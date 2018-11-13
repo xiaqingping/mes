@@ -20,12 +20,12 @@ export default class SelectLang extends PureComponent {
           </span>{' '}
           简体中文
         </Menu.Item>
-        <Menu.Item key="zh-TW">
+        {/* <Menu.Item key="zh-TW">
           <span role="img" aria-label="繁体中文">
             🇭🇰
           </span>{' '}
           繁体中文
-        </Menu.Item>
+        </Menu.Item> */}
         <Menu.Item key="en-US">
           <span role="img" aria-label="English">
             🇬🇧

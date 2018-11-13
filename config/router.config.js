@@ -256,14 +256,14 @@ export default [
         ],
       },
       {
-        name: 'shop',
+        name: 'system',
         icon: 'user',
-        path: '/shop',
+        path: '/system',
         routes: [
           {
-            path: '/shop/1',
-            name: 'shop1',
-            component: './shop/TableList',
+            path: '/system/user',
+            name: 'user',
+            component: './System/User',
           },
         ],
       },
