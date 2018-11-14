@@ -27,10 +27,7 @@ import styles from './User.less';
 import { getUser } from '@/services/user';
 
 const FormItem = Form.Item;
-// const { Step } = Steps;
-// const { TextArea } = Input;
 const { Option } = Select;
-// const RadioGroup = Radio.Group;
 
 /* eslint react/no-multi-comp:0 */
 @connect(({ rule, loading }) => ({
@@ -44,12 +41,28 @@ class TableList extends PureComponent {
     selectedRows: [],
     formValues: {},
     loading: false,
+    editingId: null,
   };
 
   columns = [
     {
       title: '员工',
       dataIndex: 'employeeCode',
+      render: (text, record) => {
+        const { editingId } = this.state;
+        const editable = record.id === editingId;
+        if (editable) {
+          return (
+            <Input
+              value={text}
+              autoFocus
+              onChange={e => this.handleFieldChange(e, 'employeeCode', record.key)}
+              placeholder="员工"
+            />
+          );
+        }
+        return text;
+      },
     },
     {
       title: '编号',
@@ -112,18 +125,20 @@ class TableList extends PureComponent {
     this.getUser(params);
   }
 
+  // 重置表单
   handleFormReset = () => {
-    const { form, dispatch } = this.props;
+    const { form } = this.props;
     form.resetFields();
     this.setState({
       formValues: {},
     });
-    dispatch({
-      type: 'rule/fetch',
-      payload: {},
-    });
+    // dispatch({
+    //   type: 'rule/fetch',
+    //   payload: {},
+    // });
   };
 
+  // 切换表单
   toggleForm = () => {
     const { expandForm } = this.state;
     this.setState({
@@ -150,6 +165,13 @@ class TableList extends PureComponent {
     // console.log('addUser');
   };
 
+  // 编辑
+  edit = id => {
+    this.setState({
+      editingId: id || 1047,
+    });
+  };
+
   // 查询
   handleSearch = e => {
     e.preventDefault();
@@ -157,15 +179,14 @@ class TableList extends PureComponent {
     const { form } = this.props;
 
     form.validateFields((err, fieldsValue) => {
-      // console.log(fieldsValue);
       if (err) return;
 
       /* eslint-disable */
-      // for (const key in fieldsValue) {
-      //   if (fieldsValue[key] === '') {
-      //     fieldsValue[key] = undefined;
-      //   }
-      // }
+      for (const key in fieldsValue) {
+        if (fieldsValue[key] === '') {
+          fieldsValue[key] = undefined;
+        }
+      }
 
       const params = {
         page: 1,
@@ -348,27 +369,42 @@ class TableList extends PureComponent {
     return expandForm ? this.renderAdvancedForm() : this.renderSimpleForm();
   }
 
+  toolbar = () => {
+    return (
+      <div className={styles.tableListOperator}>
+        <Button icon="plus" type="primary" onClick={() => this.addUser()}>
+          新增
+        </Button>
+        <Button icon="edit" type="primary" onClick={() => this.edit()}>
+          修改
+        </Button>
+        <Button icon="save" type="primary" onClick={() => this.saveUser()}>
+          保存
+        </Button>
+        <Button icon="edit" type="primary" onClick={() => this.resetPwd()}>
+          重置密码
+        </Button>
+      </div>
+    );
+  };
+
+  handleFieldChange(e, fieldName, key) {
+    const { data } = this.state;
+    const newData = data.map(item => ({ ...item }));
+    const target = this.getRowByKey(key, newData);
+    if (target) {
+      target[fieldName] = e.target.value;
+      this.setState({ data: newData });
+    }
+  }
+
+  getRowByKey(key, newData) {
+    const { data } = this.state;
+    return (newData || data).filter(item => item.key === key)[0];
+  }
+
   render() {
     const { selectedRows, data, total, loading } = this.state;
-
-    const toolbar = function() {
-      return (
-        <div className={styles.tableListOperator}>
-          <Button icon="plus" type="primary" onClick={() => this.addUser()}>
-            新增
-          </Button>
-          <Button icon="edit" type="primary" onClick={() => this.updateUser()}>
-            修改
-          </Button>
-          <Button icon="save" type="primary" onClick={() => this.saveUser()}>
-            保存
-          </Button>
-          <Button icon="edit" type="primary" onClick={() => this.resetPwd()}>
-            重置密码
-          </Button>
-        </div>
-      );
-    };
 
     return (
       <PageHeaderWrapper title="查询表格">
@@ -376,7 +412,7 @@ class TableList extends PureComponent {
           <div className={styles.tableList}>
             <div className={styles.tableListForm}>{this.renderForm()}</div>
             <Table
-              title={toolbar}
+              title={this.toolbar}
               size="small"
               rowSelection={{}}
               scroll={{ x: 1400 }}
