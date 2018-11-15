@@ -9,13 +9,22 @@ export async function queryCurrent() {
   return request('/api/currentUser');
 }
 
-// user 微服务
-// 查询用户
-export async function getUser(params) {
-  return request(`https://devapi.sangon.com:8443/api/user/v1/user/easyui?${qs.stringify(params)}`);
+// 获取验证码
+export async function getVerifycode(usercode) {
+  return request(`/user/v1/code/generate/${usercode}`);
 }
 
-// 新增用户
-export async function addUser() {
-  return request();
+// 密码登陆
+export async function loginByPwd(params) {
+  return request(`/user/v1/user/login/password/${params.usercode}/${params.password}`);
+}
+
+// 手机验证码登陆
+export async function loginByCode(params) {
+  return request(`/user/v1/user/login/verifycode/${params.usercode}/${params.verifycode}`);
+}
+
+// 查询用户
+export async function getUser(params) {
+  return request(`/user/v1/user/easyui?${qs.stringify(params)}`);
 }

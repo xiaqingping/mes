@@ -69,7 +69,7 @@ class Order extends PureComponent {
     });
   };
 
-  handleTableChange = (pagination, filtersArg, sorter) => {
+  handleTableChange = pagination => {
     // const { dispatch } = this.props;
     const { formValues } = this.state;
 
@@ -78,9 +78,6 @@ class Order extends PureComponent {
       rows: pagination.pageSize,
       ...formValues,
     };
-    if (sorter.field) {
-      params.sorter = `${sorter.field}_${sorter.order}`;
-    }
 
     this.getTableData(params);
   };
@@ -108,7 +105,7 @@ class Order extends PureComponent {
       };
 
       this.setState({
-        formValues: params,
+        formValues: fieldsValue,
       });
 
       this.getTableData(params);
@@ -158,7 +155,7 @@ class Order extends PureComponent {
     const { selectedRows, data, total, loading } = this.state;
 
     return (
-      <PageHeaderWrapper title="资源">
+      <PageHeaderWrapper>
         <Card bordered={false}>
           <div className={styles.tableList}>
             <div className={styles.tableListForm}>{this.renderForm()}</div>

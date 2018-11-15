@@ -195,7 +195,7 @@ class TableList extends PureComponent {
       };
 
       this.setState({
-        formValues: params,
+        formValues: fieldsValue,
       });
 
       this.getUser(params);
@@ -407,7 +407,7 @@ class TableList extends PureComponent {
     const { selectedRows, data, total, loading } = this.state;
 
     return (
-      <PageHeaderWrapper title="查询表格">
+      <PageHeaderWrapper>
         <Card bordered={false}>
           <div className={styles.tableList}>
             <div className={styles.tableListForm}>{this.renderForm()}</div>

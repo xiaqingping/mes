@@ -3,6 +3,9 @@ import { notification } from 'antd';
 // import router from 'umi/router';
 import hash from 'hash.js';
 import { isAntdPro } from './utils';
+import { baseURL, baseUrlConfig } from './baseURL';
+
+const baseUrl = baseURL();
 
 /**
  * Requests a URL, returning a promise.
@@ -70,8 +73,21 @@ export default function request(url, option) {
     }
   }
 
+  let finalURL = '';
+  // 根据 baseURL 和 baseUrlConfig 生成最终的 url
+  if (url.indexOf('/api') !== 0) {
+    const service = url.split('/')[1];
+    if (baseUrlConfig[service]) {
+      finalURL = baseUrlConfig[service] + url;
+    } else {
+      finalURL = baseUrl + url;
+    }
+  } else {
+    finalURL = url;
+  }
+
   return new Promise((resolve, reject) => {
-    axios(url, newOptions)
+    axios(finalURL, newOptions)
       .then(res => {
         resolve(res.data);
       })
