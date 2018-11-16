@@ -6,8 +6,6 @@ import { Checkbox, Alert, Icon } from 'antd';
 import Login from '@/components/Login';
 import styles from './Login.less';
 
-import { loginByPwd, loginByCode, getVerifycode } from '@/services/user';
-
 const { Tab, UserName, Password, Mobile, Captcha, Submit } = Login;
 
 @connect(({ login, loading }) => ({
@@ -27,47 +25,31 @@ class LoginPage extends Component {
   onGetCaptcha = () =>
     new Promise((resolve, reject) => {
       this.loginForm.validateFields(['usercode'], {}, (err, values) => {
-        console.log(values);
         if (err) {
           reject(err);
         } else {
-          // const { dispatch } = this.props;
-          // dispatch({
-          //   type: 'login/getCaptcha',
-          //   payload: values.usercode,
-          // })
-          //   .then(resolve)
-          //   .catch(reject);
-          getVerifycode(values.usercode).then(res => {
-            console.log(res);
-          });
+          const { dispatch } = this.props;
+          dispatch({
+            type: 'login/getCaptcha',
+            payload: values.usercode,
+          })
+            .then(resolve)
+            .catch(reject);
         }
       });
     });
 
   handleSubmit = (err, values) => {
-    console.log(values);
     const { type } = this.state;
     if (!err) {
-      // const { dispatch } = this.props;
-      // dispatch({
-      //   type: 'login/login',
-      //   payload: {
-      //     ...values,
-      //     type,
-      //   },
-      // });
-      const cb = res => {
-        localStorage.user = JSON.stringify(res);
-        localStorage.Authorization = res.authorization;
-        localStorage['antd-pro-authority'] = JSON.stringify(['admin']);
-      };
-
-      if (type === 'account') {
-        loginByPwd(values).then(res => cb(res));
-      } else {
-        loginByCode(values).then(res => cb(res));
-      }
+      const { dispatch } = this.props;
+      dispatch({
+        type: 'login/login',
+        payload: {
+          ...values,
+          type,
+        },
+      });
     }
   };
 

@@ -15,7 +15,7 @@ export default {
           hmr: true,
         },
         targets: {
-          ie: 9,
+          ie: 11,
         },
         locale: {
           enable: true, // default false
@@ -45,7 +45,7 @@ export default {
     ],
   ],
   targets: {
-    ie: 9,
+    ie: 11,
   },
   define: {
     APP_TYPE: process.env.APP_TYPE || '',
