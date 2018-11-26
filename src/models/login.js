@@ -28,6 +28,11 @@ export default {
       localStorage.Authorization = response.authorization;
 
       yield put({
+        type: 'user/saveCurrentUser',
+        payload: response,
+      });
+
+      yield put({
         type: 'changeLoginStatus',
         payload: response,
       });
