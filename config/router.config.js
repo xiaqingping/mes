@@ -17,7 +17,7 @@ export default [
       // 产品
       {
         name: 'product',
-        icon: 'user',
+        icon: 'home',
         path: '/product',
         routes: [
           {

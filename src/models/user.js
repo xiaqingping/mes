@@ -5,7 +5,10 @@ export default {
 
   state: {
     list: [],
-    currentUser: {},
+    currentUser: {
+      name: 'Max1',
+      avatar: 'https://blog.maxmeng.top/images/avatar.jpg',
+    },
   },
 
   effects: {
