@@ -10,8 +10,7 @@ export default {
   },
 
   effects: {
-    login({payload}, {call, put}) {
-      console.log(payload);
+    login({ payload }) {
       let login;
       if (payload.type === 'account') {
         login = user.loginByPwd;
@@ -40,6 +39,6 @@ export default {
         }
         router.replace(redirect || '/');
       });
-    }
-  }
-}
+    },
+  },
+};

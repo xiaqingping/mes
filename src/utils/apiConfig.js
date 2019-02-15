@@ -15,5 +15,5 @@
 
 // 微服务接口配置（替换掉特定微服务的baseURL）
 export default {
-  user: ''
+  user: '',
 };

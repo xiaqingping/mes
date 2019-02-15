@@ -35,4 +35,13 @@ export default {
   'menu.account.settings': '个人设置',
   'menu.account.trigger': '触发报错',
   'menu.account.logout': '退出登录',
+  'menu.product': '产品管理',
+  'menu.product.categorys': '产品分类',
+  'menu.product.extends': '产品扩展信息',
+  'menu.product.promotions': '产品促销信息',
+  'menu.seq': '测序管理',
+  'menu.seq.order': '测序订单',
+  'menu.admin': '系统管理',
+  'menu.admin.user': '用户管理',
+  'menu.admin.source': '资源',
 };

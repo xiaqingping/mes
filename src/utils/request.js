@@ -38,7 +38,7 @@ axios.interceptors.request.use(req => {
  */
 export default function request(url, options) {
   const defaultOptions = {
-    withCredentials: true
+    withCredentials: true,
   };
   const newOptions = { ...defaultOptions, ...options };
   if (
@@ -50,24 +50,24 @@ export default function request(url, options) {
       newOptions.headers = {
         Accept: 'application/json',
         'Content-Type': 'application/json; charset=utf-8',
-        ...newOptions.headers
+        ...newOptions.headers,
       };
       newOptions.body = JSON.stringify(newOptions.body);
     } else {
       // newOptions.body is FormData
       newOptions.headers = {
         Accept: 'application/json',
-        ...newOptions.headers
+        ...newOptions.headers,
       };
     }
   }
 
   return new Promise((resolve, reject) => {
     axios(url, newOptions)
-      .then((res) => {
+      .then(res => {
         resolve(res.data);
       })
-      .catch((error) => {
+      .catch(error => {
         const { response } = error;
         const { data } = response;
 

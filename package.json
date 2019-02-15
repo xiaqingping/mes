@@ -1,6 +1,6 @@
 {
-  "name": "ant-design-pro",
-  "version": "2.1.1",
+  "name": "mes",
+  "version": "1.0.0",
   "description": "An out-of-box UI solution for enterprise applications",
   "private": true,
   "scripts": {
@@ -30,11 +30,12 @@
     "lodash-decorators": "^6.0.0",
     "memoize-one": "^4.0.0",
     "moment": "^2.22.2",
+    "omit.js": "^1.0.0",
     "path-to-regexp": "^2.4.0",
     "prop-types": "^15.5.10",
     "qs": "^6.6.0",
     "rc-animate": "^2.4.4",
-    "react": "^16.6.3",
+    "react": "^16.8.2",
     "react-container-query": "^0.11.0",
     "react-document-title": "^2.0.3",
     "react-media": "^1.8.0"
@@ -53,7 +54,7 @@
     "eslint-plugin-markdown": "^1.0.0-beta.6",
     "eslint-plugin-react": "^7.11.1",
     "husky": "^1.2.0",
-    "lint-staged": "^8.1.0",
+    "lint-staged": "^8.1.4",
     "prettier": "1.15.2",
     "stylelint": "^9.8.0",
     "stylelint-config-prettier": "^4.0.0",
@@ -73,6 +74,18 @@
   "engines": {
     "node": ">=8.0.0"
   },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not ie <= 10"
+  ],
+  "checkFiles": [
+    "src/**/*.js*",
+    "src/**/*.ts*",
+    "src/**/*.less",
+    "config/**/*.js*",
+    "scripts/**/*.js"
+  ],
   "husky": {
     "hooks": {
       "pre-commit": "npm run lint-staged"

@@ -2,6 +2,7 @@
  * 用户服务
  * https://devapi.sangon.com:8443/api/user/swagger-ui.html
  */
+import qs from 'qs';
 import request from '@/utils/request';
 
 export default {
@@ -11,14 +12,14 @@ export default {
   },
   // 密码登陆
   loginByPwd(params) {
-    return request(
-      `/user/v1/user/login/password/${params.usercode}/${params.password}`
-    );
+    return request(`/user/v1/user/login/password/${params.usercode}/${params.password}`);
   },
   // 手机验证码登录
   loginByCode(params) {
-    return request(
-      `/user/v1/user/login/verifycode/${params.mobile}/${params.captcha}`
-    );
-  }
+    return request(`/user/v1/user/login/verifycode/${params.mobile}/${params.captcha}`);
+  },
+  // 查询用户
+  getUser(params) {
+    return request(`/user/v1/user/easyui?${qs.stringify(params)}`);
+  },
 };
