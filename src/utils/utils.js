@@ -1,6 +1,6 @@
 import moment from 'moment';
 import React from 'react';
-import nzh from 'nzh/cn';
+// import nzh from 'nzh/cn';
 import { parse, stringify } from 'qs';
 
 export function fixedZero(val) {
@@ -70,24 +70,24 @@ export function getPlainNode(nodeList, parentPath = '') {
   return arr;
 }
 
-export function digitUppercase(n) {
-  return nzh.toMoney(n);
-}
+// export function digitUppercase(n) {
+//   return nzh.toMoney(n);
+// }
 
-function getRelation(str1, str2) {
-  if (str1 === str2) {
-    console.warn('Two path are equal!'); // eslint-disable-line
-  }
-  const arr1 = str1.split('/');
-  const arr2 = str2.split('/');
-  if (arr2.every((item, index) => item === arr1[index])) {
-    return 1;
-  }
-  if (arr1.every((item, index) => item === arr2[index])) {
-    return 2;
-  }
-  return 3;
-}
+// function getRelation(str1, str2) {
+//   if (str1 === str2) {
+//     console.warn('Two path are equal!'); // eslint-disable-line
+//   }
+//   const arr1 = str1.split('/');
+//   const arr2 = str2.split('/');
+//   if (arr2.every((item, index) => item === arr1[index])) {
+//     return 1;
+//   }
+//   if (arr1.every((item, index) => item === arr2[index])) {
+//     return 2;
+//   }
+//   return 3;
+// }
 
 function getRenderArr(routes) {
   let renderArr = [];
@@ -161,12 +161,11 @@ export function formatWan(val) {
       <span>
         {result}
         <span
-          styles={{
+          style={{
             position: 'relative',
             top: -2,
             fontSize: 14,
             fontStyle: 'normal',
-            lineHeight: 20,
             marginLeft: 2,
           }}
         >
@@ -178,6 +177,7 @@ export function formatWan(val) {
   return result;
 }
 
+// 给官方演示站点用，用于关闭真实开发环境不需要使用的特性
 export function isAntdPro() {
   return window.location.hostname === 'preview.pro.ant.design';
 }

@@ -1,30 +1,24 @@
-import qs from 'qs';
+/*
+ * 用户服务
+ * https://devapi.sangon.com:8443/api/user/swagger-ui.html
+ */
 import request from '@/utils/request';
 
-export async function query() {
-  return request('/api/users');
-}
-
-export async function queryCurrent() {
-  return request('/api/currentUser');
-}
-
-// 获取验证码
-export async function getVerifycode(usercode) {
-  return request(`/user/v1/code/generate/${usercode}`);
-}
-
-// 密码登陆
-export async function loginByPwd(params) {
-  return request(`/user/v1/user/login/password/${params.usercode}/${params.password}`);
-}
-
-// 手机验证码登陆
-export async function loginByCode(params) {
-  return request(`/user/v1/user/login/verifycode/${params.usercode}/${params.verifycode}`);
-}
-
-// 查询用户
-export async function getUser(params) {
-  return request(`/user/v1/user/easyui?${qs.stringify(params)}`);
-}
+export default {
+  // 获取验证码
+  getCaptcha(mobile) {
+    return request(`/user/v1/code/generate/${mobile}`);
+  },
+  // 密码登陆
+  loginByPwd(params) {
+    return request(
+      `/user/v1/user/login/password/${params.usercode}/${params.password}`
+    );
+  },
+  // 手机验证码登录
+  loginByCode(params) {
+    return request(
+      `/user/v1/user/login/verifycode/${params.mobile}/${params.captcha}`
+    );
+  }
+};

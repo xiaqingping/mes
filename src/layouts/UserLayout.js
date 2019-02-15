@@ -2,7 +2,7 @@ import React, { Fragment } from 'react';
 import { formatMessage } from 'umi/locale';
 import Link from 'umi/link';
 import { Icon } from 'antd';
-import GlobalFooter from '@/components/GlobalFooter';
+import { GlobalFooter } from 'ant-design-pro';
 import SelectLang from '@/components/SelectLang';
 import styles from './UserLayout.less';
 import logo from '../assets/logo.svg';
@@ -27,7 +27,7 @@ const links = [
 
 const copyright = (
   <Fragment>
-    Copyright <Icon type="copyright" /> 2018 生工信息部出品
+    Copyright <Icon type="copyright" /> 2018 蚂蚁金服体验技术部出品
   </Fragment>
 );
 

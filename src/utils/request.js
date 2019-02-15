@@ -1,39 +1,44 @@
 import axios from 'axios';
 import { notification } from 'antd';
 // import router from 'umi/router';
-import hash from 'hash.js';
-import { isAntdPro } from './utils';
-import { baseURL, baseUrlConfig } from './baseURL';
+import apiConfig from './apiConfig';
 
-const baseUrl = baseURL();
+axios.interceptors.request.use(req => {
+  const baseURL = 'https://devapi.sangon.com:8443/api'; // TODO:
+  const token = localStorage.Authorization;
+  // const user = {};
+
+  // 根据 baseURL 、 apiconfig req.url 得出最终要请求的 url
+  const { url } = req;
+  if (url.indexOf('/api/') === 0 || url.indexOf('http') === 0) {
+    // 什么也不做
+  } else {
+    const service = url.split('/')[1];
+    if (apiConfig[service]) {
+      req.url = apiConfig[service] + url;
+    } else {
+      req.url = baseURL + url;
+    }
+  }
+
+  // 为所有请求都设置token
+  if (token) {
+    req.headers.common.Authorization = token;
+    // req.headers.common.usercode = user.loginCode;
+    // req.headers.common.username = user.name;
+  }
+  return req;
+});
 
 /**
- * Requests a URL, returning a promise.
- *
- * @param  {string} url       The URL we want to request
- * @param  {object} [option] The options we want to pass to "fetch"
- * @return {object}           An object containing either "data" or "err"
+ * 请求数据，返回Promise
+ * @param {String} url 请求url
+ * @param {Object} options axios请求参数
+ * @return {Object}
  */
-export default function request(url, option) {
-  const options = {
-    expirys: isAntdPro(),
-    ...option,
-  };
-  /**
-   * Produce fingerprints based on url and parameters
-   * Maybe url has the same parameters
-   */
-  const fingerprint = url + (options.body ? JSON.stringify(options.body) : '');
-  const hashcode = hash
-    .sha256()
-    .update(fingerprint)
-    .digest('hex');
-
+export default function request(url, options) {
   const defaultOptions = {
-    withCredentials: 'true', // 携带cookie
-    headers: {
-      Authorization: localStorage.Authorization, // 携带Token验证
-    },
+    withCredentials: true
   };
   const newOptions = { ...defaultOptions, ...options };
   if (
@@ -45,53 +50,24 @@ export default function request(url, option) {
       newOptions.headers = {
         Accept: 'application/json',
         'Content-Type': 'application/json; charset=utf-8',
-        ...newOptions.headers,
+        ...newOptions.headers
       };
       newOptions.body = JSON.stringify(newOptions.body);
     } else {
       // newOptions.body is FormData
       newOptions.headers = {
         Accept: 'application/json',
-        ...newOptions.headers,
+        ...newOptions.headers
       };
     }
   }
 
-  const expirys = options.expirys && 60;
-  // options.expirys !== false, return the cache,
-  if (options.expirys !== false) {
-    const cached = sessionStorage.getItem(hashcode);
-    const whenCached = sessionStorage.getItem(`${hashcode}:timestamp`);
-    if (cached !== null && whenCached !== null) {
-      const age = (Date.now() - whenCached) / 1000;
-      if (age < expirys) {
-        const response = new Response(new Blob([cached]));
-        return response.json();
-      }
-      sessionStorage.removeItem(hashcode);
-      sessionStorage.removeItem(`${hashcode}:timestamp`);
-    }
-  }
-
-  let finalURL = '';
-  // 根据 baseURL 和 baseUrlConfig 生成最终的 url
-  if (url.indexOf('/api') !== 0) {
-    const service = url.split('/')[1];
-    if (baseUrlConfig[service]) {
-      finalURL = baseUrlConfig[service] + url;
-    } else {
-      finalURL = baseUrl + url;
-    }
-  } else {
-    finalURL = url;
-  }
-
   return new Promise((resolve, reject) => {
-    axios(finalURL, newOptions)
-      .then(res => {
+    axios(url, newOptions)
+      .then((res) => {
         resolve(res.data);
       })
-      .catch(error => {
+      .catch((error) => {
         const { response } = error;
         const { data } = response;
 
