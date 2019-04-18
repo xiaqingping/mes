@@ -5,8 +5,8 @@ export default () => {
   axios.interceptors.request.use(request => {
     let baseURL = '';
     if (process.env.NODE_ENV === 'development') {
-      baseURL = 'https://devapi.sangon.com:8443/api';
-      // baseURL = 'https://preapi.sangon.com/api';
+      // baseURL = 'https://devapi.sangon.com:8443/api';
+      baseURL = 'https://preapi.sangon.com/api';
     } else if (process.env.NODE_ENV === 'production') {
       baseURL = 'https://api.sangon.com/api';
     }

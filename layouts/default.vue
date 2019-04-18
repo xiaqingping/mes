@@ -1,9 +1,9 @@
 <template>
   <div class="default-layout">
     <div class="left">
-      <side-nav />
+      <side-nav :collapsed="collapsed" />
     </div>
-    <div class="content">
+    <div class="content" :class="{'content-open': collapsed}">
       <global-header
         :mode="mode"
         :menus="menus"
@@ -17,6 +17,8 @@
 </template>
 
 <script>
+import { mapState } from 'vuex';
+
 import SideNav from '~/components/SideNav';
 import GlobalHeader from '~/components/GlobalHeader';
 
@@ -25,22 +27,19 @@ export default {
     SideNav,
     GlobalHeader
   },
-  props: {
-    // collapsed: {
-    //   type: Boolean,
-    //   required: false,
-    //   default: false
-    // }
-  },
   data() {
     return {
       collapsible: true,
-      collapsed: false,
       device: 'desktop',
       menus: [],
       mode: 'sidemenu',
       theme: 'dark'
     };
+  },
+  computed: {
+    ...mapState({
+      collapsed: state => state.setting.collapsed
+    })
   }
 };
 </script>
@@ -69,5 +68,8 @@ html {
 
 .content {
   margin-left: 256px;
+  &.content-open {
+    margin-left: 80px;
+  }
 }
 </style>

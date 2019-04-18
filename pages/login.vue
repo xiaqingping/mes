@@ -195,7 +195,7 @@ export default {
 
           const hide = this.$message.loading('验证码发送中..', 0);
           user
-            .getVerifycode({ mobile: values.mobile })
+            .getVerifycode(values.mobile)
             .then(res => {
               setTimeout(hide, 2500);
               this.$notification.success({

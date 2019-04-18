@@ -1,5 +1,4 @@
 <template>
-  <!-- , width: fixedHeader ? `calc(100% - ${sidebarOpened ? 256 : 80}px)` : '100%'  -->
   <a-layout-header v-if="!headerBarFixed" :class="[fixedHeader && 'ant-header-fixedHeader', sidebarOpened ? 'ant-header-side-opened' : 'ant-header-side-closed', ]" :style="{ padding: '0' }">
     <div v-if="mode === 'sidemenu'" class="header">
       <a-icon
@@ -21,23 +20,15 @@
 
 <script>
 import UserMenu from './tools/UserMenu';
-// import SMenu from '../menu/';
-// import Logo from '../tools/Logo';
-
-// import { mixin } from '@/utils/mixin.js';
 
 export default {
   name: 'GlobalHeader',
   components: {
     UserMenu
-    // SMenu,
-    // Logo
   },
-  // mixins: [mixin],
   props: {
     mode: {
       type: String,
-      // sidemenu, topmenu
       default: 'sidemenu'
     },
     menus: {
@@ -84,7 +75,7 @@ export default {
       }
     },
     toggle() {
-      this.$emit('toggle');
+      this.$store.commit('setting/toggleSideMenu');
     }
   }
 };
