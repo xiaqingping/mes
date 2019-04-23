@@ -164,8 +164,7 @@ export default {
           const login = customActiveKey === 'usercode' ? user.loginByPwd : user.loginByCode;
           login(loginParams)
             .then(res => {
-              sessionStorage.authorization = res.authorization;
-              this.loginSuccess();
+              this.loginSuccess(res);
             })
             .finally(() => (state.loginBtn = false));
         } else {
@@ -215,9 +214,6 @@ export default {
         }
       });
     },
-    stepCaptchaSuccess () {
-      this.loginSuccess();
-    },
     stepCaptchaCancel () {
       this.Logout().then(() => {
         this.loginBtn = false;
@@ -225,6 +221,7 @@ export default {
       });
     },
     loginSuccess (res) {
+      sessionStorage.setItem('TOKEN', res.authorization);
       this.$router.push('/');
       // 延迟 1 秒显示欢迎信息
       setTimeout(() => {

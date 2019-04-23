@@ -4,7 +4,10 @@
 
 <script>
 export default {
-  name: 'SystemUser'
+  name: 'SystemUser',
+  mounted () {
+
+  }
 };
 </script>
 
