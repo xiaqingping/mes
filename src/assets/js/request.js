@@ -1,64 +1,80 @@
+import Vue from 'vue';
 import axios from 'axios';
+// import store from '@/store';
 import notification from 'ant-design-vue/es/notification';
+// import { ACCESS_TOKEN } from '@/store/mutation-types';
 
-// const baseURL = 'https://devapi.sangon.com:8443/api';
-const baseURL = 'https://preapi.sangon.com/api';
-axios.defaults.baseURL = baseURL;
+let baseURL = '';
+if (process.env.NODE_ENV === 'development') {
+  // baseURL = 'https://devapi.sangon.com:8443/api';
+  baseURL = 'https://preapi.sangon.com/api';
+} else if (process.env.NODE_ENV === 'production') {
+  if (process.env.BASE_URL_TYPE === 'dev') {
+    baseURL = 'https://devapi.sangon.com:8443/api';
+  } else if (process.env.BASE_URL_TYPE === 'test') {
+    baseURL = 'https://testapi.sangon.com:8443/api';
+  } else if (process.env.BASE_URL_TYPE === 'produce') {
+    baseURL = 'https://api.sangon.com/api';
+  } else {
+    baseURL = 'https://devapi.sangon.com:8443/api';
+  }
+}
 
-/**
- * 请求数据
- * @param {String} url 请求url
- * @param {Object} options axios请求参数
- * @return {Object}
- */
-export default function request (url, options) {
-  const defaultOptions = {
-    withCredentials: true
-  };
-  const newOptions = { ...defaultOptions, ...options };
-  if (newOptions.method === 'POST' || newOptions.method === 'PUT' || newOptions.method === 'DELETE') {
-    if (!(newOptions.body instanceof FormData)) {
-      newOptions.headers = {
-        Accept: 'application/json',
-        'Content-Type': 'application/json; charset=utf-8',
-        ...newOptions.headers
-      };
-      newOptions.body = JSON.stringify(newOptions.body);
+// 创建 axios 实例
+const service = axios.create({
+  // baseURL: baseURL, // api base_url
+  timeout: 6000 // 请求超时时间
+});
+
+const err = (error) => {
+  if (error.response) {
+    let errMsg = ['系统异常,请与系统管理员联系!'];
+    const data = error.response && error.response.data;
+
+    if (data) {
+      if (data.message) {
+        errMsg = [data.message];
+      }
+      if (data.details && data.details.length > 0) {
+        errMsg = [].concat(errMsg, data.details);
+      }
+
+      if (data.type === 41 && data.code === 40000) {
+        Vue.ls.remove('TOKEN');
+        window.location.reload();
+      }
     } else {
-      // newOptions.body is FormData
-      newOptions.headers = {
-        Accept: 'application/json',
-        ...newOptions.headers
-      };
+      errMsg = [errMsg];
     }
+
+    notification.error({
+      message: (data && data.desc) || '错误提示',
+      description: errMsg.join('，') || '请求错误！'
+    });
+  }
+  return Promise.reject(error);
+};
+
+// 请求拦截
+service.interceptors.request.use(config => {
+  // 添加 baseURL
+  if (config.url.indexOf('/oldapi') !== 0) {
+    config.url = baseURL + config.url;
+  } else {
+    config.url = baseURL + config.url;
+    config.url = config.url.replace('/api/oldapi', '');
   }
 
-  return new Promise((resolve, reject) => {
-    axios(url, newOptions)
-      .then(function (res) {
-        resolve(res.data);
-      })
-      .catch(function (error) {
-        let errMsg = '系统异常,请与系统管理员联系!';
-        const err = error.response && error.response.data;
+  const token = Vue.ls.get('TOKEN');
+  if (token) {
+    config.headers['Authorization'] = token;
+  }
+  return config;
+}, err);
 
-        if (err) {
-          if (err.message) {
-            errMsg = [err.message];
-          }
-          if (err.details && err.details.length > 0) {
-            errMsg = [].concat(errMsg, err.details);
-          }
-        } else {
-          errMsg = [errMsg];
-        }
+// 响应拦截
+service.interceptors.response.use((response) => {
+  return response.data;
+}, err);
 
-        notification.error({
-          message: (err && err.desc) || '错误提示',
-          description: errMsg.join('，') || '请求错误！'
-        });
-
-        reject(err);
-      });
-  });
-}
+export default service;

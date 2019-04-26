@@ -7,7 +7,8 @@ export default new Vuex.Store({
   modules: {
   },
   state: {
-    collapsed: false
+    collapsed: false,
+    theme: 'dark'
   },
   mutations: {
     // 切换侧栏导航的展开与关闭

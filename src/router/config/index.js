@@ -10,7 +10,7 @@ export const asyncRouterMap = [
     name: 'index',
     component: BasicLayout,
     meta: { title: '首页' },
-    redirect: '/system/user',
+    redirect: '/seq/sample_order',
     children: [
       seq,
       system

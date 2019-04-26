@@ -61,7 +61,8 @@ export default {
         title: '提示',
         content: '真的要注销登录吗 ?',
         onOk () {
-          that.$router.push('/login');
+          that.$ls.remove('TOKEN');
+          that.$router.push('/user/login');
         },
         onCancel () {}
       });

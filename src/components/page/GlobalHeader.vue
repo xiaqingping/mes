@@ -31,10 +31,6 @@ export default {
       type: String,
       default: 'sidemenu'
     },
-    menus: {
-      type: Array,
-      required: true
-    },
     theme: {
       type: String,
       required: false,

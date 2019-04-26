@@ -5,6 +5,7 @@ import cart from './cart';
 import content from './content';
 import coupon from './coupon';
 import integral from './integral';
+import oldapi from './oldapi';
 import paymentRequest from './payment_request';
 import personal from './personal';
 import primer from './primer';
@@ -23,6 +24,7 @@ export {
   content,
   coupon,
   integral,
+  oldapi,
   paymentRequest,
   personal,
   primer,
@@ -42,6 +44,7 @@ export default {
   content,
   coupon,
   integral,
+  oldapi,
   paymentRequest,
   personal,
   primer,

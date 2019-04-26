@@ -221,15 +221,14 @@ export default {
       });
     },
     loginSuccess (res) {
-      sessionStorage.setItem('TOKEN', res.authorization);
-      this.$router.push('/');
-      // 延迟 1 秒显示欢迎信息
-      setTimeout(() => {
-        this.$notification.success({
-          message: '欢迎',
-          description: `欢迎回来`
-        });
-      }, 1000);
+      this.$ls.set('TOKEN', res.authorization);
+      const redirect = this.$route.query.redirect;
+      this.$router.push(redirect || '/');
+
+      this.$notification.success({
+        message: '欢迎',
+        description: `${res.name}，欢迎回来`
+      });
     }
   }
 };

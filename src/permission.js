@@ -1,4 +1,4 @@
-// import Vue from 'vue';
+import Vue from 'vue';
 import router from './router';
 // import store from './store';
 
@@ -11,7 +11,7 @@ const whiteList = ['login']; // 白名单不会重定向
 
 router.beforeEach((to, from, next) => {
   NProgress.start(); // start progress bar
-  const TOKEN = sessionStorage.getItem('TOKEN');
+  const TOKEN = Vue.ls.get('TOKEN');
   if (TOKEN) {
     if (to.path === '/user/login') {
       next({ path: '/' });

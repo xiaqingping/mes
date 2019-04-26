@@ -24,5 +24,12 @@ export default {
   // 退出登录
   logout (token) {
     return request(`/user/v1/user/logout/${token}`);
+  },
+
+  // 查询用户列表
+  getUser (params) {
+    return request(`/user/v1/user/easyui`, {
+      params
+    });
   }
 };
