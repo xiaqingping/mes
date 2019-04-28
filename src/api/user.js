@@ -27,9 +27,7 @@ export default {
   },
 
   // 查询用户列表
-  getUser (params) {
-    return request(`/user/v1/user/easyui`, {
-      params
-    });
+  getUserList (params) {
+    return request(`/user/v1/user/easyui`, { params });
   }
 };

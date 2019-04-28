@@ -11,6 +11,7 @@ import personal from './personal';
 import primer from './primer';
 import product from './product';
 import sample from './sample';
+import sampleorder from './sampleorder';
 import sampletype from './sampletype';
 import seqorder from './seqorder';
 import synthorder from './synthorder';
@@ -30,6 +31,7 @@ export {
   primer,
   product,
   sample,
+  sampleorder,
   sampletype,
   seqorder,
   synthorder,
@@ -50,6 +52,7 @@ export default {
   primer,
   product,
   sample,
+  sampleorder,
   sampletype,
   seqorder,
   synthorder,

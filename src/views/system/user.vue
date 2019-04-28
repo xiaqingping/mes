@@ -1,19 +1,24 @@
 <template>
-  <div>
+  <div class="page">
     <!-- <h1>用户管理</h1> -->
-    <a-table
-      :rowKey="item => item.id"
+    <s-table
+      ref="table"
+      size="default"
+      :scroll="{ x: 1500 }"
       :columns="columns"
-      :dataSource="list">
-    </a-table>
-  </div>
+      :data="loadData"
+      :rowSelection="{ selectedRowKeys: selectedRowKeys, onChange: onSelectChange }"
+    >
+    </s-table></div>
 </template>
 
 <script>
-import api from '@/api';
-
+import STable from '@/components/Table';
 export default {
   name: 'SystemUser',
+  components: {
+    STable
+  },
   data () {
     return {
       columns: [
@@ -21,16 +26,38 @@ export default {
         { title: '编号', dataIndex: 'loginCode' },
         { title: '姓名', dataIndex: 'name' },
         { title: '角色', dataIndex: 'roleID' },
-        { title: '大区', dataIndex: 'regionCode' }
+        { title: '大区', dataIndex: 'regionCode' },
+        { title: '网点', dataIndex: 'officeCode' },
+        { title: '客户', dataIndex: 'customerCode' },
+        { title: '测序点', dataIndex: 'cxPointId' },
+        { title: '仓库', dataIndex: 'storageCode' },
+        { title: '状态', dataIndex: 'isdel' },
+        { title: '登录时间', dataIndex: 'loginDate' },
+        { title: '创建时间', dataIndex: 'createDate' },
+        { title: 'ID', dataIndex: 'code' }
       ],
-      list: []
+      queryParam: {},
+      loadData: parameter => {
+        const params = Object.assign(parameter, this.queryParam);
+        return this.$api.user.getUserList(params).then(res => {
+          return {
+            data: res.rows,
+            rows: params.rows,
+            page: params.page,
+            total: res.total
+          };
+        });
+      },
+      selectedRowKeys: [],
+      selectedRows: []
     };
   },
-  mounted () {
-    // api.oldapi.getRole().then(res => console.log(res));
-    api.user.getUser({ page: 1, rows: 10 }).then(res => {
-      this.list = res.rows;
-    });
+  mounted () {},
+  methods: {
+    onSelectChange (selectedRowKeys, selectedRows) {
+      this.selectedRowKeys = selectedRowKeys;
+      this.selectedRows = selectedRows;
+    }
   }
 };
 </script>

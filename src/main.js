@@ -6,6 +6,7 @@ import router from './router';
 import store from './store';
 import Antd from 'ant-design-vue';
 import 'ant-design-vue/dist/antd.css';
+import api from './api';
 
 // 权限控制
 import './permission';
@@ -21,6 +22,7 @@ const options = {
 
 Vue.use(Storage, options);
 Vue.use(Antd);
+Vue.prototype.$api = api;
 
 new Vue({
   router,

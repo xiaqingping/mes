@@ -16,9 +16,12 @@
         :collapsed="collapsed"
         :device="device"
       />
-      <a-layout-content style="background:#fff;">
+      <a-layout-content>
         <slot></slot>
       </a-layout-content>
+      <!-- <a-layout-footer style="padding: 0;">
+        <global-footer></global-footer>
+      </a-layout-footer> -->
     </a-layout>
   </a-layout>
 </template>
@@ -107,6 +110,6 @@ html {
   box-sizing: border-box;
 }
 .default-layout {
-  min-height: 100%;
+  height: 100%;
 }
 </style>

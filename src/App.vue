@@ -15,4 +15,8 @@ export default {
   #app {
     height: 100%;
   }
+  .page {
+    margin: 20px;
+    background: #fff;
+  }
 </style>
