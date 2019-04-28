@@ -1,10 +1,13 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 
+import seq from './modules/seq';
+
 Vue.use(Vuex);
 
 export default new Vuex.Store({
   modules: {
+    seq
   },
   state: {
     collapsed: false,

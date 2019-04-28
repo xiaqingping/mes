@@ -78,7 +78,6 @@ export default {
         return this.$api.sampleorder.getOrderList(params).then(res => {
           return {
             data: res.rows,
-            rows: params.rows,
             page: params.page,
             total: res.total
           };

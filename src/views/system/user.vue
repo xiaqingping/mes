@@ -14,6 +14,7 @@
 
 <script>
 import STable from '@/components/Table';
+
 export default {
   name: 'SystemUser',
   components: {
@@ -42,7 +43,6 @@ export default {
         return this.$api.user.getUserList(params).then(res => {
           return {
             data: res.rows,
-            rows: params.rows,
             page: params.page,
             total: res.total
           };

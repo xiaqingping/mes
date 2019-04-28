@@ -27,7 +27,7 @@ export default {
       type: Number,
       default: 1
     },
-    rows: {
+    pageSize: {
       type: Number,
       default: 10
     },
@@ -53,6 +53,11 @@ export default {
       type: Object,
       default: null
     },
+    /** @Deprecated */
+    showAlertInfo: {
+      type: Boolean,
+      default: false
+    },
     showPagination: {
       type: String | Boolean,
       default: 'auto'
@@ -77,7 +82,7 @@ export default {
         ...this.$route,
         name: this.$route.name,
         params: Object.assign({}, this.$route.params, {
-          page: val
+          pageNo: val
         })
       });
     },
@@ -86,9 +91,9 @@ export default {
         current: val
       });
     },
-    rows (val) {
+    pageSize (val) {
       Object.assign(this.localPagination, {
-        rows: val
+        pageSize: val
       });
     },
     showSizeChanger (val) {
@@ -98,11 +103,11 @@ export default {
     }
   },
   created () {
-    const { page } = this.$route.params;
-    const localPageNum = this.pageURI && (page && parseInt(page)) || this.pageNum;
+    const { pageNo } = this.$route.params;
+    const localPageNum = this.pageURI && (pageNo && parseInt(pageNo)) || this.pageNum;
     this.localPagination = ['auto', true].includes(this.showPagination) && Object.assign({}, this.localPagination, {
       current: localPageNum,
-      rows: this.rows,
+      pageSize: this.pageSize,
       showSizeChanger: this.showSizeChanger
     });
     this.needTotalList = this.initTotalList(this.columns);
@@ -116,7 +121,7 @@ export default {
      */
     refresh (bool = false) {
       bool && (this.localPagination = Object.assign({}, {
-        current: 1, rows: this.rows
+        current: 1, pageSize: this.pageSize
       }));
       this.loadData();
     },
@@ -131,8 +136,8 @@ export default {
       const parameter = Object.assign({
         page: (pagination && pagination.current) ||
             this.localPagination.current || this.pageNum,
-        rows: (pagination && pagination.rows) ||
-            this.localPagination.rows || this.rows
+        rows: (pagination && pagination.pageSize) ||
+            this.localPagination.pageSize || this.pageSize
       },
       (sorter && sorter.field && {
         sortField: sorter.field
@@ -152,8 +157,8 @@ export default {
             current: r.page, // 返回结果中的当前分页数
             total: r.total, // 返回结果中的总记录数
             showSizeChanger: this.showSizeChanger,
-            rows: (pagination && pagination.rows) ||
-              this.localPagination.rows
+            pageSize: (pagination && pagination.pageSize) ||
+              this.localPagination.pageSize
           });
           // 为防止删除数据后导致页面当前页面数据长度为 0 ,自动翻页到上一页
           if (r.data.length === 0 && this.localPagination.current > 1) {
@@ -210,6 +215,46 @@ export default {
         this.rowSelection.onChange([], []);
         this.updateSelect([], []);
       }
+    },
+    /**
+     * 处理交给 table 使用者去处理 clear 事件时，内部选中统计同时调用
+     * @param callback
+     * @returns {*}
+     */
+    renderClear (callback) {
+      if (this.selectedRowKeys.length <= 0) return null;
+      return (
+        <a style="margin-left: 24px" onClick={() => {
+          callback();
+          this.clearSelected();
+        }}>清空</a>
+      );
+    },
+    renderAlert () {
+      // 绘制统计列数据
+      const needTotalItems = this.needTotalList.map((item) => {
+        return (<span style="margin-right: 12px">
+          {item.title}总计 <a style="font-weight: 600">{!item.customRender ? item.total : item.customRender(item.total)}</a>
+        </span>);
+      });
+
+      // 绘制 清空 按钮
+      const clearItem = (typeof this.alert.clear === 'boolean' && this.alert.clear) ? (
+        this.renderClear(this.clearSelected)
+      ) : (this.alert !== null && typeof this.alert.clear === 'function') ? (
+        this.renderClear(this.alert.clear)
+      ) : null;
+
+      // 绘制 alert 组件
+      return (
+        <a-alert showIcon={true} style="margin-bottom: 16px">
+          <template slot="message">
+            <span style="margin-right: 12px">已选择: <a style="font-weight: 600">{this.selectedRows.length}</a></span>
+            {needTotalItems}
+            {clearItem}
+          </template>
+        </a-alert>
+      );
     }
   },
 
@@ -245,7 +290,6 @@ export default {
       props[k] = this[k];
       return props[k];
     });
-
     const table = (
       <a-table {...{ props, scopedSlots: { ...this.$scopedSlots } }} onChange={this.loadData}>
         { Object.keys(this.$slots).map(name => (<template slot={name}>{this.$slots[name]}</template>)) }
@@ -254,6 +298,7 @@ export default {
 
     return (
       <div class="table-wrapper">
+        { showAlert ? this.renderAlert() : null }
         { table }
       </div>
     );
