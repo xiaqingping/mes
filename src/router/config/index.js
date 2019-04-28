@@ -1,4 +1,4 @@
-import { UserLayout, BasicLayout } from '@/components/layouts';
+import { UserLayout, BasicLayout } from '@/layouts';
 // 测序管理
 import seq from './seq';
 // 系统管理

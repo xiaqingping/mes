@@ -1,4 +1,4 @@
-import { RouteView } from '@/components/layouts';
+import { RouteView } from '@/layouts';
 
 export default {
   path: '/system',
