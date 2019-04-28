@@ -2,8 +2,7 @@
   <div class="page">
     <!-- <h1>取样单</h1> -->
     <s-table
-      ref="table"
-      size="default"
+      size="small"
       :scroll="{ x: 6000 }"
       :columns="columns"
       :data="loadData"

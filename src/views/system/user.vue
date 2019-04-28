@@ -2,8 +2,7 @@
   <div class="page">
     <!-- <h1>用户管理</h1> -->
     <s-table
-      ref="table"
-      size="default"
+      size="small"
       :scroll="{ x: 1500 }"
       :columns="columns"
       :data="loadData"

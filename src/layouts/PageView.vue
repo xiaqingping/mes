@@ -4,7 +4,10 @@
       <img v-if="typeof extraImage !== 'undefined'" :src="extraImage"/>
     </div>
     <!-- keep-alive  -->
-    <route-view ref="content"></route-view>
+    <keep-alive v-if="multiTab">
+      <router-view ref="content" />
+    </keep-alive>
+    <router-view v-else ref="content" />
   </page-layout>
 </template>
 
@@ -20,6 +23,7 @@ export default {
   },
   data () {
     return {
+      multiTab: true,
       title: '',
       description: '',
       linkList: [],
