@@ -10,8 +10,9 @@
     </div>
     <div class="page-content">
       <s-table
+        bordered
         size="small"
-        :scroll="{ x: 5000 }"
+        :scroll="{ x: 6000 }"
         :columns="columns"
         :data="loadData"
         :rowSelection="{ selectedRowKeys: selectedRowKeys, onChange: onSelectChange }"

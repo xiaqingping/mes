@@ -1,6 +1,6 @@
 import 'babel-polyfill';
 import Vue from 'vue';
-import Storage from 'vue-ls';
+import Ls from 'vue-ls';
 import App from './App.vue';
 import router from './router';
 import store from './store';
@@ -14,13 +14,13 @@ import './permission';
 Vue.config.productionTip = false;
 
 // vue-ls 缓存参数
-const options = {
+const lsOptions = {
   namespace: 'mes_',
   name: 'ls',
   storage: 'local'
 };
 
-Vue.use(Storage, options);
+Vue.use(Ls, lsOptions);
 Vue.use(Antd);
 Vue.prototype.$api = api;
 

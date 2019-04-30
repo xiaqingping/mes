@@ -17,27 +17,6 @@ import seqorder from './seqorder';
 import synthorder from './synthorder';
 import user from './user';
 
-export {
-  area,
-  basic,
-  carrier,
-  cart,
-  content,
-  coupon,
-  integral,
-  oldapi,
-  paymentRequest,
-  personal,
-  primer,
-  product,
-  sample,
-  sampleorder,
-  sampletype,
-  seqorder,
-  synthorder,
-  user
-};
-
 export default {
   area,
   basic,

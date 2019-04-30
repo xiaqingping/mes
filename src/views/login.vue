@@ -122,8 +122,6 @@
 </template>
 
 <script>
-import { user } from '@/api';
-
 export default {
   layout: 'user',
   data () {
@@ -145,6 +143,7 @@ export default {
       // this.form.resetFields()
     },
     handleSubmit (e) {
+      var self = this;
       e.preventDefault();
       const {
         form: { validateFields },
@@ -161,7 +160,7 @@ export default {
           const loginParams = { ...values };
           loginParams.usercode = values.usercode;
           loginParams.password = values.password;
-          const login = customActiveKey === 'usercode' ? user.loginByPwd : user.loginByCode;
+          const login = customActiveKey === 'usercode' ? self.$api.user.loginByPwd : self.$api.user.loginByCode;
           login(loginParams)
             .then(res => {
               this.loginSuccess(res);
@@ -194,7 +193,7 @@ export default {
           }, 1000);
 
           const hide = this.$message.loading('验证码发送中..', 0);
-          user
+          self.$api.user
             .getVerifycode(values.mobile)
             .then(res => {
               setTimeout(hide, 2500);

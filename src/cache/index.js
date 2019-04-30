@@ -1,10 +1,9 @@
-import Vue from 'vue';
-import Storage from 'vue-ls';
+import seq from './seq';
 
-const options = {
-  namespace: 'mes_',
-  name: 'ls',
-  storage: 'local'
+export {
+  seq
 };
 
-Vue.use(Storage, options);
+export default {
+  seq
+};
