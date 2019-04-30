@@ -35,7 +35,7 @@ export default {
       columns: [
         { title: '取样单号', dataIndex: 'code' },
         { title: '转订单号', dataIndex: 'seqorderCode' },
-        { title: '状态', dataIndex: 'status' },
+        { title: '状态', dataIndex: 'status', customRender: function (text, record, index) { return text + 'x'; } },
         { title: '备注', dataIndex: 'remark' },
         { title: '客户', dataIndex: 'customerName' },
         { title: '负责人', dataIndex: 'subcustomerName' },

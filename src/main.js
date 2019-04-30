@@ -7,6 +7,7 @@ import store from './store';
 import Antd from 'ant-design-vue';
 import 'ant-design-vue/dist/antd.css';
 import api from './api';
+import units from './assets/js/utils';
 
 // 权限控制
 import './permission';
@@ -23,6 +24,7 @@ const lsOptions = {
 Vue.use(Ls, lsOptions);
 Vue.use(Antd);
 Vue.prototype.$api = api;
+Vue.prototype.$units = units;
 
 new Vue({
   router,
