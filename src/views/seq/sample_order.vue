@@ -1,14 +1,23 @@
 <template>
   <div class="page">
-    <!-- <h1>取样单</h1> -->
-    <s-table
-      size="small"
-      :scroll="{ x: 6000 }"
-      :columns="columns"
-      :data="loadData"
-      :rowSelection="{ selectedRowKeys: selectedRowKeys, onChange: onSelectChange }"
-    >
-    </s-table>
+    <div class="page-head">
+      <div class="breadcrumb">
+        <span>首页 / </span>
+        <span>测序管理 / </span>
+        <span>取样单</span>
+      </div>
+      <h1 class="page-title">取样单</h1>
+    </div>
+    <div class="page-content">
+      <s-table
+        size="small"
+        :scroll="{ x: 5000 }"
+        :columns="columns"
+        :data="loadData"
+        :rowSelection="{ selectedRowKeys: selectedRowKeys, onChange: onSelectChange }"
+      >
+      </s-table>
+    </div>
   </div>
 </template>
 
