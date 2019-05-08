@@ -1,23 +1,13 @@
 <template>
-  <div class="page">
-    <div class="page-head">
-      <div class="breadcrumb">
-        <span>首页 / </span>
-        <span>系统管理 / </span>
-        <span>用户管理</span>
-      </div>
-      <h1 class="page-title">用户管理</h1>
-    </div>
-    <div class="page-content">
-      <s-table
-        size="small"
-        :scroll="{ x: 1500 }"
-        :columns="columns"
-        :data="loadData"
-        :rowSelection="{ selectedRowKeys: selectedRowKeys, onChange: onSelectChange }"
-      >
-      </s-table>
-    </div>
+  <div class="page-content">
+    <s-table
+      size="small"
+      :scroll="{ x: 1500 }"
+      :columns="columns"
+      :data="loadData"
+      :rowSelection="{ selectedRowKeys: selectedRowKeys, onChange: onSelectChange }"
+    >
+    </s-table>
   </div>
 </template>
 

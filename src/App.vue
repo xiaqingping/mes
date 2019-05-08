@@ -16,22 +16,33 @@ export default {
   #app {
     height: 100%;
   }
-  .page {
-    .page-head {
-      padding: 16px 32px 16px 32px;
-      background: #fff;
-      .breadcrumb {
-        font-size: 14px;
-        margin-bottom: 16px;
-      }
-      .page-title {
-        font-size: 20px;
-        margin: 0;
+  .page-content {
+    margin: 24px;
+    padding: 24px 32px;
+    background: #fff;
+
+    // 表格筛选条件
+    .table-search {
+      .ant-form-inline {
+        .ant-form-item {
+          display: flex;
+          margin-bottom: 12px;
+          margin-right: 0;
+          .ant-form-item-control-wrapper {
+            flex: 1 1;
+            display: inline-block;
+            vertical-align: middle;
+          }
+        }
       }
     }
-    .page-content {
-      margin: 24px;
-      background: #fff;
+
+    // 表格操作
+    .table-operator {
+      margin-bottom: 18px;
+      & > .ant-btn {
+        margin-right: 8px;
+      }
     }
   }
 </style>

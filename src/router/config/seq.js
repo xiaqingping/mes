@@ -1,10 +1,10 @@
-import { RouteView } from '@/layouts';
+import { PageView } from '@/layouts';
 
 export default {
   path: '/seq',
   name: 'seq',
   redirect: '/seq/order',
-  component: RouteView,
+  component: PageView,
   meta: { title: '测序管理', keepAlive: true, icon: 'dashboard', permission: [ 'dashboard' ] },
   children: [
     {

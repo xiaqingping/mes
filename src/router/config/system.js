@@ -1,10 +1,10 @@
-import { RouteView } from '@/layouts';
+import { PageView } from '@/layouts';
 
 export default {
   path: '/system',
   name: 'system',
   redirect: '/system/user',
-  component: RouteView,
+  component: PageView,
   meta: { title: '系统管理', keepAlive: true, icon: 'dashboard', permission: [ 'dashboard' ] },
   children: [
     {

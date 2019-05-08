@@ -1,13 +1,5 @@
 <template>
   <div class="page">
-    <div class="page-head">
-      <div class="breadcrumb">
-        <span>首页 / </span>
-        <span>测序管理 / </span>
-        <span>取样单</span>
-      </div>
-      <h1 class="page-title">取样单</h1>
-    </div>
     <div class="page-content">
       <s-table
         size="small"
