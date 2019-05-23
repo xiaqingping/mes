@@ -16,6 +16,7 @@ import sampletype from './sampletype';
 import seqorder from './seqorder';
 import synthorder from './synthorder';
 import user from './user';
+import peptide from './peptide'
 
 export default {
   area,
@@ -35,5 +36,6 @@ export default {
   sampletype,
   seqorder,
   synthorder,
-  user
+  user,
+  peptide
 };

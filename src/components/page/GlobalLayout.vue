@@ -86,6 +86,21 @@ export default {
             // { serial: 3005, name: '规则', icon: 'pie-chart', url: '/system/rule' },
             // { serial: 3006, name: '分组', icon: 'pie-chart', url: '/system/group' }
           ]
+        },
+        {
+          serial: 8000,
+          name: '多肽合成',
+          icon: 'deployment-unit',
+          children: [
+            { serial: 8001, name: '多肽订单管理', icon: 'pie-chart', url: '/peptide/peptide_order' },
+            { serial: 8002, name: '多肽纯度', icon: 'pie-chart', url: '/peptide/peptide_purity' },
+            { serial: 8003, name: '多肽合成产品', icon: 'pie-chart', url: '/peptide/peptide_product' },
+            { serial: 8004, name: '多肽氨基酸', icon: 'pie-chart', url: '/peptide/peptide_amino_acid' },
+            { serial: 8005, name: '多肽修饰', icon: 'pie-chart', url: '/peptide/peptide_modifications' },
+            { serial: 8006, name: '修饰类别', icon: 'pie-chart', url: '/peptide/peptide_modificationsType' },
+            { serial: 8007, name: '多肽修饰产品', icon: 'pie-chart', url: '/peptide/peptide_modificationProducts' },
+            { serial: 8008, name: '多肽二硫键产品', icon: 'pie-chart', url: '/peptide/peptide_disulfideBondProducts' },
+          ]
         }
       ]
     };

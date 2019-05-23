@@ -1,9 +1,7 @@
 import seq from './seq';
-
-export {
-  seq
-};
+import peptide from './peptide';
 
 export default {
-  seq
+  seq,
+  peptide
 };
