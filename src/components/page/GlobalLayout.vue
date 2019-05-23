@@ -99,7 +99,7 @@ export default {
             { serial: 8005, name: '多肽修饰', icon: 'pie-chart', url: '/peptide/peptide_modifications' },
             { serial: 8006, name: '修饰类别', icon: 'pie-chart', url: '/peptide/peptide_modificationsType' },
             { serial: 8007, name: '多肽修饰产品', icon: 'pie-chart', url: '/peptide/peptide_modificationProducts' },
-            { serial: 8008, name: '多肽二硫键产品', icon: 'pie-chart', url: '/peptide/peptide_disulfideBondProducts' },
+            { serial: 8008, name: '多肽二硫键产品', icon: 'pie-chart', url: '/peptide/peptide_disulfideBondProducts' }
           ]
         }
       ]

@@ -16,7 +16,7 @@ export const asyncRouterMap = [
     children: [
       seq,
       system,
-      peptide,
+      peptide
     ]
   },
   {

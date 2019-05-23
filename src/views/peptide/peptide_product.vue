@@ -17,7 +17,7 @@
             <a-form-item label="纯度">
               <a-select v-decorator="['purityID', {initialValue : '0'}]">
                 <a-select-option value="0">全部</a-select-option>
-                <a-select-option v-for="item in purity" :key="item.id" :value="item.id">{{ item.purity}}</a-select-option>
+                <a-select-option v-for="item in purity" :key="item.id" :value="item.id">{{ item.purity }}</a-select-option>
               </a-select>
             </a-form-item>
           </a-col>
@@ -95,113 +95,119 @@
 </template>
 
 <script>
-  import STable from '@/components/Table';
-  import peptide from '@/cache/index'
+import STable from '@/components/Table';
+import peptide from '@/cache/index';
 
-  export default {
-    name: 'SeqSampleOrder',
-    components: {
-      STable
+export default {
+  name: 'SeqSampleOrder',
+  components: {
+    STable
+  },
+  data () {
+    return {
+      form: this.$form.createForm(this),
+      visible: false,
+      // advanced: true,
+      columns: [
+        { title: '编号', dataIndex: 'code' },
+        { title: '提供总量从', dataIndex: 'providerTotalAmountBegin' },
+        { title: '提供总量至', dataIndex: 'providerTotalAmountEnd' },
+        { title: '纯度',
+          dataIndex: 'purityID',
+          customRender: function (text) {
+            const val = peptide.peptide.purity;
+            for (var i = 0; i < val.length; i++) { if (val[i].id == text) return val[i].value + '%'; }
+          } },
+        { title: '长度从', dataIndex: 'aminoAcidLengthBegin' },
+        { title: '长度至', dataIndex: 'aminoAcidLengthEnd' },
+        { title: '是否脱盐',
+          dataIndex: 'isNeedDesalting',
+          align: 'center',
+          customRender: function (text) {
+            if (text == 1) return '√';
+            else if (text == 2) return '';
+          } },
+        { title: '氨基酸类型', dataIndex: 'aminoAcidType', align: 'center' },
+        { title: '产品编号', dataIndex: 'sapProductCode' },
+        { title: '产品名称', dataIndex: 'sapProductName' },
+        { title: '状态',
+          dataIndex: 'status',
+          customRender: function (text) {
+            if (text == 1) return '正常';
+            else if (text == 2) return '已删除';
+          } },
+        { title: '创建人', dataIndex: 'creatorName' },
+        { title: '创建时间', dataIndex: 'createDate' },
+        { title: '删除人', dataIndex: 'cancelName' },
+        { title: '删除时间', dataIndex: 'cancelDate' }
+      ],
+      queryParam: {},
+      loadData: parameter => {
+        this.queryParam = this.form.getFieldsValue();
+        const params = Object.assign(parameter, this.queryParam);
+        return this.$api.peptide.getProduct(params).then(res => {
+          return {
+            data: res.rows,
+            page: params.page,
+            total: res.total
+          };
+        });
+      },
+      selectedRowKeys: [],
+      selectedRows: [],
+      purity: []
+    };
+  },
+  mounted () {
+    this.$api.peptide.getPurityAll().then(res => {
+      this.purity = res;
+    });
+  },
+  methods: {
+    showDrawer () {
+      this.visible = true;
     },
-    data() {
-      return {
-        form: this.$form.createForm(this),
-        visible: false,
-        // advanced: true,
-        columns: [
-          {title: '编号', dataIndex: 'code'},
-          {title: '提供总量从', dataIndex: 'providerTotalAmountBegin'},
-          {title: '提供总量至', dataIndex: 'providerTotalAmountEnd'},
-          {title: '纯度', dataIndex: 'purityID', customRender: function (text) {
-              let val = peptide.peptide.purity;
-              for (var i = 0; i < val.length; i++)
-                if (val[i].id == text) return val[i].value + '%';
-            }},
-          {title: '长度从', dataIndex: 'aminoAcidLengthBegin'},
-          {title: '长度至', dataIndex: 'aminoAcidLengthEnd'},
-          {title: '是否脱盐', dataIndex: 'isNeedDesalting', align: 'center', customRender: function (text) {
-              if (text == 1) return '√';
-              else if (text == 2) return '';
-            }},
-          {title: '氨基酸类型', dataIndex: 'aminoAcidType', align: 'center'},
-          {title: '产品编号', dataIndex: 'sapProductCode'},
-          {title: '产品名称', dataIndex: 'sapProductName'},
-          {title: '状态', dataIndex: 'status', customRender: function (text) {
-              if (text == 1) return '正常';
-              else if (text == 2) return '已删除';
-            }},
-          {title: '创建人', dataIndex: 'creatorName'},
-          {title: '创建时间', dataIndex: 'createDate'},
-          {title: '删除人', dataIndex: 'cancelName'},
-          {title: '删除时间', dataIndex: 'cancelDate'},
-        ],
-        queryParam: {},
-        loadData: parameter => {
-          this.queryParam = this.form.getFieldsValue();
-          const params = Object.assign(parameter, this.queryParam);
-          return this.$api.peptide.getProduct(params).then(res => {
-            return {
-              data: res.rows,
-              page: params.page,
-              total: res.total
-            };
-          });
-        },
-        selectedRowKeys: [],
-        selectedRows: [],
-        purity: []
-      };
+    onClose () {
+      this.visible = false;
     },
-    mounted() {
-      this.$api.peptide.getPurityAll().then(res => {
-        this.purity = res;
-      })
+    handleSearch () {
+      this.$refs.table.refresh(true);
     },
-    methods: {
-      showDrawer() {
-        this.visible = true
-      },
-      onClose() {
-        this.visible = false
-      },
-      handleSearch() {
-        this.$refs.table.refresh(true);
-      },
-      onSelectChange(selectedRowKeys, selectedRows) {
-        this.selectedRowKeys = selectedRowKeys;
-        this.selectedRows = selectedRows;
-      },
-      // toggleAdvanced() {
-      //   this.advanced = !this.advanced;
-      // },
-      handleDelete() {
-        if (this.selectedRowKeys[0] == null) {
-          this.$notification.error({
-            message: '错误',
-            description: `请选择一条数据`
-          });
-          return false;
-        }
-        this.$api.peptide.deleteProduct(this.selectedRowKeys[0]).then(res => {
-          this.selectedRowKeys = [];
-          return this.$refs.table.refresh(true);
-        })
-      },
-      handleResume() {
-        if (this.selectedRowKeys[0] == null) {
-          this.$notification.error({
-            message: '错误',
-            description: `请选择一条数据`
-          });
-          return false;
-        }
-        this.$api.peptide.resumeProduct(this.selectedRowKeys[0]).then(res => {
-          this.selectedRowKeys = [];
-          return this.$refs.table.refresh(true);
-        })
-      },
+    onSelectChange (selectedRowKeys, selectedRows) {
+      this.selectedRowKeys = selectedRowKeys;
+      this.selectedRows = selectedRows;
+    },
+    // toggleAdvanced() {
+    //   this.advanced = !this.advanced;
+    // },
+    handleDelete () {
+      if (this.selectedRowKeys[0] == null) {
+        this.$notification.error({
+          message: '错误',
+          description: `请选择一条数据`
+        });
+        return false;
+      }
+      this.$api.peptide.deleteProduct(this.selectedRowKeys[0]).then(res => {
+        this.selectedRowKeys = [];
+        return this.$refs.table.refresh(true);
+      });
+    },
+    handleResume () {
+      if (this.selectedRowKeys[0] == null) {
+        this.$notification.error({
+          message: '错误',
+          description: `请选择一条数据`
+        });
+        return false;
+      }
+      this.$api.peptide.resumeProduct(this.selectedRowKeys[0]).then(res => {
+        this.selectedRowKeys = [];
+        return this.$refs.table.refresh(true);
+      });
     }
-  };
+  }
+};
 </script>
 
 <style lang="scss" scoped>
