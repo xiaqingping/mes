@@ -1,5 +1,5 @@
 <template>
-  <page-layout :desc="description" :title="getTitle" :link-list="linkList" :search="search" :tabs="tabs">
+  <div>
     <page-header></page-header>
 
     <!-- keep-alive  -->
@@ -7,30 +7,20 @@
       <router-view ref="content" />
     </keep-alive>
     <router-view v-else ref="content" />
-  </page-layout>
+  </div>
 </template>
 
 <script>
 import PageHeader from '@/components/PageHeader';
-// import PageLayout from '../page/PageLayout';
-// import RouteView from './RouteView';
 
 export default {
   name: 'PageContent',
   components: {
     PageHeader
-    // RouteView,
-    // PageLayout
   },
   data () {
     return {
-      multiTab: true,
-      title: '',
-      description: '',
-      linkList: [],
-      extraImage: '',
-      search: false,
-      tabs: {}
+      multiTab: true
     };
   },
   mounted () {
@@ -40,7 +30,6 @@ export default {
     this.getPageHeaderInfo();
   },
   computed: {
-
     getTitle () {
       return this.$route.meta.title;
     }
