@@ -52,7 +52,7 @@ export default {
   },
   data () {
     return {
-      rootSubmenuKeys: [2000, 3000],
+      rootSubmenuKeys: [2000, 3000, 8000],
       defaultOpenKeys: [],
       defaultSelectedKeys: []
     };

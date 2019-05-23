@@ -28,6 +28,6 @@ export default {
     { id: 4, name: '待收样' },
     { id: 5, name: '已收样' },
     { id: 6, name: '已失效' },
-    { id: 7, name: '已作废' }
+    { id: 7, name: '已作废1' }
   ]
 };
