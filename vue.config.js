@@ -7,6 +7,10 @@ module.exports = {
   },
   // webpack devServer
   devServer: {
+    overlay: {
+      warnings: true,
+      errors: true
+    },
     // 代理
     proxy: {
       '/oldapi': {

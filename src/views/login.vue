@@ -224,6 +224,12 @@ export default {
       const redirect = this.$route.query.redirect;
       this.$router.push(redirect || '/');
 
+      this.$store.dispatch('basic/factorys');
+      this.$store.dispatch('basic/offices');
+      this.$store.dispatch('basic/paymethods');
+      this.$store.dispatch('basic/payterms');
+      this.$store.dispatch('basic/regions');
+
       this.$notification.success({
         message: '欢迎',
         description: `${res.name}，欢迎回来`
