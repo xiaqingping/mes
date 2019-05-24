@@ -1,95 +1,61 @@
 <template>
-  <div class="sider">
-    <div class="logo">
-      <h1>MES</h1>
-    </div>
-    <div class="menu-box">
-      <a-menu
-        :default-selected-keys="defaultSelectedKeys"
-        :default-open-keys="defaultOpenKeys"
-        :open-keys="defaultOpenKeys"
-        mode="inline"
-        :theme="theme"
-        :inline-collapsed="collapsed"
-        @openChange="onOpenChange"
-      >
-        <template v-for="item in menus">
-          <a-menu-item v-if="!item.children" :key="item.serial">
-            <router-link :to="item.url">
-              <a-icon :type="item.icon" />
-              <span>{{ item.name }}</span>
-            </router-link>
-          </a-menu-item>
-          <sub-menu v-else :key="item.serial" :menu-info="item" />
-        </template>
-      </a-menu>
-    </div>
-  </div>
+  <a-layout-sider
+    :class="['sider', theme, 'ant-fixed-sidemenu']"
+    width="256px"
+    :collapsible="collapsible"
+    v-model="collapsed"
+    :trigger="null">
+    <logo />
+    <s-menu
+      :collapsed="collapsed"
+      :menu="menus"
+      :theme="theme"
+      :mode="mode"
+      @select="onSelect"
+      style="padding: 16px 0px;"></s-menu>
+  </a-layout-sider>
+
 </template>
 
 <script>
-import SubMenu from './SubMenu';
+import Logo from '@/components/tools/Logo';
+import SMenu from './index';
+// import { mixin, mixinDevice } from '@/utils/mixin';
 
 export default {
-  components: {
-    SubMenu
-  },
+  name: 'SideMenu',
+  components: { Logo, SMenu },
+  // mixins: [mixin, mixinDevice],
   props: {
-    collapsed: {
-      default: false,
-      type: Boolean
+    mode: {
+      type: String,
+      required: false,
+      default: 'inline'
     },
     theme: {
-      default: 'dark',
-      type: String
+      type: String,
+      required: false,
+      default: 'dark'
+    },
+    collapsible: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
+    collapsed: {
+      type: Boolean,
+      required: false,
+      default: false
     },
     menus: {
-      default () {
-        return [];
-      },
-      type: Array
+      type: Array,
+      required: true
     }
   },
-  data () {
-    return {
-      rootSubmenuKeys: [2000, 3000, 8000],
-      defaultOpenKeys: [],
-      defaultSelectedKeys: []
-    };
-  },
   methods: {
-    onOpenChange (openKeys) {
-      const latestOpenKey = openKeys.find(key => this.defaultOpenKeys.indexOf(key) === -1);
-      if (this.rootSubmenuKeys.indexOf(latestOpenKey) === -1) {
-        this.defaultOpenKeys = openKeys;
-      } else {
-        this.defaultOpenKeys = latestOpenKey ? [latestOpenKey] : [];
-      }
+    onSelect (obj) {
+      this.$emit('menuSelect', obj);
     }
   }
 };
 </script>
-
-<style lang="scss" scoped>
-.sider {
-  width: 100%;
-  height: 100%;
-}
-.logo {
-  height: 64px;
-  line-height: 64px;
-  background: #002140;
-  h1 {
-    font-size: 20px;
-    color: #fff;
-    text-align: center;
-  }
-}
-.menu-box {
-  position: absolute;
-  top: 64px;
-  bottom: 0;
-  width: 100%;
-  overflow-y: auto;
-}
-</style>

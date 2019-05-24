@@ -4,10 +4,10 @@
       :trigger="null"
       collapsible
       v-model="collapsed">
-      <side-menu
+      <!-- <side-menu
         :collapsed="collapsed"
         :theme="theme"
-        :menus="menus"></side-menu>
+        :menus="menus"></side-menu> -->
     </a-layout-sider>
     <a-layout>
       <global-header
@@ -29,13 +29,13 @@
 <script>
 import { mapState } from 'vuex';
 
-import SideMenu from '@/components/menu/SideMenu';
+// import SideMenu from '@/components/menu/SideMenu';
 import GlobalHeader from '@/components/page/GlobalHeader';
 import GlobalFooter from '@/components/page/GlobalFooter';
 
 export default {
   components: {
-    SideMenu,
+    // SideMenu,
     GlobalHeader,
     GlobalFooter
   },
