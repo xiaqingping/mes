@@ -78,95 +78,100 @@
 </template>
 
 <script>
-  import STable from '@/components/Table';
+import STable from '@/components/Table';
 
-  export default {
-    name: 'SeqSampleOrder',
-    components: {
-      STable
-    },
-    data() {
-      return {
-        form: this.$form.createForm(this),
-        visible: false,
-        // advanced: true,
-        columns: [
-          {title: '编号', dataIndex: 'code'},
-          {title: '修饰类型', dataIndex: 'modificationType'},
-          {
-            title: '状态', dataIndex: 'status', customRender: function (text) {
-              if (text == 1) return '正常';
-              else if (text == 2) return '已删除';
+export default {
+  name: 'SeqSampleOrder',
+  components: {
+    STable
+  },
+  data () {
+    return {
+      form: this.$form.createForm(this),
+      visible: false,
+      // advanced: true,
+      columns: [
+        { title: '编号', dataIndex: 'code' },
+        { title: '修饰类型', dataIndex: 'modificationType' },
+        {
+          title: '状态',
+          dataIndex: 'status',
+          customRender: function (text) {
+            if (text === 1) {
+              return '正常';
+            } else if (text === 2) {
+              return '已删除';
             }
-          },
-          {title: '创建人', dataIndex: 'creatorName'},
-          {title: '创建日期', dataIndex: 'createDate'},
-          {title: '删除人', dataIndex: 'cancelName'},
-          {title: '删除时间', dataIndex: 'cancelDate'},
-        ],
-        queryParam: {},
-        loadData: parameter => {
-          this.queryParam = this.form.getFieldsValue();
-          const params = Object.assign(parameter, this.queryParam);
-          return this.$api.peptide.getModificationTypes(params).then(res => {
-            return {
-              data: res.rows,
-              page: params.page,
-              total: res.total
-            };
-          });
+          }
         },
-        selectedRowKeys: [],
-        selectedRows: []
-      };
+        { title: '创建人', dataIndex: 'creatorName' },
+        { title: '创建日期', dataIndex: 'createDate' },
+        { title: '删除人', dataIndex: 'cancelName' },
+        { title: '删除时间', dataIndex: 'cancelDate' }
+      ],
+      queryParam: {},
+      loadData: parameter => {
+        this.queryParam = this.form.getFieldsValue();
+        const params = Object.assign(parameter, this.queryParam);
+        return this.$api.peptide.getModificationTypes(params).then(res => {
+          return {
+            data: res.rows,
+            page: params.page,
+            total: res.total
+          };
+        });
+      },
+      selectedRowKeys: [],
+      selectedRows: []
+    };
+  },
+  mounted () {
+  },
+  methods: {
+    showDrawer () {
+      this.visible = true;
     },
-    mounted() {
+    onClose () {
+      this.visible = false;
     },
-    methods: {
-      showDrawer() {
-        this.visible = true
-      },
-      onClose() {
-        this.visible = false
-      },
-      handleSearch() {
-        this.$refs.table.refresh(true);
-      },
-      onSelectChange(selectedRowKeys, selectedRows) {
-        this.selectedRowKeys = selectedRowKeys;
-        this.selectedRows = selectedRows;
-      },
-      // toggleAdvanced() {
-      //   this.advanced = !this.advanced;
-      // },
-      handleDelete() {
-        if (this.selectedRowKeys[0] == null) {
-          this.$notification.error({
-            message: '错误',
-            description: `请选择一条数据`
-          });
-          return false;
-        }
-        this.$api.peptide.getModificationTypesDelete(this.selectedRowKeys[0]).then(res => {
-          this.selectedRowKeys = [];
-          return this.$refs.table.refresh(true);
-        })
-      },
-      handleResume() {
-        if (this.selectedRowKeys[0] == null) {
-          this.$notification.error({
-            message: '错误',
-            description: `请选择一条数据`
-          });
-          return false;
-        }
-        this.$api.peptide.getModificationTypesResume(this.selectedRowKeys[0]).then(res => {
-          this.selectedRowKeys = [];
-          return this.$refs.table.refresh(true);
-        })
-      },
+    handleSearch () {
+      this.$refs.table.refresh(true);
+    },
+    onSelectChange (selectedRowKeys, selectedRows) {
+      this.selectedRowKeys = selectedRowKeys;
+      this.selectedRows = selectedRows;
+    },
+    // toggleAdvanced() {
+    //   this.advanced = !this.advanced;
+    // },
+    handleDelete () {
+      if (this.selectedRowKeys[0] == null) {
+        this.$notification.error({
+          message: '错误',
+          description: `请选择一条数据`
+        });
+        return false;
+      }
+      this.$api.peptide.getModificationTypesDelete(this.selectedRowKeys[0]).then(res => {
+        this.selectedRowKeys = [];
+        return this.$refs.table.refresh(true);
+      });
+    },
+    handleResume () {
+      if (this.selectedRowKeys[0] == null) {
+        this.$notification.error({
+          message: '错误',
+          description: `请选择一条数据`
+        });
+        return false;
+      }
+      this.$api.peptide.getModificationTypesResume(this.selectedRowKeys[0]).then(res => {
+        this.selectedRowKeys = [];
+        return this.$refs.table.refresh(true);
+      });
     }
-  };
+  }
+};
 </script>
 
 <style lang="scss" scoped>

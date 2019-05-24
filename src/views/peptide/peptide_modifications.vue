@@ -9,7 +9,7 @@
               <a-input v-decorator="['code']" title=""/>
             </a-form-item>
           </a-col>
-<!--                    <div v-show="advanced">-->
+          <!--                    <div v-show="advanced">-->
           <a-col :xxl="4" :xl="6" :md="8" :sm="24">
             <a-form-item label="名称 ">
               <a-input v-decorator="['name']"/>
@@ -21,7 +21,7 @@
               <a-select v-decorator="['modificationTypeID', {initialValue : '0'}]">
                 <a-select-option value="0">全部</a-select-option>
                 <a-select-option v-for="item in modificationsType" :key="item.id" :value="item.id">
-                  {{item.modificationType}}
+                  {{ item.modificationType }}
                 </a-select-option>
               </a-select>
             </a-form-item>
@@ -90,127 +90,134 @@
 </template>
 
 <script>
-  import STable from '@/components/Table';
-  import peptide from '@/cache/index'
+import STable from '@/components/Table';
+import peptide from '@/cache/index';
 
-  export default {
-    name: 'SeqSampleOrder',
-    components: {
-      STable
-    },
-    data() {
-      return {
-        form: this.$form.createForm(this),
-        visible: false,
-        // advanced: true,
-        test1:{},
-        columns: [
-          {title: '编号', dataIndex: 'code'},
-          {title: '修饰名称', dataIndex: 'name'},
-          {title: '修饰代码', dataIndex: 'modificationCode'},
-          {
-            title: '修饰位置', dataIndex: 'modificationPosition', customRender: function (value) {
-              for (var i = 0; i < peptide.peptide.modificationPosition.length; i++)
-                if (peptide.peptide.modificationPosition[i].id == value) return peptide.peptide.modificationPosition[i].name;
-            }
-          },
-          {
-            title: '独立修饰', dataIndex: 'isIndependentModification', align: 'center', customRender: function (value) {
-              if (value == 1) return '√';
-            }
-          },
-          {
-            title: '修饰类别', dataIndex: 'modificationTypeID'
-            , customRender: function (value) {
-              for (var i = 0; i < peptide.peptide.modificationsType.length; i++)
-                if (peptide.peptide.modificationsType[i].id == value) {
-                  return peptide.peptide.modificationsType[i].value;
-                }
-            }
-          },
-          {
-            title: '状态', dataIndex: 'status', customRender: function (value) {
-              if (value == 1) return '正常';
-              else if (value == 2) return '已删除';
-            }
-          },
-          {title: '创建人', dataIndex: 'creatorName'},
-          {title: '创建日期', dataIndex: 'createDate'},
-          {title: '删除人', dataIndex: 'cancelName'},
-          {title: '删除时间', dataIndex: 'cancelDate'},
-        ],
-        queryParam: {},
-        loadData: parameter => {
-          this.queryParam = this.form.getFieldsValue();
-          const params = Object.assign(parameter, this.queryParam);
-          return this.$api.peptide.getModifications(params).then(res => {
-            return {
-              data: res.rows,
-              page: params.page,
-              total: res.total
-            };
-          });
+export default {
+  name: 'SeqSampleOrder',
+  components: {
+    STable
+  },
+  data () {
+    return {
+      form: this.$form.createForm(this),
+      visible: false,
+      // advanced: true,
+      test1: {},
+      columns: [
+        { title: '编号', dataIndex: 'code' },
+        { title: '修饰名称', dataIndex: 'name' },
+        { title: '修饰代码', dataIndex: 'modificationCode' },
+        {
+          title: '修饰位置',
+          dataIndex: 'modificationPosition',
+          customRender: function (value) {
+            for (var i = 0; i < peptide.peptide.modificationPosition.length; i++) { if (peptide.peptide.modificationPosition[i].id === value) return peptide.peptide.modificationPosition[i].name; }
+          }
         },
-        selectedRowKeys: [],
-        selectedRows: [],
-        modificationsType: [],
-      };
+        {
+          title: '独立修饰',
+          dataIndex: 'isIndependentModification',
+          align: 'center',
+          customRender: function (value) {
+            if (value === 1) return '√';
+          }
+        },
+        {
+          title: '修饰类别',
+          dataIndex: 'modificationTypeID',
+          customRender: function (value) {
+            for (var i = 0; i < peptide.peptide.modificationsType.length; i++) {
+              if (peptide.peptide.modificationsType[i].id === value) {
+                return peptide.peptide.modificationsType[i].value;
+              }
+            }
+          }
+        },
+        {
+          title: '状态',
+          dataIndex: 'status',
+          customRender: function (value) {
+            if (value === 1) return '正常';
+            else if (value === 2) return '已删除';
+          }
+        },
+        { title: '创建人', dataIndex: 'creatorName' },
+        { title: '创建日期', dataIndex: 'createDate' },
+        { title: '删除人', dataIndex: 'cancelName' },
+        { title: '删除时间', dataIndex: 'cancelDate' }
+      ],
+      queryParam: {},
+      loadData: parameter => {
+        this.queryParam = this.form.getFieldsValue();
+        const params = Object.assign(parameter, this.queryParam);
+        return this.$api.peptide.getModifications(params).then(res => {
+          return {
+            data: res.rows,
+            page: params.page,
+            total: res.total
+          };
+        });
+      },
+      selectedRowKeys: [],
+      selectedRows: [],
+      modificationsType: []
+    };
+  },
+  mounted () {
+    // console.log(peptide.peptide.modificationsType);
+    this.$api.peptide.getModificationTypesAll().then(res => {
+      this.modificationsType = res;
+    });
+    // this.$store.commit('plusVal', this.modificationsType);
+    // console.log(this.modificationsType);
+  },
+  methods: {
+    showDrawer () {
+      this.visible = true;
     },
-    mounted() {
-
-      // console.log(peptide.peptide.modificationsType);
-      this.$api.peptide.getModificationTypesAll().then(res => {
-        this.modificationsType = res;
-      })
-      // this.$store.commit('plusVal', this.modificationsType);
-      // console.log(this.modificationsType);
+    onClose () {
+      this.visible = false;
     },
-    methods: {
-      showDrawer() {
-        this.visible = true
-      },
-      onClose() {
-        this.visible = false
-      },
-      handleSearch() {
-        this.$refs.table.refresh(true);
-      },
+    handleSearch () {
+      this.$refs.table.refresh(true);
+    },
 
-      onSelectChange(selectedRowKeys, selectedRows) {
-        this.selectedRowKeys = selectedRowKeys;
-        this.selectedRows = selectedRows;
-      },
-      // toggleAdvanced() {
-      //   this.advanced = !this.advanced;
-      // },
-      handleDelete() {
-        if (this.selectedRowKeys[0] == null) {
-          this.$notification.error({
-            message: '错误',
-            description: `请选择一条数据`
-          });
-          return false;
-        }
-        this.$api.peptide.deleteModifications(this.selectedRowKeys[0]).then(res => {
-          this.selectedRowKeys = [];
-          return this.$refs.table.refresh(true);
-        })
-      },
-      handleResume() {
-        if (this.selectedRowKeys[0] == null) {
-          this.$notification.error({
-            message: '错误',
-            description: `请选择一条数据`
-          });
-          return false;
-        }
-        this.$api.peptide.resumeModifications(this.selectedRowKeys[0]).then(res => {
-          this.selectedRowKeys = [];
-          return this.$refs.table.refresh(true);
-        })
-      },
+    onSelectChange (selectedRowKeys, selectedRows) {
+      this.selectedRowKeys = selectedRowKeys;
+      this.selectedRows = selectedRows;
+    },
+    // toggleAdvanced() {
+    //   this.advanced = !this.advanced;
+    // },
+    handleDelete () {
+      if (this.selectedRowKeys[0] == null) {
+        this.$notification.error({
+          message: '错误',
+          description: `请选择一条数据`
+        });
+        return false;
+      }
+      this.$api.peptide.deleteModifications(this.selectedRowKeys[0]).then(res => {
+        this.selectedRowKeys = [];
+        return this.$refs.table.refresh(true);
+      });
+    },
+    handleResume () {
+      if (this.selectedRowKeys[0] == null) {
+        this.$notification.error({
+          message: '错误',
+          description: `请选择一条数据`
+        });
+        return false;
+      }
+      this.$api.peptide.resumeModifications(this.selectedRowKeys[0]).then(res => {
+        this.selectedRowKeys = [];
+        return this.$refs.table.refresh(true);
+      });
     }
-  };
+  }
+};
 </script>
 
 <style lang="scss" scoped>
