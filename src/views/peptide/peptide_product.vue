@@ -96,7 +96,7 @@
 
 <script>
 import STable from '@/components/Table';
-import peptide from '@/cache/index';
+// import peptide from '@/cache/index';
 
 export default {
   name: 'SeqSampleOrder',
@@ -104,6 +104,7 @@ export default {
     STable
   },
   data () {
+    var self = this;
     return {
       form: this.$form.createForm(this),
       visible: false,
@@ -115,8 +116,9 @@ export default {
         { title: '纯度',
           dataIndex: 'purityID',
           customRender: function (text) {
-            const val = peptide.peptide.purity;
-            for (var i = 0; i < val.length; i++) { if (val[i].id === text) return val[i].value + '%'; }
+            for (var i = 0; i < self.purity.length; i++) {
+              if (self.purity[i].id === text) return self.purity[i].purity;
+            }
           } },
         { title: '长度从', dataIndex: 'aminoAcidLengthBegin' },
         { title: '长度至', dataIndex: 'aminoAcidLengthEnd' },

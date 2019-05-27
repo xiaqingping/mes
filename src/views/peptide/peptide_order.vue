@@ -32,11 +32,9 @@
             </a-col>
             <a-col :xxl="4" :xl="6" :md="8" :sm="24">
               <a-form-item label="币种">
-                <a-select v-decorator="['currency_type']">
-                  <a-select-option value="0">全部</a-select-option>
-                  <a-select-option value="1">关闭</a-select-option>
-                  <a-select-option value="2">运行中</a-select-option>
-                </a-select>
+                <a-select v-decorator="['currency']">
+                  <a-select-option v-for="item in currency" :key="item.id" :value="item.id">{{ item.name }}
+                  </a-select-option></a-select>
               </a-form-item>
             </a-col>
             <a-col :xxl="4" :xl="6" :md="8" :sm="24">
@@ -246,6 +244,7 @@ export default {
       advanced: true,
       customer_name_top: 0,
       customer_name_left: 0,
+      currency: '',
       createDateBegin: '',
       createDateEnd: '',
       rangeOrganization: [],
@@ -297,7 +296,17 @@ export default {
         },
         { title: '销售大区', dataIndex: 'regionCode' },
         { title: '销售网点', dataIndex: 'officeCode' },
-        { title: '交货方式', dataIndex: 'deliveryType' },
+        { title: '交货方式',
+          dataIndex: 'deliveryType',
+          customRender: function (text, record, index) {
+            var val = peptide.peptide.deliveryTypeStatus;
+            for (let i = 0; i < val.length; i++) {
+              if (val[i].id === text) {
+                return val[i].id + '-' + val[i].name;
+              }
+            }
+          }
+        },
         { title: '开票方式', dataIndex: 'invoiceType' },
         { title: '付款方式', dataIndex: 'paymentMethod' },
         { title: '付款条件', dataIndex: 'paymentTerm' },
@@ -306,7 +315,17 @@ export default {
         { title: '运费', dataIndex: 'freight' },
         { title: '订单金额', dataIndex: 'amount' },
         { title: '币种', dataIndex: 'currency' },
-        { title: '随货开票', dataIndex: 'invoiceByGoods' },
+        { title: '随货开票',
+          dataIndex: 'invoiceByGoods',
+          customRender: function (text, record, index) {
+            var val = peptide.peptide.invoiceByGoodsStatus;
+            for (let i = 0; i < val.length; i++) {
+              if (val[i].id === parseInt(text)) {
+                return val[i].name;
+              }
+            }
+          }
+        },
         { title: '送货地址', dataIndex: 'address' },
         { title: '创建人姓名', dataIndex: 'creatorName' },
         { title: '创建时间', dataIndex: 'createDate' },
@@ -321,23 +340,23 @@ export default {
         { title: '完成人姓名', dataIndex: 'finishName' },
         { title: '完成时间', dataIndex: 'finishDate' }
       ],
-      columnss: [
-        { title: '编号', dataIndex: 'code' },
-        { title: '公司', dataIndex: 'name' },
-        { title: '电话', dataIndex: 'telNo' },
-        { title: '手机', dataIndex: 'mobNo' },
-        { title: '邮箱', dataIndex: 'email' },
-        { title: '分类', dataIndex: 'type' },
-        { title: '大区', dataIndex: 'regionCode' },
-        { title: '网点', dataIndex: 'officeCode' },
-        { title: '币种', dataIndex: 'currency' },
-        { title: '付款方式', dataIndex: 'payMethodCode' },
-        { title: '付款条件', dataIndex: 'payTermsCode' },
-        { title: '销售员名称', dataIndex: 'salerName' },
-        { title: '销售冻结(当前渠道)', dataIndex: 'customerRangeFrozen' },
-        { title: '销售冻结(所有渠道)', dataIndex: 'customerFrozen' },
-        { title: '客户性质', dataIndex: 'industryText' }
-      ],
+      // columnss: [
+      //   { title: '编号', dataIndex: 'code' },
+      //   { title: '公司', dataIndex: 'name' },
+      //   { title: '电话', dataIndex: 'telNo' },
+      //   { title: '手机', dataIndex: 'mobNo' },
+      //   { title: '邮箱', dataIndex: 'email' },
+      //   { title: '分类', dataIndex: 'type' },
+      //   { title: '大区', dataIndex: 'regionCode' },
+      //   { title: '网点', dataIndex: 'officeCode' },
+      //   { title: '币种', dataIndex: 'currency' },
+      //   { title: '付款方式', dataIndex: 'payMethodCode' },
+      //   { title: '付款条件', dataIndex: 'payTermsCode' },
+      //   { title: '销售员名称', dataIndex: 'salerName' },
+      //   { title: '销售冻结(当前渠道)', dataIndex: 'customerRangeFrozen' },
+      //   { title: '销售冻结(所有渠道)', dataIndex: 'customerFrozen' },
+      //   { title: '客户性质', dataIndex: 'industryText' }
+      // ],
       queryParam: {},
       loadData: parameter => {
         this.queryParam = this.form.getFieldsValue();
@@ -345,6 +364,7 @@ export default {
         this.queryParam.createDateEnd = this.createDateEnd;
         const params = Object.assign(parameter, this.queryParam);
         return this.$api.peptide.getOrder(params).then(res => {
+          console.log(res.rows);
           return {
             data: res.rows,
             page: params.page,
@@ -361,6 +381,7 @@ export default {
     var height = document.body.clientHeight;
     this.rangeOrganization = peptide.peptide.rangeOrganization;
     this.rangeChannel = peptide.peptide.rangeChannel;
+    this.currency = peptide.peptide.currency;
     if (width > 1000) {
       this.customer_name_left = (width - 1000) / 2;
     }
@@ -381,8 +402,12 @@ export default {
       }
     },
     handleSearch () {
+      console.log(this.$refs.table);
       this.$refs.table.refresh(true);
     },
+    // handleSearch1 () {
+    //   // this.$refs.table.refresh(true);
+    // },
     onSelectChange (selectedRowKeys, selectedRows) {
       this.selectedRowKeys = selectedRowKeys;
       this.selectedRows = selectedRows;
