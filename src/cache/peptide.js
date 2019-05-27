@@ -1,5 +1,3 @@
-import api from '../api';
-import peptide from '../api/peptide';
 export default {
   purity: [
     { id: 1, value: '30' },
@@ -26,5 +24,26 @@ export default {
     { id: 3, name: '中间' },
     { id: 4, name: '成环' },
     { id: 5, name: '二硫键' }
+  ],
+  orderStatus: [
+    { id: 1, name: '未审核' },
+    { id: 2, name: '部门审核' },
+    { id: 3, name: '已审核' },
+    { id: 4, name: '已转申请' },
+    { id: 5, name: '已收货' },
+    { id: 6, name: '已发货' },
+    { id: 7, name: '已作废' },
+    { id: 8, name: '部分收货' },
+    { id: 9, name: '部分发货' }
+  ],
+  rangeOrganization: [
+    { id: '', name: '全部' },
+    { id: 3110, name: '国内' },
+    { id: 3120, name: '国外' }
+  ],
+  rangeChannel: [
+    { id: '', name: '全部' },
+    { id: 10, name: '直销' },
+    { id: 20, name: '电商' }
   ]
 };

@@ -112,7 +112,7 @@ export default {
           title: '修饰位置',
           dataIndex: 'modificationPosition',
           customRender: function (value) {
-            for (var i = 0; i < peptide.peptide.modificationPosition.length; i++) { if (peptide.peptide.modificationPosition[i].id == value) return peptide.peptide.modificationPosition[i].name; }
+            for (var i = 0; i < peptide.peptide.modificationPosition.length; i++) { if (peptide.peptide.modificationPosition[i].id === value) return peptide.peptide.modificationPosition[i].name; }
           }
         },
         {
@@ -120,7 +120,7 @@ export default {
           dataIndex: 'isIndependentModification',
           align: 'center',
           customRender: function (value) {
-            if (value == 1) return '√';
+            if (value === 1) return '√';
           }
         },
         {
@@ -128,7 +128,7 @@ export default {
           dataIndex: 'modificationTypeID',
           customRender: function (value) {
             for (var i = 0; i < peptide.peptide.modificationsType.length; i++) {
-              if (peptide.peptide.modificationsType[i].id == value) {
+              if (peptide.peptide.modificationsType[i].id === value) {
                 return peptide.peptide.modificationsType[i].value;
               }
             }
@@ -138,8 +138,8 @@ export default {
           title: '状态',
           dataIndex: 'status',
           customRender: function (value) {
-            if (value == 1) return '正常';
-            else if (value == 2) return '已删除';
+            if (value === 1) return '正常';
+            else if (value === 2) return '已删除';
           }
         },
         { title: '创建人', dataIndex: 'creatorName' },

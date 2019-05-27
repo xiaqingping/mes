@@ -75,7 +75,7 @@
 
 <script>
 import STable from '@/components/Table';
-import peptide from '@/cache/index';
+// import peptide from '@/cache/index';
 
 export default {
   name: 'SeqSampleOrder',
@@ -100,7 +100,7 @@ export default {
           dataIndex: 'isNeedDesalting',
           align: 'center',
           customRender: function (value) {
-            if (value == 1) return '√';
+            if (value === 1) return '√';
           }
         },
         { title: '产品编号', dataIndex: 'sapProductCode' },
@@ -109,8 +109,8 @@ export default {
           title: '状态',
           dataIndex: 'status',
           customRender: function (text) {
-            if (text == 1) return '正常';
-            else if (text == 2) return '已删除';
+            if (text === 1) return '正常';
+            else if (text === 2) return '已删除';
           }
         },
         { title: '创建人', dataIndex: 'creatorName' },

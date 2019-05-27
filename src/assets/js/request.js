@@ -6,8 +6,8 @@ import notification from 'ant-design-vue/es/notification';
 
 let baseURL = '';
 if (process.env.NODE_ENV === 'development') {
-  // baseURL = 'https://devapi.sangon.com:8443/api';
-  baseURL = 'https://preapi.sangon.com/api';
+  baseURL = 'https://devapi.sangon.com:8443/api';
+  // baseURL = 'https://preapi.sangon.com/api';
 } else if (process.env.NODE_ENV === 'production') {
   if (process.env.BASE_URL_TYPE === 'dev') {
     baseURL = 'https://devapi.sangon.com:8443/api';
@@ -64,7 +64,6 @@ service.interceptors.request.use(config => {
     config.url = baseURL + config.url;
     config.url = config.url.replace('/api/oldapi', '');
   }
-
   const token = Vue.ls.get('TOKEN');
   if (token) {
     config.headers['Authorization'] = token;

@@ -116,7 +116,7 @@ export default {
           dataIndex: 'purityID',
           customRender: function (text) {
             const val = peptide.peptide.purity;
-            for (var i = 0; i < val.length; i++) { if (val[i].id == text) return val[i].value + '%'; }
+            for (var i = 0; i < val.length; i++) { if (val[i].id === text) return val[i].value + '%'; }
           } },
         { title: '长度从', dataIndex: 'aminoAcidLengthBegin' },
         { title: '长度至', dataIndex: 'aminoAcidLengthEnd' },
@@ -124,8 +124,8 @@ export default {
           dataIndex: 'isNeedDesalting',
           align: 'center',
           customRender: function (text) {
-            if (text == 1) return '√';
-            else if (text == 2) return '';
+            if (text === 1) return '√';
+            else if (text === 2) return '';
           } },
         { title: '氨基酸类型', dataIndex: 'aminoAcidType', align: 'center' },
         { title: '产品编号', dataIndex: 'sapProductCode' },
@@ -133,8 +133,8 @@ export default {
         { title: '状态',
           dataIndex: 'status',
           customRender: function (text) {
-            if (text == 1) return '正常';
-            else if (text == 2) return '已删除';
+            if (text === 1) return '正常';
+            else if (text === 2) return '已删除';
           } },
         { title: '创建人', dataIndex: 'creatorName' },
         { title: '创建时间', dataIndex: 'createDate' },
