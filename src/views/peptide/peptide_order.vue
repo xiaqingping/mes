@@ -12,22 +12,22 @@
           <div v-show="advanced">
             <a-col :xxl="4" :xl="6" :md="8" :sm="24">
               <a-form-item label="客户">
-                <a-input-search v-decorator="['customerName']" @search="onSearch(1)"/>
+                <a-input-search v-decorator="['customerCode']" @search="onSearch(1)"/>
               </a-form-item>
             </a-col>
             <a-col :xxl="4" :xl="6" :md="8" :sm="24">
               <a-form-item label="负责人">
-                <a-input-search v-decorator="['charge_person']" @search="onSearch()"/>
+                <a-input-search v-decorator="['subCustomerCode']" @search="onSearch()"/>
               </a-form-item>
             </a-col>
             <a-col :xxl="4" :xl="6" :md="8" :sm="24">
               <a-form-item label="订货人">
-                <a-input-search v-decorator="['order']" @search="onSearch"/>
+                <a-input-search v-decorator="['contactCode']" @search="onSearch"/>
               </a-form-item>
             </a-col>
             <a-col :xxl="4" :xl="6" :md="8" :sm="24">
               <a-form-item label="销售员">
-                <a-input-search v-decorator="['saler']" @search="onSearch"/>
+                <a-input-search v-decorator="['salerCode']" @search="onSearch"/>
               </a-form-item>
             </a-col>
             <a-col :xxl="4" :xl="6" :md="8" :sm="24">
@@ -41,7 +41,7 @@
             </a-col>
             <a-col :xxl="4" :xl="6" :md="8" :sm="24">
               <a-form-item label="销售网点">
-                <a-select v-decorator="['commercial_network']">
+                <a-select v-decorator="['officeCode']">
                   <a-select-option value="0">全部</a-select-option>
                   <a-select-option value="1">关闭</a-select-option>
                   <a-select-option value="2">运行中</a-select-option>
@@ -50,7 +50,7 @@
             </a-col>
             <a-col :xxl="4" :xl="6" :md="8" :sm="24">
               <a-form-item label="销售大区">
-                <a-select v-decorator="['sales_region']">
+                <a-select v-decorator="['regionCode']">
                   <a-select-option value="0">全部</a-select-option>
                   <a-select-option value="1">关闭</a-select-option>
                   <a-select-option value="2">运行中</a-select-option>
@@ -59,25 +59,28 @@
             </a-col>
             <a-col :xxl="4" :xl="6" :md="8" :sm="24">
               <a-form-item label="销售组织">
-                <a-select v-decorator="['sales_organization']">
-                  <a-select-option value="0">全部</a-select-option>
-                  <a-select-option value="1">关闭</a-select-option>
-                  <a-select-option value="2">运行中</a-select-option>
+                <a-select v-decorator="['rangeOrganization', {initialValue : ''}]">
+                  <a-select-option v-for="item in rangeOrganization" :key="item.id" :value="item.id">{{ item.name }}
+                  </a-select-option>
                 </a-select>
               </a-form-item>
             </a-col>
             <a-col :xxl="4" :xl="6" :md="8" :sm="24">
               <a-form-item label="销售渠道">
-                <a-select v-decorator="['distribution_channel']">
-                  <a-select-option value="0">全部</a-select-option>
-                  <a-select-option value="1">关闭</a-select-option>
-                  <a-select-option value="2">运行中</a-select-option>
+                <a-select v-decorator="['rangeChannel', {initialValue : ''}]">
+                  <a-select-option v-for="item in rangeChannel" :key="item.id" :value="item.id">{{ item.name }}
+                  </a-select-option>
                 </a-select>
               </a-form-item>
             </a-col>
             <a-col :xxl="8" :xl="12" :md="16" :sm="24">
               <a-form-item label="创建日期">
-                <a-range-picker></a-range-picker>
+                <a-range-picker
+                  :ranges="{ 今天: [moment(), moment()], '本月': [moment(), moment().endOf('month')] }"
+                  :placeholder="['开始日期', '结束日期']"
+                  format="YYYY-MM-DD"
+                  @change="onChange">
+                </a-range-picker>
               </a-form-item>
             </a-col>
           </div>
@@ -128,7 +131,7 @@
       </s-table>
     </div>
 
-    <div class="mask" v-show="customerName">
+    <!-- <div class="mask" v-show="customerName">
       <div class="customer-name-mask" :style="{top: customer_name_top + 'px', left : customer_name_left + 'px', width : small ? '1000px' : '100%', height : small ? '600px' : '100%', position: small ? 'absolute' : '', borderRadius: small ? '5px' : ''}">
         <div class="top">
           <span style="float: left">客户列表</span>
@@ -140,7 +143,7 @@
             type="minus-square"/></span>
         </div>
         <div class="middle-search" style="margin: 0 3%">
-          <a-form layout="inline" :form="form" @submit="handleSearch">
+          <a-form layout="inline" :form="form" @submit="handleSearch1">
             <a-form-item label="编号">
               <a-input v-decorator="['code']" title="" style="width: 160px"/>
             </a-form-item>
@@ -217,12 +220,16 @@
         </s-table>
       </div>
 
-    </div>
+    </div> -->
   </div>
 </template>
 
 <script>
 import STable from '@/components/Table';
+import Zhcn from 'ant-design-vue/lib/locale-provider/zh_CN';
+import moment from 'moment';
+import 'moment/locale/zh-cn';
+import peptide from '@/cache/index';
 
 export default {
   name: 'SeqSampleOrder',
@@ -230,38 +237,30 @@ export default {
     STable
   },
   data () {
+    // var self = this;
     return {
+      Zhcn,
       form: this.$form.createForm(this),
       small: true,
       customerName: false,
       advanced: true,
       customer_name_top: 0,
       customer_name_left: 0,
+      createDateBegin: '',
+      createDateEnd: '',
+      rangeOrganization: [],
+      rangeChannel: [],
       columns: [
         { title: '订单编号', dataIndex: 'code' },
         {
           title: '状态',
           dataIndex: 'status',
-          customRender: function (text) {
-            switch (text) {
-              case 1 :
-                return '未审核';
-              case 2 :
-                return '部门审核';
-              case 3 :
-                return '已审核';
-              case 4 :
-                return '已转申请';
-              case 5 :
-                return '已收货';
-              case 6 :
-                return '已发货';
-              case 7 :
-                return '已作废';
-              case 8 :
-                return '部分收货';
-              case 9 :
-                return '部分发货';
+          customRender: function (text, record, index) {
+            var val = peptide.peptide.orderStatus;
+            for (let i = 0; i < val.length; i++) {
+              if (val[i].id === text) {
+                return val[i].name;
+              }
             }
           }
         },
@@ -272,8 +271,30 @@ export default {
         { title: '订货人手机', dataIndex: 'contactMobile' },
         { title: '订货人邮箱', dataIndex: 'contactEmail' },
         { title: '销售员', dataIndex: 'salerName' },
-        { title: '销售组织', dataIndex: 'rangeOrganization' },
-        { title: '分销渠道', dataIndex: 'rangeChannel' },
+        {
+          title: '销售组织',
+          dataIndex: 'rangeOrganization',
+          customRender: function (text, record, index) {
+            var val = peptide.peptide.rangeOrganization;
+            for (let i = 0; i < val.length; i++) {
+              if (val[i].id === parseInt(text)) {
+                return val[i].name;
+              }
+            }
+          }
+        },
+        {
+          title: '分销渠道',
+          dataIndex: 'rangeChannel',
+          customRender: function (text, record, index) {
+            var val = peptide.peptide.rangeChannel;
+            for (let i = 0; i < val.length; i++) {
+              if (val[i].id === parseInt(text)) {
+                return val[i].name;
+              }
+            }
+          }
+        },
         { title: '销售大区', dataIndex: 'regionCode' },
         { title: '销售网点', dataIndex: 'officeCode' },
         { title: '交货方式', dataIndex: 'deliveryType' },
@@ -319,6 +340,9 @@ export default {
       ],
       queryParam: {},
       loadData: parameter => {
+        this.queryParam = this.form.getFieldsValue();
+        this.queryParam.createDateBegin = this.createDateBegin;
+        this.queryParam.createDateEnd = this.createDateEnd;
         const params = Object.assign(parameter, this.queryParam);
         return this.$api.peptide.getOrder(params).then(res => {
           return {
@@ -333,8 +357,10 @@ export default {
     };
   },
   mounted () {
-    const width = document.body.clientWidth;
-    const height = document.body.clientHeight;
+    var width = document.body.clientWidth;
+    var height = document.body.clientHeight;
+    this.rangeOrganization = peptide.peptide.rangeOrganization;
+    this.rangeChannel = peptide.peptide.rangeChannel;
     if (width > 1000) {
       this.customer_name_left = (width - 1000) / 2;
     }
@@ -343,6 +369,7 @@ export default {
     }
   },
   methods: {
+    moment,
     showDrawer () {
       this.visible = true;
     },
@@ -353,9 +380,7 @@ export default {
           break;
       }
     },
-    handleSearch (e) {
-      e.preventDefault();
-      this.queryParam = this.form.getFieldsValue();
+    handleSearch () {
       this.$refs.table.refresh(true);
     },
     onSelectChange (selectedRowKeys, selectedRows) {
@@ -374,6 +399,10 @@ export default {
           this.customerName = true;
           break;
       }
+    },
+    onChange (dates, dateStrings) {
+      this.createDateBegin = dateStrings[0];
+      this.createDateEnd = dateStrings[1];
     }
   }
 };
