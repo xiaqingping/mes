@@ -1,31 +1,34 @@
 <template>
   <div class="logo">
-    <router-link :to="{name:'dashboard'}">
-      <!-- <LogoSvg alt="logo" /> -->
-      <h1 v-if="showTitle">{{ title }}</h1>
+    <router-link to="/">
+      <h1>{{ title }}</h1>
     </router-link>
   </div>
 </template>
 
 <script>
-// import LogoSvg from '@/assets/logo.svg?inline';
-
 export default {
   name: 'Logo',
-  components: {
-    // LogoSvg
-  },
   props: {
     title: {
       type: String,
-      default: 'Ant Design Pro',
-      required: false
-    },
-    showTitle: {
-      type: Boolean,
-      default: true,
+      default: 'MES',
       required: false
     }
   }
 };
 </script>
+
+<style lang="scss" scoped>
+.logo {
+  height: 64px;
+  line-height: 64px;
+  background: #002140;
+  h1 {
+    font-size: 20px;
+    color: #fff;
+    text-align: center;
+  }
+}
+
+</style>

@@ -4,7 +4,7 @@ import Vuex from 'vuex';
 import permission from './modules/permission';
 import seq from './modules/seq';
 import basic from './modules/basic';
-
+import user from './modules/user';
 import getters from './getters';
 
 Vue.use(Vuex);
@@ -21,17 +21,14 @@ export default new Vuex.Store({
   modules: {
     permission,
     seq,
-    basic
+    basic,
+    user
   },
   state: {
-    collapsed: false,
     theme: 'dark'
   },
   mutations: {
-    // 切换侧栏导航的展开与关闭
-    toggleSideMenu (state) {
-      state.collapsed = !state.collapsed;
-    }
+
   },
   actions: {},
   getters,

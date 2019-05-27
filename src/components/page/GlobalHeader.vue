@@ -1,14 +1,7 @@
 <template>
   <a-layout-header v-if="!headerBarFixed" :class="[fixedHeader && 'ant-header-fixedHeader', sidebarOpened ? 'ant-header-side-opened' : 'ant-header-side-closed', ]" :style="{ padding: '0' }">
-    <div v-if="mode === 'sidemenu'" class="header">
+    <div class="header">
       <a-icon
-        v-if="device==='mobile'"
-        class="trigger"
-        :type="collapsed ? 'menu-fold' : 'menu-unfold'"
-        @click="toggle"
-      />
-      <a-icon
-        v-else
         class="trigger"
         :type="collapsed ? 'menu-unfold' : 'menu-fold'"
         @click="toggle"
@@ -27,10 +20,6 @@ export default {
     UserMenu
   },
   props: {
-    mode: {
-      type: String,
-      default: 'sidemenu'
-    },
     theme: {
       type: String,
       required: false,
@@ -71,7 +60,7 @@ export default {
       }
     },
     toggle () {
-      this.$store.commit('toggleSideMenu');
+      this.$emit('toggle');
     }
   }
 };

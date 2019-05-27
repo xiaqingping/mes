@@ -5,7 +5,7 @@ export default {
     roles: []
   },
   mutations: {
-    SET_ROLES: (state, roles) => {
+    set_roles: (state, roles) => {
       state.roles = roles;
     }
   },

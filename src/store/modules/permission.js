@@ -50,26 +50,30 @@ function filterAsyncRouter (routerMap, roles) {
   return accessedRouters;
 }
 
-export default {
+const permission = {
+  namespaced: true,
   state: {
     routers: constantRouterMap,
     addRouters: []
   },
   mutations: {
-    SET_ROUTERS: (state, routers) => {
+    set_routers: (state, routers) => {
       state.addRouters = routers;
       state.routers = constantRouterMap.concat(routers);
+      console.log(3);
     }
   },
   actions: {
-    GenerateRoutes ({ commit }, data) {
+    generateRoutes ({ getters, commit }, roles) {
       return new Promise(resolve => {
-        const { roles } = data;
         const accessedRouters = filterAsyncRouter(asyncRouterMap, roles);
-        console.log(accessedRouters);
-        commit('SET_ROUTERS', accessedRouters);
+        commit('set_routers', accessedRouters);
+        console.log(getters);
+        console.log(2);
         resolve();
       });
     }
   }
 };
+
+export default permission;

@@ -20,12 +20,10 @@
 <script>
 import Logo from '@/components/tools/Logo';
 import SMenu from './index';
-// import { mixin, mixinDevice } from '@/utils/mixin';
 
 export default {
   name: 'SideMenu',
   components: { Logo, SMenu },
-  // mixins: [mixin, mixinDevice],
   props: {
     mode: {
       type: String,
