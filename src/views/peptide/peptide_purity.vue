@@ -97,8 +97,8 @@ export default {
           title: '状态',
           dataIndex: 'status',
           customRender: function (text) {
-            if (text == 1) return '正常';
-            else if (text == 2) return '已删除';
+            if (text === 1) return '正常';
+            else if (text === 2) return '已删除';
           }
         },
         { title: '创建人', dataIndex: 'creatorName' },

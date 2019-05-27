@@ -101,7 +101,7 @@ export default {
           dataIndex: 'hydrophilic',
           align: 'center',
           customRender: function (value) {
-            return value == 1 ? '√' : '';
+            return value === 1 ? '√' : '';
           }
         },
         {
@@ -109,7 +109,7 @@ export default {
           dataIndex: 'hydrophobic',
           align: 'center',
           customRender: function (value) {
-            return value == 1 ? '√' : '';
+            return value === 1 ? '√' : '';
           }
         },
         {
@@ -117,7 +117,7 @@ export default {
           dataIndex: 'acidic',
           align: 'center',
           customRender: function (value) {
-            return value == 1 ? '√' : '';
+            return value === 1 ? '√' : '';
           }
         },
         {
@@ -125,7 +125,7 @@ export default {
           dataIndex: 'alkaline',
           align: 'center',
           customRender: function (value) {
-            return value == 1 ? '√' : '';
+            return value === 1 ? '√' : '';
           }
         },
         {
@@ -133,7 +133,7 @@ export default {
           dataIndex: 'isCanDisulfideBond',
           align: 'center',
           customRender: function (value) {
-            return value == 1 ? '√' : '';
+            return value === 1 ? '√' : '';
           }
         },
         {
@@ -153,7 +153,7 @@ export default {
           dataIndex: 'status',
           align: 'center',
           customRender: function (value) {
-            return value == 1 ? '正常' : '已删除';
+            return value === 1 ? '正常' : '已删除';
           }
         },
         {
@@ -213,7 +213,7 @@ export default {
             } else {
               for (var j = 0; j < dest.length; j++) {
                 var dj = dest[j];
-                if (dj.code == ai.code) {
+                if (dj.code === ai.code) {
                   dj.shortCode = (dj.shortCode ? dj.shortCode : '') + (ai.shortCode ? ' | ' + ai.shortCode : '');
                   dj.longCode = (dj.longCode ? dj.longCode : '') + (ai.longCode ? ' | ' + ai.longCode : '');
                   dj.aminoAcidType = (dj.aminoAcidType ? dj.aminoAcidType : '') + (ai.aminoAcidType ? ' | ' + ai.aminoAcidType : '');
