@@ -3,7 +3,7 @@ import { UserLayout, BasicLayout } from '@/layouts';
 import seq from './seq';
 // 系统管理
 import system from './system';
-// 系统管理
+// 多肽管理
 import peptide from './peptide';
 
 export const asyncRouterMap = [

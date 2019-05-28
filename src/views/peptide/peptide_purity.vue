@@ -55,25 +55,6 @@
       </s-table>
     </div>
 
-    <!--    <div>-->
-    <!--      <div type="primary" @click="showDrawer">-->
-    <!--        <div style="width: 20px;height: 100%;background-color: black">-->
-    <!--          12312312312-->
-    <!--        </div>-->
-    <!--      </div>-->
-    <!--      <a-drawer-->
-    <!--        title="Basic Drawer"-->
-    <!--        placement="right"-->
-    <!--        :closable="false"-->
-    <!--        @close="onClose"-->
-    <!--        :visible="visible"-->
-    <!--      >-->
-    <!--        <p>Some contents...</p>-->
-    <!--        <p>Some contents...</p>-->
-    <!--        <p>Some contents...</p>-->
-    <!--      </a-drawer>-->
-    <!--    </div>-->
-
   </div>
 </template>
 
@@ -97,8 +78,11 @@ export default {
           title: '状态',
           dataIndex: 'status',
           customRender: function (text) {
-            if (text === 1) return '正常';
-            else if (text === 2) return '已删除';
+            if (text === 1) {
+              return '正常';
+            } else if (text === 2) {
+              return '已删除';
+            }
           }
         },
         { title: '创建人', dataIndex: 'creatorName' },
