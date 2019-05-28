@@ -15,26 +15,18 @@
 
       <route-view></route-view>
 
-      <div class="footer">
-        <div class="links">
-          <a href="_self">帮助</a>
-          <a href="_self">隐私</a>
-          <a href="_self">条款</a>
-        </div>
-        <div class="copyright">
-          Copyright &copy; 2018 白鹭学园技术组出品
-        </div>
-      </div>
+      <global-footer></global-footer>
     </div>
   </div>
 </template>
 
 <script>
 import RouteView from '@/layouts/RouteView';
+import GlobalFooter from '@/components/page/GlobalFooter';
 
 export default {
   name: 'UserLayout',
-  components: { RouteView },
+  components: { RouteView, GlobalFooter },
   data () {
     return {
       device: ''
