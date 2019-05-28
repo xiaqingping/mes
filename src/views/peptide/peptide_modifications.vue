@@ -91,7 +91,6 @@
 
 <script>
 import STable from '@/components/Table';
-import peptide from '@/cache/index';
 
 export default {
   name: 'SeqSampleOrder',
@@ -113,8 +112,8 @@ export default {
           title: '修饰位置',
           dataIndex: 'modificationPosition',
           customRender: function (value) {
-            for (var i = 0; i < peptide.peptide.modificationPosition.length; i++) {
-              if (peptide.peptide.modificationPosition[i].id === value) return peptide.peptide.modificationPosition[i].name;
+            for (var i = 0; i < self.$store.state.peptide.modificationPosition.length; i++) {
+              if (self.$store.state.peptide.modificationPosition[i].id === value) return self.$store.state.peptide.modificationPosition[i].name;
             }
           }
         },
@@ -171,12 +170,9 @@ export default {
     };
   },
   mounted () {
-    // console.log(peptide.peptide.modificationsType);
     this.$api.peptide.getModificationTypesAll().then(res => {
       this.modificationsType = res;
     });
-    // this.$store.commit('plusVal', this.modificationsType);
-    // console.log(this.modificationsType);
   },
   methods: {
     showDrawer () {

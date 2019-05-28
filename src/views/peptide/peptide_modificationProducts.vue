@@ -34,10 +34,6 @@
         <a-button type="primary" icon="edit">保存</a-button>
         <a-button type="primary" icon="minus-square" @click="handleDelete">删除</a-button>
         <a-button type="primary" icon="minus-square" @click="handleResume">恢复</a-button>
-        <!--        <a @click="toggleAdvanced" style="margin-left: 8px">-->
-        <!--          {{ advanced ? '收起' : '展开' }}-->
-        <!--          <a-icon :type="advanced ? 'up' : 'down'"/>-->
-        <!--        </a>-->
       </div>
 
       <s-table
@@ -52,31 +48,11 @@
       </s-table>
     </div>
 
-    <!--    <div>-->
-    <!--      <div type="primary" @click="showDrawer">-->
-    <!--        <div style="width: 20px;height: 100%;background-color: black">-->
-    <!--          12312312312-->
-    <!--        </div>-->
-    <!--      </div>-->
-    <!--      <a-drawer-->
-    <!--        title="Basic Drawer"-->
-    <!--        placement="right"-->
-    <!--        :closable="false"-->
-    <!--        @close="onClose"-->
-    <!--        :visible="visible"-->
-    <!--      >-->
-    <!--        <p>Some contents...</p>-->
-    <!--        <p>Some contents...</p>-->
-    <!--        <p>Some contents...</p>-->
-    <!--      </a-drawer>-->
-    <!--    </div>-->
-
   </div>
 </template>
 
 <script>
 import STable from '@/components/Table';
-import peptide from '@/cache/index';
 
 export default {
   name: 'SeqSampleOrder',
@@ -84,6 +60,7 @@ export default {
     STable
   },
   data () {
+    var self = this;
     return {
       form: this.$form.createForm(this),
       visible: false,
@@ -95,7 +72,9 @@ export default {
           title: '修饰位置',
           dataIndex: 'modificationPosition',
           customRender: function (value) {
-            for (var i = 0; i < peptide.peptide.modificationPosition.length; i++) { if (peptide.peptide.modificationPosition[i].id === value) return peptide.peptide.modificationPosition[i].name; }
+            for (var i = 0; i < self.$store.state.peptide.modificationPosition.length; i++) {
+              if (self.$store.state.peptide.modificationPosition[i].id === value) return self.$store.state.peptide.modificationPosition[i].name;
+            }
           }
         },
         { title: '氨基酸', dataIndex: 'aminoAcidName' },
@@ -132,7 +111,6 @@ export default {
       queryParam: {},
       loadData: parameter => {
         this.queryParam = this.form.getFieldsValue();
-        // else this.queryParam = {'status': parseInt(this.form.getFieldsValue().status)};
         const params = Object.assign(parameter, this.queryParam);
         return this.$api.peptide.getModificationProducts(params).then(res => {
           return {
@@ -162,9 +140,6 @@ export default {
       this.selectedRowKeys = selectedRowKeys;
       this.selectedRows = selectedRows;
     },
-    // toggleAdvanced() {
-    //   this.advanced = !this.advanced;
-    // },
     handleDelete () {
       if (this.selectedRowKeys[0] == null) {
         this.$notification.error({
