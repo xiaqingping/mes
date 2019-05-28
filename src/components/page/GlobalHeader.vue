@@ -29,11 +29,6 @@ export default {
       type: Boolean,
       required: false,
       default: false
-    },
-    device: {
-      type: String,
-      required: false,
-      default: 'desktop'
     }
   },
   data () {

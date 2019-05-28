@@ -12,7 +12,6 @@
       <global-header
         :theme="theme"
         :collapsed="collapsed"
-        :device="device"
         @toggle="toggle"
       />
       <a-layout-content :style="{ height: '100%', paddingTop: '0' }">
@@ -46,15 +45,19 @@ export default {
   },
   data () {
     return {
-      device: 'desktop',
       theme: 'dark',
-      width: '256',
       collapsed: false,
       menus: []
     };
   },
   created () {
     this.menus = this.mainMenu.find(item => item.path === '/').children;
+
+    this.$store.dispatch('basic/get_factorys');
+    this.$store.dispatch('basic/get_offices');
+    this.$store.dispatch('basic/get_paymethods');
+    this.$store.dispatch('basic/get_payterms');
+    this.$store.dispatch('basic/get_regions');
   },
   computed: {
     ...mapState({

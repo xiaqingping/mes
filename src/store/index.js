@@ -5,7 +5,6 @@ import permission from './modules/permission';
 import seq from './modules/seq';
 import basic from './modules/basic';
 import user from './modules/user';
-import getters from './getters';
 
 Vue.use(Vuex);
 
@@ -17,7 +16,6 @@ const setCache = store => {
 };
 
 export default new Vuex.Store({
-  strict: process.env.NODE_ENV !== 'production', // 开发模式下开启严格模式
   modules: {
     permission,
     seq,
@@ -31,6 +29,5 @@ export default new Vuex.Store({
 
   },
   actions: {},
-  getters,
   plugins: [setCache]
 });

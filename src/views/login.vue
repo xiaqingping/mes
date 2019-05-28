@@ -224,12 +224,6 @@ export default {
       const redirect = this.$route.query.redirect;
       this.$router.push(redirect || '/');
 
-      this.$store.dispatch('basic/get_factorys');
-      this.$store.dispatch('basic/get_offices');
-      this.$store.dispatch('basic/get_paymethods');
-      this.$store.dispatch('basic/get_payterms');
-      this.$store.dispatch('basic/get_regions');
-
       this.$notification.success({
         message: '欢迎',
         description: `${res.name}，欢迎回来`
