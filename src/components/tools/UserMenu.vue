@@ -3,11 +3,9 @@
     <span class="action">
       <a-icon type="question-circle-o" />
     </span>
-    <!-- <header-notice class="action" /> -->
+
     <a-dropdown>
       <span class="action ant-dropdown-link user-dropdown-menu">
-        <!-- <a-avatar class="avatar" size="small" :src="avatar()" />
-        <span>{{ nickname() }}</span> -->
         <a-avatar class="avatar" size="small" :src="avatar" />
         <span>{{ nickname }}</span>
       </span>
@@ -26,7 +24,7 @@
         </a-menu-item>
         <a-menu-divider />
         <a-menu-item key="2">
-          <a href="javascript:;" @click="handleLogout">
+          <a href="javascript:;" @click="logout">
             <a-icon type="logout" />
             <span>退出登录</span>
           </a>
@@ -37,14 +35,10 @@
 </template>
 
 <script>
-// import { mapActions, mapGetters } from 'vuex';
-// import HeaderNotice from './HeaderNotice';
 
 export default {
   name: 'UserMenu',
-  components: {
-    // HeaderNotice
-  },
+  components: {},
   data () {
     return {
       avatar: 'https://blog.maxmeng.top/images/avatar.jpg',
@@ -52,9 +46,7 @@ export default {
     };
   },
   methods: {
-    // ...mapActions(['Logout']),
-    // ...mapGetters(['nickname', 'avatar']),
-    handleLogout () {
+    logout () {
       const that = this;
 
       this.$confirm({

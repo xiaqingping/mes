@@ -102,7 +102,7 @@
         </a-button>
       </a-form-item>
 
-      <div class="user-login-other">
+      <!-- <div class="user-login-other">
         <span>其他登陆方式</span>
         <a>
           <a-icon class="item-icon" type="alipay-circle" />
@@ -116,7 +116,7 @@
         <router-link class="register" to="/register">
           注册用户
         </router-link>
-      </div>
+      </div> -->
     </a-form>
   </div>
 </template>
@@ -223,12 +223,6 @@ export default {
       this.$ls.set('TOKEN', res.authorization);
       const redirect = this.$route.query.redirect;
       this.$router.push(redirect || '/');
-
-      this.$store.dispatch('basic/factorys');
-      this.$store.dispatch('basic/offices');
-      this.$store.dispatch('basic/paymethods');
-      this.$store.dispatch('basic/payterms');
-      this.$store.dispatch('basic/regions');
 
       this.$notification.success({
         message: '欢迎',
