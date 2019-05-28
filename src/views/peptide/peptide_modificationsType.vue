@@ -38,10 +38,6 @@
         <a-button type="primary" icon="edit">保存</a-button>
         <a-button type="primary" icon="minus-square" @click="handleDelete">删除</a-button>
         <a-button type="primary" icon="minus-square" @click="handleResume">恢复</a-button>
-        <!--        <a @click="toggleAdvanced" style="margin-left: 8px">-->
-        <!--          {{ advanced ? '收起' : '展开' }}-->
-        <!--          <a-icon :type="advanced ? 'up' : 'down'"/>-->
-        <!--        </a>-->
       </div>
 
       <s-table
@@ -54,25 +50,6 @@
       >
       </s-table>
     </div>
-
-    <!--    <div>-->
-    <!--      <div type="primary" @click="showDrawer">-->
-    <!--        <div style="width: 20px;height: 100%;background-color: black">-->
-    <!--          12312312312-->
-    <!--        </div>-->
-    <!--      </div>-->
-    <!--      <a-drawer-->
-    <!--        title="Basic Drawer"-->
-    <!--        placement="right"-->
-    <!--        :closable="false"-->
-    <!--        @close="onClose"-->
-    <!--        :visible="visible"-->
-    <!--      >-->
-    <!--        <p>Some contents...</p>-->
-    <!--        <p>Some contents...</p>-->
-    <!--        <p>Some contents...</p>-->
-    <!--      </a-drawer>-->
-    <!--    </div>-->
 
   </div>
 </template>
@@ -141,9 +118,6 @@ export default {
       this.selectedRowKeys = selectedRowKeys;
       this.selectedRows = selectedRows;
     },
-    // toggleAdvanced() {
-    //   this.advanced = !this.advanced;
-    // },
     handleDelete () {
       if (this.selectedRowKeys[0] == null) {
         this.$notification.error({

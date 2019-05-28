@@ -5,6 +5,7 @@ import permission from './modules/permission';
 import seq from './modules/seq';
 import basic from './modules/basic';
 import user from './modules/user';
+import peptide from './modules/peptide';
 
 Vue.use(Vuex);
 
@@ -20,7 +21,8 @@ export default new Vuex.Store({
     permission,
     seq,
     basic,
-    user
+    user,
+    peptide
   },
   state: {
     theme: 'dark'
