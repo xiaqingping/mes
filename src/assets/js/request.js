@@ -2,7 +2,6 @@ import Vue from 'vue';
 import axios from 'axios';
 // import store from '@/store';
 import notification from 'ant-design-vue/es/notification';
-// import { ACCESS_TOKEN } from '@/store/mutation-types';
 
 let baseURL = '';
 if (process.env.NODE_ENV === 'development') {

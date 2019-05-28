@@ -73,8 +73,8 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
-@import url('../assets/scss/index.scss');
+<style lang="scss">
+@import '@/assets/scss/index.scss';
 
 .page-transition-enter {
   opacity: 0;
