@@ -15,46 +15,22 @@ export default {
     regions: []
   },
   mutations: {
-    set_factorys (state, payload) {
-      state.factorys = payload;
-    },
-    set_offices (state, payload) {
-      state.offices = payload;
-    },
-    set_paymethods (state, payload) {
-      state.paymethods = payload;
-    },
-    set_payterms (state, payload) {
-      state.payterms = payload;
-    },
-    set_regions (state, payload) {
-      state.regions = payload;
+    setCache (state, payload) {
+      state[payload.type] = payload.data;
     }
   },
   actions: {
-    get_factorys (context) {
-      basic.getFactorys().then(res => {
-        context.commit('set_factorys', res);
-      });
-    },
-    get_offices (context) {
-      basic.getOffices().then(res => {
-        context.commit('set_offices', res);
-      });
-    },
-    get_paymethods (context) {
-      basic.getPaymethods().then(res => {
-        context.commit('set_paymethods', res);
-      });
-    },
-    get_payterms (context) {
-      basic.getPayterms().then(res => {
-        context.commit('set_payterms', res);
-      });
-    },
-    get_regions (context) {
-      basic.getRegions().then(res => {
-        context.commit('set_regions', res);
+    getCache (context, payload) {
+      const { type } = payload;
+      var map = {
+        factorys: basic.getFactorys,
+        offices: basic.getOffices,
+        paymethods: basic.getPaymethods,
+        payterms: basic.getPayterms,
+        regions: basic.getRegions
+      };
+      map[type]().then(data => {
+        context.commit('setCache', { type, data });
       });
     }
   }
