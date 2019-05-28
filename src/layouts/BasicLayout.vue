@@ -53,11 +53,11 @@ export default {
   created () {
     this.menus = this.mainMenu.find(item => item.path === '/').children;
 
-    this.$store.dispatch('basic/get_factorys');
-    this.$store.dispatch('basic/get_offices');
-    this.$store.dispatch('basic/get_paymethods');
-    this.$store.dispatch('basic/get_payterms');
-    this.$store.dispatch('basic/get_regions');
+    this.$store.dispatch('basic/getCache', { type: 'factorys' });
+    this.$store.dispatch('basic/getCache', { type: 'offices' });
+    this.$store.dispatch('basic/getCache', { type: 'paymethods' });
+    this.$store.dispatch('basic/getCache', { type: 'payterms' });
+    this.$store.dispatch('basic/getCache', { type: 'regions' });
   },
   computed: {
     ...mapState({
