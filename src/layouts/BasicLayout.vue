@@ -1,52 +1,92 @@
 <template>
-  <global-layout>
-    <!-- <multi-tab v-if="$store.getters.multiTab"></multi-tab> -->
-    <transition name="page-transition">
-      <route-view />
-    </transition>
-  </global-layout>
+  <a-layout>
+    <side-menu
+      :collapsed="collapsed"
+      :theme="theme"
+      :menus="menus"
+      mode="inline"
+      :collapsible="true"
+    ></side-menu>
+
+    <a-layout>
+      <global-header
+        :theme="theme"
+        :collapsed="collapsed"
+        @toggle="toggle"
+      />
+      <a-layout-content :style="{ height: '100%', paddingTop: '0' }">
+        <transition name="page-transition">
+          <route-view />
+        </transition>
+      </a-layout-content>
+
+      <a-layout-footer :style="{padding: 0}">
+        <global-footer />
+      </a-layout-footer>
+    </a-layout>
+  </a-layout>
 </template>
 
 <script>
+import { mapState } from 'vuex';
+
 import RouteView from '@/layouts/RouteView';
-// import MultiTab from '@/components/MultiTab';
-import GlobalLayout from '@/components/page/GlobalLayout';
+import GlobalHeader from '@/components/page/GlobalHeader';
+import GlobalFooter from '@/components/page/GlobalFooter';
+import SideMenu from '@/components/menu/SideMenu';
 
 export default {
   name: 'BasicLayout',
   components: {
     RouteView,
-    // MultiTab,
-    GlobalLayout
+    GlobalHeader,
+    GlobalFooter,
+    SideMenu
   },
   data () {
-    return {};
+    return {
+      theme: 'dark',
+      collapsed: false,
+      menus: []
+    };
+  },
+  created () {
+    this.menus = this.mainMenu.find(item => item.path === '/').children;
+
+    this.$store.dispatch('basic/get_factorys');
+    this.$store.dispatch('basic/get_offices');
+    this.$store.dispatch('basic/get_paymethods');
+    this.$store.dispatch('basic/get_payterms');
+    this.$store.dispatch('basic/get_regions');
+  },
+  computed: {
+    ...mapState({
+      // 动态主路由
+      mainMenu: state => state.permission.addRouters
+    })
+  },
+  methods: {
+    toggle () {
+      this.collapsed = !this.collapsed;
+    }
   }
 };
 </script>
 
 <style lang="scss" scoped>
+@import url('../assets/scss/index.scss');
 
-  /*
- * The following styles are auto-applied to elements with
- * transition="page-transition" when their visibility is toggled
- * by Vue.js.
- *
- * You can easily play with the page transition by editing
- * these styles.
- */
+.page-transition-enter {
+  opacity: 0;
+}
 
-  .page-transition-enter {
-    opacity: 0;
-  }
+.page-transition-leave-active {
+  opacity: 0;
+}
 
-  .page-transition-leave-active {
-    opacity: 0;
-  }
-
-  .page-transition-enter .page-transition-container,
-  .page-transition-leave-active .page-transition-container {
-    -webkit-transform: scale(1.1);
-    transform: scale(1.1);
-  }
+.page-transition-enter .page-transition-container,
+.page-transition-leave-active .page-transition-container {
+  -webkit-transform: scale(1.1);
+  transform: scale(1.1);
+}
 </style>

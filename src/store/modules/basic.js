@@ -15,46 +15,46 @@ export default {
     regions: []
   },
   mutations: {
-    factorys (state, payload) {
+    set_factorys (state, payload) {
       state.factorys = payload;
     },
-    offices (state, payload) {
+    set_offices (state, payload) {
       state.offices = payload;
     },
-    paymethods (state, payload) {
+    set_paymethods (state, payload) {
       state.paymethods = payload;
     },
-    payterms (state, payload) {
+    set_payterms (state, payload) {
       state.payterms = payload;
     },
-    regions (state, payload) {
+    set_regions (state, payload) {
       state.regions = payload;
     }
   },
   actions: {
-    factorys (context) {
+    get_factorys (context) {
       basic.getFactorys().then(res => {
-        context.commit('factorys', res);
+        context.commit('set_factorys', res);
       });
     },
-    offices (context) {
+    get_offices (context) {
       basic.getOffices().then(res => {
-        context.commit('offices', res);
+        context.commit('set_offices', res);
       });
     },
-    paymethods (context) {
+    get_paymethods (context) {
       basic.getPaymethods().then(res => {
-        context.commit('paymethods', res);
+        context.commit('set_paymethods', res);
       });
     },
-    payterms (context) {
+    get_payterms (context) {
       basic.getPayterms().then(res => {
-        context.commit('payterms', res);
+        context.commit('set_payterms', res);
       });
     },
-    regions (context) {
+    get_regions (context) {
       basic.getRegions().then(res => {
-        context.commit('regions', res);
+        context.commit('set_regions', res);
       });
     }
   }
