@@ -78,7 +78,7 @@ import STable from '@/components/Table';
 // import peptide from '@/cache/index';
 
 export default {
-  name: 'SeqSampleOrder',
+  name: 'PeptideDisulfideBondProducts',
   components: {
     STable
   },

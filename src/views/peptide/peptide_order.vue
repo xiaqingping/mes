@@ -127,7 +127,6 @@
       >
       </s-table>
     </div>
-
     <customer-mask :customerName="customerName" v-show="customer_status" @changeCustomerStatus="onClosed(1)">
     </customer-mask>
   </div>
@@ -141,7 +140,7 @@ import 'moment/locale/zh-cn';
 import CustomerMask from '@/components/peptide/customer_mask';
 
 export default {
-  name: 'SeqSampleOrder',
+  name: 'PeptideOrder',
   components: {
     STable,
     'customer-mask': CustomerMask
@@ -286,9 +285,6 @@ export default {
     handleSearch () {
       this.$refs.table.refresh(true);
     },
-    // handleSearch1 () {
-    //   // this.$refs.table.refresh(true);
-    // },
     onSelectChange (selectedRowKeys, selectedRows) {
       this.selectedRowKeys = selectedRowKeys;
       this.selectedRows = selectedRows;
@@ -325,4 +321,5 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+
 </style>

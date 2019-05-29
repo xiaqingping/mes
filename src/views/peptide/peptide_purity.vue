@@ -62,7 +62,7 @@
 import STable from '@/components/Table';
 
 export default {
-  name: 'SeqSampleOrder',
+  name: 'PeptidePurity',
   components: {
     STable
   },

@@ -85,7 +85,7 @@
 import STable from '@/components/Table';
 
 export default {
-  name: 'SeqSampleOrder',
+  name: 'PeptideAminoAcid',
   components: {
     STable
   },
