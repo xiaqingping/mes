@@ -5,6 +5,8 @@ import seq from './seq';
 import system from './system';
 // 多肽管理
 import peptide from './peptide';
+// 人事管理
+import personnel from './personnel';
 
 export const asyncRouterMap = [
   {
@@ -16,7 +18,8 @@ export const asyncRouterMap = [
     children: [
       seq,
       system,
-      peptide
+      peptide,
+      personnel
     ]
   },
   {
