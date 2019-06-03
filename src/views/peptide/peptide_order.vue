@@ -16,17 +16,17 @@
             </a-col>
             <a-col :xxl="4" :xl="6" :md="8" :sm="24">
               <a-form-item label="负责人">
-                <a-input-search v-decorator="['subCustomerCode']" @search="onSearch()"/>
+                <a-input-search v-decorator="['subCustomerCode']" @search="onOpen(2)"/>
               </a-form-item>
             </a-col>
             <a-col :xxl="4" :xl="6" :md="8" :sm="24">
               <a-form-item label="订货人">
-                <a-input-search v-decorator="['contactCode']" @search="onSearch"/>
+                <a-input-search v-decorator="['contactCode']" @search="onOpen(3)"/>
               </a-form-item>
             </a-col>
             <a-col :xxl="4" :xl="6" :md="8" :sm="24">
               <a-form-item label="销售员">
-                <a-input-search v-decorator="['salerCode']" @search="onSearch"/>
+                <a-input-search v-decorator="['salerCode']" @search="onOpen(4)"/>
               </a-form-item>
             </a-col>
             <a-col :xxl="4" :xl="6" :md="8" :sm="24">
@@ -127,8 +127,14 @@
       >
       </s-table>
     </div>
-    <customer-mask :customerName="customerName" v-show="customer_status" @changeCustomerStatus="onClosed(1)">
+    <customer-mask v-show="customer_status" @Closed="onClosed(1)">
     </customer-mask>
+    <sub-customer-mask v-show="sub_customer_status" @Closed="onClosed(2)">
+    </sub-customer-mask>
+    <contact-mask v-show="contact_status" @Closed="onClosed(3)">
+    </contact-mask>
+    <saler-mask v-show="saler_status" @Closed="onClosed(4)">
+    </saler-mask>
   </div>
 </template>
 
@@ -138,12 +144,18 @@ import Zhcn from 'ant-design-vue/lib/locale-provider/zh_CN';
 import moment from 'moment';
 import 'moment/locale/zh-cn';
 import CustomerMask from '@/components/peptide/customer_mask';
+import SubCustomerMask from '@/components/peptide/sub_customer_mask';
+import ContactMask from '@/components/peptide/contact_mask';
+import SalerMask from '@/components/peptide/saler_mask';
 
 export default {
   name: 'PeptideOrder',
   components: {
     STable,
-    'customer-mask': CustomerMask
+    CustomerMask,
+    SubCustomerMask,
+    ContactMask,
+    SalerMask
   },
   data () {
     var self = this;
@@ -161,6 +173,9 @@ export default {
       rangeOrganization: [],
       rangeChannel: [],
       customer_status: false,
+      sub_customer_status: false,
+      contact_status: false,
+      saler_status: false,
       columns: [
         { title: '订单编号', dataIndex: 'code' },
         {
@@ -272,7 +287,8 @@ export default {
     };
   },
   mounted () {
-    // console.log(this.$store.state);
+    var selectDrop = document.getElementsByClassName('ant-checkbox')[0];
+    selectDrop.style.display = 'none';
     this.currency = this.$store.state.peptide.currency;
     this.rangeOrganization = this.$store.state.peptide.rangeOrganization;
     this.rangeChannel = this.$store.state.peptide.rangeChannel;
@@ -286,7 +302,7 @@ export default {
       this.$refs.table.refresh(true);
     },
     onSelectChange (selectedRowKeys, selectedRows) {
-      this.selectedRowKeys = selectedRowKeys;
+      this.selectedRowKeys = selectedRowKeys.slice(-1);
       this.selectedRows = selectedRows;
     },
     onSmall () {
@@ -307,12 +323,30 @@ export default {
         case 1 :
           this.customer_status = true;
           break;
+        case 2 :
+          this.sub_customer_status = true;
+          break;
+        case 3 :
+          this.contact_status = true;
+          break;
+        case 4 :
+          this.saler_status = true;
+          break;
       }
     },
     onClosed (e) {
       switch (e) {
         case 1 :
           this.customer_status = false;
+          break;
+        case 2 :
+          this.sub_customer_status = false;
+          break;
+        case 3 :
+          this.contact_status = false;
+          break;
+        case 4 :
+          this.saler_status = false;
           break;
       }
     }

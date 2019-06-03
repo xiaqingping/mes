@@ -15,13 +15,18 @@ export default {
 
   /** ****************************** 多肽纯度 ************************************/
   // 获取纯度(全部)
-  getPurityAll () {
-    return request(`/peptide-base/v1/puritys`);
+  getPurityAll (params) {
+    return request(`/peptide-base/v1/puritys`, { params });
   },
 
   // 获取纯度列表（分页获取）
   getPurity (params) {
     return request(`/peptide-base/v1/puritys/easyui`, { params });
+  },
+
+  // 创建纯度
+  insertPurity (params) {
+    return request(`/peptide-base/v1/puritys`, { method: 'POST', data: params });
   },
 
   // 恢复纯度

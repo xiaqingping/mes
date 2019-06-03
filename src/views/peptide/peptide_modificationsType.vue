@@ -46,7 +46,7 @@
         size="small"
         :columns="columns"
         :data="loadData"
-        :rowSelection="{ selectedRowKeys: selectedRowKeys, onChange: onSelectChange, type: 'radio' }"
+        :rowSelection="{ selectedRowKeys: selectedRowKeys, onChange: onSelectChange }"
       >
       </s-table>
     </div>
@@ -103,6 +103,8 @@ export default {
     };
   },
   mounted () {
+    var selectDrop = document.getElementsByClassName('ant-checkbox')[0];
+    selectDrop.style.display = 'none';
   },
   methods: {
     showDrawer () {
@@ -115,7 +117,7 @@ export default {
       this.$refs.table.refresh(true);
     },
     onSelectChange (selectedRowKeys, selectedRows) {
-      this.selectedRowKeys = selectedRowKeys;
+      this.selectedRowKeys = selectedRowKeys.slice(-1);
       this.selectedRows = selectedRows;
     },
     handleDelete () {

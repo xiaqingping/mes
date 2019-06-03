@@ -30,12 +30,11 @@
         <a-button type="primary" icon="search" html-type="submit" style="display:none;">查询</a-button>
       </a-form>
     </div>
-
     <div>
       <div class="table-operator">
         <a-button type="primary" icon="search" @click="handleSearch">查询</a-button>
-        <a-button type="primary" icon="plus">新增</a-button>
-        <a-button type="primary" icon="edit">保存</a-button>
+        <a-button type="primary" icon="plus" @click="addTr(8)" id="add">新增</a-button>
+        <a-button type="primary" icon="edit" @click="addData">保存</a-button>
         <a-button type="primary" icon="minus-square" @click="handleDelete">删除</a-button>
         <a-button type="primary" icon="minus-square" @click="handleResume">恢复</a-button>
         <!--        <a @click="toggleAdvanced" style="margin-left: 8px">-->
@@ -50,7 +49,7 @@
         size="small"
         :columns="columns"
         :data="loadData"
-        :rowSelection="{ selectedRowKeys: selectedRowKeys, onChange: onSelectChange, type: 'radio' }"
+        :rowSelection="{ selectedRowKeys: selectedRowKeys, onChange: onSelectChange }"
       >
       </s-table>
     </div>
@@ -107,6 +106,8 @@ export default {
     };
   },
   mounted () {
+    var selectDrop = document.getElementsByClassName('ant-checkbox')[0];
+    selectDrop.style.display = 'none';
   },
   methods: {
     showDrawer () {
@@ -118,25 +119,67 @@ export default {
     handleSearch () {
       this.$refs.table.refresh(true);
     },
+    addTr (num) {
+      document.getElementById('add').setAttribute('disabled', true);
+      var tbodyObj = document.getElementsByTagName('tbody')[0];
+      var trObj = document.createElement('tr');
+      for (let i = 0; i < num; i++) {
+        var tdObj = document.createElement('td');
+        if (i === 2) {
+          tdObj.style.padding = '0';
+          tdObj.style.width = '100px';
+          tdObj.innerHTML = "<input type='text' title='该输入项为必输入项' id='addValue' autofocus='autofocus' style='width: 100%;height: 100%;border: 1px solid #FFA8A8;outline: none;background-color: #FFF3F3;'/>";
+        } else {
+          tdObj.style.backgroundColor = 'blue';
+        }
+        trObj.appendChild(tdObj);
+      }
+      tbodyObj.insertBefore(trObj, tbodyObj.firstElementChild);
+    },
+    addData () {
+      var addVal = document.getElementById('addValue').value;
+      if (addVal === '') {
+        this.$notification.error({
+          message: '错误',
+          description: `数据不能为空！`
+        });
+        return false;
+      }
+      this.$api.peptide.insertPurity({ 'purity': addVal }).then(res => {
+        if (res.id) {
+          this.refresh();
+          return this.$refs.table.refresh(true);
+        }
+      });
+    },
+    refresh () {
+      var childList = document.getElementsByTagName('tbody')[0].childNodes;
+      document.getElementsByTagName('tbody')[0].removeChild(childList[0]);
+      document.getElementById('add').removeAttribute('disabled');
+    },
     onSelectChange (selectedRowKeys, selectedRows) {
-      this.selectedRowKeys = selectedRowKeys;
+      this.selectedRowKeys = selectedRowKeys.slice(-1);
       this.selectedRows = selectedRows;
     },
     // toggleAdvanced() {
     //   this.advanced = !this.advanced;
     // },
     handleDelete () {
-      if (this.selectedRowKeys[0] == null) {
-        this.$notification.error({
-          message: '错误',
-          description: `请选择一条数据`
+      if (!document.getElementById('addValue')) {
+        if (this.selectedRowKeys[0] == null) {
+          this.$notification.error({
+            message: '错误',
+            description: `请选择一条数据`
+          });
+          return false;
+        }
+        this.$api.peptide.deletePurity(this.selectedRowKeys[0]).then(res => {
+          this.selectedRowKeys = [];
+          return this.$refs.table.refresh(true);
         });
-        return false;
+      } else {
+        this.refresh();
       }
-      this.$api.peptide.deletePurity(this.selectedRowKeys[0]).then(res => {
-        this.selectedRowKeys = [];
-        return this.$refs.table.refresh(true);
-      });
     },
     handleResume () {
       if (this.selectedRowKeys[0] == null) {
@@ -156,5 +199,11 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-
+  .addInput {
+    width: 100%;
+    height: 100%;
+    border: 1px solid #FFA8A8;
+    outline: none;
+    background-color: #FFF3F3;
+  }
 </style>
