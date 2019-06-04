@@ -42,7 +42,7 @@
 
     <div class="table-operator">
       <a-button type="primary" icon="search" @click="handleSearch">查询</a-button>
-      <a-button type="primary" icon="plus">新增</a-button>
+      <a-button type="primary" icon="plus" @click="handleIncrease">新增</a-button>
       <a-button type="primary" icon="delete" @click="handleDelete">作废</a-button>
       <a-button type="primary" icon="edit">保存</a-button>
     </div>
@@ -103,6 +103,14 @@ export default {
       e.preventDefault();
       this.queryParam = this.form.getFieldsValue();
       this.$refs.table.refresh(true);
+    },
+    // 新增
+    handleIncrease () {
+      this.$api.pay.increaseTypepay(this.selectedRowKeys[0]).then(res => {
+        this.selectedRowKeys = [];
+        return this.$refs.table.refresh(true);
+      });
+      // console.log(1);
     },
     // 删除
     handleDelete () {

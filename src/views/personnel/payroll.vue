@@ -63,7 +63,12 @@
     <div class="table-operator">
       <a-button type="primary" icon="search" @click="handleSearch">查询</a-button>
       <a-button type="primary" icon="delete" @click="handleDelete">作废</a-button>
-      <a-button type="primary" icon="file-excel">excel上传</a-button>
+      <a-button type="primary" icon="file-excel" @click="handleUpload">excel上传</a-button>
+      <!-- <a-upload action="http://192.168.19.71:8260/v1/date/excel" :multiple="true" :fileList="fileList" @change="handleChange">
+        <a-button>
+          <a-icon type="upload" icon="file-excel" /> Upload
+        </a-button>
+      </a-upload> -->
     </div>
     <!-- 表格 -->
     <s-table
@@ -89,6 +94,12 @@ export default {
   data () {
     return {
       form: this.$form.createForm(this),
+      fileList: [{
+        uid: '-1',
+        name: 'xxx.png',
+        status: 'done',
+        url: 'https://588ku.com/sucai/0-default-0-0-0-0-1/?h=bd&sem=1'
+      }],
       columns: [
         { title: '员工编号', dataIndex: 'employeeCode' },
         { title: '员工名称', dataIndex: 'employeeName' },
@@ -139,6 +150,32 @@ export default {
       });
       // console.log(1);
     },
+    // 上传excel
+    handleUpload () {
+      // this.$api.pay.uploadpays(this.selectedRowKeys[0]).then(res => {
+      //   this.selectedRowKeys = [];
+      //   return this.$refs.table.refresh(true);
+      // });
+      console.log(1);
+    },
+    // handleChange (info) {
+    //   let fileList = [...info.fileList];
+
+    //   // 1.限制上传文件的数量，只显示最近上传的两个文件，旧文件将被新文件替换
+    //   fileList = fileList.slice(-2);
+
+    //   // 2. 读取响应并显示文件链接
+    //   fileList = fileList.map((file) => {
+    //     if (file.response) {
+    //       // 组件将显示文件。url链接
+    //       file.url = file.response.url;
+    //       console.log(file.url);
+    //     }
+    //     return file;
+    //   });
+    //   this.fileList = fileList;
+    //   // console.log(fileList);
+    // },
     // 表格
     onSelectChange (selectedRowKeys, selectedRows) {
       this.selectedRowKeys = selectedRowKeys;

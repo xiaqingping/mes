@@ -14,9 +14,17 @@ export default {
   deletepays () {
     return request(`/pay/v1/date/invalid`, { method: 'PUT' });
   },
+  // 上传excel表格
+  uploadpays () {
+    return request(`/pay/v1/date/excel`, { method: 'POST' });
+  },
   // 获取工资类型
   getTypepay (params) {
     return request(`/pay/v1/type/easyui`, { params });
+  },
+  // 新增工资类型
+  increaseTypepay () {
+    return request(`/pay/v1/type`, { method: 'POST' });
   },
   // 删除工资类型
   deleteTypepays (params) {
