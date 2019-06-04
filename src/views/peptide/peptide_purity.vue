@@ -128,13 +128,16 @@ export default {
         if (i === 2) {
           tdObj.style.padding = '0';
           tdObj.style.width = '100px';
-          tdObj.innerHTML = "<input type='text' title='该输入项为必输入项' id='addValue' autofocus='autofocus' style='width: 100%;height: 100%;border: 1px solid #FFA8A8;outline: none;background-color: #FFF3F3;'/>";
+          tdObj.innerHTML = "<input type='text' title='该输入项为必输入项' id='addValue' style='width: 100%;height: 100%;border: 1px solid #FFA8A8;outline: none;background-color: #FFF3F3;'/>";
         } else {
           tdObj.style.backgroundColor = 'blue';
         }
         trObj.appendChild(tdObj);
       }
       tbodyObj.insertBefore(trObj, tbodyObj.firstElementChild);
+      this.$nextTick(() => {
+        document.getElementById('addValue').focus();
+      });
     },
     addData () {
       var addVal = document.getElementById('addValue').value;
@@ -147,15 +150,10 @@ export default {
       }
       this.$api.peptide.insertPurity({ 'purity': addVal }).then(res => {
         if (res.id) {
-          this.refresh();
+          this.utils.refresh();
           return this.$refs.table.refresh(true);
         }
       });
-    },
-    refresh () {
-      var childList = document.getElementsByTagName('tbody')[0].childNodes;
-      document.getElementsByTagName('tbody')[0].removeChild(childList[0]);
-      document.getElementById('add').removeAttribute('disabled');
     },
     onSelectChange (selectedRowKeys, selectedRows) {
       this.selectedRowKeys = selectedRowKeys.slice(-1);
@@ -178,7 +176,7 @@ export default {
           return this.$refs.table.refresh(true);
         });
       } else {
-        this.refresh();
+        this.utils.refresh();
       }
     },
     handleResume () {

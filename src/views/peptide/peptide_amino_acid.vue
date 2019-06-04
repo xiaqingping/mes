@@ -39,8 +39,8 @@
     <div>
       <div class="table-operator">
         <a-button type="primary" icon="search" @click="handleSearch">查询</a-button>
-        <a-button type="primary" icon="plus">新增</a-button>
-        <a-button type="primary" icon="edit">保存</a-button>
+        <a-button type="primary" icon="plus" @click="addTr(20)" id="add">新增</a-button>
+        <a-button type="primary" icon="edit" @click="addData">保存</a-button>
         <a-button type="primary" icon="minus-square" @click="handleDelete">删除</a-button>
         <a-button type="primary" icon="minus-square" @click="handleResume">恢复</a-button>
         <!--        <a @click="toggleAdvanced" style="margin-left: 8px">-->
@@ -95,11 +95,12 @@ export default {
       visible: false,
       // advanced: true,
       columns: [
-        { title: '编号', dataIndex: 'code' },
-        { title: '名称', dataIndex: 'name' },
+        { title: '编号', dataIndex: 'code', width: '4%' },
+        { title: '名称', dataIndex: 'name', width: '5%' },
         { title: '亲水性',
           dataIndex: 'hydrophilic',
           align: 'center',
+          width: '4%',
           customRender: function (value) {
             return value === 1 ? '√' : '';
           }
@@ -108,6 +109,7 @@ export default {
           title: '疏水性',
           dataIndex: 'hydrophobic',
           align: 'center',
+          width: '4%',
           customRender: function (value) {
             return value === 1 ? '√' : '';
           }
@@ -116,6 +118,7 @@ export default {
           title: '酸性',
           dataIndex: 'acidic',
           align: 'center',
+          width: '3%',
           customRender: function (value) {
             return value === 1 ? '√' : '';
           }
@@ -124,6 +127,7 @@ export default {
           title: '碱性',
           dataIndex: 'alkaline',
           align: 'center',
+          width: '3%',
           customRender: function (value) {
             return value === 1 ? '√' : '';
           }
@@ -132,41 +136,43 @@ export default {
           title: '是否可做二硫键',
           dataIndex: 'isCanDisulfideBond',
           align: 'center',
+          width: '8%',
           customRender: function (value) {
             return value === 1 ? '√' : '';
           }
         },
         {
-          title: '分子量', dataIndex: 'molecularWeight', align: 'center'
+          title: '分子量', dataIndex: 'molecularWeight', align: 'center', width: '4%'
         },
         {
-          title: '等电点', dataIndex: 'isoelectricPoint', align: 'center'
+          title: '等电点', dataIndex: 'isoelectricPoint', align: 'center', width: '4%'
         },
         {
-          title: '羧基解离常数', dataIndex: 'carboxylationDissociationConstant', align: 'center'
+          title: '羧基解离常数', dataIndex: 'carboxylationDissociationConstant', align: 'center', width: '8%'
         },
         {
-          title: '氨基解离常数', dataIndex: 'aminoDissociationConstant', align: 'center'
+          title: '氨基解离常数', dataIndex: 'aminoDissociationConstant', align: 'center', width: '8%'
         },
         {
           title: '状态',
           dataIndex: 'status',
           align: 'center',
+          width: '3%',
           customRender: function (value) {
             return value === 1 ? '正常' : '已删除';
           }
         },
         {
-          title: '创建人', dataIndex: 'creatorName', align: 'center'
+          title: '创建人', dataIndex: 'creatorName', align: 'center', width: '4%'
         },
         {
-          title: '创建时间', dataIndex: 'createDate', align: 'center'
+          title: '创建时间', dataIndex: 'createDate', align: 'center', width: '6%'
         },
-        { title: '删除人', dataIndex: 'cancelName' },
-        { title: '删除时间', dataIndex: 'cancelDate' },
-        { title: '类型', dataIndex: 'aminoAcidType' },
-        { title: '长代码', dataIndex: 'longCode' },
-        { title: '短代码', dataIndex: 'shortCode' }
+        { title: '删除人', dataIndex: 'cancelName', width: '5%' },
+        { title: '删除时间', dataIndex: 'cancelDate', width: '6%' },
+        { title: '类型', dataIndex: 'aminoAcidType', width: '4%', align: 'center' },
+        { title: '长代码', dataIndex: 'longCode', width: '8%', align: 'center' },
+        { title: '短代码', dataIndex: 'shortCode', width: '5%', align: 'center' }
       ],
       queryParam: {},
       loadData: parameter => {
@@ -211,7 +217,7 @@ export default {
               });
               map[ai.code] = ai;
             } else {
-              for (var j = 0; j < dest.length; j++) {
+              for (let j = 0; j < dest.length; j++) {
                 var dj = dest[j];
                 if (dj.code === ai.code) {
                   dj.shortCode = (dj.shortCode ? dj.shortCode : '') + (ai.shortCode ? ' | ' + ai.shortCode : '');
@@ -253,21 +259,62 @@ export default {
       this.selectedRowKeys = selectedRowKeys.slice(-1);
       this.selectedRows = selectedRows;
     },
-    // toggleAdvanced() {
-    //   this.advanced = !this.advanced;
-    // },
-    handleDelete () {
-      if (this.selectedRowKeys[0] == null) {
+    addTr (num) {
+      document.getElementById('add').setAttribute('disabled', true);
+      var tbodyObj = document.getElementsByTagName('tbody')[0];
+      var trObj = document.createElement('tr');
+      for (let i = 0; i < num; i++) {
+        var tdObj = document.createElement('td');
+        tdObj.style.padding = '0';
+        if (i === 2 || i === 8 || i === 9 || i === 10 || i === 11) {
+          tdObj.innerHTML = "<input type='text' title='该输入项为必输入项' id='addValue" + i + "' style='width: 100%;height: 100%;border: 1px solid #FFA8A8;outline: none;background-color: #FFF3F3;'/>";
+        } else if (i === 3 || i === 4 || i === 5 || i === 6 || i === 7) {
+          tdObj.style.backgroundColor = 'blue';
+          tdObj.style.textAlign = 'center';
+          tdObj.innerHTML = "<input type='checkbox' id='addValue" + i + "'/>";
+        } else if (i === 17) {
+          tdObj.innerHTML = "<input type='text' value='L | D' disabled style='width: 100%;border: none;text-align:center;background-color: white;' id='addValue" + i + "'/>";
+        } else if (i === 18 || i === 19) {
+          tdObj.innerHTML = "<input type='text' title='该输入项为必输入项' id='addValue" + i + "' style='width: 50%;height: 100%;border: 1px solid #FFA8A8;outline: none;background-color: #FFF3F3;'/><input type='text' title='该输入项为必输入项' id='addValue" + i + "' style='width: 50%;height: 100%;border: 1px solid #FFA8A8;outline: none;background-color: #FFF3F3;'/>";
+        } else {
+          tdObj.style.backgroundColor = 'blue';
+        }
+        trObj.appendChild(tdObj);
+      }
+      tbodyObj.insertBefore(trObj, tbodyObj.firstElementChild);
+    },
+    addData () {
+      var addVal = document.getElementById('addValue').value;
+      if (addVal === '') {
         this.$notification.error({
           message: '错误',
-          description: `请选择一条数据`
+          description: `数据不能为空！`
         });
         return false;
       }
-      this.$api.peptide.deleteAminoAcid(this.selectedRowKeys[0]).then(res => {
-        this.selectedRowKeys = [];
-        return this.$refs.table.refresh(true);
+      this.$api.peptide.insertPurity({ 'purity': addVal }).then(res => {
+        if (res.id) {
+          this.utils.refresh();
+          return this.$refs.table.refresh(true);
+        }
       });
+    },
+    handleDelete () {
+      if (!document.getElementById('addValue2')) {
+        if (this.selectedRowKeys[0] == null) {
+          this.$notification.error({
+            message: '错误',
+            description: `请选择一条数据`
+          });
+          return false;
+        }
+        this.$api.peptide.deleteAminoAcid(this.selectedRowKeys[0]).then(res => {
+          this.selectedRowKeys = [];
+          return this.$refs.table.refresh(true);
+        });
+      } else {
+        this.utils.refresh();
+      }
     },
     handleResume () {
       if (this.selectedRowKeys[0] == null) {

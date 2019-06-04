@@ -34,8 +34,8 @@
     <div>
       <div class="table-operator">
         <a-button type="primary" icon="search" @click="handleSearch">查询</a-button>
-        <a-button type="primary" icon="plus">新增</a-button>
-        <a-button type="primary" icon="edit">保存</a-button>
+        <a-button type="primary" icon="plus" @click="addTr(8)" id="add">新增</a-button>
+        <a-button type="primary" icon="edit" @click="addData">保存</a-button>
         <a-button type="primary" icon="minus-square" @click="handleDelete">删除</a-button>
         <a-button type="primary" icon="minus-square" @click="handleResume">恢复</a-button>
       </div>
@@ -68,11 +68,12 @@ export default {
       visible: false,
       // advanced: true,
       columns: [
-        { title: '编号', dataIndex: 'code' },
-        { title: '修饰类型', dataIndex: 'modificationType' },
+        { title: '编号', dataIndex: 'code', width: '10%' },
+        { title: '修饰类型', dataIndex: 'modificationType', width: '20%' },
         {
           title: '状态',
           dataIndex: 'status',
+          width: '10%',
           customRender: function (text) {
             if (text === 1) {
               return '正常';
@@ -81,10 +82,10 @@ export default {
             }
           }
         },
-        { title: '创建人', dataIndex: 'creatorName' },
-        { title: '创建日期', dataIndex: 'createDate' },
-        { title: '删除人', dataIndex: 'cancelName' },
-        { title: '删除时间', dataIndex: 'cancelDate' }
+        { title: '创建人', dataIndex: 'creatorName', width: '10%' },
+        { title: '创建日期', dataIndex: 'createDate', width: '20%' },
+        { title: '删除人', dataIndex: 'cancelName', width: '10%' },
+        { title: '删除时间', dataIndex: 'cancelDate', width: '20%' }
       ],
       queryParam: {},
       loadData: parameter => {
@@ -120,18 +121,58 @@ export default {
       this.selectedRowKeys = selectedRowKeys.slice(-1);
       this.selectedRows = selectedRows;
     },
-    handleDelete () {
-      if (this.selectedRowKeys[0] == null) {
+    addTr (num) {
+      document.getElementById('add').setAttribute('disabled', true);
+      var tbodyObj = document.getElementsByTagName('tbody')[0];
+      var trObj = document.createElement('tr');
+      for (let i = 0; i < num; i++) {
+        var tdObj = document.createElement('td');
+        if (i === 2) {
+          tdObj.style.padding = '0';
+          tdObj.style.width = '100px';
+          tdObj.innerHTML = "<input type='text' title='该输入项为必输入项' id='addValue' style='width: 100%;height: 100%;border: 1px solid #FFA8A8;outline: none;background-color: #FFF3F3;'/>";
+        } else {
+          tdObj.style.backgroundColor = 'blue';
+        };
+        trObj.appendChild(tdObj);
+      }
+      tbodyObj.insertBefore(trObj, tbodyObj.firstElementChild);
+      this.$nextTick(() => {
+        document.getElementById('addValue').focus();
+      });
+    },
+    addData () {
+      var addVal = document.getElementById('addValue').value;
+      if (addVal === '') {
         this.$notification.error({
           message: '错误',
-          description: `请选择一条数据`
+          description: `数据不能为空！`
         });
         return false;
       }
-      this.$api.peptide.getModificationTypesDelete(this.selectedRowKeys[0]).then(res => {
-        this.selectedRowKeys = [];
-        return this.$refs.table.refresh(true);
+      this.$api.peptide.insertPurity({ 'purity': addVal }).then(res => {
+        if (res.id) {
+          this.utils.refresh();
+          return this.$refs.table.refresh(true);
+        }
       });
+    },
+    handleDelete () {
+      if (!document.getElementById('addValue')) {
+        if (this.selectedRowKeys[0] == null) {
+          this.$notification.error({
+            message: '错误',
+            description: `请选择一条数据`
+          });
+          return false;
+        }
+        this.$api.peptide.getModificationTypesDelete(this.selectedRowKeys[0]).then(res => {
+          this.selectedRowKeys = [];
+          return this.$refs.table.refresh(true);
+        });
+      } else {
+        this.utils.refresh();
+      }
     },
     handleResume () {
       if (this.selectedRowKeys[0] == null) {

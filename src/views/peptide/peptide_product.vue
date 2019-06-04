@@ -181,6 +181,7 @@ export default {
       this.selectedRows = selectedRows;
     },
     addTr (num) {
+      var self = this;
       document.getElementById('add').setAttribute('disabled', true);
       var tbodyObj = document.getElementsByTagName('tbody')[0];
       var trObj = document.createElement('tr');
@@ -205,13 +206,21 @@ export default {
         } else if (i === 9) {
           tdObj.innerHTML = "<input type='text' title='该输入项为必输入项' disabled id='addValue" + i + "' style='width: 100%;height: 100%;border: 1px solid #FFA8A8;outline: none;background-color: white;'/>";
         } else if (i === 10) {
-          tdObj.innerHTML = "<input type='text' title='该输入项为必输入项' disabled id='addValue" + i + "' style='width: 100%;height: 100%;border: 1px solid #FFA8A8;outline: none;background-color: #FFF3F3;'/>";
+          tdObj.innerHTML = "<input type='text' readonly title='该输入项为必输入项' id='addValue" + i + "' style='width: 100%;height: 100%;border: 1px solid #FFA8A8;outline: none;background-color: #FFF3F3;'/>";
         } else {
           tdObj.style.backgroundColor = 'blue';
         }
         trObj.appendChild(tdObj);
       }
       tbodyObj.insertBefore(trObj, tbodyObj.firstElementChild);
+      this.$nextTick(() => {
+        document.getElementById('addValue10').onclick = function () {
+          console.log(self.test());
+        };
+      });
+    },
+    test () {
+      alert(123);
     },
     addData () {
       var addVal = document.getElementById('addValue').value;
@@ -224,15 +233,10 @@ export default {
       }
       this.$api.peptide.insertPurity({ 'purity': addVal }).then(res => {
         if (res.id) {
-          this.refresh();
+          this.utils.refresh();
           return this.$refs.table.refresh(true);
         }
       });
-    },
-    refresh () {
-      var childList = document.getElementsByTagName('tbody')[0].childNodes;
-      document.getElementsByTagName('tbody')[0].removeChild(childList[0]);
-      document.getElementById('add').removeAttribute('disabled');
     },
     handleDelete () {
       if (!document.getElementById('addValue2')) {
@@ -248,7 +252,7 @@ export default {
           return this.$refs.table.refresh(true);
         });
       } else {
-        this.refresh();
+        this.utils.refresh();
       }
     },
     handleResume () {

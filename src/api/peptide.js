@@ -61,6 +61,11 @@ export default {
     return request(`/peptide-base/v1/aminoAcid/easyui`, { params });
   },
 
+  // 获取氨基酸(全部)
+  getAminoAcidAll (params) {
+    return request(`/peptide-base/v1/aminoAcid/easyui`, { params });
+  },
+
   // 恢复氨基酸
   resumeAminoAcid (params) {
     return request(`/peptide-base/v1/aminoAcid/restore/${params}`, { method: 'POST' });
