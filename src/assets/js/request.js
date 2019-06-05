@@ -5,8 +5,8 @@ import notification from 'ant-design-vue/es/notification';
 
 let baseURL = '';
 if (process.env.NODE_ENV === 'development') {
-  baseURL = 'https://devapi.sangon.com:8443/api';
-  // baseURL = 'https://preapi.sangon.com/api';
+  // baseURL = 'https://devapi.sangon.com:8443/api';
+  baseURL = 'https://preapi.sangon.com/api';
 } else if (process.env.NODE_ENV === 'production') {
   if (process.env.BASE_URL_TYPE === 'dev') {
     baseURL = 'https://devapi.sangon.com:8443/api';
@@ -15,7 +15,8 @@ if (process.env.NODE_ENV === 'development') {
   } else if (process.env.BASE_URL_TYPE === 'produce') {
     baseURL = 'https://api.sangon.com/api';
   } else {
-    baseURL = 'https://devapi.sangon.com:8443/api';
+    // baseURL = 'https://devapi.sangon.com:8443/api';
+    baseURL = 'https://preapi.sangon.com/api';
   }
 }
 
