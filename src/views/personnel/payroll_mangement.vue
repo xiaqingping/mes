@@ -42,9 +42,9 @@
 
     <div class="table-operator">
       <a-button type="primary" icon="search" @click="handleSearch">查询</a-button>
-      <a-button type="primary" icon="plus" @click="handleIncrease">新增</a-button>
+      <a-button type="primary" icon="plus" @click="handleIncrease(10)" id="add">新增</a-button>
       <a-button type="primary" icon="delete" @click="handleDelete">作废</a-button>
-      <a-button type="primary" icon="edit">保存</a-button>
+      <a-button type="primary" icon="edit" @click="handleEdit">保存</a-button>
     </div>
     <!-- 表格 -->
     <s-table
@@ -105,12 +105,27 @@ export default {
       this.$refs.table.refresh(true);
     },
     // 新增
-    handleIncrease () {
-      this.$api.pay.increaseTypepay(this.selectedRowKeys[0]).then(res => {
-        this.selectedRowKeys = [];
-        return this.$refs.table.refresh(true);
-      });
+    handleIncrease (num) {
       // console.log(1);
+      document.getElementById('add').setAttribute('disabled', true);
+      var tbodyObj = document.getElementsByTagName('tbody')[0];
+      var trObj = document.createElement('tr');
+      for (let i = 0; i < num; i++) {
+        var tdObj = document.createElement('td');
+        tdObj.style.backgroundColor = 'white';
+        if (i === 0) {
+          tdObj.style.backgroundColor = 'white';
+          tdObj.style.textAlign = 'center';
+          tdObj.innerHTML = "'<span class='ant-table-row-indent indent-level-0 style='padding-left:0px;'/><span <label class='ant-radio-wrapper'/>";
+          // tdObj.innerHTML = "<input type='radio' class='ant-radio-input' value='29'/>";
+        } else if (i === 1 || i === 2 || i === 3 || i === 4 || i === 5 || i === 6 || i === 7 || i === 8 || i === 9) {
+          tdObj.style.backgroundColor = 'white';
+        } else {
+          tdObj.style.backgroundColor = 'blue';
+        }
+        trObj.appendChild(tdObj);
+      }
+      tbodyObj.insertBefore(trObj, tbodyObj.firstElementChild);
     },
     // 删除
     handleDelete () {
@@ -127,10 +142,15 @@ export default {
       });
       // console.log(1);
     },
+    // 保存
+    handleEdit () {
+      console.log(2);
+    },
     onSelectChange (selectedRowKeys, selectedRows) {
       this.selectedRowKeys = selectedRowKeys;
       this.selectedRows = selectedRows;
     }
+
   }
 };
 </script>

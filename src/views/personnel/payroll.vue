@@ -17,7 +17,7 @@
           </a-col>
           <a-col :xxl="4" :xl="4" :md="4" :sm="24">
             <a-form-item label="年：">
-              <a-select v-decorator="['year', {initialValue : '0'}]">
+              <a-select v-decorator="['year']">
                 <a-select-option value="0">全部</a-select-option>
                 <a-select-option value="1">2019</a-select-option>
                 <a-select-option value="2">2018</a-select-option>
@@ -29,7 +29,7 @@
           </a-col>
           <a-col :xxl="4" :xl="4" :md="4" :sm="24">
             <a-form-item label="月：">
-              <a-select v-decorator="['month', {initialValue : '0'}]">
+              <a-select v-decorator="['month']">
                 <a-select-option value="0">全部</a-select-option>
                 <a-select-option value="1">1</a-select-option>
                 <a-select-option value="2">2</a-select-option>
@@ -63,12 +63,12 @@
     <div class="table-operator">
       <a-button type="primary" icon="search" @click="handleSearch">查询</a-button>
       <a-button type="primary" icon="delete" @click="handleDelete">作废</a-button>
-      <a-button type="primary" icon="file-excel" @click="handleUpload">excel上传</a-button>
-      <!-- <a-upload action="http://192.168.19.71:8260/v1/date/excel" :multiple="true" :fileList="fileList" @change="handleChange">
-        <a-button>
-          <a-icon type="upload" icon="file-excel" /> Upload
+      <!-- <a-button type="primary" icon="file-excel" @click="handleUpload">excel上传</a-button> -->
+      <a-upload :multiple="true" :fileList="fileList" @change="handleChange">
+        <a-button type="primary" icon="file-excel">
+          <a-icon type="primary" icon="file-excel" /> 上传
         </a-button>
-      </a-upload> -->
+      </a-upload>
     </div>
     <!-- 表格 -->
     <s-table
@@ -94,12 +94,14 @@ export default {
   data () {
     return {
       form: this.$form.createForm(this),
-      fileList: [{
-        uid: '-1',
-        name: 'xxx.png',
-        status: 'done',
-        url: 'https://588ku.com/sucai/0-default-0-0-0-0-1/?h=bd&sem=1'
-      }],
+      fileList: [
+        // {
+        // uid: '-1',
+        // name: 'xxx.png',
+        // status: 'done',
+        // url: 'https://588ku.com/sucai/0-default-0-0-0-0-1/?h=bd&sem=1'
+        // }
+      ],
       columns: [
         { title: '员工编号', dataIndex: 'employeeCode' },
         { title: '员工名称', dataIndex: 'employeeName' },
@@ -151,35 +153,39 @@ export default {
       // console.log(1);
     },
     // 上传excel
-    handleUpload () {
-      // this.$api.pay.uploadpays(this.selectedRowKeys[0]).then(res => {
-      //   this.selectedRowKeys = [];
-      //   return this.$refs.table.refresh(true);
+    handleChange () {
+      // let fileList = [...info.fileList];
+      // // 1.限制上传文件的数量，只显示最近上传的两个文件，旧文件将被新文件替换
+      // fileList = fileList.slice(-2);
+      // // 2. 读取响应并显示文件链接
+      // fileList = fileList.map((file) => {
+      //   if (file.response) {
+      //     // 组件将显示文件。url链接
+      //     file.url = file.response.url;
+      //     console.log('这是url的' + file.response.url);
+      //   }
+      //   return file;
       // });
-      console.log(1);
+      // this.fileList = fileList;
+      const data = new FormData();
+      const config = { headers: { 'Content-Type': 'multipart/form-data' } };
+      this.$api.pay.uploadpays(data, config).then(res => {
+        console.log('这是' + data);
+        // return this.$refs.table.refresh(true);
+      }).then(res => {
+        // this.fileList.status = 'success';
+        console.log('成功了');
+      }).catch(res => {
+        // this.fileList.status = 'fail';
+        console.log('失败了');
+      });
     },
-    // handleChange (info) {
-    //   let fileList = [...info.fileList];
-
-    //   // 1.限制上传文件的数量，只显示最近上传的两个文件，旧文件将被新文件替换
-    //   fileList = fileList.slice(-2);
-
-    //   // 2. 读取响应并显示文件链接
-    //   fileList = fileList.map((file) => {
-    //     if (file.response) {
-    //       // 组件将显示文件。url链接
-    //       file.url = file.response.url;
-    //       console.log(file.url);
-    //     }
-    //     return file;
-    //   });
-    //   this.fileList = fileList;
-    //   // console.log(fileList);
-    // },
     // 表格
     onSelectChange (selectedRowKeys, selectedRows) {
       this.selectedRowKeys = selectedRowKeys;
+      console.log(selectedRowKeys);
       this.selectedRows = selectedRows;
+      console.log(selectedRows);
     }
   }
 };

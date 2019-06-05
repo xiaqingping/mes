@@ -15,8 +15,8 @@ export default {
     return request(`/pay/v1/date/invalid`, { method: 'PUT' });
   },
   // 上传excel表格
-  uploadpays () {
-    return request(`/pay/v1/date/excel`, { method: 'POST' });
+  uploadpays (options) {
+    return request(`/pay/v1/date/excel`, { method: 'POST', ...options });
   },
   // 获取工资类型
   getTypepay (params) {
