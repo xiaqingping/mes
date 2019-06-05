@@ -15,6 +15,7 @@
         @toggle="toggle"
       />
       <a-layout-content :style="{ height: '100%', paddingTop: '0' }">
+        <multi-tab></multi-tab>
         <transition name="page-transition">
           <route-view />
         </transition>
@@ -34,6 +35,7 @@ import RouteView from '@/layouts/RouteView';
 import GlobalHeader from '@/components/page/GlobalHeader';
 import GlobalFooter from '@/components/page/GlobalFooter';
 import SideMenu from '@/components/menu/SideMenu';
+import MultiTab from '@/components/MultiTab';
 
 export default {
   name: 'BasicLayout',
@@ -41,7 +43,8 @@ export default {
     RouteView,
     GlobalHeader,
     GlobalFooter,
-    SideMenu
+    SideMenu,
+    MultiTab
   },
   data () {
     return {
@@ -73,8 +76,8 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
-@import url('../assets/scss/index.scss');
+<style lang="scss">
+@import '@/assets/scss/index.scss';
 
 .page-transition-enter {
   opacity: 0;
