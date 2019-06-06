@@ -92,11 +92,17 @@ export default {
           };
         });
       },
+      type: [],
       selectedRowKeys: [],
       selectedRows: []
     };
   },
-  mounted () {},
+  mounted () {
+    this.$api.pay.getTypepay().then(res => {
+      this.type = res;
+      console.log(res);
+    });
+  },
   methods: {
     // 查询
     handleSearch (e) {
@@ -116,12 +122,15 @@ export default {
         if (i === 0) {
           tdObj.style.backgroundColor = 'white';
           tdObj.style.textAlign = 'center';
-          tdObj.innerHTML = "'<span class='ant-table-row-indent indent-level-0 style='padding-left:0px;'/><span <label class='ant-radio-wrapper'/>";
+          tdObj.innerHTML = "<input type='radio' id='addValue" + i + "'/>";
+          // tdObj.innerHTML = "'<span class='ant-table-row-indent indent-level-0 style='padding-left:0px;'/><span <label class='ant-radio-wrapper'/>";
           // tdObj.innerHTML = "<input type='radio' class='ant-radio-input' value='29'/>";
-        } else if (i === 1 || i === 2 || i === 3 || i === 4 || i === 5 || i === 6 || i === 7 || i === 8 || i === 9) {
+        } else if (i === 1 || i === 5 || i === 6 || i === 7 || i === 8 || i === 9) {
           tdObj.style.backgroundColor = 'white';
-        } else {
-          tdObj.style.backgroundColor = 'blue';
+        } else if (i === 2 || i === 4) {
+          tdObj.innerHTML = "<input type='text' title='该输入项为必输入项' id='addValue' style='width: 100%;height: 100%;border: 1px solid #FFA8A8;outline: none;background-color: #FFF3F3;'/>";
+        } else if (i === 3) {
+          tdObj.innerHTML = "<select title='该输入项为必输入项' id='addValue" + i + "' style='width: 100%;height: 100%;border: 1px solid #FFA8A8;outline: none;background-color: #FFF3F3;'> '<option> 工资项目 </option>' '<option> 扣款项目 </option>' '<option> 代发项目 </option>' '<option> 代缴项目 </option>'</select>";
         }
         trObj.appendChild(tdObj);
       }
