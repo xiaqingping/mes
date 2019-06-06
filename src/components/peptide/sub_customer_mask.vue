@@ -1,8 +1,8 @@
 <template>
   <div v-if="hackReset" class="mask">
-    <div class="customer-name-mask" :style="{top: customer_name_top + 'px', left : customer_name_left + 'px', width : small ? '1100px' : '100%', height : small ? '700px' : '100%', position: small ? 'absolute' : '', borderRadius: small ? '5px' : ''}">
+    <div class="customer-name-mask" :style="{top: customer_name_top + 'px', left : customer_name_left + 'px', width : small ? '1100px' : '100%', height : small ? '738px' : '100%', position: small ? 'absolute' : '', borderRadius: small ? '5px' : ''}">
       <div class="top">
-        <span style="float: left">客户列表</span>
+        <span style="float: left">负责人列表</span>
         <span class="top-icon" style="padding-bottom: 10px" @click="onClose"><a-icon
           type="close"/></span>
         <span class="top-icon" @click="onSmall" v-show="small"><a-icon
@@ -28,6 +28,12 @@
             <a-form-item label="邮箱">
               <a-input v-decorator="['saler']" style="width: 190px"/>
             </a-form-item>
+            <a-form-item label="客户编号">
+              <a-input v-decorator="['saler']" style="width: 163px"/>
+            </a-form-item>
+            <a-form-item label="客户名称">
+              <a-input v-decorator="['saler']" style="width: 163px"/>
+            </a-form-item>
             <a-form-item label="大区">
               <a-select v-decorator="['currency_type']" style="width: 190px;">
                 <a-select-option value="0">全部</a-select-option>
@@ -42,8 +48,11 @@
                 <a-select-option value="2">运行中</a-select-option>
               </a-select>
             </a-form-item>
+            <a-form-item label="币种">
+              <a-input v-decorator="['saler']" style="width: 190px"/>
+            </a-form-item>
             <a-form-item label="付款方式">
-              <a-select v-decorator="['sales_region']" style="width: 163px">
+              <a-select v-decorator="['sales_region']" style="width: 165px">
                 <a-select-option value="0">全部</a-select-option>
                 <a-select-option value="1">关闭</a-select-option>
                 <a-select-option value="2">运行中</a-select-option>
@@ -51,15 +60,7 @@
             </a-form-item>
 
             <a-form-item label="付款条件">
-              <a-select v-decorator="['sales_organization']" style="width: 160px">
-                <a-select-option value="0">全部</a-select-option>
-                <a-select-option value="1">关闭</a-select-option>
-                <a-select-option value="2">运行中</a-select-option>
-              </a-select>
-            </a-form-item>
-
-            <a-form-item label="销售范围">
-              <a-select v-decorator="['distribution_channel']" style="width: 165px">
+              <a-select v-decorator="['sales_organization']" style="width: 163px">
                 <a-select-option value="0">全部</a-select-option>
                 <a-select-option value="1">关闭</a-select-option>
                 <a-select-option value="2">运行中</a-select-option>
@@ -72,6 +73,14 @@
 
             <a-form-item label="销售员名称">
               <a-input v-decorator="['saler']" style="width: 148px"/>
+            </a-form-item>
+
+            <a-form-item label="销售范围">
+              <a-select v-decorator="['distribution_channel']" style="width: 165px">
+                <a-select-option value="0">全部</a-select-option>
+                <a-select-option value="1">关闭</a-select-option>
+                <a-select-option value="2">运行中</a-select-option>
+              </a-select>
             </a-form-item>
           </div>
           <div style="margin-bottom:10px">
@@ -165,7 +174,7 @@ export default {
       this.customer_name_left = (width - 1100) / 2;
     }
     if (height > 600) {
-      this.customer_name_top = (height - 700) / 2;
+      this.customer_name_top = (height - 738) / 2;
     }
   },
   watch: {

@@ -18,5 +18,10 @@ export default {
       }
     }
     return value;
+  },
+  refresh () {
+    var childList = document.getElementsByTagName('tbody')[0].childNodes;
+    document.getElementsByTagName('tbody')[0].removeChild(childList[0]);
+    document.getElementById('add').removeAttribute('disabled');
   }
 };
