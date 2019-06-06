@@ -140,6 +140,11 @@ export default {
     return request(`/peptide-base/v1/disulfideBondProducts/easyui`, { params });
   },
 
+  // 创建二硫键产品
+  insertdisulfideBondProducts (params) {
+    return request(`/peptide-base/v1/disulfideBondProducts`, { method: 'POST', data: params });
+  },
+
   // 恢复二硫键产品
   resumedisulfideBondProducts (params) {
     return request(`/peptide-base/v1/disulfideBondProducts/restore/${params}`, { method: 'POST' });

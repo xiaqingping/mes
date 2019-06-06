@@ -37,10 +37,6 @@
         <a-button type="primary" icon="edit" @click="addData">保存</a-button>
         <a-button type="primary" icon="minus-square" @click="handleDelete">删除</a-button>
         <a-button type="primary" icon="minus-square" @click="handleResume">恢复</a-button>
-        <!--        <a @click="toggleAdvanced" style="margin-left: 8px">-->
-        <!--          {{ advanced ? '收起' : '展开' }}-->
-        <!--          <a-icon :type="advanced ? 'up' : 'down'"/>-->
-        <!--        </a>-->
       </div>
 
       <s-table

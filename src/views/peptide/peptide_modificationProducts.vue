@@ -47,24 +47,33 @@
       >
       </s-table>
     </div>
+    <products-mask v-show="products_status" @Closed="closeMask(1)" @customerData="customerData">
+    </products-mask>
 
+    <modifications-mask v-show="modifications_status" @Closed="closeMask(2)">
+    </modifications-mask>
   </div>
 </template>
 
 <script>
 import STable from '@/components/Table';
+import ProductsMask from '@/components/peptide/products_mask';
+import ModificationsMask from '@/components/peptide/modifications_mask';
 
 export default {
   name: 'PeptideModificationProducts',
   components: {
-    STable
+    STable,
+    ProductsMask,
+    ModificationsMask
   },
   data () {
     var self = this;
     return {
       form: this.$form.createForm(this),
       visible: false,
-      // advanced: true,
+      products_status: false,
+      modifications_status: false,
       columns: [
         { title: '编号', dataIndex: 'code', width: '3%' },
         { title: '修饰名称', dataIndex: 'modificationName', width: '13%' },
@@ -148,6 +157,10 @@ export default {
     });
   },
   methods: {
+    customerData (data) {
+      document.getElementById('addValue11').value = data[0].code;
+      document.getElementById('addValue12').value = data[0].desc;
+    },
     showDrawer () {
       this.visible = true;
     },
@@ -162,8 +175,14 @@ export default {
       this.selectedRows = selectedRows;
     },
     addTr (num) {
+      if (document.getElementById('addValue2')) {
+        this.$notification.error({
+          message: '错误',
+          description: `请先保存或删除现在编辑的内容`
+        });
+        return false;
+      }
       var self = this;
-      document.getElementById('add').setAttribute('disabled', true);
       var tbodyObj = document.getElementsByTagName('tbody')[0];
       var trObj = document.createElement('tr');
       for (let i = 0; i < num; i++) {
@@ -191,12 +210,14 @@ export default {
           '</select>';
         } else if (i === 5) {
           tdObj.innerHTML = "<select title='该输入项为必输入项' id='addValue" + i + "' style='width: 100%;height: 100%;border: 1px solid #FFA8A8;outline: none;background-color: #FFF3F3;'><option value='L'>L</option><option value='D'>D</option></select>";
-        } else if (i === 2 || i === 10) {
+        } else if (i === 10) {
           tdObj.innerHTML = "<input type='text' readonly title='该输入项为必输入项' id='addValue" + i + "' style='width: 100%;height: 100%;border: 1px solid #FFA8A8;outline: none;background-color: #FFF3F3;'/>";
         } else if (i === 11) {
           tdObj.innerHTML = "<input type='text' title='该输入项为必输入项' disabled id='addValue" + i + "' style='width: 100%;height: 100%;border: 1px solid #FFA8A8;outline: none;background-color: white;'/>";
+        } else if (i === 2) {
+          tdObj.innerHTML = "<div style='position: relative;width: 100%;height: 100%'><input type='text' readonly title='该输入项为必输入项' id='addValue" + i + "' style='width: 100%;height: 100%;border: 1px solid #FFA8A8;outline: none;background-color: #FFF3F3;'/><span class='iconfont icon-suosou' id='openMaskModification' style='position: absolute;right:0;top:0;cursor:pointer;font-weight:bold;color:#8C8C8C'></span></div>";
         } else if (i === 12) {
-          tdObj.innerHTML = "<input type='text' readonly title='该输入项为必输入项' id='addValue" + i + "' style='width: 100%;height: 100%;border: 1px solid #FFA8A8;outline: none;background-color: #FFF3F3;'/>";
+          tdObj.innerHTML = "<div style='position: relative;width: 100%;height: 100%'><input type='text' readonly title='该输入项为必输入项' id='addValue" + i + "' style='width: 100%;height: 100%;border: 1px solid #FFA8A8;outline: none;background-color: #FFF3F3;'/><span class='iconfont icon-suosou' id='openMask' style='position: absolute;right:0;top:0;cursor:pointer;font-weight:bold;color:#8C8C8C'></span></div>";
         } else {
           tdObj.style.backgroundColor = 'blue';
         }
@@ -204,24 +225,133 @@ export default {
       }
       tbodyObj.insertBefore(trObj, tbodyObj.firstElementChild);
       this.$nextTick(() => {
-        document.getElementById('addValue12').onclick = function () {
-          console.log(self.test());
+        document.getElementById('openMaskModification').onmouseover = function () {
+          this.style.color = 'black';
+        };
+        document.getElementById('openMaskModification').onmouseout = function () {
+          this.style.color = '#8C8C8C';
+        };
+        document.getElementById('openMaskModification').onclick = function () {
+          self.openMask(2);
+        };
+        document.getElementById('openMask').onmouseover = function () {
+          this.style.color = 'black';
+        };
+        document.getElementById('openMask').onmouseout = function () {
+          this.style.color = '#8C8C8C';
+        };
+        document.getElementById('openMask').onclick = function () {
+          self.openMask(1);
         };
       });
     },
-    test () {
-      alert(123);
+    openMask (num) {
+      switch (num) {
+        case 1 :
+          this.products_status = true;
+          break;
+        case 2 :
+          this.modifications_status = true;
+          break;
+      }
+    },
+    closeMask (num) {
+      switch (num) {
+        case 1 :
+          this.products_status = false;
+          break;
+        case 2 :
+          this.modifications_status = false;
+          break;
+      }
     },
     addData () {
-      var addVal = document.getElementById('addValue').value;
-      if (addVal === '') {
+      var aminoAcidTypeLeft = document.getElementById('addValue2').value;
+      if (aminoAcidTypeLeft === '') {
         this.$notification.error({
           message: '错误',
           description: `数据不能为空！`
         });
         return false;
       }
-      this.$api.peptide.insertPurity({ 'purity': addVal }).then(res => {
+
+      var aminoAcidTypeRight = document.getElementById('addValue3').value;
+      if (aminoAcidTypeRight === '') {
+        this.$notification.error({
+          message: '错误',
+          description: `数据不能为空！`
+        });
+        return false;
+      }
+
+      var providerTotalAmountBegin = document.getElementById('addValue4').value;
+      if (providerTotalAmountBegin === '') {
+        this.$notification.error({
+          message: '错误',
+          description: `数据不能为空！`
+        });
+        return false;
+      }
+
+      var providerTotalAmountEnd = document.getElementById('addValue5').value;
+      if (providerTotalAmountEnd === '') {
+        this.$notification.error({
+          message: '错误',
+          description: `数据不能为空！`
+        });
+        return false;
+      }
+
+      var aminoAcidLengthBegin = document.getElementById('addValue6').value;
+      if (aminoAcidLengthBegin === '') {
+        this.$notification.error({
+          message: '错误',
+          description: `数据不能为空！`
+        });
+        return false;
+      }
+
+      var aminoAcidLengthEnd = document.getElementById('addValue7').value;
+      if (aminoAcidLengthEnd === '') {
+        this.$notification.error({
+          message: '错误',
+          description: `数据不能为空！`
+        });
+        return false;
+      }
+
+      var isNeedDesalting = document.getElementById('addValue8').checked ? 1 : 2;
+
+      var sapProductCode = document.getElementById('addValue9').value;
+      if (sapProductCode === '') {
+        this.$notification.error({
+          message: '错误',
+          description: `数据不能为空！`
+        });
+        return false;
+      }
+
+      var sapProductName = document.getElementById('addValue10').value;
+      if (sapProductName === '') {
+        this.$notification.error({
+          message: '错误',
+          description: `数据不能为空！`
+        });
+        return false;
+      }
+
+      var addVal = {
+        'aminoAcidTypeLeft': aminoAcidTypeLeft,
+        'aminoAcidTypeRight': aminoAcidTypeRight,
+        'providerTotalAmountBegin': providerTotalAmountBegin,
+        'providerTotalAmountEnd': providerTotalAmountEnd,
+        'aminoAcidLengthBegin': aminoAcidLengthBegin,
+        'aminoAcidLengthEnd': aminoAcidLengthEnd,
+        'isNeedDesalting': isNeedDesalting,
+        'sapProductCode': sapProductCode,
+        'sapProductName': sapProductName
+      };
+      this.$api.peptide.insertdisulfideBondProducts(addVal).then(res => {
         if (res.id) {
           this.utils.refresh();
           return this.$refs.table.refresh(true);

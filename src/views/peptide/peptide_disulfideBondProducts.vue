@@ -34,10 +34,6 @@
         <a-button type="primary" icon="edit" @click="addData">保存</a-button>
         <a-button type="primary" icon="minus-square" @click="handleDelete">删除</a-button>
         <a-button type="primary" icon="minus-square" @click="handleResume">恢复</a-button>
-        <!--        <a @click="toggleAdvanced" style="margin-left: 8px">-->
-        <!--          {{ advanced ? '收起' : '展开' }}-->
-        <!--          <a-icon :type="advanced ? 'up' : 'down'"/>-->
-        <!--        </a>-->
       </div>
 
       <s-table
@@ -51,7 +47,7 @@
       </s-table>
     </div>
 
-    <products-mask v-show="products_status" @Closed="closeMask()">
+    <products-mask v-show="products_status" @Closed="closeMask()" @customerData="customerData">
     </products-mask>
 
   </div>
@@ -59,7 +55,6 @@
 
 <script>
 import STable from '@/components/Table';
-// import peptide from '@/cache/index';
 import ProductsMask from '@/components/peptide/products_mask';
 
 export default {
@@ -112,6 +107,7 @@ export default {
         // else this.queryParam = {'status': parseInt(this.form.getFieldsValue().status)};
         var params = Object.assign(parameter, this.queryParam);
         return this.$api.peptide.getdisulfideBondProducts(params).then(res => {
+          console.log(res.rows);
           return {
             data: res.rows,
             page: params.page,
@@ -128,6 +124,10 @@ export default {
     selectDrop.style.display = 'none';
   },
   methods: {
+    customerData (data) {
+      document.getElementById('addValue9').value = data[0].code;
+      document.getElementById('addValue10').value = data[0].desc;
+    },
     showDrawer () {
       this.visible = true;
     },
@@ -143,8 +143,14 @@ export default {
       this.selectedRows = selectedRows;
     },
     addTr (num) {
+      if (document.getElementById('addValue2')) {
+        this.$notification.error({
+          message: '错误',
+          description: `请先保存或删除现在编辑的内容`
+        });
+        return false;
+      }
       var self = this;
-      document.getElementById('add').setAttribute('disabled', true);
       var tbodyObj = document.getElementsByTagName('tbody')[0];
       var trObj = document.createElement('tr');
       for (let i = 0; i < num; i++) {
@@ -187,15 +193,92 @@ export default {
       this.products_status = false;
     },
     addData () {
-      var addVal = document.getElementById('addValue').value;
-      if (addVal === '') {
+      var aminoAcidTypeLeft = document.getElementById('addValue2').value;
+      if (aminoAcidTypeLeft === '') {
         this.$notification.error({
           message: '错误',
           description: `数据不能为空！`
         });
         return false;
       }
-      this.$api.peptide.insertPurity({ 'purity': addVal }).then(res => {
+
+      var aminoAcidTypeRight = document.getElementById('addValue3').value;
+      if (aminoAcidTypeRight === '') {
+        this.$notification.error({
+          message: '错误',
+          description: `数据不能为空！`
+        });
+        return false;
+      }
+
+      var providerTotalAmountBegin = document.getElementById('addValue4').value;
+      if (providerTotalAmountBegin === '') {
+        this.$notification.error({
+          message: '错误',
+          description: `数据不能为空！`
+        });
+        return false;
+      }
+
+      var providerTotalAmountEnd = document.getElementById('addValue5').value;
+      if (providerTotalAmountEnd === '') {
+        this.$notification.error({
+          message: '错误',
+          description: `数据不能为空！`
+        });
+        return false;
+      }
+
+      var aminoAcidLengthBegin = document.getElementById('addValue6').value;
+      if (aminoAcidLengthBegin === '') {
+        this.$notification.error({
+          message: '错误',
+          description: `数据不能为空！`
+        });
+        return false;
+      }
+
+      var aminoAcidLengthEnd = document.getElementById('addValue7').value;
+      if (aminoAcidLengthEnd === '') {
+        this.$notification.error({
+          message: '错误',
+          description: `数据不能为空！`
+        });
+        return false;
+      }
+
+      var isNeedDesalting = document.getElementById('addValue8').checked ? 1 : 2;
+
+      var sapProductCode = document.getElementById('addValue9').value;
+      if (sapProductCode === '') {
+        this.$notification.error({
+          message: '错误',
+          description: `数据不能为空！`
+        });
+        return false;
+      }
+
+      var sapProductName = document.getElementById('addValue10').value;
+      if (sapProductName === '') {
+        this.$notification.error({
+          message: '错误',
+          description: `数据不能为空！`
+        });
+        return false;
+      }
+
+      var addVal = {
+        'aminoAcidTypeLeft': aminoAcidTypeLeft,
+        'aminoAcidTypeRight': aminoAcidTypeRight,
+        'providerTotalAmountBegin': providerTotalAmountBegin,
+        'providerTotalAmountEnd': providerTotalAmountEnd,
+        'aminoAcidLengthBegin': aminoAcidLengthBegin,
+        'aminoAcidLengthEnd': aminoAcidLengthEnd,
+        'isNeedDesalting': isNeedDesalting,
+        'sapProductCode': sapProductCode,
+        'sapProductName': sapProductName
+      };
+      this.$api.peptide.insertdisulfideBondProducts(addVal).then(res => {
         if (res.id) {
           this.utils.refresh();
           return this.$refs.table.refresh(true);

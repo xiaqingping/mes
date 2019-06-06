@@ -63,6 +63,7 @@
         ref="table"
         bordered
         size="small"
+        :scroll="{ x: 1200}"
         :columns="columns"
         :data="loadData"
         :rowSelection="{ selectedRowKeys: selectedRowKeys, onChange: onSelectChange }"
