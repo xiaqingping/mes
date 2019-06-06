@@ -18,6 +18,12 @@ export default {
       name: 'seq-order',
       component: () => import('@/views/seq/order'),
       meta: { title: '测序订单', keepAlive: false, permission: [ 'dashboard' ] }
+    },
+    {
+      path: '/seq/product',
+      name: 'seq-product',
+      component: () => import('@/views/seq/product'),
+      meta: { title: '测序产品', keepAlive: false, permission: [ 'dashboard' ] }
     }
   ]
 };
