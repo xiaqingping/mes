@@ -6,6 +6,7 @@ import seq from './modules/seq';
 import basic from './modules/basic';
 import user from './modules/user';
 import peptide from './modules/peptide';
+import system from './modules/system';
 
 Vue.use(Vuex);
 
@@ -22,7 +23,8 @@ export default new Vuex.Store({
     seq,
     basic,
     user,
-    peptide
+    peptide,
+    system
   },
   state: {
     theme: 'dark'
