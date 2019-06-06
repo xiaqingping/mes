@@ -1,9 +1,11 @@
 <template>
   <div class="page-content">
     <div class="table-operator">
-      <a-button v-action:search icon="search" @click="handleSearch">查询</a-button>
-      <a-button icon="plus">新建</a-button>
-      <a-button icon="form">审核</a-button>
+      <a-button-group>
+        <a-button v-action:search icon="search" @click="handleSearch">查询</a-button>
+        <a-button icon="plus">新建</a-button>
+        <a-button icon="form">审核</a-button>
+      </a-button-group>
     </div>
 
     <s-table

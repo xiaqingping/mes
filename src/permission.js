@@ -18,7 +18,14 @@ router.beforeEach((to, from, next) => {
     } else {
       if (store.state.user.roles.length === 0) {
         const roles = {
-          permissionList: [ 'dashboard' ]
+          permissionList: [ 'dashboard' ],
+          permissions: [
+            {
+              // actionList: ['search', 'add', 'edit']
+              actionList: ['search', 'add', 'edit'],
+              permissionId: 'dashboard'
+            }
+          ]
         };
         store.commit('user/set_roles', roles);
         store.dispatch('permission/generateRoutes', roles).then(() => {
