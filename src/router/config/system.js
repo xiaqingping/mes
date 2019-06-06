@@ -14,6 +14,12 @@ export default {
       meta: { title: '用户管理', keepAlive: false, permission: [ 'dashboard' ] }
     },
     {
+      path: '/system/menu',
+      name: 'system-menu',
+      component: () => import('@/views/system/menu'),
+      meta: { title: '菜单管理', keepAlive: false, permission: [ 'dashboard' ] }
+    },
+    {
       path: '/system/code_rule',
       name: 'system-code-rule',
       component: () => import('@/views/system/code_rule'),

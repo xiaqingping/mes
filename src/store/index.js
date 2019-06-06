@@ -1,6 +1,8 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 
+import getters from './getters';
+
 import permission from './modules/permission';
 import seq from './modules/seq';
 import basic from './modules/basic';
@@ -33,5 +35,6 @@ export default new Vuex.Store({
 
   },
   actions: {},
-  plugins: [setCache]
+  plugins: [setCache],
+  getters
 });

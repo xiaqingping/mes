@@ -6,6 +6,7 @@ import 'ant-design-vue/dist/antd.css';
 
 import api from '@/api';
 import units from '@/assets/js/utils';
+import './directives/action';
 
 // vue-ls 缓存参数
 const lsOptions = {
