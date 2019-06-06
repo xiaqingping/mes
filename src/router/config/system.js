@@ -18,6 +18,36 @@ export default {
       name: 'system-menu',
       component: () => import('@/views/system/menu'),
       meta: { title: '菜单管理', keepAlive: false, permission: [ 'dashboard' ] }
+    },
+    {
+      path: '/system/code_rule',
+      name: 'system-code-rule',
+      component: () => import('@/views/system/code_rule'),
+      meta: { title: '编号规则', keepAlive: false, permission: [ 'dashboard' ] }
+    },
+    {
+      path: '/system/authorization',
+      name: 'system-authorization',
+      component: () => import('@/views/system/authorization'),
+      meta: { title: '用户权限', keepAlive: false, permission: [ 'dashboard' ] }
+    },
+    {
+      path: '/system/sources',
+      name: 'system-sources',
+      component: () => import('@/views/system/sources'),
+      meta: { title: '资源', keepAlive: false, permission: [ 'dashboard' ] }
+    },
+    {
+      path: '/system/rule',
+      name: 'system-rule',
+      component: () => import('@/views/system/rule'),
+      meta: { title: '规则', keepAlive: false, permission: [ 'dashboard' ] }
+    },
+    {
+      path: '/system/group',
+      name: 'system-group',
+      component: () => import('@/views/system/group'),
+      meta: { title: '分组', keepAlive: false, permission: [ 'dashboard' ] }
     }
   ]
 };
