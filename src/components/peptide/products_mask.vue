@@ -2,7 +2,7 @@
   <div v-if="hackReset" class="mask">
     <div class="customer-name-mask" :style="{top: customer_name_top + 'px', left : customer_name_left + 'px', width : small ? '1100px' : '100%', height : small ? '700px' : '100%', position: small ? 'absolute' : '', borderRadius: small ? '5px' : ''}">
       <div class="top">
-        <span style="float: left">客户列表</span>
+        <span style="float: left">产品列表</span>
         <span class="top-icon" style="padding-bottom: 10px" @click="onClose"><a-icon
           type="close"/></span>
         <span class="top-icon" @click="onSmall" v-show="small"><a-icon
@@ -14,68 +14,49 @@
         <a-form layout="inline" :form="form" @submit="handleSearch">
           <div>
             <a-form-item label="编号">
-              <a-input v-decorator="['code']" title="" style="width: 190px"/>
+              <a-input v-decorator="['code']" title="" style="width: 193px"/>
             </a-form-item>
-            <a-form-item label="名称">
-              <a-input v-decorator="['customerName']" style="width: 190px"/>
+            <a-form-item label="产品名称">
+              <a-input v-decorator="['customerName']" style="width: 162px"/>
             </a-form-item>
-            <a-form-item label="电话">
-              <a-input v-decorator="['charge_person']" style="width: 190px"/>
+            <a-form-item label="英文名称">
+              <a-input v-decorator="['charge_person']" style="width: 165px"/>
             </a-form-item>
-            <a-form-item label="手机">
-              <a-input v-decorator="['order']" style="width: 190px"/>
+            <a-form-item label="旧物料号">
+              <a-input v-decorator="['order']" style="width: 165px"/>
             </a-form-item>
-            <a-form-item label="邮箱">
-              <a-input v-decorator="['saler']" style="width: 190px"/>
+            <a-form-item label="客户编号">
+              <a-input v-decorator="['saler']" style="width: 165px"/>
             </a-form-item>
-            <a-form-item label="大区">
-              <a-select v-decorator="['currency_type']" style="width: 190px;">
-                <a-select-option value="0">全部</a-select-option>
-                <a-select-option value="1">关闭</a-select-option>
-                <a-select-option value="2">运行中</a-select-option>
-              </a-select>
+            <a-form-item label="负责人编号">
+              <a-input v-decorator="['saler']" style="width: 148px"/>
             </a-form-item>
-            <a-form-item label="网点">
-              <a-select v-decorator="['commercial_network']" style="width: 190px">
-                <a-select-option value="0">全部</a-select-option>
-                <a-select-option value="1">关闭</a-select-option>
-                <a-select-option value="2">运行中</a-select-option>
-              </a-select>
+            <a-form-item label="销售大区">
+              <a-input v-decorator="['saler']" style="width: 165px"/>
             </a-form-item>
-            <a-form-item label="付款方式">
-              <a-select v-decorator="['sales_region']" style="width: 163px">
-                <a-select-option value="0">全部</a-select-option>
-                <a-select-option value="1">关闭</a-select-option>
-                <a-select-option value="2">运行中</a-select-option>
-              </a-select>
+            <a-form-item label="销售网点">
+              <a-input v-decorator="['saler']" style="width: 165px"/>
             </a-form-item>
-
-            <a-form-item label="付款条件">
-              <a-select v-decorator="['sales_organization']" style="width: 160px">
-                <a-select-option value="0">全部</a-select-option>
-                <a-select-option value="1">关闭</a-select-option>
-                <a-select-option value="2">运行中</a-select-option>
-              </a-select>
-            </a-form-item>
-
             <a-form-item label="销售范围">
-              <a-select v-decorator="['distribution_channel']" style="width: 165px">
-                <a-select-option value="0">全部</a-select-option>
-                <a-select-option value="1">关闭</a-select-option>
-                <a-select-option value="2">运行中</a-select-option>
+              <a-select v-decorator="['currency_type']" style="width: 165px;">
+                <a-select-option v-for="item in rangeArea" :key="item.id" :value="item.id">{{ item.name }}</a-select-option>
               </a-select>
             </a-form-item>
-
-            <a-form-item label="销售员编号">
-              <a-input v-decorator="['saler']" style="width: 148px"/>
+            <a-form-item label="工厂">
+              <a-select v-decorator="['commercial_network', {initialValue : '3100'}]" style="width: 193px" >
+                <a-select-option value="3100">3100-生工上海工厂</a-select-option>
+              </a-select>
             </a-form-item>
-
-            <a-form-item label="销售员名称">
-              <a-input v-decorator="['saler']" style="width: 148px"/>
+            <a-form-item label="品牌">
+              <a-select v-decorator="['sales_region', {initialValue : ''}]" style="width: 190px">
+                <a-select-option value="">全部</a-select-option>
+                <a-select-option v-for="item in brands" :key="item.code" :value="item.code">{{ item.code }}-{{ item.name }}</a-select-option>
+              </a-select>
             </a-form-item>
           </div>
           <div style="margin-bottom:10px">
             <a-button type="primary" icon="search" @click="showData">查询</a-button>
+            <a-button type="primary" @click="sub" style="float:right">确定</a-button>
           </div>
         </a-form>
 
@@ -87,9 +68,10 @@
         :scroll="{ x: 1500, y: 400}"
         :columns="columns"
         :data="loadData"
-        :rowSelection="{ selectedRowKeys: selectedRowKeys, onChange: onSelectChange, type: 'radio'}"
+        :rowSelection="{ selectedRowKeys: selectedRowKeys, onChange: onSelectChange }"
       >
       </s-table>
+
     </div>
   </div>
 
@@ -100,12 +82,6 @@ import STable from '@/components/Table';
 
 export default {
   name: 'CustomerMask',
-  // props: {
-  //   customerName: {
-  //     type: Boolean,
-  //     default: false
-  //   }
-  // },
   components: {
     STable
   },
@@ -121,6 +97,8 @@ export default {
       hackReset: true,
       status: false,
       data: false,
+      rangeArea: [],
+      brands: [],
       columns: [
         { title: '编号', dataIndex: 'code', width: '5%' },
         { title: '公司', dataIndex: 'name', width: '8%' },
@@ -141,8 +119,9 @@ export default {
       queryParam: {},
       loadData: parameter => {
         this.queryParam = this.form.getFieldsValue();
+        this.queryParam = { 'range.factory': 3100 };
         const params = Object.assign(parameter, this.queryParam);
-        return this.$api.peptide.getOrder(params).then(res => {
+        return this.$api.peptide.getProductList(params).then(res => {
           if (!this.data) {
             res.rows = [];
             res.total = 0;
@@ -159,6 +138,12 @@ export default {
     };
   },
   mounted () {
+    this.selectedRows = [];
+    this.selectedRowKeys = [];
+    this.rangeArea = this.$store.state.peptide.rangeArea;
+    this.brands = this.$store.state.basic.brands;
+    var selectDrop = document.getElementsByClassName('ant-checkbox')[1];
+    selectDrop.style.display = 'none';
     var width = document.body.clientWidth;
     var height = document.body.clientHeight;
     if (width > 1000) {
@@ -182,16 +167,21 @@ export default {
     }
   },
   methods: {
+    sub () {
+      alert(123);
+    },
     onClose () {
       this.$emit('Closed');
       this.status = true;
+      this.selectedRows = [];
+      this.selectedRowKeys = [];
     },
     handleSearch () {
       this.$refs.table.refresh(true);
     },
     onSelectChange (selectedRowKeys, selectedRows) {
-      this.selectedRowKeys = selectedRowKeys;
-      this.selectedRows = selectedRows;
+      this.selectedRowKeys = selectedRowKeys.slice(-1);
+      this.selectedRows = selectedRows.slice(-1);
     },
     onSmall () {
       this.small = !this.small;
