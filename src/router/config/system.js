@@ -12,6 +12,12 @@ export default {
       name: 'system-user',
       component: () => import('@/views/system/user'),
       meta: { title: '用户管理', keepAlive: false, permission: [ 'dashboard' ] }
+    },
+    {
+      path: '/system/menu',
+      name: 'system-menu',
+      component: () => import('@/views/system/menu'),
+      meta: { title: '菜单管理', keepAlive: false, permission: [ 'dashboard' ] }
     }
   ]
 };
