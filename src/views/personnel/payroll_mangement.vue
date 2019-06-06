@@ -124,7 +124,7 @@ export default {
           tdObj.style.textAlign = 'center';
           tdObj.innerHTML = "<input type='radio' id='addValue" + i + "'/>";
           // tdObj.innerHTML = "'<span class='ant-table-row-indent indent-level-0 style='padding-left:0px;'/><span <label class='ant-radio-wrapper'/>";
-          // tdObj.innerHTML = "<input type='radio' class='ant-radio-input' value='29'/>";
+          // tdObj.innerHTML = "<input type='radio' class='ant-radio-input'/>";
         } else if (i === 1 || i === 5 || i === 6 || i === 7 || i === 8 || i === 9) {
           tdObj.style.backgroundColor = 'white';
         } else if (i === 2 || i === 4) {
