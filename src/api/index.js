@@ -17,7 +17,7 @@ import seqorder from './seqorder';
 import synthorder from './synthorder';
 import user from './user';
 import peptide from './peptide';
-import system from './system';
+import pay from './pay';
 
 export default {
   area,
@@ -39,7 +39,7 @@ export default {
   synthorder,
   user,
   peptide,
-  system
+  pay
 };
 
 export {
