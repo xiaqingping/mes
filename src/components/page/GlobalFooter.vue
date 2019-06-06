@@ -2,8 +2,8 @@
   <div class="footer">
     <div class="links">
       <a href="https://www.sangon.com/" target="_blank">生工商城</a>
-      <a href="http://www.bbi-lifesciences.com/">BBI官网</a>
-      <a href="http://employee.sangon.com/">BBI集团员工自助系统</a>
+      <a href="http://www.bbi-lifesciences.com/" target="_blank">BBI官网</a>
+      <a href="http://employee.sangon.com/" target="_blank">BBI集团员工自助系统</a>
     </div>
     <div class="copyright">
       Copyright

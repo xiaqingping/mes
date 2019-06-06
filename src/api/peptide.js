@@ -83,12 +83,12 @@ export default {
   },
 
   // 恢复修饰
-  getModificationsResume (params) {
+  resumeModifications (params) {
     return request(`/peptide-base/v1/modifications/restore/${params}`, { method: 'POST' });
   },
 
   // 删除修饰
-  getModificationsDelete (params) {
+  deleteModifications (params) {
     return request(`/peptide-base/v1/modifications/${params}`, { method: 'DELETE' });
   },
 
@@ -103,13 +103,18 @@ export default {
     return request(`/peptide-base/v1/modificationTypes/easyui`, { params });
   },
 
+  // 创建修饰类别
+  insertModificationTypes (params) {
+    return request(`/peptide-base/v1/modificationTypes`, { method: 'POST', data: params });
+  },
+
   // 恢复修饰类别
-  resumeModifications (params) {
+  resumeModificationTypes (params) {
     return request(`/peptide-base/v1/modificationTypes/restore/${params}`, { method: 'POST' });
   },
 
   // 删除修饰类别
-  deleteModifications (params) {
+  deleteModificationTypes (params) {
     return request(`/peptide-base/v1/modificationTypes/${params}`, { method: 'DELETE' });
   },
 
@@ -143,5 +148,11 @@ export default {
   // 删除二硫键产品
   deletedisulfideBondProducts (params) {
     return request(`/peptide-base/v1/disulfideBondProducts/${params}`, { method: 'DELETE' });
+  },
+
+  /** ****************************** 获取产品 ************************************/
+  // 获取产品
+  getProductList (params) {
+    return request(`/basic/v1/products`, { params });
   }
 };

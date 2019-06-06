@@ -58,7 +58,7 @@
 import STable from '@/components/Table';
 
 export default {
-  name: 'SeqSampleOrder',
+  name: 'PeptideModificationsType',
   components: {
     STable
   },
@@ -150,7 +150,7 @@ export default {
         });
         return false;
       }
-      this.$api.peptide.insertPurity({ 'purity': addVal }).then(res => {
+      this.$api.peptide.insertModificationTypes({ 'modificationType': addVal }).then(res => {
         if (res.id) {
           this.utils.refresh();
           return this.$refs.table.refresh(true);
@@ -166,7 +166,7 @@ export default {
           });
           return false;
         }
-        this.$api.peptide.getModificationTypesDelete(this.selectedRowKeys[0]).then(res => {
+        this.$api.peptide.deleteModificationTypes(this.selectedRowKeys[0]).then(res => {
           this.selectedRowKeys = [];
           return this.$refs.table.refresh(true);
         });
@@ -182,7 +182,7 @@ export default {
         });
         return false;
       }
-      this.$api.peptide.getModificationTypesResume(this.selectedRowKeys[0]).then(res => {
+      this.$api.peptide.resumeModificationTypes(this.selectedRowKeys[0]).then(res => {
         this.selectedRowKeys = [];
         return this.$refs.table.refresh(true);
       });
