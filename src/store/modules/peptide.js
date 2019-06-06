@@ -30,7 +30,15 @@ export default {
     rangeChannel: [
       { id: '', name: '全部' },
       { id: 10, name: '直销' },
-      { id: 20, name: '电商' }
+      { id: 20, name: '电商' },
+      { id: 99, name: '公司间' }
+    ],
+    // 销售范围
+    rangeArea: [
+      { id: '10-3110', name: '直销-国内' },
+      { id: '10-3120', name: '直销-国外' },
+      { id: '99-3120', name: '公司间-国外' },
+      { id: '20-3110', name: '电商-国内' }
     ],
     // 交货方式
     deliveryTypeStatus: [
@@ -56,6 +64,7 @@ export default {
       { id: 'EUR', name: 'EUR' },
       { id: 'GBP', name: 'GBP' }
     ]
+    // 商品品牌
   },
   mutations: {},
   actions: {}
