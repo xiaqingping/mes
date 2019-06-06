@@ -1,3 +1,5 @@
+@import "~ag-grid-community/dist/styles/ag-grid.css";
+@import "~ag-grid-community/dist/styles/ag-theme-balham.css";
 #app {
   height: 100%;
 }
@@ -29,7 +31,7 @@
 
   // 表格操作
   .table-operator {
-    margin-bottom: 18px;
+    // margin-bottom: 18px; 
     & > .ant-btn {
       margin-right: 8px;
     }

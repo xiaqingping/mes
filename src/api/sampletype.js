@@ -1,8 +1,13 @@
 /*
- * 样品类型
+ * 样品类型、测序产品、测序类型、
  * https://devapi.sangon.com:8443/api/sampletype/swagger-ui.html
  */
 
-// import request from '../assets/js/request';
+import request from '../assets/js/request';
 
-export default {};
+export default {
+  // 查询测序产品
+  getSeqProduct (params) {
+    return request(`/sampletype/v1/seqproducts/easyui`, { params });
+  }
+};
