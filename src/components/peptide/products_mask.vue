@@ -195,8 +195,8 @@ export default {
         var params = Object.assign(parameter, this.queryParam);
         return this.$api.peptide.getProductList(params).then(res => {
           if (!this.data) {
-            res.rows = [];
-            res.total = 0;
+            res = [];
+            res.length = 0;
           }
           return {
             data: res,
@@ -210,8 +210,6 @@ export default {
     };
   },
   mounted () {
-    var selectDrop = document.getElementsByClassName('ant-checkbox')[1];
-    selectDrop.style.display = 'none';
     this.selectedRows = [];
     this.selectedRowKeys = [];
     this.rangeArea = this.$store.state.peptide.rangeArea;

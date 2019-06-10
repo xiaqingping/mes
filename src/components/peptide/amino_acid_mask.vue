@@ -19,14 +19,6 @@
             <a-form-item label="名称 ">
               <a-input v-decorator="['name']" style="width: 190px"/>
             </a-form-item>
-            <a-form-item label="修饰类型">
-              <a-select v-decorator="['modificationTypeID', {initialValue : '0'}]" style="width: 185px">
-                <a-select-option value="0">全部</a-select-option>
-                <a-select-option v-for="item in modificationsType" :key="item.id" :value="item.id">
-                  {{ item.modificationType }}
-                </a-select-option>
-              </a-select>
-            </a-form-item>
             <a-form-item label="状态">
               <a-select v-decorator="['status', {initialValue : '1'}]" style="width: 150px">
                 <a-select-option value="0">全部</a-select-option>
@@ -67,7 +59,6 @@ export default {
     STable
   },
   data () {
-    var self = this;
     return {
       form: this.$form.createForm(this),
       small: true,
@@ -78,72 +69,136 @@ export default {
       hackReset: true,
       status: false,
       data: false,
-      modificationsType: [],
       columns: [
-        { title: '编号', dataIndex: 'code', width: '5%' },
-        { title: '修饰名称', dataIndex: 'name', width: '18%' },
-        { title: '修饰代码', dataIndex: 'modificationCode', width: '5%' },
+        { title: '编号', dataIndex: 'code', width: '4%' },
+        { title: '名称', dataIndex: 'name', width: '5%' },
+        { title: '亲水性',
+          dataIndex: 'hydrophilic',
+          align: 'center',
+          width: '4%',
+          customRender: function (value) {
+            return value === 1 ? '√' : '';
+          }
+        },
         {
-          title: '修饰位置',
-          dataIndex: 'modificationPosition',
+          title: '疏水性',
+          dataIndex: 'hydrophobic',
+          align: 'center',
+          width: '4%',
+          customRender: function (value) {
+            return value === 1 ? '√' : '';
+          }
+        },
+        {
+          title: '酸性',
+          dataIndex: 'acidic',
+          align: 'center',
+          width: '3%',
+          customRender: function (value) {
+            return value === 1 ? '√' : '';
+          }
+        },
+        {
+          title: '碱性',
+          dataIndex: 'alkaline',
+          align: 'center',
+          width: '3%',
+          customRender: function (value) {
+            return value === 1 ? '√' : '';
+          }
+        },
+        {
+          title: '是否可做二硫键',
+          dataIndex: 'isCanDisulfideBond',
+          align: 'center',
           width: '8%',
           customRender: function (value) {
-            for (var i = 0; i < self.$store.state.peptide.modificationPosition.length; i++) {
-              if (self.$store.state.peptide.modificationPosition[i].id === value) return self.$store.state.peptide.modificationPosition[i].name;
-            }
+            return value === 1 ? '√' : '';
           }
         },
         {
-          title: '独立修饰',
-          dataIndex: 'isIndependentModification',
-          align: 'center',
-          width: '6%',
-          customRender: function (value) {
-            if (value === 1) return '√';
-          }
+          title: '分子量', dataIndex: 'molecularWeight', align: 'center', width: '4%'
         },
         {
-          title: '修饰类别',
-          dataIndex: 'modificationTypeID',
-          width: '18%',
-          customRender: function (value) {
-            for (var i = 0; i < self.modificationsType.length; i++) {
-              if (self.modificationsType[i].id === value) {
-                return self.modificationsType[i].modificationType;
-              }
-            }
-          }
+          title: '等电点', dataIndex: 'isoelectricPoint', align: 'center', width: '4%'
+        },
+        {
+          title: '羧基解离常数', dataIndex: 'carboxylationDissociationConstant', align: 'center', width: '8%'
+        },
+        {
+          title: '氨基解离常数', dataIndex: 'aminoDissociationConstant', align: 'center', width: '8%'
         },
         {
           title: '状态',
           dataIndex: 'status',
-          width: '5%',
+          align: 'center',
+          width: '3%',
           customRender: function (value) {
-            if (value === 1) {
-              return '正常';
-            } else if (value === 2) {
-              return '已删除';
-            }
+            return value === 1 ? '正常' : '已删除';
           }
         },
-        { title: '创建人', dataIndex: 'creatorName', width: '5%' },
-        { title: '创建日期', dataIndex: 'createDate', width: '10%' },
+        {
+          title: '创建人', dataIndex: 'creatorName', align: 'center', width: '4%'
+        },
+        {
+          title: '创建时间', dataIndex: 'createDate', align: 'center', width: '6%'
+        },
         { title: '删除人', dataIndex: 'cancelName', width: '5%' },
-        { title: '删除时间', dataIndex: 'cancelDate', width: '10%' }
+        { title: '删除时间', dataIndex: 'cancelDate', width: '6%' },
+        { title: '类型', dataIndex: 'aminoAcidType', width: '4%', align: 'center' },
+        { title: '长代码', dataIndex: 'longCode', width: '8%', align: 'center' },
+        { title: '短代码', dataIndex: 'shortCode', width: '5%', align: 'center' }
       ],
       queryParam: {},
       loadData: parameter => {
         this.queryParam = this.form.getFieldsValue();
         const params = Object.assign(parameter, this.queryParam);
-        return this.$api.peptide.getModifications(params).then(res => {
-          if (!this.data) {
-            res.rows = [];
-            res.total = 0;
+        return this.$api.peptide.getAminoAcid(params).then(res => {
+          var map = {}; var dest = [];
+          for (let i = 0; i < res.rows.length; i++) {
+            var ai = res.rows[i];
+            if (!map[ai.code]) {
+              dest.push({
+                id: ai.id,
+                code: ai.code,
+                name: ai.name,
+                hydrophilic: ai.hydrophilic,
+                hydrophobic: ai.hydrophobic,
+                acidic: ai.acidic,
+                alkaline: ai.alkaline,
+                isCanDisulfideBond: ai.isCanDisulfideBond,
+                molecularWeight: ai.molecularWeight,
+                isoelectricPoint: ai.isoelectricPoint,
+                carboxylationDissociationConstant: ai.carboxylationDissociationConstant,
+                aminoDissociationConstant: ai.aminoDissociationConstant,
+                status: ai.status,
+                creatorName: ai.creatorName,
+                createDate: ai.createDate,
+                cancelName: ai.cancelName,
+                cancelDate: ai.cancelDate,
+                aminoAcidType: ai.aminoAcidType,
+                longCode: ai.longCode,
+                shortCode: ai.shortCode
+              });
+              map[ai.code] = ai;
+            } else {
+              for (let j = 0; j < dest.length; j++) {
+                var dj = dest[j];
+                if (dj.code === ai.code) {
+                  dj.shortCode = (dj.shortCode ? dj.shortCode : '') + (ai.shortCode ? ' | ' + ai.shortCode : '');
+                  dj.longCode = (dj.longCode ? dj.longCode : '') + (ai.longCode ? ' | ' + ai.longCode : '');
+                  dj.aminoAcidType = (dj.aminoAcidType ? dj.aminoAcidType : '') + (ai.aminoAcidType ? ' | ' + ai.aminoAcidType : '');
+                  dj.cancelDate = (dj.cancelDate ? dj.cancelDate : '') + (ai.cancelDate ? ' | ' + ai.cancelDate : '');
+                  dj.cancelName = (dj.cancelName ? dj.cancelName : '') + (ai.cancelName ? ' | ' + ai.cancelName : '');
+                  break;
+                }
+              }
+            }
           }
           return {
-            data: res.rows,
+            data: dest,
             page: params.page,
-            total: res.total
+            total: dest.length * 2
           };
         });
       },
@@ -154,9 +209,6 @@ export default {
   mounted () {
     this.selectedRows = [];
     this.selectedRowKeys = [];
-    this.$api.peptide.getModificationTypesAll({ 'status': 1 }).then(res => {
-      this.modificationsType = res;
-    });
     var width = document.body.clientWidth;
     var height = document.body.clientHeight;
     if (width > 1000) {
@@ -183,7 +235,7 @@ export default {
   methods: {
     sub () {
       if (this.selectedRows[0]) {
-        this.$emit('modificationsData', this.selectedRows);
+        this.$emit('aminoAcidData', this.selectedRows);
         this.$emit('Closed');
         this.selectedRows = [];
         this.selectedRowKeys = [];

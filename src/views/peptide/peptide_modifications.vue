@@ -72,10 +72,10 @@
         <div style="width:35%;position: absolute; left:66%; top:0">
           <h4>修饰适用氨基酸</h4>
           <div class="sonButton">
-            <a-button type="primary" icon="plus" @click="addTr(12)" id="add">新增</a-button>
-            <a-button type="primary" icon="edit" @click="addData">保存</a-button>
-            <a-button type="primary" icon="minus-square" @click="handleDelete">删除</a-button>
-            <a-button type="primary" icon="minus-square" @click="handleResume">恢复</a-button>
+            <a-button type="primary" icon="plus" @click="addSonTr(8)" id="addSon">新增</a-button>
+            <a-button type="primary" icon="edit" @click="addSonData">保存</a-button>
+            <a-button type="primary" icon="minus-square" @click="handleSonDelete">删除</a-button>
+            <a-button type="primary" icon="minus-square" @click="handleSonResume">恢复</a-button>
           </div>
           <s-table
             v-show="advanced"
@@ -93,17 +93,20 @@
       </div>
 
     </div>
-
+    <amino-acid-mask v-show="aminoAcid_status" @Closed="closeMask()" @aminoAcidData="aminoAcidData">
+    </amino-acid-mask>
   </div>
 </template>
 
 <script>
 import STable from '@/components/Table';
+import AminoAcidMask from '@/components/peptide/amino_acid_mask';
 
 export default {
   name: 'PeptideModifications',
   components: {
-    STable
+    STable,
+    AminoAcidMask
   },
   data () {
     var self = this;
@@ -111,6 +114,8 @@ export default {
       form: this.$form.createForm(this),
       visible: false,
       advanced: true,
+      aminoAcid_status: false,
+      amino_acid_data: [],
       columns: [
         { title: '编号', dataIndex: 'code', width: '5%' },
         { title: '修饰名称', dataIndex: 'name', width: '18%' },
@@ -224,11 +229,16 @@ export default {
     selectDrop.style.display = 'none';
     var selectDropSon = document.getElementsByClassName('ant-checkbox')[1];
     selectDropSon.style.display = 'none';
-    this.$api.peptide.getModificationTypesAll().then(res => {
+    this.$api.peptide.getModificationTypesAll({ 'status': 1 }).then(res => {
       this.modificationsType = res;
     });
   },
   methods: {
+    aminoAcidData (data) {
+      this.amino_acid_data = data;
+      document.getElementById('addSonValue1').value = data[0].code;
+      document.getElementById('addSonValue2').value = data[0].name;
+    },
     showDrawer () {
       this.visible = true;
     },
@@ -248,7 +258,13 @@ export default {
       this.selectedRowSon = selectedRowKeySon.slice(-1);
     },
     addTr (num) {
-      document.getElementById('add').setAttribute('disabled', true);
+      if (document.getElementById('addValue2')) {
+        this.$notification.error({
+          message: '错误',
+          description: `请先保存或删除现在编辑的内容`
+        });
+        return false;
+      }
       var tbodyObj = document.getElementsByTagName('tbody')[0];
       var trObj = document.createElement('tr');
       for (let i = 0; i < num; i++) {
@@ -257,11 +273,11 @@ export default {
         if (i === 2 || i === 3) {
           tdObj.style.padding = '0';
           tdObj.style.width = '100px';
-          tdObj.innerHTML = "<input type='text' title='该输入项为必输入项' id='addValue' style='width: 100%;height: 100%;border: 1px solid #FFA8A8;outline: none;background-color: #FFF3F3;'/>";
+          tdObj.innerHTML = "<input type='text' title='该输入项为必输入项' id='addValue" + i + "' style='width: 100%;height: 100%;border: 1px solid #FFA8A8;outline: none;background-color: #FFF3F3;'/>";
         } else if (i === 4) {
           var expData = '';
           for (let j = 0; j < this.$store.state.peptide.modificationPosition.length; j++) {
-            expData += '<option>' + this.$store.state.peptide.modificationPosition[j].name + '</option>';
+            expData += `<option value='${this.$store.state.peptide.modificationPosition[j].id}'>${this.$store.state.peptide.modificationPosition[j].name}</option>`;
           }
           tdObj.innerHTML = "<select title='该输入项为必输入项' id='addValue" + i + "' style='width: 100%;height: 100%;border: 1px solid #FFA8A8;outline: none;background-color: #FFF3F3;'>" + expData +
           '</select>';
@@ -272,7 +288,7 @@ export default {
         } else if (i === 6) {
           var expData1 = '';
           for (let j = 0; j < this.modificationsType.length; j++) {
-            expData1 += '<option>' + this.modificationsType[j].modificationType + '</option>';
+            expData1 += `<option value='${this.modificationsType[j].id}'>${this.modificationsType[j].modificationType}</option>`;
           }
           tdObj.innerHTML = "<select title='该输入项为必输入项' id='addValue" + i + "' style='width: 100%;height: 100%;border: 1px solid #FFA8A8;outline: none;background-color: #FFF3F3;'>" + expData1 +
           '</select>';
@@ -284,15 +300,48 @@ export default {
       tbodyObj.insertBefore(trObj, tbodyObj.firstElementChild);
     },
     addData () {
-      var addVal = document.getElementById('addValue').value;
-      if (addVal === '') {
+      var name = document.getElementById('addValue2').value;
+      if (name === '') {
         this.$notification.error({
           message: '错误',
           description: `数据不能为空！`
         });
         return false;
       }
-      this.$api.peptide.insertPurity({ 'purity': addVal }).then(res => {
+      var modificationCode = document.getElementById('addValue3').value;
+      if (modificationCode === '') {
+        this.$notification.error({
+          message: '错误',
+          description: `数据不能为空！`
+        });
+        return false;
+      }
+      var modificationPosition = document.getElementById('addValue4').value;
+      if (modificationPosition === '') {
+        this.$notification.error({
+          message: '错误',
+          description: `数据不能为空！`
+        });
+        return false;
+      }
+      var modificationTypeID = document.getElementById('addValue6').value;
+      if (modificationTypeID === '') {
+        this.$notification.error({
+          message: '错误',
+          description: `数据不能为空！`
+        });
+        return false;
+      }
+      var isIndependentModification = document.getElementById('addValue5').checked ? 1 : 2;
+      var addVal = {
+        'name': name,
+        'modificationCode': modificationCode,
+        'modificationPosition': modificationPosition,
+        'modificationTypeID': modificationTypeID,
+        'isIndependentModification': isIndependentModification,
+        'details': []
+      };
+      this.$api.peptide.insertModifications(addVal).then(res => {
         if (res.id) {
           this.utils.refresh();
           return this.$refs.table.refresh(true);
@@ -300,7 +349,7 @@ export default {
       });
     },
     handleDelete () {
-      if (!document.getElementById('addValue')) {
+      if (!document.getElementById('addValue2')) {
         if (this.selectedRowKeys[0] == null) {
           this.$notification.error({
             message: '错误',
@@ -330,6 +379,133 @@ export default {
       this.$api.peptide.resumeModifications(this.selectedRowKeys[0]).then(res => {
         this.selectedRowKeys = [];
         return this.$refs.table.refresh(true);
+      });
+    },
+    addSonTr (num) {
+      var self = this;
+      if (this.selectedRows.length !== 1) {
+        this.$notification.error({
+          message: '错误',
+          description: `请先选择左侧列表的一行`
+        });
+        return false;
+      }
+      if (document.getElementById('addValue2')) {
+        this.$notification.error({
+          message: '错误',
+          description: `请先完成左侧列表的新增`
+        });
+        return false;
+      }
+      if (this.selectedRows[0].isIndependentModification === 1) {
+        this.$notification.error({
+          message: '错误',
+          description: `独立修饰不能添加适用氨基酸`
+        });
+        return false;
+      }
+      if (document.getElementById('addSonValue1')) {
+        this.$notification.error({
+          message: '错误',
+          description: `请先保存或删除现在编辑的内容`
+        });
+        return false;
+      }
+      var tbodyObj = document.getElementsByTagName('tbody')[1];
+      var trObj = document.createElement('tr');
+      for (let i = 0; i < num; i++) {
+        var tdObj = document.createElement('td');
+        tdObj.style.padding = '0';
+        if (i === 1) {
+          tdObj.innerHTML = "<div style='position: relative;width: 100%;height: 100%'><input type='text' readonly title='该输入项为必输入项' id='addSonValue" + i + "' style='width: 100%;height: 100%;border: 1px solid #FFA8A8;outline: none;background-color: #FFF3F3;'/><span class='iconfont icon-suosou' id='openMask' style='position: absolute;right:0;top:0;cursor:pointer;font-weight:bold;color:#8C8C8C'></span></div>";
+        } else if (i === 2) {
+          tdObj.innerHTML = "<input type='text' title='该输入项为必输入项' disabled id='addSonValue" + i + "' style='width: 100%;height: 100%;border: 1px solid #FFA8A8;outline: none;background-color: white;'/>";
+        } else {
+          tdObj.style.backgroundColor = 'blue';
+        }
+        trObj.appendChild(tdObj);
+      }
+      tbodyObj.insertBefore(trObj, tbodyObj.firstElementChild);
+      this.$nextTick(() => {
+        document.getElementById('openMask').onmouseover = function () {
+          this.style.color = 'black';
+        };
+        document.getElementById('openMask').onmouseout = function () {
+          this.style.color = '#8C8C8C';
+        };
+        document.getElementById('openMask').onclick = function () {
+          self.openMask();
+        };
+      });
+    },
+    addSonData () {
+      var code = document.getElementById('addSonValue1').value;
+      if (code === '') {
+        this.$notification.error({
+          message: '错误',
+          description: `数据不能为空！`
+        });
+        return false;
+      }
+      var name = document.getElementById('addSonValue2').value;
+      if (name === '') {
+        this.$notification.error({
+          message: '错误',
+          description: `数据不能为空！`
+        });
+        return false;
+      }
+      var addSonVal = {
+        'name': name,
+        'code': code,
+        'aminoAcidID': this.amino_acid_data[0].id,
+        'modificationID': this.selectedRows[0].id
+      };
+      this.$api.peptide.insertSuitableAminoAcids(addSonVal).then(res => {
+        if (res.id) {
+          var childList = document.getElementsByTagName('tbody')[1].childNodes;
+          document.getElementsByTagName('tbody')[1].removeChild(childList[0]);
+          document.getElementById('addSon').removeAttribute('disabled');
+          return this.$refs.table1.refresh(true);
+        }
+      });
+    },
+    openMask () {
+      this.aminoAcid_status = true;
+    },
+    closeMask () {
+      this.aminoAcid_status = false;
+    },
+    handleSonDelete () {
+      if (!document.getElementById('addSonValue1')) {
+        if (this.selectedRowKeySon[0] == null) {
+          this.$notification.error({
+            message: '错误',
+            description: `请选择一条数据`
+          });
+          return false;
+        }
+        this.$api.peptide.deleteSuitableAminoAcids(this.selectedRowKeySon[0]).then(res => {
+          this.selectedRowKeySon = [];
+          return this.$refs.table1.refresh(true);
+        });
+      } else {
+        var childList = document.getElementsByTagName('tbody')[1].childNodes;
+        document.getElementsByTagName('tbody')[1].removeChild(childList[0]);
+        document.getElementById('addSon').removeAttribute('disabled');
+      }
+    },
+    handleSonResume () {
+      if (this.selectedRowKeySon[0] == null) {
+        this.$notification.error({
+          message: '错误',
+          description: `请选择一条数据`
+        });
+        return false;
+      }
+      this.$api.peptide.resumeSuitableAminoAcids(this.selectedRowKeySon[0]).then(res => {
+        this.selectedRowKeySon = [];
+        return this.$refs.table1.refresh(true);
       });
     }
   }

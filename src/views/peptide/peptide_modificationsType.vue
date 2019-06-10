@@ -122,7 +122,13 @@ export default {
       this.selectedRows = selectedRows;
     },
     addTr (num) {
-      document.getElementById('add').setAttribute('disabled', true);
+      if (document.getElementById('addValue')) {
+        this.$notification.error({
+          message: '错误',
+          description: `请先保存或删除现在编辑的内容`
+        });
+        return false;
+      }
       var tbodyObj = document.getElementsByTagName('tbody')[0];
       var trObj = document.createElement('tr');
       for (let i = 0; i < num; i++) {

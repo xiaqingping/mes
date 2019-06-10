@@ -107,7 +107,6 @@ export default {
         // else this.queryParam = {'status': parseInt(this.form.getFieldsValue().status)};
         var params = Object.assign(parameter, this.queryParam);
         return this.$api.peptide.getdisulfideBondProducts(params).then(res => {
-          console.log(res.rows);
           return {
             data: res.rows,
             page: params.page,

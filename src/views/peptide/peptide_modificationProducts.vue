@@ -50,7 +50,7 @@
     <products-mask v-show="products_status" @Closed="closeMask(1)" @customerData="customerData">
     </products-mask>
 
-    <modifications-mask v-show="modifications_status" @Closed="closeMask(2)">
+    <modifications-mask v-show="modifications_status" @Closed="closeMask(2)" @modificationsData="modificationsData">
     </modifications-mask>
   </div>
 </template>
@@ -134,7 +134,8 @@ export default {
       },
       selectedRowKeys: [],
       selectedRows: [],
-      aminoAcid: []
+      aminoAcid: [],
+      modifications: []
     };
   },
   mounted () {
@@ -143,12 +144,12 @@ export default {
     this.$api.peptide.getAminoAcid({ status: 1 }).then(res => {
       var map = {}; var dest = [];
       for (let i = 0; i < res.rows.length; i++) {
-        // console.log(res.rows[i]);
         var ai = res.rows[i];
         if (!map[ai.code]) {
           dest.push({
             id: ai.id,
-            name: ai.name
+            name: ai.name,
+            code: ai.code
           });
           map[ai.code] = ai;
         }
@@ -160,6 +161,10 @@ export default {
     customerData (data) {
       document.getElementById('addValue11').value = data[0].code;
       document.getElementById('addValue12').value = data[0].desc;
+    },
+    modificationsData (data) {
+      this.modifications = data;
+      document.getElementById('addValue2').value = data[0].name;
     },
     showDrawer () {
       this.visible = true;
@@ -197,14 +202,14 @@ export default {
         } else if (i === 3) {
           var expData = '';
           for (let j = 0; j < self.$store.state.peptide.modificationPosition.length; j++) {
-            expData += '<option>' + self.$store.state.peptide.modificationPosition[j].name + '</option>';
+            expData += `<option value='${self.$store.state.peptide.modificationPosition[j].id}'>${self.$store.state.peptide.modificationPosition[j].name}</option>`;
           }
           tdObj.innerHTML = "<select title='该输入项为必输入项' id='addValue" + i + "' style='width: 100%;height: 100%;border: 1px solid #FFA8A8;outline: none;background-color: #FFF3F3;'>" + expData +
           '</select>';
         } else if (i === 4) {
           var expData1 = '';
           for (let j = 0; j < self.aminoAcid.length; j++) {
-            expData1 += '<option value=' + self.aminoAcid[j].id + '>' + self.aminoAcid[j].name + '</option>';
+            expData1 += `<option value='${self.aminoAcid[j].id}'>${self.aminoAcid[j].name}</option>`;
           }
           tdObj.innerHTML = "<select title='该输入项为必输入项' id='addValue" + i + "' style='width: 100%;height: 100%;border: 1px solid #FFA8A8;outline: none;background-color: #FFF3F3;'>" + expData1 +
           '</select>';
@@ -266,25 +271,39 @@ export default {
       }
     },
     addData () {
-      var aminoAcidTypeLeft = document.getElementById('addValue2').value;
-      if (aminoAcidTypeLeft === '') {
+      var modificationName = document.getElementById('addValue2').value;
+      if (modificationName === '') {
         this.$notification.error({
           message: '错误',
           description: `数据不能为空！`
         });
         return false;
       }
-
-      var aminoAcidTypeRight = document.getElementById('addValue3').value;
-      if (aminoAcidTypeRight === '') {
+      var modificationPosition = document.getElementById('addValue3').value;
+      if (modificationPosition === '') {
         this.$notification.error({
           message: '错误',
           description: `数据不能为空！`
         });
         return false;
       }
-
-      var providerTotalAmountBegin = document.getElementById('addValue4').value;
+      var aminoAcidName = document.getElementById('addValue4').value;
+      if (aminoAcidName === '') {
+        this.$notification.error({
+          message: '错误',
+          description: `数据不能为空！`
+        });
+        return false;
+      }
+      var aminoAcidType = document.getElementById('addValue5').value;
+      if (aminoAcidType === '') {
+        this.$notification.error({
+          message: '错误',
+          description: `数据不能为空！`
+        });
+        return false;
+      }
+      var providerTotalAmountBegin = document.getElementById('addValue6').value;
       if (providerTotalAmountBegin === '') {
         this.$notification.error({
           message: '错误',
@@ -293,7 +312,7 @@ export default {
         return false;
       }
 
-      var providerTotalAmountEnd = document.getElementById('addValue5').value;
+      var providerTotalAmountEnd = document.getElementById('addValue7').value;
       if (providerTotalAmountEnd === '') {
         this.$notification.error({
           message: '错误',
@@ -302,7 +321,7 @@ export default {
         return false;
       }
 
-      var aminoAcidLengthBegin = document.getElementById('addValue6').value;
+      var aminoAcidLengthBegin = document.getElementById('addValue8').value;
       if (aminoAcidLengthBegin === '') {
         this.$notification.error({
           message: '错误',
@@ -311,7 +330,7 @@ export default {
         return false;
       }
 
-      var aminoAcidLengthEnd = document.getElementById('addValue7').value;
+      var aminoAcidLengthEnd = document.getElementById('addValue9').value;
       if (aminoAcidLengthEnd === '') {
         this.$notification.error({
           message: '错误',
@@ -320,9 +339,9 @@ export default {
         return false;
       }
 
-      var isNeedDesalting = document.getElementById('addValue8').checked ? 1 : 2;
+      var isNeedDesalting = document.getElementById('addValue10').checked ? 1 : 2;
 
-      var sapProductCode = document.getElementById('addValue9').value;
+      var sapProductCode = document.getElementById('addValue11').value;
       if (sapProductCode === '') {
         this.$notification.error({
           message: '错误',
@@ -331,7 +350,7 @@ export default {
         return false;
       }
 
-      var sapProductName = document.getElementById('addValue10').value;
+      var sapProductName = document.getElementById('addValue12').value;
       if (sapProductName === '') {
         this.$notification.error({
           message: '错误',
@@ -340,18 +359,30 @@ export default {
         return false;
       }
 
+      var aminoAcidData = [];
+      for (let i = 0; i < this.aminoAcid.length; i++) {
+        if (parseInt(aminoAcidName) === parseInt(this.aminoAcid[i].id)) {
+          aminoAcidData = this.aminoAcid[i];
+        }
+      }
       var addVal = {
-        'aminoAcidTypeLeft': aminoAcidTypeLeft,
-        'aminoAcidTypeRight': aminoAcidTypeRight,
-        'providerTotalAmountBegin': providerTotalAmountBegin,
-        'providerTotalAmountEnd': providerTotalAmountEnd,
+        'modificationCode': this.modifications[0].code,
+        'modificationID': this.modifications[0].id,
+        'modificationName': modificationName,
+        'modificationPosition': modificationPosition,
+        'aminoAcidName': aminoAcidName,
+        'aminoAcidCode': aminoAcidData.code,
+        'aminoAcidID': aminoAcidData.id,
+        'aminoAcidType': aminoAcidType,
         'aminoAcidLengthBegin': aminoAcidLengthBegin,
         'aminoAcidLengthEnd': aminoAcidLengthEnd,
+        'providerTotalAmountBegin': providerTotalAmountBegin,
+        'providerTotalAmountEnd': providerTotalAmountEnd,
         'isNeedDesalting': isNeedDesalting,
         'sapProductCode': sapProductCode,
         'sapProductName': sapProductName
       };
-      this.$api.peptide.insertdisulfideBondProducts(addVal).then(res => {
+      this.$api.peptide.insertModificationProducts(addVal).then(res => {
         if (res.id) {
           this.utils.refresh();
           return this.$refs.table.refresh(true);
