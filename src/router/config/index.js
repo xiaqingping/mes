@@ -16,10 +16,10 @@ export const asyncRouterMap = [
     meta: { title: '首页' },
     redirect: '/seq/sample_order',
     children: [
-      seq,
-      system,
       peptide,
-      personnel
+      seq,
+      personnel,
+      system
     ]
   },
   {

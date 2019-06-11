@@ -12,12 +12,15 @@ import primer from './primer';
 import product from './product';
 import sample from './sample';
 import sampleorder from './sampleorder';
+import sampleprepare from './sampleprepare';
 import sampletype from './sampletype';
+import seqfactory from './seqfactory';
 import seqorder from './seqorder';
 import synthorder from './synthorder';
 import user from './user';
 import peptide from './peptide';
 import pay from './pay';
+import system from './system';
 
 export default {
   area,
@@ -34,12 +37,15 @@ export default {
   product,
   sample,
   sampleorder,
+  sampleprepare,
   sampletype,
+  seqfactory,
   seqorder,
   synthorder,
   user,
   peptide,
-  pay
+  pay,
+  system
 };
 
 export {
@@ -57,9 +63,13 @@ export {
   product,
   sample,
   sampleorder,
+  sampleprepare,
   sampletype,
+  seqfactory,
   seqorder,
   synthorder,
   user,
-  peptide
+  peptide,
+  pay,
+  system
 };

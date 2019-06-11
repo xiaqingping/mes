@@ -56,11 +56,11 @@ export default {
   created () {
     this.menus = this.mainMenu.find(item => item.path === '/').children;
 
-    this.$store.dispatch('basic/getCache', { type: 'factorys' });
-    this.$store.dispatch('basic/getCache', { type: 'offices' });
-    this.$store.dispatch('basic/getCache', { type: 'paymethods' });
-    this.$store.dispatch('basic/getCache', { type: 'payterms' });
-    this.$store.dispatch('basic/getCache', { type: 'regions' });
+    // 基础数据
+    this.$store.dispatch('basic/getCache');
+
+    // 测序模块
+    this.$store.dispatch('seq/getCache');
   },
   computed: {
     ...mapState({

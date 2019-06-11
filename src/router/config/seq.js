@@ -18,6 +18,18 @@ export default {
       name: 'seq-order',
       component: () => import('@/views/seq/order'),
       meta: { title: '测序订单', keepAlive: false, permission: [ 'dashboard' ] }
+    },
+    {
+      path: '/seq/sample_dose',
+      name: 'seq-sample-dose',
+      component: () => import('@/views/seq/sample_dose'),
+      meta: { title: '样品用量', keepAlive: false, permission: [ 'dashboard' ] }
+    },
+    {
+      path: '/seq/product',
+      name: 'seq-product',
+      component: () => import('@/views/seq/product'),
+      meta: { title: '测序产品', keepAlive: false, permission: [ 'dashboard' ] }
     }
   ]
 };
