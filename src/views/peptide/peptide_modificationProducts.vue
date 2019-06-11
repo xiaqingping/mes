@@ -161,10 +161,12 @@ export default {
     customerData (data) {
       document.getElementById('addValue11').value = data[0].code;
       document.getElementById('addValue12').value = data[0].desc;
+      this.utils.isValueMask(['addValue11', 'addValue12']);
     },
     modificationsData (data) {
       this.modifications = data;
       document.getElementById('addValue2').value = data[0].name;
+      this.utils.isValueMask(['addValue2']);
     },
     showDrawer () {
       this.visible = true;
@@ -194,7 +196,7 @@ export default {
         var tdObj = document.createElement('td');
         tdObj.style.padding = '0';
         if (i === 6 || i === 7 || i === 8 || i === 9) {
-          tdObj.innerHTML = "<input type='text' title='该输入项为必输入项' id='addValue" + i + "' style='width: 100%;height: 100%;border: 1px solid #FFA8A8;outline: none;background-color: #FFF3F3;'/>";
+          tdObj.innerHTML = "<input class='isValue' type='text' title='该输入项为必输入项' id='addValue" + i + "' style='width: 100%;height: 100%;border: 1px solid #FFA8A8;outline: none;background-color: #FFF3F3;'/>";
         } else if (i === 10) {
           tdObj.style.backgroundColor = 'blue';
           tdObj.style.textAlign = 'center';
@@ -204,19 +206,17 @@ export default {
           for (let j = 0; j < self.$store.state.peptide.modificationPosition.length; j++) {
             expData += `<option value='${self.$store.state.peptide.modificationPosition[j].id}'>${self.$store.state.peptide.modificationPosition[j].name}</option>`;
           }
-          tdObj.innerHTML = "<select title='该输入项为必输入项' id='addValue" + i + "' style='width: 100%;height: 100%;border: 1px solid #FFA8A8;outline: none;background-color: #FFF3F3;'>" + expData +
+          tdObj.innerHTML = "<select title='该输入项为必输入项' id='addValue" + i + "' style='width: 100%;height: 100%;border: 1px solid grey;outline: none;background-color: white;'>" + expData +
           '</select>';
         } else if (i === 4) {
           var expData1 = '';
           for (let j = 0; j < self.aminoAcid.length; j++) {
             expData1 += `<option value='${self.aminoAcid[j].id}'>${self.aminoAcid[j].name}</option>`;
           }
-          tdObj.innerHTML = "<select title='该输入项为必输入项' id='addValue" + i + "' style='width: 100%;height: 100%;border: 1px solid #FFA8A8;outline: none;background-color: #FFF3F3;'>" + expData1 +
+          tdObj.innerHTML = "<select title='该输入项为必输入项' id='addValue" + i + "' style='width: 100%;height: 100%;border: 1px solid grey;outline: none;background-color: white;'>" + expData1 +
           '</select>';
         } else if (i === 5) {
-          tdObj.innerHTML = "<select title='该输入项为必输入项' id='addValue" + i + "' style='width: 100%;height: 100%;border: 1px solid #FFA8A8;outline: none;background-color: #FFF3F3;'><option value='L'>L</option><option value='D'>D</option></select>";
-        } else if (i === 10) {
-          tdObj.innerHTML = "<input type='text' readonly title='该输入项为必输入项' id='addValue" + i + "' style='width: 100%;height: 100%;border: 1px solid #FFA8A8;outline: none;background-color: #FFF3F3;'/>";
+          tdObj.innerHTML = "<select title='该输入项为必输入项' id='addValue" + i + "' style='width: 100%;height: 100%;border: 1px solid grey;outline: none;background-color: white;'><option value='L'>L</option><option value='D'>D</option></select>";
         } else if (i === 11) {
           tdObj.innerHTML = "<input type='text' title='该输入项为必输入项' disabled id='addValue" + i + "' style='width: 100%;height: 100%;border: 1px solid #FFA8A8;outline: none;background-color: white;'/>";
         } else if (i === 2) {
@@ -248,6 +248,7 @@ export default {
         document.getElementById('openMask').onclick = function () {
           self.openMask(1);
         };
+        this.utils.isValue();
       });
     },
     openMask (num) {
@@ -259,6 +260,9 @@ export default {
           this.modifications_status = true;
           break;
       }
+      document.addEventListener('mousewheel', function (e) {
+        e.preventDefault();
+      }, { passive: false });
     },
     closeMask (num) {
       switch (num) {
@@ -269,6 +273,9 @@ export default {
           this.modifications_status = false;
           break;
       }
+      document.addEventListener('mousewheel', function (e) {
+        e.returnValue = true;
+      }, { passive: false });
     },
     addData () {
       var modificationName = document.getElementById('addValue2').value;

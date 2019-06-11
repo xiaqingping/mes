@@ -40,6 +40,7 @@
         ref="table"
         bordered
         size="small"
+        :scroll="{ x: 1500 }"
         :columns="columns"
         :data="loadData"
         :rowSelection="{ selectedRowKeys: selectedRowKeys, onChange: onSelectChange }"
@@ -86,7 +87,7 @@ export default {
           }
         },
         { title: '产品编号', dataIndex: 'sapProductCode', width: '8%' },
-        { title: '产品名称', dataIndex: 'sapProductName', width: '21%' },
+        { title: '产品名称', dataIndex: 'sapProductName', width: '18%' },
         {
           title: '状态',
           dataIndex: 'status',
@@ -98,13 +99,12 @@ export default {
         },
         { title: '创建人', dataIndex: 'creatorName', width: '4%' },
         { title: '创建日期', dataIndex: 'createDate', width: '10%' },
-        { title: '删除人', dataIndex: 'cancelName', width: '5%' },
+        { title: '删除人', dataIndex: 'cancelName', width: '4%' },
         { title: '删除时间', dataIndex: 'cancelDate', width: '10%' }
       ],
       queryParam: {},
       loadData: parameter => {
         this.queryParam = this.form.getFieldsValue();
-        // else this.queryParam = {'status': parseInt(this.form.getFieldsValue().status)};
         var params = Object.assign(parameter, this.queryParam);
         return this.$api.peptide.getdisulfideBondProducts(params).then(res => {
           return {
@@ -126,6 +126,7 @@ export default {
     customerData (data) {
       document.getElementById('addValue9').value = data[0].code;
       document.getElementById('addValue10').value = data[0].desc;
+      this.utils.isValueMask(['addValue9', 'addValue10']);
     },
     showDrawer () {
       this.visible = true;
@@ -156,13 +157,13 @@ export default {
         var tdObj = document.createElement('td');
         tdObj.style.padding = '0';
         if (i === 4 || i === 5 || i === 6 || i === 7) {
-          tdObj.innerHTML = "<input type='text' title='该输入项为必输入项' id='addValue" + i + "' style='width: 100%;height: 100%;border: 1px solid #FFA8A8;outline: none;background-color: #FFF3F3;'/>";
+          tdObj.innerHTML = "<input type='text' class='isValue' title='该输入项为必输入项' id='addValue" + i + "' style='width: 100%;height: 100%;border: 1px solid #FFA8A8;outline: none;background-color: #FFF3F3;'/>";
         } else if (i === 8) {
           tdObj.style.backgroundColor = 'blue';
           tdObj.style.textAlign = 'center';
           tdObj.innerHTML = "<input type='checkbox' id='addValue" + i + "'/>";
         } else if (i === 2 || i === 3) {
-          tdObj.innerHTML = "<select title='该输入项为必输入项' id='addValue" + i + "' style='width: 100%;height: 100%;border: 1px solid #FFA8A8;outline: none;background-color: #FFF3F3;'><option value='L'>L</option><option value='D'>D</option></select>";
+          tdObj.innerHTML = "<select title='该输入项为必输入项' id='addValue" + i + "' style='width: 100%;height: 100%;border: 1px solid grey;outline: none;background-color: white;'><option value='L'>L</option><option value='D'>D</option></select>";
         } else if (i === 9) {
           tdObj.innerHTML = "<input type='text' title='该输入项为必输入项' disabled id='addValue" + i + "' style='width: 100%;height: 100%;border: 1px solid #FFA8A8;outline: none;background-color: white;'/>";
         } else if (i === 10) {
@@ -183,13 +184,20 @@ export default {
         document.getElementById('openMask').onclick = function () {
           self.openMask();
         };
+        self.utils.isValue();
       });
     },
     openMask () {
       this.products_status = true;
+      document.addEventListener('mousewheel', function (e) {
+        e.preventDefault();
+      }, { passive: false });
     },
     closeMask () {
       this.products_status = false;
+      document.addEventListener('mousewheel', function (e) {
+        e.returnValue = true;
+      }, { passive: false });
     },
     addData () {
       var aminoAcidTypeLeft = document.getElementById('addValue2').value;

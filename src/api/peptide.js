@@ -45,6 +45,11 @@ export default {
     return request(`/peptide-base/v1/synthesisProducts/easyui`, { params });
   },
 
+  // 创建氨基酸
+  insertProduct (params) {
+    return request(`/peptide-base/v1/synthesisProducts`, { method: 'POST', data: params });
+  },
+
   // 恢复合成产品
   resumeProduct (params) {
     return request(`/peptide-base/v1/synthesisProducts/restore/${params}`, { method: 'POST' });
@@ -59,6 +64,11 @@ export default {
   // 获取氨基酸
   getAminoAcid (params) {
     return request(`/peptide-base/v1/aminoAcid/easyui`, { params });
+  },
+
+  // 创建氨基酸
+  insertAminoAcid (params) {
+    return request(`/peptide-base/v1/aminoAcid`, { method: 'POST', data: params });
   },
 
   // 获取氨基酸(全部)

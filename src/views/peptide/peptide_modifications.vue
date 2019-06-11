@@ -238,6 +238,7 @@ export default {
       this.amino_acid_data = data;
       document.getElementById('addSonValue1').value = data[0].code;
       document.getElementById('addSonValue2').value = data[0].name;
+      this.utils.isValueMask(['addSonValue1', 'addSonValue2']);
     },
     showDrawer () {
       this.visible = true;
@@ -265,6 +266,7 @@ export default {
         });
         return false;
       }
+      var self = this;
       var tbodyObj = document.getElementsByTagName('tbody')[0];
       var trObj = document.createElement('tr');
       for (let i = 0; i < num; i++) {
@@ -273,13 +275,13 @@ export default {
         if (i === 2 || i === 3) {
           tdObj.style.padding = '0';
           tdObj.style.width = '100px';
-          tdObj.innerHTML = "<input type='text' title='该输入项为必输入项' id='addValue" + i + "' style='width: 100%;height: 100%;border: 1px solid #FFA8A8;outline: none;background-color: #FFF3F3;'/>";
+          tdObj.innerHTML = "<input type='text' class='isValue' title='该输入项为必输入项' id='addValue" + i + "' style='width: 100%;height: 100%;border: 1px solid #FFA8A8;outline: none;background-color: #FFF3F3;'/>";
         } else if (i === 4) {
           var expData = '';
           for (let j = 0; j < this.$store.state.peptide.modificationPosition.length; j++) {
             expData += `<option value='${this.$store.state.peptide.modificationPosition[j].id}'>${this.$store.state.peptide.modificationPosition[j].name}</option>`;
           }
-          tdObj.innerHTML = "<select title='该输入项为必输入项' id='addValue" + i + "' style='width: 100%;height: 100%;border: 1px solid #FFA8A8;outline: none;background-color: #FFF3F3;'>" + expData +
+          tdObj.innerHTML = "<select title='该输入项为必输入项' id='addValue" + i + "' style='width: 100%;height: 100%;border: 1px solid grey;outline: none;background-color: white;'>" + expData +
           '</select>';
         } else if (i === 5) {
           tdObj.style.backgroundColor = 'blue';
@@ -290,7 +292,7 @@ export default {
           for (let j = 0; j < this.modificationsType.length; j++) {
             expData1 += `<option value='${this.modificationsType[j].id}'>${this.modificationsType[j].modificationType}</option>`;
           }
-          tdObj.innerHTML = "<select title='该输入项为必输入项' id='addValue" + i + "' style='width: 100%;height: 100%;border: 1px solid #FFA8A8;outline: none;background-color: #FFF3F3;'>" + expData1 +
+          tdObj.innerHTML = "<select title='该输入项为必输入项' id='addValue" + i + "' style='width: 100%;height: 100%;border: 1px solid grey;outline: none;background-color: white;'>" + expData1 +
           '</select>';
         } else {
           tdObj.style.backgroundColor = 'blue';
@@ -298,6 +300,9 @@ export default {
         trObj.appendChild(tdObj);
       }
       tbodyObj.insertBefore(trObj, tbodyObj.firstElementChild);
+      this.$nextTick(() => {
+        self.utils.isValue();
+      });
     },
     addData () {
       var name = document.getElementById('addValue2').value;
@@ -472,9 +477,15 @@ export default {
     },
     openMask () {
       this.aminoAcid_status = true;
+      document.addEventListener('mousewheel', function (e) {
+        e.preventDefault();
+      }, { passive: false });
     },
     closeMask () {
       this.aminoAcid_status = false;
+      document.addEventListener('mousewheel', function (e) {
+        e.returnValue = true;
+      }, { passive: false });
     },
     handleSonDelete () {
       if (!document.getElementById('addSonValue1')) {

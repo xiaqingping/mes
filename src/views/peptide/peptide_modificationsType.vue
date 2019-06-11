@@ -136,7 +136,7 @@ export default {
         if (i === 2) {
           tdObj.style.padding = '0';
           tdObj.style.width = '100px';
-          tdObj.innerHTML = "<input type='text' title='该输入项为必输入项' id='addValue' style='width: 100%;height: 100%;border: 1px solid #FFA8A8;outline: none;background-color: #FFF3F3;'/>";
+          tdObj.innerHTML = "<input type='text' class='isValue' title='该输入项为必输入项' id='addValue' style='width: 100%;height: 100%;border: 1px solid #FFA8A8;outline: none;background-color: #FFF3F3;'/>";
         } else {
           tdObj.style.backgroundColor = 'blue';
         };
@@ -145,6 +145,7 @@ export default {
       tbodyObj.insertBefore(trObj, tbodyObj.firstElementChild);
       this.$nextTick(() => {
         document.getElementById('addValue').focus();
+        this.utils.isValue();
       });
     },
     addData () {

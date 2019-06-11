@@ -11,8 +11,6 @@
             </a-form-item>
           </a-col>
 
-          <!--          <div v-show="advanced">-->
-
           <a-col :xxl="4" :xl="6" :md="8" :sm="24">
             <a-form-item label="纯度">
               <a-select v-decorator="['purityID', {initialValue : '0'}]">
@@ -40,7 +38,6 @@
               </a-select>
             </a-form-item>
           </a-col>
-          <!--          </div>-->
 
         </a-row>
         <a-button type="primary" icon="search" html-type="submit" style="display:none;">查询</a-button>
@@ -53,10 +50,6 @@
         <a-button type="primary" icon="edit" @click="addData">保存</a-button>
         <a-button type="primary" icon="minus-square" @click="handleDelete">删除</a-button>
         <a-button type="primary" icon="minus-square" @click="handleResume">恢复</a-button>
-        <!--        <a @click="toggleAdvanced" style="margin-left: 8px">-->
-        <!--          {{ advanced ? '收起' : '展开' }}-->
-        <!--          <a-icon :type="advanced ? 'up' : 'down'"/>-->
-        <!--        </a>-->
       </div>
 
       <s-table
@@ -70,42 +63,27 @@
       >
       </s-table>
     </div>
-    <!--    <div>-->
-    <!--      <div type="primary" @click="showDrawer">-->
-    <!--        <div style="width: 20px;height: 100%;background-color: black">-->
-    <!--          12312312312-->
-    <!--        </div>-->
-    <!--      </div>-->
-    <!--      <a-drawer-->
-    <!--        title="Basic Drawer"-->
-    <!--        placement="right"-->
-    <!--        :closable="false"-->
-    <!--        @close="onClose"-->
-    <!--        :visible="visible"-->
-    <!--      >-->
-    <!--        <p>Some contents...</p>-->
-    <!--        <p>Some contents...</p>-->
-    <!--        <p>Some contents...</p>-->
-    <!--      </a-drawer>-->
-    <!--    </div>-->
-
+    <products-mask v-show="products_status" @Closed="closeMask()" @customerData="customerData">
+    </products-mask>
   </div>
 </template>
 
 <script>
 import STable from '@/components/Table';
+import ProductsMask from '@/components/peptide/products_mask';
 
 export default {
   name: 'PeptideProduct',
   components: {
-    STable
+    STable,
+    ProductsMask
   },
   data () {
     var self = this;
     return {
       form: this.$form.createForm(this),
       visible: false,
-      // advanced: true,
+      products_status: false,
       columns: [
         { title: '编号', dataIndex: 'code', width: '4%' },
         { title: '提供总量从', dataIndex: 'providerTotalAmountBegin', width: '6%' },
@@ -146,7 +124,7 @@ export default {
       queryParam: {},
       loadData: parameter => {
         this.queryParam = this.form.getFieldsValue();
-        const params = Object.assign(parameter, this.queryParam);
+        var params = Object.assign(parameter, this.queryParam);
         return this.$api.peptide.getProduct(params).then(res => {
           return {
             data: res.rows,
@@ -168,6 +146,11 @@ export default {
     });
   },
   methods: {
+    customerData (data) {
+      document.getElementById('addValue9').value = data[0].code;
+      document.getElementById('addValue10').value = data[0].desc;
+      this.utils.isValueMask(['addValue9', 'addValue10']);
+    },
     showDrawer () {
       this.visible = true;
     },
@@ -182,32 +165,38 @@ export default {
       this.selectedRows = selectedRows;
     },
     addTr (num) {
+      if (document.getElementById('addValue2')) {
+        this.$notification.error({
+          message: '错误',
+          description: `请先保存或删除现在编辑的内容`
+        });
+        return false;
+      }
       var self = this;
-      document.getElementById('add').setAttribute('disabled', true);
       var tbodyObj = document.getElementsByTagName('tbody')[0];
       var trObj = document.createElement('tr');
       for (let i = 0; i < num; i++) {
         var tdObj = document.createElement('td');
         tdObj.style.padding = '0';
         if (i === 2 || i === 3 || i === 5 || i === 6) {
-          tdObj.innerHTML = "<input type='text' title='该输入项为必输入项' id='addValue" + i + "' style='width: 100%;height: 100%;border: 1px solid #FFA8A8;outline: none;background-color: #FFF3F3;'/>";
+          tdObj.innerHTML = "<input type='text' class='isValue' title='该输入项为必输入项' id='addValue" + i + "' style='width: 100%;height: 100%;border: 1px solid #FFA8A8;outline: none;background-color: #FFF3F3;'/>";
         } else if (i === 4) {
           var expData = '';
           for (let j = 0; j < this.purity.length; j++) {
-            expData += '<option>' + this.purity[j].purity + '</option>';
+            expData += `<option value='${this.purity[j].id}'>${this.purity[j].purity}</option>`;
           }
-          tdObj.innerHTML = "<select title='该输入项为必输入项' id='addValue" + i + "' style='width: 100%;height: 100%;border: 1px solid #FFA8A8;outline: none;background-color: #FFF3F3;'>" + expData +
+          tdObj.innerHTML = "<select title='该输入项为必输入项' id='addValue" + i + "' style='width: 100%;height: 100%;outline: none;border: 1px solid grey;'>" + expData +
           '</select>';
         } else if (i === 7) {
           tdObj.style.backgroundColor = 'blue';
           tdObj.style.textAlign = 'center';
           tdObj.innerHTML = "<input type='checkbox' id='addValue" + i + "'/>";
         } else if (i === 8) {
-          tdObj.innerHTML = "<select title='该输入项为必输入项' id='addValue" + i + "' style='width: 100%;height: 100%;border: 1px solid #FFA8A8;outline: none;background-color: #FFF3F3;'><option value='L'>L</option><option value='D'>D</option></select>";
+          tdObj.innerHTML = "<select title='该输入项为必输入项' id='addValue" + i + "' style='width: 100%;height: 100%;border: 1px solid grey;outline: none;'><option value='L'>L</option><option value='D'>D</option></select>";
         } else if (i === 9) {
           tdObj.innerHTML = "<input type='text' title='该输入项为必输入项' disabled id='addValue" + i + "' style='width: 100%;height: 100%;border: 1px solid #FFA8A8;outline: none;background-color: white;'/>";
         } else if (i === 10) {
-          tdObj.innerHTML = "<input type='text' readonly title='该输入项为必输入项' id='addValue" + i + "' style='width: 100%;height: 100%;border: 1px solid #FFA8A8;outline: none;background-color: #FFF3F3;'/>";
+          tdObj.innerHTML = "<div style='position: relative;width: 100%;height: 100%'><input type='text' readonly title='该输入项为必输入项' id='addValue" + i + "' style='width: 100%;height: 100%;border: 1px solid #FFA8A8;outline: none;background-color: #FFF3F3;'/><span class='iconfont icon-suosou' id='openMask' style='position: absolute;right:0;top:0;cursor:pointer;font-weight:bold;color:#8C8C8C'></span></div>";
         } else {
           tdObj.style.backgroundColor = 'blue';
         }
@@ -215,24 +204,117 @@ export default {
       }
       tbodyObj.insertBefore(trObj, tbodyObj.firstElementChild);
       this.$nextTick(() => {
-        document.getElementById('addValue10').onclick = function () {
-          console.log(self.test());
+        document.getElementById('openMask').onmouseover = function () {
+          this.style.color = 'black';
         };
+        document.getElementById('openMask').onmouseout = function () {
+          this.style.color = '#8C8C8C';
+        };
+        document.getElementById('openMask').onclick = function () {
+          self.openMask();
+        };
+        self.utils.isValue();
       });
     },
-    test () {
-      alert(123);
+    openMask () {
+      this.products_status = true;
+      document.addEventListener('mousewheel', function (e) {
+        e.preventDefault();
+      }, { passive: false });
+    },
+    closeMask () {
+      this.products_status = false;
+      document.addEventListener('mousewheel', function (e) {
+        e.returnValue = true;
+      }, { passive: false });
     },
     addData () {
-      var addVal = document.getElementById('addValue').value;
-      if (addVal === '') {
+      var providerTotalAmountBegin = document.getElementById('addValue2').value;
+      if (providerTotalAmountBegin === '') {
         this.$notification.error({
           message: '错误',
           description: `数据不能为空！`
         });
         return false;
       }
-      this.$api.peptide.insertPurity({ 'purity': addVal }).then(res => {
+      var providerTotalAmountEnd = document.getElementById('addValue3').value;
+      if (providerTotalAmountEnd === '') {
+        this.$notification.error({
+          message: '错误',
+          description: `数据不能为空！`
+        });
+        return false;
+      }
+      var purityID = document.getElementById('addValue4').value;
+      if (purityID === '') {
+        this.$notification.error({
+          message: '错误',
+          description: `数据不能为空！`
+        });
+        return false;
+      }
+      var aminoAcidLengthBegin = document.getElementById('addValue5').value;
+      if (aminoAcidLengthBegin === '') {
+        this.$notification.error({
+          message: '错误',
+          description: `数据不能为空！`
+        });
+        return false;
+      }
+      var aminoAcidLengthEnd = document.getElementById('addValue6').value;
+      if (aminoAcidLengthEnd === '') {
+        this.$notification.error({
+          message: '错误',
+          description: `数据不能为空！`
+        });
+        return false;
+      }
+      var isNeedDesalting = document.getElementById('addValue7').checked ? 1 : 2;
+      var aminoAcidType = document.getElementById('addValue8').value;
+      if (aminoAcidType === '') {
+        this.$notification.error({
+          message: '错误',
+          description: `数据不能为空！`
+        });
+        return false;
+      }
+      var sapProductCode = document.getElementById('addValue9').value;
+      if (sapProductCode === '') {
+        this.$notification.error({
+          message: '错误',
+          description: `数据不能为空！`
+        });
+        return false;
+      }
+      var sapProductName = document.getElementById('addValue10').value;
+      if (sapProductName === '') {
+        this.$notification.error({
+          message: '错误',
+          description: `数据不能为空！`
+        });
+        return false;
+      }
+      var purityData = [];
+      for (let i = 0; i < this.purity.length; i++) {
+        if (parseInt(purityID) === parseInt(this.purity[i].id)) {
+          purityData = this.purity[i];
+        }
+      }
+      var addVal = {
+        'aminoAcidLengthBegin': aminoAcidLengthBegin,
+        'aminoAcidLengthEnd': aminoAcidLengthEnd,
+        'aminoAcidMinimumCharge': 0,
+        'aminoAcidType': aminoAcidType,
+        'isNeedDesalting': isNeedDesalting,
+        'providerTotalAmountBegin': providerTotalAmountBegin,
+        'providerTotalAmountEnd': providerTotalAmountEnd,
+        'purityCode': purityData.code,
+        'purityID': purityData.id,
+        'purityName': purityData.purity,
+        'sapProductCode': sapProductCode,
+        'sapProductName': sapProductName
+      };
+      this.$api.peptide.insertProduct(addVal).then(res => {
         if (res.id) {
           this.utils.refresh();
           return this.$refs.table.refresh(true);

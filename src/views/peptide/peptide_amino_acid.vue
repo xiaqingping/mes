@@ -260,39 +260,142 @@ export default {
       this.selectedRows = selectedRows;
     },
     addTr (num) {
-      document.getElementById('add').setAttribute('disabled', true);
+      if (document.getElementById('addValue2')) {
+        this.$notification.error({
+          message: '错误',
+          description: `请先保存或删除现在编辑的内容`
+        });
+        return false;
+      }
+      var self = this;
       var tbodyObj = document.getElementsByTagName('tbody')[0];
       var trObj = document.createElement('tr');
       for (let i = 0; i < num; i++) {
         var tdObj = document.createElement('td');
         tdObj.style.padding = '0';
         if (i === 2 || i === 8 || i === 9 || i === 10 || i === 11) {
-          tdObj.innerHTML = "<input type='text' title='该输入项为必输入项' id='addValue" + i + "' style='width: 100%;height: 100%;border: 1px solid #FFA8A8;outline: none;background-color: #FFF3F3;'/>";
+          tdObj.innerHTML = "<input type='text' class='isValue' title='该输入项为必输入项' id='addValue" + i + "' style='width: 100%;height: 100%;border: 1px solid #FFA8A8;outline: none;background-color: #FFF3F3;'/>";
         } else if (i === 3 || i === 4 || i === 5 || i === 6 || i === 7) {
           tdObj.style.backgroundColor = 'blue';
           tdObj.style.textAlign = 'center';
           tdObj.innerHTML = "<input type='checkbox' id='addValue" + i + "'/>";
         } else if (i === 17) {
-          tdObj.innerHTML = "<input type='text' value='L | D' disabled style='width: 100%;border: none;text-align:center;background-color: white;' id='addValue" + i + "'/>";
+          tdObj.innerHTML = "<input type='text' value='L | D' disabled style='width: 100%;border: none;text-align:center;background-color: white;border: 1px solid grey' id='addValue" + i + "'/>";
         } else if (i === 18 || i === 19) {
-          tdObj.innerHTML = "<input type='text' title='该输入项为必输入项' id='addValue" + i + "' style='width: 50%;height: 100%;border: 1px solid #FFA8A8;outline: none;background-color: #FFF3F3;'/><input type='text' title='该输入项为必输入项' id='addValue" + i + "' style='width: 50%;height: 100%;border: 1px solid #FFA8A8;outline: none;background-color: #FFF3F3;'/>";
+          tdObj.innerHTML = "<input type='text' class='isValue' title='该输入项为必输入项' id='addValueLeft" + i + "' style='width: 50%;height: 100%;border: 1px solid #FFA8A8;outline: none;background-color: #FFF3F3;'/><input class='isValue' type='text' title='该输入项为必输入项' id='addValueRight" + i + "' style='width: 50%;height: 100%;border: 1px solid #FFA8A8;outline: none;background-color: #FFF3F3;'/>";
         } else {
           tdObj.style.backgroundColor = 'blue';
         }
         trObj.appendChild(tdObj);
       }
       tbodyObj.insertBefore(trObj, tbodyObj.firstElementChild);
+      this.$nextTick(() => {
+        self.utils.isValue();
+      });
     },
     addData () {
-      var addVal = document.getElementById('addValue').value;
-      if (addVal === '') {
+      var name = document.getElementById('addValue2').value;
+      if (name === '') {
         this.$notification.error({
           message: '错误',
           description: `数据不能为空！`
         });
         return false;
       }
-      this.$api.peptide.insertPurity({ 'purity': addVal }).then(res => {
+      var hydrophilic = document.getElementById('addValue3').checked ? 1 : 2;
+      var hydrophobic = document.getElementById('addValue4').checked ? 1 : 2;
+      var acidic = document.getElementById('addValue5').checked ? 1 : 2;
+      var alkaline = document.getElementById('addValue6').checked ? 1 : 2;
+      var isCanDisulfideBond = document.getElementById('addValue7').checked ? 1 : 2;
+      var molecularWeight = document.getElementById('addValue8').value;
+      if (molecularWeight === '') {
+        this.$notification.error({
+          message: '错误',
+          description: `数据不能为空！`
+        });
+        return false;
+      }
+      var isoelectricPoint = document.getElementById('addValue9').value;
+      if (isoelectricPoint === '') {
+        this.$notification.error({
+          message: '错误',
+          description: `数据不能为空！`
+        });
+        return false;
+      }
+      var carboxylationDissociationConstant = document.getElementById('addValue10').value;
+      if (carboxylationDissociationConstant === '') {
+        this.$notification.error({
+          message: '错误',
+          description: `数据不能为空！`
+        });
+        return false;
+      }
+      var aminoDissociationConstant = document.getElementById('addValue11').value;
+      if (aminoDissociationConstant === '') {
+        this.$notification.error({
+          message: '错误',
+          description: `数据不能为空！`
+        });
+        return false;
+      }
+      var longCodeLeft = document.getElementById('addValueLeft18').value;
+      if (longCodeLeft === '') {
+        this.$notification.error({
+          message: '错误',
+          description: `数据不能为空！`
+        });
+        return false;
+      }
+      var longCodeRight = document.getElementById('addValueRight18').value;
+      if (longCodeRight === '') {
+        this.$notification.error({
+          message: '错误',
+          description: `数据不能为空！`
+        });
+        return false;
+      }
+      var shortCodeLeft = document.getElementById('addValueLeft19').value;
+      if (shortCodeLeft === '') {
+        this.$notification.error({
+          message: '错误',
+          description: `数据不能为空！`
+        });
+        return false;
+      }
+      var shortCodeRight = document.getElementById('addValueRight19').value;
+      if (shortCodeRight === '') {
+        this.$notification.error({
+          message: '错误',
+          description: `数据不能为空！`
+        });
+        return false;
+      }
+      var addVal = {
+        'acidic': acidic,
+        'alkaline': alkaline,
+        'aminoDissociationConstant': aminoDissociationConstant,
+        'carboxylationDissociationConstant': carboxylationDissociationConstant,
+        'details': [
+          {
+            'aminoAcidType': 'L',
+            'longCode': longCodeLeft,
+            'shortCode': shortCodeLeft
+          },
+          {
+            'aminoAcidType': 'D',
+            'longCode': longCodeRight,
+            'shortCode': shortCodeRight
+          }
+        ],
+        'hydrophilic': hydrophilic,
+        'hydrophobic': hydrophobic,
+        'isCanDisulfideBond': isCanDisulfideBond,
+        'isoelectricPoint': isoelectricPoint,
+        'molecularWeight': molecularWeight,
+        'name': name
+      };
+      this.$api.peptide.insertAminoAcid(addVal).then(res => {
         if (res.id) {
           this.utils.refresh();
           return this.$refs.table.refresh(true);

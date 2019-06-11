@@ -116,7 +116,14 @@ export default {
       this.$refs.table.refresh(true);
     },
     addTr (num) {
-      document.getElementById('add').setAttribute('disabled', true);
+      if (document.getElementById('addValue')) {
+        this.$notification.error({
+          message: '错误',
+          description: `请先保存或删除现在编辑的内容`
+        });
+        return false;
+      }
+      var self = this;
       var tbodyObj = document.getElementsByTagName('tbody')[0];
       var trObj = document.createElement('tr');
       for (let i = 0; i < num; i++) {
@@ -124,7 +131,7 @@ export default {
         if (i === 2) {
           tdObj.style.padding = '0';
           tdObj.style.width = '100px';
-          tdObj.innerHTML = "<input type='text' title='该输入项为必输入项' id='addValue' style='width: 100%;height: 100%;border: 1px solid #FFA8A8;outline: none;background-color: #FFF3F3;'/>";
+          tdObj.innerHTML = "<input type='text' class='isValue' title='该输入项为必输入项' id='addValue' style='width: 100%;height: 100%;border: 1px solid #FFA8A8;outline: none;background-color: #FFF3F3;'/>";
         } else {
           tdObj.style.backgroundColor = 'blue';
         }
@@ -133,6 +140,7 @@ export default {
       tbodyObj.insertBefore(trObj, tbodyObj.firstElementChild);
       this.$nextTick(() => {
         document.getElementById('addValue').focus();
+        self.utils.isValue();
       });
     },
     addData () {
@@ -155,9 +163,6 @@ export default {
       this.selectedRowKeys = selectedRowKeys.slice(-1);
       this.selectedRows = selectedRows;
     },
-    // toggleAdvanced() {
-    //   this.advanced = !this.advanced;
-    // },
     handleDelete () {
       if (!document.getElementById('addValue')) {
         if (this.selectedRowKeys[0] == null) {
