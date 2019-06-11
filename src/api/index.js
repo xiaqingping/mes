@@ -12,7 +12,9 @@ import primer from './primer';
 import product from './product';
 import sample from './sample';
 import sampleorder from './sampleorder';
+import sampleprepare from './sampleprepare';
 import sampletype from './sampletype';
+import seqfactory from './seqfactory';
 import seqorder from './seqorder';
 import synthorder from './synthorder';
 import user from './user';
@@ -35,7 +37,9 @@ export default {
   product,
   sample,
   sampleorder,
+  sampleprepare,
   sampletype,
+  seqfactory,
   seqorder,
   synthorder,
   user,
@@ -59,7 +63,9 @@ export {
   product,
   sample,
   sampleorder,
+  sampleprepare,
   sampletype,
+  seqfactory,
   seqorder,
   synthorder,
   user,

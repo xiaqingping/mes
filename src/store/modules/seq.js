@@ -1,4 +1,7 @@
+import { sampletype, seqfactory } from '@/api';
+
 export default {
+  namespaced: true,
   state: {
     // 取样单状态
     sampleOrderStatus: [
@@ -30,8 +33,36 @@ export default {
       { id: 5, name: '已收样' },
       { id: 6, name: '已失效' },
       { id: 7, name: '已作废' }
-    ]
+    ],
+    // 样品类型
+    sampleType: [],
+    seqfactory: []
   },
-  mutations: {},
-  actions: {}
+  mutations: {
+    setCache (state, payload) {
+      state[payload.type] = payload.data;
+    }
+  },
+  actions: {
+    getCache (context, payload = { type: null }) {
+      const { type } = payload;
+      var map = {
+        sampleType: sampletype.getSampleType,
+        seqfactory: seqfactory.getSeqfactory
+      };
+
+      // 如果存在type则只获取type对应的数据，否则获取全部数据
+      if (type) {
+        map[type]().then(data => {
+          context.commit('setCache', { type, data });
+        });
+      } else {
+        for (const type in map) {
+          map[type]().then(data => {
+            context.commit('setCache', { type, data });
+          });
+        }
+      }
+    }
+  }
 };
