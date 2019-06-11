@@ -17,7 +17,7 @@
           </a-col>
           <a-col :xxl="4" :xl="4" :md="4" :sm="24">
             <a-form-item label="年：">
-              <a-select v-decorator="['year']">
+              <a-select v-decorator="['year', {initialValue : '0'}]">
                 <a-select-option value="0">全部</a-select-option>
                 <a-select-option value="1">2019</a-select-option>
                 <a-select-option value="2">2018</a-select-option>
@@ -29,7 +29,7 @@
           </a-col>
           <a-col :xxl="4" :xl="4" :md="4" :sm="24">
             <a-form-item label="月：">
-              <a-select v-decorator="['month']">
+              <a-select v-decorator="['month', {initialValue : '0'}]">
                 <a-select-option value="0">全部</a-select-option>
                 <a-select-option value="1">1</a-select-option>
                 <a-select-option value="2">2</a-select-option>

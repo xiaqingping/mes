@@ -17,7 +17,7 @@
           </a-col>
           <a-col :xxl="4" :xl="4" :md="4" :sm="24">
             <a-form-item label="类型：">
-              <a-select v-decorator="['type']">
+              <a-select v-decorator="['type', {initialValue : '0'}]">
                 <a-select-option value="0">全部</a-select-option>
                 <a-select-option value="1">工资项目</a-select-option>
                 <a-select-option value="2">扣款项目</a-select-option>
@@ -127,33 +127,59 @@ export default {
           // tdObj.innerHTML = "<input type='radio' class='ant-radio-input'/>";
         } else if (i === 1 || i === 5 || i === 6 || i === 7 || i === 8 || i === 9) {
           tdObj.style.backgroundColor = 'white';
-        } else if (i === 2 || i === 4) {
+        } else if (i === 2) {
           tdObj.innerHTML = "<input type='text' title='该输入项为必输入项' id='addValue' style='width: 100%;height: 100%;border: 1px solid #FFA8A8;outline: none;background-color: #FFF3F3;'/>";
+        } else if (i === 4) {
+          tdObj.innerHTML = "<input type='text' title='该输入项为必输入项' id='addValue" + i + "' style='width: 100%;height: 100%;border: 1px solid #FFA8A8;outline: none;background-color: #FFF3F3;'/>";
         } else if (i === 3) {
           tdObj.innerHTML = "<select title='该输入项为必输入项' id='addValue" + i + "' style='width: 100%;height: 100%;border: 1px solid #FFA8A8;outline: none;background-color: #FFF3F3;'> '<option> 工资项目 </option>' '<option> 扣款项目 </option>' '<option> 代发项目 </option>' '<option> 代缴项目 </option>'</select>";
         }
         trObj.appendChild(tdObj);
       }
       tbodyObj.insertBefore(trObj, tbodyObj.firstElementChild);
+      this.$nextTick(() => {
+        document.getElementById('addValue').focus();
+      });
     },
     // 删除
     handleDelete () {
-      if (this.selectedRowKeys[0] == null) {
-        this.$notification.error({
-          message: '错误',
-          description: `请选择一条数据`
+      if (!document.getElementById('addValue')) {
+        if (this.selectedRowKeys[0] == null) {
+          this.$notification.error({
+            message: '错误',
+            description: `请选择一条数据`
+          });
+          return false;
+        }
+        this.$api.pay.deleteTypepays(this.selectedRowKeys[0]).then(res => {
+          this.selectedRowKeys = [];
+          return this.$refs.table.refresh(true);
         });
-        return false;
+      } else {
+        this.utils.refresh();
       }
-      this.$api.pay.deleteTypepays(this.selectedRowKeys[0]).then(res => {
-        this.selectedRowKeys = [];
-        return this.$refs.table.refresh(true);
-      });
-      // console.log(1);
     },
     // 保存
     handleEdit () {
-      console.log(2);
+      // console.log(2);
+      var addVal = document.getElementById('addValue').value;
+      // var addVal3 = document.getElementById('addValue3').option.value;
+      var addVal4 = document.getElementById('addValue4').value;
+      if (addVal === '') {
+        this.$notification.error({
+          message: '错误',
+          description: `数据不能为空！`
+        });
+        return false;
+      }
+      this.$api.pay.increaseTypepay({ 'name': addVal, 'serial': addVal4 }).then(res => {
+        // 'type': addVal3,
+        if (res.id) {
+          this.utils.refresh();
+          console.log(1);
+          return this.$refs.table.refresh(true);
+        }
+      });
     },
     onSelectChange (selectedRowKeys, selectedRows) {
       this.selectedRowKeys = selectedRowKeys;
