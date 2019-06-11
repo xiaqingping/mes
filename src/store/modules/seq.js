@@ -36,20 +36,27 @@ export default {
     ],
     // 样品类型
     sampleType: [],
+    // 测序点
     seqfactory: []
   },
   mutations: {
     setCache (state, payload) {
+      // 对返回的数据进行加工处理
+      const processMap = {};
+      if (processMap[payload.type]) {
+        payload.data = processMap[payload.type](payload.data);
+      }
+
       state[payload.type] = payload.data;
     }
   },
   actions: {
     getCache (context, payload = { type: null }) {
-      const { type } = payload;
-      var map = {
+      const map = {
         sampleType: sampletype.getSampleType,
         seqfactory: seqfactory.getSeqfactory
       };
+      const { type } = payload;
 
       // 如果存在type则只获取type对应的数据，否则获取全部数据
       if (type) {
