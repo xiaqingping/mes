@@ -3,6 +3,11 @@ import { basic } from '@/api';
 export default {
   namespaced: true,
   state: {
+    // 通用数据状态
+    status: [
+      { id: 1, name: '正常' },
+      { id: 2, name: '已删除' }
+    ],
     // 工厂
     factorys: [],
     // 网点
@@ -53,8 +58,7 @@ export default {
     }
   },
   actions: {
-    getCache (context, payload) {
-      const { type } = payload;
+    getCache (context, payload = { type: null }) {
       var map = {
         factorys: basic.getFactorys,
         offices: basic.getOffices,
@@ -62,9 +66,20 @@ export default {
         payterms: basic.getPayterms,
         regions: basic.getRegions
       };
-      map[type]().then(data => {
-        context.commit('setCache', { type, data });
-      });
+      const { type } = payload;
+
+      // 如果存在type则只获取type对应的数据，否则获取全部数据
+      if (type) {
+        map[type]().then(data => {
+          context.commit('setCache', { type, data });
+        });
+      } else {
+        for (const type in map) {
+          map[type]().then(data => {
+            context.commit('setCache', { type, data });
+          });
+        }
+      }
     }
   }
 };
