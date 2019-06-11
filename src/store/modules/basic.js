@@ -3,8 +3,15 @@ import { basic } from '@/api';
 export default {
   namespaced: true,
   state: {
+    // 通用数据状态
+    status: [
+      { id: 1, name: '正常' },
+      { id: 2, name: '已删除' }
+    ],
     // 工厂
     factorys: [],
+    // 仓库
+    storages: [],
     // 网点
     offices: [],
     // 付款方式
@@ -49,22 +56,52 @@ export default {
   },
   mutations: {
     setCache (state, payload) {
+      // 对返回的数据进行加工处理
+      const processMap = {
+        storages (arr) {
+          arr.forEach(function (e) {
+            e.text = e.code + ' - ' + e.name;
+          });
+          return arr;
+        },
+        factorys (arr) {
+          arr.forEach(function (e) {
+            e.text = e.code + ' - ' + e.name;
+          });
+          return arr;
+        }
+      };
+
+      if (processMap[payload.type]) {
+        payload.data = processMap[payload.type](payload.data);
+      }
       state[payload.type] = payload.data;
     }
   },
   actions: {
-    getCache (context, payload) {
-      const { type } = payload;
+    getCache (context, payload = { type: null }) {
       var map = {
         factorys: basic.getFactorys,
         offices: basic.getOffices,
         paymethods: basic.getPaymethods,
         payterms: basic.getPayterms,
-        regions: basic.getRegions
+        regions: basic.getRegions,
+        storages: basic.getStorages
       };
-      map[type]().then(data => {
-        context.commit('setCache', { type, data });
-      });
+      const { type } = payload;
+
+      // 如果存在type则只获取type对应的数据，否则获取全部数据
+      if (type) {
+        map[type]().then(data => {
+          context.commit('setCache', { type, data });
+        });
+      } else {
+        for (const type in map) {
+          map[type]().then(data => {
+            context.commit('setCache', { type, data });
+          });
+        }
+      }
     }
   }
 };

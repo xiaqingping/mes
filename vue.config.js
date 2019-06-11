@@ -1,4 +1,4 @@
-// const path = require('path');
+const path = require('path');
 
 module.exports = {
   // 部署应用的基本URL
@@ -7,7 +7,7 @@ module.exports = {
   configureWebpack: {
     resolve: {
       alias: {
-        // 'vue$': path.resolve(__dirname, 'node_modules/vue/dist/vue.js')
+        'vue$': path.resolve(__dirname, 'node_modules/vue/dist/vue.js')
       }
     }
   },
