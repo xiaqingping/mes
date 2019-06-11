@@ -10,6 +10,10 @@ export default {
   getFactorys () {
     return request(`/basic/v1/factorys`);
   },
+  // 查询仓库
+  getStorages () {
+    return request(`/basic/v1/storages`);
+  },
   // 查询网点列表
   getOffices () {
     return request(`/basic/v1/offices`);

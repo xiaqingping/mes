@@ -8,6 +8,6 @@ import request from '../assets/js/request';
 export default {
   // 查询测序点
   getSeqfactory (params, easyui) {
-    return request(`/seqfactory/v1/seqfactory` + (easyui ? '/easyui' : ''), { params });
+    return request(`/seqfactory/v1/seqfactory${easyui ? '/easyui' : ''}`, { params });
   }
 };

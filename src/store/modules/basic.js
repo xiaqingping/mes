@@ -10,6 +10,8 @@ export default {
     ],
     // 工厂
     factorys: [],
+    // 仓库
+    storages: [],
     // 网点
     offices: [],
     // 付款方式
@@ -54,6 +56,25 @@ export default {
   },
   mutations: {
     setCache (state, payload) {
+      // 对返回的数据进行加工处理
+      const processMap = {
+        storages (arr) {
+          arr.forEach(function (e) {
+            e.text = e.code + ' - ' + e.name;
+          });
+          return arr;
+        },
+        factorys (arr) {
+          arr.forEach(function (e) {
+            e.text = e.code + ' - ' + e.name;
+          });
+          return arr;
+        }
+      };
+
+      if (processMap[payload.type]) {
+        payload.data = processMap[payload.type](payload.data);
+      }
       state[payload.type] = payload.data;
     }
   },
@@ -64,7 +85,8 @@ export default {
         offices: basic.getOffices,
         paymethods: basic.getPaymethods,
         payterms: basic.getPayterms,
-        regions: basic.getRegions
+        regions: basic.getRegions,
+        storages: basic.getStorages
       };
       const { type } = payload;
 
