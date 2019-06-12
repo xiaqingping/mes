@@ -1,3 +1,4 @@
+<!-- 测序类型 -->
 <template>
   <div class="page-content">
 

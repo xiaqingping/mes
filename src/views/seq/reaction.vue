@@ -1,4 +1,4 @@
-<!-- 反应排版 -->
+<!-- 测序反应 -->
 <template>
   <div class="page-content">
 
