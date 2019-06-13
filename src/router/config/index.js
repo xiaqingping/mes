@@ -14,7 +14,7 @@ export const asyncRouterMap = [
     name: 'index',
     component: BasicLayout,
     meta: { title: '首页' },
-    redirect: '/seq/sample_order',
+    redirect: '/seq/sample_dose',
     children: [
       peptide,
       seq,

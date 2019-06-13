@@ -1,3 +1,4 @@
+<!-- 样品用量 -->
 <template>
   <div class="page-content">
 
@@ -6,7 +7,7 @@
         <a-row :gutter="24">
           <a-col :xxl="4" :xl="6" :md="8">
             <a-form-item label="状态">
-              <a-select v-decorator="['status']">
+              <a-select v-decorator="['status', {initialValue: 1}]">
                 <a-select-option value="">全部</a-select-option>
                 <a-select-option v-for="status in $store.state.basic.status" :value="status.id" :key="status.id">{{ status.name }}</a-select-option>
               </a-select>
@@ -14,9 +15,9 @@
           </a-col>
           <a-col :xxl="4" :xl="6" :md="8">
             <a-form-item label="样品类型">
-              <a-select v-decorator="['sampleTypeId']">
+              <a-select v-decorator="['sampleTypeId', {initialValue: ''}]">
                 <a-select-option value="">全部</a-select-option>
-                <a-select-option v-for="status in $store.state.basic.status" :value="status.id" :key="status.id">{{ status.name }}</a-select-option>
+                <a-select-option v-for="status in $store.state.seq.sampleType" :value="status.id" :key="status.id">{{ status.name }}</a-select-option>
               </a-select>
             </a-form-item>
           </a-col>
@@ -27,9 +28,9 @@
           </a-col>
           <a-col :xxl="4" :xl="6" :md="8">
             <a-form-item label="测序点">
-              <a-select v-decorator="['seqfactoryIdList']">
-                <a-select-option value="0">全部</a-select-option>
-                <a-select-option v-for="status in $store.state.basic.status" :value="status.id" :key="status.id">{{ status.name }}</a-select-option>
+              <a-select v-decorator="['seqfactoryIdList', {initialValue: ''}]">
+                <a-select-option value="">全部</a-select-option>
+                <a-select-option v-for="status in $store.state.seq.seqfactory" :value="status.id" :key="status.id">{{ status.name }}</a-select-option>
               </a-select>
             </a-form-item>
           </a-col>
@@ -40,24 +41,54 @@
 
     <div class="table-operator">
       <a-button-group>
-        <a-button icon="search" @click="handleSearch">查询</a-button>
-        <a-button icon="plus">新建</a-button>
-        <a-button icon="form">修改</a-button>
-        <a-button icon="delete">删除</a-button>
-        <a-button icon="save">保存</a-button>
+        <a-button icon="search" @click="handleSearch({page: 1})">查询</a-button>
+        <a-button icon="plus" @click="handleAddRow">新建</a-button>
+        <!-- <a-button icon="form">修改</a-button> -->
+        <!-- <a-button icon="delete">删除</a-button> -->
+        <!-- <a-button icon="save">保存</a-button> -->
       </a-button-group>
     </div>
 
-    <s-table
+    <a-table
       ref="table"
-      bordered
       size="small"
-      :scroll="{ x: 1300 }"
+      rowKey="id"
+      bordered
+      :scroll="{...scroll}"
+      :loading="loading"
       :columns="columns"
-      :data="loadData"
-      :rowSelection="{ selectedRowKeys: selectedRowKeys, onChange: onSelectChange }"
+      :pagination="pagination"
+      :dataSource="dataSource"
+      :rowSelection="{ type:'checkbox', selectedRowKeys: selectedRowKeys, onChange: onSelectChange }"
+      :customRow="customRow"
+      @change="change"
     >
-    </s-table>
+      <template slot="sampleTypeName" slot-scope="value, row, index">
+        <div
+          :key="value"
+          style="margin: -8px 0;">
+          <a-input
+            size="small"
+            v-if="editIndex === index"
+            :value="value"
+            @change="e => handleChange(e.target.value, row.key, col)"
+          />
+          <template v-else>{{ value }}</template>
+        </div>
+      </template>
+      <template slot="actions" slot-scope="value, row, index">
+        <div :key="value">
+          <template v-if="row.status === 1 && editIndex !== index">
+            <a @click="() => handleCancel(row.id)">删除 </a>
+            <a @click="() => handleUpdate(index)">修改 </a>
+          </template>
+          <template v-if="editIndex === index">
+            <a @click="() => handleSave(row)">保存 </a>
+            <a @click="() => handleQuitEdit(row)">退出 </a>
+          </template>
+        </div>
+      </template>
+    </a-table>
   </div>
 </template>
 
@@ -72,33 +103,35 @@ export default {
   data () {
     return {
       form: this.$form.createForm(this),
-      advanced: true,
+      scroll: { x: 1400 },
+      loading: false,
       columns: [],
-      queryParam: {},
-      loadData: parameter => {
-        const params = Object.assign(parameter, this.queryParam);
-        return this.$api.sampleprepare.getSampleDose(params).then(res => {
-          return {
-            data: res.rows,
-            page: params.page,
-            total: res.total
-          };
-        });
+      pagination: {
+        current: 1,
+        pageSize: 10,
+        total: 0,
+        showSizeChanger: true
       },
+      dataSource: [],
+      queryParam: {},
       selectedRowKeys: [],
-      selectedRows: []
+      selectedRows: [],
+      id: 0,
+      editIndex: -1
     };
   },
   mounted () {
-    this.createColumnDefs();
+    this.setColumn();
+    this.handleSearch();
   },
   methods: {
-    createColumnDefs () {
+    // 设置表格列属性
+    setColumn () {
       const { formatter } = this.$units;
       const { basic } = this.$store.state;
 
       this.columns = [
-        { title: '样品类型', dataIndex: 'sampleTypeName' },
+        { title: '样品类型', dataIndex: 'sampleTypeName', scopedSlots: { customRender: 'sampleTypeName' } },
         { title: '最小长度', dataIndex: 'minSampleLength' },
         { title: '最大长度', dataIndex: 'maxSampleLength' },
         { title: '浓度', dataIndex: 'concentration' },
@@ -111,20 +144,97 @@ export default {
         { title: '修改人', dataIndex: 'changerName' },
         { title: '修改时间', dataIndex: 'changeDate' },
         { title: '作废人', dataIndex: 'cancelName' },
-        { title: '作废时间', dataIndex: 'cancelDate' }
+        { title: '作废时间', dataIndex: 'cancelDate' },
+        { title: '操作', width: 80, dataIndex: 'actions', fixed: 'right', scopedSlots: { customRender: 'actions' } }
       ];
     },
-    handleSearch (e) {
-      e.preventDefault();
-      this.queryParam = this.form.getFieldsValue();
-      this.$refs.table.refresh(true);
+    // 表格change事件，分页、排序、筛选变化时触发
+    change (pagination, filters, sorter) {
+      const params = {
+        page: pagination.current,
+        rows: pagination.pageSize
+      };
+      this.handleSearch(params);
+    },
+    // 查询
+    handleSearch (params = {}) {
+      this.loading = true;
+      this.editIndex = -1;
+      this.selectedRowKeys = [];
+      this.selectedRows = [];
+
+      const queryParam = this.form.getFieldsValue();
+      params = Object.assign({ page: this.pagination.current, rows: this.pagination.pageSize }, params, queryParam);
+
+      this.$api.sampleprepare.getSampleDose(params).then((data) => {
+        this.dataSource = data.rows;
+        this.pagination.total = data.total;
+        this.pagination.current = params.page;
+        this.pagination.pageSize = params.rows;
+      }).finally(() => {
+        this.loading = false;
+      });
+    },
+    // 新增一可编辑行
+    handleAddRow () {
+      const newData = {
+        id: --this.id,
+        minSampleLength: undefined
+      };
+      this.dataSource = [newData, ...this.dataSource];
+      this.editIndex = 0;
+    },
+    // 作废
+    handleCancel (id) {
+      this.$api.sampleprepare.cancelSampleDose(id).then(() => {
+        this.handleSearch();
+      });
+    },
+    // 修改
+    handleUpdate (index) {
+      this.editIndex = index;
+    },
+    /**
+     * 保存
+     * status字段有值代表是修改，否则是新增
+     */
+    handleSave (row) {
+      if (row.status) {
+        this.$api.sampleprepare.updateSampleDose(row).then(() => {
+          this.handleSearch();
+        });
+      } else {
+        this.$api.sampleprepare.addSampleDose(row).then(() => {
+          this.handleSearch();
+        });
+      }
+    },
+    // 退出编辑
+    handleQuitEdit () {
+      this.editIndex = -1;
+    },
+    // 行属性
+    customRow (row, rowIndex) {
+      return {
+        on: {
+          click: () => {
+            // const index = this.selectedRowKeys.indexOf(row.id);
+            // if (index === -1) {
+            //   this.selectedRowKeys.push(row.id);
+            //   this.selectedRows.push(row);
+            // } else {
+            //   this.selectedRowKeys.splice(index, 1);
+            //   this.selectedRows = this.selectedRows.filter(function (e) {
+            //     return e.id !== row.id;
+            //   });
+            // }
+          }
+        }
+      };
     },
     onSelectChange (selectedRowKeys, selectedRows) {
       this.selectedRowKeys = selectedRowKeys;
       this.selectedRows = selectedRows;
-    },
-    toggleAdvanced () {
-      this.advanced = !this.advanced;
     }
   }
 };

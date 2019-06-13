@@ -1,3 +1,4 @@
+<!-- 样品类型 -->
 <template>
   <div class="page-content">
 
