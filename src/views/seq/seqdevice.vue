@@ -1,3 +1,4 @@
+<!-- 测序仪 -->
 <template>
   <div class="page-content">
 

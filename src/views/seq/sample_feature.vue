@@ -1,3 +1,4 @@
+<!-- 样品特性 -->
 <template>
   <div class="page-content">
 

@@ -1,3 +1,4 @@
+<!-- 载体 -->
 <template>
   <div class="page-content">
 
@@ -77,6 +78,8 @@ export default {
       queryParam: {},
       loadData: parameter => {
         const params = Object.assign(parameter, this.queryParam);
+        console.log(parameter);
+        console.log(params);
         return this.$api.carrier.getCarrier(params, true).then(res => {
           return {
             data: res.rows,
