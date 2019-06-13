@@ -9,7 +9,6 @@
               <a-input v-decorator="['code']" title=""/>
             </a-form-item>
           </a-col>
-          <!--          <div v-show="advanced">-->
 
           <a-col :xxl="4" :xl="6" :md="8" :sm="24">
             <a-form-item label="状态">
@@ -20,7 +19,6 @@
               </a-select>
             </a-form-item>
           </a-col>
-          <!--          </div>-->
 
         </a-row>
         <a-button type="primary" icon="search" html-type="submit" style="display:none;">查询</a-button>

@@ -89,7 +89,7 @@
     <div>
       <div class="table-operator">
         <a-button type="primary" icon="search" @click="handleSearch">查询</a-button>
-        <a-button type="primary" icon="plus">新增</a-button>
+        <a-button type="primary" icon="plus" @click="onOpen(5)">新增</a-button>
         <a-button type="primary" icon="edit">修改</a-button>
 
         <a-dropdown>
@@ -135,6 +135,8 @@
     </contact-mask>
     <saler-mask v-show="saler_status" @Closed="onClosed(4)">
     </saler-mask>
+    <add-mask v-show="add_status" @Closed="onClosed(5)">
+    </add-mask>
   </div>
 </template>
 
@@ -147,6 +149,7 @@ import CustomerMask from '@/components/peptide/customer_mask';
 import SubCustomerMask from '@/components/peptide/sub_customer_mask';
 import ContactMask from '@/components/peptide/contact_mask';
 import SalerMask from '@/components/peptide/saler_mask';
+import AddMask from '@/components/peptide/order/add_mask';
 
 export default {
   name: 'PeptideOrder',
@@ -155,7 +158,8 @@ export default {
     CustomerMask,
     SubCustomerMask,
     ContactMask,
-    SalerMask
+    SalerMask,
+    AddMask
   },
   data () {
     var self = this;
@@ -176,6 +180,7 @@ export default {
       sub_customer_status: false,
       contact_status: false,
       saler_status: false,
+      add_status: false,
       columns: [
         { title: '订单编号', dataIndex: 'code' },
         {
@@ -332,6 +337,9 @@ export default {
         case 4 :
           this.saler_status = true;
           break;
+        case 5 :
+          this.add_status = true;
+          break;
       }
     },
     onClosed (e) {
@@ -347,6 +355,9 @@ export default {
           break;
         case 4 :
           this.saler_status = false;
+          break;
+        case 5 :
+          this.add_status = false;
           break;
       }
     }
