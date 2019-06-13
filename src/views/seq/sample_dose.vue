@@ -3,7 +3,7 @@
   <div class="page-content">
 
     <div class="table-search">
-      <a-form layout="inline" :form="form" @submit="search">
+      <a-form layout="inline" :form="form" @submit="handleSearch">
         <a-row :gutter="24">
           <a-col :xxl="4" :xl="6" :md="8">
             <a-form-item label="状态">
@@ -41,11 +41,11 @@
 
     <div class="table-operator">
       <a-button-group>
-        <a-button icon="search" @click="search({page: 1})">查询</a-button>
-        <a-button icon="plus" @click="addRow">新建</a-button>
-        <a-button icon="form">修改</a-button>
-        <a-button icon="delete">删除</a-button>
-        <a-button icon="save">保存</a-button>
+        <a-button icon="search" @click="handleSearch({page: 1})">查询</a-button>
+        <a-button icon="plus" @click="handleAddRow">新建</a-button>
+        <!-- <a-button icon="form">修改</a-button> -->
+        <!-- <a-button icon="delete">删除</a-button> -->
+        <!-- <a-button icon="save">保存</a-button> -->
       </a-button-group>
     </div>
 
@@ -59,21 +59,33 @@
       :columns="columns"
       :pagination="pagination"
       :dataSource="dataSource"
-      :rowSelection="{ type:'radio', selectedRowKeys: selectedRowKeys, onChange: onSelectChange }"
+      :rowSelection="{ type:'checkbox', selectedRowKeys: selectedRowKeys, onChange: onSelectChange }"
       :customRow="customRow"
       @change="change"
     >
-      <template v-slot:sampleTypeName="slotProps">
-        <div :key="text">
-          <!-- <a-input
+      <template slot="sampleTypeName" slot-scope="value, row, index">
+        <div
+          :key="value"
+          style="margin: -8px 0;">
+          <a-input
+            size="small"
             v-if="editIndex === index"
-            style="margin: -5px 0"
-            :value="text"
-            @change="e => handleChange(e.target.value, record.key, col)"
-          /> -->
-          <!-- <template>{{ text }} {{ record }} {{ index }}</template> -->
-          <!-- <tamplate>{{ slotProps.text }}</tamplate> -->
-          <template>123</template>
+            :value="value"
+            @change="e => handleChange(e.target.value, row.key, col)"
+          />
+          <template v-else>{{ value }}</template>
+        </div>
+      </template>
+      <template slot="actions" slot-scope="value, row, index">
+        <div :key="value">
+          <template v-if="row.status === 1 && editIndex !== index">
+            <a @click="() => handleCancel(row.id)">删除 </a>
+            <a @click="() => handleUpdate(index)">修改 </a>
+          </template>
+          <template v-if="editIndex === index">
+            <a @click="() => handleSave(row)">保存 </a>
+            <a @click="() => handleQuitEdit(row)">退出 </a>
+          </template>
         </div>
       </template>
     </a-table>
@@ -91,7 +103,7 @@ export default {
   data () {
     return {
       form: this.$form.createForm(this),
-      scroll: { x: 1300 },
+      scroll: { x: 1400 },
       loading: false,
       columns: [],
       pagination: {
@@ -105,12 +117,12 @@ export default {
       selectedRowKeys: [],
       selectedRows: [],
       id: 0,
-      editIndex: 0
+      editIndex: -1
     };
   },
   mounted () {
     this.setColumn();
-    this.search();
+    this.handleSearch();
   },
   methods: {
     // 设置表格列属性
@@ -119,7 +131,7 @@ export default {
       const { basic } = this.$store.state;
 
       this.columns = [
-        { title: '样品类型', dataIndex: 'sampleTypeName' },
+        { title: '样品类型', dataIndex: 'sampleTypeName', scopedSlots: { customRender: 'sampleTypeName' } },
         { title: '最小长度', dataIndex: 'minSampleLength' },
         { title: '最大长度', dataIndex: 'maxSampleLength' },
         { title: '浓度', dataIndex: 'concentration' },
@@ -132,7 +144,8 @@ export default {
         { title: '修改人', dataIndex: 'changerName' },
         { title: '修改时间', dataIndex: 'changeDate' },
         { title: '作废人', dataIndex: 'cancelName' },
-        { title: '作废时间', dataIndex: 'cancelDate' }
+        { title: '作废时间', dataIndex: 'cancelDate' },
+        { title: '操作', width: 80, dataIndex: 'actions', fixed: 'right', scopedSlots: { customRender: 'actions' } }
       ];
     },
     // 表格change事件，分页、排序、筛选变化时触发
@@ -141,11 +154,15 @@ export default {
         page: pagination.current,
         rows: pagination.pageSize
       };
-      this.search(params);
+      this.handleSearch(params);
     },
     // 查询
-    search (params = {}) {
+    handleSearch (params = {}) {
       this.loading = true;
+      this.editIndex = -1;
+      this.selectedRowKeys = [];
+      this.selectedRows = [];
+
       const queryParam = this.form.getFieldsValue();
       params = Object.assign({ page: this.pagination.current, rows: this.pagination.pageSize }, params, queryParam);
 
@@ -158,13 +175,43 @@ export default {
         this.loading = false;
       });
     },
-    // 新增一行
-    addRow () {
+    // 新增一可编辑行
+    handleAddRow () {
       const newData = {
         id: --this.id,
         minSampleLength: undefined
       };
       this.dataSource = [newData, ...this.dataSource];
+      this.editIndex = 0;
+    },
+    // 作废
+    handleCancel (id) {
+      this.$api.sampleprepare.cancelSampleDose(id).then(() => {
+        this.handleSearch();
+      });
+    },
+    // 修改
+    handleUpdate (index) {
+      this.editIndex = index;
+    },
+    /**
+     * 保存
+     * status字段有值代表是修改，否则是新增
+     */
+    handleSave (row) {
+      if (row.status) {
+        this.$api.sampleprepare.updateSampleDose(row).then(() => {
+          this.handleSearch();
+        });
+      } else {
+        this.$api.sampleprepare.addSampleDose(row).then(() => {
+          this.handleSearch();
+        });
+      }
+    },
+    // 退出编辑
+    handleQuitEdit () {
+      this.editIndex = -1;
     },
     // 行属性
     customRow (row, rowIndex) {

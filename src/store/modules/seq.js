@@ -37,7 +37,9 @@ export default {
     // 样品类型
     sampleType: [],
     // 测序点
-    seqfactory: []
+    seqfactory: [],
+    // 测序类型
+    seqType: []
   },
   mutations: {
     setCache (state, payload) {
@@ -54,7 +56,8 @@ export default {
     getCache (context, payload = { type: null }) {
       const map = {
         sampleType: sampletype.getSampleType,
-        seqfactory: seqfactory.getSeqfactory
+        seqfactory: seqfactory.getSeqfactory,
+        seqType: sampletype.getSeqType
       };
       const { type } = payload;
 

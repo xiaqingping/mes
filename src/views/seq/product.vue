@@ -6,18 +6,33 @@
       <div class="table-search">
         <a-form layout="inline" :form="form" @submit="search">
           <a-row :gutter="24">
-            <a-col :xxl="4" :xl="6" :md="8" :sm="24">
-              <a-form-item label="取样单状态">
-                <a-select v-decorator="['status']">
-                  <a-select-option value="0">全部</a-select-option>
-                  <a-select-option value="1">正常</a-select-option>
-                  <a-select-option value="2">已删除</a-select-option>
+            <a-col :xxl="4" :xl="6" :md="8">
+              <a-form-item label="状态">
+                <a-select v-decorator="['status', {initialValue: 1}]">
+                  <a-select-option value="">全部</a-select-option>
+                  <a-select-option v-for="status in $store.state.basic.status" :value="status.id" :key="status.id">{{ status.name }}</a-select-option>
                 </a-select>
               </a-form-item>
             </a-col>
-            <a-col :xxl="4" :xl="6" :md="8" :sm="24">
-              <a-form-item label="取样单编号">
-                <a-input v-decorator="['code']"/>
+            <a-col :xxl="4" :xl="6" :md="8">
+              <a-form-item label="SAP产品编号">
+                <a-input-search v-decorator="['productCode']" @search="searchProduct"/>
+              </a-form-item>
+            </a-col>
+            <a-col :xxl="4" :xl="6" :md="8">
+              <a-form-item label="样品类型">
+                <a-select v-decorator="['sampleTypeId', {initialValue: ''}]">
+                  <a-select-option value="">全部</a-select-option>
+                  <a-select-option v-for="status in $store.state.seq.sampleType" :value="status.id" :key="status.id">{{ status.name }}</a-select-option>
+                </a-select>
+              </a-form-item>
+            </a-col>
+            <a-col :xxl="4" :xl="6" :md="8">
+              <a-form-item label="测序类型">
+                <a-select v-decorator="['seqTypeId', {initialValue: ''}]">
+                  <a-select-option value="">全部</a-select-option>
+                  <a-select-option v-for="status in $store.state.seq.seqType" :value="status.id" :key="status.id">{{ status.name }}</a-select-option>
+                </a-select>
               </a-form-item>
             </a-col>
           </a-row>
@@ -85,11 +100,11 @@ export default {
     };
   },
   mounted () {
-    this.createColumnDefs();
+    this.createColumn();
     this.search();
   },
   methods: {
-    createColumnDefs () {
+    createColumn () {
       const { formatter } = this.$units;
       const { basic } = this.$store.state;
 
@@ -104,14 +119,6 @@ export default {
           headerCheckboxSelection: function (params) {
             return params.columnApi.getRowGroupColumns().length === 0;
           }
-        },
-        {
-          lockPosition: true,
-          valueGetter: 'node.rowIndex',
-          cellClass: 'locked-col',
-          width: 40,
-          suppressNavigable: true,
-          editable: false
         },
         { headerName: 'SAP产品编号', field: 'productCode', filter: 'agTextColumnFilter' },
         { headerName: 'SAP产品名称', field: 'productName' },
@@ -128,17 +135,21 @@ export default {
           cellRenderer: function (params) {
             return '<a>删除</a>';
           },
-          editable: false
+          editable: false,
+          pinned: 'right'
         }
       ];
     },
     search () {
-      this.$api.sampletype.getSeqProduct().then(res => {
+      this.$api.sampletype.getSeqProduct({}, true).then(res => {
         this.rowData = res.rows;
       });
     },
     addRow () {
       this.gridApi.updateRowData({ add: [{ productCode: '000' }], addIndex: 0 });
+    },
+    searchProduct () {
+      console.log('searchProduct');
     },
     onSelectChange (selectedRowKeys, selectedRows) {
       this.selectedRowKeys = selectedRowKeys;
