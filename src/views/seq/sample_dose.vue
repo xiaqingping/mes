@@ -103,6 +103,7 @@ export default {
   data () {
     return {
       form: this.$form.createForm(this),
+      agGridName: 'seq.sample_dose',
       scroll: { x: 1400 },
       loading: false,
       columns: [],
@@ -129,8 +130,7 @@ export default {
     setColumn () {
       const { formatter } = this.$units;
       const { basic } = this.$store.state;
-
-      this.columns = [
+      const defaultColumns = [
         { title: '样品类型', dataIndex: 'sampleTypeName', scopedSlots: { customRender: 'sampleTypeName' } },
         { title: '最小长度', dataIndex: 'minSampleLength' },
         { title: '最大长度', dataIndex: 'maxSampleLength' },
@@ -145,8 +145,10 @@ export default {
         { title: '修改时间', dataIndex: 'changeDate' },
         { title: '作废人', dataIndex: 'cancelName' },
         { title: '作废时间', dataIndex: 'cancelDate' },
-        { title: '操作', width: 80, dataIndex: 'actions', fixed: 'right', scopedSlots: { customRender: 'actions' } }
+        { title: '操作', dataIndex: 'actions', fixed: 'right', scopedSlots: { customRender: 'actions' } }
       ];
+
+      this.columns = defaultColumns;
     },
     // 表格change事件，分页、排序、筛选变化时触发
     change (pagination, filters, sorter) {

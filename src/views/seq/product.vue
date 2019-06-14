@@ -45,18 +45,22 @@
           <a-button icon="search" @click="search">查询</a-button>
           <a-button type="primary" icon="plus" @click="addRow()">新增</a-button>
           <a-button type="danger" icon="form">删除</a-button>
-          <a-button type="primary" @click="getSelectedRows()">保存</a-button>
+          <a-button type="primary">保存</a-button>
         </a-button-group>
       </div>
 
       <ag-grid-vue
         style="height: 500px;"
         class="ag-theme-balham"
+        :gridOptions="gridOptions"
         :columnDefs="columnDefs"
+        :frameworkComponents="frameworkComponents"
         :rowData="rowData"
         :defaultColDef="defaultColDef"
         rowSelection="multiple"
         @grid-ready="onGridReady"
+        @columnResized="cacheColumnState"
+        @columnMoved="cacheColumnState"
         editType="fullRow"
         pagination
         resizable>
@@ -66,37 +70,42 @@
 </template>
 
 <script>
+import { throttle } from 'lodash';
+import { mapState } from 'vuex';
 import STable from '@/components/Table';
 import { AgGridVue } from 'ag-grid-vue';
+import selectEditor from '@/components/ag-grid-editor/selectEditor';
 
 export default {
   name: 'SeqSampleOrder',
   components: {
     STable,
-    AgGridVue,
-    ActionsCell: {
-      template: '<a-icon type="delete" @click="aa"></a-icon>',
-      methods: {
-        aa () {
-          console.log(this);
-        }
-      }
-    }
+    AgGridVue
   },
+  computed: mapState(['basic', 'seq']),
   data () {
     return {
       form: this.$form.createForm(this),
+      agGridName: 'seq.sample_dose',
+      gridApi: null,
+      columnApi: null,
+      // 默认列参数
       defaultColDef: {
         resizable: true,
         editable: true
       },
-      gridApi: null,
-      columnApi: null,
+      // grid参数
+      gridOptions: {},
+      // 表格列参数
       columnDefs: null,
+      // 框架组件
+      frameworkComponents: {
+        selectEditor
+      },
+      // 表格数据
       rowData: null,
-      queryParam: {},
-      selectedRowKeys: [],
-      selectedRows: []
+      // 表单筛选参数
+      queryParam: {}
     };
   },
   mounted () {
@@ -106,13 +115,14 @@ export default {
   methods: {
     createColumn () {
       const { formatter } = this.$units;
-      const { basic } = this.$store.state;
+      const { agGridName, basic, seq } = this;
 
-      this.columnDefs = [
+      const defalutColumn = [
         {
           headerName: 'Athlete',
           field: 'athlete',
           width: 40,
+          editable: false,
           checkboxSelection: params => {
             return params.columnApi.getRowGroupColumns().length === 0;
           },
@@ -120,9 +130,22 @@ export default {
             return params.columnApi.getRowGroupColumns().length === 0;
           }
         },
-        { headerName: 'SAP产品编号', field: 'productCode', filter: 'agTextColumnFilter' },
+        { headerName: 'SAP产品编号', field: 'productCode' },
         { headerName: 'SAP产品名称', field: 'productName' },
-        { headerName: '样品类型', field: 'sampleTypeName' },
+        { headerName: '样品类型',
+          field: 'sampleTypeId',
+          cellEditor: 'selectEditor',
+          cellEditorParams: {
+            list: seq.sampleType
+          },
+          valueFormatter: function (row) {
+            return formatter(seq.sampleType, row.value);
+          }
+          // valueParser: function (params) {
+          //   // console.log(params);
+          //   return params;
+          // }
+        },
         { headerName: '测序类型', field: 'seqTypeName' },
         { headerName: '统一附加费', field: 'surcharge' },
         { headerName: '状态', field: 'status', valueFormatter: function (row) { return formatter(basic.status, row.value); } },
@@ -133,12 +156,32 @@ export default {
         { headerName: '操作',
           field: 'actions',
           cellRenderer: function (params) {
-            return '<a>删除</a>';
+            const buttonList = [];
+            if (params.data.status === 1) {
+              buttonList.push('<a>删除</a>');
+            }
+            return buttonList.join('');
           },
           editable: false,
           pinned: 'right'
         }
       ];
+
+      const columnDefs = [];
+      const column = this.$ls.get('column') || {};
+      if (column[agGridName]) {
+        column[agGridName].forEach(function (e) {
+          for (let i = 0; i < defalutColumn.length; i++) {
+            if (defalutColumn[i].field === e.field) {
+              defalutColumn[i].width = e.width;
+              columnDefs.push(defalutColumn[i]);
+              break;
+            }
+          }
+        });
+      }
+
+      this.columnDefs = columnDefs;
     },
     search () {
       this.$api.sampletype.getSeqProduct({}, true).then(res => {
@@ -151,20 +194,23 @@ export default {
     searchProduct () {
       console.log('searchProduct');
     },
-    onSelectChange (selectedRowKeys, selectedRows) {
-      this.selectedRowKeys = selectedRowKeys;
-      this.selectedRows = selectedRows;
-    },
     onGridReady (params) {
       this.gridApi = params.api;
       this.columnApi = params.columnApi;
     },
-    getSelectedRows () {
-      const selectedNodes = this.gridApi.getSelectedNodes();
-      const selectedData = selectedNodes.map(node => node.data);
-      const selectedDataStringPresentation = selectedData.map(node => node.seqTypeName).join(', ');
-      alert(`Selected nodes: ${selectedDataStringPresentation}`);
-    }
+    // 缓存列属性
+    cacheColumnState: throttle(function () {
+      const { columnApi, agGridName } = this;
+      const columnState = columnApi.getColumnState();
+
+      const arr = columnState.map(e => {
+        return { field: e.colId, width: e.width };
+      });
+
+      const column = this.$ls.get('column') || {};
+      column[agGridName] = arr;
+      this.$ls.set('column', column);
+    }, 1000)
   }
 };
 </script>
