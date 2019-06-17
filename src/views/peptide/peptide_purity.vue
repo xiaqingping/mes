@@ -105,13 +105,8 @@ export default {
   mounted () {
     this.setColumns();
     this.handleSearch();
-    this.init();
   },
   methods: {
-    init () {
-      const { peptide } = this.$store.state;
-      this.status = peptide.status;
-    },
     setColumns () {
       const self = this;
       const { formatter } = this.$units;
@@ -123,7 +118,7 @@ export default {
         {
           title: '状态',
           dataIndex: 'status',
-          customRender: function (text) {
+          customRender: (text) => {
             return formatter(self.status, text);
           }
         },
@@ -187,25 +182,19 @@ export default {
       var data = {};
       if (r.id) {
         data = r;
-        data.purity = this.purity;
-      } else {
-        data.purity = this.purity;
       }
+      data.purity = this.purity;
       this.$api.peptide.insertPurity(data).then(res => {
         if (res.id) {
-          this.purity = '';
-          this.handleSearch();
+          this.handleExit();
         }
       });
     },
     handleDelete (i) {
       if (i) {
         this.$api.peptide.deletePurity(i).then(res => {
-          this.selectedRowKeys = [];
           this.handleSearch();
         });
-      } else {
-        this.handleSearch();
       }
     },
     handleExit () {
