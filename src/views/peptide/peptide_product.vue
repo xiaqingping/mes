@@ -276,9 +276,6 @@ export default {
       this.sapProductCode = data[0].code;
       this.sapProductName = data[0].desc;
     },
-    onClose () {
-      this.visible = false;
-    },
     handleSearch (params = {}) {
       this.loading = true;
       this.editIndex = -1;

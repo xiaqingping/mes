@@ -37,7 +37,6 @@
             </a-form-item>
           </a-col>
 
-          <!--          </div>-->
         </a-row>
         <a-button type="primary" icon="search" html-type="submit" style="display:none;">查询</a-button>
       </a-form>
@@ -45,31 +44,77 @@
 
     <div>
       <div class="table-operator">
-        <a-button type="primary" icon="search" @click="handleSearch">查询</a-button>
-        <a-button type="primary" icon="plus" @click="addTr(12)" id="add">新增</a-button>
-        <a-button type="primary" icon="edit" @click="addData">保存</a-button>
-        <a-button type="primary" icon="minus-square" @click="handleDelete">删除</a-button>
-        <a-button type="primary" icon="minus-square" @click="handleResume">恢复</a-button>
-
-        <!--        <a @click="toggleAdvanced" style="margin-left: 8px">-->
-        <!--          {{ advanced ? '收起' : '展开' }}-->
-        <!--          <a-icon :type="advanced ? 'up' : 'down'"/>-->
-        <!--        </a>-->
+        <a-button-group>
+          <a-button icon="search" @click="handleSearch">查询</a-button>
+          <a-button icon="plus" @click="handleAdd">新增</a-button>
+        </a-button-group>
       </div>
 
       <div style="height:100%;position: relative;">
-        <s-table
-          style="width:65%;"
+        <a-table
           ref="table"
           bordered
           size="small"
-          :scroll="{ x: 1500, y: 500 }"
+          style="width:65%"
+          rowKey="id"
           :columns="columns"
-          :data="loadData"
-          :rowSelection="{ selectedRowKeys: selectedRowKeys, onChange: onSelectChange }"
+          :dataSource="dataSource"
+          :loading="loading"
+          :rowClassName="rowClassName"
+          :pagination="pagination"
+          :customRow="customRow"
+          :scroll="{ x: 1400}"
+          @change="change"
         >
-        </s-table>
-        <div style="width:35%;position: absolute; left:66%; top:0">
+
+          <template slot="name" slot-scope="value, row, index">
+            <a-input
+              size="small"
+              v-if="editIndex === index"
+              style="width:230px;"
+              :class="[name ? '' : 'isValue']"
+              v-model="name"
+            />
+            <template v-else>{{ value }}</template>
+          </template>
+
+          <template slot="modificationCode" slot-scope="value, row, index">
+            <a-input
+              size="small"
+              v-if="editIndex === index"
+              style="width:100px;"
+              :class="[modificationCode ? '' : 'isValue']"
+              v-model="modificationCode"
+            />
+            <template v-else>{{ value }}</template>
+          </template>
+
+          <template slot="modificationPosition" slot-scope="value, row, index">
+            <a-select style="width: 65px;" size="small" v-if="editIndex === index" v-model="modificationPosition">
+              <a-select-option v-for="item in modificationPositionData" :key="item.id" :value="item.id">
+                {{ item.name }}
+              </a-select-option>
+            </a-select>
+            <template v-else>{{ value }}</template>
+          </template>
+
+          <template slot="actions" slot-scope="value, row, index">
+            <div :key="value">
+              <template v-if="row.status === 1 && editIndex !== index">
+                <a @click="handleDelete(row.id)">删除 </a>
+              </template>
+              <template v-if="row.status === 2 && editIndex !== index">
+                <a @click="handleResume(row.id)">恢复</a>
+              </template>
+              <template v-if="editIndex === index">
+                <a @click="handleSave(row)">保存 </a>
+                <a @click="handleExit()">退出 </a>
+              </template>
+            </div>
+          </template>
+
+        </a-table>
+        <!-- <div style="width:35%;position: absolute; left:66%; top:0">
           <h4>修饰适用氨基酸</h4>
           <div class="sonButton">
             <a-button type="primary" icon="plus" @click="addSonTr(8)" id="addSon">新增</a-button>
@@ -88,7 +133,7 @@
             :rowSelection="{ selectedRowKeys: selectedRowKeySon, onChange: onSelectChangeSon }"
           >
           </s-table>
-        </div>
+        </div> -->
 
       </div>
 
@@ -109,77 +154,38 @@ export default {
     AminoAcidMask
   },
   data () {
-    var self = this;
+    // var self = this;
     return {
+      status: {},
       form: this.$form.createForm(this),
-      visible: false,
+      pagination: {
+        current: 1,
+        pageSize: 10,
+        total: 0,
+        showSizeChanger: true
+      },
+      columns: [],
+      loading: false,
+      dataSource: [],
+      editIndex: -1,
+      purity: '',
+      selectRow: '',
+      name: '',
+      modificationCode: '',
+      modificationPosition: '',
+      isIndependentModification: '',
+      modificationTypeID: '',
+      data: {
+        'name': '',
+        'modificationCode': '',
+        'modificationPosition': '',
+        'isIndependentModification': '',
+        'modificationTypeID': ''
+      },
+
       advanced: true,
       aminoAcid_status: false,
       amino_acid_data: [],
-      columns: [
-        { title: '编号', dataIndex: 'code', width: '5%' },
-        { title: '修饰名称', dataIndex: 'name', width: '18%' },
-        { title: '修饰代码', dataIndex: 'modificationCode', width: '5%' },
-        {
-          title: '修饰位置',
-          dataIndex: 'modificationPosition',
-          width: '8%',
-          customRender: function (value) {
-            for (var i = 0; i < self.$store.state.peptide.modificationPosition.length; i++) {
-              if (self.$store.state.peptide.modificationPosition[i].id === value) return self.$store.state.peptide.modificationPosition[i].name;
-            }
-          }
-        },
-        {
-          title: '独立修饰',
-          dataIndex: 'isIndependentModification',
-          align: 'center',
-          width: '6%',
-          customRender: function (value) {
-            if (value === 1) return '√';
-          }
-        },
-        {
-          title: '修饰类别',
-          dataIndex: 'modificationTypeID',
-          width: '18%',
-          customRender: function (value) {
-            for (var i = 0; i < self.modificationsType.length; i++) {
-              if (self.modificationsType[i].id === value) {
-                return self.modificationsType[i].modificationType;
-              }
-            }
-          }
-        },
-        {
-          title: '状态',
-          dataIndex: 'status',
-          width: '5%',
-          customRender: function (value) {
-            if (value === 1) {
-              return '正常';
-            } else if (value === 2) {
-              return '已删除';
-            }
-          }
-        },
-        { title: '创建人', dataIndex: 'creatorName', width: '5%' },
-        { title: '创建日期', dataIndex: 'createDate', width: '10%' },
-        { title: '删除人', dataIndex: 'cancelName', width: '5%' },
-        { title: '删除时间', dataIndex: 'cancelDate', width: '10%' }
-      ],
-      queryParam: {},
-      loadData: parameter => {
-        this.queryParam = this.form.getFieldsValue();
-        const params = Object.assign(parameter, this.queryParam);
-        return this.$api.peptide.getModifications(params).then(res => {
-          return {
-            data: res.rows,
-            page: params.page,
-            total: res.total
-          };
-        });
-      },
       columnSon: [
         { title: '编号', dataIndex: 'id', width: '10%' },
         { title: '名称', dataIndex: 'name', width: '10%' },
@@ -216,7 +222,8 @@ export default {
       selectedRows: [],
       selectedRowKeySon: [],
       selectedRowSon: [],
-      modificationsType: []
+      modificationsType: [],
+      modificationPositionData: []
     };
   },
   watch: {
@@ -225,38 +232,121 @@ export default {
     }
   },
   mounted () {
-    var selectDrop = document.getElementsByClassName('ant-checkbox')[0];
-    selectDrop.style.display = 'none';
-    var selectDropSon = document.getElementsByClassName('ant-checkbox')[1];
-    selectDropSon.style.display = 'none';
-    this.$api.peptide.getModificationTypesAll({ 'status': 1 }).then(res => {
-      this.modificationsType = res;
-    });
+    this.setColumns();
+    this.handleSearch();
+    this.init();
   },
   methods: {
+    init () {
+      this.$api.peptide.getModificationTypes({ 'status': 1 }).then(res => {
+        this.modificationsType = res.rows;
+      });
+    },
+    setColumns () {
+      const self = this;
+      const { formatter } = this.$units;
+      const { peptide } = this.$store.state;
+      this.status = peptide.status;
+      this.modificationPositionData = peptide.modificationPosition;
+      this.columns = [
+        { title: '编号', dataIndex: 'code' },
+        { title: '修饰名称', dataIndex: 'name', scopedSlots: { customRender: 'name' } },
+        { title: '修饰代码', dataIndex: 'modificationCode', scopedSlots: { customRender: 'modificationCode' } },
+        {
+          title: '修饰位置',
+          dataIndex: 'modificationPosition',
+          scopedSlots: { customRender: 'modificationPosition' },
+          customRender: (value) => {
+            return formatter(peptide.modificationPosition, value);
+          }
+        },
+        {
+          title: '独立修饰',
+          dataIndex: 'isIndependentModification',
+          scopedSlots: { customRender: 'isIndependentModification' },
+          align: 'center'
+        },
+        {
+          title: '修饰类别',
+          dataIndex: 'modificationTypeID',
+          // scopedSlots: { customRender: 'modificationTypeID' },
+          customRender: (value) => {
+            return formatter(self.modificationsType, value, 'id', 'modificationType');
+          }
+        },
+        {
+          title: '状态',
+          dataIndex: 'status',
+          customRender: (value) => {
+            return formatter(self.status, value);
+          }
+        },
+        { title: '创建人', dataIndex: 'creatorName' },
+        { title: '创建日期', dataIndex: 'createDate' },
+        { title: '删除人', dataIndex: 'cancelName' },
+        { title: '删除时间', dataIndex: 'cancelDate' },
+        { title: '操作', width: 80, dataIndex: 'actions', fixed: 'right', scopedSlots: { customRender: 'actions' }, align: 'center' }
+      ];
+    },
+    handleSearch (params = {}) {
+      this.loading = true;
+      this.editIndex = -1;
+
+      const queryParam = this.form.getFieldsValue();
+      params = Object.assign({ page: this.pagination.current, rows: this.pagination.pageSize }, params, queryParam);
+
+      this.$api.peptide.getModifications(params).then((data) => {
+        this.dataSource = data.rows;
+        this.pagination.total = data.total;
+        this.pagination.current = params.page;
+        this.pagination.pageSize = params.rows;
+      }).finally(() => {
+        this.loading = false;
+      });
+    },
+    handleAdd () {
+      if (this.editIndex === 0) {
+        return false;
+      }
+      this.data.id = 0;
+      this.dataSource = [ this.data, ...this.dataSource ];
+      this.editIndex = 0;
+    },
+    rowClassName (record, index) {
+      if (record.id) {
+        return 'selectRow' + record.id;
+      }
+    },
+    customRow (row, rowIndex) {
+      return {
+        on: {
+          click: () => {
+            if (this.selectRow) {
+              document.getElementsByClassName('selectRow' + this.selectRow)[0].style.backgroundColor = 'white';
+              document.getElementsByClassName('selectRow' + this.selectRow)[1].style.backgroundColor = 'white';
+            }
+            if (row.id === 0) {
+              return false;
+            }
+            document.getElementsByClassName('selectRow' + row.id)[0].style.backgroundColor = 'pink';
+            document.getElementsByClassName('selectRow' + row.id)[1].style.backgroundColor = 'pink';
+            this.selectRow = row.id;
+          }
+        }
+      };
+    },
+    change (pagination) {
+      const params = {
+        page: pagination.current,
+        rows: pagination.pageSize
+      };
+      this.handleSearch(params);
+    },
     aminoAcidData (data) {
       this.amino_acid_data = data;
       document.getElementById('addSonValue1').value = data[0].code;
       document.getElementById('addSonValue2').value = data[0].name;
       this.utils.isValueMask(['addSonValue1', 'addSonValue2']);
-    },
-    showDrawer () {
-      this.visible = true;
-    },
-    onClose () {
-      this.visible = false;
-    },
-    handleSearch () {
-      this.$refs.table.refresh(true);
-    },
-    onSelectChange (selectedRowKeys, selectedRows) {
-      this.selectedRowKeys = selectedRowKeys.slice(-1);
-      this.selectedRows = selectedRows.slice(-1);
-      this.loadDataId = this.selectedRowKeys[0];
-    },
-    onSelectChangeSon (selectedRowKeySon, selectedRowSon) {
-      this.selectedRowKeySon = selectedRowKeySon.slice(-1);
-      this.selectedRowSon = selectedRowKeySon.slice(-1);
     },
     addTr (num) {
       if (document.getElementById('addValue2')) {
@@ -353,38 +443,31 @@ export default {
         }
       });
     },
-    handleDelete () {
-      if (!document.getElementById('addValue2')) {
-        if (this.selectedRowKeys[0] == null) {
-          this.$notification.error({
-            message: '错误',
-            description: `请选择一条数据`
-          });
-          return false;
-        }
-        this.$api.peptide.deleteModifications(this.selectedRowKeys[0]).then(res => {
-          this.selectedRowKeys = [];
-          return this.$refs.table.refresh(true);
+    handleDelete (i) {
+      if (i) {
+        this.$api.peptide.deletePurity(i).then(res => {
+          this.handleSearch();
         });
-      } else {
-        this.utils.refresh();
       }
     },
-    toggleAdvanced () {
-      this.advanced = !this.advanced;
+    handleExit () {
+      this.purity = '';
+      this.handleSearch();
     },
-    handleResume () {
-      if (this.selectedRowKeys[0] == null) {
+    handleResume (i) {
+      if (!i) {
         this.$notification.error({
           message: '错误',
           description: `请选择一条数据`
         });
         return false;
       }
-      this.$api.peptide.resumeModifications(this.selectedRowKeys[0]).then(res => {
-        this.selectedRowKeys = [];
-        return this.$refs.table.refresh(true);
+      this.$api.peptide.resumePurity(i).then(res => {
+        this.handleSearch();
       });
+    },
+    toggleAdvanced () {
+      this.advanced = !this.advanced;
     },
     addSonTr (num) {
       var self = this;

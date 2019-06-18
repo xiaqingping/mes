@@ -53,7 +53,7 @@
             <a-input
               size="small"
               v-if="editIndex === index"
-              style="width:100px;height:21px"
+              style="width:100px;"
               :class="[purity ? '' : 'isValue']"
               v-model="purity"
             />
@@ -99,7 +99,8 @@ export default {
       dataSource: [],
       id: 0,
       editIndex: -1,
-      purity: ''
+      purity: '',
+      selectRow: ''
     };
   },
   mounted () {
@@ -151,14 +152,6 @@ export default {
       }).finally(() => {
         this.loading = false;
       });
-    },
-    customRow (row, rowIndex) {
-      return {
-        on: {
-          click: (row) => {
-          }
-        }
-      };
     },
     handleAdd () {
       if (this.editIndex === 0) {

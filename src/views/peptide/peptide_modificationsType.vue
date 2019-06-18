@@ -9,7 +9,6 @@
               <a-input v-decorator="['code']" title=""/>
             </a-form-item>
           </a-col>
-          <!--          <div v-show="advanced">-->
           <a-col :xxl="4" :xl="6" :md="8" :sm="24">
             <a-form-item label="修饰类型 ">
               <a-input v-decorator="['modificationType']"/>
@@ -24,7 +23,6 @@
               </a-select>
             </a-form-item>
           </a-col>
-          <!--          </div>-->
 
         </a-row>
         <a-button type="primary" icon="search" html-type="submit" style="display:none;">查询</a-button>
@@ -33,165 +31,179 @@
 
     <div>
       <div class="table-operator">
-        <a-button type="primary" icon="search" @click="handleSearch">查询</a-button>
-        <a-button type="primary" icon="plus" @click="addTr(8)" id="add">新增</a-button>
-        <a-button type="primary" icon="edit" @click="addData">保存</a-button>
-        <a-button type="primary" icon="minus-square" @click="handleDelete">删除</a-button>
-        <a-button type="primary" icon="minus-square" @click="handleResume">恢复</a-button>
+        <a-button-group>
+          <a-button icon="search" @click="handleSearch">查询</a-button>
+          <a-button icon="plus" @click="handleAdd">新增</a-button>
+        </a-button-group>
       </div>
 
-      <s-table
+      <a-table
         ref="table"
         bordered
         size="small"
+        rowKey="id"
         :columns="columns"
-        :data="loadData"
-        :rowSelection="{ selectedRowKeys: selectedRowKeys, onChange: onSelectChange }"
+        :dataSource="dataSource"
+        :loading="loading"
+        :pagination="pagination"
+        @change="change"
       >
-      </s-table>
+        <template slot="modificationType" slot-scope="value, row, index">
+          <div
+            :key="value">
+            <a-input
+              size="small"
+              v-if="editIndex === index"
+              style="width:200px;"
+              :class="[modificationType ? '' : 'isValue']"
+              v-model="modificationType"
+            />
+            <template v-else>{{ value }}</template>
+          </div>
+        </template>
+
+        <template slot="actions" slot-scope="value, row, index">
+          <div :key="value">
+            <template v-if="row.status === 1 && editIndex !== index">
+              <a @click="handleDelete(row.id)">删除 </a>
+            </template>
+            <template v-if="row.status === 2 && editIndex !== index">
+              <a @click="handleResume(row.id)">恢复</a>
+            </template>
+            <template v-if="editIndex === index">
+              <a @click="handleSave(row)">保存 </a>
+              <a @click="handleExit()">退出 </a>
+            </template>
+          </div>
+        </template>
+      </a-table>
     </div>
 
   </div>
 </template>
 
 <script>
-import STable from '@/components/Table';
-
 export default {
   name: 'PeptideModificationsType',
-  components: {
-    STable
-  },
   data () {
     return {
+      status: {},
       form: this.$form.createForm(this),
-      visible: false,
-      // advanced: true,
-      columns: [
-        { title: '编号', dataIndex: 'code', width: '10%' },
-        { title: '修饰类型', dataIndex: 'modificationType', width: '20%' },
-        {
-          title: '状态',
-          dataIndex: 'status',
-          width: '10%',
-          customRender: function (text) {
-            if (text === 1) {
-              return '正常';
-            } else if (text === 2) {
-              return '已删除';
-            }
-          }
-        },
-        { title: '创建人', dataIndex: 'creatorName', width: '10%' },
-        { title: '创建日期', dataIndex: 'createDate', width: '20%' },
-        { title: '删除人', dataIndex: 'cancelName', width: '10%' },
-        { title: '删除时间', dataIndex: 'cancelDate', width: '20%' }
-      ],
-      queryParam: {},
-      loadData: parameter => {
-        this.queryParam = this.form.getFieldsValue();
-        const params = Object.assign(parameter, this.queryParam);
-        return this.$api.peptide.getModificationTypes(params).then(res => {
-          return {
-            data: res.rows,
-            page: params.page,
-            total: res.total
-          };
-        });
+      pagination: {
+        current: 1,
+        pageSize: 10,
+        total: 0,
+        showSizeChanger: true
       },
-      selectedRowKeys: [],
-      selectedRows: []
+      columns: [],
+      loading: false,
+      dataSource: [],
+      id: 0,
+      editIndex: -1,
+      modificationType: ''
     };
   },
   mounted () {
-    var selectDrop = document.getElementsByClassName('ant-checkbox')[0];
-    selectDrop.style.display = 'none';
+    this.setColumns();
+    this.handleSearch();
   },
   methods: {
-    showDrawer () {
-      this.visible = true;
+    setColumns () {
+      const self = this;
+      const { formatter } = this.$units;
+      const { peptide } = this.$store.state;
+      this.status = peptide.status;
+      this.columns = [
+        { title: '编号', dataIndex: 'code' },
+        { title: '修饰类型', dataIndex: 'modificationType', scopedSlots: { customRender: 'modificationType' } },
+        {
+          title: '状态',
+          dataIndex: 'status',
+          customRender: (text) => {
+            return formatter(self.status, text);
+          }
+        },
+        { title: '创建人', dataIndex: 'creatorName' },
+        { title: '创建日期', dataIndex: 'createDate' },
+        { title: '删除人', dataIndex: 'cancelName' },
+        { title: '删除时间', dataIndex: 'cancelDate' },
+        { title: '操作', width: 80, dataIndex: 'actions', fixed: 'right', scopedSlots: { customRender: 'actions' }, align: 'center' }
+      ];
     },
-    onClose () {
-      this.visible = false;
+    change (pagination) {
+      const params = {
+        page: pagination.current,
+        rows: pagination.pageSize
+      };
+      this.handleSearch(params);
     },
-    handleSearch () {
-      this.$refs.table.refresh(true);
-    },
-    onSelectChange (selectedRowKeys, selectedRows) {
-      this.selectedRowKeys = selectedRowKeys.slice(-1);
-      this.selectedRows = selectedRows;
-    },
-    addTr (num) {
-      if (document.getElementById('addValue')) {
-        this.$notification.error({
-          message: '错误',
-          description: `请先保存或删除现在编辑的内容`
-        });
-        return false;
-      }
-      var tbodyObj = document.getElementsByTagName('tbody')[0];
-      var trObj = document.createElement('tr');
-      for (let i = 0; i < num; i++) {
-        var tdObj = document.createElement('td');
-        if (i === 2) {
-          tdObj.style.padding = '0';
-          tdObj.style.width = '100px';
-          tdObj.innerHTML = "<input type='text' class='isValue' title='该输入项为必输入项' id='addValue' style='width: 100%;height: 100%;border: 1px solid #FFA8A8;outline: none;background-color: #FFF3F3;'/>";
-        } else {
-          tdObj.style.backgroundColor = 'blue';
-        };
-        trObj.appendChild(tdObj);
-      }
-      tbodyObj.insertBefore(trObj, tbodyObj.firstElementChild);
-      this.$nextTick(() => {
-        document.getElementById('addValue').focus();
-        this.utils.isValue();
+    handleSearch (params = {}) {
+      this.loading = true;
+      this.editIndex = -1;
+
+      const queryParam = this.form.getFieldsValue();
+      params = Object.assign({ page: this.pagination.current, rows: this.pagination.pageSize }, params, queryParam);
+
+      this.$api.peptide.getModificationTypes(params).then((data) => {
+        this.dataSource = data.rows;
+        this.pagination.total = data.total;
+        this.pagination.current = params.page;
+        this.pagination.pageSize = params.rows;
+      }).finally(() => {
+        this.loading = false;
       });
     },
-    addData () {
-      var addVal = document.getElementById('addValue').value;
-      if (addVal === '') {
+    handleAdd () {
+      if (this.editIndex === 0) {
+        return false;
+      }
+      var addVal = {
+        id: this.id,
+        modificationType: ''
+      };
+      this.dataSource = [ addVal, ...this.dataSource ];
+      this.editIndex = 0;
+    },
+    handleSave (r) {
+      if (this.modificationType === '') {
         this.$notification.error({
           message: '错误',
           description: `数据不能为空！`
         });
         return false;
       }
-      this.$api.peptide.insertModificationTypes({ 'modificationType': addVal }).then(res => {
+      var data = {};
+      if (r.id) {
+        data = r;
+      }
+      data.modificationType = this.modificationType;
+      this.$api.peptide.insertModificationTypes(data).then(res => {
         if (res.id) {
-          this.utils.refresh();
-          return this.$refs.table.refresh(true);
+          this.handleExit();
         }
       });
     },
-    handleDelete () {
-      if (!document.getElementById('addValue')) {
-        if (this.selectedRowKeys[0] == null) {
-          this.$notification.error({
-            message: '错误',
-            description: `请选择一条数据`
-          });
-          return false;
-        }
-        this.$api.peptide.deleteModificationTypes(this.selectedRowKeys[0]).then(res => {
-          this.selectedRowKeys = [];
-          return this.$refs.table.refresh(true);
+    handleDelete (i) {
+      if (i) {
+        this.$api.peptide.deleteModificationTypes(i).then(res => {
+          this.handleSearch();
         });
-      } else {
-        this.utils.refresh();
       }
     },
-    handleResume () {
-      if (this.selectedRowKeys[0] == null) {
+    handleExit () {
+      this.modificationType = '';
+      this.handleSearch();
+    },
+    handleResume (i) {
+      if (!i) {
         this.$notification.error({
           message: '错误',
           description: `请选择一条数据`
         });
         return false;
       }
-      this.$api.peptide.resumeModificationTypes(this.selectedRowKeys[0]).then(res => {
-        this.selectedRowKeys = [];
-        return this.$refs.table.refresh(true);
+      this.$api.peptide.resumeModificationTypes(i).then(res => {
+        this.handleSearch();
       });
     }
   }

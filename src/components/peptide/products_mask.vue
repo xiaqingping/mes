@@ -55,8 +55,8 @@
             </a-form-item>
           </div>
           <div style="margin-bottom:10px">
-            <a-button type="primary" icon="search" @click="showData">查询</a-button>
-            <a-button type="primary" @click="sub" style="float:right">确定</a-button>
+            <a-button icon="search" @click="showData">查询</a-button>
+            <a-button @click="sub" style="float:right">确定</a-button>
           </div>
         </a-form>
 

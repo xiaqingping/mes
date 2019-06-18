@@ -32,404 +32,451 @@
           <!--          </div>-->
 
         </a-row>
-        <a-button type="primary" icon="search" html-type="submit" style="display:none;">查询</a-button>
+        <!-- <a-button type="primary" icon="search" html-type="submit" style="display:none;">查询</a-button> -->
       </a-form>
     </div>
 
     <div>
       <div class="table-operator">
-        <a-button type="primary" icon="search" @click="handleSearch">查询</a-button>
-        <a-button type="primary" icon="plus" @click="addTr(20)" id="add">新增</a-button>
-        <a-button type="primary" icon="edit" @click="addData">保存</a-button>
-        <a-button type="primary" icon="minus-square" @click="handleDelete">删除</a-button>
-        <a-button type="primary" icon="minus-square" @click="handleResume">恢复</a-button>
-        <!--        <a @click="toggleAdvanced" style="margin-left: 8px">-->
-        <!--          {{ advanced ? '收起' : '展开' }}-->
-        <!--          <a-icon :type="advanced ? 'up' : 'down'"/>-->
-        <!--        </a>-->
+        <a-button-group>
+          <a-button icon="search" @click="handleSearch">查询</a-button>
+          <a-button icon="plus" @click="handleAdd">新增</a-button>
+        </a-button-group>
       </div>
 
-      <s-table
+      <a-table
         ref="table"
         bordered
         size="small"
+        rowKey="id"
+        :loading="loading"
+        :pagination="pagination"
         :columns="columns"
-        :data="loadData"
-        :rowSelection="{ selectedRowKeys: selectedRowKeys, onChange: onSelectChange }"
+        :dataSource="dataSource"
+        @change="change"
+        :scroll="{ x: '2000px' }"
       >
-      </s-table>
-    </div>
 
-    <!--    <div>-->
-    <!--      <div type="primary" @click="showDrawer">-->
-    <!--        <div style="width: 20px;height: 100%;background-color: black">-->
-    <!--          12312312312-->
-    <!--        </div>-->
-    <!--      </div>-->
-    <!--      <a-drawer-->
-    <!--        title="Basic Drawer"-->
-    <!--        placement="right"-->
-    <!--        :closable="false"-->
-    <!--        @close="onClose"-->
-    <!--        :visible="visible"-->
-    <!--      >-->
-    <!--        <p>Some contents...</p>-->
-    <!--        <p>Some contents...</p>-->
-    <!--        <p>Some contents...</p>-->
-    <!--      </a-drawer>-->
-    <!--    </div>-->
+        <template slot="name" slot-scope="value, row, index">
+          <a-input
+            size="small"
+            v-if="editIndex === index"
+            style="width:100px;"
+            :class="[name ? '' : 'isValue']"
+            v-model="name"
+          />
+          <template v-else>{{ value }}</template>
+        </template>
+
+        <template slot="hydrophilic" slot-scope="value, row, index">
+          <a-checkbox v-if="editIndex === index" @change="onChange($event, 'hydrophilic')"></a-checkbox>
+          <template v-else>{{ value === 1 ? '√' :'' }}</template>
+        </template>
+
+        <template slot="hydrophobic" slot-scope="value, row, index">
+          <a-checkbox v-if="editIndex === index" @change="onChange($event, 'hydrophobic')"></a-checkbox>
+          <template v-else>{{ value === 1 ? '√' :'' }}</template>
+        </template>
+
+        <template slot="acidic" slot-scope="value, row, index">
+          <a-checkbox v-if="editIndex === index" @change="onChange($event, 'acidic')"></a-checkbox>
+          <template v-else>{{ value === 1 ? '√' :'' }}</template>
+        </template>
+
+        <template slot="alkaline" slot-scope="value, row, index">
+          <a-checkbox v-if="editIndex === index" @change="onChange($event, 'alkaline')"></a-checkbox>
+          <template v-else>{{ value === 1 ? '√' :'' }}</template>
+        </template>
+
+        <template slot="isCanDisulfideBond" slot-scope="value, row, index">
+          <a-checkbox v-if="editIndex === index" @change="onChange($event, 'isCanDisulfideBond')"></a-checkbox>
+          <template v-else>{{ value === 1 ? '√' :'' }}</template>
+        </template>
+
+        <template slot="molecularWeight" slot-scope="value, row, index">
+          <a-input
+            size="small"
+            v-if="editIndex === index"
+            style="width:50px;"
+            :class="[molecularWeight ? '' : 'isValue']"
+            v-model="molecularWeight"
+          />
+          <template v-else>{{ value }}</template>
+        </template>
+
+        <template slot="isoelectricPoint" slot-scope="value, row, index">
+          <a-input
+            size="small"
+            v-if="editIndex === index"
+            style="width:50px;"
+            :class="[isoelectricPoint ? '' : 'isValue']"
+            v-model="isoelectricPoint"
+          />
+          <template v-else>{{ value }}</template>
+        </template>
+
+        <template slot="carboxylationDissociationConstant" slot-scope="value, row, index">
+          <a-input
+            size="small"
+            v-if="editIndex === index"
+            style="width:50px;"
+            :class="[carboxylationDissociationConstant ? '' : 'isValue']"
+            v-model="carboxylationDissociationConstant"
+          />
+          <template v-else>{{ value }}</template>
+        </template>
+
+        <template slot="aminoDissociationConstant" slot-scope="value, row, index">
+          <a-input
+            size="small"
+            v-if="editIndex === index"
+            style="width:50px;"
+            :class="[aminoDissociationConstant ? '' : 'isValue']"
+            v-model="aminoDissociationConstant"
+          />
+          <template v-else>{{ value }}</template>
+        </template>
+
+        <template slot="aminoAcidType" slot-scope="value, row, index">
+          <a-input
+            size="small"
+            v-if="editIndex === index"
+            style="width:50px;"
+            :class="[aminoAcidType ? '' : 'isValue']"
+            v-model="aminoAcidType"
+            read-only
+          />
+          <template v-else>{{ value }}</template>
+        </template>
+
+        <template slot="longCode" slot-scope="value, row, index">
+          <a-input
+            size="small"
+            v-if="editIndex === index"
+            style="width:50px;"
+            :class="[leftLongCode ? '' : 'isValue']"
+            v-model="leftLongCode"
+          />&nbsp;
+          <a-input
+            size="small"
+            v-if="editIndex === index"
+            style="width:50px;"
+            :class="[rightLongCode ? '' : 'isValue']"
+            v-model="rightLongCode"
+          />
+          <template v-else>{{ value }}</template>
+        </template>
+
+        <template slot="shortCode" slot-scope="value, row, index">
+          <a-input
+            size="small"
+            v-if="editIndex === index"
+            style="width:50px;"
+            :class="[leftShortCode ? '' : 'isValue']"
+            v-model="leftShortCode"
+          />&nbsp;
+          <a-input
+            size="small"
+            v-if="editIndex === index"
+            style="width:50px;"
+            :class="[rightShortCode ? '' : 'isValue']"
+            v-model="rightShortCode"
+          />
+          <template v-else>{{ value }}</template>
+        </template>
+        <template slot="actions" slot-scope="value, row, index">
+          <div :key="value">
+            <template v-if="row.status === 1 && editIndex !== index">
+              <a @click="handleDelete(row.id)">删除 </a>
+            </template>
+            <template v-if="row.status === 2 && editIndex !== index">
+              <a @click="handleResume(row.id)">恢复</a>
+            </template>
+            <template v-if="editIndex === index">
+              <a @click="handleSave(row)">保存 </a>
+              <a @click="handleExit()">退出 </a>
+            </template>
+          </div>
+        </template>
+      </a-table>
+    </div>
   </div>
 </template>
 
 <script>
-import STable from '@/components/Table';
 
 export default {
   name: 'PeptideAminoAcid',
-  components: {
-    STable
-  },
   data () {
     return {
       form: this.$form.createForm(this),
-      visible: false,
-      // advanced: true,
-      columns: [
-        { title: '编号', dataIndex: 'code', width: '4%' },
-        { title: '名称', dataIndex: 'name', width: '5%' },
+      pagination: {
+        current: 1,
+        pageSize: 10,
+        total: 0,
+        showSizeChanger: true
+      },
+      status: '',
+      columns: [],
+      loading: false,
+      dataSource: [],
+      id: 0,
+      editIndex: -1,
+      name: '',
+      hydrophilic: '',
+      hydrophobic: '',
+      acidic: '',
+      alkaline: '',
+      isCanDisulfideBond: '',
+      molecularWeight: '',
+      isoelectricPoint: '',
+      carboxylationDissociationConstant: '',
+      aminoDissociationConstant: '',
+      aminoAcidType: 'L | D',
+      leftLongCode: '',
+      rightLongCode: '',
+      leftShortCode: '',
+      rightShortCode: '',
+      data: {
+        'name': '',
+        'hydrophilic': '',
+        'hydrophobic': '',
+        'acidic': '',
+        'alkaline': '',
+        'isCanDisulfideBond': '',
+        'molecularWeight': '',
+        'isoelectricPoint': '',
+        'carboxylationDissociationConstant': '',
+        'aminoDissociationConstant': '',
+        'aminoAcidType': '',
+        'longCode': '',
+        'shortCode': ''
+      }
+    };
+  },
+  mounted () {
+    this.setColumns();
+    this.handleSearch();
+  },
+  methods: {
+    setColumns () {
+      const self = this;
+      const { formatter } = this.$units;
+      const { peptide } = this.$store.state;
+      this.status = peptide.status;
+      this.columns = [
+        { title: '编号', dataIndex: 'code' },
+        { title: '名称', dataIndex: 'name', scopedSlots: { customRender: 'name' } },
         { title: '亲水性',
           dataIndex: 'hydrophilic',
           align: 'center',
-          width: '4%',
-          customRender: function (value) {
-            return value === 1 ? '√' : '';
-          }
+          scopedSlots: { customRender: 'hydrophilic' }
         },
         {
           title: '疏水性',
           dataIndex: 'hydrophobic',
           align: 'center',
-          width: '4%',
-          customRender: function (value) {
-            return value === 1 ? '√' : '';
-          }
+          scopedSlots: { customRender: 'hydrophobic' }
         },
         {
           title: '酸性',
           dataIndex: 'acidic',
           align: 'center',
-          width: '3%',
-          customRender: function (value) {
-            return value === 1 ? '√' : '';
-          }
+          scopedSlots: { customRender: 'acidic' }
         },
         {
           title: '碱性',
           dataIndex: 'alkaline',
           align: 'center',
-          width: '3%',
-          customRender: function (value) {
-            return value === 1 ? '√' : '';
-          }
+          scopedSlots: { customRender: 'alkaline' }
         },
         {
           title: '是否可做二硫键',
           dataIndex: 'isCanDisulfideBond',
           align: 'center',
-          width: '8%',
-          customRender: function (value) {
-            return value === 1 ? '√' : '';
-          }
+          scopedSlots: { customRender: 'isCanDisulfideBond' }
         },
-        {
-          title: '分子量', dataIndex: 'molecularWeight', align: 'center', width: '4%'
-        },
-        {
-          title: '等电点', dataIndex: 'isoelectricPoint', align: 'center', width: '4%'
-        },
-        {
-          title: '羧基解离常数', dataIndex: 'carboxylationDissociationConstant', align: 'center', width: '8%'
-        },
-        {
-          title: '氨基解离常数', dataIndex: 'aminoDissociationConstant', align: 'center', width: '8%'
-        },
+        { title: '分子量', dataIndex: 'molecularWeight', align: 'center', scopedSlots: { customRender: 'molecularWeight' } },
+        { title: '等电点', dataIndex: 'isoelectricPoint', align: 'center', scopedSlots: { customRender: 'isoelectricPoint' } },
+        { title: '羧基解离常数', dataIndex: 'carboxylationDissociationConstant', align: 'center', scopedSlots: { customRender: 'carboxylationDissociationConstant' } },
+        { title: '氨基解离常数', dataIndex: 'aminoDissociationConstant', align: 'center', scopedSlots: { customRender: 'aminoDissociationConstant' } },
         {
           title: '状态',
           dataIndex: 'status',
-          align: 'center',
-          width: '3%',
-          customRender: function (value) {
-            return value === 1 ? '正常' : '已删除';
+          customRender: (text) => {
+            return formatter(self.status, text);
           }
         },
-        {
-          title: '创建人', dataIndex: 'creatorName', align: 'center', width: '4%'
-        },
-        {
-          title: '创建时间', dataIndex: 'createDate', align: 'center', width: '6%'
-        },
-        { title: '删除人', dataIndex: 'cancelName', width: '5%' },
-        { title: '删除时间', dataIndex: 'cancelDate', width: '6%' },
-        { title: '类型', dataIndex: 'aminoAcidType', width: '4%', align: 'center' },
-        { title: '长代码', dataIndex: 'longCode', width: '8%', align: 'center' },
-        { title: '短代码', dataIndex: 'shortCode', width: '5%', align: 'center' }
-      ],
-      queryParam: {},
-      loadData: parameter => {
-        // parameter.rows *= 2;
-        // console.log(parameter);
-        this.queryParam = this.form.getFieldsValue();
-        const params = Object.assign(parameter, this.queryParam);
-        return this.$api.peptide.getAminoAcid(params).then(res => {
-          // console.log(res.rows);
-          // for (let index in res.rows) {
-          //   if (index % 2 == 1) {
-          //     delete res.rows[index].id;
-          //     // res.rows[index].id = '';
-          //   }
-          // }
-          var map = {}; var dest = [];
-          for (let i = 0; i < res.rows.length; i++) {
-            // console.log(res.rows[i]);
-            var ai = res.rows[i];
-            if (!map[ai.code]) {
-              dest.push({
-                id: ai.id,
-                code: ai.code,
-                name: ai.name,
-                hydrophilic: ai.hydrophilic,
-                hydrophobic: ai.hydrophobic,
-                acidic: ai.acidic,
-                alkaline: ai.alkaline,
-                isCanDisulfideBond: ai.isCanDisulfideBond,
-                molecularWeight: ai.molecularWeight,
-                isoelectricPoint: ai.isoelectricPoint,
-                carboxylationDissociationConstant: ai.carboxylationDissociationConstant,
-                aminoDissociationConstant: ai.aminoDissociationConstant,
-                status: ai.status,
-                creatorName: ai.creatorName,
-                createDate: ai.createDate,
-                cancelName: ai.cancelName,
-                cancelDate: ai.cancelDate,
-                aminoAcidType: ai.aminoAcidType,
-                longCode: ai.longCode,
-                shortCode: ai.shortCode
-              });
-              map[ai.code] = ai;
-            } else {
-              for (let j = 0; j < dest.length; j++) {
-                var dj = dest[j];
-                if (dj.code === ai.code) {
-                  dj.shortCode = (dj.shortCode ? dj.shortCode : '') + (ai.shortCode ? ' | ' + ai.shortCode : '');
-                  dj.longCode = (dj.longCode ? dj.longCode : '') + (ai.longCode ? ' | ' + ai.longCode : '');
-                  dj.aminoAcidType = (dj.aminoAcidType ? dj.aminoAcidType : '') + (ai.aminoAcidType ? ' | ' + ai.aminoAcidType : '');
-                  dj.cancelDate = (dj.cancelDate ? dj.cancelDate : '') + (ai.cancelDate ? ' | ' + ai.cancelDate : '');
-                  dj.cancelName = (dj.cancelName ? dj.cancelName : '') + (ai.cancelName ? ' | ' + ai.cancelName : '');
-                  break;
-                }
+        { title: '创建人', dataIndex: 'creatorName', align: 'center' },
+        { title: '创建时间', dataIndex: 'createDate', align: 'center' },
+        { title: '删除人', dataIndex: 'cancelName' },
+        { title: '删除时间', dataIndex: 'cancelDate' },
+        { title: '类型', dataIndex: 'aminoAcidType', align: 'center', scopedSlots: { customRender: 'aminoAcidType' } },
+        { title: '长代码', dataIndex: 'longCode', align: 'center', scopedSlots: { customRender: 'longCode' } },
+        { title: '短代码', dataIndex: 'shortCode', align: 'center', scopedSlots: { customRender: 'shortCode' } },
+        { title: '操作', width: 80, dataIndex: 'actions', fixed: 'right', scopedSlots: { customRender: 'actions' }, align: 'center' }
+      ];
+    },
+    handleSearch (params = {}) {
+      this.loading = true;
+      this.editIndex = -1;
+      const queryParam = this.form.getFieldsValue();
+      params = Object.assign({ page: this.pagination.current, rows: this.pagination.pageSize }, params, queryParam);
+      this.$api.peptide.getAminoAcid(params).then((data) => {
+        var map = {}; var dest = [];
+        for (let i = 0; i < data.rows.length; i++) {
+          var ai = data.rows[i];
+          if (!map[ai.id]) {
+            dest.push({
+              id: ai.id,
+              code: ai.code,
+              name: ai.name,
+              hydrophilic: ai.hydrophilic,
+              hydrophobic: ai.hydrophobic,
+              acidic: ai.acidic,
+              alkaline: ai.alkaline,
+              isCanDisulfideBond: ai.isCanDisulfideBond,
+              molecularWeight: ai.molecularWeight,
+              isoelectricPoint: ai.isoelectricPoint,
+              carboxylationDissociationConstant: ai.carboxylationDissociationConstant,
+              aminoDissociationConstant: ai.aminoDissociationConstant,
+              status: ai.status,
+              creatorName: ai.creatorName,
+              createDate: ai.createDate,
+              cancelName: ai.cancelName,
+              cancelDate: ai.cancelDate,
+              aminoAcidType: ai.aminoAcidType,
+              longCode: ai.longCode,
+              shortCode: ai.shortCode
+            });
+            map[ai.id] = ai;
+          } else {
+            for (let j = 0; j < dest.length; j++) {
+              var dj = dest[j];
+              if (dj.id === ai.id) {
+                dj.shortCode = (dj.shortCode ? dj.shortCode : '') + (ai.shortCode ? ' | ' + ai.shortCode : '');
+                dj.longCode = (dj.longCode ? dj.longCode : '') + (ai.longCode ? ' | ' + ai.longCode : '');
+                dj.aminoAcidType = (dj.aminoAcidType ? dj.aminoAcidType : '') + (ai.aminoAcidType ? ' | ' + ai.aminoAcidType : '');
+                break;
               }
             }
           }
-          return {
-            data: dest,
-            page: params.page,
-            total: dest.length * 2
-          };
-        });
-      },
-      selectedRowKeys: [],
-      selectedRows: []
-    };
-  },
-  mounted () {
-    var selectDrop = document.getElementsByClassName('ant-checkbox')[0];
-    selectDrop.style.display = 'none';
-  },
-  methods: {
-    showDrawer () {
-      this.visible = true;
-    },
-    onClose () {
-      this.visible = false;
-    },
-    handleSearch () {
-      this.$refs.table.refresh(true);
-    },
-    onSelectChange (selectedRowKeys, selectedRows) {
-      this.selectedRowKeys = selectedRowKeys.slice(-1);
-      this.selectedRows = selectedRows;
-    },
-    addTr (num) {
-      if (document.getElementById('addValue2')) {
-        this.$notification.error({
-          message: '错误',
-          description: `请先保存或删除现在编辑的内容`
-        });
-        return false;
-      }
-      var self = this;
-      var tbodyObj = document.getElementsByTagName('tbody')[0];
-      var trObj = document.createElement('tr');
-      for (let i = 0; i < num; i++) {
-        var tdObj = document.createElement('td');
-        tdObj.style.padding = '0';
-        if (i === 2 || i === 8 || i === 9 || i === 10 || i === 11) {
-          tdObj.innerHTML = "<input type='text' class='isValue' title='该输入项为必输入项' id='addValue" + i + "' style='width: 100%;height: 100%;border: 1px solid #FFA8A8;outline: none;background-color: #FFF3F3;'/>";
-        } else if (i === 3 || i === 4 || i === 5 || i === 6 || i === 7) {
-          tdObj.style.backgroundColor = 'blue';
-          tdObj.style.textAlign = 'center';
-          tdObj.innerHTML = "<input type='checkbox' id='addValue" + i + "'/>";
-        } else if (i === 17) {
-          tdObj.innerHTML = "<input type='text' value='L | D' disabled style='width: 100%;border: none;text-align:center;background-color: white;border: 1px solid grey' id='addValue" + i + "'/>";
-        } else if (i === 18 || i === 19) {
-          tdObj.innerHTML = "<input type='text' class='isValue' title='该输入项为必输入项' id='addValueLeft" + i + "' style='width: 50%;height: 100%;border: 1px solid #FFA8A8;outline: none;background-color: #FFF3F3;'/><input class='isValue' type='text' title='该输入项为必输入项' id='addValueRight" + i + "' style='width: 50%;height: 100%;border: 1px solid #FFA8A8;outline: none;background-color: #FFF3F3;'/>";
-        } else {
-          tdObj.style.backgroundColor = 'blue';
         }
-        trObj.appendChild(tdObj);
-      }
-      tbodyObj.insertBefore(trObj, tbodyObj.firstElementChild);
-      this.$nextTick(() => {
-        self.utils.isValue();
+        this.dataSource = dest;
+        this.pagination.total = dest.length * 2;
+        this.pagination.current = params.page;
+        this.pagination.pageSize = params.rows;
+      }).finally(() => {
+        this.loading = false;
       });
     },
-    addData () {
-      var name = document.getElementById('addValue2').value;
-      if (name === '') {
-        this.$notification.error({
-          message: '错误',
-          description: `数据不能为空！`
-        });
-        return false;
-      }
-      var hydrophilic = document.getElementById('addValue3').checked ? 1 : 2;
-      var hydrophobic = document.getElementById('addValue4').checked ? 1 : 2;
-      var acidic = document.getElementById('addValue5').checked ? 1 : 2;
-      var alkaline = document.getElementById('addValue6').checked ? 1 : 2;
-      var isCanDisulfideBond = document.getElementById('addValue7').checked ? 1 : 2;
-      var molecularWeight = document.getElementById('addValue8').value;
-      if (molecularWeight === '') {
-        this.$notification.error({
-          message: '错误',
-          description: `数据不能为空！`
-        });
-        return false;
-      }
-      var isoelectricPoint = document.getElementById('addValue9').value;
-      if (isoelectricPoint === '') {
-        this.$notification.error({
-          message: '错误',
-          description: `数据不能为空！`
-        });
-        return false;
-      }
-      var carboxylationDissociationConstant = document.getElementById('addValue10').value;
-      if (carboxylationDissociationConstant === '') {
-        this.$notification.error({
-          message: '错误',
-          description: `数据不能为空！`
-        });
-        return false;
-      }
-      var aminoDissociationConstant = document.getElementById('addValue11').value;
-      if (aminoDissociationConstant === '') {
-        this.$notification.error({
-          message: '错误',
-          description: `数据不能为空！`
-        });
-        return false;
-      }
-      var longCodeLeft = document.getElementById('addValueLeft18').value;
-      if (longCodeLeft === '') {
-        this.$notification.error({
-          message: '错误',
-          description: `数据不能为空！`
-        });
-        return false;
-      }
-      var longCodeRight = document.getElementById('addValueRight18').value;
-      if (longCodeRight === '') {
-        this.$notification.error({
-          message: '错误',
-          description: `数据不能为空！`
-        });
-        return false;
-      }
-      var shortCodeLeft = document.getElementById('addValueLeft19').value;
-      if (shortCodeLeft === '') {
-        this.$notification.error({
-          message: '错误',
-          description: `数据不能为空！`
-        });
-        return false;
-      }
-      var shortCodeRight = document.getElementById('addValueRight19').value;
-      if (shortCodeRight === '') {
-        this.$notification.error({
-          message: '错误',
-          description: `数据不能为空！`
-        });
-        return false;
-      }
-      var addVal = {
-        'acidic': acidic,
-        'alkaline': alkaline,
-        'aminoDissociationConstant': aminoDissociationConstant,
-        'carboxylationDissociationConstant': carboxylationDissociationConstant,
-        'details': [
-          {
-            'aminoAcidType': 'L',
-            'longCode': longCodeLeft,
-            'shortCode': shortCodeLeft
-          },
-          {
-            'aminoAcidType': 'D',
-            'longCode': longCodeRight,
-            'shortCode': shortCodeRight
-          }
-        ],
-        'hydrophilic': hydrophilic,
-        'hydrophobic': hydrophobic,
-        'isCanDisulfideBond': isCanDisulfideBond,
-        'isoelectricPoint': isoelectricPoint,
-        'molecularWeight': molecularWeight,
-        'name': name
+    change (pagination) {
+      const params = {
+        page: pagination.current,
+        rows: pagination.pageSize
       };
-      this.$api.peptide.insertAminoAcid(addVal).then(res => {
+      this.handleSearch(params);
+    },
+    onChange (e, v) {
+      switch (v) {
+        case 'hydrophilic':
+          this.hydrophilic = e.target.checked;
+          break;
+        case 'hydrophobic':
+          this.hydrophobic = e.target.checked;
+          break;
+        case 'acidic':
+          this.acidic = e.target.checked;
+          break;
+        case 'alkaline':
+          this.alkaline = e.target.checked;
+          break;
+        case 'isCanDisulfideBond':
+          this.isCanDisulfideBond = e.target.checked;
+          break;
+      }
+    },
+    handleAdd () {
+      if (this.editIndex === 0) {
+        return false;
+      }
+      this.data.id = this.id;
+      this.dataSource = [ this.data, ...this.dataSource ];
+      this.editIndex = 0;
+    },
+    handleSave (r) {
+      if (this.name === '' || this.molecularWeight === '' || this.isoelectricPoint === '' || this.carboxylationDissociationConstant === '' || this.aminoDissociationConstant === '' || this.leftLongCode === '' || this.leftShortCode === '' || this.rightLongCode === '' || this.rightShortCode === '') {
+        this.$notification.error({
+          message: '错误',
+          description: `数据不能为空！`
+        });
+        return false;
+      }
+      if (r.id) {
+        this.data = r;
+      }
+      this.data.name = this.name;
+      this.data.hydrophilic = this.hydrophilic ? 1 : 0;
+      this.data.hydrophobic = this.hydrophobic ? 1 : 0;
+      this.data.acidic = this.acidic ? 1 : 0;
+      this.data.alkaline = this.alkaline ? 1 : 0;
+      this.data.isCanDisulfideBond = this.isCanDisulfideBond ? 1 : 0;
+      this.data.molecularWeight = this.molecularWeight;
+      this.data.isoelectricPoint = this.isoelectricPoint;
+      this.data.carboxylationDissociationConstant = this.carboxylationDissociationConstant;
+      this.data.aminoDissociationConstant = this.aminoDissociationConstant;
+      this.data.details = [
+        {
+          'aminoAcidType': 'L',
+          'longCode': this.leftLongCode,
+          'shortCode': this.leftShortCode
+        },
+        {
+          'aminoAcidType': 'D',
+          'longCode': this.rightLongCode,
+          'shortCode': this.rightShortCode
+        }
+      ];
+      this.$api.peptide.insertAminoAcid(this.data).then(res => {
         if (res.id) {
-          this.utils.refresh();
-          return this.$refs.table.refresh(true);
+          this.handleExit();
         }
       });
     },
-    handleDelete () {
-      if (!document.getElementById('addValue2')) {
-        if (this.selectedRowKeys[0] == null) {
-          this.$notification.error({
-            message: '错误',
-            description: `请选择一条数据`
-          });
-          return false;
-        }
-        this.$api.peptide.deleteAminoAcid(this.selectedRowKeys[0]).then(res => {
-          this.selectedRowKeys = [];
-          return this.$refs.table.refresh(true);
-        });
-      } else {
-        this.utils.refresh();
-      }
+    handleExit () {
+      this.name = '';
+      this.providerTotalAmountEnd = '';
+      this.purityName = '';
+      this.aminoAcidLengthBegin = '';
+      this.aminoAcidLengthEnd = '';
+      this.isNeedDesalting = false;
+      this.aminoAcidType = '';
+      this.sapProductCode = '';
+      this.sapProductName = '';
+      this.handleSearch();
     },
-    handleResume () {
-      if (this.selectedRowKeys[0] == null) {
+    handleDelete (i) {
+      if (!i) {
         this.$notification.error({
           message: '错误',
           description: `请选择一条数据`
         });
         return false;
       }
-      this.$api.peptide.resumeAminoAcid(this.selectedRowKeys[0]).then(res => {
-        this.selectedRowKeys = [];
-        return this.$refs.table.refresh(true);
+      this.$api.peptide.deleteAminoAcid(i).then(res => {
+        this.handleSearch();
+      });
+    },
+    handleResume (i) {
+      if (!i) {
+        this.$notification.error({
+          message: '错误',
+          description: `请选择一条数据`
+        });
+        return false;
+      }
+      this.$api.peptide.resumeAminoAcid(i).then(res => {
+        this.handleSearch();
       });
     }
   }
