@@ -42,10 +42,7 @@
     <div class="table-operator">
       <a-button-group>
         <a-button icon="search" @click="handleSearch({page: 1})">查询</a-button>
-        <a-button icon="plus" @click="handleAddRow">新建</a-button>
-        <!-- <a-button icon="form">修改</a-button> -->
-        <!-- <a-button icon="delete">删除</a-button> -->
-        <!-- <a-button icon="save">保存</a-button> -->
+        <a-button icon="plus" type="primary" @click="handleAddRow">新建</a-button>
       </a-button-group>
     </div>
 
@@ -145,7 +142,7 @@ export default {
         { title: '修改时间', dataIndex: 'changeDate' },
         { title: '作废人', dataIndex: 'cancelName' },
         { title: '作废时间', dataIndex: 'cancelDate' },
-        { title: '操作', dataIndex: 'actions', fixed: 'right', scopedSlots: { customRender: 'actions' } }
+        { title: '操作', dataIndex: 'actions', fixed: 'right', width: 80, scopedSlots: { customRender: 'actions' } }
       ];
 
       this.columns = defaultColumns;
