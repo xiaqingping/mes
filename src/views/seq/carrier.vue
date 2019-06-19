@@ -54,10 +54,12 @@
       border
       resizable
       auto-resize
+      :ref="ref"
       :loading="loading"
       :columns="columns"
       :pager-config="pagerConfig"
       :data.sync="tableData"
+      :edit-config="{key: 'id', trigger: 'manual', mode: 'row'}"
       @current-page-change="(currentPage) => pagerChange({type: 'currentPage', value: currentPage})"
       @page-size-change="(pageSize) => pagerChange({type: 'pageSize', value: pageSize})">
     </vxe-grid>
@@ -71,6 +73,7 @@ export default {
   data () {
     return {
       form: this.$form.createForm(this),
+      ref: 't-carrier',
       loading: false,
       editIndex: -1,
       queryParam: {},
@@ -96,9 +99,9 @@ export default {
       this.columns = [
         { type: 'index', width: 40 },
         { label: '编号', prop: 'code' },
-        { label: '名称', prop: 'name' },
-        { label: '别名', prop: 'alias' },
-        { label: '系列', prop: 'seriesName' },
+        { label: '名称', prop: 'name', editRender: { name: 'input' } },
+        { label: '别名', prop: 'alias', editRender: { name: 'input' } },
+        { label: '系列', prop: 'seriesName', editRender: { name: 'input' } },
         { label: '状态', prop: 'status', formatter: function ({ cellValue }) { return formatter(basic.status, cellValue); } },
         { label: '创建人', prop: 'creatorName' },
         { label: '创建时间', prop: 'createDate' },
@@ -116,13 +119,13 @@ export default {
               if (row.status === 1 && this.editIndex !== rowIndex) {
                 actions = [
                   <a onClick={() => this.handleCancel(row.id)}>删除</a>,
-                  <a>修改</a>
+                  <a onClick={() => this.handleUpdate(row, rowIndex)}>修改</a>
                 ];
               }
               if (this.editIndex === rowIndex) {
                 actions = [
                   <a>保存</a>,
-                  <a>退出</a>
+                  <a onClick={() => this.handleQuitEdit(row, rowIndex)}>退出</a>
                 ];
               }
               return [
@@ -161,9 +164,17 @@ export default {
       });
     },
     // 修改
-    handleUpdate (index) {
-      console.log(index);
+    handleUpdate (row, index) {
+      this.$refs['t-carrier'].setActiveRow(row);
       this.editIndex = index;
+    },
+    // 退出编辑
+    handleQuitEdit (row, index) {
+      console.log(this.$refs['t-carrier']);
+      console.log(this.$refs['t-carrier'].clearActivedd);
+      console.log(this.$refs['t-carrier'].clearActived);
+      this.$refs['t-carrier'].clearActivedd();
+      this.editIndex = -1;
     },
     // 分页改变时
     pagerChange (change) {

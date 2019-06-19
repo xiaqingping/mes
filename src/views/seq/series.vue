@@ -54,7 +54,7 @@
         </vxe-grid>
       </a-layout-content>
 
-      <a-layout-sider width="250" style="background:#f0f2f5;">
+      <a-layout-sider width="250">
         <span style="line-height:32px;">引物</span>
         <div class="table-operator">
           <a-button-group>
