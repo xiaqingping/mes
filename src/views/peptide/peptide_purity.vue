@@ -44,7 +44,6 @@
         :dataSource="dataSource"
         :loading="loading"
         :pagination="pagination"
-        :customRow="customRow"
         @change="change"
       >
         <template slot="purity" slot-scope="value, row, index">
