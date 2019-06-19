@@ -9,5 +9,9 @@ export default {
   // 查询载体
   getCarrier (params, easyui) {
     return request(`/carrier/v1/carriers${easyui ? '/easyui' : ''}`, { params });
+  },
+  // 作废载体
+  cancelCarrier (id) {
+    return request(`/carrier/v1/carriers/${id}`, { method: 'DELETE' });
   }
 };

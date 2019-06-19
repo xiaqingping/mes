@@ -42,53 +42,24 @@
     <div class="table-operator">
       <a-button-group>
         <a-button icon="search" @click="handleSearch({page: 1})">查询</a-button>
-        <a-button icon="plus" @click="handleAddRow">新建</a-button>
-        <!-- <a-button icon="form">修改</a-button> -->
-        <!-- <a-button icon="delete">删除</a-button> -->
-        <!-- <a-button icon="save">保存</a-button> -->
+        <a-button icon="plus" type="primary" @click="handleAddRow">新建</a-button>
       </a-button-group>
     </div>
 
-    <a-table
-      ref="table"
-      size="small"
-      rowKey="id"
-      bordered
-      :scroll="{...scroll}"
+    <vxe-grid
+      stripe
+      highlight-hover-row
+      border
+      resizable
+      auto-resize
+      :start-index="(pagerConfig.currentPage - 1) * pagerConfig.pageSize"
       :loading="loading"
       :columns="columns"
-      :pagination="pagination"
-      :dataSource="dataSource"
-      :rowSelection="{ type:'checkbox', selectedRowKeys: selectedRowKeys, onChange: onSelectChange }"
-      :customRow="customRow"
-      @change="change"
-    >
-      <template slot="sampleTypeName" slot-scope="value, row, index">
-        <div
-          :key="value"
-          style="margin: -8px 0;">
-          <a-input
-            size="small"
-            v-if="editIndex === index"
-            :value="value"
-            @change="e => handleChange(e.target.value, row.key, col)"
-          />
-          <template v-else>{{ value }}</template>
-        </div>
-      </template>
-      <template slot="actions" slot-scope="value, row, index">
-        <div :key="value">
-          <template v-if="row.status === 1 && editIndex !== index">
-            <a @click="() => handleCancel(row.id)">删除 </a>
-            <a @click="() => handleUpdate(index)">修改 </a>
-          </template>
-          <template v-if="editIndex === index">
-            <a @click="() => handleSave(row)">保存 </a>
-            <a @click="() => handleQuitEdit(row)">退出 </a>
-          </template>
-        </div>
-      </template>
-    </a-table>
+      :pager-config="pagerConfig"
+      :data.sync="tableData"
+      @current-page-change="(currentPage) => pagerChange({type: 'currentPage', value: currentPage})"
+      @page-size-change="(pageSize) => pagerChange({type: 'pageSize', value: pageSize})">
+    </vxe-grid>
   </div>
 </template>
 
@@ -103,22 +74,16 @@ export default {
   data () {
     return {
       form: this.$form.createForm(this),
-      agGridName: 'seq.sample_dose',
-      scroll: { x: 1400 },
       loading: false,
-      columns: [],
-      pagination: {
-        current: 1,
-        pageSize: 10,
-        total: 0,
-        showSizeChanger: true
-      },
-      dataSource: [],
+      editIndex: -1,
       queryParam: {},
-      selectedRowKeys: [],
-      selectedRows: [],
-      id: 0,
-      editIndex: -1
+      tableData: [],
+      columns: [],
+      pagerConfig: {
+        currentPage: 1,
+        pageSize: 10,
+        total: 0
+      }
     };
   },
   mounted () {
@@ -131,32 +96,50 @@ export default {
       const { formatter } = this.$units;
       const { basic } = this.$store.state;
       const defaultColumns = [
-        { title: '样品类型', dataIndex: 'sampleTypeName', scopedSlots: { customRender: 'sampleTypeName' } },
-        { title: '最小长度', dataIndex: 'minSampleLength' },
-        { title: '最大长度', dataIndex: 'maxSampleLength' },
-        { title: '浓度', dataIndex: 'concentration' },
-        { title: '样品特性', dataIndex: 'sampleFeatureName' },
-        { title: '样品用量', dataIndex: 'sampleDose' },
-        { title: '测序点', dataIndex: 'seqfactoryName' },
-        { title: '状态', dataIndex: 'status', customRender: function (text, record, index) { return formatter(basic.status, text); } },
-        { title: '创建人', dataIndex: 'creatorName' },
-        { title: '创建时间', dataIndex: 'createDate' },
-        { title: '修改人', dataIndex: 'changerName' },
-        { title: '修改时间', dataIndex: 'changeDate' },
-        { title: '作废人', dataIndex: 'cancelName' },
-        { title: '作废时间', dataIndex: 'cancelDate' },
-        { title: '操作', dataIndex: 'actions', fixed: 'right', scopedSlots: { customRender: 'actions' } }
+        { type: 'index', width: 40 },
+        { label: '样品类型', prop: 'sampleTypeName' },
+        { label: '最小长度', prop: 'minSampleLength' },
+        { label: '最大长度', prop: 'maxSampleLength' },
+        { label: '浓度', prop: 'concentration' },
+        { label: '样品特性', prop: 'sampleFeatureName' },
+        { label: '样品用量', prop: 'sampleDose' },
+        { label: '测序点', prop: 'seqfactoryName' },
+        { label: '状态', prop: 'status', formatter: function ({ cellValue }) { return formatter(basic.status, cellValue); } },
+        { label: '创建人', prop: 'creatorName' },
+        { label: '创建时间', prop: 'createDate' },
+        { label: '修改人', prop: 'changerName' },
+        { label: '修改时间', prop: 'changeDate' },
+        { label: '作废人', prop: 'cancelName' },
+        { label: '作废时间', prop: 'cancelDate' },
+        { label: '操作',
+          prop: 'actions',
+          fixed: 'right',
+          width: 80,
+          slots: {
+            default: ({ row, rowIndex }) => {
+              let actions = [];
+              if (row.status === 1 && this.editIndex !== rowIndex) {
+                actions = [
+                  <a onClick={() => this.handleUpdate(rowIndex)}>修改</a>,
+                  <a onClick={() => this.handleCancel(row.id)}>删除</a>
+                ];
+              }
+              if (this.editIndex === rowIndex) {
+                actions = [
+                  <a>保存</a>,
+                  <a>退出</a>
+                ];
+              }
+              return [
+                <span class="table-actions">
+                  {actions}
+                </span>
+              ];
+            }
+          } }
       ];
 
       this.columns = defaultColumns;
-    },
-    // 表格change事件，分页、排序、筛选变化时触发
-    change (pagination, filters, sorter) {
-      const params = {
-        page: pagination.current,
-        rows: pagination.pageSize
-      };
-      this.handleSearch(params);
     },
     // 查询
     handleSearch (params = {}) {
@@ -166,13 +149,13 @@ export default {
       this.selectedRows = [];
 
       const queryParam = this.form.getFieldsValue();
-      params = Object.assign({ page: this.pagination.current, rows: this.pagination.pageSize }, params, queryParam);
+      params = Object.assign({ page: this.pagerConfig.currentPage, rows: this.pagerConfig.pageSize }, params, queryParam);
 
-      this.$api.sampleprepare.getSampleDose(params).then((data) => {
-        this.dataSource = data.rows;
-        this.pagination.total = data.total;
-        this.pagination.current = params.page;
-        this.pagination.pageSize = params.rows;
+      this.$api.sampleprepare.getSampleDose(params, true).then((data) => {
+        this.tableData = data.rows;
+        this.pagerConfig.total = data.total;
+        this.pagerConfig.currentPage = params.page;
+        this.pagerConfig.pageSize = params.rows;
       }).finally(() => {
         this.loading = false;
       });
@@ -180,8 +163,7 @@ export default {
     // 新增一可编辑行
     handleAddRow () {
       const newData = {
-        id: --this.id,
-        minSampleLength: undefined
+        id: --this.id
       };
       this.dataSource = [newData, ...this.dataSource];
       this.editIndex = 0;
@@ -214,29 +196,6 @@ export default {
     // 退出编辑
     handleQuitEdit () {
       this.editIndex = -1;
-    },
-    // 行属性
-    customRow (row, rowIndex) {
-      return {
-        on: {
-          click: () => {
-            // const index = this.selectedRowKeys.indexOf(row.id);
-            // if (index === -1) {
-            //   this.selectedRowKeys.push(row.id);
-            //   this.selectedRows.push(row);
-            // } else {
-            //   this.selectedRowKeys.splice(index, 1);
-            //   this.selectedRows = this.selectedRows.filter(function (e) {
-            //     return e.id !== row.id;
-            //   });
-            // }
-          }
-        }
-      };
-    },
-    onSelectChange (selectedRowKeys, selectedRows) {
-      this.selectedRowKeys = selectedRowKeys;
-      this.selectedRows = selectedRows;
     }
   }
 };

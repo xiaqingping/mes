@@ -4,7 +4,7 @@
     <div class="page-content">
 
       <div class="table-search">
-        <a-form layout="inline" :form="form" @submit="search">
+        <a-form layout="inline" :form="form" @submit="handleSearch">
           <a-row :gutter="24">
             <a-col :xxl="4" :xl="6" :md="8">
               <a-form-item label="状态">
@@ -42,175 +42,147 @@
 
       <div class="table-operator">
         <a-button-group>
-          <a-button icon="search" @click="search">查询</a-button>
-          <a-button type="primary" icon="plus" @click="addRow()">新增</a-button>
-          <a-button type="danger" icon="form">删除</a-button>
-          <a-button type="primary">保存</a-button>
+          <a-button icon="search" @click="handleSearch">查询</a-button>
+          <a-button icon="plus" type="primary" @click="handleAddRow()">新增</a-button>
         </a-button-group>
       </div>
 
-      <ag-grid-vue
-        style="height: 500px;"
-        class="ag-theme-balham"
-        :gridOptions="gridOptions"
-        :columnDefs="columnDefs"
-        :frameworkComponents="frameworkComponents"
-        :rowData="rowData"
-        :defaultColDef="defaultColDef"
-        rowSelection="multiple"
-        @grid-ready="onGridReady"
-        @columnResized="cacheColumnState"
-        @columnMoved="cacheColumnState"
-        editType="fullRow"
-        pagination
-        resizable>
-      </ag-grid-vue>
+      <vxe-grid
+        stripe
+        highlight-hover-row
+        border
+        resizable
+        auto-resize
+        :start-index="(pagerConfig.currentPage - 1) * pagerConfig.pageSize"
+        :loading="loading"
+        :columns="columns"
+        :pager-config="pagerConfig"
+        :data.sync="tableData"
+        @current-page-change="(currentPage) => pagerChange({type: 'currentPage', value: currentPage})"
+        @page-size-change="(pageSize) => pagerChange({type: 'pageSize', value: pageSize})">
+      </vxe-grid>
     </div>
   </div>
 </template>
 
 <script>
-import { throttle } from 'lodash';
 import { mapState } from 'vuex';
-import STable from '@/components/Table';
-import { AgGridVue } from 'ag-grid-vue';
-import selectEditor from '@/components/ag-grid-editor/selectEditor';
 
 export default {
   name: 'SeqSampleOrder',
-  components: {
-    STable,
-    AgGridVue
-  },
   computed: mapState(['basic', 'seq']),
   data () {
     return {
       form: this.$form.createForm(this),
-      agGridName: 'seq.sample_dose',
-      gridApi: null,
-      columnApi: null,
-      // 默认列参数
-      defaultColDef: {
-        resizable: true,
-        editable: true
-      },
-      // grid参数
-      gridOptions: {},
-      // 表格列参数
-      columnDefs: null,
-      // 框架组件
-      frameworkComponents: {
-        selectEditor
-      },
-      // 表格数据
-      rowData: null,
-      // 表单筛选参数
-      queryParam: {}
+      loading: false,
+      editIndex: -1,
+      queryParam: {},
+      tableData: [],
+      columns: [],
+      pagerConfig: {
+        currentPage: 1,
+        pageSize: 10,
+        total: 0
+      }
     };
   },
   mounted () {
-    this.createColumn();
-    this.search();
+    this.setColumn();
+    this.handleSearch();
   },
   methods: {
-    createColumn () {
+    // 设置表格列属性
+    setColumn () {
       const { formatter } = this.$units;
-      const { agGridName, basic, seq } = this;
+      const { basic } = this;
 
-      const defalutColumn = [
-        {
-          headerName: 'Athlete',
-          field: 'athlete',
-          width: 40,
-          editable: false,
-          checkboxSelection: params => {
-            return params.columnApi.getRowGroupColumns().length === 0;
-          },
-          headerCheckboxSelection: function (params) {
-            return params.columnApi.getRowGroupColumns().length === 0;
-          }
-        },
-        { headerName: 'SAP产品编号', field: 'productCode' },
-        { headerName: 'SAP产品名称', field: 'productName' },
-        { headerName: '样品类型',
-          field: 'sampleTypeId',
-          cellEditor: 'selectEditor',
-          cellEditorParams: {
-            list: seq.sampleType
-          },
-          valueFormatter: function (row) {
-            return formatter(seq.sampleType, row.value);
-          }
-          // valueParser: function (params) {
-          //   // console.log(params);
-          //   return params;
-          // }
-        },
-        { headerName: '测序类型', field: 'seqTypeName' },
-        { headerName: '统一附加费', field: 'surcharge' },
-        { headerName: '状态', field: 'status', valueFormatter: function (row) { return formatter(basic.status, row.value); } },
-        { headerName: '创建人', field: 'creatorName' },
-        { headerName: '创建时间', field: 'createDate' },
-        { headerName: '作废人', field: 'cancelName' },
-        { headerName: '作废时间', field: 'cancelDate' },
-        { headerName: '操作',
-          field: 'actions',
-          cellRenderer: function (params) {
-            const buttonList = [];
-            if (params.data.status === 1) {
-              buttonList.push('<a>删除</a>');
+      this.columns = [
+        { type: 'index', width: 40 },
+        { label: 'SAP产品编号', prop: 'productCode' },
+        { label: 'SAP产品名称', prop: 'productName' },
+        { label: '样品类型', prop: 'sampleTypeName' },
+        { label: '测序类型', prop: 'seqTypeName' },
+        { label: '统一附加费', prop: 'surcharge' },
+        { label: '状态', prop: 'status', formatter: function ({ cellValue }) { return formatter(basic.status, cellValue); } },
+        { label: '创建人', prop: 'creatorName' },
+        { label: '创建时间', prop: 'createDate' },
+        { label: '作废人', prop: 'cancelName' },
+        { label: '作废时间', prop: 'cancelDate' },
+        { label: '操作',
+          prop: 'actions',
+          fixed: 'right',
+          slots: {
+            default: ({ row, rowIndex }) => {
+              let actions = [];
+              if (row.status === 1 && this.editIndex !== rowIndex) {
+                actions = [
+                  <a onClick={() => this.handleCancel(row.id)}>删除</a>
+                ];
+              }
+              if (this.editIndex === rowIndex) {
+                actions = [
+                  <a>保存</a>,
+                  <a>退出</a>
+                ];
+              }
+              return [
+                <span class="table-actions">
+                  {actions}
+                </span>
+              ];
             }
-            return buttonList.join('');
-          },
-          editable: false,
-          pinned: 'right'
+          }
         }
       ];
-
-      const columnDefs = [];
-      const column = this.$ls.get('column') || {};
-      if (column[agGridName]) {
-        column[agGridName].forEach(function (e) {
-          for (let i = 0; i < defalutColumn.length; i++) {
-            if (defalutColumn[i].field === e.field) {
-              defalutColumn[i].width = e.width;
-              columnDefs.push(defalutColumn[i]);
-              break;
-            }
-          }
-        });
-      }
-
-      this.columnDefs = columnDefs;
     },
-    search () {
-      this.$api.sampletype.getSeqProduct({}, true).then(res => {
-        this.rowData = res.rows;
+    // 查询
+    handleSearch (params = {}) {
+      this.loading = true;
+      this.editIndex = -1;
+      this.selectedRowKeys = [];
+      this.selectedRows = [];
+
+      const queryParam = this.form.getFieldsValue();
+      params = Object.assign({ page: this.pagerConfig.currentPage, rows: this.pagerConfig.pageSize }, params, queryParam);
+
+      this.$api.sampletype.getSeqProduct(params, true).then((data) => {
+        this.tableData = data.rows;
+        this.pagerConfig.total = data.total;
+        this.pagerConfig.currentPage = params.page;
+        this.pagerConfig.pageSize = params.rows;
+      }).finally(() => {
+        this.loading = false;
       });
     },
-    addRow () {
-      this.gridApi.updateRowData({ add: [{ productCode: '000' }], addIndex: 0 });
+    // 分页改变时
+    pagerChange (change) {
+      if (change.type === 'pageSize') {
+        //
+      }
+      this.pagerConfig[change.type] = change.value;
+      this.handleSearch();
+    },
+    // 新增一可编辑行
+    handleAddRow () {
+      const newData = {
+        id: --this.id
+      };
+      this.tableData = [newData, ...this.tableData];
+      this.editIndex = 0;
+    },
+    // 作废
+    handleCancel (id) {
+      this.$api.sampletype.cancelSeqProduct(id).then(() => {
+        this.handleSearch();
+      });
+    },
+    // 保存
+    handleSave (row) {
+      //
     },
     searchProduct () {
       console.log('searchProduct');
-    },
-    onGridReady (params) {
-      this.gridApi = params.api;
-      this.columnApi = params.columnApi;
-    },
-    // 缓存列属性
-    cacheColumnState: throttle(function () {
-      const { columnApi, agGridName } = this;
-      const columnState = columnApi.getColumnState();
-
-      const arr = columnState.map(e => {
-        return { field: e.colId, width: e.width };
-      });
-
-      const column = this.$ls.get('column') || {};
-      column[agGridName] = arr;
-      this.$ls.set('column', column);
-    }, 1000)
+    }
   }
 };
 </script>

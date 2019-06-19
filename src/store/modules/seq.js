@@ -1,4 +1,4 @@
-import { sampletype, seqfactory } from '@/api';
+import { sampletype, seqfactory, series } from '@/api';
 
 export default {
   namespaced: true,
@@ -39,7 +39,9 @@ export default {
     // 测序点
     seqfactory: [],
     // 测序类型
-    seqType: []
+    seqType: [],
+    // 载体系列
+    series: []
   },
   mutations: {
     setCache (state, payload) {
@@ -54,21 +56,22 @@ export default {
   },
   actions: {
     getCache (context, payload = { type: null }) {
-      const map = {
+      const methods = {
         sampleType: sampletype.getSampleType,
         seqfactory: seqfactory.getSeqfactory,
-        seqType: sampletype.getSeqType
+        seqType: sampletype.getSeqType,
+        series: series.getSeries
       };
       const { type } = payload;
 
       // 如果存在type则只获取type对应的数据，否则获取全部数据
       if (type) {
-        map[type]().then(data => {
+        methods[type]().then(data => {
           context.commit('setCache', { type, data });
         });
       } else {
-        for (const type in map) {
-          map[type]().then(data => {
+        for (const type in methods) {
+          methods[type]().then(data => {
             context.commit('setCache', { type, data });
           });
         }
