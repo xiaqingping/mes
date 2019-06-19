@@ -116,7 +116,7 @@ export default {
               let actions = [];
               if (row.status === 1 && this.editIndex !== rowIndex) {
                 actions = [
-                  <a>删除</a>
+                  <a onClick={() => this.handleCancel(row.id)}>删除</a>
                 ];
               }
               if (this.editIndex === rowIndex) {
@@ -165,17 +165,16 @@ export default {
     // 新增一可编辑行
     handleAddRow () {
       const newData = {
-        id: --this.id,
-        minSampleLength: undefined
+        id: --this.id
       };
       this.tableData = [newData, ...this.tableData];
       this.editIndex = 0;
     },
     // 作废
     handleCancel (id) {
-      // this.$api.sampleprepare.cancelSampleDose(id).then(() => {
-      //   this.handleSearch();
-      // });
+      this.$api.sampletype.cancelSeqProduct(id).then(() => {
+        this.handleSearch();
+      });
     },
     // 保存
     handleSave (row) {

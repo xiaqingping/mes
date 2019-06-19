@@ -57,6 +57,15 @@ const err = (error) => {
 
 // 请求拦截
 service.interceptors.request.use(config => {
+  // 过滤get请求中的无效字段
+  if (config.method === 'get') {
+    for (const item in config.params) {
+      if (config.params[item] === '' || config.params[item] === 'undefined') {
+        delete config.params[item];
+      }
+    }
+  }
+
   // 添加 baseURL
   if (config.url.indexOf('/oldapi') !== 0) {
     config.url = baseURL + config.url;

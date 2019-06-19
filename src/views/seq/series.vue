@@ -30,7 +30,7 @@
 
     <a-layout>
       <a-layout-content>
-        <!-- <span style="line-height:32px;">主栏</span> -->
+        <span style="line-height:32px;">系列</span>
         <div class="table-operator">
           <a-button-group>
             <a-button icon="search" @click="handleSearch">查询</a-button>
@@ -55,10 +55,9 @@
       </a-layout-content>
 
       <a-layout-sider width="250" style="background:#f0f2f5;">
-        <span style="line-height:32px;">侧栏</span>
+        <span style="line-height:32px;">引物</span>
         <div class="table-operator">
           <a-button-group>
-            <a-button icon="search" @click="handleSearch">查询</a-button>
             <a-button icon="plus">新建</a-button>
             <a-button icon="save">保存</a-button>
           </a-button-group>

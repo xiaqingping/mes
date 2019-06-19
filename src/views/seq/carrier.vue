@@ -115,7 +115,7 @@ export default {
               let actions = [];
               if (row.status === 1 && this.editIndex !== rowIndex) {
                 actions = [
-                  <a>删除</a>,
+                  <a onClick={() => this.handleCancel(row.id)}>删除</a>,
                   <a>修改</a>
                 ];
               }
@@ -154,6 +154,17 @@ export default {
         this.loading = false;
       });
     },
+    // 作废
+    handleCancel (id) {
+      this.$api.carrier.cancelCarrier(id).then(() => {
+        this.handleSearch();
+      });
+    },
+    // 修改
+    handleUpdate (index) {
+      console.log(index);
+      this.editIndex = index;
+    },
     // 分页改变时
     pagerChange (change) {
       if (change.type === 'pageSize') {
@@ -161,10 +172,8 @@ export default {
       }
       this.pagerConfig[change.type] = change.value;
       this.handleSearch();
-    },
-    handleUpdate (index) {
-      console.log(index);
     }
+
   }
 };
 </script>
