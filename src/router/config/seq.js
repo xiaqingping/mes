@@ -91,12 +91,12 @@ export default {
     //   component: () => import('@/views/seq/seqdevice'),
     //   meta: { title: '测序仪', keepAlive: false, permission: [ 'dashboard' ] }
     // },
-    // {
-    //   path: '/seq/seqfactory',
-    //   name: 'seq-seqfactory',
-    //   component: () => import('@/views/seq/seqfactory'),
-    //   meta: { title: '测序点', keepAlive: false, permission: [ 'dashboard' ] }
-    // },
+    {
+      path: '/seq/seqfactory',
+      name: 'seq-seqfactory',
+      component: () => import('@/views/seq/seqfactory'),
+      meta: { title: '测序点', keepAlive: false, permission: [ 'dashboard' ] }
+    },
     {
       path: '/seq/series',
       name: 'seq-series',

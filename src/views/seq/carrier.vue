@@ -49,7 +49,7 @@
       </a-button-group>
     </div>
 
-    <vxe-grid
+    <!-- <vxe-grid
       stripe
       highlight-hover-row
       border
@@ -59,34 +59,51 @@
       :loading="loading"
       :columns="columns"
       :pager-config="pagerConfig"
-      :data.sync="tableData"
+      :data.sync="data"
       :edit-rules="editRules"
       :edit-config="{key: 'id', trigger: 'manual', mode: 'row', showIcon: false, autoClear: false}"
       @current-page-change="(currentPage) => pagerChange({type: 'currentPage', value: currentPage})"
       @page-size-change="(pageSize) => pagerChange({type: 'pageSize', value: pageSize})">
-      <!-- <vxe-table-column v-for="cloumn in columns" :key="cloumn.prop"></vxe-table-column> -->
-    </vxe-grid>
+      <vxe-table-column v-for="cloumn in columns" :key="cloumn.prop"></vxe-table-column>
+    </vxe-grid> -->
+    <s-table
+      :ref="carrierTable.ref"
+      :loading="carrierTable.loading"
+      :columns="carrierTable.columns"
+      :data="carrierTable.data"
+      :pager-config="carrierTable.pagerConfig"
+      :edit-rules="carrierTable.editRules"
+      :edit-config="{key: 'id', trigger: 'manual', mode: 'row', showIcon: false, autoClear: false}"
+      @pager-change="pagerChange"
+      @set-ref="setRef"
+    >
+    </s-table>
   </div>
 </template>
 
 <script>
+import STable from '@/components/STable.js';
+
 export default {
   name: 'SeqSampleOrder',
-  components: {},
+  components: {
+    STable
+  },
   data () {
     return {
       form: this.$form.createForm(this),
-      ref: 't-carrier',
-      loading: false,
-      editIndex: -1,
-      queryParam: {},
-      tableData: [],
-      columns: [],
-      editRules: {},
-      pagerConfig: {
-        currentPage: 1,
-        pageSize: 10,
-        total: 0
+      carrierTable: {
+        ref: null,
+        editIndex: -1,
+        loading: false,
+        data: [],
+        columns: [],
+        editRules: {},
+        pagerConfig: {
+          currentPage: 1,
+          pageSize: 10,
+          total: 0
+        }
       }
     };
   },
@@ -97,7 +114,7 @@ export default {
   },
   methods: {
     validEvent () {
-      this.$refs['t-carrier'].validate(this.tableData[this.editIndex], valid => {
+      this.$refs['carrier'].validate(this.data[this.editIndex], valid => {
         console.log(valid);
         if (valid) {
 
@@ -106,22 +123,16 @@ export default {
     },
     // 设置表格列属性
     setColumn () {
+      const tableName = 'carrierTable';
       const { formatter } = this.$units;
       const { basic } = this.$store.state;
 
       const columns = [
         { width: 40, type: 'index' },
-        { label: '编号',
-          prop: 'code',
-          slots: {
-            edit: () => {
-              return 321;
-            }
-          }
-        },
+        { label: '编号', prop: 'code' },
         { label: '名称', prop: 'name', editRender: { name: 'AInput', props: { size: 'small' } } },
-        { label: '别名', prop: 'alias', editRender: { name: 'input' } },
-        { label: '系列', prop: 'seriesName', editRender: { name: 'ASelect', props: { size: 'small' }, style: 'width:100%;', options: [{ value: 1, label: 123 }] } },
+        { label: '别名', prop: 'alias', editRender: { name: 'ASelect', props: { size: 'small' } } },
+        { label: '系列', prop: 'seriesName', editRender: { name: 'ASelect', props: { size: 'small' }, options: [{ value: 1, label: 123 }] } },
         { label: '状态', prop: 'status', formatter: function ({ cellValue }) { return formatter(basic.status, cellValue); } },
         { label: '创建人', prop: 'creatorName' },
         { label: '创建时间', prop: 'createDate' },
@@ -162,11 +173,12 @@ export default {
         if (!e.width) e.width = 100;
       });
 
-      this.columns = columns;
+      this[tableName].columns = columns;
     },
     // 设置表格验证规则
     setEditRules () {
-      this.editRules = {
+      const tableName = 'carrierTable';
+      this[tableName].editRules = {
         trigger: 'change',
         name: [
           { required: true, message: '名称不能为空' }
@@ -181,21 +193,20 @@ export default {
     },
     // 查询
     handleSearch (params = {}) {
-      this.loading = true;
-      this.editIndex = -1;
-      this.selectedRowKeys = [];
-      this.selectedRows = [];
+      const tableName = 'carrierTable';
+      this[tableName].loading = true;
+      this[tableName].editIndex = -1;
 
       const queryParam = this.form.getFieldsValue();
-      params = Object.assign({ page: this.pagerConfig.currentPage, rows: this.pagerConfig.pageSize }, params, queryParam);
+      params = Object.assign({ page: this[tableName].pagerConfig.currentPage, rows: this[tableName].pagerConfig.pageSize }, params, queryParam);
 
       this.$api.carrier.getCarrier(params, true).then((data) => {
-        this.tableData = data.rows;
-        this.pagerConfig.total = data.total;
-        this.pagerConfig.currentPage = params.page;
-        this.pagerConfig.pageSize = params.rows;
+        this[tableName].data = data.rows;
+        this[tableName].pagerConfig.total = data.total;
+        this[tableName].pagerConfig.currentPage = params.page;
+        this[tableName].pagerConfig.pageSize = params.rows;
       }).finally(() => {
-        this.loading = false;
+        this[tableName].loading = false;
       });
     },
     // 作废
@@ -206,21 +217,27 @@ export default {
     },
     // 修改
     handleUpdate (row, index) {
-      this.$refs['t-carrier'].setActiveRow(row);
+      const tableName = 'carrierTable';
+      const table = this[tableName].ref;
+      console.log(table);
+      console.log(table.setActiveRow);
+      table.setActiveRow(row);
       this.editIndex = index;
     },
     // 退出编辑
     handleQuitEdit (row, index) {
-      this.$refs['t-carrier'].clearActived();
+      this.$refs['carrier'].clearActived();
       this.editIndex = -1;
     },
     // 分页改变时
     pagerChange (change) {
-      if (change.type === 'pageSize') {
-        //
-      }
-      this.pagerConfig[change.type] = change.value;
+      const tableName = 'carrierTable';
+      this[tableName].pagerConfig = Object.assign(this[tableName].pagerConfig, change);
       this.handleSearch();
+    },
+    setRef (ref) {
+      const tableName = 'carrierTable';
+      this[tableName].ref = ref;
     }
 
   }

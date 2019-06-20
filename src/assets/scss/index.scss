@@ -54,8 +54,30 @@
 }
 
 // vxe-table 自定义样式
-.vxe-cell {
-  & > .ant-select {
-    width: 100%;
+.vxe-grid {
+  .vxe-body--column.col--edit {
+    .vxe-cell {
+      // height: 100%;
+      // line-height: 30px;
+      // padding: 0;
+      & > .ant-input {
+        width: 100%;
+        // height: 100%;
+        // border-radius: 0;
+      }
+      & > .ant-select {
+        width: 100%;
+        // height: 100%;
+        // border-radius: 0;
+        // & > .ant-select-selection {
+        //   height: 100%;
+        //   border-radius: 0;
+        // }
+        // .ant-select-selection__rendered {
+        //   height: 100%;
+        // }
+      }
+    }
   }
 }
+
