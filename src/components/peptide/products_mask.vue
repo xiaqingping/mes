@@ -54,7 +54,7 @@
               </a-select>
             </a-form-item>
           </div>
-          <div style="margin-bottom:10px">
+          <div>
             <a-button icon="search" @click="showData">查询</a-button>
             <a-button @click="sub" style="float:right">确定</a-button>
           </div>
@@ -239,6 +239,13 @@ export default {
   },
   methods: {
     sub () {
+      if (this.selectedRows[0].saleStatus === 'Z1') {
+        this.$notification.error({
+          message: '错误',
+          description: `不能选择暂停销售产品`
+        });
+        return false;
+      }
       if (this.selectedRows[0]) {
         this.$emit('customerData', this.selectedRows);
         this.$emit('Closed');

@@ -306,15 +306,15 @@ export default {
     },
     openMask () {
       this.products_status = true;
-      // document.addEventListener('mousewheel', function (e) {
-      //   e.preventDefault();
-      // }, { passive: false });
+      document.addEventListener('mousewheel', function (e) {
+        e.preventDefault();
+      }, { passive: false });
     },
     closeMask () {
       this.products_status = false;
-      // document.addEventListener('mousewheel', function (e) {
-      //   e.returnValue = true;
-      // }, { passive: false });
+      document.addEventListener('mousewheel', function (e) {
+        e.returnValue = true;
+      }, { passive: false });
     },
     handleSave (r) {
       if (this.providerTotalAmountBegin === '' || this.providerTotalAmountEnd === '' || this.aminoAcidLengthBegin === '' || this.aminoAcidLengthEnd === '' || this.aminoAcidType === '' || this.sapProductCode === '' || this.sapProductName === '' || this.purityName === '') {

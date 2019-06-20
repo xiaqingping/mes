@@ -1,6 +1,6 @@
 <template>
   <div v-if="hackReset" class="mask">
-    <div class="customer-name-mask" :style="{top: customer_name_top + 'px', left : customer_name_left + 'px', width : small ? '1100px' : '100%', height : small ? '630px' : '100%', position: small ? 'absolute' : '', borderRadius: small ? '5px' : ''}">
+    <div class="customer-name-mask" :style="{top: customer_name_top + 'px', left : customer_name_left + 'px', width : small ? '1100px' : '100%', height : small ? '610px' : '100%', position: small ? 'absolute' : '', borderRadius: small ? '5px' : ''}">
       <div class="top">
         <span style="float: left">多肽修饰列表</span>
         <span class="top-icon" style="padding-bottom: 10px" @click="onClose($event)"><a-icon
@@ -27,10 +27,8 @@
               </a-select>
             </a-form-item>
           </div>
-          <div style="margin-bottom:10px">
-            <a-button type="primary" icon="search" @click="showData">查询</a-button>
-            <a-button type="primary" @click="sub" style="float:right">确定</a-button>
-          </div>
+          <a-button icon="search" @click="showData">查询</a-button>
+          <a-button @click="sub" style="float:right">确定</a-button>
         </a-form>
 
       </div>
@@ -38,7 +36,7 @@
         ref="table"
         bordered
         size="small"
-        :scroll="{ x: 1500, y: 500 }"
+        :scroll="{ x: 2200 }"
         :columns="columns"
         :data="loadData"
         :rowSelection="{ selectedRowKeys: selectedRowKeys, onChange: onSelectChange }"
@@ -54,7 +52,7 @@
 import STable from '@/components/Table';
 
 export default {
-  name: 'CustomerMask',
+  name: 'AminoAcidMask',
   components: {
     STable
   },
@@ -70,12 +68,11 @@ export default {
       status: false,
       data: false,
       columns: [
-        { title: '编号', dataIndex: 'code', width: '4%' },
-        { title: '名称', dataIndex: 'name', width: '5%' },
+        { title: '编号', dataIndex: 'code' },
+        { title: '名称', dataIndex: 'name' },
         { title: '亲水性',
           dataIndex: 'hydrophilic',
           align: 'center',
-          width: '4%',
           customRender: function (value) {
             return value === 1 ? '√' : '';
           }
@@ -84,7 +81,6 @@ export default {
           title: '疏水性',
           dataIndex: 'hydrophobic',
           align: 'center',
-          width: '4%',
           customRender: function (value) {
             return value === 1 ? '√' : '';
           }
@@ -93,7 +89,6 @@ export default {
           title: '酸性',
           dataIndex: 'acidic',
           align: 'center',
-          width: '3%',
           customRender: function (value) {
             return value === 1 ? '√' : '';
           }
@@ -102,7 +97,6 @@ export default {
           title: '碱性',
           dataIndex: 'alkaline',
           align: 'center',
-          width: '3%',
           customRender: function (value) {
             return value === 1 ? '√' : '';
           }
@@ -111,43 +105,41 @@ export default {
           title: '是否可做二硫键',
           dataIndex: 'isCanDisulfideBond',
           align: 'center',
-          width: '8%',
           customRender: function (value) {
             return value === 1 ? '√' : '';
           }
         },
         {
-          title: '分子量', dataIndex: 'molecularWeight', align: 'center', width: '4%'
+          title: '分子量', dataIndex: 'molecularWeight', align: 'center'
         },
         {
-          title: '等电点', dataIndex: 'isoelectricPoint', align: 'center', width: '4%'
+          title: '等电点', dataIndex: 'isoelectricPoint', align: 'center'
         },
         {
-          title: '羧基解离常数', dataIndex: 'carboxylationDissociationConstant', align: 'center', width: '8%'
+          title: '羧基解离常数', dataIndex: 'carboxylationDissociationConstant', align: 'center'
         },
         {
-          title: '氨基解离常数', dataIndex: 'aminoDissociationConstant', align: 'center', width: '8%'
+          title: '氨基解离常数', dataIndex: 'aminoDissociationConstant', align: 'center'
         },
         {
           title: '状态',
           dataIndex: 'status',
           align: 'center',
-          width: '3%',
           customRender: function (value) {
             return value === 1 ? '正常' : '已删除';
           }
         },
         {
-          title: '创建人', dataIndex: 'creatorName', align: 'center', width: '4%'
+          title: '创建人', dataIndex: 'creatorName', align: 'center'
         },
         {
-          title: '创建时间', dataIndex: 'createDate', align: 'center', width: '6%'
+          title: '创建时间', dataIndex: 'createDate', align: 'center'
         },
-        { title: '删除人', dataIndex: 'cancelName', width: '5%' },
-        { title: '删除时间', dataIndex: 'cancelDate', width: '6%' },
-        { title: '类型', dataIndex: 'aminoAcidType', width: '4%', align: 'center' },
-        { title: '长代码', dataIndex: 'longCode', width: '8%', align: 'center' },
-        { title: '短代码', dataIndex: 'shortCode', width: '5%', align: 'center' }
+        { title: '删除人', dataIndex: 'cancelName' },
+        { title: '删除时间', dataIndex: 'cancelDate' },
+        { title: '类型', dataIndex: 'aminoAcidType', align: 'center' },
+        { title: '长代码', dataIndex: 'longCode', align: 'center' },
+        { title: '短代码', dataIndex: 'shortCode', align: 'center' }
       ],
       queryParam: {},
       loadData: parameter => {
@@ -215,7 +207,7 @@ export default {
       this.customer_name_left = (width - 1100) / 2;
     }
     if (height > 600) {
-      this.customer_name_top = (height - 630) / 2;
+      this.customer_name_top = (height - 610) / 2;
     }
   },
   watch: {

@@ -9,7 +9,6 @@
               <a-input v-decorator="['code']" title=""/>
             </a-form-item>
           </a-col>
-          <!--                    <div v-show="advanced">-->
           <a-col :xxl="4" :xl="6" :md="8" :sm="24">
             <a-form-item label="名称 ">
               <a-input v-decorator="['name']"/>
@@ -202,7 +201,7 @@ export default {
   },
   data () {
     return {
-      status: {},
+
       form: this.$form.createForm(this),
       pagination: {
         current: 1,
@@ -384,6 +383,7 @@ export default {
             document.getElementsByClassName('selectRow' + row.id)[0].style.backgroundColor = 'yellow';
             document.getElementsByClassName('selectRow' + row.id)[1].style.backgroundColor = 'yellow';
             this.selectRow = row.id;
+            this.isIndependentModificationStatus = row.isIndependentModification;
             this.dataSourceSon = row.details;
           }
         }
@@ -443,6 +443,46 @@ export default {
       this.dataSource = this.dataSource.filter((data) => {
         return data.id;
       });
+      this.handleSearch();
+    },
+    handleResume (i) {
+      if (!i) {
+        this.$notification.error({
+          message: '错误',
+          description: `请选择一条数据`
+        });
+        return false;
+      }
+      this.$api.peptide.resumePurity(i).then(res => {
+        this.handleSearch();
+      });
+    },
+    handleAddSon () {
+      if (!this.selectRow || this.editIndexSon === 0 || this.isIndependentModificationStatus === 1) {
+        return false;
+      }
+      if (this.editIndexSon === 0) {
+        return false;
+      }
+      const addVal = {
+        'id': 0,
+        'code': '',
+        'name': ''
+      };
+      this.dataSourceSon = [ addVal, ...this.dataSourceSon ];
+      this.editIndexSon = 0;
+    },
+    openMask () {
+      this.aminoAcid_status = true;
+      document.addEventListener('mousewheel', function (e) {
+        e.preventDefault();
+      }, { passive: false });
+    },
+    closeMask () {
+      this.aminoAcid_status = false;
+      document.addEventListener('mousewheel', function (e) {
+        e.returnValue = true;
+      }, { passive: false });
     },
     handleExitSon () {
       this.sonCode = '';
@@ -470,46 +510,6 @@ export default {
           this.handleExitSon();
         }
       });
-    },
-    handleResume (i) {
-      if (!i) {
-        this.$notification.error({
-          message: '错误',
-          description: `请选择一条数据`
-        });
-        return false;
-      }
-      this.$api.peptide.resumePurity(i).then(res => {
-        this.handleSearch();
-      });
-    },
-    handleAddSon () {
-      if (!this.selectRow) {
-        return false;
-      }
-      alert(this.selectRow);
-      if (this.editIndexSon === 0) {
-        return false;
-      }
-      const addVal = {
-        'id': 0,
-        'code': '',
-        'name': ''
-      };
-      this.dataSourceSon = [ addVal, ...this.dataSourceSon ];
-      this.editIndexSon = 0;
-    },
-    openMask () {
-      this.aminoAcid_status = true;
-      // document.addEventListener('mousewheel', function (e) {
-      //   e.preventDefault();
-      // }, { passive: false });
-    },
-    closeMask () {
-      this.aminoAcid_status = false;
-      // document.addEventListener('mousewheel', function (e) {
-      //   e.returnValue = true;
-      // }, { passive: false });
     },
     handleDeleteSon (i) {
       if (i) {
