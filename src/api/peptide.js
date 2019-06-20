@@ -45,6 +45,11 @@ export default {
     return request(`/peptide-base/v1/synthesisProducts/easyui`, { params });
   },
 
+  // 创建氨基酸
+  insertProduct (params) {
+    return request(`/peptide-base/v1/synthesisProducts`, { method: 'POST', data: params });
+  },
+
   // 恢复合成产品
   resumeProduct (params) {
     return request(`/peptide-base/v1/synthesisProducts/restore/${params}`, { method: 'POST' });
@@ -59,6 +64,11 @@ export default {
   // 获取氨基酸
   getAminoAcid (params) {
     return request(`/peptide-base/v1/aminoAcid/easyui`, { params });
+  },
+
+  // 创建氨基酸
+  insertAminoAcid (params) {
+    return request(`/peptide-base/v1/aminoAcid`, { method: 'POST', data: params });
   },
 
   // 获取氨基酸(全部)
@@ -82,6 +92,11 @@ export default {
     return request(`/peptide-base/v1/modifications/easyui`, { params });
   },
 
+  // 创建修饰
+  insertModifications (params) {
+    return request(`/peptide-base/v1/modifications`, { method: 'POST', data: params });
+  },
+
   // 恢复修饰
   resumeModifications (params) {
     return request(`/peptide-base/v1/modifications/restore/${params}`, { method: 'POST' });
@@ -94,8 +109,8 @@ export default {
 
   /** ****************************** 多肽修饰类别 ********************************/
   // 获取修饰类别（全部）
-  getModificationTypesAll () {
-    return request(`/peptide-base/v1/modificationTypes`);
+  getModificationTypesAll (params) {
+    return request(`/peptide-base/v1/modificationTypes`, { params });
   },
 
   // 获取修饰类别（分页获取）
@@ -124,6 +139,11 @@ export default {
     return request(`/peptide-base/v1/modificationProducts/easyui`, { params });
   },
 
+  // 创建修饰产品
+  insertModificationProducts (params) {
+    return request(`/peptide-base/v1/modificationProducts`, { method: 'POST', data: params });
+  },
+
   // 恢复修饰产品
   resumeModificationProducts (params) {
     return request(`/peptide-base/v1/modificationProducts/restore/${params}`, { method: 'POST' });
@@ -134,10 +154,31 @@ export default {
     return request(`/peptide-base/v1/modificationProducts/${params}`, { method: 'DELETE' });
   },
 
+  /** ****************************** 适用氨基酸 ************************************/
+  // 保存适用氨基酸
+  insertSuitableAminoAcids (params) {
+    return request(`/peptide-base/v1/suitableAminoAcids`, { method: 'POST', data: params });
+  },
+
+  // 恢复适用氨基酸
+  resumeSuitableAminoAcids (params) {
+    return request(`/peptide-base/v1/suitableAminoAcids/restore/${params}`, { method: 'POST' });
+  },
+
+  // 删除适用氨基酸
+  deleteSuitableAminoAcids (params) {
+    return request(`/peptide-base/v1/suitableAminoAcids/${params}`, { method: 'DELETE' });
+  },
+
   /** ****************************** 多肽二硫键产品 ************************************/
   // 获取二硫键产品（分页获取）
   getdisulfideBondProducts (params) {
     return request(`/peptide-base/v1/disulfideBondProducts/easyui`, { params });
+  },
+
+  // 创建二硫键产品
+  insertdisulfideBondProducts (params) {
+    return request(`/peptide-base/v1/disulfideBondProducts`, { method: 'POST', data: params });
   },
 
   // 恢复二硫键产品

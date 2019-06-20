@@ -63,8 +63,16 @@ export default {
       { id: 'CAD', name: 'CAD' },
       { id: 'EUR', name: 'EUR' },
       { id: 'GBP', name: 'GBP' }
+    ],
+    // 订单类型状态
+    orderTypeStatus: [
+      { id: 0, name: '标准订单' },
+      { id: 1, name: '内部订单' }
+    ],
+    status: [
+      { id: 1, name: '正常' },
+      { id: 2, name: '已删除' }
     ]
-    // 商品品牌
   },
   mutations: {},
   actions: {}
