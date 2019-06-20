@@ -54,7 +54,7 @@
         </vxe-grid>
       </a-layout-content>
 
-      <a-layout-sider width="250" style="background:#f0f2f5;">
+      <a-layout-sider width="250">
         <span style="line-height:32px;">引物</span>
         <div class="table-operator">
           <a-button-group>
@@ -138,7 +138,7 @@ export default {
       const { formatter } = this.$units;
       const { basic } = this.$store.state;
 
-      this.columns = [
+      const columns = [
         { type: 'index', width: 40 },
         { label: '编号', prop: 'code' },
         { label: '名称', prop: 'name' },
@@ -177,6 +177,12 @@ export default {
           }
         }
       ];
+
+      columns.forEach(function (e) {
+        if (!e.width) e.width = 100;
+      });
+
+      this.columns = columns;
     },
     // 查询
     handleSearch (params = {}) {

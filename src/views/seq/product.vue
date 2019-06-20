@@ -96,7 +96,7 @@ export default {
       const { formatter } = this.$units;
       const { basic } = this;
 
-      this.columns = [
+      const columns = [
         { type: 'index', width: 40 },
         { label: 'SAP产品编号', prop: 'productCode' },
         { label: 'SAP产品名称', prop: 'productName' },
@@ -134,6 +134,12 @@ export default {
           }
         }
       ];
+
+      columns.forEach(function (e) {
+        if (!e.width) e.width = 100;
+      });
+
+      this.columns = columns;
     },
     // 查询
     handleSearch (params = {}) {

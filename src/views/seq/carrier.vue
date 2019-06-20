@@ -45,6 +45,7 @@
       <a-button-group>
         <a-button icon="search" @click="handleSearch">查询</a-button>
         <a-button icon="plus" type="primary">新建</a-button>
+        <a-button icon="plus" type="primary" @click="validEvent">验证</a-button>
       </a-button-group>
     </div>
 
@@ -54,12 +55,16 @@
       border
       resizable
       auto-resize
+      :ref="ref"
       :loading="loading"
       :columns="columns"
       :pager-config="pagerConfig"
       :data.sync="tableData"
+      :edit-rules="editRules"
+      :edit-config="{key: 'id', trigger: 'manual', mode: 'row', showIcon: false, autoClear: false}"
       @current-page-change="(currentPage) => pagerChange({type: 'currentPage', value: currentPage})"
       @page-size-change="(pageSize) => pagerChange({type: 'pageSize', value: pageSize})">
+      <!-- <vxe-table-column v-for="cloumn in columns" :key="cloumn.prop"></vxe-table-column> -->
     </vxe-grid>
   </div>
 </template>
@@ -71,11 +76,13 @@ export default {
   data () {
     return {
       form: this.$form.createForm(this),
+      ref: 't-carrier',
       loading: false,
       editIndex: -1,
       queryParam: {},
       tableData: [],
       columns: [],
+      editRules: {},
       pagerConfig: {
         currentPage: 1,
         pageSize: 10,
@@ -85,20 +92,36 @@ export default {
   },
   mounted () {
     this.setColumn();
+    this.setEditRules();
     this.handleSearch();
   },
   methods: {
+    validEvent () {
+      this.$refs['t-carrier'].validate(this.tableData[this.editIndex], valid => {
+        console.log(valid);
+        if (valid) {
+
+        }
+      });
+    },
     // 设置表格列属性
     setColumn () {
       const { formatter } = this.$units;
       const { basic } = this.$store.state;
 
-      this.columns = [
-        { type: 'index', width: 40 },
-        { label: '编号', prop: 'code' },
-        { label: '名称', prop: 'name' },
-        { label: '别名', prop: 'alias' },
-        { label: '系列', prop: 'seriesName' },
+      const columns = [
+        { width: 40, type: 'index' },
+        { label: '编号',
+          prop: 'code',
+          slots: {
+            edit: () => {
+              return 321;
+            }
+          }
+        },
+        { label: '名称', prop: 'name', editRender: { name: 'AInput', props: { size: 'small' } } },
+        { label: '别名', prop: 'alias', editRender: { name: 'input' } },
+        { label: '系列', prop: 'seriesName', editRender: { name: 'ASelect', props: { size: 'small' }, style: 'width:100%;', options: [{ value: 1, label: 123 }] } },
         { label: '状态', prop: 'status', formatter: function ({ cellValue }) { return formatter(basic.status, cellValue); } },
         { label: '创建人', prop: 'creatorName' },
         { label: '创建时间', prop: 'createDate' },
@@ -116,13 +139,13 @@ export default {
               if (row.status === 1 && this.editIndex !== rowIndex) {
                 actions = [
                   <a onClick={() => this.handleCancel(row.id)}>删除</a>,
-                  <a>修改</a>
+                  <a onClick={() => this.handleUpdate(row, rowIndex)}>修改</a>
                 ];
               }
               if (this.editIndex === rowIndex) {
                 actions = [
                   <a>保存</a>,
-                  <a>退出</a>
+                  <a onClick={() => this.handleQuitEdit(row, rowIndex)}>退出</a>
                 ];
               }
               return [
@@ -134,6 +157,27 @@ export default {
           }
         }
       ];
+
+      columns.forEach(function (e) {
+        if (!e.width) e.width = 100;
+      });
+
+      this.columns = columns;
+    },
+    // 设置表格验证规则
+    setEditRules () {
+      this.editRules = {
+        trigger: 'change',
+        name: [
+          { required: true, message: '名称不能为空' }
+        ],
+        alias: [
+          { required: true, message: '名称不能为空' }
+        ],
+        seriesName: [
+          { required: true, message: '系列不能为空' }
+        ]
+      };
     },
     // 查询
     handleSearch (params = {}) {
@@ -161,9 +205,14 @@ export default {
       });
     },
     // 修改
-    handleUpdate (index) {
-      console.log(index);
+    handleUpdate (row, index) {
+      this.$refs['t-carrier'].setActiveRow(row);
       this.editIndex = index;
+    },
+    // 退出编辑
+    handleQuitEdit (row, index) {
+      this.$refs['t-carrier'].clearActived();
+      this.editIndex = -1;
     },
     // 分页改变时
     pagerChange (change) {

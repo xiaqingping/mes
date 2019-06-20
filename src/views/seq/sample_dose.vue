@@ -95,7 +95,7 @@ export default {
     setColumn () {
       const { formatter } = this.$units;
       const { basic } = this.$store.state;
-      const defaultColumns = [
+      const columns = [
         { type: 'index', width: 40 },
         { label: '样品类型', prop: 'sampleTypeName' },
         { label: '最小长度', prop: 'minSampleLength' },
@@ -139,7 +139,11 @@ export default {
           } }
       ];
 
-      this.columns = defaultColumns;
+      columns.forEach(function (e) {
+        if (!e.width) e.width = 100;
+      });
+
+      this.columns = columns;
     },
     // 查询
     handleSearch (params = {}) {
