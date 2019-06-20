@@ -57,6 +57,11 @@ VXETable.setup({
   showAllOverflow: 'title',
   // 所有表头内容超过隐藏
   showHeaderAllOverflow: 'title',
+  // 默认 tooltip 主题样式
+  tooltip: {
+    zIndex: 3000,
+    theme: 'dark'
+  },
   // 默认分页参数
   pager: {
     pageSize: 10,

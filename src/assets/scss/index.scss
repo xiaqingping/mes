@@ -53,3 +53,9 @@
   }
 }
 
+// vxe-table 自定义样式
+.vxe-cell {
+  & > .ant-select {
+    width: 100%;
+  }
+}

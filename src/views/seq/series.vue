@@ -138,7 +138,7 @@ export default {
       const { formatter } = this.$units;
       const { basic } = this.$store.state;
 
-      this.columns = [
+      const columns = [
         { type: 'index', width: 40 },
         { label: '编号', prop: 'code' },
         { label: '名称', prop: 'name' },
@@ -177,6 +177,12 @@ export default {
           }
         }
       ];
+
+      columns.forEach(function (e) {
+        if (!e.width) e.width = 100;
+      });
+
+      this.columns = columns;
     },
     // 查询
     handleSearch (params = {}) {
