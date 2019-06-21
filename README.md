@@ -20,8 +20,10 @@ npm run test
 npm run lint
 ```
 
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+## 技术栈
+[Vue](https://cn.vuejs.org/v2/guide/) + [Vue Router](https://router.vuejs.org/zh/) + [Vuex](https://vuex.vuejs.org/zh/guide/)
+[Ant-design-vue](https://vue.ant.design/docs/vue/introduce-cn/)
+[vxe-table](https://xuliangzhan_admin.gitee.io/vxe-table/)
 
 ## 负责人
 <details>

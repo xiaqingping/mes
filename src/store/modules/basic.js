@@ -10,6 +10,8 @@ export default {
     ],
     // 工厂
     factorys: [],
+    // 仓库
+    storages: [],
     // 网点
     offices: [],
     // 付款方式
@@ -54,28 +56,48 @@ export default {
   },
   mutations: {
     setCache (state, payload) {
+      // 对返回的数据进行加工处理
+      const processMap = {
+        storages (arr) {
+          arr.forEach(function (e) {
+            e.text = e.code + ' - ' + e.name;
+          });
+          return arr;
+        },
+        factorys (arr) {
+          arr.forEach(function (e) {
+            e.text = e.code + ' - ' + e.name;
+          });
+          return arr;
+        }
+      };
+
+      if (processMap[payload.type]) {
+        payload.data = processMap[payload.type](payload.data);
+      }
       state[payload.type] = payload.data;
     }
   },
   actions: {
     getCache (context, payload = { type: null }) {
-      var map = {
+      var methods = {
         factorys: basic.getFactorys,
         offices: basic.getOffices,
         paymethods: basic.getPaymethods,
         payterms: basic.getPayterms,
-        regions: basic.getRegions
+        regions: basic.getRegions,
+        storages: basic.getStorages
       };
       const { type } = payload;
 
       // 如果存在type则只获取type对应的数据，否则获取全部数据
       if (type) {
-        map[type]().then(data => {
+        methods[type]().then(data => {
           context.commit('setCache', { type, data });
         });
       } else {
-        for (const type in map) {
-          map[type]().then(data => {
+        for (const type in methods) {
+          methods[type]().then(data => {
             context.commit('setCache', { type, data });
           });
         }

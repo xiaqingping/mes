@@ -3,6 +3,15 @@
  * https://devapi.sangon.com:8443/api/carrier/swagger-ui.html
  */
 
-// import request from '../assets/js/request';
+import request from '../assets/js/request';
 
-export default {};
+export default {
+  // 查询载体
+  getCarrier (params, easyui) {
+    return request(`/carrier/v1/carriers${easyui ? '/easyui' : ''}`, { params });
+  },
+  // 作废载体
+  cancelCarrier (id) {
+    return request(`/carrier/v1/carriers/${id}`, { method: 'DELETE' });
+  }
+};

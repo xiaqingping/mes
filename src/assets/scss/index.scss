@@ -1,5 +1,3 @@
-@import "~ag-grid-community/dist/styles/ag-grid.css";
-@import "~ag-grid-community/dist/styles/ag-theme-balham.css";
 #app {
   height: 100%;
 }
@@ -12,6 +10,13 @@
   margin: 24px;
   padding: 24px 32px;
   background: #fff;
+  .ant-layout {
+    background: #fff;
+    .ant-layout-sider {
+      margin-left: 10px;
+      background: #fff;
+    }
+  }
 
   // 表格筛选条件
   .table-search {
@@ -29,11 +34,28 @@
     }
   }
 
-  // 表格操作
+  // 表格顶部操作
   .table-operator {
     // margin-bottom: 18px; 
     & > .ant-btn {
       margin-right: 8px;
     }
+  }
+
+  // 表格内操作栏
+  .table-actions {
+    a {
+      margin-right: 5px;
+      &:last-child {
+        margin-right: 0;
+      }
+    }
+  }
+}
+
+// vxe-table 自定义样式
+.vxe-cell {
+  & > .ant-select {
+    width: 100%;
   }
 }
