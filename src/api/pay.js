@@ -4,7 +4,6 @@
  */
 
 import request from '../assets/js/request';
-
 export default {
   // 获取员工信息
   getPay (params) {
@@ -22,7 +21,7 @@ export default {
   getTypepay (params) {
     return request(`/pay/v1/type/easyui`, { params });
   },
-  // 新增工资类型
+  // 保存工资类型
   increaseTypepay (params) {
     return request(`/pay/v1/type`, { method: 'POST', data: params });
   },

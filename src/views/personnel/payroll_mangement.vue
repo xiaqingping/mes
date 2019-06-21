@@ -98,7 +98,7 @@ export default {
     };
   },
   mounted () {
-    this.$api.pay.getTypepay().then(res => {
+    this.$api.pay.getTypepay({ status: 1 }).then(res => {
       this.type = res;
       console.log(res);
     });
@@ -123,8 +123,6 @@ export default {
           tdObj.style.backgroundColor = 'white';
           tdObj.style.textAlign = 'center';
           tdObj.innerHTML = "<input type='radio' id='addValue" + i + "'/>";
-          // tdObj.innerHTML = "'<span class='ant-table-row-indent indent-level-0 style='padding-left:0px;'/><span <label class='ant-radio-wrapper'/>";
-          // tdObj.innerHTML = "<input type='radio' class='ant-radio-input'/>";
         } else if (i === 1 || i === 5 || i === 6 || i === 7 || i === 8 || i === 9) {
           tdObj.style.backgroundColor = 'white';
         } else if (i === 2) {
@@ -132,6 +130,12 @@ export default {
         } else if (i === 4) {
           tdObj.innerHTML = "<input type='text' title='该输入项为必输入项' id='addValue" + i + "' style='width: 100%;height: 100%;border: 1px solid #FFA8A8;outline: none;background-color: #FFF3F3;'/>";
         } else if (i === 3) {
+          // var expData = '';
+          // for (let j = 0; j < this.type.length; j++) {
+          //   expData += '<option>' + this.type[j].status + '</option>';
+          // }
+          // tdObj.innerHTML = "<select title='该输入项为必输入项' id='addValue" + i + "' style='width: 100%;height: 100%;border: 1px solid #FFA8A8;background-color: #FFF3F3;'>" + expData +
+          // '</select>';
           tdObj.innerHTML = "<select title='该输入项为必输入项' id='addValue" + i + "' style='width: 100%;height: 100%;border: 1px solid #FFA8A8;outline: none;background-color: #FFF3F3;'> '<option> 工资项目 </option>' '<option> 扣款项目 </option>' '<option> 代发项目 </option>' '<option> 代缴项目 </option>'</select>";
         }
         trObj.appendChild(tdObj);
@@ -163,7 +167,7 @@ export default {
     handleEdit () {
       // console.log(2);
       var addVal = document.getElementById('addValue').value;
-      // var addVal3 = document.getElementById('addValue3').option.value;
+      var addVal3 = document.getElementById('addValue3').option;
       var addVal4 = document.getElementById('addValue4').value;
       if (addVal === '') {
         this.$notification.error({
@@ -172,13 +176,13 @@ export default {
         });
         return false;
       }
-      this.$api.pay.increaseTypepay({ 'name': addVal, 'serial': addVal4 }).then(res => {
-        // 'type': addVal3,
+      this.$api.pay.increaseTypepay({ 'name': addVal, 'type': addVal3, 'serial': addVal4 }).then(res => {
+        console.log('这是' + name.addVal);
         if (res.id) {
           this.utils.refresh();
-          console.log(1);
           return this.$refs.table.refresh(true);
         }
+        return this.$refs.table.refresh(true);
       });
     },
     onSelectChange (selectedRowKeys, selectedRows) {
