@@ -19,31 +19,137 @@
               </a-select>
             </a-form-item>
           </a-col>
-
         </a-row>
-        <a-button type="primary" icon="search" html-type="submit" style="display:none;">查询</a-button>
       </a-form>
     </div>
 
     <div>
       <div class="table-operator">
-        <a-button type="primary" icon="search" @click="handleSearch">查询</a-button>
-        <a-button type="primary" icon="plus" @click="addTr(16)" id="add">新增</a-button>
-        <a-button type="primary" icon="edit" @click="addData">保存</a-button>
+        <a-button-group>
+          <a-button icon="search" @click="handleSearch">查询</a-button>
+          <a-button icon="plus" @click="handleAdd" id="add">新增</a-button>
+        <!-- <a-button type="primary" icon="edit" @click="addData">保存</a-button>
         <a-button type="primary" icon="minus-square" @click="handleDelete">删除</a-button>
-        <a-button type="primary" icon="minus-square" @click="handleResume">恢复</a-button>
+        <a-button type="primary" icon="minus-square" @click="handleResume">恢复</a-button> -->
+        </a-button-group>
       </div>
 
-      <s-table
+      <a-table
         ref="table"
         bordered
         size="small"
-        :scroll="{ x: 1500 }"
+        rowKey="id"
+        :dataSource="dataSource"
+        :loading="loading"
+        :scroll="{ x: 1700 }"
         :columns="columns"
-        :data="loadData"
-        :rowSelection="{ selectedRowKeys: selectedRowKeys, onChange: onSelectChange }"
+        :pagination="pagination"
+        @change="change"
       >
-      </s-table>
+
+        <template slot="aminoAcidTypeLeft" slot-scope="value, row, index">
+          <a-select style="width: 65px;" size="small" v-if="editIndex === index" v-model="aminoAcidTypeLeft">
+            <a-select-option value="L">L</a-select-option>
+            <a-select-option value="D">D</a-select-option>
+          </a-select>
+          <template v-else>{{ value }}</template>
+        </template>
+
+        <template slot="aminoAcidTypeRight" slot-scope="value, row, index">
+          <a-select style="width: 65px;" size="small" v-if="editIndex === index" v-model="aminoAcidTypeRight">
+            <a-select-option value="L">L</a-select-option>
+            <a-select-option value="D">D</a-select-option>
+          </a-select>
+          <template v-else>{{ value }}</template>
+        </template>
+
+        <template slot="providerTotalAmountBegin" slot-scope="value, row, index">
+          <a-input
+            size="small"
+            v-if="editIndex === index"
+            style="width:100px;"
+            :class="[providerTotalAmountBegin ? '' : 'isValue']"
+            v-model="providerTotalAmountBegin"
+          />
+          <template v-else>{{ value }}</template>
+        </template>
+
+        <template slot="providerTotalAmountEnd" slot-scope="value, row, index">
+          <a-input
+            size="small"
+            v-if="editIndex === index"
+            style="width:100px;"
+            :class="[providerTotalAmountEnd ? '' : 'isValue']"
+            v-model="providerTotalAmountEnd"
+          />
+          <template v-else>{{ value }}</template>
+        </template>
+
+        <template slot="aminoAcidLengthBegin" slot-scope="value, row, index">
+          <a-input
+            size="small"
+            v-if="editIndex === index"
+            style="width:100px;"
+            :class="[aminoAcidLengthBegin ? '' : 'isValue']"
+            v-model="aminoAcidLengthBegin"
+          />
+          <template v-else>{{ value }}</template>
+        </template>
+
+        <template slot="aminoAcidLengthEnd" slot-scope="value, row, index">
+          <a-input
+            size="small"
+            v-if="editIndex === index"
+            style="width:100px;"
+            :class="[aminoAcidLengthEnd ? '' : 'isValue']"
+            v-model="aminoAcidLengthEnd"
+          />
+          <template v-else>{{ value }}</template>
+        </template>
+
+        <template slot="isNeedDesalting" slot-scope="value, row, index">
+          <a-checkbox v-if="editIndex === index" @change="onChange"></a-checkbox>
+          <template v-else>{{ value === 1 ? '√' :'' }}</template>
+        </template>
+
+        <template slot="sapProductCode" slot-scope="value, row, index">
+          <a-input
+            size="small"
+            v-if="editIndex === index"
+            style="width:100px;"
+            v-model="sapProductCode"
+            read-only
+          />
+          <template v-else>{{ value }}</template>
+        </template>
+
+        <template slot="sapProductName" slot-scope="value, row, index">
+          <a-input-search
+            size="small"
+            v-if="editIndex === index"
+            style="width:200px;"
+            v-model="sapProductName"
+            @search="openMask"
+            read-only
+          />
+          <template v-else>{{ value }}</template>
+        </template>
+
+        <template slot="actions" slot-scope="value, row, index">
+          <div :key="value" style="position: relative;z-index:10000;opacity: 1">
+            <template v-if="row.status === 1 && editIndex !== index">
+              <a @click="handleDelete(row.id)">删除 </a>
+            </template>
+            <template v-if="row.status === 2 && editIndex !== index">
+              <a @click="handleResume(row.id)">恢复</a>
+            </template>
+            <template v-if="editIndex === index">
+              <a @click="handleSave(row)">保存 </a>
+              <a @click="handleExit()">退出 </a>
+            </template>
+          </div>
+        </template>
+      </a-table>
     </div>
 
     <products-mask v-show="products_status" @Closed="closeMask()" @customerData="customerData">
@@ -53,13 +159,11 @@
 </template>
 
 <script>
-import STable from '@/components/Table';
 import ProductsMask from '@/components/peptide/products_mask';
 
 export default {
   name: 'PeptideDisulfideBondProducts',
   components: {
-    STable,
     ProductsMask
   },
   data () {
@@ -67,123 +171,122 @@ export default {
       form: this.$form.createForm(this),
       visible: false,
       products_status: false,
-      columns: [
-        { title: '编号', dataIndex: 'code', width: '3%' },
-        { title: '氨基酸类型1', dataIndex: 'aminoAcidTypeLeft', width: '7%' },
-        { title: '氨基酸类型2', dataIndex: 'aminoAcidTypeRight', width: '7%' },
-        { title: '提供总量从', dataIndex: 'providerTotalAmountBegin', width: '6%' },
-        { title: '提供总量至', dataIndex: 'providerTotalAmountEnd', width: '6%' },
-        { title: '长度从', dataIndex: 'aminoAcidLengthBegin', width: '4%' },
-        { title: '长度至', dataIndex: 'aminoAcidLengthEnd', width: '4%' },
+      pagination: {
+        current: 1,
+        pageSize: 10,
+        total: 0,
+        showSizeChanger: true
+      },
+      status: '',
+      columns: [],
+      loading: false,
+      dataSource: [],
+      editIndex: -1,
+      aminoAcidTypeLeft: '',
+      aminoAcidTypeRight: '',
+      providerTotalAmountBegin: '',
+      providerTotalAmountEnd: '',
+      aminoAcidLengthBegin: '',
+      aminoAcidLengthEnd: '',
+      isNeedDesalting: '',
+      sapProductCode: '',
+      sapProductName: '',
+      data: {
+        'aminoAcidTypeLeft': '',
+        'aminoAcidTypeRight': '',
+        'providerTotalAmountBegin': '',
+        'providerTotalAmountEnd': '',
+        'aminoAcidLengthBegin': '',
+        'aminoAcidLengthEnd': '',
+        'isNeedDesalting': '',
+        'sapProductCode': '',
+        'sapProductName': ''
+      }
+    };
+  },
+  mounted () {
+    this.setColumns();
+    this.handleSearch();
+  },
+  methods: {
+    setColumns () {
+      const self = this;
+      const { formatter } = this.$units;
+      const { peptide } = this.$store.state;
+      this.status = peptide.status;
+      this.columns = [
+        { title: '编号', dataIndex: 'code' },
+        { title: '氨基酸类型1', dataIndex: 'aminoAcidTypeLeft', scopedSlots: { customRender: 'aminoAcidTypeLeft' } },
+        { title: '氨基酸类型2', dataIndex: 'aminoAcidTypeRight', scopedSlots: { customRender: 'aminoAcidTypeRight' } },
+        { title: '提供总量从', dataIndex: 'providerTotalAmountBegin', scopedSlots: { customRender: 'providerTotalAmountBegin' } },
+        { title: '提供总量至', dataIndex: 'providerTotalAmountEnd', scopedSlots: { customRender: 'providerTotalAmountEnd' } },
+        { title: '长度从', dataIndex: 'aminoAcidLengthBegin', scopedSlots: { customRender: 'aminoAcidLengthBegin' } },
+        { title: '长度至', dataIndex: 'aminoAcidLengthEnd', scopedSlots: { customRender: 'aminoAcidLengthEnd' } },
         {
           title: '是否脱盐',
           dataIndex: 'isNeedDesalting',
           align: 'center',
-          width: '5%',
-          customRender: function (value) {
-            if (value === 1) return '√';
-          }
+          scopedSlots: { customRender: 'isNeedDesalting' }
         },
-        { title: '产品编号', dataIndex: 'sapProductCode', width: '8%' },
-        { title: '产品名称', dataIndex: 'sapProductName', width: '18%' },
+        { title: '产品编号', dataIndex: 'sapProductCode', scopedSlots: { customRender: 'sapProductCode' } },
+        { title: '产品名称', dataIndex: 'sapProductName', scopedSlots: { customRender: 'sapProductName' } },
         {
           title: '状态',
           dataIndex: 'status',
-          width: '4%',
-          customRender: function (text) {
-            if (text === 1) return '正常';
-            else if (text === 2) return '已删除';
+          customRender: (text) => {
+            return formatter(self.status, text);
           }
         },
-        { title: '创建人', dataIndex: 'creatorName', width: '4%' },
-        { title: '创建日期', dataIndex: 'createDate', width: '10%' },
-        { title: '删除人', dataIndex: 'cancelName', width: '4%' },
-        { title: '删除时间', dataIndex: 'cancelDate', width: '10%' }
-      ],
-      queryParam: {},
-      loadData: parameter => {
-        this.queryParam = this.form.getFieldsValue();
-        var params = Object.assign(parameter, this.queryParam);
-        return this.$api.peptide.getdisulfideBondProducts(params).then(res => {
-          return {
-            data: res.rows,
-            page: params.page,
-            total: res.total
-          };
-        });
-      },
-      selectedRowKeys: [],
-      selectedRows: []
-    };
-  },
-  mounted () {
-    var selectDrop = document.getElementsByClassName('ant-checkbox')[0];
-    selectDrop.style.display = 'none';
-  },
-  methods: {
+        { title: '创建人', dataIndex: 'creatorName' },
+        { title: '创建日期', dataIndex: 'createDate' },
+        { title: '删除人', dataIndex: 'cancelName' },
+        { title: '删除时间', dataIndex: 'cancelDate' },
+        { title: '操作', width: 80, dataIndex: 'actions', fixed: 'right', scopedSlots: { customRender: 'actions' }, align: 'center' }
+      ];
+    },
+    handleSearch (params = {}) {
+      this.loading = true;
+      this.editIndex = -1;
+
+      const queryParam = this.form.getFieldsValue();
+      params = Object.assign({ page: this.pagination.current, rows: this.pagination.pageSize }, params, queryParam);
+
+      this.$api.peptide.getdisulfideBondProducts(params).then((data) => {
+        this.dataSource = data.rows;
+        this.pagination.total = data.total;
+        this.pagination.current = params.page;
+        this.pagination.pageSize = params.rows;
+      }).finally(() => {
+        this.loading = false;
+      });
+    },
+    handleAdd () {
+      if (this.editIndex === 0) {
+        return false;
+      }
+      this.data.id = 0;
+      this.dataSource = [ this.data, ...this.dataSource ];
+      this.editIndex = 0;
+    },
+    onChange (e) {
+      this.isNeedDesalting = e.target.checked;
+    },
+    change (pagination) {
+      const params = {
+        page: pagination.current,
+        rows: pagination.pageSize
+      };
+      this.handleSearch(params);
+    },
     customerData (data) {
-      document.getElementById('addValue9').value = data[0].code;
-      document.getElementById('addValue10').value = data[0].desc;
-      this.utils.isValueMask(['addValue9', 'addValue10']);
+      this.sapProductCode = data[0].code;
+      this.sapProductName = data[0].desc;
     },
     showDrawer () {
       this.visible = true;
     },
     onClose () {
       this.visible = false;
-    },
-    handleSearch () {
-      this.$refs.table.refresh(true);
-    },
-    onSelectChange (selectedRowKeys, selectedRows) {
-      this.selectedRowKeys = selectedRowKeys.slice(-1);
-      // console.log(this.selectedRowKeys[0]);
-      this.selectedRows = selectedRows;
-    },
-    addTr (num) {
-      if (document.getElementById('addValue2')) {
-        this.$notification.error({
-          message: '错误',
-          description: `请先保存或删除现在编辑的内容`
-        });
-        return false;
-      }
-      var self = this;
-      var tbodyObj = document.getElementsByTagName('tbody')[0];
-      var trObj = document.createElement('tr');
-      for (let i = 0; i < num; i++) {
-        var tdObj = document.createElement('td');
-        tdObj.style.padding = '0';
-        if (i === 4 || i === 5 || i === 6 || i === 7) {
-          tdObj.innerHTML = "<input type='text' class='isValue' title='该输入项为必输入项' id='addValue" + i + "' style='width: 100%;height: 100%;border: 1px solid #FFA8A8;outline: none;background-color: #FFF3F3;'/>";
-        } else if (i === 8) {
-          tdObj.style.backgroundColor = 'blue';
-          tdObj.style.textAlign = 'center';
-          tdObj.innerHTML = "<input type='checkbox' id='addValue" + i + "'/>";
-        } else if (i === 2 || i === 3) {
-          tdObj.innerHTML = "<select title='该输入项为必输入项' id='addValue" + i + "' style='width: 100%;height: 100%;border: 1px solid grey;outline: none;background-color: white;'><option value='L'>L</option><option value='D'>D</option></select>";
-        } else if (i === 9) {
-          tdObj.innerHTML = "<input type='text' title='该输入项为必输入项' disabled id='addValue" + i + "' style='width: 100%;height: 100%;border: 1px solid #FFA8A8;outline: none;background-color: white;'/>";
-        } else if (i === 10) {
-          tdObj.innerHTML = "<div style='position: relative;width: 100%;height: 100%'><input type='text' readonly title='该输入项为必输入项' id='addValue" + i + "' style='width: 100%;height: 100%;border: 1px solid #FFA8A8;outline: none;background-color: #FFF3F3;'/><span class='iconfont icon-suosou' id='openMask' style='position: absolute;right:0;top:0;cursor:pointer;font-weight:bold;color:#8C8C8C'></span></div>";
-        } else {
-          tdObj.style.backgroundColor = 'blue';
-        }
-        trObj.appendChild(tdObj);
-      }
-      tbodyObj.insertBefore(trObj, tbodyObj.firstElementChild);
-      this.$nextTick(() => {
-        document.getElementById('openMask').onmouseover = function () {
-          this.style.color = 'black';
-        };
-        document.getElementById('openMask').onmouseout = function () {
-          this.style.color = '#8C8C8C';
-        };
-        document.getElementById('openMask').onclick = function () {
-          self.openMask();
-        };
-        self.utils.isValue();
-      });
     },
     openMask () {
       this.products_status = true;
@@ -290,34 +393,62 @@ export default {
         }
       });
     },
-    handleDelete () {
-      if (!document.getElementById('addValue2')) {
-        if (this.selectedRowKeys[0] == null) {
-          this.$notification.error({
-            message: '错误',
-            description: `请选择一条数据`
-          });
-          return false;
-        }
-        this.$api.peptide.deletedisulfideBondProducts(this.selectedRowKeys[0]).then(res => {
-          this.selectedRowKeys = [];
-          return this.$refs.table.refresh(true);
+    handleSave () {
+      if (this.modificationName === '' || this.modificationPosition === '' || this.providerTotalAmountBegin === '' || this.providerTotalAmountEnd === '' || this.aminoAcidLengthBegin === '' || this.aminoAcidLengthEnd === '' || this.sapProductCode === '' || this.sapProductName === '') {
+        this.$notification.error({
+          message: '错误',
+          description: `数据不能为空！`
         });
-      } else {
-        this.utils.refresh();
+        return false;
+      }
+      this.data.aminoAcidTypeLeft = this.aminoAcidTypeLeft;
+      this.data.aminoAcidTypeRight = this.aminoAcidTypeRight;
+      this.data.providerTotalAmountBegin = parseInt(this.providerTotalAmountBegin);
+      this.data.providerTotalAmountEnd = parseInt(this.providerTotalAmountEnd);
+      this.data.aminoAcidLengthBegin = parseInt(this.aminoAcidLengthBegin);
+      this.data.aminoAcidLengthEnd = parseInt(this.aminoAcidLengthEnd);
+      this.data.isNeedDesalting = this.isNeedDesalting ? 1 : 2;
+      this.data.sapProductCode = this.sapProductCode;
+      this.data.sapProductName = this.sapProductName;
+      this.$api.peptide.insertdisulfideBondProducts(this.data).then(res => {
+        if (res.id) {
+          this.handleExit();
+        }
+      });
+    },
+    handleExit () {
+      this.aminoAcidTypeLeft = '';
+      this.aminoAcidTypeRight = '';
+      this.providerTotalAmountBegin = '';
+      this.providerTotalAmountEnd = '';
+      this.aminoAcidLengthBegin = '';
+      this.aminoAcidLengthEnd = '';
+      this.isNeedDesalting = '';
+      this.sapProductCode = '';
+      this.sapProductName = '';
+      this.editIndex = -1;
+      this.dataSource = this.dataSource.filter((data) => {
+        return data.id;
+      });
+      this.handleSearch();
+    },
+    handleDelete (i) {
+      if (i) {
+        this.$api.peptide.deletedisulfideBondProducts(i).then(res => {
+          this.handleSearch();
+        });
       }
     },
-    handleResume () {
-      if (this.selectedRowKeys[0] == null) {
+    handleResume (i) {
+      if (!i) {
         this.$notification.error({
           message: '错误',
           description: `请选择一条数据`
         });
         return false;
       }
-      this.$api.peptide.resumedisulfideBondProducts(this.selectedRowKeys[0]).then(res => {
-        this.selectedRowKeys = [];
-        return this.$refs.table.refresh(true);
+      this.$api.peptide.resumedisulfideBondProducts(i).then(res => {
+        this.handleSearch();
       });
     }
   }

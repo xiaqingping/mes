@@ -18,30 +18,30 @@ export default {
       }
     }
     return value;
-  },
-  refresh () {
-    var childList = document.getElementsByTagName('tbody')[0].childNodes;
-    document.getElementsByTagName('tbody')[0].removeChild(childList[0]);
-    document.getElementById('add').removeAttribute('disabled');
-  },
-  isValue () {
-    var isValue = document.getElementsByClassName('isValue');
-    for (let i = 0; i < isValue.length; i++) {
-      isValue[i].onkeyup = function () {
-        if (this.value) {
-          this.style.backgroundColor = 'white';
-          this.style.borderColor = 'grey';
-        } else {
-          this.style.backgroundColor = '#FFF3F3';
-          this.style.borderColor = '#FFA8A8';
-        }
-      };
-    }
-  },
-  isValueMask (data) {
-    for (let i = 0; i < data.length; i++) {
-      document.getElementById(`${data[i]}`).style.backgroundColor = 'white';
-      document.getElementById(`${data[i]}`).style.borderColor = 'grey';
-    }
   }
+  // refresh () {
+  //   var childList = document.getElementsByTagName('tbody')[0].childNodes;
+  //   document.getElementsByTagName('tbody')[0].removeChild(childList[0]);
+  //   document.getElementById('add').removeAttribute('disabled');
+  // },
+  // isValue () {
+  //   var isValue = document.getElementsByClassName('isValue');
+  //   for (let i = 0; i < isValue.length; i++) {
+  //     isValue[i].onkeyup = function () {
+  //       if (this.value) {
+  //         this.style.backgroundColor = 'white';
+  //         this.style.borderColor = 'grey';
+  //       } else {
+  //         this.style.backgroundColor = '#FFF3F3';
+  //         this.style.borderColor = '#FFA8A8';
+  //       }
+  //     };
+  //   }
+  // },
+  // isValueMask (data) {
+  //   for (let i = 0; i < data.length; i++) {
+  //     document.getElementById(`${data[i]}`).style.backgroundColor = 'white';
+  //     document.getElementById(`${data[i]}`).style.borderColor = 'grey';
+  //   }
+  // }
 };
