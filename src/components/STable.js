@@ -38,6 +38,18 @@ export default {
     editRules: {
       type: Object
     },
+    editConfig: {
+      type: Object,
+      default () {
+        return {
+          key: 'id',
+          trigger: 'manual',
+          mode: 'row',
+          showIcon: false,
+          autoClear: false
+        };
+      }
+    },
     pagerConfig: {
       type: Object,
       default () {
@@ -49,9 +61,6 @@ export default {
       }
     }
   }),
-  mounted () {
-    this.$emit('set-ref', this.$refs['s-table']);
-  },
   methods: {
     pagerChange (change) {
       const { currentPage, pageSize } = this.pagerConfig;
@@ -68,6 +77,7 @@ export default {
     }
   },
   render () {
+    // const props = {};
     return (
       <vxe-grid
         ref="s-table"
@@ -79,6 +89,7 @@ export default {
         columns={this.columns}
         data={this.data}
         pagerConfig={this.pagerConfig}
+        edit-config={this.editConfig}
         on-current-page-change={(currentPage) => this.pagerChange({ type: 'currentPage', value: currentPage })}
         on-page-size-change={(pageSize) => this.pagerChange({ type: 'pageSize', value: pageSize })}
       >

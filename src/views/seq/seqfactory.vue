@@ -36,25 +36,53 @@
       </a-form>
     </div>
 
-    <div class="table-operator">
-      <a-button-group>
-        <a-button icon="search" @click="handleSearch">查询</a-button>
-        <a-button icon="plus">新建</a-button>
-        <a-button icon="form">修改</a-button>
-        <a-button icon="delete">删除</a-button>
-        <a-button icon="save">保存</a-button>
-      </a-button-group>
-    </div>
+    <a-layout>
+      <a-layout-content>
+        <span style="line-height:32px;">测序点</span>
+        <div class="table-operator">
+          <a-button-group>
+            <a-button icon="search" @click="handleSearch">查询</a-button>
+            <a-button icon="plus" type="primary" @click="handleAddRow">新建</a-button>
+          </a-button-group>
+        </div>
 
-    <s-table
-      :ref="seqfactoryTable.ref"
-      :loading="seqfactoryTable.loading"
-      :columns="seqfactoryTable.columns"
-      :data="seqfactoryTable.tableData"
-      :pager-config="seqfactoryTable.pagerConfig"
-      @pager-change="pagerChange"
-    >
-    </s-table>
+        <vxe-grid
+          highlight-hover-row
+          auto-resize
+          :ref="seqfactoryTable.ref"
+          :loading="seqfactoryTable.loading"
+          :columns="seqfactoryTable.columns"
+          :pager-config="seqfactoryTable.pagerConfig"
+          :data.sync="seqfactoryTable.tableData"
+          :edit-rules="seqfactoryTable.editRules"
+          :edit-config="{key: 'id', trigger: 'manual', mode: 'row', showIcon: false, autoClear: false}"
+          @cell-click="(options) => handleCellClick(options)"
+          @current-page-change="(currentPage) => pagerChange({type: 'currentPage', value: currentPage})"
+          @page-size-change="(pageSize) => pagerChange({type: 'pageSize', value: pageSize})">
+        </vxe-grid>
+      </a-layout-content>
+
+      <a-layout-sider width="200">
+        <span style="line-height:32px;">网点</span>
+        <div class="table-operator">
+          <a-button-group>
+            <a-button icon="plus" type="primary" @click="handleAddRowToPrimers">新建</a-button>
+          </a-button-group>
+        </div>
+
+        <!-- <vxe-grid
+          highlight-hover-row
+          auto-resize
+          :ref="seqfactoryOfficeTable.ref"
+          :loading="seqfactoryOfficeTable.loading"
+          :columns="seqfactoryOfficeTable.columns"
+          :data.sync="seqfactoryOfficeTable.tableData"
+          :edit-rules="seqfactoryOfficeTable.editRules"
+          :edit-config="{key: 'id', trigger: 'manual', mode: 'row', showIcon: false, autoClear: false}">
+        </vxe-grid> -->
+      </a-layout-sider>
+    </a-layout>
+
   </div>
 </template>
 
@@ -71,23 +99,28 @@ export default {
       form: this.$form.createForm(this),
       queryParam: {},
       seqfactoryTable: {
-        editIndex: -1,
+        id: 0,
         ref: 'seqfactory',
+        xTable: null,
         loading: false,
         tableData: [],
         columns: [],
-        editRules: {},
         pagerConfig: {
           currentPage: 1,
           pageSize: 10,
           total: 0
+        },
+        editRules: {
+          name: [
+            { required: true, message: '名称必填' }
+          ]
         }
       }
     };
   },
   mounted () {
     this.setColumn();
-    // this.setEditRules();
+    // this.setColumnToPrimer();
     this.handleSearch();
   },
   methods: {
@@ -100,7 +133,18 @@ export default {
       const columns = [
         { width: 40, type: 'index' },
         { label: '编号', prop: 'code' },
-        { label: '名称', prop: 'name' },
+        {
+          label: '名称',
+          prop: 'name',
+          editRender: { },
+          slots: {
+            edit: ({ row, column }) => {
+              return [
+                <a-input v-model={ row[column.property] } />
+              ];
+            }
+          }
+        },
         { label: 'SAP工厂', prop: 'factory', formatter: function ({ cellValue }) { return formatter(basic.factorys, cellValue, 'code', 'text'); } },
         { label: '仓库', prop: 'storageCode', formatter: function ({ cellValue }) { return formatter(basic.storages, cellValue, 'code', 'text'); } },
         { label: '状态', prop: 'status', formatter: function ({ cellValue }) { return formatter(basic.status, cellValue); } },
@@ -109,16 +153,52 @@ export default {
         { label: '修改人', prop: 'changerName' },
         { label: '修改时间', prop: 'changeDate' },
         { label: '作废人', prop: 'cancelName' },
-        { label: '作废时间', prop: 'cancelDate' }
+        { label: '作废时间', prop: 'cancelDate' },
+        {
+          label: '操作',
+          prop: 'actions',
+          fixed: 'right',
+          slots: {
+            default: ({ row, rowIndex }) => {
+              let actions = [];
+              const xTable = this[tableName].xTable;
+              const isEdit = xTable.hasActiveRow(row);
+              const options = { row, rowIndex, tableName, xTable };
+
+              if (!isEdit && row.status === 1) {
+                actions = [
+                  <a onClick={() => this.handleCancel(options)}>删除</a>,
+                  <a onClick={() => this.handleUpdate(options)}>修改</a>
+                ];
+              }
+              if (isEdit) {
+                actions = [
+                  <a onClick={() => this.handleSave(options) }>保存</a>,
+                  <a onClick={() => this.handleQuitEdit(options) }>退出</a>
+                ];
+              }
+              return [
+                <span class="table-actions">
+                  {actions}
+                </span>
+              ];
+            }
+          }
+        }
       ];
 
+      columns.forEach(function (e) {
+        if (!e.width) e.width = 100;
+      });
+
       this[tableName].columns = columns;
+
+      this[tableName].xTable = this.$refs[this[tableName].ref].$refs.xTable;
     },
     // 查询
     handleSearch (params = {}) {
       const tableName = 'seqfactoryTable';
       this[tableName].loading = true;
-      this[tableName].editIndex = -1;
 
       const queryParam = this.form.getFieldsValue();
       params = Object.assign({ page: this[tableName].pagerConfig.currentPage, rows: this[tableName].pagerConfig.pageSize }, params, queryParam);
@@ -132,11 +212,81 @@ export default {
         this[tableName].loading = false;
       });
     },
+    // 新增一可编辑行
+    handleAddRow () {
+      const tableName = 'seqfactoryTable';
+      const table = this[tableName].xTable;
+      const newData = {
+        id: --this[tableName].id,
+        name: ''
+      };
+      this[tableName].tableData = [newData, ...this[tableName].tableData];
+      table.setActiveRow(newData);
+    },
+    // 修改
+    handleUpdate ({ row, xTable }) {
+      xTable.setActiveRow(row);
+    },
+    // 删除
+    handleCancel ({ row }) {
+      this.$api.series.cancelSeries(row.id).then(() => {
+        this.handleSearch();
+      });
+    },
+    // 保存
+    handleSave ({ row }) {
+      if (row.status) {
+        // 修改
+        this.$api.series.updateSeries(row).then(() => {
+          this.handleSearch();
+        });
+      } else {
+        // 新增
+        this.$api.series.addSeries(row).then(() => {
+          this.handleSearch();
+        });
+      }
+    },
+    // 退出编辑
+    handleQuitEdit ({ row, rowIndex, tableName, xTable }) {
+      xTable.clearActived();
+      if (!row.status) {
+        this[tableName].tableData.splice(rowIndex, 1);
+      }
+    },
+    // 点击测序点表格时
+    handleCellClick ({ row }) {
+      const tableName = 'seqfactoryOfficeTable';
+      this[tableName].loading = true;
+      this.$api.series.getPrimersBySeries(row.id).then(res => {
+        this[tableName].tableData = res;
+      }).finally(() => {
+        this[tableName].loading = false;
+      });
+    },
     // 分页改变时
     pagerChange (change) {
-      const tableName = 'seqfactoryTable';
-      this[tableName].pagerConfig = Object.assign(this[tableName].pagerConfig, change);
+      const tableName = 'seriesTable';
+      if (change.type === 'pageSize') {
+        //
+      }
+      this[tableName].pagerConfig[change.type] = change.value;
       this.handleSearch();
+    },
+
+    /**
+     * 测序点之网点
+     */
+    // 新增一可编辑行
+    handleAddRowToPrimers () {
+      const tableName = 'seqfactoryOfficeTable';
+      const table = this.$refs[tableName].$refs.xTable;
+      const newData = {
+        id: --this[tableName].id,
+        name: ''
+      };
+      this[tableName].tableData = [newData, ...this[tableName].tableData];
+      table.setActiveRow(newData);
     }
   }
 };

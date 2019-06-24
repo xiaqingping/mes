@@ -6,8 +6,39 @@
 import request from '../assets/js/request';
 
 export default {
-  // 查询测序点
+  /**
+   * 测序点
+   */
+  // 查询
   getSeqfactory (params, easyui) {
     return request(`/seqfactory/v1/seqfactory${easyui ? '/easyui' : ''}`, { params });
+  },
+  // 新增
+  addSeqfactory (data) {
+    return request(`/seqfactory/v1/seqfactory`, { method: 'POST', data });
+  },
+  // 修改
+  updateSeqfactory (data) {
+    return request(`/seqfactory/v1/seqfactory/${data.id}`, { method: 'PUT', data });
+  },
+  // 作废
+  cancelSeqfactory (id) {
+    return request(`/seqfactory/v1/seqfactory/${id}`, { method: 'DELETE' });
+  },
+
+  /**
+   * 测序点之网点
+   */
+  // 查询
+  getOfficeBySeqfactory (seqfactoryId) {
+    return request(`/seqfactory/v1/seqfactory/${seqfactoryId}/office`);
+  },
+  // 新增
+  addOfficeBySeqfactory (seqfactoryId, data) {
+    return request(`/seqfactory/v1/seqfactory/${seqfactoryId}/office`, { method: 'POST', data });
+  },
+  // 作废
+  cancelOfficeBySeqfactory (seqfactoryId, id) {
+    return request(`/seqfactory/v1/seqfactory/${seqfactoryId}/primers/${id}`, { method: 'DELETE' });
   }
 };

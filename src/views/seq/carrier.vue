@@ -45,56 +45,35 @@
       <a-button-group>
         <a-button icon="search" @click="handleSearch">查询</a-button>
         <a-button icon="plus" type="primary">新建</a-button>
-        <a-button icon="plus" type="primary" @click="validEvent">验证</a-button>
       </a-button-group>
     </div>
 
-    <!-- <vxe-grid
-      stripe
+    <vxe-grid
       highlight-hover-row
-      border
-      resizable
       auto-resize
-      :ref="ref"
-      :loading="loading"
-      :columns="columns"
-      :pager-config="pagerConfig"
-      :data.sync="data"
-      :edit-rules="editRules"
-      :edit-config="{key: 'id', trigger: 'manual', mode: 'row', showIcon: false, autoClear: false}"
-      @current-page-change="(currentPage) => pagerChange({type: 'currentPage', value: currentPage})"
-      @page-size-change="(pageSize) => pagerChange({type: 'pageSize', value: pageSize})">
-      <vxe-table-column v-for="cloumn in columns" :key="cloumn.prop"></vxe-table-column>
-    </vxe-grid> -->
-    <s-table
       :ref="carrierTable.ref"
       :loading="carrierTable.loading"
       :columns="carrierTable.columns"
-      :data="carrierTable.data"
       :pager-config="carrierTable.pagerConfig"
+      :data.sync="carrierTable.tableData"
       :edit-rules="carrierTable.editRules"
       :edit-config="{key: 'id', trigger: 'manual', mode: 'row', showIcon: false, autoClear: false}"
-      @pager-change="pagerChange"
-      @set-ref="setRef"
-    >
-    </s-table>
+      @current-page-change="(currentPage) => pagerChange({type: 'currentPage', value: currentPage})"
+      @page-size-change="(pageSize) => pagerChange({type: 'pageSize', value: pageSize})">
+    </vxe-grid>
   </div>
 </template>
 
 <script>
-import STable from '@/components/STable.js';
-
 export default {
   name: 'SeqSampleOrder',
   components: {
-    STable
   },
   data () {
     return {
       form: this.$form.createForm(this),
       carrierTable: {
-        ref: null,
-        editIndex: -1,
+        ref: 'carrierTable',
         loading: false,
         data: [],
         columns: [],
@@ -114,12 +93,12 @@ export default {
   },
   methods: {
     validEvent () {
-      this.$refs['carrier'].validate(this.data[this.editIndex], valid => {
-        console.log(valid);
-        if (valid) {
+      // this.$refs['carrier'].validate(this.data[this.editIndex], valid => {
+      //   console.log(valid);
+      //   if (valid) {
 
-        }
-      });
+      //   }
+      // });
     },
     // 设置表格列属性
     setColumn () {
@@ -195,13 +174,12 @@ export default {
     handleSearch (params = {}) {
       const tableName = 'carrierTable';
       this[tableName].loading = true;
-      this[tableName].editIndex = -1;
 
       const queryParam = this.form.getFieldsValue();
       params = Object.assign({ page: this[tableName].pagerConfig.currentPage, rows: this[tableName].pagerConfig.pageSize }, params, queryParam);
 
       this.$api.carrier.getCarrier(params, true).then((data) => {
-        this[tableName].data = data.rows;
+        this[tableName].tableData = data.rows;
         this[tableName].pagerConfig.total = data.total;
         this[tableName].pagerConfig.currentPage = params.page;
         this[tableName].pagerConfig.pageSize = params.rows;
@@ -209,35 +187,53 @@ export default {
         this[tableName].loading = false;
       });
     },
-    // 作废
-    handleCancel (id) {
-      this.$api.carrier.cancelCarrier(id).then(() => {
+    // 新增一可编辑行
+    handleAddRow () {
+      const tableName = 'carrierTable';
+      const table = this.$refs[tableName].$refs.xTable;
+      const newData = {
+        id: --this[tableName].id,
+        name: ''
+      };
+      this[tableName].tableData = [newData, ...this[tableName].tableData];
+      table.setActiveRow(newData);
+    },
+    // 修改
+    handleUpdate ({ row, xTable }) {
+      xTable.setActiveRow(row);
+    },
+    // 删除
+    handleCancel ({ row }) {
+      this.$api.carrier.cancelCarrier(row.id).then(() => {
         this.handleSearch();
       });
     },
-    // 修改
-    handleUpdate (row, index) {
-      const tableName = 'carrierTable';
-      const table = this[tableName].ref;
-      console.log(table);
-      console.log(table.setActiveRow);
-      table.setActiveRow(row);
-      this.editIndex = index;
+    // 保存
+    handleSave ({ row }) {
+      if (row.status) {
+        // 修改
+        this.$api.carrier.updateCarrier(row).then(() => {
+          this.handleSearch();
+        });
+      } else {
+        // 新增
+        this.$api.carrier.addCarrier(row).then(() => {
+          this.handleSearch();
+        });
+      }
     },
     // 退出编辑
-    handleQuitEdit (row, index) {
-      this.$refs['carrier'].clearActived();
-      this.editIndex = -1;
+    handleQuitEdit ({ row, rowIndex, tableName, xTable }) {
+      xTable.clearActived();
+      if (!row.status) {
+        this[tableName].tableData.splice(rowIndex, 1);
+      }
     },
     // 分页改变时
     pagerChange (change) {
       const tableName = 'carrierTable';
       this[tableName].pagerConfig = Object.assign(this[tableName].pagerConfig, change);
       this.handleSearch();
-    },
-    setRef (ref) {
-      const tableName = 'carrierTable';
-      this[tableName].ref = ref;
     }
 
   }

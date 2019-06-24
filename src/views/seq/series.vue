@@ -34,44 +34,43 @@
         <div class="table-operator">
           <a-button-group>
             <a-button icon="search" @click="handleSearch">查询</a-button>
-            <a-button icon="plus">新建</a-button>
+            <a-button icon="plus" type="primary" @click="handleAddRow">新建</a-button>
           </a-button-group>
         </div>
 
         <vxe-grid
-          stripe
           highlight-hover-row
-          border
-          resizable
           auto-resize
-          min-height="400"
-          :loading="loading"
-          :columns="columns"
-          :pager-config="pagerConfig"
-          :data.sync="tableData"
+          :ref="seriesTable.ref"
+          :loading="seriesTable.loading"
+          :columns="seriesTable.columns"
+          :pager-config="seriesTable.pagerConfig"
+          :data.sync="seriesTable.tableData"
+          :edit-rules="seriesTable.editRules"
+          :edit-config="{key: 'id', trigger: 'manual', mode: 'row', showIcon: false, autoClear: false}"
+          @cell-click="(options) => handleCellClick(options)"
           @current-page-change="(currentPage) => pagerChange({type: 'currentPage', value: currentPage})"
           @page-size-change="(pageSize) => pagerChange({type: 'pageSize', value: pageSize})">
         </vxe-grid>
       </a-layout-content>
 
-      <a-layout-sider width="250">
+      <a-layout-sider width="300">
         <span style="line-height:32px;">引物</span>
         <div class="table-operator">
           <a-button-group>
-            <a-button icon="plus">新建</a-button>
-            <a-button icon="save">保存</a-button>
+            <a-button icon="plus" type="primary" @click="handleAddRowToPrimers">新建</a-button>
           </a-button-group>
         </div>
 
         <vxe-grid
-          stripe
           highlight-hover-row
-          border
-          resizable
           auto-resize
-          :loading="table2.loading"
-          :columns="table2.columns"
-          :data.sync="table2.tableData">
+          :ref="seriesPrimersTable.ref"
+          :loading="seriesPrimersTable.loading"
+          :columns="seriesPrimersTable.columns"
+          :data.sync="seriesPrimersTable.tableData"
+          :edit-rules="seriesPrimersTable.editRules"
+          :edit-config="{key: 'id', trigger: 'manual', mode: 'row', showIcon: false, autoClear: false}">
         </vxe-grid>
       </a-layout-sider>
     </a-layout>
@@ -80,19 +79,18 @@
 </template>
 
 <script>
-import STable from '@/components/Table';
-
 export default {
   name: 'SeqSampleOrder',
   components: {
-    STable
   },
   data () {
     return {
       form: this.$form.createForm(this),
-      editIndex: -1,
       queryParam: {},
-      table1: {
+      seriesTable: {
+        id: 0,
+        ref: 'seriesTable',
+        xTable: null,
         loading: false,
         tableData: [],
         columns: [],
@@ -100,48 +98,51 @@ export default {
           currentPage: 1,
           pageSize: 10,
           total: 0
+        },
+        editRules: {
+          name: [
+            { required: true, message: '名称必填' }
+          ]
         }
       },
-      table2: {
+      seriesPrimersTable: {
+        id: 0,
+        ref: 'seriesPrimersTable',
+        xTable: null,
         loading: false,
-        tableData: [{
-          id: 1,
-          name: 123
-        }],
-        columns: [
-          { label: '引物编号', prop: 'code' },
-          { label: '引物名称', prop: 'name' },
-          { label: '引物类型', prop: 'type' }
-        ],
-        pagerConfig: {
-          currentPage: 1,
-          pageSize: 10,
-          total: 0
-        }
-      },
-      loading: false,
-      tableData: [],
-      columns: [],
-      pagerConfig: {
-        currentPage: 1,
-        pageSize: 10,
-        total: 0
+        tableData: [],
+        columns: [],
+        editRules: {}
       }
     };
   },
   mounted () {
     this.setColumn();
+    this.setColumnToPrimer();
     this.handleSearch();
   },
   methods: {
+    // 设置表格列属性
     setColumn () {
+      const tableName = 'seriesTable';
       const { formatter } = this.$units;
       const { basic } = this.$store.state;
 
       const columns = [
         { type: 'index', width: 40 },
         { label: '编号', prop: 'code' },
-        { label: '名称', prop: 'name' },
+        // { label: '名称', prop: 'name', editRender: { name: 'MyCell' } },
+        { label: '名称',
+          prop: 'name',
+          editRender: { },
+          slots: {
+            edit: ({ row, column }) => {
+              return [
+                <a-input v-model={ row[column.property] } />
+              ];
+            }
+          }
+        },
         { label: '状态', prop: 'status', formatter: function ({ cellValue }) { return formatter(basic.status, cellValue); } },
         { label: '创建人', prop: 'creatorName' },
         { label: '创建时间', prop: 'createDate' },
@@ -156,16 +157,20 @@ export default {
           slots: {
             default: ({ row, rowIndex }) => {
               let actions = [];
-              if (row.status === 1 && this.editIndex !== rowIndex) {
+              const xTable = this[tableName].xTable;
+              const isEdit = xTable.hasActiveRow(row);
+              const options = { row, rowIndex, tableName, xTable };
+
+              if (!isEdit && row.status === 1) {
                 actions = [
-                  <a>删除</a>,
-                  <a>修改</a>
+                  <a onClick={() => this.handleCancel(options)}>删除</a>,
+                  <a onClick={() => this.handleUpdate(options)}>修改</a>
                 ];
               }
-              if (this.editIndex === rowIndex) {
+              if (isEdit) {
                 actions = [
-                  <a>保存</a>,
-                  <a>退出</a>
+                  <a onClick={() => this.handleSave(options) }>保存</a>,
+                  <a onClick={() => this.handleQuitEdit(options) }>退出</a>
                 ];
               }
               return [
@@ -182,34 +187,153 @@ export default {
         if (!e.width) e.width = 100;
       });
 
-      this.columns = columns;
+      this[tableName].columns = columns;
+
+      this[tableName].xTable = this.$refs[this[tableName].ref].$refs.xTable;
+    },
+    // 为系列之引物设置列
+    setColumnToPrimer () {
+      const tableName = 'seriesPrimersTable';
+      const { formatter } = this.$units;
+      const { seq } = this.$store.state;
+      const columns = [
+        { label: '引物编号', prop: 'code' },
+        { label: '引物名称',
+          prop: 'name',
+          editRender: { },
+          slots: {
+            edit: ({ row, column }) => {
+              return [
+                <a-input v-model={ row[column.property] } />
+              ];
+            }
+          } },
+        { label: '引物类型', prop: 'type', formatter: function ({ cellValue }) { return formatter(seq.primerType, cellValue); } },
+        {
+          label: '操作',
+          prop: 'actions',
+          slots: {
+            default: ({ row, rowIndex }) => {
+              let actions = [];
+              const xTable = this[tableName].xTable;
+              const isEdit = xTable.hasActiveRow(row);
+              const options = { row, rowIndex, tableName, xTable };
+              if (!isEdit) {
+                actions = [
+                  <a onClick={() => this.handleCancel(options)}>删除</a>
+                ];
+              } else {
+                actions = [
+                  <a onClick={() => this.handleSave(options) }>保存</a>,
+                  <a onClick={() => this.handleQuitEdit(options) }>退出</a>
+                ];
+              }
+              return [
+                <span class="table-actions">
+                  {actions}
+                </span>
+              ];
+            }
+          }
+        }
+      ];
+
+      this[tableName].columns = columns;
+
+      this[tableName].xTable = this.$refs[this[tableName].ref].$refs.xTable;
     },
     // 查询
     handleSearch (params = {}) {
-      this.loading = true;
-      this.editIndex = -1;
-      this.selectedRowKeys = [];
-      this.selectedRows = [];
+      const tableName = 'seriesTable';
+      this[tableName].loading = true;
 
       const queryParam = this.form.getFieldsValue();
-      params = Object.assign({ page: this.pagerConfig.currentPage, rows: this.pagerConfig.pageSize }, params, queryParam);
+      params = Object.assign({ page: this[tableName].pagerConfig.currentPage, rows: this[tableName].pagerConfig.pageSize }, params, queryParam);
 
       this.$api.series.getSeries(params, true).then((data) => {
-        this.tableData = data.rows;
-        this.pagerConfig.total = data.total;
-        this.pagerConfig.currentPage = params.page;
-        this.pagerConfig.pageSize = params.rows;
+        this[tableName].tableData = data.rows;
+        this[tableName].pagerConfig.total = data.total;
+        this[tableName].pagerConfig.currentPage = params.page;
+        this[tableName].pagerConfig.pageSize = params.rows;
       }).finally(() => {
-        this.loading = false;
+        this[tableName].loading = false;
+      });
+    },
+    // 新增一可编辑行
+    handleAddRow () {
+      const tableName = 'seriesTable';
+      const table = this[tableName].xTable;
+      const newData = {
+        id: --this[tableName].id,
+        name: ''
+      };
+      this[tableName].tableData = [newData, ...this[tableName].tableData];
+      table.setActiveRow(newData);
+    },
+    // 修改
+    handleUpdate ({ row, xTable }) {
+      xTable.setActiveRow(row);
+    },
+    // 删除
+    handleCancel ({ row }) {
+      this.$api.series.cancelSeries(row.id).then(() => {
+        this.handleSearch();
+      });
+    },
+    // 保存
+    handleSave ({ row }) {
+      if (row.status) {
+        // 修改
+        this.$api.series.updateSeries(row).then(() => {
+          this.handleSearch();
+        });
+      } else {
+        // 新增
+        this.$api.series.addSeries(row).then(() => {
+          this.handleSearch();
+        });
+      }
+    },
+    // 退出编辑
+    handleQuitEdit ({ row, rowIndex, tableName, xTable }) {
+      xTable.clearActived();
+      if (!row.status) {
+        this[tableName].tableData.splice(rowIndex, 1);
+      }
+    },
+    // 点击载体表格时
+    handleCellClick ({ row }) {
+      const tableName = 'seriesPrimersTable';
+      this[tableName].loading = true;
+      this.$api.series.getPrimersBySeries(row.id).then(res => {
+        this[tableName].tableData = res;
+      }).finally(() => {
+        this[tableName].loading = false;
       });
     },
     // 分页改变时
     pagerChange (change) {
+      const tableName = 'seriesTable';
       if (change.type === 'pageSize') {
         //
       }
-      this.pagerConfig[change.type] = change.value;
+      this[tableName].pagerConfig[change.type] = change.value;
       this.handleSearch();
+    },
+
+    /**
+     * 系列之引物
+     */
+    // 新增一可编辑行
+    handleAddRowToPrimers () {
+      const tableName = 'seriesPrimersTable';
+      const table = this.$refs[tableName].$refs.xTable;
+      const newData = {
+        id: --this[tableName].id,
+        name: ''
+      };
+      this[tableName].tableData = [newData, ...this[tableName].tableData];
+      table.setActiveRow(newData);
     }
   }
 };

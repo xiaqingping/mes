@@ -47,16 +47,16 @@
     </div>
 
     <vxe-grid
-      stripe
+      class="vxe-table-antd"
+      ref="sample_dose"
       highlight-hover-row
-      border
-      resizable
       auto-resize
       :start-index="(pagerConfig.currentPage - 1) * pagerConfig.pageSize"
       :loading="loading"
       :columns="columns"
       :pager-config="pagerConfig"
       :data.sync="tableData"
+      :edit-config="{key: 'id', trigger: 'manual', mode: 'row', showIcon: false, autoClear: false}"
       @current-page-change="(currentPage) => pagerChange({type: 'currentPage', value: currentPage})"
       @page-size-change="(pageSize) => pagerChange({type: 'pageSize', value: pageSize})">
     </vxe-grid>
@@ -94,11 +94,20 @@ export default {
     // 设置表格列属性
     setColumn () {
       const { formatter } = this.$units;
-      const { basic } = this.$store.state;
+      const { basic, seq } = this.$store.state;
+
       const columns = [
         { type: 'index', width: 40 },
-        { label: '样品类型', prop: 'sampleTypeName' },
-        { label: '最小长度', prop: 'minSampleLength' },
+        {
+          label: '样品类型',
+          prop: 'sampleTypeId',
+          editRender: {
+            name: 'ASelect',
+            props: { size: 'small' },
+            optionProps: { value: 'id', label: 'name' },
+            options: seq.sampleType
+          }
+        },
         { label: '最大长度', prop: 'maxSampleLength' },
         { label: '浓度', prop: 'concentration' },
         { label: '样品特性', prop: 'sampleFeatureName' },
@@ -120,7 +129,7 @@ export default {
               let actions = [];
               if (row.status === 1 && this.editIndex !== rowIndex) {
                 actions = [
-                  <a onClick={() => this.handleUpdate(rowIndex)}>修改</a>,
+                  <a onClick={() => this.handleUpdate(row, rowIndex)}>修改</a>,
                   <a onClick={() => this.handleCancel(row.id)}>删除</a>
                 ];
               }
@@ -144,6 +153,14 @@ export default {
       });
 
       this.columns = columns;
+    },
+    // 分页改变时
+    pagerChange (change) {
+      if (change.type === 'pageSize') {
+        //
+      }
+      this.pagerConfig[change.type] = change.value;
+      this.handleSearch();
     },
     // 查询
     handleSearch (params = {}) {
@@ -179,7 +196,9 @@ export default {
       });
     },
     // 修改
-    handleUpdate (index) {
+    handleUpdate (row, index) {
+      const table = this.$refs['sample_dose'];
+      table.setActiveRow(row);
       this.editIndex = index;
     },
     /**
