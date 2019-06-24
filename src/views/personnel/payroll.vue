@@ -58,8 +58,7 @@
         <a-button type="primary" icon="search" html-type="submit" style="display:none;">查询</a-button>
       </a-form>
     </div>
-
-    <div class="content-left">
+    <div class="content-center" style="position: relative;height:100%;">
       <div class="table-operator">
         <a-button type="primary" icon="search" @click="handleSearch">查询</a-button>
         <a-button type="primary" icon="delete" @click="handleDelete">作废</a-button>
@@ -74,23 +73,24 @@
       <s-table
         ref="table"
         bordered
+        style="width:65%"
         size="small"
         :columns="columns"
         :data="loadData"
         :rowSelection="{ selectedRowKeys: selectedRowKeys, onChange: onSelectChange }"
       ></s-table>
-    </div>
-    <div class="content-right">
-      <h3>工资明细</h3>
-      <!-- 表格 -->
-      <s-table
-        ref="table"
-        bordered
-        size="small"
-        :columns="addcolumns"
-        :data="loadData"
-        :rowSelection="{ selectedRowKeys: selectedRowKeys, onChange: onSelectChange }"
-      ></s-table>
+      <div class="content-right" style="width:35%;position: absolute; left:66%; top:0">
+        <h3>工资明细</h3>
+        <!-- 表格 -->
+        <s-table
+          ref="table"
+          bordered
+          size="small"
+          :columns="addcolumns"
+          :data="loadData"
+          :rowSelection="{ selectedRowKeys: selectedRowKeys, onChange: onSelectChange }"
+        ></s-table>
+      </div>
     </div>
   </div>
 </template>
