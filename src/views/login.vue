@@ -224,6 +224,8 @@ export default {
       const redirect = this.$route.query.redirect;
       this.$router.push(redirect || '/');
 
+      // set_user
+      this.$store.commit('user/set_user', res);
       this.$notification.success({
         message: '欢迎',
         description: `${res.name}，欢迎回来`
