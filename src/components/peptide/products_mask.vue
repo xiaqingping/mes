@@ -62,17 +62,18 @@
 
       </div>
       <div style="height:100%;position: relative;">
-        <s-table
+        <a-table
           ref="table"
           style="width:78%;"
           bordered
+          rowKey="id"
           size="small"
           :scroll="{ x: 1900, y: 400}"
           :columns="columns"
-          :data="loadData"
+          :dataSource="dataSource"
           :rowSelection="{ selectedRowKeys: selectedRowKeys, onChange: onSelectChange }"
         >
-        </s-table>
+        </a-table>
         <div style="width:20%;position: absolute; left:79%; top:0">
           <h4>库存</h4>
           <a-table
@@ -92,13 +93,9 @@
 </template>
 
 <script>
-import STable from '@/components/Table';
 
 export default {
   name: 'CustomerMask',
-  components: {
-    STable
-  },
   data () {
     // var self = this;
     return {
@@ -187,29 +184,13 @@ export default {
         }
       ],
       queryParam: {},
-      loadData: parameter => {
-        this.queryParam = this.form.getFieldsValue();
-        this.queryParam['range.channel'] = this.queryParam.range_area.split('-')[0] ? this.queryParam.range_area.split('-')[0] : '';
-        this.queryParam['range.organization'] = this.queryParam.range_area.split('-')[1] ? this.queryParam.range_area.split('-')[1] : '';
-        this.queryParam['stock.factory'] = '3100';
-        var params = Object.assign(parameter, this.queryParam);
-        return this.$api.peptide.getProductList(params).then(res => {
-          if (!this.data) {
-            res = [];
-            res.length = 0;
-          }
-          return {
-            data: res,
-            page: params.page,
-            total: res.length
-          };
-        });
-      },
+      dataSource: [],
       selectedRowKeys: [],
       selectedRows: []
     };
   },
   mounted () {
+    this.handleSearch();
     this.selectedRows = [];
     this.selectedRowKeys = [];
     this.rangeArea = this.$store.state.peptide.rangeArea;
@@ -235,9 +216,25 @@ export default {
         this.data = false;
       }
     }
-
   },
   methods: {
+    handleSearch () {
+      const queryParam = this.form.getFieldsValue();
+      if (!this.queryParam.range_area) {
+        this.queryParam.range_area = '10-3110';
+      }
+      queryParam['range.channel'] = this.queryParam.range_area.split('-')[0] ? this.queryParam.range_area.split('-')[0] : '';
+      queryParam['range.organization'] = this.queryParam.range_area.split('-')[1] ? this.queryParam.range_area.split('-')[1] : '';
+      queryParam['stock.factory'] = '3100';
+      const params = Object.assign({ page: 1, rows: 10 }, queryParam);
+      this.$api.peptide.getProductList(params).then((data) => {
+        if (this.data) {
+          this.dataSource = data;
+        }
+      }).finally(() => {
+        this.loading = false;
+      });
+    },
     sub () {
       if (this.selectedRows[0].saleStatus === 'Z1') {
         this.$notification.error({
@@ -263,14 +260,22 @@ export default {
       this.status = true;
       this.selectedRows = [];
       this.selectedRowKeys = [];
-    },
-    handleSearch () {
-      this.$refs.table.refresh(true);
+      this.dataSon = [];
     },
     onSelectChange (selectedRowKeys, selectedRows) {
       this.selectedRowKeys = selectedRowKeys.slice(-1);
-      this.selectedRows = selectedRows.slice(-1);
-      if (this.selectedRows[0]) {
+      if (selectedRows.length === 1) {
+        this.selectedRows = selectedRows;
+      } else {
+        for (let i = 0; i < selectedRows.length; i++) {
+          if (selectedRows[i].id === this.selectedRowKeys[0]) {
+            this.selectedRows = [];
+            this.selectedRows[0] = selectedRows[i];
+          }
+        }
+      }
+
+      if (this.selectedRows) {
         for (let i = 0; i < this.selectedRows[0].stock.storages.length; i++) {
           this.selectedRows[0].stock.storages[i]['id'] = i + 1;
         }
@@ -288,7 +293,7 @@ export default {
     },
     showData () {
       this.data = true;
-      this.$refs.table.refresh(true);
+      this.handleSearch();
     }
   }
 };

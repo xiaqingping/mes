@@ -2,6 +2,7 @@
  *多肽
  * http://192.168.19.71:8289/swagger-ui.html    peptideorder
  * http://192.168.19.71:8288/swagger-ui.html   peptide-base
+ * http://192.168.20.2:8001/swagger-ui.html    BASIC
  */
 
 import request from '../assets/js/request';

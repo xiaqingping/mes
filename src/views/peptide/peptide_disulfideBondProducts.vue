@@ -282,12 +282,6 @@ export default {
       this.sapProductCode = data[0].code;
       this.sapProductName = data[0].desc;
     },
-    showDrawer () {
-      this.visible = true;
-    },
-    onClose () {
-      this.visible = false;
-    },
     openMask () {
       this.products_status = true;
       document.addEventListener('mousewheel', function (e) {
@@ -299,99 +293,6 @@ export default {
       document.addEventListener('mousewheel', function (e) {
         e.returnValue = true;
       }, { passive: false });
-    },
-    addData () {
-      var aminoAcidTypeLeft = document.getElementById('addValue2').value;
-      if (aminoAcidTypeLeft === '') {
-        this.$notification.error({
-          message: '错误',
-          description: `数据不能为空！`
-        });
-        return false;
-      }
-
-      var aminoAcidTypeRight = document.getElementById('addValue3').value;
-      if (aminoAcidTypeRight === '') {
-        this.$notification.error({
-          message: '错误',
-          description: `数据不能为空！`
-        });
-        return false;
-      }
-
-      var providerTotalAmountBegin = document.getElementById('addValue4').value;
-      if (providerTotalAmountBegin === '') {
-        this.$notification.error({
-          message: '错误',
-          description: `数据不能为空！`
-        });
-        return false;
-      }
-
-      var providerTotalAmountEnd = document.getElementById('addValue5').value;
-      if (providerTotalAmountEnd === '') {
-        this.$notification.error({
-          message: '错误',
-          description: `数据不能为空！`
-        });
-        return false;
-      }
-
-      var aminoAcidLengthBegin = document.getElementById('addValue6').value;
-      if (aminoAcidLengthBegin === '') {
-        this.$notification.error({
-          message: '错误',
-          description: `数据不能为空！`
-        });
-        return false;
-      }
-
-      var aminoAcidLengthEnd = document.getElementById('addValue7').value;
-      if (aminoAcidLengthEnd === '') {
-        this.$notification.error({
-          message: '错误',
-          description: `数据不能为空！`
-        });
-        return false;
-      }
-
-      var isNeedDesalting = document.getElementById('addValue8').checked ? 1 : 2;
-
-      var sapProductCode = document.getElementById('addValue9').value;
-      if (sapProductCode === '') {
-        this.$notification.error({
-          message: '错误',
-          description: `数据不能为空！`
-        });
-        return false;
-      }
-
-      var sapProductName = document.getElementById('addValue10').value;
-      if (sapProductName === '') {
-        this.$notification.error({
-          message: '错误',
-          description: `数据不能为空！`
-        });
-        return false;
-      }
-
-      var addVal = {
-        'aminoAcidTypeLeft': aminoAcidTypeLeft,
-        'aminoAcidTypeRight': aminoAcidTypeRight,
-        'providerTotalAmountBegin': providerTotalAmountBegin,
-        'providerTotalAmountEnd': providerTotalAmountEnd,
-        'aminoAcidLengthBegin': aminoAcidLengthBegin,
-        'aminoAcidLengthEnd': aminoAcidLengthEnd,
-        'isNeedDesalting': isNeedDesalting,
-        'sapProductCode': sapProductCode,
-        'sapProductName': sapProductName
-      };
-      this.$api.peptide.insertdisulfideBondProducts(addVal).then(res => {
-        if (res.id) {
-          this.utils.refresh();
-          return this.$refs.table.refresh(true);
-        }
-      });
     },
     handleSave () {
       if (this.modificationName === '' || this.modificationPosition === '' || this.providerTotalAmountBegin === '' || this.providerTotalAmountEnd === '' || this.aminoAcidLengthBegin === '' || this.aminoAcidLengthEnd === '' || this.sapProductCode === '' || this.sapProductName === '') {
