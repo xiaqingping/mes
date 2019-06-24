@@ -68,6 +68,7 @@
           bordered
           rowKey="id"
           size="small"
+          :loading="loading"
           :scroll="{ x: 1900, y: 400}"
           :columns="columns"
           :dataSource="dataSource"
@@ -101,6 +102,7 @@ export default {
     return {
       form: this.$form.createForm(this),
       small: true,
+      loading: false,
       customer_name_top: 0,
       customer_name_left: 0,
       rangeOrganization: [],
@@ -219,16 +221,17 @@ export default {
   },
   methods: {
     handleSearch () {
+      this.loading = true;
+
       const queryParam = this.form.getFieldsValue();
-      if (!this.queryParam.range_area) {
-        this.queryParam.range_area = '10-3110';
-      }
-      queryParam['range.channel'] = this.queryParam.range_area.split('-')[0] ? this.queryParam.range_area.split('-')[0] : '';
-      queryParam['range.organization'] = this.queryParam.range_area.split('-')[1] ? this.queryParam.range_area.split('-')[1] : '';
+      queryParam['range.channel'] = queryParam.range_area.split('-')[0] ? queryParam.range_area.split('-')[0] : '';
+      queryParam['range.organization'] = queryParam.range_area.split('-')[1] ? queryParam.range_area.split('-')[1] : '';
       queryParam['stock.factory'] = '3100';
       const params = Object.assign({ page: 1, rows: 10 }, queryParam);
       this.$api.peptide.getProductList(params).then((data) => {
         if (this.data) {
+          this.selectedRows = [];
+          this.selectedRowKeys = [];
           this.dataSource = data;
         }
       }).finally(() => {
