@@ -6,11 +6,19 @@
 import request from '../assets/js/request';
 
 export default {
-  // 查询载体
+  // 查询
   getCarrier (params, easyui) {
     return request(`/carrier/v1/carriers${easyui ? '/easyui' : ''}`, { params });
   },
-  // 作废载体
+  // 新增
+  addCarrier (data) {
+    return request(`/carrier/v1/carriers`, { method: 'POST', data });
+  },
+  // 修改
+  updateCarrier (data) {
+    return request(`/carrier/v1/carriers/${data.id}`, { method: 'PUT', data });
+  },
+  // 作废
   cancelCarrier (id) {
     return request(`/carrier/v1/carriers/${id}`, { method: 'DELETE' });
   }

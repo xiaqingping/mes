@@ -42,8 +42,11 @@ export default {
   data () {
     return {
       avatar: 'https://blog.maxmeng.top/images/avatar.jpg',
-      nickname: 'max'
+      nickname: 'xxx'
     };
+  },
+  mounted () {
+    this.nickname = this.$store.state.user.user.name;
   },
   methods: {
     logout () {
@@ -51,7 +54,7 @@ export default {
 
       this.$confirm({
         title: '提示',
-        content: '真的要注销登录吗 ?',
+        content: '真的要注销登录吗？',
         onOk () {
           that.$ls.remove('TOKEN');
           that.$router.push('/user/login');
