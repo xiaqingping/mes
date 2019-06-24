@@ -34,7 +34,24 @@
     }
   }
 
-  // 表格顶部操作
+  // 输入框没有值
+  .isValue {
+    background-color: #FFF3F3;
+    border: 1px solid #FFA8A8;
+
+  }
+
+  .isValue:focus {
+    box-shadow: 0px 0px 2px 2px #F0D6DA;
+    border: 1px solid #FFA8A8;
+  }
+
+  .isValue:hover {
+    box-shadow: 0px 0px 2px 2px #F0D6DA;
+    border: 1px solid #FFA8A8;
+  }
+
+  // 表格操作
   .table-operator {
     // margin-bottom: 18px; 
     & > .ant-btn {

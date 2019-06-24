@@ -9,7 +9,6 @@
               <a-input v-decorator="['code']" title=""/>
             </a-form-item>
           </a-col>
-          <!--          <div v-show="advanced">-->
           <a-col :xxl="4" :xl="6" :md="8" :sm="24">
             <a-form-item label="纯度 ">
               <a-input v-decorator="['purity']"/>
@@ -17,14 +16,12 @@
           </a-col>
           <a-col :xxl="4" :xl="6" :md="8" :sm="24">
             <a-form-item label="状态">
-              <a-select v-decorator="['status', {initialValue : '1'}]">
+              <a-select v-decorator="['status', {initialValue : 1}]">
                 <a-select-option value="0">全部</a-select-option>
-                <a-select-option value="1">正常</a-select-option>
-                <a-select-option value="2">已删除</a-select-option>
+                <a-select-option v-for="item in status" :key="item.id" :value="item.id">{{ item.name }}</a-select-option>
               </a-select>
             </a-form-item>
           </a-col>
-          <!--          </div>-->
 
         </a-row>
         <a-button type="primary" icon="search" html-type="submit" style="display:none;">查询</a-button>
@@ -32,176 +29,186 @@
     </div>
     <div>
       <div class="table-operator">
-        <a-button type="primary" icon="search" @click="handleSearch">查询</a-button>
-        <a-button type="primary" icon="plus" @click="addTr(8)" id="add">新增</a-button>
-        <a-button type="primary" icon="edit" @click="addData">保存</a-button>
-        <a-button type="primary" icon="minus-square" @click="handleDelete">删除</a-button>
-        <a-button type="primary" icon="minus-square" @click="handleResume">恢复</a-button>
-        <!--        <a @click="toggleAdvanced" style="margin-left: 8px">-->
-        <!--          {{ advanced ? '收起' : '展开' }}-->
-        <!--          <a-icon :type="advanced ? 'up' : 'down'"/>-->
-        <!--        </a>-->
+        <a-button-group>
+          <a-button icon="search" @click="handleSearch">查询</a-button>
+          <a-button icon="plus" @click="handleAdd">新增</a-button>
+        </a-button-group>
       </div>
 
-      <s-table
+      <a-table
         ref="table"
         bordered
         size="small"
+        rowKey="id"
         :columns="columns"
-        :data="loadData"
-        :rowSelection="{ selectedRowKeys: selectedRowKeys, onChange: onSelectChange }"
+        :dataSource="dataSource"
+        :loading="loading"
+        :pagination="pagination"
+        @change="change"
       >
-      </s-table>
+        <template slot="purity" slot-scope="value, row, index">
+          <div
+            :key="value">
+            <a-input
+              size="small"
+              v-if="editIndex === index"
+              style="width:100px;"
+              :class="[purity ? '' : 'isValue']"
+              v-model="purity"
+            />
+            <template v-else>{{ value }}</template>
+          </div>
+        </template>
+        <template slot="actions" slot-scope="value, row, index">
+          <div :key="value">
+            <template v-if="row.status === 1 && editIndex !== index">
+              <a @click="handleDelete(row.id)">删除 </a>
+            </template>
+            <template v-if="row.status === 2 && editIndex !== index">
+              <a @click="handleResume(row.id)">恢复</a>
+            </template>
+            <template v-if="editIndex === index">
+              <a @click="handleSave(row)">保存 </a>
+              <a @click="handleExit()">退出 </a>
+            </template>
+          </div>
+        </template>
+      </a-table>
     </div>
 
   </div>
 </template>
 
 <script>
-import STable from '@/components/Table';
 
 export default {
   name: 'PeptidePurity',
-  components: {
-    STable
-  },
   data () {
     return {
+      status: {},
       form: this.$form.createForm(this),
-      visible: false,
-      // advanced: true,
-      columns: [
-        { title: '编号', dataIndex: 'code' },
-        { title: '纯度', dataIndex: 'purity' },
+      pagination: {
+        current: 1,
+        pageSize: 10,
+        total: 0,
+        showSizeChanger: true
+      },
+      columns: [],
+      loading: false,
+      dataSource: [],
+      id: 0,
+      editIndex: -1,
+      purity: '',
+      selectRow: ''
+    };
+  },
+  mounted () {
+    this.setColumns();
+    this.handleSearch();
+  },
+  methods: {
+    setColumns () {
+      const self = this;
+      const { formatter } = this.$units;
+      const { peptide } = this.$store.state;
+      this.status = peptide.status;
+      this.columns = [
+        { title: '编号', dataIndex: 'code', width: '100px', align: 'center' },
+        { title: '纯度', dataIndex: 'purity', scopedSlots: { customRender: 'purity' }, width: '150px' },
         {
           title: '状态',
           dataIndex: 'status',
-          customRender: function (text) {
-            if (text === 1) {
-              return '正常';
-            } else if (text === 2) {
-              return '已删除';
-            }
+          customRender: (text) => {
+            return formatter(self.status, text);
           }
         },
         { title: '创建人', dataIndex: 'creatorName' },
         { title: '创建日期', dataIndex: 'createDate' },
         { title: '删除人', dataIndex: 'cancelName' },
-        { title: '删除时间', dataIndex: 'cancelDate' }
-      ],
-      queryParam: {},
-      loadData: parameter => {
-        this.queryParam = this.form.getFieldsValue();
-        const params = Object.assign(parameter, this.queryParam);
-        return this.$api.peptide.getPurity(params).then(res => {
-          return {
-            data: res.rows,
-            page: params.page,
-            total: res.total
-          };
-        });
-      },
-      selectedRowKeys: [],
-      selectedRows: []
-    };
-  },
-  mounted () {
-    var selectDrop = document.getElementsByClassName('ant-checkbox')[0];
-    selectDrop.style.display = 'none';
-  },
-  methods: {
-    showDrawer () {
-      this.visible = true;
+        { title: '删除时间', dataIndex: 'cancelDate' },
+        { title: '操作', width: 80, dataIndex: 'actions', fixed: 'right', scopedSlots: { customRender: 'actions' }, align: 'center' }
+      ];
     },
-    onClose () {
-      this.visible = false;
+    change (pagination) {
+      const params = {
+        page: pagination.current,
+        rows: pagination.pageSize
+      };
+      this.handleSearch(params);
     },
-    handleSearch () {
-      this.$refs.table.refresh(true);
-    },
-    addTr (num) {
-      document.getElementById('add').setAttribute('disabled', true);
-      var tbodyObj = document.getElementsByTagName('tbody')[0];
-      var trObj = document.createElement('tr');
-      for (let i = 0; i < num; i++) {
-        var tdObj = document.createElement('td');
-        if (i === 2) {
-          tdObj.style.padding = '0';
-          tdObj.style.width = '100px';
-          tdObj.innerHTML = "<input type='text' title='该输入项为必输入项' id='addValue' style='width: 100%;height: 100%;border: 1px solid #FFA8A8;outline: none;background-color: #FFF3F3;'/>";
-        } else {
-          tdObj.style.backgroundColor = 'blue';
-        }
-        trObj.appendChild(tdObj);
-      }
-      tbodyObj.insertBefore(trObj, tbodyObj.firstElementChild);
-      this.$nextTick(() => {
-        document.getElementById('addValue').focus();
+    handleSearch (params = {}) {
+      this.loading = true;
+      this.editIndex = -1;
+
+      const queryParam = this.form.getFieldsValue();
+      params = Object.assign({ page: this.pagination.current, rows: this.pagination.pageSize }, params, queryParam);
+
+      this.$api.peptide.getPurity(params).then((data) => {
+        this.dataSource = data.rows;
+        this.pagination.total = data.total;
+        this.pagination.current = params.page;
+        this.pagination.pageSize = params.rows;
+      }).finally(() => {
+        this.loading = false;
       });
     },
-    addData () {
-      var addVal = document.getElementById('addValue').value;
-      if (addVal === '') {
+    handleAdd () {
+      if (this.editIndex === 0) {
+        return false;
+      }
+      var addVal = {
+        id: this.id,
+        purity: ''
+      };
+      this.dataSource = [ addVal, ...this.dataSource ];
+      this.editIndex = 0;
+    },
+    handleSave (r) {
+      if (this.purity === '') {
         this.$notification.error({
           message: '错误',
           description: `数据不能为空！`
         });
         return false;
       }
-      this.$api.peptide.insertPurity({ 'purity': addVal }).then(res => {
+      var data = {};
+      if (r.id) {
+        data = r;
+      }
+      data.purity = this.purity;
+      this.$api.peptide.insertPurity(data).then(res => {
         if (res.id) {
-          this.utils.refresh();
-          return this.$refs.table.refresh(true);
+          this.handleExit();
         }
       });
     },
-    onSelectChange (selectedRowKeys, selectedRows) {
-      this.selectedRowKeys = selectedRowKeys.slice(-1);
-      this.selectedRows = selectedRows;
-    },
-    // toggleAdvanced() {
-    //   this.advanced = !this.advanced;
-    // },
-    handleDelete () {
-      if (!document.getElementById('addValue')) {
-        if (this.selectedRowKeys[0] == null) {
-          this.$notification.error({
-            message: '错误',
-            description: `请选择一条数据`
-          });
-          return false;
-        }
-        this.$api.peptide.deletePurity(this.selectedRowKeys[0]).then(res => {
-          this.selectedRowKeys = [];
-          return this.$refs.table.refresh(true);
+    handleDelete (i) {
+      if (i) {
+        this.$api.peptide.deletePurity(i).then(res => {
+          this.handleSearch();
         });
-      } else {
-        this.utils.refresh();
       }
     },
-    handleResume () {
-      if (this.selectedRowKeys[0] == null) {
+    handleExit () {
+      this.purity = '';
+      this.handleSearch();
+    },
+    handleResume (i) {
+      if (!i) {
         this.$notification.error({
           message: '错误',
           description: `请选择一条数据`
         });
         return false;
       }
-      this.$api.peptide.resumePurity(this.selectedRowKeys[0]).then(res => {
-        this.selectedRowKeys = [];
-        return this.$refs.table.refresh(true);
+      this.$api.peptide.resumePurity(i).then(res => {
+        this.handleSearch();
       });
     }
   }
 };
 </script>
 
-<style lang="scss" scoped>
-  .addInput {
-    width: 100%;
-    height: 100%;
-    border: 1px solid #FFA8A8;
-    outline: none;
-    background-color: #FFF3F3;
-  }
+<style lang="scss">
+
 </style>
