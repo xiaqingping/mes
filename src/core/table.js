@@ -3,11 +3,14 @@ import {
   VXETable,
   Table,
   Column,
+  Cell,
   Header,
   Body,
   Footer,
+  Icon,
   Filter,
   Loading,
+  Tooltip,
   Grid,
   // Excel,
   Menu,
@@ -26,13 +29,16 @@ import zhCNLocat from 'vxe-table/lib/locale/lang/zh-CN';
 
 Vue.use(Table);
 Vue.use(Column);
+Vue.use(Cell);
 Vue.use(Header);
 Vue.use(Body);
 Vue.use(Footer);
+Vue.use(Icon);
 Vue.use(Filter);
 Vue.use(Loading);
+Vue.use(Tooltip);
 Vue.use(Grid);
-// Vue.use(Excel);
+// Vue.use(Excel)
 Vue.use(Menu);
 Vue.use(Toolbar);
 Vue.use(Pager);
@@ -44,19 +50,28 @@ Vue.use(Message);
 Vue.use(Export);
 Vue.use(Resize);
 
-// 按需加载的方式默认是不带国际化的，需要自行导入
-VXETable.setup({
-  i18n: (key, value) => VXETable.t(zhCNLocat, key)
-});
-
-// 按需加载的方式默认是不带国际化的，需要自行导入
+// 全局默认设置
 VXETable.setup({
   // 默认尺寸
-  size: 'mini',
+  size: 'small',
   // 所有内容超过隐藏
-  showAllOverflow: 'title',
+  showOverflow: 'title',
   // 所有表头内容超过隐藏
-  showHeaderAllOverflow: 'title',
+  showHeaderOverflow: null,
+  // 条纹
+  stripe: true,
+  // 边框
+  border: true,
+  // 拖拽列宽
+  resizable: true,
+  // 列宽自动撑开
+  fit: true,
+  // 显示表头
+  showHeader: true,
+  // 版本号（对于某些带 Storage 数据储存的功能有用到，上升版本号可以用于重置 Storage 数据）
+  version: 0,
+  // 默认快捷菜单
+  contextMenu: null,
   // 默认 tooltip 主题样式
   tooltip: {
     zIndex: 3000,
@@ -68,6 +83,20 @@ VXETable.setup({
     pagerCount: 1,
     pageSizes: [10, 50, 100],
     layouts: ['PrevPage', 'NextPage', 'Sizes', 'Total']
+  },
+  // 默认工具栏参数
+  toolbar: {
+    setting: false,
+    buttons: []
+  },
+  // 默认消息提示框参数
+  message: {
+    zIndex: 999,
+    lockView: true,
+    lockScroll: true,
+    mask: true,
+    duration: 3000,
+    animat: true
   },
   // 默认优化配置项
   optimization: {
@@ -84,8 +113,23 @@ VXETable.setup({
       oSize: 20,
       rSize: 80
     }
-  }
-  // i18n: (key, value) => VXETable.t(zhCNLocat, key)
+  },
+  i18n: (key, value) => VXETable.t(zhCNLocat, key)
 });
 
 VXETable.use(VXETablePluginAntd);
+
+// 自定义渲染器
+VXETable.renderer.add('MyCell', {
+  autofocus: '.my-cell',
+  renderEdit (h, editRender, { row, column }) {
+    return [
+      <a-input class="my-cell" text="text" v-model={ row[column.property] } />
+    ];
+  },
+  renderCell (h, editRender, { row, column }) {
+    return [
+      <span>{row[column.property]}</span>
+    ];
+  }
+});
