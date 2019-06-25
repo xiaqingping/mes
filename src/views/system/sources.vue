@@ -1,5 +1,6 @@
 <template>
   <div class="page-content">
+
     <div class="table-search">
       <a-form layout="inline" :form="form" @submit="handleSearch">
         <a-row :gutter="24">
@@ -23,73 +24,99 @@
     </div>
 
     <div class="table-operator">
-      <a-button type="primary" icon="search" @click="handleSearch">查询</a-button>
+      <a-button-group>
+        <a-button icon="search" @click="handleSearch">查询</a-button>
+      </a-button-group>
     </div>
 
-    <s-table
-      ref="table"
-      size="small"
-      bordered
-      :scroll="{ x: 1500 }"
-      :columns="columns"
-      :data="loadData"
-      :rowSelection="{ selectedRowKeys: selectedRowKeys, onChange: onSelectChange }"
+    <vxe-grid
+      highlight-hover-row
+      auto-resize
+      :ref="carrierTable.ref"
+      :loading="carrierTable.loading"
+      :columns="carrierTable.columns"
+      :pager-config="carrierTable.pagerConfig"
+      :data.sync="carrierTable.tableData"
+      :edit-config="{key: 'id', trigger: 'manual', mode: 'row', showIcon: false, autoClear: false}"
+      @current-page-change="(currentPage) => pagerChange({type: 'currentPage', value: currentPage})"
+      @page-size-change="(pageSize) => pagerChange({type: 'pageSize', value: pageSize})"
     >
-    </s-table>
+    </vxe-grid>
+
   </div>
 </template>
 
 <script>
-import STable from '@/components/Table';
-
 export default {
   name: 'SystemUser',
   components: {
-    STable
   },
   data () {
     return {
       form: this.$form.createForm(this),
-      advanced: true,
-      type: [],
-      columns: [
-        { title: 'client', dataIndex: 'client' },
-        { title: 'path', dataIndex: 'path' },
-        { title: '描述', dataIndex: 'desc' },
-        { title: 'type', dataIndex: 'type' }
-      ],
-      queryParam: {},
-      loadData: parameter => {
-        const params = Object.assign(parameter, this.queryParam);
-        return this.$api.system.getSourcesList(params).then(res => {
-          return {
-            data: res.rows,
-            page: params.page,
-            total: res.total
-          };
-        });
-      },
-      selectedRowKeys: [],
-      selectedRows: []
+
+      carrierTable: {
+        ref: 'carrierTable',
+        loading: false,
+        data: [],
+        columns: [],
+        pagerConfig: {
+          currentPage: 1,
+          pageSize: 10,
+          total: 0
+        }
+      }
     };
   },
   mounted () {
+    this.setColumn();
+    this.handleSearch();
     // 缓存
     this.type = this.$store.state.system.type;
   },
   methods: {
+    // 设置表格列属性
+    setColumn () {
+      const tableName = 'carrierTable';
+      // const { formatter } = this.$units;
+      // const { basic } = this.$store.state;
+
+      const columns = [
+        { width: 40, type: 'index' },
+        { label: 'client', prop: 'client' },
+        { label: 'path', prop: 'path' },
+        { label: '描述', prop: 'desc' },
+        { label: 'type', prop: 'type' }
+      ];
+
+      columns.forEach(function (e) {
+        if (!e.width) e.width = 375;
+      });
+
+      this[tableName].columns = columns;
+    },
     // 查询
-    handleSearch (e) {
-      e.preventDefault();
-      this.queryParam = this.form.getFieldsValue();
-      this.$refs.table.refresh(true);
+    handleSearch (params = {}) {
+      const tableName = 'carrierTable';
+      this[tableName].loading = true;
+
+      const queryParam = this.form.getFieldsValue();
+      params = Object.assign({ page: this[tableName].pagerConfig.currentPage, rows: this[tableName].pagerConfig.pageSize }, params, queryParam);
+
+      this.$api.system.getSourcesList(params, true).then((data) => {
+        this[tableName].tableData = data.rows;
+        this[tableName].pagerConfig.total = data.total;
+        this[tableName].pagerConfig.currentPage = params.page;
+        this[tableName].pagerConfig.pageSize = params.rows;
+      }).finally(() => {
+        this[tableName].loading = false;
+      });
     },
-    onSelectChange (selectedRowKeys, selectedRows) {
-      this.selectedRowKeys = selectedRowKeys;
-      this.selectedRows = selectedRows;
-    },
-    toggleAdvanced () {
-      this.advanced = !this.advanced;
+    // 分页改变时
+    pagerChange (change) {
+      const tableName = 'carrierTable';
+      this[tableName].pagerConfig = Object.assign(this[tableName].pagerConfig, change);
+      this.handleSearch();
     }
   }
 };
