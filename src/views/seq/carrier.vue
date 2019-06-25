@@ -111,9 +111,20 @@ export default {
       const columns = [
         { width: 40, type: 'index' },
         { label: '编号', prop: 'code' },
-        { label: '名称', prop: 'name', editRender: { name: 'AInput' } },
-        { label: '别名', prop: 'alias', editRender: { name: 'AInput' } },
-        { label: '系列', prop: 'seriesId', editRender: { name: 'ASelect', options: seq.series, optionProps: { value: 'id', label: 'name' } } },
+        { label: '名称', prop: 'name', editRender: { name: 'input' } },
+        { label: '别名', prop: 'alias', editRender: { name: 'input' } },
+        {
+          label: '系列',
+          prop: 'seriesId',
+          editRender: {
+            name: 'ASelect',
+            options: seq.series,
+            optionProps: { value: 'id', label: 'name' },
+            events: {
+              change: ({ row, rowIndex }, value) => { this.seriesChange(seq.series, row, value); }
+            }
+          }
+        },
         { label: '状态', prop: 'status', formatter: function ({ cellValue }) { return formatter(basic.status, cellValue); } },
         { label: '创建人', prop: 'creatorName' },
         { label: '创建时间', prop: 'createDate' },
@@ -241,6 +252,21 @@ export default {
       const tableName = 'carrierTable';
       this[tableName].pagerConfig = Object.assign(this[tableName].pagerConfig, { pageSize, currentPage });
       this.handleSearch();
+    },
+    // 选择系列
+    seriesChange (series, row, value) {
+      let obj = {};
+      for (var i = 0; i < series.length; i++) {
+        if (series[i].id === value) {
+          obj = {
+            seriesId: series[i].id,
+            seriesCode: series[i].code,
+            seriesName: series[i].name
+          };
+          break;
+        }
+      }
+      row = Object.assign(row, obj);
     }
 
   }

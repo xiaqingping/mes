@@ -57,8 +57,7 @@
           :edit-rules="seqfactoryTable.editRules"
           :edit-config="{key: 'id', trigger: 'manual', mode: 'row', showIcon: false, autoClear: false}"
           @cell-click="(options) => handleCellClick(options)"
-          @current-page-change="(currentPage) => pagerChange({type: 'currentPage', value: currentPage})"
-          @page-size-change="(pageSize) => pagerChange({type: 'pageSize', value: pageSize})">
+          @page-change="pagerChange">
         </vxe-grid>
       </a-layout-content>
 
@@ -100,8 +99,10 @@ export default {
       queryParam: {},
       seqfactoryTable: {
         id: 0,
-        ref: 'seqfactory',
+        ref: 'seqfactoryTable',
         xTable: null,
+        editIndex: -1,
+        editData: null,
         loading: false,
         tableData: [],
         columns: [],
@@ -133,18 +134,7 @@ export default {
       const columns = [
         { width: 40, type: 'index' },
         { label: '编号', prop: 'code' },
-        {
-          label: '名称',
-          prop: 'name',
-          editRender: { },
-          slots: {
-            edit: ({ row, column }) => {
-              return [
-                <a-input v-model={ row[column.property] } />
-              ];
-            }
-          }
-        },
+        { label: '名称', prop: 'name', editRender: { name: 'input' } },
         { label: 'SAP工厂', prop: 'factory', formatter: function ({ cellValue }) { return formatter(basic.factorys, cellValue, 'code', 'text'); } },
         { label: '仓库', prop: 'storageCode', formatter: function ({ cellValue }) { return formatter(basic.storages, cellValue, 'code', 'text'); } },
         { label: '状态', prop: 'status', formatter: function ({ cellValue }) { return formatter(basic.status, cellValue); } },
@@ -177,8 +167,9 @@ export default {
                   <a onClick={() => this.handleQuitEdit(options) }>退出</a>
                 ];
               }
+
               return [
-                <span class="table-actions">
+                <span class="table-actions" onClick={(event) => event.stopPropagation()}>
                   {actions}
                 </span>
               ];
@@ -196,18 +187,21 @@ export default {
       this[tableName].xTable = this.$refs[this[tableName].ref].$refs.xTable;
     },
     // 查询
-    handleSearch (params = {}) {
+    handleSearch () {
       const tableName = 'seqfactoryTable';
       this[tableName].loading = true;
+      const { currentPage, pageSize } = this[tableName].pagerConfig;
 
       const queryParam = this.form.getFieldsValue();
-      params = Object.assign({ page: this[tableName].pagerConfig.currentPage, rows: this[tableName].pagerConfig.pageSize }, params, queryParam);
+      const params = Object.assign({ page: currentPage, rows: pageSize }, queryParam);
 
       this.$api.seqfactory.getSeqfactory(params, true).then((data) => {
         this[tableName].tableData = data.rows;
         this[tableName].pagerConfig.total = data.total;
         this[tableName].pagerConfig.currentPage = params.page;
         this[tableName].pagerConfig.pageSize = params.rows;
+
+        this[tableName].editIndex = -1;
       }).finally(() => {
         this[tableName].loading = false;
       });
@@ -215,17 +209,22 @@ export default {
     // 新增一可编辑行
     handleAddRow () {
       const tableName = 'seqfactoryTable';
+      if (this[tableName].editIndex !== -1) return this.$message.warning('请保存或退出正在编辑的行');
+
       const table = this[tableName].xTable;
       const newData = {
-        id: --this[tableName].id,
-        name: ''
+        id: --this[tableName].id
       };
+
       this[tableName].tableData = [newData, ...this[tableName].tableData];
       table.setActiveRow(newData);
+      this[tableName].editIndex = 0;
     },
     // 修改
-    handleUpdate ({ row, xTable }) {
+    handleUpdate ({ row, rowIndex, tableName, xTable }) {
       xTable.setActiveRow(row);
+      this[tableName].editIndex = rowIndex;
+      this[tableName].editData = JSON.parse(JSON.stringify(row));
     },
     // 删除
     handleCancel ({ row }) {
@@ -249,13 +248,20 @@ export default {
     },
     // 退出编辑
     handleQuitEdit ({ row, rowIndex, tableName, xTable }) {
-      xTable.clearActived();
-      if (!row.status) {
-        this[tableName].tableData.splice(rowIndex, 1);
-      }
+      xTable.clearActived().then(() => {
+        this[tableName].editIndex = -1;
+        if (!row.status) {
+          this[tableName].tableData.splice(rowIndex, 1);
+        } else {
+          this.$set(this[tableName].tableData, rowIndex, this[tableName].editData);
+          this[tableName].editData = null;
+        }
+      });
     },
     // 点击测序点表格时
     handleCellClick ({ row }) {
+      if (!row.id || row.id < 0) return;
+
       const tableName = 'seqfactoryOfficeTable';
       this[tableName].loading = true;
       this.$api.series.getPrimersBySeries(row.id).then(res => {
@@ -265,12 +271,9 @@ export default {
       });
     },
     // 分页改变时
-    pagerChange (change) {
+    pagerChange ({ pageSize, currentPage }) {
       const tableName = 'seriesTable';
-      if (change.type === 'pageSize') {
-        //
-      }
-      this[tableName].pagerConfig[change.type] = change.value;
+      this[tableName].pagerConfig = Object.assign(this[tableName].pagerConfig, { pageSize, currentPage });
       this.handleSearch();
     },
 
