@@ -71,10 +71,10 @@ VXETable.setup({
   // 版本号（对于某些带 Storage 数据储存的功能有用到，上升版本号可以用于重置 Storage 数据）
   version: 0,
   // 默认快捷菜单
-  contextMenu: null,
+  menu: null,
   // 默认 tooltip 主题样式
   tooltip: {
-    zIndex: 3000,
+    zIndex: 99,
     theme: 'dark'
   },
   // 默认分页参数

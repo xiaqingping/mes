@@ -21,7 +21,6 @@ router.beforeEach((to, from, next) => {
           permissionList: [ 'dashboard' ],
           permissions: [
             {
-              // actionList: ['search', 'add', 'edit']
               actionList: ['search', 'add', 'edit'],
               permissionId: 'dashboard'
             }
