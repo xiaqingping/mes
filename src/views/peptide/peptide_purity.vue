@@ -35,18 +35,21 @@
         </a-button-group>
       </div>
 
-      <a-table
+      <vxe-grid
+        highlight-hover-row
+        auto-resize
         ref="table"
-        bordered
         size="small"
-        rowKey="id"
         :columns="columns"
-        :dataSource="dataSource"
+        :data.sync="dataSource"
         :loading="loading"
-        :pagination="pagination"
-        @change="change"
-      >
-        <template slot="purity" slot-scope="value, row, index">
+        :edit-rules="editRules"
+        :edit-config="{key: 'id', trigger: 'manual', mode: 'row', showIcon: false, autoClear: false}"
+        :pager-config="pagination"
+        @current-page-change="(currentPage) => pagerChange({type: 'currentPage', value: currentPage})"
+        @page-size-change="(pageSize) => pagerChange({type: 'pageSize', value: pageSize})">
+        >
+        <!-- <template slot="purity" slot-scope="value, row, index">
           <div
             :key="value">
             <a-input
@@ -72,15 +75,14 @@
               <a @click="handleExit()">退出 </a>
             </template>
           </div>
-        </template>
-      </a-table>
+        </template> -->
+      </vxe-grid>
     </div>
 
   </div>
 </template>
 
 <script>
-
 export default {
   name: 'PeptidePurity',
   data () {
@@ -88,18 +90,18 @@ export default {
       status: {},
       form: this.$form.createForm(this),
       pagination: {
-        current: 1,
+        currentPage: 1,
         pageSize: 10,
-        total: 0,
-        showSizeChanger: true
+        total: 0
       },
       columns: [],
       loading: false,
       dataSource: [],
-      id: 0,
-      editIndex: -1,
-      purity: '',
-      selectRow: ''
+      editRules: {
+        purity: [
+          { required: true, message: '名称必填' }
+        ]
+      }
     };
   },
   mounted () {
@@ -113,58 +115,87 @@ export default {
       const { peptide } = this.$store.state;
       this.status = peptide.status;
       this.columns = [
-        { title: '编号', dataIndex: 'code', width: '100px', align: 'center' },
-        { title: '纯度', dataIndex: 'purity', scopedSlots: { customRender: 'purity' }, width: '150px' },
+        { type: 'index' },
+        { label: '编号', prop: 'code' },
+        { label: '纯度', prop: 'purity', editRender: { name: 'input' } },
         {
-          title: '状态',
-          dataIndex: 'status',
-          customRender: (text) => {
-            return formatter(self.status, text);
+          label: '状态',
+          prop: 'status',
+          formatter: ({ cellValue }) => {
+            return formatter(self.status, cellValue);
           }
         },
-        { title: '创建人', dataIndex: 'creatorName' },
-        { title: '创建日期', dataIndex: 'createDate' },
-        { title: '删除人', dataIndex: 'cancelName' },
-        { title: '删除时间', dataIndex: 'cancelDate' },
-        { title: '操作', width: 80, dataIndex: 'actions', fixed: 'right', scopedSlots: { customRender: 'actions' }, align: 'center' }
+        { label: '创建人', prop: 'creatorName' },
+        { label: '创建日期', prop: 'createDate' },
+        { label: '删除人', prop: 'cancelName' },
+        { label: '删除时间', prop: 'cancelDate' },
+        {
+          label: '操作',
+          prop: 'actions',
+          fixed: 'right',
+          slots: {
+            default: ({ row, rowIndex }) => {
+              let actions = [];
+              const xTable = this.$refs.table;
+              const isEdit = xTable.hasActiveRow(row);
+              const options = { row, rowIndex, xTable };
+
+              if (!isEdit) {
+                if (row.status === 1) {
+                  actions = [
+                    <a onClick={() => this.handleDelete(options)}>删除</a>
+                  ];
+                } else {
+                  actions = [
+                    <a onClick={() => this.handleResume(options)}>恢复</a>
+                  ];
+                }
+              }
+              if (isEdit) {
+                actions = [
+                  <a onClick={() => this.handleSave(options) }>保存</a>,
+                  <a onClick={() => this.handleExit(options) }>退出</a>
+                ];
+              }
+              return [
+                <span class="table-actions">
+                  {actions}
+                </span>
+              ];
+            }
+          }
+        }
       ];
     },
-    change (pagination) {
-      const params = {
-        page: pagination.current,
-        rows: pagination.pageSize
-      };
-      this.handleSearch(params);
+    // 分页改变时
+    pagerChange (change) {
+      this.pagination[change.type] = change.value;
+      this.handleSearch();
     },
     handleSearch (params = {}) {
       this.loading = true;
       this.editIndex = -1;
 
       const queryParam = this.form.getFieldsValue();
-      params = Object.assign({ page: this.pagination.current, rows: this.pagination.pageSize }, params, queryParam);
+      params = Object.assign({ page: this.pagination.currentPage, rows: this.pagination.pageSize }, params, queryParam);
 
       this.$api.peptide.getPurity(params).then((data) => {
         this.dataSource = data.rows;
         this.pagination.total = data.total;
-        this.pagination.current = params.page;
-        this.pagination.pageSize = params.rows;
       }).finally(() => {
         this.loading = false;
       });
     },
     handleAdd () {
-      if (this.editIndex === 0) {
-        return false;
-      }
       var addVal = {
-        id: this.id,
+        id: 0,
         purity: ''
       };
       this.dataSource = [ addVal, ...this.dataSource ];
-      this.editIndex = 0;
+      this.$refs.table.setActiveRow(addVal);
     },
-    handleSave (r) {
-      if (this.purity === '') {
+    handleSave (o) {
+      if (o.row.purity === '') {
         this.$notification.error({
           message: '错误',
           description: `数据不能为空！`
@@ -172,36 +203,37 @@ export default {
         return false;
       }
       var data = {};
-      if (r.id) {
-        data = r;
+      if (o.row.id) {
+        data = o.row;
       }
-      data.purity = this.purity;
+      data.purity = o.row.purity;
       this.$api.peptide.insertPurity(data).then(res => {
         if (res.id) {
-          this.handleExit();
+          this.handleSearch();
         }
       });
     },
-    handleDelete (i) {
-      if (i) {
-        this.$api.peptide.deletePurity(i).then(res => {
+    handleDelete ({ row }) {
+      if (row.id) {
+        this.$api.peptide.deletePurity(row.id).then(res => {
           this.handleSearch();
         });
       }
     },
     handleExit () {
       this.purity = '';
-      this.handleSearch();
+      this.$refs.table.clearActived();
+      this.$refs.table.data.splice(0, 1);
     },
-    handleResume (i) {
-      if (!i) {
+    handleResume ({ row }) {
+      if (!row.id) {
         this.$notification.error({
           message: '错误',
           description: `请选择一条数据`
         });
         return false;
       }
-      this.$api.peptide.resumePurity(i).then(res => {
+      this.$api.peptide.resumePurity(row.id).then(res => {
         this.handleSearch();
       });
     }
