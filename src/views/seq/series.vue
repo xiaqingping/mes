@@ -3,7 +3,7 @@
   <div class="page-content">
 
     <div class="table-search">
-      <a-form layout="inline" :form="form" @submit="handleSearch">
+      <a-form layout="inline" :form="form" @submit.prevent="handleSearch">
         <a-row :gutter="24">
           <a-col :xxl="4" :xl="6" :md="8">
             <a-form-item label="编号">
@@ -79,7 +79,7 @@
 
 <script>
 export default {
-  name: 'SeqSampleOrder',
+  name: 'Series',
   components: {
   },
   data () {
@@ -91,6 +91,7 @@ export default {
         ref: 'seriesTable',
         xTable: null,
         editIndex: -1,
+        editData: null,
         loading: false,
         tableData: [],
         columns: [],
@@ -131,7 +132,7 @@ export default {
       const columns = [
         { type: 'index', width: 40 },
         { label: '编号', prop: 'code' },
-        { label: '名称', prop: 'name', editRender: { name: 'AInput' } },
+        { label: '名称', prop: 'name', editRender: { name: 'input' } },
         { label: '状态', prop: 'status', formatter: function ({ cellValue }) { return formatter(basic.status, cellValue); } },
         { label: '创建人', prop: 'creatorName' },
         { label: '创建时间', prop: 'createDate' },
@@ -162,6 +163,7 @@ export default {
                   <a onClick={() => this.handleQuitEdit(options) }>退出</a>
                 ];
               }
+
               return [
                 <span class="table-actions" onClick={(event) => event.stopPropagation()}>
                   {actions}
@@ -180,6 +182,100 @@ export default {
 
       this[tableName].xTable = this.$refs[this[tableName].ref].$refs.xTable;
     },
+    // 查询
+    handleSearch () {
+      const tableName = 'seriesTable';
+      this[tableName].loading = true;
+      const { currentPage, pageSize } = this[tableName].pagerConfig;
+
+      const queryParam = this.form.getFieldsValue();
+      const params = Object.assign({ page: currentPage, rows: pageSize }, queryParam);
+
+      this.$api.series.getSeries(params, true).then((data) => {
+        this[tableName].tableData = data.rows;
+        this[tableName].pagerConfig.total = data.total;
+        this[tableName].pagerConfig.currentPage = params.page;
+        this[tableName].pagerConfig.pageSize = params.rows;
+
+        this[tableName].editIndex = -1;
+      }).finally(() => {
+        this[tableName].loading = false;
+      });
+    },
+    // 新增一可编辑行
+    handleAddRow () {
+      const tableName = 'seriesTable';
+      if (this[tableName].editIndex !== -1) return this.$message.warning('请保存或退出正在编辑的行');
+
+      const table = this[tableName].xTable;
+      const newData = {
+        id: --this[tableName].id
+      };
+
+      this[tableName].tableData = [newData, ...this[tableName].tableData];
+      table.setActiveRow(newData);
+      this[tableName].editIndex = 0;
+    },
+    // 修改
+    handleUpdate ({ row, rowIndex, tableName, xTable }) {
+      xTable.setActiveRow(row);
+      this[tableName].editIndex = rowIndex;
+      this[tableName].editData = JSON.parse(JSON.stringify(row));
+    },
+    // 删除
+    handleCancel ({ row }) {
+      this.$api.series.cancelSeries(row.id).then(() => {
+        this.handleSearch();
+      });
+    },
+    // 保存
+    handleSave ({ row }) {
+      if (row.status) {
+        // 修改
+        this.$api.series.updateSeries(row).then(() => {
+          this.handleSearch();
+        });
+      } else {
+        // 新增
+        this.$api.series.addSeries(row).then(() => {
+          this.handleSearch();
+        });
+      }
+    },
+    // 退出编辑
+    handleQuitEdit ({ row, rowIndex, tableName, xTable }) {
+      xTable.clearActived().then(() => {
+        this[tableName].editIndex = -1;
+        if (!row.status) {
+          this[tableName].tableData.splice(rowIndex, 1);
+        } else {
+          this.$set(this[tableName].tableData, rowIndex, this[tableName].editData);
+          this[tableName].editData = null;
+        }
+      });
+    },
+    // 点击载体表格时
+    handleCellClick ({ row }) {
+      if (!row.id || row.id < 0) return;
+
+      const tableName = 'seriesPrimersTable';
+      this[tableName].loading = true;
+      this.$api.series.getPrimersBySeries(row.id).then(res => {
+        this[tableName].tableData = res;
+      }).finally(() => {
+        this[tableName].loading = false;
+      });
+    },
+    // 分页改变时
+    pagerChange ({ pageSize, currentPage }) {
+      const tableName = 'seriesTable';
+      this[tableName].pagerConfig = Object.assign(this[tableName].pagerConfig, { pageSize, currentPage });
+      this.handleSearch();
+    },
+
+    /**
+     * 系列之引物
+     */
     // 为系列之引物设置列
     setColumnToPrimer () {
       const tableName = 'seriesPrimersTable';
@@ -222,94 +318,6 @@ export default {
 
       this[tableName].xTable = this.$refs[this[tableName].ref].$refs.xTable;
     },
-    // 查询
-    handleSearch (e) {
-      if (e) e.preventDefault();
-      const tableName = 'seriesTable';
-      this[tableName].loading = true;
-
-      const queryParam = this.form.getFieldsValue();
-      const params = Object.assign({ page: this[tableName].pagerConfig.currentPage, rows: this[tableName].pagerConfig.pageSize }, queryParam);
-
-      this.$api.series.getSeries(params, true).then((data) => {
-        this[tableName].tableData = data.rows;
-        this[tableName].pagerConfig.total = data.total;
-        this[tableName].pagerConfig.currentPage = params.page;
-        this[tableName].pagerConfig.pageSize = params.rows;
-
-        this[tableName].editIndex = -1;
-      }).finally(() => {
-        this[tableName].loading = false;
-      });
-    },
-    // 新增一可编辑行
-    handleAddRow () {
-      const tableName = 'seriesTable';
-      if (this[tableName].editIndex !== -1) return this.$message.warning('请保存或退出正在编辑的行');
-
-      const table = this[tableName].xTable;
-      const newData = {
-        id: --this[tableName].id,
-        name: ''
-      };
-      this[tableName].tableData = [newData, ...this[tableName].tableData];
-      table.setActiveRow(newData);
-      this[tableName].editIndex = 0;
-    },
-    // 修改
-    handleUpdate ({ row, rowIndex, tableName, xTable }) {
-      xTable.setActiveRow(row);
-      this[tableName].editIndex = rowIndex;
-    },
-    // 删除
-    handleCancel ({ row }) {
-      this.$api.series.cancelSeries(row.id).then(() => {
-        this.handleSearch();
-      });
-    },
-    // 保存
-    handleSave ({ row }) {
-      if (row.status) {
-        // 修改
-        this.$api.series.updateSeries(row).then(() => {
-          this.handleSearch();
-        });
-      } else {
-        // 新增
-        this.$api.series.addSeries(row).then(() => {
-          this.handleSearch();
-        });
-      }
-    },
-    // 退出编辑
-    handleQuitEdit ({ row, rowIndex, tableName, xTable }) {
-      xTable.clearActived();
-      if (!row.status) {
-        this[tableName].tableData.splice(rowIndex, 1);
-      }
-    },
-    // 点击载体表格时
-    handleCellClick ({ row }) {
-      if (!row.id || row.id < 0) return;
-
-      const tableName = 'seriesPrimersTable';
-      this[tableName].loading = true;
-      this.$api.series.getPrimersBySeries(row.id).then(res => {
-        this[tableName].tableData = res;
-      }).finally(() => {
-        this[tableName].loading = false;
-      });
-    },
-    // 分页改变时
-    pagerChange ({ pageSize, currentPage }) {
-      const tableName = 'seriesTable';
-      this[tableName].pagerConfig = Object.assign(this[tableName].pagerConfig, { pageSize, currentPage });
-      this.handleSearch();
-    },
-
-    /**
-     * 系列之引物
-     */
     // 新增一可编辑行
     handleAddRowToPrimers () {
       const tableName = 'seriesPrimersTable';
