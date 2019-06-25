@@ -103,7 +103,6 @@ export default {
           prop: 'sampleTypeId',
           editRender: {
             name: 'ASelect',
-            props: { size: 'small' },
             optionProps: { value: 'id', label: 'name' },
             options: seq.sampleType
           }
