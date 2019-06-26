@@ -3,7 +3,7 @@
   <div class="page-content">
 
     <div class="table-search">
-      <a-form layout="inline" :form="form" @submit="handleSearch">
+      <a-form layout="inline" :form="form" @submit.prevent="handleSearch">
         <a-row :gutter="24">
           <a-col :xxl="4" :xl="6" :md="8">
             <a-form-item label="编号">
@@ -44,7 +44,7 @@
     <div class="table-operator">
       <a-button-group>
         <a-button icon="search" @click="handleSearch">查询</a-button>
-        <a-button icon="plus" type="primary">新建</a-button>
+        <a-button icon="plus" type="primary" @click="handleAddRow">新建</a-button>
       </a-button-group>
     </div>
 
@@ -58,26 +58,37 @@
       :data.sync="carrierTable.tableData"
       :edit-rules="carrierTable.editRules"
       :edit-config="{key: 'id', trigger: 'manual', mode: 'row', showIcon: false, autoClear: false}"
-      @current-page-change="(currentPage) => pagerChange({type: 'currentPage', value: currentPage})"
-      @page-size-change="(pageSize) => pagerChange({type: 'pageSize', value: pageSize})">
+      @page-change="pagerChange">
     </vxe-grid>
   </div>
 </template>
 
 <script>
 export default {
-  name: 'SeqSampleOrder',
+  name: 'Carrier',
   components: {
   },
   data () {
     return {
       form: this.$form.createForm(this),
+      queryParam: {},
       carrierTable: {
+        id: 0,
         ref: 'carrierTable',
+        xTable: null,
+        editIndex: -1,
+        editData: null,
         loading: false,
-        data: [],
+        tableData: [],
         columns: [],
-        editRules: {},
+        editRules: {
+          name: [
+            { required: true, message: '名称不能为空' }
+          ],
+          seriesId: [
+            { required: true, message: '系列不能为空' }
+          ]
+        },
         pagerConfig: {
           currentPage: 1,
           pageSize: 10,
@@ -88,30 +99,32 @@ export default {
   },
   mounted () {
     this.setColumn();
-    this.setEditRules();
     this.handleSearch();
   },
   methods: {
-    validEvent () {
-      // this.$refs['carrier'].validate(this.data[this.editIndex], valid => {
-      //   console.log(valid);
-      //   if (valid) {
-
-      //   }
-      // });
-    },
     // 设置表格列属性
     setColumn () {
       const tableName = 'carrierTable';
       const { formatter } = this.$units;
-      const { basic } = this.$store.state;
+      const { basic, seq } = this.$store.state;
 
       const columns = [
         { width: 40, type: 'index' },
         { label: '编号', prop: 'code' },
-        { label: '名称', prop: 'name', editRender: { name: 'AInput', props: { size: 'small' } } },
-        { label: '别名', prop: 'alias', editRender: { name: 'ASelect', props: { size: 'small' } } },
-        { label: '系列', prop: 'seriesName', editRender: { name: 'ASelect', props: { size: 'small' }, options: [{ value: 1, label: 123 }] } },
+        { label: '名称', prop: 'name', editRender: { name: 'input' } },
+        { label: '别名', prop: 'alias', editRender: { name: 'input' } },
+        {
+          label: '系列',
+          prop: 'seriesId',
+          editRender: {
+            name: 'ASelect',
+            options: seq.series,
+            optionProps: { value: 'id', label: 'name' },
+            events: {
+              change: ({ row, rowIndex }, value) => { this.seriesChange(seq.series, row, value); }
+            }
+          }
+        },
         { label: '状态', prop: 'status', formatter: function ({ cellValue }) { return formatter(basic.status, cellValue); } },
         { label: '创建人', prop: 'creatorName' },
         { label: '创建时间', prop: 'createDate' },
@@ -126,20 +139,25 @@ export default {
           slots: {
             default: ({ row, rowIndex }) => {
               let actions = [];
-              if (row.status === 1 && this.editIndex !== rowIndex) {
+              const xTable = this[tableName].xTable;
+              const isEdit = xTable.hasActiveRow(row);
+              const options = { row, rowIndex, tableName, xTable };
+
+              if (!isEdit && row.status === 1) {
                 actions = [
-                  <a onClick={() => this.handleCancel(row.id)}>删除</a>,
-                  <a onClick={() => this.handleUpdate(row, rowIndex)}>修改</a>
+                  <a onClick={() => this.handleCancel(options)}>删除</a>,
+                  <a onClick={() => this.handleUpdate(options)}>修改</a>
                 ];
               }
-              if (this.editIndex === rowIndex) {
+              if (isEdit) {
                 actions = [
-                  <a>保存</a>,
-                  <a onClick={() => this.handleQuitEdit(row, rowIndex)}>退出</a>
+                  <a onClick={() => this.handleSave(options) }>保存</a>,
+                  <a onClick={() => this.handleQuitEdit(options) }>退出</a>
                 ];
               }
+
               return [
-                <span class="table-actions">
+                <span class="table-actions" onClick={(event) => event.stopPropagation()}>
                   {actions}
                 </span>
               ];
@@ -153,36 +171,25 @@ export default {
       });
 
       this[tableName].columns = columns;
-    },
-    // 设置表格验证规则
-    setEditRules () {
-      const tableName = 'carrierTable';
-      this[tableName].editRules = {
-        trigger: 'change',
-        name: [
-          { required: true, message: '名称不能为空' }
-        ],
-        alias: [
-          { required: true, message: '名称不能为空' }
-        ],
-        seriesName: [
-          { required: true, message: '系列不能为空' }
-        ]
-      };
+
+      this[tableName].xTable = this.$refs[this[tableName].ref].$refs.xTable;
     },
     // 查询
-    handleSearch (params = {}) {
+    handleSearch () {
       const tableName = 'carrierTable';
       this[tableName].loading = true;
+      const { currentPage, pageSize } = this[tableName].pagerConfig;
 
       const queryParam = this.form.getFieldsValue();
-      params = Object.assign({ page: this[tableName].pagerConfig.currentPage, rows: this[tableName].pagerConfig.pageSize }, params, queryParam);
+      const params = Object.assign({ page: currentPage, rows: pageSize }, queryParam);
 
       this.$api.carrier.getCarrier(params, true).then((data) => {
         this[tableName].tableData = data.rows;
         this[tableName].pagerConfig.total = data.total;
         this[tableName].pagerConfig.currentPage = params.page;
         this[tableName].pagerConfig.pageSize = params.rows;
+
+        this[tableName].editIndex = -1;
       }).finally(() => {
         this[tableName].loading = false;
       });
@@ -190,17 +197,23 @@ export default {
     // 新增一可编辑行
     handleAddRow () {
       const tableName = 'carrierTable';
-      const table = this.$refs[tableName].$refs.xTable;
+      if (this[tableName].editIndex !== -1) return this.$message.warning('请保存或退出正在编辑的行');
+
+      const table = this[tableName].xTable;
       const newData = {
         id: --this[tableName].id,
         name: ''
       };
+
       this[tableName].tableData = [newData, ...this[tableName].tableData];
       table.setActiveRow(newData);
+      this[tableName].editIndex = 0;
     },
     // 修改
-    handleUpdate ({ row, xTable }) {
+    handleUpdate ({ row, rowIndex, tableName, xTable }) {
       xTable.setActiveRow(row);
+      this[tableName].editIndex = rowIndex;
+      this[tableName].editData = JSON.parse(JSON.stringify(row));
     },
     // 删除
     handleCancel ({ row }) {
@@ -224,16 +237,36 @@ export default {
     },
     // 退出编辑
     handleQuitEdit ({ row, rowIndex, tableName, xTable }) {
-      xTable.clearActived();
-      if (!row.status) {
-        this[tableName].tableData.splice(rowIndex, 1);
-      }
+      xTable.clearActived().then(() => {
+        this[tableName].editIndex = -1;
+        if (!row.status) {
+          this[tableName].tableData.splice(rowIndex, 1);
+        } else {
+          this.$set(this[tableName].tableData, rowIndex, this[tableName].editData);
+          this[tableName].editData = null;
+        }
+      });
     },
     // 分页改变时
-    pagerChange (change) {
+    pagerChange ({ pageSize, currentPage }) {
       const tableName = 'carrierTable';
-      this[tableName].pagerConfig = Object.assign(this[tableName].pagerConfig, change);
+      this[tableName].pagerConfig = Object.assign(this[tableName].pagerConfig, { pageSize, currentPage });
       this.handleSearch();
+    },
+    // 选择系列
+    seriesChange (series, row, value) {
+      let obj = {};
+      for (var i = 0; i < series.length; i++) {
+        if (series[i].id === value) {
+          obj = {
+            seriesId: series[i].id,
+            seriesCode: series[i].code,
+            seriesName: series[i].name
+          };
+          break;
+        }
+      }
+      row = Object.assign(row, obj);
     }
 
   }
