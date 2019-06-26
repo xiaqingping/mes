@@ -256,9 +256,12 @@ export default {
     },
     // 点击载体表格时
     handleCellClick ({ row }) {
-      if (!row.id || row.id < 0) return;
-
       const tableName = 'seriesPrimersTable';
+      if (!row.id || row.id < 0) {
+        this[tableName].tableData = [];
+        return;
+      }
+
       this[tableName].loading = true;
       this.$api.series.getPrimersBySeries(row.id).then(res => {
         this[tableName].tableData = res;

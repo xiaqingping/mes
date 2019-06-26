@@ -201,8 +201,7 @@ export default {
 
       const table = this[tableName].xTable;
       const newData = {
-        id: --this[tableName].id,
-        name: ''
+        id: --this[tableName].id
       };
 
       this[tableName].tableData = [newData, ...this[tableName].tableData];
