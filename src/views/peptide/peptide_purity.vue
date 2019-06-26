@@ -31,24 +31,23 @@
       <div class="table-operator">
         <a-button-group>
           <a-button icon="search" @click="handleSearch">查询</a-button>
-          <a-button icon="plus" @click="handleAdd">新增</a-button>
+          <a-button icon="plus" @click="handleAddRow">新增</a-button>
         </a-button-group>
       </div>
 
       <vxe-grid
         highlight-hover-row
         auto-resize
-        ref="table"
-        size="small"
-        :columns="columns"
-        :data.sync="dataSource"
-        :loading="loading"
-        :edit-rules="editRules"
+        :ref="purityTable.ref"
+        :columns="purityTable.columns"
+        :data.sync="purityTable.tableData"
+        :loading="purityTable.loading"
+        :edit-rules="purityTable.editRules"
         :edit-config="{key: 'id', trigger: 'manual', mode: 'row', showIcon: false, autoClear: false}"
-        :pager-config="pagination"
+        :pager-config="purityTable.pagerConfig"
         @current-page-change="(currentPage) => pagerChange({type: 'currentPage', value: currentPage})"
-        @page-size-change="(pageSize) => pagerChange({type: 'pageSize', value: pageSize})">
-        >
+        @page-size-change="(pageSize) => pagerChange({type: 'pageSize', value: pageSize})"
+      >
         <!-- <template slot="purity" slot-scope="value, row, index">
           <div
             :key="value">
@@ -83,24 +82,32 @@
 </template>
 
 <script>
+const tableName = 'purityTable';
+
 export default {
   name: 'PeptidePurity',
   data () {
     return {
-      status: {},
+      status: {}, // 状态缓存
       form: this.$form.createForm(this),
-      pagination: {
-        currentPage: 1,
-        pageSize: 10,
-        total: 0
-      },
-      columns: [],
-      loading: false,
-      dataSource: [],
-      editRules: {
-        purity: [
-          { required: true, message: '名称必填' }
-        ]
+      purityTable: {
+        id: 0,
+        ref: 'purityTable',
+        xTable: null,
+        editIndex: -1,
+        loading: false,
+        tableData: [],
+        columns: [],
+        pagerConfig: {
+          currentPage: 1,
+          pageSize: 10,
+          total: 0
+        },
+        editRules: {
+          purity: [
+            { required: true, message: '名称必填' }
+          ]
+        }
       }
     };
   },
@@ -109,15 +116,16 @@ export default {
     this.handleSearch();
   },
   methods: {
+    // 初始表头
     setColumns () {
       const self = this;
       const { formatter } = this.$units;
       const { peptide } = this.$store.state;
       this.status = peptide.status;
-      this.columns = [
-        { type: 'index' },
+      const columns = [
+        { type: 'index', width: 40 },
         { label: '编号', prop: 'code' },
-        { label: '纯度', prop: 'purity', editRender: { name: 'input' } },
+        { label: '纯度', prop: 'purity', editRender: { name: 'AInput' } },
         {
           label: '状态',
           prop: 'status',
@@ -136,9 +144,9 @@ export default {
           slots: {
             default: ({ row, rowIndex }) => {
               let actions = [];
-              const xTable = this.$refs.table;
+              const xTable = this[tableName].xTable;
               const isEdit = xTable.hasActiveRow(row);
-              const options = { row, rowIndex, xTable };
+              const options = { row, rowIndex, tableName, xTable };
 
               if (!isEdit) {
                 if (row.status === 1) {
@@ -166,34 +174,52 @@ export default {
           }
         }
       ];
+      columns.forEach(function (e) {
+        if (!e.width) e.width = 100;
+      });
+
+      this[tableName].columns = columns;
+
+      this[tableName].xTable = this.$refs[this[tableName].ref].$refs.xTable;
     },
-    // 分页改变时
+    // 分页
     pagerChange (change) {
-      this.pagination[change.type] = change.value;
+      this[tableName].pagerConfig[change.type] = change.value;
       this.handleSearch();
     },
-    handleSearch (params = {}) {
-      this.loading = true;
-      this.editIndex = -1;
+    // 搜索数据或者刷新
+    handleSearch (e) {
+      if (e) e.preventDefault();
+      this[tableName].loading = true;
 
       const queryParam = this.form.getFieldsValue();
-      params = Object.assign({ page: this.pagination.currentPage, rows: this.pagination.pageSize }, params, queryParam);
+      const params = Object.assign({ page: this[tableName].pagerConfig.currentPage, rows: this[tableName].pagerConfig.pageSize }, queryParam);
 
-      this.$api.peptide.getPurity(params).then((data) => {
-        this.dataSource = data.rows;
-        this.pagination.total = data.total;
+      this.$api.peptide.getPurity(params, true).then((data) => {
+        this[tableName].tableData = data.rows;
+        this[tableName].pagerConfig.total = data.total;
+        this[tableName].pagerConfig.currentPage = params.page;
+        this[tableName].pagerConfig.pageSize = params.rows;
+
+        this[tableName].editIndex = -1;
       }).finally(() => {
-        this.loading = false;
+        this[tableName].loading = false;
       });
     },
-    handleAdd () {
+    // 增加按钮
+    handleAddRow () {
+      if (this[tableName].editIndex !== -1) return this.$message.warning('请保存或退出正在编辑的行');
+
+      const table = this[tableName].xTable;
       var addVal = {
-        id: 0,
+        id: --this[tableName].id,
         purity: ''
       };
-      this.dataSource = [ addVal, ...this.dataSource ];
-      this.$refs.table.setActiveRow(addVal);
+      this[tableName].tableData = [addVal, ...this[tableName].tableData];
+      table.setActiveRow(addVal);
+      this[tableName].editIndex = 0;
     },
+    // 保存功能
     handleSave (o) {
       if (o.row.purity === '') {
         this.$notification.error({
@@ -203,9 +229,9 @@ export default {
         return false;
       }
       var data = {};
-      if (o.row.id) {
-        data = o.row;
-      }
+      // if (o.row.id) {
+      //   data = o.row;
+      // }
       data.purity = o.row.purity;
       this.$api.peptide.insertPurity(data).then(res => {
         if (res.id) {
@@ -213,18 +239,21 @@ export default {
         }
       });
     },
+    // 删除功能
     handleDelete ({ row }) {
-      if (row.id) {
-        this.$api.peptide.deletePurity(row.id).then(res => {
-          this.handleSearch();
-        });
+      this.$api.peptide.deletePurity(row.id).then(res => {
+        this.handleSearch();
+      });
+    },
+    // 退出功能
+    handleExit ({ row, rowIndex, tableName, xTable }) {
+      xTable.clearActived();
+      if (!row.status) {
+        this[tableName].tableData.splice(rowIndex, 1);
       }
+      this[tableName].editIndex = -1;
     },
-    handleExit () {
-      this.purity = '';
-      this.$refs.table.clearActived();
-      this.$refs.table.data.splice(0, 1);
-    },
+    // 恢复功能
     handleResume ({ row }) {
       if (!row.id) {
         this.$notification.error({

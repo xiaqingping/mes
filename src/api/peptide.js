@@ -157,6 +157,11 @@ export default {
 
   /** ****************************** 适用氨基酸 ************************************/
   // 保存适用氨基酸
+  getSuitableAminoAcids (params) {
+    return request(`/peptide-base/v1/suitableAminoAcids/read/${params}`);
+  },
+
+  // 保存适用氨基酸
   insertSuitableAminoAcids (params) {
     return request(`/peptide-base/v1/suitableAminoAcids`, { method: 'POST', data: params });
   },

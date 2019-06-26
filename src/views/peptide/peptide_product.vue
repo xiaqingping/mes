@@ -47,22 +47,23 @@
       <div class="table-operator">
         <a-button-group>
           <a-button icon="search" @click="handleSearch">查询</a-button>
-          <a-button icon="plus" @click="handleAdd">新增</a-button>
+          <a-button icon="plus" @click="handleAddRow">新增</a-button>
         </a-button-group>
       </div>
-      <a-table
-        ref="table"
-        bordered
-        size="small"
-        rowKey="id"
-        :columns="columns"
-        :dataSource="dataSource"
-        :loading="loading"
-        :pagination="pagination"
-        @change="change"
-        :scroll="{ x: '2000px' }"
+      <vxe-grid
+        highlight-hover-row
+        auto-resize
+        :ref="productTable.ref"
+        :columns="productTable.columns"
+        :data.sync="productTable.tableData"
+        :loading="productTable.loading"
+        :edit-rules="productTable.editRules"
+        :edit-config="{key: 'id', trigger: 'manual', mode: 'row', showIcon: false, autoClear: false}"
+        :pager-config="productTable.pagerConfig"
+        @current-page-change="(currentPage) => pagerChange({type: 'currentPage', value: currentPage})"
+        @page-size-change="(pageSize) => pagerChange({type: 'pageSize', value: pageSize})"
       >
-        <template slot="providerTotalAmountBegin" slot-scope="value, row, index">
+        <!-- <template slot="providerTotalAmountBegin" slot-scope="value, row, index">
           <a-input
             size="small"
             v-if="editIndex === index"
@@ -162,16 +163,17 @@
               <a @click="handleExit()">退出 </a>
             </template>
           </div>
-        </template>
-      </a-table>
+        </template> -->
+      </vxe-grid>
     </div>
-    <products-mask v-show="products_status" @Closed="closeMask()" @customerData="customerData">
-    </products-mask>
+    <!-- <products-mask v-show="products_status" @Closed="closeMask()" @customerData="customerData">
+    </products-mask> -->
   </div>
 </template>
 
 <script>
 import ProductsMask from '@/components/peptide/products_mask';
+const tableName = 'productTable';
 
 export default {
   name: 'PeptideProduct',
@@ -180,41 +182,29 @@ export default {
   },
   data () {
     return {
+      status: {}, // 状态缓存
       form: this.$form.createForm(this),
-      pagination: {
-        current: 1,
-        pageSize: 10,
-        total: 0,
-        showSizeChanger: true
+      productTable: {
+        id: 0,
+        ref: 'productTable',
+        xTable: null,
+        editIndex: -1,
+        loading: false,
+        tableData: [],
+        columns: [],
+        pagerConfig: {
+          currentPage: 1,
+          pageSize: 10,
+          total: 0
+        },
+        editRules: {
+          purity: [
+            { required: true, message: '名称必填' }
+          ]
+        }
       },
-      status: '',
-      columns: [],
-      loading: false,
-      dataSource: [],
-      id: 0,
-      editIndex: -1,
-      purity: {},
-      providerTotalAmountBegin: '',
-      providerTotalAmountEnd: '',
-      purityName: '',
-      aminoAcidLengthBegin: '',
-      aminoAcidLengthEnd: '',
-      isNeedDesalting: false,
-      aminoAcidType: '',
-      sapProductCode: '',
-      sapProductName: '',
-      data: {
-        'providerTotalAmountBegin': '',
-        'providerTotalAmountEnd': '',
-        'purityName': '',
-        'aminoAcidLengthBegin': '',
-        'aminoAcidLengthEnd': '',
-        'isNeedDesalting': '',
-        'aminoAcidType': '',
-        'sapProductCode': '',
-        'sapProductName': ''
-      },
-      products_status: ''
+      products_status: '',
+      purity: {}
     };
   },
   mounted () {
@@ -230,79 +220,134 @@ export default {
       const { formatter } = this.$units;
       const { peptide } = this.$store.state;
       this.status = peptide.status;
-      this.columns = [
-        { title: '编号', dataIndex: 'code', align: 'center' },
-        { title: '提供总量从', dataIndex: 'providerTotalAmountBegin', scopedSlots: { customRender: 'providerTotalAmountBegin' } },
-        { title: '提供总量至', dataIndex: 'providerTotalAmountEnd', scopedSlots: { customRender: 'providerTotalAmountEnd' } },
-        { title: '纯度', dataIndex: 'purityName', scopedSlots: { customRender: 'purityName' } },
-        { title: '长度从', dataIndex: 'aminoAcidLengthBegin', scopedSlots: { customRender: 'aminoAcidLengthBegin' } },
-        { title: '长度至', dataIndex: 'aminoAcidLengthEnd', scopedSlots: { customRender: 'aminoAcidLengthEnd' } },
-        { title: '是否脱盐', dataIndex: 'isNeedDesalting', align: 'center', scopedSlots: { customRender: 'isNeedDesalting' } },
-        { title: '氨基酸类型', dataIndex: 'aminoAcidType', align: 'center', scopedSlots: { customRender: 'aminoAcidType' } },
-        { title: '产品编号', dataIndex: 'sapProductCode', scopedSlots: { customRender: 'sapProductCode' } },
-        { title: '产品名称', dataIndex: 'sapProductName', scopedSlots: { customRender: 'sapProductName' } },
-        { title: '状态',
-          dataIndex: 'status',
-          customRender: (text) => {
-            return formatter(self.status, text);
+      const columns = [
+        { type: 'index', width: 40 },
+        { label: '编号', prop: 'code' },
+        { label: '提供总量从', prop: 'providerTotalAmountBegin', editRender: { name: 'AInput' } },
+        { label: '提供总量至', prop: 'providerTotalAmountEnd', editRender: { name: 'AInput' } },
+        { label: '纯度', prop: 'purityName', editRender: { name: 'AInput' } },
+        { label: '长度从', prop: 'aminoAcidLengthBegin', editRender: { name: 'AInput' } },
+        { label: '长度至', prop: 'aminoAcidLengthEnd', editRender: { name: 'AInput' } },
+        { label: '是否脱盐', prop: 'isNeedDesalting', align: 'center', editRender: { name: 'AInput' } },
+        { label: '氨基酸类型', prop: 'aminoAcidType', align: 'center', editRender: { name: 'AInput' } },
+        { label: '产品编号', prop: 'sapProductCode', editRender: { name: 'AInput' } },
+        { label: '产品名称', prop: 'sapProductName', editRender: { name: 'AInput' } },
+        { label: '状态',
+          prop: 'status',
+          formatter: ({ cellValue }) => {
+            return formatter(self.status, cellValue);
           }
         },
-        { title: '创建人', dataIndex: 'creatorName' },
-        { title: '创建时间', dataIndex: 'createDate' },
-        { title: '删除人', dataIndex: 'cancelName' },
-        { title: '删除时间', dataIndex: 'cancelDate' },
-        { title: '操作', width: 80, dataIndex: 'actions', fixed: 'right', scopedSlots: { customRender: 'actions' }, align: 'center' }
+        { label: '创建人', prop: 'creatorName' },
+        { label: '创建时间', prop: 'createDate' },
+        { label: '删除人', prop: 'cancelName' },
+        { label: '删除时间', prop: 'cancelDate' },
+        {
+          label: '操作',
+          prop: 'actions',
+          fixed: 'right',
+          slots: {
+            default: ({ row, rowIndex }) => {
+              let actions = [];
+              const xTable = this[tableName].xTable;
+              const isEdit = xTable.hasActiveRow(row);
+              const options = { row, rowIndex, tableName, xTable };
+
+              if (!isEdit) {
+                if (row.status === 1) {
+                  actions = [
+                    <a onClick={() => this.handleDelete(options)}>删除</a>
+                  ];
+                } else {
+                  actions = [
+                    <a onClick={() => this.handleResume(options)}>恢复</a>
+                  ];
+                }
+              }
+              if (isEdit) {
+                actions = [
+                  <a onClick={() => this.handleSave(options) }>保存</a>,
+                  <a onClick={() => this.handleExit(options) }>退出</a>
+                ];
+              }
+              return [
+                <span class="table-actions">
+                  {actions}
+                </span>
+              ];
+            }
+          }
+        }
       ];
+      columns.forEach(function (e) {
+        if (!e.width) e.width = 100;
+      });
+
+      this[tableName].columns = columns;
+
+      this[tableName].xTable = this.$refs[this[tableName].ref].$refs.xTable;
     },
-    handleAdd () {
-      if (this.editIndex === 0) {
-        return false;
-      }
-      this.data.id = this.id;
-      this.dataSource = [ this.data, ...this.dataSource ];
-      this.editIndex = 0;
+    handleSearch (e) {
+      if (e) e.preventDefault();
+      this[tableName].loading = true;
+
+      const queryParam = this.form.getFieldsValue();
+      const params = Object.assign({ page: this[tableName].pagerConfig.currentPage, rows: this[tableName].pagerConfig.pageSize }, queryParam);
+
+      this.$api.peptide.getProduct(params).then((data) => {
+        this[tableName].tableData = data.rows;
+        this[tableName].pagerConfig.total = data.total;
+        this[tableName].pagerConfig.current = params.page;
+        this[tableName].pagerConfig.pageSize = params.rows;
+        this[tableName].editIndex = -1;
+      }).finally(() => {
+        this[tableName].loading = false;
+      });
     },
-    onChange (e) {
-      this.isNeedDesalting = e.target.checked;
-    },
-    change (pagination) {
-      const params = {
-        page: pagination.current,
-        rows: pagination.pageSize
+    handleAddRow () {
+      if (this[tableName].editIndex !== -1) return this.$message.warning('请保存或退出正在编辑的行');
+
+      const table = this[tableName].xTable;
+      var addVal = {
+        id: --this[tableName].id,
+        providerTotalAmountBegin: '',
+        providerTotalAmountEnd: '',
+        aminoAcidLengthBegin: '',
+        aminoAcidLengthEnd: '',
+        isNeedDesalting: '',
+        aminoAcidType: '',
+        sapProductCode: '',
+        sapProductName: ''
       };
-      this.handleSearch(params);
+      this[tableName].tableData = [addVal, ...this[tableName].tableData];
+      table.setActiveRow(addVal);
+      this[tableName].editIndex = 0;
+    },
+    pagerChange (change) {
+      this[tableName].pagerConfig[change.type] = change.value;
+      this.handleSearch();
     },
     customerData (data) {
       this.sapProductCode = data[0].code;
       this.sapProductName = data[0].desc;
     },
-    handleSearch (params = {}) {
-      this.loading = true;
-      this.editIndex = -1;
-
-      const queryParam = this.form.getFieldsValue();
-      params = Object.assign({ page: this.pagination.current, rows: this.pagination.pageSize }, params, queryParam);
-
-      this.$api.peptide.getProduct(params).then((data) => {
-        this.dataSource = data.rows;
-        this.pagination.total = data.total;
-        this.pagination.current = params.page;
-        this.pagination.pageSize = params.rows;
-      }).finally(() => {
-        this.loading = false;
-      });
-    },
-    handleExit () {
-      this.providerTotalAmountBegin = '';
-      this.providerTotalAmountEnd = '';
-      this.purityName = '';
-      this.aminoAcidLengthBegin = '';
-      this.aminoAcidLengthEnd = '';
-      this.isNeedDesalting = false;
-      this.aminoAcidType = '';
-      this.sapProductCode = '';
-      this.sapProductName = '';
-      this.handleSearch();
+    handleExit ({ row, rowIndex, tableName, xTable }) {
+      // this.providerTotalAmountBegin = '';
+      // this.providerTotalAmountEnd = '';
+      // this.purityName = '';
+      // this.aminoAcidLengthBegin = '';
+      // this.aminoAcidLengthEnd = '';
+      // this.isNeedDesalting = false;
+      // this.aminoAcidType = '';
+      // this.sapProductCode = '';
+      // this.sapProductName = '';
+      // this.$refs.table.clearActived();
+      // this.$refs.table.data.splice(0, 1);
+      xTable.clearActived();
+      if (!row.status) {
+        this[tableName].tableData.splice(rowIndex, 1);
+      }
+      this[tableName].editIndex = -1;
     },
     openMask () {
       this.products_status = true;
@@ -350,27 +395,20 @@ export default {
         }
       });
     },
-    handleDelete (i) {
-      if (!i) {
-        this.$notification.error({
-          message: '错误',
-          description: `请选择一条数据`
-        });
-        return false;
-      }
-      this.$api.peptide.deleteProduct(i).then(res => {
+    handleDelete ({ row }) {
+      this.$api.peptide.deleteProduct(row.id).then(res => {
         this.handleSearch();
       });
     },
-    handleResume (i) {
-      if (!i) {
+    handleResume ({ row }) {
+      if (!row.id) {
         this.$notification.error({
           message: '错误',
           description: `请选择一条数据`
         });
         return false;
       }
-      this.$api.peptide.resumeProduct(i).then(res => {
+      this.$api.peptide.resumeProduct(row.id).then(res => {
         this.handleSearch();
       });
     }
