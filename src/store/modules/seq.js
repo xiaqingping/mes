@@ -50,7 +50,12 @@ export default {
       { id: 50, name: 50 }
     ],
     // 样品特性
-    sampleFeature: []
+    sampleFeature: [],
+    // 统一附加费
+    surcharge: [
+      { id: 1, name: '√' },
+      { id: 2, name: '' }
+    ]
   },
   mutations: {
     setCache (state, payload) {

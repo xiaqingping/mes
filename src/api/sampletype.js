@@ -69,5 +69,13 @@ export default {
   // 查询
   getSeqType (params, easyui) {
     return request(`/sampletype/v1/seqtypes${easyui ? '/easyui' : ''}`, { params });
+  },
+  // 新增
+  addSeqType (data) {
+    return request(`/sampletype/v1/seqtypes`, { method: 'POST', data });
+  },
+  // 作废
+  cancelSeqType (id) {
+    return request(`/sampletype/v1/seqtypes/${id}`, { method: 'DELETE' });
   }
 };
