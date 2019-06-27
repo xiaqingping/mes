@@ -81,14 +81,7 @@ export default {
         loading: false,
         tableData: [],
         columns: [],
-        editRules: {
-          name: [
-            { required: true, message: '名称不能为空' }
-          ],
-          seriesId: [
-            { required: true, message: '系列不能为空' }
-          ]
-        },
+        editRules: {},
         pagerConfig: {
           currentPage: 1,
           pageSize: 10,
@@ -171,6 +164,14 @@ export default {
       });
 
       this[tableName].columns = columns;
+      this[tableName].editRules = {
+        name: [
+          { required: true, message: '名称不能为空' }
+        ],
+        seriesId: [
+          { required: true, message: '系列不能为空' }
+        ]
+      };
 
       this[tableName].xTable = this.$refs[this[tableName].ref].$refs.xTable;
     },
@@ -201,8 +202,7 @@ export default {
 
       const table = this[tableName].xTable;
       const newData = {
-        id: --this[tableName].id,
-        name: ''
+        id: --this[tableName].id
       };
 
       this[tableName].tableData = [newData, ...this[tableName].tableData];
