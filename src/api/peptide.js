@@ -16,7 +16,7 @@ export default {
 
   /** ****************************** 多肽纯度 ************************************/
   // 获取纯度(全部)
-  getPurityAll (params) {
+  getPurityAll (params = { status: 1 }) {
     return request(`/peptide-base/v1/puritys`, { params });
   },
 
@@ -73,8 +73,8 @@ export default {
   },
 
   // 获取氨基酸(全部)
-  getAminoAcidAll (params) {
-    return request(`/peptide-base/v1/aminoAcid/easyui`, { params });
+  getAminoAcidAll (params = { status: 1 }) {
+    return request(`/peptide-base/v1/aminoAcid`, { params });
   },
 
   // 恢复氨基酸
@@ -110,7 +110,7 @@ export default {
 
   /** ****************************** 多肽修饰类别 ********************************/
   // 获取修饰类别（全部）
-  getModificationTypesAll (params) {
+  getModificationTypesAll (params = { status: 1 }) {
     return request(`/peptide-base/v1/modificationTypes`, { params });
   },
 

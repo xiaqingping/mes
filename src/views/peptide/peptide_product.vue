@@ -1,3 +1,4 @@
+<!-- 多肽合成产品-->
 <template>
   <div class="page-content">
 
@@ -15,7 +16,7 @@
             <a-form-item label="纯度">
               <a-select v-decorator="['purityID', {initialValue : '0'}]">
                 <a-select-option value="0">全部</a-select-option>
-                <a-select-option v-for="item in purity" :key="item.id" :value="item.id">{{ item.purity }}</a-select-option>
+                <a-select-option v-for="item in $store.state.peptide.purity" :key="item.id" :value="item.id">{{ item.purity }}</a-select-option>
               </a-select>
             </a-form-item>
           </a-col>
@@ -47,7 +48,7 @@
       <div class="table-operator">
         <a-button-group>
           <a-button icon="search" @click="handleSearch">查询</a-button>
-          <a-button icon="plus" @click="handleAddRow">新增</a-button>
+          <a-button icon="plus" type="primary" @click="handleAddRow">新增</a-button>
         </a-button-group>
       </div>
       <vxe-grid
@@ -60,110 +61,8 @@
         :edit-rules="productTable.editRules"
         :edit-config="{key: 'id', trigger: 'manual', mode: 'row', showIcon: false, autoClear: false}"
         :pager-config="productTable.pagerConfig"
-        @current-page-change="(currentPage) => pagerChange({type: 'currentPage', value: currentPage})"
-        @page-size-change="(pageSize) => pagerChange({type: 'pageSize', value: pageSize})"
+        @page-change="pagerChange"
       >
-        <!-- <template slot="providerTotalAmountBegin" slot-scope="value, row, index">
-          <a-input
-            size="small"
-            v-if="editIndex === index"
-            style="width:100px;"
-            :class="[providerTotalAmountBegin ? '' : 'isValue']"
-            v-model="providerTotalAmountBegin"
-          />
-          <template v-else>{{ value }}</template>
-        </template>
-
-        <template slot="providerTotalAmountEnd" slot-scope="value, row, index">
-          <a-input
-            size="small"
-            v-if="editIndex === index"
-            style="width:100px;"
-            :class="[providerTotalAmountEnd ? '' : 'isValue']"
-            v-model="providerTotalAmountEnd"
-          />
-          <template v-else>{{ value }}</template>
-        </template>
-
-        <template slot="purityName" slot-scope="value, row, index">
-          <a-select style="width: 65px;" size="small" v-if="editIndex === index" v-model="purityName">
-            <a-select-option v-for="item in purity" :key="item.id" :value="item.purity">{{ item.purity }}</a-select-option>
-          </a-select>
-          <template v-else>{{ value }}</template>
-        </template>
-
-        <template slot="aminoAcidLengthBegin" slot-scope="value, row, index">
-          <a-input
-            size="small"
-            v-if="editIndex === index"
-            style="width:100px;"
-            :class="[aminoAcidLengthBegin ? '' : 'isValue']"
-            v-model="aminoAcidLengthBegin"
-          />
-          <template v-else>{{ value }}</template>
-        </template>
-
-        <template slot="aminoAcidLengthEnd" slot-scope="value, row, index">
-          <a-input
-            size="small"
-            v-if="editIndex === index"
-            style="width:100px;"
-            :class="[aminoAcidLengthEnd ? '' : 'isValue']"
-            v-model="aminoAcidLengthEnd"
-          />
-          <template v-else>{{ value }}</template>
-        </template>
-
-        <template slot="isNeedDesalting" slot-scope="value, row, index">
-          <a-checkbox v-if="editIndex === index" @change="onChange"></a-checkbox>
-          <template v-else>{{ value === 1 ? '√' :'' }}</template>
-        </template>
-
-        <template slot="aminoAcidType" slot-scope="value, row, index">
-          <a-select style="width: 65px;" size="small" v-if="editIndex === index" v-model="aminoAcidType">
-            <a-select-option value="L">L</a-select-option>
-            <a-select-option value="D">D</a-select-option>
-          </a-select>
-          <template v-else>{{ value }}</template>
-        </template>
-
-        <template slot="sapProductCode" slot-scope="value, row, index">
-          <a-input
-            size="small"
-            v-if="editIndex === index"
-            style="width:100px;"
-            v-model="sapProductCode"
-            read-only
-          />
-          <template v-else>{{ value }}</template>
-        </template>
-
-        <template slot="sapProductName" slot-scope="value, row, index">
-          <a-input-search
-            size="small"
-            v-if="editIndex === index"
-            style="width:200px;"
-            v-model="sapProductName"
-            @search="openMask"
-            read-only
-          />
-          <template v-else>{{ value }}</template>
-        </template>
-
-        <template slot="actions" slot-scope="value, row, index">
-          <div :key="value">
-            <template v-if="row.status === 1 && editIndex !== index">
-              <a @click="handleDelete(row.id)">删除 </a>
-            </template>
-            <template v-if="row.status === 2 && editIndex !== index">
-              <a @click="handleResume(row.id)">恢复</a>
-            </template>
-            <template v-if="editIndex === index">
-              <a @click="handleSave(row)">保存 </a>
-              <a @click="handleExit()">退出 </a>
-            </template>
-          </div>
-        </template> -->
       </vxe-grid>
     </div>
     <!-- <products-mask v-show="products_status" @Closed="closeMask()" @customerData="customerData">
@@ -204,15 +103,12 @@ export default {
         }
       },
       products_status: '',
-      purity: {}
+      aa: []
     };
   },
   mounted () {
     this.setColumns();
     this.handleSearch();
-    this.$api.peptide.getPurityAll({ status: 1 }).then(res => {
-      this.purity = res;
-    });
   },
   methods: {
     setColumns () {
@@ -225,7 +121,15 @@ export default {
         { label: '编号', prop: 'code' },
         { label: '提供总量从', prop: 'providerTotalAmountBegin', editRender: { name: 'AInput' } },
         { label: '提供总量至', prop: 'providerTotalAmountEnd', editRender: { name: 'AInput' } },
-        { label: '纯度', prop: 'purityName', editRender: { name: 'AInput' } },
+        { label: '纯度',
+          prop: 'purityID',
+          formatter: function ({ cellValue }) { return formatter(peptide.purity, cellValue, 'id', 'purity'); },
+          editRender: {
+            name: 'ASelect',
+            optionProps: { value: 'id', label: 'purity' },
+            options: peptide.purity
+          }
+        },
         { label: '长度从', prop: 'aminoAcidLengthBegin', editRender: { name: 'AInput' } },
         { label: '长度至', prop: 'aminoAcidLengthEnd', editRender: { name: 'AInput' } },
         { label: '是否脱盐', prop: 'isNeedDesalting', align: 'center', editRender: { name: 'AInput' } },
@@ -309,22 +213,15 @@ export default {
 
       const table = this[tableName].xTable;
       var addVal = {
-        id: --this[tableName].id,
-        providerTotalAmountBegin: '',
-        providerTotalAmountEnd: '',
-        aminoAcidLengthBegin: '',
-        aminoAcidLengthEnd: '',
-        isNeedDesalting: '',
-        aminoAcidType: '',
-        sapProductCode: '',
-        sapProductName: ''
+        id: --this[tableName].id
       };
+
       this[tableName].tableData = [addVal, ...this[tableName].tableData];
       table.setActiveRow(addVal);
       this[tableName].editIndex = 0;
     },
-    pagerChange (change) {
-      this[tableName].pagerConfig[change.type] = change.value;
+    pagerChange ({ pageSize, currentPage }) {
+      this[tableName].pagerConfig = Object.assign(this[tableName].pagerConfig, { pageSize, currentPage });
       this.handleSearch();
     },
     customerData (data) {
@@ -332,17 +229,6 @@ export default {
       this.sapProductName = data[0].desc;
     },
     handleExit ({ row, rowIndex, tableName, xTable }) {
-      // this.providerTotalAmountBegin = '';
-      // this.providerTotalAmountEnd = '';
-      // this.purityName = '';
-      // this.aminoAcidLengthBegin = '';
-      // this.aminoAcidLengthEnd = '';
-      // this.isNeedDesalting = false;
-      // this.aminoAcidType = '';
-      // this.sapProductCode = '';
-      // this.sapProductName = '';
-      // this.$refs.table.clearActived();
-      // this.$refs.table.data.splice(0, 1);
       xTable.clearActived();
       if (!row.status) {
         this[tableName].tableData.splice(rowIndex, 1);

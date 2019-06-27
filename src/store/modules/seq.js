@@ -41,7 +41,16 @@ export default {
     // 测序类型
     seqType: [],
     // 载体系列
-    series: []
+    series: [],
+    // 浓度
+    concentration: [
+      { id: 10, name: 10 },
+      { id: 20, name: 20 },
+      { id: 30, name: 30 },
+      { id: 50, name: 50 }
+    ],
+    // 样品特性
+    sampleFeature: []
   },
   mutations: {
     setCache (state, payload) {
@@ -60,10 +69,10 @@ export default {
         sampleType: sampletype.getSampleType,
         seqfactory: seqfactory.getSeqfactory,
         seqType: sampletype.getSeqType,
+        sampleFeature: sampletype.getSampleFeature,
         series: series.getSeries
       };
       const { type } = payload;
-
       // 如果存在type则只获取type对应的数据，否则获取全部数据
       if (type) {
         methods[type]().then(data => {

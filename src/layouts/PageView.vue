@@ -3,10 +3,11 @@
     <page-header></page-header>
 
     <!-- keep-alive  -->
-    <keep-alive v-if="multiTab">
+    <!-- <keep-alive v-if="multiTab">
       <router-view ref="content" />
     </keep-alive>
-    <router-view v-else ref="content" />
+    <router-view v-else ref="content" /> -->
+    <router-view ref="content" />
   </div>
 </template>
 

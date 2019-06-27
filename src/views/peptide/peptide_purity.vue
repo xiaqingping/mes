@@ -1,3 +1,4 @@
+<!-- 多肽纯度-->
 <template>
   <div class="page-content">
 
@@ -31,7 +32,7 @@
       <div class="table-operator">
         <a-button-group>
           <a-button icon="search" @click="handleSearch">查询</a-button>
-          <a-button icon="plus" @click="handleAddRow">新增</a-button>
+          <a-button icon="plus" type="primary" @click="handleAddRow">新增</a-button>
         </a-button-group>
       </div>
 
@@ -45,36 +46,8 @@
         :edit-rules="purityTable.editRules"
         :edit-config="{key: 'id', trigger: 'manual', mode: 'row', showIcon: false, autoClear: false}"
         :pager-config="purityTable.pagerConfig"
-        @current-page-change="(currentPage) => pagerChange({type: 'currentPage', value: currentPage})"
-        @page-size-change="(pageSize) => pagerChange({type: 'pageSize', value: pageSize})"
-      >
-        <!-- <template slot="purity" slot-scope="value, row, index">
-          <div
-            :key="value">
-            <a-input
-              size="small"
-              v-if="editIndex === index"
-              style="width:100px;"
-              :class="[purity ? '' : 'isValue']"
-              v-model="purity"
-            />
-            <template v-else>{{ value }}</template>
-          </div>
-        </template>
-        <template slot="actions" slot-scope="value, row, index">
-          <div :key="value">
-            <template v-if="row.status === 1 && editIndex !== index">
-              <a @click="handleDelete(row.id)">删除 </a>
-            </template>
-            <template v-if="row.status === 2 && editIndex !== index">
-              <a @click="handleResume(row.id)">恢复</a>
-            </template>
-            <template v-if="editIndex === index">
-              <a @click="handleSave(row)">保存 </a>
-              <a @click="handleExit()">退出 </a>
-            </template>
-          </div>
-        </template> -->
+        @page-change="pagerChange">
+        >
       </vxe-grid>
     </div>
 
@@ -183,8 +156,8 @@ export default {
       this[tableName].xTable = this.$refs[this[tableName].ref].$refs.xTable;
     },
     // 分页
-    pagerChange (change) {
-      this[tableName].pagerConfig[change.type] = change.value;
+    pagerChange ({ pageSize, currentPage }) {
+      this[tableName].pagerConfig = Object.assign(this[tableName].pagerConfig, { pageSize, currentPage });
       this.handleSearch();
     },
     // 搜索数据或者刷新
@@ -195,7 +168,7 @@ export default {
       const queryParam = this.form.getFieldsValue();
       const params = Object.assign({ page: this[tableName].pagerConfig.currentPage, rows: this[tableName].pagerConfig.pageSize }, queryParam);
 
-      this.$api.peptide.getPurity(params, true).then((data) => {
+      this.$api.peptide.getPurity(params).then((data) => {
         this[tableName].tableData = data.rows;
         this[tableName].pagerConfig.total = data.total;
         this[tableName].pagerConfig.currentPage = params.page;
@@ -212,8 +185,7 @@ export default {
 
       const table = this[tableName].xTable;
       var addVal = {
-        id: --this[tableName].id,
-        purity: ''
+        id: --this[tableName].id
       };
       this[tableName].tableData = [addVal, ...this[tableName].tableData];
       table.setActiveRow(addVal);

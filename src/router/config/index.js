@@ -16,6 +16,12 @@ export const asyncRouterMap = [
     meta: { title: '首页' },
     redirect: '/seq/seqfactory',
     children: [
+      {
+        path: '/home',
+        name: 'home',
+        component: () => import('@/views/home'),
+        meta: { title: '首页', keepAlive: true, icon: 'dashboard', permission: [ 'dashboard' ] }
+      },
       peptide,
       seq,
       personnel,

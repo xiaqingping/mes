@@ -1,3 +1,4 @@
+<!-- 多肽氨基酸-->
 <template>
   <div class="page-content">
 
@@ -40,7 +41,7 @@
       <div class="table-operator">
         <a-button-group>
           <a-button icon="search" @click="handleSearch">查询</a-button>
-          <a-button icon="plus" @click="handleAddRow">新增</a-button>
+          <a-button icon="plus" type="primary" @click="handleAddRow">新增</a-button>
         </a-button-group>
       </div>
 
@@ -54,151 +55,8 @@
         :edit-rules="aminoAcidTable.editRules"
         :edit-config="{key: 'id', trigger: 'manual', mode: 'row', showIcon: false, autoClear: false}"
         :pager-config="aminoAcidTable.pagerConfig"
-        @current-page-change="(currentPage) => pagerChange({type: 'currentPage', value: currentPage})"
-        @page-size-change="(pageSize) => pagerChange({type: 'pageSize', value: pageSize})"
+        @page-change="pagerChange"
       >
-
-        <!-- <template slot="name" slot-scope="value, row, index">
-          <a-input
-            size="small"
-            v-if="editIndex === index"
-            style="width:100px;"
-            :class="[name ? '' : 'isValue']"
-            v-model="name"
-          />
-          <template v-else>{{ value }}</template>
-        </template>
-
-        <template slot="hydrophilic" slot-scope="value, row, index">
-          <a-checkbox v-if="editIndex === index" @change="onChange($event, 'hydrophilic')"></a-checkbox>
-          <template v-else>{{ value === 1 ? '√' :'' }}</template>
-        </template>
-
-        <template slot="hydrophobic" slot-scope="value, row, index">
-          <a-checkbox v-if="editIndex === index" @change="onChange($event, 'hydrophobic')"></a-checkbox>
-          <template v-else>{{ value === 1 ? '√' :'' }}</template>
-        </template>
-
-        <template slot="acidic" slot-scope="value, row, index">
-          <a-checkbox v-if="editIndex === index" @change="onChange($event, 'acidic')"></a-checkbox>
-          <template v-else>{{ value === 1 ? '√' :'' }}</template>
-        </template>
-
-        <template slot="alkaline" slot-scope="value, row, index">
-          <a-checkbox v-if="editIndex === index" @change="onChange($event, 'alkaline')"></a-checkbox>
-          <template v-else>{{ value === 1 ? '√' :'' }}</template>
-        </template>
-
-        <template slot="isCanDisulfideBond" slot-scope="value, row, index">
-          <a-checkbox v-if="editIndex === index" @change="onChange($event, 'isCanDisulfideBond')"></a-checkbox>
-          <template v-else>{{ value === 1 ? '√' :'' }}</template>
-        </template>
-
-        <template slot="molecularWeight" slot-scope="value, row, index">
-          <a-input
-            size="small"
-            v-if="editIndex === index"
-            style="width:50px;"
-            :class="[molecularWeight ? '' : 'isValue']"
-            v-model="molecularWeight"
-          />
-          <template v-else>{{ value }}</template>
-        </template>
-
-        <template slot="isoelectricPoint" slot-scope="value, row, index">
-          <a-input
-            size="small"
-            v-if="editIndex === index"
-            style="width:50px;"
-            :class="[isoelectricPoint ? '' : 'isValue']"
-            v-model="isoelectricPoint"
-          />
-          <template v-else>{{ value }}</template>
-        </template>
-
-        <template slot="carboxylationDissociationConstant" slot-scope="value, row, index">
-          <a-input
-            size="small"
-            v-if="editIndex === index"
-            style="width:50px;"
-            :class="[carboxylationDissociationConstant ? '' : 'isValue']"
-            v-model="carboxylationDissociationConstant"
-          />
-          <template v-else>{{ value }}</template>
-        </template>
-
-        <template slot="aminoDissociationConstant" slot-scope="value, row, index">
-          <a-input
-            size="small"
-            v-if="editIndex === index"
-            style="width:50px;"
-            :class="[aminoDissociationConstant ? '' : 'isValue']"
-            v-model="aminoDissociationConstant"
-          />
-          <template v-else>{{ value }}</template>
-        </template>
-
-        <template slot="aminoAcidType" slot-scope="value, row, index">
-          <a-input
-            size="small"
-            v-if="editIndex === index"
-            style="width:50px;"
-            :class="[aminoAcidType ? '' : 'isValue']"
-            v-model="aminoAcidType"
-            read-only
-          />
-          <template v-else>{{ value }}</template>
-        </template>
-
-        <template slot="longCode" slot-scope="value, row, index">
-          <a-input
-            size="small"
-            v-if="editIndex === index"
-            style="width:50px;"
-            :class="[leftLongCode ? '' : 'isValue']"
-            v-model="leftLongCode"
-          />&nbsp;
-          <a-input
-            size="small"
-            v-if="editIndex === index"
-            style="width:50px;"
-            :class="[rightLongCode ? '' : 'isValue']"
-            v-model="rightLongCode"
-          />
-          <template v-else>{{ value }}</template>
-        </template>
-
-        <template slot="shortCode" slot-scope="value, row, index">
-          <a-input
-            size="small"
-            v-if="editIndex === index"
-            style="width:50px;"
-            :class="[leftShortCode ? '' : 'isValue']"
-            v-model="leftShortCode"
-          />&nbsp;
-          <a-input
-            size="small"
-            v-if="editIndex === index"
-            style="width:50px;"
-            :class="[rightShortCode ? '' : 'isValue']"
-            v-model="rightShortCode"
-          />
-          <template v-else>{{ value }}</template>
-        </template>
-        <template slot="actions" slot-scope="value, row, index">
-          <div :key="value">
-            <template v-if="row.status === 1 && editIndex !== index">
-              <a @click="handleDelete(row.id)">删除 </a>
-            </template>
-            <template v-if="row.status === 2 && editIndex !== index">
-              <a @click="handleResume(row.id)">恢复</a>
-            </template>
-            <template v-if="editIndex === index">
-              <a @click="handleSave(row)">保存 </a>
-              <a @click="handleExit()">退出 </a>
-            </template>
-          </div>
-        </template> -->
       </vxe-grid>
     </div>
   </div>
@@ -399,8 +257,8 @@ export default {
         this[tableName].loading = false;
       });
     },
-    pagerChange (change) {
-      this[tableName].pagerConfig[change.type] = change.value;
+    pagerChange ({ pageSize, currentPage }) {
+      this[tableName].pagerConfig = Object.assign(this[tableName].pagerConfig, { pageSize, currentPage });
       this.handleSearch();
     },
     handleAddRow () {

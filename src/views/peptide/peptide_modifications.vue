@@ -1,3 +1,4 @@
+<!-- 多肽修饰-->
 <template>
   <div class="page-content">
 
@@ -63,69 +64,8 @@
             :edit-config="{key: 'id', trigger: 'manual', mode: 'row', showIcon: false, autoClear: false}"
             :pager-config="modificationsTable.pagerConfig"
             @cell-click="(options) => handleCellClick(options)"
-            @current-page-change="(currentPage) => pagerChange({type: 'currentPage', value: currentPage})"
-            @page-size-change="(pageSize) => pagerChange({type: 'pageSize', value: pageSize})"
+            @page-change="pagerChange"
           >
-
-            <!-- <template slot="name" slot-scope="value, row, index">
-              <a-input
-                size="small"
-                v-if="editIndex === index"
-                style="width:230px;"
-                :class="[name ? '' : 'isValue']"
-                v-model="name"
-              />
-              <template v-else>{{ value }}</template>
-            </template>
-
-            <template slot="modificationCode" slot-scope="value, row, index">
-              <a-input
-                size="small"
-                v-if="editIndex === index"
-                style="width:100px;"
-                :class="[modificationCode ? '' : 'isValue']"
-                v-model="modificationCode"
-              />
-              <template v-else>{{ value }}</template>
-            </template>
-
-            <template slot="modificationPosition" slot-scope="value, row, index">
-              <a-select style="width: 80px;" size="small" v-if="editIndex === index" v-model="modificationPosition">
-                <a-select-option v-for="item in modificationPositionData" :key="item.id" :value="item.id">
-                  {{ item.name }}
-                </a-select-option>
-              </a-select>
-              <template v-else>{{ row.modificationPositionName }}</template>
-            </template>
-
-            <template slot="isIndependentModification" slot-scope="value, row, index">
-              <a-checkbox v-if="editIndex === index" @change="onChange"></a-checkbox>
-              <template v-else>{{ value === 1 ? '√' :'' }}</template>
-            </template>
-
-            <template slot="modificationTypeID" slot-scope="value, row, index">
-              <a-select style="width: 220px;" size="small" v-if="editIndex === index" v-model="modificationTypeID" >
-                <a-select-option v-for="item in modificationsType" :key="item.id" :value="item.id">
-                  {{ item.modificationType }}
-                </a-select-option>
-              </a-select>
-              <template v-else>{{ row.modificationTypeName }}</template>
-            </template>
-
-            <template slot="actions" slot-scope="value, row, index">
-              <div :key="value">
-                <template v-if="row.status === 1 && editIndex !== index">
-                  <a @click="handleDelete(row.id)">删除 </a>
-                </template>
-                <template v-if="row.status === 2 && editIndex !== index">
-                  <a @click="handleResume(row.id)">恢复</a>
-                </template>
-                <template v-if="editIndex === index">
-                  <a @click="handleSave(row)">保存 </a>
-                  <a @click="handleExit()">退出 </a>
-                </template>
-              </div>
-            </template> -->
           </vxe-grid>
         </div>
       </a-layout-content>
@@ -147,43 +87,6 @@
           :edit-rules="modificationSonTable.editRules"
           :edit-config="{key: 'id', trigger: 'manual', mode: 'row', showIcon: false, autoClear: false}"
         >
-          <!-- <template slot="code" slot-scope="value, row, index">
-            <a-input-search
-              size="small"
-              v-if="editIndexSon === index"
-              style="width:100px;"
-              v-model="sonCode"
-              @search="openMask"
-              read-only
-            />
-            <template v-else>{{ value }}</template>
-          </template>
-
-          <template slot="name" slot-scope="value, row, index">
-            <a-input
-              size="small"
-              v-if="editIndexSon === index"
-              style="width:100px;"
-              v-model="sonName"
-              read-only
-            />
-            <template v-else>{{ value }}</template>
-          </template>
-
-          <template slot="actions" slot-scope="value, row, index">
-            <div :key="value">
-              <template v-if="row.status === 1 && editIndexSon !== index">
-                <a @click="handleDeleteSon(row.id)">删除 </a>
-              </template>
-              <template v-if="row.status === 2 && editIndexSon !== index">
-                <a @click="handleResumeSon(row.id)">恢复</a>
-              </template>
-              <template v-if="editIndexSon === index">
-                <a @click="handleSaveSon(row)">保存 </a>
-                <a @click="handleExitSon()">退出 </a>
-              </template>
-            </div>
-          </template> -->
         </vxe-grid>
       </a-layout-sider>
     </a-layout>
@@ -455,8 +358,8 @@ export default {
       table.setActiveRow(addVal);
       this[tableName].editIndex = 0;
     },
-    pagerChange (change) {
-      this[tableName].pagerConfig[change.type] = change.value;
+    pagerChange ({ pageSize, currentPage }) {
+      this[tableName].pagerConfig = Object.assign(this[tableName].pagerConfig, { pageSize, currentPage });
       this.handleSearch();
     },
     changeSon (pagination) {
