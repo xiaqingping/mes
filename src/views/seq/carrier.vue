@@ -254,14 +254,14 @@ export default {
       this.handleSearch();
     },
     // 选择系列
-    seriesChange (series, row, value) {
+    seriesChange (arr, row, value) {
       let obj = {};
-      for (var i = 0; i < series.length; i++) {
-        if (series[i].id === value) {
+      for (var i = 0; i < arr.length; i++) {
+        if (arr[i].id === value) {
           obj = {
-            seriesId: series[i].id,
-            seriesCode: series[i].code,
-            seriesName: series[i].name
+            seriesId: arr[i].id,
+            seriesCode: arr[i].code,
+            seriesName: arr[i].name
           };
           break;
         }

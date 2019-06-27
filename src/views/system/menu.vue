@@ -1,73 +1,127 @@
 <template>
   <div class="page-content">
-    <div class="table-operator">
-      <a-button-group>
-        <a-button v-action:search icon="search" @click="handleSearch">查询</a-button>
-        <a-button icon="plus">新建</a-button>
-        <a-button icon="form">审核</a-button>
-      </a-button-group>
-    </div>
 
-    <s-table
-      size="small"
-      :scroll="{ x: 1500 }"
-      :columns="columns"
-      :data="loadData"
-      :rowSelection="{ selectedRowKeys: selectedRowKeys, onChange: onSelectChange }"
-    >
-    </s-table>
+    <a-layout>
+      <a-layout-content>
+        <span style="line-height:32px;">菜单</span>
+        <div class="table-operator">
+          <a-button-group>
+            <a-button v-action:search icon="search" @click="handleSearch">查询</a-button>
+            <a-button icon="save" type="primary">保存</a-button>
+          </a-button-group>
+        </div>
+
+        <vxe-grid
+          highlight-hover-row
+          auto-resize
+          :ref="menuTable.ref"
+          :loading="menuTable.loading"
+          :columns="menuTable.columns"
+          :data.sync="menuTable.tableData"
+          :edit-rules="menuTable.editRules"
+          :tree-config="{key: 'name', children: 'children'}"
+          :edit-config="{key: 'id', trigger: 'manual', mode: 'row', showIcon: false, autoClear: false}">
+        </vxe-grid>
+      </a-layout-content>
+
+      <a-layout-sider width="300">
+        <span style="line-height:32px;">按钮</span>
+        <div class="table-operator">
+          <a-button-group>
+            <a-button icon="edit" type="primary">修改</a-button>
+          </a-button-group>
+        </div>
+
+        <!-- <vxe-grid
+          highlight-hover-row
+          auto-resize
+          :ref="seriesPrimersTable.ref"
+          :loading="seriesPrimersTable.loading"
+          :columns="seriesPrimersTable.columns"
+          :data.sync="seriesPrimersTable.tableData"
+          :edit-rules="seriesPrimersTable.editRules"
+          :edit-config="{key: 'id', trigger: 'manual', mode: 'row', showIcon: false, autoClear: false}">
+        </vxe-grid> -->
+      </a-layout-sider>
+    </a-layout>
   </div>
 </template>
 
 <script>
-import STable from '@/components/Table';
+import { asyncRouterMap } from '@/router/config/index';
 
 export default {
-  name: 'SystemUser',
+  name: 'SystemMenu',
   components: {
-    STable
   },
   data () {
     return {
-      columns: [
-        { title: '员工', dataIndex: 'employeeCode' },
-        { title: '编号', dataIndex: 'loginCode' },
-        { title: '姓名', dataIndex: 'name' },
-        { title: '角色', dataIndex: 'roleID' },
-        { title: '大区', dataIndex: 'regionCode' },
-        { title: '网点', dataIndex: 'officeCode' },
-        { title: '客户', dataIndex: 'customerCode' },
-        { title: '测序点', dataIndex: 'cxPointId' },
-        { title: '仓库', dataIndex: 'storageCode' },
-        { title: '状态', dataIndex: 'isdel' },
-        { title: '登录时间', dataIndex: 'loginDate' },
-        { title: '创建时间', dataIndex: 'createDate' },
-        { title: 'ID', dataIndex: 'code' }
-      ],
-      queryParam: {},
-      loadData: parameter => {
-        const params = Object.assign(parameter, this.queryParam);
-        return this.$api.user.getUserList(params).then(res => {
-          return {
-            data: res.rows,
-            page: params.page,
-            total: res.total
-          };
-        });
-      },
-      selectedRowKeys: [],
-      selectedRows: []
+      menuTable: {
+        id: 0,
+        ref: 'menuTable',
+        xTable: null,
+        editIndex: -1,
+        editData: null,
+        loading: false,
+        tableData: [],
+        columns: [],
+        editRules: {}
+      }
     };
   },
-  mounted () {},
+  mounted () {
+    this.setColumn();
+    this.handleSearch();
+  },
   methods: {
-    onSelectChange (selectedRowKeys, selectedRows) {
-      this.selectedRowKeys = selectedRowKeys;
-      this.selectedRows = selectedRows;
+    // 设置表格列属性
+    setColumn () {
+      const tableName = 'menuTable';
+      const columns = [
+        { type: 'index', width: 40 },
+        { label: '菜单', prop: 'name', treeNode: true },
+        { label: '链接', prop: 'url' },
+        { label: '图标', prop: 'note' },
+        { label: '排序', prop: 'serial' }
+      ];
+
+      // columns.forEach(function (e) {
+      //   if (!e.width) e.width = 100;
+      // });
+
+      this[tableName].columns = columns;
+      this[tableName].editRules = {
+        name: [
+          { required: true, message: '名称不能为空' }
+        ],
+        seriesId: [
+          { required: true, message: '系列不能为空' }
+        ]
+      };
+
+      this[tableName].xTable = this.$refs[this[tableName].ref].$refs.xTable;
     },
-    handleSearch (e) {
-      e.preventDefault();
-      this.$refs.table.refresh(true);
+    // 查询
+    handleSearch () {
+      const tableName = 'menuTable';
+      const menu = this.formatMenu(JSON.parse(JSON.stringify(asyncRouterMap[0].children)));
+      this[tableName].tableData = menu;
+    },
+    // 格式化菜单数据
+    formatMenu (menu) {
+      var arr = menu.map((e, i) => {
+        const obj = {
+          name: e.meta.title,
+          url: e.path,
+          note: e.meta.icon,
+          serial: i + 1
+        };
+        if (e.children) {
+          obj.children = this.formatMenu(e.children);
+        }
+        return obj;
+      });
+      return arr;
     }
   }
 };

@@ -192,7 +192,7 @@ export default {
     },
     // 删除
     handleCancel ({ row }) {
-      this.$api.sampletype.cancelSampleType(row.id).then(() => {
+      this.$api.sampletype.cancelSeqType(row.id).then(() => {
         this.handleSearch();
       });
     },
