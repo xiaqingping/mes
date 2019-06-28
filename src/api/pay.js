@@ -18,8 +18,8 @@ export default {
     return request(`/pay/v1/date/excel`, { method: 'POST', ...options });
   },
   // 获取工资类型
-  getTypepay (params) {
-    return request(`/pay/v1/type/easyui`, { params });
+  getTypepay (params, easyui) {
+    return request(`/pay/v1/type/${easyui ? '/easyui' : ''}`, { params });
   },
   // 保存工资类型
   increaseTypepay (params) {
