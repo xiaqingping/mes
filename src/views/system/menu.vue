@@ -93,9 +93,6 @@ export default {
       this[tableName].editRules = {
         name: [
           { required: true, message: '名称不能为空' }
-        ],
-        seriesId: [
-          { required: true, message: '系列不能为空' }
         ]
       };
 
