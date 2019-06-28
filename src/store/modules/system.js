@@ -2,7 +2,6 @@ export default {
   state: {
     // Type
     type: [
-      // { id: '', name: '全部' },
       { id: 'GET', name: 'GET' },
       { id: 'POST', name: 'POST' },
       { id: 'DELETE', name: 'DELETE' },
@@ -10,7 +9,6 @@ export default {
     ],
     // 参数类型
     paramType: [
-      // { id: '', name: '全部' },
       { id: 1, name: '参数' },
       { id: 2, name: '属性' },
       { id: 3, name: '接口' }
@@ -18,37 +16,40 @@ export default {
     // 状态
     status: [
       { id: 0, name: '有效' },
-      { id: 1, name: '无效' }
+      { id: 1, name: '过期' }
+    ],
+    // 状态 - 用户管理
+    isdel: [
+      { id: 0, name: '正常' },
+      { id: 1, name: '作废' }
     ],
     // 角色
     roles: [
-      { id: '', name: '全部' },
-      { id: 22, name: 'BBI_基因' },
-      { id: 2, name: '多肽订单' },
-      { id: 3, name: '代理商' },
-      { id: 4, name: '客服订单' },
-      { id: 5, name: '其他部门' },
-      { id: 6, name: '测序审核' },
-      { id: 7, name: '测序制单' },
-      { id: 8, name: '基因实验' },
-      { id: 9, name: '基因审核' },
-      { id: 10, name: '基因制单' },
-      { id: 11, name: '合成审核' },
-      { id: 12, name: '合成制单' },
-      { id: 13, name: '销售总监' },
-      { id: 14, name: '大区经理' },
-      { id: 15, name: '销售经理' },
-      { id: 16, name: '销售助理' },
-      { id: 17, name: '销售代表' },
-      { id: 18, name: '财务' },
-      { id: 19, name: '人事' },
-      { id: 20, name: '仓库' },
-      { id: 21, name: '采购员' },
+      { id: 67, name: 'BBI_基因' },
+      { id: 56, name: '多肽订单' },
+      { id: 53, name: '代理商' },
+      { id: 52, name: '客服订单' },
+      { id: 51, name: '其他部门' },
+      { id: 50, name: '测序审核' },
+      { id: 49, name: '测序制单' },
+      { id: 48, name: '基因实验' },
+      { id: 47, name: '基因审核' },
+      { id: 46, name: '基因制单' },
+      { id: 45, name: '合成审核' },
+      { id: 44, name: '合成制单' },
+      { id: 39, name: '销售总监' },
+      { id: 38, name: '大区经理' },
+      { id: 37, name: '销售经理' },
+      { id: 36, name: '销售助理' },
+      { id: 35, name: '销售代表' },
+      { id: 34, name: '财务' },
+      { id: 33, name: '人事' },
+      { id: 32, name: '仓库' },
+      { id: 5, name: '采购员' },
       { id: 1, name: '系统管理员' }
     ],
     // 大区
     regions: [
-      { id: 0, name: '全部' },
       { id: 1000, name: '华北大区' },
       { id: 2000, name: '东北大区' },
       { id: 2200, name: '香港大区' },
@@ -70,7 +71,6 @@ export default {
     ],
     // 网点
     offices: [
-      { id: 0, name: '全部' },
       { id: 100, name: '北京' },
       { id: 101, name: '广州' },
       { id: 102, name: '武汉' },
@@ -118,11 +118,24 @@ export default {
       { id: 998, name: '总部-国际' },
       { id: 999, name: '总部-国内' }
     ],
-    // 状态 - 用户管理
-    isdel: [
-      { id: '', name: '全部' },
-      { id: 0, name: '正常' },
-      { id: 1, name: '作废' }
+    // 测序点
+    cxPointId: [
+      { id: 1, name: '上海测序点x' },
+      { id: 2, name: '广州测序点' },
+      { id: 3, name: '北京测序点' },
+      { id: 4, name: '武汉测序点' },
+      { id: 5, name: '成都测序点' },
+      { id: 6, name: '昆明测序点' },
+      { id: 7, name: '长春测序点' },
+      { id: 8, name: '青岛测序点' },
+      { id: 9, name: '西安测序点' },
+      { id: 10, name: '郑州测序点' },
+      { id: 11, name: '南京测序点' }
+    ],
+    // 仓库
+    storageCode: [
+      { id: 1002, name: '北京测序' },
+      { id: 2100, name: '上海仓' }
     ]
   },
   mutations: {},
