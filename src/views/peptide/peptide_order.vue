@@ -432,5 +432,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-
+  // .vxe-pager-size--select{
+  //   z-index: 10;
+  // }
 </style>
