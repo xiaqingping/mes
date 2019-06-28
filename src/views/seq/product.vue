@@ -42,7 +42,7 @@
 
       <div class="table-operator">
         <a-button-group>
-          <a-button icon="search" @click="handleSearch">查询</a-button>
+          <a-button v-action:search icon="search" @click="handleSearch">查询</a-button>
           <a-button icon="plus" type="primary" @click="handleAddRow()">新增</a-button>
         </a-button-group>
       </div>
