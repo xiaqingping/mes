@@ -2,6 +2,7 @@
  *多肽
  * http://192.168.19.71:8289/swagger-ui.html    peptideorder
  * http://192.168.19.71:8288/swagger-ui.html   peptide-base
+ * http://192.168.20.2:8001/swagger-ui.html    BASIC
  */
 
 import request from '../assets/js/request';
@@ -15,7 +16,7 @@ export default {
 
   /** ****************************** 多肽纯度 ************************************/
   // 获取纯度(全部)
-  getPurityAll (params) {
+  getPurityAll (params = { status: 1 }) {
     return request(`/peptide-base/v1/puritys`, { params });
   },
 
@@ -72,8 +73,8 @@ export default {
   },
 
   // 获取氨基酸(全部)
-  getAminoAcidAll (params) {
-    return request(`/peptide-base/v1/aminoAcid/easyui`, { params });
+  getAminoAcidAll (params = { status: 1 }) {
+    return request(`/peptide-base/v1/aminoAcid`, { params });
   },
 
   // 恢复氨基酸
@@ -109,7 +110,7 @@ export default {
 
   /** ****************************** 多肽修饰类别 ********************************/
   // 获取修饰类别（全部）
-  getModificationTypesAll (params) {
+  getModificationTypesAll (params = { status: 1 }) {
     return request(`/peptide-base/v1/modificationTypes`, { params });
   },
 
@@ -155,6 +156,11 @@ export default {
   },
 
   /** ****************************** 适用氨基酸 ************************************/
+  // 保存适用氨基酸
+  getSuitableAminoAcids (params) {
+    return request(`/peptide-base/v1/suitableAminoAcids/read/${params}`);
+  },
+
   // 保存适用氨基酸
   insertSuitableAminoAcids (params) {
     return request(`/peptide-base/v1/suitableAminoAcids`, { method: 'POST', data: params });

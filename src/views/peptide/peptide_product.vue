@@ -1,3 +1,4 @@
+<!-- 多肽合成产品-->
 <template>
   <div class="page-content">
 
@@ -15,7 +16,7 @@
             <a-form-item label="纯度">
               <a-select v-decorator="['purityID', {initialValue : '0'}]">
                 <a-select-option value="0">全部</a-select-option>
-                <a-select-option v-for="item in purity" :key="item.id" :value="item.id">{{ item.purity }}</a-select-option>
+                <a-select-option v-for="item in $store.state.peptide.purity" :key="item.id" :value="item.id">{{ item.purity }}</a-select-option>
               </a-select>
             </a-form-item>
           </a-col>
@@ -47,131 +48,31 @@
       <div class="table-operator">
         <a-button-group>
           <a-button icon="search" @click="handleSearch">查询</a-button>
-          <a-button icon="plus" @click="handleAdd">新增</a-button>
+          <a-button icon="plus" type="primary" @click="handleAddRow">新增</a-button>
         </a-button-group>
       </div>
-      <a-table
-        ref="table"
-        bordered
-        size="small"
-        rowKey="id"
-        :columns="columns"
-        :dataSource="dataSource"
-        :loading="loading"
-        :pagination="pagination"
-        @change="change"
-        :scroll="{ x: '2000px' }"
+      <vxe-grid
+        highlight-hover-row
+        auto-resize
+        :ref="productTable.ref"
+        :columns="productTable.columns"
+        :data.sync="productTable.tableData"
+        :loading="productTable.loading"
+        :edit-rules="productTable.editRules"
+        :edit-config="{key: 'id', trigger: 'manual', mode: 'row', showIcon: false, autoClear: false}"
+        :pager-config="productTable.pagerConfig"
+        @page-change="pagerChange"
       >
-        <template slot="providerTotalAmountBegin" slot-scope="value, row, index">
-          <a-input
-            size="small"
-            v-if="editIndex === index"
-            style="width:100px;"
-            :class="[providerTotalAmountBegin ? '' : 'isValue']"
-            v-model="providerTotalAmountBegin"
-          />
-          <template v-else>{{ value }}</template>
-        </template>
-
-        <template slot="providerTotalAmountEnd" slot-scope="value, row, index">
-          <a-input
-            size="small"
-            v-if="editIndex === index"
-            style="width:100px;"
-            :class="[providerTotalAmountEnd ? '' : 'isValue']"
-            v-model="providerTotalAmountEnd"
-          />
-          <template v-else>{{ value }}</template>
-        </template>
-
-        <template slot="purityName" slot-scope="value, row, index">
-          <a-select style="width: 65px;" size="small" v-if="editIndex === index" v-model="purityName">
-            <a-select-option v-for="item in purity" :key="item.id" :value="item.purity">{{ item.purity }}</a-select-option>
-          </a-select>
-          <template v-else>{{ value }}</template>
-        </template>
-
-        <template slot="aminoAcidLengthBegin" slot-scope="value, row, index">
-          <a-input
-            size="small"
-            v-if="editIndex === index"
-            style="width:100px;"
-            :class="[aminoAcidLengthBegin ? '' : 'isValue']"
-            v-model="aminoAcidLengthBegin"
-          />
-          <template v-else>{{ value }}</template>
-        </template>
-
-        <template slot="aminoAcidLengthEnd" slot-scope="value, row, index">
-          <a-input
-            size="small"
-            v-if="editIndex === index"
-            style="width:100px;"
-            :class="[aminoAcidLengthEnd ? '' : 'isValue']"
-            v-model="aminoAcidLengthEnd"
-          />
-          <template v-else>{{ value }}</template>
-        </template>
-
-        <template slot="isNeedDesalting" slot-scope="value, row, index">
-          <a-checkbox v-if="editIndex === index" @change="onChange"></a-checkbox>
-          <template v-else>{{ value === 1 ? '√' :'' }}</template>
-        </template>
-
-        <template slot="aminoAcidType" slot-scope="value, row, index">
-          <a-select style="width: 65px;" size="small" v-if="editIndex === index" v-model="aminoAcidType">
-            <a-select-option value="L">L</a-select-option>
-            <a-select-option value="D">D</a-select-option>
-          </a-select>
-          <template v-else>{{ value }}</template>
-        </template>
-
-        <template slot="sapProductCode" slot-scope="value, row, index">
-          <a-input
-            size="small"
-            v-if="editIndex === index"
-            style="width:100px;"
-            v-model="sapProductCode"
-            read-only
-          />
-          <template v-else>{{ value }}</template>
-        </template>
-
-        <template slot="sapProductName" slot-scope="value, row, index">
-          <a-input-search
-            size="small"
-            v-if="editIndex === index"
-            style="width:200px;"
-            v-model="sapProductName"
-            @search="openMask"
-            read-only
-          />
-          <template v-else>{{ value }}</template>
-        </template>
-
-        <template slot="actions" slot-scope="value, row, index">
-          <div :key="value">
-            <template v-if="row.status === 1 && editIndex !== index">
-              <a @click="handleDelete(row.id)">删除 </a>
-            </template>
-            <template v-if="row.status === 2 && editIndex !== index">
-              <a @click="handleResume(row.id)">恢复</a>
-            </template>
-            <template v-if="editIndex === index">
-              <a @click="handleSave(row)">保存 </a>
-              <a @click="handleExit()">退出 </a>
-            </template>
-          </div>
-        </template>
-      </a-table>
+      </vxe-grid>
     </div>
-    <products-mask v-show="products_status" @Closed="closeMask()" @customerData="customerData">
-    </products-mask>
+    <!-- <products-mask v-show="products_status" @Closed="closeMask()" @customerData="customerData">
+    </products-mask> -->
   </div>
 </template>
 
 <script>
 import ProductsMask from '@/components/peptide/products_mask';
+const tableName = 'productTable';
 
 export default {
   name: 'PeptideProduct',
@@ -180,49 +81,34 @@ export default {
   },
   data () {
     return {
+      status: {}, // 状态缓存
       form: this.$form.createForm(this),
-      pagination: {
-        current: 1,
-        pageSize: 10,
-        total: 0,
-        showSizeChanger: true
+      productTable: {
+        id: 0,
+        ref: 'productTable',
+        xTable: null,
+        editIndex: -1,
+        loading: false,
+        tableData: [],
+        columns: [],
+        pagerConfig: {
+          currentPage: 1,
+          pageSize: 10,
+          total: 0
+        },
+        editRules: {
+          purity: [
+            { required: true, message: '名称必填' }
+          ]
+        }
       },
-      status: '',
-      columns: [],
-      loading: false,
-      dataSource: [],
-      id: 0,
-      editIndex: -1,
-      purity: {},
-      providerTotalAmountBegin: '',
-      providerTotalAmountEnd: '',
-      purityName: '',
-      aminoAcidLengthBegin: '',
-      aminoAcidLengthEnd: '',
-      isNeedDesalting: false,
-      aminoAcidType: '',
-      sapProductCode: '',
-      sapProductName: '',
-      data: {
-        'providerTotalAmountBegin': '',
-        'providerTotalAmountEnd': '',
-        'purityName': '',
-        'aminoAcidLengthBegin': '',
-        'aminoAcidLengthEnd': '',
-        'isNeedDesalting': '',
-        'aminoAcidType': '',
-        'sapProductCode': '',
-        'sapProductName': ''
-      },
-      products_status: ''
+      products_status: '',
+      aa: []
     };
   },
   mounted () {
     this.setColumns();
     this.handleSearch();
-    this.$api.peptide.getPurityAll({ status: 1 }).then(res => {
-      this.purity = res;
-    });
   },
   methods: {
     setColumns () {
@@ -230,79 +116,124 @@ export default {
       const { formatter } = this.$units;
       const { peptide } = this.$store.state;
       this.status = peptide.status;
-      this.columns = [
-        { title: '编号', dataIndex: 'code', align: 'center' },
-        { title: '提供总量从', dataIndex: 'providerTotalAmountBegin', scopedSlots: { customRender: 'providerTotalAmountBegin' } },
-        { title: '提供总量至', dataIndex: 'providerTotalAmountEnd', scopedSlots: { customRender: 'providerTotalAmountEnd' } },
-        { title: '纯度', dataIndex: 'purityName', scopedSlots: { customRender: 'purityName' } },
-        { title: '长度从', dataIndex: 'aminoAcidLengthBegin', scopedSlots: { customRender: 'aminoAcidLengthBegin' } },
-        { title: '长度至', dataIndex: 'aminoAcidLengthEnd', scopedSlots: { customRender: 'aminoAcidLengthEnd' } },
-        { title: '是否脱盐', dataIndex: 'isNeedDesalting', align: 'center', scopedSlots: { customRender: 'isNeedDesalting' } },
-        { title: '氨基酸类型', dataIndex: 'aminoAcidType', align: 'center', scopedSlots: { customRender: 'aminoAcidType' } },
-        { title: '产品编号', dataIndex: 'sapProductCode', scopedSlots: { customRender: 'sapProductCode' } },
-        { title: '产品名称', dataIndex: 'sapProductName', scopedSlots: { customRender: 'sapProductName' } },
-        { title: '状态',
-          dataIndex: 'status',
-          customRender: (text) => {
-            return formatter(self.status, text);
+      const columns = [
+        { type: 'index', width: 40 },
+        { label: '编号', prop: 'code' },
+        { label: '提供总量从', prop: 'providerTotalAmountBegin', editRender: { name: 'AInput' } },
+        { label: '提供总量至', prop: 'providerTotalAmountEnd', editRender: { name: 'AInput' } },
+        { label: '纯度',
+          prop: 'purityID',
+          formatter: function ({ cellValue }) { return formatter(peptide.purity, cellValue, 'id', 'purity'); },
+          editRender: {
+            name: 'ASelect',
+            optionProps: { value: 'id', label: 'purity' },
+            options: peptide.purity
           }
         },
-        { title: '创建人', dataIndex: 'creatorName' },
-        { title: '创建时间', dataIndex: 'createDate' },
-        { title: '删除人', dataIndex: 'cancelName' },
-        { title: '删除时间', dataIndex: 'cancelDate' },
-        { title: '操作', width: 80, dataIndex: 'actions', fixed: 'right', scopedSlots: { customRender: 'actions' }, align: 'center' }
+        { label: '长度从', prop: 'aminoAcidLengthBegin', editRender: { name: 'AInput' } },
+        { label: '长度至', prop: 'aminoAcidLengthEnd', editRender: { name: 'AInput' } },
+        { label: '是否脱盐', prop: 'isNeedDesalting', align: 'center', editRender: { name: 'AInput' } },
+        { label: '氨基酸类型', prop: 'aminoAcidType', align: 'center', editRender: { name: 'AInput' } },
+        { label: '产品编号', prop: 'sapProductCode', editRender: { name: 'AInput' } },
+        { label: '产品名称', prop: 'sapProductName', editRender: { name: 'AInput' } },
+        { label: '状态',
+          prop: 'status',
+          formatter: ({ cellValue }) => {
+            return formatter(self.status, cellValue);
+          }
+        },
+        { label: '创建人', prop: 'creatorName' },
+        { label: '创建时间', prop: 'createDate' },
+        { label: '删除人', prop: 'cancelName' },
+        { label: '删除时间', prop: 'cancelDate' },
+        {
+          label: '操作',
+          prop: 'actions',
+          fixed: 'right',
+          slots: {
+            default: ({ row, rowIndex }) => {
+              let actions = [];
+              const xTable = this[tableName].xTable;
+              const isEdit = xTable.hasActiveRow(row);
+              const options = { row, rowIndex, tableName, xTable };
+
+              if (!isEdit) {
+                if (row.status === 1) {
+                  actions = [
+                    <a onClick={() => this.handleDelete(options)}>删除</a>
+                  ];
+                } else {
+                  actions = [
+                    <a onClick={() => this.handleResume(options)}>恢复</a>
+                  ];
+                }
+              }
+              if (isEdit) {
+                actions = [
+                  <a onClick={() => this.handleSave(options) }>保存</a>,
+                  <a onClick={() => this.handleExit(options) }>退出</a>
+                ];
+              }
+              return [
+                <span class="table-actions">
+                  {actions}
+                </span>
+              ];
+            }
+          }
+        }
       ];
+      columns.forEach(function (e) {
+        if (!e.width) e.width = 100;
+      });
+
+      this[tableName].columns = columns;
+
+      this[tableName].xTable = this.$refs[this[tableName].ref].$refs.xTable;
     },
-    handleAdd () {
-      if (this.editIndex === 0) {
-        return false;
-      }
-      this.data.id = this.id;
-      this.dataSource = [ this.data, ...this.dataSource ];
-      this.editIndex = 0;
+    handleSearch (e) {
+      if (e) e.preventDefault();
+      this[tableName].loading = true;
+
+      const queryParam = this.form.getFieldsValue();
+      const params = Object.assign({ page: this[tableName].pagerConfig.currentPage, rows: this[tableName].pagerConfig.pageSize }, queryParam);
+
+      this.$api.peptide.getProduct(params).then((data) => {
+        this[tableName].tableData = data.rows;
+        this[tableName].pagerConfig.total = data.total;
+        this[tableName].pagerConfig.current = params.page;
+        this[tableName].pagerConfig.pageSize = params.rows;
+        this[tableName].editIndex = -1;
+      }).finally(() => {
+        this[tableName].loading = false;
+      });
     },
-    onChange (e) {
-      this.isNeedDesalting = e.target.checked;
-    },
-    change (pagination) {
-      const params = {
-        page: pagination.current,
-        rows: pagination.pageSize
+    handleAddRow () {
+      if (this[tableName].editIndex !== -1) return this.$message.warning('请保存或退出正在编辑的行');
+
+      const table = this[tableName].xTable;
+      var addVal = {
+        id: --this[tableName].id
       };
-      this.handleSearch(params);
+
+      this[tableName].tableData = [addVal, ...this[tableName].tableData];
+      table.setActiveRow(addVal);
+      this[tableName].editIndex = 0;
+    },
+    pagerChange ({ pageSize, currentPage }) {
+      this[tableName].pagerConfig = Object.assign(this[tableName].pagerConfig, { pageSize, currentPage });
+      this.handleSearch();
     },
     customerData (data) {
       this.sapProductCode = data[0].code;
       this.sapProductName = data[0].desc;
     },
-    handleSearch (params = {}) {
-      this.loading = true;
-      this.editIndex = -1;
-
-      const queryParam = this.form.getFieldsValue();
-      params = Object.assign({ page: this.pagination.current, rows: this.pagination.pageSize }, params, queryParam);
-
-      this.$api.peptide.getProduct(params).then((data) => {
-        this.dataSource = data.rows;
-        this.pagination.total = data.total;
-        this.pagination.current = params.page;
-        this.pagination.pageSize = params.rows;
-      }).finally(() => {
-        this.loading = false;
-      });
-    },
-    handleExit () {
-      this.providerTotalAmountBegin = '';
-      this.providerTotalAmountEnd = '';
-      this.purityName = '';
-      this.aminoAcidLengthBegin = '';
-      this.aminoAcidLengthEnd = '';
-      this.isNeedDesalting = false;
-      this.aminoAcidType = '';
-      this.sapProductCode = '';
-      this.sapProductName = '';
-      this.handleSearch();
+    handleExit ({ row, rowIndex, tableName, xTable }) {
+      xTable.clearActived();
+      if (!row.status) {
+        this[tableName].tableData.splice(rowIndex, 1);
+      }
+      this[tableName].editIndex = -1;
     },
     openMask () {
       this.products_status = true;
@@ -350,27 +281,20 @@ export default {
         }
       });
     },
-    handleDelete (i) {
-      if (!i) {
-        this.$notification.error({
-          message: '错误',
-          description: `请选择一条数据`
-        });
-        return false;
-      }
-      this.$api.peptide.deleteProduct(i).then(res => {
+    handleDelete ({ row }) {
+      this.$api.peptide.deleteProduct(row.id).then(res => {
         this.handleSearch();
       });
     },
-    handleResume (i) {
-      if (!i) {
+    handleResume ({ row }) {
+      if (!row.id) {
         this.$notification.error({
           message: '错误',
           description: `请选择一条数据`
         });
         return false;
       }
-      this.$api.peptide.resumeProduct(i).then(res => {
+      this.$api.peptide.resumeProduct(row.id).then(res => {
         this.handleSearch();
       });
     }

@@ -14,7 +14,7 @@ export const asyncRouterMap = [
     name: 'index',
     component: BasicLayout,
     meta: { title: '首页' },
-    redirect: '/home',
+    redirect: '/seq/seqfactory',
     children: [
       {
         path: '/home',
