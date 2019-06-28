@@ -19,9 +19,9 @@
     "vue-property-decorator": "^8.2.1",
     "vue-router": "^3.0.3",
     "vuex": "^3.0.1",
-    "vxe-table": "^1.5.7",
+    "vxe-table": "^2.0.0-beta.1",
     "vxe-table-plugin-antd": "^1.1.0",
-    "xe-utils": "^1.9.5"
+    "xe-utils": "^1.9.6"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "^3.8.0",

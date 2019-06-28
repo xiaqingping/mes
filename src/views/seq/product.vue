@@ -4,7 +4,7 @@
     <div class="page-content">
 
       <div class="table-search">
-        <a-form layout="inline" :form="form" @submit="handleSearch">
+        <a-form layout="inline" :form="form" @submit.prevent="handleSearch">
           <a-row :gutter="24">
             <a-col :xxl="4" :xl="6" :md="8">
               <a-form-item label="状态">
@@ -42,47 +42,49 @@
 
       <div class="table-operator">
         <a-button-group>
-          <a-button icon="search" @click="handleSearch">查询</a-button>
+          <a-button v-action:search icon="search" @click="handleSearch">查询</a-button>
           <a-button icon="plus" type="primary" @click="handleAddRow()">新增</a-button>
         </a-button-group>
       </div>
 
       <vxe-grid
-        stripe
         highlight-hover-row
-        border
-        resizable
         auto-resize
-        :start-index="(pagerConfig.currentPage - 1) * pagerConfig.pageSize"
-        :loading="loading"
-        :columns="columns"
-        :pager-config="pagerConfig"
-        :data.sync="tableData"
-        @current-page-change="(currentPage) => pagerChange({type: 'currentPage', value: currentPage})"
-        @page-size-change="(pageSize) => pagerChange({type: 'pageSize', value: pageSize})">
+        :ref="productTable.ref"
+        :loading="productTable.loading"
+        :columns="productTable.columns"
+        :pager-config="productTable.pagerConfig"
+        :data.sync="productTable.tableData"
+        :edit-rules="productTable.editRules"
+        :edit-config="{key: 'id', trigger: 'manual', mode: 'row', showIcon: false, autoClear: false}"
+        @page-change="pagerChange">
       </vxe-grid>
     </div>
   </div>
 </template>
 
 <script>
-import { mapState } from 'vuex';
-
 export default {
-  name: 'SeqSampleOrder',
-  computed: mapState(['basic', 'seq']),
+  name: 'SeqProduct',
   data () {
     return {
       form: this.$form.createForm(this),
-      loading: false,
-      editIndex: -1,
       queryParam: {},
-      tableData: [],
-      columns: [],
-      pagerConfig: {
-        currentPage: 1,
-        pageSize: 10,
-        total: 0
+      productTable: {
+        id: 0,
+        ref: 'productTable',
+        xTable: null,
+        editIndex: -1,
+        editData: null,
+        loading: false,
+        tableData: [],
+        columns: [],
+        editRules: {},
+        pagerConfig: {
+          currentPage: 1,
+          pageSize: 10,
+          total: 0
+        }
       }
     };
   },
@@ -93,40 +95,72 @@ export default {
   methods: {
     // 设置表格列属性
     setColumn () {
+      const tableName = 'productTable';
       const { formatter } = this.$units;
-      const { basic } = this;
+      const { basic, seq } = this.$store.state;
 
       const columns = [
         { type: 'index', width: 40 },
         { label: 'SAP产品编号', prop: 'productCode' },
-        { label: 'SAP产品名称', prop: 'productName' },
-        { label: '样品类型', prop: 'sampleTypeName' },
-        { label: '测序类型', prop: 'seqTypeName' },
-        { label: '统一附加费', prop: 'surcharge' },
+        { label: 'SAP产品名称', prop: 'productName', editRender: { name: 'input' } },
+        {
+          label: '样品类型',
+          prop: 'sampleTypeId',
+          formatter: function ({ cellValue }) { return formatter(seq.sampleType, cellValue); },
+          editRender: {
+            name: 'ASelect',
+            options: seq.sampleType,
+            optionProps: { value: 'id', label: 'name' },
+            events: {
+              change: ({ row, rowIndex }, value) => { this.sampleTypeChange(seq.sampleType, row, value); }
+            }
+          }
+        },
+        {
+          label: '测序类型',
+          prop: 'seqTypeId',
+          formatter: function ({ cellValue }) { return formatter(seq.seqType, cellValue); },
+          editRender: {
+            name: 'ASelect',
+            options: seq.seqType,
+            optionProps: { value: 'id', label: 'name' },
+            events: {
+              change: ({ row, rowIndex }, value) => { this.seqTypeChange(seq.seqType, row, value); }
+            }
+          }
+        },
+        { label: '统一附加费', prop: 'surcharge', formatter: function ({ cellValue }) { return formatter(seq.surcharge, cellValue); } },
         { label: '状态', prop: 'status', formatter: function ({ cellValue }) { return formatter(basic.status, cellValue); } },
         { label: '创建人', prop: 'creatorName' },
         { label: '创建时间', prop: 'createDate' },
         { label: '作废人', prop: 'cancelName' },
         { label: '作废时间', prop: 'cancelDate' },
-        { label: '操作',
+        {
+          label: '操作',
           prop: 'actions',
           fixed: 'right',
           slots: {
             default: ({ row, rowIndex }) => {
               let actions = [];
-              if (row.status === 1 && this.editIndex !== rowIndex) {
+              const xTable = this[tableName].xTable;
+              const isEdit = xTable.hasActiveRow(row);
+              const options = { row, rowIndex, tableName, xTable };
+
+              if (!isEdit && row.status === 1) {
                 actions = [
-                  <a onClick={() => this.handleCancel(row.id)}>删除</a>
+                  <a onClick={() => this.handleCancel(options)}>删除</a>,
+                  <a onClick={() => this.handleUpdate(options)}>修改</a>
                 ];
               }
-              if (this.editIndex === rowIndex) {
+              if (isEdit) {
                 actions = [
-                  <a>保存</a>,
-                  <a>退出</a>
+                  <a onClick={() => this.handleSave(options) }>保存</a>,
+                  <a onClick={() => this.handleQuitEdit(options) }>退出</a>
                 ];
               }
+
               return [
-                <span class="table-actions">
+                <span class="table-actions" onClick={(event) => event.stopPropagation()}>
                   {actions}
                 </span>
               ];
@@ -135,59 +169,129 @@ export default {
         }
       ];
 
-      columns.forEach(function (e) {
-        if (!e.width) e.width = 100;
-      });
+      // columns.forEach(function (e) {
+      //   if (!e.width) e.width = 100;
+      // });
 
-      this.columns = columns;
+      this[tableName].columns = columns;
+      this[tableName].editRules = {
+        name: [
+          { required: true, message: '名称不能为空' }
+        ],
+        seriesId: [
+          { required: true, message: '系列不能为空' }
+        ]
+      };
+
+      this[tableName].xTable = this.$refs[this[tableName].ref].$refs.xTable;
     },
     // 查询
-    handleSearch (params = {}) {
-      this.loading = true;
-      this.editIndex = -1;
-      this.selectedRowKeys = [];
-      this.selectedRows = [];
+    handleSearch () {
+      const tableName = 'productTable';
+      this[tableName].loading = true;
+      const { currentPage, pageSize } = this[tableName].pagerConfig;
 
       const queryParam = this.form.getFieldsValue();
-      params = Object.assign({ page: this.pagerConfig.currentPage, rows: this.pagerConfig.pageSize }, params, queryParam);
+      const params = Object.assign({ page: currentPage, rows: pageSize }, queryParam);
 
       this.$api.sampletype.getSeqProduct(params, true).then((data) => {
-        this.tableData = data.rows;
-        this.pagerConfig.total = data.total;
-        this.pagerConfig.currentPage = params.page;
-        this.pagerConfig.pageSize = params.rows;
+        this[tableName].tableData = data.rows;
+        this[tableName].pagerConfig.total = data.total;
+        this[tableName].pagerConfig.currentPage = params.page;
+        this[tableName].pagerConfig.pageSize = params.rows;
+
+        this[tableName].editIndex = -1;
       }).finally(() => {
-        this.loading = false;
+        this[tableName].loading = false;
       });
-    },
-    // 分页改变时
-    pagerChange (change) {
-      if (change.type === 'pageSize') {
-        //
-      }
-      this.pagerConfig[change.type] = change.value;
-      this.handleSearch();
     },
     // 新增一可编辑行
     handleAddRow () {
+      const tableName = 'productTable';
+      if (this[tableName].editIndex !== -1) return this.$message.warning('请保存或退出正在编辑的行');
+
+      const table = this[tableName].xTable;
       const newData = {
-        id: --this.id
+        id: --this[tableName].id
       };
-      this.tableData = [newData, ...this.tableData];
-      this.editIndex = 0;
+
+      this[tableName].tableData = [newData, ...this[tableName].tableData];
+      table.setActiveRow(newData);
+      this[tableName].editIndex = 0;
     },
-    // 作废
-    handleCancel (id) {
-      this.$api.sampletype.cancelSeqProduct(id).then(() => {
+    // 修改
+    handleUpdate ({ row, rowIndex, tableName, xTable }) {
+      xTable.setActiveRow(row);
+      this[tableName].editIndex = rowIndex;
+      this[tableName].editData = JSON.parse(JSON.stringify(row));
+    },
+    // 删除
+    handleCancel ({ row }) {
+      this.$api.sampletype.cancelSeqProduct(row.id).then(() => {
         this.handleSearch();
       });
     },
     // 保存
-    handleSave (row) {
-      //
+    handleSave ({ row }) {
+      if (row.status) {
+        // 修改(没有修改功能)
+      } else {
+        // 新增
+        this.$api.sampletype.addSeqProduct(row).then(() => {
+          this.handleSearch();
+        });
+      }
+    },
+    // 退出编辑
+    handleQuitEdit ({ row, rowIndex, tableName, xTable }) {
+      xTable.clearActived().then(() => {
+        this[tableName].editIndex = -1;
+        if (!row.status) {
+          this[tableName].tableData.splice(rowIndex, 1);
+        } else {
+          this.$set(this[tableName].tableData, rowIndex, this[tableName].editData);
+          this[tableName].editData = null;
+        }
+      });
+    },
+    // 分页改变时
+    pagerChange ({ pageSize, currentPage }) {
+      const tableName = 'productTable';
+      this[tableName].pagerConfig = Object.assign(this[tableName].pagerConfig, { pageSize, currentPage });
+      this.handleSearch();
+    },
+    // 选择样品类型
+    sampleTypeChange (arr, row, value) {
+      let obj = {};
+      for (var i = 0; i < arr.length; i++) {
+        if (arr[i].id === value) {
+          obj = {
+            sampleTypeId: arr[i].id,
+            sampleTypeCode: arr[i].code,
+            sampleTypeName: arr[i].name
+          };
+          break;
+        }
+      }
+      row = Object.assign(row, obj);
+    },
+    // 选择测序类型
+    seqTypeChange (arr, row, value) {
+      let obj = {};
+      for (var i = 0; i < arr.length; i++) {
+        if (arr[i].id === value) {
+          obj = {
+            seqTypeId: arr[i].id,
+            seqTypeCode: arr[i].code,
+            seqTypeName: arr[i].name
+          };
+          break;
+        }
+      }
+      row = Object.assign(row, obj);
     },
     searchProduct () {
-      console.log('searchProduct');
+
     }
   }
 };

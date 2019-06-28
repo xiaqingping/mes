@@ -268,7 +268,7 @@ export default {
     },
     // 删除
     handleCancel ({ row }) {
-      this.$api.series.cancelSeries(row.id).then(() => {
+      this.$api.seqfactory.cancelSeqfactory(row.id).then(() => {
         this.handleSearch();
       });
     },
@@ -323,7 +323,7 @@ export default {
     storagesChange (arr, row, value) {
       let obj = {};
       for (var i = 0; i < arr.length; i++) {
-        if (arr[i].id === value) {
+        if (arr[i].code === value) {
           obj = {
             storageCode: arr[i].code,
             storageName: arr[i].name
