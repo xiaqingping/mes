@@ -61,6 +61,9 @@ export default {
 
     // 测序模块
     this.$store.dispatch('seq/getCache');
+
+    // 多肽模块
+    this.$store.dispatch('peptide/getCache');
   },
   computed: {
     ...mapState({

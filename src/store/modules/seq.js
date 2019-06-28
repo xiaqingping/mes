@@ -78,7 +78,6 @@ export default {
         series: series.getSeries
       };
       const { type } = payload;
-
       // 如果存在type则只获取type对应的数据，否则获取全部数据
       if (type) {
         methods[type]().then(data => {

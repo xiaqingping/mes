@@ -1,4 +1,7 @@
+import { peptide } from '@/api';
+
 export default {
+  namespaced: true,
   state: {
   // 修饰位置
     modificationPosition: [
@@ -72,8 +75,39 @@ export default {
     status: [
       { id: 1, name: '正常' },
       { id: 2, name: '已删除' }
-    ]
+    ],
+    // 纯度
+    purity: []
   },
-  mutations: {},
-  actions: {}
+  mutations: {
+    setCache (state, payload) {
+      // 对返回的数据进行加工处理
+      const processMap = {};
+      if (processMap[payload.type]) {
+        payload.data = processMap[payload.type](payload.data);
+      }
+
+      state[payload.type] = payload.data;
+    }
+  },
+  actions: {
+    getCache (context, payload = { type: null }) {
+      const methods = {
+        purity: peptide.getPurityAll
+      };
+      const { type } = payload;
+      // 如果存在type则只获取type对应的数据，否则获取全部数据
+      if (type) {
+        methods[type]().then(data => {
+          context.commit('setCache', { type, data });
+        });
+      } else {
+        for (const type in methods) {
+          methods[type]().then(data => {
+            context.commit('setCache', { type, data });
+          });
+        }
+      }
+    }
+  }
 };
