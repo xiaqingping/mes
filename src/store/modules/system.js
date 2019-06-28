@@ -23,7 +23,7 @@ export default {
     // 角色
     roles: [
       { id: '', name: '全部' },
-      { id: 1, name: 'BBI_基因' },
+      { id: 22, name: 'BBI_基因' },
       { id: 2, name: '多肽订单' },
       { id: 3, name: '代理商' },
       { id: 4, name: '客服订单' },
@@ -44,7 +44,7 @@ export default {
       { id: 19, name: '人事' },
       { id: 20, name: '仓库' },
       { id: 21, name: '采购员' },
-      { id: 22, name: '系统管理员' }
+      { id: 1, name: '系统管理员' }
     ],
     // 大区
     regions: [
