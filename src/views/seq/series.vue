@@ -214,6 +214,7 @@ export default {
 
       this[tableName].tableData = [newData, ...this[tableName].tableData];
       table.setActiveRow(newData);
+      this[tableName].editIndex = 0;
     },
     // 修改
     handleUpdate ({ row, rowIndex, tableName, xTable }) {
