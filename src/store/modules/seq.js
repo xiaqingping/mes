@@ -55,6 +55,15 @@ export default {
     surcharge: [
       { id: 1, name: '√' },
       { id: 2, name: '' }
+    ],
+    // 反应板状态
+    reactionBoardStatus: [
+      { id: 1, name: '未排板' },
+      { id: 2, name: '排板中' },
+      { id: 3, name: '排板完成' },
+      { id: 4, name: '已上机' },
+      { id: 5, name: '上机完成' },
+      { id: 6, name: '已取消' }
     ]
   },
   mutations: {
