@@ -18,7 +18,7 @@ router.beforeEach((to, from, next) => {
     } else {
       if (store.state.user.roles.length === 0) {
         const roles = {
-          permissionList: [ 'dashboard' ],
+          permissionList: [ 'dashboard', 'allow' ],
           permissions: [
             {
               actionList: ['search', 'add', 'edit'],

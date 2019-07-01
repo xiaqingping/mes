@@ -1,10 +1,9 @@
 /*
  * 工资管理
- * https://devapi.sangon.com:8443/api/sampleorder/swagger-ui.html
+ * https://devapi.sangon.com:8443/api/pay/swagger-ui.html
  */
 
 import request from '../assets/js/request';
-
 export default {
   // 获取员工信息
   getPay (params) {
@@ -19,12 +18,12 @@ export default {
     return request(`/pay/v1/date/excel`, { method: 'POST', ...options });
   },
   // 获取工资类型
-  getTypepay (params) {
-    return request(`/pay/v1/type/easyui`, { params });
+  getTypepay (params, easyui) {
+    return request(`/pay/v1/type/${easyui ? '/easyui' : ''}`, { params });
   },
-  // 新增工资类型
-  increaseTypepay () {
-    return request(`/pay/v1/type`, { method: 'POST' });
+  // 保存工资类型
+  increaseTypepay (params) {
+    return request(`/pay/v1/type`, { method: 'POST', data: params });
   },
   // 删除工资类型
   deleteTypepays (params) {

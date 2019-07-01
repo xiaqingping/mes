@@ -18,6 +18,8 @@ const action = Vue.directive('action', {
     const actionName = binding.arg;
     const roles = store.getters.roles;
     const elVal = vnode.context.$route.meta.permission;
+    // 路由上没有定义权限，则不执行指令
+    if (!elVal) return;
     const permissionId = elVal instanceof String && [elVal] || elVal;
     roles.permissions.forEach(p => {
       if (!permissionId.includes(p.permissionId)) {
