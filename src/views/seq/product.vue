@@ -101,11 +101,11 @@ export default {
 
       const columns = [
         { type: 'index', width: 40 },
-        { label: 'SAP产品编号', prop: 'productCode' },
-        { label: 'SAP产品名称', prop: 'productName', editRender: { name: 'input' } },
+        { title: 'SAP产品编号', field: 'productCode' },
+        { title: 'SAP产品名称', field: 'productName', editRender: { name: 'input' } },
         {
-          label: '样品类型',
-          prop: 'sampleTypeId',
+          title: '样品类型',
+          field: 'sampleTypeId',
           formatter: function ({ cellValue }) { return formatter(seq.sampleType, cellValue); },
           editRender: {
             name: 'ASelect',
@@ -117,8 +117,8 @@ export default {
           }
         },
         {
-          label: '测序类型',
-          prop: 'seqTypeId',
+          title: '测序类型',
+          field: 'seqTypeId',
           formatter: function ({ cellValue }) { return formatter(seq.seqType, cellValue); },
           editRender: {
             name: 'ASelect',
@@ -129,15 +129,15 @@ export default {
             }
           }
         },
-        { label: '统一附加费', prop: 'surcharge', formatter: function ({ cellValue }) { return formatter(seq.surcharge, cellValue); } },
-        { label: '状态', prop: 'status', formatter: function ({ cellValue }) { return formatter(basic.status, cellValue); } },
-        { label: '创建人', prop: 'creatorName' },
-        { label: '创建时间', prop: 'createDate' },
-        { label: '作废人', prop: 'cancelName' },
-        { label: '作废时间', prop: 'cancelDate' },
+        { title: '统一附加费', field: 'surcharge', formatter: function ({ cellValue }) { return formatter(seq.surcharge, cellValue); } },
+        { title: '状态', field: 'status', formatter: function ({ cellValue }) { return formatter(basic.status, cellValue); } },
+        { title: '创建人', field: 'creatorName' },
+        { title: '创建时间', field: 'createDate' },
+        { title: '作废人', field: 'cancelName' },
+        { title: '作废时间', field: 'cancelDate' },
         {
-          label: '操作',
-          prop: 'actions',
+          title: '操作',
+          field: 'actions',
           fixed: 'right',
           slots: {
             default: ({ row, rowIndex }) => {

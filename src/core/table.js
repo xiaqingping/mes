@@ -19,9 +19,9 @@ import {
   Checkbox,
   Radio,
   Input,
-  Button,
-  Message,
-  Export,
+  // Button,
+  // Message,
+  // Export,
   Resize
 } from 'vxe-table';
 import VXETablePluginAntd from 'vxe-table-plugin-antd';
@@ -45,9 +45,9 @@ Vue.use(Pager);
 Vue.use(Checkbox);
 Vue.use(Radio);
 Vue.use(Input);
-Vue.use(Button);
-Vue.use(Message);
-Vue.use(Export);
+// Vue.use(Button);
+// Vue.use(Message);
+// Vue.use(Export);
 Vue.use(Resize);
 
 // 全局默认设置
