@@ -1,7 +1,6 @@
 
 <template>
   <div class="page-content">
-
     <div class="table-search">
       <a-form layout="inline" :form="form" @submit="handleSearch">
         <a-row :gutter="24">
@@ -17,7 +16,7 @@
           </a-col>
           <a-col :xxl="4" :xl="4" :md="4" :sm="24">
             <a-form-item label="年：">
-              <a-select v-decorator="['year']">
+              <a-select v-decorator="['year', {initialValue : '0'}]">
                 <a-select-option value="0">全部</a-select-option>
                 <a-select-option value="1">2019</a-select-option>
                 <a-select-option value="2">2018</a-select-option>
@@ -29,7 +28,7 @@
           </a-col>
           <a-col :xxl="4" :xl="4" :md="4" :sm="24">
             <a-form-item label="月：">
-              <a-select v-decorator="['month']">
+              <a-select v-decorator="['month', {initialValue : '0'}]">
                 <a-select-option value="0">全部</a-select-option>
                 <a-select-option value="1">1</a-select-option>
                 <a-select-option value="2">2</a-select-option>
@@ -59,33 +58,45 @@
         <a-button type="primary" icon="search" html-type="submit" style="display:none;">查询</a-button>
       </a-form>
     </div>
-
-    <div class="table-operator">
-      <a-button type="primary" icon="search" @click="handleSearch">查询</a-button>
-      <a-button type="primary" icon="delete" @click="handleDelete">作废</a-button>
-      <!-- <a-button type="primary" icon="file-excel" @click="handleUpload">excel上传</a-button> -->
-      <a-upload :multiple="true" :fileList="fileList" @change="handleChange">
-        <a-button type="primary" icon="file-excel">
-          <a-icon type="primary" icon="file-excel" /> 上传
-        </a-button>
-      </a-upload>
+    <div class="content-center" style="position: relative;height:100%;">
+      <div class="table-operator">
+        <a-button type="primary" icon="search" @click="handleSearch">查询</a-button>
+        <a-button type="primary" icon="delete" @click="handleDelete">作废</a-button>
+        <!-- <a-button type="primary" icon="file-excel" @click="handleUpload">excel上传</a-button> -->
+        <a-upload :multiple="true" :fileList="fileList" @change="handleChange">
+          <a-button type="primary" icon="file-excel">
+            <a-icon type="primary" icon="file-excel"/>上传
+          </a-button>
+        </a-upload>
+      </div>
+      <!-- 表格 -->
+      <s-table
+        ref="table"
+        bordered
+        style="width:65%"
+        size="small"
+        :columns="columns"
+        :data="loadData"
+        :rowSelection="{ selectedRowKeys: selectedRowKeys, onChange: onSelectChange }"
+      ></s-table>
+      <div class="content-right" style="width:35%;position: absolute; left:66%; top:0">
+        <h3>工资明细</h3>
+        <!-- 表格 -->
+        <s-table
+          ref="table"
+          bordered
+          size="small"
+          :columns="addcolumns"
+          :data="loadData"
+          :rowSelection="{ selectedRowKeys: selectedRowKeys, onChange: onSelectChange }"
+        ></s-table>
+      </div>
     </div>
-    <!-- 表格 -->
-    <s-table
-      ref="table"
-      bordered
-      size="small"
-      :columns="columns"
-      :data="loadData"
-      :rowSelection="{ selectedRowKeys: selectedRowKeys, onChange: onSelectChange }"
-    >
-    </s-table>
   </div>
 </template>
 
 <script>
 import STable from '@/components/Table';
-
 export default {
   name: 'SeqSampleOrder',
   components: {
@@ -107,12 +118,21 @@ export default {
         { title: '员工名称', dataIndex: 'employeeName' },
         { title: '总额', dataIndex: 'amount' },
         { title: '时间', dataIndex: 'year' },
-        { title: '状态', dataIndex: 'status', customRender: function (text) { if (text === 1) return '正常'; else if (text === 2) return '已删除'; }
+        {
+          title: '状态',
+          dataIndex: 'status',
+          customRender: function (text) { if (text === 1) return '正常'; else if (text === 2) return '已删除'; }
         },
         { title: '创建人', dataIndex: 'createName' },
         { title: '创建时间', dataIndex: 'createDate' },
         { title: '删除人', dataIndex: 'cancelName' },
         { title: '删除时间', dataIndex: 'cancelDate' }
+      ],
+      addcolumns: [
+        { title: '编号', dataIndex: 'itemList[0].typeCode', width: '25%' },
+        { title: '名称', dataIndex: 'itemList[0].typeName', width: '25%' },
+        { title: '类型', dataIndex: 'itemList[0].type', customRender: function (text) { if (text === 1) return '工资项目'; else if (text === 2) return '扣款项目'; else if (text === 3) return '代发项目'; else if (text === 4) return '代缴项目'; }, width: '25%' },
+        { title: '总额', dataIndex: 'itemList[0].amount', width: '25%' }
       ],
       queryParam: {},
       loadData: parameter => {
@@ -125,11 +145,17 @@ export default {
           };
         });
       },
+      type: [],
       selectedRowKeys: [],
       selectedRows: []
     };
   },
-  mounted () {},
+  mounted () {
+    this.$api.pay.getPay({ status: 2 }).then(res => {
+      this.type = res.rows;
+      console.log(res.rows);
+    });
+  },
   methods: {
     // 查询
     handleSearch (e) {
@@ -169,18 +195,21 @@ export default {
       // this.fileList = fileList;
       const data = new FormData();
       const config = { headers: { 'Content-Type': 'multipart/form-data' } };
-      this.$api.pay.uploadpays(data, config).then(res => {
-        console.log('这是' + data);
-        // return this.$refs.table.refresh(true);
-      }).then(res => {
-        // this.fileList.status = 'success';
-        console.log('成功了');
-      }).catch(res => {
-        // this.fileList.status = 'fail';
-        console.log('失败了');
-      });
+      this.$api.pay
+        .uploadpays(data, config)
+        .then(res => {
+          console.log('这是' + data);
+          // return this.$refs.table.refresh(true);
+        })
+        .then(res => {
+          // this.fileList.status = 'success';
+          console.log('成功了');
+        })
+        .catch(res => {
+          // this.fileList.status = 'fail';
+          console.log('失败了');
+        });
     },
-    // 表格
     onSelectChange (selectedRowKeys, selectedRows) {
       this.selectedRowKeys = selectedRowKeys;
       console.log(selectedRowKeys);
