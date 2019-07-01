@@ -92,12 +92,16 @@
       ref="table"
       size="small"
       bordered
-      :scroll="{ x: 3000 }"
+      :scroll="{ x: 2000 }"
       :columns="columns"
       :data="loadData"
       :rowSelection="{ selectedRowKeys: selectedRowKeys, onChange: onSelectChange }"
     >
     </s-table>
+
+    <!-- <vxe-grid
+    >
+    </vxe-grid> -->
   </div>
 </template>
 
@@ -124,15 +128,20 @@ export default {
         { title: '姓名', dataIndex: 'name' },
         {
           title: '角色',
-          dataIndex: 'roleID',
-          customRender: function (text, record, index) {
-            var val = self.$store.state.system.roles;
-            for (let i = 0; i < val.length; i++) {
-              if (val[i].id === parseInt(text)) {
-                return val[i].name;
-              }
-            }
-          }
+          dataIndex: 'roleID'
+          // customRender: function (value) {
+          //   var val = this.$store.state.system.roles;
+          //   console.log(val);
+          //   for (let i = 0; i < val.length; i++) {
+          //     if (val[i].id === value) {
+          //       if (val[i].id === 0) {
+          //         val[i].name = 0;
+          //         return val[i].name;
+          //       }
+          //       return val[i].name;
+          //     }
+          //   }
+          // }
         },
         { title: '大区', dataIndex: 'regionCode' },
         { title: '网点', dataIndex: 'officeCode' },
@@ -164,6 +173,9 @@ export default {
     this.regions = this.$store.state.system.regions;
     this.offices = this.$store.state.system.offices;
     this.isdel = this.$store.state.system.isdel;
+    // this.$api.system.getModificationTypesAll().then(res => {
+    //   this.modificationsType = res;
+    // });
   },
   methods: {
     moment,

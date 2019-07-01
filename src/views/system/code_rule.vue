@@ -19,11 +19,11 @@
         <a-col :span="6">
           <!-- 编号规则 -->
           <a-card title="编号规则">
-            <a href="#" slot="extra" @click="toggleAdvanced" style="margin-left: 8px">
+            <!-- <a href="#" slot="extra" @click="toggleAdvanced" style="margin-left: 8px">
               {{ advanced ? '收起' : '展开' }}
               <a-icon :type="advanced ? 'up' : 'down'"/>
-            </a>
-            </a>
+            </a> -->
+
             <div class="table-operator">
               <a-button-group>
                 <a-button type="primary" size="small" icon="search" @click="handleSearch">查询</a-button>
@@ -33,10 +33,11 @@
             </div>
 
             <s-table
+              style="height:500px"
               ref="table"
               size="small"
               bordered
-              :scroll="{ x: 1000 , y: 400 }"
+              :scroll="{ x: 1500 , y: 400 }"
               :columns="columns"
               :data="loadData"
               :rowSelection="{ selectedRowKeys: selectedRowKeys, onChange: onSelectChange }"
@@ -44,14 +45,14 @@
             </s-table>
           </a-card>
         </a-col>
+
         <!-- 编号规则内容 -->
         <a-col :span="6">
           <a-card title="编号规则内容">
-            <a href="#" slot="extra" @click="toggleAdvanced" style="margin-left: 8px">
+            <!-- <a href="#" slot="extra" @click="toggleAdvanced" style="margin-left: 8px">
               {{ advanced ? '收起' : '展开' }}
               <a-icon :type="advanced ? 'up' : 'down'"/>
-            </a>
-            </a>
+            </a> -->
             <div class="table-operator">
               <a-button-group>
                 <a-button type="primary" size="small" icon="plus">新建</a-button>
@@ -61,25 +62,27 @@
             </div>
 
             <s-table
-              ref="table"
+              style="height:500px"
+              v-show="advanced"
+              ref="table1"
               size="small"
               bordered
               :scroll="{ x: 300 , y: 400 }"
-              :columns="contentsColumns"
-              :data="loadData"
-              :rowSelection="{ selectedRowKeys: selectedRowKeys, onChange: onSelectChange }"
+              :columns="columnOne"
+              :data="loadDataOne"
+              :rowSelection="{ selectedRowKeys: selectedRowKeyOne, onChange: onSelectChangeOne }"
             >
             </s-table>
           </a-card>
         </a-col>
+
         <!-- 编号规则取值 -->
         <a-col :span="6">
           <a-card title="编号规则取值">
-            <a href="#" slot="extra" @click="toggleAdvanced" style="margin-left: 8px">
+            <!-- <a href="#" slot="extra" @click="toggleAdvanced" style="margin-left: 8px">
               {{ advanced ? '收起' : '展开' }}
               <a-icon :type="advanced ? 'up' : 'down'"/>
-            </a>
-            </a>
+            </a> -->
             <div class="table-operator">
               <a-button-group>
                 <a-button type="primary" size="small" icon="plus">新建</a-button>
@@ -89,17 +92,19 @@
             </div>
 
             <s-table
-              ref="table"
+              style="height:500px"
+              ref="table2"
               size="small"
               bordered
               :scroll="{ x: 300 , y: 400 }"
-              :columns="detailsColums"
-              :data="loadData"
-              :rowSelection="{ selectedRowKeys: selectedRowKeys, onChange: onSelectChange }"
+              :columns="columnTwo"
+              :data="loadDataTwo"
+              :rowSelection="{ selectedRowKeys: selectedRowKeyTwo, onChange: onSelectChangeTwo }"
             >
             </s-table>
           </a-card>
         </a-col>
+
         <!-- 编号规则条件 -->
         <a-col :span="6">
           <a-card title="编号规则条件">
@@ -117,13 +122,14 @@
             </div>
 
             <s-table
-              ref="table"
+              style="height:500px"
+              ref="table3"
               size="small"
               bordered
               :scroll="{ x: 400 , y: 400 }"
-              :columns="conditionsColums"
-              :data="loadData"
-              :rowSelection="{ selectedRowKeys: selectedRowKeys, onChange: onSelectChange }"
+              :columns="columnThree"
+              :data="loadDataThree"
+              :rowSelection="{ selectedRowKeys: selectedRowKeyThree, onChange: onSelectChangeThree }"
             >
             </s-table>
           </a-card>
@@ -149,34 +155,17 @@ export default {
       // 编号规则
       columns: [
         { title: 'Client', dataIndex: 'client', width: '30%' },
-        { title: '规则', dataIndex: 'rule', width: '10%', align: 'center' },
+        { title: '规则', dataIndex: 'rule', width: '20%', align: 'center' },
         {
           title: '覆盖旧编号',
           dataIndex: 'cover',
           align: 'center',
-          width: '10%',
           customRender: function (value) {
             return value === 1 ? '√' : '';
           }
         },
-        { title: '开始日期', dataIndex: 'dateBegin', width: '25%' },
-        { title: '结束日期', dataIndex: 'dateEnd' }
-      ],
-      // 编号规则内容
-      contentsColumns: [
-        { title: '位置', dataIndex: 'place', width: '40%', align: 'center' },
-        { title: '默认值', dataIndex: 'level', align: 'center' }
-      ],
-      // 编号规则取值
-      detailsColums: [
-        { title: '值', dataIndex: 'value', width: '60%', align: 'center' },
-        { title: '优先级', dataIndex: 'value', align: 'center' }
-      ],
-      // 编号规则条件
-      conditionsColums: [
-        { title: '字段', dataIndex: 'field', width: '30%', align: 'center' },
-        { title: 'OP', dataIndex: 'op', width: '30%', align: 'center' },
-        { title: '文本', dataIndex: 'text', align: 'center' }
+        { title: '开始日期', dataIndex: 'dateBegin', width: '20%' },
+        { title: '结束日期', dataIndex: 'dateEnd', width: '20%' }
       ],
       queryParam: {},
       loadData: parameter => {
@@ -190,8 +179,78 @@ export default {
         });
       },
       selectedRowKeys: [],
-      selectedRows: []
+      selectedRows: [],
+      loadDataId: 0,
+
+      // 编号规则内容
+      columnOne: [
+        { title: '位置', dataIndex: 'place', width: '40%', align: 'center' },
+        { title: '默认值', dataIndex: 'value', align: 'center' }
+      ],
+      queryParamOne: {},
+      loadDataOne: parameter => {
+        return this.$api.system.getContentList({ ruleId: this.loadDataId }).then(res => {
+          console.log(res.rows);
+          return {
+            data: res.rows,
+            page: 0,
+            total: res.total
+          };
+        });
+      },
+      selectedRowKeyOne: [],
+      selectedRowOne: [],
+      loadDataIdOne: 0,
+
+      // 编号规则取值
+      columnTwo: [
+        { title: '值', dataIndex: 'value', width: '60%', align: 'center' },
+        { title: '优先级', dataIndex: 'level', align: 'center' }
+      ],
+      queryParamTwo: {},
+      loadDataTwo: parameter => {
+        return this.$api.system.getDerailList({ contentId: this.loadDataIdOne }).then(res => {
+          return {
+            data: res.rows,
+            page: 1,
+            total: res.total
+          };
+        });
+      },
+      selectedRowKeyTwo: [],
+      selectedRowTwo: [],
+      loadDataIdTwo: 0,
+
+      // 编号规则条件
+      columnThree: [
+        { title: '字段', dataIndex: 'field', width: '30%', align: 'center' },
+        { title: 'OP', dataIndex: 'op', width: '30%', align: 'center' },
+        { title: '文本', dataIndex: 'text', align: 'center' }
+      ],
+      queryParamThree: {},
+      loadDataThree: parameter => {
+        return this.$api.system.getConditionsList({ detailId: this.loadDataIdTwo }).then(res => {
+          return {
+            data: res.rows,
+            page: 1,
+            total: res.total
+          };
+        });
+      },
+      selectedRowKeyThree: [],
+      selectedRowThree: []
     };
+  },
+  watch: {
+    loadDataId: function () {
+      this.$refs.table1.refresh(true);
+    },
+    loadDataIdOne: function () {
+      this.$refs.table2.refresh(true);
+    },
+    loadDataIdTwo: function () {
+      this.$refs.table3.refresh(true);
+    }
   },
   mounted () {},
   methods: {
@@ -201,10 +260,31 @@ export default {
       this.queryParam = this.form.getFieldsValue();
       this.$refs.table.refresh(true);
     },
+    // 编号规则
     onSelectChange (selectedRowKeys, selectedRows) {
-      this.selectedRowKeys = selectedRowKeys;
-      this.selectedRows = selectedRows;
+      this.selectedRowKeys = selectedRowKeys.slice(-1);
+      this.selectedRows = selectedRows.slice(-1);
+      this.loadDataId = this.selectedRowKeys[0];
     },
+    // 编号规则内容
+    onSelectChangeOne (selectedRowKeyOne, selectedRowOne) {
+      this.selectedRowKeyOne = selectedRowKeyOne.slice(-1);
+      this.selectedRowOne = selectedRowOne.slice(-1);
+      this.loadDataIdOne = this.selectedRowKeyOne[0];
+    },
+    // 编号规则取值
+    onSelectChangeTwo (selectedRowKeyTwo, selectedRowTwo) {
+      this.selectedRowKeyTwo = selectedRowKeyTwo.slice(-1);
+      this.selectedRowTwo = selectedRowTwo.slice(-1);
+      this.loadDataIdTwo = this.selectedRowKeyTwo[0];
+      console.log(this.loadDataIdTwo);
+    },
+    // 编号规则条件
+    onSelectChangeThree (selectedRowKeyThree, selectedRowThree) {
+      this.selectedRowKeyThree = selectedRowKeyThree.slice(-1);
+      this.selectedRowThree = selectedRowThree.slice(-1);
+    },
+
     toggleAdvanced () {
       this.advanced = !this.advanced;
     }

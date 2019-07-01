@@ -168,7 +168,7 @@ export default {
         this[tableName].loading = false;
       });
     },
-    // 新增一可编辑行
+    // 新增
     handleAddRow () {
       const tableName = 'sampleTypeTable';
       if (this[tableName].editIndex !== -1) return this.$message.warning('请保存或退出正在编辑的行');
