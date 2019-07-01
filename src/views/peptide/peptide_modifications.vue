@@ -168,19 +168,19 @@ export default {
       this.modificationPositionData = peptide.modificationPosition;
       const columns = [
         { type: 'index', width: 40 },
-        { label: '编号', prop: 'code' },
-        { label: '修饰名称', prop: 'name', editRender: { name: 'AInput' } },
-        { label: '修饰代码', prop: 'modificationCode', editRender: { name: 'AInput' } },
+        { title: '编号', field: 'code' },
+        { title: '修饰名称', field: 'name', editRender: { name: 'AInput' } },
+        { title: '修饰代码', field: 'modificationCode', editRender: { name: 'AInput' } },
         {
-          label: '修饰位置',
-          prop: 'modificationPosition',
+          title: '修饰位置',
+          field: 'modificationPosition',
           formatter: ({ cellValue }) => {
             return formatter(self.modificationPositionData, cellValue);
           }
         },
         {
-          label: '独立修饰',
-          prop: 'isIndependentModification',
+          title: '独立修饰',
+          field: 'isIndependentModification',
           scopedSlots: { customRender: 'isIndependentModification' },
           align: 'center',
           formatter: ({ cellValue }) => {
@@ -188,26 +188,26 @@ export default {
           }
         },
         {
-          label: '修饰类别',
-          prop: 'modificationTypeID',
+          title: '修饰类别',
+          field: 'modificationTypeID',
           formatter: ({ cellValue }) => {
             return formatter(self.modificationsType, cellValue, 'id', 'modificationType');
           }
         },
         {
-          label: '状态',
-          prop: 'status',
+          title: '状态',
+          field: 'status',
           formatter: ({ cellValue }) => {
             return formatter(self.status, cellValue);
           }
         },
-        { label: '创建人', prop: 'creatorName' },
-        { label: '创建日期', prop: 'createDate' },
-        { label: '删除人', prop: 'cancelName' },
-        { label: '删除时间', prop: 'cancelDate' },
+        { title: '创建人', field: 'creatorName' },
+        { title: '创建日期', field: 'createDate' },
+        { title: '删除人', field: 'cancelName' },
+        { title: '删除时间', field: 'cancelDate' },
         {
-          label: '操作',
-          prop: 'actions',
+          title: '操作',
+          field: 'actions',
           fixed: 'right',
           slots: {
             default: ({ row, rowIndex }) => {
@@ -243,27 +243,27 @@ export default {
         }
       ];
       const columnSon = [
-        { label: '编号', prop: 'code', editRender: { name: 'AInput' } },
-        { label: '名称', prop: 'name', editRender: { name: 'AInput' } },
+        { title: '编号', field: 'code', editRender: { name: 'AInput' } },
+        { title: '名称', field: 'name', editRender: { name: 'AInput' } },
         {
-          label: '状态',
-          prop: 'status',
+          title: '状态',
+          field: 'status',
           align: 'center',
           formatter: ({ cellValue }) => {
             return formatter(self.status, cellValue);
           }
         },
         {
-          label: '创建人', prop: 'creatorName', align: 'center'
+          title: '创建人', field: 'creatorName', align: 'center'
         },
         {
-          label: '创建时间', prop: 'createDate', align: 'center'
+          title: '创建时间', field: 'createDate', align: 'center'
         },
-        { label: '删除人', prop: 'cancelName' },
-        { label: '删除时间', prop: 'cancelDate' },
+        { title: '删除人', field: 'cancelName' },
+        { title: '删除时间', field: 'cancelDate' },
         {
-          label: '操作',
-          prop: 'actions',
+          title: '操作',
+          field: 'actions',
           fixed: 'right',
           slots: {
             default: ({ row, rowIndex }) => {

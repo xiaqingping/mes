@@ -88,8 +88,9 @@
         :data.sync="customerMask.tableData"
         :loading="customerMask.loading"
         :edit-rules="customerMask.editRules"
-        :edit-config="{key: 'id', trigger: 'manual', mode: 'row', showIcon: false, autoClear: false}"
+        :edit-config="{key: 'id', trigger: 'dblclick', mode: 'row', showIcon: false, autoClear: false}"
         :pager-config="customerMask.pagerConfig"
+        @cell-dblclick="(options) => handleCellDblclick(options)"
         @page-change="pagerChange">
         >
       </vxe-grid>
@@ -163,57 +164,21 @@ export default {
       // this.status = peptide.status;
       const columns = [
         { type: 'index', width: 40 },
-        { label: '编号', prop: 'code' },
-        { label: '公司', prop: 'name' },
-        { label: '电话', prop: 'telNo' },
-        { label: '手机', prop: 'mobNo' },
-        { label: '邮箱', prop: 'email' },
-        { label: '分类', prop: 'type' },
-        { label: '大区', prop: 'regionCode' },
-        { label: '网点', prop: 'officeCode' },
-        { label: '币种', prop: 'currency' },
-        { label: '付款方式', prop: 'payMethodCode' },
-        { label: '付款条件', prop: 'payTermsCode' },
-        { label: '销售员名称', prop: 'salerName' },
-        { label: '销售冻结(当前渠道)', prop: 'customerRangeFrozen' },
-        { label: '销售冻结(所有渠道)', prop: 'customerFrozen' },
-        { label: '客户性质', prop: 'industryText' },
-        {
-          label: '操作',
-          prop: 'actions',
-          fixed: 'right',
-          slots: {
-            default: ({ row, rowIndex }) => {
-              let actions = [];
-              const xTable = this[tableName].xTable;
-              const isEdit = xTable.hasActiveRow(row);
-              const options = { row, rowIndex, tableName, xTable };
-
-              if (!isEdit) {
-                if (row.status === 1) {
-                  actions = [
-                    <a onClick={() => this.handleDelete(options)}>删除</a>
-                  ];
-                } else {
-                  actions = [
-                    <a onClick={() => this.handleResume(options)}>恢复</a>
-                  ];
-                }
-              }
-              if (isEdit) {
-                actions = [
-                  <a onClick={() => this.handleSave(options) }>保存</a>,
-                  <a onClick={() => this.handleExit(options) }>退出</a>
-                ];
-              }
-              return [
-                <span class="table-actions">
-                  {actions}
-                </span>
-              ];
-            }
-          }
-        }
+        { title: '编号', field: 'code' },
+        { title: '公司', field: 'name' },
+        { title: '电话', field: 'telNo' },
+        { title: '手机', field: 'mobNo' },
+        { title: '邮箱', field: 'email' },
+        { title: '分类', field: 'type' },
+        { title: '大区', field: 'regionCode' },
+        { title: '网点', field: 'officeCode' },
+        { title: '币种', field: 'currency' },
+        { title: '付款方式', field: 'payMethodCode' },
+        { title: '付款条件', field: 'payTermsCode' },
+        { title: '销售员名称', field: 'salerName' },
+        { title: '销售冻结(当前渠道)', field: 'customerRangeFrozen' },
+        { title: '销售冻结(所有渠道)', field: 'customerFrozen' },
+        { title: '客户性质', field: 'industryText' }
       ];
       columns.forEach(function (e) {
         if (!e.width) e.width = 130;
@@ -223,9 +188,12 @@ export default {
 
       this[tableName].xTable = this.$refs[this[tableName].ref].$refs.xTable;
     },
-    onClose () {
-      this.$emit('Closed');
+    onClose (row = {}) {
+      this.$emit('Closed', row, 1);
       this.status = true;
+    },
+    handleCellDblclick ({ row }) {
+      this.onClose(row);
     },
     handleSearch (e) {
       if (e) e.preventDefault();
@@ -270,7 +238,7 @@ export default {
     top: 0;
     left: 0;
     background: rgba(0, 0, 0, 0.1);
-    z-index: 1;
+    z-index: 10;
     overflow: hidden;
   }
 

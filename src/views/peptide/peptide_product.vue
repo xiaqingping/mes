@@ -118,11 +118,11 @@ export default {
       this.status = peptide.status;
       const columns = [
         { type: 'index', width: 40 },
-        { label: '编号', prop: 'code' },
-        { label: '提供总量从', prop: 'providerTotalAmountBegin', editRender: { name: 'AInput' } },
-        { label: '提供总量至', prop: 'providerTotalAmountEnd', editRender: { name: 'AInput' } },
-        { label: '纯度',
-          prop: 'purityID',
+        { title: '编号', field: 'code' },
+        { title: '提供总量从', field: 'providerTotalAmountBegin', editRender: { name: 'AInput' } },
+        { title: '提供总量至', field: 'providerTotalAmountEnd', editRender: { name: 'AInput' } },
+        { title: '纯度',
+          field: 'purityID',
           formatter: function ({ cellValue }) { return formatter(peptide.purity, cellValue, 'id', 'purity'); },
           editRender: {
             name: 'ASelect',
@@ -130,25 +130,31 @@ export default {
             options: peptide.purity
           }
         },
-        { label: '长度从', prop: 'aminoAcidLengthBegin', editRender: { name: 'AInput' } },
-        { label: '长度至', prop: 'aminoAcidLengthEnd', editRender: { name: 'AInput' } },
-        { label: '是否脱盐', prop: 'isNeedDesalting', align: 'center', editRender: { name: 'AInput' } },
-        { label: '氨基酸类型', prop: 'aminoAcidType', align: 'center', editRender: { name: 'AInput' } },
-        { label: '产品编号', prop: 'sapProductCode', editRender: { name: 'AInput' } },
-        { label: '产品名称', prop: 'sapProductName', editRender: { name: 'AInput' } },
-        { label: '状态',
-          prop: 'status',
+        { title: '长度从', field: 'aminoAcidLengthBegin', editRender: { name: 'AInput' } },
+        { title: '长度至', field: 'aminoAcidLengthEnd', editRender: { name: 'AInput' } },
+        { title: '是否脱盐',
+          field: 'isNeedDesalting',
+          align: 'center',
+          formatter: function ({ cellValue }) {
+            if (cellValue === 1) { return '√'; }
+          }
+        },
+        { title: '氨基酸类型', field: 'aminoAcidType', align: 'center', editRender: { name: 'AInput' } },
+        { title: '产品编号', field: 'sapProductCode', editRender: { name: 'AInput' } },
+        { title: '产品名称', field: 'sapProductName', editRender: { name: 'AInput' } },
+        { title: '状态',
+          field: 'status',
           formatter: ({ cellValue }) => {
             return formatter(self.status, cellValue);
           }
         },
-        { label: '创建人', prop: 'creatorName' },
-        { label: '创建时间', prop: 'createDate' },
-        { label: '删除人', prop: 'cancelName' },
-        { label: '删除时间', prop: 'cancelDate' },
+        { title: '创建人', field: 'creatorName' },
+        { title: '创建时间', field: 'createDate' },
+        { title: '删除人', field: 'cancelName' },
+        { title: '删除时间', field: 'cancelDate' },
         {
-          label: '操作',
-          prop: 'actions',
+          title: '操作',
+          field: 'actions',
           fixed: 'right',
           slots: {
             default: ({ row, rowIndex }) => {

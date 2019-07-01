@@ -104,60 +104,60 @@ export default {
       this.status = peptide.status;
       const columns = [
         { type: 'index', width: 40 },
-        { label: '编号', prop: 'code' },
-        { label: '名称', prop: 'name', editRender: { name: 'AInput' } },
-        { label: '亲水性',
-          prop: 'hydrophilic',
+        { title: '编号', field: 'code' },
+        { title: '名称', field: 'name', editRender: { name: 'AInput' } },
+        { title: '亲水性',
+          field: 'hydrophilic',
           align: 'center',
           scopedSlots: { customRender: 'hydrophilic' }
         },
         {
-          label: '疏水性',
-          prop: 'hydrophobic',
+          title: '疏水性',
+          field: 'hydrophobic',
           align: 'center',
           scopedSlots: { customRender: 'hydrophobic' }
         },
         {
-          label: '酸性',
-          prop: 'acidic',
+          title: '酸性',
+          field: 'acidic',
           align: 'center',
           scopedSlots: { customRender: 'acidic' }
         },
         {
-          label: '碱性',
-          prop: 'alkaline',
+          title: '碱性',
+          field: 'alkaline',
           align: 'center',
           scopedSlots: { customRender: 'alkaline' }
         },
         {
-          label: '是否可做二硫键',
-          prop: 'isCanDisulfideBond',
+          title: '是否可做二硫键',
+          field: 'isCanDisulfideBond',
           align: 'center',
           formatter: ({ cellValue }) => {
             return cellValue === 1 ? '√' : '';
           }
         },
-        { label: '分子量', prop: 'molecularWeight', align: 'center', scopedSlots: { customRender: 'molecularWeight' } },
-        { label: '等电点', prop: 'isoelectricPoint', align: 'center', scopedSlots: { customRender: 'isoelectricPoint' } },
-        { label: '羧基解离常数', prop: 'carboxylationDissociationConstant', align: 'center', scopedSlots: { customRender: 'carboxylationDissociationConstant' } },
-        { label: '氨基解离常数', prop: 'aminoDissociationConstant', align: 'center', scopedSlots: { customRender: 'aminoDissociationConstant' } },
+        { title: '分子量', field: 'molecularWeight', align: 'center', scopedSlots: { customRender: 'molecularWeight' } },
+        { title: '等电点', field: 'isoelectricPoint', align: 'center', scopedSlots: { customRender: 'isoelectricPoint' } },
+        { title: '羧基解离常数', field: 'carboxylationDissociationConstant', align: 'center', scopedSlots: { customRender: 'carboxylationDissociationConstant' } },
+        { title: '氨基解离常数', field: 'aminoDissociationConstant', align: 'center', scopedSlots: { customRender: 'aminoDissociationConstant' } },
         {
-          label: '状态',
-          prop: 'status',
+          title: '状态',
+          field: 'status',
           formatter: ({ cellValue }) => {
             return formatter(self.status, cellValue);
           }
         },
-        { label: '创建人', prop: 'creatorName', align: 'center' },
-        { label: '创建时间', prop: 'createDate', align: 'center' },
-        { label: '删除人', prop: 'cancelName' },
-        { label: '删除时间', prop: 'cancelDate' },
-        { label: '类型', prop: 'aminoAcidType', align: 'center', scopedSlots: { customRender: 'aminoAcidType' } },
-        { label: '长代码', prop: 'longCode', align: 'center', scopedSlots: { customRender: 'longCode' } },
-        { label: '短代码', prop: 'shortCode', align: 'center', scopedSlots: { customRender: 'shortCode' } },
+        { title: '创建人', field: 'creatorName', align: 'center' },
+        { title: '创建时间', field: 'createDate', align: 'center' },
+        { title: '删除人', field: 'cancelName' },
+        { title: '删除时间', field: 'cancelDate' },
+        { title: '类型', field: 'aminoAcidType', align: 'center', scopedSlots: { customRender: 'aminoAcidType' } },
+        { title: '长代码', field: 'longCode', align: 'center', scopedSlots: { customRender: 'longCode' } },
+        { title: '短代码', field: 'shortCode', align: 'center', scopedSlots: { customRender: 'shortCode' } },
         {
-          label: '操作',
-          prop: 'actions',
+          title: '操作',
+          field: 'actions',
           fixed: 'right',
           slots: {
             default: ({ row, rowIndex }) => {

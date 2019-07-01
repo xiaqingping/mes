@@ -12,22 +12,22 @@
           <div v-show="advanced">
             <a-col :xxl="4" :xl="6" :md="8" :sm="24">
               <a-form-item label="客户">
-                <a-input-search v-decorator="['customerCode']" @search="onOpen(1)"/>
+                <a-input-search @search="onOpen(1)" v-model="customer_value"/>
               </a-form-item>
             </a-col>
             <a-col :xxl="4" :xl="6" :md="8" :sm="24">
               <a-form-item label="负责人">
-                <a-input-search v-decorator="['subCustomerCode']" @search="onOpen(2)"/>
+                <a-input-search @search="onOpen(2)" v-model="sub_customer_value"/>
               </a-form-item>
             </a-col>
             <a-col :xxl="4" :xl="6" :md="8" :sm="24">
               <a-form-item label="订货人">
-                <a-input-search v-decorator="['contactCode']" @search="onOpen(3)"/>
+                <a-input-search @search="onOpen(3)" v-model="contact_value"/>
               </a-form-item>
             </a-col>
             <a-col :xxl="4" :xl="6" :md="8" :sm="24">
               <a-form-item label="销售员">
-                <a-input-search v-decorator="['salerCode']" @search="onOpen(4)"/>
+                <a-input-search @search="onOpen(4)" v-model="saler_value"/>
               </a-form-item>
             </a-col>
             <a-col :xxl="4" :xl="6" :md="8" :sm="24">
@@ -133,15 +133,15 @@
         >
       </vxe-grid>
     </div>
-    <customer-mask v-show="customer_status" @Closed="onClosed(1)">
+    <customer-mask v-show="customer_status" @Closed="onClosed">
     </customer-mask>
-    <sub-customer-mask v-show="sub_customer_status" @Closed="onClosed(2)">
+    <sub-customer-mask v-show="sub_customer_status" @Closed="onClosed">
     </sub-customer-mask>
-    <contact-mask v-show="contact_status" @Closed="onClosed(3)">
+    <contact-mask v-show="contact_status" @Closed="onClosed">
     </contact-mask>
-    <saler-mask v-show="saler_status" @Closed="onClosed(4)">
+    <saler-mask v-show="saler_status" @Closed="onClosed">
     </saler-mask>
-    <add-mask v-show="add_status" @Closed="onClosed(5)">
+    <add-mask v-show="add_status" @Closed="onClosed">
     </add-mask>
   </div>
 </template>
@@ -204,23 +204,10 @@ export default {
       contact_status: false,
       saler_status: false,
       add_status: false,
-      queryParam: {},
-      loadData: parameter => {
-        this.queryParam = this.form.getFieldsValue();
-        this.queryParam.createDateBegin = this.createDateBegin;
-        this.queryParam.createDateEnd = this.createDateEnd;
-        const params = Object.assign(parameter, this.queryParam);
-        return this.$api.peptide.getOrder(params).then(res => {
-          // console.log(res.rows);
-          return {
-            data: res.rows,
-            page: params.page,
-            total: res.total
-          };
-        });
-      },
-      selectedRowKeys: [],
-      selectedRows: []
+      customer_value: '',
+      sub_customer_value: '',
+      contact_value: '',
+      saler_value: ''
     };
   },
   mounted () {
@@ -235,74 +222,74 @@ export default {
       this.status = peptide.status;
       const columns = [
         { type: 'index', width: 40 },
-        { label: '订单编号', prop: 'code' },
+        { title: '订单编号', field: 'code' },
         {
-          label: '状态',
-          prop: 'status',
+          title: '状态',
+          field: 'status',
           formatter: ({ cellValue }) => {
             return formatter(peptide.orderStatus, cellValue);
           }
         },
-        { label: '客户', prop: 'customerName' },
-        { label: '负责人', prop: 'subCustomerName' },
-        { label: '订货人', prop: 'contactName' },
-        { label: '备注', prop: 'remark' },
-        { label: '订货人手机', prop: 'contactMobile' },
-        { label: '订货人邮箱', prop: 'contactEmail' },
-        { label: '销售员', prop: 'salerName' },
+        { title: '客户', field: 'customerName' },
+        { title: '负责人', field: 'subCustomerName' },
+        { title: '订货人', field: 'contactName' },
+        { title: '备注', field: 'remark' },
+        { title: '订货人手机', field: 'contactMobile' },
+        { title: '订货人邮箱', field: 'contactEmail' },
+        { title: '销售员', field: 'salerName' },
         {
-          label: '销售组织',
-          prop: 'rangeOrganization',
+          title: '销售组织',
+          field: 'rangeOrganization',
           formatter: ({ cellValue }) => {
             return formatter(peptide.rangeOrganization, cellValue);
           }
         },
         {
-          label: '分销渠道',
-          prop: 'rangeChannel',
+          title: '分销渠道',
+          field: 'rangeChannel',
           formatter: ({ cellValue }) => {
             return formatter(peptide.rangeChannel, cellValue);
           }
         },
-        { label: '销售大区', prop: 'regionCode' },
-        { label: '销售网点', prop: 'officeCode' },
-        { label: '交货方式',
-          prop: 'deliveryType',
+        { title: '销售大区', field: 'regionCode' },
+        { title: '销售网点', field: 'officeCode' },
+        { title: '交货方式',
+          field: 'deliveryType',
           formatter: ({ cellValue }) => {
             return formatter(peptide.deliveryTypeStatus, cellValue);
           }
         },
-        { label: '开票方式', prop: 'invoiceType' },
-        { label: '付款方式', prop: 'paymentMethod' },
-        { label: '付款条件', prop: 'paymentTerm' },
-        { label: 'SAP销售订单号', prop: 'sapOrderCode' },
-        { label: 'SAP交货单号', prop: 'sapDeliveryCode' },
-        { label: '运费', prop: 'freight' },
-        { label: '订单金额', prop: 'amount' },
-        { label: '币种', prop: 'currency' },
-        { label: '随货开票',
-          prop: 'invoiceByGoods',
+        { title: '开票方式', field: 'invoiceType' },
+        { title: '付款方式', field: 'paymentMethod' },
+        { title: '付款条件', field: 'paymentTerm' },
+        { title: 'SAP销售订单号', field: 'sapOrderCode' },
+        { title: 'SAP交货单号', field: 'sapDeliveryCode' },
+        { title: '运费', field: 'freight' },
+        { title: '订单金额', field: 'amount' },
+        { title: '币种', field: 'currency' },
+        { title: '随货开票',
+          field: 'invoiceByGoods',
           formatter: ({ cellValue }) => {
             if (!cellValue) return peptide.invoiceByGoodsStatus[0].name;
             return formatter(peptide.invoiceByGoodsStatus, cellValue);
           }
         },
-        { label: '送货地址', prop: 'address' },
-        { label: '创建人姓名', prop: 'creatorName' },
-        { label: '创建时间', prop: 'createDate' },
-        { label: '修改人姓名', prop: 'changerName' },
-        { label: '修改时间', prop: 'changeDate' },
-        { label: '发货人姓名', prop: 'sendName' },
-        { label: '发货时间', prop: 'sendDate' },
-        { label: '作废人姓名', prop: 'cancelName' },
-        { label: '作废时间', prop: 'cancelDate' },
-        { label: '审核人姓名', prop: 'checkName' },
-        { label: '审核时间', prop: 'checkDate' },
-        { label: '完成人姓名', prop: 'finishName' },
-        { label: '完成时间', prop: 'finishDate' },
+        { title: '送货地址', field: 'address' },
+        { title: '创建人姓名', field: 'creatorName' },
+        { title: '创建时间', field: 'createDate' },
+        { title: '修改人姓名', field: 'changerName' },
+        { title: '修改时间', field: 'changeDate' },
+        { title: '发货人姓名', field: 'sendName' },
+        { title: '发货时间', field: 'sendDate' },
+        { title: '作废人姓名', field: 'cancelName' },
+        { title: '作废时间', field: 'cancelDate' },
+        { title: '审核人姓名', field: 'checkName' },
+        { title: '审核时间', field: 'checkDate' },
+        { title: '完成人姓名', field: 'finishName' },
+        { title: '完成时间', field: 'finishDate' },
         {
-          label: '操作',
-          prop: 'actions',
+          title: '操作',
+          field: 'actions',
           fixed: 'right',
           slots: {
             default: ({ row, rowIndex }) => {
@@ -408,19 +395,23 @@ export default {
           break;
       }
     },
-    onClosed (e) {
-      switch (e) {
+    onClosed (row, num) {
+      switch (num) {
         case 1 :
           this.customer_status = false;
+          this.customer_value = row.code ? row.code : this.customer_value;
           break;
         case 2 :
           this.sub_customer_status = false;
+          this.sub_customer_value = row.code ? row.code : this.sub_customer_value;
           break;
         case 3 :
           this.contact_status = false;
+          this.contact_value = row.code ? row.code : this.contact_value;
           break;
         case 4 :
           this.saler_status = false;
+          this.saler_value = row.code ? row.code : this.saler_value;
           break;
         case 5 :
           this.add_status = false;

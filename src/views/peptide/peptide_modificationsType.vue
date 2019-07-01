@@ -95,22 +95,22 @@ export default {
       const { peptide } = this.$store.state;
       this.status = peptide.status;
       const columns = [
-        { label: '编号', prop: 'code' },
-        { label: '修饰类型', prop: 'modificationType', editRender: { name: 'input' } },
+        { title: '编号', field: 'code' },
+        { title: '修饰类型', field: 'modificationType', editRender: { name: 'input' } },
         {
-          label: '状态',
-          prop: 'status',
+          title: '状态',
+          field: 'status',
           formatter: ({ cellValue }) => {
             return formatter(self.status, cellValue);
           }
         },
-        { label: '创建人', prop: 'creatorName' },
-        { label: '创建日期', prop: 'createDate' },
-        { label: '删除人', prop: 'cancelName' },
-        { label: '删除时间', prop: 'cancelDate' },
+        { title: '创建人', field: 'creatorName' },
+        { title: '创建日期', field: 'createDate' },
+        { title: '删除人', field: 'cancelName' },
+        { title: '删除时间', field: 'cancelDate' },
         {
-          label: '操作',
-          prop: 'actions',
+          title: '操作',
+          field: 'actions',
           fixed: 'right',
           slots: {
             default: ({ row, rowIndex }) => {
