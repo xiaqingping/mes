@@ -103,12 +103,12 @@ export default {
 
       const columns = [
         { width: 40, type: 'index' },
-        { label: '编号', prop: 'code' },
-        { label: '名称', prop: 'name', editRender: { name: 'input' } },
-        { label: '别名', prop: 'alias', editRender: { name: 'input' } },
+        { title: '编号', field: 'code' },
+        { title: '名称', field: 'name', editRender: { name: 'input' } },
+        { title: '别名', field: 'alias', editRender: { name: 'input' } },
         {
-          label: '系列',
-          prop: 'seriesId',
+          title: '系列',
+          field: 'seriesId',
           editRender: {
             name: 'ASelect',
             options: seq.series,
@@ -118,16 +118,16 @@ export default {
             }
           }
         },
-        { label: '状态', prop: 'status', formatter: function ({ cellValue }) { return formatter(basic.status, cellValue); } },
-        { label: '创建人', prop: 'creatorName' },
-        { label: '创建时间', prop: 'createDate' },
-        { label: '修改人', prop: 'changerName' },
-        { label: '修改时间', prop: 'changeDate' },
-        { label: '作废人', prop: 'cancelName' },
-        { label: '作废时间', prop: 'cancelDate' },
+        { title: '状态', field: 'status', formatter: function ({ cellValue }) { return formatter(basic.status, cellValue); } },
+        { title: '创建人', field: 'creatorName' },
+        { title: '创建时间', field: 'createDate' },
+        { title: '修改人', field: 'changerName' },
+        { title: '修改时间', field: 'changeDate' },
+        { title: '作废人', field: 'cancelName' },
+        { title: '作废时间', field: 'cancelDate' },
         {
-          label: '操作',
-          prop: 'actions',
+          title: '操作',
+          field: 'actions',
           fixed: 'right',
           slots: {
             default: ({ row, rowIndex }) => {

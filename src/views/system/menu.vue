@@ -20,7 +20,7 @@
           :data.sync="menuTable.tableData"
           :edit-rules="menuTable.editRules"
           :tree-config="{key: 'name', children: 'children'}"
-          :edit-config="{key: 'id', trigger: 'manual', mode: 'row', showIcon: false, autoClear: false}">
+          :edit-config="{key: 'id', trigger: 'click', mode: 'row', showIcon: false, autoClear: false}">
         </vxe-grid>
       </a-layout-content>
 
@@ -79,10 +79,10 @@ export default {
       const tableName = 'menuTable';
       const columns = [
         { type: 'index', width: 40 },
-        { label: '菜单', prop: 'name', treeNode: true },
-        { label: '链接', prop: 'url' },
-        { label: '图标', prop: 'note' },
-        { label: '排序', prop: 'serial' }
+        { title: '菜单', field: 'name', treeNode: true },
+        { title: '链接', field: 'url' },
+        { title: '图标', field: 'note', editRender: { name: 'input' } },
+        { title: '排序', field: 'serial', editRender: { name: 'input' } }
       ];
 
       // columns.forEach(function (e) {

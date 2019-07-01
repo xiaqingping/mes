@@ -139,11 +139,11 @@ export default {
 
       const columns = [
         { width: 40, type: 'index' },
-        { label: '编号', prop: 'code' },
-        { label: '名称', prop: 'name', editRender: { name: 'input' } },
+        { title: '编号', field: 'code' },
+        { title: '名称', field: 'name', editRender: { name: 'input' } },
         {
-          label: 'SAP工厂',
-          prop: 'factory',
+          title: 'SAP工厂',
+          field: 'factory',
           formatter: function ({ cellValue }) { return formatter(basic.factorys, cellValue, 'code', 'text'); },
           editRender: {
             name: 'ASelect',
@@ -153,7 +153,7 @@ export default {
         },
         {
           label: '仓库',
-          prop: 'storageCode',
+          field: 'storageCode',
           formatter: function ({ cellValue }) { return formatter(basic.storages, cellValue, 'code', 'text'); },
           editRender: {
             name: 'ASelect',
@@ -164,16 +164,16 @@ export default {
             }
           }
         },
-        { label: '状态', prop: 'status', formatter: function ({ cellValue }) { return formatter(basic.status, cellValue); } },
-        { label: '创建人', prop: 'creatorName' },
-        { label: '创建时间', prop: 'createDate' },
-        { label: '修改人', prop: 'changerName' },
-        { label: '修改时间', prop: 'changeDate' },
-        { label: '作废人', prop: 'cancelName' },
-        { label: '作废时间', prop: 'cancelDate' },
+        { title: '状态', field: 'status', formatter: function ({ cellValue }) { return formatter(basic.status, cellValue); } },
+        { title: '创建人', field: 'creatorName' },
+        { title: '创建时间', field: 'createDate' },
+        { title: '修改人', field: 'changerName' },
+        { title: '修改时间', field: 'changeDate' },
+        { title: '作废人', field: 'cancelName' },
+        { title: '作废时间', field: 'cancelDate' },
         {
-          label: '操作',
-          prop: 'actions',
+          title: '操作',
+          field: 'actions',
           fixed: 'right',
           slots: {
             default: ({ row, rowIndex }) => {
@@ -344,8 +344,8 @@ export default {
 
       const columns = [
         {
-          label: '网点',
-          prop: 'code',
+          title: '网点',
+          field: 'code',
           formatter: function ({ cellValue }) { return formatter(basic.offices, cellValue, 'code', 'name'); },
           editRender: {
             name: 'ASelect',
@@ -354,8 +354,8 @@ export default {
           }
         },
         {
-          label: '操作',
-          prop: 'actions',
+          title: '操作',
+          field: 'actions',
           slots: {
             default: ({ row, rowIndex }) => {
               let actions = [];

@@ -21,8 +21,8 @@ npm run lint
 ```
 
 ## 技术栈
-[Vue](https://cn.vuejs.org/v2/guide/) + [Vue Router](https://router.vuejs.org/zh/) + [Vuex](https://vuex.vuejs.org/zh/guide/)
-[Ant-design-vue](https://vue.ant.design/docs/vue/introduce-cn/)
+[Vue](https://cn.vuejs.org/v2/guide/) + [Vue Router](https://router.vuejs.org/zh/) + [Vuex](https://vuex.vuejs.org/zh/guide/)  
+[Ant-design-vue](https://vue.ant.design/docs/vue/introduce-cn/)  
 [vxe-table](https://xuliangzhan_admin.gitee.io/vxe-table/)
 
 ## 负责人

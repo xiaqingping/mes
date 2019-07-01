@@ -102,8 +102,8 @@ export default {
       const columns = [
         { type: 'index', width: 40 },
         {
-          label: '样品类型',
-          prop: 'sampleTypeId',
+          title: '样品类型',
+          field: 'sampleTypeId',
           formatter: function ({ cellValue }) { return formatter(seq.sampleType, cellValue); },
           editRender: {
             name: 'ASelect',
@@ -111,11 +111,11 @@ export default {
             options: seq.sampleType
           }
         },
-        { label: '最小长度', prop: 'minSampleLength', editRender: { name: 'AInputNumber' } },
-        { label: '最大长度', prop: 'maxSampleLength', editRender: { name: 'AInputNumber' } },
+        { title: '最小长度', field: 'minSampleLength', editRender: { name: 'AInputNumber' } },
+        { title: '最大长度', field: 'maxSampleLength', editRender: { name: 'AInputNumber' } },
         {
-          label: '浓度',
-          prop: 'concentration',
+          title: '浓度',
+          field: 'concentration',
           editRender: {
             name: 'ASelect',
             optionProps: { value: 'id', label: 'name' },
@@ -123,8 +123,8 @@ export default {
           }
         },
         {
-          label: '样品特性',
-          prop: 'sampleFeatureId',
+          title: '样品特性',
+          field: 'sampleFeatureId',
           formatter: function ({ cellValue, row }) {
             if (!cellValue) return row.sampleFeatureName;
             return formatter(seq.sampleFeature, cellValue);
@@ -135,25 +135,25 @@ export default {
             options: seq.sampleFeature
           }
         },
-        { label: '样品用量', prop: 'sampleDose', editRender: { name: 'AInputNumber' } },
-        { label: '测序点',
-          prop: 'seqfactoryId',
+        { title: '样品用量', field: 'sampleDose', editRender: { name: 'AInputNumber' } },
+        { title: '测序点',
+          field: 'seqfactoryId',
           editRender: {
             name: 'ASelect',
             optionProps: { value: 'id', label: 'name' },
             options: seq.seqfactory
           }
         },
-        { label: '状态', prop: 'status', formatter: function ({ cellValue }) { return formatter(basic.status, cellValue); } },
-        { label: '创建人', prop: 'creatorName' },
-        { label: '创建时间', prop: 'createDate' },
-        { label: '修改人', prop: 'changerName' },
-        { label: '修改时间', prop: 'changeDate' },
-        { label: '作废人', prop: 'cancelName' },
-        { label: '作废时间', prop: 'cancelDate' },
+        { title: '状态', field: 'status', formatter: function ({ cellValue }) { return formatter(basic.status, cellValue); } },
+        { title: '创建人', field: 'creatorName' },
+        { title: '创建时间', field: 'createDate' },
+        { title: '修改人', field: 'changerName' },
+        { title: '修改时间', field: 'changeDate' },
+        { title: '作废人', field: 'cancelName' },
+        { title: '作废时间', field: 'cancelDate' },
         {
-          label: '操作',
-          prop: 'actions',
+          title: '操作',
+          field: 'actions',
           fixed: 'right',
           slots: {
             default: ({ row, rowIndex }) => {
