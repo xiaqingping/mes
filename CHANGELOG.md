@@ -1,3 +1,18 @@
+## 2019-07-01
+1. vxe-table 依赖升级
+``` javascript
+// 表格列配置 columns 属性名变更，旧属性名v3.0废弃
+// old
+this.columns = [
+  { prop: 'name', label: '名称' }
+];
+
+// new
+this.columns = [
+  { field: 'name', title: '名称'}
+];
+```
+
 ## 2019-06-25
 
 1. 依赖更新  

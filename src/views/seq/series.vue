@@ -131,18 +131,18 @@ export default {
 
       const columns = [
         { type: 'index', width: 40 },
-        { label: '编号', prop: 'code' },
-        { label: '名称', prop: 'name', editRender: { name: 'input' } },
-        { label: '状态', prop: 'status', formatter: function ({ cellValue }) { return formatter(basic.status, cellValue); } },
-        { label: '创建人', prop: 'creatorName' },
-        { label: '创建时间', prop: 'createDate' },
-        { label: '修改人', prop: 'changerName' },
-        { label: '修改时间', prop: 'changeDate' },
-        { label: '作废人', prop: 'cancelName' },
-        { label: '作废时间', prop: 'cancelDate' },
+        { title: '编号', field: 'code' },
+        { title: '名称', field: 'name', editRender: { name: 'input' } },
+        { title: '状态', field: 'status', formatter: function ({ cellValue }) { return formatter(basic.status, cellValue); } },
+        { title: '创建人', field: 'creatorName' },
+        { title: '创建时间', field: 'createDate' },
+        { title: '修改人', field: 'changerName' },
+        { title: '修改时间', field: 'changeDate' },
+        { title: '作废人', field: 'cancelName' },
+        { title: '作废时间', field: 'cancelDate' },
         {
-          label: '操作',
-          prop: 'actions',
+          title: '操作',
+          field: 'actions',
           fixed: 'right',
           slots: {
             default: ({ row, rowIndex }) => {
@@ -285,12 +285,12 @@ export default {
       const { formatter } = this.$units;
       const { seq } = this.$store.state;
       const columns = [
-        { label: '引物编号', prop: 'code' },
-        { label: '引物名称', prop: 'name', editRender: { name: 'AInput' } },
-        { label: '引物类型', prop: 'type', formatter: function ({ cellValue }) { return formatter(seq.primerType, cellValue); } },
+        { title: '引物编号', field: 'code' },
+        { title: '引物名称', field: 'name', editRender: { name: 'AInput' } },
+        { title: '引物类型', field: 'type', formatter: function ({ cellValue }) { return formatter(seq.primerType, cellValue); } },
         {
-          label: '操作',
-          prop: 'actions',
+          title: '操作',
+          field: 'actions',
           slots: {
             default: ({ row, rowIndex }) => {
               let actions = [];
