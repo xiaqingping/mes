@@ -65,8 +65,8 @@
       >
       </vxe-grid>
     </div>
-    <!-- <products-mask v-show="products_status" @Closed="closeMask()" @customerData="customerData">
-    </products-mask> -->
+    <products-mask v-show="products_status" @Closed="closeMask()" @customerData="customerData">
+    </products-mask>
   </div>
 </template>
 
@@ -137,11 +137,59 @@ export default {
           align: 'center',
           formatter: function ({ cellValue }) {
             if (cellValue === 1) { return '√'; }
+          },
+          slots: {
+            default: ({ row, rowIndex }) => {
+              const xTable = this[tableName].xTable;
+              const isEdit = xTable.hasActiveRow(row);
+              if (isEdit) {
+                return [
+                  <vxe-checkbox>
+                  </vxe-checkbox>
+                ];
+              }
+            }
           }
         },
-        { title: '氨基酸类型', field: 'aminoAcidType', align: 'center', editRender: { name: 'AInput' } },
-        { title: '产品编号', field: 'sapProductCode', editRender: { name: 'AInput' } },
-        { title: '产品名称', field: 'sapProductName', editRender: { name: 'AInput' } },
+        { title: '氨基酸类型',
+          field: 'aminoAcidType',
+          align: 'center',
+          editRender: {
+            name: 'ASelect',
+            optionProps: { value: 'id', label: 'id' },
+            options: [{ id: 'L' }, { id: 'D' }]
+          }
+        },
+        { title: '产品编号',
+          field: 'sapProductCode',
+          slots: {
+            default: ({ row, rowIndex }) => {
+              const xTable = this[tableName].xTable;
+              const isEdit = xTable.hasActiveRow(row);
+              if (isEdit) {
+                return [
+                  <a-input disabled size="small" style="background-color:white;cursor:text"/>
+                ];
+              }
+            }
+          }
+        },
+        { title: '产品名称',
+          field: 'sapProductName',
+          slots: {
+            default: ({ row, rowIndex }) => {
+              const xTable = this[tableName].xTable;
+              const isEdit = xTable.hasActiveRow(row);
+              if (isEdit) {
+                return [
+                  <span style="position: relative">
+                    <a-input disabled size="small" style="background-color:white;cursor:text;"/>
+                    <a-icon type="search" style="position: absolute;right:10px;top:0" onClick={() => { this.openMask(); }} />
+                  </span>
+                ];
+              }
+            }
+          } },
         { title: '状态',
           field: 'status',
           formatter: ({ cellValue }) => {
@@ -309,5 +357,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-
+ svg:hover {
+   color:black
+ }
 </style>
