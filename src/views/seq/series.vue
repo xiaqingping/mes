@@ -54,7 +54,7 @@
         </vxe-grid>
       </a-layout-content>
 
-      <a-layout-sider width="300">
+      <a-layout-sider width="350">
         <span style="line-height:32px;">引物</span>
         <div class="table-operator">
           <a-button-group>
@@ -77,11 +77,12 @@
     </a-layout>
 
     <a-modal
-      title="引物"
+      title="选择引物"
+      width="1000px"
       :visible="choosePrimer.visible"
       :footer="null"
       @cancel="choosePrimer.visible = false">
-      <choose-primer></choose-primer>
+      <choose-primer @callback="setPrimer"></choose-primer>
     </a-modal>
   </div>
 </template>
@@ -122,13 +123,16 @@ export default {
         id: 0,
         ref: 'seriesPrimersTable',
         xTable: null,
+        editIndex: -1,
+        editData: null,
         loading: false,
         tableData: [],
         columns: [],
         editRules: {}
       },
       choosePrimer: {
-        visible: false
+        visible: false,
+        formData: {}
       }
     };
   },
@@ -352,14 +356,40 @@ export default {
       const tableName = 'seriesPrimersTable';
       const table = this.$refs[tableName].$refs.xTable;
       const newData = {
-        id: --this[tableName].id
+        id: --this[tableName].id,
+        name: 123
       };
       this[tableName].tableData = [newData, ...this[tableName].tableData];
       table.setActiveRow(newData);
+      // table.insert(newData).then(({ row }) => {
+      //   console.log(row);
+      //   table.setActiveRow(row);
+      // });
+      this[tableName].editIndex = 0;
     },
-    // 选择引物
+    // 显示引物选择框
     selectPrimer () {
       this.choosePrimer.visible = true;
+    },
+    // 设置引物
+    setPrimer (data) {
+      const tableName = 'seriesPrimersTable';
+      const editIndex = this[tableName].editIndex;
+      // var ddd = this[tableName].xTable.getRecords(editIndex);
+      const editData = this[tableName].tableData[editIndex];
+      const primer = {
+        primerId: data.id,
+        code: data.code,
+        name: data.name,
+        type: data.type
+      };
+      let newData = {};
+      newData = Object.assign({}, editData, primer);
+      this.$set(this[tableName].tableData, editIndex, newData);
+      this.choosePrimer.visible = false;
+      this.$nextTick(() => {
+        this[tableName].xTable.setActiveRow(newData);
+      });
     }
   }
 };

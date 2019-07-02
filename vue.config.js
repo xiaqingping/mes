@@ -6,9 +6,6 @@ module.exports = {
   publicPath: '/',
   // webpack 配置
   configureWebpack: {
-    // plugins: [
-    //   new BundleAnalyzerPlugin()
-    // ],
     resolve: {
       alias: {
         'vue$': path.resolve(__dirname, 'node_modules/vue/dist/vue.js')
