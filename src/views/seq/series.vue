@@ -141,7 +141,7 @@ export default {
     // 设置表格列属性
     setColumn () {
       const tableName = 'seriesTable';
-      const { formatter } = this.$units;
+      const { formatter } = this.$utils;
       const { basic } = this.$store.state;
 
       const columns = [
@@ -297,7 +297,7 @@ export default {
     // 为系列之引物设置列
     setColumnToPrimer () {
       const tableName = 'seriesPrimersTable';
-      const { formatter } = this.$units;
+      const { formatter } = this.$utils;
       const { seq } = this.$store.state;
       const columns = [
         { title: '引物编号', field: 'code' },

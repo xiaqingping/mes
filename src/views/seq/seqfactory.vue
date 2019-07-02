@@ -134,7 +134,7 @@ export default {
     // 设置表格列属性
     setColumn () {
       const tableName = 'seqfactoryTable';
-      const { formatter } = this.$units;
+      const { formatter } = this.$utils;
       const { basic } = this.$store.state;
 
       const columns = [
@@ -339,7 +339,7 @@ export default {
      */
     setColumnToOffice () {
       const tableName = 'seqfactoryOfficeTable';
-      const { formatter } = this.$units;
+      const { formatter } = this.$utils;
       const { basic } = this.$store.state;
 
       const columns = [

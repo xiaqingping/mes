@@ -94,7 +94,7 @@ export default {
   },
   methods: {
     createColumnDefs () {
-      const { formatter } = this.$units;
+      const { formatter } = this.$utils;
       const { basic } = this.$store.state;
 
       this.columns = [

@@ -230,7 +230,7 @@ export default {
   methods: {
     moment,
     setColumns () {
-      const { formatter } = this.$units;
+      const { formatter } = this.$utils;
       const { peptide } = this.$store.state;
       this.status = peptide.status;
       const columns = [

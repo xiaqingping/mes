@@ -131,7 +131,7 @@ export default {
     // 设置表格列属性
     setColumn () {
       const tableName = 'primerTable';
-      const { formatter } = this.$units;
+      const { formatter } = this.$utils;
       const { seq } = this.$store.state;
 
       const columns = [

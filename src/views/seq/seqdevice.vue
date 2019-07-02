@@ -130,7 +130,7 @@ export default {
     // 设置表格列属性
     setColumn () {
       const tableName = 'seqdeviceTable';
-      const { formatter } = this.$units;
+      const { formatter } = this.$utils;
       const { basic, seq } = this.$store.state;
 
       const columns = [
@@ -288,7 +288,7 @@ export default {
     // 为测序仪之明细设置列
     setColumnToSeqdeviceDetails () {
       const tableName = 'seqdeviceDetailsTable';
-      const { formatter } = this.$units;
+      const { formatter } = this.$utils;
       const { seq } = this.$store.state;
 
       const columns = [
