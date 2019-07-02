@@ -5,7 +5,11 @@
 </template>
 
 <script>
-
-export default {};
-
+export default {
+  name: 'App',
+  created () {
+    const cache = this.$ls.get('cache');
+    this.$store.commit('setCacheByLocalStorage', cache);
+  }
+};
 </script>

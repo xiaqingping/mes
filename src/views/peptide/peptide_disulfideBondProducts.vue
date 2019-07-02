@@ -96,7 +96,7 @@ export default {
   methods: {
     setColumns () {
       const self = this;
-      const { formatter } = this.$units;
+      const { formatter } = this.$utils;
       const { peptide } = this.$store.state;
       this.status = peptide.status;
       const columns = [

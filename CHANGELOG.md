@@ -1,3 +1,12 @@
+# 2019-07-02
+1. 修改系统工具 utils 赋值到 Vue 原型上的命名错误问题
+``` javascript
+// old
+Vue.prototype.$units = utils;
+// new 
+Vue.prototype.$utils = utils;
+```
+
 ## 2019-07-01
 1. vxe-table 依赖升级
 ``` javascript
