@@ -254,7 +254,7 @@ export default {
         }
       });
     },
-    // 点击载体表格时
+    // 点击表格行时
     handleCellClick ({ row }) {
       const tableName = 'seriesPrimersTable';
       if (!row.id || row.id < 0) {

@@ -79,18 +79,18 @@ export default {
       component: () => import('@/views/seq/sample_resistance'),
       meta: { title: '样品抗性', keepAlive: false, permission: [ 'dashboard' ] }
     },
-    // {
-    //   path: '/seq/sample_feature',
-    //   name: 'seq-sample_feature',
-    //   component: () => import('@/views/seq/sample_feature'),
-    //   meta: { title: '样品特性', keepAlive: false, permission: [ 'dashboard' ] }
-    // },
-    // {
-    //   path: '/seq/seqdevice',
-    //   name: 'seq-seqdevice',
-    //   component: () => import('@/views/seq/seqdevice'),
-    //   meta: { title: '测序仪', keepAlive: false, permission: [ 'dashboard' ] }
-    // },
+    {
+      path: '/seq/sample_feature',
+      name: 'seq-sample_feature',
+      component: () => import('@/views/seq/sample_feature'),
+      meta: { title: '样品特性', keepAlive: false, permission: [ 'dashboard' ] }
+    },
+    {
+      path: '/seq/seqdevice',
+      name: 'seq-seqdevice',
+      component: () => import('@/views/seq/seqdevice'),
+      meta: { title: '测序仪', keepAlive: false, permission: [ 'dashboard' ] }
+    },
     {
       path: '/seq/seqfactory',
       name: 'seq-seqfactory',

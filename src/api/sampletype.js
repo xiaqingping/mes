@@ -30,6 +30,10 @@ export default {
   getSampleFeature (params, easyui) {
     return request(`/sampletype/v1/samplefeature${easyui ? '/easyui' : ''}`, { params });
   },
+  // 查询样品特性明细
+  getSampleFeatureDetail (id) {
+    return request(`/sampletype/v1/samplefeaturedetail/${id}/detail`);
+  },
 
   /**
    * 样品抗性
