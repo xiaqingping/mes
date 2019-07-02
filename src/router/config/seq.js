@@ -55,12 +55,12 @@ export default {
     //   component: () => import('@/views/seq/sample'),
     //   meta: { title: '样品管理', keepAlive: false, permission: [ 'dashboard' ] }
     // },
-    // {
-    //   path: '/seq/primer',
-    //   name: 'seq-primer',
-    //   component: () => import('@/views/seq/primer'),
-    //   meta: { title: '引物管理', keepAlive: false, permission: [ 'dashboard' ] }
-    // },
+    {
+      path: '/seq/primer',
+      name: 'seq-primer',
+      component: () => import('@/views/seq/primer'),
+      meta: { title: '引物管理', keepAlive: false, permission: [ 'dashboard' ] }
+    },
     {
       path: '/seq/seqtype',
       name: 'seq-seqtype',

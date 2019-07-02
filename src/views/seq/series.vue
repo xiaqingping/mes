@@ -41,6 +41,7 @@
         <vxe-grid
           highlight-hover-row
           auto-resize
+          height="570"
           :ref="seriesTable.ref"
           :loading="seriesTable.loading"
           :columns="seriesTable.columns"
@@ -64,6 +65,7 @@
         <vxe-grid
           highlight-hover-row
           auto-resize
+          height="570"
           :ref="seriesPrimersTable.ref"
           :loading="seriesPrimersTable.loading"
           :columns="seriesPrimersTable.columns"
@@ -74,13 +76,23 @@
       </a-layout-sider>
     </a-layout>
 
+    <a-modal
+      title="引物"
+      :visible="choosePrimer.visible"
+      :footer="null"
+      @cancel="choosePrimer.visible = false">
+      <choose-primer></choose-primer>
+    </a-modal>
   </div>
 </template>
 
 <script>
+import ChoosePrimer from '@/components/seq/choosePrimer';
+
 export default {
   name: 'Series',
   components: {
+    ChoosePrimer
   },
   data () {
     return {
@@ -114,6 +126,9 @@ export default {
         tableData: [],
         columns: [],
         editRules: {}
+      },
+      choosePrimer: {
+        visible: false
       }
     };
   },
@@ -126,7 +141,7 @@ export default {
     // 设置表格列属性
     setColumn () {
       const tableName = 'seriesTable';
-      const { formatter } = this.$units;
+      const { formatter } = this.$utils;
       const { basic } = this.$store.state;
 
       const columns = [
@@ -282,11 +297,22 @@ export default {
     // 为系列之引物设置列
     setColumnToPrimer () {
       const tableName = 'seriesPrimersTable';
-      const { formatter } = this.$units;
+      const { formatter } = this.$utils;
       const { seq } = this.$store.state;
       const columns = [
         { title: '引物编号', field: 'code' },
-        { title: '引物名称', field: 'name', editRender: { name: 'AInput' } },
+        {
+          title: '引物名称',
+          field: 'name',
+          editRender: {},
+          slots: {
+            edit: () => {
+              return [
+                <a-input-search size="small" onSearch={this.selectPrimer}/>
+              ];
+            }
+          }
+        },
         { title: '引物类型', field: 'type', formatter: function ({ cellValue }) { return formatter(seq.primerType, cellValue); } },
         {
           title: '操作',
@@ -326,11 +352,14 @@ export default {
       const tableName = 'seriesPrimersTable';
       const table = this.$refs[tableName].$refs.xTable;
       const newData = {
-        id: --this[tableName].id,
-        name: ''
+        id: --this[tableName].id
       };
       this[tableName].tableData = [newData, ...this[tableName].tableData];
       table.setActiveRow(newData);
+    },
+    // 选择引物
+    selectPrimer () {
+      this.choosePrimer.visible = true;
     }
   }
 };

@@ -92,7 +92,7 @@ export default {
     // 初始表头
     setColumns () {
       const self = this;
-      const { formatter } = this.$units;
+      const { formatter } = this.$utils;
       const { peptide } = this.$store.state;
       this.status = peptide.status;
       const columns = [

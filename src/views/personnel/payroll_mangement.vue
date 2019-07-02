@@ -140,7 +140,7 @@ export default {
     // 设置表格列属性
     setColumn () {
       const tableName = 'seqtypeTable';
-      const { formatter } = this.$units;
+      const { formatter } = this.$utils;
       const { basic } = this.$store.state;
 
       const columns = [

@@ -3,7 +3,7 @@
   <div class="page-content">
 
     <div class="table-search">
-      <a-form layout="inline" :form="form" @submit="handleSearch">
+      <a-form layout="inline" :form="form" @submit.prevent="handleSearch">
         <a-row :gutter="24">
           <a-col :xxl="4" :xl="6" :md="8">
             <a-form-item label="编号">
@@ -139,7 +139,7 @@ export default {
     // 设置表格列属性
     setColumn () {
       const tableName = 'sampleFeature';
-      const { formatter } = this.$units;
+      const { formatter } = this.$utils;
       const { basic } = this.$store.state;
 
       const columns = [
@@ -261,9 +261,6 @@ export default {
     // 为特性之明细设置列
     setColumnToSampleFeatureDetails () {
       const tableName = 'sampleFeatureDetailsTable';
-      // const { formatter } = this.$units;
-      // const { seq } = this.$store.state;
-
       const columns = [
         { title: '测序点', field: 'seqfactoryName' },
         { title: 'DMSO', field: 'dmso' },
