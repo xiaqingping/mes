@@ -23,6 +23,11 @@ export default {
       { id: 0, name: '正常' },
       { id: 1, name: '作废' }
     ],
+    // 类型 - 用户权限
+    ruleType: [
+      { id: 1, name: '规则' },
+      { id: 2, name: '分组' }
+    ],
     // 角色
     roles: [
       { id: 67, name: 'BBI_基因' },

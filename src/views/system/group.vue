@@ -38,11 +38,12 @@
         </vxe-grid>
       </a-layout-content>
 
-      <a-layout-sider width="70%">
+      <a-layout-sider width="80%">
         <span style="line-height:32px;">规则分组</span>
         <div class="table-operator">
           <a-button-group>
             <!-- <a-button icon="search" @click="handleSearchToRule">查询</a-button> -->
+            <a-button icon="sync" @click="handleRefresh">刷新</a-button>
             <a-button icon="plus" type="primary" @click="handleAddRowToRule">新建</a-button>
           </a-button-group>
         </div>
@@ -102,40 +103,6 @@ export default {
         columns: [],
         editRules: {}
       }
-
-      // columnSon: [
-      //   { title: '名称', dataIndex: 'name', width: '12%' },
-      //   { title: 'Client', dataIndex: 'sourceClient', width: '6%' },
-      //   { title: 'Type', dataIndex: 'sourceType', width: '5%' },
-      //   { title: '资源', dataIndex: 'sourcePath', width: '23%' },
-      //   { title: '资源描述', dataIndex: 'sourceDesc', width: '12%' },
-      //   {
-      //     title: '参数类型',
-      //     dataIndex: 'paramType',
-      //     width: '6%',
-      //     customRender: function (value) {
-      //       if (value === 1) {
-      //         return '参数';
-      //       } else if (value === 2) {
-      //         return '属性';
-      //       } else if (value === 3) {
-      //         return '接口';
-      //       }
-      //     }
-      //   },
-      //   { title: '参数', dataIndex: 'parameterField', width: '8%' },
-      //   { title: '参数描述', dataIndex: 'parameterDesc', width: '8%' },
-      //   { title: 'OP', dataIndex: 'op', width: '5%' },
-      //   { title: '值', dataIndex: 'value', width: '5%' },
-      //   {
-      //     title: '状态',
-      //     dataIndex: 'status',
-      //     customRender: function (value) {
-      //       return value === 0 ? '有效' : '过期';
-      //     }
-      //   }
-      // ],
-      //   return this.$api.system.getGroupRulesList(params).then(res => {
     };
   },
   mounted () {
@@ -149,10 +116,10 @@ export default {
       const tableName = 'groupTable';
       const columns = [
         { type: 'index', width: 40 },
-        { label: '分组名称', prop: 'name', editRender: { name: 'input' } },
+        { title: '分组名称', field: 'name', editRender: { name: 'input' }, width: '60%' },
         {
-          label: '操作',
-          prop: 'actions',
+          title: '操作',
+          field: 'actions',
           fixed: 'right',
           slots: {
             default: ({ row, rowIndex }) => {
@@ -182,25 +149,20 @@ export default {
         }
       ];
 
-      columns.forEach(function (e) {
-        if (!e.width) e.width = 100;
-      });
-
       this[tableName].columns = columns;
 
       this[tableName].xTable = this.$refs[this[tableName].ref].$refs.xTable;
     },
     // 查询
-    handleSearch () {
+    handleSearch (e) {
+      if (e) e.preventDefault();
       const tableName = 'groupTable';
       this[tableName].loading = true;
-      const { currentPage, pageSize } = this[tableName].pagerConfig;
 
       const queryParam = this.form.getFieldsValue();
-      const params = Object.assign({ page: currentPage, rows: pageSize }, queryParam);
+      const params = Object.assign({ page: this[tableName].pagerConfig.currentPage, rows: this[tableName].pagerConfig.pageSize }, queryParam);
 
-      this.$api.system.getGroupsList(params, true).then((data) => {
-        this[tableName].tableData = data.rows;
+      this.$api.system.getGroups(params, true).then((data) => {
         this[tableName].tableData = data.rows;
         this[tableName].pagerConfig.total = data.total;
         this[tableName].pagerConfig.currentPage = params.page;
@@ -224,6 +186,14 @@ export default {
 
       this[tableName].tableData = [newData, ...this[tableName].tableData];
       table.setActiveRow(newData);
+      this[tableName].editIndex = 0;
+    },
+    // 保存
+    handleSave ({ row }) {
+      this.$api.system.inserGroups(row).then((res) => {
+        // this.handleSearch();
+        console.log(res);
+      });
     },
     // 退出编辑
     handleQuitEdit ({ row, rowIndex, tableName, xTable }) {
@@ -251,14 +221,16 @@ export default {
         this[tableName].tableData = [];
         return;
       }
-      console.log(row);
       this[tableName].loading = true;
-      this.$api.system.getGroupRulesList(row.id).then(res => {
-        // console.log(res);
-        this[tableName].tableData = res;
+      this.$api.system.getGroupRules(row.id).then(res => {
+        this[tableName].tableData = res.rows;
       }).finally(() => {
         this[tableName].loading = false;
       });
+    },
+    // 刷新
+    handleRefresh () {
+      alert(123);
     },
 
     /**
@@ -270,20 +242,20 @@ export default {
       // const { formatter } = this.$units;
       // const { system } = this.$store.state;
       const columns = [
-        { label: '名称', prop: 'code' },
-        { label: 'Client', prop: 'sourceClient', editRender: { name: 'AInput' } },
-        { label: 'Type', prop: 'sourceType' },
-        { label: '资源', prop: 'sourcePath' },
-        { label: '资源描述', prop: 'sourceDesc' },
-        { label: '参数类型', prop: 'paramType' },
-        { label: '参数', prop: 'parameterField' },
-        { label: '参数描述', prop: 'parameterDesc' },
-        { label: 'OP', prop: 'op' },
-        { label: '值', prop: 'value' },
-        { label: '状态', prop: 'status' },
+        { title: '名称', field: 'name' },
+        { title: 'Client', field: 'sourceClient', editRender: { name: 'AInput' } },
+        { title: 'Type', field: 'sourceType' },
+        { title: '资源', field: 'sourcePath' },
+        { title: '资源描述', field: 'sourceDesc' },
+        { title: '参数类型', field: 'paramType' },
+        { title: '参数', field: 'parameterField' },
+        { title: '参数描述', field: 'parameterDesc' },
+        { title: 'OP', field: 'op' },
+        { title: '值', field: 'value' },
+        { title: '状态', field: 'status' },
         {
-          label: '操作',
-          prop: 'actions',
+          title: '操作',
+          field: 'actions',
           slots: {
             default: ({ row, rowIndex }) => {
               let actions = [];
