@@ -74,7 +74,7 @@ VXETable.setup({
   menu: null,
   // 默认 tooltip 主题样式
   tooltip: {
-    zIndex: 99,
+    zIndex: 9999,
     theme: 'dark'
   },
   // 默认分页参数
@@ -120,11 +120,16 @@ VXETable.setup({
 VXETable.use(VXETablePluginAntd);
 
 // 自定义渲染器
-VXETable.renderer.add('MyCell', {
-  autofocus: '.my-cell',
-  renderEdit (h, editRender, { row, column }) {
+VXETable.renderer.add('SInputSearch', {
+  autofocus: '.ant-input',
+  renderEdit (h, editRender, params) {
+    const { $table, row, column } = params;
     return [
-      <a-input class="my-cell" text="text" v-model={ row[column.property] } />
+      <a-input-search
+        size={ $table.vSize }
+        value={ row[column.property] }
+        onInput={ val => { row[column.property] = val; }}
+        onSearch={ editRender.events.search } />
     ];
   },
   renderCell (h, editRender, { row, column }) {

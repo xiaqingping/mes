@@ -39,6 +39,7 @@
         </div>
 
         <vxe-grid
+          highlight-current-row
           highlight-hover-row
           auto-resize
           height="570"
@@ -100,6 +101,7 @@ export default {
       form: this.$form.createForm(this),
       queryParam: {},
       seriesTable: {
+        child: 'seriesPrimersTable',
         id: 0,
         ref: 'seriesTable',
         xTable: null,
@@ -120,6 +122,7 @@ export default {
         }
       },
       seriesPrimersTable: {
+        parent: 'seriesTable',
         id: 0,
         ref: 'seriesPrimersTable',
         xTable: null,
@@ -149,9 +152,11 @@ export default {
       const { basic } = this.$store.state;
 
       const columns = [
+        // { type: 'radio', width: 40 },
+        { type: 'selection', width: 40 },
         { type: 'index', width: 40 },
         { title: '编号', field: 'code' },
-        { title: '名称', field: 'name', editRender: { name: 'input' } },
+        { title: '名称', field: 'name', editRender: { name: 'AInput' } },
         { title: '状态', field: 'status', formatter: function ({ cellValue }) { return formatter(basic.status, cellValue); } },
         { title: '创建人', field: 'creatorName' },
         { title: '创建时间', field: 'createDate' },
@@ -216,7 +221,7 @@ export default {
         this[tableName].pagerConfig.currentPage = params.page;
         this[tableName].pagerConfig.pageSize = params.rows;
 
-        this[tableName].editIndex = -1;
+        // this[tableName].editIndex = -1;
       }).finally(() => {
         this[tableName].loading = false;
       });
@@ -231,8 +236,11 @@ export default {
         id: --this[tableName].id
       };
 
-      this[tableName].tableData = [newData, ...this[tableName].tableData];
-      table.setActiveRow(newData);
+      // this[tableName].tableData = [newData, ...this[tableName].tableData];
+      // table.setActiveRow(newData);
+      table.insert(newData).then(({ row }) => {
+        table.setActiveRow(row);
+      });
       this[tableName].editIndex = 0;
     },
     // 修改
@@ -261,15 +269,17 @@ export default {
         });
       }
     },
-    // 退出编辑
-    handleQuitEdit ({ row, rowIndex, tableName, xTable }) {
+    /**
+     * 退出编辑
+     * status 有值，退出修改操作，还原数据
+     *        无值，退出新增操作，删除新增的行
+     */
+    handleQuitEdit ({ row, xTable }) {
       xTable.clearActived().then(() => {
-        this[tableName].editIndex = -1;
-        if (!row.status) {
-          this[tableName].tableData.splice(rowIndex, 1);
+        if (typeof row.status === 'number') {
+          xTable.revert(row);
         } else {
-          this.$set(this[tableName].tableData, rowIndex, this[tableName].editData);
-          this[tableName].editData = null;
+          xTable.remove(row);
         }
       });
     },
@@ -305,18 +315,7 @@ export default {
       const { seq } = this.$store.state;
       const columns = [
         { title: '引物编号', field: 'code' },
-        {
-          title: '引物名称',
-          field: 'name',
-          editRender: {},
-          slots: {
-            edit: () => {
-              return [
-                <a-input-search size="small" onSearch={this.selectPrimer}/>
-              ];
-            }
-          }
-        },
+        { title: '引物名称', field: 'name', editRender: { name: 'SInputSearch', events: { search: this.selectPrimer } } },
         { title: '引物类型', field: 'type', formatter: function ({ cellValue }) { return formatter(seq.primerType, cellValue); } },
         {
           title: '操作',
@@ -354,18 +353,16 @@ export default {
     // 新增一可编辑行
     handleAddRowToPrimers () {
       const tableName = 'seriesPrimersTable';
-      const table = this.$refs[tableName].$refs.xTable;
+      const table = this[tableName].xTable;
+      const parentTable = this[this[tableName].parent].xTable;
+      console.log(parentTable.getSelectRecords());
       const newData = {
-        id: --this[tableName].id,
-        name: 123
+        id: --this[tableName].id
       };
-      this[tableName].tableData = [newData, ...this[tableName].tableData];
-      table.setActiveRow(newData);
-      // table.insert(newData).then(({ row }) => {
-      //   console.log(row);
-      //   table.setActiveRow(row);
-      // });
-      this[tableName].editIndex = 0;
+      table.insert(newData).then(({ row }) => {
+        table.setActiveRow(row);
+      });
+      // this[tableName].editIndex = 0;
     },
     // 显示引物选择框
     selectPrimer () {
@@ -374,22 +371,16 @@ export default {
     // 设置引物
     setPrimer (data) {
       const tableName = 'seriesPrimersTable';
-      const editIndex = this[tableName].editIndex;
-      // var ddd = this[tableName].xTable.getRecords(editIndex);
-      const editData = this[tableName].tableData[editIndex];
+      const table = this[tableName].xTable;
       const primer = {
         primerId: data.id,
         code: data.code,
         name: data.name,
         type: data.type
       };
-      let newData = {};
-      newData = Object.assign({}, editData, primer);
-      this.$set(this[tableName].tableData, editIndex, newData);
+      Object.assign(table.getInsertRecords()[0], primer);
+
       this.choosePrimer.visible = false;
-      this.$nextTick(() => {
-        this[tableName].xTable.setActiveRow(newData);
-      });
     }
   }
 };
