@@ -96,7 +96,7 @@ export default {
     // 设置表格列属性
     setColumn () {
       const tableName = 'productTable';
-      const { formatter } = this.$units;
+      const { formatter } = this.$utils;
       const { basic, seq } = this.$store.state;
 
       const columns = [

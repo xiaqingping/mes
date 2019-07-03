@@ -14,16 +14,16 @@
         :collapsed="collapsed"
         @toggle="toggle"
       />
-      <a-layout-content :style="{ height: '100%', paddingTop: '0' }">
+      <a-layout-content :style="{ display: 'flex', 'flex-direction': 'column', height: '100%', paddingTop: '0' }">
         <multi-tab></multi-tab>
         <transition name="page-transition">
           <route-view />
         </transition>
       </a-layout-content>
 
-      <a-layout-footer :style="{padding: 0}">
+      <!-- <a-layout-footer :style="{padding: 0}">
         <global-footer />
-      </a-layout-footer>
+      </a-layout-footer> -->
     </a-layout>
   </a-layout>
 </template>

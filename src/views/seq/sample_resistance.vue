@@ -90,7 +90,7 @@ export default {
     // 设置表格列属性
     setColumn () {
       const tableName = 'resistanceTable';
-      const { formatter } = this.$units;
+      const { formatter } = this.$utils;
       const { basic } = this.$store.state;
 
       const columns = [
