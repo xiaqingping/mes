@@ -97,13 +97,26 @@ export default {
           total: 0
         },
         editRules: {
-          purity: [
+          providerTotalAmountBegin: [
+            { required: true, message: '名称必填' }
+          ],
+          providerTotalAmountEnd: [
+            { required: true, message: '名称必填' }
+          ],
+          purityID: [
+            { required: true, message: '名称必填' }
+          ],
+          aminoAcidLengthBegin: [
+            { required: true, message: '名称必填' }
+          ],
+          aminoAcidLengthEnd: [
             { required: true, message: '名称必填' }
           ]
         }
       },
       products_status: '',
-      aa: []
+      sapProductCode: '',
+      sapProductName: ''
     };
   },
   mounted () {
@@ -168,7 +181,7 @@ export default {
               const isEdit = xTable.hasActiveRow(row);
               if (isEdit) {
                 return [
-                  <a-input disabled size="small" style="background-color:white;cursor:text"/>
+                  <a-input disabled size="small" style="background-color:white;cursor:text;color:black" value="sap"/>
                 ];
               }
             }
@@ -279,8 +292,8 @@ export default {
       this.handleSearch();
     },
     customerData (data) {
-      this.sapProductCode = data[0].code;
-      this.sapProductName = data[0].desc;
+      this.sapProductCode = data.code;
+      this.sapProductName = data.desc;
     },
     handleExit ({ row, rowIndex, tableName, xTable }) {
       xTable.clearActived();
@@ -302,38 +315,39 @@ export default {
       }, { passive: false });
     },
     handleSave (r) {
-      if (this.providerTotalAmountBegin === '' || this.providerTotalAmountEnd === '' || this.aminoAcidLengthBegin === '' || this.aminoAcidLengthEnd === '' || this.aminoAcidType === '' || this.sapProductCode === '' || this.sapProductName === '' || this.purityName === '') {
-        this.$notification.error({
-          message: '错误',
-          description: `数据不能为空！`
-        });
-        return false;
-      }
-      var purityData = [];
-      this.purity.forEach((val, index, arr) => {
-        if (val.purity === this.purityName) {
-          purityData = val;
-        }
-      });
-      if (r.id) {
-        this.data = r;
-      }
-      this.data.providerTotalAmountBegin = this.providerTotalAmountBegin;
-      this.data.providerTotalAmountEnd = this.providerTotalAmountEnd;
-      this.data.purityName = purityData.purity;
-      this.data.purityCode = purityData.code;
-      this.data.purityID = purityData.id;
-      this.data.aminoAcidLengthBegin = this.aminoAcidLengthBegin;
-      this.data.aminoAcidLengthEnd = this.aminoAcidLengthEnd;
-      this.data.isNeedDesalting = this.isNeedDesalting ? 1 : 2;
-      this.data.aminoAcidType = this.aminoAcidType;
-      this.data.sapProductCode = this.sapProductCode;
-      this.data.sapProductName = this.sapProductName;
-      this.$api.peptide.insertProduct(this.data).then(res => {
-        if (res.id) {
-          this.handleExit();
-        }
-      });
+      console.log(r);
+      // if (this.providerTotalAmountBegin === '' || this.providerTotalAmountEnd === '' || this.aminoAcidLengthBegin === '' || this.aminoAcidLengthEnd === '' || this.aminoAcidType === '' || this.sapProductCode === '' || this.sapProductName === '' || this.purityName === '') {
+      //   this.$notification.error({
+      //     message: '错误',
+      //     description: `数据不能为空！`
+      //   });
+      //   return false;
+      // }
+      // var purityData = [];
+      // this.purity.forEach((val, index, arr) => {
+      //   if (val.purity === this.purityName) {
+      //     purityData = val;
+      //   }
+      // });
+      // if (r.id) {
+      //   this.data = r;
+      // }
+      // this.data.providerTotalAmountBegin = this.providerTotalAmountBegin;
+      // this.data.providerTotalAmountEnd = this.providerTotalAmountEnd;
+      // this.data.purityName = purityData.purity;
+      // this.data.purityCode = purityData.code;
+      // this.data.purityID = purityData.id;
+      // this.data.aminoAcidLengthBegin = this.aminoAcidLengthBegin;
+      // this.data.aminoAcidLengthEnd = this.aminoAcidLengthEnd;
+      // this.data.isNeedDesalting = this.isNeedDesalting ? 1 : 2;
+      // this.data.aminoAcidType = this.aminoAcidType;
+      // this.data.sapProductCode = this.sapProductCode;
+      // this.data.sapProductName = this.sapProductName;
+      // this.$api.peptide.insertProduct(this.data).then(res => {
+      //   if (res.id) {
+      //     this.handleExit();
+      //   }
+      // });
     },
     handleDelete ({ row }) {
       this.$api.peptide.deleteProduct(row.id).then(res => {

@@ -56,37 +56,51 @@
           </div>
           <div>
             <a-button icon="search" @click="showData">查询</a-button>
-            <a-button @click="sub" style="float:right">确定</a-button>
           </div>
         </a-form>
 
       </div>
-      <div style="height:100%;position: relative;">
-        <a-table
-          ref="table"
-          style="width:78%;"
-          bordered
-          rowKey="id"
-          size="small"
-          :loading="loading"
-          :scroll="{ x: 1900, y: 400}"
-          :columns="columns"
-          :dataSource="dataSource"
-          :rowSelection="{ selectedRowKeys: selectedRowKeys, onChange: onSelectChange }"
-        >
-        </a-table>
-        <div style="width:20%;position: absolute; left:79%; top:0">
-          <h4>库存</h4>
-          <a-table
-            :columns="columnSon"
-            :dataSource="dataSon"
-            bordered
-            rowKey="id"
-            ref="table1"
-            size="small"
-            :scroll="{ x: 200, y: 400}"/>
-        </div>
-      </div>
+      <a-layout>
+        <a-layout-content>
+          <div>
+            <div class="table-operator">
+            </div>
+
+            <vxe-grid
+              highlight-hover-row
+              auto-resize
+              :ref="productTable.ref"
+              :columns="productTable.columns"
+              :data.sync="productTable.tableData"
+              :loading="productTable.loading"
+              :edit-rules="productTable.editRules"
+              :edit-config="{key: 'id', trigger: 'manual', mode: 'row', showIcon: false, autoClear: false}"
+              :pager-config="productTable.pagerConfig"
+              @cell-click="(options) => handleCellClick(options)"
+              @cell-dblclick="(options) => sub(options)"
+              @page-change="pagerChange"
+            >
+            </vxe-grid>
+          </div>
+        </a-layout-content>
+
+        <a-layout-sider width="300">
+          <span style="line-height:32px;">库存</span>
+          <div class="table-operator">
+          </div>
+          <vxe-grid
+            highlight-hover-row
+            auto-resize
+            :ref="productSonTable.ref"
+            :loading="productSonTable.loading"
+            :columns="productSonTable.columns"
+            :data.sync="productSonTable.tableData"
+            :edit-rules="productSonTable.editRules"
+            :edit-config="{key: 'id', trigger: 'manual', mode: 'row', showIcon: false, autoClear: false}"
+          >
+          </vxe-grid>
+        </a-layout-sider>
+      </a-layout>
 
     </div>
   </div>
@@ -94,6 +108,8 @@
 </template>
 
 <script>
+const tableName = 'productTable';
+const tableNameSon = 'productSonTable';
 
 export default {
   name: 'CustomerMask',
@@ -101,6 +117,29 @@ export default {
     // var self = this;
     return {
       form: this.$form.createForm(this),
+      productTable: {
+        id: 0,
+        ref: 'productTable',
+        xTable: null,
+        editIndex: -1,
+        loading: false,
+        tableData: [],
+        columns: [],
+        pagerConfig: {
+          currentPage: 1,
+          pageSize: 10,
+          total: 0
+        }
+      },
+      productSonTable: {
+        id: 0,
+        ref: 'productSonTable',
+        xTable: null,
+        loading: false,
+        tableData: [],
+        columns: [],
+        editRules: {}
+      },
       small: true,
       loading: false,
       customer_name_top: 0,
@@ -111,90 +150,12 @@ export default {
       status: false,
       data: false,
       rangeArea: [],
-      brands: [],
-      columnSon: [
-        { title: '仓库', dataIndex: 'storageName', width: '120px' },
-        { title: '数量', dataIndex: 'saleCount', width: '80px' }
-      ],
-      dataSon: [],
-      columns: [
-        { title: '编号', dataIndex: 'code', width: '120px' },
-        { title: '产品名称', dataIndex: 'desc', width: '200px' },
-        { title: '英文名称', dataIndex: 'edesc', width: '200px' },
-        { title: '旧物料号', dataIndex: 'oldCode', width: '120px' },
-        { title: '品牌', dataIndex: 'brand', width: '80px' },
-        { title: '包装', dataIndex: 'packing', width: '80px' },
-        {
-          title: '温度条件',
-          dataIndex: 'temperatureCode',
-          width: '160px',
-          customRender: function (value, record, index) {
-            if (value) {
-              return `${record.temperatureCode}-${record.temperature}`;
-            }
-          }
-        },
-        {
-          title: '危险品标识',
-          dataIndex: 'cas',
-          width: '120px',
-          customRender: function (value) {
-            return value ? value.w7_nam : '';
-          }
-        },
-        { title: '产品价格', dataIndex: 'listPrice', align: 'right', width: '100px' },
-        { title: '客户折扣', dataIndex: 'custDiscount', align: 'right', width: '100px' },
-        { title: '客户价格', dataIndex: 'custPrice', align: 'right', width: '100px' },
-        { title: '促销价格', dataIndex: 'promPrice', align: 'right', width: '100px' },
-        {
-          title: '库存',
-          dataIndex: 'stock',
-          width: '100px',
-          align: 'right',
-          customRender: function (value) {
-            return value.saleCount;
-          }
-        },
-        {
-          title: '到货周期',
-          dataIndex: 'deliPeriod',
-          width: '100px',
-          customRender: function (value, record, index) {
-            if (record.deliPeriod === 0 && record.prodPeriod === 0) {
-              if (record.stock.saleCount > 0) {
-                return '现货';
-              } else {
-                return '无货';
-              }
-            } else {
-              return '预计' + Math.max(record.deliPeriod, record.prodPeriod) + '天到货';
-            }
-          }
-        },
-        {
-          title: '状态',
-          dataIndex: 'saleStatus',
-          width: '100px',
-          customRender: function (value) {
-            switch (value) {
-              case 'Z1':
-                return '暂停销售';
-              case 'GE':
-                return '状态异常(促销)';
-            }
-          }
-        }
-      ],
-      queryParam: {},
-      dataSource: [],
-      selectedRowKeys: [],
-      selectedRows: []
+      brands: []
     };
   },
   mounted () {
+    this.setColumns();
     this.handleSearch();
-    this.selectedRows = [];
-    this.selectedRowKeys = [];
     this.rangeArea = this.$store.state.peptide.rangeArea;
     this.brands = this.$store.state.basic.brands;
     var width = document.body.clientWidth;
@@ -220,42 +181,126 @@ export default {
     }
   },
   methods: {
-    handleSearch () {
-      this.loading = true;
+    setColumns () {
+      const { peptide } = this.$store.state;
+      this.status = peptide.status;
+      this.modificationPositionData = peptide.modificationPosition;
+      const columns = [
+        { type: 'index', width: 40 },
+        { title: '编号', field: 'code' },
+        { title: '产品名称', field: 'desc' },
+        { title: '英文名称', field: 'edesc' },
+        { title: '旧物料号', field: 'oldCode' },
+        { title: '品牌', field: 'brand' },
+        { title: '包装', field: 'packing' },
+        {
+          title: '温度条件',
+          field: 'temperatureCode',
+          formatter: ({ cellValue, row }) => {
+            return `${row.temperatureCode}-${row.temperature}`;
+          }
+        },
+        {
+          title: '危险品标识',
+          field: 'cas',
+          formatter: ({ cellValue }) => {
+            return cellValue ? cellValue.w7_nam : '';
+          }
+        },
+        { title: '产品价格', field: 'listPrice', align: 'right' },
+        { title: '客户折扣', field: 'custDiscount', align: 'right' },
+        { title: '客户价格', field: 'custPrice', align: 'right' },
+        { title: '促销价格', field: 'promPrice', align: 'right' },
+        {
+          title: '库存',
+          field: 'stock',
+          align: 'right',
+          formatter: ({ cellValue }) => {
+            return cellValue.saleCount;
+          }
+        },
+        {
+          title: '到货周期',
+          field: 'deliPeriod',
+          formatter: ({ cellValue, row }) => {
+            if (row.deliPeriod === 0 && row.prodPeriod === 0) {
+              if (row.stock.saleCount > 0) {
+                return '现货';
+              } else {
+                return '无货';
+              }
+            } else {
+              return '预计' + Math.max(row.deliPeriod, row.prodPeriod) + '天到货';
+            }
+          }
+        },
+        {
+          title: '状态',
+          field: 'saleStatus',
+          formatter: ({ cellValue }) => {
+            switch (cellValue) {
+              case 'Z1':
+                return '暂停销售';
+              case 'GE':
+                return '状态异常(促销)';
+            }
+          }
+        }
+      ];
+      const columnSon = [
+        { title: '仓库', field: 'storageName', columnKey: 'storage' },
+        { title: '数量', field: 'saleCount' }
+      ];
+
+      columns.forEach(function (e) {
+        if (!e.width) e.width = 100;
+      });
+
+      this[tableName].columns = columns;
+      this[tableNameSon].columns = columnSon;
+      this[tableName].xTable = this.$refs[this[tableName].ref].$refs.xTable;
+      this[tableNameSon].xTable = this.$refs[this[tableNameSon].ref].$refs.xTable;
+    },
+    handleCellClick ({ row }) {
+      this[tableNameSon].tableData = row.stock.storages.map((value, index, array) => {
+        return Object.assign({ id: value.storage }, value);
+      });
+    },
+    handleSearch (e) {
+      if (e) e.preventDefault();
+      this[tableName].loading = true;
 
       const queryParam = this.form.getFieldsValue();
       queryParam['range.channel'] = queryParam.range_area.split('-')[0] ? queryParam.range_area.split('-')[0] : '';
       queryParam['range.organization'] = queryParam.range_area.split('-')[1] ? queryParam.range_area.split('-')[1] : '';
       queryParam['stock.factory'] = '3100';
-      const params = Object.assign({ page: 1, rows: 10 }, queryParam);
+      const params = Object.assign({ page: this[tableName].pagerConfig.currentPage, rows: this[tableName].pagerConfig.pageSize }, queryParam);
+
       this.$api.peptide.getProductList(params).then((data) => {
-        if (this.data) {
-          this.selectedRows = [];
-          this.selectedRowKeys = [];
-          this.dataSource = data;
-        }
+        this[tableName].tableData = data;
+        this[tableName].pagerConfig.total = data.length;
+        this[tableName].pagerConfig.current = params.page;
+        this[tableName].pagerConfig.pageSize = params.rows;
+        this[tableName].editIndex = -1;
       }).finally(() => {
-        this.loading = false;
+        this[tableName].loading = false;
       });
     },
-    sub () {
-      if (this.selectedRows[0].saleStatus === 'Z1') {
+    pagerChange ({ pageSize, currentPage }) {
+      this[tableName].pagerConfig = Object.assign(this[tableName].pagerConfig, { pageSize, currentPage });
+      this.handleSearch();
+    },
+    sub (o) {
+      if (o.row.saleStatus === 'Z1') {
         this.$notification.error({
           message: '错误',
           description: `不能选择暂停销售产品`
         });
         return false;
       }
-      if (this.selectedRows[0]) {
-        this.$emit('customerData', this.selectedRows);
+      if (o.row) {
+        this.$emit('customerData', o.row);
         this.$emit('Closed');
-        this.selectedRows = [];
-        this.selectedRowKeys = [];
-      } else {
-        this.$notification.error({
-          message: '错误',
-          description: `请选择一条数据`
-        });
       }
     },
     onClose (e) {
@@ -265,34 +310,8 @@ export default {
       this.selectedRowKeys = [];
       this.dataSon = [];
     },
-    onSelectChange (selectedRowKeys, selectedRows) {
-      this.selectedRowKeys = selectedRowKeys.slice(-1);
-      if (selectedRows.length === 1) {
-        this.selectedRows = selectedRows;
-      } else {
-        for (let i = 0; i < selectedRows.length; i++) {
-          if (selectedRows[i].id === this.selectedRowKeys[0]) {
-            this.selectedRows = [];
-            this.selectedRows[0] = selectedRows[i];
-          }
-        }
-      }
-
-      if (this.selectedRows) {
-        for (let i = 0; i < this.selectedRows[0].stock.storages.length; i++) {
-          this.selectedRows[0].stock.storages[i]['id'] = i + 1;
-        }
-        this.dataSon = this.selectedRows[0].stock.storages;
-      } else {
-        this.dataSon = [];
-      }
-    },
     onSmall () {
       this.small = !this.small;
-    },
-    onChange (dates, dateStrings) {
-      this.createDateBegin = dateStrings[0];
-      this.createDateEnd = dateStrings[1];
     },
     showData () {
       this.data = true;

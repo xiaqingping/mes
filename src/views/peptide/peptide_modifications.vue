@@ -313,6 +313,7 @@ export default {
       this[tableNameSon].xTable = this.$refs[this[tableNameSon].ref].$refs.xTable;
     },
     handleCellClick ({ row }) {
+      this[tableNameSon].loading = true;
       this.parentData = { row };
       this.$api.peptide.getSuitableAminoAcids(row.id).then((data) => {
         this[tableNameSon].tableData = data;
@@ -336,15 +337,6 @@ export default {
         this[tableName].editIndex = -1;
       }).finally(() => {
         this[tableName].loading = false;
-      });
-    },
-    handleSearchSon () {
-      this.loadingSon = true;
-      this.editIndexSon = -1;
-      this.$api.peptide.getModifications({ 'id': this.selectRow }).then((data) => {
-        this.dataSourceSon = data.rows[0].details;
-      }).finally(() => {
-        this.loadingSon = false;
       });
     },
     handleAddRow () {
