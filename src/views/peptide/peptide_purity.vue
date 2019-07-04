@@ -147,9 +147,9 @@ export default {
           }
         }
       ];
-      columns.forEach(function (e) {
-        if (!e.width) e.width = 100;
-      });
+      // columns.forEach(function (e) {
+      //   if (!e.width) e.width = 100;
+      // });
 
       this[tableName].columns = columns;
 
@@ -187,8 +187,10 @@ export default {
       var addVal = {
         id: --this[tableName].id
       };
-      this[tableName].tableData = [addVal, ...this[tableName].tableData];
-      table.setActiveRow(addVal);
+      // this[tableName].tableData = [addVal, ...this[tableName].tableData];
+      table.insert(addVal).then(({ row }) => {
+        table.setActiveRow(row);
+      });
       this[tableName].editIndex = 0;
     },
     // 保存功能
@@ -201,9 +203,6 @@ export default {
         return false;
       }
       var data = {};
-      // if (o.row.id) {
-      //   data = o.row;
-      // }
       data.purity = o.row.purity;
       this.$api.peptide.insertPurity(data).then(res => {
         if (res.id) {

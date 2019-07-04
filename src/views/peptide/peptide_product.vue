@@ -41,7 +41,6 @@
           </a-col>
 
         </a-row>
-        <a-button type="primary" icon="search" html-type="submit" style="display:none;">查询</a-button>
       </a-form>
     </div>
     <div>
@@ -54,6 +53,7 @@
       <vxe-grid
         highlight-hover-row
         auto-resize
+        height="570"
         :ref="productTable.ref"
         :columns="productTable.columns"
         :data.sync="productTable.tableData"
@@ -175,34 +175,12 @@ export default {
         },
         { title: '产品编号',
           field: 'sapProductCode',
-          slots: {
-            default: ({ row, rowIndex }) => {
-              const xTable = this[tableName].xTable;
-              const isEdit = xTable.hasActiveRow(row);
-              if (isEdit) {
-                return [
-                  <a-input disabled size="small" style="background-color:white;cursor:text;color:black" value="sap"/>
-                ];
-              }
-            }
-          }
+          editRender: { name: 'AInput', props: { 'disabled': true } }
         },
         { title: '产品名称',
           field: 'sapProductName',
-          slots: {
-            default: ({ row, rowIndex }) => {
-              const xTable = this[tableName].xTable;
-              const isEdit = xTable.hasActiveRow(row);
-              if (isEdit) {
-                return [
-                  <span style="position: relative">
-                    <a-input disabled size="small" style="background-color:white;cursor:text;"/>
-                    <a-icon type="search" style="position: absolute;right:10px;top:0" onClick={() => { this.openMask(); }} />
-                  </span>
-                ];
-              }
-            }
-          } },
+          editRender: { name: 'SInputSearch', events: { search: this.openMask } }
+        },
         { title: '状态',
           field: 'status',
           formatter: ({ cellValue }) => {
@@ -283,8 +261,9 @@ export default {
         id: --this[tableName].id
       };
 
-      this[tableName].tableData = [addVal, ...this[tableName].tableData];
-      table.setActiveRow(addVal);
+      table.insert(addVal).then(({ row }) => {
+        table.setActiveRow(row);
+      });
       this[tableName].editIndex = 0;
     },
     pagerChange ({ pageSize, currentPage }) {
@@ -292,8 +271,12 @@ export default {
       this.handleSearch();
     },
     customerData (data) {
-      this.sapProductCode = data.code;
-      this.sapProductName = data.desc;
+      const table = this[tableName].xTable;
+      const primer = {
+        sapProductName: data.desc,
+        sapProductCode: data.code
+      };
+      Object.assign(table.getInsertRecords()[0], primer);
     },
     handleExit ({ row, rowIndex, tableName, xTable }) {
       xTable.clearActived();

@@ -91,10 +91,15 @@
       </a-layout-sider>
     </a-layout>
 
-    <div>
+    <a-modal
+      title="多肽修饰列表"
+      width="1000px"
+      :visible="aminoAcid.visible"
+      :footer="null"
+      @cancel="aminoAcid.visible = false">
       <amino-acid-mask v-show="aminoAcid_status" @Closed="closeMask()" @aminoAcidData="aminoAcidData">
       </amino-acid-mask>
-    </div>
+    </a-modal>
   </div>
 </template>
 
@@ -139,9 +144,13 @@ export default {
         columns: [],
         editRules: {}
       },
+      aminoAcid: {
+        visible: true,
+        formData: {}
+      },
       modificationsType: {}, // 修饰类型
       status: {},
-      aminoAcid_status: false,
+      aminoAcid_status: true,
       parentData: {},
       modificationPositionData: {} // 修饰位置
     };
