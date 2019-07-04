@@ -127,8 +127,7 @@ VXETable.renderer.add('SInputSearch', {
     return [
       <a-input-search
         size={ $table.vSize }
-        value={ row[column.property] }
-        onInput={ val => { row[column.property] = val; }}
+        v-model={row[column.property]}
         onSearch={ editRender.events.search } />
     ];
   },
