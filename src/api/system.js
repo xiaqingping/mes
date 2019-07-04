@@ -19,7 +19,7 @@ export default {
     return request(`/serial/v1/contents/easyui`, { params });
   },
 
-  // 查询编号规则取值
+  // 查询编号规则取值getRulesList
   getDerailList (params) {
     return request(`/serial/v1/details/easyui`, { params });
   },

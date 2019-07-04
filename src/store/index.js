@@ -9,6 +9,7 @@ import basic from './modules/basic';
 import user from './modules/user';
 import peptide from './modules/peptide';
 import system from './modules/system';
+import pay from './modules/pay';
 
 Vue.use(Vuex);
 
@@ -26,7 +27,8 @@ export default new Vuex.Store({
     basic,
     user,
     peptide,
-    system
+    system,
+    pay
   },
   state: {
     theme: 'dark'
