@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="box">
     <page-header></page-header>
 
     <!-- keep-alive  -->
@@ -56,25 +56,30 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  .extra-img {
-    margin-top: -60px;
-    text-align: center;
-    width: 195px;
+.box {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+.extra-img {
+  margin-top: -60px;
+  text-align: center;
+  width: 195px;
 
-    img {
+  img {
+    width: 100%;
+  }
+}
+
+.mobile {
+  .extra-img{
+    margin-top: 0;
+    text-align: center;
+    width: 96px;
+
+    img{
       width: 100%;
     }
   }
-
-  .mobile {
-    .extra-img{
-      margin-top: 0;
-      text-align: center;
-      width: 96px;
-
-      img{
-        width: 100%;
-      }
-    }
-  }
+}
 </style>

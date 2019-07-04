@@ -7,8 +7,11 @@
 }
 
 .page-content {
-  margin: 24px;
-  padding: 24px 32px;
+  flex-grow: 1;
+  padding: 12px;
+  margin: 12px;
+  // margin: 24px;
+  // padding: 24px 32px;
   background: #fff;
   .ant-layout {
     background: #fff;
@@ -81,6 +84,9 @@
         width: 100%;
       }
       & > .ant-select {
+        width: 100%;
+      }
+      & > .ant-input-search {
         width: 100%;
       }
       & > .ant-input-number {

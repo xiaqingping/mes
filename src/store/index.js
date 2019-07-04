@@ -34,7 +34,9 @@ export default new Vuex.Store({
     theme: 'dark'
   },
   mutations: {
-
+    setCacheByLocalStorage (state, payload) {
+      state = payload;
+    }
   },
   actions: {},
   plugins: [setCache],

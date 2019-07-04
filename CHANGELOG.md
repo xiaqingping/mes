@@ -1,3 +1,12 @@
+# 2019-07-02
+1. 修改系统工具 utils 赋值到 Vue 原型上的命名错误问题
+``` javascript
+// old
+Vue.prototype.$units = utils;
+// new 
+Vue.prototype.$utils = utils;
+```
+
 ## 2019-07-01
 1. vxe-table 依赖升级
 ``` javascript
@@ -14,7 +23,6 @@ this.columns = [
 ```
 
 ## 2019-06-25
-
 1. 依赖更新  
 2. views/seq/series示例更新  
    * 表单域回车时，取消默认事件（默认事件导致页面刷新） ~~涉及 `handleSearch`~~ 使用Vue事件修饰符 `.prevent` 取消默认事件
