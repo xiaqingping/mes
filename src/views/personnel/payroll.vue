@@ -65,6 +65,7 @@
         :data.sync="payTable.tableData"
         :edit-rules="payTable.editRules"
         :edit-config="{key: 'id', trigger: 'manual', mode: 'row', showIcon: false, autoClear: false}"
+        @cell-click="(options) => handleCellClick(options)"
         @page-change="pagerChange"
       ></vxe-grid>
       <div class="content-right" style="width:35%;position: absolute; left:66%; top:0">
@@ -270,6 +271,21 @@ export default {
       const tableName = 'payrollTable';
       this[tableName].pagerConfig = Object.assign(this[tableName].pagerConfig, { pageSize, currentPage });
       this.handleSearch();
+    },
+    // 点击表格行时
+    handleCellClick ({ row }) {
+      const tableName = 'payTable';
+      if (!row.id || row.id < 0) {
+        this[tableName].tableData = [];
+        return;
+      }
+
+      this[tableName].loading = true;
+      this.$api.pay.getPay(row.id).then(res => {
+        this[tableName].tableData = res;
+      }).finally(() => {
+        this[tableName].loading = false;
+      });
     },
     // 上传excel
     handleChange () {
