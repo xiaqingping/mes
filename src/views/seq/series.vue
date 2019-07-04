@@ -152,11 +152,11 @@ export default {
       const { basic } = this.$store.state;
 
       const columns = [
-        // { type: 'radio', width: 40 },
-        { type: 'selection', width: 40 },
+        { type: 'radio', width: 40 },
+        // { type: 'selection', width: 40 },
         { type: 'index', width: 40 },
         { title: '编号', field: 'code' },
-        { title: '名称', field: 'name', editRender: { name: 'AInput' } },
+        { title: '名称', field: 'name', editRender: { name: 'input' } },
         { title: '状态', field: 'status', formatter: function ({ cellValue }) { return formatter(basic.status, cellValue); } },
         { title: '创建人', field: 'creatorName' },
         { title: '创建时间', field: 'createDate' },
@@ -184,7 +184,7 @@ export default {
               if (isEdit) {
                 actions = [
                   <a onClick={() => this.handleSave(options) }>保存</a>,
-                  <a onClick={() => this.handleQuitEdit(options) }>退出</a>
+                  <a onClick={() => this.$utils.tableQuitEdit(options) }>退出</a>
                 ];
               }
 
@@ -229,24 +229,22 @@ export default {
     // 新增一可编辑行
     handleAddRow () {
       const tableName = 'seriesTable';
-      if (this[tableName].editIndex !== -1) return this.$message.warning('请保存或退出正在编辑的行');
-
       const table = this[tableName].xTable;
+
+      const active = table.getActiveRow();
+      if (active.row) return this.$message.warning('请保存或退出正在编辑的行');
+
       const newData = {
         id: --this[tableName].id
       };
 
-      // this[tableName].tableData = [newData, ...this[tableName].tableData];
-      // table.setActiveRow(newData);
       table.insert(newData).then(({ row }) => {
         table.setActiveRow(row);
       });
-      this[tableName].editIndex = 0;
     },
     // 修改
     handleUpdate ({ row, rowIndex, tableName, xTable }) {
       xTable.setActiveRow(row);
-      this[tableName].editIndex = rowIndex;
       this[tableName].editData = JSON.parse(JSON.stringify(row));
     },
     // 删除
@@ -269,34 +267,9 @@ export default {
         });
       }
     },
-    /**
-     * 退出编辑
-     * status 有值，退出修改操作，还原数据
-     *        无值，退出新增操作，删除新增的行
-     */
-    handleQuitEdit ({ row, xTable }) {
-      xTable.clearActived().then(() => {
-        if (typeof row.status === 'number') {
-          xTable.revert(row);
-        } else {
-          xTable.remove(row);
-        }
-      });
-    },
     // 点击表格行时
     handleCellClick ({ row }) {
-      const tableName = 'seriesPrimersTable';
-      if (!row.id || row.id < 0) {
-        this[tableName].tableData = [];
-        return;
-      }
-
-      this[tableName].loading = true;
-      this.$api.series.getPrimersBySeries(row.id).then(res => {
-        this[tableName].tableData = res;
-      }).finally(() => {
-        this[tableName].loading = false;
-      });
+      this.handleSearchPrimer(row.id);
     },
     // 分页改变时
     pagerChange ({ pageSize, currentPage }) {
@@ -308,6 +281,21 @@ export default {
     /**
      * 系列之引物
      */
+    handleSearchPrimer (seriesId) {
+      const tableName = 'seriesPrimersTable';
+
+      if (!seriesId || seriesId < 0) {
+        this[tableName].tableData = [];
+        return;
+      }
+
+      this[tableName].loading = true;
+      this.$api.series.getPrimersBySeries(seriesId).then(res => {
+        this[tableName].tableData = res;
+      }).finally(() => {
+        this[tableName].loading = false;
+      });
+    },
     // 为系列之引物设置列
     setColumnToPrimer () {
       const tableName = 'seriesPrimersTable';
@@ -328,12 +316,12 @@ export default {
               const options = { row, rowIndex, tableName, xTable };
               if (!isEdit) {
                 actions = [
-                  <a onClick={() => this.handleCancel(options)}>删除</a>
+                  <a onClick={() => this.handleCancelPrimer(options)}>删除</a>
                 ];
               } else {
                 actions = [
-                  <a onClick={() => this.handleSave(options) }>保存</a>,
-                  <a onClick={() => this.handleQuitEdit(options) }>退出</a>
+                  <a onClick={() => this.handleSavePrimer(options) }>保存</a>,
+                  <a onClick={() => this.$utils.tableQuitEdit(options) }>退出</a>
                 ];
               }
               return [
@@ -355,14 +343,17 @@ export default {
       const tableName = 'seriesPrimersTable';
       const table = this[tableName].xTable;
       const parentTable = this[this[tableName].parent].xTable;
-      console.log(parentTable.getSelectRecords());
+      const selectRow = parentTable.getCurrentRow();
+      if (!selectRow) return this.$message.warning('请先选择左侧列表的一行');
+      if (selectRow.status !== 1) return this.$message.warning('只能为状态正常的系列添加引物');
+
       const newData = {
+        seriesId: selectRow.id,
         id: --this[tableName].id
       };
       table.insert(newData).then(({ row }) => {
         table.setActiveRow(row);
       });
-      // this[tableName].editIndex = 0;
     },
     // 显示引物选择框
     selectPrimer () {
@@ -381,6 +372,18 @@ export default {
       Object.assign(table.getInsertRecords()[0], primer);
 
       this.choosePrimer.visible = false;
+    },
+    // 保存引物
+    handleSavePrimer ({ row }) {
+      this.$api.series.addPrimersBySeries(row).then(() => {
+        this.handleSearchPrimer(row.seriesId);
+      });
+    },
+    // 删除引物
+    handleCancelPrimer ({ row }) {
+      this.$api.series.cancelPrimersBySeries(row).then(() => {
+        this.handleSearchPrimer(row.seriesId);
+      });
     }
   }
 };
