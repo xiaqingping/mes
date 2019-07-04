@@ -3,27 +3,27 @@ import axios from 'axios';
 // import store from '@/store';
 import notification from 'ant-design-vue/es/notification';
 
-let baseURL = '';
+let baseURL = 'https://devapi.sangon.com:8443/api';
+const baseURLMap = {
+  dev: 'https://devapi.sangon.com:8443/api',
+  test: 'https://testapi.sangon.com:8443/api',
+  pre: 'https://preapi.sangon.com/api',
+  product: 'https://api.sangon.com/api'
+};
+
+/**
+ * 接口会根据所设置的环境变量改变，具体请阅读 README.md 文件中的《接口与环境设置》章节，如不设置环境变量，默认都是dev
+ */
 if (process.env.NODE_ENV === 'development') {
-  baseURL = 'https://devapi.sangon.com:8443/api';
-  // baseURL = 'https://preapi.sangon.com/api';
+  if (process.env.VUE_APP_BASE_URL_TYPE) baseURL = baseURLMap[process.env.VUE_APP_BASE_URL_TYPE];
 } else if (process.env.NODE_ENV === 'production') {
-  if (process.env.BASE_URL_TYPE === 'dev') {
-    baseURL = 'https://devapi.sangon.com:8443/api';
-  } else if (process.env.BASE_URL_TYPE === 'test') {
-    baseURL = 'https://testapi.sangon.com:8443/api';
-  } else if (process.env.BASE_URL_TYPE === 'produce') {
-    baseURL = 'https://api.sangon.com/api';
-  } else {
-    // baseURL = 'https://devapi.sangon.com:8443/api';
-    baseURL = 'https://preapi.sangon.com/api';
-  }
+  if (process.env.VUE_APP_BASE_URL_TYPE) baseURL = baseURLMap[process.env.VUE_APP_BASE_URL_TYPE];
 }
 
 // 创建 axios 实例
 const service = axios.create({
-  // baseURL: baseURL, // api base_url
-  timeout: 6000 // 请求超时时间
+  baseURL: baseURL,
+  timeout: 6000
 });
 
 const err = (error) => {
@@ -67,12 +67,13 @@ service.interceptors.request.use(config => {
   }
 
   // 添加 baseURL
-  if (config.url.indexOf('/oldapi') !== 0) {
-    config.url = baseURL + config.url;
-  } else {
-    config.url = baseURL + config.url;
-    config.url = config.url.replace('/api/oldapi', '');
-  }
+  // if (config.url.indexOf('/oldapi') !== 0) {
+  //   config.url = baseURL + config.url;
+  // } else {
+  //   config.url = baseURL + config.url;
+  //   config.url = config.url.replace('/api/oldapi', '');
+  // }
+
   const token = Vue.ls.get('TOKEN');
   if (token) {
     config.headers['Authorization'] = token;
