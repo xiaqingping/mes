@@ -8,13 +8,24 @@ import peptide from './peptide';
 // 人事管理
 import personnel from './personnel';
 
+/**
+ * 重定向设置，默认为首页（/home）
+ */
+let redirect = '/home';
+if (process.env.NODE_ENV === 'development') {
+  // 开发时，重定向到 .evn.development.local 文件中，VUE_APP_redirect 设置的路由（示例：VUE_APP_redirect=/seq/series）
+  if (process.env.VUE_APP_redirect) redirect = process.env.VUE_APP_redirect;
+} else if (process.env.NODE_ENV === 'production') {
+  // 生产时，应该重定向到用户设置的路由
+}
+
 export const asyncRouterMap = [
   {
     path: '/',
     name: 'index',
     component: BasicLayout,
     meta: { title: '首页' },
-    redirect: '/home',
+    redirect: redirect,
     children: [
       {
         path: '/home',
