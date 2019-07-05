@@ -1,5 +1,6 @@
 # 2019-07-05
 1. 修改 `div.table-search a-row` 下，每个栅格（`a-col`）的大小尺寸，提高空间利用率。
+
 ``` html
 <!-- old -->
 <a-col :xxl="4" :xl="6" :md="8" :sm="24">
@@ -22,6 +23,7 @@
 
 # 2019-07-02
 1. 修改系统工具 utils 赋值到 Vue 原型上的命名错误问题
+
 ``` javascript
 // old
 Vue.prototype.$units = utils;
@@ -32,6 +34,7 @@ Vue.prototype.$utils = utils;
 
 ## 2019-07-01
 1. vxe-table 依赖升级
+
 ``` javascript
 // 表格列配置 columns 属性名变更，旧属性名v3.0废弃
 // old
