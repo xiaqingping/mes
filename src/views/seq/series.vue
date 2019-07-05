@@ -5,17 +5,17 @@
     <div class="table-search">
       <a-form layout="inline" :form="form" @submit.prevent="handleSearch">
         <a-row :gutter="24">
-          <a-col :xxl="4" :xl="6" :md="8">
+          <a-col :md="6" :xl="4">
             <a-form-item label="编号">
               <a-input v-decorator="['code']"/>
             </a-form-item>
           </a-col>
-          <a-col :xxl="4" :xl="6" :md="8">
+          <a-col :md="6" :xl="4">
             <a-form-item label="名称">
               <a-input v-decorator="['name']"/>
             </a-form-item>
           </a-col>
-          <a-col :xxl="4" :xl="6" :md="8">
+          <a-col :md="6" :xl="4">
             <a-form-item label="状态">
               <a-select v-decorator="['status', {initialValue: 1}]">
                 <a-select-option value="">全部</a-select-option>
@@ -50,8 +50,8 @@
           :data.sync="seriesTable.tableData"
           :edit-rules="seriesTable.editRules"
           :edit-config="{key: 'id', trigger: 'manual', mode: 'row', showIcon: false, autoClear: false}"
-          @cell-click="(options) => handleCellClick(options)"
-          @page-change="pagerChange">
+          @cell-click="({row}) => handleSearchPrimer(row.id)"
+          @page-change="({pageSize, currentPage}) => this.$utils.tablePageChange({pageSize, currentPage, table: seriesTable, callback: handleSearch})">
         </vxe-grid>
       </a-layout-content>
 
@@ -83,7 +83,7 @@
       :visible="choosePrimer.visible"
       :footer="null"
       @cancel="choosePrimer.visible = false">
-      <choose-primer @callback="setPrimer"></choose-primer>
+      <choose-primer @callback="setPrimerBySelect"></choose-primer>
     </a-modal>
   </div>
 </template>
@@ -92,7 +92,7 @@
 import ChoosePrimer from '@/components/seq/choosePrimer';
 
 export default {
-  name: 'Series',
+  name: 'SeqSeries',
   components: {
     ChoosePrimer
   },
@@ -105,8 +105,6 @@ export default {
         id: 0,
         ref: 'seriesTable',
         xTable: null,
-        editIndex: -1,
-        editData: null,
         loading: false,
         tableData: [],
         columns: [],
@@ -115,19 +113,13 @@ export default {
           pageSize: 10,
           total: 0
         },
-        editRules: {
-          name: [
-            { required: true, message: '名称必填' }
-          ]
-        }
+        editRules: {}
       },
       seriesPrimersTable: {
         parent: 'seriesTable',
         id: 0,
         ref: 'seriesPrimersTable',
         xTable: null,
-        editIndex: -1,
-        editData: null,
         loading: false,
         tableData: [],
         columns: [],
@@ -153,7 +145,6 @@ export default {
 
       const columns = [
         { type: 'radio', width: 40 },
-        // { type: 'selection', width: 40 },
         { type: 'index', width: 40 },
         { title: '编号', field: 'code' },
         { title: '名称', field: 'name', editRender: { name: 'input' } },
@@ -177,14 +168,14 @@ export default {
 
               if (!isEdit && row.status === 1) {
                 actions = [
-                  <a onClick={() => this.handleCancel(options)}>删除</a>,
-                  <a onClick={() => this.handleUpdate(options)}>修改</a>
+                  <a onClick={ () => this.handleCancel(options) }>删除</a>,
+                  <a onClick={ () => xTable.setActiveRow(row) }>修改</a>
                 ];
               }
               if (isEdit) {
                 actions = [
-                  <a onClick={() => this.handleSave(options) }>保存</a>,
-                  <a onClick={() => this.$utils.tableQuitEdit(options) }>退出</a>
+                  <a onClick={ () => this.handleSave(options) }>保存</a>,
+                  <a onClick={ () => this.$utils.tableQuitEdit(options) }>退出</a>
                 ];
               }
 
@@ -203,6 +194,11 @@ export default {
       });
 
       this[tableName].columns = columns;
+      this[tableName].editRules = {
+        name: [
+          { required: true, message: '名称必填' }
+        ]
+      };
 
       this[tableName].xTable = this.$refs[this[tableName].ref].$refs.xTable;
     },
@@ -221,7 +217,8 @@ export default {
         this[tableName].pagerConfig.currentPage = params.page;
         this[tableName].pagerConfig.pageSize = params.rows;
 
-        // this[tableName].editIndex = -1;
+        // 重置子列表
+        this.handleSearchPrimer();
       }).finally(() => {
         this[tableName].loading = false;
       });
@@ -232,7 +229,7 @@ export default {
       const table = this[tableName].xTable;
 
       const active = table.getActiveRow();
-      if (active.row) return this.$message.warning('请保存或退出正在编辑的行');
+      if (active && active.row) return this.$message.warning('请保存或退出正在编辑的行');
 
       const newData = {
         id: --this[tableName].id
@@ -242,11 +239,6 @@ export default {
         table.setActiveRow(row);
       });
     },
-    // 修改
-    handleUpdate ({ row, rowIndex, tableName, xTable }) {
-      xTable.setActiveRow(row);
-      this[tableName].editData = JSON.parse(JSON.stringify(row));
-    },
     // 删除
     handleCancel ({ row }) {
       this.$api.series.cancelSeries(row.id).then(() => {
@@ -254,48 +246,27 @@ export default {
       });
     },
     // 保存
-    handleSave ({ row }) {
-      if (row.status) {
-        // 修改
-        this.$api.series.updateSeries(row).then(() => {
-          this.handleSearch();
-        });
-      } else {
-        // 新增
-        this.$api.series.addSeries(row).then(() => {
-          this.handleSearch();
-        });
-      }
-    },
-    // 点击表格行时
-    handleCellClick ({ row }) {
-      this.handleSearchPrimer(row.id);
-    },
-    // 分页改变时
-    pagerChange ({ pageSize, currentPage }) {
-      const tableName = 'seriesTable';
-      this[tableName].pagerConfig = Object.assign(this[tableName].pagerConfig, { pageSize, currentPage });
-      this.handleSearch();
+    handleSave ({ row, xTable }) {
+      xTable.validate(row).then(() => {
+        if (row.status) {
+          // 修改
+          this.$api.series.updateSeries(row).then(() => {
+            this.handleSearch();
+          });
+        } else {
+          // 新增
+          this.$api.series.addSeries(row).then(() => {
+            this.handleSearch();
+          });
+        }
+      }).catch(err => {
+        console.log(err);
+      });
     },
 
     /**
      * 系列之引物
      */
-    handleSearchPrimer (seriesId) {
-      const tableName = 'seriesPrimersTable';
-
-      if (!seriesId || seriesId < 0) {
-        this[tableName].tableData = [];
-        return;
-      }
-
-      this[tableName].loading = true;
-      this.$api.series.getPrimersBySeries(seriesId).then(res => {
-        this[tableName].tableData = res;
-      }).finally(() => {
-        this[tableName].loading = false;
-      });
-    },
     // 为系列之引物设置列
     setColumnToPrimer () {
       const tableName = 'seriesPrimersTable';
@@ -335,8 +306,29 @@ export default {
       ];
 
       this[tableName].columns = columns;
+      this[tableName].editRules = {
+        name: [
+          { required: true, message: '名称必填' }
+        ]
+      };
 
       this[tableName].xTable = this.$refs[this[tableName].ref].$refs.xTable;
+    },
+    // 查询
+    handleSearchPrimer (seriesId) {
+      const tableName = 'seriesPrimersTable';
+
+      if (!seriesId || seriesId < 0) {
+        this[tableName].tableData = [];
+        return;
+      }
+
+      this[tableName].loading = true;
+      this.$api.series.getPrimersBySeries(seriesId).then(res => {
+        this[tableName].tableData = res;
+      }).finally(() => {
+        this[tableName].loading = false;
+      });
     },
     // 新增一可编辑行
     handleAddRowToPrimers () {
@@ -360,7 +352,7 @@ export default {
       this.choosePrimer.visible = true;
     },
     // 设置引物
-    setPrimer (data) {
+    setPrimerBySelect (data) {
       const tableName = 'seriesPrimersTable';
       const table = this[tableName].xTable;
       const primer = {
@@ -374,9 +366,13 @@ export default {
       this.choosePrimer.visible = false;
     },
     // 保存引物
-    handleSavePrimer ({ row }) {
-      this.$api.series.addPrimersBySeries(row).then(() => {
-        this.handleSearchPrimer(row.seriesId);
+    handleSavePrimer ({ row, xTable }) {
+      xTable.validate(row).then(() => {
+        this.$api.series.addPrimersBySeries(row).then(() => {
+          this.handleSearchPrimer(row.seriesId);
+        });
+      }).catch(err => {
+        console.log(err);
       });
     },
     // 删除引物

@@ -5,22 +5,22 @@
     <div class="table-search">
       <a-form layout="inline" :form="form" @submit.prevent="handleSearch">
         <a-row :gutter="24">
-          <a-col :xxl="4" :xl="6" :md="8">
+          <a-col :md="6" :xl="4">
             <a-form-item label="编号">
               <a-input v-decorator="['code']"/>
             </a-form-item>
           </a-col>
-          <a-col :xxl="4" :xl="6" :md="8">
+          <a-col :md="6" :xl="4">
             <a-form-item label="名称">
               <a-input v-decorator="['name']"/>
             </a-form-item>
           </a-col>
-          <a-col :xxl="4" :xl="6" :md="8">
+          <a-col :md="6" :xl="4">
             <a-form-item label="别名">
               <a-input v-decorator="['alias']"/>
             </a-form-item>
           </a-col>
-          <a-col :xxl="4" :xl="6" :md="8">
+          <a-col :md="6" :xl="4">
             <a-form-item label="系列">
               <a-select v-decorator="['seriesId', {initialValue: ''}]">
                 <a-select-option value="">全部</a-select-option>
@@ -28,7 +28,7 @@
               </a-select>
             </a-form-item>
           </a-col>
-          <a-col :xxl="4" :xl="6" :md="8">
+          <a-col :md="6" :xl="4">
             <a-form-item label="状态">
               <a-select v-decorator="['status', {initialValue: 1}]">
                 <a-select-option value="">全部</a-select-option>
@@ -51,6 +51,7 @@
     <vxe-grid
       highlight-hover-row
       auto-resize
+      height="550"
       :ref="carrierTable.ref"
       :loading="carrierTable.loading"
       :columns="carrierTable.columns"
@@ -58,14 +59,14 @@
       :data.sync="carrierTable.tableData"
       :edit-rules="carrierTable.editRules"
       :edit-config="{key: 'id', trigger: 'manual', mode: 'row', showIcon: false, autoClear: false}"
-      @page-change="pagerChange">
+      @page-change="({pageSize, currentPage}) => this.$utils.tablePageChange({pageSize, currentPage, table: carrierTable, callback: handleSearch})">
     </vxe-grid>
   </div>
 </template>
 
 <script>
 export default {
-  name: 'Carrier',
+  name: 'SeqCarrier',
   components: {
   },
   data () {
@@ -76,8 +77,6 @@ export default {
         id: 0,
         ref: 'carrierTable',
         xTable: null,
-        editIndex: -1,
-        editData: null,
         loading: false,
         tableData: [],
         columns: [],
@@ -102,7 +101,8 @@ export default {
       const { basic, seq } = this.$store.state;
 
       const columns = [
-        { width: 40, type: 'index' },
+        { type: 'radio', width: 40 },
+        { type: 'index', width: 40 },
         { title: '编号', field: 'code' },
         { title: '名称', field: 'name', editRender: { name: 'input' } },
         { title: '别名', field: 'alias', editRender: { name: 'input' } },
@@ -138,14 +138,14 @@ export default {
 
               if (!isEdit && row.status === 1) {
                 actions = [
-                  <a onClick={() => this.handleCancel(options)}>删除</a>,
-                  <a onClick={() => this.handleUpdate(options)}>修改</a>
+                  <a onClick={ () => this.handleCancel(options) }>删除</a>,
+                  <a onClick={ () => xTable.setActiveRow(row) }>修改</a>
                 ];
               }
               if (isEdit) {
                 actions = [
-                  <a onClick={() => this.handleSave(options) }>保存</a>,
-                  <a onClick={() => this.handleQuitEdit(options) }>退出</a>
+                  <a onClick={ () => this.handleSave(options) }>保存</a>,
+                  <a onClick={ () => this.$utils.tableQuitEdit(options) }>退出</a>
                 ];
               }
 
@@ -189,8 +189,6 @@ export default {
         this[tableName].pagerConfig.total = data.total;
         this[tableName].pagerConfig.currentPage = params.page;
         this[tableName].pagerConfig.pageSize = params.rows;
-
-        this[tableName].editIndex = -1;
       }).finally(() => {
         this[tableName].loading = false;
       });
@@ -198,22 +196,18 @@ export default {
     // 新增一可编辑行
     handleAddRow () {
       const tableName = 'carrierTable';
-      if (this[tableName].editIndex !== -1) return this.$message.warning('请保存或退出正在编辑的行');
-
       const table = this[tableName].xTable;
+
+      const active = table.getActiveRow();
+      if (active && active.row) return this.$message.warning('请保存或退出正在编辑的行');
+
       const newData = {
         id: --this[tableName].id
       };
 
-      this[tableName].tableData = [newData, ...this[tableName].tableData];
-      table.setActiveRow(newData);
-      this[tableName].editIndex = 0;
-    },
-    // 修改
-    handleUpdate ({ row, rowIndex, tableName, xTable }) {
-      xTable.setActiveRow(row);
-      this[tableName].editIndex = rowIndex;
-      this[tableName].editData = JSON.parse(JSON.stringify(row));
+      table.insert(newData).then(({ row }) => {
+        table.setActiveRow(row);
+      });
     },
     // 删除
     handleCancel ({ row }) {
@@ -222,36 +216,22 @@ export default {
       });
     },
     // 保存
-    handleSave ({ row }) {
-      if (row.status) {
-        // 修改
-        this.$api.carrier.updateCarrier(row).then(() => {
-          this.handleSearch();
-        });
-      } else {
-        // 新增
-        this.$api.carrier.addCarrier(row).then(() => {
-          this.handleSearch();
-        });
-      }
-    },
-    // 退出编辑
-    handleQuitEdit ({ row, rowIndex, tableName, xTable }) {
-      xTable.clearActived().then(() => {
-        this[tableName].editIndex = -1;
-        if (!row.status) {
-          this[tableName].tableData.splice(rowIndex, 1);
+    handleSave ({ row, xTable }) {
+      xTable.validate(row).then(() => {
+        if (row.status) {
+          // 修改
+          this.$api.carrier.updateCarrier(row).then(() => {
+            this.handleSearch();
+          });
         } else {
-          this.$set(this[tableName].tableData, rowIndex, this[tableName].editData);
-          this[tableName].editData = null;
+          // 新增
+          this.$api.carrier.addCarrier(row).then(() => {
+            this.handleSearch();
+          });
         }
+      }).catch(err => {
+        console.log(err);
       });
-    },
-    // 分页改变时
-    pagerChange ({ pageSize, currentPage }) {
-      const tableName = 'carrierTable';
-      this[tableName].pagerConfig = Object.assign(this[tableName].pagerConfig, { pageSize, currentPage });
-      this.handleSearch();
     },
     // 选择系列
     seriesChange (arr, row, value) {
@@ -268,7 +248,6 @@ export default {
       }
       row = Object.assign(row, obj);
     }
-
   }
 };
 </script>

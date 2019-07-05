@@ -5,12 +5,12 @@
     <div class="table-search">
       <a-form layout="inline" :form="form" @submit="handleSearch">
         <a-row :gutter="24">
-          <a-col :xxl="4" :xl="6" :md="8" :sm="24">
+          <a-col :md="6" :xl="4" :sm="24">
             <a-form-item label="取样单编号">
               <a-input v-decorator="['code']"/>
             </a-form-item>
           </a-col>
-          <a-col :xxl="4" :xl="6" :md="8" :sm="24">
+          <a-col :md="6" :xl="4" :sm="24">
             <a-form-item label="取样单状态">
               <a-select v-decorator="['status']">
                 <a-select-option value="0">全部</a-select-option>
@@ -20,52 +20,52 @@
             </a-form-item>
           </a-col>
           <template v-if="advanced">
-            <a-col :xxl="4" :xl="6" :md="8" :sm="24">
+            <a-col :md="6" :xl="4" :sm="24">
               <a-form-item label="备注">
                 <a-input v-decorator="['remark']"/>
               </a-form-item>
             </a-col>
-            <a-col :xxl="4" :xl="6" :md="8" :sm="24">
+            <a-col :md="6" :xl="4" :sm="24">
               <a-form-item label="客户编号">
                 <a-input v-decorator="['customerCode']"/>
               </a-form-item>
             </a-col>
-            <a-col :xxl="4" :xl="6" :md="8" :sm="24">
+            <a-col :md="6" :xl="4" :sm="24">
               <a-form-item label="客户名称">
                 <a-input v-decorator="['customerName']"/>
               </a-form-item>
             </a-col>
-            <a-col :xxl="4" :xl="6" :md="8" :sm="24">
+            <a-col :md="6" :xl="4" :sm="24">
               <a-form-item label="负责人编号">
                 <a-input v-decorator="['subcustomerCode']"/>
               </a-form-item>
             </a-col>
-            <a-col :xxl="4" :xl="6" :md="8" :sm="24">
+            <a-col :md="6" :xl="4" :sm="24">
               <a-form-item label="负责人名称">
                 <a-input v-decorator="['subcustomerName']"/>
               </a-form-item>
             </a-col>
-            <a-col :xxl="4" :xl="6" :md="8" :sm="24">
+            <a-col :md="6" :xl="4" :sm="24">
               <a-form-item label="订货人编号">
                 <a-input v-decorator="['contactCode']"/>
               </a-form-item>
             </a-col>
-            <a-col :xxl="4" :xl="6" :md="8" :sm="24">
+            <a-col :md="6" :xl="4" :sm="24">
               <a-form-item label="订货人名称">
                 <a-input v-decorator="['contactName']"/>
               </a-form-item>
             </a-col>
-            <a-col :xxl="4" :xl="6" :md="8" :sm="24">
+            <a-col :md="6" :xl="4" :sm="24">
               <a-form-item label="订货人电话">
                 <a-input v-decorator="['contactMobile']"/>
               </a-form-item>
             </a-col>
-            <a-col :xxl="4" :xl="6" :md="8" :sm="24">
+            <a-col :md="6" :xl="4" :sm="24">
               <a-form-item label="订货人邮箱">
                 <a-input v-decorator="['contactEmail']"/>
               </a-form-item>
             </a-col>
-            <a-col :xxl="4" :xl="6" :md="8" :sm="24">
+            <a-col :md="6" :xl="4" :sm="24">
               <a-form-item label="创建日期">
                 <a-date-picker v-decorator="['createDateBegin']"/>
               </a-form-item>

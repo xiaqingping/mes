@@ -1,3 +1,21 @@
+# 2019-07-05
+1. 修改 `div.table-search a-row` 下，每个栅格（`a-col`）的大小尺寸，提高空间利用率。
+``` html
+<!-- old -->
+<a-col :xxl="4" :xl="6" :md="8" :sm="24">
+  <a-form-item label="编号">
+    <a-input v-decorator="['code']"/>
+  </a-form-item>
+</a-col>
+
+<!-- new -->
+<a-col :md="6" :xl="4">
+  <a-form-item label="编号">
+    <a-input v-decorator="['code']"/>
+  </a-form-item>
+</a-col>
+```
+
 # 2019-07-04
 1. 依赖升级，可能需要删除掉 `/node_modules` 文件夹，再 `npm install`，直接 `npm install` 可能会升级失败。
 2. 项目接口地址和重定向路由都需要通过环境变量来设置，否则默认接口为 `dev`，重定向路由为 `/home`。具体请查看 README.md 文件。
@@ -7,6 +25,7 @@
 ``` javascript
 // old
 Vue.prototype.$units = utils;
+
 // new 
 Vue.prototype.$utils = utils;
 ```
