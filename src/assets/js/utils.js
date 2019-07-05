@@ -18,5 +18,21 @@ export default {
       }
     }
     return value;
+  },
+  /**
+   * 表格退出编辑
+   *   status 有值，退出修改操作，还原数据
+   *          无值，退出新增操作，删除新增的行
+   * @param {Object} row 退出编辑行的数据
+   * @param {Object} xTable vxe-table组件
+   */
+  tableQuitEdit ({ row, xTable }) {
+    xTable.clearActived().then(() => {
+      if (typeof row.status === 'number') {
+        xTable.revert(row);
+      } else {
+        xTable.remove(row);
+      }
+    });
   }
 };

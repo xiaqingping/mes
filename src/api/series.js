@@ -34,11 +34,11 @@ export default {
     return request(`/series/v1/series/${seriesId}/primers`);
   },
   // 新增
-  addPrimersBySeries (seriesId, data) {
-    return request(`/series/v1/series/${seriesId}/primers`, { method: 'POST', data });
+  addPrimersBySeries (data) {
+    return request(`/series/v1/series/${data.seriesId}/primers`, { method: 'POST', data });
   },
   // 作废
-  cancelPrimersBySeries (seriesId, id) {
-    return request(`/series/v1/series/${seriesId}/primers/${id}`, { method: 'DELETE' });
+  cancelPrimersBySeries (data) {
+    return request(`/series/v1/series/${data.seriesId}/primers/${data.id}`, { method: 'DELETE' });
   }
 };
