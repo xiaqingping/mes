@@ -153,7 +153,7 @@ export default {
     // 设置表格列属性
     setColumn () {
       const tableName = 'userTable';
-      const { formatter } = this.$units;
+      const { formatter } = this.$utils;
       const { system } = this.$store.state;
 
       const columns = [

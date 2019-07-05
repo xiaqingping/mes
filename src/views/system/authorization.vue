@@ -51,8 +51,8 @@
         <div class="table-operator">
           <a-button-group>
             <a-button icon="search">查询</a-button>
-            <!-- <a-button icon="search" @click="handleSearchToClient">查询</a-button>
-            <a-button icon="plus" type="primary" @click="handleAddRowToClient">新建</a-button> -->
+            <!-- <a-button icon="search" @click="handleSearchToClient">查询</a-button> -->
+            <!-- <a-button icon="plus" type="primary" @click="handleAddRowToClient">新建</a-button> -->
           </a-button-group>
         </div>
 
@@ -62,10 +62,12 @@
           :ref="clientTable.ref"
           :loading="clientTable.loading"
           :columns="clientTable.columns"
+          :pager-config="clientTable.pagerConfig"
           :data.sync="clientTable.tableData"
           :edit-rules="clientTable.editRules"
           :edit-config="{key: 'id', trigger: 'manual', mode: 'row', showIcon: false, autoClear: false}"
-          @cell-click="(options) => handleCellClickToClient(options)">
+          @cell-click="(options) => handleCellClickToClient(options)"
+          @page-change="pagerChangeToGroupRule">
         </vxe-grid>
       </a-layout-sider>
 
@@ -73,9 +75,9 @@
         <span style="line-height:32px;">明细</span>
         <div class="table-operator">
           <a-button-group>
-            <a-button icon="search">查询</a-button>
-            <!-- <a-button icon="search" @click="handleSearchToClient">查询</a-button>
-            <a-button icon="plus" type="primary" @click="handleAddRowToClient">新建</a-button> -->
+            <!-- <a-button icon="search">查询</a-button> -->
+            <!-- <a-button icon="search" @click="handleSearchToClient">查询</a-button> -->
+            <!-- <a-button icon="plus" type="primary" @click="handleAddRowToClient">新建</a-button> -->
           </a-button-group>
         </div>
 
@@ -110,6 +112,8 @@ export default {
     return {
       form: this.$form.createForm(this),
       // authorization_status: false,
+      clickStatus: null,
+
       // 员工列表
       authorizationTable: {
         id: 0,
@@ -128,9 +132,9 @@ export default {
           // name: [
           //   { required: true, message: '名称必填' }
           // ]
-        },
-        clickStatus: null
+        }
       },
+      // 用户权限明细
       clientTable: {
         id: 0,
         ref: 'clientTable',
@@ -138,8 +142,14 @@ export default {
         loading: false,
         tableData: [],
         columns: [],
+        pagerConfig: {
+          currentPage: 1,
+          pageSize: 10,
+          total: 0
+        },
         editRules: {}
       },
+      // 明细
       groupRuleTable: {
         id: 0,
         ref: 'groupRuleTable',
@@ -170,8 +180,6 @@ export default {
     // 设置列
     setColumn () {
       const tableName = 'authorizationTable';
-      // const { formatter } = this.$units;
-      // const { system } = this.$store.state;
       const columns = [
         { type: 'index', width: 40 },
         { title: 'ID', field: 'code' },
@@ -249,7 +257,6 @@ export default {
     },
     // 分页改变时
     pagerChange ({ pageSize, currentPage }) {
-      // alert(1);
       const tableName = 'authorizationTable';
       this[tableName].pagerConfig = Object.assign(this[tableName].pagerConfig, { pageSize, currentPage });
       this.handleSearch();
@@ -264,9 +271,7 @@ export default {
       this[tableName].loading = true;
       this.$api.system.getAuthorityList(row.id).then(res => {
         this[tableName].tableData = res;
-        // row['status'] = 1;
-        // this.$options.methods.handleCellClickToClient(row);
-        // console.log(res);
+        // this.$options.methods.handleRefresh();
       }).finally(() => {
         this[tableName].loading = false;
       });
@@ -278,7 +283,7 @@ export default {
     // 设置列 - 用户权限明细
     setColumnToClient () {
       const tableName = 'clientTable';
-      const { formatter } = this.$units;
+      const { formatter } = this.$utils;
       const { system } = this.$store.state;
       const columns = [
         { type: 'index', width: 40 },
@@ -314,12 +319,31 @@ export default {
       ];
 
       this[tableName].columns = columns;
-
       this[tableName].xTable = this.$refs[this[tableName].ref].$refs.xTable;
+    },
+    // 清空
+    handleRefresh () {
+      const tableName = 'clientTable';
+      this[tableName].loading = true;
+      const { currentPage, pageSize } = this[tableName].pagerConfig;
+
+      const queryParam = this.form.getFieldsValue();
+      const params = Object.assign({ page: currentPage, rows: pageSize }, queryParam);
+
+      this.$api.system.getGrouprulesList(params).then((data) => {
+        this[tableName].tableData = data.rows;
+        this[tableName].pagerConfig.total = data.total;
+        this[tableName].pagerConfig.currentPage = params.page;
+        this[tableName].pagerConfig.pageSize = params.rows;
+
+        this[tableName].editIndex = -1;
+      }).finally(() => {
+        this[tableName].loading = false;
+      });
     },
     // 点击载体表格时
     handleCellClickToClient ({ row }) {
-      // console.log(row.status);
+      // console.log(row);
       const tableName = 'groupRuleTable';
       if (!row.id || row.id < 0) {
         this[tableName].tableData = [];
@@ -328,10 +352,16 @@ export default {
       this[tableName].loading = true;
       this.$api.system.getGrouprulesList(row.ruleId).then(res => {
         this[tableName].tableData = res.rows;
-        // console.log(res.rows);
       }).finally(() => {
         this[tableName].loading = false;
       });
+    },
+    // 分页改变时
+    pagerChangeToGroupRule ({ pageSize, currentPage }) {
+      // alert(1);
+      const tableName = 'clientTable';
+      this[tableName].pagerConfig = Object.assign(this[tableName].pagerConfig, { pageSize, currentPage });
+      this.handleRefresh();
     },
 
     /**
@@ -340,7 +370,7 @@ export default {
     // 设置列 - 明细
     setColumnToGrounpRules () {
       const tableName = 'groupRuleTable';
-      const { formatter } = this.$units;
+      const { formatter } = this.$utils;
       const { system } = this.$store.state;
       const columns = [
         { type: 'index', width: 40 },

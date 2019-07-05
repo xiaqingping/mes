@@ -189,10 +189,28 @@ export default {
       this[tableName].editIndex = 0;
     },
     // 保存
-    handleSave ({ row }) {
-      this.$api.system.inserGroups(row).then((res) => {
-        // this.handleSearch();
-        console.log(res);
+    handleSave (o) {
+      // this.$api.system.inserGroups(row).then((res) => {
+      //   // this.handleSearch();
+      //   console.log(res);
+      // });
+      console.log(o);
+      if (o.row.name === '') {
+        this.$notification.error({
+          message: '错误',
+          description: `数据不能为空！`
+        });
+        return false;
+      }
+      var data = {};
+      // if (o.row.id) {
+      //   data = o.row;
+      // }
+      data.name = o.row.name;
+      this.$api.system.inserGroups(data).then(res => {
+        if (res.id) {
+          this.handleSearch();
+        }
       });
     },
     // 退出编辑

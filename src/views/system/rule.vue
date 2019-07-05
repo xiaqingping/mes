@@ -130,19 +130,19 @@ export default {
     // 设置表格列属性
     setColumn () {
       const tableName = 'ruleTable';
-      const { formatter } = this.$units;
+      const { formatter } = this.$utils;
       const { system } = this.$store.state;
 
       const columns = [
         { width: 40, type: 'index' },
-        { label: '规则名称', prop: 'name', editRender: { name: 'AInput' } },
-        { label: 'Client', prop: 'sourceClient', editRender: { name: 'AInput', props: { disabled: true } } },
-        { label: 'Type', prop: 'sourceType', editRender: { name: 'AInput', props: { disabled: true } } },
-        { label: '资源', prop: 'sourcePath', editRender: { name: 'AInput' } },
-        { label: '资源描述', prop: 'sourceDesc', editRender: { name: 'AInput', props: { disabled: true } } },
+        { title: '规则名称', field: 'name', editRender: { name: 'AInput' } },
+        { title: 'Client', field: 'sourceClient', editRender: { name: 'AInput', props: { disabled: true } } },
+        { title: 'Type', field: 'sourceType', editRender: { name: 'AInput', props: { disabled: true } } },
+        { title: '资源', field: 'sourcePath', editRender: { name: 'AInput' } },
+        { title: '资源描述', field: 'sourceDesc', editRender: { name: 'AInput', props: { disabled: true } } },
         {
-          label: '参数类型',
-          prop: 'paramType',
+          title: '参数类型',
+          field: 'paramType',
           formatter: function ({ cellValue }) {
             return formatter(system.paramType, cellValue);
           },
@@ -155,13 +155,13 @@ export default {
             ]
           }
         },
-        { label: '参数', prop: 'parameterField', editRender: { name: 'AInput', props: { disabled: true } } },
-        { label: '参数描述', prop: 'parameterDesc', editRender: { name: 'AInput', props: { disabled: true } } },
-        { label: 'OP', prop: 'op', editRender: { name: 'AInput', props: { value: 'eq' } } },
-        { label: '值', prop: 'value' },
+        { title: '参数', field: 'parameterField', editRender: { name: 'AInput', props: { disabled: true } } },
+        { title: '参数描述', field: 'parameterDesc', editRender: { name: 'AInput', props: { disabled: true } } },
+        { title: 'OP', field: 'op', editRender: { name: 'AInput', props: { value: 'eq' } } },
+        { title: '值', field: 'value' },
         {
-          label: '状态',
-          prop: 'status',
+          title: '状态',
+          field: 'status',
           formatter: function ({ cellValue }) {
             if (cellValue === 0) {
               cellValue = '0';
@@ -170,14 +170,14 @@ export default {
           },
           editRender: {
             name: 'AInput',
-            props: {
+            field: {
               disabled: true
             }
           }
         },
         {
-          label: '操作',
-          prop: 'actions',
+          title: '操作',
+          field: 'actions',
           fixed: 'right',
           slots: {
             default: ({ row, rowIndex }) => {
@@ -256,10 +256,6 @@ export default {
       this[tableName].pagerConfig = Object.assign(this[tableName].pagerConfig, change);
       this.handleSearch();
     },
-    // 搜索收起
-    toggleAdvanced () {
-      this.advanced = !this.advanced;
-    },
     // 删除
     handleCancel ({ row }) {
       alert(row);
@@ -273,6 +269,10 @@ export default {
       if (!row.status) {
         this[tableName].tableData.splice(rowIndex, 1);
       }
+    },
+    // 搜索收起
+    toggleAdvanced () {
+      this.advanced = !this.advanced;
     }
   }
 };

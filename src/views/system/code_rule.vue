@@ -13,281 +13,374 @@
         <a-button type="primary" icon="search" html-type="submit" style="display:none;">查询</a-button>
       </a-form>
     </div>
+
     <!-- 表格内容 -->
-    <div>
-      <a-row :gutter="0">
-        <a-col :span="6">
-          <!-- 编号规则 -->
-          <a-card title="编号规则">
-            <!-- <a href="#" slot="extra" @click="toggleAdvanced" style="margin-left: 8px">
-              {{ advanced ? '收起' : '展开' }}
-              <a-icon :type="advanced ? 'up' : 'down'"/>
-            </a> -->
 
-            <div class="table-operator">
-              <a-button-group>
-                <a-button type="primary" size="small" icon="search" @click="handleSearch">查询</a-button>
-                <a-button type="primary" size="small" icon="plus">新建</a-button>
-                <a-button type="primary" size="small" icon="save">保存</a-button>
-              </a-button-group>
-            </div>
+    <a-layout>
+      <!-- 编号规则 -->
+      <!-- 编号规则条件 -->
+      <a-layout-content>
+        <span style="line-height:32px;">编号规则</span>
+        <div class="table-operator">
+          <a-button-group>
+            <a-button icon="search" @click="handleSearch">查询</a-button>
+            <!-- <a-button icon="plus" type="primary" @click="handleAddRow">新建</a-button> -->
+          </a-button-group>
+        </div>
 
-            <s-table
-              style="height:500px"
-              ref="table"
-              size="small"
-              bordered
-              :scroll="{ x: 1500 , y: 400 }"
-              :columns="columns"
-              :data="loadData"
-              :rowSelection="{ selectedRowKeys: selectedRowKeys, onChange: onSelectChange }"
-            >
-            </s-table>
-          </a-card>
-        </a-col>
+        <vxe-grid
+          highlight-current-row
+          highlight-hover-row
+          auto-resize
+          height="570"
+          :ref="codeRuleTable.ref"
+          :loading="codeRuleTable.loading"
+          :columns="codeRuleTable.columns"
+          :pager-config="codeRuleTable.pagerConfig"
+          :data.sync="codeRuleTable.tableData"
+          :edit-rules="codeRuleTable.editRules"
+          :edit-config="{key: 'id', trigger: 'manual', mode: 'row', showIcon: false, autoClear: false}"
+          @cell-click="(options) => handleCellClick(options)"
+          @page-change="pagerChange">
+        </vxe-grid>
+      </a-layout-content>
 
-        <!-- 编号规则内容 -->
-        <a-col :span="6">
-          <a-card title="编号规则内容">
-            <!-- <a href="#" slot="extra" @click="toggleAdvanced" style="margin-left: 8px">
-              {{ advanced ? '收起' : '展开' }}
-              <a-icon :type="advanced ? 'up' : 'down'"/>
-            </a> -->
-            <div class="table-operator">
-              <a-button-group>
-                <a-button type="primary" size="small" icon="plus">新建</a-button>
-                <a-button type="primary" size="small" icon="delete">删除</a-button>
-                <a-button type="primary" size="small" icon="save">保存</a-button>
-              </a-button-group>
-            </div>
+      <!-- 编号规则内容 -->
+      <a-layout-sider width="350">
+        <span style="line-height:32px;">编号规则内容</span>
+        <div class="table-operator">
+          <a-button-group>
+            <a-button icon="plus" type="primary">新建</a-button>
+          </a-button-group>
+        </div>
 
-            <s-table
-              style="height:500px"
-              v-show="advanced"
-              ref="table1"
-              size="small"
-              bordered
-              :scroll="{ x: 300 , y: 400 }"
-              :columns="columnOne"
-              :data="loadDataOne"
-              :rowSelection="{ selectedRowKeys: selectedRowKeyOne, onChange: onSelectChangeOne }"
-            >
-            </s-table>
-          </a-card>
-        </a-col>
+        <vxe-grid
+          highlight-hover-row
+          auto-resize
+          height="570"
+          :ref="codeRuleContentTable.ref"
+          :loading="codeRuleContentTable.loading"
+          :columns="codeRuleContentTable.columns"
+          :data.sync="codeRuleContentTable.tableData"
+          :edit-rules="codeRuleContentTable.editRules"
+          :edit-config="{key: 'id', trigger: 'manual', mode: 'row', showIcon: false, autoClear: false}"
+          @cell-click="(options) => handleCellClickToValue(options)">
+        </vxe-grid>
+      </a-layout-sider>
 
-        <!-- 编号规则取值 -->
-        <a-col :span="6">
-          <a-card title="编号规则取值">
-            <!-- <a href="#" slot="extra" @click="toggleAdvanced" style="margin-left: 8px">
-              {{ advanced ? '收起' : '展开' }}
-              <a-icon :type="advanced ? 'up' : 'down'"/>
-            </a> -->
-            <div class="table-operator">
-              <a-button-group>
-                <a-button type="primary" size="small" icon="plus">新建</a-button>
-                <a-button type="primary" size="small" icon="delete">删除</a-button>
-                <a-button type="primary" size="small" icon="save">保存</a-button>
-              </a-button-group>
-            </div>
+      <!-- 编号规则取值 -->
+      <a-layout-sider width="350">
+        <span style="line-height:32px;">编号规则取值</span>
+        <div class="table-operator">
+          <a-button-group>
+            <a-button icon="plus" type="primary">新建</a-button>
+          </a-button-group>
+        </div>
 
-            <s-table
-              style="height:500px"
-              ref="table2"
-              size="small"
-              bordered
-              :scroll="{ x: 300 , y: 400 }"
-              :columns="columnTwo"
-              :data="loadDataTwo"
-              :rowSelection="{ selectedRowKeys: selectedRowKeyTwo, onChange: onSelectChangeTwo }"
-            >
-            </s-table>
-          </a-card>
-        </a-col>
+        <vxe-grid
+          highlight-hover-row
+          auto-resize
+          height="570"
+          :ref="codeRuleValueTable.ref"
+          :loading="codeRuleValueTable.loading"
+          :columns="codeRuleValueTable.columns"
+          :data.sync="codeRuleValueTable.tableData"
+          :edit-rules="codeRuleValueTable.editRules"
+          :edit-config="{key: 'id', trigger: 'manual', mode: 'row', showIcon: false, autoClear: false}">
+        </vxe-grid>
+      </a-layout-sider>
 
-        <!-- 编号规则条件 -->
-        <a-col :span="6">
-          <a-card title="编号规则条件">
-            <a href="#" slot="extra" @click="toggleAdvanced" style="margin-left: 8px">
-              {{ advanced ? '收起' : '展开' }}
-              <a-icon :type="advanced ? 'up' : 'down'"/>
-            </a>
-            </a>
-            <div class="table-operator">
-              <a-button-group>
-                <a-button type="primary" size="small" icon="plus">新建</a-button>
-                <a-button type="primary" size="small" icon="delete">删除</a-button>
-                <a-button type="primary" size="small" icon="save">保存</a-button>
-              </a-button-group>
-            </div>
-
-            <s-table
-              style="height:500px"
-              ref="table3"
-              size="small"
-              bordered
-              :scroll="{ x: 400 , y: 400 }"
-              :columns="columnThree"
-              :data="loadDataThree"
-              :rowSelection="{ selectedRowKeys: selectedRowKeyThree, onChange: onSelectChangeThree }"
-            >
-            </s-table>
-          </a-card>
-        </a-col>
-
-      </a-row>
-    </div>
+    </a-layout>
   </div>
 </template>
 
 <script>
-import STable from '@/components/Table';
+// import STable from '@/components/Table';
 
 export default {
-  names: 'SystemUser',
+  names: 'SystemCodeRule',
   components: {
-    STable
   },
   data () {
     return {
       form: this.$form.createForm(this),
-      advanced: true,
       // 编号规则
-      columns: [
-        { title: 'Client', dataIndex: 'client', width: '30%' },
-        { title: '规则', dataIndex: 'rule', width: '20%', align: 'center' },
-        {
-          title: '覆盖旧编号',
-          dataIndex: 'cover',
-          align: 'center',
-          customRender: function (value) {
-            return value === 1 ? '√' : '';
-          }
+      codeRuleTable: {
+        id: 0,
+        ref: 'codeRuleTable',
+        xTable: null,
+        editIndex: -1,
+        editData: null,
+        loading: false,
+        tableData: [],
+        columns: [],
+        pagerConfig: {
+          currentPage: 1,
+          pageSize: 10,
+          total: 0
         },
-        { title: '开始日期', dataIndex: 'dateBegin', width: '20%' },
-        { title: '结束日期', dataIndex: 'dateEnd', width: '20%' }
-      ],
-      queryParam: {},
-      loadData: parameter => {
-        const params = Object.assign(parameter, this.queryParam);
-        return this.$api.system.getCodeRuleList(params).then(res => {
-          return {
-            data: res.rows,
-            page: params.page,
-            total: res.total
-          };
-        });
+        editRules: {
+          // name: [
+          //   { required: true, message: '名称必填' }
+          // ]
+        }
       },
-      selectedRowKeys: [],
-      selectedRows: [],
-      loadDataId: 0,
 
       // 编号规则内容
-      columnOne: [
-        { title: '位置', dataIndex: 'place', width: '40%', align: 'center' },
-        { title: '默认值', dataIndex: 'value', align: 'center' }
-      ],
-      queryParamOne: {},
-      loadDataOne: parameter => {
-        return this.$api.system.getContentList({ ruleId: this.loadDataId }).then(res => {
-          console.log(res.rows);
-          return {
-            data: res.rows,
-            page: 0,
-            total: res.total
-          };
-        });
+      codeRuleContentTable: {
+        // parent: 'seriesTable',
+        id: 0,
+        ref: 'codeRuleContentTable',
+        xTable: null,
+        editIndex: -1,
+        editData: null,
+        loading: false,
+        tableData: [],
+        columns: [],
+        editRules: {}
       },
-      selectedRowKeyOne: [],
-      selectedRowOne: [],
-      loadDataIdOne: 0,
 
       // 编号规则取值
-      columnTwo: [
-        { title: '值', dataIndex: 'value', width: '60%', align: 'center' },
-        { title: '优先级', dataIndex: 'level', align: 'center' }
-      ],
-      queryParamTwo: {},
-      loadDataTwo: parameter => {
-        return this.$api.system.getDerailList({ contentId: this.loadDataIdOne }).then(res => {
-          return {
-            data: res.rows,
-            page: 1,
-            total: res.total
-          };
-        });
-      },
-      selectedRowKeyTwo: [],
-      selectedRowTwo: [],
-      loadDataIdTwo: 0,
+      codeRuleValueTable: {
+        // parent: 'seriesTable',
+        id: 0,
+        ref: 'codeRuleValueTable',
+        xTable: null,
+        editIndex: -1,
+        editData: null,
+        loading: false,
+        tableData: [],
+        columns: [],
+        editRules: {}
+      }
+      // columnTwo: [
+      //   { title: '值', dataIndex: 'value', width: '60%', align: 'center' },
+      //   { title: '优先级', dataIndex: 'level', align: 'center' }
+      // ],
+      //   return this.$api.system.getDerailList({ contentId: this.loadDataIdOne }).then(res => {
 
       // 编号规则条件
-      columnThree: [
-        { title: '字段', dataIndex: 'field', width: '30%', align: 'center' },
-        { title: 'OP', dataIndex: 'op', width: '30%', align: 'center' },
-        { title: '文本', dataIndex: 'text', align: 'center' }
-      ],
-      queryParamThree: {},
-      loadDataThree: parameter => {
-        return this.$api.system.getConditionsList({ detailId: this.loadDataIdTwo }).then(res => {
-          return {
-            data: res.rows,
-            page: 1,
-            total: res.total
-          };
-        });
-      },
-      selectedRowKeyThree: [],
-      selectedRowThree: []
+      // columnThree: [
+      //   { title: '字段', dataIndex: 'field', width: '30%', align: 'center' },
+      //   { title: 'OP', dataIndex: 'op', width: '30%', align: 'center' },
+      //   { title: '文本', dataIndex: 'text', align: 'center' }
+      // ],
+      //   return this.$api.system.getConditionsList({ detailId: this.loadDataIdTwo }).then(res => {
     };
   },
-  watch: {
-    loadDataId: function () {
-      this.$refs.table1.refresh(true);
-    },
-    loadDataIdOne: function () {
-      this.$refs.table2.refresh(true);
-    },
-    loadDataIdTwo: function () {
-      this.$refs.table3.refresh(true);
-    }
+  mounted () {
+    // 编号规则
+    this.setColumn();
+    this.handleSearch();
+    // 编号规则内容
+    this.setColumnToContent();
+    // 编号规则取值
+    this.setColumnToValue();
   },
-  mounted () {},
   methods: {
+    /**
+     * 编号规则
+     */
+    // 设置列
+    setColumn () {
+      const tableName = 'codeRuleTable';
+      const columns = [
+        { type: 'index', width: 40 },
+        { title: 'Client', field: 'client' },
+        { title: '规则', field: 'rule' },
+        {
+          title: '覆盖旧编号',
+          field: 'cover',
+          align: 'center',
+          formatter: function ({ cellValue }) {
+            return cellValue === 1 ? '√' : '';
+          }
+        },
+        { title: '开始日期', field: 'dateBegin' },
+        { title: '结束日期', field: 'dateEnd' },
+        {
+          title: '操作',
+          field: 'actions',
+          fixed: 'right',
+          slots: {
+            default: ({ row, rowIndex }) => {
+              let actions = [];
+              const xTable = this[tableName].xTable;
+              const isEdit = xTable.hasActiveRow(row);
+              const options = { row, rowIndex, tableName, xTable };
+
+              actions = [
+                <a onClick={() => this.handleCancel(options)}>删除</a>,
+                <a onClick={() => this.handleUpdate(options)}>修改</a>
+              ];
+              if (isEdit) {
+                actions = [
+                  <a onClick={() => this.handleSave(options) }>保存</a>,
+                  <a onClick={() => this.handleQuitEdit(options) }>退出</a>
+                ];
+              }
+
+              return [
+                <span class="table-actions" onClick={(event) => event.stopPropagation()}>
+                  {actions}
+                </span>
+              ];
+            }
+          }
+        }
+      ];
+      columns.forEach(function (e) {
+        if (!e.width) e.width = 100;
+      });
+
+      this[tableName].columns = columns;
+      this[tableName].xTable = this.$refs[this[tableName].ref].$refs.xTable;
+    },
     // 查询
     handleSearch (e) {
-      e.preventDefault();
-      this.queryParam = this.form.getFieldsValue();
-      this.$refs.table.refresh(true);
+      const tableName = 'codeRuleTable';
+      this[tableName].loading = true;
+      const { currentPage, pageSize } = this[tableName].pagerConfig;
+
+      const queryParam = this.form.getFieldsValue();
+      const params = Object.assign({ page: currentPage, rows: pageSize }, queryParam);
+
+      this.$api.system.getCodeRuleList(params, true).then((data) => {
+        this[tableName].tableData = data.rows;
+        this[tableName].pagerConfig.total = data.total;
+        this[tableName].pagerConfig.currentPage = params.page;
+        this[tableName].pagerConfig.pageSize = params.rows;
+
+        this[tableName].editIndex = -1;
+      }).finally(() => {
+        this[tableName].loading = false;
+      });
     },
-    // 编号规则
-    onSelectChange (selectedRowKeys, selectedRows) {
-      this.selectedRowKeys = selectedRowKeys.slice(-1);
-      this.selectedRows = selectedRows.slice(-1);
-      this.loadDataId = this.selectedRowKeys[0];
+    // 点击表格行时
+    handleCellClick ({ row }) {
+      const tableName = 'codeRuleContentTable';
+      if (!row.id || row.id < 0) {
+        this[tableName].tableData = [];
+        return;
+      }
+
+      this[tableName].loading = true;
+      this.$api.system.getContentList(row.id).then(res => {
+        this[tableName].tableData = res.rows;
+      }).finally(() => {
+        this[tableName].loading = false;
+      });
     },
-    // 编号规则内容
-    onSelectChangeOne (selectedRowKeyOne, selectedRowOne) {
-      this.selectedRowKeyOne = selectedRowKeyOne.slice(-1);
-      this.selectedRowOne = selectedRowOne.slice(-1);
-      this.loadDataIdOne = this.selectedRowKeyOne[0];
-    },
-    // 编号规则取值
-    onSelectChangeTwo (selectedRowKeyTwo, selectedRowTwo) {
-      this.selectedRowKeyTwo = selectedRowKeyTwo.slice(-1);
-      this.selectedRowTwo = selectedRowTwo.slice(-1);
-      this.loadDataIdTwo = this.selectedRowKeyTwo[0];
-      console.log(this.loadDataIdTwo);
-    },
-    // 编号规则条件
-    onSelectChangeThree (selectedRowKeyThree, selectedRowThree) {
-      this.selectedRowKeyThree = selectedRowKeyThree.slice(-1);
-      this.selectedRowThree = selectedRowThree.slice(-1);
+    // 分页改变时
+    pagerChange ({ pageSize, currentPage }) {
+      const tableName = 'codeRuleTable';
+      this[tableName].pagerConfig = Object.assign(this[tableName].pagerConfig, { pageSize, currentPage });
+      this.handleSearch();
     },
 
-    toggleAdvanced () {
-      this.advanced = !this.advanced;
+    /**
+     * 编号规则内容
+     */
+    // 设置列
+    setColumnToContent () {
+      const tableName = 'codeRuleContentTable';
+      const columns = [
+        { type: 'index', width: 40 },
+        { title: '位置', field: 'place' },
+        { title: '默认值', field: 'value' },
+        {
+          title: '操作',
+          field: 'actions',
+          slots: {
+            default: ({ row, rowIndex }) => {
+              let actions = [];
+              const xTable = this[tableName].xTable;
+              const isEdit = xTable.hasActiveRow(row);
+              const options = { row, rowIndex, tableName, xTable };
+              if (!isEdit) {
+                actions = [
+                  <a onClick={() => this.handleCancel(options)}>删除</a>
+                ];
+              } else {
+                actions = [
+                  <a onClick={() => this.handleSave(options) }>保存</a>,
+                  <a onClick={() => this.handleQuitEdit(options) }>退出</a>
+                ];
+              }
+              return [
+                <span class="table-actions">
+                  {actions}
+                </span>
+              ];
+            }
+          }
+        }
+      ];
+
+      this[tableName].columns = columns;
+      this[tableName].xTable = this.$refs[this[tableName].ref].$refs.xTable;
+    },
+    // 点击表格行时
+    handleCellClickToValue ({ row }) {
+      const tableName = 'codeRuleValueTable';
+      if (!row.id || row.id < 0) {
+        this[tableName].tableData = [];
+        return;
+      }
+
+      this[tableName].loading = true;
+      this.$api.system.getDerailList(row.id).then(res => {
+        this[tableName].tableData = res.rows;
+        console.log(res);
+      }).finally(() => {
+        this[tableName].loading = false;
+      });
+    },
+
+    /**
+     * 编号规则取值
+     */
+    // 设置列
+    setColumnToValue () {
+      const tableName = 'codeRuleValueTable';
+      const columns = [
+        { type: 'index', width: 40 },
+        { title: '值', field: 'value' },
+        { title: '优先级', field: 'level' },
+        {
+          title: '操作',
+          field: 'actions',
+          slots: {
+            default: ({ row, rowIndex }) => {
+              let actions = [];
+              const xTable = this[tableName].xTable;
+              const isEdit = xTable.hasActiveRow(row);
+              const options = { row, rowIndex, tableName, xTable };
+              if (!isEdit) {
+                actions = [
+                  <a onClick={() => this.handleCancel(options)}>删除</a>
+                ];
+              } else {
+                actions = [
+                  <a onClick={() => this.handleSave(options) }>保存</a>,
+                  <a onClick={() => this.handleQuitEdit(options) }>退出</a>
+                ];
+              }
+              return [
+                <span class="table-actions">
+                  {actions}
+                </span>
+              ];
+            }
+          }
+        }
+      ];
+
+      this[tableName].columns = columns;
+      this[tableName].xTable = this.$refs[this[tableName].ref].$refs.xTable;
     }
+
+    // 编号规则条件
   }
 };
 </script>
