@@ -3,7 +3,6 @@ import axios from 'axios';
 // import store from '@/store';
 import notification from 'ant-design-vue/es/notification';
 
-let baseURL = 'https://devapi.sangon.com:8443/api';
 const baseURLMap = {
   dev: 'https://devapi.sangon.com:8443/api',
   test: 'https://testapi.sangon.com:8443/api',
@@ -11,6 +10,7 @@ const baseURLMap = {
   product: 'https://api.sangon.com/api'
 };
 
+let baseURL = 'https://devapi.sangon.com:8443/api';
 /**
  * 接口会根据所设置的环境变量改变，具体请阅读 README.md 文件中的《接口与环境设置》章节，如不设置环境变量，默认都是dev
  */
@@ -36,7 +36,7 @@ const err = (error) => {
         errMsg = [data.message];
       }
       if (data.details && data.details.length > 0) {
-        errMsg = [].concat(errMsg, data.details);
+        errMsg = data.details;
       }
 
       if (data.type === 41 && data.code === 40000) {
@@ -57,22 +57,20 @@ const err = (error) => {
 
 // 请求拦截
 service.interceptors.request.use(config => {
-  // 过滤get请求中的无效字段
+  // 过滤请求中的无效字段
   if (config.method === 'get') {
     for (const item in config.params) {
-      if (config.params[item] === '' || config.params[item] === 'undefined') {
+      if (config.params[item] === '' || config.params[item] === undefined || config.params[item] === null) {
         delete config.params[item];
       }
     }
+  } else {
+    for (const item in config.data) {
+      if (config.data[item] === null) {
+        delete config.data[item];
+      }
+    }
   }
-
-  // 添加 baseURL
-  // if (config.url.indexOf('/oldapi') !== 0) {
-  //   config.url = baseURL + config.url;
-  // } else {
-  //   config.url = baseURL + config.url;
-  //   config.url = config.url.replace('/api/oldapi', '');
-  // }
 
   const token = Vue.ls.get('TOKEN');
   if (token) {
