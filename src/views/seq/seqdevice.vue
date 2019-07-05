@@ -5,17 +5,17 @@
     <div class="table-search">
       <a-form layout="inline" :form="form" @submit.prevent="handleSearch">
         <a-row :gutter="24">
-          <a-col :xxl="4" :xl="6" :md="8">
+          <a-col :md="6" :xl="4">
             <a-form-item label="编号">
               <a-input v-decorator="['code']"/>
             </a-form-item>
           </a-col>
-          <a-col :xxl="4" :xl="6" :md="8">
+          <a-col :md="6" :xl="4">
             <a-form-item label="名称">
               <a-input v-decorator="['name']"/>
             </a-form-item>
           </a-col>
-          <a-col :xxl="4" :xl="6" :md="8">
+          <a-col :md="6" :xl="4">
             <a-form-item label="状态">
               <a-select v-decorator="['status', {initialValue: 1}]">
                 <a-select-option value="">全部</a-select-option>
@@ -23,7 +23,7 @@
               </a-select>
             </a-form-item>
           </a-col>
-          <a-col :xxl="4" :xl="6" :md="8">
+          <a-col :md="6" :xl="4">
             <a-form-item label="测序点">
               <a-select v-decorator="['seqfactoryIdList', {initialValue: ''}]">
                 <a-select-option value="">全部</a-select-option>
@@ -49,29 +49,31 @@
         <vxe-grid
           highlight-hover-row
           auto-resize
-          :ref="seqdeviceTable.ref"
+          height="600"
+          ref="seqdeviceTable"
           :loading="seqdeviceTable.loading"
           :columns="seqdeviceTable.columns"
           :pager-config="seqdeviceTable.pagerConfig"
           :data.sync="seqdeviceTable.tableData"
           :edit-rules="seqdeviceTable.editRules"
           :edit-config="{key: 'id', trigger: 'manual', mode: 'row', showIcon: false, autoClear: false}"
-          @cell-click="(options) => handleCellClick(options)"
-          @page-change="pagerChange">
+          @cell-click="({row}) => handleSearchDetail(row.id)"
+          @page-change="({pageSize, currentPage}) => this.$utils.tablePageChange({pageSize, currentPage, table: seqdeviceTable, callback: handleSearch})">
         </vxe-grid>
       </a-layout-content>
 
       <a-layout-sider width="300">
         <span style="line-height:32px;">测序仪明细</span>
-
         <vxe-grid
           highlight-hover-row
           auto-resize
-          :ref="seqdeviceDetailsTable.ref"
+          height="600"
+          ref="seqdeviceDetailsTable"
           :loading="seqdeviceDetailsTable.loading"
           :columns="seqdeviceDetailsTable.columns"
+          :pager-config="seqdeviceDetailsTable.pagerConfig"
           :data.sync="seqdeviceDetailsTable.tableData"
-          :pager-config="seqdeviceDetailsTable.pagerConfig">
+          @page-change="({pageSize, currentPage}) => this.$utils.tablePageChange({pageSize, currentPage, table: seqdeviceDetailsTable, callback: handleSearchDetail})">
         </vxe-grid>
       </a-layout-sider>
     </a-layout>
@@ -80,7 +82,7 @@
 
 <script>
 export default {
-  name: 'SeqSampleOrder',
+  name: 'SeqDevice',
   components: {
   },
   data () {
@@ -89,10 +91,7 @@ export default {
       queryParam: {},
       seqdeviceTable: {
         id: 0,
-        ref: 'seqdeviceTable',
         xTable: null,
-        editIndex: -1,
-        editData: null,
         loading: false,
         tableData: [],
         columns: [],
@@ -101,14 +100,9 @@ export default {
           pageSize: 10,
           total: 0
         },
-        editRules: {
-          name: [
-            { required: true, message: '名称必填' }
-          ]
-        }
+        editRules: {}
       },
       seqdeviceDetailsTable: {
-        ref: 'seqdeviceDetailsTable',
         xTable: null,
         loading: false,
         tableData: [],
@@ -183,8 +177,13 @@ export default {
       });
 
       this[tableName].columns = columns;
+      this[tableName].editRules = {
+        name: [
+          { required: true, message: '名称必填' }
+        ]
+      };
 
-      this[tableName].xTable = this.$refs[this[tableName].ref].$refs.xTable;
+      this[tableName].xTable = this.$refs[tableName].$refs.xTable;
     },
     // 查询
     handleSearch (e) {
@@ -201,85 +200,25 @@ export default {
         this[tableName].pagerConfig.currentPage = params.page;
         this[tableName].pagerConfig.pageSize = params.rows;
 
-        this[tableName].editIndex = -1;
+        // 重置明细
+        this.handleSearchDetail();
       }).finally(() => {
         this[tableName].loading = false;
       });
     },
     // 新增一可编辑行
     handleAddRow () {
-      const tableName = 'seqdeviceTable';
-      if (this[tableName].editIndex !== -1) return this.$message.warning('请保存或退出正在编辑的行');
-
-      const table = this[tableName].xTable;
-      const newData = {
-        id: --this[tableName].id
-      };
-
-      this[tableName].tableData = [newData, ...this[tableName].tableData];
-      table.setActiveRow(newData);
-      this[tableName].editIndex = 0;
+      console.log('新增');
     },
     // 修改
     handleUpdate ({ row, rowIndex, tableName, xTable }) {
-      xTable.setActiveRow(row);
-      this[tableName].editIndex = rowIndex;
-      this[tableName].editData = JSON.parse(JSON.stringify(row));
+      console.log('修改');
     },
     // 删除
     handleCancel ({ row }) {
       this.$api.series.cancelSeries(row.id).then(() => {
         this.handleSearch();
       });
-    },
-    // 保存
-    handleSave ({ row }) {
-      if (row.status) {
-        // 修改
-        this.$api.series.updateSeries(row).then(() => {
-          this.handleSearch();
-        });
-      } else {
-        // 新增
-        this.$api.series.addSeries(row).then(() => {
-          this.handleSearch();
-        });
-      }
-    },
-    // 退出编辑
-    handleQuitEdit ({ row, rowIndex, tableName, xTable }) {
-      xTable.clearActived().then(() => {
-        this[tableName].editIndex = -1;
-        if (!row.status) {
-          this[tableName].tableData.splice(rowIndex, 1);
-        } else {
-          this.$set(this[tableName].tableData, rowIndex, this[tableName].editData);
-          this[tableName].editData = null;
-        }
-      });
-    },
-    // 点击表格行时
-    handleCellClick ({ row }) {
-      const tableName = 'seqdeviceDetailsTable';
-      if (!row.id || row.id < 0) {
-        this[tableName].tableData = [];
-        return;
-      }
-
-      this[tableName].loading = true;
-      this.$api.reaction.getReactioncomposesDetails(row.id).then(res => {
-        const data = res.reactions;
-        this[tableName].tableData = data;
-        this[tableName].pagerConfig.total = data.length;
-      }).finally(() => {
-        this[tableName].loading = false;
-      });
-    },
-    // 分页改变时
-    pagerChange ({ pageSize, currentPage }) {
-      const tableName = 'seqdeviceTable';
-      this[tableName].pagerConfig = Object.assign(this[tableName].pagerConfig, { pageSize, currentPage });
-      this.handleSearch();
     },
 
     /**
@@ -309,7 +248,29 @@ export default {
 
       this[tableName].columns = columns;
 
-      this[tableName].xTable = this.$refs[this[tableName].ref].$refs.xTable;
+      this[tableName].xTable = this.$refs[tableName].$refs.xTable;
+    },
+    // 查询
+    handleSearchDetail (seqdeviceId) {
+      const tableName = 'seqdeviceDetailsTable';
+
+      if (!seqdeviceId || seqdeviceId < 0) {
+        this[tableName].tableData = [];
+        return;
+      }
+
+      this[tableName].loading = true;
+      const { currentPage, pageSize } = this[tableName].pagerConfig;
+      const params = { page: currentPage, rows: pageSize };
+
+      this.$api.seqdevice.getReactioncomposeBySeqdevice(seqdeviceId, params).then(data => {
+        this[tableName].tableData = data.rows;
+        this[tableName].pagerConfig.total = data.total;
+        this[tableName].pagerConfig.currentPage = params.page;
+        this[tableName].pagerConfig.pageSize = params.rows;
+      }).finally(() => {
+        this[tableName].loading = false;
+      });
     }
   }
 };

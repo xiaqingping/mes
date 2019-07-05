@@ -85,41 +85,41 @@ export default {
     //   component: () => import('@/views/seq/sample_feature'),
     //   meta: { title: '样品特性', keepAlive: false, permission: [ 'dashboard' ] }
     // },
-    // {
-    //   path: '/seq/seqdevice',
-    //   name: 'seq-seqdevice',
-    //   component: () => import('@/views/seq/seqdevice'),
-    //   meta: { title: '测序仪', keepAlive: false, permission: [ 'dashboard' ] }
-    // },
-    // {
-    //   path: '/seq/seqfactory',
-    //   name: 'seq-seqfactory',
-    //   component: () => import('@/views/seq/seqfactory'),
-    //   meta: { title: '测序点', keepAlive: false, permission: [ 'allow' ] }
-    // },
+    {
+      path: '/seq/seqdevice',
+      name: 'seq-seqdevice',
+      component: () => import('@/views/seq/seqdevice'),
+      meta: { title: '测序仪', keepAlive: false, permission: [ 'dashboard' ] }
+    },
+    {
+      path: '/seq/seqfactory',
+      name: 'seq-seqfactory',
+      component: () => import('@/views/seq/seqfactory'),
+      meta: { title: '测序点', keepAlive: false, permission: [ 'allow' ] }
+    },
     {
       path: '/seq/series',
       name: 'seq-series',
       component: () => import('@/views/seq/series'),
       meta: { title: '载体系列', keepAlive: false, permission: [ 'dashboard' ] }
+    },
+    {
+      path: '/seq/carrier',
+      name: 'seq-carrier',
+      component: () => import('@/views/seq/carrier'),
+      meta: { title: '载体管理', keepAlive: false, permission: [ 'dashboard' ] }
+    },
+    {
+      path: '/seq/sample_dose',
+      name: 'seq-sample-dose',
+      component: () => import('@/views/seq/sample_dose'),
+      meta: { title: '样品用量', keepAlive: false, permission: [ 'dashboard' ] }
+    },
+    {
+      path: '/seq/product',
+      name: 'seq-product',
+      component: () => import('@/views/seq/product'),
+      meta: { title: '测序产品', keepAlive: false, permission: [ 'dashboard' ] }
     }
-    // {
-    //   path: '/seq/carrier',
-    //   name: 'seq-carrier',
-    //   component: () => import('@/views/seq/carrier'),
-    //   meta: { title: '载体管理', keepAlive: false, permission: [ 'dashboard' ] }
-    // },
-    // {
-    //   path: '/seq/sample_dose',
-    //   name: 'seq-sample-dose',
-    //   component: () => import('@/views/seq/sample_dose'),
-    //   meta: { title: '样品用量', keepAlive: false, permission: [ 'dashboard' ] }
-    // },
-    // {
-    //   path: '/seq/product',
-    //   name: 'seq-product',
-    //   component: () => import('@/views/seq/product'),
-    //   meta: { title: '测序产品', keepAlive: false, permission: [ 'dashboard' ] }
-    // }
   ]
 };

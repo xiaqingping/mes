@@ -5,7 +5,7 @@
     <div class="table-search">
       <a-form layout="inline" :form="form" @submit="handleSearch">
         <a-row :gutter="24">
-          <a-col :xxl="4" :xl="6" :md="8">
+          <a-col :md="6" :xl="4">
             <a-form-item label="状态">
               <a-select v-decorator="['status']">
                 <a-select-option value="">全部</a-select-option>
@@ -13,7 +13,7 @@
               </a-select>
             </a-form-item>
           </a-col>
-          <a-col :xxl="4" :xl="6" :md="8">
+          <a-col :md="6" :xl="4">
             <a-form-item label="样品类型">
               <a-select v-decorator="['sampleTypeId']">
                 <a-select-option value="">全部</a-select-option>
@@ -21,12 +21,12 @@
               </a-select>
             </a-form-item>
           </a-col>
-          <a-col :xxl="4" :xl="6" :md="8">
+          <a-col :md="6" :xl="4">
             <a-form-item label="样品用量">
               <a-input v-decorator="['sampleDose']"/>
             </a-form-item>
           </a-col>
-          <a-col :xxl="4" :xl="6" :md="8">
+          <a-col :md="6" :xl="4">
             <a-form-item label="测序点">
               <a-select v-decorator="['seqfactoryIdList']">
                 <a-select-option value="0">全部</a-select-option>
