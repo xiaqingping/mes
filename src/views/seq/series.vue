@@ -43,7 +43,7 @@
           highlight-hover-row
           auto-resize
           height="570"
-          :ref="seriesTable.ref"
+          ref="seriesTable"
           :loading="seriesTable.loading"
           :columns="seriesTable.columns"
           :pager-config="seriesTable.pagerConfig"
@@ -67,7 +67,7 @@
           highlight-hover-row
           auto-resize
           height="570"
-          :ref="seriesPrimersTable.ref"
+          ref="seriesPrimersTable"
           :loading="seriesPrimersTable.loading"
           :columns="seriesPrimersTable.columns"
           :data.sync="seriesPrimersTable.tableData"
@@ -103,7 +103,6 @@ export default {
       seriesTable: {
         child: 'seriesPrimersTable',
         id: 0,
-        ref: 'seriesTable',
         xTable: null,
         loading: false,
         tableData: [],
@@ -118,7 +117,6 @@ export default {
       seriesPrimersTable: {
         parent: 'seriesTable',
         id: 0,
-        ref: 'seriesPrimersTable',
         xTable: null,
         loading: false,
         tableData: [],
@@ -200,7 +198,7 @@ export default {
         ]
       };
 
-      this[tableName].xTable = this.$refs[this[tableName].ref].$refs.xTable;
+      this[tableName].xTable = this.$refs[tableName].$refs.xTable;
     },
     // 查询
     handleSearch () {
@@ -287,12 +285,12 @@ export default {
               const options = { row, rowIndex, tableName, xTable };
               if (!isEdit) {
                 actions = [
-                  <a onClick={() => this.handleCancelPrimer(options)}>删除</a>
+                  <a onClick={ () => this.handleCancelPrimer(options) }>删除</a>
                 ];
               } else {
                 actions = [
-                  <a onClick={() => this.handleSavePrimer(options) }>保存</a>,
-                  <a onClick={() => this.$utils.tableQuitEdit(options) }>退出</a>
+                  <a onClick={ () => this.handleSavePrimer(options) }>保存</a>,
+                  <a onClick={ () => this.$utils.tableQuitEdit(options) }>退出</a>
                 ];
               }
               return [
@@ -312,7 +310,7 @@ export default {
         ]
       };
 
-      this[tableName].xTable = this.$refs[this[tableName].ref].$refs.xTable;
+      this[tableName].xTable = this.$refs[tableName].$refs.xTable;
     },
     // 查询
     handleSearchPrimer (seriesId) {
@@ -338,6 +336,8 @@ export default {
       const selectRow = parentTable.getCurrentRow();
       if (!selectRow) return this.$message.warning('请先选择左侧列表的一行');
       if (selectRow.status !== 1) return this.$message.warning('只能为状态正常的系列添加引物');
+      const active = table.getActiveRow();
+      if (active && active.row) return this.$message.warning('请保存或退出正在编辑的行');
 
       const newData = {
         seriesId: selectRow.id,

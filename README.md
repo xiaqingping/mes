@@ -77,19 +77,28 @@ RNA合成：王星名
 |   |—— api/ 接口文件
 |   |   |—— *** 根据后台微服务拆分接口文件
 |   |   |—— index.js 接口根模块
+|   |
 |   |—— assets/ 资源文件（会被webpack打包）
+|   |
 |   |—— components/ 组件
+|   |
 |   |—— config/ 配置文件
-|   |—— core/ 与vue框架相关（指令、插件）
+|   |
+|   |—— core/ 与vue框架相关（指令、插件等）
+|   |
 |   |—— layouts/ 布局
+|   |
 |   |—— router/ 路由
 |   |   |—— config/ 
 |   |   |   |—— *** 每个项目大模块一个js文件
 |   |   |—— index.js 路由主模块
+|   |
 |   |—— store/ 全局数据
+|   |
 |   |—— views/ 页面
 |   |   |—— ***/ 每个项目大模块一个文件夹
 |   |   |—— login.vue 登录页面
+|   |
 |   |—— APP.vue 根组件
 |   |—— main.js 项目入口
 |   |—— permission.js 权限控制
@@ -97,6 +106,8 @@ RNA合成：王星名
 |—— .gitignore
 |
 |—— babel.config.js 
+|
+|—— CHANGELOG.md 更新日志 
 |
 |—— jsconfig.json vscode编辑器JS项目配置
 |

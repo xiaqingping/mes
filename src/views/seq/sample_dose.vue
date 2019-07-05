@@ -50,7 +50,7 @@
       highlight-hover-row
       auto-resize
       height="600"
-      :ref="sampleDoseTable.ref"
+      ref="sampleDoseTable"
       :loading="sampleDoseTable.loading"
       :columns="sampleDoseTable.columns"
       :pager-config="sampleDoseTable.pagerConfig"
@@ -73,7 +73,6 @@ export default {
       queryParam: {},
       sampleDoseTable: {
         id: 0,
-        ref: 'sampleDoseTable',
         xTable: null,
         loading: false,
         tableData: [],
@@ -211,7 +210,7 @@ export default {
         ]
       };
 
-      this[tableName].xTable = this.$refs[this[tableName].ref].$refs.xTable;
+      this[tableName].xTable = this.$refs[tableName].$refs.xTable;
     },
     // 查询
     handleSearch () {
