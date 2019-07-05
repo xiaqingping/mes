@@ -115,6 +115,7 @@ export default {
         }
       },
       products_status: '',
+      isNeedDesalting_status: '',
       sapProductCode: '',
       sapProductName: ''
     };
@@ -151,18 +152,7 @@ export default {
           formatter: function ({ cellValue }) {
             if (cellValue === 1) { return '√'; }
           },
-          slots: {
-            default: ({ row, rowIndex }) => {
-              const xTable = this[tableName].xTable;
-              const isEdit = xTable.hasActiveRow(row);
-              if (isEdit) {
-                return [
-                  <vxe-checkbox>
-                  </vxe-checkbox>
-                ];
-              }
-            }
-          }
+          editRender: { name: 'SCheckBox', events: { change: this.changeIsNeedDesalting } }
         },
         { title: '氨基酸类型',
           field: 'aminoAcidType',
@@ -253,6 +243,14 @@ export default {
         this[tableName].loading = false;
       });
     },
+    // checkbox修改是否脱盐值
+    changeIsNeedDesalting (e) {
+      const table = this[tableName].xTable;
+      const primer = {
+        isNeedDesalting: e.target.checked
+      };
+      Object.assign(table.getInsertRecords()[0], primer);
+    },
     handleAddRow () {
       if (this[tableName].editIndex !== -1) return this.$message.warning('请保存或退出正在编辑的行');
 
@@ -298,7 +296,6 @@ export default {
       }, { passive: false });
     },
     handleSave (r) {
-      console.log(r);
       // if (this.providerTotalAmountBegin === '' || this.providerTotalAmountEnd === '' || this.aminoAcidLengthBegin === '' || this.aminoAcidLengthEnd === '' || this.aminoAcidType === '' || this.sapProductCode === '' || this.sapProductName === '' || this.purityName === '') {
       //   this.$notification.error({
       //     message: '错误',
@@ -306,31 +303,33 @@ export default {
       //   });
       //   return false;
       // }
-      // var purityData = [];
-      // this.purity.forEach((val, index, arr) => {
-      //   if (val.purity === this.purityName) {
-      //     purityData = val;
-      //   }
-      // });
+      var purityData = [];
+      this.$store.state.peptide.purity.forEach((val, index, arr) => {
+        if (val.id === r.row.purityID) {
+          purityData = val;
+        }
+      });
       // if (r.id) {
       //   this.data = r;
       // }
-      // this.data.providerTotalAmountBegin = this.providerTotalAmountBegin;
-      // this.data.providerTotalAmountEnd = this.providerTotalAmountEnd;
-      // this.data.purityName = purityData.purity;
-      // this.data.purityCode = purityData.code;
-      // this.data.purityID = purityData.id;
-      // this.data.aminoAcidLengthBegin = this.aminoAcidLengthBegin;
-      // this.data.aminoAcidLengthEnd = this.aminoAcidLengthEnd;
-      // this.data.isNeedDesalting = this.isNeedDesalting ? 1 : 2;
-      // this.data.aminoAcidType = this.aminoAcidType;
-      // this.data.sapProductCode = this.sapProductCode;
-      // this.data.sapProductName = this.sapProductName;
-      // this.$api.peptide.insertProduct(this.data).then(res => {
-      //   if (res.id) {
-      //     this.handleExit();
-      //   }
-      // });
+      const data = {
+        providerTotalAmountBegin: r.row.providerTotalAmountBegin,
+        providerTotalAmountEnd: r.row.providerTotalAmountEnd,
+        purityName: purityData.purity,
+        purityCode: purityData.code,
+        purityID: purityData.id,
+        aminoAcidLengthBegin: r.row.aminoAcidLengthBegin,
+        aminoAcidLengthEnd: r.row.aminoAcidLengthEnd,
+        isNeedDesalting: r.row.isNeedDesalting ? 1 : 2,
+        aminoAcidType: r.row.aminoAcidType,
+        sapProductCode: r.row.sapProductCode,
+        sapProductName: r.row.sapProductName
+      };
+      this.$api.peptide.insertProduct(data).then(res => {
+        if (res.id) {
+          this.handleSearch();
+        }
+      });
     },
     handleDelete ({ row }) {
       this.$api.peptide.deleteProduct(row.id).then(res => {
