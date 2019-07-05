@@ -51,7 +51,7 @@
         highlight-hover-row
         auto-resize
         height="600"
-        :ref="productTable.ref"
+        ref="productTable"
         :loading="productTable.loading"
         :columns="productTable.columns"
         :pager-config="productTable.pagerConfig"
@@ -73,7 +73,6 @@ export default {
       queryParam: {},
       productTable: {
         id: 0,
-        ref: 'productTable',
         xTable: null,
         loading: false,
         tableData: [],
@@ -185,7 +184,7 @@ export default {
         ]
       };
 
-      this[tableName].xTable = this.$refs[this[tableName].ref].$refs.xTable;
+      this[tableName].xTable = this.$refs[tableName].$refs.xTable;
     },
     // 查询
     handleSearch () {

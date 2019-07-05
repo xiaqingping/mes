@@ -51,8 +51,8 @@
     <vxe-grid
       highlight-hover-row
       auto-resize
-      height="550"
-      :ref="carrierTable.ref"
+      height="600"
+      ref="carrierTable"
       :loading="carrierTable.loading"
       :columns="carrierTable.columns"
       :pager-config="carrierTable.pagerConfig"
@@ -75,7 +75,6 @@ export default {
       queryParam: {},
       carrierTable: {
         id: 0,
-        ref: 'carrierTable',
         xTable: null,
         loading: false,
         tableData: [],
@@ -173,7 +172,7 @@ export default {
         ]
       };
 
-      this[tableName].xTable = this.$refs[this[tableName].ref].$refs.xTable;
+      this[tableName].xTable = this.$refs[tableName].$refs.xTable;
     },
     // 查询
     handleSearch () {

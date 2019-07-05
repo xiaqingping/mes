@@ -41,7 +41,8 @@
         <vxe-grid
           highlight-hover-row
           auto-resize
-          :ref="sampleFeature.ref"
+          height="570"
+          ref="sampleFeature"
           :loading="sampleFeature.loading"
           :columns="sampleFeature.columns"
           :pager-config="sampleFeature.pagerConfig"
@@ -49,7 +50,7 @@
           :edit-rules="sampleFeature.editRules"
           :edit-config="{key: 'id', trigger: 'manual', mode: 'row', showIcon: false, autoClear: false}"
           @cell-click="(options) => handleCellClick(options)"
-          @page-change="pagerChange">
+          @page-change="({pageSize, currentPage}) => this.$utils.tablePageChange({pageSize, currentPage, table: sampleFeature, callback: handleSearch})">
         </vxe-grid>
       </a-layout-content>
 
@@ -64,10 +65,10 @@
         <vxe-grid
           highlight-hover-row
           auto-resize
-          :ref="sampleFeatureDetailsTable.ref"
+          height="570"
+          ref="sampleFeatureDetailsTable"
           :loading="sampleFeatureDetailsTable.loading"
           :columns="sampleFeatureDetailsTable.columns"
-          :pager-config="sampleFeatureDetailsTable.pagerConfig"
           :data.sync="sampleFeatureDetailsTable.tableData"
           :edit-rules="sampleFeatureDetailsTable.editRules"
           :edit-config="{key: 'id', trigger: 'manual', mode: 'row', showIcon: false, autoClear: false}"
@@ -90,10 +91,7 @@ export default {
       queryParam: {},
       sampleFeature: {
         id: 0,
-        ref: 'sampleFeature',
         xTable: null,
-        editIndex: -1,
-        editData: null,
         loading: false,
         tableData: [],
         columns: [],
@@ -110,18 +108,10 @@ export default {
       },
       sampleFeatureDetailsTable: {
         id: 0,
-        ref: 'sampleFeatureDetailsTable',
         xTable: null,
-        editIndex: -1,
-        editData: null,
         loading: false,
         tableData: [],
         columns: [],
-        pagerConfig: {
-          currentPage: 1,
-          pageSize: 10,
-          total: 0
-        },
         editRules: {
           name: [
             { required: true, message: '名称必填' }
@@ -145,7 +135,7 @@ export default {
       const columns = [
         { type: 'index', width: 40 },
         { title: '编号', field: 'code' },
-        { title: '名称', field: 'name' },
+        { title: '名称', field: 'name', editRender: { name: 'input' } },
         { title: '状态', field: 'status', formatter: function ({ cellValue }) { return formatter(basic.status, cellValue); } },
         { title: '创建人', field: 'creatorName' },
         { title: '创建时间', field: 'createDate' },
@@ -159,7 +149,7 @@ export default {
 
       this[tableName].columns = columns;
 
-      this[tableName].xTable = this.$refs[this[tableName].ref].$refs.xTable;
+      this[tableName].xTable = this.$refs[tableName].$refs.xTable;
     },
     // 查询
     handleSearch () {
@@ -176,7 +166,7 @@ export default {
         this[tableName].pagerConfig.currentPage = params.page;
         this[tableName].pagerConfig.pageSize = params.rows;
 
-        this[tableName].editIndex = -1;
+        // 重置子列表 TODO:
       }).finally(() => {
         this[tableName].loading = false;
       });
@@ -184,7 +174,6 @@ export default {
     // 新增一可编辑行
     handleAddRow () {
       const tableName = 'sampleFeature';
-      if (this[tableName].editIndex !== -1) return this.$message.warning('请保存或退出正在编辑的行');
 
       const table = this[tableName].xTable;
       const newData = {
@@ -193,13 +182,6 @@ export default {
 
       this[tableName].tableData = [newData, ...this[tableName].tableData];
       table.setActiveRow(newData);
-      this[tableName].editIndex = 0;
-    },
-    // 修改
-    handleUpdate ({ row, rowIndex, tableName, xTable }) {
-      xTable.setActiveRow(row);
-      this[tableName].editIndex = rowIndex;
-      this[tableName].editData = JSON.parse(JSON.stringify(row));
     },
     // 删除
     handleCancel ({ row }) {
@@ -221,18 +203,6 @@ export default {
         });
       }
     },
-    // 退出编辑
-    handleQuitEdit ({ row, rowIndex, tableName, xTable }) {
-      xTable.clearActived().then(() => {
-        this[tableName].editIndex = -1;
-        if (!row.status) {
-          this[tableName].tableData.splice(rowIndex, 1);
-        } else {
-          this.$set(this[tableName].tableData, rowIndex, this[tableName].editData);
-          this[tableName].editData = null;
-        }
-      });
-    },
     // 点击表格行时
     handleCellClick ({ row }) {
       const tableName = 'sampleFeatureDetailsTable';
@@ -247,12 +217,6 @@ export default {
       }).finally(() => {
         this[tableName].loading = false;
       });
-    },
-    // 分页改变时
-    pagerChange ({ pageSize, currentPage }) {
-      const tableName = 'sampleFeature';
-      this[tableName].pagerConfig = Object.assign(this[tableName].pagerConfig, { pageSize, currentPage });
-      this.handleSearch();
     },
 
     /**
@@ -277,7 +241,7 @@ export default {
 
       this[tableName].columns = columns;
 
-      this[tableName].xTable = this.$refs[this[tableName].ref].$refs.xTable;
+      this[tableName].xTable = this.$refs[tableName].$refs.xTable;
     }
   }
 };
