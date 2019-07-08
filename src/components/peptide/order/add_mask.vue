@@ -386,7 +386,7 @@ export default {
       this.loadDataId = this.selectedRowKeys[0];
     },
     onClose () {
-      this.$emit('Closed');
+      this.$emit('Closed', '', 5);
       this.status = true;
     },
     onSmall () {

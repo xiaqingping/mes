@@ -9,6 +9,10 @@ export default {
   getPay (params) {
     return request(`/pay/v1/date/easyui`, { params });
   },
+  // 保存员工信息
+  increasepay (params) {
+    return request(`/pay/v1/date`, { method: 'POST', data: params });
+  },
   // 删除员工信息
   deletepays () {
     return request(`/pay/v1/date/invalid`, { method: 'PUT' });
@@ -18,8 +22,8 @@ export default {
     return request(`/pay/v1/date/excel`, { method: 'POST', ...options });
   },
   // 获取工资类型
-  getTypepay (params, easyui) {
-    return request(`/pay/v1/type/${easyui ? '/easyui' : ''}`, { params });
+  getTypepay (params) {
+    return request(`/pay/v1/type`, { params });
   },
   // 保存工资类型
   increaseTypepay (params) {

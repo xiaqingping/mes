@@ -137,3 +137,23 @@ VXETable.renderer.add('SInputSearch', {
     ];
   }
 });
+
+VXETable.renderer.add('SCheckBox', {
+  autofocus: '.ant-checkbox-input',
+  renderEdit (h, editRender, params) {
+    const { $table, row, column } = params;
+    return [
+      <a-checkbox
+        size={ $table.vSize }
+        value={row[column.property]}
+        onChange={ editRender.events.change }
+      >
+      </a-checkbox>
+    ];
+  },
+  renderCell (h, editRender, { row, column }) {
+    return [
+      <span>{row[column.property]}</span>
+    ];
+  }
+});
