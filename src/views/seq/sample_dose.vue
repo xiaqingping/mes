@@ -5,7 +5,7 @@
     <div class="table-search">
       <a-form layout="inline" :form="form" @submit="handleSearch">
         <a-row :gutter="24">
-          <a-col :xxl="4" :xl="6" :md="8">
+          <a-col :md="6" :xl="4">
             <a-form-item label="状态">
               <a-select v-decorator="['status', {initialValue: 1}]">
                 <a-select-option value="">全部</a-select-option>
@@ -13,7 +13,7 @@
               </a-select>
             </a-form-item>
           </a-col>
-          <a-col :xxl="4" :xl="6" :md="8">
+          <a-col :md="6" :xl="4">
             <a-form-item label="样品类型">
               <a-select v-decorator="['sampleTypeId', {initialValue: ''}]">
                 <a-select-option value="">全部</a-select-option>
@@ -21,12 +21,12 @@
               </a-select>
             </a-form-item>
           </a-col>
-          <a-col :xxl="4" :xl="6" :md="8">
+          <a-col :md="6" :xl="4">
             <a-form-item label="样品用量">
               <a-input v-decorator="['sampleDose']"/>
             </a-form-item>
           </a-col>
-          <a-col :xxl="4" :xl="6" :md="8">
+          <a-col :md="6" :xl="4">
             <a-form-item label="测序点">
               <a-select v-decorator="['seqfactoryIdList', {initialValue: ''}]">
                 <a-select-option value="">全部</a-select-option>
@@ -49,14 +49,15 @@
     <vxe-grid
       highlight-hover-row
       auto-resize
-      :ref="sampleDoseTable.ref"
+      height="600"
+      ref="sampleDoseTable"
       :loading="sampleDoseTable.loading"
       :columns="sampleDoseTable.columns"
       :pager-config="sampleDoseTable.pagerConfig"
       :data.sync="sampleDoseTable.tableData"
       :edit-rules="sampleDoseTable.editRules"
       :edit-config="{key: 'id', trigger: 'manual', mode: 'row', showIcon: false, autoClear: false}"
-      @page-change="pagerChange">
+      @page-change="({pageSize, currentPage}) => this.$utils.tablePageChange({pageSize, currentPage, table: sampleDoseTable, callback: handleSearch})">
     </vxe-grid>
   </div>
 </template>
@@ -72,10 +73,7 @@ export default {
       queryParam: {},
       sampleDoseTable: {
         id: 0,
-        ref: 'sampleDoseTable',
         xTable: null,
-        editIndex: -1,
-        editData: null,
         loading: false,
         tableData: [],
         columns: [],
@@ -100,6 +98,7 @@ export default {
       const { basic, seq } = this.$store.state;
 
       const columns = [
+        { type: 'radio', width: 40 },
         { type: 'index', width: 40 },
         {
           title: '样品类型',
@@ -164,14 +163,14 @@ export default {
 
               if (!isEdit && row.status === 1) {
                 actions = [
-                  <a onClick={() => this.handleCancel(options)}>删除</a>,
-                  <a onClick={() => this.handleUpdate(options)}>修改</a>
+                  <a onClick={ () => this.handleCancel(options) }>删除</a>,
+                  <a onClick={ () => xTable.setActiveRow(row) }>修改</a>
                 ];
               }
               if (isEdit) {
                 actions = [
-                  <a onClick={() => this.handleSave(options) }>保存</a>,
-                  <a onClick={() => this.handleQuitEdit(options) }>退出</a>
+                  <a onClick={ () => this.handleSave(options) }>保存</a>,
+                  <a onClick={ () => this.$utils.tableQuitEdit(options) }>退出</a>
                 ];
               }
 
@@ -190,8 +189,28 @@ export default {
       });
 
       this[tableName].columns = columns;
+      this[tableName].editRules = {
+        sampleTypeId: [
+          { required: true, message: '样品类型不能为空' }
+        ],
+        minSampleLength: [
+          { required: true, message: '最小长度不能为空' }
+        ],
+        maxSampleLength: [
+          { required: true, message: '最大长度不能为空' }
+        ],
+        concentration: [
+          { required: true, message: '浓度不能为空' }
+        ],
+        sampleFeatureId: [
+          { required: true, message: '样品特性不能为空' }
+        ],
+        sampleDose: [
+          { required: true, message: '样品用量不能为空' }
+        ]
+      };
 
-      this[tableName].xTable = this.$refs[this[tableName].ref].$refs.xTable;
+      this[tableName].xTable = this.$refs[tableName].$refs.xTable;
     },
     // 查询
     handleSearch () {
@@ -207,8 +226,6 @@ export default {
         this[tableName].pagerConfig.total = data.total;
         this[tableName].pagerConfig.currentPage = params.page;
         this[tableName].pagerConfig.pageSize = params.rows;
-
-        this[tableName].editIndex = -1;
       }).finally(() => {
         this[tableName].loading = false;
       });
@@ -216,22 +233,18 @@ export default {
     // 新增一可编辑行
     handleAddRow () {
       const tableName = 'sampleDoseTable';
-      if (this[tableName].editIndex !== -1) return this.$message.warning('请保存或退出正在编辑的行');
-
       const table = this[tableName].xTable;
+
+      const active = table.getActiveRow();
+      if (active && active.row) return this.$message.warning('请保存或退出正在编辑的行');
+
       const newData = {
         id: --this[tableName].id
       };
 
-      this[tableName].tableData = [newData, ...this[tableName].tableData];
-      table.setActiveRow(newData);
-      this[tableName].editIndex = 0;
-    },
-    // 修改
-    handleUpdate ({ row, rowIndex, tableName, xTable }) {
-      xTable.setActiveRow(row);
-      this[tableName].editIndex = rowIndex;
-      this[tableName].editData = JSON.parse(JSON.stringify(row));
+      table.insert(newData).then(({ row }) => {
+        table.setActiveRow(row);
+      });
     },
     // 删除
     handleCancel ({ row }) {
@@ -239,38 +252,21 @@ export default {
         this.handleSearch();
       });
     },
-    /**
-     * 保存
-     * status字段有值代表是修改，否则是新增
-     */
-    handleSave ({ row }) {
-      if (row.status) {
-        this.$api.sampleprepare.updateSampleDose(row).then(() => {
-          this.handleSearch();
-        });
-      } else {
-        this.$api.sampleprepare.addSampleDose(row).then(() => {
-          this.handleSearch();
-        });
-      }
-    },
-    // 退出编辑
-    handleQuitEdit ({ row, rowIndex, tableName, xTable }) {
-      xTable.clearActived().then(() => {
-        this[tableName].editIndex = -1;
-        if (!row.status) {
-          this[tableName].tableData.splice(rowIndex, 1);
+    // 保存
+    handleSave ({ row, xTable }) {
+      xTable.validate(row).then(() => {
+        if (row.status) {
+          this.$api.sampleprepare.updateSampleDose(row).then(() => {
+            this.handleSearch();
+          });
         } else {
-          this.$set(this[tableName].tableData, rowIndex, this[tableName].editData);
-          this[tableName].editData = null;
+          this.$api.sampleprepare.addSampleDose(row).then(() => {
+            this.handleSearch();
+          });
         }
+      }).catch(err => {
+        console.log(err);
       });
-    },
-    // 分页改变时
-    pagerChange ({ pageSize, currentPage }) {
-      const tableName = 'sampleDoseTable';
-      this[tableName].pagerConfig = Object.assign(this[tableName].pagerConfig, { pageSize, currentPage });
-      this.handleSearch();
     }
   }
 };

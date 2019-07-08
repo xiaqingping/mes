@@ -34,11 +34,11 @@ export default {
     return request(`/seqfactory/v1/seqfactory/${seqfactoryId}/office`);
   },
   // 新增
-  addOfficeBySeqfactory (seqfactoryId, data) {
-    return request(`/seqfactory/v1/seqfactory/${seqfactoryId}/office`, { method: 'POST', data });
+  addOfficeBySeqfactory (data) {
+    return request(`/seqfactory/v1/seqfactory/${data.seqfactoryId}/office`, { method: 'POST', data });
   },
   // 作废
-  cancelOfficeBySeqfactory (seqfactoryId, id) {
-    return request(`/seqfactory/v1/seqfactory/${seqfactoryId}/primers/${id}`, { method: 'DELETE' });
+  cancelOfficeBySeqfactory (data) {
+    return request(`/seqfactory/v1/seqfactory/office/${data.id}`, { method: 'DELETE' });
   }
 };

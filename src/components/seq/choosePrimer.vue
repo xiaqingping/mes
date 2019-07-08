@@ -7,6 +7,14 @@
             <a-input v-decorator="['code']"/>
           </a-form-item>
         </a-col>
+        <a-col :xxl="4" :xl="6" :md="8">
+          <a-form-item label="类型">
+            <a-select v-decorator="['typeIdList', {initialValue: ''}]">
+              <a-select-option value="">全部</a-select-option>
+              <a-select-option v-for="type in $store.state.seq.primerType" :value="type.id" :key="type.id">{{ type.name }}</a-select-option>
+            </a-select>
+          </a-form-item>
+        </a-col>
       </a-row>
     </a-form>
 
@@ -71,7 +79,7 @@ export default {
         { title: '失效原因', field: 'expireReason' },
         { title: '过期时间', field: 'overdueDate' },
         { title: '浓度', field: 'concentration' },
-        { title: '类型', field: 'type' },
+        { title: '类型', field: 'type', formatter: function ({ cellValue }) { return formatter(seq.primerType, cellValue); } },
         { title: '序列', field: 'sequence' },
         { title: '碱基数', field: 'base' },
         { title: '测序点', field: 'seqfactoryName' },

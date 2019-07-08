@@ -18,5 +18,32 @@ export default {
       }
     }
     return value;
+  },
+  /**
+   * 表格退出编辑
+   *   id >0，退出修改操作，还原数据
+   *      <0，退出新增操作，删除新增的行
+   * @param {Object} row 退出编辑行的数据
+   * @param {Object} xTable vxe-table组件
+   */
+  tableQuitEdit ({ row, xTable }) {
+    xTable.clearActived().then(() => {
+      if (row && row.id < 0) {
+        xTable.remove(row);
+      } else {
+        xTable.revert(row);
+      }
+    });
+  },
+  /**
+   * 表格分页改变时
+   * @param {Number} pageSize 一页数量
+   * @param {Number} currentPage 当前页码
+   * @param {Object} table 表格对象
+   * @param {Function} callback 回调函数
+   */
+  tablePageChange ({ pageSize, currentPage, table, callback }) {
+    table.pagerConfig = Object.assign(table.pagerConfig, { pageSize, currentPage });
+    callback();
   }
 };
