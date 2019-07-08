@@ -62,7 +62,7 @@
 import STable from '@/components/Table';
 
 export default {
-  name: 'CustomerMask',
+  name: 'PeptideModificationsMask',
   components: {
     STable
   },
@@ -135,7 +135,7 @@ export default {
       loadData: parameter => {
         this.queryParam = this.form.getFieldsValue();
         const params = Object.assign(parameter, this.queryParam);
-        return this.$api.peptide.getModifications(params).then(res => {
+        return this.$api.peptideBase.getModifications(params).then(res => {
           if (!this.data) {
             res.rows = [];
             res.total = 0;
@@ -154,7 +154,7 @@ export default {
   mounted () {
     this.selectedRows = [];
     this.selectedRowKeys = [];
-    this.$api.peptide.getModificationTypesAll({ 'status': 1 }).then(res => {
+    this.$api.peptideBase.getModificationTypesAll({ 'status': 1 }).then(res => {
       this.modificationsType = res;
     });
     var width = document.body.clientWidth;

@@ -99,7 +99,7 @@ export default {
   mounted () {
     this.setColumns();
     this.handleSearch();
-    this.$api.peptide.getAminoAcid({ status: 1 }).then(res => {
+    this.$api.peptideBase.getAminoAcid({ status: 1 }).then(res => {
       var map = {}; var dest = [];
       for (let i = 0; i < res.rows.length; i++) {
         var ai = res.rows[i];
@@ -208,7 +208,7 @@ export default {
 
       const queryParam = this.form.getFieldsValue();
       const params = Object.assign({ page: this[tableName].pagerConfig.currentPage, rows: this[tableName].pagerConfig.pageSize }, queryParam);
-      this.$api.peptide.getModificationProducts(params).then((data) => {
+      this.$api.peptideBase.getModificationProducts(params).then((data) => {
         this[tableName].tableData = data.rows;
         this[tableName].pagerConfig.total = data.total;
         this[tableName].pagerConfig.currentPage = params.page;
@@ -313,7 +313,7 @@ export default {
       this.data.isNeedDesalting = this.isNeedDesalting ? 1 : 2;
       this.data.sapProductCode = this.sapProductCode;
       this.data.sapProductName = this.sapProductName;
-      this.$api.peptide.insertModificationProducts(this.data).then(res => {
+      this.$api.peptideBase.insertModificationProducts(this.data).then(res => {
         if (res.id) {
           this.handleExit();
         }
@@ -334,12 +334,12 @@ export default {
         });
         return false;
       }
-      this.$api.peptide.resumeModificationProducts(row.id).then(res => {
+      this.$api.peptideBase.resumeModificationProducts(row.id).then(res => {
         this.handleSearch();
       });
     },
     handleDelete ({ row }) {
-      this.$api.peptide.deleteModificationProducts(row.id).then(res => {
+      this.$api.peptideBase.deleteModificationProducts(row.id).then(res => {
         this.handleSearch();
       });
     }

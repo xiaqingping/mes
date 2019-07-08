@@ -161,7 +161,7 @@ export default {
   },
   methods: {
     init () {
-      this.$api.peptide.getModificationTypes({ 'status': 1 }).then(res => {
+      this.$api.peptideBase.getModificationTypes({ 'status': 1 }).then(res => {
         this.modificationsType = res.rows;
       });
     },
@@ -323,7 +323,7 @@ export default {
     handleCellClick ({ row }) {
       this[tableNameSon].loading = true;
       this.parentData = { row };
-      this.$api.peptide.getSuitableAminoAcids(row.id).then((data) => {
+      this.$api.peptideBase.getSuitableAminoAcids(row.id).then((data) => {
         this[tableNameSon].tableData = data;
         this[tableNameSon].editIndex = -1;
       }).finally(() => {
@@ -337,7 +337,7 @@ export default {
       const queryParam = this.form.getFieldsValue();
       const params = Object.assign({ page: this[tableName].pagerConfig.currentPage, rows: this[tableName].pagerConfig.pageSize }, queryParam);
 
-      this.$api.peptide.getModifications(params).then((data) => {
+      this.$api.peptideBase.getModifications(params).then((data) => {
         this[tableName].tableData = data.rows;
         this[tableName].pagerConfig.total = data.total;
         this[tableName].pagerConfig.current = params.page;
@@ -385,7 +385,7 @@ export default {
       this.data.isIndependentModification = this.isIndependentModification ? 1 : 2;
       this.data.modificationTypeID = this.modificationTypeID;
       this.data.details = [];
-      this.$api.peptide.insertModifications(this.data).then(res => {
+      this.$api.peptideBase.insertModifications(this.data).then(res => {
         if (res.id) {
           this.handleExit();
         }
@@ -393,11 +393,11 @@ export default {
     },
     handleDelete ({ row }, type = '') {
       if (type === 'son') {
-        this.$api.peptide.deleteSuitableAminoAcids(row.id).then(res => {
+        this.$api.peptideBase.deleteSuitableAminoAcids(row.id).then(res => {
           this.handleCellClick(this.parentData);
         });
       } else {
-        this.$api.peptide.deletePurity(row.id).then(res => {
+        this.$api.peptideBase.deletePurity(row.id).then(res => {
           this.handleSearch();
         });
       }
@@ -425,11 +425,11 @@ export default {
     },
     handleResume ({ row }, type = '') {
       if (type === 'son') {
-        this.$api.peptide.resumeSuitableAminoAcids(row.id).then(res => {
+        this.$api.peptideBase.resumeSuitableAminoAcids(row.id).then(res => {
           this.handleCellClick(this.parentData);
         });
       } else {
-        this.$api.peptide.resumePurity(row.id).then(res => {
+        this.$api.peptideBase.resumePurity(row.id).then(res => {
           this.handleSearch();
         });
       }
@@ -471,7 +471,7 @@ export default {
         'aminoAcidID': this.amino_acid_data[0].id,
         'modificationID': this.selectRow
       };
-      this.$api.peptide.insertSuitableAminoAcids(addSonVal).then(res => {
+      this.$api.peptideBase.insertSuitableAminoAcids(addSonVal).then(res => {
         if (res.id) {
           this.handleExitSon();
         }

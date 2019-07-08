@@ -178,7 +178,7 @@ export default {
       const queryParam = this.form.getFieldsValue();
       const params = Object.assign({ page: this[tableName].pagerConfig.currentPage, rows: this[tableName].pagerConfig.pageSize }, queryParam);
 
-      this.$api.peptide.getdisulfideBondProducts(params).then((data) => {
+      this.$api.peptideBase.getdisulfideBondProducts(params).then((data) => {
         this[tableName].tableData = data.rows;
         this[tableName].pagerConfig.total = data.total;
         this[tableName].pagerConfig.currentPage = params.page;
@@ -237,7 +237,7 @@ export default {
       this.data.isNeedDesalting = this.isNeedDesalting ? 1 : 2;
       this.data.sapProductCode = this.sapProductCode;
       this.data.sapProductName = this.sapProductName;
-      this.$api.peptide.insertdisulfideBondProducts(this.data).then(res => {
+      this.$api.peptideBase.insertdisulfideBondProducts(this.data).then(res => {
         if (res.id) {
           this.handleExit();
         }
@@ -251,7 +251,7 @@ export default {
       this[tableName].editIndex = -1;
     },
     handleDelete ({ row }) {
-      this.$api.peptide.deletedisulfideBondProducts(row.id).then(res => {
+      this.$api.peptideBase.deletedisulfideBondProducts(row.id).then(res => {
         this.handleSearch();
       });
     },
@@ -263,7 +263,7 @@ export default {
         });
         return false;
       }
-      this.$api.peptide.resumedisulfideBondProducts(row.id).then(res => {
+      this.$api.peptideBase.resumedisulfideBondProducts(row.id).then(res => {
         this.handleSearch();
       });
     }

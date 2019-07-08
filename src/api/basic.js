@@ -41,5 +41,9 @@ export default {
   // 查询负责人
   getSubcustomer () {
     return request('/basic/v1/subcustomer');
+  },
+  // 查询产品
+  getProductList (params) {
+    return request(`/basic/v1/products`, { params });
   }
 };

@@ -89,6 +89,12 @@ export default {
             { required: true, message: '名称必填' }
           ]
         }
+      },
+      data: {
+        longCodeLeft: '',
+        longCodeRight: '',
+        shortCodeLeft: '',
+        shortCodeRight: ''
       }
     };
   },
@@ -109,38 +115,51 @@ export default {
         { title: '亲水性',
           field: 'hydrophilic',
           align: 'center',
-          scopedSlots: { customRender: 'hydrophilic' }
+          formatter: function ({ cellValue }) {
+            if (cellValue === 1) { return '√'; }
+          },
+          editRender: { name: 'SCheckBox', events: { change: this.changeHydrophilic } }
         },
         {
           title: '疏水性',
           field: 'hydrophobic',
           align: 'center',
-          scopedSlots: { customRender: 'hydrophobic' }
+          formatter: function ({ cellValue }) {
+            if (cellValue === 1) { return '√'; }
+          },
+          editRender: { name: 'SCheckBox', events: { change: this.changeHydrophobic } }
         },
         {
           title: '酸性',
           field: 'acidic',
           align: 'center',
-          scopedSlots: { customRender: 'acidic' }
+          formatter: function ({ cellValue }) {
+            if (cellValue === 1) { return '√'; }
+          },
+          editRender: { name: 'SCheckBox', events: { change: this.changeAcidic } }
         },
         {
           title: '碱性',
           field: 'alkaline',
           align: 'center',
-          scopedSlots: { customRender: 'alkaline' }
+          formatter: function ({ cellValue }) {
+            if (cellValue === 1) { return '√'; }
+          },
+          editRender: { name: 'SCheckBox', events: { change: this.changeAlkaline } }
         },
         {
           title: '是否可做二硫键',
           field: 'isCanDisulfideBond',
           align: 'center',
-          formatter: ({ cellValue }) => {
-            return cellValue === 1 ? '√' : '';
-          }
+          formatter: function ({ cellValue }) {
+            if (cellValue === 1) { return '√'; }
+          },
+          editRender: { name: 'SCheckBox', events: { change: this.changeIsCanDisulfideBond } }
         },
-        { title: '分子量', field: 'molecularWeight', align: 'center', scopedSlots: { customRender: 'molecularWeight' } },
-        { title: '等电点', field: 'isoelectricPoint', align: 'center', scopedSlots: { customRender: 'isoelectricPoint' } },
-        { title: '羧基解离常数', field: 'carboxylationDissociationConstant', align: 'center', scopedSlots: { customRender: 'carboxylationDissociationConstant' } },
-        { title: '氨基解离常数', field: 'aminoDissociationConstant', align: 'center', scopedSlots: { customRender: 'aminoDissociationConstant' } },
+        { title: '分子量', field: 'molecularWeight', align: 'center', editRender: { name: 'AInput' } },
+        { title: '等电点', field: 'isoelectricPoint', align: 'center', editRender: { name: 'AInput' } },
+        { title: '羧基解离常数', field: 'carboxylationDissociationConstant', align: 'center', editRender: { name: 'AInput' } },
+        { title: '氨基解离常数', field: 'aminoDissociationConstant', align: 'center', editRender: { name: 'AInput' } },
         {
           title: '状态',
           field: 'status',
@@ -152,9 +171,78 @@ export default {
         { title: '创建时间', field: 'createDate', align: 'center' },
         { title: '删除人', field: 'cancelName' },
         { title: '删除时间', field: 'cancelDate' },
-        { title: '类型', field: 'aminoAcidType', align: 'center', scopedSlots: { customRender: 'aminoAcidType' } },
-        { title: '长代码', field: 'longCode', align: 'center', scopedSlots: { customRender: 'longCode' } },
-        { title: '短代码', field: 'shortCode', align: 'center', scopedSlots: { customRender: 'shortCode' } },
+        { title: '类型',
+          field: 'aminoAcidType',
+          align: 'center',
+          slots: {
+            default: ({ row, rowIndex }) => {
+              let actions = [];
+              const xTable = this[tableName].xTable;
+              const isEdit = xTable.hasActiveRow(row);
+              if (isEdit) {
+                actions = [
+                  <a-input size="small" style="width:50px;background-color:white;color:black;cursor:text" defaultValue="L" disabled/>,
+                  <a-input size="small" style="width:50px;background-color:white;color:black;cursor:text" defaultValue="D" disabled/>
+                ];
+                return [
+                  <span class="table-actions">
+                    {actions}
+                  </span>
+                ];
+              } else {
+                return row.aminoAcidType;
+              }
+            }
+          }
+        },
+        { title: '长代码',
+          field: 'longCode',
+          align: 'center',
+          slots: {
+            default: ({ row, rowIndex }) => {
+              let actions = [];
+              const xTable = this[tableName].xTable;
+              const isEdit = xTable.hasActiveRow(row);
+              if (isEdit) {
+                actions = [
+                  <a-input size="small" style="width:50px" onkeyup={ (e) => { self.data.longCodeLeft = e.target.value; }}/>,
+                  <a-input size="small" style="width:50px" onkeyup={ (e) => { self.data.longCodeRight = e.target.value; }}/>
+                ];
+                return [
+                  <span class="table-actions">
+                    {actions}
+                  </span>
+                ];
+              } else {
+                return row.longCode;
+              }
+            }
+          }
+        },
+        { title: '短代码',
+          field: 'shortCode',
+          align: 'center',
+          slots: {
+            default: ({ row, rowIndex }) => {
+              let actions = [];
+              const xTable = this[tableName].xTable;
+              const isEdit = xTable.hasActiveRow(row);
+              if (isEdit) {
+                actions = [
+                  <a-input size="small" style="width:50px" onkeyup={ (e) => { self.data.shortCodeLeft = e.target.value; }}/>,
+                  <a-input size="small" style="width:50px" onkeyup={ (e) => { self.data.shortCodeRight = e.target.value; }}/>
+                ];
+                return [
+                  <span class="table-actions">
+                    {actions}
+                  </span>
+                ];
+              } else {
+                return row.shortCode;
+              }
+            }
+          }
+        },
         {
           title: '操作',
           field: 'actions',
@@ -208,7 +296,7 @@ export default {
       this.editIndex = -1;
       const queryParam = this.form.getFieldsValue();
       const params = Object.assign({ page: this[tableName].pagerConfig.currentPage, rows: this[tableName].pagerConfig.pageSize }, queryParam);
-      this.$api.peptide.getAminoAcid(params).then((data) => {
+      this.$api.peptideBase.getAminoAcid(params).then((data) => {
         var map = {}; var dest = [];
         for (let i = 0; i < data.rows.length; i++) {
           var ai = data.rows[i];
@@ -266,60 +354,90 @@ export default {
 
       const table = this[tableName].xTable;
       var addVal = {
-        id: --this[tableName].id,
-        name: '',
-        hydrophilic: '',
-        hydrophobic: '',
-        acidic: '',
-        alkaline: '',
-        isCanDisulfideBond: '',
-        molecularWeight: '',
-        isoelectricPoint: '',
-        carboxylationDissociationConstant: '',
-        aminoDissociationConstant: ''
+        id: --this[tableName].id
       };
-      this[tableName].tableData = [addVal, ...this[tableName].tableData];
-      table.setActiveRow(addVal);
+
+      table.insert(addVal).then(({ row }) => {
+        table.setActiveRow(row);
+      });
       this[tableName].editIndex = 0;
     },
     handleSave (r) {
-      if (this.name === '' || this.molecularWeight === '' || this.isoelectricPoint === '' || this.carboxylationDissociationConstant === '' || this.aminoDissociationConstant === '' || this.leftLongCode === '' || this.leftShortCode === '' || this.rightLongCode === '' || this.rightShortCode === '') {
-        this.$notification.error({
-          message: '错误',
-          description: `数据不能为空！`
-        });
-        return false;
-      }
-      if (r.id) {
-        this.data = r;
-      }
-      this.data.name = this.name;
-      this.data.hydrophilic = this.hydrophilic ? 1 : 0;
-      this.data.hydrophobic = this.hydrophobic ? 1 : 0;
-      this.data.acidic = this.acidic ? 1 : 0;
-      this.data.alkaline = this.alkaline ? 1 : 0;
-      this.data.isCanDisulfideBond = this.isCanDisulfideBond ? 1 : 0;
-      this.data.molecularWeight = this.molecularWeight;
-      this.data.isoelectricPoint = this.isoelectricPoint;
-      this.data.carboxylationDissociationConstant = this.carboxylationDissociationConstant;
-      this.data.aminoDissociationConstant = this.aminoDissociationConstant;
-      this.data.details = [
-        {
-          'aminoAcidType': 'L',
-          'longCode': this.leftLongCode,
-          'shortCode': this.leftShortCode
-        },
-        {
-          'aminoAcidType': 'D',
-          'longCode': this.rightLongCode,
-          'shortCode': this.rightShortCode
-        }
-      ];
-      this.$api.peptide.insertAminoAcid(this.data).then(res => {
+      console.log(r);
+      // if (this.name === '' || this.molecularWeight === '' || this.isoelectricPoint === '' || this.carboxylationDissociationConstant === '' || this.aminoDissociationConstant === '' || this.leftLongCode === '' || this.leftShortCode === '' || this.rightLongCode === '' || this.rightShortCode === '') {
+      //   this.$notification.error({
+      //     message: '错误',
+      //     description: `数据不能为空！`
+      //   });
+      //   return false;
+      // }
+      // if (r.id) {
+      //   this.data = r;
+      // }
+      const data = {
+        name: r.row.name,
+        hydrophilic: r.row.hydrophilic ? 1 : 0,
+        hydrophobic: r.row.hydrophobic ? 1 : 0,
+        acidic: r.row.acidic ? 1 : 0,
+        alkaline: r.row.alkaline ? 1 : 0,
+        isCanDisulfideBond: r.row.isCanDisulfideBond ? 1 : 0,
+        molecularWeight: r.row.molecularWeight,
+        isoelectricPoint: r.row.isoelectricPoint,
+        carboxylationDissociationConstant: r.row.carboxylationDissociationConstant,
+        aminoDissociationConstant: r.row.aminoDissociationConstant,
+        details: [
+          {
+            'aminoAcidType': 'L',
+            'longCode': this.data.longCodeLeft,
+            'shortCode': this.data.longCodeRight
+          },
+          {
+            'aminoAcidType': 'D',
+            'longCode': this.data.shortCodeLeft,
+            'shortCode': this.data.shortCodeRight
+          }
+        ]
+      };
+      this.$api.peptideBase.insertAminoAcid(data).then(res => {
         if (res.id) {
-          this.handleExit();
+          this.handleSearch();
         }
       });
+    },
+    changeHydrophilic (e) {
+      const table = this[tableName].xTable;
+      const primer = {
+        hydrophilic: e.target.checked
+      };
+      Object.assign(table.getInsertRecords()[0], primer);
+    },
+    changeHydrophobic (e) {
+      const table = this[tableName].xTable;
+      const primer = {
+        hydrophobic: e.target.checked
+      };
+      Object.assign(table.getInsertRecords()[0], primer);
+    },
+    changeAcidic (e) {
+      const table = this[tableName].xTable;
+      const primer = {
+        acidic: e.target.checked
+      };
+      Object.assign(table.getInsertRecords()[0], primer);
+    },
+    changeAlkaline (e) {
+      const table = this[tableName].xTable;
+      const primer = {
+        alkaline: e.target.checked
+      };
+      Object.assign(table.getInsertRecords()[0], primer);
+    },
+    changeIsCanDisulfideBond (e) {
+      const table = this[tableName].xTable;
+      const primer = {
+        isCanDisulfideBond: e.target.checked
+      };
+      Object.assign(table.getInsertRecords()[0], primer);
     },
     handleExit ({ row, rowIndex, tableName, xTable }) {
       xTable.clearActived();
@@ -329,7 +447,7 @@ export default {
       this[tableName].editIndex = -1;
     },
     handleDelete ({ row }) {
-      this.$api.peptide.deleteAminoAcid(row.id).then(res => {
+      this.$api.peptideBase.deleteAminoAcid(row.id).then(res => {
         this.handleSearch();
       });
     },
@@ -341,7 +459,7 @@ export default {
         });
         return false;
       }
-      this.$api.peptide.resumeAminoAcid(row.id).then(res => {
+      this.$api.peptideBase.resumeAminoAcid(row.id).then(res => {
         this.handleSearch();
       });
     }

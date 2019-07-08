@@ -147,9 +147,11 @@
 </template>
 
 <script>
+// 用于日期中文
 import Zhcn from 'ant-design-vue/lib/locale-provider/zh_CN';
 import moment from 'moment';
 import 'moment/locale/zh-cn';
+
 import CustomerMask from '@/components/peptide/customer_mask';
 import SubCustomerMask from '@/components/peptide/sub_customer_mask';
 import ContactMask from '@/components/peptide/contact_mask';
@@ -348,7 +350,7 @@ export default {
       queryParam.createDateBegin = this.createDateBegin;
       queryParam.createDateEnd = this.createDateEnd;
       const params = Object.assign({ page: this[tableName].pagerConfig.currentPage, rows: this[tableName].pagerConfig.pageSize }, queryParam);
-      this.$api.peptide.getOrder(params).then((data) => {
+      this.$api.peptideorder.getOrder(params).then((data) => {
         this[tableName].tableData = data.rows;
         this[tableName].pagerConfig.total = data.total;
         this[tableName].pagerConfig.currentPage = params.page;

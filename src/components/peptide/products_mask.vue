@@ -113,9 +113,8 @@ const tableName = 'productTable';
 const tableNameSon = 'productSonTable';
 
 export default {
-  name: 'CustomerMask',
+  name: 'PeptideProductsMask',
   data () {
-    // var self = this;
     return {
       form: this.$form.createForm(this),
       productTable: {
@@ -251,7 +250,7 @@ export default {
       queryParam['stock.factory'] = '3100';
       const params = Object.assign({ page: this[tableName].pagerConfig.currentPage, rows: this[tableName].pagerConfig.pageSize }, queryParam);
 
-      this.$api.peptide.getProductList(params).then((data) => {
+      this.$api.basic.getProductList(params).then((data) => {
         this[tableName].tableData = data;
         this[tableName].pagerConfig.total = data.length;
         this[tableName].pagerConfig.current = params.page;

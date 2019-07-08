@@ -38,7 +38,7 @@
 <script>
 
 export default {
-  name: 'AminoAcidMask',
+  name: 'PeptideAminoAcidMask',
   data () {
     return {
       form: this.$form.createForm(this),
@@ -145,7 +145,7 @@ export default {
       const queryParam = this.form.getFieldsValue();
       const params = Object.assign({ page: currentPage, rows: pageSize }, queryParam);
 
-      this.$api.peptide.getAminoAcid(params).then(res => {
+      this.$api.peptideBase.getAminoAcid(params).then(res => {
         var map = {}; var dest = [];
         for (let i = 0; i < res.rows.length; i++) {
           var ai = res.rows[i];

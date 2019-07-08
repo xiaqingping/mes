@@ -103,7 +103,7 @@
 const tableName = 'customerMask';
 
 export default {
-  name: 'CustomerMask',
+  name: 'PeptideCustomerMask',
   data () {
     return {
       form: this.$form.createForm(this),
@@ -204,7 +204,7 @@ export default {
       queryParam.createDateBegin = this.createDateBegin;
       queryParam.createDateEnd = this.createDateEnd;
       const params = Object.assign({ page: this[tableName].pagerConfig.currentPage, rows: this[tableName].pagerConfig.pageSize }, queryParam);
-      this.$api.peptide.getOrder(params).then((data) => {
+      this.$api.peptideorder.getOrder(params).then((data) => {
         this[tableName].tableData = data.rows;
         this[tableName].pagerConfig.total = data.total;
         this[tableName].pagerConfig.currentPage = params.page;

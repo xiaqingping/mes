@@ -1,4 +1,4 @@
-import { peptide } from '@/api';
+import { peptideBase } from '@/api';
 
 export default {
   namespaced: true,
@@ -93,7 +93,7 @@ export default {
   actions: {
     getCache (context, payload = { type: null }) {
       const methods = {
-        purity: peptide.getPurityAll
+        purity: peptideBase.getPurityAll
       };
       const { type } = payload;
       // 如果存在type则只获取type对应的数据，否则获取全部数据

@@ -165,7 +165,7 @@ export default {
       const queryParam = this.form.getFieldsValue();
       const params = Object.assign({ page: this[tableName].pagerConfig.currentPage, rows: this[tableName].pagerConfig.pageSize }, queryParam);
 
-      this.$api.peptide.getModificationTypes(params).then((data) => {
+      this.$api.peptideBase.getModificationTypes(params).then((data) => {
         this[tableName].tableData = data.rows;
         this[tableName].pagerConfig.total = data.total;
         this[tableName].pagerConfig.currentPage = params.page;
@@ -200,14 +200,14 @@ export default {
         data = r;
       }
       data.modificationType = this.modificationType;
-      this.$api.peptide.insertModificationTypes(data).then(res => {
+      this.$api.peptideBase.insertModificationTypes(data).then(res => {
         if (res.id) {
           this.handleExit();
         }
       });
     },
     handleDelete ({ row }) {
-      this.$api.peptide.deleteModificationTypes(row.id).then(res => {
+      this.$api.peptideBase.deleteModificationTypes(row.id).then(res => {
         this.handleSearch();
       });
     },
@@ -226,7 +226,7 @@ export default {
         });
         return false;
       }
-      this.$api.peptide.resumeModificationTypes(row.id).then(res => {
+      this.$api.peptideBase.resumeModificationTypes(row.id).then(res => {
         this.handleSearch();
       });
     }

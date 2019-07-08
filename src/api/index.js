@@ -20,7 +20,8 @@ import seqorder from './seqorder';
 import synthorder from './synthorder';
 import series from './series';
 import user from './user';
-import peptide from './peptide';
+import peptideBase from './peptide-base';
+import peptideorder from './peptideorder';
 import pay from './pay';
 import system from './system';
 
@@ -47,7 +48,8 @@ export default {
   synthorder,
   series,
   user,
-  peptide,
+  peptideBase,
+  peptideorder,
   pay,
   system
 };
@@ -75,7 +77,8 @@ export {
   series,
   synthorder,
   user,
-  peptide,
+  peptideBase,
+  peptideorder,
   pay,
   system
 };
