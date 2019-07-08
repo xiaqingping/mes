@@ -47,7 +47,7 @@
 
 <script>
 export default {
-  name: 'SystemUser',
+  name: 'SystemSources',
   components: {
   },
   data () {
@@ -56,7 +56,6 @@ export default {
 
       carrierTable: {
         ref: 'carrierTable',
-        xTable: null,
         loading: false,
         tableData: [],
         data: [],
@@ -89,10 +88,6 @@ export default {
         { title: '描述', field: 'desc' },
         { title: 'type', field: 'type' }
       ];
-
-      columns.forEach(function (e) {
-        if (!e.width) e.width = 375;
-      });
 
       this[tableName].columns = columns;
     },
