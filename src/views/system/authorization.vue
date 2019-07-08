@@ -34,6 +34,7 @@
         <vxe-grid
           highlight-hover-row
           auto-resize
+          height="570"
           :ref="authorizationTable.ref"
           :loading="authorizationTable.loading"
           :columns="authorizationTable.columns"
@@ -59,6 +60,7 @@
         <vxe-grid
           highlight-hover-row
           auto-resize
+          height="570"
           :ref="clientTable.ref"
           :loading="clientTable.loading"
           :columns="clientTable.columns"
@@ -75,7 +77,7 @@
         <span style="line-height:32px;">明细</span>
         <div class="table-operator">
           <a-button-group>
-            <!-- <a-button icon="search">查询</a-button> -->
+            <a-button icon="search">查询</a-button>
             <!-- <a-button icon="search" @click="handleSearchToClient">查询</a-button> -->
             <!-- <a-button icon="plus" type="primary" @click="handleAddRowToClient">新建</a-button> -->
           </a-button-group>
@@ -84,6 +86,7 @@
         <vxe-grid
           highlight-hover-row
           auto-resize
+          height="570"
           :ref="groupRuleTable.ref"
           :loading="groupRuleTable.loading"
           :columns="groupRuleTable.columns"
@@ -142,11 +145,6 @@ export default {
         loading: false,
         tableData: [],
         columns: [],
-        pagerConfig: {
-          currentPage: 1,
-          pageSize: 10,
-          total: 0
-        },
         editRules: {}
       },
       // 明细
@@ -159,9 +157,6 @@ export default {
         columns: [],
         editRules: {}
       }
-
-      //   const params = this.loadDataIdOne;
-      //   return this.$api.system.getGroupRulesList(params).then(res => {
     };
   },
   mounted () {
@@ -321,26 +316,6 @@ export default {
       this[tableName].columns = columns;
       this[tableName].xTable = this.$refs[this[tableName].ref].$refs.xTable;
     },
-    // 清空
-    handleRefresh () {
-      const tableName = 'clientTable';
-      this[tableName].loading = true;
-      const { currentPage, pageSize } = this[tableName].pagerConfig;
-
-      const queryParam = this.form.getFieldsValue();
-      const params = Object.assign({ page: currentPage, rows: pageSize }, queryParam);
-
-      this.$api.system.getGrouprulesList(params).then((data) => {
-        this[tableName].tableData = data.rows;
-        this[tableName].pagerConfig.total = data.total;
-        this[tableName].pagerConfig.currentPage = params.page;
-        this[tableName].pagerConfig.pageSize = params.rows;
-
-        this[tableName].editIndex = -1;
-      }).finally(() => {
-        this[tableName].loading = false;
-      });
-    },
     // 点击载体表格时
     handleCellClickToClient ({ row }) {
       // console.log(row);
@@ -355,13 +330,6 @@ export default {
       }).finally(() => {
         this[tableName].loading = false;
       });
-    },
-    // 分页改变时
-    pagerChangeToGroupRule ({ pageSize, currentPage }) {
-      // alert(1);
-      const tableName = 'clientTable';
-      this[tableName].pagerConfig = Object.assign(this[tableName].pagerConfig, { pageSize, currentPage });
-      this.handleRefresh();
     },
 
     /**

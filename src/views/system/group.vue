@@ -26,6 +26,7 @@
         <vxe-grid
           highlight-hover-row
           auto-resize
+          height="570"
           :ref="groupTable.ref"
           :loading="groupTable.loading"
           :columns="groupTable.columns"
@@ -51,6 +52,7 @@
         <vxe-grid
           highlight-hover-row
           auto-resize
+          height="570"
           :ref="groupRuleTable.ref"
           :loading="groupRuleTable.loading"
           :columns="groupRuleTable.columns"

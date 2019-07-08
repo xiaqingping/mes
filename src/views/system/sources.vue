@@ -38,8 +38,7 @@
       :pager-config="carrierTable.pagerConfig"
       :data.sync="carrierTable.tableData"
       :edit-config="{key: 'id', trigger: 'manual', mode: 'row', showIcon: false, autoClear: false}"
-      @current-page-change="(currentPage) => pagerChange({type: 'currentPage', value: currentPage})"
-      @page-size-change="(pageSize) => pagerChange({type: 'pageSize', value: pageSize})"
+      @page-change="pagerChange"
     >
     </vxe-grid>
 
@@ -57,7 +56,9 @@ export default {
 
       carrierTable: {
         ref: 'carrierTable',
+        xTable: null,
         loading: false,
+        tableData: [],
         data: [],
         columns: [],
         pagerConfig: {
@@ -83,10 +84,10 @@ export default {
 
       const columns = [
         { width: 40, type: 'index' },
-        { label: 'client', prop: 'client' },
-        { label: 'path', prop: 'path' },
-        { label: '描述', prop: 'desc' },
-        { label: 'type', prop: 'type' }
+        { title: 'client', field: 'client' },
+        { title: 'path', field: 'path' },
+        { title: '描述', field: 'desc' },
+        { title: 'type', field: 'type' }
       ];
 
       columns.forEach(function (e) {
@@ -114,7 +115,7 @@ export default {
     },
     // 分页改变时
     pagerChange (change) {
-      const tableName = 'carrierTable';
+      const tableName = 'ruleTable';
       this[tableName].pagerConfig = Object.assign(this[tableName].pagerConfig, change);
       this.handleSearch();
     }
