@@ -87,17 +87,6 @@
       </a-layout-content>
     </a-layout>
     <div class="content-center" style="position: relative;height:100%;">
-      <!-- <div class="table-operator">
-        <a-button-group>
-          <a-button icon="search" @click="handleSearch">查询</a-button>
-          <a-button icon="plus" @click="handleAddRow">新建</a-button>
-          <a-upload :multiple="true" :fileList="fileList" @change="handleChange">
-            <a-button type="primary" icon="file-excel">
-              <a-icon type="primary" icon="file-excel"/>上传
-            </a-button>
-          </a-upload>
-        </a-button-group>
-      </div> -->
       <!-- 表格 -->
       <!-- <vxe-grid
         highlight-hover-row
@@ -265,16 +254,29 @@ export default {
     },
     // 新增
     handleAddRow () {
+      // const tableName = 'payTable';
+      // if (this[tableName].editIndex !== -1) return this.$message.warning('请保存或退出正在编辑的行');
+      // const table = this[tableName].xTable;
+      // const newData = {
+      //   id: --this[tableName].id
+      // };
+
+      // this[tableName].tableData = [newData, ...this[tableName].tableData];
+      // table.setActiveRow(newData);
+      // this[tableName].editIndex = 0;
       const tableName = 'payTable';
-      if (this[tableName].editIndex !== -1) return this.$message.warning('请保存或退出正在编辑的行');
       const table = this[tableName].xTable;
+
+      const active = table.getActiveRow();
+      if (active && active.row) return this.$message.warning('请保存或退出正在编辑的行');
+
       const newData = {
         id: --this[tableName].id
       };
 
-      this[tableName].tableData = [newData, ...this[tableName].tableData];
-      table.setActiveRow(newData);
-      this[tableName].editIndex = 0;
+      table.insert(newData).then(({ row }) => {
+        table.setActiveRow(row);
+      });
     },
     // 删除
     handleCancel ({ row }) {
