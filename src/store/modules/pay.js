@@ -14,11 +14,11 @@ export default {
       { id: 4, name: '代缴项目' }
     ],
     year: [
-      { id: 1, name: '2019' },
-      { id: 2, name: '2018' },
-      { id: 3, name: '2017' },
-      { id: 4, name: '2016' },
-      { id: 5, name: '2015' }
+      { id: 2019, name: '2019' },
+      { id: 2018, name: '2018' },
+      { id: 2017, name: '2017' },
+      { id: 2016, name: '2016' },
+      { id: 2015, name: '2015' }
     ],
     month: [
       { id: 1, name: '1' },

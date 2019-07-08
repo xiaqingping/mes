@@ -59,7 +59,7 @@
 <script>
 
 export default {
-  name: 'PayrollMangement',
+  // name: 'payrollTable',
   components: {},
   data () {
     return {
@@ -91,7 +91,7 @@ export default {
     // 设置表格列属性
     setColumn () {
       const tableName = 'payrollTable';
-      const { formatter } = this.$units;
+      const { formatter } = this.$utils;
       const { pay } = this.$store.state;
 
       const columns = [
