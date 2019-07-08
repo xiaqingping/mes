@@ -25,6 +25,11 @@ npm run lint
 [Ant-design-vue](https://vue.ant.design/docs/vue/introduce-cn/)  
 [vxe-table](https://xuliangzhan_admin.gitee.io/vxe-table/)
 
+## 命名规范
+* `/src/store/modules` 全局数据文件夹下文件命名，比如我负责测序模块（seq），那么你的全局数据文件必须命名为 `seq.js`，每一个大模块为一个文件。
+* `/src/api` 接口文件夹下的文件命名，根据后台接口微服务命名，一个微服务为一个文件，多个不同的服务不要放到同一个文件内。比如 `basic` 服务，就是 `basic.js`。
+* 每一个 `.vue` 单文件组件，`name` 属性的值为：此文件所在的文件夹名称 + 此文件名。如： `/src/seq/sample` 为 `SeqSample`；如果文件名里已经包含了文件夹名称，则不用重复写文件夹名称，如 `/src/seq/seqtype` 为 `SeqType`。
+
 ## 环境变量设置
 这里涉及到 [vue-cli](https://cli.vuejs.org/zh/guide/mode-and-env.html)，请查看文档。
 示例文件：`.env.development.local`，格式 `name=value`，下面示例中的注释，不可写入此文件中。
