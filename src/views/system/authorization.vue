@@ -18,276 +18,392 @@
         <a-button type="primary" icon="search" html-type="submit" style="display:none;">查询</a-button>
       </a-form>
     </div>
+
     <!-- 中间内容 -->
-    <div>
-      <a-row :gutter="0">
-        <a-col :span="6">
-          <a-card title="员工列表">
-            <div class="table-operator">
-              <a-button-group>
-                <a-button type="primary" size="small" icon="search" @click="handleSearch">查询</a-button>
-                <a-button type="primary" size="small" icon="plus" @click="handleIncrease(4)" id="add">新建</a-button>
-                <a-button type="primary" size="small" icon="delete">删除</a-button>
-                <a-button type="primary" size="small" icon="save">保存</a-button>
-              </a-button-group>
-            </div>
 
-            <s-table
-              style="height:500px"
-              ref="table"
-              size="small"
-              bordered
-              :scroll="{ x: 600, y: 400 }"
-              :columns="columns"
-              :data="loadData"
-              :rowSelection="{ selectedRowKeys: selectedRowKeys, onChange: onSelectChange }"
-            >
-            </s-table>
-          </a-card>
-        </a-col>
-        <a-col :span="5">
-          <a-card title="用户权限明细">
-            <div class="table-operator">
-              <a-button-group>
-                <a-button type="primary" size="small" icon="redo">刷新</a-button>
-                <a-button type="primary" size="small" icon="plus">新建</a-button>
-                <a-button type="primary" size="small" icon="delete">删除</a-button>
-                <a-button type="primary" size="small" icon="save">保存</a-button>
-              </a-button-group>
-            </div>
+    <a-layout>
+      <a-layout-content>
+        <span style="line-height:32px;">员工列表</span>
+        <div class="table-operator">
+          <a-button-group>
+            <a-button icon="search" @click="handleSearch">查询</a-button>
+            <a-button icon="plus" type="primary" @click="handleAddRow">新建</a-button>
+          </a-button-group>
+        </div>
 
-            <s-table
-              style="height:500px"
-              ref="table1"
-              size="small"
-              bordered
-              :scroll="{ x: 300, y: 400 }"
-              :columns="columnOne"
-              :data="loadDataOne"
-              :rowSelection="{ selectedRowKeys: selectedRowKeyOne, onChange: onSelectChangeOne }"
-            >
-            </s-table>
-          </a-card>
-        </a-col>
-        <a-col :span="13">
-          <a-card title="明细" >
-            <s-table
-              style="height:523px"
-              ref="table2"
-              size="small"
-              bordered
-              :scroll="{ x: 1500, y: 424 }"
-              :columns="columnTwo"
-              :data="loadDataTwo"
-              :rowSelection="{ selectedRowKeys: selectedRowKeyTwo, onChange: onSelectChangeTwo }"
-            >
-            </s-table>
-          </a-card>
-        </a-col>
-      </a-row>
-    </div>
+        <vxe-grid
+          highlight-hover-row
+          auto-resize
+          height="570"
+          :ref="authorizationTable.ref"
+          :loading="authorizationTable.loading"
+          :columns="authorizationTable.columns"
+          :pager-config="authorizationTable.pagerConfig"
+          :data.sync="authorizationTable.tableData"
+          :edit-rules="authorizationTable.editRules"
+          :edit-config="{key: 'id', trigger: 'manual', mode: 'row', showIcon: false, autoClear: false}"
+          @cell-click="(options) => handleCellClick(options)"
+          @page-change="pagerChange">
+        </vxe-grid>
+      </a-layout-content>
 
-    <authorization-mask v-show="authorization_status" @Closed="closeMask()">
-    </authorization-mask>
+      <a-layout-sider width="20%">
+        <span style="line-height:32px;">用户权限明细</span>
+        <div class="table-operator">
+          <a-button-group>
+            <a-button icon="search">查询</a-button>
+            <!-- <a-button icon="search" @click="handleSearchToClient">查询</a-button> -->
+            <!-- <a-button icon="plus" type="primary" @click="handleAddRowToClient">新建</a-button> -->
+          </a-button-group>
+        </div>
+
+        <vxe-grid
+          highlight-hover-row
+          auto-resize
+          height="570"
+          :ref="clientTable.ref"
+          :loading="clientTable.loading"
+          :columns="clientTable.columns"
+          :pager-config="clientTable.pagerConfig"
+          :data.sync="clientTable.tableData"
+          :edit-rules="clientTable.editRules"
+          :edit-config="{key: 'id', trigger: 'manual', mode: 'row', showIcon: false, autoClear: false}"
+          @cell-click="(options) => handleCellClickToClient(options)"
+          @page-change="pagerChangeToGroupRule">
+        </vxe-grid>
+      </a-layout-sider>
+
+      <a-layout-sider width="50%">
+        <span style="line-height:32px;">明细</span>
+        <div class="table-operator">
+          <a-button-group>
+            <a-button icon="search">查询</a-button>
+            <!-- <a-button icon="search" @click="handleSearchToClient">查询</a-button> -->
+            <!-- <a-button icon="plus" type="primary" @click="handleAddRowToClient">新建</a-button> -->
+          </a-button-group>
+        </div>
+
+        <vxe-grid
+          highlight-hover-row
+          auto-resize
+          height="570"
+          :ref="groupRuleTable.ref"
+          :loading="groupRuleTable.loading"
+          :columns="groupRuleTable.columns"
+          :data.sync="groupRuleTable.tableData"
+          :edit-rules="groupRuleTable.editRules"
+          :edit-config="{key: 'id', trigger: 'manual', mode: 'row', showIcon: false, autoClear: false}">
+        </vxe-grid>
+      </a-layout-sider>
+    </a-layout>
+
+    <!-- <authorization-mask v-show="authorization_status" @Closed="closeMask()">
+    </authorization-mask> -->
 
   </div>
 </template>
 
 <script>
-import STable from '@/components/Table';
-import AuthorizationMask from '@/components/system/authorization_mask';
+// import AuthorizationMask from '@/components/system/authorization_mask';
 
 export default {
   name: 'SystemAuthorization',
   components: {
-    STable,
-    AuthorizationMask
+    // AuthorizationMask
   },
   data () {
     return {
       form: this.$form.createForm(this),
-      authorization_status: false,
+      // authorization_status: false,
+      clickStatus: null,
+
       // 员工列表
-      columns: [
-        { title: 'ID', dataIndex: 'code', width: '50%' },
-        { title: '姓名', dataIndex: 'name', width: '20%' },
-        { title: '员工号', dataIndex: 'employeeCode' }
-      ],
-      queryParam: {},
-      loadData: parameter => {
-        const params = Object.assign(parameter, this.queryParam);
-        return this.$api.system.getDataAuthList(params).then(res => {
-          // console.log(res.rows);
-          return {
-            data: res.rows,
-            page: params.page,
-            total: res.total
-          };
-        });
-      },
-      selectedRowKeys: [],
-      selectedRows: [],
-
-      // 用户权限明细
-      columnOne: [
-        {
-          title: '类型',
-          dataIndex: 'ruleType',
-          width: '30%',
-          customRender: function (value) {
-            if (value === 1) {
-              return '规则';
-            } else if (value === 2) {
-              return '分组';
-            }
-          }
+      authorizationTable: {
+        id: 0,
+        ref: 'authorizationTable',
+        xTable: null,
+        editIndex: -1,
+        loading: false,
+        tableData: [],
+        columns: [],
+        pagerConfig: {
+          currentPage: 1,
+          pageSize: 10,
+          total: 0
         },
-        { title: '权限', dataIndex: 'ruleName' }
-      ],
-      queryParamOne: {},
-      loadDataOne: parameter => {
-        const params = this.loadDataId;
-        return this.$api.system.getAuthorityList(params).then(res => {
-          return {
-            data: res,
-            page: params.page,
-            total: res.total
-          };
-        });
+        editRules: {
+          // name: [
+          //   { required: true, message: '名称必填' }
+          // ]
+        }
       },
-      selectedRowKeyOne: [],
-      selectedRowOne: [],
-      loadDataId: 0,
-
+      // 用户权限明细
+      clientTable: {
+        id: 0,
+        ref: 'clientTable',
+        xTable: null,
+        loading: false,
+        tableData: [],
+        columns: [],
+        editRules: {}
+      },
       // 明细
-      columnTwo: [
-        { title: '名称', dataIndex: 'name', width: '13%' },
-        { title: 'Client', dataIndex: 'sourceClient', width: '6%' },
-        { title: 'Type', dataIndex: 'sourceType', width: '5%' },
-        { title: '资源', dataIndex: 'sourcePath', width: '10%' },
-        { title: '资源描述', dataIndex: 'sourceDesc', width: '12%' },
-        { title: '类型参数', dataIndex: 'paramType', width: '8%' },
-        { title: '参数', dataIndex: 'parameterField', width: '8%' },
-        { title: '参数描述', dataIndex: 'parameterDesc', width: '8%' },
-        { title: 'OP', dataIndex: 'op', width: '5%' },
-        { title: '值', dataIndex: 'value', width: '6%' },
-        { title: '状态', dataIndex: 'status' }
-      ],
-      queryParamTwo: {},
-      loadDataTwo: parameter => {
-        const params = this.loadDataIdOne;
-        return this.$api.system.getGroupRulesList(params).then(res => {
-          // console.log(res.rows);
-          console.log(this.loadDataIdOne);
-          return {
-            data: res.rows,
-            page: params.page,
-            total: res.total
-          };
-        });
-      },
-      selectedRowKeyTwo: [],
-      selectedRowTwo: [],
-      loadDataIdOne: 10
+      groupRuleTable: {
+        id: 0,
+        ref: 'groupRuleTable',
+        xTable: null,
+        loading: false,
+        tableData: [],
+        columns: [],
+        editRules: {}
+      }
     };
   },
-  watch: {
-    loadDataId: function () {
-      this.$refs.table1.refresh(true);
-    },
-    loadDataOneId: function () {
-      this.$refs.table2.refresh(true);
-    }
-  },
   mounted () {
-    var selectDrop = document.getElementsByClassName('ant-checkbox')[0];
-    selectDrop.style.display = 'none';
-    var selectDropOne = document.getElementsByClassName('ant-checkbox')[1];
-    selectDropOne.style.display = 'none';
-    var selectDropTwo = document.getElementsByClassName('ant-checkbox')[2];
-    selectDropTwo.style.display = 'none';
+    // 员工列表
+    this.setColumn();
+    this.handleSearch();
+    // 用户权限明细
+    this.setColumnToClient();
+    // 明细
+    this.setColumnToGrounpRules();
   },
   methods: {
-    // 模态框展示
-    showDrawer () {
-      this.visible = true;
-    },
-    onClose () {
-      this.visible = false;
-    },
-    // 员工列表
-    onSelectChange (selectedRowKeys, selectedRows) {
-      this.selectedRowKeys = selectedRowKeys.slice(-1);
-      this.selectedRows = selectedRows.slice(-1);
-      this.loadDataId = this.selectedRowKeys[0];
-    },
-    // 新增
-    handleIncrease (num) {
-      var self = this;
-      document.getElementById('add').setAttribute('disabled', true);
-      var tbodyObj = document.getElementsByTagName('tbody')[0];
-      var trObj = document.createElement('tr');
-      for (let i = 0; i < num; i++) {
-        var tdObj = document.createElement('td');
-        tdObj.style.padding = '0';
-        if (i === 1) {
-          tdObj.innerHTML = "<div style='position: relative;width: 100%;height: 100%'><input type='text' readonly title='该输入项为必输入项' id='addValue" + i + "' style='width: 100%;height: 100%;border: 1px solid #FFA8A8;outline: none;background-color: #FFF3F3;'/><span class='iconfont icon-suosou' id='openMask' style='position: absolute;right:0;top:0;cursor:pointer;font-weight:bold;color:#8C8C8C'></span></div>";
-        } else if (i === 2 || i === 3) {
-          tdObj.innerHTML = "<input type='text' title='该输入项为必输入项' id='addValue" + i + "' style='width: 100%;height: 100%;border: 1px solid #FFA8A8;outline: none;background-color: #FFF3F3;'/>";
-        } else {
-          tdObj.style.textAlign = 'center';
-          tdObj.innerHTML = "<input type='checkbox' id='addValue" + i + "'/>";
+    /**
+     * 员工列表
+     */
+    // 设置列
+    setColumn () {
+      const tableName = 'authorizationTable';
+      const columns = [
+        { type: 'index', width: 40 },
+        { title: 'ID', field: 'code' },
+        { title: '姓名', field: 'name' },
+        { title: '员工号', field: 'employeeCode' },
+        {
+          title: '操作',
+          field: 'actions',
+          fixed: 'right',
+          slots: {
+            default: ({ row, rowIndex }) => {
+              let actions = [];
+              const xTable = this[tableName].xTable;
+              const isEdit = xTable.hasActiveRow(row);
+              const options = { row, rowIndex, tableName, xTable };
+              actions = [
+                <a onClick={() => this.handleCancel(options)}>删除</a>
+              ];
+              if (isEdit) {
+                actions = [
+                  <a onClick={() => this.handleSave(options) }>保存</a>,
+                  <a onClick={() => this.handleQuitEdit(options) }>退出</a>
+                ];
+              }
+              return [
+                <span class="table-actions" onClick={(event) => event.stopPropagation()}>
+                  {actions}
+                </span>
+              ];
+            }
+          }
         }
-        trObj.appendChild(tdObj);
-      }
-      tbodyObj.insertBefore(trObj, tbodyObj.firstElementChild);
-      this.$nextTick(() => {
-        document.getElementById('openMask').onmouseover = function () {
-          this.style.color = 'black';
-        };
-        document.getElementById('openMask').onmouseout = function () {
-          this.style.color = '#8C8C8C';
-        };
-        document.getElementById('openMask').onclick = function () {
-          self.openMask();
-        };
+      ];
+
+      columns.forEach(function (e) {
+        if (!e.width) e.width = 100;
+      });
+      this[tableName].columns = columns;
+      this[tableName].xTable = this.$refs[this[tableName].ref].$refs.xTable;
+    },
+    // 查询
+    handleSearch (e) {
+      if (e) e.preventDefault();
+      const tableName = 'authorizationTable';
+      this[tableName].loading = true;
+
+      const queryParam = this.form.getFieldsValue();
+      const params = Object.assign({ page: this[tableName].pagerConfig.currentPage, rows: this[tableName].pagerConfig.pageSize }, queryParam);
+
+      this.$api.system.getDataAuthList(params, true).then((data) => {
+        this[tableName].tableData = data.rows;
+        this[tableName].pagerConfig.total = data.total;
+        this[tableName].pagerConfig.currentPage = params.page;
+        this[tableName].pagerConfig.pageSize = params.rows;
+
+        this[tableName].editIndex = -1;
+      }).finally(() => {
+        this[tableName].loading = false;
       });
     },
-    openMask () {
-      this.authorization_status = true;
+    // 新增一可编辑行
+    handleAddRow () {
+      alert(123);
+      const tableName = 'authorizationTable';
+      if (this[tableName].editIndex !== -1) return this.$message.warning('请保存或退出正在编辑的行');
+
+      const table = this[tableName].xTable;
+      const newData = {
+        id: --this[tableName].id
+      };
+
+      this[tableName].tableData = [newData, ...this[tableName].tableData];
+      table.setActiveRow(newData);
+      this[tableName].editIndex = 0;
     },
-    closeMask () {
-      this.authorization_status = false;
+    // 分页改变时
+    pagerChange ({ pageSize, currentPage }) {
+      const tableName = 'authorizationTable';
+      this[tableName].pagerConfig = Object.assign(this[tableName].pagerConfig, { pageSize, currentPage });
+      this.handleSearch();
+    },
+    // 点击载体表格时
+    handleCellClick ({ row }) {
+      const tableName = 'clientTable';
+      if (!row.id || row.id < 0) {
+        this[tableName].tableData = [];
+        return;
+      }
+      this[tableName].loading = true;
+      this.$api.system.getAuthorityList(row.id).then(res => {
+        this[tableName].tableData = res;
+        // this.$options.methods.handleRefresh();
+      }).finally(() => {
+        this[tableName].loading = false;
+      });
     },
 
-    // 用户权限明细
-    onSelectChangeOne (selectedRowKeyOne, selectedRowOne) {
-      this.selectedRowKeyOne = selectedRowKeyOne.slice(-1);
-      this.selectedRowOne = selectedRowOne.slice(-1);
-      // this.loadDataIdOne = this.selectedRowOne[0]['ruleId'];
-      this.loadDataIdOne = this.selectedRowKeyOne[0];
-      // console.log(this.loadDataIdOne);
+    /**
+     * 用户权限明细
+     */
+    // 设置列 - 用户权限明细
+    setColumnToClient () {
+      const tableName = 'clientTable';
+      const { formatter } = this.$utils;
+      const { system } = this.$store.state;
+      const columns = [
+        { type: 'index', width: 40 },
+        { title: '类型', field: 'ruleType', formatter: function ({ cellValue }) { return formatter(system.ruleType, cellValue); } },
+        { title: '权限', field: 'ruleName' },
+        {
+          title: '操作',
+          field: 'actions',
+          slots: {
+            default: ({ row, rowIndex }) => {
+              let actions = [];
+              const xTable = this[tableName].xTable;
+              const isEdit = xTable.hasActiveRow(row);
+              const options = { row, rowIndex, tableName, xTable };
+              if (!isEdit) {
+                actions = [
+                  <a onClick={() => this.handleCancel(options)}>删除</a>
+                ];
+              } else {
+                actions = [
+                  <a onClick={() => this.handleSave(options) }>保存</a>,
+                  <a onClick={() => this.handleQuitEdit(options) }>退出</a>
+                ];
+              }
+              return [
+                <span class="table-actions">
+                  {actions}
+                </span>
+              ];
+            }
+          }
+        }
+      ];
+
+      this[tableName].columns = columns;
+      this[tableName].xTable = this.$refs[this[tableName].ref].$refs.xTable;
+    },
+    // 点击载体表格时
+    handleCellClickToClient ({ row }) {
+      // console.log(row);
+      const tableName = 'groupRuleTable';
+      if (!row.id || row.id < 0) {
+        this[tableName].tableData = [];
+        return;
+      }
+      this[tableName].loading = true;
+      this.$api.system.getGrouprulesList(row.ruleId).then(res => {
+        this[tableName].tableData = res.rows;
+      }).finally(() => {
+        this[tableName].loading = false;
+      });
     },
 
-    // 明细
-    onSelectChangeTwo (selectedRowKeyTwo, selectedRowTwo) {
-      this.selectedRowKeyTwo = selectedRowKeyTwo.slice(-1);
-      this.selectedRowTwo = selectedRowTwo.slice(-1);
-      // console.log(selectedRowTwo);
+    /**
+     * 明细
+     */
+    // 设置列 - 明细
+    setColumnToGrounpRules () {
+      const tableName = 'groupRuleTable';
+      const { formatter } = this.$utils;
+      const { system } = this.$store.state;
+      const columns = [
+        { type: 'index', width: 40 },
+        { title: '名称', field: 'name' },
+        { title: 'Client', field: 'sourceClient' },
+        { title: 'Type', field: 'sourceType' },
+        { title: '资源', field: 'sourcePath' },
+        { title: '资源描述', field: 'sourceDesc' },
+        { title: '类型参数', field: 'paramType', formatter: function ({ cellValue }) { return formatter(system.paramType, cellValue); } },
+        { title: '参数', field: 'parameterField' },
+        { title: '参数描述', field: 'parameterDesc' },
+        { title: 'OP', field: 'op' },
+        { title: '值', field: 'value' },
+        { title: '状态', field: 'status', formatter: function ({ cellValue }) { if (cellValue === 0) { cellValue = '0'; } return formatter(system.status, cellValue); } },
+        {
+          title: '操作',
+          field: 'actions',
+          slots: {
+            default: ({ row, rowIndex }) => {
+              let actions = [];
+              const xTable = this[tableName].xTable;
+              const isEdit = xTable.hasActiveRow(row);
+              const options = { row, rowIndex, tableName, xTable };
+              if (!isEdit) {
+                actions = [
+                  <a onClick={() => this.handleCancel(options)}>删除</a>
+                ];
+              } else {
+                actions = [
+                  <a onClick={() => this.handleSave(options) }>保存</a>,
+                  <a onClick={() => this.handleQuitEdit(options) }>退出</a>
+                ];
+              }
+              return [
+                <span class="table-actions">
+                  {actions}
+                </span>
+              ];
+            }
+          }
+        }
+      ];
+
+      this[tableName].columns = columns;
+
+      this[tableName].xTable = this.$refs[this[tableName].ref].$refs.xTable;
     },
+    // 模态框展示
+    // showDrawer () {
+    //   this.visible = true;
+    // },
+    // onClose () {
+    //   this.visible = false;
+    // },
+
+    // openMask () {
+    //   this.authorization_status = true;
+    // },
+    // closeMask () {
+    //   this.authorization_status = false;
+    // },
 
     toggleAdvanced () {
       this.advanced = !this.advanced;
-    },
-    handleSearch () {
-      this.$refs.table.refresh(true);
     }
   }
 };
 </script>
-
-<style lang="scss" scoped>
-.ant-card-body{
-  padding: 3px
-}
-</style>

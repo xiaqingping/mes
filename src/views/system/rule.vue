@@ -22,6 +22,7 @@
             <a-col :xxl="4" :xl="6" :md="8" :sm="24">
               <a-form-item label="Type">
                 <a-select v-decorator="['sourceType']">
+                  <a-select-option value="">全部</a-select-option>
                   <a-select-option v-for="item in type" :key="item.id" :value="item.id">{{ item.name }}</a-select-option>
                 </a-select>
               </a-form-item>
@@ -34,6 +35,7 @@
             <a-col :xxl="4" :xl="6" :md="8" :sm="24">
               <a-form-item label="参数类型">
                 <a-select v-decorator="['paramType']">
+                  <a-select-option value="">全部</a-select-option>
                   <a-select-option v-for="item in paramType" :key="item.id" :value="item.id">{{ item.name }}</a-select-option>
                 </a-select>
               </a-form-item>
@@ -56,9 +58,7 @@
     <div class="table-operator">
       <a-button-group>
         <a-button icon="search" @click="handleSearch">查询</a-button>
-        <a-button type="primary" icon="plus" @click="addTr(11)" id="add">新建</a-button>
-        <!-- <a-button type="primary" icon="delete" @click="addData">删除</a-button> -->
-        <!-- <a-button type="primary" icon="save">保存</a-button> -->
+        <a-button type="primary" icon="plus" @click="handleAddRow">新建</a-button>
       </a-button-group>
       <a @click="toggleAdvanced" style="margin-left: 8px">
         {{ advanced ? '收起' : '展开' }}
@@ -69,15 +69,14 @@
     <vxe-grid
       highlight-hover-row
       auto-resize
-      :ref="carrierTable.ref"
-      :loading="carrierTable.loading"
-      :columns="carrierTable.columns"
-      :pager-config="carrierTable.pagerConfig"
-      :data.sync="carrierTable.tableData"
-
+      :ref="ruleTable.ref"
+      :loading="ruleTable.loading"
+      :columns="ruleTable.columns"
+      :pager-config="ruleTable.pagerConfig"
+      :data.sync="ruleTable.tableData"
+      :edit-rules="ruleTable.editRules"
       :edit-config="{key: 'id', trigger: 'manual', mode: 'row', showIcon: false, autoClear: false}"
-      @current-page-change="(currentPage) => pagerChange({type: 'currentPage', value: currentPage})"
-      @page-size-change="(pageSize) => pagerChange({type: 'pageSize', value: pageSize})"
+      @page-change="pagerChange"
     >
     </vxe-grid>
 
@@ -86,7 +85,7 @@
 
 <script>
 export default {
-  name: 'SystemUser',
+  name: 'SystemRule',
   components: {
   },
   data () {
@@ -96,17 +95,24 @@ export default {
       type: [],
       paramType: [],
       status: [],
+      queryParam: {},
 
-      carrierTable: {
-        ref: 'carrierTable',
+      ruleTable: {
+        id: 0,
+        ref: 'ruleTable',
+        xTable: null,
         loading: false,
-        data: [],
+        tableData: [],
         columns: [],
-        // editRules: {},
         pagerConfig: {
           currentPage: 1,
           pageSize: 10,
           total: 0
+        },
+        editRules: {
+          name: [
+            { required: true, message: '规则名称必填' }
+          ]
         }
       }
     };
@@ -123,63 +129,77 @@ export default {
   methods: {
     // 设置表格列属性
     setColumn () {
-      const tableName = 'carrierTable';
+      const tableName = 'ruleTable';
+      const { formatter } = this.$utils;
+      const { system } = this.$store.state;
+
       const columns = [
         { width: 40, type: 'index' },
-        { label: '规则名称', prop: 'name' },
-        { label: 'Client', prop: 'sourceClient' },
-        { label: 'Type', prop: 'sourceType' },
-        { label: '资源', prop: 'sourcePath' },
-        { label: '资源描述', prop: 'sourceDesc' },
+        { title: '规则名称', field: 'name', editRender: { name: 'AInput' } },
+        { title: 'Client', field: 'sourceClient', editRender: { name: 'AInput', props: { disabled: true } } },
+        { title: 'Type', field: 'sourceType', editRender: { name: 'AInput', props: { disabled: true } } },
+        { title: '资源', field: 'sourcePath', editRender: { name: 'AInput' } },
+        { title: '资源描述', field: 'sourceDesc', editRender: { name: 'AInput', props: { disabled: true } } },
         {
-          label: '参数类型',
-          prop: 'paramType',
+          title: '参数类型',
+          field: 'paramType',
           formatter: function ({ cellValue }) {
-            if (cellValue === 1) {
-              return '参数';
-            } else if (cellValue === 2) {
-              return '属性';
-            } else if (cellValue === 3) {
-              return '接口';
-            }
+            return formatter(system.paramType, cellValue);
+          },
+          editRender: {
+            name: 'ASelect',
+            options: [
+              { value: 1, label: '参数' },
+              { value: 2, label: '属性' },
+              { value: 3, label: '接口' }
+            ]
           }
         },
-        { label: '参数', prop: 'parameterField' },
-        { label: '参数描述', prop: 'parameterDesc' },
-        { label: 'OP', prop: 'op' },
-        { label: '值', prop: 'value' },
+        { title: '参数', field: 'parameterField', editRender: { name: 'AInput', props: { disabled: true } } },
+        { title: '参数描述', field: 'parameterDesc', editRender: { name: 'AInput', props: { disabled: true } } },
+        { title: 'OP', field: 'op', editRender: { name: 'AInput', props: { value: 'eq' } } },
+        { title: '值', field: 'value' },
         {
-          label: '状态',
-          prop: 'status',
+          title: '状态',
+          field: 'status',
           formatter: function ({ cellValue }) {
             if (cellValue === 0) {
-              return '有效';
-            } else if (cellValue === 1) {
-              return '无效';
+              cellValue = '0';
+            }
+            return formatter(system.status, cellValue);
+          },
+          editRender: {
+            name: 'AInput',
+            field: {
+              disabled: true
             }
           }
         },
         {
-          label: '操作',
-          prop: 'actions',
+          title: '操作',
+          field: 'actions',
           fixed: 'right',
           slots: {
             default: ({ row, rowIndex }) => {
               let actions = [];
-              if (row.status === 0 && this.editIndex !== rowIndex) {
+              const xTable = this[tableName].xTable;
+              const isEdit = xTable.hasActiveRow(row);
+              const options = { row, rowIndex, tableName, xTable };
+
+              if (!isEdit && row.status === 0) {
                 actions = [
-                  <a onClick={() => this.handleCancel(row.id)}>删除</a>,
-                  <a onClick={() => this.handleUpdate(row, rowIndex)}>修改</a>
+                  <a onClick={() => this.handleCancel(options)}>删除</a>
+                  // <a onClick={() => this.handleUpdate(options)}>修改</a>
                 ];
               }
-              if (this.editIndex === rowIndex) {
+              if (isEdit) {
                 actions = [
-                  <a>保存</a>,
-                  <a onClick={() => this.handleQuitEdit(row, rowIndex)}>退出</a>
+                  <a onClick={() => this.handleSave(options) }>保存</a>,
+                  <a onClick={() => this.handleQuitEdit(options) }>退出</a>
                 ];
               }
               return [
-                <span class="table-actions">
+                <span class="table-actions" onClick={(event) => event.stopPropagation()}>
                   {actions}
                 </span>
               ];
@@ -193,65 +213,67 @@ export default {
       });
 
       this[tableName].columns = columns;
+
+      this[tableName].xTable = this.$refs[this[tableName].ref].$refs.xTable;
     },
     // 查询
-    handleSearch (params = {}) {
-      const tableName = 'carrierTable';
+    handleSearch (e) {
+      if (e) e.preventDefault();
+      const tableName = 'ruleTable';
       this[tableName].loading = true;
 
       const queryParam = this.form.getFieldsValue();
-      params = Object.assign({ page: this[tableName].pagerConfig.currentPage, rows: this[tableName].pagerConfig.pageSize }, params, queryParam);
+      const params = Object.assign({ page: this[tableName].pagerConfig.currentPage, rows: this[tableName].pagerConfig.pageSize }, queryParam);
 
       this.$api.system.getRulesList(params, true).then((data) => {
         this[tableName].tableData = data.rows;
         this[tableName].pagerConfig.total = data.total;
         this[tableName].pagerConfig.currentPage = params.page;
         this[tableName].pagerConfig.pageSize = params.rows;
+
+        this[tableName].editIndex = -1;
       }).finally(() => {
         this[tableName].loading = false;
       });
     },
+    // 新增一可编辑行
+    handleAddRow () {
+      const tableName = 'ruleTable';
+      if (this[tableName].editIndex !== -1) return this.$message.warning('请保存或退出正在编辑的行');
+
+      const table = this[tableName].xTable;
+      const newData = {
+        id: --this[tableName].id,
+        name: ''
+      };
+      this[tableName].tableData = [newData, ...this[tableName].tableData];
+      table.setActiveRow(newData);
+      this[tableName].editIndex = 0;
+    },
     // 分页改变时
     pagerChange (change) {
-      const tableName = 'carrierTable';
+      const tableName = 'ruleTable';
       this[tableName].pagerConfig = Object.assign(this[tableName].pagerConfig, change);
       this.handleSearch();
+    },
+    // 删除
+    handleCancel ({ row }) {
+      alert(row);
+      // this.$api.series.cancelSeries(row.id).then(() => {
+      //   this.handleSearch();
+      // });
+    },
+    // 退出编辑
+    handleQuitEdit ({ row, rowIndex, tableName, xTable }) {
+      xTable.clearActived();
+      if (!row.status) {
+        this[tableName].tableData.splice(rowIndex, 1);
+      }
     },
     // 搜索收起
     toggleAdvanced () {
       this.advanced = !this.advanced;
     }
-    // addTr (num) {
-    //   document.getElementById('add').setAttribute('disabled', true);
-    //   var tbodyObj = document.getElementsByTagName('tbody')[0];
-    //   var trObj = document.createElement('tr');
-    //   for (let i = 0; i < num; i++) {
-    //     var tdObj = document.createElement('td');
-    //     tdObj.style.padding = '0';
-    //     if (i === 1 || i === 5) {
-    //       tdObj.innerHTML = "<input type='text' title='该输入项为必输入项' id='addValue" + i + "' style='width: 100%;height: 100%;border: 1px solid #FFA8A8;outline: none;background-color: #FFF3F3;'/>";
-    //     } else if (i === 2 || i === 3 || i === 4) {
-    //       // tdObj.style.backgroundColor = 'blue';
-    //       // tdObj.style.textAlign = 'center';
-    //       // tdObj.innerHTML = "<input type='checkbox' id='addValue" + i + "'/>";
-    //       tdObj.innerHTML = "<input type='selected' value='' disabled style='width: 100%;border: none;text-align:center;background-color: white;' id='addValue" + i + "'/>";
-    //     } else if (i === 7 || i === 2 || i === 3 || i === 4) {
-    //       tdObj.innerHTML = "<input type='selected' value='' disabled style='width: 100%;border: none;text-align:center;background-color: white;' id='addValue" + i + "'/>";
-    //     } else if (i === 8 || i === 9) {
-    //       tdObj.innerHTML = "<input type='text' title='该输入项为必输入项' id='addValue" + i + "' style='width: 50%;height: 100%;border: 1px solid #FFA8A8;outline: none;background-color: #FFF3F3;'/><input type='text' title='该输入项为必输入项' id='addValue" + i + "' style='width: 50%;height: 100%;border: 1px solid #FFA8A8;outline: none;background-color: #FFF3F3;'/>";
-    //     } else if (i === 8 || i === 9) {
-    //       tdObj.style.textAlign = 'center';
-    //       tdObj.innerHTML = "<input type='radio' id='addValue" + i + "'/>";
-    //     } else if (i === 8 || i === 9) {
-    //       tdObj.innerHTML = "<input type='text' title='该输入项为必输入项' id='addValue" + i + "' style='width: 50%;height: 100%;border: 1px solid #FFA8A8;outline: none;background-color: #FFF3F3;'/><input type='text' title='该输入项为必输入项' id='addValue" + i + "' style='width: 50%;height: 100%;border: 1px solid #FFA8A8;outline: none;background-color: #FFF3F3;'/>";
-    //     } else {
-    //       tdObj.style.textAlign = 'center';
-    //       tdObj.innerHTML = "<input type='radio' id='addValue" + i + "'/>";
-    //     }
-    //     trObj.appendChild(tdObj);
-    //   }
-    //   tbodyObj.insertBefore(trObj, tbodyObj.firstElementChild);
-    // }
   }
 };
 </script>

@@ -197,6 +197,7 @@ export default {
     },
     // 保存功能
     handleSave (o) {
+      // console.log(o);
       if (o.row.purity === '') {
         this.$notification.error({
           message: '错误',
