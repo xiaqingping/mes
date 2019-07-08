@@ -89,39 +89,47 @@
         </a-form>
 
       </div>
-      <s-table
-        ref="table"
-        bordered
-        size="small"
-        :scroll="{ x: 1500, y: 400}"
-        :columns="columns"
-        :data="loadData"
-        :rowSelection="{ selectedRowKeys: selectedRowKeys, onChange: onSelectChange, type: 'radio'}"
-      >
-      </s-table>
+      <vxe-grid
+        highlight-hover-row
+        auto-resize
+        :ref="subCustomerMask.ref"
+        :columns="subCustomerMask.columns"
+        :data.sync="subCustomerMask.tableData"
+        :loading="subCustomerMask.loading"
+        :edit-rules="subCustomerMask.editRules"
+        :edit-config="{key: 'id', trigger: 'dblclick', mode: 'row', showIcon: false, autoClear: false}"
+        :pager-config="subCustomerMask.pagerConfig"
+        @cell-dblclick="(options) => handleCellDblclick(options)"
+        @page-change="pagerChange">
+        >
+      </vxe-grid>
     </div>
   </div>
 
 </template>
 
 <script>
-import STable from '@/components/Table';
+const tableName = 'subCustomerMask';
 
 export default {
-  name: 'CustomerMask',
-  // props: {
-  //   customerName: {
-  //     type: Boolean,
-  //     default: false
-  //   }
-  // },
-  components: {
-    STable
-  },
+  name: 'SubCustomerMask',
   data () {
-    // var self = this;
     return {
       form: this.$form.createForm(this),
+      subCustomerMask: {
+        id: 0,
+        ref: 'subCustomerMask',
+        xTable: null,
+        editIndex: -1,
+        loading: false,
+        tableData: [],
+        columns: [],
+        pagerConfig: {
+          currentPage: 1,
+          pageSize: 10,
+          total: 0
+        }
+      },
       small: true,
       customer_name_top: 0,
       customer_name_left: 0,
@@ -129,45 +137,12 @@ export default {
       rangeChannel: [],
       hackReset: true,
       status: false,
-      data: false,
-      columns: [
-        { title: '编号', dataIndex: 'code', width: '5%' },
-        { title: '公司', dataIndex: 'name', width: '8%' },
-        { title: '电话', dataIndex: 'telNo', width: '7%' },
-        { title: '手机', dataIndex: 'mobNo', width: '7%' },
-        { title: '邮箱', dataIndex: 'email', width: '8%' },
-        { title: '分类', dataIndex: 'type', width: '5%' },
-        { title: '大区', dataIndex: 'regionCode', width: '5%' },
-        { title: '网点', dataIndex: 'officeCode', width: '5%' },
-        { title: '币种', dataIndex: 'currency', width: '4%' },
-        { title: '付款方式', dataIndex: 'payMethodCode', width: '6%' },
-        { title: '付款条件', dataIndex: 'payTermsCode', width: '5%' },
-        { title: '销售员名称', dataIndex: 'salerName', width: '6%' },
-        { title: '销售冻结(当前渠道)', dataIndex: 'customerRangeFrozen', width: '10%' },
-        { title: '销售冻结(所有渠道)', dataIndex: 'customerFrozen', width: '10%' },
-        { title: '客户性质', dataIndex: 'industryText', width: '5%' }
-      ],
-      queryParam: {},
-      loadData: parameter => {
-        this.queryParam = this.form.getFieldsValue();
-        const params = Object.assign(parameter, this.queryParam);
-        return this.$api.peptide.getOrder(params).then(res => {
-          if (!this.data) {
-            res.rows = [];
-            res.total = 0;
-          }
-          return {
-            data: res.rows,
-            page: params.page,
-            total: res.total
-          };
-        });
-      },
-      selectedRowKeys: [],
-      selectedRows: []
+      data: false
     };
   },
   mounted () {
+    this.setColumns();
+    this.handleSearch();
     var width = document.body.clientWidth;
     var height = document.body.clientHeight;
     if (width > 1000) {
@@ -191,12 +166,61 @@ export default {
     }
   },
   methods: {
-    onClose () {
-      this.$emit('Closed');
+    setColumns () {
+      const columns = [
+        { type: 'index', width: 40 },
+        { title: '编号', field: 'code' },
+        { title: '公司', field: 'name' },
+        { title: '电话', field: 'telNo' },
+        { title: '手机', field: 'mobNo' },
+        { title: '邮箱', field: 'email' },
+        { title: '分类', field: 'type' },
+        { title: '大区', field: 'regionCode' },
+        { title: '网点', field: 'officeCode' },
+        { title: '币种', field: 'currency' },
+        { title: '付款方式', field: 'payMethodCode' },
+        { title: '付款条件', field: 'payTermsCode' },
+        { title: '销售员名称', field: 'salerName' },
+        { title: '销售冻结(当前渠道)', field: 'customerRangeFrozen' },
+        { title: '销售冻结(所有渠道)', field: 'customerFrozen' },
+        { title: '客户性质', field: 'industryText' }
+      ];
+      columns.forEach(function (e) {
+        if (!e.width) e.width = 130;
+      });
+
+      this[tableName].columns = columns;
+
+      this[tableName].xTable = this.$refs[this[tableName].ref].$refs.xTable;
+    },
+    handleSearch (e) {
+      if (e) e.preventDefault();
+      this[tableName].loading = true;
+
+      const queryParam = this.form.getFieldsValue();
+
+      queryParam.createDateBegin = this.createDateBegin;
+      queryParam.createDateEnd = this.createDateEnd;
+      const params = Object.assign({ page: this[tableName].pagerConfig.currentPage, rows: this[tableName].pagerConfig.pageSize }, queryParam);
+      this.$api.peptide.getOrder(params).then((data) => {
+        this[tableName].tableData = data.rows;
+        this[tableName].pagerConfig.total = data.total;
+        this[tableName].pagerConfig.currentPage = params.page;
+        this[tableName].pagerConfig.pageSize = params.rows;
+      }).finally(() => {
+        this[tableName].loading = false;
+      });
+    },
+    pagerChange ({ pageSize, currentPage }) {
+      this[tableName].pagerConfig = Object.assign(this[tableName].pagerConfig, { pageSize, currentPage });
+      this.handleSearch();
+    },
+    onClose (row = {}) {
+      this.$emit('Closed', row, 2);
       this.status = true;
     },
-    handleSearch () {
-      this.$refs.table.refresh(true);
+    handleCellDblclick ({ row }) {
+      this.onClose(row);
     },
     onSelectChange (selectedRowKeys, selectedRows) {
       this.selectedRowKeys = selectedRowKeys;

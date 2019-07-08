@@ -6,13 +6,13 @@
       <a-form layout="inline" :form="form" @submit="handleSearch">
         <a-row :gutter="24">
 
-          <a-col :xxl="4" :xl="6" :md="8" :sm="24">
+          <a-col :md="6" :xl="4">
             <a-form-item label="编号">
               <a-input v-decorator="['code']" title=""/>
             </a-form-item>
           </a-col>
 
-          <a-col :xxl="4" :xl="6" :md="8" :sm="24">
+          <a-col :md="6" :xl="4">
             <a-form-item label="纯度">
               <a-select v-decorator="['purityID', {initialValue : '0'}]">
                 <a-select-option value="0">全部</a-select-option>
@@ -21,7 +21,7 @@
             </a-form-item>
           </a-col>
 
-          <a-col :xxl="4" :xl="6" :md="8" :sm="24">
+          <a-col :md="6" :xl="4">
             <a-form-item label="类型">
               <a-select v-decorator="['aminoAcidType', {initialValue : ''}]">
                 <a-select-option value="">全部</a-select-option>
@@ -30,7 +30,7 @@
               </a-select>
             </a-form-item>
           </a-col>
-          <a-col :xxl="4" :xl="6" :md="8" :sm="24">
+          <a-col :md="6" :xl="4">
             <a-form-item label="状态">
               <a-select v-decorator="['status', {initialValue : '1'}]">
                 <a-select-option value="0">全部</a-select-option>
@@ -41,7 +41,6 @@
           </a-col>
 
         </a-row>
-        <a-button type="primary" icon="search" html-type="submit" style="display:none;">查询</a-button>
       </a-form>
     </div>
     <div>
@@ -54,6 +53,7 @@
       <vxe-grid
         highlight-hover-row
         auto-resize
+        height="570"
         :ref="productTable.ref"
         :columns="productTable.columns"
         :data.sync="productTable.tableData"
@@ -65,8 +65,16 @@
       >
       </vxe-grid>
     </div>
-    <!-- <products-mask v-show="products_status" @Closed="closeMask()" @customerData="customerData">
-    </products-mask> -->
+
+    <a-modal
+      title="产品列表"
+      width="1000px"
+      :visible="products.visible"
+      :footer="null"
+      @cancel="products.visible = false">
+      <products-mask @Closed="closeMask()" @customerData="customerData">
+      </products-mask>
+    </a-modal>
   </div>
 </template>
 
@@ -97,13 +105,31 @@ export default {
           total: 0
         },
         editRules: {
-          purity: [
+          providerTotalAmountBegin: [
+            { required: true, message: '名称必填' }
+          ],
+          providerTotalAmountEnd: [
+            { required: true, message: '名称必填' }
+          ],
+          purityID: [
+            { required: true, message: '名称必填' }
+          ],
+          aminoAcidLengthBegin: [
+            { required: true, message: '名称必填' }
+          ],
+          aminoAcidLengthEnd: [
             { required: true, message: '名称必填' }
           ]
         }
       },
+      products: {
+        visible: false,
+        formData: {}
+      },
       products_status: '',
-      aa: []
+      isNeedDesalting_status: '',
+      sapProductCode: '',
+      sapProductName: ''
     };
   },
   mounted () {
@@ -118,11 +144,11 @@ export default {
       this.status = peptide.status;
       const columns = [
         { type: 'index', width: 40 },
-        { label: '编号', prop: 'code' },
-        { label: '提供总量从', prop: 'providerTotalAmountBegin', editRender: { name: 'AInput' } },
-        { label: '提供总量至', prop: 'providerTotalAmountEnd', editRender: { name: 'AInput' } },
-        { label: '纯度',
-          prop: 'purityID',
+        { title: '编号', field: 'code' },
+        { title: '提供总量从', field: 'providerTotalAmountBegin', editRender: { name: 'AInput' } },
+        { title: '提供总量至', field: 'providerTotalAmountEnd', editRender: { name: 'AInput' } },
+        { title: '纯度',
+          field: 'purityID',
           formatter: function ({ cellValue }) { return formatter(peptide.purity, cellValue, 'id', 'purity'); },
           editRender: {
             name: 'ASelect',
@@ -130,25 +156,46 @@ export default {
             options: peptide.purity
           }
         },
-        { label: '长度从', prop: 'aminoAcidLengthBegin', editRender: { name: 'AInput' } },
-        { label: '长度至', prop: 'aminoAcidLengthEnd', editRender: { name: 'AInput' } },
-        { label: '是否脱盐', prop: 'isNeedDesalting', align: 'center', editRender: { name: 'AInput' } },
-        { label: '氨基酸类型', prop: 'aminoAcidType', align: 'center', editRender: { name: 'AInput' } },
-        { label: '产品编号', prop: 'sapProductCode', editRender: { name: 'AInput' } },
-        { label: '产品名称', prop: 'sapProductName', editRender: { name: 'AInput' } },
-        { label: '状态',
-          prop: 'status',
+        { title: '长度从', field: 'aminoAcidLengthBegin', editRender: { name: 'AInput' } },
+        { title: '长度至', field: 'aminoAcidLengthEnd', editRender: { name: 'AInput' } },
+        { title: '是否脱盐',
+          field: 'isNeedDesalting',
+          align: 'center',
+          formatter: function ({ cellValue }) {
+            if (cellValue === 1) { return '√'; }
+          },
+          editRender: { name: 'SCheckBox', events: { change: this.changeIsNeedDesalting } }
+        },
+        { title: '氨基酸类型',
+          field: 'aminoAcidType',
+          align: 'center',
+          editRender: {
+            name: 'ASelect',
+            optionProps: { value: 'id', label: 'id' },
+            options: [{ id: 'L' }, { id: 'D' }]
+          }
+        },
+        { title: '产品编号',
+          field: 'sapProductCode',
+          editRender: { name: 'AInput', props: { 'disabled': true } }
+        },
+        { title: '产品名称',
+          field: 'sapProductName',
+          editRender: { name: 'SInputSearch', events: { search: this.openMask } }
+        },
+        { title: '状态',
+          field: 'status',
           formatter: ({ cellValue }) => {
             return formatter(self.status, cellValue);
           }
         },
-        { label: '创建人', prop: 'creatorName' },
-        { label: '创建时间', prop: 'createDate' },
-        { label: '删除人', prop: 'cancelName' },
-        { label: '删除时间', prop: 'cancelDate' },
+        { title: '创建人', field: 'creatorName' },
+        { title: '创建时间', field: 'createDate' },
+        { title: '删除人', field: 'cancelName' },
+        { title: '删除时间', field: 'cancelDate' },
         {
-          label: '操作',
-          prop: 'actions',
+          title: '操作',
+          field: 'actions',
           fixed: 'right',
           slots: {
             default: ({ row, rowIndex }) => {
@@ -208,6 +255,14 @@ export default {
         this[tableName].loading = false;
       });
     },
+    // checkbox修改是否脱盐值
+    changeIsNeedDesalting (e) {
+      const table = this[tableName].xTable;
+      const primer = {
+        isNeedDesalting: e.target.checked
+      };
+      Object.assign(table.getInsertRecords()[0], primer);
+    },
     handleAddRow () {
       if (this[tableName].editIndex !== -1) return this.$message.warning('请保存或退出正在编辑的行');
 
@@ -216,8 +271,9 @@ export default {
         id: --this[tableName].id
       };
 
-      this[tableName].tableData = [addVal, ...this[tableName].tableData];
-      table.setActiveRow(addVal);
+      table.insert(addVal).then(({ row }) => {
+        table.setActiveRow(row);
+      });
       this[tableName].editIndex = 0;
     },
     pagerChange ({ pageSize, currentPage }) {
@@ -225,8 +281,12 @@ export default {
       this.handleSearch();
     },
     customerData (data) {
-      this.sapProductCode = data[0].code;
-      this.sapProductName = data[0].desc;
+      const table = this[tableName].xTable;
+      const primer = {
+        sapProductName: data.desc,
+        sapProductCode: data.code
+      };
+      Object.assign(table.getInsertRecords()[0], primer);
     },
     handleExit ({ row, rowIndex, tableName, xTable }) {
       xTable.clearActived();
@@ -236,48 +296,50 @@ export default {
       this[tableName].editIndex = -1;
     },
     openMask () {
-      this.products_status = true;
+      this.products.visible = true;
       document.addEventListener('mousewheel', function (e) {
         e.preventDefault();
       }, { passive: false });
     },
     closeMask () {
-      this.products_status = false;
+      this.products.visible = false;
       document.addEventListener('mousewheel', function (e) {
         e.returnValue = true;
       }, { passive: false });
     },
     handleSave (r) {
-      if (this.providerTotalAmountBegin === '' || this.providerTotalAmountEnd === '' || this.aminoAcidLengthBegin === '' || this.aminoAcidLengthEnd === '' || this.aminoAcidType === '' || this.sapProductCode === '' || this.sapProductName === '' || this.purityName === '') {
-        this.$notification.error({
-          message: '错误',
-          description: `数据不能为空！`
-        });
-        return false;
-      }
+      // if (this.providerTotalAmountBegin === '' || this.providerTotalAmountEnd === '' || this.aminoAcidLengthBegin === '' || this.aminoAcidLengthEnd === '' || this.aminoAcidType === '' || this.sapProductCode === '' || this.sapProductName === '' || this.purityName === '') {
+      //   this.$notification.error({
+      //     message: '错误',
+      //     description: `数据不能为空！`
+      //   });
+      //   return false;
+      // }
       var purityData = [];
-      this.purity.forEach((val, index, arr) => {
-        if (val.purity === this.purityName) {
+      this.$store.state.peptide.purity.forEach((val, index, arr) => {
+        if (val.id === r.row.purityID) {
           purityData = val;
         }
       });
-      if (r.id) {
-        this.data = r;
-      }
-      this.data.providerTotalAmountBegin = this.providerTotalAmountBegin;
-      this.data.providerTotalAmountEnd = this.providerTotalAmountEnd;
-      this.data.purityName = purityData.purity;
-      this.data.purityCode = purityData.code;
-      this.data.purityID = purityData.id;
-      this.data.aminoAcidLengthBegin = this.aminoAcidLengthBegin;
-      this.data.aminoAcidLengthEnd = this.aminoAcidLengthEnd;
-      this.data.isNeedDesalting = this.isNeedDesalting ? 1 : 2;
-      this.data.aminoAcidType = this.aminoAcidType;
-      this.data.sapProductCode = this.sapProductCode;
-      this.data.sapProductName = this.sapProductName;
-      this.$api.peptide.insertProduct(this.data).then(res => {
+      // if (r.id) {
+      //   this.data = r;
+      // }
+      const data = {
+        providerTotalAmountBegin: r.row.providerTotalAmountBegin,
+        providerTotalAmountEnd: r.row.providerTotalAmountEnd,
+        purityName: purityData.purity,
+        purityCode: purityData.code,
+        purityID: purityData.id,
+        aminoAcidLengthBegin: r.row.aminoAcidLengthBegin,
+        aminoAcidLengthEnd: r.row.aminoAcidLengthEnd,
+        isNeedDesalting: r.row.isNeedDesalting ? 1 : 2,
+        aminoAcidType: r.row.aminoAcidType,
+        sapProductCode: r.row.sapProductCode,
+        sapProductName: r.row.sapProductName
+      };
+      this.$api.peptide.insertProduct(data).then(res => {
         if (res.id) {
-          this.handleExit();
+          this.handleSearch();
         }
       });
     },
@@ -303,5 +365,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-
+ svg:hover {
+   color:black
+ }
 </style>

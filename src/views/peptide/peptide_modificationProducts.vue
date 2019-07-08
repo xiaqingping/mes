@@ -5,13 +5,13 @@
     <div class="table-search">
       <a-form layout="inline" :form="form" @submit="handleSearch">
         <a-row :gutter="24">
-          <a-col :xxl="4" :xl="6" :md="8" :sm="24">
+          <a-col :md="6" :xl="4">
             <a-form-item label="编号">
               <a-input v-decorator="['code']" title=""/>
             </a-form-item>
           </a-col>
 
-          <a-col :xxl="4" :xl="6" :md="8" :sm="24">
+          <a-col :md="6" :xl="4">
             <a-form-item label="状态">
               <a-select v-decorator="['status', {initialValue : '1'}]">
                 <a-select-option value="0">全部</a-select-option>
@@ -122,44 +122,44 @@ export default {
       const { peptide } = this.$store.state;
       this.status = peptide.status;
       const columns = [
-        { label: '编号', prop: 'code' },
-        { label: '修饰名称', prop: 'modificationName', editRender: { name: 'AInput' } },
+        { title: '编号', field: 'code' },
+        { title: '修饰名称', field: 'modificationName', editRender: { name: 'AInput' } },
         {
-          label: '修饰位置',
-          prop: 'modificationPosition',
+          title: '修饰位置',
+          field: 'modificationPosition',
           formatter: ({ cellValue }) => {
             if (cellValue) { return formatter(peptide.modificationPosition, cellValue); }
           }
         },
-        { label: '氨基酸', prop: 'aminoAcidName', scopedSlots: { customRender: 'aminoAcidName' } },
-        { label: '氨基酸类型', prop: 'aminoAcidType', scopedSlots: { customRender: 'aminoAcidType' } },
-        { label: '提供总量从', prop: 'providerTotalAmountBegin', scopedSlots: { customRender: 'providerTotalAmountBegin' } },
-        { label: '提供总量至', prop: 'providerTotalAmountEnd', scopedSlots: { customRender: 'providerTotalAmountEnd' } },
-        { label: '长度从', prop: 'aminoAcidLengthBegin', scopedSlots: { customRender: 'aminoAcidLengthBegin' } },
-        { label: '长度至', prop: 'aminoAcidLengthEnd', scopedSlots: { customRender: 'aminoAcidLengthEnd' } },
-        { label: '是否脱盐',
-          prop: 'isNeedDesalting',
+        { title: '氨基酸', field: 'aminoAcidName', scopedSlots: { customRender: 'aminoAcidName' } },
+        { title: '氨基酸类型', field: 'aminoAcidType', scopedSlots: { customRender: 'aminoAcidType' } },
+        { title: '提供总量从', field: 'providerTotalAmountBegin', scopedSlots: { customRender: 'providerTotalAmountBegin' } },
+        { title: '提供总量至', field: 'providerTotalAmountEnd', scopedSlots: { customRender: 'providerTotalAmountEnd' } },
+        { title: '长度从', field: 'aminoAcidLengthBegin', scopedSlots: { customRender: 'aminoAcidLengthBegin' } },
+        { title: '长度至', field: 'aminoAcidLengthEnd', scopedSlots: { customRender: 'aminoAcidLengthEnd' } },
+        { title: '是否脱盐',
+          field: 'isNeedDesalting',
           formatter: ({ cellValue }) => {
             if (cellValue === 1) { return '√'; }
           },
           align: 'center'
         },
-        { label: '产品编号', prop: 'sapProductCode', scopedSlots: { customRender: 'sapProductCode' } },
-        { label: '产品名称', prop: 'sapProductName', scopedSlots: { customRender: 'sapProductName' } },
+        { title: '产品编号', field: 'sapProductCode', scopedSlots: { customRender: 'sapProductCode' } },
+        { title: '产品名称', field: 'sapProductName', scopedSlots: { customRender: 'sapProductName' } },
         {
-          label: '状态',
-          prop: 'status',
+          title: '状态',
+          field: 'status',
           formatter: ({ cellValue }) => {
             return formatter(self.status, cellValue);
           }
         },
-        { label: '创建人', prop: 'creatorName' },
-        { label: '创建日期', prop: 'createDate' },
-        { label: '删除人', prop: 'cancelName' },
-        { label: '删除时间', prop: 'cancelDate' },
+        { title: '创建人', field: 'creatorName' },
+        { title: '创建日期', field: 'createDate' },
+        { title: '删除人', field: 'cancelName' },
+        { title: '删除时间', field: 'cancelDate' },
         {
-          label: '操作',
-          prop: 'actions',
+          title: '操作',
+          field: 'actions',
           fixed: 'right',
           slots: {
             default: ({ row, rowIndex }) => {

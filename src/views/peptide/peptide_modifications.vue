@@ -5,18 +5,18 @@
     <div class="table-search">
       <a-form layout="inline" :form="form" @submit="handleSearch">
         <a-row :gutter="24">
-          <a-col :xxl="4" :xl="6" :md="8" :sm="24">
+          <a-col :md="6" :xl="4">
             <a-form-item label="编号">
               <a-input v-decorator="['code']" title=""/>
             </a-form-item>
           </a-col>
-          <a-col :xxl="4" :xl="6" :md="8" :sm="24">
+          <a-col :md="6" :xl="4">
             <a-form-item label="名称 ">
               <a-input v-decorator="['name']"/>
             </a-form-item>
           </a-col>
 
-          <a-col :xxl="6" :xl="8" :md="12" :sm="24">
+          <a-col :md="6" :xl="4">
             <a-form-item label="修饰类型">
               <a-select v-decorator="['modificationTypeID', {initialValue : '0'}]">
                 <a-select-option value="0">全部</a-select-option>
@@ -27,7 +27,7 @@
             </a-form-item>
           </a-col>
 
-          <a-col :xxl="4" :xl="6" :md="8" :sm="24">
+          <a-col :md="6" :xl="4">
             <a-form-item label="状态">
               <a-select v-decorator="['status', {initialValue : '1'}]">
                 <a-select-option value="0">全部</a-select-option>
@@ -44,7 +44,6 @@
 
     <a-layout>
       <a-layout-content>
-        <span style="line-height:32px;">系列</span>
         <div>
           <div class="table-operator">
             <a-button-group>
@@ -91,10 +90,15 @@
       </a-layout-sider>
     </a-layout>
 
-    <div>
+    <a-modal
+      title="多肽修饰列表"
+      width="1000px"
+      :visible="aminoAcid.visible"
+      :footer="null"
+      @cancel="aminoAcid.visible = false">
       <amino-acid-mask v-show="aminoAcid_status" @Closed="closeMask()" @aminoAcidData="aminoAcidData">
       </amino-acid-mask>
-    </div>
+    </a-modal>
   </div>
 </template>
 
@@ -139,9 +143,13 @@ export default {
         columns: [],
         editRules: {}
       },
+      aminoAcid: {
+        visible: true,
+        formData: {}
+      },
       modificationsType: {}, // 修饰类型
       status: {},
-      aminoAcid_status: false,
+      aminoAcid_status: true,
       parentData: {},
       modificationPositionData: {} // 修饰位置
     };
@@ -168,19 +176,19 @@ export default {
       this.modificationPositionData = peptide.modificationPosition;
       const columns = [
         { type: 'index', width: 40 },
-        { label: '编号', prop: 'code' },
-        { label: '修饰名称', prop: 'name', editRender: { name: 'AInput' } },
-        { label: '修饰代码', prop: 'modificationCode', editRender: { name: 'AInput' } },
+        { title: '编号', field: 'code' },
+        { title: '修饰名称', field: 'name', editRender: { name: 'AInput' } },
+        { title: '修饰代码', field: 'modificationCode', editRender: { name: 'AInput' } },
         {
-          label: '修饰位置',
-          prop: 'modificationPosition',
+          title: '修饰位置',
+          field: 'modificationPosition',
           formatter: ({ cellValue }) => {
             return formatter(self.modificationPositionData, cellValue);
           }
         },
         {
-          label: '独立修饰',
-          prop: 'isIndependentModification',
+          title: '独立修饰',
+          field: 'isIndependentModification',
           scopedSlots: { customRender: 'isIndependentModification' },
           align: 'center',
           formatter: ({ cellValue }) => {
@@ -188,26 +196,26 @@ export default {
           }
         },
         {
-          label: '修饰类别',
-          prop: 'modificationTypeID',
+          title: '修饰类别',
+          field: 'modificationTypeID',
           formatter: ({ cellValue }) => {
             return formatter(self.modificationsType, cellValue, 'id', 'modificationType');
           }
         },
         {
-          label: '状态',
-          prop: 'status',
+          title: '状态',
+          field: 'status',
           formatter: ({ cellValue }) => {
             return formatter(self.status, cellValue);
           }
         },
-        { label: '创建人', prop: 'creatorName' },
-        { label: '创建日期', prop: 'createDate' },
-        { label: '删除人', prop: 'cancelName' },
-        { label: '删除时间', prop: 'cancelDate' },
+        { title: '创建人', field: 'creatorName' },
+        { title: '创建日期', field: 'createDate' },
+        { title: '删除人', field: 'cancelName' },
+        { title: '删除时间', field: 'cancelDate' },
         {
-          label: '操作',
-          prop: 'actions',
+          title: '操作',
+          field: 'actions',
           fixed: 'right',
           slots: {
             default: ({ row, rowIndex }) => {
@@ -243,27 +251,27 @@ export default {
         }
       ];
       const columnSon = [
-        { label: '编号', prop: 'code', editRender: { name: 'AInput' } },
-        { label: '名称', prop: 'name', editRender: { name: 'AInput' } },
+        { title: '编号', field: 'code', editRender: { name: 'AInput' } },
+        { title: '名称', field: 'name', editRender: { name: 'AInput' } },
         {
-          label: '状态',
-          prop: 'status',
+          title: '状态',
+          field: 'status',
           align: 'center',
           formatter: ({ cellValue }) => {
             return formatter(self.status, cellValue);
           }
         },
         {
-          label: '创建人', prop: 'creatorName', align: 'center'
+          title: '创建人', field: 'creatorName', align: 'center'
         },
         {
-          label: '创建时间', prop: 'createDate', align: 'center'
+          title: '创建时间', field: 'createDate', align: 'center'
         },
-        { label: '删除人', prop: 'cancelName' },
-        { label: '删除时间', prop: 'cancelDate' },
+        { title: '删除人', field: 'cancelName' },
+        { title: '删除时间', field: 'cancelDate' },
         {
-          label: '操作',
-          prop: 'actions',
+          title: '操作',
+          field: 'actions',
           fixed: 'right',
           slots: {
             default: ({ row, rowIndex }) => {
@@ -313,6 +321,7 @@ export default {
       this[tableNameSon].xTable = this.$refs[this[tableNameSon].ref].$refs.xTable;
     },
     handleCellClick ({ row }) {
+      this[tableNameSon].loading = true;
       this.parentData = { row };
       this.$api.peptide.getSuitableAminoAcids(row.id).then((data) => {
         this[tableNameSon].tableData = data;
@@ -336,15 +345,6 @@ export default {
         this[tableName].editIndex = -1;
       }).finally(() => {
         this[tableName].loading = false;
-      });
-    },
-    handleSearchSon () {
-      this.loadingSon = true;
-      this.editIndexSon = -1;
-      this.$api.peptide.getModifications({ 'id': this.selectRow }).then((data) => {
-        this.dataSourceSon = data.rows[0].details;
-      }).finally(() => {
-        this.loadingSon = false;
       });
     },
     handleAddRow () {
