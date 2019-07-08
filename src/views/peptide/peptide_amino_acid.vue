@@ -5,23 +5,23 @@
     <div class="table-search">
       <a-form layout="inline" :form="form" @submit="handleSearch">
         <a-row :gutter="24">
-          <a-col :xxl="4" :xl="6" :md="8" :sm="24">
+          <a-col :md="6" :xl="4">
             <a-form-item label="编号">
               <a-input v-decorator="['code']" title=""/>
             </a-form-item>
           </a-col>
           <!--          <div v-show="advanced">-->
-          <a-col :xxl="4" :xl="6" :md="8" :sm="24">
+          <a-col :md="6" :xl="4">
             <a-form-item label="名称">
               <a-input v-decorator="['name']"/>
             </a-form-item>
           </a-col>
-          <a-col :xxl="4" :xl="6" :md="8" :sm="24">
+          <a-col :md="6" :xl="4">
             <a-form-item label="代码">
               <a-input v-decorator="['aminoAcidCode']"/>
             </a-form-item>
           </a-col>
-          <a-col :xxl="4" :xl="6" :md="8" :sm="24">
+          <a-col :md="6" :xl="4">
             <a-form-item label="状态">
               <a-select v-decorator="['status', {initialValue : '1'}]">
                 <a-select-option value="0">全部</a-select-option>

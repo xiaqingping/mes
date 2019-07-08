@@ -6,13 +6,13 @@
       <a-form layout="inline" :form="form" @submit="handleSearch">
         <a-row :gutter="24">
 
-          <a-col :xxl="4" :xl="6" :md="8" :sm="24">
+          <a-col :md="6" :xl="4">
             <a-form-item label="编号">
               <a-input v-decorator="['code']" title=""/>
             </a-form-item>
           </a-col>
 
-          <a-col :xxl="4" :xl="6" :md="8" :sm="24">
+          <a-col :md="6" :xl="4">
             <a-form-item label="纯度">
               <a-select v-decorator="['purityID', {initialValue : '0'}]">
                 <a-select-option value="0">全部</a-select-option>
@@ -21,7 +21,7 @@
             </a-form-item>
           </a-col>
 
-          <a-col :xxl="4" :xl="6" :md="8" :sm="24">
+          <a-col :md="6" :xl="4">
             <a-form-item label="类型">
               <a-select v-decorator="['aminoAcidType', {initialValue : ''}]">
                 <a-select-option value="">全部</a-select-option>
@@ -30,7 +30,7 @@
               </a-select>
             </a-form-item>
           </a-col>
-          <a-col :xxl="4" :xl="6" :md="8" :sm="24">
+          <a-col :md="6" :xl="4">
             <a-form-item label="状态">
               <a-select v-decorator="['status', {initialValue : '1'}]">
                 <a-select-option value="0">全部</a-select-option>
@@ -65,8 +65,16 @@
       >
       </vxe-grid>
     </div>
-    <products-mask v-show="products_status" @Closed="closeMask()" @customerData="customerData">
-    </products-mask>
+
+    <a-modal
+      title="产品列表"
+      width="1000px"
+      :visible="products.visible"
+      :footer="null"
+      @cancel="products.visible = false">
+      <products-mask @Closed="closeMask()" @customerData="customerData">
+      </products-mask>
+    </a-modal>
   </div>
 </template>
 
@@ -113,6 +121,10 @@ export default {
             { required: true, message: '名称必填' }
           ]
         }
+      },
+      products: {
+        visible: false,
+        formData: {}
       },
       products_status: '',
       isNeedDesalting_status: '',
@@ -284,13 +296,13 @@ export default {
       this[tableName].editIndex = -1;
     },
     openMask () {
-      this.products_status = true;
+      this.products.visible = true;
       document.addEventListener('mousewheel', function (e) {
         e.preventDefault();
       }, { passive: false });
     },
     closeMask () {
-      this.products_status = false;
+      this.products.visible = false;
       document.addEventListener('mousewheel', function (e) {
         e.returnValue = true;
       }, { passive: false });

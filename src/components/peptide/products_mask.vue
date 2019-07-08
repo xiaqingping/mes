@@ -1,6 +1,6 @@
 <template>
-  <div v-if="hackReset" class="mask">
-    <div class="customer-name-mask" :style="{top: customer_name_top + 'px', left : customer_name_left + 'px', width : small ? '1100px' : '100%', height : small ? '700px' : '100%', position: small ? 'absolute' : '', borderRadius: small ? '5px' : ''}">
+  <div>
+    <!-- <div class="customer-name-mask" :style="{top: customer_name_top + 'px', left : customer_name_left + 'px', width : small ? '1100px' : '100%', height : small ? '700px' : '100%', position: small ? 'absolute' : '', borderRadius: small ? '5px' : ''}">
       <div class="top">
         <span style="float: left">产品列表</span>
         <span class="top-icon" style="padding-bottom: 10px" @click="onClose($event)"><a-icon
@@ -9,101 +9,102 @@
           type="plus-square"/></span>
         <span class="top-icon" @click="onSmall" v-show="!small"><a-icon
           type="minus-square"/></span>
-      </div>
-      <div class="middle-search" style="margin: 0 3%">
-        <a-form layout="inline" :form="form" @submit="handleSearch">
-          <div>
-            <a-form-item label="编号">
-              <a-input v-decorator="['code']" style="width: 193px"/>
-            </a-form-item>
-            <a-form-item label="产品名称">
-              <a-input v-decorator="['desc']" style="width: 162px"/>
-            </a-form-item>
-            <a-form-item label="英文名称">
-              <a-input v-decorator="['edesc']" style="width: 165px"/>
-            </a-form-item>
-            <a-form-item label="旧物料号">
-              <a-input v-decorator="['oldCode']" style="width: 165px"/>
-            </a-form-item>
-            <a-form-item label="客户编号">
-              <a-input v-decorator="['customerCode']" style="width: 165px"/>
-            </a-form-item>
-            <a-form-item label="负责人编号">
-              <a-input v-decorator="['subcustomerCode']" style="width: 148px"/>
-            </a-form-item>
-            <a-form-item label="销售大区">
-              <a-input v-decorator="['regionCode']" style="width: 165px"/>
-            </a-form-item>
-            <a-form-item label="销售网点">
-              <a-input v-decorator="['officeCode']" style="width: 165px"/>
-            </a-form-item>
-            <a-form-item label="销售范围">
-              <a-select v-decorator="['range_area', {initialValue : '10-3110'}]" style="width: 165px;">
-                <a-select-option v-for="item in rangeArea" :key="item.id" :value="item.id">{{ item.name }}</a-select-option>
-              </a-select>
-            </a-form-item>
-            <a-form-item label="工厂">
-              <a-select v-decorator="['stock_factory', {initialValue : '3100'}]" style="width: 193px" >
-                <a-select-option value="3100">3100-生工上海工厂</a-select-option>
-              </a-select>
-            </a-form-item>
-            <a-form-item label="品牌">
-              <a-select v-decorator="['brandCode', {initialValue : ''}]" style="width: 190px">
-                <a-select-option value="">全部</a-select-option>
-                <a-select-option v-for="item in brands" :key="item.code" :value="item.code">{{ item.code }}-{{ item.name }}</a-select-option>
-              </a-select>
-            </a-form-item>
-          </div>
-          <div>
-            <a-button icon="search" @click="showData">查询</a-button>
-          </div>
-        </a-form>
+      </div> -->
+    <div class="middle-search" style="margin: 0 3%">
+      <a-form layout="inline" :form="form" @submit="handleSearch">
+        <div>
+          <a-form-item label="编号">
+            <a-input v-decorator="['code']" style="width: 163px"/>
+          </a-form-item>
+          <a-form-item label="产品名称">
+            <a-input v-decorator="['desc']" style="width: 132px"/>
+          </a-form-item>
+          <a-form-item label="英文名称">
+            <a-input v-decorator="['edesc']" style="width: 135px"/>
+          </a-form-item>
+          <a-form-item label="旧物料号">
+            <a-input v-decorator="['oldCode']" style="width: 135px"/>
+          </a-form-item>
+          <a-form-item label="客户编号">
+            <a-input v-decorator="['customerCode']" style="width: 135px"/>
+          </a-form-item>
+          <a-form-item label="负责人编号">
+            <a-input v-decorator="['subcustomerCode']" style="width: 118px"/>
+          </a-form-item>
+          <a-form-item label="销售大区">
+            <a-input v-decorator="['regionCode']" style="width: 135px"/>
+          </a-form-item>
+          <a-form-item label="销售网点">
+            <a-input v-decorator="['officeCode']" style="width: 135px"/>
+          </a-form-item>
+          <a-form-item label="销售范围">
+            <a-select v-decorator="['range_area', {initialValue : '10-3110'}]" style="width: 135px;">
+              <a-select-option v-for="item in rangeArea" :key="item.id" :value="item.id">{{ item.name }}</a-select-option>
+            </a-select>
+          </a-form-item>
+          <a-form-item label="工厂">
+            <a-select v-decorator="['stock_factory', {initialValue : '3100'}]" style="width: 163px" >
+              <a-select-option value="3100">3100-生工上海工厂</a-select-option>
+            </a-select>
+          </a-form-item>
+          <a-form-item label="品牌">
+            <a-select v-decorator="['brandCode', {initialValue : ''}]" style="width: 160px">
+              <a-select-option value="">全部</a-select-option>
+              <a-select-option v-for="item in brands" :key="item.code" :value="item.code">{{ item.code }}-{{ item.name }}</a-select-option>
+            </a-select>
+          </a-form-item>
+        </div>
+        <div>
+          <a-button icon="search" @click="showData">查询</a-button>
+        </div>
+      </a-form>
 
-      </div>
-      <a-layout>
-        <a-layout-content>
-          <div>
-            <div class="table-operator">
-            </div>
+    </div>
 
-            <vxe-grid
-              highlight-hover-row
-              auto-resize
-              :ref="productTable.ref"
-              :columns="productTable.columns"
-              :data.sync="productTable.tableData"
-              :loading="productTable.loading"
-              :edit-rules="productTable.editRules"
-              :edit-config="{key: 'id', trigger: 'manual', mode: 'row', showIcon: false, autoClear: false}"
-              :pager-config="productTable.pagerConfig"
-              @cell-click="(options) => handleCellClick(options)"
-              @cell-dblclick="(options) => sub(options)"
-              @page-change="pagerChange"
-            >
-            </vxe-grid>
-          </div>
-        </a-layout-content>
-
-        <a-layout-sider width="300">
-          <span style="line-height:32px;">库存</span>
+    <a-layout style="background-color:white;">
+      <a-layout-content>
+        <div>
           <div class="table-operator">
           </div>
+
           <vxe-grid
             highlight-hover-row
             auto-resize
-            :ref="productSonTable.ref"
-            :loading="productSonTable.loading"
-            :columns="productSonTable.columns"
-            :data.sync="productSonTable.tableData"
-            :edit-rules="productSonTable.editRules"
+            :ref="productTable.ref"
+            :columns="productTable.columns"
+            :data.sync="productTable.tableData"
+            :loading="productTable.loading"
+            :edit-rules="productTable.editRules"
             :edit-config="{key: 'id', trigger: 'manual', mode: 'row', showIcon: false, autoClear: false}"
+            :pager-config="productTable.pagerConfig"
+            @cell-click="(options) => handleCellClick(options)"
+            @cell-dblclick="(options) => sub(options)"
+            @page-change="pagerChange"
           >
           </vxe-grid>
-        </a-layout-sider>
-      </a-layout>
+        </div>
+      </a-layout-content>
 
-    </div>
+      <a-layout-sider width="300" style="background-color:white;margin-left:10px">
+        <span style="line-height:32px;">库存</span>
+        <div class="table-operator">
+        </div>
+        <vxe-grid
+          highlight-hover-row
+          auto-resize
+          :ref="productSonTable.ref"
+          :loading="productSonTable.loading"
+          :columns="productSonTable.columns"
+          :data.sync="productSonTable.tableData"
+          :edit-rules="productSonTable.editRules"
+          :edit-config="{key: 'id', trigger: 'manual', mode: 'row', showIcon: false, autoClear: false}"
+        >
+        </vxe-grid>
+      </a-layout-sider>
+    </a-layout>
+
   </div>
+  <!-- </div> -->
 
 </template>
 
@@ -142,11 +143,6 @@ export default {
       },
       small: true,
       loading: false,
-      customer_name_top: 0,
-      customer_name_left: 0,
-      rangeOrganization: [],
-      rangeChannel: [],
-      hackReset: true,
       status: false,
       data: false,
       rangeArea: [],
@@ -158,27 +154,6 @@ export default {
     this.handleSearch();
     this.rangeArea = this.$store.state.peptide.rangeArea;
     this.brands = this.$store.state.basic.brands;
-    var width = document.body.clientWidth;
-    var height = document.body.clientHeight;
-    if (width > 1000) {
-      this.customer_name_left = (width - 1100) / 2;
-    }
-    if (height > 600) {
-      this.customer_name_top = (height - 700) / 2;
-    }
-  },
-  watch: {
-    status: function () {
-      if (this.status) {
-        this.hackReset = false;
-        this.$nextTick(() => {
-          this.hackReset = true;
-        });
-        this.status = false;
-        this.small = true;
-        this.data = false;
-      }
-    }
   },
   methods: {
     setColumns () {
@@ -322,43 +297,43 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  .mask {
-    position: fixed;
-    width: 100%;
-    height: 100%;
-    top: 0;
-    left: 0;
-    background: rgba(0, 0, 0, 0.1);
-    z-index: 10;
-    overflow: hidden;
-  }
+  // .mask {
+  //   position: fixed;
+  //   width: 100%;
+  //   height: 100%;
+  //   top: 0;
+  //   left: 0;
+  //   background: rgba(0, 0, 0, 0.1);
+  //   z-index: 10;
+  //   overflow: hidden;
+  // }
 
-  .customer-name-mask {
-    background: white;
-    box-shadow: 2px 2px 4px gray;
+  // .customer-name-mask {
+  //   background: white;
+  //   box-shadow: 2px 2px 4px gray;
 
-    .top {
-      height: 40px;
-      line-height: 40px;
-      margin: 0 2%;
-      color: gray;
+  //   .top {
+  //     height: 40px;
+  //     line-height: 40px;
+  //     margin: 0 2%;
+  //     color: gray;
 
-      .top-icon {
-        font-size: 14px;
-        cursor: pointer;
-        margin-left: 10px;
-        float: right;
-      }
+  //     .top-icon {
+  //       font-size: 14px;
+  //       cursor: pointer;
+  //       margin-left: 10px;
+  //       float: right;
+  //     }
 
-      .top-icon:hover {
-        color: black;
-      }
-    }
+  //     .top-icon:hover {
+  //       color: black;
+  //     }
+  //   }
 
-    .middle-search {
-      .ant-row {
-        margin-left: 5px;
-      }
-    }
-  }
+  //   .middle-search {
+  //     .ant-row {
+  //       margin-left: 5px;
+  //     }
+  //   }
+  // }
 </style>

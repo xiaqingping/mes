@@ -208,43 +208,43 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  .mask {
-    position: fixed;
-    width: 100%;
-    height: 100%;
-    top: 0;
-    left: 0;
-    background: rgba(0, 0, 0, 0.1);
-    z-index: 10;
-    overflow: hidden;
-  }
+  // .mask {
+  //   position: fixed;
+  //   width: 100%;
+  //   height: 100%;
+  //   top: 0;
+  //   left: 0;
+  //   background: rgba(0, 0, 0, 0.1);
+  //   z-index: 10;
+  //   overflow: hidden;
+  // }
 
-  .customer-name-mask {
-    background: white;
-    box-shadow: 2px 2px 4px gray;
+  // .customer-name-mask {
+  //   background: white;
+  //   box-shadow: 2px 2px 4px gray;
 
-    .top {
-      height: 40px;
-      line-height: 40px;
-      margin: 0 2%;
-      color: gray;
+  //   .top {
+  //     height: 40px;
+  //     line-height: 40px;
+  //     margin: 0 2%;
+  //     color: gray;
 
-      .top-icon {
-        font-size: 14px;
-        cursor: pointer;
-        margin-left: 10px;
-        float: right;
-      }
+  //     .top-icon {
+  //       font-size: 14px;
+  //       cursor: pointer;
+  //       margin-left: 10px;
+  //       float: right;
+  //     }
 
-      .top-icon:hover {
-        color: black;
-      }
-    }
+  //     .top-icon:hover {
+  //       color: black;
+  //     }
+  //   }
 
-    .middle-search {
-      .ant-row {
-        margin-left: 5px;
-      }
-    }
-  }
+  //   .middle-search {
+  //     .ant-row {
+  //       margin-left: 5px;
+  //     }
+  //   }
+  // }
 </style>

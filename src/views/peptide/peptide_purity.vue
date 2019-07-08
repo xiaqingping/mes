@@ -39,6 +39,7 @@
       <vxe-grid
         highlight-hover-row
         auto-resize
+        height="570"
         :ref="purityTable.ref"
         :columns="purityTable.columns"
         :data.sync="purityTable.tableData"

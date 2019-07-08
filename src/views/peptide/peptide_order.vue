@@ -4,40 +4,40 @@
     <div class="table-search">
       <a-form layout="inline" :form="form" @submit="handleSearch">
         <a-row :gutter="24">
-          <a-col :xxl="4" :xl="6" :md="8" :sm="24">
+          <a-col :md="6" :xl="4">
             <a-form-item label="订单编号">
               <a-input v-decorator="['code']" title=""/>
             </a-form-item>
           </a-col>
           <div v-show="advanced">
-            <a-col :xxl="4" :xl="6" :md="8" :sm="24">
+            <a-col :md="6" :xl="4">
               <a-form-item label="客户">
                 <a-input-search @search="onOpen(1)" v-model="customer_value"/>
               </a-form-item>
             </a-col>
-            <a-col :xxl="4" :xl="6" :md="8" :sm="24">
+            <a-col :md="6" :xl="4">
               <a-form-item label="负责人">
                 <a-input-search @search="onOpen(2)" v-model="sub_customer_value"/>
               </a-form-item>
             </a-col>
-            <a-col :xxl="4" :xl="6" :md="8" :sm="24">
+            <a-col :md="6" :xl="4">
               <a-form-item label="订货人">
                 <a-input-search @search="onOpen(3)" v-model="contact_value"/>
               </a-form-item>
             </a-col>
-            <a-col :xxl="4" :xl="6" :md="8" :sm="24">
+            <a-col :md="6" :xl="4">
               <a-form-item label="销售员">
                 <a-input-search @search="onOpen(4)" v-model="saler_value"/>
               </a-form-item>
             </a-col>
-            <a-col :xxl="4" :xl="6" :md="8" :sm="24">
+            <a-col :md="6" :xl="4">
               <a-form-item label="币种">
                 <a-select v-decorator="['currency']">
                   <a-select-option v-for="item in currency" :key="item.id" :value="item.id">{{ item.name }}
                   </a-select-option></a-select>
               </a-form-item>
             </a-col>
-            <a-col :xxl="4" :xl="6" :md="8" :sm="24">
+            <a-col :md="6" :xl="4">
               <a-form-item label="销售网点">
                 <a-select v-decorator="['officeCode']">
                   <a-select-option value="0">全部</a-select-option>
@@ -46,7 +46,7 @@
                 </a-select>
               </a-form-item>
             </a-col>
-            <a-col :xxl="4" :xl="6" :md="8" :sm="24">
+            <a-col :md="6" :xl="4">
               <a-form-item label="销售大区">
                 <a-select v-decorator="['regionCode']">
                   <a-select-option value="0">全部</a-select-option>
@@ -55,7 +55,7 @@
                 </a-select>
               </a-form-item>
             </a-col>
-            <a-col :xxl="4" :xl="6" :md="8" :sm="24">
+            <a-col :md="6" :xl="4">
               <a-form-item label="销售组织">
                 <a-select v-decorator="['rangeOrganization', {initialValue : ''}]">
                   <a-select-option v-for="item in rangeOrganization" :key="item.id" :value="item.id">{{ item.name }}
@@ -63,7 +63,7 @@
                 </a-select>
               </a-form-item>
             </a-col>
-            <a-col :xxl="4" :xl="6" :md="8" :sm="24">
+            <a-col :md="6" :xl="4">
               <a-form-item label="销售渠道">
                 <a-select v-decorator="['rangeChannel', {initialValue : ''}]">
                   <a-select-option v-for="item in rangeChannel" :key="item.id" :value="item.id">{{ item.name }}
@@ -71,7 +71,7 @@
                 </a-select>
               </a-form-item>
             </a-col>
-            <a-col :xxl="8" :xl="12" :md="16" :sm="24">
+            <a-col :md="6" :xl="4">
               <a-form-item label="创建日期">
                 <a-range-picker
                   :ranges="{ 今天: [moment(), moment()], '本月': [moment(), moment().endOf('month')] }"

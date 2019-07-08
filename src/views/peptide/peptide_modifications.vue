@@ -5,18 +5,18 @@
     <div class="table-search">
       <a-form layout="inline" :form="form" @submit="handleSearch">
         <a-row :gutter="24">
-          <a-col :xxl="4" :xl="6" :md="8" :sm="24">
+          <a-col :md="6" :xl="4">
             <a-form-item label="编号">
               <a-input v-decorator="['code']" title=""/>
             </a-form-item>
           </a-col>
-          <a-col :xxl="4" :xl="6" :md="8" :sm="24">
+          <a-col :md="6" :xl="4">
             <a-form-item label="名称 ">
               <a-input v-decorator="['name']"/>
             </a-form-item>
           </a-col>
 
-          <a-col :xxl="6" :xl="8" :md="12" :sm="24">
+          <a-col :md="6" :xl="4">
             <a-form-item label="修饰类型">
               <a-select v-decorator="['modificationTypeID', {initialValue : '0'}]">
                 <a-select-option value="0">全部</a-select-option>
@@ -27,7 +27,7 @@
             </a-form-item>
           </a-col>
 
-          <a-col :xxl="4" :xl="6" :md="8" :sm="24">
+          <a-col :md="6" :xl="4">
             <a-form-item label="状态">
               <a-select v-decorator="['status', {initialValue : '1'}]">
                 <a-select-option value="0">全部</a-select-option>
@@ -44,7 +44,6 @@
 
     <a-layout>
       <a-layout-content>
-        <span style="line-height:32px;">系列</span>
         <div>
           <div class="table-operator">
             <a-button-group>
