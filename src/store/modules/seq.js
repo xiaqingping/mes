@@ -56,6 +56,21 @@ export default {
       { id: 1, name: '√' },
       { id: 2, name: '' }
     ],
+    // 反应状态
+    reactionStatus: [
+      { id: 1, name: '未排板' },
+      { id: 2, name: '已暂停' },
+      { id: 3, name: '排板中' },
+      { id: 4, name: '排板完成' },
+      { id: 5, name: '测序中' },
+      { id: 6, name: '待分析' },
+      { id: 7, name: '已分析' },
+      { id: 8, name: '已完成' },
+      { id: 9, name: '重新制备' },
+      { id: 10, name: '重新反应' },
+      { id: 11, name: '已失败' },
+      { id: 12, name: '已取消' }
+    ],
     // 反应板状态
     reactionBoardStatus: [
       { id: 1, name: '未排板' },

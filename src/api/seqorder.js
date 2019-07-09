@@ -7,7 +7,7 @@ import request from '../assets/js/request';
 
 export default {
   // 查询测序订单
-  getOrderList (params) {
-    return request(`/seqorder/v1/seqorders/easyui`, { params });
+  getOrderList (params, easyui) {
+    return request(`/seqorder/v1/seqorders${easyui ? '/easyui' : ''}`, { params });
   }
 };

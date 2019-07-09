@@ -4,6 +4,7 @@ import carrier from './carrier';
 import cart from './cart';
 import content from './content';
 import coupon from './coupon';
+import dataanalysis from './dataanalysis';
 import integral from './integral';
 import paymentRequest from './payment_request';
 import personal from './personal';
@@ -32,6 +33,7 @@ export default {
   cart,
   content,
   coupon,
+  dataanalysis,
   integral,
   paymentRequest,
   personal,
@@ -61,6 +63,7 @@ export {
   cart,
   content,
   coupon,
+  dataanalysis,
   integral,
   paymentRequest,
   personal,

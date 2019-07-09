@@ -3,33 +3,35 @@
   <div class="page-content">
 
     <div class="table-search">
-      <a-form layout="inline" :form="form" @submit="handleSearch">
+      <a-form layout="inline" :form="form" @submit.prevent="handleSearch">
         <a-row :gutter="24">
           <a-col :md="6" :xl="4">
+            <a-form-item label="编号">
+              <a-input v-decorator="['code']"/>
+            </a-form-item>
+          </a-col>
+          <a-col :md="6" :xl="4">
+            <a-form-item label="名称">
+              <a-input v-decorator="['name']"/>
+            </a-form-item>
+          </a-col>
+          <a-col :md="6" :xl="4">
+            <a-form-item label="别名">
+              <a-input v-decorator="['alias']"/>
+            </a-form-item>
+          </a-col>
+          <a-col :md="6" :xl="4">
+            <a-form-item label="系列">
+              <a-select v-decorator="['seriesId', {initialValue: ''}]">
+                <a-select-option value="">全部</a-select-option>
+                <a-select-option v-for="series in $store.state.seq.series" :value="series.id" :key="series.id">{{ series.name }}</a-select-option>
+              </a-select>
+            </a-form-item>
+          </a-col>
+          <a-col :md="6" :xl="4">
             <a-form-item label="状态">
-              <a-select v-decorator="['status']">
+              <a-select v-decorator="['status', {initialValue: 1}]">
                 <a-select-option value="">全部</a-select-option>
-                <a-select-option v-for="status in $store.state.basic.status" :value="status.id" :key="status.id">{{ status.name }}</a-select-option>
-              </a-select>
-            </a-form-item>
-          </a-col>
-          <a-col :md="6" :xl="4">
-            <a-form-item label="样品类型">
-              <a-select v-decorator="['sampleTypeId']">
-                <a-select-option value="">全部</a-select-option>
-                <a-select-option v-for="status in $store.state.basic.status" :value="status.id" :key="status.id">{{ status.name }}</a-select-option>
-              </a-select>
-            </a-form-item>
-          </a-col>
-          <a-col :md="6" :xl="4">
-            <a-form-item label="样品用量">
-              <a-input v-decorator="['sampleDose']"/>
-            </a-form-item>
-          </a-col>
-          <a-col :md="6" :xl="4">
-            <a-form-item label="测序点">
-              <a-select v-decorator="['seqfactoryIdList']">
-                <a-select-option value="0">全部</a-select-option>
                 <a-select-option v-for="status in $store.state.basic.status" :value="status.id" :key="status.id">{{ status.name }}</a-select-option>
               </a-select>
             </a-form-item>
@@ -42,67 +44,65 @@
     <div class="table-operator">
       <a-button-group>
         <a-button icon="search" @click="handleSearch">查询</a-button>
-        <a-button icon="plus">新建</a-button>
-        <a-button icon="form">修改</a-button>
-        <a-button icon="delete">删除</a-button>
-        <a-button icon="save">保存</a-button>
+        <a-button icon="plus" type="primary">新建</a-button>
       </a-button-group>
     </div>
 
-    <s-table
-      ref="table"
-      bordered
-      size="small"
-      :scroll="{ x: 1300 }"
-      :columns="columns"
-      :data="loadData"
-      :rowSelection="{ selectedRowKeys: selectedRowKeys, onChange: onSelectChange }"
-    >
-    </s-table>
+    <vxe-grid
+      highlight-hover-row
+      auto-resize
+      height="600"
+      ref="reactionComposes"
+      :loading="reactionComposes.loading"
+      :columns="reactionComposes.columns"
+      :pager-config="reactionComposes.pagerConfig"
+      :data.sync="reactionComposes.tableData"
+      @page-change="({pageSize, currentPage}) => this.$utils.tablePageChange({pageSize, currentPage, table: reactionComposes, callback: handleSearch})">
+    </vxe-grid>
   </div>
 </template>
 
 <script>
-import STable from '@/components/Table';
-
 export default {
-  name: 'SeqSampleOrder',
+  name: 'SeqReactionComposes',
   components: {
-    STable
   },
   data () {
     return {
       form: this.$form.createForm(this),
-      advanced: true,
-      columns: [],
       queryParam: {},
-      loadData: parameter => {
-        const params = Object.assign(parameter, this.queryParam);
-        return this.$api.reaction.getReactioncomposes(params, true).then(res => {
-          return {
-            data: res.rows,
-            page: params.page,
-            total: res.total
-          };
-        });
-      },
-      selectedRowKeys: [],
-      selectedRows: []
+      reactionComposes: {
+        id: 0,
+        xTable: null,
+        loading: false,
+        tableData: [],
+        columns: [],
+        pagerConfig: {
+          currentPage: 1,
+          pageSize: 10,
+          total: 0
+        }
+      }
     };
   },
   mounted () {
-    this.createColumnDefs();
+    this.setColumn();
+    this.handleSearch();
   },
   methods: {
-    createColumnDefs () {
-      const { formatter } = this.$utils;
-      const { basic } = this.$store.state;
+    // 设置表格列属性
+    setColumn () {
+      const tableName = 'reactionComposes';
+      // const { formatter } = this.$utils;
+      // const { basic, seq } = this.$store.state;
 
-      this.columns = [
+      const columns = [
+        { type: 'radio', width: 40 },
+        { type: 'index', width: 40 },
         { title: '反应板号', dataIndex: 'code' },
         { title: '测序类型', dataIndex: 'reactions' },
         { title: '测序仪', dataIndex: 'seqdeviceId' },
-        { title: '状态', dataIndex: 'status', customRender: function (text, record, index) { return formatter(basic.status, text); } },
+        { title: '状态', dataIndex: 'status' },
         { title: '测序点', dataIndex: 'seqfactoryId' },
         { title: '上机人姓名', dataIndex: 'ondeviceName' },
         { title: '上机时间', dataIndex: 'ondeviceDate' },
@@ -111,18 +111,31 @@ export default {
         { title: '创建人', dataIndex: 'creatorName' },
         { title: '创建时间', dataIndex: 'createDate' }
       ];
+
+      columns.forEach(function (e) {
+        if (!e.width) e.width = 100;
+      });
+
+      this[tableName].columns = columns;
+      this[tableName].xTable = this.$refs[tableName].$refs.xTable;
     },
-    handleSearch (e) {
-      e.preventDefault();
-      this.queryParam = this.form.getFieldsValue();
-      this.$refs.table.refresh(true);
-    },
-    onSelectChange (selectedRowKeys, selectedRows) {
-      this.selectedRowKeys = selectedRowKeys;
-      this.selectedRows = selectedRows;
-    },
-    toggleAdvanced () {
-      this.advanced = !this.advanced;
+    // 查询
+    handleSearch () {
+      const tableName = 'reactionComposes';
+      this[tableName].loading = true;
+      const { currentPage, pageSize } = this[tableName].pagerConfig;
+
+      const queryParam = this.form.getFieldsValue();
+      const params = Object.assign({ page: currentPage, rows: pageSize }, queryParam);
+
+      this.$api.reaction.getReactioncomposes(params, true).then((data) => {
+        this[tableName].tableData = data.rows;
+        this[tableName].pagerConfig.total = data.total;
+        this[tableName].pagerConfig.currentPage = params.page;
+        this[tableName].pagerConfig.pageSize = params.rows;
+      }).finally(() => {
+        this[tableName].loading = false;
+      });
     }
   }
 };
