@@ -363,7 +363,6 @@ export default {
       this[tableName].editIndex = 0;
     },
     handleSave (r) {
-      console.log(r);
       // if (this.name === '' || this.molecularWeight === '' || this.isoelectricPoint === '' || this.carboxylationDissociationConstant === '' || this.aminoDissociationConstant === '' || this.leftLongCode === '' || this.leftShortCode === '' || this.rightLongCode === '' || this.rightShortCode === '') {
       //   this.$notification.error({
       //     message: '错误',

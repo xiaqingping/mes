@@ -30,6 +30,7 @@
       :pager-config="primerTable.pagerConfig"
       :data.sync="primerTable.tableData"
       @cell-click="(options) => handleCellClick(options)"
+      @cell-dblclick="(options) => sub(options)"
       @page-change="pagerChange">
     </vxe-grid>
   </div>
@@ -197,6 +198,12 @@ export default {
     },
     handleCellClick ({ row }) {
       this.$emit('callback', row);
+    },
+    sub (o) {
+      if (o.row) {
+        this.$emit('aminoAcidData', o.row);
+        this.$emit('Closed');
+      }
     },
     pagerChange ({ pageSize, currentPage }) {
       const tableName = 'primerTable';
