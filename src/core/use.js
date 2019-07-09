@@ -4,6 +4,8 @@ import api from '@/api';
 import utils from '@/assets/js/utils';
 import './directives/action';
 
+import './moment';
+
 import './ant-design-vue';
 import './table';
 

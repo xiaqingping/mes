@@ -120,6 +120,12 @@ export default {
       name: 'seq-product',
       component: () => import('@/views/seq/product'),
       meta: { title: '测序产品', keepAlive: false, permission: [ 'dashboard' ] }
+    },
+    {
+      path: '/seq/report_analysis',
+      name: 'seq-report_analysis',
+      component: () => import('@/views/seq/report_analysis'),
+      meta: { title: '测序明细报表', keepAlive: false, permission: [ 'dashboard' ] }
     }
   ]
 };
