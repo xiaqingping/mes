@@ -3,19 +3,19 @@
   <div class="page-content">
 
     <div class="table-search">
-      <a-form layout="inline" :form="form" @submit.prevent="handleSearch">
+      <a-form layout="vertical" :form="form" @submit.prevent="handleSearch">
         <a-row :gutter="24">
-          <a-col :md="6" :xl="4">
+          <a-col :md="6" :lg="4" :xl="3">
             <a-form-item label="编号">
               <a-input v-decorator="['code']"/>
             </a-form-item>
           </a-col>
-          <a-col :md="6" :xl="4">
+          <a-col :md="6" :lg="4" :xl="3">
             <a-form-item label="名称">
               <a-input v-decorator="['name']"/>
             </a-form-item>
           </a-col>
-          <a-col :md="6" :xl="4">
+          <a-col :md="6" :lg="4" :xl="3">
             <a-form-item label="状态">
               <a-select v-decorator="['status', {initialValue: 1}]">
                 <a-select-option value="">全部</a-select-option>
