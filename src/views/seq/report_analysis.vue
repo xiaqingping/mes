@@ -4,9 +4,9 @@
     <div class="page-content">
 
       <div class="table-search">
-        <a-form layout="inline" :form="form" @submit.prevent="handleSearch">
+        <a-form layout="vertical" :form="form" @submit.prevent="handleSearch">
           <a-row :gutter="24">
-            <a-col :md="6" :xl="4">
+            <a-col :md="6" :lg="4" :xl="3">
               <a-form-item label="测序点">
                 <a-select v-decorator="['seqfactoryId']">
                   <a-select-option value="">全部</a-select-option>
@@ -14,17 +14,17 @@
                 </a-select>
               </a-form-item>
             </a-col>
-            <a-col :md="12" :xl="8">
+            <a-col :md="12" :lg="8" :xl="6">
               <a-form-item label="创建日期">
                 <a-range-picker
                   v-decorator="['time']"
                   :showTime="{
-                    defaultValue: [moment('00:00:00', 'HH:mm:ss'), moment('11:59:59', 'HH:mm:ss')]
+                    defaultValue: [$moment('00:00:00', 'HH:mm:ss'), $moment('11:59:59', 'HH:mm:ss')]
                   }"
                   format="YYYY-MM-DD" />
               </a-form-item>
             </a-col>
-            <a-col :md="6" :xl="4">
+            <a-col :md="6" :lg="4" :xl="3">
               <a-form-item label="样品类型">
                 <a-select v-decorator="['sampleTypeId', {initialValue: ''}]">
                   <a-select-option value="">全部</a-select-option>
@@ -32,7 +32,7 @@
                 </a-select>
               </a-form-item>
             </a-col>
-            <a-col :md="6" :xl="4">
+            <a-col :md="6" :lg="4" :xl="3">
               <a-form-item label="引物类型">
                 <a-select v-decorator="['primerTypes', {initialValue: ''}]">
                   <a-select-option value="">全部</a-select-option>
@@ -40,7 +40,7 @@
                 </a-select>
               </a-form-item>
             </a-col>
-            <a-col :md="6" :xl="4">
+            <a-col :md="6" :lg="4" :xl="3">
               <a-form-item label="测序类型">
                 <a-select v-decorator="['seqTypeId', {initialValue: ''}]">
                   <a-select-option value="">全部</a-select-option>
@@ -48,7 +48,7 @@
                 </a-select>
               </a-form-item>
             </a-col>
-            <a-col :md="6" :xl="4">
+            <a-col :md="6" :lg="4" :xl="3">
               <a-form-item label="反应状态">
                 <a-select v-decorator="['reactionStatus', {initialValue: ''}]">
                   <a-select-option value="">全部</a-select-option>
@@ -56,7 +56,7 @@
                 </a-select>
               </a-form-item>
             </a-col>
-            <a-col :md="6" :xl="4">
+            <a-col :md="6" :lg="4" :xl="3">
               <a-form-item label="销售网点">
                 <a-select v-decorator="['officeCode', {initialValue: ''}]">
                   <a-select-option value="">全部</a-select-option>
