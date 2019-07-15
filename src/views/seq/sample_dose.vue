@@ -51,6 +51,7 @@
       auto-resize
       height="600"
       ref="sampleDoseTable"
+      :radio-config="{trigger: 'row'}"
       :loading="sampleDoseTable.loading"
       :columns="sampleDoseTable.columns"
       :pager-config="sampleDoseTable.pagerConfig"

@@ -53,6 +53,7 @@
       auto-resize
       height="600"
       ref="carrierTable"
+      :radio-config="{trigger: 'row'}"
       :loading="carrierTable.loading"
       :columns="carrierTable.columns"
       :pager-config="carrierTable.pagerConfig"

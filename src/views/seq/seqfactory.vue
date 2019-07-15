@@ -52,6 +52,7 @@
           auto-resize
           height="570"
           ref="seqfactoryTable"
+          :radio-config="{trigger: 'row'}"
           :loading="seqfactoryTable.loading"
           :columns="seqfactoryTable.columns"
           :pager-config="seqfactoryTable.pagerConfig"

@@ -44,6 +44,7 @@
           auto-resize
           height="570"
           ref="seriesTable"
+          :radio-config="{trigger: 'row'}"
           :loading="seriesTable.loading"
           :columns="seriesTable.columns"
           :pager-config="seriesTable.pagerConfig"
