@@ -20,7 +20,7 @@
     "vue-property-decorator": "^8.2.1",
     "vue-router": "^3.0.3",
     "vuex": "^3.0.1",
-    "vxe-table": "^1.8.10",
+    "vxe-table": "^1.8.14",
     "vxe-table-plugin-antd": "^1.2.1",
     "xe-utils": "^1.9.6"
   },
