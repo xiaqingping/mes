@@ -13,15 +13,15 @@
     "axios": "^0.18.1",
     "babel-polyfill": "^6.26.0",
     "core-js": "^2.6.9",
-    "lodash": "^4.17.11",
+    "lodash": "^4.17.14",
     "nprogress": "^0.2.0",
     "vue": "^2.6.10",
     "vue-ls": "^3.2.1",
     "vue-property-decorator": "^8.2.1",
     "vue-router": "^3.0.3",
     "vuex": "^3.0.1",
-    "vxe-table": "^1.7.0",
-    "vxe-table-plugin-antd": "^1.2.0",
+    "vxe-table": "^1.8.15",
+    "vxe-table-plugin-antd": "^1.2.1",
     "xe-utils": "^1.9.6"
   },
   "devDependencies": {
