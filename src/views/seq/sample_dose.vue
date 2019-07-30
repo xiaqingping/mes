@@ -3,9 +3,9 @@
   <div class="page-content">
 
     <div class="table-search">
-      <a-form layout="inline" :form="form" @submit="handleSearch">
+      <a-form layout="vertical" :form="form" @submit="handleSearch">
         <a-row :gutter="24">
-          <a-col :md="6" :xl="4">
+          <a-col :md="6" :lg="4" :xl="3">
             <a-form-item label="状态">
               <a-select v-decorator="['status', {initialValue: 1}]">
                 <a-select-option value="">全部</a-select-option>
@@ -13,7 +13,7 @@
               </a-select>
             </a-form-item>
           </a-col>
-          <a-col :md="6" :xl="4">
+          <a-col :md="6" :lg="4" :xl="3">
             <a-form-item label="样品类型">
               <a-select v-decorator="['sampleTypeId', {initialValue: ''}]">
                 <a-select-option value="">全部</a-select-option>
@@ -21,12 +21,12 @@
               </a-select>
             </a-form-item>
           </a-col>
-          <a-col :md="6" :xl="4">
+          <a-col :md="6" :lg="4" :xl="3">
             <a-form-item label="样品用量">
               <a-input v-decorator="['sampleDose']"/>
             </a-form-item>
           </a-col>
-          <a-col :md="6" :xl="4">
+          <a-col :md="6" :lg="4" :xl="3">
             <a-form-item label="测序点">
               <a-select v-decorator="['seqfactoryIdList', {initialValue: ''}]">
                 <a-select-option value="">全部</a-select-option>
@@ -51,6 +51,7 @@
       auto-resize
       height="600"
       ref="sampleDoseTable"
+      :radio-config="{trigger: 'row'}"
       :loading="sampleDoseTable.loading"
       :columns="sampleDoseTable.columns"
       :pager-config="sampleDoseTable.pagerConfig"

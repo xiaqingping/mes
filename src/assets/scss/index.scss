@@ -35,6 +35,14 @@
         }
       }
     }
+    .ant-form-vertical {
+      .ant-form-item {
+        margin-bottom: 0;
+        .ant-calendar-picker {
+          width: 100%!important;
+        }
+      }
+    }
   }
 
   // 输入框没有值
