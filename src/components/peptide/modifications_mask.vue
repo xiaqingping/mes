@@ -1,5 +1,6 @@
 <template>
-  <div v-if="hackReset" class="mask">
+  <div>
+    <!-- <div v-if="hackReset" class="mask">
     <div class="customer-name-mask" :style="{top: customer_name_top + 'px', left : customer_name_left + 'px', width : small ? '1100px' : '100%', height : small ? '630px' : '100%', position: small ? 'absolute' : '', borderRadius: small ? '5px' : ''}">
       <div class="top">
         <span style="float: left">多肽修饰列表</span>
@@ -9,67 +10,91 @@
           type="plus-square"/></span>
         <span class="top-icon" @click="onSmall" v-show="!small"><a-icon
           type="minus-square"/></span>
-      </div>
-      <div class="middle-search" style="margin: 0 3%">
-        <a-form layout="inline" :form="form" @submit="handleSearch">
-          <div>
-            <a-form-item label="编号">
-              <a-input v-decorator="['code']" title="" style="width: 190px"/>
-            </a-form-item>
-            <a-form-item label="名称 ">
-              <a-input v-decorator="['name']" style="width: 190px"/>
-            </a-form-item>
-            <a-form-item label="修饰类型">
-              <a-select v-decorator="['modificationTypeID', {initialValue : '0'}]" style="width: 185px">
-                <a-select-option value="0">全部</a-select-option>
-                <a-select-option v-for="item in modificationsType" :key="item.id" :value="item.id">
-                  {{ item.modificationType }}
-                </a-select-option>
-              </a-select>
-            </a-form-item>
-            <a-form-item label="状态">
-              <a-select v-decorator="['status', {initialValue : '1'}]" style="width: 150px">
-                <a-select-option value="0">全部</a-select-option>
-                <a-select-option value="1">正常</a-select-option>
-                <a-select-option value="2">已删除</a-select-option>
-              </a-select>
-            </a-form-item>
-          </div>
-          <div>
-            <a-button icon="search" @click="showData">查询</a-button>
-            <a-button @click="sub" style="float:right">确定</a-button>
-          </div>
-        </a-form>
-
-      </div>
-      <s-table
-        ref="table"
-        bordered
-        size="small"
-        :scroll="{ x: 1500, y: 500 }"
-        :columns="columns"
-        :data="loadData"
-        :rowSelection="{ selectedRowKeys: selectedRowKeys, onChange: onSelectChange }"
-      >
-      </s-table>
+      </div> -->
+    <div class="middle-search" style="margin: 0 3%">
+      <a-form layout="inline" :form="form" @submit="handleSearch">
+        <div>
+          <a-form-item label="编号">
+            <a-input v-decorator="['code']" title="" style="width: 190px"/>
+          </a-form-item>
+          <a-form-item label="名称 ">
+            <a-input v-decorator="['name']" style="width: 190px"/>
+          </a-form-item>
+          <a-form-item label="修饰类型">
+            <a-select v-decorator="['modificationTypeID', {initialValue : '0'}]" style="width: 185px">
+              <a-select-option value="0">全部</a-select-option>
+              <a-select-option v-for="item in modificationsType" :key="item.id" :value="item.id">
+                {{ item.modificationType }}
+              </a-select-option>
+            </a-select>
+          </a-form-item>
+          <a-form-item label="状态">
+            <a-select v-decorator="['status', {initialValue : '1'}]" style="width: 150px">
+              <a-select-option value="0">全部</a-select-option>
+              <a-select-option value="1">正常</a-select-option>
+              <a-select-option value="2">已删除</a-select-option>
+            </a-select>
+          </a-form-item>
+        </div>
+        <div>
+          <a-button icon="search" @click="showData">查询</a-button>
+        <!-- <a-button @click="sub" style="float:right">确定</a-button> -->
+        </div>
+      </a-form>
 
     </div>
+
+    <a-layout style="background-color:white;">
+      <a-layout-content>
+        <div>
+          <div class="table-operator">
+          </div>
+
+          <vxe-grid
+            highlight-hover-row
+            auto-resize
+            :ref="modificationsTable.ref"
+            :columns="modificationsTable.columns"
+            :data.sync="modificationsTable.tableData"
+            :loading="modificationsTable.loading"
+            :edit-rules="modificationsTable.editRules"
+            :edit-config="{key: 'id', trigger: 'manual', mode: 'row', showIcon: false, autoClear: false}"
+            :pager-config="modificationsTable.pagerConfig"
+            @cell-dblclick="(options) => sub(options)"
+            @page-change="pagerChange"
+          >
+          </vxe-grid>
+        </div>
+      </a-layout-content>
+    </a-layout>
+
   </div>
 
 </template>
 
 <script>
-import STable from '@/components/Table';
+const tableName = 'modificationsTable';
 
 export default {
   name: 'PeptideModificationsMask',
-  components: {
-    STable
-  },
   data () {
     var self = this;
     return {
       form: this.$form.createForm(this),
+      modificationsTable: {
+        id: 0,
+        ref: 'modificationsTable',
+        xTable: null,
+        editIndex: -1,
+        loading: false,
+        tableData: [],
+        columns: [],
+        pagerConfig: {
+          currentPage: 1,
+          pageSize: 10,
+          total: 0
+        }
+      },
       small: true,
       customer_name_top: 0,
       customer_name_left: 0,
@@ -152,41 +177,90 @@ export default {
     };
   },
   mounted () {
-    this.selectedRows = [];
-    this.selectedRowKeys = [];
-    this.$api.peptideBase.getModificationTypesAll({ 'status': 1 }).then(res => {
-      this.modificationsType = res;
-    });
-    var width = document.body.clientWidth;
-    var height = document.body.clientHeight;
-    if (width > 1000) {
-      this.customer_name_left = (width - 1100) / 2;
-    }
-    if (height > 600) {
-      this.customer_name_top = (height - 630) / 2;
-    }
-  },
-  watch: {
-    status: function () {
-      if (this.status) {
-        this.hackReset = false;
-        this.$nextTick(() => {
-          this.hackReset = true;
-        });
-        this.status = false;
-        this.small = true;
-        this.data = false;
-      }
-    }
-
+    this.setColumns();
+    this.handleSearch();
+    this.rangeArea = this.$store.state.peptide.rangeArea;
+    this.brands = this.$store.state.basic.brands;
   },
   methods: {
-    sub () {
-      if (this.selectedRows[0]) {
-        this.$emit('modificationsData', this.selectedRows);
+    setColumns () {
+      const self = this;
+      const { formatter } = this.$utils;
+      const { peptide } = this.$store.state;
+      this.status = peptide.status;
+      const columns = [
+        { type: 'index', width: 40 },
+        { title: '编号', field: 'code' },
+        { title: '修饰名称', field: 'name' },
+        { title: '修饰代码', field: 'modificationCode' },
+        {
+          title: '修饰位置',
+          field: 'modificationPosition',
+          formatter: ({ cellValue }) => {
+            return formatter(peptide.modificationPosition, cellValue);
+          }
+        },
+        {
+          title: '独立修饰',
+          field: 'isIndependentModification',
+          align: 'center',
+          formatter: ({ cellValue }) => {
+            return cellValue === 1 ? '√' : '';
+          }
+        },
+        {
+          title: '修饰类别',
+          field: 'modificationTypeID',
+          formatter: ({ cellValue }) => {
+            return formatter(peptide.modificationTypes, cellValue, 'id', 'modificationType');
+          }
+        },
+        {
+          title: '状态',
+          field: 'status',
+          formatter: ({ cellValue }) => {
+            return formatter(self.status, cellValue);
+          }
+        },
+        { title: '创建人', field: 'creatorName' },
+        { title: '创建日期', field: 'createDate' },
+        { title: '删除人', field: 'cancelName' },
+        { title: '删除时间', field: 'cancelDate' }
+      ];
+
+      columns.forEach(function (e) {
+        if (!e.width) e.width = 100;
+      });
+
+      this[tableName].columns = columns;
+
+      this[tableName].xTable = this.$refs[this[tableName].ref].$refs.xTable;
+    },
+    handleSearch (e) {
+      if (e) e.preventDefault();
+      this[tableName].loading = true;
+
+      const queryParam = this.form.getFieldsValue();
+      const params = Object.assign({ page: this[tableName].pagerConfig.currentPage, rows: this[tableName].pagerConfig.pageSize }, queryParam);
+
+      this.$api.peptideBase.getModifications(params).then((data) => {
+        this[tableName].tableData = data.rows;
+        this[tableName].pagerConfig.total = data.total;
+        this[tableName].pagerConfig.current = params.page;
+        this[tableName].pagerConfig.pageSize = params.rows;
+        this[tableName].editIndex = -1;
+      }).finally(() => {
+        this[tableName].loading = false;
+      });
+    },
+    pagerChange ({ pageSize, currentPage }) {
+      this[tableName].pagerConfig = Object.assign(this[tableName].pagerConfig, { pageSize, currentPage });
+      this.handleSearch();
+    },
+    sub (o) {
+      if (o.row) {
+        this.$emit('modificationsData', o.row);
         this.$emit('Closed');
-        this.selectedRows = [];
-        this.selectedRowKeys = [];
       } else {
         this.$notification.error({
           message: '错误',
@@ -199,9 +273,6 @@ export default {
       this.status = true;
       this.selectedRows = [];
       this.selectedRowKeys = [];
-    },
-    handleSearch () {
-      this.$refs.table.refresh(true);
     },
     onSelectChange (selectedRowKeys, selectedRows) {
       this.selectedRowKeys = selectedRowKeys.slice(-1);
@@ -223,43 +294,43 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  .mask {
-    position: fixed;
-    width: 100%;
-    height: 100%;
-    top: 0;
-    left: 0;
-    background: rgba(0, 0, 0, 0.1);
-    z-index: 10;
-    overflow: hidden;
-  }
+  // .mask {
+  //   position: fixed;
+  //   width: 100%;
+  //   height: 100%;
+  //   top: 0;
+  //   left: 0;
+  //   background: rgba(0, 0, 0, 0.1);
+  //   z-index: 10;
+  //   overflow: hidden;
+  // }
 
-  .customer-name-mask {
-    background: white;
-    box-shadow: 2px 2px 4px gray;
+  // .customer-name-mask {
+  //   background: white;
+  //   box-shadow: 2px 2px 4px gray;
 
-    .top {
-      height: 40px;
-      line-height: 40px;
-      margin: 0 2%;
-      color: gray;
+  //   .top {
+  //     height: 40px;
+  //     line-height: 40px;
+  //     margin: 0 2%;
+  //     color: gray;
 
-      .top-icon {
-        font-size: 14px;
-        cursor: pointer;
-        margin-left: 10px;
-        float: right;
-      }
+  //     .top-icon {
+  //       font-size: 14px;
+  //       cursor: pointer;
+  //       margin-left: 10px;
+  //       float: right;
+  //     }
 
-      .top-icon:hover {
-        color: black;
-      }
-    }
+  //     .top-icon:hover {
+  //       color: black;
+  //     }
+  //   }
 
-    .middle-search {
-      .ant-row {
-        margin-left: 5px;
-      }
-    }
-  }
+  //   .middle-search {
+  //     .ant-row {
+  //       margin-left: 5px;
+  //     }
+  //   }
+  // }
 </style>

@@ -421,7 +421,7 @@ export default {
           this.handleCellClick(this.parentData);
         });
       } else {
-        this.$api.peptideBase.deletePurity(row.id).then(res => {
+        this.$api.peptideBase.deleteModifications(row.id).then(res => {
           this.handleSearch();
         });
       }
@@ -447,7 +447,7 @@ export default {
           this.handleCellClick(this.parentData);
         });
       } else {
-        this.$api.peptideBase.resumePurity(row.id).then(res => {
+        this.$api.peptideBase.resumeModifications(row.id).then(res => {
           this.handleSearch();
         });
       }

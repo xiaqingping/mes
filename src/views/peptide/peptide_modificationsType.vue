@@ -188,21 +188,23 @@ export default {
       this[tableName].editIndex = 0;
     },
     handleSave (r) {
-      if (this.modificationType === '') {
-        this.$notification.error({
-          message: '错误',
-          description: `数据不能为空！`
-        });
-        return false;
-      }
-      var data = {};
-      if (r.id) {
-        data = r;
-      }
-      data.modificationType = this.modificationType;
+      // if (this.modificationType === '') {
+      //   this.$notification.error({
+      //     message: '错误',
+      //     description: `数据不能为空！`
+      //   });
+      //   return false;
+      // }
+      // var data = {};
+      // if (r.id) {
+      //   data = r;
+      // }
+      const data = {
+        modificationType: r.row.modificationType
+      };
       this.$api.peptideBase.insertModificationTypes(data).then(res => {
         if (res.id) {
-          this.handleExit();
+          this.handleSearch();
         }
       });
     },

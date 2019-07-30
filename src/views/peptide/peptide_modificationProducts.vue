@@ -48,11 +48,27 @@
         >
       </vxe-grid>
     </div>
-    <products-mask v-show="products_status" @Closed="closeMask(1)" @customerData="customerData">
-    </products-mask>
 
-    <modifications-mask v-show="modifications_status" @Closed="closeMask(2)" @modificationsData="modificationsData">
-    </modifications-mask>
+    <a-modal
+      title="产品列表"
+      width="1000px"
+      :visible="products.visible"
+      :footer="null"
+      @cancel="products.visible = false">
+      <products-mask @Closed="closeMask(1)" @customerData="customerData">
+      </products-mask>
+    </a-modal>
+
+    <a-modal
+      title="多肽修饰列表"
+      width="1000px"
+      :visible="modifications.visible"
+      :footer="null"
+      @cancel="modifications.visible = false">
+      <modifications-mask @Closed="closeMask(2)" @modificationsData="modificationsData">
+      </modifications-mask>
+    </a-modal>
+
   </div>
 </template>
 
@@ -92,60 +108,89 @@ export default {
           ]
         }
       },
-      products_status: '',
-      modifications_status: ''
+      products: {
+        visible: false,
+        formData: {}
+      },
+      modifications: {
+        visible: false,
+        formData: {}
+      }
     };
   },
   mounted () {
-    this.setColumns();
-    this.handleSearch();
-    this.$api.peptideBase.getAminoAcid({ status: 1 }).then(res => {
-      var map = {}; var dest = [];
-      for (let i = 0; i < res.rows.length; i++) {
-        var ai = res.rows[i];
-        if (!map[ai.code]) {
-          dest.push({
-            id: ai.id,
-            name: ai.name,
-            code: ai.code
-          });
-          map[ai.code] = ai;
-        }
-      }
-      this.aminoAcid = dest;
-    });
+    this.init();
   },
   methods: {
+    init () {
+      this.$api.peptideBase.getAminoAcid().then((res) => {
+        var map = {}; var dest = [];
+        for (let i = 0; i < res.rows.length; i++) {
+          var ai = res.rows[i];
+          if (!map[ai.code]) {
+            dest.push({
+              id: ai.id,
+              name: ai.name,
+              code: ai.code
+            });
+            map[ai.code] = ai;
+          }
+        }
+        this.aminoAcid = dest;
+        this.setColumns();
+        this.handleSearch();
+      });
+    },
     setColumns () {
-      const self = this;
       const { formatter } = this.$utils;
       const { peptide } = this.$store.state;
       this.status = peptide.status;
+      const self = this;
       const columns = [
         { title: '编号', field: 'code' },
-        { title: '修饰名称', field: 'modificationName', editRender: { name: 'AInput' } },
+        { title: '修饰名称', field: 'modificationName', editRender: { name: 'SInputSearch', events: { search: self.openModificationMask } } },
         {
           title: '修饰位置',
           field: 'modificationPosition',
           formatter: ({ cellValue }) => {
             if (cellValue) { return formatter(peptide.modificationPosition, cellValue); }
+          },
+          editRender: { name: 'AInput', props: { 'disabled': true } }
+        },
+        {
+          title: '氨基酸',
+          field: 'aminoAcidName',
+          formatter: function ({ cellValue }) { return formatter(self.aminoAcid, cellValue); },
+          editRender: {
+            name: 'ASelect',
+            optionProps: { value: 'id', label: 'name' },
+            options: self.aminoAcid
           }
         },
-        { title: '氨基酸', field: 'aminoAcidName', scopedSlots: { customRender: 'aminoAcidName' } },
-        { title: '氨基酸类型', field: 'aminoAcidType', scopedSlots: { customRender: 'aminoAcidType' } },
-        { title: '提供总量从', field: 'providerTotalAmountBegin', scopedSlots: { customRender: 'providerTotalAmountBegin' } },
-        { title: '提供总量至', field: 'providerTotalAmountEnd', scopedSlots: { customRender: 'providerTotalAmountEnd' } },
-        { title: '长度从', field: 'aminoAcidLengthBegin', scopedSlots: { customRender: 'aminoAcidLengthBegin' } },
-        { title: '长度至', field: 'aminoAcidLengthEnd', scopedSlots: { customRender: 'aminoAcidLengthEnd' } },
+        {
+          title: '氨基酸类型',
+          field: 'aminoAcidType',
+          align: 'center',
+          editRender: {
+            name: 'ASelect',
+            optionProps: { value: 'id', label: 'id' },
+            options: [{ id: 'L' }, { id: 'D' }]
+          }
+        },
+        { title: '提供总量从', field: 'providerTotalAmountBegin', editRender: { name: 'AInput' } },
+        { title: '提供总量至', field: 'providerTotalAmountEnd', editRender: { name: 'AInput' } },
+        { title: '长度从', field: 'aminoAcidLengthBegin', editRender: { name: 'AInput' } },
+        { title: '长度至', field: 'aminoAcidLengthEnd', editRender: { name: 'AInput' } },
         { title: '是否脱盐',
           field: 'isNeedDesalting',
           formatter: ({ cellValue }) => {
             if (cellValue === 1) { return '√'; }
           },
-          align: 'center'
+          align: 'center',
+          editRender: { name: 'SCheckBox', events: { change: this.changeIsNeedDesalting } }
         },
-        { title: '产品编号', field: 'sapProductCode', scopedSlots: { customRender: 'sapProductCode' } },
-        { title: '产品名称', field: 'sapProductName', scopedSlots: { customRender: 'sapProductName' } },
+        { title: '产品编号', field: 'sapProductCode', editRender: { name: 'AInput', props: { 'disabled': true } } },
+        { title: '产品名称', field: 'sapProductName', editRender: { name: 'SInputSearch', events: { search: self.openProductMask } } },
         {
           title: '状态',
           field: 'status',
@@ -195,7 +240,7 @@ export default {
         }
       ];
       columns.forEach(function (e) {
-        if (!e.width) e.width = 100;
+        if (!e.width) e.width = 120;
       });
 
       this[tableName].columns = columns;
@@ -219,6 +264,13 @@ export default {
         this.loading = false;
       });
     },
+    changeIsNeedDesalting (e) {
+      const table = this[tableName].xTable;
+      const primer = {
+        isNeedDesalting: e.target.checked
+      };
+      Object.assign(table.getInsertRecords()[0], primer);
+    },
     pagerChange ({ pageSize, currentPage }) {
       this[tableName].pagerConfig = Object.assign(this[tableName].pagerConfig, { pageSize, currentPage });
       this.handleSearch();
@@ -230,33 +282,38 @@ export default {
       var addVal = {
         id: --this[tableName].id
       };
-      this[tableName].tableData = [addVal, ...this[tableName].tableData];
-      table.setActiveRow(addVal);
+      table.insert(addVal).then(({ row }) => {
+        table.setActiveRow(row);
+      });
       this[tableName].editIndex = 0;
     },
     customerData (data) {
-      this.sapProductCode = data[0].code;
-      this.sapProductName = data[0].desc;
+      const table = this[tableName].xTable;
+      const primer = {
+        sapProductName: data.desc,
+        sapProductCode: data.code
+      };
+      Object.assign(table.getInsertRecords()[0], primer);
     },
     modificationsData (data) {
-      this.modificationPositionData.forEach((v) => {
-        if (data[0].modificationPosition === v.id) {
-          data[0].modificationPositionName = v.name;
-        }
-      });
-      this.modifications = data;
-      this.modificationName = data[0].name;
-      this.modificationPosition = data[0].modificationPositionName;
+      const table = this[tableName].xTable;
+      const { formatter } = this.$utils;
+      const { peptide } = this.$store.state;
+      const primer = {
+        modificationName: data.name,
+        modificationPosition: formatter(peptide.modificationPosition, data.modificationPosition)
+      };
+      this.modificationPositionData = data;
+      Object.assign(table.getInsertRecords()[0], primer);
     },
-    openMask (num) {
-      switch (num) {
-        case 1 :
-          this.products_status = true;
-          break;
-        case 2 :
-          this.modifications_status = true;
-          break;
-      }
+    openModificationMask () {
+      this.modifications.visible = true;
+      document.addEventListener('mousewheel', function (e) {
+        e.preventDefault();
+      }, { passive: false });
+    },
+    openProductMask () {
+      this.products.visible = true;
       document.addEventListener('mousewheel', function (e) {
         e.preventDefault();
       }, { passive: false });
@@ -264,58 +321,61 @@ export default {
     closeMask (num) {
       switch (num) {
         case 1 :
-          this.products_status = false;
+          this.products.visible = false;
           break;
         case 2 :
-          this.modifications_status = false;
+          this.modifications.visible = false;
           break;
       }
       document.addEventListener('mousewheel', function (e) {
         e.returnValue = true;
       }, { passive: false });
     },
-    handleSave () {
-      if (this.modificationName === '' || this.modificationPosition === '' || this.providerTotalAmountBegin === '' || this.providerTotalAmountEnd === '' || this.aminoAcidLengthBegin === '' || this.aminoAcidLengthEnd === '' || this.sapProductCode === '' || this.sapProductName === '') {
-        this.$notification.error({
-          message: '错误',
-          description: `数据不能为空！`
-        });
-        return false;
-      }
+    handleSave (r) {
+      // if (this.modificationName === '' || this.modificationPosition === '' || this.providerTotalAmountBegin === '' || this.providerTotalAmountEnd === '' || this.aminoAcidLengthBegin === '' || this.aminoAcidLengthEnd === '' || this.sapProductCode === '' || this.sapProductName === '') {
+      //   this.$notification.error({
+      //     message: '错误',
+      //     description: `数据不能为空！`
+      //   });
+      //   return false;
+      // }
 
-      if (this.modifications[0].isIndependentModification === 2) {
-        if (this.aminoAcidName === '' || this.aminoAcidType === '') {
-          this.$notification.error({
-            message: '错误',
-            description: `修饰不是独立修饰，氨基酸和氨基酸类型不能为空`
-          });
-          return false;
-        }
-      }
+      // if (this.modifications[0].isIndependentModification === 2) {
+      //   if (this.aminoAcidName === '' || this.aminoAcidType === '') {
+      //     this.$notification.error({
+      //       message: '错误',
+      //       description: `修饰不是独立修饰，氨基酸和氨基酸类型不能为空`
+      //     });
+      //     return false;
+      //   }
+      // }
       var aminoAcidData = [];
       for (let i = 0; i < this.aminoAcid.length; i++) {
-        if (parseInt(this.aminoAcidName) === parseInt(this.aminoAcid[i].id)) {
+        if (parseInt(r.row.aminoAcidName) === parseInt(this.aminoAcid[i].id)) {
           aminoAcidData = this.aminoAcid[i];
         }
       }
-      this.data.modificationCode = this.modifications[0].code;
-      this.data.modificationID = this.modifications[0].id;
-      this.data.modificationName = this.modificationName;
-      this.data.modificationPosition = this.modifications[0].modificationPosition;
-      this.data.aminoAcidName = aminoAcidData.name;
-      this.data.aminoAcidCode = aminoAcidData.code;
-      this.data.aminoAcidID = aminoAcidData.id;
-      this.data.aminoAcidType = this.aminoAcidType;
-      this.data.aminoAcidLengthBegin = parseInt(this.aminoAcidLengthBegin);
-      this.data.aminoAcidLengthEnd = parseInt(this.aminoAcidLengthEnd);
-      this.data.providerTotalAmountBegin = parseInt(this.providerTotalAmountBegin);
-      this.data.providerTotalAmountEnd = parseInt(this.providerTotalAmountEnd);
-      this.data.isNeedDesalting = this.isNeedDesalting ? 1 : 2;
-      this.data.sapProductCode = this.sapProductCode;
-      this.data.sapProductName = this.sapProductName;
-      this.$api.peptideBase.insertModificationProducts(this.data).then(res => {
+      const data = {
+        modificationCode: this.modificationPositionData.modificationCode,
+        modificationID: this.modificationPositionData.modificationTypeID,
+        modificationName: r.row.modificationName,
+        modificationPosition: this.modificationPositionData.modificationPosition,
+        aminoAcidName: aminoAcidData.name,
+        aminoAcidCode: aminoAcidData.code,
+        aminoAcidID: aminoAcidData.id,
+        aminoAcidType: r.row.aminoAcidType,
+        aminoAcidLengthBegin: parseInt(r.row.aminoAcidLengthBegin),
+        aminoAcidLengthEnd: parseInt(r.row.aminoAcidLengthEnd),
+        providerTotalAmountBegin: parseInt(r.row.providerTotalAmountBegin),
+        providerTotalAmountEnd: parseInt(r.row.providerTotalAmountEnd),
+        isNeedDesalting: r.row.isNeedDesalting ? 1 : 2,
+        sapProductCode: r.row.sapProductCode,
+        sapProductName: r.row.sapProductName
+      };
+
+      this.$api.peptideBase.insertModificationProducts(data).then(res => {
         if (res.id) {
-          this.handleExit();
+          this.handleSearch();
         }
       });
     },
