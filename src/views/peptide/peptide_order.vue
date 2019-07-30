@@ -133,16 +133,50 @@
         >
       </vxe-grid>
     </div>
-    <customer-mask v-show="customer_status" @Closed="onClosed">
-    </customer-mask>
-    <sub-customer-mask v-show="sub_customer_status" @Closed="onClosed">
-    </sub-customer-mask>
-    <contact-mask v-show="contact_status" @Closed="onClosed">
-    </contact-mask>
-    <saler-mask v-show="saler_status" @Closed="onClosed">
-    </saler-mask>
+
+    <a-modal
+      title="客户列表"
+      width="1050px"
+      :visible="customer_status"
+      :footer="null"
+      @cancel="customer_status = false">
+      <customer-mask @Closed="onClosed">
+      </customer-mask>
+    </a-modal>
+
+    <a-modal
+      title="负责人列表"
+      width="1050px"
+      :visible="sub_customer_status"
+      :footer="null"
+      @cancel="sub_customer_status = false">
+      <sub-customer-mask @Closed="onClosed">
+      </sub-customer-mask>
+    </a-modal>
+
+    <a-modal
+      title="订货人列表"
+      width="1050px"
+      :visible="contact_status"
+      :footer="null"
+      @cancel="contact_status = false">
+      <contact-mask @Closed="onClosed">
+      </contact-mask>
+    </a-modal>
+
+    <a-modal
+      title="销售员列表"
+      width="1050px"
+      :visible="saler_status"
+      :footer="null"
+      @cancel="saler_status = false">
+      <saler-mask @Closed="onClosed">
+      </saler-mask>
+    </a-modal>
+
     <add-mask v-show="add_status" @Closed="onClosed">
     </add-mask>
+
   </div>
 </template>
 

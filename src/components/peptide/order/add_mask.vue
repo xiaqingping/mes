@@ -191,7 +191,7 @@
                 <a-button type="primary" icon="delete">删除</a-button>
                 <a-button type="primary" icon="save">保存</a-button>
               </div>
-              <a-table
+              <vxe-grid
                 :columns="columns"
                 :dataSource="data"
                 bordered
@@ -200,7 +200,8 @@
                 size="small"
                 style="width:65%;"
                 :rowSelection="{ selectedRowKeys: selectedRowKeys, onChange: onSelectChange }"
-                :scroll="{ x: 3200, y: 400}"/>
+                :scroll="{ x: 3200, y: 400}">
+              </vxe-grid>
               <div style="width:35%;position: absolute; left:66%; top:0">
                 <h4 style="float:left">氨基酸</h4><br/>
                 <div class="sonButton">
@@ -210,14 +211,15 @@
                   <a-button type="primary" icon="delete">删除</a-button>
                   <a-button type="primary" icon="save">保存</a-button>
                 </div>
-                <a-table
+                <vxe-grid
                   :columns="columnSon"
                   :dataSource="dataSon"
                   bordered
                   rowKey="id"
                   ref="table1"
                   size="small"
-                  :scroll="{ x: 600, y: 400}"/>
+                  :scroll="{ x: 600, y: 400}">
+                </vxe-grid>
               </div>
             </div>
             <svg width="100%" id="serverSvg"></svg>
@@ -248,14 +250,9 @@
 </template>
 
 <script>
-import STable from '@/components/Table';
 
 export default {
   name: 'AddMask',
-
-  components: {
-    STable
-  },
   data () {
     return {
       form: this.$form.createForm(this),
