@@ -53,9 +53,12 @@
           </div>
 
           <vxe-grid
+            highlight-current-row
             highlight-hover-row
             auto-resize
             :ref="modificationsTable.ref"
+            height="570"
+            :radio-config="{trigger: 'row'}"
             :columns="modificationsTable.columns"
             :data.sync="modificationsTable.tableData"
             :loading="modificationsTable.loading"
@@ -69,7 +72,7 @@
         </div>
       </a-layout-content>
 
-      <a-layout-sider width="300">
+      <a-layout-sider width="300" height="100%">
         <span style="line-height:32px;">修饰适用氨基酸</span>
         <div class="table-operator">
           <a-button-group>
@@ -79,6 +82,7 @@
         <vxe-grid
           highlight-hover-row
           auto-resize
+          height="570"
           :ref="modificationSonTable.ref"
           :loading="modificationSonTable.loading"
           :columns="modificationSonTable.columns"
@@ -165,6 +169,7 @@ export default {
       const { peptide } = this.$store.state;
       this.status = peptide.status;
       const columns = [
+        { type: 'radio', width: 40 },
         { type: 'index', width: 40 },
         { title: '编号', field: 'code' },
         { title: '修饰名称', field: 'name', editRender: { name: 'AInput' } },
@@ -274,6 +279,7 @@ export default {
           title: '操作',
           field: 'actions',
           fixed: 'right',
+
           slots: {
             default: ({ row, rowIndex }) => {
               let actions = [];
