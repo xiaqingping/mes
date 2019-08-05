@@ -37,6 +37,7 @@
       </div>
 
       <vxe-grid
+        highlight-current-row
         highlight-hover-row
         auto-resize
         height="570"

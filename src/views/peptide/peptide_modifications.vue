@@ -69,10 +69,11 @@
             @page-change="pagerChange"
           >
           </vxe-grid>
+
         </div>
       </a-layout-content>
 
-      <a-layout-sider width="300" height="100%">
+      <a-layout-sider width="300">
         <span style="line-height:32px;">修饰适用氨基酸</span>
         <div class="table-operator">
           <a-button-group>
@@ -91,6 +92,7 @@
           :edit-config="{key: 'id', trigger: 'manual', mode: 'row', showIcon: false, autoClear: false}"
         >
         </vxe-grid>
+
       </a-layout-sider>
     </a-layout>
 
@@ -278,8 +280,6 @@ export default {
         {
           title: '操作',
           field: 'actions',
-          fixed: 'right',
-
           slots: {
             default: ({ row, rowIndex }) => {
               let actions = [];
@@ -507,4 +507,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+  div .vxe-table--fixed-right-wrapper {
+    height: 569px!important;
+  }
 </style>
