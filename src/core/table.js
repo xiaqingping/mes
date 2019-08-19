@@ -12,16 +12,15 @@ import {
   Loading,
   Tooltip,
   Grid,
-  // Excel,
   Menu,
   Toolbar,
   Pager,
   Checkbox,
   Radio,
   Input,
-  // Button,
-  // Message,
-  // Export,
+  Button,
+  Message,
+  Export,
   Resize
 } from 'vxe-table';
 import VXETablePluginAntd from 'vxe-table-plugin-antd';
@@ -38,16 +37,15 @@ Vue.use(Filter);
 Vue.use(Loading);
 Vue.use(Tooltip);
 Vue.use(Grid);
-// Vue.use(Excel)
 Vue.use(Menu);
 Vue.use(Toolbar);
 Vue.use(Pager);
 Vue.use(Checkbox);
 Vue.use(Radio);
 Vue.use(Input);
-// Vue.use(Button);
-// Vue.use(Message);
-// Vue.use(Export);
+Vue.use(Button);
+Vue.use(Message);
+Vue.use(Export);
 Vue.use(Resize);
 
 // 全局默认设置
@@ -86,7 +84,13 @@ VXETable.setup({
   },
   // 默认工具栏参数
   toolbar: {
-    setting: false,
+    refresh: false,
+    resizable: {
+      storage: false
+    },
+    setting: {
+      storage: false
+    },
     buttons: []
   },
   // 默认消息提示框参数
@@ -101,17 +105,13 @@ VXETable.setup({
   // 默认优化配置项
   optimization: {
     animat: true,
-    // 当列大于 40 条时自动启用横向 X 滚动渲染
+    // 当列大于 50 条时自动启用横向 X 滚动渲染
     scrollX: {
-      gt: 40,
-      oSize: 5,
-      rSize: 16
+      gt: 50
     },
     // 当数据大于 500 条时自动启用纵向 Y 滚动渲染
     scrollY: {
-      gt: 500,
-      oSize: 20,
-      rSize: 80
+      gt: 500
     }
   },
   i18n: (key, value) => VXETable.t(zhCNLocat, key)
