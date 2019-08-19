@@ -96,8 +96,8 @@ export default {
       const columns = [
         { width: 40, type: 'index' },
         { title: '编号', field: 'code' },
-        { title: '名称', field: 'name', editRender: { name: 'input' } },
-        { title: '别名', field: 'alias', editRender: { name: 'input' } },
+        { title: '名称', field: 'name', editRender: { name: 'AInput' } },
+        { title: '别名', field: 'alias', editRender: { name: 'AInput' } },
         { title: '状态', field: 'status', formatter: function ({ cellValue }) { return formatter(basic.status, cellValue); } },
         { title: '创建人', field: 'creatorName' },
         { title: '创建时间', field: 'createDate' },

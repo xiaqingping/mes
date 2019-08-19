@@ -104,8 +104,8 @@ export default {
         { type: 'radio', width: 40 },
         { type: 'index', width: 40 },
         { title: '编号', field: 'code' },
-        { title: '名称', field: 'name', editRender: { name: 'input' } },
-        { title: '别名', field: 'alias', editRender: { name: 'input' } },
+        { title: '名称', field: 'name', editRender: { name: 'AInput' } },
+        { title: '别名', field: 'alias', editRender: { name: 'AInput' } },
         {
           title: '系列',
           field: 'seriesId',
