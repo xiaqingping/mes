@@ -100,7 +100,7 @@ export default {
       const columns = [
         { type: 'index', width: 40 },
         { title: 'SAP产品编号', field: 'productCode' },
-        { title: 'SAP产品名称', field: 'productName', editRender: { name: 'input' } },
+        { title: 'SAP产品名称', field: 'productName', editRender: { name: 'AInput' } },
         {
           title: '样品类型',
           field: 'sampleTypeId',
