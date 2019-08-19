@@ -139,8 +139,7 @@ export default {
       }
     },
     activeKey: function (newPathKey) {
-      // TODO: NavigationDuplicated
-      this.$router.push({ path: newPathKey }).catch(() => { });
+      this.$router.push({ path: newPathKey });
     }
   },
   render () {
