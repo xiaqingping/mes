@@ -71,7 +71,7 @@
                 </a-select>
               </a-form-item>
             </a-col>
-            <a-col :md="6" :xl="4">
+            <a-col :md="12" :xl="8">
               <a-form-item label="创建日期">
                 <a-range-picker
                   :ranges="{ 今天: [moment(), moment()], '本月': [moment(), moment().endOf('month')] }"
