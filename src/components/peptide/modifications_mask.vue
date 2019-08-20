@@ -1,27 +1,16 @@
 <template>
   <div>
-    <!-- <div v-if="hackReset" class="mask">
-    <div class="customer-name-mask" :style="{top: customer_name_top + 'px', left : customer_name_left + 'px', width : small ? '1100px' : '100%', height : small ? '630px' : '100%', position: small ? 'absolute' : '', borderRadius: small ? '5px' : ''}">
-      <div class="top">
-        <span style="float: left">多肽修饰列表</span>
-        <span class="top-icon" style="padding-bottom: 10px" @click="onClose($event)"><a-icon
-          type="close"/></span>
-        <span class="top-icon" @click="onSmall" v-show="small"><a-icon
-          type="plus-square"/></span>
-        <span class="top-icon" @click="onSmall" v-show="!small"><a-icon
-          type="minus-square"/></span>
-      </div> -->
-    <div class="middle-search" style="margin: 0 3%">
+    <div class="middle-search">
       <a-form layout="inline" :form="form" @submit="handleSearch">
         <div>
           <a-form-item label="编号">
-            <a-input v-decorator="['code']" title="" style="width: 190px"/>
+            <a-input v-decorator="['code']" title="" style="width: 150px"/>
           </a-form-item>
           <a-form-item label="名称 ">
-            <a-input v-decorator="['name']" style="width: 190px"/>
+            <a-input v-decorator="['name']" style="width: 150px"/>
           </a-form-item>
           <a-form-item label="修饰类型">
-            <a-select v-decorator="['modificationTypeID', {initialValue : '0'}]" style="width: 185px">
+            <a-select v-decorator="['modificationTypeID', {initialValue : '0'}]" style="width: 145px">
               <a-select-option value="0">全部</a-select-option>
               <a-select-option v-for="item in modificationsType" :key="item.id" :value="item.id">
                 {{ item.modificationType }}
@@ -29,7 +18,7 @@
             </a-select>
           </a-form-item>
           <a-form-item label="状态">
-            <a-select v-decorator="['status', {initialValue : '1'}]" style="width: 150px">
+            <a-select v-decorator="['status', {initialValue : '1'}]" style="width: 120px">
               <a-select-option value="0">全部</a-select-option>
               <a-select-option value="1">正常</a-select-option>
               <a-select-option value="2">已删除</a-select-option>
@@ -78,7 +67,6 @@ const tableName = 'modificationsTable';
 export default {
   name: 'PeptideModificationsMask',
   data () {
-    var self = this;
     return {
       form: this.$form.createForm(this),
       modificationsTable: {
@@ -95,85 +83,9 @@ export default {
           total: 0
         }
       },
-      small: true,
-      customer_name_top: 0,
-      customer_name_left: 0,
-      rangeOrganization: [],
-      rangeChannel: [],
-      hackReset: true,
       status: false,
       data: false,
-      modificationsType: [],
-      columns: [
-        { title: '编号', dataIndex: 'code', width: '5%' },
-        { title: '修饰名称', dataIndex: 'name', width: '18%' },
-        { title: '修饰代码', dataIndex: 'modificationCode', width: '5%' },
-        {
-          title: '修饰位置',
-          dataIndex: 'modificationPosition',
-          width: '8%',
-          customRender: function (value) {
-            for (var i = 0; i < self.$store.state.peptide.modificationPosition.length; i++) {
-              if (self.$store.state.peptide.modificationPosition[i].id === value) return self.$store.state.peptide.modificationPosition[i].name;
-            }
-          }
-        },
-        {
-          title: '独立修饰',
-          dataIndex: 'isIndependentModification',
-          align: 'center',
-          width: '6%',
-          customRender: function (value) {
-            if (value === 1) return '√';
-          }
-        },
-        {
-          title: '修饰类别',
-          dataIndex: 'modificationTypeID',
-          width: '18%',
-          customRender: function (value) {
-            for (var i = 0; i < self.modificationsType.length; i++) {
-              if (self.modificationsType[i].id === value) {
-                return self.modificationsType[i].modificationType;
-              }
-            }
-          }
-        },
-        {
-          title: '状态',
-          dataIndex: 'status',
-          width: '5%',
-          customRender: function (value) {
-            if (value === 1) {
-              return '正常';
-            } else if (value === 2) {
-              return '已删除';
-            }
-          }
-        },
-        { title: '创建人', dataIndex: 'creatorName', width: '5%' },
-        { title: '创建日期', dataIndex: 'createDate', width: '10%' },
-        { title: '删除人', dataIndex: 'cancelName', width: '5%' },
-        { title: '删除时间', dataIndex: 'cancelDate', width: '10%' }
-      ],
-      queryParam: {},
-      loadData: parameter => {
-        this.queryParam = this.form.getFieldsValue();
-        const params = Object.assign(parameter, this.queryParam);
-        return this.$api.peptideBase.getModifications(params).then(res => {
-          if (!this.data) {
-            res.rows = [];
-            res.total = 0;
-          }
-          return {
-            data: res.rows,
-            page: params.page,
-            total: res.total
-          };
-        });
-      },
-      selectedRowKeys: [],
-      selectedRows: []
+      modificationsType: []
     };
   },
   mounted () {
@@ -267,19 +179,6 @@ export default {
           description: `请选择一条数据`
         });
       }
-    },
-    onClose (e) {
-      this.$emit('Closed');
-      this.status = true;
-      this.selectedRows = [];
-      this.selectedRowKeys = [];
-    },
-    onSelectChange (selectedRowKeys, selectedRows) {
-      this.selectedRowKeys = selectedRowKeys.slice(-1);
-      this.selectedRows = selectedRows.slice(-1);
-    },
-    onSmall () {
-      this.small = !this.small;
     },
     onChange (dates, dateStrings) {
       this.createDateBegin = dateStrings[0];

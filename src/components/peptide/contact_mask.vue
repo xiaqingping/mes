@@ -79,8 +79,6 @@ export default {
         }
       },
       small: true,
-      customer_name_top: 0,
-      customer_name_left: 0,
       rangeOrganization: [],
       rangeChannel: [],
       hackReset: true,
@@ -91,14 +89,6 @@ export default {
   mounted () {
     this.setColumns();
     this.handleSearch();
-    var width = document.body.clientWidth;
-    var height = document.body.clientHeight;
-    if (width > 1000) {
-      this.customer_name_left = (width - 1100) / 2;
-    }
-    if (height > 600) {
-      this.customer_name_top = (height - 660) / 2;
-    }
   },
   watch: {
     status: function () {
