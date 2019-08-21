@@ -37,6 +37,7 @@
       </div>
 
       <vxe-grid
+        highlight-current-row
         highlight-hover-row
         auto-resize
         height="570"
@@ -170,7 +171,7 @@ export default {
       const queryParam = this.form.getFieldsValue();
       const params = Object.assign({ page: this[tableName].pagerConfig.currentPage, rows: this[tableName].pagerConfig.pageSize }, queryParam);
 
-      this.$api.peptide.getPurity(params).then((data) => {
+      this.$api.peptideBase.getPurity(params).then((data) => {
         this[tableName].tableData = data.rows;
         this[tableName].pagerConfig.total = data.total;
         this[tableName].pagerConfig.currentPage = params.page;
@@ -207,7 +208,7 @@ export default {
       }
       var data = {};
       data.purity = o.row.purity;
-      this.$api.peptide.insertPurity(data).then(res => {
+      this.$api.peptideBase.insertPurity(data).then(res => {
         if (res.id) {
           this.handleSearch();
         }
@@ -215,7 +216,7 @@ export default {
     },
     // 删除功能
     handleDelete ({ row }) {
-      this.$api.peptide.deletePurity(row.id).then(res => {
+      this.$api.peptideBase.deletePurity(row.id).then(res => {
         this.handleSearch();
       });
     },
@@ -236,7 +237,7 @@ export default {
         });
         return false;
       }
-      this.$api.peptide.resumePurity(row.id).then(res => {
+      this.$api.peptideBase.resumePurity(row.id).then(res => {
         this.handleSearch();
       });
     }

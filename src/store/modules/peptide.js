@@ -1,4 +1,4 @@
-import { peptide } from '@/api';
+import { peptideBase } from '@/api';
 
 export default {
   namespaced: true,
@@ -76,6 +76,8 @@ export default {
       { id: 1, name: '正常' },
       { id: 2, name: '已删除' }
     ],
+    // 修饰类型
+    modificationTypes: [],
     // 纯度
     purity: []
   },
@@ -86,14 +88,14 @@ export default {
       if (processMap[payload.type]) {
         payload.data = processMap[payload.type](payload.data);
       }
-
       state[payload.type] = payload.data;
     }
   },
   actions: {
     getCache (context, payload = { type: null }) {
       const methods = {
-        purity: peptide.getPurityAll
+        purity: peptideBase.getPurityAll,
+        modificationTypes: peptideBase.getModificationTypesAll
       };
       const { type } = payload;
       // 如果存在type则只获取type对应的数据，否则获取全部数据

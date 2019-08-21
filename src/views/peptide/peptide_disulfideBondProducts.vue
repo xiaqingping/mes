@@ -48,8 +48,15 @@
 
     </div>
 
-    <products-mask v-show="products_status" @Closed="closeMask()" @customerData="customerData">
-    </products-mask>
+    <a-modal
+      title="产品列表"
+      width="1000px"
+      :visible="products.visible"
+      :footer="null"
+      @cancel="products.visible = false">
+      <products-mask @Closed="closeMask()" @customerData="customerData">
+      </products-mask>
+    </a-modal>
 
   </div>
 </template>
@@ -86,6 +93,10 @@ export default {
             { required: true, message: '名称必填' }
           ]
         }
+      },
+      products: {
+        visible: false,
+        formData: {}
       }
     };
   },
@@ -101,20 +112,41 @@ export default {
       this.status = peptide.status;
       const columns = [
         { title: '编号', field: 'code' },
-        { title: '氨基酸类型1', field: 'aminoAcidTypeLeft', editRender: { name: 'AInput' } },
-        { title: '氨基酸类型2', field: 'aminoAcidTypeRight', scopedSlots: { customRender: 'aminoAcidTypeRight' } },
-        { title: '提供总量从', field: 'providerTotalAmountBegin', scopedSlots: { customRender: 'providerTotalAmountBegin' } },
-        { title: '提供总量至', field: 'providerTotalAmountEnd', scopedSlots: { customRender: 'providerTotalAmountEnd' } },
-        { title: '长度从', field: 'aminoAcidLengthBegin', scopedSlots: { customRender: 'aminoAcidLengthBegin' } },
-        { title: '长度至', field: 'aminoAcidLengthEnd', scopedSlots: { customRender: 'aminoAcidLengthEnd' } },
+        {
+          title: '氨基酸类型1',
+          field: 'aminoAcidTypeLeft',
+          align: 'center',
+          editRender: {
+            name: 'ASelect',
+            optionProps: { value: 'id', label: 'id' },
+            options: [{ id: 'L' }, { id: 'D' }]
+          }
+        },
+        {
+          title: '氨基酸类型2',
+          field: 'aminoAcidTypeRight',
+          align: 'center',
+          editRender: {
+            name: 'ASelect',
+            optionProps: { value: 'id', label: 'id' },
+            options: [{ id: 'L' }, { id: 'D' }]
+          }
+        },
+        { title: '提供总量从', field: 'providerTotalAmountBegin', editRender: { name: 'AInput' } },
+        { title: '提供总量至', field: 'providerTotalAmountEnd', editRender: { name: 'AInput' } },
+        { title: '长度从', field: 'aminoAcidLengthBegin', editRender: { name: 'AInput' } },
+        { title: '长度至', field: 'aminoAcidLengthEnd', editRender: { name: 'AInput' } },
         {
           title: '是否脱盐',
           field: 'isNeedDesalting',
+          formatter: ({ cellValue }) => {
+            if (cellValue === 1) { return '√'; }
+          },
           align: 'center',
-          scopedSlots: { customRender: 'isNeedDesalting' }
+          editRender: { name: 'SCheckBox', events: { change: this.changeIsNeedDesalting } }
         },
-        { title: '产品编号', field: 'sapProductCode', scopedSlots: { customRender: 'sapProductCode' } },
-        { title: '产品名称', field: 'sapProductName', scopedSlots: { customRender: 'sapProductName' } },
+        { title: '产品编号', field: 'sapProductCode', editRender: { name: 'AInput', props: { 'disabled': true } } },
+        { title: '产品名称', field: 'sapProductName', editRender: { name: 'SInputSearch', events: { search: self.openMask } } },
         {
           title: '状态',
           field: 'status',
@@ -178,7 +210,7 @@ export default {
       const queryParam = this.form.getFieldsValue();
       const params = Object.assign({ page: this[tableName].pagerConfig.currentPage, rows: this[tableName].pagerConfig.pageSize }, queryParam);
 
-      this.$api.peptide.getdisulfideBondProducts(params).then((data) => {
+      this.$api.peptideBase.getdisulfideBondProducts(params).then((data) => {
         this[tableName].tableData = data.rows;
         this[tableName].pagerConfig.total = data.total;
         this[tableName].pagerConfig.currentPage = params.page;
@@ -189,6 +221,13 @@ export default {
         this[tableName].loading = false;
       });
     },
+    changeIsNeedDesalting (e) {
+      const table = this[tableName].xTable;
+      const primer = {
+        isNeedDesalting: e.target.checked
+      };
+      Object.assign(table.getInsertRecords()[0], primer);
+    },
     handleAddRow () {
       if (this[tableName].editIndex !== -1) return this.$message.warning('请保存或退出正在编辑的行');
 
@@ -196,8 +235,9 @@ export default {
       var addVal = {
         id: --this[tableName].id
       };
-      this[tableName].tableData = [addVal, ...this[tableName].tableData];
-      table.setActiveRow(addVal);
+      table.insert(addVal).then(({ row }) => {
+        table.setActiveRow(row);
+      });
       this[tableName].editIndex = 0;
     },
     pagerChange ({ pageSize, currentPage }) {
@@ -205,41 +245,49 @@ export default {
       this.handleSearch();
     },
     customerData (data) {
-      this.sapProductCode = data[0].code;
-      this.sapProductName = data[0].desc;
+      const table = this[tableName].xTable;
+      const primer = {
+        sapProductName: data.desc,
+        sapProductCode: data.code
+      };
+      Object.assign(table.getInsertRecords()[0], primer);
     },
     openMask () {
-      this.products_status = true;
+      this.products.visible = true;
       document.addEventListener('mousewheel', function (e) {
         e.preventDefault();
       }, { passive: false });
     },
     closeMask () {
-      this.products_status = false;
+      this.products.visible = false;
       document.addEventListener('mousewheel', function (e) {
         e.returnValue = true;
       }, { passive: false });
     },
-    handleSave () {
-      if (this.modificationName === '' || this.modificationPosition === '' || this.providerTotalAmountBegin === '' || this.providerTotalAmountEnd === '' || this.aminoAcidLengthBegin === '' || this.aminoAcidLengthEnd === '' || this.sapProductCode === '' || this.sapProductName === '') {
-        this.$notification.error({
-          message: '错误',
-          description: `数据不能为空！`
-        });
-        return false;
-      }
-      this.data.aminoAcidTypeLeft = this.aminoAcidTypeLeft;
-      this.data.aminoAcidTypeRight = this.aminoAcidTypeRight;
-      this.data.providerTotalAmountBegin = parseInt(this.providerTotalAmountBegin);
-      this.data.providerTotalAmountEnd = parseInt(this.providerTotalAmountEnd);
-      this.data.aminoAcidLengthBegin = parseInt(this.aminoAcidLengthBegin);
-      this.data.aminoAcidLengthEnd = parseInt(this.aminoAcidLengthEnd);
-      this.data.isNeedDesalting = this.isNeedDesalting ? 1 : 2;
-      this.data.sapProductCode = this.sapProductCode;
-      this.data.sapProductName = this.sapProductName;
-      this.$api.peptide.insertdisulfideBondProducts(this.data).then(res => {
+    handleSave (r) {
+      // if (this.modificationName === '' || this.modificationPosition === '' || this.providerTotalAmountBegin === '' || this.providerTotalAmountEnd === '' || this.aminoAcidLengthBegin === '' || this.aminoAcidLengthEnd === '' || this.sapProductCode === '' || this.sapProductName === '') {
+      //   this.$notification.error({
+      //     message: '错误',
+      //     description: `数据不能为空！`
+      //   });
+      //   return false;
+      // }
+
+      const data = {
+        aminoAcidTypeLeft: r.row.aminoAcidTypeLeft,
+        aminoAcidTypeRight: r.row.aminoAcidTypeRight,
+        providerTotalAmountBegin: parseInt(r.row.providerTotalAmountBegin),
+        providerTotalAmountEnd: parseInt(r.row.providerTotalAmountEnd),
+        aminoAcidLengthBegin: parseInt(r.row.aminoAcidLengthBegin),
+        aminoAcidLengthEnd: parseInt(r.row.aminoAcidLengthEnd),
+        isNeedDesalting: r.row.isNeedDesalting ? 1 : 2,
+        sapProductCode: r.row.sapProductCode,
+        sapProductName: r.row.sapProductName
+      };
+
+      this.$api.peptideBase.insertdisulfideBondProducts(data).then(res => {
         if (res.id) {
-          this.handleExit();
+          this.handleSearch();
         }
       });
     },
@@ -251,7 +299,7 @@ export default {
       this[tableName].editIndex = -1;
     },
     handleDelete ({ row }) {
-      this.$api.peptide.deletedisulfideBondProducts(row.id).then(res => {
+      this.$api.peptideBase.deletedisulfideBondProducts(row.id).then(res => {
         this.handleSearch();
       });
     },
@@ -263,7 +311,7 @@ export default {
         });
         return false;
       }
-      this.$api.peptide.resumedisulfideBondProducts(row.id).then(res => {
+      this.$api.peptideBase.resumedisulfideBondProducts(row.id).then(res => {
         this.handleSearch();
       });
     }

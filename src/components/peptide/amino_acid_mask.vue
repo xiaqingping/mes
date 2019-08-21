@@ -30,6 +30,7 @@
       :pager-config="primerTable.pagerConfig"
       :data.sync="primerTable.tableData"
       @cell-click="(options) => handleCellClick(options)"
+      @cell-dblclick="(options) => sub(options)"
       @page-change="pagerChange">
     </vxe-grid>
   </div>
@@ -38,7 +39,7 @@
 <script>
 
 export default {
-  name: 'AminoAcidMask',
+  name: 'PeptideAminoAcidMask',
   data () {
     return {
       form: this.$form.createForm(this),
@@ -145,7 +146,7 @@ export default {
       const queryParam = this.form.getFieldsValue();
       const params = Object.assign({ page: currentPage, rows: pageSize }, queryParam);
 
-      this.$api.peptide.getAminoAcid(params).then(res => {
+      this.$api.peptideBase.getAminoAcid(params).then(res => {
         var map = {}; var dest = [];
         for (let i = 0; i < res.rows.length; i++) {
           var ai = res.rows[i];
@@ -197,6 +198,12 @@ export default {
     },
     handleCellClick ({ row }) {
       this.$emit('callback', row);
+    },
+    sub (o) {
+      if (o.row) {
+        this.$emit('aminoAcidData', o.row);
+        this.$emit('Closed');
+      }
     },
     pagerChange ({ pageSize, currentPage }) {
       const tableName = 'primerTable';

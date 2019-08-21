@@ -245,7 +245,7 @@ export default {
       const queryParam = this.form.getFieldsValue();
       const params = Object.assign({ page: this[tableName].pagerConfig.currentPage, rows: this[tableName].pagerConfig.pageSize }, queryParam);
 
-      this.$api.peptide.getProduct(params).then((data) => {
+      this.$api.peptideBase.getProduct(params).then((data) => {
         this[tableName].tableData = data.rows;
         this[tableName].pagerConfig.total = data.total;
         this[tableName].pagerConfig.current = params.page;
@@ -337,14 +337,14 @@ export default {
         sapProductCode: r.row.sapProductCode,
         sapProductName: r.row.sapProductName
       };
-      this.$api.peptide.insertProduct(data).then(res => {
+      this.$api.peptideBase.insertProduct(data).then(res => {
         if (res.id) {
           this.handleSearch();
         }
       });
     },
     handleDelete ({ row }) {
-      this.$api.peptide.deleteProduct(row.id).then(res => {
+      this.$api.peptideBase.deleteProduct(row.id).then(res => {
         this.handleSearch();
       });
     },
@@ -356,7 +356,7 @@ export default {
         });
         return false;
       }
-      this.$api.peptide.resumeProduct(row.id).then(res => {
+      this.$api.peptideBase.resumeProduct(row.id).then(res => {
         this.handleSearch();
       });
     }

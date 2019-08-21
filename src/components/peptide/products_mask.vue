@@ -1,16 +1,6 @@
 <template>
   <div>
-    <!-- <div class="customer-name-mask" :style="{top: customer_name_top + 'px', left : customer_name_left + 'px', width : small ? '1100px' : '100%', height : small ? '700px' : '100%', position: small ? 'absolute' : '', borderRadius: small ? '5px' : ''}">
-      <div class="top">
-        <span style="float: left">产品列表</span>
-        <span class="top-icon" style="padding-bottom: 10px" @click="onClose($event)"><a-icon
-          type="close"/></span>
-        <span class="top-icon" @click="onSmall" v-show="small"><a-icon
-          type="plus-square"/></span>
-        <span class="top-icon" @click="onSmall" v-show="!small"><a-icon
-          type="minus-square"/></span>
-      </div> -->
-    <div class="middle-search" style="margin: 0 3%">
+    <div class="middle-search">
       <a-form layout="inline" :form="form" @submit="handleSearch">
         <div>
           <a-form-item label="编号">
@@ -104,7 +94,6 @@
     </a-layout>
 
   </div>
-  <!-- </div> -->
 
 </template>
 
@@ -113,9 +102,8 @@ const tableName = 'productTable';
 const tableNameSon = 'productSonTable';
 
 export default {
-  name: 'CustomerMask',
+  name: 'PeptideProductsMask',
   data () {
-    // var self = this;
     return {
       form: this.$form.createForm(this),
       productTable: {
@@ -141,7 +129,6 @@ export default {
         columns: [],
         editRules: {}
       },
-      small: true,
       loading: false,
       status: false,
       data: false,
@@ -251,7 +238,7 @@ export default {
       queryParam['stock.factory'] = '3100';
       const params = Object.assign({ page: this[tableName].pagerConfig.currentPage, rows: this[tableName].pagerConfig.pageSize }, queryParam);
 
-      this.$api.peptide.getProductList(params).then((data) => {
+      this.$api.basic.getProductList(params).then((data) => {
         this[tableName].tableData = data;
         this[tableName].pagerConfig.total = data.length;
         this[tableName].pagerConfig.current = params.page;
@@ -284,9 +271,6 @@ export default {
       this.selectedRows = [];
       this.selectedRowKeys = [];
       this.dataSon = [];
-    },
-    onSmall () {
-      this.small = !this.small;
     },
     showData () {
       this.data = true;

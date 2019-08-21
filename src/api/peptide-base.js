@@ -1,19 +1,11 @@
 /*
  *多肽
- * http://192.168.19.71:8289/swagger-ui.html    peptideorder
  * http://192.168.19.71:8288/swagger-ui.html   peptide-base
- * http://192.168.20.2:8001/swagger-ui.html    BASIC
  */
 
 import request from '../assets/js/request';
 
 export default {
-  /** ****************************** 多肽订单 ************************************/
-  // 获取订单列表
-  getOrder (params) {
-    return request(`/peptideorder/v1/orders/easyui`, { params });
-  },
-
   /** ****************************** 多肽纯度 ************************************/
   // 获取纯度(全部)
   getPurityAll (params = { status: 1 }) {
@@ -63,7 +55,7 @@ export default {
 
   /** ****************************** 多肽氨基酸 ************************************/
   // 获取氨基酸
-  getAminoAcid (params) {
+  getAminoAcid (params = { status: 1 }) {
     return request(`/peptide-base/v1/aminoAcid/easyui`, { params });
   },
 
@@ -195,11 +187,5 @@ export default {
   // 删除二硫键产品
   deletedisulfideBondProducts (params) {
     return request(`/peptide-base/v1/disulfideBondProducts/${params}`, { method: 'DELETE' });
-  },
-
-  /** ****************************** 获取产品 ************************************/
-  // 获取产品
-  getProductList (params) {
-    return request(`/basic/v1/products`, { params });
   }
 };

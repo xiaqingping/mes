@@ -16,11 +16,11 @@
             </a-form-item>
           </a-col>
 
-          <a-col :md="6" :xl="4">
+          <a-col :md="12" :xl="6">
             <a-form-item label="修饰类型">
               <a-select v-decorator="['modificationTypeID', {initialValue : '0'}]">
                 <a-select-option value="0">全部</a-select-option>
-                <a-select-option v-for="item in modificationsType" :key="item.id" :value="item.id">
+                <a-select-option v-for="item in $store.state.peptide.modificationTypes" :key="item.id" :value="item.id">
                   {{ item.modificationType }}
                 </a-select-option>
               </a-select>
@@ -53,9 +53,12 @@
           </div>
 
           <vxe-grid
+            highlight-current-row
             highlight-hover-row
             auto-resize
             :ref="modificationsTable.ref"
+            height="570"
+            :radio-config="{trigger: 'row'}"
             :columns="modificationsTable.columns"
             :data.sync="modificationsTable.tableData"
             :loading="modificationsTable.loading"
@@ -66,6 +69,7 @@
             @page-change="pagerChange"
           >
           </vxe-grid>
+
         </div>
       </a-layout-content>
 
@@ -79,6 +83,7 @@
         <vxe-grid
           highlight-hover-row
           auto-resize
+          height="570"
           :ref="modificationSonTable.ref"
           :loading="modificationSonTable.loading"
           :columns="modificationSonTable.columns"
@@ -87,6 +92,7 @@
           :edit-config="{key: 'id', trigger: 'manual', mode: 'row', showIcon: false, autoClear: false}"
         >
         </vxe-grid>
+
       </a-layout-sider>
     </a-layout>
 
@@ -96,7 +102,7 @@
       :visible="aminoAcid.visible"
       :footer="null"
       @cancel="aminoAcid.visible = false">
-      <amino-acid-mask v-show="aminoAcid_status" @Closed="closeMask()" @aminoAcidData="aminoAcidData">
+      <amino-acid-mask @Closed="closeMask()" @aminoAcidData="aminoAcidData">
       </amino-acid-mask>
     </a-modal>
   </div>
@@ -144,27 +150,18 @@ export default {
         editRules: {}
       },
       aminoAcid: {
-        visible: true,
+        visible: false,
         formData: {}
       },
-      modificationsType: {}, // 修饰类型
       status: {},
-      aminoAcid_status: true,
-      parentData: {},
-      modificationPositionData: {} // 修饰位置
+      parentData: {}
     };
   },
   mounted () {
     this.setColumns();
     this.handleSearch();
-    this.init();
   },
   methods: {
-    init () {
-      this.$api.peptide.getModificationTypes({ 'status': 1 }).then(res => {
-        this.modificationsType = res.rows;
-      });
-    },
     onChange (e) {
       this.isIndependentModification = e.target.checked;
     },
@@ -173,8 +170,8 @@ export default {
       const { formatter } = this.$utils;
       const { peptide } = this.$store.state;
       this.status = peptide.status;
-      this.modificationPositionData = peptide.modificationPosition;
       const columns = [
+        { type: 'radio', width: 40 },
         { type: 'index', width: 40 },
         { title: '编号', field: 'code' },
         { title: '修饰名称', field: 'name', editRender: { name: 'AInput' } },
@@ -183,23 +180,34 @@ export default {
           title: '修饰位置',
           field: 'modificationPosition',
           formatter: ({ cellValue }) => {
-            return formatter(self.modificationPositionData, cellValue);
+            return formatter(peptide.modificationPosition, cellValue);
+          },
+          editRender: {
+            name: 'ASelect',
+            optionProps: { value: 'id', label: 'name' },
+            options: peptide.modificationPosition
           }
         },
         {
           title: '独立修饰',
           field: 'isIndependentModification',
-          scopedSlots: { customRender: 'isIndependentModification' },
           align: 'center',
           formatter: ({ cellValue }) => {
             return cellValue === 1 ? '√' : '';
-          }
+          },
+          editRender: { name: 'SCheckBox', events: { change: this.changeIsIndependentModification } }
         },
         {
           title: '修饰类别',
           field: 'modificationTypeID',
           formatter: ({ cellValue }) => {
-            return formatter(self.modificationsType, cellValue, 'id', 'modificationType');
+            // console.log(self.modificationsType);
+            return formatter(peptide.modificationTypes, cellValue, 'id', 'modificationType');
+          },
+          editRender: {
+            name: 'ASelect',
+            optionProps: { value: 'id', label: 'modificationType' },
+            options: peptide.modificationTypes
           }
         },
         {
@@ -251,8 +259,8 @@ export default {
         }
       ];
       const columnSon = [
-        { title: '编号', field: 'code', editRender: { name: 'AInput' } },
-        { title: '名称', field: 'name', editRender: { name: 'AInput' } },
+        { title: '编号', field: 'code', editRender: { name: 'SInputSearch', events: { search: this.openMask } } },
+        { title: '名称', field: 'name', editRender: { name: 'AInput', props: { 'disabled': true } } },
         {
           title: '状态',
           field: 'status',
@@ -272,7 +280,6 @@ export default {
         {
           title: '操作',
           field: 'actions',
-          fixed: 'right',
           slots: {
             default: ({ row, rowIndex }) => {
               let actions = [];
@@ -293,7 +300,7 @@ export default {
               }
               if (isEdit) {
                 actions = [
-                  <a onClick={() => this.handleSave(options, 'son') }>保存</a>,
+                  <a onClick={() => this.handleSaveSon(options) }>保存</a>,
                   <a onClick={() => this.handleExit(options, 'son') }>退出</a>
                 ];
               }
@@ -312,7 +319,7 @@ export default {
       });
 
       columnSon.forEach(function (e) {
-        if (!e.width) e.width = 80;
+        if (!e.width) e.width = 100;
       });
 
       this[tableName].columns = columns;
@@ -321,14 +328,16 @@ export default {
       this[tableNameSon].xTable = this.$refs[this[tableNameSon].ref].$refs.xTable;
     },
     handleCellClick ({ row }) {
-      this[tableNameSon].loading = true;
-      this.parentData = { row };
-      this.$api.peptide.getSuitableAminoAcids(row.id).then((data) => {
-        this[tableNameSon].tableData = data;
-        this[tableNameSon].editIndex = -1;
-      }).finally(() => {
-        this[tableNameSon].loading = false;
-      });
+      if (row.id > 0) {
+        this[tableNameSon].loading = true;
+        this.parentData = { row };
+        this.$api.peptideBase.getSuitableAminoAcids(row.id).then((data) => {
+          this[tableNameSon].tableData = data;
+          this[tableNameSon].editIndex = -1;
+        }).finally(() => {
+          this[tableNameSon].loading = false;
+        });
+      }
     },
     handleSearch (e) {
       if (e) e.preventDefault();
@@ -337,7 +346,7 @@ export default {
       const queryParam = this.form.getFieldsValue();
       const params = Object.assign({ page: this[tableName].pagerConfig.currentPage, rows: this[tableName].pagerConfig.pageSize }, queryParam);
 
-      this.$api.peptide.getModifications(params).then((data) => {
+      this.$api.peptideBase.getModifications(params).then((data) => {
         this[tableName].tableData = data.rows;
         this[tableName].pagerConfig.total = data.total;
         this[tableName].pagerConfig.current = params.page;
@@ -354,9 +363,18 @@ export default {
       var addVal = {
         id: --this[tableName].id
       };
-      this[tableName].tableData = [addVal, ...this[tableName].tableData];
-      table.setActiveRow(addVal);
+
+      table.insert(addVal).then(({ row }) => {
+        table.setActiveRow(row);
+      });
       this[tableName].editIndex = 0;
+    },
+    changeIsIndependentModification (e) {
+      const table = this[tableName].xTable;
+      const primer = {
+        isIndependentModification: e.target.checked
+      };
+      Object.assign(table.getInsertRecords()[0], primer);
     },
     pagerChange ({ pageSize, currentPage }) {
       this[tableName].pagerConfig = Object.assign(this[tableName].pagerConfig, { pageSize, currentPage });
@@ -367,48 +385,54 @@ export default {
       this.paginationSon.pageSize = pagination.pageSize;
     },
     aminoAcidData (data) {
-      this.amino_acid_data = data;
-      this.sonCode = data[0].code;
-      this.sonName = data[0].name;
+      const table = this[tableNameSon].xTable;
+      const primer = {
+        code: data.code,
+        name: data.name,
+        aminoAcidID: data.id
+      };
+      Object.assign(table.getInsertRecords()[0], primer);
     },
-    handleSave () {
-      if (this.name === '' || this.modificationCode === '' || this.modificationCode === '' || this.modificationTypeID === '') {
-        this.$notification.error({
-          message: '错误',
-          description: `数据不能为空！`
-        });
-        return false;
-      }
-      this.data.name = this.name;
-      this.data.modificationCode = this.modificationCode;
-      this.data.modificationPosition = this.modificationPosition;
-      this.data.isIndependentModification = this.isIndependentModification ? 1 : 2;
-      this.data.modificationTypeID = this.modificationTypeID;
-      this.data.details = [];
-      this.$api.peptide.insertModifications(this.data).then(res => {
+    handleSave (r) {
+      // if (this.name === '' || this.modificationCode === '' || this.modificationCode === '' || this.modificationTypeID === '') {
+      //   this.$notification.error({
+      //     message: '错误',
+      //     description: `数据不能为空！`
+      //   });
+      //   return false;
+      // }
+      // this.data.name = this.name;
+      // this.data.modificationCode = this.modificationCode;
+      // this.data.modificationPosition = this.modificationPosition;
+      // this.data.isIndependentModification = this.isIndependentModification ? 1 : 2;
+      // this.data.modificationTypeID = this.modificationTypeID;
+      // this.data.details = [];
+      const data = {
+        name: r.row.name,
+        modificationCode: r.row.modificationCode,
+        modificationPosition: r.row.modificationPosition,
+        isIndependentModification: r.row.isIndependentModification ? 1 : 2,
+        modificationTypeID: r.row.modificationTypeID,
+        details: []
+      };
+      this.$api.peptideBase.insertModifications(data).then(res => {
         if (res.id) {
-          this.handleExit();
+          this.handleSearch();
         }
       });
     },
     handleDelete ({ row }, type = '') {
       if (type === 'son') {
-        this.$api.peptide.deleteSuitableAminoAcids(row.id).then(res => {
+        this.$api.peptideBase.deleteSuitableAminoAcids(row.id).then(res => {
           this.handleCellClick(this.parentData);
         });
       } else {
-        this.$api.peptide.deletePurity(row.id).then(res => {
+        this.$api.peptideBase.deleteModifications(row.id).then(res => {
           this.handleSearch();
         });
       }
     },
     handleExit ({ row, rowIndex, tableName, xTable }, type = '') {
-      // this.name = '';
-      // this.modificationCode = '';
-      // this.modificationPosition = '';
-      // this.isIndependentModification = '';
-      // this.modificationTypeID = '';
-      // this.editIndex = -1;
       if (type === 'son') {
         xTable.clearActived();
         if (!row.status) {
@@ -425,11 +449,11 @@ export default {
     },
     handleResume ({ row }, type = '') {
       if (type === 'son') {
-        this.$api.peptide.resumeSuitableAminoAcids(row.id).then(res => {
+        this.$api.peptideBase.resumeSuitableAminoAcids(row.id).then(res => {
           this.handleCellClick(this.parentData);
         });
       } else {
-        this.$api.peptide.resumePurity(row.id).then(res => {
+        this.$api.peptideBase.resumeModifications(row.id).then(res => {
           this.handleSearch();
         });
       }
@@ -441,39 +465,40 @@ export default {
       var addVal = {
         id: --this[tableNameSon].id
       };
-      this[tableNameSon].tableData = [addVal, ...this[tableNameSon].tableData];
-      table.setActiveRow(addVal);
+      table.insert(addVal).then(({ row }) => {
+        table.setActiveRow(row);
+      });
       this[tableNameSon].editIndex = 0;
     },
     openMask () {
-      this.aminoAcid_status = true;
+      this.aminoAcid.visible = true;
       document.addEventListener('mousewheel', function (e) {
         e.preventDefault();
       }, { passive: false });
     },
     closeMask () {
-      this.aminoAcid_status = false;
+      this.aminoAcid.visible = false;
       document.addEventListener('mousewheel', function (e) {
         e.returnValue = true;
       }, { passive: false });
     },
-    handleSaveSon () {
-      if (this.sonName === '' || this.sonCode === '' || this.selectRow === '') {
-        this.$notification.error({
-          message: '错误',
-          description: `数据不能为空！`
-        });
-        return false;
-      }
+    handleSaveSon (r) {
+      // if (this.sonName === '' || this.sonCode === '' || this.selectRow === '') {
+      //   this.$notification.error({
+      //     message: '错误',
+      //     description: `数据不能为空！`
+      //   });
+      //   return false;
+      // }
       var addSonVal = {
-        'name': this.sonName,
-        'code': this.sonCode,
-        'aminoAcidID': this.amino_acid_data[0].id,
-        'modificationID': this.selectRow
+        'name': r.row.name,
+        'code': r.row.code,
+        'aminoAcidID': r.row.aminoAcidID,
+        'modificationID': this.parentData.row.id
       };
-      this.$api.peptide.insertSuitableAminoAcids(addSonVal).then(res => {
+      this.$api.peptideBase.insertSuitableAminoAcids(addSonVal).then(res => {
         if (res.id) {
-          this.handleExitSon();
+          this.handleCellClick(this.parentData);
         }
       });
     }
@@ -482,4 +507,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+  div .vxe-table--fixed-right-wrapper {
+    height: 569px!important;
+  }
 </style>

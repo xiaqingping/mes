@@ -184,25 +184,43 @@
           </div>
           <div id="svgResize" style="border-top: 2px solid #b5b9a9; "></div>
           <div id="svgDown">
-            <div style="height:100%;position: relative;margin-top:5px">
-              <div class="sonButton">
-                <a-button type="primary" icon="edit">批量导入序列</a-button>
-                <a-button type="primary" icon="plus">新增</a-button>
-                <a-button type="primary" icon="delete">删除</a-button>
-                <a-button type="primary" icon="save">保存</a-button>
-              </div>
-              <a-table
-                :columns="columns"
-                :dataSource="data"
-                bordered
-                rowKey="id"
-                ref="table1"
-                size="small"
-                style="width:65%;"
-                :rowSelection="{ selectedRowKeys: selectedRowKeys, onChange: onSelectChange }"
-                :scroll="{ x: 3200, y: 400}"/>
-              <div style="width:35%;position: absolute; left:66%; top:0">
-                <h4 style="float:left">氨基酸</h4><br/>
+            <a-layout>
+              <a-layout-content>
+                <div style="height:100%;position: relative;margin-top:5px">
+                  <div class="sonButton">
+                    <a-button type="primary" icon="edit">批量导入序列</a-button>
+                    <a-button type="primary" icon="plus">新增</a-button>
+                    <a-button type="primary" icon="delete">删除</a-button>
+                    <a-button type="primary" icon="save">保存</a-button>
+                  </div>
+                  <!-- <vxe-grid
+                    :columns="columns"
+                    :dataSource="data"
+                    bordered
+                    rowKey="id"
+                    ref="table1"
+                    size="small"
+                    :rowSelection="{ selectedRowKeys: selectedRowKeys, onChange: onSelectChange }"
+                    :scroll="{ x: 3200, y: 400}"> -->
+                  <vxe-grid
+                    highlight-hover-row
+                    auto-resize
+                    :ref="productTable.ref"
+                    :columns="columns"
+                    :data.sync="productTable.tableData"
+                    :loading="productTable.loading"
+                    :edit-rules="productTable.editRules"
+                    :edit-config="{key: 'id', trigger: 'manual', mode: 'row', showIcon: false, autoClear: false}"
+                    :pager-config="productTable.pagerConfig"
+                    @cell-click="(options) => handleCellClick(options)"
+                    @cell-dblclick="(options) => sub(options)"
+                    @page-change="pagerChange"
+                  >
+                  </vxe-grid>
+                </div>
+              </a-layout-content>
+              <a-layout-sider width="550">
+                <h4 style="text-align:left">氨基酸</h4>
                 <div class="sonButton">
                   <a-input style="width: 100px; margin-right:10px"/>
                   <a-button type="primary" icon="edit">修改价格</a-button>
@@ -210,36 +228,47 @@
                   <a-button type="primary" icon="delete">删除</a-button>
                   <a-button type="primary" icon="save">保存</a-button>
                 </div>
-                <a-table
+                <!-- <vxe-grid
                   :columns="columnSon"
                   :dataSource="dataSon"
                   bordered
                   rowKey="id"
                   ref="table1"
                   size="small"
-                  :scroll="{ x: 600, y: 400}"/>
-              </div>
-            </div>
-            <svg width="100%" id="serverSvg"></svg>
-            <div class="bottomButton">
-              <a-button
-                type="primary"
-                @click="sub"
-                icon="check"
-              >
-                保存
-              </a-button>
-              <a-button
-                style="margin-left:10px"
-                type="primary"
-                @click="onClose"
-                icon="close"
-              >
-                取消
-              </a-button>
-            </div>
-
+                  :scroll="{ x: 600, y: 400}"> -->
+                <vxe-grid
+                  highlight-hover-row
+                  auto-resize
+                  :ref="productSonTable.ref"
+                  :loading="productSonTable.loading"
+                  :columns="columnSon"
+                  :data.sync="productSonTable.tableData"
+                  :edit-rules="productSonTable.editRules"
+                  :edit-config="{key: 'id', trigger: 'manual', mode: 'row', showIcon: false, autoClear: false}"
+                >
+                </vxe-grid>
+              </a-layout-sider>
+            </a-layout>
           </div>
+          <svg width="100%" id="serverSvg"></svg>
+          <div class="bottomButton">
+            <a-button
+              type="primary"
+              @click="sub"
+              icon="check"
+            >
+              保存
+            </a-button>
+            <a-button
+              style="margin-left:10px"
+              type="primary"
+              @click="onClose"
+              icon="close"
+            >
+              取消
+            </a-button>
+          </div>
+
         </div>
       </a-form>
     </div>
@@ -248,17 +277,37 @@
 </template>
 
 <script>
-import STable from '@/components/Table';
+const tableName = 'productTable';
+const tableNameSon = 'productSonTable';
 
 export default {
   name: 'AddMask',
-
-  components: {
-    STable
-  },
   data () {
     return {
       form: this.$form.createForm(this),
+      productTable: {
+        id: 0,
+        ref: 'productTable',
+        xTable: null,
+        editIndex: -1,
+        // loading: false,
+        tableData: [],
+        columns: [],
+        pagerConfig: {
+          currentPage: 1,
+          pageSize: 10,
+          total: 0
+        }
+      },
+      productSonTable: {
+        id: 0,
+        ref: 'productSonTable',
+        xTable: null,
+        loading: false,
+        tableData: [],
+        columns: [],
+        editRules: {}
+      },
       small: false,
       customer_name_top: 0,
       customer_name_left: 0,
@@ -271,40 +320,40 @@ export default {
       selectedRowKeys: [],
       selectedRows: [],
       columns: [
-        { title: '编号', dataIndex: 'code', width: '120px' },
-        { title: '多肽名称', dataIndex: 'name', width: '80px' },
-        { title: '提供总量(mg)', dataIndex: 'providerTotalAmount', width: '80px' },
-        { title: '是否脱盐', dataIndex: 'isNeedDesalting', width: '80px' },
-        { title: '纯度', dataIndex: 'peptidePurityId', width: '80px' },
-        { title: '序列', dataIndex: 'sequence', width: '80px' },
-        { title: '氨基酸数', dataIndex: 'aminoAcidCount', width: '80px' },
-        { title: '氨基酸金额', dataIndex: 'aminoAcidAmount', width: '80px' },
-        { title: '氨基端修饰', dataIndex: 'aminoModificationName', width: '80px' },
-        { title: '氨基端修饰金额', dataIndex: 'aminoModificationPrice', width: '80px' },
-        { title: '氨基端修饰SAP产品编号', dataIndex: 'aminoSapProductCode', width: '80px' },
-        { title: '氨基端修饰SAP产品名称', dataIndex: 'aminoSapProductName', width: '80px' },
-        { title: '羧基端修饰', dataIndex: 'carboxyModificationName', width: '80px' },
-        { title: '羧基端修饰金额', dataIndex: 'carboxyModificationPrice', width: '80px' },
-        { title: '羧基端修饰SAP产品编号', dataIndex: 'carboxySapProductCode', width: '80px' },
-        { title: '羧基端修饰SAP产品名称', dataIndex: 'carboxySapProductName', width: '80px' },
-        { title: '中间修饰', dataIndex: 'middleModification', width: '80px' },
-        { title: '中间修饰数量', dataIndex: 'middleModificationDetailCount', width: '80px' },
-        { title: '中间修饰金额', dataIndex: 'middleModificationDetailAmount', width: '80px' },
-        { title: '二硫键', dataIndex: 'disulfideBond', width: '80px' },
-        { title: '二硫键数量', dataIndex: 'disulfideBondDetailCount', width: '80px' },
-        { title: '二硫键金额', dataIndex: 'disulfideBondDetailAmount', width: '80px' },
-        { title: '分装管数', dataIndex: 'subpackage', width: '80px' },
-        { title: '金额', dataIndex: 'totalAmount', width: '80px' },
-        { title: '备注', dataIndex: 'notes', width: '80px' }
+        { title: '编号', field: 'code', width: 100 },
+        { title: '多肽名称', field: 'name', width: 100 },
+        { title: '提供总量(mg)', field: 'providerTotalAmount', width: 100 },
+        { title: '是否脱盐', field: 'isNeedDesalting', width: 100 },
+        { title: '纯度', field: 'peptidePurityId', width: 100 },
+        { title: '序列', field: 'sequence', width: 100 },
+        { title: '氨基酸数', field: 'aminoAcidCount', width: 100 },
+        { title: '氨基酸金额', field: 'aminoAcidAmount', width: 100 },
+        { title: '氨基端修饰', field: 'aminoModificationName', width: 100 },
+        { title: '氨基端修饰金额', field: 'aminoModificationPrice', width: 110 },
+        { title: '氨基端修饰SAP产品编号', field: 'aminoSapProductCode', width: 160 },
+        { title: '氨基端修饰SAP产品名称', field: 'aminoSapProductName', width: 160 },
+        { title: '羧基端修饰', field: 'carboxyModificationName', width: 100 },
+        { title: '羧基端修饰金额', field: 'carboxyModificationPrice', width: 110 },
+        { title: '羧基端修饰SAP产品编号', field: 'carboxySapProductCode', width: 160 },
+        { title: '羧基端修饰SAP产品名称', field: 'carboxySapProductName', width: 160 },
+        { title: '中间修饰', field: 'middleModification', width: 100 },
+        { title: '中间修饰数量', field: 'middleModificationDetailCount', width: 100 },
+        { title: '中间修饰金额', field: 'middleModificationDetailAmount', width: 100 },
+        { title: '二硫键', field: 'disulfideBond', width: 100 },
+        { title: '二硫键数量', field: 'disulfideBondDetailCount', width: 100 },
+        { title: '二硫键金额', field: 'disulfideBondDetailAmount', width: 100 },
+        { title: '分装管数', field: 'subpackage', width: 100 },
+        { title: '金额', field: 'totalAmount', width: 100 },
+        { title: '备注', field: 'notes', width: 100 }
       ],
       columnSon: [
-        { title: '氨基酸', dataIndex: 'aminoAcidID', width: '40px' },
-        { title: '类型', dataIndex: 'aminoAcidType', width: '40px' },
-        { title: '长代码', dataIndex: 'longCode', width: '40px' },
-        { title: '短代码', dataIndex: 'shortCode', width: '40px' },
-        { title: '单价', dataIndex: 'price', width: '40px' },
-        { title: 'SAP产品编号', dataIndex: 'sapProductCode', width: '80px' },
-        { title: 'SAP产品名称', dataIndex: 'sapProductName', width: '80px' }
+        { title: '氨基酸', field: 'aminoAcidID', width: 100 },
+        { title: '类型', field: 'aminoAcidType', width: 100 },
+        { title: '长代码', field: 'longCode', width: 100 },
+        { title: '短代码', field: 'shortCode', width: 100 },
+        { title: '单价', field: 'price', width: 100 },
+        { title: 'SAP产品编号', field: 'sapProductCode', width: 100 },
+        { title: 'SAP产品名称', field: 'sapProductName', width: 100 }
       ],
       dataSon: [],
       data: []
@@ -343,6 +392,83 @@ export default {
     }
   },
   methods: {
+    // setColumns () {
+    //   const { peptide } = this.$store.state;
+    //   this.status = peptide.status;
+    //   this.modificationPositionData = peptide.modificationPosition;
+    //   const columns = [
+    //     { title: '编号', field: 'code' },
+    //     { title: '多肽名称', field: 'name', width: '80px' },
+    //     { title: '提供总量(mg)', field: 'providerTotalAmount' },
+    //     { title: '是否脱盐', field: 'isNeedDesalting' },
+    //     { title: '纯度', field: 'peptidePurityId' },
+    //     { title: '序列', field: 'sequence' },
+    //     { title: '氨基酸数', field: 'aminoAcidCount' },
+    //     { title: '氨基酸金额', field: 'aminoAcidAmount' },
+    //     { title: '氨基端修饰', field: 'aminoModificationName' },
+    //     { title: '氨基端修饰金额', field: 'aminoModificationPrice' },
+    //     { title: '氨基端修饰SAP产品编号', field: 'aminoSapProductCode' },
+    //     { title: '氨基端修饰SAP产品名称', field: 'aminoSapProductName' },
+    //     { title: '羧基端修饰', field: 'carboxyModificationName' },
+    //     { title: '羧基端修饰金额', field: 'carboxyModificationPrice' },
+    //     { title: '羧基端修饰SAP产品编号', field: 'carboxySapProductCode' },
+    //     { title: '羧基端修饰SAP产品名称', field: 'carboxySapProductName' },
+    //     { title: '中间修饰', field: 'middleModification' },
+    //     { title: '中间修饰数量', field: 'middleModificationDetailCount' },
+    //     { title: '中间修饰金额', field: 'middleModificationDetailAmount' },
+    //     { title: '二硫键', field: 'disulfideBond' },
+    //     { title: '二硫键数量', field: 'disulfideBondDetailCount' },
+    //     { title: '二硫键金额', field: 'disulfideBondDetailAmount' },
+    //     { title: '分装管数', field: 'subpackage' },
+    //     { title: '金额', field: 'totalAmount' },
+    //     { title: '备注', field: 'notes' }
+    //   ];
+    //   const columnSon = [
+    //     { title: '氨基酸', field: 'aminoAcidID' },
+    //     { title: '类型', field: 'aminoAcidType' },
+    //     { title: '长代码', field: 'longCode' },
+    //     { title: '短代码', field: 'shortCode' },
+    //     { title: '单价', field: 'price' },
+    //     { title: 'SAP产品编号', field: 'sapProductCode' },
+    //     { title: 'SAP产品名称', field: 'sapProductName' }
+    //   ];
+
+    //   columns.forEach(function (e) {
+    //     if (!e.width) e.width = 100;
+    //   });
+
+    //   columnSon.forEach(function (e) {
+    //     if (!e.width) e.width = 100;
+    //   });
+
+    //   this[tableName].columns = columns;
+    //   this[tableNameSon].columns = columnSon;
+    //   this[tableName].xTable = this.$refs[this[tableName].ref].$refs.xTable;
+    //   this[tableNameSon].xTable = this.$refs[this[tableNameSon].ref].$refs.xTable;
+    // },
+    handleCellClick ({ row }) {
+      this[tableNameSon].tableData = row.stock.storages.map((value, index, array) => {
+        return Object.assign({ id: value.storage }, value);
+      });
+    },
+    handleSearch (e) {
+      // if (e) e.preventDefault();
+      // // this[tableName].loading = true;
+      // const queryParam = this.form.getFieldsValue();
+      // const params = Object.assign({ page: this[tableName].pagerConfig.currentPage, rows: this[tableName].pagerConfig.pageSize }, queryParam);
+
+      // this.$api.basic.getProductList(params).then((data) => {
+      //   this[tableName].tableData = data;
+      //   this[tableName].pagerConfig.total = data.length;
+      //   this[tableName].pagerConfig.current = params.page;
+      //   this[tableName].pagerConfig.pageSize = params.rows;
+      //   this[tableName].editIndex = -1;
+      // });
+    },
+    pagerChange ({ pageSize, currentPage }) {
+      this[tableName].pagerConfig = Object.assign(this[tableName].pagerConfig, { pageSize, currentPage });
+      this.handleSearch();
+    },
     sub () {
       console.log(this.form.getFieldsValue());
     },
@@ -379,11 +505,6 @@ export default {
         svgResize.setCapture && svgResize.setCapture();
         return false;
       };
-    },
-    onSelectChange (selectedRowKeys, selectedRows) {
-      this.selectedRowKeys = selectedRowKeys.slice(-1);
-      this.selectedRows = selectedRows.slice(-1);
-      this.loadDataId = this.selectedRowKeys[0];
     },
     onClose () {
       this.$emit('Closed', '', 5);
@@ -479,8 +600,9 @@ export default {
   }
 
   .sonButton {
+    text-align: right;
    button {
-     margin:0 5px 10px 0
+     margin:0 5px 5px 0
    }
  }
 

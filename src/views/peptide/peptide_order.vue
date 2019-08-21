@@ -71,7 +71,7 @@
                 </a-select>
               </a-form-item>
             </a-col>
-            <a-col :md="6" :xl="4">
+            <a-col :md="12" :xl="8">
               <a-form-item label="创建日期">
                 <a-range-picker
                   :ranges="{ 今天: [moment(), moment()], '本月': [moment(), moment().endOf('month')] }"
@@ -133,23 +133,59 @@
         >
       </vxe-grid>
     </div>
-    <customer-mask v-show="customer_status" @Closed="onClosed">
-    </customer-mask>
-    <sub-customer-mask v-show="sub_customer_status" @Closed="onClosed">
-    </sub-customer-mask>
-    <contact-mask v-show="contact_status" @Closed="onClosed">
-    </contact-mask>
-    <saler-mask v-show="saler_status" @Closed="onClosed">
-    </saler-mask>
+
+    <a-modal
+      title="客户列表"
+      width="1050px"
+      :visible="customer_status"
+      :footer="null"
+      @cancel="customer_status = false">
+      <customer-mask @Closed="onClosed">
+      </customer-mask>
+    </a-modal>
+
+    <a-modal
+      title="负责人列表"
+      width="1050px"
+      :visible="sub_customer_status"
+      :footer="null"
+      @cancel="sub_customer_status = false">
+      <sub-customer-mask @Closed="onClosed">
+      </sub-customer-mask>
+    </a-modal>
+
+    <a-modal
+      title="订货人列表"
+      width="1050px"
+      :visible="contact_status"
+      :footer="null"
+      @cancel="contact_status = false">
+      <contact-mask @Closed="onClosed">
+      </contact-mask>
+    </a-modal>
+
+    <a-modal
+      title="销售员列表"
+      width="1050px"
+      :visible="saler_status"
+      :footer="null"
+      @cancel="saler_status = false">
+      <saler-mask @Closed="onClosed">
+      </saler-mask>
+    </a-modal>
+
     <add-mask v-show="add_status" @Closed="onClosed">
     </add-mask>
+
   </div>
 </template>
 
 <script>
+// 用于日期中文
 import Zhcn from 'ant-design-vue/lib/locale-provider/zh_CN';
 import moment from 'moment';
 import 'moment/locale/zh-cn';
+
 import CustomerMask from '@/components/peptide/customer_mask';
 import SubCustomerMask from '@/components/peptide/sub_customer_mask';
 import ContactMask from '@/components/peptide/contact_mask';
@@ -348,7 +384,7 @@ export default {
       queryParam.createDateBegin = this.createDateBegin;
       queryParam.createDateEnd = this.createDateEnd;
       const params = Object.assign({ page: this[tableName].pagerConfig.currentPage, rows: this[tableName].pagerConfig.pageSize }, queryParam);
-      this.$api.peptide.getOrder(params).then((data) => {
+      this.$api.peptideorder.getOrder(params).then((data) => {
         this[tableName].tableData = data.rows;
         this[tableName].pagerConfig.total = data.total;
         this[tableName].pagerConfig.currentPage = params.page;
