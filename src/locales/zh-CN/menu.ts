@@ -47,4 +47,8 @@ export default {
   'menu.editor.flow': '流程编辑器',
   'menu.editor.mind': '脑图编辑器',
   'menu.editor.koni': '拓扑编辑器',
+  'menu.seq': '测序管理',
+  'menu.seq.order': '测序订单',
+  'menu.partner': '业务伙伴',
+  'menu.partner.customer': '客户维护',
 };
