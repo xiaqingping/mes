@@ -14,7 +14,8 @@
         :collapsed="collapsed"
         @toggle="toggle"
       />
-      <a-layout-content :style="{ display: 'flex', 'flex-direction': 'column', height: '100%', paddingTop: '0' }">
+      <!-- <a-layout-content :style="{ display: 'flex', 'flex-direction': 'column', height: '100%', paddingTop: '0' }"> -->
+      <a-layout-content :style="{ height: '100%', margin: '24px 24px 0', paddingTop: fixedHeader ? '64px' : '0' }">
         <multi-tab></multi-tab>
         <transition name="page-transition">
           <route-view />
@@ -50,6 +51,7 @@ export default {
     return {
       theme: 'dark',
       collapsed: false,
+      fixedHeader: false,
       menus: []
     };
   },

@@ -7,6 +7,8 @@ import system from './system';
 import peptide from './peptide';
 // 人事管理
 import personnel from './personnel';
+// 业务伙伴
+import businessPartners from './business_partners';
 
 /**
  * 重定向设置，默认为首页（/home）
@@ -36,6 +38,7 @@ export const asyncRouterMap = [
       peptide,
       seq,
       personnel,
+      businessPartners,
       system
     ]
   },
