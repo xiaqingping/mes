@@ -27,7 +27,7 @@ const { Option } = Select;
 
 class Customer extends Component {
   state = {
-    expandForm: true,
+    expandForm: false,
   };
 
   columns = [
@@ -103,40 +103,106 @@ class Customer extends Component {
   };
 
   renderAdvancedForm() {
-    const { form } = this.props;
-    const { getFieldDecorator } = form;
+    const {
+      form: { getFieldDecorator },
+    } = this.props;
     return (
       <Form onSubmit={this.handleSearch} layout="inline">
         <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
-          <Col md={8} sm={24}>
-            <FormItem label="规则名称">
-              {getFieldDecorator('name')(<Input placeholder="请输入" />)}
+          <Col md={6} sm={12}>
+            <FormItem label="编号">
+              {getFieldDecorator('code')(<Input />)}
             </FormItem>
           </Col>
-          <Col md={8} sm={24}>
-            <FormItem label="使用状态">
-              {getFieldDecorator('status')(
+          <Col md={6} sm={12}>
+            <FormItem label="名称">
+              {getFieldDecorator('name')(<Input />)}
+            </FormItem>
+          </Col>
+          <Col md={6} sm={12}>
+            <FormItem label="移动电话">
+              {getFieldDecorator('mobile')(<Input />)}
+            </FormItem>
+          </Col>
+          <Col md={6} sm={12}>
+            <FormItem label="Email">
+              {getFieldDecorator('email')(<Input />)}
+            </FormItem>
+          </Col>
+          <Col md={6} sm={12}>
+            <FormItem label="认证状态">
+              {getFieldDecorator('renzheng')(
                 <Select placeholder="请选择" style={{ width: '100%' }}>
-                  <Option value="0">关闭</Option>
-                  <Option value="1">运行中</Option>
+                  <Option value="0">未认证</Option>
+                  <Option value="1">已认证</Option>
                 </Select>,
               )}
             </FormItem>
           </Col>
-          <Col md={8} sm={24}>
-            <span className={styles.submitButtons}>
-              <Button type="primary" htmlType="submit">
-                查询
-              </Button>
-              <Button style={{ marginLeft: 8 }} onClick={this.handleFormReset}>
-                重置
-              </Button>
-              <a style={{ marginLeft: 8 }} onClick={this.toggleForm}>
-                展开 <Icon type="down" />
-              </a>
-            </span>
+          <Col md={6} sm={12}>
+            <FormItem label="销售状态">
+              {getFieldDecorator('xiaoshou')(
+                <Select placeholder="请选择" style={{ width: '100%' }}>
+                  <Option value="0">未认证</Option>
+                  <Option value="1">已认证</Option>
+                </Select>,
+              )}
+            </FormItem>
+          </Col>
+          <Col md={6} sm={12}>
+            <FormItem label="数据状态">
+              {getFieldDecorator('shuju')(
+                <Select placeholder="请选择" style={{ width: '100%' }}>
+                  <Option value="0">未认证</Option>
+                  <Option value="1">已认证</Option>
+                </Select>,
+              )}
+            </FormItem>
+          </Col>
+          <Col md={6} sm={12}>
+            <FormItem label="区域归属">
+              {getFieldDecorator('quyu')(
+                <Select placeholder="请选择" style={{ width: '100%' }}>
+                  <Option value="0">未认证</Option>
+                  <Option value="1">已认证</Option>
+                </Select>,
+              )}
+            </FormItem>
+          </Col>
+          <Col md={6} sm={12}>
+            <FormItem label="销售归属">
+              {getFieldDecorator('xiaoshouguishu')(
+                <Select placeholder="请选择" style={{ width: '100%' }}>
+                  <Option value="0">未认证</Option>
+                  <Option value="1">已认证</Option>
+                </Select>,
+              )}
+            </FormItem>
+          </Col>
+          <Col md={6} sm={12}>
+            <FormItem label="地址">
+              {getFieldDecorator('address')(
+                <Select placeholder="请选择" style={{ width: '100%' }}>
+                  <Option value="0">未认证</Option>
+                  <Option value="1">已认证</Option>
+                </Select>,
+              )}
+            </FormItem>
           </Col>
         </Row>
+        <div style={{ overflow: 'hidden' }}>
+          <div style={{ float: 'right', marginBottom: 24 }}>
+            <Button type="primary" htmlType="submit">
+              查询
+            </Button>
+            <Button style={{ marginLeft: 8 }} onClick={this.handleFormReset}>
+              重置
+            </Button>
+            <a style={{ marginLeft: 8 }} onClick={this.toggleForm}>
+              收起 <Icon type="up" />
+            </a>
+          </div>
+        </div>
       </Form>
     );
   }
@@ -147,22 +213,22 @@ class Customer extends Component {
     return (
       <Form onSubmit={this.handleSearch} layout="inline">
         <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
-          <Col md={8} sm={24}>
-            <FormItem label="规则名称">
-              {getFieldDecorator('name')(<Input placeholder="请输入" />)}
+          <Col md={6} sm={12}>
+            <FormItem label="编号">
+              {getFieldDecorator('code')(<Input />)}
             </FormItem>
           </Col>
-          <Col md={8} sm={24}>
-            <FormItem label="使用状态">
-              {getFieldDecorator('status')(
-                <Select placeholder="请选择" style={{ width: '100%' }}>
-                  <Option value="0">关闭</Option>
-                  <Option value="1">运行中</Option>
-                </Select>,
-              )}
+          <Col md={6} sm={12}>
+            <FormItem label="名称">
+              {getFieldDecorator('name')(<Input />)}
             </FormItem>
           </Col>
-          <Col md={8} sm={24}>
+          <Col md={6} sm={12}>
+            <FormItem label="移动电话">
+              {getFieldDecorator('mobile')(<Input />)}
+            </FormItem>
+          </Col>
+          <Col md={6} sm={12}>
             <span className={styles.submitButtons}>
               <Button type="primary" htmlType="submit">
                 查询
