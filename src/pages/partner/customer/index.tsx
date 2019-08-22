@@ -94,7 +94,10 @@ class Customer extends Component {
   };
 
   toggleForm = () => {
-    console.log(3);
+    const { expandForm } = this.state;
+    this.setState({
+      expandForm: !expandForm,
+    });
   };
 
   renderForm = () => {

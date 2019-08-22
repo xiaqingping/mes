@@ -29,6 +29,19 @@ ol {
   list-style: none;
 }
 
+// label 宽度控制
+.ant-form-inline {
+  .ant-form-item {
+    .ant-form-item-label {
+      label {
+        display: inline-block;
+        width: 70px;
+        text-align: left;
+      }
+    }
+  }
+}
+
 @media (max-width: @screen-xs) {
   .ant-table {
     width: 100%;
