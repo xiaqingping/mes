@@ -3,6 +3,7 @@ import Vuex from 'vuex';
 
 import getters from './getters';
 
+import app from './modules/app';
 import permission from './modules/permission';
 import seq from './modules/seq';
 import basic from './modules/basic';
@@ -22,6 +23,7 @@ const setCache = store => {
 
 export default new Vuex.Store({
   modules: {
+    app,
     permission,
     seq,
     basic,
