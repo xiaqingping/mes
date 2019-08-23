@@ -27,7 +27,9 @@ const { Option } = Select;
 
 class Customer extends Component {
   state = {
+    selectedRows: [],
     expandForm: false,
+    data: null,
   };
 
   columns = [
@@ -73,16 +75,44 @@ class Customer extends Component {
     },
   ];
 
+  componentDidMount() {
+    this.handleSearch();
+  }
+
   handleSearch = () => {
-    console.log('data');
+    const data = [];
+    for (let i = 0; i < 25; i++) {
+      data.push({
+        id: i + 1,
+        code: i + 1,
+        name: `name${i}`,
+        renzheng: true,
+        dongjie: true,
+        wanzheng: true,
+        mobile: '18735818888',
+        email: '123@qq.com',
+        phone: '123456789',
+        address: '上海市松江区',
+      });
+    }
+    this.setState({
+      data: {
+        pagination: {
+          pageSize: 10,
+        },
+        list: data,
+      },
+    });
   };
 
   handleModalVisible = (flag?: boolean) => {
     console.log(flag);
   };
 
-  handleSelectRows = () => {
-    console.log(2);
+  handleSelectRows = (rows: []) => {
+    this.setState({
+      selectedRows: rows,
+    });
   };
 
   handleStandardTableChange = () => {
@@ -250,18 +280,7 @@ class Customer extends Component {
   }
 
   render() {
-    const selectedRows = [];
-
-    const data = {
-      pagination: {},
-      list: [
-        {
-          name: '123',
-          code: 123,
-        },
-      ],
-    }
-
+    const { data, selectedRows } = this.state;
     const loading = false;
 
     const menu = (

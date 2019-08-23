@@ -89,6 +89,12 @@ export default (config: any) => {
         },
       },
     });
+
+  // ESlint 错误显示
+  // config.devServer.overlay({
+  //   warnings: true,
+  //   errors: true
+  // });
 };
 
 const getAntdSerials = (color: string) => {

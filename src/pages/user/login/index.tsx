@@ -114,8 +114,8 @@ class Login extends Component<LoginProps, LoginState> {
                 formatMessage({ id: 'user-login.login.message-invalid-credentials' }),
               )}
             <UserName
-              name="userName"
-              placeholder={`${formatMessage({ id: 'user-login.login.userName' })}: admin or user`}
+              name="usercode"
+              placeholder={formatMessage({ id: 'user-login.login.userName' })}
               rules={[
                 {
                   required: true,
@@ -125,7 +125,7 @@ class Login extends Component<LoginProps, LoginState> {
             />
             <Password
               name="password"
-              placeholder={`${formatMessage({ id: 'user-login.login.password' })}: ant.design`}
+              placeholder={formatMessage({ id: 'user-login.login.password' })}
               rules={[
                 {
                   required: true,
