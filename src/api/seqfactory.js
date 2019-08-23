@@ -10,19 +10,19 @@ export default {
    * 测序点
    */
   // 查询
-  getSeqfactory (params, easyui) {
+  getSeqfactory(params, easyui) {
     return request(`/seqfactory/v1/seqfactory${easyui ? '/easyui' : ''}`, { params });
   },
   // 新增
-  addSeqfactory (data) {
-    return request(`/seqfactory/v1/seqfactory`, { method: 'POST', data });
+  addSeqfactory(data) {
+    return request('/seqfactory/v1/seqfactory', { method: 'POST', data });
   },
   // 修改
-  updateSeqfactory (data) {
+  updateSeqfactory(data) {
     return request(`/seqfactory/v1/seqfactory/${data.id}`, { method: 'PUT', data });
   },
   // 作废
-  cancelSeqfactory (id) {
+  cancelSeqfactory(id) {
     return request(`/seqfactory/v1/seqfactory/${id}`, { method: 'DELETE' });
   },
 
@@ -30,15 +30,15 @@ export default {
    * 测序点之网点
    */
   // 查询
-  getOfficeBySeqfactory (seqfactoryId) {
+  getOfficeBySeqfactory(seqfactoryId) {
     return request(`/seqfactory/v1/seqfactory/${seqfactoryId}/office`);
   },
   // 新增
-  addOfficeBySeqfactory (data) {
+  addOfficeBySeqfactory(data) {
     return request(`/seqfactory/v1/seqfactory/${data.seqfactoryId}/office`, { method: 'POST', data });
   },
   // 作废
-  cancelOfficeBySeqfactory (data) {
+  cancelOfficeBySeqfactory(data) {
     return request(`/seqfactory/v1/seqfactory/office/${data.id}`, { method: 'DELETE' });
-  }
+  },
 };

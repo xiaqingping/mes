@@ -10,19 +10,19 @@ export default {
    * 载体系列
    */
   // 查询
-  getSeries (params, easyui) {
+  getSeries(params, easyui) {
     return request(`/series/v1/series${easyui ? '/easyui' : ''}`, { params });
   },
   // 新增
-  addSeries (data) {
-    return request(`/series/v1/series`, { method: 'POST', data });
+  addSeries(data) {
+    return request('/series/v1/series', { method: 'POST', data });
   },
   // 修改
-  updateSeries (data) {
+  updateSeries(data) {
     return request(`/series/v1/series/${data.id}`, { method: 'PUT', data });
   },
   // 作废
-  cancelSeries (id) {
+  cancelSeries(id) {
     return request(`/series/v1/series/${id}`, { method: 'DELETE' });
   },
 
@@ -30,15 +30,15 @@ export default {
    * 载体系列之引物
    */
   // 查询
-  getPrimersBySeries (seriesId) {
+  getPrimersBySeries(seriesId) {
     return request(`/series/v1/series/${seriesId}/primers`);
   },
   // 新增
-  addPrimersBySeries (data) {
+  addPrimersBySeries(data) {
     return request(`/series/v1/series/${data.seriesId}/primers`, { method: 'POST', data });
   },
   // 作废
-  cancelPrimersBySeries (data) {
+  cancelPrimersBySeries(data) {
     return request(`/series/v1/series/${data.seriesId}/primers/${data.id}`, { method: 'DELETE' });
-  }
+  },
 };

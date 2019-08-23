@@ -7,19 +7,19 @@ import request from '@/assets/js/request';
 
 export default {
   // 查询
-  getCarrier (params, easyui) {
+  getCarrier(params, easyui) {
     return request(`/carrier/v1/carriers${easyui ? '/easyui' : ''}`, { params });
   },
   // 新增
-  addCarrier (data) {
-    return request(`/carrier/v1/carriers`, { method: 'POST', data });
+  addCarrier(data) {
+    return request('/carrier/v1/carriers', { method: 'POST', data });
   },
   // 修改
-  updateCarrier (data) {
+  updateCarrier(data) {
     return request(`/carrier/v1/carriers/${data.id}`, { method: 'PUT', data });
   },
   // 作废
-  cancelCarrier (id) {
+  cancelCarrier(id) {
     return request(`/carrier/v1/carriers/${id}`, { method: 'DELETE' });
-  }
+  },
 };

@@ -53,7 +53,7 @@ export default {
   peptideBase,
   peptideorder,
   pay,
-  system
+  system,
 };
 
 export {
@@ -83,5 +83,5 @@ export {
   peptideBase,
   peptideorder,
   pay,
-  system
+  system,
 };

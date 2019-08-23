@@ -7,7 +7,7 @@ import request from '@/assets/js/request';
 
 export default {
   // 查询引物
-  getSample (params, easyui) {
+  getSample(params, easyui) {
     return request(`/sample/v1/samples${easyui ? '/easyui' : ''}`, { params });
-  }
+  },
 };

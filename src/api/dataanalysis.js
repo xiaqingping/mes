@@ -7,7 +7,7 @@ import request from '@/assets/js/request';
 
 export default {
   // 查询测序明细报表
-  getSeqdataanalysis (params, easyui) {
+  getSeqdataanalysis(params, easyui) {
     return request(`/dataanalysis/v1/seqdataanalysis${easyui ? '/easyui' : ''}`, { params });
-  }
+  },
 };

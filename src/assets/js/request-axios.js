@@ -7,7 +7,7 @@ const baseURLMap = {
   dev: 'https://devapi.sangon.com:8443/api',
   test: 'https://testapi.sangon.com:8443/api',
   pre: 'https://preapi.sangon.com/api',
-  product: 'https://api.sangon.com/api'
+  product: 'https://api.sangon.com/api',
 };
 
 let baseURL = 'https://devapi.sangon.com:8443/api';

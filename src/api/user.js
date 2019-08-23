@@ -8,6 +8,7 @@ import request from '@/assets/js/request';
 export default {
   // 获取验证码
   getVerifycode(mobile) {
+    console.log(mobile);
     return request(`/user/v1/code/generate/${mobile}`);
   },
 

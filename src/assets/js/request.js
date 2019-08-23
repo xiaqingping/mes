@@ -4,7 +4,7 @@ const baseURLMap = {
   dev: 'https://devapi.sangon.com:8443/api',
   test: 'https://testapi.sangon.com:8443/api',
   pre: 'https://preapi.sangon.com/api',
-  prod: 'https://api.sangon.com/api'
+  prod: 'https://api.sangon.com/api',
 };
 
 const env = process.env.ENV || 'dev';

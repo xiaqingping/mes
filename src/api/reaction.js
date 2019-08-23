@@ -10,19 +10,19 @@ export default {
    * 反应
    */
   // 查询
-  getReaction (params) {
-    return request(`/reaction/v1/reactions/easyui`, { params });
+  getReaction(params) {
+    return request('/reaction/v1/reactions/easyui', { params });
   },
 
   /**
    * 反应排版
    */
   // 查询
-  getReactioncomposes (params) {
-    return request(`/reaction/v1/reactioncomposes/easyui`, { params });
+  getReactioncomposes(params) {
+    return request('/reaction/v1/reactioncomposes/easyui', { params });
   },
   // 查询反应板排版详情
-  getReactioncomposesDetails (id) {
+  getReactioncomposesDetails(id) {
     return request(`/reaction/v1/reactioncomposes/${id}`);
   },
 
@@ -30,7 +30,7 @@ export default {
    * 结果分析
    */
   // 查询
-  getSeqresults (params) {
-    return request(`/reaction/v1/seqresults/easyui`, { params });
-  }
+  getSeqresults(params) {
+    return request('/reaction/v1/seqresults/easyui', { params });
+  },
 };
