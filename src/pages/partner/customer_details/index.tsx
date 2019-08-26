@@ -16,18 +16,46 @@ import {
   message,
 } from 'antd';
 import React, { Component } from 'react';
+
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
+import FooterToolbar from '@/components/FooterToolbar';
 import BasicInfo from './components/BasicInfo';
 import Type from './components/Type';
-import Authentication from './components/Authentication';
 import Credit from './components/Credit';
+import Authentication from './components/Authentication';
 import Bank from './components/Bank';
 import Address from './components/Address';
 
-
 // eslint-disable-next-line react/prefer-stateless-function
 class CustomerDetails extends Component {
+  state = {
+    width: '100%',
+  };
+
+  componentDidMount() {
+    window.addEventListener('resize', this.resizeFooterToolbar, { passive: true });
+    this.resizeFooterToolbar();
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.resizeFooterToolbar);
+  }
+
+  resizeFooterToolbar = () => {
+    requestAnimationFrame(() => {
+      const sider = document.querySelectorAll('.ant-layout-sider')[0] as HTMLDivElement;
+      if (sider) {
+        const width = `calc(100% - ${sider.style.width})`;
+        const { width: stateWidth } = this.state;
+        if (stateWidth !== width) {
+          this.setState({ width });
+        }
+      }
+    });
+  };
+
   render() {
+    const { width } = this.state;
     return (
       <PageHeaderWrapper>
         <BasicInfo></BasicInfo>
@@ -36,6 +64,11 @@ class CustomerDetails extends Component {
         <Authentication></Authentication>
         <Bank></Bank>
         <Address></Address>
+        <FooterToolbar style={{ width }}>
+          {/* {this.getErrorInfo()} */}
+          <Button>取消</Button>
+          <Button type="primary">提交</Button>
+        </FooterToolbar>
       </PageHeaderWrapper>
     );
   }
