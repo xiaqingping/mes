@@ -16,6 +16,7 @@ import {
   message,
 } from 'antd';
 import React, { Component } from 'react';
+import { connect } from 'dva';
 
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import FooterToolbar from '@/components/FooterToolbar';
@@ -26,7 +27,22 @@ import Authentication from './components/Authentication';
 import Bank from './components/Bank';
 import Address from './components/Address';
 
-// eslint-disable-next-line react/prefer-stateless-function
+@connect(
+  ({
+    listTableList,
+    loading,
+  }: {
+    listTableList: [];
+    loading: {
+      models: {
+        [key: string]: boolean;
+      };
+    };
+  }) => ({
+    listTableList,
+    loading: loading.models.rule,
+  }),
+)
 class CustomerDetails extends Component {
   state = {
     width: '100%',
