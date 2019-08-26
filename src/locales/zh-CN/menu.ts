@@ -51,4 +51,5 @@ export default {
   'menu.seq.order': '测序订单',
   'menu.partner': '业务伙伴',
   'menu.partner.customer': '客户维护',
+  'menu.partner.customer.details': '客户详情',
 };

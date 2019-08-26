@@ -10,7 +10,6 @@ import { connect } from 'dva';
 import { StateType } from '@/models/login';
 import LoginComponents from './components/Login';
 import styles from './style.less';
-import { LoginParamsType } from '@/services/login';
 import { ConnectState } from '@/models/connect';
 
 const { Tab, UserName, Password, Mobile, Captcha, Submit } = LoginComponents;
@@ -43,7 +42,7 @@ class Login extends Component<LoginProps, LoginState> {
     });
   };
 
-  handleSubmit = (err: unknown, values: LoginParamsType) => {
+  handleSubmit = (err: unknown, values: any) => {
     const { type } = this.state;
     if (!err) {
       const { dispatch } = this.props;

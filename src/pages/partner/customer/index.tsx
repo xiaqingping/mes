@@ -15,7 +15,8 @@ import {
   Select,
   message,
 } from 'antd';
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
+import router from 'umi/router';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 
 import StandardTable, { StandardTableColumnProps } from './components/StandardTable';
@@ -24,6 +25,46 @@ import styles from './style.less';
 
 const FormItem = Form.Item;
 const { Option } = Select;
+
+// 认证
+const renzhengMap = {
+  0: {
+    title: 'default',
+    text: '未认证',
+  },
+  1: {
+    title: 'processing',
+    text: '审核中',
+  },
+  2: {
+    title: 'success',
+    text: '已认证',
+  },
+};
+
+// 冻结
+const dongjieMap = {
+  0: {
+    title: 'error',
+    text: '冻结',
+  },
+  1: {
+    title: 'success',
+    text: '活跃',
+  },
+};
+
+// 完整
+const wanzhengMap = {
+  0: {
+    title: 'default',
+    text: '不完整',
+  },
+  1: {
+    title: 'success',
+    text: '完整',
+  },
+};
 
 class Customer extends Component {
   state = {
@@ -36,42 +77,70 @@ class Customer extends Component {
     {
       title: '客户编号',
       dataIndex: 'code',
+      width: 150,
     },
     {
       title: '名称',
       dataIndex: 'name',
+      width: 100,
     },
     {
       title: '认证',
       dataIndex: 'renzheng',
+      width: 150,
+      render(val: number) {
+        return <Badge status={renzhengMap[val].title} text={renzhengMap[val].text} />;
+      },
     },
     {
       title: '冻结',
       dataIndex: 'dongjie',
+      width: 150,
+      render(val: number) {
+        return <Badge status={dongjieMap[val].title} text={dongjieMap[val].text} />;
+      },
     },
     {
       title: '完整',
       dataIndex: 'wanzheng',
+      width: 150,
+      render(val: number) {
+        return <Badge status={wanzhengMap[val].title} text={wanzhengMap[val].text} />;
+      },
     },
     {
       title: '移动电话',
       dataIndex: 'mobile',
+      width: 100,
     },
     {
       title: 'Email',
       dataIndex: 'email',
+      width: 100,
     },
     {
       title: '电话',
       dataIndex: 'phone',
+      width: 100,
     },
     {
       title: '地址',
       dataIndex: 'address',
+      width: 300,
     },
     {
+      fixed: 'right',
       title: '操作',
-      dataIndex: 'action',
+      width: 200,
+      render: (text, record) => (
+        <Fragment>
+          <a>修改</a>
+          <Divider type="vertical" />
+          <a href="">认证</a>
+          <Divider type="vertical" />
+          <a href="">冻结</a>
+        </Fragment>
+      ),
     },
   ];
 
@@ -86,9 +155,9 @@ class Customer extends Component {
         id: i + 1,
         code: i + 1,
         name: `name${i}`,
-        renzheng: true,
-        dongjie: true,
-        wanzheng: true,
+        renzheng: 1,
+        dongjie: 0,
+        wanzheng: 1,
         mobile: '18735818888',
         email: '123@qq.com',
         phone: '123456789',
@@ -106,7 +175,13 @@ class Customer extends Component {
   };
 
   handleModalVisible = (flag?: boolean) => {
-    console.log(flag);
+    router.push({
+      pathname: '/partner/customer/details',
+      query: {
+        type: 'add',
+        code: 123456789,
+      },
+    });
   };
 
   handleSelectRows = (rows: []) => {
@@ -311,6 +386,7 @@ class Customer extends Component {
               )}
             </div>
             <StandardTable
+              scroll={{ x: 1300 }}
               selectedRows={selectedRows}
               loading={loading}
               data={data}

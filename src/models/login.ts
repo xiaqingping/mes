@@ -35,7 +35,12 @@ const Model: LoginModelType = {
 
   effects: {
     *login({ payload }, { call, put }) {
-      const response = yield call(user.loginByPwd, payload);
+      let response = null;
+      if (payload.type === 'account') {
+        response = yield call(user.loginByPwd, payload);
+      } else {
+        response = yield call(user.loginByCode, payload);
+      }
       yield put({
         type: 'changeLoginStatus',
         payload: response,

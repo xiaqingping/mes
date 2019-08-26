@@ -7,7 +7,7 @@ const { pwa, primaryColor } = defaultSettings; // preview.pro.ant.design only do
 // preview.pro.ant.design 专用环境变量，请不要在你的项目中使用它。
 
 // 所有路由信息
-const routes = require('../router');
+const routes = require('./router');
 
 const { ANT_DESIGN_PRO_ONLY_DO_NOT_USE_IN_YOUR_PRODUCTION } = process.env;
 const isAntDesignProPreview = ANT_DESIGN_PRO_ONLY_DO_NOT_USE_IN_YOUR_PRODUCTION === 'site';
