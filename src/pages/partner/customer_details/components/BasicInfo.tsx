@@ -15,12 +15,47 @@ import {
   Select,
   Switch,
   message,
+  Cascader,
 } from 'antd';
 import React, { Component } from 'react';
 
 const FormItem = Form.Item;
 const InputGroup = Input.Group;
 const { Option } = Select;
+const options = [
+  {
+    value: 'zhejiang',
+    label: 'Zhejiang',
+    children: [
+      {
+        value: 'hangzhou',
+        label: 'Hangzhou',
+        children: [
+          {
+            value: 'xihu',
+            label: 'West Lake',
+          },
+        ],
+      },
+    ],
+  },
+  {
+    value: 'jiangsu',
+    label: 'Jiangsu',
+    children: [
+      {
+        value: 'nanjing',
+        label: 'Nanjing',
+        children: [
+          {
+            value: 'zhonghuamen',
+            label: 'Zhong Hua Men',
+          },
+        ],
+      },
+    ],
+  },
+];
 
 // eslint-disable-next-line react/prefer-stateless-function
 class BasicInfo extends Component {
@@ -90,8 +125,10 @@ class BasicInfo extends Component {
           </Col>
           <Col md={6} sm={12}>
             <FormItem label="语言">
-              {getFieldDecorator('yuyan')(
-                <Select defaultValue="1">
+              {getFieldDecorator('yuyan', {
+                initValue: 1,
+              })(
+                <Select>
                   <Option value="1">中文</Option>
                 </Select>,
               )}
@@ -104,7 +141,10 @@ class BasicInfo extends Component {
           </Col>
           <Col md={15} sm={24}>
             <FormItem label="通讯地址">
-              {getFieldDecorator('address')(<Input />)}
+              <InputGroup compact>
+                {getFieldDecorator('address1')(<Cascader options={options} style={{ width: '40%' }} />)}
+                {getFieldDecorator('address')(<Input style={{ width: '60%' }} />)}
+              </InputGroup>
             </FormItem>
           </Col>
           <Col md={3} sm={6}>
