@@ -16,7 +16,6 @@ import {
   Switch,
   message,
   Cascader,
-  DatePicker,
 } from 'antd';
 import React, { Component } from 'react';
 
