@@ -17,6 +17,7 @@ import {
 } from 'antd';
 import React, { Component, Fragment } from 'react';
 import router from 'umi/router';
+import Link from 'umi/link';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 
 import StandardTable, { StandardTableColumnProps } from './components/StandardTable';
@@ -78,6 +79,11 @@ class Customer extends Component {
       title: '客户编号',
       dataIndex: 'code',
       width: 150,
+      render(val: number) {
+        return (
+          <Link to={`/partner/customer/details/${val}`}>{val}</Link>
+        );
+      },
     },
     {
       title: '名称',
@@ -166,15 +172,18 @@ class Customer extends Component {
       fixed: 'right',
       title: '操作',
       width: 200,
-      render: (text, record) => (
-        <Fragment>
-          <a>修改</a>
-          <Divider type="vertical" />
-          <a href="">认证</a>
-          <Divider type="vertical" />
-          <a href="">冻结</a>
-        </Fragment>
-      ),
+      render: (text, record: object) => {
+        const { code } = record;
+        return (
+          <Fragment>
+            <Link to={`/partner/customer/edit/${code}`}>修改</Link>
+            <Divider type="vertical" />
+            <a href="">认证</a>
+            <Divider type="vertical" />
+            <a href="">冻结</a>
+          </Fragment>
+        );
+      },
     },
   ];
 
@@ -208,14 +217,8 @@ class Customer extends Component {
     });
   };
 
-  handleModalVisible = (flag?: boolean) => {
-    router.push({
-      pathname: '/partner/customer/details',
-      query: {
-        type: 'add',
-        code: 123456789,
-      },
-    });
+  handleModalVisible = () => {
+    router.push('/partner/customer/edit');
   };
 
   handleSelectRows = (rows: []) => {
