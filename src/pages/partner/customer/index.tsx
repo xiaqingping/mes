@@ -29,15 +29,15 @@ const { Option } = Select;
 // 认证
 const renzhengMap = {
   0: {
-    title: 'default',
+    value: 'default',
     text: '未认证',
   },
   1: {
-    title: 'processing',
+    value: 'processing',
     text: '审核中',
   },
   2: {
-    title: 'success',
+    value: 'success',
     text: '已认证',
   },
 };
@@ -45,11 +45,11 @@ const renzhengMap = {
 // 冻结
 const dongjieMap = {
   0: {
-    title: 'error',
+    value: 'error',
     text: '冻结',
   },
   1: {
-    title: 'success',
+    value: 'success',
     text: '活跃',
   },
 };
@@ -57,11 +57,11 @@ const dongjieMap = {
 // 完整
 const wanzhengMap = {
   0: {
-    title: 'default',
+    value: 'default',
     text: '不完整',
   },
   1: {
-    title: 'success',
+    value: 'success',
     text: '完整',
   },
 };
@@ -88,24 +88,58 @@ class Customer extends Component {
       title: '认证',
       dataIndex: 'renzheng',
       width: 150,
+      filters: [
+        {
+          value: 'default',
+          text: '未认证',
+        },
+        {
+          value: 'processing',
+          text: '审核中',
+        },
+        {
+          value: 'success',
+          text: '已认证',
+        },
+      ],
       render(val: number) {
-        return <Badge status={renzhengMap[val].title} text={renzhengMap[val].text} />;
+        return <Badge status={renzhengMap[val].value} text={renzhengMap[val].text} />;
       },
     },
     {
       title: '冻结',
       dataIndex: 'dongjie',
       width: 150,
+      filters: [
+        {
+          value: 'error',
+          text: '冻结',
+        },
+        {
+          value: 'success',
+          text: '活跃',
+        },
+      ],
       render(val: number) {
-        return <Badge status={dongjieMap[val].title} text={dongjieMap[val].text} />;
+        return <Badge status={dongjieMap[val].value} text={dongjieMap[val].text} />;
       },
     },
     {
       title: '完整',
       dataIndex: 'wanzheng',
       width: 150,
+      filters: [
+        {
+          value: 'default',
+          text: '不完整',
+        },
+        {
+          value: 'success',
+          text: '完整',
+        },
+      ],
       render(val: number) {
-        return <Badge status={wanzhengMap[val].title} text={wanzhengMap[val].text} />;
+        return <Badge status={wanzhengMap[val].value} text={wanzhengMap[val].text} />;
       },
     },
     {
