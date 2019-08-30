@@ -5,25 +5,35 @@ module.exports = {
   icon: 'smile',
   routes: [
     {
-      name: 'customer',
-      path: '/partner/customer',
+      name: 'maintain',
+      path: '/partner/maintain',
       hideChildrenInMenu: true,
       routes: [
         {
-          path: '/partner/customer',
-          component: './partner/customer',
+          path: '/partner/maintain',
+          component: './partner/maintain',
         },
         {
           name: 'details',
-          path: '/partner/customer/details/:id',
-          component: './partner/customer_details',
+          path: '/partner/maintain/details/:id',
+          component: './partner/maintain_details',
         },
         {
           name: 'details',
-          path: '/partner/customer/edit/:id?',
-          component: './partner/customer_edit',
+          path: '/partner/maintain/edit/:id?',
+          component: './partner/maintain_edit',
         },
       ],
+    },
+    {
+      name: 'operation',
+      path: '/partner/operation',
+      component: './partner/operation',
+    },
+    {
+      name: 'verification',
+      path: '/partner/verification',
+      component: './partner/verification',
     },
   ],
 };

@@ -47,4 +47,12 @@ export default {
   'menu.editor.flow': 'Flow Editor',
   'menu.editor.mind': 'Mind Editor',
   'menu.editor.koni': 'Koni Editor',
+  'menu.seq': '测序管理',
+  'menu.seq.order': '测序订单',
+  'menu.partner': '业务伙伴',
+  'menu.partner.maintain': '伙伴维护',
+  'menu.partner.maintain.details': '客户详情',
+  'menu.partner.maintain.edit': '编辑',
+  'menu.partner.operation': '操作记录',
+  'menu.partner.verification': '验证记录',
 };
