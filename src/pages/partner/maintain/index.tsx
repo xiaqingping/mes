@@ -20,12 +20,13 @@ import router from 'umi/router';
 import Link from 'umi/link';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 
-import StandardTable, { StandardTableColumnProps } from './components/StandardTable';
+import StandardTable from '@/components/StandardTable';
 
 import styles from './style.less';
 
 const FormItem = Form.Item;
 const { Option } = Select;
+const { MonthPicker, RangePicker, WeekPicker } = DatePicker;
 
 // 认证
 const renzhengMap = {
@@ -67,11 +68,11 @@ const wanzhengMap = {
   },
 };
 
-class Customer extends Component {
+class Maintain extends Component {
   state = {
     selectedRows: [],
-    expandForm: false,
-    data: null,
+    expandForm: true,
+    data: {},
   };
 
   columns = [
@@ -81,7 +82,7 @@ class Customer extends Component {
       width: 150,
       render(val: number) {
         return (
-          <Link to={`/partner/customer/details/${val}`}>{val}</Link>
+          <Link to={`/partner/maintain/details/${val}`}>{val}</Link>
         );
       },
     },
@@ -171,16 +172,24 @@ class Customer extends Component {
     {
       fixed: 'right',
       title: '操作',
-      width: 200,
+      width: 150,
       render: (text, record: object) => {
         const { code } = record;
+        const menu = (
+          <Menu>
+            <Menu.Item><a href="">认证</a></Menu.Item>
+            <Menu.Item><a href="">冻结</a></Menu.Item>
+          </Menu>
+        );
         return (
           <Fragment>
-            <Link to={`/partner/customer/edit/${code}`}>修改</Link>
+            <Link to={`/partner/maintain/edit/${code}`}>修改</Link>
             <Divider type="vertical" />
-            <a href="">认证</a>
-            <Divider type="vertical" />
-            <a href="">冻结</a>
+            <Dropdown overlay={menu}>
+              <a className="ant-dropdown-link" href="#">
+                更多操作 <Icon type="down" />
+              </a>
+            </Dropdown>
           </Fragment>
         );
       },
@@ -188,10 +197,15 @@ class Customer extends Component {
   ];
 
   componentDidMount() {
-    this.handleSearch();
+    this.getData();
   }
 
-  handleSearch = () => {
+  handleSearch = e => {
+    e.preventDefault();
+    this.getData();
+  };
+
+  getData = () => {
     const data = [];
     for (let i = 0; i < 25; i++) {
       data.push({
@@ -215,10 +229,10 @@ class Customer extends Component {
         list: data,
       },
     });
-  };
+  }
 
   handleModalVisible = () => {
-    router.push('/partner/customer/edit');
+    router.push('/partner/maintain/edit');
   };
 
   handleSelectRows = (rows: []) => {
@@ -277,7 +291,7 @@ class Customer extends Component {
           <Col md={6} sm={12}>
             <FormItem label="认证状态">
               {getFieldDecorator('renzheng')(
-                <Select placeholder="请选择" style={{ width: '100%' }}>
+                <Select placeholder="请选择">
                   <Option value="0">未认证</Option>
                   <Option value="1">已认证</Option>
                 </Select>,
@@ -287,7 +301,7 @@ class Customer extends Component {
           <Col md={6} sm={12}>
             <FormItem label="销售状态">
               {getFieldDecorator('xiaoshou')(
-                <Select placeholder="请选择" style={{ width: '100%' }}>
+                <Select placeholder="请选择">
                   <Option value="0">未认证</Option>
                   <Option value="1">已认证</Option>
                 </Select>,
@@ -295,9 +309,16 @@ class Customer extends Component {
             </FormItem>
           </Col>
           <Col md={6} sm={12}>
+            <FormItem label="销售状态">
+              {getFieldDecorator('xiaoshou')(
+                <RangePicker />,
+              )}
+            </FormItem>
+          </Col>
+          <Col md={6} sm={12}>
             <FormItem label="数据状态">
               {getFieldDecorator('shuju')(
-                <Select placeholder="请选择" style={{ width: '100%' }}>
+                <Select placeholder="请选择">
                   <Option value="0">未认证</Option>
                   <Option value="1">已认证</Option>
                 </Select>,
@@ -307,30 +328,21 @@ class Customer extends Component {
           <Col md={6} sm={12}>
             <FormItem label="区域归属">
               {getFieldDecorator('quyu')(
-                <Select placeholder="请选择" style={{ width: '100%' }}>
-                  <Option value="0">未认证</Option>
-                  <Option value="1">已认证</Option>
-                </Select>,
+                <Input />,
               )}
             </FormItem>
           </Col>
           <Col md={6} sm={12}>
             <FormItem label="销售归属">
               {getFieldDecorator('xiaoshouguishu')(
-                <Select placeholder="请选择" style={{ width: '100%' }}>
-                  <Option value="0">未认证</Option>
-                  <Option value="1">已认证</Option>
-                </Select>,
+                <Input />,
               )}
             </FormItem>
           </Col>
           <Col md={6} sm={12}>
-            <FormItem label="地址">
-              {getFieldDecorator('address')(
-                <Select placeholder="请选择" style={{ width: '100%' }}>
-                  <Option value="0">未认证</Option>
-                  <Option value="1">已认证</Option>
-                </Select>,
+            <FormItem label="开票方">
+              {getFieldDecorator('kaipiao')(
+                <Input />,
               )}
             </FormItem>
           </Col>
@@ -438,4 +450,4 @@ class Customer extends Component {
   }
 }
 
-export default Form.create()(Customer);
+export default Form.create()(Maintain);
