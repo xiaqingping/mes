@@ -23,8 +23,8 @@ import styles from './style.less';
 
 const FormItem = Form.Item;
 const { Option } = Select;
+const { MonthPicker, RangePicker, WeekPicker } = DatePicker;
 
-// eslint-disable-next-line react/prefer-stateless-function
 class Operation extends React.Component {
   state = {
     selectedRows: [],
@@ -59,7 +59,6 @@ class Operation extends React.Component {
       dataIndex: 'action',
     },
   ];
-
 
   componentDidMount() {
     this.handleSearch();
@@ -125,84 +124,41 @@ class Operation extends React.Component {
     } = this.props;
     return (
       <Form onSubmit={this.handleSearch} layout="inline">
-        <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
-          <Col md={6} sm={12}>
+        <Row gutter={{ lg: 24, md: 12, sm: 6 }}>
+          <Col lg={6} md={8} sm={12}>
             <FormItem label="编号">
               {getFieldDecorator('code')(<Input />)}
             </FormItem>
           </Col>
-          <Col md={6} sm={12}>
-            <FormItem label="名称">
-              {getFieldDecorator('name')(<Input />)}
+          <Col lg={6} md={8} sm={12}>
+            <FormItem label="业务伙伴">
+              {getFieldDecorator('yewuhuoban')(<Input />)}
             </FormItem>
           </Col>
-          <Col md={6} sm={12}>
-            <FormItem label="移动电话">
-              {getFieldDecorator('mobile')(<Input />)}
-            </FormItem>
-          </Col>
-          <Col md={6} sm={12}>
-            <FormItem label="Email">
-              {getFieldDecorator('email')(<Input />)}
-            </FormItem>
-          </Col>
-          <Col md={6} sm={12}>
-            <FormItem label="认证状态">
-              {getFieldDecorator('renzheng')(
-                <Select placeholder="请选择" style={{ width: '100%' }}>
-                  <Option value="0">未认证</Option>
-                  <Option value="1">已认证</Option>
+          <Col lg={6} md={8} sm={12}>
+            <FormItem label="类型">
+              {getFieldDecorator('type')(
+                <Select mode="multiple">
+                  <Option value="0">类型1</Option>
+                  <Option value="1">类型2</Option>
                 </Select>,
               )}
             </FormItem>
           </Col>
-          <Col md={6} sm={12}>
-            <FormItem label="销售状态">
-              {getFieldDecorator('xiaoshou')(
-                <Select placeholder="请选择" style={{ width: '100%' }}>
-                  <Option value="0">未认证</Option>
-                  <Option value="1">已认证</Option>
+          <Col lg={6} md={8} sm={12}>
+            <FormItem label="状态">
+              {getFieldDecorator('status')(
+                <Select mode="multiple">
+                  <Option value="0">状态1</Option>
+                  <Option value="1">状态2</Option>
                 </Select>,
               )}
             </FormItem>
           </Col>
-          <Col md={6} sm={12}>
-            <FormItem label="数据状态">
-              {getFieldDecorator('shuju')(
-                <Select placeholder="请选择" style={{ width: '100%' }}>
-                  <Option value="0">未认证</Option>
-                  <Option value="1">已认证</Option>
-                </Select>,
-              )}
-            </FormItem>
-          </Col>
-          <Col md={6} sm={12}>
-            <FormItem label="区域归属">
-              {getFieldDecorator('quyu')(
-                <Select placeholder="请选择" style={{ width: '100%' }}>
-                  <Option value="0">未认证</Option>
-                  <Option value="1">已认证</Option>
-                </Select>,
-              )}
-            </FormItem>
-          </Col>
-          <Col md={6} sm={12}>
-            <FormItem label="销售归属">
-              {getFieldDecorator('xiaoshouguishu')(
-                <Select placeholder="请选择" style={{ width: '100%' }}>
-                  <Option value="0">未认证</Option>
-                  <Option value="1">已认证</Option>
-                </Select>,
-              )}
-            </FormItem>
-          </Col>
-          <Col md={6} sm={12}>
-            <FormItem label="地址">
-              {getFieldDecorator('address')(
-                <Select placeholder="请选择" style={{ width: '100%' }}>
-                  <Option value="0">未认证</Option>
-                  <Option value="1">已认证</Option>
-                </Select>,
+          <Col lg={6} md={8} sm={12}>
+            <FormItem label="完成时间">
+              {getFieldDecorator('wanchengshijian')(
+                <RangePicker />,
               )}
             </FormItem>
           </Col>
@@ -229,23 +185,28 @@ class Operation extends React.Component {
     const { getFieldDecorator } = form;
     return (
       <Form onSubmit={this.handleSearch} layout="inline">
-        <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
-          <Col md={6} sm={12}>
+        <Row gutter={{ lg: 24, md: 12, sm: 6 }}>
+          <Col lg={6} md={8} sm={12}>
             <FormItem label="编号">
               {getFieldDecorator('code')(<Input />)}
             </FormItem>
           </Col>
-          <Col md={6} sm={12}>
-            <FormItem label="名称">
-              {getFieldDecorator('name')(<Input />)}
+          <Col lg={6} md={8} sm={12}>
+            <FormItem label="业务伙伴">
+              {getFieldDecorator('yewuhuoban')(<Input />)}
             </FormItem>
           </Col>
-          <Col md={6} sm={12}>
-            <FormItem label="移动电话">
-              {getFieldDecorator('mobile')(<Input />)}
+          <Col lg={6} md={8} sm={12}>
+            <FormItem label="类型">
+              {getFieldDecorator('type')(
+                <Select mode="multiple">
+                  <Option value="0">类型1</Option>
+                  <Option value="1">类型2</Option>
+                </Select>,
+              )}
             </FormItem>
           </Col>
-          <Col md={6} sm={12}>
+          <Col lg={6} md={8} sm={12}>
             <span className={styles.submitButtons}>
               <Button type="primary" htmlType="submit">
                 查询

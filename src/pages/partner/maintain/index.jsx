@@ -95,9 +95,9 @@ const quyuoptions = [
 function renderOption(item) {
   return (
     <Option key={item.value} text={item.value}>
-      <div>
-        <span>{item.code}</span>
-        <span>{item.value}</span>
+      <div className="global-search-item">
+        <span className="global-search-item-desc">{item.code}</span>
+        <span className="global-search-item-count">{item.value}</span>
       </div>
     </Option>
   );
@@ -106,9 +106,11 @@ function renderOption(item) {
 class Maintain extends React.Component {
   state = {
     selectedRows: [],
-    expandForm: true,
+    expandForm: false,
     data: {},
     formValues: {},
+    xiaoshuoguishu: [],
+    kaipiaofang: [],
   };
 
   columns = [
@@ -306,6 +308,24 @@ class Maintain extends React.Component {
     console.log(3);
   };
 
+  // 查询销售归属
+  xiaoshuoguishuSearch = value => {
+    this.setState({
+      xiaoshuoguishu: [
+        {
+          id: 1,
+          code: 11111,
+          value: `第一个${value}`,
+        },
+        {
+          id: 2,
+          code: 22222,
+          value: `第二个${value}`,
+        },
+      ],
+    });
+  }
+
   toggleForm = () => {
     const { expandForm } = this.state;
     this.setState({
@@ -322,43 +342,32 @@ class Maintain extends React.Component {
     const {
       form: { getFieldDecorator },
     } = this.props;
-    const dataSource = [
-      {
-        id: 1,
-        code: 111111,
-        value: '第一个',
-      },
-      {
-        id: 2,
-        code: 222222,
-        value: '第二个',
-      },
-    ];
+    const { xiaoshuoguishu } = this.state;
 
     return (
       <Form onSubmit={this.handleSearch} layout="inline">
-        <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
-          <Col md={6} sm={12}>
+        <Row gutter={{ lg: 24, md: 12, sm: 6 }}>
+          <Col lg={6} md={8} sm={12}>
             <FormItem label="编号">
               {getFieldDecorator('code')(<Input />)}
             </FormItem>
           </Col>
-          <Col md={6} sm={12}>
+          <Col lg={6} md={8} sm={12}>
             <FormItem label="名称">
               {getFieldDecorator('name')(<Input />)}
             </FormItem>
           </Col>
-          <Col md={6} sm={12}>
+          <Col lg={6} md={8} sm={12}>
             <FormItem label="移动电话">
               {getFieldDecorator('mobile')(<Input />)}
             </FormItem>
           </Col>
-          <Col md={6} sm={12}>
+          <Col lg={6} md={8} sm={12}>
             <FormItem label="Email">
               {getFieldDecorator('email')(<Input />)}
             </FormItem>
           </Col>
-          <Col md={6} sm={12}>
+          <Col lg={6} md={8} sm={12}>
             <FormItem label="认证状态">
               {getFieldDecorator('renzheng')(
                 <Select placeholder="请选择" mode="multiple">
@@ -368,7 +377,7 @@ class Maintain extends React.Component {
               )}
             </FormItem>
           </Col>
-          <Col md={6} sm={12}>
+          <Col lg={6} md={8} sm={12}>
             <FormItem label="销售状态">
               {getFieldDecorator('xiaoshou')(
                 <Select placeholder="请选择" mode="multiple">
@@ -378,7 +387,7 @@ class Maintain extends React.Component {
               )}
             </FormItem>
           </Col>
-          <Col md={6} sm={12}>
+          <Col lg={6} md={8} sm={12}>
             <FormItem label="数据状态">
               {getFieldDecorator('shuju')(
                 <Select placeholder="请选择" mode="multiple">
@@ -388,24 +397,32 @@ class Maintain extends React.Component {
               )}
             </FormItem>
           </Col>
-          <Col md={6} sm={12}>
+          <Col lg={6} md={8} sm={12}>
             <FormItem label="区域归属">
               {getFieldDecorator('quyu')(
                 <Cascader options={quyuoptions} />,
               )}
             </FormItem>
           </Col>
-          <Col md={6} sm={12}>
+          <Col lg={6} md={8} sm={12}>
             <FormItem label="销售归属">
               {getFieldDecorator('xiaoshouguishu')(
-                <AutoComplete dataSource={dataSource.map(renderOption)} />,
+                <AutoComplete
+                  dataSource={xiaoshuoguishu.map(renderOption)}
+                  onSearch={this.xiaoshuoguishuSearch}
+                  optionLabelProp="text"
+                />,
               )}
             </FormItem>
           </Col>
-          <Col md={6} sm={12}>
+          <Col lg={6} md={8} sm={12}>
             <FormItem label="开票方">
               {getFieldDecorator('kaipiao')(
-                <AutoComplete />,
+                <AutoComplete
+                  dataSource={xiaoshuoguishu.map(renderOption)}
+                  onSearch={this.xiaoshuoguishuSearch}
+                  optionLabelProp="text"
+                />,
               )}
             </FormItem>
           </Col>
@@ -432,23 +449,23 @@ class Maintain extends React.Component {
     const { getFieldDecorator } = form;
     return (
       <Form onSubmit={this.handleSearch} layout="inline">
-        <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
-          <Col md={6} sm={12}>
+        <Row gutter={{ lg: 24, md: 12, sm: 6 }}>
+          <Col lg={6} md={8} sm={12}>
             <FormItem label="编号">
               {getFieldDecorator('code')(<Input />)}
             </FormItem>
           </Col>
-          <Col md={6} sm={12}>
+          <Col lg={6} md={8} sm={12}>
             <FormItem label="名称">
               {getFieldDecorator('name')(<Input />)}
             </FormItem>
           </Col>
-          <Col md={6} sm={12}>
+          <Col lg={6} md={8} sm={12}>
             <FormItem label="移动电话">
               {getFieldDecorator('mobile')(<Input />)}
             </FormItem>
           </Col>
-          <Col md={6} sm={12}>
+          <Col lg={6} md={8} sm={12}>
             <span className={styles.submitButtons}>
               <Button type="primary" htmlType="submit">
                 查询
@@ -469,13 +486,6 @@ class Maintain extends React.Component {
   render() {
     const { data, selectedRows } = this.state;
     const loading = false;
-
-    const menu = (
-      <Menu selectedKeys={[]}>
-        <Menu.Item key="remove">删除</Menu.Item>
-        <Menu.Item key="approval">批量审批</Menu.Item>
-      </Menu>
-    );
 
     return (
       <PageHeaderWrapper>

@@ -81,6 +81,11 @@ class StandardTable extends Component {
       ? {
           showSizeChanger: true,
           showQuickJumper: true,
+          showTotal: (total, range) => {
+            const totalPage = Math.ceil(total / (pagination.pageSize || 10));
+            const currentPage = Math.ceil(range[0] / (pagination.pageSize || 10));
+            return `共 ${total} 条记录 第 ${currentPage}/${totalPage} 页`;
+          },
           ...pagination,
         }
       : false;
