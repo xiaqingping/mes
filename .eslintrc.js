@@ -1,4 +1,3 @@
-// https://github.com/umijs/fabric
 const { strictEslint } = require('@umijs/fabric');
 const _ = require('lodash');
 

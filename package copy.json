@@ -15,7 +15,7 @@
     "lint-staged": "lint-staged",
     "lint-staged:js": "eslint --ext .js,.jsx,.ts,.tsx ",
     "lint:fix": "eslint --fix --cache --ext .js,.jsx,.ts,.tsx --format=pretty ./src && npm run lint:style",
-    "lint:js": "eslint --cache --ext .js,.jsx,.ts,.tsx --format=pretty ./",
+    "lint:js": "eslint --cache --ext .js,.jsx,.ts,.tsx --format=pretty ./src",
     "lint:prettier": "check-prettier lint",
     "lint:style": "stylelint --fix \"src/**/*.less\" --syntax less",
     "prettier": "prettier -c --write \"**/*\"",
@@ -47,7 +47,7 @@
   "dependencies": {
     "@ant-design/pro-layout": "^4.5.9",
     "@antv/data-set": "^0.10.2",
-    "antd": "^3.20.0",
+    "antd": "^3.22.2",
     "classnames": "^2.2.6",
     "dva": "^2.4.1",
     "lodash": "^4.17.11",
@@ -60,7 +60,7 @@
     "react-document-title": "^2.0.3",
     "react-dom": "^16.8.6",
     "redux": "^4.0.1",
-    "umi": "^2.8.20",
+    "umi": "^2.8.7",
     "umi-plugin-pro-block": "^1.3.2",
     "umi-plugin-react": "^1.9.5",
     "umi-request": "^1.0.8"
