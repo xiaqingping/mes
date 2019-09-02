@@ -7,7 +7,7 @@ const baseURLMap = {
   prod: 'https://api.sangon.com/api',
 };
 
-const env = process.env.ENV || 'dev';
+const env = process.env.ENV || 'pre';
 
 const request = extend({
   prefix: baseURLMap[env], // prefix

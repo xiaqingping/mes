@@ -1,4 +1,3 @@
-import { queryNotices } from '@/services/user';
 const GlobalModel = {
   namespace: 'global',
   state: {
@@ -7,7 +6,8 @@ const GlobalModel = {
   },
   effects: {
     *fetchNotices(_, { call, put, select }) {
-      const data = yield call(queryNotices);
+      // const data = yield call(queryNotices);
+      const data = []; // TODO:
       yield put({
         type: 'saveNotices',
         payload: data,
