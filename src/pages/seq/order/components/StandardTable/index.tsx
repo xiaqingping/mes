@@ -109,6 +109,15 @@ class StandardTable extends Component<StandardTableProps<TableListItem>, Standar
       ? {
           showSizeChanger: true,
           showQuickJumper: true,
+          showTotal: (total:number, range:number[]) => {
+            const totalPage = Math.ceil(total / (pagination.pageSize || 10));
+            const currentPage = Math.ceil(range[0] / (pagination.pageSize || 10));
+            // return `共 ${total} 条记录 第 ${currentPage}/${totalPage} 页`;
+            const msg = `共 ${total} 条记录 第 ${currentPage}/${totalPage} 页`;
+            return (
+              <div style={{ float: 'left' }}>{msg}</div>
+            );
+          },
           ...pagination,
         }
       : false;
