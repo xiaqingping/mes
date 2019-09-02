@@ -200,9 +200,24 @@ class Maintain extends Component {
     this.getData();
   }
 
-  handleSearch = e => {
+  handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    this.getData();
+    const { form } = this.props;
+    form.validateFields((err, fieldsValue) => {
+      if (err) return;
+      const values = {
+        ...fieldsValue,
+        updatedAt: fieldsValue.updatedAt && fieldsValue.updatedAt.valueOf(),
+      };
+      this.setState({
+        formValues: values,
+      });
+      // dispatch({
+      //   type: 'listTableList/fetch',
+      //   payload: values,
+      // });
+      this.getData();
+    });
   };
 
   getData = () => {
@@ -305,13 +320,6 @@ class Maintain extends Component {
                   <Option value="0">未认证</Option>
                   <Option value="1">已认证</Option>
                 </Select>,
-              )}
-            </FormItem>
-          </Col>
-          <Col md={6} sm={12}>
-            <FormItem label="销售状态">
-              {getFieldDecorator('xiaoshou')(
-                <RangePicker />,
               )}
             </FormItem>
           </Col>
