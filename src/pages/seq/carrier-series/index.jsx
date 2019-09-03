@@ -122,6 +122,12 @@ class CarrierSeries extends Component {
     });
   }
 
+  handleSelectRows = rows => {
+    this.setState({
+      selectedRows: rows,
+    });
+  };
+
   // 获取表格数据
   getTableData = (options = {}) => {
     this.setState({
