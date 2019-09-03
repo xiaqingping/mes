@@ -291,7 +291,7 @@ class Maintain extends React.Component {
   }
 
   handleModalVisible = () => {
-    router.push('/partner/maintain/edit');
+    router.push('/partner/maintain/add');
   };
 
   handleSelectRows = rows => {
