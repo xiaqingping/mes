@@ -64,8 +64,13 @@ class CarrierSeries extends Component {
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
-            <FormItem label="移动电话">
-              {getFieldDecorator('mobile')(<Input />)}
+            <FormItem label="状态">
+              {getFieldDecorator('status')(
+                <Select>
+                  <Option value="1">正常</Option>
+                  <Option value="2">已删除</Option>
+                </Select>,
+              )}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
