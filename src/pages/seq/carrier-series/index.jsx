@@ -15,6 +15,7 @@ import {
 import React, { Component } from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import StandardTable from '@/components/StandardTable';
+import api from '@/api';
 
 const FormItem = Form.Item;
 const { Option } = Select;
@@ -24,28 +25,105 @@ class CarrierSeries extends Component {
     data: {},
     loading: false,
     selectedRows: [],
+    editIndex: -1,
   }
 
   columns = [
-    { title: '编号', dataIndex: 'code' },
-    { title: '名称', dataIndex: 'name' },
-    { title: '状态', dataIndex: 'status' },
-    { title: '创建人', dataIndex: 'creatorName' },
-    { title: '创建时间', dataIndex: 'createDate' },
-    { title: '修改人', dataIndex: 'changerName' },
-    { title: '修改时间', dataIndex: 'changeDate' },
-    { title: '作废人', dataIndex: 'cancelName' },
-    { title: '作废时间', dataIndex: 'cancelDate' },
     {
+      title: '编号',
+      dataIndex: 'code',
+      width: 100,
+    },
+    {
+      title: '名称',
+      dataIndex: 'name',
+      width: 180,
+    },
+    {
+      title: '状态',
+      dataIndex: 'status',
+      width: 100,
+    },
+    {
+      title: '创建人',
+      dataIndex: 'creatorName',
+      width: 100,
+    },
+    {
+      title: '创建时间',
+      dataIndex: 'createDate',
+      width: 200,
+    },
+    {
+      title: '修改人',
+      dataIndex: 'changerName',
+      width: 100,
+    },
+    {
+      title: '修改时间',
+      dataIndex: 'changeDate',
+      width: 200,
+    },
+    {
+      title: '作废人',
+      dataIndex: 'cancelName',
+      width: 100,
+    },
+    {
+      title: '作废时间',
+      dataIndex: 'cancelDate',
+      width: 200,
+    },
+    {
+      fixed: 'right',
       title: '操作',
-      render() {
-        return (
-          <a>操作栏</a>
-        );
+      width: 120,
+      render: (value, row, index) => {
+        const { status } = row;
+        const { editIndex } = this.state;
+        let actions;
+        if (editIndex !== index && status === 1) {
+          actions = (
+            <>
+              <a>删除</a>
+              <Divider type="vertical" />
+              <a>修改</a>
+              </>
+          );
+        }
+        if (editIndex === index) {
+          actions = (
+            <>
+              <a>保存</a>
+              <Divider type="vertical" />
+              <a>退出</a>
+            </>
+          );
+        }
+        return actions;
       },
     },
   ];
 
+  componentDidMount() {
+    this.getTableData();
+  }
+
+  // 获取表格数据
+  getTableData = (query = {}) => {
+    api.series.getSeries(query, true).then(data => {
+      this.setState({
+        data: {
+          pagination: {
+            pageSize: 10,
+          },
+          list: data.rows,
+        },
+      });
+    });
+  }
+
+  // 渲染表单
   renderForm = () => {
     const {
       form: { getFieldDecorator },
@@ -65,7 +143,7 @@ class CarrierSeries extends Component {
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="状态">
-              {getFieldDecorator('status')(
+              {getFieldDecorator('status', { initialValue: '1' })(
                 <Select>
                   <Option value="1">正常</Option>
                   <Option value="2">已删除</Option>
@@ -88,6 +166,11 @@ class CarrierSeries extends Component {
     );
   }
 
+  // 新增
+  handleAdd = () => {
+    console.log('add');
+  }
+
   render() {
     const { data, loading, selectedRows } = this.state;
 
@@ -102,6 +185,7 @@ class CarrierSeries extends Component {
               </Button>
             </div>
             <StandardTable
+              scroll={{ x: 1300 }}
               selectedRows={selectedRows}
               loading={loading}
               data={data}
