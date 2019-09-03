@@ -66,7 +66,9 @@ class CustomerDetails extends Component {
   render() {
     const { width } = this.state;
     return (
-      <PageHeaderWrapper>
+      <PageHeaderWrapper
+        title="修改 100001"
+      >
         <BasicInfo></BasicInfo>
         <Type></Type>
         <Credit></Credit>

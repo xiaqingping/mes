@@ -18,6 +18,7 @@ import {
 } from 'antd';
 import * as React from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
+import StandardTable from '@/components/StandardTable';
 
 import styles from './style.less';
 
@@ -29,8 +30,7 @@ class Operation extends React.Component {
   state = {
     selectedRows: [],
     expandForm: false,
-    dataSource: [],
-    pagination: {},
+    data: {},
   };
 
   columns = [
@@ -55,36 +55,59 @@ class Operation extends React.Component {
       dataIndex: 'actionman',
     },
     {
+      fixed: 'right',
       title: '操作',
-      dataIndex: 'action',
+      width: 150,
+      render: (text, record) => {
+        const { code } = record;
+        return (
+          <a>查看</a>
+        );
+      },
     },
   ];
 
   componentDidMount() {
-    this.handleSearch();
+    this.getData();
   }
 
-  handleSearch = () => {
+  getData = () => {
     const data = [];
+    const { formValues } = this.state;
+    console.log(formValues);
     for (let i = 0; i < 25; i++) {
       data.push({
         id: i + 1,
-        code: i + 1,
-        name: `name${i}`,
-        renzheng: 1,
-        dongjie: 0,
-        wanzheng: 1,
-        mobile: '18735818888',
-        email: '123@qq.com',
-        phone: '123456789',
-        address: '上海市松江区',
+        code: 100000 + (i + 1),
+        huoban: `name${i}`,
+        type: 1, // 1人，2组织
+        status: 1,
+        actionman: 'xxx',
       });
     }
     this.setState({
-      pagination: {
-        pageSize: 10,
+      data: {
+        pagination: {
+          pageSize: 10,
+        },
+        list: data,
       },
-      dataSource: data,
+    });
+  }
+
+  handleSearch = e => {
+    e.preventDefault();
+    const { form } = this.props;
+    form.validateFields((err, fieldsValue) => {
+      if (err) return;
+      const values = {
+        ...fieldsValue,
+        updatedAt: fieldsValue.updatedAt && fieldsValue.updatedAt.valueOf(),
+      };
+      this.setState({
+        formValues: values,
+      });
+      this.getData();
     });
   };
 
@@ -225,53 +248,26 @@ class Operation extends React.Component {
   }
 
   render() {
-    const { dataSource, pagination, selectedRows } = this.state;
+    const { data, selectedRows } = this.state;
     const loading = false;
-
-    const menu = (
-      <Menu selectedKeys={[]}>
-        <Menu.Item key="remove">删除</Menu.Item>
-        <Menu.Item key="approval">批量审批</Menu.Item>
-      </Menu>
-    );
 
     return (
       <PageHeaderWrapper>
         <Card bordered={false}>
-        <div className={styles.tableList}>
+          <div className={styles.tableList}>
             <div className={styles.tableListForm}>{this.renderForm()}</div>
             <div className={styles.tableListOperator}>
               <Button icon="plus" type="primary" onClick={() => this.handleModalVisible()}>
                 新建
               </Button>
-              {selectedRows.length > 0 && (
-                <span>
-                  <Button>批量操作</Button>
-                  <Dropdown overlay={menu}>
-                    <Button>
-                      更多操作 <Icon type="down" />
-                    </Button>
-                  </Dropdown>
-                </span>
-              )}
             </div>
-            {/* <StandardTable
+            <StandardTable
               scroll={{ x: 1300 }}
               selectedRows={selectedRows}
               loading={loading}
               data={data}
               columns={this.columns}
               onSelectRow={this.handleSelectRows}
-              onChange={this.handleStandardTableChange}
-            /> */}
-            <Table
-              rowKey="id"
-              dataSource={dataSource}
-              columns={this.columns}
-              pagination={pagination}
-              scroll={{ x: 1300 }}
-              loading={loading}
-              rowSelection={{ onSelect: rows => this.handleSelectRows(rows) }}
               onChange={this.handleStandardTableChange}
             />
           </div>

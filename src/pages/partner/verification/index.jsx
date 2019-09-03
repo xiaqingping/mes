@@ -16,7 +16,7 @@ import {
   message,
 } from 'antd';
 import * as React from 'react';
-import { PageHeaderWrapper } from '@ant-design/pro-layout';
+import { PageHeaderWrapper, RouteContext } from '@ant-design/pro-layout';
 
 const FormItem = Form.Item;
 const { Option } = Select;
@@ -24,7 +24,9 @@ const { Option } = Select;
 class Verification extends React.Component {
   render() {
     return (
-      <PageHeaderWrapper>
+      <PageHeaderWrapper
+        title="123456"
+      >
         <Card bordered={false}>
           <div>验证记录</div>
         </Card>

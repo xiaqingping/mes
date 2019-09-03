@@ -253,10 +253,6 @@ class Maintain extends React.Component {
       this.setState({
         formValues: values,
       });
-      // dispatch({
-      //   type: 'listTableList/fetch',
-      //   payload: values,
-      // });
       this.getData();
     });
   };
