@@ -124,12 +124,16 @@ class CarrierSeries extends Component {
 
   // 获取表格数据
   getTableData = (options = {}) => {
+    this.setState({
+      loading: true,
+    });
     const { form } = this.props;
     const { pagination: { current: page, pageSize: rows } } = this.state;
     const query = Object.assign(form.getFieldsValue(), { page, rows }, options);
 
     api.series.getSeries(query, true).then(data => {
       this.setState({
+        loading: false,
         list: data.rows,
         pagination: {
           total: data.total,
