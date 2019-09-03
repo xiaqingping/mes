@@ -3,7 +3,7 @@
  * https://devapi.sangon.com:8443/api/seqorder/swagger-ui.html
  */
 
-import request from '@/assets/js/request';
+import request from '@/utils/request';
 
 export default {
   // 查询测序订单

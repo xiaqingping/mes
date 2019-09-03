@@ -9,5 +9,10 @@ module.exports = {
       path: '/seq/order',
       component: './seq/order',
     },
+    {
+      name: 'carrier-series',
+      path: '/seq/carrier-series',
+      component: './seq/carrier-series',
+    },
   ],
 };

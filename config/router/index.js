@@ -32,7 +32,7 @@ module.exports = [
             icon: 'smile',
             component: './Welcome',
           },
-          // seq,
+          seq,
           partner,
           {
             component: './404',

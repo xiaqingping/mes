@@ -3,7 +3,7 @@
  * http://192.168.19.71:8289/swagger-ui.html    peptideorder
  */
 
-import request from '@/assets/js/request';
+import request from '@/utils/request';
 
 export default {
   /** ****************************** 多肽订单 *********************************** */

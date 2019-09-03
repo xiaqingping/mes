@@ -3,7 +3,7 @@
  * http://192.168.19.71:8288/swagger-ui.html   peptide-base
  */
 
-import request from '@/assets/js/request';
+import request from '@/utils/request';
 
 export default {
   /** ****************************** 多肽纯度 *********************************** */

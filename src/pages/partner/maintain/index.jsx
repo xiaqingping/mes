@@ -19,7 +19,6 @@ import router from 'umi/router';
 import Link from 'umi/link';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import StandardTable from '@/components/StandardTable';
-import styles from './style.less';
 
 const FormItem = Form.Item;
 const { Option } = Select;
@@ -462,7 +461,7 @@ class Maintain extends React.Component {
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
-            <span className={styles.submitButtons}>
+            <span className="submitButtons">
               <Button type="primary" htmlType="submit">
                 查询
               </Button>
@@ -486,9 +485,9 @@ class Maintain extends React.Component {
     return (
       <PageHeaderWrapper>
         <Card bordered={false}>
-          <div className={styles.tableList}>
-            <div className={styles.tableListForm}>{this.renderForm()}</div>
-            <div className={styles.tableListOperator}>
+          <div className="tableList">
+            <div className="tableListForm">{this.renderForm()}</div>
+            <div className="tableListOperator">
               <Button icon="plus" type="primary" onClick={() => this.handleModalVisible(true)}>
                 新建
               </Button>

@@ -69,6 +69,7 @@ const Model = {
   reducers: {
     changeLoginStatus(state, { payload }) {
       setAuthority(payload.currentAuthority);
+      sessionStorage.setItem('token', payload.authorization);
       return { ...state, status: payload.status, type: payload.type };
     },
   },

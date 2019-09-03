@@ -3,7 +3,7 @@
  * https://devapi.sangon.com:8443/api/sampleorder/swagger-ui.html
  */
 
-import request from '@/assets/js/request';
+import request from '@/utils/request';
 
 export default {
   // 获取取样单
