@@ -1,14 +1,10 @@
 import {
-  Badge,
   Button,
   Card,
   Col,
   Divider,
-  Dropdown,
   Form,
-  Icon,
   Input,
-  Menu,
   Row,
   Select,
 } from 'antd';
@@ -22,7 +18,12 @@ const { Option } = Select;
 
 class CarrierSeries extends Component {
   state = {
-    data: {},
+    pagination: {
+      current: 1,
+      pageSize: 10,
+      total: 0,
+    },
+    list: [],
     loading: false,
     selectedRows: [],
     editIndex: -1,
@@ -109,15 +110,31 @@ class CarrierSeries extends Component {
     this.getTableData();
   }
 
+  handleSearch = e => {
+    e.preventDefault();
+    this.getTableData({ page: 1 });
+  }
+
+  handleStandardTableChange = (pagination, filtersArg, sorter) => {
+    this.getTableData({
+      page: pagination.current,
+      rows: pagination.pageSize,
+    });
+  }
+
   // 获取表格数据
-  getTableData = (query = {}) => {
+  getTableData = (options = {}) => {
+    const { form } = this.props;
+    const { pagination: { current: page, pageSize: rows } } = this.state;
+    const query = Object.assign(form.getFieldsValue(), { page, rows }, options);
+
     api.series.getSeries(query, true).then(data => {
       this.setState({
-        data: {
-          pagination: {
-            pageSize: 10,
-          },
-          list: data.rows,
+        list: data.rows,
+        pagination: {
+          total: data.total,
+          current: query.page,
+          pageSize: query.rows,
         },
       });
     });
@@ -172,7 +189,8 @@ class CarrierSeries extends Component {
   }
 
   render() {
-    const { data, loading, selectedRows } = this.state;
+    const { list, pagination, loading, selectedRows } = this.state;
+    const data = { list, pagination };
 
     return (
       <PageHeaderWrapper>
