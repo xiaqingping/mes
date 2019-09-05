@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import {
   Badge,
   Button,
@@ -19,16 +20,39 @@ import {
 import * as React from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import StandardTable from '@/components/StandardTable';
+import api from '@/api'
 
 const FormItem = Form.Item;
 const { Option } = Select;
 const { MonthPicker, RangePicker, WeekPicker } = DatePicker;
 
+// 完整
+const status = {
+  1: {
+    value: 'default',
+    text: '未完成',
+  },
+  2: {
+    value: 'success',
+    text: '已完成',
+  },
+  3: {
+    value: 'warning',
+    text: '部分完成',
+  },
+};
+
 class Operation extends React.Component {
   state = {
+    pagination: {
+      current: 1,
+      pageSize: 10,
+      total: 0,
+    },
+    list: [],
+    loading: false,
     selectedRows: [],
-    expandForm: false,
-    data: {},
+    editIndex: -1,
   };
 
   columns = [
@@ -43,10 +67,39 @@ class Operation extends React.Component {
     {
       title: '类型',
       dataIndex: 'type',
+      width: 200,
+      filters: [
+        {
+          value: '1',
+          text: '新建',
+        },
+        {
+          value: '2',
+          text: '修改',
+        },
+      ],
     },
     {
       title: '状态',
       dataIndex: 'status',
+      width: 200,
+      filters: [
+        {
+          value: '1',
+          text: '未完成',
+        },
+        {
+          value: '2',
+          text: '已完成',
+        },
+        {
+          value: '3',
+          text: '部分完成',
+        },
+      ],
+      render(val) {
+        return <Badge status={status[val].value} text={status[val].text} />;
+      },
     },
     {
       title: '操作人',
@@ -66,52 +119,20 @@ class Operation extends React.Component {
   ];
 
   componentDidMount() {
-    this.getData();
-  }
-
-  getData = () => {
-    const data = [];
-    const { formValues } = this.state;
-    console.log(formValues);
-    for (let i = 0; i < 25; i++) {
-      data.push({
-        id: i + 1,
-        code: 100000 + (i + 1),
-        huoban: `name${i}`,
-        type: 1, // 1人，2组织
-        status: 1,
-        actionman: 'xxx',
-      });
-    }
-    this.setState({
-      data: {
-        pagination: {
-          pageSize: 10,
-        },
-        list: data,
-      },
-    });
+    this.getTableData();
   }
 
   handleSearch = e => {
     e.preventDefault();
-    const { form } = this.props;
-    form.validateFields((err, fieldsValue) => {
-      if (err) return;
-      const values = {
-        ...fieldsValue,
-        updatedAt: fieldsValue.updatedAt && fieldsValue.updatedAt.valueOf(),
-      };
-      this.setState({
-        formValues: values,
-      });
-      this.getData();
-    });
-  };
+    this.getTableData({ page: 1 });
+  }
 
-  handleModalVisible = () => {
-    // router.push('/partner/customer/edit');
-  };
+  handleStandardTableChange = (pagination, filtersArg, sorter) => {
+    this.getTableData({
+      page: pagination.current,
+      rows: pagination.pageSize,
+    });
+  }
 
   handleSelectRows = rows => {
     this.setState({
@@ -119,9 +140,27 @@ class Operation extends React.Component {
     });
   };
 
-  handleStandardTableChange = () => {
-    console.log(3);
-  };
+  // 获取表格数据
+  getTableData = (options = {}) => {
+    this.setState({
+      loading: true,
+    });
+    const { form } = this.props;
+    const { pagination: { current: page, pageSize: rows } } = this.state;
+    const query = Object.assign(form.getFieldsValue(), { page, rows }, options);
+
+    api.series.getSeries(query, true).then(data => {
+      this.setState({
+        loading: false,
+        list: data.rows,
+        pagination: {
+          total: data.total,
+          current: query.page,
+          pageSize: query.rows,
+        },
+      });
+    });
+  }
 
   handleFormReset = () => {
     console.log(3);
@@ -138,6 +177,10 @@ class Operation extends React.Component {
     const { expandForm } = this.state;
     return expandForm ? this.renderAdvancedForm() : this.renderSimpleForm();
   };
+
+  handleAdd = () => {
+    console.log('add');
+  }
 
   renderAdvancedForm() {
     const {
@@ -245,9 +288,10 @@ class Operation extends React.Component {
     );
   }
 
+
   render() {
-    const { data, selectedRows } = this.state;
-    const loading = false;
+    const { list, pagination, loading, selectedRows } = this.state;
+    const data = { list, pagination };
 
     return (
       <PageHeaderWrapper>
@@ -255,7 +299,7 @@ class Operation extends React.Component {
           <div className="tableList">
             <div className="tableListForm">{this.renderForm()}</div>
             <div className="tableListOperator">
-              <Button icon="plus" type="primary" onClick={() => this.handleModalVisible()}>
+              <Button icon="plus" type="primary" onClick={() => this.handleAdd()}>
                 新建
               </Button>
             </div>
