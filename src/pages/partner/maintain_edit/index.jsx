@@ -20,12 +20,9 @@ import { connect } from 'dva';
 
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import FooterToolbar from '@/components/FooterToolbar';
-import BasicInfo from './components/BasicInfo';
-import Type from './components/Type';
-import Credit from './components/Credit';
-import Authentication from './components/Authentication';
-import Bank from './components/Bank';
-import Address from './components/Address';
+import Customer from './Customer';
+import Supplier from './Supplier';
+
 
 @connect(
   ({
@@ -39,6 +36,7 @@ import Address from './components/Address';
 class CustomerDetails extends Component {
   state = {
     width: '100%',
+    tabActiveKey: 'customer',
   };
 
   componentDidMount() {
@@ -63,20 +61,41 @@ class CustomerDetails extends Component {
     });
   };
 
+  onTabChange = tabActiveKey => {
+    this.setState({
+      tabActiveKey,
+    });
+  };
+
   render() {
-    const { width } = this.state;
+    const { width, tabActiveKey } = this.state;
+    const contentList = {
+      customer: (
+        <Customer type={tabActiveKey} />
+      ),
+      supplier: (
+        <Supplier type={tabActiveKey} />
+      ),
+    };
     return (
       <PageHeaderWrapper
         title="修改 100001"
+        tabActiveKey={tabActiveKey}
+        onTabChange={this.onTabChange}
+        style={{ paddingBottom: '0px' }}
+        tabList={[
+          {
+            key: 'customer',
+            tab: '客户',
+          },
+          {
+            key: 'supplier',
+            tab: '供应商',
+          },
+        ]}
       >
-        <BasicInfo></BasicInfo>
-        <Type></Type>
-        <Credit></Credit>
-        <Authentication></Authentication>
-        <Bank></Bank>
-        <Address></Address>
+        {contentList[tabActiveKey]}
         <FooterToolbar style={{ width }}>
-          {/* {this.getErrorInfo()} */}
           <Button>取消</Button>
           <Button type="primary">提交</Button>
         </FooterToolbar>

@@ -114,9 +114,10 @@ class Maintain extends React.Component {
 
   columns = [
     {
+      fixed: 'left',
       title: '客户编号',
       dataIndex: 'code',
-      width: 150,
+      width: 100,
       render(val) {
         return (
           <Link to={`/partner/maintain/details/${val}`}>
@@ -129,7 +130,7 @@ class Maintain extends React.Component {
     {
       title: '名称',
       dataIndex: 'name',
-      width: 100,
+      width: 250,
     },
     {
       title: '认证',
@@ -167,12 +168,13 @@ class Maintain extends React.Component {
           text: '活跃',
         },
       ],
+      filterMultiple: false,
       render(val) {
         return <Badge status={dongjieMap[val].value} text={dongjieMap[val].text} />;
       },
     },
     {
-      title: '完整',
+      title: '客户',
       dataIndex: 'wanzheng',
       width: 100,
       filters: [
@@ -185,6 +187,26 @@ class Maintain extends React.Component {
           text: '完整',
         },
       ],
+      filterMultiple: false,
+      render(val) {
+        return <Badge status={wanzhengMap[val].value} text={wanzhengMap[val].text} />;
+      },
+    },
+    {
+      title: '供应商',
+      dataIndex: 'gongyings',
+      width: 100,
+      filters: [
+        {
+          value: 'default',
+          text: '不完整',
+        },
+        {
+          value: 'success',
+          text: '完整',
+        },
+      ],
+      filterMultiple: false,
       render(val) {
         return <Badge status={wanzhengMap[val].value} text={wanzhengMap[val].text} />;
       },
@@ -197,12 +219,12 @@ class Maintain extends React.Component {
     {
       title: 'Email',
       dataIndex: 'email',
-      width: 100,
+      width: 200,
     },
     {
       title: '电话',
       dataIndex: 'phone',
-      width: 100,
+      width: 150,
     },
     {
       title: '地址',
@@ -217,6 +239,9 @@ class Maintain extends React.Component {
         const { code } = record;
         const menu = (
           <Menu>
+            <Menu.Item><a href="">取消冻结</a></Menu.Item>
+            <Menu.Item><a href="">取消认证</a></Menu.Item>
+            <Menu.Item><a href="">变更认证</a></Menu.Item>
             <Menu.Item><a href="">认证</a></Menu.Item>
             <Menu.Item><a href="">冻结</a></Menu.Item>
           </Menu>
@@ -268,6 +293,7 @@ class Maintain extends React.Component {
         renzheng: 1,
         dongjie: 0,
         wanzheng: 1,
+        gongyings: 1,
         type: 1, // 1人，2组织
         mobile: '18735818888',
         email: '123@qq.com',
@@ -368,26 +394,37 @@ class Maintain extends React.Component {
                 <Select placeholder="请选择" mode="multiple">
                   <Option value="0">未认证</Option>
                   <Option value="1">已认证</Option>
+                  <Option value="2">审核中</Option>
                 </Select>,
               )}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
-            <FormItem label="销售状态">
+            <FormItem label="销售冻结">
               {getFieldDecorator('xiaoshou')(
                 <Select placeholder="请选择" mode="multiple">
-                  <Option value="0">未认证</Option>
-                  <Option value="1">已认证</Option>
+                  <Option value="0">冻结</Option>
+                  <Option value="1">活跃</Option>
                 </Select>,
               )}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
-            <FormItem label="数据状态">
+            <FormItem label="客户数据">
               {getFieldDecorator('shuju')(
                 <Select placeholder="请选择" mode="multiple">
-                  <Option value="0">未认证</Option>
-                  <Option value="1">已认证</Option>
+                  <Option value="0">完整</Option>
+                  <Option value="1">不完整</Option>
+                </Select>,
+              )}
+            </FormItem>
+          </Col>
+          <Col lg={6} md={8} sm={12}>
+            <FormItem label="供应商数据">
+              {getFieldDecorator('gongyingsshuju')(
+                <Select placeholder="请选择" mode="multiple">
+                  <Option value="0">完整</Option>
+                  <Option value="1">不完整</Option>
                 </Select>,
               )}
             </FormItem>
@@ -493,7 +530,7 @@ class Maintain extends React.Component {
               </Button>
             </div>
             <StandardTable
-              scroll={{ x: 1300 }}
+              scroll={{ x: 1600 }}
               selectedRows={selectedRows}
               loading={loading}
               data={data}

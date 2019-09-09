@@ -19,6 +19,7 @@ import {
   Descriptions,
 } from 'antd';
 import React, { Component } from 'react';
+import { NameInput, MobileTelephoneInput, TelphoneInput, FoxInput, AddressInput } from '@/components/CustomizedFormControls';
 
 const FormItem = Form.Item;
 const InputGroup = Input.Group;
@@ -69,26 +70,12 @@ class BasicInfo extends Component {
         <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
           <Col md={6} sm={12}>
             <FormItem label="名称">
-              <InputGroup compact>
-                <Select defaultValue="1" style={{ width: '40%' }}>
-                  <Option value="1">先生</Option>
-                  <Option value="2">女士</Option>
-                  <Option value="3">学校</Option>
-                  <Option value="4">医院</Option>
-                </Select>
-                {getFieldDecorator('name')(<Input style={{ width: '60%' }} />)}
-              </InputGroup>
+              {getFieldDecorator('name')(<NameInput />)}
             </FormItem>
           </Col>
           <Col md={6} sm={12}>
             <FormItem label="移动电话">
-              <InputGroup compact>
-                <Select defaultValue="+86" style={{ width: '40%' }}>
-                  <Option value="+86">+86</Option>
-                  <Option value="+00">+00</Option>
-                </Select>
-                {getFieldDecorator('mobile')(<Input style={{ width: '60%' }} />)}
-              </InputGroup>
+              {getFieldDecorator('mobile')(<MobileTelephoneInput />)}
             </FormItem>
           </Col>
           <Col md={6} sm={12}>
@@ -98,20 +85,12 @@ class BasicInfo extends Component {
           </Col>
           <Col md={6} sm={12}>
             <FormItem label="电话">
-              <InputGroup compact>
-                <Select defaultValue="+86" style={{ width: '30%' }}>
-                  <Option value="+86">+86</Option>
-                  <Option value="+00">+00</Option>
-                </Select>
-                <Input style={{ width: '20%' }} />
-                {getFieldDecorator('phone')(<Input style={{ width: '30%' }} />)}
-                {getFieldDecorator('fenjihao')(<Input style={{ width: '20%' }} />)}
-              </InputGroup>
+              {getFieldDecorator('email')(<TelphoneInput />)}
             </FormItem>
           </Col>
           <Col md={6} sm={12}>
             <FormItem label="传真">
-              {getFieldDecorator('chuanzhen')(<Input />)}
+              {getFieldDecorator('chuanzhen')(<FoxInput />)}
             </FormItem>
           </Col>
           <Col md={3} sm={6}>
@@ -126,9 +105,7 @@ class BasicInfo extends Component {
           </Col>
           <Col md={6} sm={12}>
             <FormItem label="语言">
-              {getFieldDecorator('yuyan', {
-                initValue: 1,
-              })(
+              {getFieldDecorator('yuyan')(
                 <Select>
                   <Option value="1">中文</Option>
                 </Select>,
@@ -142,15 +119,12 @@ class BasicInfo extends Component {
           </Col>
           <Col md={15} sm={24}>
             <FormItem label="通讯地址">
-              <InputGroup compact>
-                {getFieldDecorator('address1')(<Cascader options={options} style={{ width: '40%' }} />)}
-                {getFieldDecorator('address')(<Input style={{ width: '60%' }} />)}
-              </InputGroup>
+              {getFieldDecorator('address1')(<AddressInput />)}
             </FormItem>
           </Col>
           <Col md={3} sm={6}>
             <FormItem label="销售冻结">
-              {getFieldDecorator('dongjie')(<Switch />)}
+              {getFieldDecorator('dongjie', { valuePropName: 'checked' })(<Switch />)}
             </FormItem>
           </Col>
         </Row>
