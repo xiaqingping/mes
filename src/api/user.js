@@ -30,4 +30,9 @@ export default {
   getUserList(params) {
     return request('/user/v1/user/easyui', { params });
   },
+
+  // 重置密码
+  resetPasswords (data) {
+    return request(`/user/v1/user/${data.code}/password/reset`, { method: 'PUT', data });
+  },
 };

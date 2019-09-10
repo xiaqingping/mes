@@ -20,4 +20,11 @@ export default {
   'menu.partner.maintain.details': '客户详情',
   'menu.partner.operation': '操作记录',
   'menu.partner.verification': '验证记录',
+  'menu.system': '系统管理',
+  'menu.system.user': '用户管理',
+  'menu.system.code-rule': '编号权限',
+  'menu.system.authorization': '用户权限',
+  'menu.system.sources': '资源',
+  'menu.system.rule': '规则',
+  'menu.system.group': '分组',
 };

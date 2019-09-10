@@ -1,71 +1,66 @@
 /*
  * 用户权限
  * https://devapi.sangon.com:8443/api/dataauth/swagger-ui.html
- * 编号规则
- * https://devapi.sangon.com:8443/api/serial/swagger-ui.html
  */
 
 import request from '@/utils/request';
 
 export default {
-  /** ****************************** 编号规则 *********************************** */
-  // 查询 - 编号规则
-  getCodeRuleList(params) {
-    return request('/serial/v1/rules/easyui', { params });
-  },
-
-  // 查询 - 编号规则 内容 (分页-1)
-  getContentList(params) {
-    return request('/serial/v1/contents/easyui', { params });
-  },
-
-  // 查询 - 编号规则 取值 (分页-2)
-  getDerailList(params) {
-    return request('/serial/v1/details/easyui', { params });
-  },
-
-  // 查询 - 编号规则 条件 (分页-3)
-  getConditionsList(params) {
-    return request('/serial/v1/conditions/easyui', { params });
-  },
-
-  /** ****************************** 用户权限 *********************************** */
-  // 查询 - 用户权限 列表
-  getDataAuthList(params) {
+  /** ****************************** 员工列表 *********************************** */
+  // 查询
+  getClients (params) {
     return request('/dataauth/v1/data/clients/easyui', { params });
   },
-  // 查询 - 用户权限 明细 (分页-1)
-  getAuthorityList(params) {
+  // 保存 (新增，删除)
+  saveClient (data) {
+    return request('/dataauth/v1/data/clients/list', { method: 'PUT', data });
+  },
+  /** ****************************** 用户权限 *********************************** */
+  // 查询
+  getAuthorizes (params) {
     return request(`/dataauth/v1/data/authorizes/client/${params}`);
   },
-  // 查询 - 明细 (分页-2)
-  getGrouprulesList(params) {
-    return request(`/dataauth/v1//data/grouprules/easyui/${params}/rules`);
+  // 保存 (新增，删除)
+  saveAuthorizes (data) {
+    return request('/dataauth/v1/data/authorizes/list', { method: 'PUT', data });
   },
 
   /** ****************************** 资源 *********************************** */
   // 查询 - 权限资源
-  getSourcesList(params) {
+  getSources (params) {
     return request('/dataauth/v1/data/sources/easyui', { params });
+  },
+  // 查询 - 资源参数
+  getSourcesParameterList (params) {
+    return request(`/dataauth/v1/data/sources/${params}`);
   },
 
   /** ****************************** 规则 *********************************** */
-  // 查询 - 权限规则
-  getRulesList(params) {
+  // 查询
+  getRules (params) {
     return request('/dataauth/v1/data/rules/easyui', { params });
   },
+  // 保存 (新增，删除)
+  saveRules (data) {
+    return request('/dataauth/v1/data/rules/easyui', { method: 'PUT', data });
+  },
 
-  /** ****************************** 分组 *********************************** */
-  // 查询 - 分组
-  getGroups(params) {
+  /** ****************************** 权限分组 *********************************** */
+  // 查询
+  getGroups (params) {
     return request('/dataauth/v1/data/groups/easyui', { params });
   },
-  // 保存 - 分组
-  inserGroups(params) {
-    return request('/dataauth/v1/data/groups/list', { method: 'PUT', params });
+  // 保存
+  saveGroups (data) {
+    return request('/dataauth/v1/data/groups/list', { method: 'PUT', data });
   },
-  // 查询 - 规则分组 (分页)
-  getGroupRules(params) {
+  /** ****************************** 规则分组 *********************************** */
+  // 查询
+  getGroupRules (params) {
     return request(`/dataauth/v1/data/grouprules/easyui/${params}/rules`);
+  },
+  // 保存 (新增，删除)
+  saveGroupRules (data) {
+    return request('/dataauth/v1/data/grouprules/list', { method: 'PUT', data });
   },
 };
