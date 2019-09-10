@@ -15,20 +15,70 @@ import {
   Select,
   message,
   Table,
+  AutoComplete,
 } from 'antd';
 import * as React from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import StandardTable from '@/components/StandardTable';
+import api from '@/api'
+import DetailsList from './components/details'
 
 const FormItem = Form.Item;
 const { Option } = Select;
 const { MonthPicker, RangePicker, WeekPicker } = DatePicker;
 
+// 状态
+const status = {
+  1: {
+    value: 'default',
+    text: '未完成',
+  },
+  2: {
+    value: 'success',
+    text: '已完成',
+  },
+  3: {
+    value: 'warning',
+    text: '部分完成',
+  },
+};
+
 class Operation extends React.Component {
   state = {
+    pagination: {
+      current: 1,
+      pageSize: 10,
+      total: 0,
+    },
+    list: [],
+    loading: false,
     selectedRows: [],
-    expandForm: false,
-    data: {},
+    detailsVisible: true,
+    detailsValue: null,
+    // editIndex: -1,
+  };
+
+  data = {
+    huoban: [
+      '13012345678 张三',
+      '13112345678 张三',
+      '13212345678 张三',
+      '13312345678 张三',
+      '13412345678 张三',
+      '13512345678 张三',
+      '13612345678 张三',
+      '13712345678 张三',
+      '13812345678 张三',
+      '13912345678 张三',
+      '17112345678 张三',
+      '17212345678 张三',
+      '17312345678 张三',
+      '17412345678 张三',
+      '17512345678 张三',
+      '17612345678 张三',
+      '17712345678 张三',
+      '17812345678 张三',
+    ],
   };
 
   columns = [
@@ -39,18 +89,68 @@ class Operation extends React.Component {
     {
       title: '业务伙伴',
       dataIndex: 'huoban',
+      render(text, record) {
+          return text ? <span><Icon type="user" /> {text}<br/><span>&nbsp;&nbsp;&nbsp;&nbsp;{record.phone}</span></span> : ''
+      },
     },
     {
       title: '类型',
       dataIndex: 'type',
+      width: 120,
+      filters: [
+        {
+          value: '1',
+          text: '新建',
+        },
+        {
+          value: '2',
+          text: '修改',
+        },
+      ],
+      render(text) {
+        return text === 1 ? '新建' : '修改'
+    },
     },
     {
       title: '状态',
       dataIndex: 'status',
+      width: 300,
+      align: 'center',
+      filters: [
+        {
+          value: '1',
+          text: '未完成',
+        },
+        {
+          value: '2',
+          text: '已完成',
+        },
+        {
+          value: '3',
+          text: '部分完成',
+        },
+      ],
+      render(val, record) {
+        return <span><Badge status={status[val].value} text={status[val].text}/><br/><span style={{ marginLeft: 85 }}>{val === 2 ? record.actiontime : ''}</span></span>;
+      },
     },
     {
       title: '操作人',
       dataIndex: 'actionman',
+      align: 'center',
+      width: 100,
+    },
+    {
+      title: '操作时间',
+      dataIndex: 'actiontime',
+      align: 'center',
+      width: 100,
+    },
+    {
+      title: '业务伙伴编号',
+      dataIndex: 'partnerCode',
+      align: 'center',
+      width: 150,
     },
     {
       fixed: 'right',
@@ -59,59 +159,58 @@ class Operation extends React.Component {
       render: (text, record) => {
         const { code } = record;
         return (
-          <a>查看</a>
+          <a onClick={this.showDrawer}>查看</a>
         );
       },
     },
   ];
 
   componentDidMount() {
+    // this.getTableData();
     this.getData();
   }
 
   getData = () => {
     const data = [];
-    const { formValues } = this.state;
-    console.log(formValues);
-    for (let i = 0; i < 25; i++) {
+    for (let i = 0; i < 30; i++) {
       data.push({
         id: i + 1,
         code: 100000 + (i + 1),
         huoban: `name${i}`,
-        type: 1, // 1人，2组织
-        status: 1,
-        actionman: 'xxx',
+        phone: `1${Math.ceil((Math.random() + 0.0001) * 10000000000)}`,
+        type: Math.ceil((Math.random() + 0.0001) * 2),
+        status: Math.ceil((Math.random() + 0.0001) * 3),
+        actionman: `action${i}`,
+        actiontime: `2019-9-${Math.ceil((Math.random() + 0.0001) * 30)} 12:30:59`,
+        partnerCode: Math.ceil((Math.random() + 0.0001) * 100000), // 1人，2组织
       });
     }
     this.setState({
-      data: {
         pagination: {
           pageSize: 10,
         },
         list: data,
-      },
     });
-  }
+  };
 
   handleSearch = e => {
     e.preventDefault();
-    const { form } = this.props;
-    form.validateFields((err, fieldsValue) => {
-      if (err) return;
-      const values = {
-        ...fieldsValue,
-        updatedAt: fieldsValue.updatedAt && fieldsValue.updatedAt.valueOf(),
-      };
-      this.setState({
-        formValues: values,
-      });
-      this.getData();
-    });
-  };
+    // this.getTableData({ page: 1 });
+    this.getData({ page: 1 });
+  }
 
-  handleModalVisible = () => {
-    // router.push('/partner/customer/edit');
-  };
+  handleStandardTableChange = (pagination, filtersArg) => {
+    // this.getTableData({
+    //   page: pagination.current,
+    //   rows: pagination.pageSize,
+    //   ...filtersArg,
+    // });
+    this.getData({
+      page: pagination.current,
+      rows: pagination.pageSize,
+      ...filtersArg,
+    });
+  }
 
   handleSelectRows = rows => {
     this.setState({
@@ -119,12 +218,30 @@ class Operation extends React.Component {
     });
   };
 
-  handleStandardTableChange = () => {
-    console.log(3);
-  };
+  // 获取表格数据
+  // getTableData = (options = {}) => {
+  //   this.setState({
+  //     loading: true,
+  //   });
+  //   const { form } = this.props;
+  //   const { pagination: { current: page, pageSize: rows } } = this.state;
+  //   const query = Object.assign(form.getFieldsValue(), { page, rows }, options);
+
+  //   api.series.getSeries(query, true).then(data => {
+  //     this.setState({
+  //       loading: false,
+  //       list: data.rows,
+  //       pagination: {
+  //         total: data.total,
+  //         current: query.page,
+  //         pageSize: query.rows,
+  //       },
+  //     });
+  //   });
+  // }
 
   handleFormReset = () => {
-    console.log(3);
+    this.props.form.resetFields();
   };
 
   toggleForm = () => {
@@ -138,6 +255,10 @@ class Operation extends React.Component {
     const { expandForm } = this.state;
     return expandForm ? this.renderAdvancedForm() : this.renderSimpleForm();
   };
+
+  // handleAdd = () => {
+  //   console.log('add');
+  // }
 
   renderAdvancedForm() {
     const {
@@ -153,15 +274,18 @@ class Operation extends React.Component {
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="业务伙伴">
-              {getFieldDecorator('yewuhuoban')(<Input />)}
+              {getFieldDecorator('yewuhuoban')(
+              <AutoComplete dataSource={this.data.huoban} placeholder="请输入" filterOption={(inputValue, option) =>
+                option.props.children.indexOf(inputValue) !== -1
+              } />)}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="类型">
               {getFieldDecorator('type')(
                 <Select mode="multiple">
-                  <Option value="0">类型1</Option>
-                  <Option value="1">类型2</Option>
+                  <Option value="1">新建</Option>
+                  <Option value="2">修改</Option>
                 </Select>,
               )}
             </FormItem>
@@ -170,8 +294,9 @@ class Operation extends React.Component {
             <FormItem label="状态">
               {getFieldDecorator('status')(
                 <Select mode="multiple">
-                  <Option value="0">状态1</Option>
-                  <Option value="1">状态2</Option>
+                  <Option value="1">未完成</Option>
+                  <Option value="2">已完成</Option>
+                  <Option value="3">部分完成</Option>
                 </Select>,
               )}
             </FormItem>
@@ -213,16 +338,19 @@ class Operation extends React.Component {
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
-            <FormItem label="业务伙伴">
-              {getFieldDecorator('yewuhuoban')(<Input />)}
+          <FormItem label="业务伙伴">
+              {getFieldDecorator('yewuhuoban')(
+              <AutoComplete dataSource={this.data.huoban} placeholder="请输入" filterOption={(inputValue, option) =>
+                option.props.children.indexOf(inputValue) !== -1
+              } />)}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="类型">
               {getFieldDecorator('type')(
                 <Select mode="multiple">
-                  <Option value="0">类型1</Option>
-                  <Option value="1">类型2</Option>
+                  <Option value="1">新建</Option>
+                  <Option value="2">修改</Option>
                 </Select>,
               )}
             </FormItem>
@@ -245,9 +373,10 @@ class Operation extends React.Component {
     );
   }
 
+
   render() {
-    const { data, selectedRows } = this.state;
-    const loading = false;
+    const { list, pagination, loading, selectedRows, detailsVisible } = this.state;
+    const data = { list, pagination };
 
     return (
       <PageHeaderWrapper>
@@ -255,9 +384,9 @@ class Operation extends React.Component {
           <div className="tableList">
             <div className="tableListForm">{this.renderForm()}</div>
             <div className="tableListOperator">
-              <Button icon="plus" type="primary" onClick={() => this.handleModalVisible()}>
+              {/* <Button icon="plus" type="primary" onClick={() => this.handleAdd()}>
                 新建
-              </Button>
+              </Button> */}
             </div>
             <StandardTable
               scroll={{ x: 1300 }}
@@ -270,6 +399,7 @@ class Operation extends React.Component {
             />
           </div>
         </Card>
+        <DetailsList detailsVisible={detailsVisible} content={list[0]}/>
       </PageHeaderWrapper>
     );
   }
