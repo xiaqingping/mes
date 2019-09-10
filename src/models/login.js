@@ -13,37 +13,43 @@ const Model = {
   effects: {
     *login({ payload }, { call, put }) {
       let response = null;
-      if (payload.type === 'account') {
-        response = yield call(user.loginByPwd, payload);
-      } else {
-        response = yield call(user.loginByCode, payload);
-      }
-      yield put({
-        type: 'changeLoginStatus',
-        payload: response,
-      });
 
-      if (response) {
-        const urlParams = new URL(window.location.href);
-        const params = getPageQuery();
-        let { redirect } = params;
-
-        if (redirect) {
-          const redirectUrlParams = new URL(redirect);
-
-          if (redirectUrlParams.origin === urlParams.origin) {
-            redirect = redirect.substr(urlParams.origin.length);
-
-            if (redirect.match(/^\/.*#/)) {
-              redirect = redirect.substr(redirect.indexOf('#') + 1);
-            }
-          } else {
-            window.location.href = redirect;
-            return;
-          }
+      try {
+        if (payload.type === 'account') {
+          response = yield call(user.loginByPwd, payload);
+        } else {
+          response = yield call(user.loginByCode, payload);
         }
 
-        yield put(routerRedux.replace(redirect || '/'));
+        yield put({
+          type: 'changeLoginStatus',
+          payload: response,
+        });
+
+        if (response) {
+          const urlParams = new URL(window.location.href);
+          const params = getPageQuery();
+          let { redirect } = params;
+
+          if (redirect) {
+            const redirectUrlParams = new URL(redirect);
+
+            if (redirectUrlParams.origin === urlParams.origin) {
+              redirect = redirect.substr(urlParams.origin.length);
+
+              if (redirect.match(/^\/.*#/)) {
+                redirect = redirect.substr(redirect.indexOf('#') + 1);
+              }
+            } else {
+              window.location.href = redirect;
+              return;
+            }
+          }
+
+          yield put(routerRedux.replace(redirect || '/'));
+        }
+      } catch (error) {
+        console.log(error);
       }
     },
 
@@ -68,8 +74,9 @@ const Model = {
   },
   reducers: {
     changeLoginStatus(state, { payload }) {
-      setAuthority(payload.currentAuthority);
-      sessionStorage.setItem('token', payload.authorization);
+      // TODO: 权限控制
+      setAuthority(payload.currentAuthority || 'admin');
+      localStorage.setItem('token', payload.authorization);
       return { ...state, status: payload.status, type: payload.type };
     },
   },

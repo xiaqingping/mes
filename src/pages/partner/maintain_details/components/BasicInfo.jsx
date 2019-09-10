@@ -1,70 +1,21 @@
 import {
-  Badge,
-  Button,
   Card,
-  Col,
-  DatePicker,
-  Divider,
-  Dropdown,
-  Form,
-  Icon,
-  Input,
-  InputNumber,
-  Menu,
-  Row,
-  Select,
-  Switch,
-  message,
-  Cascader,
   Descriptions,
 } from 'antd';
 import React, { Component } from 'react';
 
-const FormItem = Form.Item;
-const InputGroup = Input.Group;
 const DescriptionsItem = Descriptions.Item;
-const { Option } = Select;
-const options = [
-  {
-    value: 'zhejiang',
-    label: 'Zhejiang',
-    children: [
-      {
-        value: 'hangzhou',
-        label: 'Hangzhou',
-        children: [
-          {
-            value: 'xihu',
-            label: 'West Lake',
-          },
-        ],
-      },
-    ],
-  },
-  {
-    value: 'jiangsu',
-    label: 'Jiangsu',
-    children: [
-      {
-        value: 'nanjing',
-        label: 'Nanjing',
-        children: [
-          {
-            value: 'zhonghuamen',
-            label: 'Zhong Hua Men',
-          },
-        ],
-      },
-    ],
-  },
-];
 
 // eslint-disable-next-line react/prefer-stateless-function
 class BasicInfo extends Component {
   render() {
     return (
-      <Card title="基础信息" bordered={false} style={{ marginBottom: '24px' }}>
+      <Card
+        title="基础信息"
+        bordered={false}
+        style={{ marginBottom: '24px' }}>
         <Descriptions
+          className="s-descriptions"
           layout="vertical"
           column={8}
         >
@@ -85,4 +36,4 @@ class BasicInfo extends Component {
   }
 }
 
-export default Form.create()(BasicInfo);
+export default BasicInfo;
