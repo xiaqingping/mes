@@ -322,11 +322,11 @@ class Maintain extends React.Component {
   };
 
   handleStandardTableChange = () => {
-    console.log(3);
+
   };
 
   handleFormReset = () => {
-    console.log(3);
+
   };
 
   // 查询销售归属
