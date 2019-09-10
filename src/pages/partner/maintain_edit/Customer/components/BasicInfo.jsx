@@ -19,7 +19,8 @@ import {
   Descriptions,
 } from 'antd';
 import React, { Component } from 'react';
-import { NameInput, MobileTelephoneInput, TelphoneInput, FoxInput, AddressInput } from '@/components/CustomizedFormControls';
+import { formatMessage } from 'umi-plugin-react/locale';
+import { NameInput, MobileTelephoneInput, TelphoneInput, FoxInput, AddressInput, PriceInput } from '@/components/CustomizedFormControls';
 
 const FormItem = Form.Item;
 const InputGroup = Input.Group;
@@ -61,6 +62,14 @@ const options = [
 
 // eslint-disable-next-line react/prefer-stateless-function
 class BasicInfo extends Component {
+  checkNameInput = (rule, value, callback) => {
+    if (value.name) {
+      callback();
+      return;
+    }
+    callback(formatMessage({ id: 'partner.maintain.requireName' }));
+  };
+
   renderForm = () => {
     const {
       form: { getFieldDecorator },
@@ -70,7 +79,10 @@ class BasicInfo extends Component {
         <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
           <Col md={6} sm={12}>
             <FormItem label="名称">
-              {getFieldDecorator('name')(<NameInput />)}
+              {getFieldDecorator('name', {
+                initialValue: { select: 1, name: '' },
+                rules: [{ validator: this.checkNameInput }],
+              })(<NameInput />)}
             </FormItem>
           </Col>
           <Col md={6} sm={12}>
@@ -141,4 +153,8 @@ class BasicInfo extends Component {
   }
 }
 
-export default Form.create()(BasicInfo);
+export default Form.create({
+  onValuesChange(obj) {
+    console.log(obj);
+  },
+})(BasicInfo);

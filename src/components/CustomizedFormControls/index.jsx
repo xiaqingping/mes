@@ -45,19 +45,58 @@ const options = [
 
 // 名称
 export class NameInput extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {};
+  static getDerivedStateFromProps(nextProps) {
+    if ('value' in nextProps) {
+      return {
+        ...(nextProps.value || {}),
+      };
+    }
+    return null;
   }
 
+  constructor(props) {
+    super(props);
+    const value = props.value || {};
+    this.state = {
+      select: value.select || 1,
+      name: value.name || '',
+    };
+  }
+
+  selectChange = select => {
+    if (!('value' in this.props)) {
+      this.setState({ select });
+    }
+    this.triggerChange({ select });
+  }
+
+  nameChange = e => {
+    const name = e.target.value;
+    if (!('value' in this.props)) {
+      this.setState({ name });
+    }
+    this.triggerChange({ name });
+  }
+
+  triggerChange = changedValue => {
+    const { onChange } = this.props;
+    if (onChange) {
+      onChange({
+        ...this.state,
+        ...changedValue,
+      });
+    }
+  };
+
   render() {
+    const { select, name } = this.state;
     return (
       <InputGroup compact>
-        <Select defaultValue="1" style={{ width: '40%' }}>
-          <Option value="1"><Icon type="user" /> 个人</Option>
-          <Option value="2"><Icon type="home" /> 组织</Option>
+        <Select value={select} style={{ width: '40%' }} onChange={this.selectChange}>
+          <Option value={1}><Icon type="user" /> 个人</Option>
+          <Option value={2}><Icon type="home" /> 组织</Option>
         </Select>
-        <Input style={{ width: '60%' }} />
+        <Input value={name} style={{ width: '60%' }} onChange={this.nameChange} />
       </InputGroup>
     );
   }
