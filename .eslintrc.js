@@ -3,7 +3,8 @@ const _ = require('lodash');
 
 const myEslint = _.merge({}, strictEslint, {
   rules: {
-    'no-plusplus': 'off'
+    'no-plusplus': 'off',
+    'no-console': 'off',
   }
 });
 
