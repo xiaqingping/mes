@@ -25,6 +25,7 @@ import peptideBase from './peptide-base';
 import peptideorder from './peptideorder';
 import pay from './pay';
 import system from './system';
+import serial from './serial';
 
 export default {
   area,
@@ -54,6 +55,7 @@ export default {
   peptideorder,
   pay,
   system,
+  serial,
 };
 
 export {
@@ -84,4 +86,5 @@ export {
   peptideorder,
   pay,
   system,
+  serial,
 };
