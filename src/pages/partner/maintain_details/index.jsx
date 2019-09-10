@@ -27,11 +27,7 @@ import Authentication from './components/Authentication';
 import Bank from './components/Bank';
 import Address from './components/Address';
 
-@connect(
-  ({
-    listTableList,
-    loading,
-  }) => ({
+@connect(({ listTableList, loading }) => ({
     listTableList,
     loading: loading.models.rule,
   }),
@@ -74,7 +70,6 @@ class CustomerDetails extends Component {
         <Bank></Bank>
         <Address></Address>
         <FooterToolbar style={{ width }}>
-          {/* {this.getErrorInfo()} */}
           <Button>取消</Button>
           <Button type="primary">提交</Button>
         </FooterToolbar>

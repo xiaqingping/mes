@@ -82,6 +82,29 @@ ol {
   }
 }
 
+// 描述列表
+:global {
+  .s-descriptions {
+    &.ant-descriptions {
+      .ant-descriptions-row:nth-child(2n+1) {
+        .ant-descriptions-item {
+          padding-bottom: 12px;
+        }
+      }
+      .ant-descriptions-row:nth-child(2n) {
+        .ant-descriptions-item {
+          padding-bottom: 32px;
+        }
+      }
+      .ant-descriptions-row:last-child {
+        .ant-descriptions-item {
+          padding-bottom: 16px;
+        }
+      }
+    }
+  }
+}
+
 @media screen and (max-width: @screen-lg) {
   .tableListForm :global(.ant-form-item) {
     margin-right: 24px;

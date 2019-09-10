@@ -74,6 +74,7 @@ const Model = {
   },
   reducers: {
     changeLoginStatus(state, { payload }) {
+      // TODO: 权限控制
       setAuthority(payload.currentAuthority || 'admin');
       localStorage.setItem('token', payload.authorization);
       return { ...state, status: payload.status, type: payload.type };

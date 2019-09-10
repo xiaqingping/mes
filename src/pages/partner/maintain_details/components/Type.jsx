@@ -1,7 +1,10 @@
 import {
   Card,
+  Descriptions,
 } from 'antd';
 import React, { Component } from 'react';
+
+const DescriptionsItem = Descriptions.Item;
 
 const tabListNoTitle = [
   {
@@ -45,7 +48,19 @@ class BasicInfo extends Component {
           this.onTabChange(key);
         }}
       >
-        <div>456</div>
+        <Descriptions
+          className="s-descriptions"
+          layout="vertical"
+          column={7}
+        >
+          <DescriptionsItem label="网点归属">华东大区/山东网点</DescriptionsItem>
+          <DescriptionsItem label="默认付款方式">银行付款</DescriptionsItem>
+          <DescriptionsItem label="币种">意大利里拉</DescriptionsItem>
+          <DescriptionsItem label="客户分类">客户</DescriptionsItem>
+          <DescriptionsItem label="随货开票">是</DescriptionsItem>
+          <DescriptionsItem label="销售冻结">活跃</DescriptionsItem>
+          <DescriptionsItem label="默认开票类型">增值税专用发票</DescriptionsItem>
+        </Descriptions>
       </Card>
     );
   }
