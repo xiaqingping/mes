@@ -94,9 +94,9 @@ const quyuoptions = [
 function renderOption(item) {
   return (
     <Option key={item.value} text={item.value}>
-      <div className="global-search-item">
-        <span className="global-search-item-desc">{item.code}</span>
-        <span className="global-search-item-count">{item.value}</span>
+      <div style={{ display: 'flex' }}>
+        <span style={{ flexGrow: 1 }}>{item.code}</span>
+        <span style={{ flexGrow: 1 }}>{item.value}</span>
       </div>
     </Option>
   );
@@ -251,7 +251,7 @@ class Maintain extends React.Component {
             <Link to={`/partner/maintain/edit/${code}`}>修改</Link>
             <Divider type="vertical" />
             <Dropdown overlay={menu}>
-              <a className="ant-dropdown-link" href="#">
+              <a className="ant-dropdown-link">
                 更多操作 <Icon type="down" />
               </a>
             </Dropdown>
