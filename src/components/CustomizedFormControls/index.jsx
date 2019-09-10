@@ -104,19 +104,58 @@ export class NameInput extends React.Component {
 
 // 移动电话
 export class MobileTelephoneInput extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {};
+  static getDerivedStateFromProps(nextProps) {
+    if ('value' in nextProps) {
+      return {
+        ...(nextProps.value || {}),
+      };
+    }
+    return null;
   }
 
+  constructor(props) {
+    super(props);
+    const value = props.value || {};
+    this.state = {
+      area: value.area || '+86',
+      code: value.code || '',
+    };
+  }
+
+  areaChange = area => {
+    if (!('value' in this.props)) {
+      this.setState({ area });
+    }
+    this.triggerChange({ area });
+  }
+
+  codeChange = e => {
+    const code = e.target.value;
+    if (!('value' in this.props)) {
+      this.setState({ code });
+    }
+    this.triggerChange({ code });
+  }
+
+  triggerChange = changedValue => {
+    const { onChange } = this.props;
+    if (onChange) {
+      onChange({
+        ...this.state,
+        ...changedValue,
+      });
+    }
+  };
+
   render() {
+    const { area, code } = this.state;
     return (
       <InputGroup compact>
-        <Select defaultValue="+86" style={{ width: '40%' }}>
+        <Select value={area} style={{ width: '40%' }} onChange={this.areaChange}>
           <Option value="+86">+86</Option>
           <Option value="+01">+01</Option>
         </Select>
-        <Input style={{ width: '60%' }} />
+        <Input value={code} style={{ width: '60%' }} onChange={this.codeChange} />
       </InputGroup>
     );
   }
@@ -124,21 +163,54 @@ export class MobileTelephoneInput extends React.Component {
 
 // 电话
 export class TelphoneInput extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {};
+  static getDerivedStateFromProps(nextProps) {
+    if ('value' in nextProps) {
+      return {
+        ...(nextProps.value || {}),
+      };
+    }
+    return null;
   }
 
+  constructor(props) {
+    super(props);
+    const value = props.value || {};
+    this.state = {
+      area: value.area || '+86',
+      provincial: value.provincial || '',
+      code: value.code || '',
+      extension: value.extension || '',
+    };
+  }
+
+  valueChange = (key, value) => {
+    if (!('value' in this.props)) {
+      this.setState({ [key]: value });
+    }
+    this.triggerChange({ [key]: value });
+  }
+
+  triggerChange = changedValue => {
+    const { onChange } = this.props;
+    if (onChange) {
+      onChange({
+        ...this.state,
+        ...changedValue,
+      });
+    }
+  };
+
   render() {
+    const { area, provincial, code, extension } = this.state;
     return (
       <InputGroup compact>
-        <Select defaultValue="+86" style={{ width: '30%' }}>
+        <Select value={area} style={{ width: '30%' }} onChange={val => this.valueChange('area', val)}>
           <Option value="+86">+86</Option>
           <Option value="+01">+01</Option>
         </Select>
-        <Input style={{ width: '20%' }} />
-        <Input style={{ width: '30%' }} />
-        <Input style={{ width: '20%' }} />
+        <Input value={provincial} style={{ width: '20%' }} onChange={e => this.valueChange('provincial', e.target.value)}/>
+        <Input value={code} style={{ width: '30%' }} onChange={e => this.valueChange('code', e.target.value)}/>
+        <Input value={extension} style={{ width: '20%' }} onChange={e => this.valueChange('extension', e.target.value)}/>
       </InputGroup>
     );
   }

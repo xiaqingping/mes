@@ -97,7 +97,7 @@ class BasicInfo extends Component {
           </Col>
           <Col md={6} sm={12}>
             <FormItem label="电话">
-              {getFieldDecorator('email')(<TelphoneInput />)}
+              {getFieldDecorator('tel')(<TelphoneInput />)}
             </FormItem>
           </Col>
           <Col md={6} sm={12}>
