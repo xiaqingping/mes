@@ -1,22 +1,8 @@
 import {
-  Badge,
-  Button,
-  Card,
-  Col,
-  DatePicker,
-  Divider,
-  Dropdown,
-  Form,
   Icon,
   Input,
-  InputNumber,
-  Menu,
-  Row,
   Select,
-  Switch,
-  message,
   Cascader,
-  Descriptions,
 } from 'antd';
 import React from 'react';
 
