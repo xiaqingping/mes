@@ -28,7 +28,11 @@ const addressList = [
 ];
 
 const basicInfo = {
-  name: 1,
+  name: {
+    select: 1,
+    name: '',
+  },
+  email: '123@qq.com',
 };
 
 @connect(({ listTableList, loading }) => ({
@@ -77,11 +81,12 @@ class CustomerEdit extends Component {
     });
   };
 
-  submit = () => {
+  validate = () => {
     const {
       form: { validateFieldsAndScroll },
       dispatch,
     } = this.props;
+    console.log(this.form.validate());
     validateFieldsAndScroll((error, values) => {
       console.log(values);
       if (!error) {
@@ -104,7 +109,8 @@ class CustomerEdit extends Component {
         <Card title="基础信息" bordered={false} style={{ marginBottom: '24px' }}>
           {getFieldDecorator('basicInfo', {
             initialValue: basicInfo,
-          })(<BasicInfo form={this.props.form} />)}
+          // eslint-disable-next-line no-return-assign
+          })(<BasicInfo wrappedComponentRef={form => this.form = form} />)}
         </Card>
         <Type></Type>
         <Credit></Credit>
@@ -159,7 +165,7 @@ class CustomerEdit extends Component {
         {contentList[tabActiveKey]}
         <FooterToolbar style={{ width }}>
           <Button>取消</Button>
-          <Button type="primary" onClick={this.submit}>提交</Button>
+          <Button type="primary" onClick={this.validate}>提交</Button>
         </FooterToolbar>
       </PageHeaderWrapper>
     );
