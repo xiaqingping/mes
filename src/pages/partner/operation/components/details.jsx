@@ -116,7 +116,7 @@ class Details extends React.Component {
           width= "600"
           className="myTables"
         >
-            <Table dataSource={list} columns={this.columns} size="small" pagination={{ pageSize: 20 }}/>
+            <Table dataSource={list} columns={this.columns} size="small" pagination={false}/>
         </Drawer>
       </div>
     );

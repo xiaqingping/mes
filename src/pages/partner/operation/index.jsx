@@ -148,12 +148,9 @@ class Operation extends React.Component {
       fixed: 'right',
       title: '操作',
       width: 150,
-      render: (text, record) => {
-        const { code } = record;
-        return (
+      render: (text, record) => (
           <a onClick={ e => this.showDrawer(record, e)}>查看</a>
-        );
-      },
+        ),
     },
   ];
 
