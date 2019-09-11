@@ -37,10 +37,6 @@ const status = {
     value: 'success',
     text: '已完成',
   },
-  3: {
-    value: 'warning',
-    text: '部分完成',
-  },
 };
 
 class Operation extends React.Component {
@@ -53,7 +49,7 @@ class Operation extends React.Component {
     list: [],
     loading: false,
     selectedRows: [],
-    detailsVisible: true,
+    detailsVisible: false,
     detailsValue: null,
     // editIndex: -1,
   };
@@ -125,10 +121,6 @@ class Operation extends React.Component {
           value: '2',
           text: '已完成',
         },
-        {
-          value: '3',
-          text: '部分完成',
-        },
       ],
       render(val, record) {
         return <span><Badge status={status[val].value} text={status[val].text}/><br/><span style={{ marginLeft: 85 }}>{val === 2 ? record.actiontime : ''}</span></span>;
@@ -159,7 +151,7 @@ class Operation extends React.Component {
       render: (text, record) => {
         const { code } = record;
         return (
-          <a onClick={this.showDrawer}>查看</a>
+          <a onClick={ e => this.showDrawer(record, e)}>查看</a>
         );
       },
     },
@@ -168,6 +160,14 @@ class Operation extends React.Component {
   componentDidMount() {
     // this.getTableData();
     this.getData();
+  }
+
+  showDrawer = (record, e) => {
+    e.preventDefault();
+    this.setState({
+      detailsVisible: true,
+      detailsValue: record,
+    })
   }
 
   getData = () => {
@@ -179,8 +179,8 @@ class Operation extends React.Component {
         huoban: `name${i}`,
         phone: `1${Math.ceil((Math.random() + 0.0001) * 10000000000)}`,
         type: Math.ceil((Math.random() + 0.0001) * 2),
-        status: Math.ceil((Math.random() + 0.0001) * 3),
-        actionman: `action${i}`,
+        status: Math.ceil((Math.random() + 0.0001) * 2),
+        actionman: `action${i + 10}`,
         actiontime: `2019-9-${Math.ceil((Math.random() + 0.0001) * 30)} 12:30:59`,
         partnerCode: Math.ceil((Math.random() + 0.0001) * 100000), // 1人，2组织
       });
@@ -375,9 +375,8 @@ class Operation extends React.Component {
 
 
   render() {
-    const { list, pagination, loading, selectedRows, detailsVisible } = this.state;
+    const { list, pagination, loading, selectedRows, detailsVisible, detailsValue } = this.state;
     const data = { list, pagination };
-
     return (
       <PageHeaderWrapper>
         <Card bordered={false}>
@@ -399,7 +398,7 @@ class Operation extends React.Component {
             />
           </div>
         </Card>
-        <DetailsList detailsVisible={detailsVisible} content={list[0]}/>
+        <DetailsList detailsVisible={detailsVisible} detailsValue={detailsValue}/>
       </PageHeaderWrapper>
     );
   }
