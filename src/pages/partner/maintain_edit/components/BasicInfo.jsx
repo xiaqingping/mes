@@ -1,66 +1,42 @@
 import {
-  Badge,
-  Button,
   Card,
   Col,
-  DatePicker,
-  Divider,
-  Dropdown,
   Form,
-  Icon,
   Input,
-  InputNumber,
-  Menu,
   Row,
   Select,
   Switch,
-  message,
-  Cascader,
-  Descriptions,
 } from 'antd';
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import { formatMessage } from 'umi-plugin-react/locale';
-import { NameInput, MobileTelephoneInput, TelphoneInput, FoxInput, AddressInput, PriceInput } from '@/components/CustomizedFormControls';
+import { isEqual } from 'lodash';
+import { NameInput, MobileTelephoneInput, TelphoneInput, FoxInput, AddressInput } from '@/components/CustomizedFormControls';
 
 const FormItem = Form.Item;
-const InputGroup = Input.Group;
 const { Option } = Select;
-const options = [
-  {
-    value: 'zhejiang',
-    label: 'Zhejiang',
-    children: [
-      {
-        value: 'hangzhou',
-        label: 'Hangzhou',
-        children: [
-          {
-            value: 'xihu',
-            label: 'West Lake',
-          },
-        ],
-      },
-    ],
-  },
-  {
-    value: 'jiangsu',
-    label: 'Jiangsu',
-    children: [
-      {
-        value: 'nanjing',
-        label: 'Nanjing',
-        children: [
-          {
-            value: 'zhonghuamen',
-            label: 'Zhong Hua Men',
-          },
-        ],
-      },
-    ],
-  },
-];
 
-class BasicInfo extends Component {
+class BasicInfo extends PureComponent {
+  static getDerivedStateFromProps(nextProps, preState) {
+    if (isEqual(nextProps.value, preState.value)) {
+      return null;
+    }
+
+    return {
+      data: nextProps.value,
+      value: nextProps.value,
+    };
+  }
+
+  constructor(props) {
+    super(props);
+    console.log(props);
+    this.state = {
+      data: props.value,
+      loading: false,
+      value: props.value,
+    };
+  }
+
   checkNameInput = (rule, value, callback) => {
     if (value.name) {
       callback();
@@ -69,10 +45,11 @@ class BasicInfo extends Component {
     callback(formatMessage({ id: 'partner.maintain.requireName' }));
   };
 
-  renderForm = () => {
+  render() {
     const {
       form: { getFieldDecorator },
     } = this.props;
+
     return (
       <Form layout="vertical">
         <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
@@ -141,19 +118,7 @@ class BasicInfo extends Component {
         </Row>
       </Form>
     );
-  };
-
-  render() {
-    return (
-      <Card title="基础信息" bordered={false} style={{ marginBottom: '24px' }}>
-        {this.renderForm()}
-      </Card>
-    );
   }
 }
 
-export default Form.create({
-  onValuesChange(obj) {
-    console.log(obj);
-  },
-})(BasicInfo);
+export default BasicInfo;
