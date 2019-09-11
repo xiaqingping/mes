@@ -234,7 +234,7 @@ class Maintain extends React.Component {
     {
       fixed: 'right',
       title: '操作',
-      width: 150,
+      width: 160,
       render: (text, record) => {
         const { code } = record;
         const menu = (
