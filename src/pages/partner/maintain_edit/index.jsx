@@ -1,19 +1,5 @@
 import {
-  Badge,
   Button,
-  Card,
-  Col,
-  DatePicker,
-  Divider,
-  Dropdown,
-  Form,
-  Icon,
-  Input,
-  InputNumber,
-  Menu,
-  Row,
-  Select,
-  message,
 } from 'antd';
 import React, { Component } from 'react';
 import { connect } from 'dva';
