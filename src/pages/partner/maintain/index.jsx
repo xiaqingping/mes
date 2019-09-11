@@ -391,7 +391,7 @@ class Maintain extends React.Component {
           <Col lg={6} md={8} sm={12}>
             <FormItem label="认证状态">
               {getFieldDecorator('renzheng')(
-                <Select placeholder="请选择" mode="multiple">
+                <Select maxTagCount={1} maxTagTextLength={2} placeholder="请选择" mode="multiple">
                   <Option value="0">未认证</Option>
                   <Option value="1">已认证</Option>
                   <Option value="2">审核中</Option>
@@ -402,7 +402,7 @@ class Maintain extends React.Component {
           <Col lg={6} md={8} sm={12}>
             <FormItem label="销售冻结">
               {getFieldDecorator('xiaoshou')(
-                <Select placeholder="请选择" mode="multiple">
+                <Select placeholder="请选择">
                   <Option value="0">冻结</Option>
                   <Option value="1">活跃</Option>
                 </Select>,
@@ -412,7 +412,7 @@ class Maintain extends React.Component {
           <Col lg={6} md={8} sm={12}>
             <FormItem label="客户数据">
               {getFieldDecorator('shuju')(
-                <Select placeholder="请选择" mode="multiple">
+                <Select placeholder="请选择">
                   <Option value="0">完整</Option>
                   <Option value="1">不完整</Option>
                 </Select>,
@@ -422,7 +422,7 @@ class Maintain extends React.Component {
           <Col lg={6} md={8} sm={12}>
             <FormItem label="供应商数据">
               {getFieldDecorator('gongyingsshuju')(
-                <Select placeholder="请选择" mode="multiple">
+                <Select placeholder="请选择">
                   <Option value="0">完整</Option>
                   <Option value="1">不完整</Option>
                 </Select>,

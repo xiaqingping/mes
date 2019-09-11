@@ -10,15 +10,10 @@ import Customer from './Customer';
 import Supplier from './Supplier';
 
 
-@connect(
-  ({
-    listTableList,
-    loading,
-  }) => ({
-    listTableList,
-    loading: loading.models.rule,
-  }),
-)
+@connect(({ listTableList, loading }) => ({
+  listTableList,
+  loading: loading.models.rule,
+}))
 class CustomerDetails extends Component {
   state = {
     width: '100%',
@@ -48,8 +43,18 @@ class CustomerDetails extends Component {
   };
 
   onTabChange = tabActiveKey => {
+    const { dispatch } = this.props;
     this.setState({
       tabActiveKey,
+    });
+    // dispatch({
+    //   type: 'partner_maintain/read',
+    // });
+    dispatch({
+      type: 'partner_maintain/setDetails',
+      payload: {
+        title: '1',
+      },
     });
   };
 
