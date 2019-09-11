@@ -1,5 +1,4 @@
 import {
-  Card,
   Col,
   Form,
   Input,
@@ -22,18 +21,15 @@ class BasicInfo extends PureComponent {
     }
 
     return {
-      data: nextProps.value,
-      value: nextProps.value,
+      ...nextProps.value,
     };
   }
 
   constructor(props) {
     super(props);
-    console.log(props);
+    console.log(props.value);
     this.state = {
-      data: props.value,
-      loading: false,
-      value: props.value,
+      ...props.value,
     };
   }
 
@@ -45,10 +41,50 @@ class BasicInfo extends PureComponent {
     callback(formatMessage({ id: 'partner.maintain.requireName' }));
   };
 
+  valueChange = (key, value) => {
+    console.log('change')
+    if (!('value' in this.props)) {
+      this.setState({ [key]: value });
+    }
+    this.triggerChange({ [key]: value });
+  }
+
+  validate = () => {
+    const {
+      form: { validateFieldsAndScroll },
+    } = this.props;
+    validateFieldsAndScroll((error, values) => {
+      if (!error) {
+        //
+      }
+    });
+  }
+
+  triggerChange = changedValue => {
+    console.log('trigger')
+    const { onChange } = this.props;
+    if (onChange) {
+      console.log({
+        ...this.state,
+        ...changedValue,
+      });
+      const basicInfo = {
+        ...this.state,
+        ...changedValue,
+      };
+      onChange(basicInfo);
+      // onChange({
+      //   ...this.state,
+      //   ...changedValue,
+      // });
+    }
+  };
+
   render() {
     const {
       form: { getFieldDecorator },
     } = this.props;
+    const { name, email } = this.state;
 
     return (
       <Form layout="vertical">
@@ -56,7 +92,7 @@ class BasicInfo extends PureComponent {
           <Col md={6} sm={12}>
             <FormItem label="名称">
               {getFieldDecorator('name', {
-                initialValue: { select: 1, name: '' },
+                initialValue: name,
                 rules: [{ validator: this.checkNameInput }],
               })(<NameInput />)}
             </FormItem>
@@ -68,7 +104,9 @@ class BasicInfo extends PureComponent {
           </Col>
           <Col md={6} sm={12}>
             <FormItem label="邮箱">
-              {getFieldDecorator('email')(<Input />)}
+              {getFieldDecorator('email', {
+                initialValue: email,
+              })(<Input onChange={e => this.valueChange('email', e.target.value)} />)}
             </FormItem>
           </Col>
           <Col md={6} sm={12}>
@@ -121,4 +159,4 @@ class BasicInfo extends PureComponent {
   }
 }
 
-export default BasicInfo;
+export default Form.create()(BasicInfo);
