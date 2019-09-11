@@ -60,7 +60,6 @@ const options = [
   },
 ];
 
-// eslint-disable-next-line react/prefer-stateless-function
 class BasicInfo extends Component {
   checkNameInput = (rule, value, callback) => {
     if (value.name) {

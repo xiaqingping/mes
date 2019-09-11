@@ -49,17 +49,6 @@ class BasicInfo extends Component {
           columns={columns}
           pagination={false}
         ></Table>
-        <Button
-          style={{
-            width: '100%',
-            marginTop: 16,
-            marginBottom: 8,
-          }}
-          type="dashed"
-          icon="plus"
-        >
-          新增成员
-        </Button>
       </Card>
     );
   }
