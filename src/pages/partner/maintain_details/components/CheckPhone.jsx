@@ -127,7 +127,7 @@ class CheckPhone extends Component {
       return (
           <Form layout="inline" onSubmit={this.handleSend}>
             <div style={{ height: '200px', textAlign: 'center', paddingTop: '68px' }}>
-              <FormItem label="联系方式" >
+              <FormItem label="联系方式">
                 {getFieldDecorator('phone')(<Input style={{ width: '300px' }} placeholder="输入移动电话或邮箱"/>)}
               </FormItem>
             </div>
