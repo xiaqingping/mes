@@ -9,7 +9,11 @@ import {
 import React, { PureComponent } from 'react';
 import { formatMessage } from 'umi-plugin-react/locale';
 import { isEqual } from 'lodash';
-import { NameInput, MobileTelephoneInput, TelphoneInput, FoxInput, AddressInput } from '@/components/CustomizedFormControls';
+import { EmailInput, NameInput, MobileTelephoneInput, TelphoneInput, FoxInput, AddressInput } from '@/components/CustomizedFormControls';
+
+import styles from '../style.less';
+
+console.log(styles);
 
 const FormItem = Form.Item;
 const { Option } = Select;
@@ -27,7 +31,6 @@ class BasicInfo extends PureComponent {
 
   constructor(props) {
     super(props);
-    console.log(props.value);
     this.state = {
       ...props.value,
     };
@@ -77,7 +80,7 @@ class BasicInfo extends PureComponent {
     const { name, email } = this.state;
 
     return (
-      <Form layout="vertical">
+      <Form layout="vertical" className={styles['sangon-form']}>
         <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
           <Col md={6} sm={12}>
             <FormItem label="名称">
@@ -95,8 +98,8 @@ class BasicInfo extends PureComponent {
           <Col md={6} sm={12}>
             <FormItem label="邮箱">
               {getFieldDecorator('email', {
-                initialValue: email,
-              })(<Input onChange={e => this.valueChange('email', e.target.value)} />)}
+                initialValue: { email },
+              })(<EmailInput />)}
             </FormItem>
           </Col>
           <Col md={6} sm={12}>

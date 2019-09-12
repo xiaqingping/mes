@@ -97,12 +97,12 @@ class BasicInfo extends Component {
             </Col>
             <Col span={3}>
               <FormItem label="随货开票">
-                {getFieldDecorator('kaipiao')(<Switch />)}
+                {getFieldDecorator('kaipiao', { valuePropName: 'checked' })(<Switch />)}
               </FormItem>
             </Col>
             <Col span={3}>
               <FormItem label="销售冻结">
-                {getFieldDecorator('dongj')(<Switch />)}
+                {getFieldDecorator('dongj', { valuePropName: 'checked' })(<Switch />)}
               </FormItem>
             </Col>
           </Row>
