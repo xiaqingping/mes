@@ -77,8 +77,6 @@ export class EmailInput extends React.Component {
       dataSource = suffix.map(domain => `${value}@${domain}`);
     }
 
-    // if (value && value.indexOf('@') === -1) dataSource.push(`${value}@gmail.com`);
-
     if (!('value' in this.props)) {
       this.setState({
         [key]: value,
