@@ -131,7 +131,12 @@ class CustomerEdit extends Component {
     } = this.props;
     return (
       <>
-        {/* <BasicInfo></BasicInfo> */}
+        <Card title="基础信息" bordered={false} style={{ marginBottom: '24px' }}>
+          {getFieldDecorator('basicInfo', {
+            initialValue: basicInfo,
+          // eslint-disable-next-line no-return-assign
+          })(<BasicInfo wrappedComponentRef={form => this.form = form} />)}
+        </Card>
         <Type1></Type1>
         <Bank></Bank>
       </>
