@@ -45,7 +45,7 @@ const statusList = [
   { value: 1, text: '过期' },
 ];
 
-class User extends Component {
+class Rule extends Component {
   state = {
     pagination: {
       current: 1,
@@ -307,4 +307,4 @@ class User extends Component {
   }
 }
 
-export default Form.create()(User);
+export default Form.create()(Rule);
