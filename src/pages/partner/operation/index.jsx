@@ -253,9 +253,9 @@ class Operation extends React.Component {
     return expandForm ? this.renderAdvancedForm() : this.renderSimpleForm();
   };
 
-  // handleAdd = () => {
-  //   console.log('add');
-  // }
+  selectValue = (value, option) => {
+    console.log('onSelect', value);
+  }
 
   renderAdvancedForm() {
     const {
@@ -323,6 +323,7 @@ class Operation extends React.Component {
     );
   }
 
+
   renderSimpleForm() {
     const { form } = this.props;
     const { getFieldDecorator } = form;
@@ -337,8 +338,11 @@ class Operation extends React.Component {
           <Col lg={6} md={8} sm={12}>
           <FormItem label="业务伙伴">
               {getFieldDecorator('yewuhuoban')(
-              <AutoComplete dataSource={this.data.huoban} placeholder="请输入" filterOption={(inputValue, option) =>
-                option.props.children.indexOf(inputValue) !== -1
+              <AutoComplete
+                onSelect={(value, option) => this.selectValue(value, option)}
+                dataSource={this.data.huoban} placeholder="请输入"
+                filterOption={(inputValue, option) =>
+                  option.props.children.indexOf(inputValue) !== -1
               } />)}
             </FormItem>
           </Col>
