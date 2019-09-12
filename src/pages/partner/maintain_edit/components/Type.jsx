@@ -1,7 +1,16 @@
 import {
   Card,
+  Form,
+  Row,
+  Col,
+  Input,
+  Select,
+  Switch,
 } from 'antd';
 import React, { Component } from 'react';
+
+const FormItem = Form.Item;
+const { Option } = Select;
 
 const tabListNoTitle = [
   {
@@ -22,7 +31,6 @@ const tabListNoTitle = [
   },
 ];
 
-// eslint-disable-next-line react/prefer-stateless-function
 class BasicInfo extends Component {
   state = {
     noTitleKey: '1',
@@ -35,6 +43,10 @@ class BasicInfo extends Component {
   }
 
   render() {
+    const {
+      form: { getFieldDecorator },
+    } = this.props;
+
     return (
       <Card
         bordered={false}
@@ -45,10 +57,59 @@ class BasicInfo extends Component {
           this.onTabChange(key);
         }}
       >
-        <div>456</div>
+        <Form>
+          <Row gutter={32}>
+            <Col span={3}>
+              <FormItem label="网点归属">
+                {getFieldDecorator('wangdian')(
+                  <Select>
+                    <Option value="1">上海</Option>
+                  </Select>,
+                )}
+              </FormItem>
+            </Col>
+            <Col span={3}>
+              <FormItem label="默认付款方式">
+                {getFieldDecorator('paytype')(
+                  <Select>
+                    <Option value="1">网银</Option>
+                  </Select>,
+                )}
+              </FormItem>
+            </Col>
+            <Col span={3}>
+              <FormItem label="币种">
+                {getFieldDecorator('currency')(
+                  <Select>
+                    <Option value="1">人民币</Option>
+                  </Select>,
+                )}
+              </FormItem>
+            </Col>
+            <Col span={3}>
+              <FormItem label="客户分类">
+                {getFieldDecorator('type')(
+                  <Select>
+                    <Option value="1">大专院校</Option>
+                  </Select>,
+                )}
+              </FormItem>
+            </Col>
+            <Col span={3}>
+              <FormItem label="随货开票">
+                {getFieldDecorator('kaipiao', { valuePropName: 'checked' })(<Switch />)}
+              </FormItem>
+            </Col>
+            <Col span={3}>
+              <FormItem label="销售冻结">
+                {getFieldDecorator('dongj', { valuePropName: 'checked' })(<Switch />)}
+              </FormItem>
+            </Col>
+          </Row>
+        </Form>
       </Card>
     );
   }
 }
 
-export default BasicInfo;
+export default Form.create()(BasicInfo);

@@ -17,6 +17,8 @@ import Address from './components/Address';
 import Type1 from './components/Type1';
 import Bank from './components/Bank';
 
+import EditableTable from './components/TableForm';
+
 const addressList = [
   {
     id: 1,
@@ -86,7 +88,7 @@ class CustomerEdit extends Component {
       form: { validateFieldsAndScroll },
       dispatch,
     } = this.props;
-    console.log(this.form.validate());
+
     validateFieldsAndScroll((error, values) => {
       console.log(values);
       if (!error) {
@@ -120,6 +122,9 @@ class CustomerEdit extends Component {
             initialValue: addressList,
           })(<Address />)}
         </Card>
+        <Card>
+          <EditableTable></EditableTable>
+        </Card>
       </>
     );
   }
@@ -131,7 +136,12 @@ class CustomerEdit extends Component {
     } = this.props;
     return (
       <>
-        {/* <BasicInfo></BasicInfo> */}
+        <Card title="基础信息" bordered={false} style={{ marginBottom: '24px' }}>
+          {getFieldDecorator('basicInfo', {
+            initialValue: basicInfo,
+          // eslint-disable-next-line no-return-assign
+          })(<BasicInfo wrappedComponentRef={form => this.form = form} />)}
+        </Card>
         <Type1></Type1>
         <Bank></Bank>
       </>
