@@ -31,8 +31,6 @@ class SecurityLayout extends React.Component {
     const { isReady } = this.state;
     const { children, loading, currentUser } = this.props;
 
-    console.log(currentUser);
-
     if ((!currentUser.authorization && loading) || !isReady) {
       return <PageLoading />;
     }
