@@ -42,7 +42,6 @@ class BasicInfo extends PureComponent {
   };
 
   valueChange = (key, value) => {
-    console.log('change')
     if (!('value' in this.props)) {
       this.setState({ [key]: value });
     }
@@ -61,22 +60,13 @@ class BasicInfo extends PureComponent {
   }
 
   triggerChange = changedValue => {
-    console.log('trigger')
     const { onChange } = this.props;
     if (onChange) {
-      console.log({
-        ...this.state,
-        ...changedValue,
-      });
       const basicInfo = {
         ...this.state,
         ...changedValue,
       };
       onChange(basicInfo);
-      // onChange({
-      //   ...this.state,
-      //   ...changedValue,
-      // });
     }
   };
 
