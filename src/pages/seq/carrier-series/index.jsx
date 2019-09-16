@@ -9,22 +9,96 @@ import {
   Select,
 } from 'antd';
 import React, { Component } from 'react';
+import { connect } from 'dva';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import StandardTable from '@/components/StandardTable';
-import api from '@/api';
 
 const FormItem = Form.Item;
 const { Option } = Select;
 
+/**
+ * 页面顶部筛选表单
+ */
+@Form.create()
+class Search extends Component {
+  componentDidMount() {
+    this.submit();
+  }
+
+  submit = e => {
+    if (e) e.preventDefault();
+    const val = this.props.form.getFieldsValue();
+    this.props.getTableData({ page: 1, ...val });
+  }
+
+  handleFormReset = () => {
+    this.props.form.resetFields();
+  }
+
+  // 渲染表单
+  renderForm = () => {
+    const {
+      form: { getFieldDecorator },
+    } = this.props;
+    return (
+      <Form onSubmit={this.submit} layout="inline">
+        <Row gutter={{ lg: 24, md: 12, sm: 6 }}>
+          <Col lg={6} md={8} sm={12}>
+            <FormItem label="编号">
+              {getFieldDecorator('code')(<Input />)}
+            </FormItem>
+          </Col>
+          <Col lg={6} md={8} sm={12}>
+            <FormItem label="名称">
+              {getFieldDecorator('name')(<Input />)}
+            </FormItem>
+          </Col>
+          <Col lg={6} md={8} sm={12}>
+            <FormItem label="状态">
+              {getFieldDecorator('status', { initialValue: '1' })(
+                <Select>
+                  <Option value="1">正常</Option>
+                  <Option value="2">已删除</Option>
+                </Select>,
+              )}
+            </FormItem>
+          </Col>
+          <Col lg={6} md={8} sm={12}>
+            <span className="submitButtons">
+              <Button type="primary" htmlType="submit">
+                查询
+              </Button>
+              <Button style={{ marginLeft: 8 }} onClick={this.handleFormReset}>
+                重置
+              </Button>
+            </span>
+          </Col>
+        </Row>
+      </Form>
+    );
+  }
+
+  render() {
+    return (
+      <div className="tableListForm">{this.renderForm()}</div>
+    );
+  }
+}
+
+/**
+ * 页面根组件
+ */
+@connect(({ SeqCarrierSeries, loading }) => ({
+  SeqCarrierSeries,
+  loading: loading.models.SeqCarrierSeries,
+}))
+@Form.create()
 class CarrierSeries extends Component {
   state = {
-    pagination: {
-      current: 1,
-      pageSize: 10,
-      total: 0,
+    formValues: {
+      page: 1,
+      rows: 10,
     },
-    list: [],
-    loading: false,
     selectedRows: [],
     editIndex: -1,
   }
@@ -107,12 +181,7 @@ class CarrierSeries extends Component {
   ];
 
   componentDidMount() {
-    this.getTableData();
-  }
-
-  handleSearch = e => {
-    e.preventDefault();
-    this.getTableData({ page: 1 });
+    //
   }
 
   handleStandardTableChange = (pagination, filtersArg, sorter) => {
@@ -130,67 +199,18 @@ class CarrierSeries extends Component {
 
   // 获取表格数据
   getTableData = (options = {}) => {
+    const { formValues } = this.state;
+    const query = Object.assign({}, formValues, options);
+
     this.setState({
-      loading: true,
+      formValues: query,
     });
-    const { form } = this.props;
-    const { pagination: { current: page, pageSize: rows } } = this.state;
-    const query = Object.assign(form.getFieldsValue(), { page, rows }, options);
 
-    api.series.getSeries(query, true).then(data => {
-      this.setState({
-        loading: false,
-        list: data.rows,
-        pagination: {
-          total: data.total,
-          current: query.page,
-          pageSize: query.rows,
-        },
-      });
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'SeqCarrierSeries/fetch',
+      payload: query,
     });
-  }
-
-  // 渲染表单
-  renderForm = () => {
-    const {
-      form: { getFieldDecorator },
-    } = this.props;
-    return (
-      <Form onSubmit={this.handleSearch} layout="inline">
-        <Row gutter={{ lg: 24, md: 12, sm: 6 }}>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="编号">
-              {getFieldDecorator('code')(<Input />)}
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="名称">
-              {getFieldDecorator('name')(<Input />)}
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="状态">
-              {getFieldDecorator('status', { initialValue: '1' })(
-                <Select>
-                  <Option value="1">正常</Option>
-                  <Option value="2">已删除</Option>
-                </Select>,
-              )}
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <span className="submitButtons">
-              <Button type="primary" htmlType="submit">
-                查询
-              </Button>
-              <Button style={{ marginLeft: 8 }} onClick={this.handleFormReset}>
-                重置
-              </Button>
-            </span>
-          </Col>
-        </Row>
-      </Form>
-    );
   }
 
   // 新增
@@ -199,14 +219,18 @@ class CarrierSeries extends Component {
   }
 
   render() {
-    const { list, pagination, loading, selectedRows } = this.state;
-    const data = { list, pagination };
+    const { formValues: { page: current, rows: pageSize }, selectedRows } = this.state;
+    const {
+      SeqCarrierSeries: { list, total },
+      loading,
+    } = this.props;
+    const data = { list, pagination: { current, pageSize, total } };
 
     return (
       <PageHeaderWrapper>
         <Card bordered={false}>
           <div className="tableList">
-            <div className="tableListForm">{this.renderForm()}</div>
+            <Search getTableData={this.getTableData} />
             <div className="tableListOperator">
               <Button icon="plus" type="primary" onClick={() => this.handleAdd()}>
                 新建
@@ -228,4 +252,4 @@ class CarrierSeries extends Component {
   }
 }
 
-export default Form.create()(CarrierSeries);
+export default CarrierSeries;

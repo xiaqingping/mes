@@ -9,11 +9,9 @@ import {
 import React, { PureComponent } from 'react';
 import { formatMessage } from 'umi-plugin-react/locale';
 import { isEqual } from 'lodash';
-import { EmailInput, NameInput, MobileTelephoneInput, TelphoneInput, FoxInput, AddressInput } from '@/components/CustomizedFormControls';
+import { EmailInput, NameInput, MobileTelephoneInput, TelphoneInput, AddressInput } from '@/components/CustomizedFormControls';
 
 import styles from '../style.less';
-
-console.log(styles);
 
 const FormItem = Form.Item;
 const { Option } = Select;
@@ -30,10 +28,23 @@ class BasicInfo extends PureComponent {
   }
 
   constructor(props) {
+    console.log(props);
     super(props);
     this.state = {
       ...props.value,
     };
+  }
+
+  validate = () => {
+    const {
+      form: { validateFieldsAndScroll },
+    } = this.props;
+    validateFieldsAndScroll((error, values) => {
+      console.log(values);
+      if (!error) {
+        //
+      }
+    });
   }
 
   checkNameInput = (rule, value, callback) => {
@@ -51,25 +62,18 @@ class BasicInfo extends PureComponent {
     this.triggerChange({ [key]: value });
   }
 
-  validate = () => {
-    const {
-      form: { validateFieldsAndScroll },
-    } = this.props;
-    validateFieldsAndScroll((error, values) => {
-      if (!error) {
-        //
-      }
-    });
-  }
-
   triggerChange = changedValue => {
     const { onChange } = this.props;
     if (onChange) {
-      const basicInfo = {
+      console.log(onChange);
+      console.log({
         ...this.state,
         ...changedValue,
-      };
-      onChange(basicInfo);
+      });
+      onChange({
+        ...this.state,
+        ...changedValue,
+      });
     }
   };
 
@@ -78,6 +82,7 @@ class BasicInfo extends PureComponent {
       form: { getFieldDecorator },
     } = this.props;
     const { name, email } = this.state;
+    const MobileDisabled = name.select === 2;
 
     return (
       <Form layout="vertical" className={styles['sangon-form']}>
@@ -87,45 +92,47 @@ class BasicInfo extends PureComponent {
               {getFieldDecorator('name', {
                 initialValue: name,
                 rules: [{ validator: this.checkNameInput }],
-              })(<NameInput />)}
+              })(<NameInput onChange={value => this.valueChange('name', value)} />)}
             </FormItem>
           </Col>
           <Col md={6} sm={12}>
             <FormItem label="移动电话">
-              {getFieldDecorator('mobile')(<MobileTelephoneInput />)}
+              {getFieldDecorator('mobile', {
+                initialValue: { disabled: MobileDisabled },
+              })(<MobileTelephoneInput onChange={value => this.valueChange('mobile', value)} />)}
             </FormItem>
           </Col>
           <Col md={6} sm={12}>
             <FormItem label="邮箱">
               {getFieldDecorator('email', {
                 initialValue: { email },
-              })(<EmailInput />)}
+              })(<EmailInput onChange={value => this.valueChange('email', value)} />)}
             </FormItem>
           </Col>
           <Col md={6} sm={12}>
             <FormItem label="电话">
-              {getFieldDecorator('tel')(<TelphoneInput />)}
+              {getFieldDecorator('tel')(<TelphoneInput onChange={value => this.valueChange('tel', value)} />)}
             </FormItem>
           </Col>
           <Col md={6} sm={12}>
             <FormItem label="传真">
-              {getFieldDecorator('chuanzhen')(<FoxInput />)}
+              {getFieldDecorator('chuanzhen')(<TelphoneInput onChange={value => this.valueChange('chuanzhen', value)} />)}
             </FormItem>
           </Col>
           <Col md={3} sm={6}>
             <FormItem label="邮政编码">
-              {getFieldDecorator('youbian')(<Input />)}
+              {getFieldDecorator('youbian')(<Input onChange={e => this.valueChange('youbian', e.target.value)} />)}
             </FormItem>
           </Col>
           <Col md={3} sm={6}>
             <FormItem label="时区">
-              {getFieldDecorator('shiqu')(<Input />)}
+              {getFieldDecorator('shiqu')(<Input onChange={e => this.valueChange('shiqu', e.target.value)} />)}
             </FormItem>
           </Col>
           <Col md={6} sm={12}>
             <FormItem label="语言">
               {getFieldDecorator('yuyan')(
-                <Select>
+                <Select onChange={value => this.valueChange('yuyan', value)} >
                   <Option value="1">中文</Option>
                 </Select>,
               )}
@@ -133,17 +140,21 @@ class BasicInfo extends PureComponent {
           </Col>
           <Col md={6} sm={12}>
             <FormItem label="特殊行业类别">
-              {getFieldDecorator('hangye')(<Input />)}
+              {getFieldDecorator('hangye')(
+                <Select onChange={value => this.valueChange('hangye', value)} >
+                  <Option value="1">军队</Option>
+                </Select>,
+              )}
             </FormItem>
           </Col>
           <Col md={15} sm={24}>
             <FormItem label="通讯地址">
-              {getFieldDecorator('address1')(<AddressInput />)}
+              {getFieldDecorator('address')(<AddressInput onChange={value => this.valueChange('address', value)} />)}
             </FormItem>
           </Col>
           <Col md={3} sm={6}>
             <FormItem label="销售冻结">
-              {getFieldDecorator('dongjie', { valuePropName: 'checked' })(<Switch />)}
+              {getFieldDecorator('dongjie', { valuePropName: 'checked' })(<Switch onChange={value => this.valueChange('dongjie', value)} />)}
             </FormItem>
           </Col>
         </Row>

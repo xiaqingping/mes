@@ -120,17 +120,17 @@ class EditableTable extends React.Component {
                     onClick={() => this.save(form, record.key)}
                     style={{ marginRight: 8 }}
                   >
-                    Save
+                    保存
                   </a>
                 )}
               </EditableContext.Consumer>
               <Popconfirm title="Sure to cancel?" onConfirm={() => this.cancel(record.key)}>
-                <a>Cancel</a>
+                <a>取消</a>
               </Popconfirm>
             </span>
           ) : (
             <a disabled={editingKey !== ''} onClick={() => this.edit(record.key)}>
-              Edit
+              编辑
             </a>
           );
         },
@@ -191,8 +191,6 @@ class EditableTable extends React.Component {
         }),
       };
     });
-
-    console.log(this.state.data);
 
     return (
       <EditableContext.Provider value={this.props.form}>
