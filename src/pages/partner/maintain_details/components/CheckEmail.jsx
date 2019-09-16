@@ -33,7 +33,7 @@ class CheckEmail extends Component {
 
 
   setModalVisible(EmailVisible) {
-    this.setState({ EmailVisible });
+    this.setState({ EmailVisible, status: 1 });
   }
 
   // 用户自行变更验证input的数据

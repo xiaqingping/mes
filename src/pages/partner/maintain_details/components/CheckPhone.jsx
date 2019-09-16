@@ -33,7 +33,7 @@ class CheckPhone extends Component {
 
 
   setModalVisible(phoneVisible) {
-    this.setState({ phoneVisible });
+    this.setState({ phoneVisible, status: 1 });
   }
 
   // 用户自行变更验证input的数据

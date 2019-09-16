@@ -52,6 +52,7 @@ class Operation extends React.Component {
     detailsVisible: false,
     detailsValue: null,
     // editIndex: -1,
+    typeValue: [],
   };
 
   data = {
@@ -76,6 +77,10 @@ class Operation extends React.Component {
       '17812345678 张三',
     ],
   };
+
+  val = [];
+
+  select = false;
 
   columns = [
     {
@@ -103,6 +108,18 @@ class Operation extends React.Component {
           text: '修改',
         },
       ],
+      filteredValue: this.state.typeValue,
+      onFilter: (value, record) => {
+        this.changeTypeValue(value)
+      },
+      onFilterDropdownVisibleChange: e => {
+        if (e) {
+          this.val = [];
+        } else if (!this.select) {
+            this.setState({ typeValue: [] })
+          }
+          this.select = false
+      },
       render(text) {
         return text === 1 ? '新建' : '修改'
     },
@@ -164,6 +181,21 @@ class Operation extends React.Component {
     this.setState({
       detailsVisible: true,
       detailsValue: record,
+    })
+  }
+
+
+  changeTypeValue = e => {
+    this.select = true;
+    if (typeof e === 'string') {
+      if (this.val.indexOf(e) < 0) {
+        this.val.push(e)
+      }
+    } else {
+      this.val = e;
+    }
+     this.setState({
+      typeValue: this.val,
     })
   }
 
@@ -242,6 +274,7 @@ class Operation extends React.Component {
   };
 
   toggleForm = () => {
+    console.log(this.state.typeValue)
     const { expandForm } = this.state;
     this.setState({
       expandForm: !expandForm,
@@ -327,6 +360,7 @@ class Operation extends React.Component {
   renderSimpleForm() {
     const { form } = this.props;
     const { getFieldDecorator } = form;
+    const { typeValue } = this.state;
     return (
       <Form onSubmit={this.handleSearch} layout="inline">
         <Row gutter={{ lg: 24, md: 12, sm: 6 }}>
@@ -348,8 +382,8 @@ class Operation extends React.Component {
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="类型">
-              {getFieldDecorator('type')(
-                <Select mode="multiple">
+              {getFieldDecorator('type', typeValue ? { initialValue: typeValue } : 'type')(
+                <Select mode="multiple" onChange={e => this.changeTypeValue(e)}>
                   <Option value="1">新建</Option>
                   <Option value="2">修改</Option>
                 </Select>,
