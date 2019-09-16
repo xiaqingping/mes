@@ -1,7 +1,7 @@
 import {
   Card,
   Table,
-  Button,
+  Badge,
 } from 'antd';
 import React, { Component } from 'react';
 
@@ -13,6 +13,11 @@ const columns = [
   {
     title: '移动电话',
     dataIndex: 'mobile',
+    render(val) {
+      return (
+        <Badge status="error" text={val}/>
+      );
+    },
   },
   {
     title: '邮编',
@@ -49,17 +54,6 @@ class BasicInfo extends Component {
           columns={columns}
           pagination={false}
         ></Table>
-        <Button
-          style={{
-            width: '100%',
-            marginTop: 16,
-            marginBottom: 8,
-          }}
-          type="dashed"
-          icon="plus"
-        >
-          新增成员
-        </Button>
       </Card>
     );
   }

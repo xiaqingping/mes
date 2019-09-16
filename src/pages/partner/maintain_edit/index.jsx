@@ -1,39 +1,47 @@
 import {
-  Badge,
-  Button,
-  Card,
-  Col,
-  DatePicker,
-  Divider,
-  Dropdown,
   Form,
-  Icon,
-  Input,
-  InputNumber,
-  Menu,
-  Row,
-  Select,
-  message,
+  Card,
+  Button,
 } from 'antd';
 import React, { Component } from 'react';
 import { connect } from 'dva';
 
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import FooterToolbar from '@/components/FooterToolbar';
-import Customer from './Customer';
-import Supplier from './Supplier';
 
+import BasicInfo from './components/BasicInfo';
+import Type from './components/Type';
+import Credit from './components/Credit';
+import Authentication from './components/Authentication';
+import Address from './components/Address';
+import Type1 from './components/Type1';
+import Bank from './components/Bank';
 
-@connect(
-  ({
-    listTableList,
-    loading,
-  }) => ({
-    listTableList,
-    loading: loading.models.rule,
-  }),
-)
-class CustomerDetails extends Component {
+import EditableTable from './components/TableForm';
+
+const addressList = [
+  {
+    id: 1,
+    name: 'name',
+    telephone: '18735818888',
+    postcode: '123456',
+    address: '上海市松江区香闵路698号',
+  },
+];
+
+const basicInfo = {
+  name: {
+    select: 1,
+    name: '',
+  },
+  email: '123@qq.com',
+};
+
+@connect(({ listTableList, loading }) => ({
+  listTableList,
+  loading: loading.models.rule,
+}))
+class CustomerEdit extends Component {
   state = {
     width: '100%',
     tabActiveKey: 'customer',
@@ -62,27 +70,97 @@ class CustomerDetails extends Component {
   };
 
   onTabChange = tabActiveKey => {
+    const { dispatch } = this.props;
     this.setState({
       tabActiveKey,
     });
+
+    dispatch({
+      type: 'partner_maintain/setDetails',
+      payload: {
+        title: '1',
+      },
+    });
   };
+
+  validate = () => {
+    const {
+      form: { validateFieldsAndScroll },
+      dispatch,
+    } = this.props;
+
+    validateFieldsAndScroll((error, values) => {
+      console.log(values);
+      if (!error) {
+        // 请求接口
+        // dispatch({
+        //   type: 'formAdvancedForm/submitAdvancedForm',
+        //   payload: values,
+        // });
+      }
+    });
+  }
+
+  // 客户
+  renderCustomer = () => {
+    const {
+      form: { getFieldDecorator },
+    } = this.props;
+    return (
+      <>
+        <Card title="基础信息" bordered={false} style={{ marginBottom: '24px' }}>
+          {getFieldDecorator('basicInfo', {
+            initialValue: basicInfo,
+          // eslint-disable-next-line no-return-assign
+          })(<BasicInfo wrappedComponentRef={form => this.form = form} />)}
+        </Card>
+        <Type></Type>
+        <Credit></Credit>
+        <Authentication></Authentication>
+        <Card title="收货地址" bordered={false} style={{ paddingBottom: '50px' }}>
+          {getFieldDecorator('addressList', {
+            initialValue: addressList,
+          })(<Address />)}
+        </Card>
+        <Card>
+          <EditableTable></EditableTable>
+        </Card>
+      </>
+    );
+  }
+
+  // 供应商
+  renderSupplier = () => {
+    const {
+      form: { getFieldDecorator },
+    } = this.props;
+    return (
+      <>
+        <Card title="基础信息" bordered={false} style={{ marginBottom: '24px' }}>
+          {getFieldDecorator('basicInfo', {
+            initialValue: basicInfo,
+          // eslint-disable-next-line no-return-assign
+          })(<BasicInfo wrappedComponentRef={form => this.form = form} />)}
+        </Card>
+        <Type1></Type1>
+        <Bank></Bank>
+      </>
+    );
+  }
 
   render() {
     const { width, tabActiveKey } = this.state;
     const contentList = {
-      customer: (
-        <Customer type={tabActiveKey} />
-      ),
-      supplier: (
-        <Supplier type={tabActiveKey} />
-      ),
+      customer: this.renderCustomer(),
+      supplier: this.renderSupplier(),
     };
+
     return (
       <PageHeaderWrapper
         title="修改 100001"
         tabActiveKey={tabActiveKey}
         onTabChange={this.onTabChange}
-        style={{ paddingBottom: '0px' }}
+        style={{ paddingBottom: 0 }}
         tabList={[
           {
             key: 'customer',
@@ -97,11 +175,11 @@ class CustomerDetails extends Component {
         {contentList[tabActiveKey]}
         <FooterToolbar style={{ width }}>
           <Button>取消</Button>
-          <Button type="primary">提交</Button>
+          <Button type="primary" onClick={this.validate}>提交</Button>
         </FooterToolbar>
       </PageHeaderWrapper>
     );
   }
 }
 
-export default CustomerDetails;
+export default Form.create()(CustomerEdit);

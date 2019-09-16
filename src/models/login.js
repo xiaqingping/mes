@@ -21,8 +21,15 @@ const Model = {
           response = yield call(user.loginByCode, payload);
         }
 
+        response.avatar = 'https://blog.maxmeng.top/images/avatar.jpg';
+
+        localStorage.setItem('user', JSON.stringify(response));
         yield put({
           type: 'changeLoginStatus',
+          payload: response,
+        });
+        yield put({
+          type: 'user/saveCurrentUser',
           payload: response,
         });
 

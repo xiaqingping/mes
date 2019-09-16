@@ -3,7 +3,6 @@ import BasicInfo from './components/BasicInfo';
 import Type from './components/Type';
 import Credit from './components/Credit';
 import Authentication from './components/Authentication';
-import Bank from './components/Bank';
 import Address from './components/Address';
 
 class Customer extends React.Component {
@@ -19,7 +18,6 @@ class Customer extends React.Component {
         <Type></Type>
         <Credit></Credit>
         <Authentication></Authentication>
-        <Bank></Bank>
         <Address></Address>
       </>
     );

@@ -1,30 +1,13 @@
 import {
   Badge,
-  Button,
-  Card,
-  Col,
-  DatePicker,
-  Divider,
-  Dropdown,
   Form,
-  Icon,
-  Input,
-  InputNumber,
-  Menu,
-  Row,
-  Select,
-  message,
   Table,
-  AutoComplete,
+  Input,
   Drawer,
 } from 'antd';
 import * as React from 'react';
-import { PageHeaderWrapper } from '@ant-design/pro-layout';
-import StandardTable from '@/components/StandardTable';
-import api from '@/api'
+// import api from '@/api'
 import styles from './style.less'
-
-const FormItem = Form.Item;
 
 // 状态
 const status = {
@@ -38,13 +21,17 @@ const status = {
   },
   3: {
     value: 'warning',
-    text: '部分完成',
+    text: '待验证',
+  },
+  4: {
+    value: 'error',
+    text: '验证失败',
   },
 };
 
 class Details extends React.Component {
   state = {
-    visible: this.props.detailsVisible,
+    visible: false,
     list: [],
   };
 
@@ -68,7 +55,6 @@ class Details extends React.Component {
     {
       title: '状态',
       dataIndex: 'status',
-      align: 'center',
       render(val) {
         return <Badge status={status[val].value} text={status[val].text}/>;
       },
@@ -79,21 +65,25 @@ class Details extends React.Component {
     },
   ];
 
-  // componentDidMount() {
-  //   // this.getTableData();
-  //   this.getData();
-  // }
+  componentWillReceiveProps (nextProps) {
+    const { detailsVisible } = nextProps;
+    const { detailsValue } = nextProps;
+    this.setState({
+      visible: detailsVisible,
+    })
+    this.getData(detailsValue);
+  }
 
-  getData = () => {
+  getData = detailsValue => {
     const data = [];
     for (let i = 0; i < 20; i++) {
       data.push({
         id: i + 1,
         field: 100000 + (i + 1),
-        new_value: this.props.content.huoban,
-        old_value: this.props.contant.actionman,
+        new_value: detailsValue ? detailsValue.huoban : '',
+        old_value: detailsValue ? detailsValue.actionman : '',
         key: `${Math.ceil((Math.random() + 0.0001) * 10000)}/${Math.ceil((Math.random() + 0.0001) * 100)}`,
-        status: Math.ceil((Math.random() + 0.0001) * 3),
+        status: Math.ceil((Math.random() + 0.0001) * 4),
         check_code: Math.ceil((Math.random() + 0.0001) * 100000000),
       });
     }
@@ -124,8 +114,9 @@ class Details extends React.Component {
           onClose={this.onClose}
           visible={visible}
           width= "600"
+          className="myTables"
         >
-            <Table className={styles.tableName} dataSource={list} columns={this.columns} size="small"/>
+            <Table dataSource={list} columns={this.columns} size="small" pagination={false}/>
         </Drawer>
       </div>
     );

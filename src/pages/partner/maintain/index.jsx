@@ -114,7 +114,6 @@ class Maintain extends React.Component {
 
   columns = [
     {
-      fixed: 'left',
       title: '客户编号',
       dataIndex: 'code',
       width: 100,
@@ -234,7 +233,7 @@ class Maintain extends React.Component {
     {
       fixed: 'right',
       title: '操作',
-      width: 150,
+      width: 170,
       render: (text, record) => {
         const { code } = record;
         const menu = (
@@ -367,31 +366,31 @@ class Maintain extends React.Component {
 
     return (
       <Form onSubmit={this.handleSearch} layout="inline">
-        <Row gutter={{ lg: 24, md: 12, sm: 6 }}>
-          <Col lg={6} md={8} sm={12}>
+        <Row gutter={{ xxl: 100, lg: 80 }}>
+          <Col xxl={6} lg={8}>
             <FormItem label="编号">
               {getFieldDecorator('code')(<Input />)}
             </FormItem>
           </Col>
-          <Col lg={6} md={8} sm={12}>
+          <Col xxl={6} lg={8}>
             <FormItem label="名称">
               {getFieldDecorator('name')(<Input />)}
             </FormItem>
           </Col>
-          <Col lg={6} md={8} sm={12}>
+          <Col xxl={6} lg={8}>
             <FormItem label="移动电话">
               {getFieldDecorator('mobile')(<Input />)}
             </FormItem>
           </Col>
-          <Col lg={6} md={8} sm={12}>
+          <Col xxl={6} lg={8}>
             <FormItem label="Email">
               {getFieldDecorator('email')(<Input />)}
             </FormItem>
           </Col>
-          <Col lg={6} md={8} sm={12}>
+          <Col xxl={6} lg={8}>
             <FormItem label="认证状态">
               {getFieldDecorator('renzheng')(
-                <Select placeholder="请选择" mode="multiple">
+                <Select maxTagCount={1} maxTagTextLength={2} placeholder="请选择" mode="multiple">
                   <Option value="0">未认证</Option>
                   <Option value="1">已认证</Option>
                   <Option value="2">审核中</Option>
@@ -399,44 +398,44 @@ class Maintain extends React.Component {
               )}
             </FormItem>
           </Col>
-          <Col lg={6} md={8} sm={12}>
+          <Col xxl={6} lg={8}>
             <FormItem label="销售冻结">
               {getFieldDecorator('xiaoshou')(
-                <Select placeholder="请选择" mode="multiple">
+                <Select placeholder="请选择">
                   <Option value="0">冻结</Option>
                   <Option value="1">活跃</Option>
                 </Select>,
               )}
             </FormItem>
           </Col>
-          <Col lg={6} md={8} sm={12}>
+          <Col xxl={6} lg={8}>
             <FormItem label="客户数据">
               {getFieldDecorator('shuju')(
-                <Select placeholder="请选择" mode="multiple">
+                <Select placeholder="请选择">
                   <Option value="0">完整</Option>
                   <Option value="1">不完整</Option>
                 </Select>,
               )}
             </FormItem>
           </Col>
-          <Col lg={6} md={8} sm={12}>
+          <Col xxl={6} lg={8}>
             <FormItem label="供应商数据">
               {getFieldDecorator('gongyingsshuju')(
-                <Select placeholder="请选择" mode="multiple">
+                <Select placeholder="请选择">
                   <Option value="0">完整</Option>
                   <Option value="1">不完整</Option>
                 </Select>,
               )}
             </FormItem>
           </Col>
-          <Col lg={6} md={8} sm={12}>
+          <Col xxl={6} lg={8}>
             <FormItem label="区域归属">
               {getFieldDecorator('quyu')(
                 <Cascader options={quyuoptions} />,
               )}
             </FormItem>
           </Col>
-          <Col lg={6} md={8} sm={12}>
+          <Col xxl={6} lg={8}>
             <FormItem label="销售归属">
               {getFieldDecorator('xiaoshouguishu')(
                 <AutoComplete
@@ -447,7 +446,7 @@ class Maintain extends React.Component {
               )}
             </FormItem>
           </Col>
-          <Col lg={6} md={8} sm={12}>
+          <Col xxl={6} lg={8}>
             <FormItem label="开票方">
               {getFieldDecorator('kaipiao')(
                 <AutoComplete
@@ -481,23 +480,23 @@ class Maintain extends React.Component {
     const { getFieldDecorator } = form;
     return (
       <Form onSubmit={this.handleSearch} layout="inline">
-        <Row gutter={{ lg: 24, md: 12, sm: 6 }}>
-          <Col lg={6} md={8} sm={12}>
+        <Row gutter={{ xxl: 100, lg: 80 }}>
+          <Col xxl={6} lg={8}>
             <FormItem label="编号">
               {getFieldDecorator('code')(<Input />)}
             </FormItem>
           </Col>
-          <Col lg={6} md={8} sm={12}>
+          <Col xxl={6} lg={8}>
             <FormItem label="名称">
               {getFieldDecorator('name')(<Input />)}
             </FormItem>
           </Col>
-          <Col lg={6} md={8} sm={12}>
+          <Col xxl={6} lg={0}>
             <FormItem label="移动电话">
               {getFieldDecorator('mobile')(<Input />)}
             </FormItem>
           </Col>
-          <Col lg={6} md={8} sm={12}>
+          <Col xxl={6} lg={8}>
             <span className="submitButtons">
               <Button type="primary" htmlType="submit">
                 查询
