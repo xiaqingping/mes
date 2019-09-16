@@ -15,6 +15,11 @@ import api from '@/api';
 
 const FormItem = Form.Item;
 const { Option } = Select;
+const gridStyle = {
+  width: '50%',
+  textAlign: 'center',
+  // background:'pink'
+};
 
 class pay extends Component {
   state = {
@@ -28,7 +33,7 @@ class pay extends Component {
     selectedRows: [],
     editIndex: -1,
   }
-
+  // 工资管理
   columns = [
     {
       title: '员工编号',
@@ -104,6 +109,29 @@ class pay extends Component {
         return actions;
       },
     },
+  ];
+// 工资明细
+  columnss = [
+    {
+      title: '编号',
+      dataIndex: 'employeeCode',
+      width: 100,
+    },
+    {
+      title: '名称',
+      dataIndex: 'employeeName',
+      width: 180,
+    },
+    {
+      title: '类型',
+      dataIndex: 'type',
+      width: 100,
+    },
+    {
+      title: '金额',
+      dataIndex: 'amount',
+      width: 100,
+    }
   ];
 
   componentDidMount() {
@@ -253,7 +281,14 @@ class pay extends Component {
   handleAdd = () => {
     console.log('add');
   }
-
+  // 作废
+  handleDelete = () => {
+    console.log('delete');
+  }
+  // 上传excel文件
+  handleUploading = () => {
+    console.log('uploading');
+  }
   render() {
     const { list, pagination, loading, selectedRows } = this.state;
     const data = { list, pagination };
@@ -261,29 +296,47 @@ class pay extends Component {
     return (
       <PageHeaderWrapper>
         <Card bordered={false}>
-          <div className="tableList">
-            <div className="tableListForm">{this.renderForm()}</div>
-            <div className="tableListOperator">
-              <Button icon="plus" type="primary" onClick={() => this.handleAdd()}>
-                新建
-              </Button>
-              <Button icon="delete" type="primary" onClick={() => this.handleAdd()}>
-                作废
-              </Button>
-              <Button icon="file-excel" type="primary" onClick={() => this.handleAdd()}>
-                excel上传
-              </Button>
+          <Card.Grid  style={gridStyle} >
+            <div className="tableList">
+              <div className="tableListForm">{this.renderForm()}</div>
+              <div className="tableListOperator">
+                <Button icon="plus" type="primary" onClick={() => this.handleAdd()}>
+                  新建
+                </Button>
+                <Button icon="delete" type="primary" onClick={() => this.handleDelete()}>
+                  作废
+                </Button>
+                <Button icon="file-excel" type="primary" onClick={() => this.handleUploading()}>
+                  excel上传
+                </Button>
+              </div>
+              <StandardTable
+                scroll={{ x: 600 }}
+                selectedRows={selectedRows}
+                loading={loading}
+                data={data}
+                columns={this.columns}
+                onSelectRow={this.handleSelectRows}
+                onChange={this.handleStandardTableChange}
+              />
             </div>
-            <StandardTable
-              scroll={{ x: 1300 }}
-              selectedRows={selectedRows}
-              loading={loading}
-              data={data}
-              columns={this.columns}
-              onSelectRow={this.handleSelectRows}
-              onChange={this.handleStandardTableChange}
-            />
-          </div>
+          </Card.Grid>
+          {/* 工资明细 */}
+          <Card.Grid >
+            <p>工资明细</p>
+            <div className="tableList">
+              {/* <div className="tableListForm">{this.renderForm()}</div> */}
+              <StandardTable
+                scroll={{ x: 600 }}
+                selectedRows={selectedRows}
+                loading={loading}
+                data={data}
+                columnss={this.columnss}
+                onSelectRow={this.handleSelectRows}
+                onChange={this.handleStandardTableChange}
+              />
+            </div>
+          </Card.Grid>
         </Card>
       </PageHeaderWrapper>
     );
