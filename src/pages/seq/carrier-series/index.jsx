@@ -59,6 +59,7 @@ class Search extends Component {
             <FormItem label="状态">
               {getFieldDecorator('status', { initialValue: '1' })(
                 <Select>
+                  <Option value="">全部</Option>
                   <Option value="1">正常</Option>
                   <Option value="2">已删除</Option>
                 </Select>,
@@ -126,6 +127,7 @@ class EditableCell extends React.Component {
     return <EditableContext.Consumer>{this.renderCell}</EditableContext.Consumer>;
   }
 }
+
 
 /**
  * 页面根组件
