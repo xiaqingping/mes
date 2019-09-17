@@ -7,11 +7,12 @@ import {
   Input,
   Row,
   Select,
+  message,
 } from 'antd';
 import React, { Component } from 'react';
-import { connect } from 'dva';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import StandardTable from '@/components/StandardTable';
+import api from '@/api';
 
 const FormItem = Form.Item;
 const { Option } = Select;
@@ -140,10 +141,6 @@ class EditableCell extends React.Component {
 /**
  * 页面根组件
  */
-@connect(({ SeqCarrierSeries, loading }) => ({
-  SeqCarrierSeries,
-  loading: loading.models.SeqCarrierSeries,
-}))
 @Form.create()
 class CarrierSeries extends Component {
   state = {
@@ -151,8 +148,12 @@ class CarrierSeries extends Component {
       page: 1,
       rows: 10,
     },
+    list: [],
+    total: 0,
+    loading: false,
     selectedRows: [],
     editIndex: -1,
+    id: 0, // 新增数据时，提供负数id
   }
 
   columns = [
@@ -258,12 +259,15 @@ class CarrierSeries extends Component {
 
     this.setState({
       formValues: query,
+      loading: true,
     });
 
-    const { dispatch } = this.props;
-    dispatch({
-      type: 'SeqCarrierSeries/fetch',
-      payload: query,
+    api.series.getSeries(query, true).then(res => {
+      this.setState({
+        list: res.rows,
+        total: res.total,
+        loading: false,
+      });
     });
   }
 
@@ -308,15 +312,23 @@ class CarrierSeries extends Component {
 
   // 新增
   handleAdd = () => {
-    console.log('add');
+    const { editIndex, id, list } = this.state;
+    if (editIndex !== -1) return message.warning('请先保存或退出正在编辑的数据');
+    const newId = id - 1;
+    this.setState({
+      id: newId,
+      editIndex: 0,
+      list: [
+        {
+          id: newId,
+        },
+        ...list,
+      ],
+    });
   }
 
   render() {
-    const { formValues: { page: current, rows: pageSize }, selectedRows } = this.state;
-    const {
-      SeqCarrierSeries: { list, total },
-      loading,
-    } = this.props;
+    const { formValues: { page: current, rows: pageSize }, selectedRows, list, total, loading } = this.state;
     const data = { list, pagination: { current, pageSize, total } };
 
     const components = {
@@ -354,6 +366,7 @@ class CarrierSeries extends Component {
             <EditableContext.Provider value={this.props.form}>
               <StandardTable
                 scroll={{ x: 1300 }}
+                rowClassName="editable-row"
                 components={components}
                 selectedRows={selectedRows}
                 loading={loading}
