@@ -15,6 +15,7 @@ import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import StandardTable from '@/components/StandardTable';
 import api from '@/api';
 
+const EditableContext = React.createContext();
 const FormItem = Form.Item;
 const { Option } = Select;
 
@@ -89,7 +90,6 @@ class Search extends Component {
 }
 
 
-const EditableContext = React.createContext();
 /**
  * 表格编辑组件
  */
