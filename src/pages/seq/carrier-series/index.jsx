@@ -93,14 +93,6 @@ const EditableContext = React.createContext();
  * 表格编辑组件
  */
 class EditableCell extends React.Component {
-  getInput = () => {
-    const { inputType } = this.props;
-    if (inputType === 'input') {
-      return <Input />;
-    }
-    return <Input />;
-  };
-
   renderCell = ({ getFieldDecorator }) => {
     const {
       editing,
@@ -110,6 +102,7 @@ class EditableCell extends React.Component {
       record,
       index,
       children,
+      rules,
       ...restProps
     } = this.props;
     return (
@@ -117,14 +110,9 @@ class EditableCell extends React.Component {
         {editing ? (
           <Form.Item style={{ margin: 0 }}>
             {getFieldDecorator(dataIndex, {
-              rules: [
-                {
-                  required: true,
-                  message: `${title}必填!`,
-                },
-              ],
+              rules,
               initialValue: record[dataIndex],
-            })(this.getInput())}
+            })(inputType)}
           </Form.Item>
         ) : (
           children
@@ -168,7 +156,10 @@ class CarrierSeries extends Component {
       dataIndex: 'name',
       width: 180,
       editable: true,
-      inputType: 'input',
+      inputType: <Input />,
+      rules: [
+        { required: true, message: '必填' },
+      ],
     },
     {
       title: '状态',
@@ -291,29 +282,13 @@ class CarrierSeries extends Component {
   saveRow = index => {
     this.props.form.validateFields((error, row) => {
       if (error) return;
-      console.log(row);
-      console.log(index);
       const { list } = this.state;
       const newData = { ...list[index], ...row };
-      console.log(newData);
       if (newData.id > 0) {
         api.series.updateSeries(newData).then(() => this.getTableData());
       } else {
         api.series.addSeries(newData).then(() => this.getTableData());
       }
-      // const newData = [...this.state.data];
-      // const index = newData.findIndex(item => key === item.key);
-      // if (index > -1) {
-      //   const item = newData[index];
-      //   newData.splice(index, 1, {
-      //     ...item,
-      //     ...row,
-      //   });
-      //   this.setState({ data: newData, editIndex: '' });
-      // } else {
-      //   newData.push(row);
-      //   this.setState({ data: newData, editIndex: '' });
-      // }
     });
   }
 
@@ -340,7 +315,10 @@ class CarrierSeries extends Component {
   // 新增
   handleAdd = () => {
     const { editIndex, id, list } = this.state;
-    if (editIndex !== -1) return message.warning('请先保存或退出正在编辑的数据');
+    if (editIndex !== -1) {
+      message.warning('请先保存或退出正在编辑的数据');
+      return;
+    }
 
     const newId = id - 1;
     this.setState({
@@ -379,6 +357,7 @@ class CarrierSeries extends Component {
         ...col,
         onCell: (record, rowIndex) => ({
           record,
+          rules: col.rules,
           inputType: col.inputType,
           dataIndex: col.dataIndex,
           title: col.title,
