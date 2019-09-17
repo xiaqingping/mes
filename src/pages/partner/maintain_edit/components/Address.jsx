@@ -1,286 +1,218 @@
-import { Button, Divider, Input, Popconfirm, Table, message } from 'antd';
-import React, { PureComponent } from 'react';
-import { isEqual } from 'lodash';
+import {
+  Button,
+  Table,
+  Input,
+  InputNumber,
+  Popconfirm,
+  Form,
+} from 'antd';
+import React from 'react';
 
-class Address extends PureComponent {
-  static getDerivedStateFromProps(nextProps, preState) {
-    if (isEqual(nextProps.value, preState.value)) {
-      return null;
-    }
+import { MobileTelephoneInput } from '@/components/CustomizedFormControls'
 
-    return {
-      data: nextProps.value,
-      value: nextProps.value,
-    };
+const EditableContext = React.createContext();
+
+class EditableCell extends React.Component {
+  renderCell = ({ getFieldDecorator }) => {
+    const {
+      editing,
+      dataIndex,
+      title,
+      inputType,
+      record,
+      index,
+      children,
+      rules,
+      ...restProps
+    } = this.props;
+    return (
+      <td {...restProps}>
+        {editing ? (
+          <Form.Item>
+            {getFieldDecorator(dataIndex, {
+              rules,
+              initialValue: record[dataIndex],
+            })(inputType)}
+          </Form.Item>
+        ) : (
+          children
+        )}
+      </td>
+    );
+  };
+
+
+  render() {
+    return <EditableContext.Consumer>{this.renderCell}</EditableContext.Consumer>;
   }
+}
 
-  clickedCancel = false;
-
-  index = 0;
-
-  cacheOriginData = {};
-
-  columns = [
-    {
-      title: '姓名',
-      dataIndex: 'name',
-      width: '15%',
-      render: (text, record) => {
-        if (record.editable) {
-          return (
-            <Input
-              value={text}
-              autoFocus
-              onChange={e => this.handleFieldChange(e, 'name', record.key)}
-            />
-          );
-        }
-
-        return text;
-      },
-    },
-    {
-      title: '移动电话',
-      dataIndex: 'telephone',
-      width: '15%',
-      render: (text, record) => {
-        if (record.editable) {
-          return (
-            <Input
-              value={text}
-              onChange={e => this.handleFieldChange(e, 'telephone', record.key)}
-            />
-          );
-        }
-
-        return text;
-      },
-    },
-    {
-      title: '邮编',
-      dataIndex: 'postcode',
-      width: '10%',
-      render: (text, record) => {
-        if (record.editable) {
-          return (
-            <Input
-              value={text}
-              onChange={e => this.handleFieldChange(e, 'postcode', record.key)}
-            />
-          );
-        }
-
-        return text;
-      },
-    },
-    {
-      title: '地址',
-      dataIndex: 'address',
-      width: '45%',
-      render: (text, record) => {
-        if (record.editable) {
-          return (
-            <Input
-              value={text}
-              onChange={e => this.handleFieldChange(e, 'address', record.key)}
-            />
-          );
-        }
-
-        return text;
-      },
-    },
-    {
-      title: '操作',
-      key: 'action',
-      render: (text, record) => {
-        const { loading } = this.state;
-
-        if (!!record.editable && loading) {
-          return null;
-        }
-
-        if (record.editable) {
-          if (record.isNew) {
-            return (
-              <span>
-                <a onClick={e => this.saveRow(e, record.key)}>添加</a>
-                <Divider type="vertical" />
-                <Popconfirm title="是否要删除此行？" onConfirm={() => this.remove(record.key)}>
-                  <a>删除</a>
-                </Popconfirm>
-              </span>
-            );
-          }
-
-          return (
-            <span>
-              <a onClick={e => this.saveRow(e, record.key)}>保存</a>
-              <Divider type="vertical" />
-              <a onClick={e => this.cancel(e, record.key)}>取消</a>
-            </span>
-          );
-        }
-
-        return (
-          <span>
-            <a onClick={e => this.toggleEditable(e, record.key)}>编辑</a>
-            <Divider type="vertical" />
-            <Popconfirm title="是否要删除此行？" onConfirm={() => this.remove(record.key)}>
-              <a>删除</a>
-            </Popconfirm>
-          </span>
-        );
-      },
-    },
-  ];
+class EditableTable extends React.Component {
+  static getDerivedStateFromProps(props) {
+    if ('value' in props) {
+      return {
+        data: props.value.data || [],
+        editIndex: typeof props.value.editIndex === 'number' ? props.value.editIndex : -1,
+      };
+    }
+    return null;
+  }
 
   constructor(props) {
     super(props);
+    const value = props.value || {};
     this.state = {
-      data: props.value,
-      loading: false,
-      value: props.value,
+      data: value.data,
+      editIndex: value.editIndex || -1,
     };
+    this.columns = [
+      {
+        title: '姓名',
+        dataIndex: 'name',
+        width: '15%',
+        editable: true,
+        inputType: <Input />,
+        rules: [
+          { required: true },
+        ],
+      },
+      {
+        title: '移动电话',
+        dataIndex: 'telephone',
+        width: '20%',
+        editable: true,
+        inputType: <MobileTelephoneInput />,
+        rules: [
+          { required: true },
+        ],
+      },
+      {
+        title: '邮编',
+        dataIndex: 'postcode',
+        width: '10%',
+        editable: true,
+        inputType: <InputNumber />,
+        rules: [
+          { required: true },
+        ],
+      },
+      {
+        title: '地址',
+        dataIndex: 'address',
+        width: '35%',
+        editable: true,
+        inputType: <Input />,
+        rules: [
+          { required: true },
+        ],
+      },
+      {
+        title: '操作',
+        dataIndex: 'actions',
+        width: '10%',
+        render: (text, record, index) => {
+          const { editIndex } = this.state;
+          const editable = editIndex === index;
+          return editable ? (
+            <span>
+              <EditableContext.Consumer>
+                {form => (
+                  <a
+                    onClick={() => this.save(form, index)}
+                    style={{ marginRight: 8 }}
+                  >
+                    保存
+                  </a>
+                )}
+              </EditableContext.Consumer>
+              <Popconfirm title="Sure to cancel?" onConfirm={() => this.cancel(index)}>
+                <a>取消</a>
+              </Popconfirm>
+            </span>
+          ) : (
+            <a onClick={() => this.edit(index)}>
+              编辑
+            </a>
+          );
+        },
+      },
+    ];
   }
 
-  getRowByKey(key, newData) {
-    const { data = [] } = this.state;
-    return (newData || data).filter(item => item.key === key)[0];
-  }
-
-  toggleEditable = (e, key) => {
-    e.preventDefault();
-    const { data = [] } = this.state;
-    const newData = data.map(item => ({ ...item }));
-    const target = this.getRowByKey(key, newData);
-
-    if (target) {
-      // 进入编辑状态时保存原始数据
-      if (!target.editable) {
-        this.cacheOriginData[key] = { ...target };
-      }
-
-      target.editable = !target.editable;
-      this.setState({
-        data: newData,
-      });
-    }
-  };
-
-  newAddress = () => {
-    const { data = [] } = this.state;
-    const newData = data.map(item => ({ ...item }));
-    newData.push({
-      key: `NEW_TEMP_ID_${this.index}`,
-      telephone: '',
-      name: '',
-      postcode: '',
-      editable: true,
-      isNew: true,
-    });
-    this.index += 1;
-    this.setState({
-      data: newData,
-    });
-  };
-
-  remove(key) {
-    const { data = [] } = this.state;
+  valueChange = changedValue => {
     const { onChange } = this.props;
-    const newData = data.filter(item => item.key !== key);
-    this.setState({
-      data: newData,
-    });
-
     if (onChange) {
-      onChange(newData);
-    }
-  }
-
-  handleFieldChange(e, fieldName, key) {
-    const { data = [] } = this.state;
-    const newData = [...data];
-    const target = this.getRowByKey(key, newData);
-
-    if (target) {
-      target[fieldName] = e.target.value;
-      this.setState({
-        data: newData,
+      onChange({
+        ...this.state,
+        ...changedValue,
       });
     }
+  };
+
+  addRow = () => {
+    const { data } = this.state;
+    data.push({
+      id: -1,
+    });
+    this.valueChange({ data, editIndex: data.length - 1 });
   }
 
-  saveRow(e, key) {
-    e.persist();
-    this.setState({
-      loading: true,
-    });
-    setTimeout(() => {
-      if (this.clickedCancel) {
-        this.clickedCancel = false;
-        return;
-      }
+  cancel = () => {
+    this.valueChange({ editIndex: -1 });
+  };
 
-      const target = this.getRowByKey(key) || {};
-
-      if (!target.telephone || !target.name || !target.postcode) {
-        message.error('请填写完整');
-        e.target.focus();
-        this.setState({
-          loading: false,
-        });
-        return;
-      }
-
-      delete target.isNew;
-      this.toggleEditable(e, key);
-      const { data = [] } = this.state;
-      const { onChange } = this.props;
-
-      if (onChange) {
-        onChange(data);
-      }
-
-      this.setState({
-        loading: false,
+  save = (form, index) => {
+    form.validateFields((error, row) => {
+      if (error) return;
+      const data = [...this.state.data];
+      const item = data[index];
+      data.splice(index, 1, {
+        ...item,
+        ...row,
       });
-    }, 500);
+      this.valueChange({
+        data,
+        editIndex: -1,
+      });
+    });
   }
 
-  cancel(e, key) {
-    this.clickedCancel = true;
-    e.preventDefault();
-    const { data = [] } = this.state;
-    const newData = [...data]; // 编辑前的原始数据
-
-    let cacheOriginData = [];
-    cacheOriginData = newData.map(item => {
-      if (item.key === key) {
-        if (this.cacheOriginData[key]) {
-          const originItem = { ...item, ...this.cacheOriginData[key], editable: false };
-          delete this.cacheOriginData[key];
-          return originItem;
-        }
-      }
-
-      return item;
-    });
-    this.setState({
-      data: cacheOriginData,
-    });
-    this.clickedCancel = false;
+  edit(index) {
+    this.valueChange({ editIndex: index });
   }
 
   render() {
-    const { loading, data } = this.state;
+    const components = {
+      body: {
+        cell: EditableCell,
+      },
+    };
+
+    const columns = this.columns.map(col => {
+      if (!col.editable) {
+        return col;
+      }
+      return {
+        ...col,
+        onCell: (record, rowIndex) => ({
+          record,
+          rules: col.rules,
+          inputType: col.inputType,
+          dataIndex: col.dataIndex,
+          title: col.title,
+          editing: rowIndex === this.state.editIndex,
+        }),
+      };
+    });
+
     return (
-      <>
+      <EditableContext.Provider value={this.props.form}>
         <Table
           rowKey="id"
-          loading={loading}
-          columns={this.columns}
-          dataSource={data}
+          components={components}
+          dataSource={this.state.data}
+          columns={columns}
+          rowClassName="editable-row"
           pagination={false}
         />
         <Button
@@ -290,14 +222,14 @@ class Address extends PureComponent {
             marginBottom: 8,
           }}
           type="dashed"
-          onClick={this.newAddress}
+          onClick={this.addRow}
           icon="plus"
         >
           新增
         </Button>
-      </>
+      </EditableContext.Provider>
     );
   }
 }
 
-export default Address;
+export default Form.create()(EditableTable);

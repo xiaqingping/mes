@@ -17,8 +17,6 @@ import Address from './components/Address';
 import Type1 from './components/Type1';
 import Bank from './components/Bank';
 
-import EditableTable from './components/TableForm';
-
 @connect(({ listTableList, loading }) => ({
   listTableList,
   loading: loading.models.rule,
@@ -38,6 +36,13 @@ class CustomerEdit extends Component {
       addressList: [
         {
           id: 1,
+          name: 'name',
+          telephone: '18735818888',
+          postcode: '123456',
+          address: '上海市松江区香闵路698号',
+        },
+        {
+          id: 2,
           name: 'name',
           telephone: '18735818888',
           postcode: '123456',
@@ -98,10 +103,6 @@ class CustomerEdit extends Component {
     });
   }
 
-  iptChange = value => {
-    console.log(value)
-  }
-
   // 客户
   renderCustomer = () => {
     const {
@@ -115,18 +116,15 @@ class CustomerEdit extends Component {
           {getFieldDecorator('basicInfo', {
             initialValue: basicInfo,
           // eslint-disable-next-line no-return-assign
-          })(<BasicInfo onChange={this.iptChange} wrappedComponentRef={form => this.form = form} />)}
+          })(<BasicInfo wrappedComponentRef={form => this.form = form} />)}
         </Card>
         <Type></Type>
         <Credit></Credit>
         <Authentication></Authentication>
         <Card title="收货地址" bordered={false} style={{ paddingBottom: '50px' }}>
           {getFieldDecorator('addressList', {
-            initialValue: addressList,
+            initialValue: { data: addressList },
           })(<Address />)}
-        </Card>
-        <Card>
-          <EditableTable></EditableTable>
         </Card>
       </>
     );
