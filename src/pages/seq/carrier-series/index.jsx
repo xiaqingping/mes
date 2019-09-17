@@ -109,7 +109,7 @@ class EditableCell extends React.Component {
     return (
       <td {...restProps}>
         {editing ? (
-          <Form.Item style={{ margin: 0 }}>
+          <Form.Item>
             {getFieldDecorator(dataIndex, {
               rules,
               initialValue: record[dataIndex],
@@ -296,6 +296,10 @@ class CarrierSeries extends Component {
 
   // 开启编辑
   editRow = index => {
+    if (this.state.editIndex !== -1) {
+      message.warning('请先保存或退出正在编辑的数据');
+      return;
+    }
     this.setState({
       editIndex: index,
     });
