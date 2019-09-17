@@ -7,12 +7,15 @@ import {
   Input,
   Row,
   Select,
+  message,
+  Popconfirm,
 } from 'antd';
 import React, { Component } from 'react';
-import { connect } from 'dva';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import StandardTable from '@/components/StandardTable';
+import api from '@/api';
 
+const EditableContext = React.createContext();
 const FormItem = Form.Item;
 const { Option } = Select;
 
@@ -57,6 +60,7 @@ class Search extends Component {
             <FormItem label="状态">
               {getFieldDecorator('status', { initialValue: '1' })(
                 <Select>
+                  <Option value="">全部</Option>
                   <Option value="1">正常</Option>
                   <Option value="2">已删除</Option>
                 </Select>,
@@ -86,19 +90,10 @@ class Search extends Component {
 }
 
 
-const EditableContext = React.createContext();
 /**
  * 表格编辑组件
  */
 class EditableCell extends React.Component {
-  getInput = () => {
-    const { inputType } = this.props;
-    if (inputType === 'input') {
-      return <Input />;
-    }
-    return <Input />;
-  };
-
   renderCell = ({ getFieldDecorator }) => {
     const {
       editing,
@@ -108,6 +103,7 @@ class EditableCell extends React.Component {
       record,
       index,
       children,
+      rules,
       ...restProps
     } = this.props;
     return (
@@ -115,14 +111,9 @@ class EditableCell extends React.Component {
         {editing ? (
           <Form.Item style={{ margin: 0 }}>
             {getFieldDecorator(dataIndex, {
-              rules: [
-                {
-                  required: true,
-                  message: `${title}必填!`,
-                },
-              ],
+              rules,
               initialValue: record[dataIndex],
-            })(this.getInput())}
+            })(inputType)}
           </Form.Item>
         ) : (
           children
@@ -137,13 +128,10 @@ class EditableCell extends React.Component {
   }
 }
 
+
 /**
  * 页面根组件
  */
-@connect(({ SeqCarrierSeries, loading }) => ({
-  SeqCarrierSeries,
-  loading: loading.models.SeqCarrierSeries,
-}))
 @Form.create()
 class CarrierSeries extends Component {
   state = {
@@ -151,8 +139,12 @@ class CarrierSeries extends Component {
       page: 1,
       rows: 10,
     },
+    list: [],
+    total: 0,
+    loading: false,
     selectedRows: [],
     editIndex: -1,
+    id: 0, // 新增数据时，提供负数id
   }
 
   columns = [
@@ -166,7 +158,10 @@ class CarrierSeries extends Component {
       dataIndex: 'name',
       width: 180,
       editable: true,
-      inputType: 'input',
+      inputType: <Input />,
+      rules: [
+        { required: true, message: '必填' },
+      ],
     },
     {
       title: '状态',
@@ -214,9 +209,11 @@ class CarrierSeries extends Component {
         if (editIndex !== index && status === 1) {
           actions = (
             <>
-              <a onClick={() => this.deleteRow(row)}>删除</a>
+              <Popconfirm title="确定作废数据？" onConfirm={() => this.deleteRow(row)}>
+                <a>删除</a>
+              </Popconfirm>
               <Divider type="vertical" />
-              <a onClick={() => this.changeEdit(index)}>修改</a>
+              <a onClick={() => this.editRow(index)}>修改</a>
             </>
           );
         }
@@ -225,7 +222,7 @@ class CarrierSeries extends Component {
             <>
               <a onClick={() => this.saveRow(index)}>保存</a>
               <Divider type="vertical" />
-              <a onClick={() => this.changeEdit(-1)}>退出</a>
+              <a onClick={() => this.cancelEdit(row, -1)}>退出</a>
             </>
           );
         }
@@ -258,12 +255,16 @@ class CarrierSeries extends Component {
 
     this.setState({
       formValues: query,
+      loading: true,
     });
 
-    const { dispatch } = this.props;
-    dispatch({
-      type: 'SeqCarrierSeries/fetch',
-      payload: query,
+    api.series.getSeries(query, true).then(res => {
+      this.setState({
+        list: res.rows,
+        total: res.total,
+        loading: false,
+        editIndex: -1,
+      });
     });
   }
 
@@ -274,49 +275,74 @@ class CarrierSeries extends Component {
 
   // 作废数据
   deleteRow = row => {
-    console.log(row);
+    api.series.cancelSeries(row.id).then(() => {
+      this.getTableData();
+    });
   };
 
   // 保存
   saveRow = index => {
     this.props.form.validateFields((error, row) => {
-      console.log(row);
-      console.log(index);
-      if (error) {
-        //
+      if (error) return;
+      const { list } = this.state;
+      const newData = { ...list[index], ...row };
+      if (newData.id > 0) {
+        api.series.updateSeries(newData).then(() => this.getTableData());
+      } else {
+        api.series.addSeries(newData).then(() => this.getTableData());
       }
-      // const newData = [...this.state.data];
-      // const index = newData.findIndex(item => key === item.key);
-      // if (index > -1) {
-      //   const item = newData[index];
-      //   newData.splice(index, 1, {
-      //     ...item,
-      //     ...row,
-      //   });
-      //   this.setState({ data: newData, editIndex: '' });
-      // } else {
-      //   newData.push(row);
-      //   this.setState({ data: newData, editIndex: '' });
-      // }
     });
   }
 
-  // 编辑状态
-  changeEdit = index => {
-    this.setState({ editIndex: index });
+  // 开启编辑
+  editRow = index => {
+    this.setState({
+      editIndex: index,
+    });
+  }
+
+  // 退出编辑
+  cancelEdit = (row, index) => {
+    if (row.id > 0) {
+      this.setState({ editIndex: index });
+    } else {
+      const { list } = this.state;
+      this.setState({
+        list: list.filter(e => e.id > 0),
+        editIndex: index,
+      });
+    }
   }
 
   // 新增
   handleAdd = () => {
-    console.log('add');
+    const { editIndex, id, list } = this.state;
+    if (editIndex !== -1) {
+      message.warning('请先保存或退出正在编辑的数据');
+      return;
+    }
+
+    const newId = id - 1;
+    this.setState({
+      id: newId,
+      editIndex: 0,
+      list: [
+        {
+          id: newId,
+        },
+        ...list,
+      ],
+    });
   }
 
   render() {
-    const { formValues: { page: current, rows: pageSize }, selectedRows } = this.state;
     const {
-      SeqCarrierSeries: { list, total },
+      formValues: { page: current, rows: pageSize },
+      selectedRows,
+      list,
+      total,
       loading,
-    } = this.props;
+    } = this.state;
     const data = { list, pagination: { current, pageSize, total } };
 
     const components = {
@@ -333,6 +359,7 @@ class CarrierSeries extends Component {
         ...col,
         onCell: (record, rowIndex) => ({
           record,
+          rules: col.rules,
           inputType: col.inputType,
           dataIndex: col.dataIndex,
           title: col.title,
@@ -354,6 +381,7 @@ class CarrierSeries extends Component {
             <EditableContext.Provider value={this.props.form}>
               <StandardTable
                 scroll={{ x: 1300 }}
+                rowClassName="editable-row"
                 components={components}
                 selectedRows={selectedRows}
                 loading={loading}
