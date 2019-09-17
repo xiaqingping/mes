@@ -19,24 +19,6 @@ import Bank from './components/Bank';
 
 import EditableTable from './components/TableForm';
 
-const addressList = [
-  {
-    id: 1,
-    name: 'name',
-    telephone: '18735818888',
-    postcode: '123456',
-    address: '上海市松江区香闵路698号',
-  },
-];
-
-const basicInfo = {
-  name: {
-    select: 1,
-    name: '',
-  },
-  email: '123@qq.com',
-};
-
 @connect(({ listTableList, loading }) => ({
   listTableList,
   loading: loading.models.rule,
@@ -45,6 +27,24 @@ class CustomerEdit extends Component {
   state = {
     width: '100%',
     tabActiveKey: 'customer',
+    details: {
+      basicInfo: {
+        name: {
+          select: 1,
+          name: '',
+        },
+        email: '123@qq.com',
+      },
+      addressList: [
+        {
+          id: 1,
+          name: 'name',
+          telephone: '18735818888',
+          postcode: '123456',
+          address: '上海市松江区香闵路698号',
+        },
+      ],
+    },
   };
 
   componentDidMount() {
@@ -86,19 +86,20 @@ class CustomerEdit extends Component {
   validate = () => {
     const {
       form: { validateFieldsAndScroll },
-      dispatch,
     } = this.props;
+    // 验证表单
+    // console.log(this.form.validate());
 
     validateFieldsAndScroll((error, values) => {
       console.log(values);
       if (!error) {
-        // 请求接口
-        // dispatch({
-        //   type: 'formAdvancedForm/submitAdvancedForm',
-        //   payload: values,
-        // });
+        //
       }
     });
+  }
+
+  iptChange = value => {
+    console.log(value)
   }
 
   // 客户
@@ -106,13 +107,15 @@ class CustomerEdit extends Component {
     const {
       form: { getFieldDecorator },
     } = this.props;
+    const { details: { addressList, basicInfo } } = this.state;
+
     return (
       <>
         <Card title="基础信息" bordered={false} style={{ marginBottom: '24px' }}>
           {getFieldDecorator('basicInfo', {
             initialValue: basicInfo,
           // eslint-disable-next-line no-return-assign
-          })(<BasicInfo wrappedComponentRef={form => this.form = form} />)}
+          })(<BasicInfo onChange={this.iptChange} wrappedComponentRef={form => this.form = form} />)}
         </Card>
         <Type></Type>
         <Credit></Credit>
@@ -134,6 +137,7 @@ class CustomerEdit extends Component {
     const {
       form: { getFieldDecorator },
     } = this.props;
+    const { details: { basicInfo } } = this.state;
     return (
       <>
         <Card title="基础信息" bordered={false} style={{ marginBottom: '24px' }}>
