@@ -8,6 +8,7 @@ import {
   Row,
   Select,
   message,
+  Popconfirm,
 } from 'antd';
 import React, { Component } from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
@@ -215,9 +216,11 @@ class CarrierSeries extends Component {
         if (editIndex !== index && status === 1) {
           actions = (
             <>
-              <a onClick={() => this.deleteRow(row)}>删除</a>
+              <Popconfirm title="确定作废数据？" onConfirm={() => this.deleteRow(row)}>
+                <a>删除</a>
+              </Popconfirm>
               <Divider type="vertical" />
-              <a onClick={() => this.changeEdit(index)}>修改</a>
+              <a onClick={() => this.editRow(index)}>修改</a>
             </>
           );
         }
@@ -226,7 +229,7 @@ class CarrierSeries extends Component {
             <>
               <a onClick={() => this.saveRow(index)}>保存</a>
               <Divider type="vertical" />
-              <a onClick={() => this.changeEdit(-1)}>退出</a>
+              <a onClick={() => this.cancelEdit(row, -1)}>退出</a>
             </>
           );
         }
@@ -267,6 +270,7 @@ class CarrierSeries extends Component {
         list: res.rows,
         total: res.total,
         loading: false,
+        editIndex: -1,
       });
     });
   }
@@ -278,16 +282,24 @@ class CarrierSeries extends Component {
 
   // 作废数据
   deleteRow = row => {
-    console.log(row);
+    api.series.cancelSeries(row.id).then(() => {
+      this.getTableData();
+    });
   };
 
   // 保存
   saveRow = index => {
     this.props.form.validateFields((error, row) => {
+      if (error) return;
       console.log(row);
       console.log(index);
-      if (error) {
-        //
+      const { list } = this.state;
+      const newData = { ...list[index], ...row };
+      console.log(newData);
+      if (newData.id > 0) {
+        api.series.updateSeries(newData).then(() => this.getTableData());
+      } else {
+        api.series.addSeries(newData).then(() => this.getTableData());
       }
       // const newData = [...this.state.data];
       // const index = newData.findIndex(item => key === item.key);
@@ -305,15 +317,31 @@ class CarrierSeries extends Component {
     });
   }
 
-  // 编辑状态
-  changeEdit = index => {
-    this.setState({ editIndex: index });
+  // 开启编辑
+  editRow = index => {
+    this.setState({
+      editIndex: index,
+    });
+  }
+
+  // 退出编辑
+  cancelEdit = (row, index) => {
+    if (row.id > 0) {
+      this.setState({ editIndex: index });
+    } else {
+      const { list } = this.state;
+      this.setState({
+        list: list.filter(e => e.id > 0),
+        editIndex: index,
+      });
+    }
   }
 
   // 新增
   handleAdd = () => {
     const { editIndex, id, list } = this.state;
     if (editIndex !== -1) return message.warning('请先保存或退出正在编辑的数据');
+
     const newId = id - 1;
     this.setState({
       id: newId,
@@ -328,7 +356,13 @@ class CarrierSeries extends Component {
   }
 
   render() {
-    const { formValues: { page: current, rows: pageSize }, selectedRows, list, total, loading } = this.state;
+    const {
+      formValues: { page: current, rows: pageSize },
+      selectedRows,
+      list,
+      total,
+      loading,
+    } = this.state;
     const data = { list, pagination: { current, pageSize, total } };
 
     const components = {
