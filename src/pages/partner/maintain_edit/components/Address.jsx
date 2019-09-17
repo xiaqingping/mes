@@ -3,7 +3,7 @@ import {
   Table,
   Input,
   InputNumber,
-  Popconfirm,
+  Divider,
   Form,
 } from 'antd';
 import React from 'react';
@@ -113,26 +113,22 @@ class EditableTable extends React.Component {
         render: (text, record, index) => {
           const { editIndex } = this.state;
           const editable = editIndex === index;
-          return editable ? (
-            <span>
-              <EditableContext.Consumer>
-                {form => (
-                  <a
-                    onClick={() => this.save(form, index)}
-                    style={{ marginRight: 8 }}
-                  >
-                    保存
-                  </a>
-                )}
-              </EditableContext.Consumer>
-              <Popconfirm title="Sure to cancel?" onConfirm={() => this.cancel(index)}>
-                <a>取消</a>
-              </Popconfirm>
-            </span>
-          ) : (
-            <a onClick={() => this.edit(index)}>
-              编辑
-            </a>
+          if (editable) {
+            return (
+              <>
+                <a onClick={() => this.save(index)}>保存</a>
+                <Divider type="vertical" />
+                <a onClick={() => this.cancel(index)}>取消</a>
+              </>
+            );
+          }
+
+          return (
+            <>
+              <a onClick={() => this.deleteRow(index)}>删除</a>
+              <Divider type="vertical" />
+              <a onClick={() => this.edit(index)}>修改</a>
+            </>
           );
         },
       },
@@ -157,12 +153,18 @@ class EditableTable extends React.Component {
     this.valueChange({ data, editIndex: data.length - 1 });
   }
 
+  deleteRow = index => {
+    const { data } = this.state;
+    data.splice(index, 1);
+    this.valueChange({ data });
+  }
+
   cancel = () => {
     this.valueChange({ editIndex: -1 });
   };
 
-  save = (form, index) => {
-    form.validateFields((error, row) => {
+  save = index => {
+    this.props.form.validateFields((error, row) => {
       if (error) return;
       const data = [...this.state.data];
       const item = data[index];
