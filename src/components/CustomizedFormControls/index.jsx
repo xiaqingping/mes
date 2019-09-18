@@ -106,36 +106,25 @@ export class EmailInput extends React.Component {
     };
   }
 
-  valueChange = (key, value) => {
+  valueChange = changedValue => {
+    const { onChange } = this.props;
     let dataSource = [];
     const suffix = [
       'qq.com',
       'gmail.com',
       '163.com',
     ];
-    if (!value || value.indexOf('@') >= 0) {
+
+    if (!changedValue.email || changedValue.email.indexOf('@') >= 0) {
       dataSource = [];
     } else {
-      dataSource = suffix.map(domain => `${value}@${domain}`);
+      dataSource = suffix.map(domain => `${changedValue.email}@${domain}`);
     }
 
-    if (!('value' in this.props)) {
-      this.setState({
-        [key]: value,
-        dataSource,
-      });
-    }
-    this.triggerChange({
-      [key]: value,
-      dataSource,
-    });
-  }
-
-  triggerChange = changedValue => {
-    const { onChange } = this.props;
     if (onChange) {
       onChange({
         ...this.state,
+        dataSource,
         ...changedValue,
       });
     }
@@ -148,7 +137,7 @@ export class EmailInput extends React.Component {
       <AutoComplete
         value={email}
         dataSource={dataSource}
-        onChange={val => this.valueChange('email', val)}
+        onChange={val => this.valueChange({ email: val })}
       />
     );
   }
@@ -174,14 +163,7 @@ export class NameInput extends React.Component {
     };
   }
 
-  valueChange = (key, value) => {
-    if (!('value' in this.props)) {
-      this.setState({ [key]: value });
-    }
-    this.triggerChange({ [key]: value });
-  }
-
-  triggerChange = changedValue => {
+  valueChange = changedValue => {
     const { onChange } = this.props;
     if (onChange) {
       onChange({
@@ -195,16 +177,15 @@ export class NameInput extends React.Component {
     const { select, name } = this.state;
     return (
       <InputGroup compact>
-        <Select value={select} style={{ width: '40%' }} onChange={val => this.valueChange('select', val)}>
+        <Select value={select} style={{ width: '40%' }} onChange={val => this.valueChange({ select: val })}>
           <Option value={1}><Icon type="user" /> 个人</Option>
           <Option value={2}><Icon type="home" /> 组织</Option>
         </Select>
-        <Input value={name} style={{ width: '60%' }} onChange={e => this.valueChange('name', e.target.value)} />
+        <Input value={name} style={{ width: '60%' }} onChange={e => this.valueChange({ name: e.target.value })} />
       </InputGroup>
     );
   }
 }
-
 
 // 移动电话
 export class MobileTelephoneInput extends React.Component {
@@ -227,14 +208,7 @@ export class MobileTelephoneInput extends React.Component {
     };
   }
 
-  valueChange = (key, value) => {
-    if (!('value' in this.props)) {
-      this.setState({ [key]: value });
-    }
-    this.triggerChange({ [key]: value });
-  }
-
-  triggerChange = changedValue => {
+  valueChange = changedValue => {
     const { onChange } = this.props;
     if (onChange) {
       onChange({
@@ -248,11 +222,11 @@ export class MobileTelephoneInput extends React.Component {
     const { area, code, disabled } = this.state;
     return (
       <InputGroup compact>
-        <Select disabled={disabled} value={area} style={{ width: '40%' }} onChange={val => this.valueChange('area', val)}>
+        <Select disabled={disabled} value={area} style={{ width: '40%' }} onChange={val => this.valueChange({ area: val })}>
           <Option value="+86">+86</Option>
           <Option value="+01">+01</Option>
         </Select>
-        <Input disabled={disabled} value={code} style={{ width: '60%' }} onChange={e => this.valueChange('code', e.target.value)} />
+        <Input disabled={disabled} value={code} style={{ width: '60%' }} onChange={e => this.valueChange({ code: e.target.value })} />
       </InputGroup>
     );
   }
@@ -280,14 +254,7 @@ export class TelphoneInput extends React.Component {
     };
   }
 
-  valueChange = (key, value) => {
-    if (!('value' in this.props)) {
-      this.setState({ [key]: value });
-    }
-    this.triggerChange({ [key]: value });
-  }
-
-  triggerChange = changedValue => {
+  valueChange = changedValue => {
     const { onChange } = this.props;
     if (onChange) {
       onChange({
@@ -301,13 +268,13 @@ export class TelphoneInput extends React.Component {
     const { area, provincial, code, extension } = this.state;
     return (
       <InputGroup compact>
-        <Select value={area} style={{ width: '30%' }} onChange={val => this.valueChange('area', val)}>
+        <Select value={area} style={{ width: '30%' }} onChange={val => this.valueChange({ area: val })}>
           <Option value="+86">+86</Option>
           <Option value="+01">+01</Option>
         </Select>
-        <Input value={provincial} style={{ width: '20%' }} onChange={e => this.valueChange('provincial', e.target.value)}/>
-        <Input value={code} style={{ width: '30%' }} onChange={e => this.valueChange('code', e.target.value)}/>
-        <Input value={extension} style={{ width: '20%' }} onChange={e => this.valueChange('extension', e.target.value)}/>
+        <Input value={provincial} style={{ width: '20%' }} onChange={e => this.valueChange({ provincial: e.target.value })}/>
+        <Input value={code} style={{ width: '30%' }} onChange={e => this.valueChange({ code: e.target.value })}/>
+        <Input value={extension} style={{ width: '20%' }} onChange={e => this.valueChange({ extension: e.target.value })}/>
       </InputGroup>
     );
   }
@@ -333,14 +300,7 @@ export class AddressInput extends React.Component {
     };
   }
 
-  valueChange = (key, value) => {
-    if (!('value' in this.props)) {
-      this.setState({ [key]: value });
-    }
-    this.triggerChange({ [key]: value });
-  }
-
-  triggerChange = changedValue => {
+  valueChange = changedValue => {
     const { onChange } = this.props;
     if (onChange) {
       onChange({
@@ -354,8 +314,8 @@ export class AddressInput extends React.Component {
     const { address, cascader } = this.state;
     return (
       <InputGroup compact>
-        <Cascader value={cascader} options={options} style={{ width: '40%' }} onChange={value => this.valueChange('cascader', value)} />
-        <Input value={address} style={{ width: '60%' }} onChange={e => this.valueChange('address', e.target.value)} />
+        <Cascader value={cascader} options={options} style={{ width: '40%' }} onChange={value => this.valueChange({ cascader: value })} />
+        <Input value={address} style={{ width: '60%' }} onChange={e => this.valueChange({ address: e.target.value })} />
       </InputGroup>
     );
   }
