@@ -1,4 +1,4 @@
-// 多肽合成产品
+// 多肽修饰
 import {
   Button,
   Card,
@@ -46,49 +46,47 @@ class Search extends Component {
     } = this.props;
     return (
       <Form onSubmit={this.submit} layout="inline">
-      <Row gutter={{ lg: 24, md: 12, sm: 6 }}>
-        <Col lg={6} md={8} sm={12}>
-          <FormItem label="编号">
-            {getFieldDecorator('code')(<Input />)}
-          </FormItem>
-        </Col>
-        <Col lg={6} md={8} sm={12}>
-          <FormItem label="纯度">
-            {getFieldDecorator('purity')(<Input />)}
-          </FormItem>
-        </Col>
-        <Col lg={6} md={8} sm={12}>
-          <FormItem label="类型">
-          {getFieldDecorator('aminoAcidType', { initialValue: '' })(
-              <Select>
-                <Option value="">全部</Option>
-                <Option value="L">L</Option>
-                <Option value="D">D</Option>
-              </Select>)}
-          </FormItem>
-        </Col>
-        <Col lg={6} md={8} sm={12}>
-          <FormItem label="状态">
-          {getFieldDecorator('status', { initialValue: '1' })(
-              <Select>
-                <Option value="0">全部</Option>
-                <Option value="1">正常</Option>
-                <Option value="2">已删除</Option>
-              </Select>)}
-          </FormItem>
-        </Col>
-        <Col lg={6} md={8} sm={12}>
-          <span className="submitButtons">
-            <Button type="primary" htmlType="submit">
-              查询
-            </Button>
-            <Button style={{ marginLeft: 8 }} onClick={this.handleFormReset}>
-              重置
-            </Button>
-          </span>
-        </Col>
-      </Row>
-    </Form>
+        <Row gutter={{ lg: 24, md: 12, sm: 6 }}>
+          <Col lg={6} md={8} sm={12}>
+            <FormItem label="编号">
+              {getFieldDecorator('code')(<Input />)}
+            </FormItem>
+          </Col>
+          <Col lg={6} md={8} sm={12}>
+            <FormItem label="名称">
+              {getFieldDecorator('name')(<Input />)}
+            </FormItem>
+          </Col>
+          <Col lg={6} md={8} sm={12}>
+            <FormItem label="修饰类型">
+              {getFieldDecorator('modificationTypeID')(
+                <Select>
+                  <Option value="">全部</Option>
+                </Select>)}
+            </FormItem>
+          </Col>
+          <Col lg={6} md={8} sm={12}>
+            <FormItem label="状态">
+            {getFieldDecorator('status', { initialValue: '1' })(
+                <Select>
+                  <Option value="0">全部</Option>
+                  <Option value="1">正常</Option>
+                  <Option value="2">已删除</Option>
+                </Select>)}
+            </FormItem>
+          </Col>
+          <Col lg={6} md={8} sm={12}>
+            <span className="submitButtons">
+              <Button type="primary" htmlType="submit">
+                查询
+              </Button>
+              <Button style={{ marginLeft: 8 }} onClick={this.handleFormReset}>
+                重置
+              </Button>
+            </span>
+          </Col>
+        </Row>
+      </Form>
     );
   }
 
@@ -115,19 +113,20 @@ class EditableCell extends React.Component {
       rules,
       ...restProps
     } = this.props;
-    if (editing) {
-      return (
-        <td {...restProps} style={{ padding: 0 }}>
-            <Form.Item style={{ margin: 0, padding: 0 }}>
-              {getFieldDecorator(dataIndex, {
-                rules,
-                initialValue: record[dataIndex],
-              })(inputType)}
-            </Form.Item>
-        </td>
-      );
-    }
-    return (<td {...restProps}>{children}</td>);
+    return (
+      <td {...restProps}>
+        {editing ? (
+          <Form.Item style={{ margin: 0 }}>
+            {getFieldDecorator(dataIndex, {
+              rules,
+              initialValue: record[dataIndex],
+            })(inputType)}
+          </Form.Item>
+        ) : (
+          children
+        )}
+      </td>
+    );
   };
 
 
@@ -136,7 +135,11 @@ class EditableCell extends React.Component {
   }
 }
 
-class Product extends Component {
+/**
+ * 页面根组件
+ */
+@Form.create()
+class Modifications extends Component {
   state = {
     formValues: {
       page: 1,
@@ -157,9 +160,9 @@ class Product extends Component {
       width: 100,
     },
     {
-      title: '提供总量从',
-      dataIndex: 'providerTotalAmountBegin',
-      width: 100,
+      title: '修饰名称',
+      dataIndex: 'name',
+      width: 180,
       editable: true,
       inputType: <Input />,
       rules: [
@@ -167,49 +170,55 @@ class Product extends Component {
       ],
     },
     {
-      title: '提供总量至',
-      dataIndex: 'providerTotalAmountEnd',
+      title: '修饰代码',
+      dataIndex: 'modificationCode',
+      width: 180,
+    },
+    {
+      title: '修饰位置',
+      dataIndex: 'modificationPosition',
+      width: 180,
+    },
+    {
+      title: '独立修饰',
+      dataIndex: 'isIndependentModification',
+      width: 180,
+    },
+    {
+      title: '修饰类别',
+      dataIndex: 'modificationTypeID',
+      width: 180,
+    },
+    {
+      title: '状态',
+      dataIndex: 'status',
+      width: 100,
+      render: text => (text === 1 ? '正常' : '已删除'),
+    },
+    {
+      title: '创建人',
+      dataIndex: 'creatorName',
       width: 100,
     },
     {
-      title: '纯度',
-      dataIndex: 'purityID',
+      title: '创建时间',
+      dataIndex: 'createDate',
+      width: 200,
+    },
+    {
+      title: '删除人',
+      dataIndex: 'cancelName',
       width: 100,
     },
     {
-      title: '长度从',
-      dataIndex: 'aminoAcidLengthBegin',
-      width: 100,
-    },
-    {
-      title: '长度至',
-      dataIndex: 'aminoAcidLengthEnd',
-      width: 100,
-    },
-    {
-      title: '是否脱盐',
-      dataIndex: 'isNeedDesalting',
-      width: 100,
-      render: text => (text === 1 ? '√' : ''),
-    },
-    {
-      title: '氨基酸类型',
-      dataIndex: 'aminoAcidType',
-      width: 100,
-    },
-    {
-      title: '产品编号',
-      dataIndex: 'sapProductCode',
-      width: 100,
-    },
-    {
-      title: '产品名称',
-      dataIndex: 'sapProductName',
-      width: 300,
+      title: '删除时间',
+      dataIndex: 'cancelDate',
+      width: 200,
     },
     {
       title: '操作',
-      width: 200,
+      fixed: 'right',
+      width: 150,
       render: (value, row, index) => {
         const { editIndex } = this.state;
         let actions;
@@ -271,7 +280,7 @@ class Product extends Component {
       loading: true,
     });
 
-    api.peptideBase.getProduct(query).then(res => {
+    api.peptideBase.getModifications(query).then(res => {
       this.setState({
         list: res.rows,
         total: res.total,
@@ -280,10 +289,6 @@ class Product extends Component {
       });
     });
   }
-
-  handleFormReset = () => {
-    this.props.form.resetFields();
-  };
 
   // 退出编辑
   cancelEdit = (row, index) => {
@@ -300,14 +305,14 @@ class Product extends Component {
 
   // 删除数据
   deleteRow = row => {
-    api.peptideBase.deleteProduct(row.id).then(() => {
+    api.peptideBase.deleteModifications(row.id).then(() => {
       this.getTableData();
     });
   };
 
   // 恢复数据
   resumeRow = row => {
-    api.peptideBase.resumeProduct(row.id).then(() => {
+    api.peptideBase.resumeModifications(row.id).then(() => {
       this.getTableData();
     });
   };
@@ -321,7 +326,7 @@ class Product extends Component {
       if (newData.id > 0) {
         // api.peptideBase.updateSeries(newData).then(() => this.getTableData());
       } else {
-        api.peptideBase.insertProduct(newData).then(() => this.getTableData());
+        api.peptideBase.insertModifications(newData).then(() => this.getTableData());
       }
     });
   }
@@ -345,57 +350,6 @@ class Product extends Component {
         ...list,
       ],
     });
-  }
-
-  renderForm() {
-    const { form } = this.props;
-    const { getFieldDecorator } = form;
-    return (
-      <Form onSubmit={this.handleSearch} layout="inline">
-        <Row gutter={{ lg: 24, md: 12, sm: 6 }}>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="编号">
-              {getFieldDecorator('code')(<Input />)}
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="纯度">
-              {getFieldDecorator('purity')(<Input />)}
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="类型">
-            {getFieldDecorator('aminoAcidType', { initialValue: '' })(
-                <Select>
-                  <Option value="">全部</Option>
-                  <Option value="L">L</Option>
-                  <Option value="D">D</Option>
-                </Select>)}
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="状态">
-            {getFieldDecorator('status', { initialValue: '1' })(
-                <Select>
-                  <Option value="0">全部</Option>
-                  <Option value="1">正常</Option>
-                  <Option value="2">已删除</Option>
-                </Select>)}
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <span className="submitButtons">
-              <Button type="primary" htmlType="submit">
-                查询
-              </Button>
-              <Button style={{ marginLeft: 8 }} onClick={this.handleFormReset}>
-                重置
-              </Button>
-            </span>
-          </Col>
-        </Row>
-      </Form>
-    );
   }
 
   render() {
@@ -441,19 +395,38 @@ class Product extends Component {
                 新建
               </Button>
             </div>
-            <EditableContext.Provider value={this.props.form}>
-              <StandardTable
-                scroll={{ x: 1300 }}
-                rowClassName="editable-row"
-                components={components}
-                selectedRows={selectedRows}
-                loading={loading}
-                data={data}
-                columns={columns}
-                onSelectRow={this.handleSelectRows}
-                onChange={this.handleStandardTableChange}
-              />
-            </EditableContext.Provider>
+            <Col span={12}>
+              <EditableContext.Provider value={this.props.form}>
+                <StandardTable
+                  scroll={{ x: 1300 }}
+                  rowClassName="editable-row"
+                  components={components}
+                  selectedRows={selectedRows}
+                  loading={loading}
+                  data={data}
+                  columns={columns}
+                  onSelectRow={this.handleSelectRows}
+                  onChange={this.handleStandardTableChange}
+                />
+              </EditableContext.Provider>
+              </Col>
+              <Col span={1}>
+              </Col>
+              <Col span={11}>
+                <EditableContext.Provider value={this.props.form}>
+                  <StandardTable
+                    scroll={{ x: 1300 }}
+                    rowClassName="editable-row"
+                    components={components}
+                    selectedRows={selectedRows}
+                    loading={loading}
+                    data={data}
+                    columns={columns}
+                    onSelectRow={this.handleSelectRows}
+                    onChange={this.handleStandardTableChange}
+                  />
+                </EditableContext.Provider>
+              </Col>
           </div>
         </Card>
       </PageHeaderWrapper>
@@ -461,4 +434,4 @@ class Product extends Component {
   }
 }
 
-export default Form.create()(Product);
+export default Modifications;

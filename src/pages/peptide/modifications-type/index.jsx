@@ -1,4 +1,4 @@
-// 多肽合成产品
+// 多肽纯度
 import {
   Button,
   Card,
@@ -53,18 +53,8 @@ class Search extends Component {
           </FormItem>
         </Col>
         <Col lg={6} md={8} sm={12}>
-          <FormItem label="纯度">
-            {getFieldDecorator('purity')(<Input />)}
-          </FormItem>
-        </Col>
-        <Col lg={6} md={8} sm={12}>
-          <FormItem label="类型">
-          {getFieldDecorator('aminoAcidType', { initialValue: '' })(
-              <Select>
-                <Option value="">全部</Option>
-                <Option value="L">L</Option>
-                <Option value="D">D</Option>
-              </Select>)}
+          <FormItem label="修饰类型">
+            {getFieldDecorator('modificationType')(<Input />)}
           </FormItem>
         </Col>
         <Col lg={6} md={8} sm={12}>
@@ -136,7 +126,7 @@ class EditableCell extends React.Component {
   }
 }
 
-class Product extends Component {
+class ModificationsType extends Component {
   state = {
     formValues: {
       page: 1,
@@ -157,9 +147,9 @@ class Product extends Component {
       width: 100,
     },
     {
-      title: '提供总量从',
-      dataIndex: 'providerTotalAmountBegin',
-      width: 100,
+      title: '修饰类型',
+      dataIndex: 'modificationType',
+      width: 200,
       editable: true,
       inputType: <Input />,
       rules: [
@@ -167,45 +157,34 @@ class Product extends Component {
       ],
     },
     {
-      title: '提供总量至',
-      dataIndex: 'providerTotalAmountEnd',
+      title: '状态',
+      dataIndex: 'status',
+      width: 100,
+      render: text => {
+        if (text === 1) return '正常';
+        if (text === 2) return '已删除';
+        return ''
+      },
+    },
+    {
+      title: '创建人',
+      dataIndex: 'creatorName',
       width: 100,
     },
     {
-      title: '纯度',
-      dataIndex: 'purityID',
+      title: '创建日期',
+      dataIndex: 'createDate',
+      width: 200,
+    },
+    {
+      title: '删除人',
+      dataIndex: 'cancelName',
       width: 100,
     },
     {
-      title: '长度从',
-      dataIndex: 'aminoAcidLengthBegin',
-      width: 100,
-    },
-    {
-      title: '长度至',
-      dataIndex: 'aminoAcidLengthEnd',
-      width: 100,
-    },
-    {
-      title: '是否脱盐',
-      dataIndex: 'isNeedDesalting',
-      width: 100,
-      render: text => (text === 1 ? '√' : ''),
-    },
-    {
-      title: '氨基酸类型',
-      dataIndex: 'aminoAcidType',
-      width: 100,
-    },
-    {
-      title: '产品编号',
-      dataIndex: 'sapProductCode',
-      width: 100,
-    },
-    {
-      title: '产品名称',
-      dataIndex: 'sapProductName',
-      width: 300,
+      title: '删除时间',
+      dataIndex: 'cancelDate',
+      width: 200,
     },
     {
       title: '操作',
@@ -271,7 +250,7 @@ class Product extends Component {
       loading: true,
     });
 
-    api.peptideBase.getProduct(query).then(res => {
+    api.peptideBase.getModificationTypes(query).then(res => {
       this.setState({
         list: res.rows,
         total: res.total,
@@ -280,6 +259,7 @@ class Product extends Component {
       });
     });
   }
+
 
   handleFormReset = () => {
     this.props.form.resetFields();
@@ -300,14 +280,14 @@ class Product extends Component {
 
   // 删除数据
   deleteRow = row => {
-    api.peptideBase.deleteProduct(row.id).then(() => {
+    api.peptideBase.deleteModificationTypes(row.id).then(() => {
       this.getTableData();
     });
   };
 
   // 恢复数据
   resumeRow = row => {
-    api.peptideBase.resumeProduct(row.id).then(() => {
+    api.peptideBase.resumeModificationTypes(row.id).then(() => {
       this.getTableData();
     });
   };
@@ -321,7 +301,7 @@ class Product extends Component {
       if (newData.id > 0) {
         // api.peptideBase.updateSeries(newData).then(() => this.getTableData());
       } else {
-        api.peptideBase.insertProduct(newData).then(() => this.getTableData());
+        api.peptideBase.insertModificationTypes(newData).then(() => this.getTableData());
       }
     });
   }
@@ -345,57 +325,6 @@ class Product extends Component {
         ...list,
       ],
     });
-  }
-
-  renderForm() {
-    const { form } = this.props;
-    const { getFieldDecorator } = form;
-    return (
-      <Form onSubmit={this.handleSearch} layout="inline">
-        <Row gutter={{ lg: 24, md: 12, sm: 6 }}>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="编号">
-              {getFieldDecorator('code')(<Input />)}
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="纯度">
-              {getFieldDecorator('purity')(<Input />)}
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="类型">
-            {getFieldDecorator('aminoAcidType', { initialValue: '' })(
-                <Select>
-                  <Option value="">全部</Option>
-                  <Option value="L">L</Option>
-                  <Option value="D">D</Option>
-                </Select>)}
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="状态">
-            {getFieldDecorator('status', { initialValue: '1' })(
-                <Select>
-                  <Option value="0">全部</Option>
-                  <Option value="1">正常</Option>
-                  <Option value="2">已删除</Option>
-                </Select>)}
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <span className="submitButtons">
-              <Button type="primary" htmlType="submit">
-                查询
-              </Button>
-              <Button style={{ marginLeft: 8 }} onClick={this.handleFormReset}>
-                重置
-              </Button>
-            </span>
-          </Col>
-        </Row>
-      </Form>
-    );
   }
 
   render() {
@@ -461,4 +390,4 @@ class Product extends Component {
   }
 }
 
-export default Form.create()(Product);
+export default Form.create()(ModificationsType);

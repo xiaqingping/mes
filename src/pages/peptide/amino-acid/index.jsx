@@ -1,44 +1,149 @@
 // 多肽合成产品
 import {
-  Badge,
   Button,
   Card,
   Col,
-  DatePicker,
   Divider,
-  Dropdown,
   Form,
-  Icon,
   Input,
-  InputNumber,
-  Menu,
   Row,
   Select,
   message,
-  Table,
+  Popconfirm,
 } from 'antd';
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import StandardTable from '@/components/StandardTable';
-import api from '@/api'
+import api from '@/api';
 
+const EditableContext = React.createContext();
 const FormItem = Form.Item;
 const { Option } = Select;
-const { MonthPicker, RangePicker, WeekPicker } = DatePicker;
-const { Search } = Input;
+
+/**
+ * 页面顶部筛选表单
+ */
+@Form.create()
+class Search extends Component {
+  componentDidMount() {
+    this.submit();
+  }
+
+  submit = e => {
+    if (e) e.preventDefault();
+    const val = this.props.form.getFieldsValue();
+    this.props.getTableData({ page: 1, ...val });
+  }
+
+  handleFormReset = () => {
+    this.props.form.resetFields();
+  }
+
+  // 渲染表单
+  renderForm = () => {
+    const {
+      form: { getFieldDecorator },
+    } = this.props;
+    return (
+      <Form onSubmit={this.submit} layout="inline">
+        <Row gutter={{ lg: 24, md: 12, sm: 6 }}>
+          <Col lg={6} md={8} sm={12}>
+            <FormItem label="编号">
+              {getFieldDecorator('code')(<Input />)}
+            </FormItem>
+          </Col>
+          <Col lg={6} md={8} sm={12}>
+            <FormItem label="名称">
+              {getFieldDecorator('name')(<Input />)}
+            </FormItem>
+          </Col>
+          <Col lg={6} md={8} sm={12}>
+            <FormItem label="代码">
+            {getFieldDecorator('aminoAcidCode')(<Input />)}
+            </FormItem>
+          </Col>
+          <Col lg={6} md={8} sm={12}>
+            <FormItem label="状态">
+            {getFieldDecorator('status', { initialValue: '1' })(
+                <Select>
+                  <Option value="0">全部</Option>
+                  <Option value="1">正常</Option>
+                  <Option value="2">已删除</Option>
+                </Select>)}
+            </FormItem>
+          </Col>
+          <Col lg={6} md={8} sm={12}>
+            <span className="submitButtons">
+              <Button type="primary" htmlType="submit">
+                查询
+              </Button>
+              <Button style={{ marginLeft: 8 }} onClick={this.handleFormReset}>
+                重置
+              </Button>
+            </span>
+          </Col>
+        </Row>
+      </Form>
+    );
+  }
+
+  render() {
+    return (
+      <div className="tableListForm">{this.renderForm()}</div>
+    );
+  }
+}
+
+/**
+ * 表格编辑组件
+ */
+class EditableCell extends React.Component {
+  renderCell = ({ getFieldDecorator }) => {
+    const {
+      editing,
+      dataIndex,
+      title,
+      inputType,
+      record,
+      index,
+      children,
+      rules,
+      ...restProps
+    } = this.props;
+    if (editing) {
+      return (
+        <td {...restProps} style={{ padding: 0 }}>
+            <Form.Item style={{ margin: 0, padding: 0 }}>
+              {getFieldDecorator(dataIndex, {
+                rules,
+                initialValue: record[dataIndex],
+              })(inputType)}
+            </Form.Item>
+        </td>
+      );
+    }
+    return (<td {...restProps}>{children}</td>);
+  };
+
+
+  render() {
+    return <EditableContext.Consumer>{this.renderCell}</EditableContext.Consumer>;
+  }
+}
 
 class Order extends Component {
   state = {
-    pagination: {
-      current: 1,
-      pageSize: 10,
-      total: 0,
+    formValues: {
+      page: 1,
+      rows: 10,
     },
     list: [],
+    total: 0,
     loading: false,
     selectedRows: [],
     editIndex: -1,
-  };
+    id: 0, // 新增数据时，提供负数id
+  }
 
   columns = [
     {
@@ -139,46 +244,69 @@ class Order extends Component {
       title: '类型',
       dataIndex: 'aminoAcidType',
       width: 100,
+      align: 'center',
+      render: text => (
+        <Fragment>
+          <span>{text[0]}</span>
+          <Divider type="horizontal" style={{ margin: 0 }}/>
+          <span>{text[1]}</span>
+        </Fragment>
+      ),
     },
     {
       title: '长代码',
       dataIndex: 'longCode',
       width: 100,
+      align: 'center',
+      render: text => (
+        <Fragment>
+          <span>{text[0]}</span>
+          <Divider type="horizontal" style={{ margin: 0 }}/>
+          <span>{text[1]}</span>
+        </Fragment>
+      ),
     },
     {
       title: '短代码',
       dataIndex: 'shortCode',
       width: 100,
+      align: 'center',
+      render: text => (
+        <Fragment>
+          <span>{text[0]}</span>
+          <Divider type="horizontal" style={{ margin: 0 }}/>
+          <span>{text[1]}</span>
+        </Fragment>
+      ),
     },
     {
       title: '操作',
+      width: 150,
       fixed: 'right',
-      width: 100,
       render: (value, row, index) => {
-        const { status } = row;
         const { editIndex } = this.state;
         let actions;
         if (editIndex !== index) {
           if (row.status === 1) {
             actions = (
-              <>
+              <Popconfirm title="确定删除数据？" onConfirm={() => this.deleteRow(row)}>
                 <a>删除</a>
-                </>
+              </Popconfirm>
             );
           } else {
             actions = (
-              <>
+              <Popconfirm title="确定恢复数据？" onConfirm={() => this.resumeRow(row)}>
                 <a>恢复</a>
-                </>
+              </Popconfirm>
             );
           }
         }
         if (editIndex === index) {
           actions = (
             <>
-              <a>保存</a>
+              <a onClick={() => this.saveRow(index)}>保存</a>
               <Divider type="vertical" />
-              <a>退出</a>
+              <a onClick={() => this.cancelEdit(row, -1)}>退出</a>
             </>
           );
         }
@@ -188,21 +316,18 @@ class Order extends Component {
   ];
 
   componentDidMount() {
-    this.getTableData();
+    //
   }
 
-  handleSearch = e => {
-    e.preventDefault();
-    this.getTableData({ page: 1 });
-  }
-
-  handleStandardTableChange = (pagination, filtersArg, sorter) => {
+  // 分页
+  handleStandardTableChange = pagination => {
     this.getTableData({
       page: pagination.current,
       rows: pagination.pageSize,
     });
   }
 
+  // 选择行
   handleSelectRows = rows => {
     this.setState({
       selectedRows: rows,
@@ -211,12 +336,14 @@ class Order extends Component {
 
   // 获取表格数据
   getTableData = (options = {}) => {
+    const { formValues } = this.state;
+    const query = Object.assign({}, formValues, options);
+
     this.setState({
+      formValues: query,
       loading: true,
     });
-    const { form } = this.props;
-    const { pagination: { current: page, pageSize: rows } } = this.state;
-    const query = Object.assign(form.getFieldsValue(), { page, rows }, options);
+
     api.peptideBase.getAminoAcid(query).then(data => {
       const map = {}; const dest = [];
       for (let i = 0; i < data.rows.length; i++) {
@@ -249,9 +376,15 @@ class Order extends Component {
           for (let j = 0; j < dest.length; j++) {
             const dj = dest[j];
             if (dj.id === ai.id) {
-              dj.shortCode = (dj.shortCode ? dj.shortCode : '') + (ai.shortCode ? ` | ${ai.shortCode}` : '');
-              dj.longCode = (dj.longCode ? dj.longCode : '') + (ai.longCode ? ` | ${ai.longCode}` : '');
-              dj.aminoAcidType = (dj.aminoAcidType ? dj.aminoAcidType : '') + (ai.aminoAcidType ? ` | ${ai.aminoAcidType}` : '');
+              dj.shortCode = [dj.shortCode, ai.shortCode];
+              // dj.shortCode = (dj.shortCode ? dj.shortCode : '')
+              // + (ai.shortCode ? ` | ${ai.shortCode}` : '');
+              dj.longCode = [dj.longCode, ai.longCode];
+              // dj.longCode = (dj.longCode ? dj.longCode : '')
+              // + (ai.longCode ? ` | ${ai.longCode}` : '');
+              dj.aminoAcidType = [dj.aminoAcidType, ai.aminoAcidType]
+              // dj.aminoAcidType = (dj.aminoAcidType ? dj.aminoAcidType : '')
+              // + (ai.aminoAcidType ? ` | ${ai.aminoAcidType}` : '');
               break;
             }
           }
@@ -260,11 +393,8 @@ class Order extends Component {
       this.setState({
         loading: false,
         list: dest,
-        pagination: {
-          total: dest.length * 2,
-          current: query.page,
-          pageSize: query.rows,
-        },
+        total: dest.length * 2,
+        editIndex: -1,
       });
     });
   }
@@ -273,79 +403,124 @@ class Order extends Component {
     this.props.form.resetFields();
   };
 
-  handleAdd = () => {
-    console.log('add');
+  // 退出编辑
+  cancelEdit = (row, index) => {
+    if (row.id > 0) {
+      this.setState({ editIndex: index });
+    } else {
+      const { list } = this.state;
+      this.setState({
+        list: list.filter(e => e.id > 0),
+        editIndex: index,
+      });
+    }
   }
 
-  renderForm() {
-    const { form } = this.props;
-    const { getFieldDecorator } = form;
-    return (
-      <Form onSubmit={this.handleSearch} layout="inline">
-        <Row gutter={{ lg: 24, md: 12, sm: 6 }}>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="编号">
-              {getFieldDecorator('code')(<Input />)}
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="名称">
-              {getFieldDecorator('name')(<Input />)}
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="代码">
-            {getFieldDecorator('aminoAcidCode')(<Input />)}
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="状态">
-            {getFieldDecorator('status', { initialValue: '1' })(
-                <Select>
-                  <Option value="0">全部</Option>
-                  <Option value="1">正常</Option>
-                  <Option value="2">已删除</Option>
-                </Select>)}
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <span className="submitButtons">
-              <Button type="primary" htmlType="submit">
-                查询
-              </Button>
-              <Button style={{ marginLeft: 8 }} onClick={this.handleFormReset}>
-                重置
-              </Button>
-            </span>
-          </Col>
-        </Row>
-      </Form>
-    );
+  // 删除数据
+  deleteRow = row => {
+    api.peptideBase.deleteAminoAcid(row.id).then(() => {
+      this.getTableData();
+    });
+  };
+
+  // 恢复数据
+  resumeRow = row => {
+    api.peptideBase.resumeAminoAcid(row.id).then(() => {
+      this.getTableData();
+    });
+  };
+
+  // 保存
+  saveRow = index => {
+    this.props.form.validateFields((error, row) => {
+      if (error) return;
+      const { list } = this.state;
+      const newData = { ...list[index], ...row };
+      if (newData.id > 0) {
+        // api.peptideBase.updateSeries(newData).then(() => this.getTableData());
+      } else {
+        api.peptideBase.insertAminoAcid(newData).then(() => this.getTableData());
+      }
+    });
+  }
+
+  // 新增
+  handleAdd = () => {
+    const { editIndex, id, list } = this.state;
+    if (editIndex !== -1) {
+      message.warning('请先保存或退出正在编辑的数据');
+      return;
+    }
+
+    const newId = id - 1;
+    this.setState({
+      id: newId,
+      editIndex: 0,
+      list: [
+        {
+          id: newId,
+        },
+        ...list,
+      ],
+    });
   }
 
   render() {
-    const { list, pagination, loading, selectedRows } = this.state;
-    const data = { list, pagination };
+    const {
+      formValues: { page: current, rows: pageSize },
+      selectedRows,
+      list,
+      total,
+      loading,
+    } = this.state;
+    const data = { list, pagination: { current, pageSize, total } };
+
+    const components = {
+      body: {
+        cell: EditableCell,
+      },
+    };
+
+    const columns = this.columns.map(col => {
+      if (!col.editable) {
+        return col;
+      }
+      return {
+        ...col,
+        onCell: (record, rowIndex) => ({
+          record,
+          rules: col.rules,
+          inputType: col.inputType,
+          dataIndex: col.dataIndex,
+          title: col.title,
+          editing: rowIndex === this.state.editIndex,
+        }),
+      };
+    });
 
     return (
       <PageHeaderWrapper>
         <Card bordered={false}>
           <div className="tableList">
-            <div className="tableListForm">{this.renderForm()}</div>
+            <Search getTableData={this.getTableData} />
             <div className="tableListOperator">
               <Button icon="plus" type="primary" onClick={() => this.handleAdd()}>
                 新建
               </Button>
             </div>
-            <StandardTable
-              scroll={{ x: 2000 }}
-              selectedRows={selectedRows}
-              loading={loading}
-              data={data}
-              columns={this.columns}
-              onSelectRow={this.handleSelectRows}
-              onChange={this.handleStandardTableChange}
-            />
+            <EditableContext.Provider value={this.props.form}>
+              <StandardTable
+                scroll={{ x: 2500 }}
+                rowClassName="editable-row"
+                components={components}
+                selectedRows={selectedRows}
+                loading={loading}
+                data={data}
+                columns={columns}
+                onSelectRow={this.handleSelectRows}
+                onChange={this.handleStandardTableChange}
+              />
+            </EditableContext.Provider>
           </div>
         </Card>
       </PageHeaderWrapper>

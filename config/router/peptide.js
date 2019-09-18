@@ -24,25 +24,25 @@ module.exports = {
       path: '/peptide/amino-acid',
       component: './peptide/amino-acid',
     },
-    // {
-    //   name: 'modifications',
-    //   path: '/peptide/modifications',
-    //   component: './peptide/modifications',
-    // },
-    // {
-    //   name: 'modifications-type',
-    //   path: '/peptide/modifications-type',
-    //   component: './peptide/modifications-type',
-    // },
-    // {
-    //   name: 'modification-products',
-    //   path: '/peptide/modification-products',
-    //   component: './peptide/modification-products',
-    // },
-    // {
-    //   name: 'disulfide-bond-products',
-    //   path: '/peptide/disulfide-bond-products',
-    //   component: './peptide/disulfide-bond-products',
-    // }
+    {
+      name: 'modifications',
+      path: '/peptide/modifications',
+      component: './peptide/modifications',
+    },
+    {
+      name: 'modifications-type',
+      path: '/peptide/modifications-type',
+      component: './peptide/modifications-type',
+    },
+    {
+      name: 'modification-products',
+      path: '/peptide/modification-products',
+      component: './peptide/modification-products',
+    },
+    {
+      name: 'disulfide-bond-products',
+      path: '/peptide/disulfide-bond-products',
+      component: './peptide/disulfide-bond-products',
+    }
   ],
 };
