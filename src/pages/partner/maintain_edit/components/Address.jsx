@@ -85,6 +85,12 @@ class EditableTable extends React.Component {
         rules: [
           { required: true },
         ],
+        render(text) {
+          if (typeof text === 'object') {
+            return text.area + text.code;
+          }
+          return text;
+        },
       },
       {
         title: '邮编',
