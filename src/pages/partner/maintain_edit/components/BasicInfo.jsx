@@ -64,11 +64,6 @@ class BasicInfo extends PureComponent {
   triggerChange = changedValue => {
     const { onChange } = this.props;
     if (onChange) {
-      console.log(onChange);
-      console.log({
-        ...this.state,
-        ...changedValue,
-      });
       onChange({
         ...this.state,
         ...changedValue,
@@ -146,12 +141,12 @@ class BasicInfo extends PureComponent {
               )}
             </FormItem>
           </Col>
-          <Col md={15} sm={24}>
+          <Col md={18} sm={24}>
             <FormItem label="通讯地址">
               {getFieldDecorator('address')(<AddressInput onChange={value => this.valueChange('address', value)} />)}
             </FormItem>
           </Col>
-          <Col md={3} sm={6}>
+          <Col md={6} sm={6}>
             <FormItem label="销售冻结">
               {getFieldDecorator('dongjie', { valuePropName: 'checked' })(<Switch onChange={value => this.valueChange('dongjie', value)} />)}
             </FormItem>
