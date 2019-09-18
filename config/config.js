@@ -55,22 +55,23 @@ const plugins = [
       autoAddMenu: true,
     },
   ],
-]; // 针对 preview.pro.ant.design 的 GA 统计代码
+];
 
-if (isAntDesignProPreview) {
-  plugins.push([
-    'umi-plugin-ga',
-    {
-      code: 'UA-72788897-6',
-    },
-  ]);
-  plugins.push([
-    'umi-plugin-pro',
-    {
-      serverUrl: 'https://ant-design-pro.netlify.com',
-    },
-  ]);
-}
+// 针对 preview.pro.ant.design 的 GA 统计代码
+// if (isAntDesignProPreview) {
+//   plugins.push([
+//     'umi-plugin-ga',
+//     {
+//       code: 'UA-72788897-6',
+//     },
+//   ]);
+//   plugins.push([
+//     'umi-plugin-pro',
+//     {
+//       serverUrl: 'https://ant-design-pro.netlify.com',
+//     },
+//   ]);
+// }
 
 export default {
   plugins,

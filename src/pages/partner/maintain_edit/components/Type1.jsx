@@ -1,21 +1,12 @@
 import {
-  Badge,
-  Button,
   Card,
   Col,
-  DatePicker,
-  Divider,
-  Dropdown,
   Form,
-  Icon,
   Input,
   InputNumber,
-  Menu,
   Row,
   Select,
   Switch,
-  message,
-  Cascader,
 } from 'antd';
 import React, { Component } from 'react';
 
@@ -113,8 +104,14 @@ class Type extends Component {
           </Col>
           <Col md={6}>
             <FormItem label="计划交货时间">
-              {getFieldDecorator('time')(
-                <DatePicker style={{ width: '100%' }} />,
+              {getFieldDecorator('time', {
+                initialValue: 1,
+              })(
+                <InputNumber
+                  min={1}
+                  formatter={value => `${value}天`}
+                  parser={value => value.replace('天', '')}
+                />,
               )}
             </FormItem>
           </Col>

@@ -3,7 +3,6 @@ import {
   Form,
   Row,
   Col,
-  Input,
   Select,
   Switch,
 } from 'antd';

@@ -122,7 +122,6 @@ class EditableCell extends React.Component {
     );
   };
 
-
   render() {
     return <EditableContext.Consumer>{this.renderCell}</EditableContext.Consumer>;
   }

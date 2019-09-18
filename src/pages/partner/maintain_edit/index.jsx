@@ -10,7 +10,7 @@ import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import FooterToolbar from '@/components/FooterToolbar';
 
 import BasicInfo from './components/BasicInfo';
-import Type from './components/Type';
+import SalesScope from './components/SalesScope';
 import Credit from './components/Credit';
 import Authentication from './components/Authentication';
 import Address from './components/Address';
@@ -118,7 +118,7 @@ class CustomerEdit extends Component {
           // eslint-disable-next-line no-return-assign
           })(<BasicInfo wrappedComponentRef={form => this.form = form} />)}
         </Card>
-        <Type></Type>
+        <SalesScope></SalesScope>
         <Credit></Credit>
         <Authentication></Authentication>
         <Card title="收货地址" bordered={false} style={{ paddingBottom: '50px' }}>
