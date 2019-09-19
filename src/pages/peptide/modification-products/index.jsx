@@ -15,6 +15,7 @@ import React, { Component } from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import StandardTable from '@/components/StandardTable';
 import api from '@/api';
+import peptide from'../peptide'
 
 const EditableContext = React.createContext();
 const FormItem = Form.Item;
@@ -155,6 +156,15 @@ class ModificationProducts extends Component {
       title: '修饰位置',
       dataIndex: 'modificationPosition',
       width: 100,
+      render: (text) => {
+        let val = null;
+        peptide.modificationPosition.map((item) => {
+          if (item.id == text) {
+            val = item.name
+          }
+        })
+        return val;
+      }
     },
     {
       title: '氨基酸',

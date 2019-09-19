@@ -280,7 +280,6 @@ class Product extends Component {
 
   componentDidMount() {
     api.peptideBase.getPurityAll().then(res => {
-      console.log(res)
       this.setState({
         purityValue: res
       })

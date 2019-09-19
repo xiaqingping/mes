@@ -15,6 +15,7 @@ import React, { Component } from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import StandardTable from '@/components/StandardTable';
 import api from '@/api';
+import peptide from'../peptide'
 
 const EditableContext = React.createContext();
 const FormItem = Form.Item;
@@ -151,6 +152,7 @@ class Modifications extends Component {
     selectedRows: [],
     editIndex: -1,
     id: 0, // 新增数据时，提供负数id
+    modificationType:[]
   }
 
   columns = [
@@ -178,16 +180,36 @@ class Modifications extends Component {
       title: '修饰位置',
       dataIndex: 'modificationPosition',
       width: 180,
+      render: (text) => {
+        let val = null;
+        peptide.modificationPosition.map((item) => {
+          if (item.id == text) {
+            val = item.name
+          }
+        })
+        return val;
+      }
     },
     {
       title: '独立修饰',
       dataIndex: 'isIndependentModification',
       width: 180,
+      render: text => (text === 1 ? '√' : ''),
     },
     {
       title: '修饰类别',
       dataIndex: 'modificationTypeID',
       width: 180,
+      render: (text) => {
+        const {modificationType} = this.state;
+        let val = null;
+        modificationType.map((item) => {
+          if (item.id == text) {
+            val = item.modificationType
+          }
+        })
+        return val;
+      }
     },
     {
       title: '状态',
@@ -198,7 +220,7 @@ class Modifications extends Component {
     {
       title: '创建人',
       dataIndex: 'creatorName',
-      width: 100,
+      width: 120,
     },
     {
       title: '创建时间',
@@ -208,7 +230,7 @@ class Modifications extends Component {
     {
       title: '删除人',
       dataIndex: 'cancelName',
-      width: 100,
+      width: 120,
     },
     {
       title: '删除时间',
@@ -252,7 +274,11 @@ class Modifications extends Component {
   ];
 
   componentDidMount() {
-    //
+    api.peptideBase.getModificationTypesAll().then(res => {
+      this.setState({
+        modificationType: res
+      })
+    })
   }
 
   // 分页
