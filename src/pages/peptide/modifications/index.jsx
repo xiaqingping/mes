@@ -395,7 +395,7 @@ class Modifications extends Component {
                 新建
               </Button>
             </div>
-            <Col span={12}>
+            <Col span={14}>
               <EditableContext.Provider value={this.props.form}>
                 <StandardTable
                   scroll={{ x: 1300 }}
@@ -412,7 +412,7 @@ class Modifications extends Component {
               </Col>
               <Col span={1}>
               </Col>
-              <Col span={11}>
+              <Col span={9}>
                 <EditableContext.Provider value={this.props.form}>
                   <StandardTable
                     scroll={{ x: 1300 }}

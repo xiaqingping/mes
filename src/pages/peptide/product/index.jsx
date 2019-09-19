@@ -25,6 +25,7 @@ const { Option } = Select;
  */
 @Form.create()
 class Search extends Component {
+
   componentDidMount() {
     this.submit();
   }
@@ -43,6 +44,7 @@ class Search extends Component {
   renderForm = () => {
     const {
       form: { getFieldDecorator },
+      purityValue,
     } = this.props;
     return (
       <Form onSubmit={this.submit} layout="inline">
@@ -54,7 +56,12 @@ class Search extends Component {
         </Col>
         <Col lg={6} md={8} sm={12}>
           <FormItem label="纯度">
-            {getFieldDecorator('purity')(<Input />)}
+            {getFieldDecorator('purity')(<Select
+                  >
+                    {purityValue.map((item) => {
+                      <Option value={item.id}>{item.purity}</Option>
+                    })}
+                  </Select>)}
           </FormItem>
         </Col>
         <Col lg={6} md={8} sm={12}>
@@ -148,8 +155,9 @@ class Product extends Component {
     selectedRows: [],
     editIndex: -1,
     id: 0, // 新增数据时，提供负数id
+    purityValue:[],
   }
-
+  
   columns = [
     {
       title: '编号',
@@ -170,11 +178,39 @@ class Product extends Component {
       title: '提供总量至',
       dataIndex: 'providerTotalAmountEnd',
       width: 100,
+      editable: true,
+      inputType: <Input />,
+      rules: [
+        { required: true, message: '必填' },
+      ],
     },
     {
       title: '纯度',
       dataIndex: 'purityID',
       width: 100,
+      editable: true,
+      inputType: <Select
+                    showSearch
+                    style={{ width: 100 }}
+                    placeholder="Select a person"
+                  >
+                    <Option value="jack">Jack</Option>
+                    <Option value="lucy">Lucy</Option>
+                    <Option value="tom">Tom</Option>
+                  </Select>,
+      rules: [
+        { required: true, message: '必填' },
+      ],
+      render: (text) => {
+        const {purityValue} = this.state;
+        let val = null;
+        purityValue.map((item) => {
+          if (item.id == text) {
+            val = item.purity
+          }
+        })
+        return val;
+      }
     },
     {
       title: '长度从',
@@ -243,7 +279,12 @@ class Product extends Component {
   ];
 
   componentDidMount() {
-    //
+    api.peptideBase.getPurityAll().then(res => {
+      console.log(res)
+      this.setState({
+        purityValue: res
+      })
+    })
   }
 
   // 分页
@@ -347,57 +388,6 @@ class Product extends Component {
     });
   }
 
-  renderForm() {
-    const { form } = this.props;
-    const { getFieldDecorator } = form;
-    return (
-      <Form onSubmit={this.handleSearch} layout="inline">
-        <Row gutter={{ lg: 24, md: 12, sm: 6 }}>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="编号">
-              {getFieldDecorator('code')(<Input />)}
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="纯度">
-              {getFieldDecorator('purity')(<Input />)}
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="类型">
-            {getFieldDecorator('aminoAcidType', { initialValue: '' })(
-                <Select>
-                  <Option value="">全部</Option>
-                  <Option value="L">L</Option>
-                  <Option value="D">D</Option>
-                </Select>)}
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="状态">
-            {getFieldDecorator('status', { initialValue: '1' })(
-                <Select>
-                  <Option value="0">全部</Option>
-                  <Option value="1">正常</Option>
-                  <Option value="2">已删除</Option>
-                </Select>)}
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <span className="submitButtons">
-              <Button type="primary" htmlType="submit">
-                查询
-              </Button>
-              <Button style={{ marginLeft: 8 }} onClick={this.handleFormReset}>
-                重置
-              </Button>
-            </span>
-          </Col>
-        </Row>
-      </Form>
-    );
-  }
-
   render() {
     const {
       formValues: { page: current, rows: pageSize },
@@ -405,6 +395,7 @@ class Product extends Component {
       list,
       total,
       loading,
+      purityValue
     } = this.state;
     const data = { list, pagination: { current, pageSize, total } };
 
@@ -435,7 +426,7 @@ class Product extends Component {
       <PageHeaderWrapper>
         <Card bordered={false}>
           <div className="tableList">
-            <Search getTableData={this.getTableData} />
+            <Search getTableData={this.getTableData}  purityValue={purityValue.map((item) => {return item})}/>
             <div className="tableListOperator">
               <Button icon="plus" type="primary" onClick={() => this.handleAdd()}>
                 新建

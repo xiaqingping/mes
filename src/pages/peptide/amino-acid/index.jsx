@@ -15,6 +15,7 @@ import React, { Component, Fragment } from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import StandardTable from '@/components/StandardTable';
 import api from '@/api';
+import './style.less'
 
 const EditableContext = React.createContext();
 const FormItem = Form.Item;
@@ -160,26 +161,31 @@ class Order extends Component {
       title: '亲水性',
       dataIndex: 'hydrophilic',
       width: 100,
+      render: text => (text === 1 ? '√' : ''),
     },
     {
       title: '疏水性',
       dataIndex: 'hydrophobic',
       width: 100,
+      render: text => (text === 1 ? '√' : ''),
     },
     {
       title: '酸性',
       dataIndex: 'acidic',
       width: 100,
+      render: text => (text === 1 ? '√' : ''),
     },
     {
       title: '碱性',
       dataIndex: 'alkaline',
       width: 100,
+      render: text => (text === 1 ? '√' : ''),
     },
     {
       title: '是否可做二硫键',
       dataIndex: 'isCanDisulfideBond',
       width: 230,
+      render: text => (text === 1 ? '√' : ''),
     },
     {
       title: '分子量',
@@ -234,54 +240,84 @@ class Order extends Component {
       title: '删除人',
       dataIndex: 'cancelName',
       width: 100,
+      render: text => {
+        console.log(text)
+        if (text) {
+          return <Fragment>
+            <span>{text[0]}</span>
+            <Divider type="horizontal" style={{ margin: 0 }}/>
+            <span>{text[1]}</span>
+        </Fragment>
+        }
+      },
     },
     {
       title: '删除时间',
       dataIndex: 'cancelDate',
       width: 300,
+      render: text => {
+        console.log(text)
+        if (text) {
+          return <Fragment>
+            <span>{text[0]}</span>
+            <Divider type="horizontal" style={{ margin: 0 }}/>
+            <span>{text[1]}</span>
+        </Fragment>
+        }
+      },
     },
     {
       title: '类型',
       dataIndex: 'aminoAcidType',
       width: 100,
       align: 'center',
-      render: text => (
-        <Fragment>
-          <span>{text[0]}</span>
-          <Divider type="horizontal" style={{ margin: 0 }}/>
-          <span>{text[1]}</span>
+      render: text => {
+        console.log(text)
+        if (text) {
+          return <Fragment>
+            <span>{text[0]}</span>
+            <Divider type="horizontal" style={{ margin: 0 }}/>
+            <span>{text[1]}</span>
         </Fragment>
-      ),
+        }
+      },
     },
     {
       title: '长代码',
       dataIndex: 'longCode',
       width: 100,
       align: 'center',
-      render: text => (
-        <Fragment>
-          <span>{text[0]}</span>
-          <Divider type="horizontal" style={{ margin: 0 }}/>
-          <span>{text[1]}</span>
+      render: text => {
+        console.log(text)
+        if (text) {
+          return <Fragment>
+            <span>{text[0]}</span>
+            <Divider type="horizontal" style={{ margin: 0 }}/>
+            <span>{text[1]}</span>
         </Fragment>
-      ),
+        }
+      },
     },
     {
       title: '短代码',
       dataIndex: 'shortCode',
       width: 100,
       align: 'center',
-      render: text => (
-        <Fragment>
-          <span>{text[0]}</span>
-          <Divider type="horizontal" style={{ margin: 0 }}/>
-          <span>{text[1]}</span>
+      render: text => {
+        console.log(text)
+        if (text) {
+          return <Fragment>
+            <span>{text[0]}</span>
+            <Divider type="horizontal" style={{ margin: 0 }}/>
+            <span>{text[1]}</span>
         </Fragment>
-      ),
+        }
+      },
     },
     {
       title: '操作',
       width: 150,
+      align:'center',
       fixed: 'right',
       render: (value, row, index) => {
         const { editIndex } = this.state;
@@ -376,13 +412,15 @@ class Order extends Component {
           for (let j = 0; j < dest.length; j++) {
             const dj = dest[j];
             if (dj.id === ai.id) {
-              dj.shortCode = [dj.shortCode, ai.shortCode];
+              dj.cancelName = dj.cancelName || ai.cancelName ?  [dj.cancelName, ai.cancelName] : '';
+              dj.cancelDate = dj.cancelDate || ai.cancelDate ?  [dj.cancelDate, ai.cancelDate] : '';
+              dj.shortCode = dj.shortCode || ai.shortCode ?  [dj.shortCode, ai.shortCode] : '';
               // dj.shortCode = (dj.shortCode ? dj.shortCode : '')
               // + (ai.shortCode ? ` | ${ai.shortCode}` : '');
-              dj.longCode = [dj.longCode, ai.longCode];
+              dj.longCode = dj.longCode || ai.longCode ?  [dj.longCode, ai.longCode] : '';
               // dj.longCode = (dj.longCode ? dj.longCode : '')
               // + (ai.longCode ? ` | ${ai.longCode}` : '');
-              dj.aminoAcidType = [dj.aminoAcidType, ai.aminoAcidType]
+              dj.aminoAcidType = dj.aminoAcidType || ai.aminoAcidType ?  [dj.aminoAcidType, ai.aminoAcidType] : '';
               // dj.aminoAcidType = (dj.aminoAcidType ? dj.aminoAcidType : '')
               // + (ai.aminoAcidType ? ` | ${ai.aminoAcidType}` : '');
               break;
@@ -510,6 +548,7 @@ class Order extends Component {
             </div>
             <EditableContext.Provider value={this.props.form}>
               <StandardTable
+                className="mytables"
                 scroll={{ x: 2500 }}
                 rowClassName="editable-row"
                 components={components}
