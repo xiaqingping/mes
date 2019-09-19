@@ -124,7 +124,7 @@ class Type extends Component {
     return (
       <Card
         bordered={false}
-        style={{ width: '100%', marginBottom: '24px' }}
+        style={{ marginBottom: '24px' }}
         tabList={tabListNoTitle}
         activeTabKey={this.state.noTitleKey}
         onTabChange={key => {

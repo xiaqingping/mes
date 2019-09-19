@@ -110,7 +110,7 @@ class CustomerEdit extends Component {
         <SalesScope></SalesScope>
         <Credit></Credit>
         <Authentication></Authentication>
-        <Card title="收货地址" bordered={false} style={{ paddingBottom: '50px' }}>
+        <Card title="收货地址" bordered={false}>
           {getFieldDecorator('addressList', {
             initialValue: { data: addressList },
           })(<Address />)}
@@ -176,7 +176,9 @@ class CustomerEdit extends Component {
           },
         ]}
       >
-        {this.renderContent()}
+        <div style={{ paddingBottom: 50 }}>
+          {this.renderContent()}
+        </div>
         <FooterToolbar style={{ width }}>
           <Button>取消</Button>
           <Button type="primary" onClick={this.validate}>提交</Button>
