@@ -8,7 +8,6 @@ import {
 } from 'antd';
 import React, { PureComponent } from 'react';
 import { formatMessage } from 'umi-plugin-react/locale';
-import { isEqual } from 'lodash';
 import { EmailInput, NameInput, MobileTelephoneInput, TelphoneInput, AddressInput } from '@/components/CustomizedFormControls';
 
 import styles from '../style.less';
@@ -17,11 +16,7 @@ const FormItem = Form.Item;
 const { Option } = Select;
 
 class BasicInfo extends PureComponent {
-  static getDerivedStateFromProps(nextProps, preState) {
-    if (isEqual(nextProps.value, preState.value)) {
-      return null;
-    }
-
+  static getDerivedStateFromProps(nextProps) {
     return {
       ...nextProps.value,
     };
@@ -76,10 +71,10 @@ class BasicInfo extends PureComponent {
       form: { getFieldDecorator },
     } = this.props;
     const { name, email } = this.state;
-    const MobileDisabled = name.select === 2;
+    const MobileDisabled = name && name.select === 2;
 
     return (
-      <Form layout="vertical" className={styles['sangon-form']}>
+      <Form layout="vertical" className={styles.sangonForm}>
         <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
           <Col md={6} sm={12}>
             <FormItem label="名称">
