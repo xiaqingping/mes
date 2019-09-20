@@ -1,10 +1,11 @@
 import {
-  Card,
+  Button,
   Form,
   Row,
   Col,
   Select,
   Switch,
+  Tabs,
 } from 'antd';
 import React, { Component } from 'react';
 import BillToParty from './BillToParty';
@@ -12,60 +13,30 @@ import SoldToParty from './SoldToParty';
 import ShipToParty from './ShipToParty';
 import Salesperson from './Salesperson';
 
+import styles from '../style.less';
+
 const FormItem = Form.Item;
 const { Option } = Select;
-
-const tabListNoTitle = [
-  {
-    key: '1',
-    tab: '生工国内电商',
-  },
-  {
-    key: '2',
-    tab: '生工国外电商',
-  },
-  {
-    key: '3',
-    tab: '生工国内直销',
-  },
-  {
-    key: '4',
-    tab: '生工国外直销',
-  },
-];
-
-const list = {
-  BillToParty: <BillToParty />,
-  SoldToParty: <SoldToParty />,
-  ShipToParty: <ShipToParty />,
-  Salesperson: <Salesperson />,
-};
+const { TabPane } = Tabs;
 
 class BasicInfo extends Component {
   state = {
-    key1: '1',
-    key2: 'BillToParty',
+    salesScope: [
+      { key: 1 },
+    ],
   }
 
   onTabChange = obj => {
     this.setState(obj);
   }
 
-  render() {
+  renderTabPane = obj => {
     const {
       form: { getFieldDecorator },
     } = this.props;
 
     return (
-      <Card
-        bordered={false}
-        style={{ width: '100%', marginBottom: '24px' }}
-        tabList={tabListNoTitle}
-        activeTabKey={this.state.key1}
-        onTabChange={key => {
-          this.onTabChange({ key1: key });
-        }}
-      >
+      <TabPane tab="生工国内电商" key="1">
         <Form>
           <Row gutter={32}>
             <Col span={3}>
@@ -116,21 +87,55 @@ class BasicInfo extends Component {
             </Col>
           </Row>
         </Form>
-        <Card
-          tabList={[
-            { key: 'BillToParty', tab: '开票方' },
-            { key: 'SoldToParty', tab: '售达方' },
-            { key: 'ShipToParty', tab: '送达方' },
-            { key: 'Salesperson', tab: '销售员' },
-          ]}
-          activeTabKey={this.state.key2}
-          onTabChange={key => {
-            this.onTabChange({ key2: key });
-          }}
-        >
-          {list[this.state.key2]}
-        </Card>
-      </Card>
+        <Tabs className={styles.internalTab}>
+          <TabPane tab="开票方" key="BillToParty">
+            <BillToParty />
+          </TabPane>
+          <TabPane tab="售达方" key="SoldToParty">
+            <SoldToParty />
+          </TabPane>
+          <TabPane tab="送达方" key="ShipToParty">
+            <ShipToParty />
+          </TabPane>
+          <TabPane tab="销售员" key="Salesperson">
+            <Salesperson />
+          </TabPane>
+        </Tabs>
+      </TabPane>
+    );
+  }
+
+  selectSalesScope = value => {
+    console.log(value);
+  }
+
+  renderSelect = () => {
+    const list = [
+      { value: '1', title: '生工国内电商' },
+      { value: '2', title: '生工国外电商' },
+      { value: '3', title: '生工国内直销' },
+      { value: '4', title: '生工国外直销' },
+    ];
+    return (
+      <Select
+        style={{ marginRight: 24, width: 130 }}
+        placeholder="销售范围"
+        onSelect={this.selectSalesScope}
+      >
+        {list.map(e => <Option value={e.value} key={e.value}>{e.title}</Option>)}
+      </Select>
+    );
+  }
+
+  render() {
+    const { salesScope } = this.state;
+    return (
+      <Tabs
+        className={styles.externalTab}
+        tabBarExtraContent={this.renderSelect()}
+      >
+        { salesScope.length > 0 ? salesScope.map(e => this.renderTabPane(e)) : <TabPane tab="空" key="null"></TabPane> }
+      </Tabs>
     );
   }
 }

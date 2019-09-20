@@ -4,7 +4,6 @@ import {
   Button,
 } from 'antd';
 import React, { Component } from 'react';
-import { connect } from 'dva';
 
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import FooterToolbar from '@/components/FooterToolbar';
@@ -17,15 +16,15 @@ import Address from './components/Address';
 import Type1 from './components/Type1';
 import Bank from './components/Bank';
 
-@connect(({ listTableList, loading }) => ({
-  listTableList,
-  loading: loading.models.rule,
-}))
 class CustomerEdit extends Component {
   state = {
     width: '100%',
     tabActiveKey: 'customer',
-    details: {
+    details: {},
+  };
+
+  componentDidMount() {
+    const details = {
       basicInfo: {
         name: {
           select: 1,
@@ -43,16 +42,14 @@ class CustomerEdit extends Component {
         },
         {
           id: 2,
-          name: 'name',
+          name: 'name2',
           telephone: '18735818888',
           postcode: '123456',
           address: '上海市松江区香闵路698号',
         },
       ],
-    },
-  };
-
-  componentDidMount() {
+    };
+    this.setState({ details });
     window.addEventListener('resize', this.resizeFooterToolbar, { passive: true });
     this.resizeFooterToolbar();
   }
@@ -75,16 +72,8 @@ class CustomerEdit extends Component {
   };
 
   onTabChange = tabActiveKey => {
-    const { dispatch } = this.props;
     this.setState({
       tabActiveKey,
-    });
-
-    dispatch({
-      type: 'partner_maintain/setDetails',
-      payload: {
-        title: '1',
-      },
     });
   };
 
@@ -104,11 +93,11 @@ class CustomerEdit extends Component {
   }
 
   // 客户
-  renderCustomer = () => {
+  renderCustomer = details => {
     const {
       form: { getFieldDecorator },
     } = this.props;
-    const { details: { addressList, basicInfo } } = this.state;
+    const { basicInfo, addressList } = details;
 
     return (
       <>
@@ -121,7 +110,7 @@ class CustomerEdit extends Component {
         <SalesScope></SalesScope>
         <Credit></Credit>
         <Authentication></Authentication>
-        <Card title="收货地址" bordered={false} style={{ paddingBottom: '50px' }}>
+        <Card title="收货地址" bordered={false}>
           {getFieldDecorator('addressList', {
             initialValue: { data: addressList },
           })(<Address />)}
@@ -131,11 +120,11 @@ class CustomerEdit extends Component {
   }
 
   // 供应商
-  renderSupplier = () => {
+  renderSupplier = details => {
     const {
       form: { getFieldDecorator },
     } = this.props;
-    const { details: { basicInfo } } = this.state;
+    const { basicInfo } = details;
     return (
       <>
         <Card title="基础信息" bordered={false} style={{ marginBottom: '24px' }}>
@@ -150,12 +139,25 @@ class CustomerEdit extends Component {
     );
   }
 
+  renderContent = () => {
+    const { tabActiveKey, details } = this.state;
+
+    switch (tabActiveKey) {
+      case 'customer':
+         return this.renderCustomer(details);
+
+      case 'supplier':
+        return this.renderSupplier(details);
+
+      default:
+          break;
+    }
+
+    return null;
+  }
+
   render() {
     const { width, tabActiveKey } = this.state;
-    const contentList = {
-      customer: this.renderCustomer(),
-      supplier: this.renderSupplier(),
-    };
 
     return (
       <PageHeaderWrapper
@@ -174,7 +176,9 @@ class CustomerEdit extends Component {
           },
         ]}
       >
-        {contentList[tabActiveKey]}
+        <div style={{ paddingBottom: 50 }}>
+          {this.renderContent()}
+        </div>
         <FooterToolbar style={{ width }}>
           <Button>取消</Button>
           <Button type="primary" onClick={this.validate}>提交</Button>
