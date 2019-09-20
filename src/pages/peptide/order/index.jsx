@@ -296,7 +296,6 @@ class Order extends Component {
   }
 
 
-
   handleFormReset = () => {
     this.props.form.resetFields();
   };
@@ -331,22 +330,22 @@ class Order extends Component {
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="客户">
-              {getFieldDecorator('customerCode')(<Search  onSearch={value => console.log(value)} />)}
+              {getFieldDecorator('customerCode')(<Search onSearch={value => console.log(value)} />)}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="负责人">
-            {getFieldDecorator('subCustomerCode')(<Search  onSearch={value => console.log(value)} />)}
+            {getFieldDecorator('subCustomerCode')(<Search onSearch={value => console.log(value)} />)}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="订货人">
-            {getFieldDecorator('contactCode')(<Search  onSearch={value => console.log(value)} />)}
+            {getFieldDecorator('contactCode')(<Search onSearch={value => console.log(value)} />)}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="销售员">
-            {getFieldDecorator('salerCode')(<Search  onSearch={value => console.log(value)} />)}
+            {getFieldDecorator('salerCode')(<Search onSearch={value => console.log(value)} />)}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
@@ -437,22 +436,22 @@ class Order extends Component {
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="客户">
-              {getFieldDecorator('customerCode')(<Search  onSearch={value => console.log(value)} />)}
+              {getFieldDecorator('customerCode')(<Search onSearch={value => console.log(value)} />)}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="负责人">
-            {getFieldDecorator('subCustomerCode')(<Search  onSearch={value => console.log(value)} />)}
+            {getFieldDecorator('subCustomerCode')(<Search onSearch={value => console.log(value)} />)}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="订货人">
-            {getFieldDecorator('contactCode')(<Search  onSearch={value => console.log(value)} />)}
+            {getFieldDecorator('contactCode')(<Search onSearch={value => console.log(value)} />)}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="销售员">
-            {getFieldDecorator('salerCode')(<Search  onSearch={value => console.log(value)} />)}
+            {getFieldDecorator('salerCode')(<Search onSearch={value => console.log(value)} />)}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>

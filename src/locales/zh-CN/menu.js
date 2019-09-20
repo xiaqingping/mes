@@ -32,4 +32,10 @@ export default {
   'menu.system.sources': '资源',
   'menu.system.rule': '规则',
   'menu.system.group': '分组',
+  'menu.purchase': '采购管理',
+  'menu.purchase.order': '采购订单',
+  'menu.purchase.apply': '采购申请',
+  'menu.purchase.payment': '付款申请',
+  'menu.purchase.bank': '银行科目',
+  'menu.purchase.supplier': '供应商科目',
 };

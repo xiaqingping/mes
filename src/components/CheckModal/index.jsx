@@ -91,10 +91,10 @@ const idenData = [
     content: [
       {
         src: '/favicon.png',
-        id: 111111111,
+        key: 111111111,
       }, {
         src: '/icons/icon-128x128.png',
-        id: 222222222222,
+        key: 222222222222,
       },
       ],
   },
@@ -241,7 +241,7 @@ class CheckModal extends React.Component {
     <ul className={styles.contenList}>
       {
         changeData.map(mes => <li key={mes.id}>{mes.titel}：{
-          mes.id === 16 ? <>{mes.content.map(img => <><img className={styles.imgStyle} key={img.id} src={img.src} alt="认证附件"/></>)}</> : <> {mes.content}</>
+          mes.id === 16 ? <>{mes.content.map(img => <><img className={styles.imgStyle} key={img.key} src={img.src} alt="认证附件"/></>)}</> : <> {mes.content}</>
         } {
           (mes.id === 4) && <>
           &nbsp;&nbsp;&nbsp;&nbsp; { actionResent }

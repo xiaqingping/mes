@@ -30,4 +30,10 @@ export default {
   'menu.system.sources': '资源',
   'menu.system.rule': '规则',
   'menu.system.group': '分组',
+  'menu.purchase': 'Purchase',
+  'menu.purchase.order': 'Purchase Order',
+  'menu.purchase.apply': 'Purchase Apply',
+  'menu.purchase.payment': 'Payment Apply',
+  'menu.purchase.bank': 'Bank Subjects',
+  'menu.purchase.supplier': 'Supplier Subjects',
 };

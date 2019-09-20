@@ -3,6 +3,7 @@ const personel = require('./personel');
 const partner = require('./partner');
 const peptide = require('./peptide')
 const system = require('./system');
+const purchase = require('./purchase');
 
 module.exports = [
   {
@@ -39,7 +40,11 @@ module.exports = [
           partner,
           peptide,
           system,
+<<<<<<< HEAD
           personel,
+=======
+          purchase,
+>>>>>>> develop
           {
             component: './404',
           },
