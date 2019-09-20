@@ -39,18 +39,6 @@ const status = {
   },
 };
 
-function renderOption(item) {
-  return (
-    <Option key={item.value} text={item.value}>
-      <div style={{ display: 'flex' }}>
-        <span><Icon type="user" /></span>&nbsp;&nbsp;
-        <span>{item.code}</span>&nbsp;&nbsp;
-        <span>{item.value}</span>
-      </div>
-    </Option>
-  );
-}
-
 class Operation extends React.Component {
   state = {
     pagination: {
@@ -64,53 +52,30 @@ class Operation extends React.Component {
     detailsVisible: false,
     detailsValue: null,
     // editIndex: -1,
-    typeValue: [],
-    partnerVal: [],
   };
 
   data = {
     huoban: [
-      {
-      id: 1,
-      code: '100',
-      value: '张1',
-    },
-    {
-      id: 2,
-      code: '101',
-      value: '张2',
-    },
-    {
-      id: 3,
-      code: '102',
-      value: '张3',
-    },
-    {
-      id: 4,
-      code: '103',
-      value: '张4',
-    },
-    {
-      id: 5,
-      code: '104',
-      value: '张5',
-    },
-    {
-      id: 6,
-      code: '105',
-      value: '张6',
-    },
-    {
-      id: 7,
-      code: '106',
-      value: '张7',
-    },
-  ],
+      '13012345678 张三',
+      '13112345678 张三',
+      '13212345678 张三',
+      '13312345678 张三',
+      '13412345678 张三',
+      '13512345678 张三',
+      '13612345678 张三',
+      '13712345678 张三',
+      '13812345678 张三',
+      '13912345678 张三',
+      '17112345678 张三',
+      '17212345678 张三',
+      '17312345678 张三',
+      '17412345678 张三',
+      '17512345678 张三',
+      '17612345678 张三',
+      '17712345678 张三',
+      '17812345678 张三',
+    ],
   };
-
-  val = [];
-
-  select = false;
 
   columns = [
     {
@@ -138,18 +103,6 @@ class Operation extends React.Component {
           text: '修改',
         },
       ],
-      filteredValue: this.state.typeValue,
-      onFilter: (value, record) => {
-        this.changeTypeValue(value)
-      },
-      onFilterDropdownVisibleChange: e => {
-        if (e) {
-          this.val = [];
-        } else if (!this.select) {
-            this.setState({ typeValue: [] })
-          }
-          this.select = false
-      },
       render(text) {
         return text === 1 ? '新建' : '修改'
     },
@@ -204,9 +157,6 @@ class Operation extends React.Component {
   componentDidMount() {
     // this.getTableData();
     this.getData();
-    this.setState({
-      partnerVal: this.data.huoban,
-    })
   }
 
   showDrawer = (record, e) => {
@@ -214,21 +164,6 @@ class Operation extends React.Component {
     this.setState({
       detailsVisible: true,
       detailsValue: record,
-    })
-  }
-
-
-  changeTypeValue = e => {
-    this.select = true;
-    if (typeof e === 'string') {
-      if (this.val.indexOf(e) < 0) {
-        this.val.push(e)
-      }
-    } else {
-      this.val = e;
-    }
-     this.setState({
-      typeValue: this.val,
     })
   }
 
@@ -302,13 +237,11 @@ class Operation extends React.Component {
   //   });
   // }
 
-  // 重置
   handleFormReset = () => {
     this.props.form.resetFields();
   };
 
   toggleForm = () => {
-    console.log(this.state.typeValue)
     const { expandForm } = this.state;
     this.setState({
       expandForm: !expandForm,
@@ -320,34 +253,14 @@ class Operation extends React.Component {
     return expandForm ? this.renderAdvancedForm() : this.renderSimpleForm();
   };
 
-  // 业务伙伴筛选
-  inputValue = value => {
-    const arr = []
-    if (!value) {
-      return false
-    }
-    this.data.huoban.map(item => {
-      if (item.value.indexOf(value) !== -1) {
-        arr.push(item);
-      }
-      if (item.code.indexOf(value) !== -1 && arr.indexOf(item)) { arr.push(item); }
-    })
-    this.setState({
-      partnerVal: arr,
-      // allowClear: 'ture',
-    });
-  }
-
-  // 清楚按钮
-  inputKeyUp =e => {
-    console.log(e.keyCode);
+  selectValue = (value, option) => {
+    console.log('onSelect', value);
   }
 
   renderAdvancedForm() {
     const {
       form: { getFieldDecorator },
     } = this.props;
-    const { typeValue, partnerVal } = this.state;
     return (
       <Form onSubmit={this.handleSearch} layout="inline">
         <Row gutter={{ lg: 24, md: 12, sm: 6 }}>
@@ -357,20 +270,17 @@ class Operation extends React.Component {
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
-          <FormItem label="业务伙伴">
+            <FormItem label="业务伙伴">
               {getFieldDecorator('yewuhuoban')(
-              <AutoComplete
-                onSearch={this.inputValue}
-                dataSource={partnerVal.map(renderOption)}
-                placeholder="请输入"
-                optionLabelProp="text"
-                />)}
+              <AutoComplete dataSource={this.data.huoban} placeholder="请输入" filterOption={(inputValue, option) =>
+                option.props.children.indexOf(inputValue) !== -1
+              } />)}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="类型">
-              {getFieldDecorator('type', typeValue ? { initialValue: typeValue } : 'type')(
-                <Select mode="multiple" onChange={e => this.changeTypeValue(e)}>
+              {getFieldDecorator('type')(
+                <Select mode="multiple">
                   <Option value="1">新建</Option>
                   <Option value="2">修改</Option>
                 </Select>,
@@ -417,7 +327,6 @@ class Operation extends React.Component {
   renderSimpleForm() {
     const { form } = this.props;
     const { getFieldDecorator } = form;
-    const { typeValue, partnerVal } = this.state;
     return (
       <Form onSubmit={this.handleSearch} layout="inline">
         <Row gutter={{ lg: 24, md: 12, sm: 6 }}>
@@ -430,18 +339,17 @@ class Operation extends React.Component {
           <FormItem label="业务伙伴">
               {getFieldDecorator('yewuhuoban')(
               <AutoComplete
-                allowClear
-                onSearch={this.inputValue}
-                dataSource={partnerVal.map(renderOption)}
-                placeholder="请输入"
-                optionLabelProp="value"
-                />)}
+                onSelect={(value, option) => this.selectValue(value, option)}
+                dataSource={this.data.huoban} placeholder="请输入"
+                filterOption={(inputValue, option) =>
+                  option.props.children.indexOf(inputValue) !== -1
+              } />)}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="类型">
-              {getFieldDecorator('type', typeValue ? { initialValue: typeValue } : 'type')(
-                <Select mode="multiple" onChange={e => this.changeTypeValue(e)}>
+              {getFieldDecorator('type')(
+                <Select mode="multiple">
                   <Option value="1">新建</Option>
                   <Option value="2">修改</Option>
                 </Select>,

@@ -55,9 +55,8 @@ class BasicInfo extends Component {
           <DescriptionsItem span={6} label="通讯地址">上海市松江区上海市松江区上海市松江区</DescriptionsItem>
           <DescriptionsItem span={2} label="销售冻结"><Badge status="error"/>&nbsp;&nbsp;冻结</DescriptionsItem>
         </Descriptions>
-        <CheckPhone phoneShow={phoneShow} />
-        <CheckEmail emailShow={emailShow}/>
-        {/* <CheckEmail emailShow={emailShow} proceed="true" emailAccount="123456@qq.com" /> */}
+        <CheckPhone phoneShow={phoneShow}></CheckPhone>
+        <CheckEmail emailShow={emailShow}></CheckEmail>
       </Card>
     );
   }
