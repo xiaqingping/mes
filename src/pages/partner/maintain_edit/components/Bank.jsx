@@ -119,7 +119,6 @@ class Bank extends Component {
     return (
       <Card
         bordered={false}
-        style={{ width: '100%', marginBottom: '24px' }}
         tabList={tabListNoTitle}
         activeTabKey={this.state.tabKey}
         onTabChange={key => {

@@ -15,9 +15,15 @@ class SecurityLayout extends React.Component {
     const { dispatch } = this.props;
 
     if (dispatch) {
+      // TODO: 获取当前用户信息
       dispatch({
         type: 'user/fetchCurrent',
       });
+      // console.log(JSON.parse(localStorage.getItem('user')));
+      // dispatch({
+      //   type: 'user/saveCurrent',
+      //   paylod: JSON.parse(localStorage.getItem('user')),
+      // });
     }
   }
 
@@ -25,11 +31,11 @@ class SecurityLayout extends React.Component {
     const { isReady } = this.state;
     const { children, loading, currentUser } = this.props;
 
-    if ((!currentUser.userid && loading) || !isReady) {
+    if ((!currentUser.authorization && loading) || !isReady) {
       return <PageLoading />;
     }
 
-    if (!currentUser.userid) {
+    if (!currentUser.authorization) {
       return <Redirect to="/user/login"></Redirect>;
     }
 
