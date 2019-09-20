@@ -1,4 +1,5 @@
 const seq = require('./seq');
+const personel = require('./personel');
 const partner = require('./partner');
 const peptide = require('./peptide')
 const system = require('./system');
@@ -39,6 +40,7 @@ module.exports = [
           partner,
           peptide,
           system,
+          personel,
           purchase,
           {
             component: './404',
