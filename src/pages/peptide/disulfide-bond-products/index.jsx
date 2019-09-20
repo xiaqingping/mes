@@ -144,7 +144,7 @@ class DisulfideBondProducts extends Component {
     {
       title: '氨基酸类型1',
       dataIndex: 'aminoAcidTypeLeft',
-      width: 100,
+      width: 120,
       editable: true,
       inputType: <Input />,
       rules: [
@@ -154,7 +154,7 @@ class DisulfideBondProducts extends Component {
     {
       title: '氨基酸类型2',
       dataIndex: 'aminoAcidTypeRight',
-      width: 100,
+      width: 120,
     },
     {
       title: '提供总量从',
@@ -185,12 +185,12 @@ class DisulfideBondProducts extends Component {
     {
       title: '产品编号',
       dataIndex: 'sapProductCode',
-      width: 100,
+      width: 150,
     },
     {
       title: '产品名称',
       dataIndex: 'sapProductName',
-      width: 300,
+      width: 320,
     },
     {
       title: '状态',
@@ -224,7 +224,8 @@ class DisulfideBondProducts extends Component {
     },
     {
       title: '操作',
-      width: 200,
+      width: 150,
+      fixed: 'right',
       render: (value, row, index) => {
         const { editIndex } = this.state;
         let actions;
@@ -458,7 +459,7 @@ class DisulfideBondProducts extends Component {
             </div>
             <EditableContext.Provider value={this.props.form}>
               <StandardTable
-                scroll={{ x: 3300 }}
+                scroll={{ x: 2200 }}
                 rowClassName="editable-row"
                 components={components}
                 selectedRows={selectedRows}

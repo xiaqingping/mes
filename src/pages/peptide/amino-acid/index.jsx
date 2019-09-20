@@ -156,6 +156,11 @@ class Order extends Component {
       title: '名称',
       dataIndex: 'name',
       width: 100,
+      editable: true,
+      inputType: <Input />,
+      rules: [
+        { required: true, message: '必填' },
+      ],
     },
     {
       title: '亲水性',
@@ -211,7 +216,11 @@ class Order extends Component {
       title: '状态',
       dataIndex: 'status',
       width: 100,
-      render: text => (text === 1 ? '正常' : '已删除'),
+      render: text => {
+        if (text === 1) return '正常';
+        if (text === 2) return '已删除';
+        return ''
+      },
     },
     {
       title: '创建人',
@@ -241,14 +250,12 @@ class Order extends Component {
       dataIndex: 'cancelName',
       width: 100,
       render: text => {
-        console.log(text)
-        if (text) {
-          return <Fragment>
-            <span>{text[0]}</span>
-            <Divider type="horizontal" style={{ margin: 0 }}/>
-            <span>{text[1]}</span>
-        </Fragment>
-        }
+        if (!text) return false;
+        return (<Fragment>
+                  <span>{text[0]}</span>
+                  <Divider type="horizontal" style={{ margin: 0 }}/>
+                  <span>{text[1]}</span>
+              </Fragment>)
       },
     },
     {
@@ -256,14 +263,12 @@ class Order extends Component {
       dataIndex: 'cancelDate',
       width: 300,
       render: text => {
-        console.log(text)
-        if (text) {
-          return <Fragment>
-            <span>{text[0]}</span>
-            <Divider type="horizontal" style={{ margin: 0 }}/>
-            <span>{text[1]}</span>
-        </Fragment>
-        }
+        if (!text) return false;
+        return (<Fragment>
+                  <span>{text[0]}</span>
+                  <Divider type="horizontal" style={{ margin: 0 }}/>
+                  <span>{text[1]}</span>
+              </Fragment>)
       },
     },
     {
@@ -272,14 +277,12 @@ class Order extends Component {
       width: 100,
       align: 'center',
       render: text => {
-        console.log(text)
-        if (text) {
-          return <Fragment>
-            <span>{text[0]}</span>
-            <Divider type="horizontal" style={{ margin: 0 }}/>
-            <span>{text[1]}</span>
-        </Fragment>
-        }
+        if (!text) return false;
+        return (<Fragment>
+                  <span>{text[0]}</span>
+                  <Divider type="horizontal" style={{ margin: 0 }}/>
+                  <span>{text[1]}</span>
+              </Fragment>)
       },
     },
     {
@@ -288,14 +291,12 @@ class Order extends Component {
       width: 100,
       align: 'center',
       render: text => {
-        console.log(text)
-        if (text) {
-          return <Fragment>
-            <span>{text[0]}</span>
-            <Divider type="horizontal" style={{ margin: 0 }}/>
-            <span>{text[1]}</span>
-        </Fragment>
-        }
+        if (!text) return false;
+        return (<Fragment>
+                  <span>{text[0]}</span>
+                  <Divider type="horizontal" style={{ margin: 0 }}/>
+                  <span>{text[1]}</span>
+              </Fragment>)
       },
     },
     {
@@ -304,20 +305,18 @@ class Order extends Component {
       width: 100,
       align: 'center',
       render: text => {
-        console.log(text)
-        if (text) {
-          return <Fragment>
-            <span>{text[0]}</span>
-            <Divider type="horizontal" style={{ margin: 0 }}/>
-            <span>{text[1]}</span>
-        </Fragment>
-        }
+        if (!text) return false;
+        return (<Fragment>
+                  <span>{text[0]}</span>
+                  <Divider type="horizontal" style={{ margin: 0 }}/>
+                  <span>{text[1]}</span>
+              </Fragment>)
       },
     },
     {
       title: '操作',
       width: 150,
-      align:'center',
+      align: 'center',
       fixed: 'right',
       render: (value, row, index) => {
         const { editIndex } = this.state;
@@ -412,15 +411,15 @@ class Order extends Component {
           for (let j = 0; j < dest.length; j++) {
             const dj = dest[j];
             if (dj.id === ai.id) {
-              dj.cancelName = dj.cancelName || ai.cancelName ?  [dj.cancelName, ai.cancelName] : '';
-              dj.cancelDate = dj.cancelDate || ai.cancelDate ?  [dj.cancelDate, ai.cancelDate] : '';
-              dj.shortCode = dj.shortCode || ai.shortCode ?  [dj.shortCode, ai.shortCode] : '';
+              dj.cancelName = dj.cancelName || ai.cancelName ? [dj.cancelName, ai.cancelName] : '';
+              dj.cancelDate = dj.cancelDate || ai.cancelDate ? [dj.cancelDate, ai.cancelDate] : '';
+              dj.shortCode = dj.shortCode || ai.shortCode ? [dj.shortCode, ai.shortCode] : '';
               // dj.shortCode = (dj.shortCode ? dj.shortCode : '')
               // + (ai.shortCode ? ` | ${ai.shortCode}` : '');
-              dj.longCode = dj.longCode || ai.longCode ?  [dj.longCode, ai.longCode] : '';
+              dj.longCode = dj.longCode || ai.longCode ? [dj.longCode, ai.longCode] : '';
               // dj.longCode = (dj.longCode ? dj.longCode : '')
               // + (ai.longCode ? ` | ${ai.longCode}` : '');
-              dj.aminoAcidType = dj.aminoAcidType || ai.aminoAcidType ?  [dj.aminoAcidType, ai.aminoAcidType] : '';
+              dj.aminoAcidType = dj.aminoAcidType || ai.aminoAcidType ? [dj.aminoAcidType, ai.aminoAcidType] : '';
               // dj.aminoAcidType = (dj.aminoAcidType ? dj.aminoAcidType : '')
               // + (ai.aminoAcidType ? ` | ${ai.aminoAcidType}` : '');
               break;

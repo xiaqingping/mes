@@ -15,7 +15,7 @@ import React, { Component } from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import StandardTable from '@/components/StandardTable';
 import api from '@/api';
-import peptide from'../peptide'
+import peptide from '../peptide'
 
 const EditableContext = React.createContext();
 const FormItem = Form.Item;
@@ -145,7 +145,7 @@ class ModificationProducts extends Component {
     {
       title: '修饰名称',
       dataIndex: 'modificationName',
-      width: 200,
+      width: 250,
       editable: true,
       inputType: <Input />,
       rules: [
@@ -156,15 +156,15 @@ class ModificationProducts extends Component {
       title: '修饰位置',
       dataIndex: 'modificationPosition',
       width: 100,
-      render: (text) => {
+      render: text => {
         let val = null;
-        peptide.modificationPosition.map((item) => {
-          if (item.id == text) {
+        peptide.modificationPosition.forEach(item => {
+          if (item.id === text) {
             val = item.name
           }
         })
         return val;
-      }
+      },
     },
     {
       title: '氨基酸',
@@ -174,17 +174,17 @@ class ModificationProducts extends Component {
     {
       title: '氨基酸类型',
       dataIndex: 'aminoAcidType',
-      width: 100,
+      width: 120,
     },
     {
       title: '提供总量从',
       dataIndex: 'providerTotalAmountBegin',
-      width: 100,
+      width: 120,
     },
     {
       title: '提供总量至',
       dataIndex: 'providerTotalAmountEnd',
-      width: 100,
+      width: 120,
     },
     {
       title: '长度从',
@@ -205,7 +205,7 @@ class ModificationProducts extends Component {
     {
       title: '产品编号',
       dataIndex: 'sapProductCode',
-      width: 100,
+      width: 200,
     },
     {
       title: '产品名称',
@@ -479,7 +479,7 @@ class ModificationProducts extends Component {
             </div>
             <EditableContext.Provider value={this.props.form}>
               <StandardTable
-                scroll={{ x: 3300 }}
+                scroll={{ x: 2300 }}
                 rowClassName="editable-row"
                 components={components}
                 selectedRows={selectedRows}

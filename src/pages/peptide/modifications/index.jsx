@@ -10,12 +10,13 @@ import {
   Select,
   message,
   Popconfirm,
+  Table,
 } from 'antd';
 import React, { Component } from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import StandardTable from '@/components/StandardTable';
 import api from '@/api';
-import peptide from'../peptide'
+import peptide from '../peptide'
 
 const EditableContext = React.createContext();
 const FormItem = Form.Item;
@@ -149,10 +150,12 @@ class Modifications extends Component {
     list: [],
     total: 0,
     loading: false,
+    loadingSon: false,
     selectedRows: [],
     editIndex: -1,
     id: 0, // 新增数据时，提供负数id
-    modificationType:[]
+    modificationType: [],
+    dataSon: [],
   }
 
   columns = [
@@ -164,7 +167,7 @@ class Modifications extends Component {
     {
       title: '修饰名称',
       dataIndex: 'name',
-      width: 180,
+      width: 300,
       editable: true,
       inputType: <Input />,
       rules: [
@@ -174,42 +177,120 @@ class Modifications extends Component {
     {
       title: '修饰代码',
       dataIndex: 'modificationCode',
-      width: 180,
+      width: 100,
     },
     {
       title: '修饰位置',
       dataIndex: 'modificationPosition',
-      width: 180,
-      render: (text) => {
+      width: 100,
+      render: text => {
         let val = null;
-        peptide.modificationPosition.map((item) => {
-          if (item.id == text) {
+        peptide.modificationPosition.forEach(item => {
+          if (item.id === text) {
             val = item.name
           }
         })
         return val;
-      }
+      },
     },
     {
       title: '独立修饰',
       dataIndex: 'isIndependentModification',
-      width: 180,
+      width: 100,
       render: text => (text === 1 ? '√' : ''),
     },
     {
       title: '修饰类别',
       dataIndex: 'modificationTypeID',
-      width: 180,
-      render: (text) => {
-        const {modificationType} = this.state;
+      width: 250,
+      render: text => {
+        const { modificationType } = this.state;
         let val = null;
-        modificationType.map((item) => {
-          if (item.id == text) {
+        modificationType.forEach(item => {
+          if (item.id === text) {
             val = item.modificationType
           }
         })
         return val;
-      }
+      },
+    },
+    {
+      title: '状态',
+      dataIndex: 'status',
+      width: 100,
+      render: text => {
+        if (text === 1) return '正常';
+        if (text === 2) return '已删除';
+        return ''
+      },
+    },
+    {
+      title: '创建人',
+      dataIndex: 'creatorName',
+      width: 100,
+    },
+    {
+      title: '创建时间',
+      dataIndex: 'createDate',
+      width: 200,
+    },
+    {
+      title: '删除人',
+      dataIndex: 'cancelName',
+      width: 100,
+    },
+    {
+      title: '删除时间',
+      dataIndex: 'cancelDate',
+      width: 200,
+    },
+    {
+      title: '操作',
+      fixed: 'right',
+      className: 'operate',
+      width: 150,
+      render: (value, row, index) => {
+        const { editIndex } = this.state;
+        let actions;
+        if (editIndex !== index) {
+          if (row.status === 1) {
+            actions = (
+              <Popconfirm title="确定删除数据？" onConfirm={() => this.deleteRow(row)}>
+                <a className="operate">删除</a>
+              </Popconfirm>
+            );
+          } else {
+            actions = (
+              <Popconfirm title="确定恢复数据？" onConfirm={() => this.resumeRow(row)}>
+                <a className="operate">恢复</a>
+              </Popconfirm>
+            );
+          }
+        }
+        if (editIndex === index) {
+          actions = (
+            <>
+              <a className="operate" onClick={() => this.saveRow(index)}>保存</a>
+              <Divider type="vertical" />
+              <a className="operate" onClick={() => this.cancelEdit(row, -1)}>退出</a>
+            </>
+          );
+        }
+        return actions;
+      },
+    },
+  ];
+
+  columnSon = [
+    {
+      title: '编号',
+      dataIndex: 'code',
+      width: 100,
+    },
+    {
+      title: '名称',
+      dataIndex: 'name',
+      width: 180,
     },
     {
       title: '状态',
@@ -237,48 +318,30 @@ class Modifications extends Component {
       dataIndex: 'cancelDate',
       width: 200,
     },
-    {
-      title: '操作',
-      fixed: 'right',
-      width: 150,
-      render: (value, row, index) => {
-        const { editIndex } = this.state;
-        let actions;
-        if (editIndex !== index) {
-          if (row.status === 1) {
-            actions = (
-              <Popconfirm title="确定删除数据？" onConfirm={() => this.deleteRow(row)}>
-                <a>删除</a>
-              </Popconfirm>
-            );
-          } else {
-            actions = (
-              <Popconfirm title="确定恢复数据？" onConfirm={() => this.resumeRow(row)}>
-                <a>恢复</a>
-              </Popconfirm>
-            );
-          }
-        }
-        if (editIndex === index) {
-          actions = (
-            <>
-              <a onClick={() => this.saveRow(index)}>保存</a>
-              <Divider type="vertical" />
-              <a onClick={() => this.cancelEdit(row, -1)}>退出</a>
-            </>
-          );
-        }
-        return actions;
-      },
-    },
   ];
 
   componentDidMount() {
     api.peptideBase.getModificationTypesAll().then(res => {
       this.setState({
-        modificationType: res
+        modificationType: res,
       })
     })
+  }
+
+  // 设置子值
+  dataSon = (v, e) => {
+    if (e.target.className === 'operate' || e.target.className.indexOf('ant-btn-sm') !== -1) {
+      return
+    }
+    this.setState({
+      loadingSon: true,
+    })
+    setTimeout(() => {
+        this.setState({
+          dataSon: v.details,
+          loadingSon: false,
+        })
+      }, 500)
   }
 
   // 分页
@@ -385,6 +448,8 @@ class Modifications extends Component {
       list,
       total,
       loading,
+      dataSon,
+      loadingSon,
     } = this.state;
     const data = { list, pagination: { current, pageSize, total } };
 
@@ -424,13 +489,14 @@ class Modifications extends Component {
             <Col span={14}>
               <EditableContext.Provider value={this.props.form}>
                 <StandardTable
-                  scroll={{ x: 1300 }}
+                  scroll={{ x: 1800 }}
                   rowClassName="editable-row"
                   components={components}
                   selectedRows={selectedRows}
                   loading={loading}
                   data={data}
                   columns={columns}
+                  onRow={record => ({ onClick: e => this.dataSon(record, e) }) }
                   onSelectRow={this.handleSelectRows}
                   onChange={this.handleStandardTableChange}
                 />
@@ -440,16 +506,13 @@ class Modifications extends Component {
               </Col>
               <Col span={9}>
                 <EditableContext.Provider value={this.props.form}>
-                  <StandardTable
-                    scroll={{ x: 1300 }}
-                    rowClassName="editable-row"
-                    components={components}
-                    selectedRows={selectedRows}
-                    loading={loading}
-                    data={data}
-                    columns={columns}
-                    onSelectRow={this.handleSelectRows}
-                    onChange={this.handleStandardTableChange}
+                  <Table
+                    scroll={{ x: 700 }}
+                    loading={loadingSon}
+                    dataSource={dataSon}
+                    columns={this.columnSon}
+                    pagination={false}
+                    rowKey="id"
                   />
                 </EditableContext.Provider>
               </Col>
