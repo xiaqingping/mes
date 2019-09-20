@@ -43,7 +43,7 @@ class Group extends Component {
     {
       title: 'Client',
       dataIndex: 'sourceClient',
-      width: 100,
+      width: 200,
     },
     {
       title: 'Type',
@@ -144,7 +144,7 @@ class Group extends Component {
     // const { form } = this.props;
     const { pagination: { current: page, pageSize: rows } } = this.state;
     // const query = Object.assign(form.getFieldsValue(), { page, rows }, options);
-    const groupId = 10;
+    const groupId = 0;
     // const groupId = this.context.value;
     // console.log(this.context.value);
     // if (groupId === undefined) {
@@ -178,7 +178,7 @@ class Group extends Component {
       <Card.Grid style={gridStyle2} bordered="false" hoverable={false}>
         <div className="groupRuleTableList">
           <StandardTable
-            scroll={{ x: 1500 }}
+            scroll={{ x: 2000 }}
             selectedRows={selectedRows}
             loading={loading}
             data={data}

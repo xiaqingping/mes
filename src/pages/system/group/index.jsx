@@ -1,32 +1,36 @@
 import {
-  // Button,
   Card,
-  // Col,
   Form,
-  // Input,
-  // Row,
-  // Select,
-  // Divider,/
 } from 'antd';
 import React, { Component } from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import Group from './components/Group';
 import GroupRule from './components/GroupRule';
 
-const gridStyle2 = {
-  width: '65%',
-  textAlign: 'center',
-};
 class GroupList extends Component {
-  state = {
+  state = {}
+
+  constructor (props) {
+    super(props);
+    this.state = {
+      groudId: 0,
+    };
+  }
+
+  getGroupId = id => {
+    this.state({
+      groupId: id,
+    })
+    console.log(this.groudId);
   }
 
   render() {
+    // const { groudId } = this.state;
     return (
       <PageHeaderWrapper>
         <Card>
-          <Group></Group>
-          <GroupRule></GroupRule>
+          <Group getGroupId={this.id}></Group>
+          <GroupRule groudId={this.state.groudId}></GroupRule>
         </Card>,
       </PageHeaderWrapper>
     );

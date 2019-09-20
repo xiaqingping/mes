@@ -35,6 +35,7 @@ class Group extends Component {
     list: [],
     loading: false,
     selectedRows: [],
+    // groupId: '',
   }
 
   // 设置列 分组
@@ -73,6 +74,11 @@ class Group extends Component {
     },
   ];
 
+  constructor (props) {
+    super(props);
+    this.setstate = { groupId: 0 };
+  }
+
   componentDidMount() {
     this.getTableData();
   }
@@ -96,7 +102,9 @@ class Group extends Component {
   }
 
   handleSearchGroupRules = data => {
-    // this.context.value = data.id;
+    this.setState({
+      groupId: data.id,
+    })
   }
 
   // 获取表格数据 分组
@@ -158,7 +166,7 @@ class Group extends Component {
   }
 
   render() {
-    const { list, pagination, loading, selectedRows } = this.state;
+    const { list, pagination, loading, selectedRows, groupId } = this.state;
     const data = { list, pagination };
 
     return (
