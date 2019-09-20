@@ -6,9 +6,10 @@ import {
   Input,
   Icon,
   Select,
+  Badge,
 } from 'antd';
 import React, { Component, Fragment } from 'react';
-import './style.less'
+import styles from './style.less'
 
 const { Option } = Select;
 const FormItem = Form.Item;
@@ -21,33 +22,18 @@ class CheckEmail extends Component {
     oneQuestion: null,
     twoQuestion: null,
     threeQuestion: null,
-    proceed: false,
   };
 
   componentWillReceiveProps (nextProps) {
     const { emailShow } = nextProps;
-    const { proceed } = nextProps; // 继续验证的状态区别
-    if (proceed) {
-      this.setState({
-        EmailVisible: emailShow,
-        proceed: !!proceed,
-        status: 5,
-      })
-    } else {
-      this.setState({
-        EmailVisible: emailShow,
-      })
-    }
+    this.setState({
+      EmailVisible: emailShow,
+    })
   }
 
 
   setModalVisible(EmailVisible) {
-    this.setState({ EmailVisible,
-      status: 1,
-      oneQuestion: null,
-      twoQuestion: null,
-      threeQuestion: null,
-      proceed: false });
+    this.setState({ EmailVisible });
   }
 
   // 用户自行变更验证input的数据
@@ -161,7 +147,8 @@ class CheckEmail extends Component {
     const {
       form: { getFieldDecorator },
     } = this.props;
-    const { status, oneQuestion, twoQuestion, threeQuestion, proceed } = this.state;
+    const { status, oneQuestion, twoQuestion, threeQuestion } = this.state;
+
     if (status === 4) {
       return (
         <Form layout="inline" style={{ textAlign: 'center', paddingTop: '20px' }} onSubmit={this.handleQuestion}>
@@ -217,10 +204,19 @@ class CheckEmail extends Component {
       return (
         <div style={{ textAlign: 'center', paddingTop: '20px' }}>
           <Icon type="check-circle" style={{ fontSize: '20px', color: '#54C31F' }}/>
-          <span style={{ fontSize: '20px', fontWeight: '600' }}>&nbsp;&nbsp;&nbsp;{proceed ? '继续完成新邮箱验证' : '问题验证成功，请输入新的邮箱'}</span>
+          <span style={{ fontSize: '20px', fontWeight: '600' }}>&nbsp;&nbsp;&nbsp;问题验证成功，请输入新的邮箱</span>
           <Form layout="inline" onSubmit={this.handleCode} style={{ marginTop: '45px' }}>
             <div>
-              {this.pageRetrun()}
+              <FormItem label="邮箱">
+                {getFieldDecorator('userPhone')(<Input style={{ width: '297px' }} placeholder="请输入"/>)}
+              </FormItem>
+              <FormItem label="验证码" style={{ margin: '20px 16px 60px 0' }}>
+                {getFieldDecorator('code')(<Input style={{ width: '180px' }} placeholder="请输入短信验证码"/>)}
+                &nbsp;&nbsp;&nbsp;&nbsp;
+                <Button type="primary" ghost onClick={() => { this.getCode() }}>
+                  获取验证码
+                </Button>
+              </FormItem>
             </div>
             <div style={{ textAlign: 'right', padding: '10px 20px', borderTop: '1px solid #E8E8E8' }}>
               <FormItem>
@@ -258,47 +254,6 @@ class CheckEmail extends Component {
       )
   }
 
-  // 继续验证和问题验证后的页面
-  pageRetrun = () => {
-    const {
-      form: { getFieldDecorator },
-      emailAccount,
-    } = this.props;
-    const { proceed } = this.state;
-    if (proceed) {
-      return (
-      <Fragment>
-        <div className="divStyle">
-          <span>邮箱</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-          <span>{emailAccount}</span>
-        </div>
-
-        <FormItem label="验证码" style={{ margin: '20px 16px 60px 0' }}>
-          {getFieldDecorator('code')(<Input style={{ width: '180px' }} placeholder="请输入短信验证码"/>)}
-          &nbsp;&nbsp;&nbsp;&nbsp;
-          <Button type="primary" ghost onClick={() => { this.getCode() }}>
-            获取验证码
-          </Button>
-        </FormItem>
-      </Fragment>
-      )
-    }
-     return (
-      <Fragment>
-        <FormItem label="邮箱">
-          {getFieldDecorator('userPhone')(<Input style={{ width: '297px' }} placeholder="请输入"/>)}
-        </FormItem>
-        <FormItem label="验证码" style={{ margin: '20px 16px 60px 0' }}>
-          {getFieldDecorator('code')(<Input style={{ width: '180px' }} placeholder="请输入短信验证码"/>)}
-          &nbsp;&nbsp;&nbsp;&nbsp;
-          <Button type="primary" ghost onClick={() => { this.getCode() }}>
-            获取验证码
-          </Button>
-        </FormItem>
-      </Fragment>
-    )
-  }
-
   // tab切换
   tabsChange = key => {
       this.setState({
@@ -308,7 +263,6 @@ class CheckEmail extends Component {
   }
 
   render() {
-    const { proceed } = this.state;
     return (
       <div>
         <Modal
@@ -318,7 +272,7 @@ class CheckEmail extends Component {
           className="check-tabs"
           footer={ null}
         >
-            <Tabs defaultActiveKey={proceed ? '2' : '1'} onChange={key => { this.tabsChange(key) }}>
+            <Tabs defaultActiveKey="1" onChange={key => { this.tabsChange(key) }}>
               <TabPane tab="用户自行变更" key="1">
               {this.userChange()}
               </TabPane>
