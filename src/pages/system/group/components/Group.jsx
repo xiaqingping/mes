@@ -9,22 +9,23 @@ import {
   Divider,
 } from 'antd';
 import React, { Component } from 'react';
-import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import StandardTable from '@/components/StandardTable';
 import api from '@/api';
 
 const FormItem = Form.Item;
-const { Option } = Select;
+// const { Option } = Select;
+// const { Search } = Input;
 
-// Type
-const type = [
-  { value: 'GET', text: 'GET' },
-  { value: 'POST', text: 'POST' },
-  { value: 'DELETE', text: 'DELETE' },
-  { value: 'PUT', text: 'PUT' },
-];
+const gridStyle = {
+  width: '35%',
+  textAlign: 'center',
+};
+const onGridStyle = {
+  width: '100%',
+  textAlign: 'center',
+};
 
-class CodeRule extends Component {
+class Group extends Component {
   state = {
     pagination: {
       current: 1,
@@ -34,33 +35,15 @@ class CodeRule extends Component {
     list: [],
     loading: false,
     selectedRows: [],
+    // groupId: '',
   }
 
+  // 设置列 分组
   columns = [
     {
-      title: 'Client',
-      dataIndex: 'client',
-      width: 200,
-    },
-    {
-      title: '规则',
-      dataIndex: 'rule',
-      width: 200,
-    },
-    {
-      title: '覆盖旧编号',
-      dataIndex: 'cover',
-      width: 100,
-    },
-    {
-      title: '开始日期',
-      dataIndex: 'dateBegin',
-      width: 200,
-    },
-    {
-      title: '结束日期',
-      dataIndex: 'dateEnd',
-      width: 200,
+      title: '分组名称',
+      dataIndex: 'name',
+      width: 300,
     },
     {
       fixed: 'right',
@@ -91,6 +74,11 @@ class CodeRule extends Component {
     },
   ];
 
+  constructor (props) {
+    super(props);
+    this.setstate = { groupId: 0 };
+  }
+
   componentDidMount() {
     this.getTableData();
   }
@@ -109,23 +97,26 @@ class CodeRule extends Component {
 
   handleSelectRows = rows => {
     this.setState({
-      selectedRows: rows,
+        selectedRows: rows,
     });
   }
 
-  // 获取表格数据
+  handleSearchGroupRules = data => {
+    this.setState({
+      groupId: data.id,
+    })
+  }
+
+  // 获取表格数据 分组
   getTableData = (options = {}) => {
     this.setState({
-      loading: true,
+        loading: true,
     });
     const { form } = this.props;
     const { pagination: { current: page, pageSize: rows } } = this.state;
     const query = Object.assign(form.getFieldsValue(), { page, rows }, options);
-    if (query.client === '') {
-      query.client = undefined;
-    }
 
-    api.serial.getCodeRule(query, true).then(data => {
+    api.system.getGroups(query, true).then(data => {
       this.setState({
         loading: false,
         list: data.rows,
@@ -146,7 +137,7 @@ class CodeRule extends Component {
   // 渲染表单
   renderForm = () => this.renderAdvancedForm()
 
-  // 显示搜索全部
+  // 显示搜索
   renderAdvancedForm() {
     const {
       form: { getFieldDecorator },
@@ -155,8 +146,8 @@ class CodeRule extends Component {
       <Form onSubmit={this.handleSearch} layout="inline">
         <Row gutter={{ lg: 24, md: 12, sm: 6 }}>
           <Col lg={6} md={8} sm={12}>
-            <FormItem label="Client">
-              {getFieldDecorator('client')(<Input />)}
+            <FormItem label="分组名称">
+              {getFieldDecorator('name')(<Input />)}
             </FormItem>
           </Col>
         </Row>
@@ -175,28 +166,35 @@ class CodeRule extends Component {
   }
 
   render() {
-    const { list, pagination, loading, selectedRows } = this.state;
+    const { list, pagination, loading, selectedRows, groupId } = this.state;
     const data = { list, pagination };
 
     return (
-      <PageHeaderWrapper>
-        <Card bordered={false}>
+      <>
+        <Card.Grid style={onGridStyle} hoverable={false}>
+        <div className="tableListForm">{this.renderForm()}</div>
+        </Card.Grid>
+        <Card.Grid style={gridStyle} bordered="false" hoverable={false}>
           <div className="tableList">
-            <div className="tableListForm">{this.renderForm()}</div>
             <StandardTable
-              scroll={{ x: 1300 }}
+              scroll={{ x: 400 }}
               selectedRows={selectedRows}
               loading={loading}
               data={data}
               columns={this.columns}
               onSelectRow={this.handleSelectRows}
               onChange={this.handleStandardTableChange}
+              onRowClick={
+                record => {
+                  this.handleSearchGroupRules(record);
+                }
+              }
             />
           </div>
-        </Card>
-      </PageHeaderWrapper>
+        </Card.Grid>
+      </>
     );
   }
 }
 
-export default Form.create()(CodeRule);
+export default Form.create()(Group);
