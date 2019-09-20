@@ -13,16 +13,16 @@ module.exports = {
           path: '/partner/maintain',
           component: './partner/maintain',
         },
-        {
-          name: 'add',
-          path: '/partner/maintain/add',
-          component: './partner/maintain_edit',
-        },
-        {
-          name: 'edit',
-          path: '/partner/maintain/edit/:id',
-          component: './partner/maintain_edit',
-        },
+        // {
+        //   name: 'add',
+        //   path: '/partner/maintain/add',
+        //   component: './partner/maintain_edit',
+        // },
+        // {
+        //   name: 'edit',
+        //   path: '/partner/maintain/edit/:id',
+        //   component: './partner/maintain_edit',
+        // },
         {
           name: 'details',
           path: '/partner/maintain/details/:id',
