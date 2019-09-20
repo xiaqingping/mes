@@ -4,50 +4,52 @@ import {
   Button,
 } from 'antd';
 import React, { Component } from 'react';
-import { connect } from 'dva';
 
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import FooterToolbar from '@/components/FooterToolbar';
 
 import BasicInfo from './components/BasicInfo';
-import Type from './components/Type';
+import SalesScope from './components/SalesScope';
 import Credit from './components/Credit';
 import Authentication from './components/Authentication';
 import Address from './components/Address';
 import Type1 from './components/Type1';
 import Bank from './components/Bank';
 
-import EditableTable from './components/TableForm';
-
-const addressList = [
-  {
-    id: 1,
-    name: 'name',
-    telephone: '18735818888',
-    postcode: '123456',
-    address: '上海市松江区香闵路698号',
-  },
-];
-
-const basicInfo = {
-  name: {
-    select: 1,
-    name: '',
-  },
-  email: '123@qq.com',
-};
-
-@connect(({ listTableList, loading }) => ({
-  listTableList,
-  loading: loading.models.rule,
-}))
 class CustomerEdit extends Component {
   state = {
     width: '100%',
     tabActiveKey: 'customer',
+    details: {},
   };
 
   componentDidMount() {
+    const details = {
+      basicInfo: {
+        name: {
+          select: 1,
+          name: '',
+        },
+        email: '123@qq.com',
+      },
+      addressList: [
+        {
+          id: 1,
+          name: 'name',
+          telephone: '18735818888',
+          postcode: '123456',
+          address: '上海市松江区香闵路698号',
+        },
+        {
+          id: 2,
+          name: 'name2',
+          telephone: '18735818888',
+          postcode: '123456',
+          address: '上海市松江区香闵路698号',
+        },
+      ],
+    };
+    this.setState({ details });
     window.addEventListener('resize', this.resizeFooterToolbar, { passive: true });
     this.resizeFooterToolbar();
   }
@@ -70,42 +72,33 @@ class CustomerEdit extends Component {
   };
 
   onTabChange = tabActiveKey => {
-    const { dispatch } = this.props;
     this.setState({
       tabActiveKey,
-    });
-
-    dispatch({
-      type: 'partner_maintain/setDetails',
-      payload: {
-        title: '1',
-      },
     });
   };
 
   validate = () => {
     const {
       form: { validateFieldsAndScroll },
-      dispatch,
     } = this.props;
+    // 验证表单
+    // console.log(this.form.validate());
 
     validateFieldsAndScroll((error, values) => {
       console.log(values);
       if (!error) {
-        // 请求接口
-        // dispatch({
-        //   type: 'formAdvancedForm/submitAdvancedForm',
-        //   payload: values,
-        // });
+        //
       }
     });
   }
 
   // 客户
-  renderCustomer = () => {
+  renderCustomer = details => {
     const {
       form: { getFieldDecorator },
     } = this.props;
+    const { basicInfo, addressList } = details;
+
     return (
       <>
         <Card title="基础信息" bordered={false} style={{ marginBottom: '24px' }}>
@@ -114,26 +107,24 @@ class CustomerEdit extends Component {
           // eslint-disable-next-line no-return-assign
           })(<BasicInfo wrappedComponentRef={form => this.form = form} />)}
         </Card>
-        <Type></Type>
+        <SalesScope></SalesScope>
         <Credit></Credit>
         <Authentication></Authentication>
-        <Card title="收货地址" bordered={false} style={{ paddingBottom: '50px' }}>
+        <Card title="收货地址" bordered={false}>
           {getFieldDecorator('addressList', {
-            initialValue: addressList,
+            initialValue: { data: addressList },
           })(<Address />)}
-        </Card>
-        <Card>
-          <EditableTable></EditableTable>
         </Card>
       </>
     );
   }
 
   // 供应商
-  renderSupplier = () => {
+  renderSupplier = details => {
     const {
       form: { getFieldDecorator },
     } = this.props;
+    const { basicInfo } = details;
     return (
       <>
         <Card title="基础信息" bordered={false} style={{ marginBottom: '24px' }}>
@@ -148,12 +139,25 @@ class CustomerEdit extends Component {
     );
   }
 
+  renderContent = () => {
+    const { tabActiveKey, details } = this.state;
+
+    switch (tabActiveKey) {
+      case 'customer':
+         return this.renderCustomer(details);
+
+      case 'supplier':
+        return this.renderSupplier(details);
+
+      default:
+          break;
+    }
+
+    return null;
+  }
+
   render() {
     const { width, tabActiveKey } = this.state;
-    const contentList = {
-      customer: this.renderCustomer(),
-      supplier: this.renderSupplier(),
-    };
 
     return (
       <PageHeaderWrapper
@@ -172,7 +176,9 @@ class CustomerEdit extends Component {
           },
         ]}
       >
-        {contentList[tabActiveKey]}
+        <div style={{ paddingBottom: 50 }}>
+          {this.renderContent()}
+        </div>
         <FooterToolbar style={{ width }}>
           <Button>取消</Button>
           <Button type="primary" onClick={this.validate}>提交</Button>

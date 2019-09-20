@@ -1,62 +1,42 @@
 import {
-  Card,
+  Button,
   Form,
   Row,
   Col,
-  Input,
   Select,
   Switch,
+  Tabs,
 } from 'antd';
 import React, { Component } from 'react';
+import BillToParty from './BillToParty';
+import SoldToParty from './SoldToParty';
+import ShipToParty from './ShipToParty';
+import Salesperson from './Salesperson';
+
+import styles from '../style.less';
 
 const FormItem = Form.Item;
 const { Option } = Select;
-
-const tabListNoTitle = [
-  {
-    key: '1',
-    tab: '生工国内电商',
-  },
-  {
-    key: '2',
-    tab: '生工国外电商',
-  },
-  {
-    key: '3',
-    tab: '生工国内直销',
-  },
-  {
-    key: '4',
-    tab: '生工国外直销',
-  },
-];
+const { TabPane } = Tabs;
 
 class BasicInfo extends Component {
   state = {
-    noTitleKey: '1',
+    salesScope: [
+      { key: 1 },
+    ],
   }
 
-  onTabChange = key => {
-    this.setState({
-      noTitleKey: key,
-    });
+  onTabChange = obj => {
+    this.setState(obj);
   }
 
-  render() {
+  renderTabPane = obj => {
     const {
       form: { getFieldDecorator },
     } = this.props;
 
     return (
-      <Card
-        bordered={false}
-        style={{ width: '100%', marginBottom: '24px' }}
-        tabList={tabListNoTitle}
-        activeTabKey={this.state.noTitleKey}
-        onTabChange={key => {
-          this.onTabChange(key);
-        }}
-      >
+      <TabPane tab="生工国内电商" key="1">
         <Form>
           <Row gutter={32}>
             <Col span={3}>
@@ -107,7 +87,55 @@ class BasicInfo extends Component {
             </Col>
           </Row>
         </Form>
-      </Card>
+        <Tabs className={styles.internalTab}>
+          <TabPane tab="开票方" key="BillToParty">
+            <BillToParty />
+          </TabPane>
+          <TabPane tab="售达方" key="SoldToParty">
+            <SoldToParty />
+          </TabPane>
+          <TabPane tab="送达方" key="ShipToParty">
+            <ShipToParty />
+          </TabPane>
+          <TabPane tab="销售员" key="Salesperson">
+            <Salesperson />
+          </TabPane>
+        </Tabs>
+      </TabPane>
+    );
+  }
+
+  selectSalesScope = value => {
+    console.log(value);
+  }
+
+  renderSelect = () => {
+    const list = [
+      { value: '1', title: '生工国内电商' },
+      { value: '2', title: '生工国外电商' },
+      { value: '3', title: '生工国内直销' },
+      { value: '4', title: '生工国外直销' },
+    ];
+    return (
+      <Select
+        style={{ marginRight: 24, width: 130 }}
+        placeholder="销售范围"
+        onSelect={this.selectSalesScope}
+      >
+        {list.map(e => <Option value={e.value} key={e.value}>{e.title}</Option>)}
+      </Select>
+    );
+  }
+
+  render() {
+    const { salesScope } = this.state;
+    return (
+      <Tabs
+        className={styles.externalTab}
+        tabBarExtraContent={this.renderSelect()}
+      >
+        { salesScope.length > 0 ? salesScope.map(e => this.renderTabPane(e)) : <TabPane tab="空" key="null"></TabPane> }
+      </Tabs>
     );
   }
 }

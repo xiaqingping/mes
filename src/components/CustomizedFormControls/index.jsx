@@ -11,38 +11,80 @@ const InputGroup = Input.Group;
 const { Option } = Select;
 const options = [
   {
-    value: 'zhejiang',
-    label: 'Zhejiang',
+    value: '浙江',
+    label: '浙江',
     children: [
       {
-        value: 'hangzhou',
-        label: 'Hangzhou',
+        value: '杭州',
+        label: '杭州',
         children: [
           {
-            value: 'xihu',
-            label: 'West Lake',
+            value: '西湖',
+            label: '西湖',
           },
         ],
       },
     ],
   },
   {
-    value: 'jiangsu',
-    label: 'Jiangsu',
+    value: '江苏',
+    label: '江苏',
     children: [
       {
-        value: 'nanjing',
-        label: 'Nanjing',
+        value: '南京',
+        label: '南京',
         children: [
           {
-            value: 'zhonghuamen',
-            label: 'Zhong Hua Men',
+            value: '中华门',
+            label: '中华门',
           },
         ],
       },
     ],
   },
 ];
+
+// TODO: 是否可以用高阶组件组件包裹
+function formControl (WrappedComponent) {
+  return class extends React.Component {
+    static getDerivedStateFromProps(nextProps) {
+      if ('value' in nextProps) {
+        return {
+          ...nextProps.value,
+        };
+      }
+      return null;
+    }
+
+    constructor(props) {
+      super(props);
+      this.state = {
+        ...props.value,
+      };
+    }
+
+    valueChange = (key, value) => {
+      if (!('value' in this.props)) {
+        this.setState({ [key]: value });
+      }
+      this.triggerChange({ [key]: value });
+    }
+
+    triggerChange = changedValue => {
+      const { onChange } = this.props;
+      if (onChange) {
+        onChange({
+          ...this.state,
+          ...changedValue,
+        });
+      }
+    };
+
+    render() {
+      return <WrappedComponent data={this.state.data} {...this.props} />;
+    }
+  }
+}
 
 // Email
 export class EmailInput extends React.Component {
@@ -64,36 +106,25 @@ export class EmailInput extends React.Component {
     };
   }
 
-  valueChange = (key, value) => {
+  valueChange = changedValue => {
+    const { onChange } = this.props;
     let dataSource = [];
     const suffix = [
       'qq.com',
       'gmail.com',
       '163.com',
     ];
-    if (!value || value.indexOf('@') >= 0) {
+
+    if (!changedValue.email || changedValue.email.indexOf('@') >= 0) {
       dataSource = [];
     } else {
-      dataSource = suffix.map(domain => `${value}@${domain}`);
+      dataSource = suffix.map(domain => `${changedValue.email}@${domain}`);
     }
 
-    if (!('value' in this.props)) {
-      this.setState({
-        [key]: value,
-        dataSource,
-      });
-    }
-    this.triggerChange({
-      [key]: value,
-      dataSource,
-    });
-  }
-
-  triggerChange = changedValue => {
-    const { onChange } = this.props;
     if (onChange) {
       onChange({
         ...this.state,
+        dataSource,
         ...changedValue,
       });
     }
@@ -106,7 +137,7 @@ export class EmailInput extends React.Component {
       <AutoComplete
         value={email}
         dataSource={dataSource}
-        onChange={val => this.valueChange('email', val)}
+        onChange={val => this.valueChange({ email: val })}
       />
     );
   }
@@ -132,14 +163,7 @@ export class NameInput extends React.Component {
     };
   }
 
-  valueChange = (key, value) => {
-    if (!('value' in this.props)) {
-      this.setState({ [key]: value });
-    }
-    this.triggerChange({ [key]: value });
-  }
-
-  triggerChange = changedValue => {
+  valueChange = changedValue => {
     const { onChange } = this.props;
     if (onChange) {
       onChange({
@@ -153,11 +177,11 @@ export class NameInput extends React.Component {
     const { select, name } = this.state;
     return (
       <InputGroup compact>
-        <Select value={select} style={{ width: '40%' }} onChange={val => this.valueChange('select', val)}>
+        <Select value={select} style={{ width: '40%' }} onChange={val => this.valueChange({ select: val })}>
           <Option value={1}><Icon type="user" /> 个人</Option>
           <Option value={2}><Icon type="home" /> 组织</Option>
         </Select>
-        <Input value={name} style={{ width: '60%' }} onChange={e => this.valueChange('name', e.target.value)} />
+        <Input value={name} style={{ width: '60%' }} onChange={e => this.valueChange({ name: e.target.value })} />
       </InputGroup>
     );
   }
@@ -180,17 +204,11 @@ export class MobileTelephoneInput extends React.Component {
     this.state = {
       area: value.area || '+86',
       code: value.code || '',
+      disabled: value.disabled,
     };
   }
 
-  valueChange = (key, value) => {
-    if (!('value' in this.props)) {
-      this.setState({ [key]: value });
-    }
-    this.triggerChange({ [key]: value });
-  }
-
-  triggerChange = changedValue => {
+  valueChange = changedValue => {
     const { onChange } = this.props;
     if (onChange) {
       onChange({
@@ -201,20 +219,20 @@ export class MobileTelephoneInput extends React.Component {
   };
 
   render() {
-    const { area, code } = this.state;
+    const { area, code, disabled } = this.state;
     return (
       <InputGroup compact>
-        <Select value={area} style={{ width: '40%' }} onChange={val => this.valueChange('area', val)}>
+        <Select disabled={disabled} value={area} style={{ width: '40%' }} onChange={val => this.valueChange({ area: val })}>
           <Option value="+86">+86</Option>
           <Option value="+01">+01</Option>
         </Select>
-        <Input value={code} style={{ width: '60%' }} onChange={e => this.valueChange('code', e.target.value)} />
+        <Input disabled={disabled} value={code} style={{ width: '60%' }} onChange={e => this.valueChange({ code: e.target.value })} />
       </InputGroup>
     );
   }
 }
 
-// 电话
+// 电话 & 传真
 export class TelphoneInput extends React.Component {
   static getDerivedStateFromProps(nextProps) {
     if ('value' in nextProps) {
@@ -236,14 +254,7 @@ export class TelphoneInput extends React.Component {
     };
   }
 
-  valueChange = (key, value) => {
-    if (!('value' in this.props)) {
-      this.setState({ [key]: value });
-    }
-    this.triggerChange({ [key]: value });
-  }
-
-  triggerChange = changedValue => {
+  valueChange = changedValue => {
     const { onChange } = this.props;
     if (onChange) {
       onChange({
@@ -257,35 +268,13 @@ export class TelphoneInput extends React.Component {
     const { area, provincial, code, extension } = this.state;
     return (
       <InputGroup compact>
-        <Select value={area} style={{ width: '30%' }} onChange={val => this.valueChange('area', val)}>
+        <Select value={area} style={{ width: '30%' }} onChange={val => this.valueChange({ area: val })}>
           <Option value="+86">+86</Option>
           <Option value="+01">+01</Option>
         </Select>
-        <Input value={provincial} style={{ width: '20%' }} onChange={e => this.valueChange('provincial', e.target.value)}/>
-        <Input value={code} style={{ width: '30%' }} onChange={e => this.valueChange('code', e.target.value)}/>
-        <Input value={extension} style={{ width: '20%' }} onChange={e => this.valueChange('extension', e.target.value)}/>
-      </InputGroup>
-    );
-  }
-}
-
-// 传真
-export class FoxInput extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {};
-  }
-
-  render() {
-    return (
-      <InputGroup compact>
-        <Select defaultValue="+86" style={{ width: '30%' }}>
-          <Option value="+86">+86</Option>
-          <Option value="+01">+01</Option>
-        </Select>
-        <Input style={{ width: '20%' }} />
-        <Input style={{ width: '30%' }} />
-        <Input style={{ width: '20%' }} />
+        <Input value={provincial} style={{ width: '20%' }} onChange={e => this.valueChange({ provincial: e.target.value })}/>
+        <Input value={code} style={{ width: '30%' }} onChange={e => this.valueChange({ code: e.target.value })}/>
+        <Input value={extension} style={{ width: '20%' }} onChange={e => this.valueChange({ extension: e.target.value })}/>
       </InputGroup>
     );
   }
@@ -293,16 +282,40 @@ export class FoxInput extends React.Component {
 
 // 地址
 export class AddressInput extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {};
+  static getDerivedStateFromProps(nextProps) {
+    if ('value' in nextProps) {
+      return {
+        ...(nextProps.value || {}),
+      };
+    }
+    return null;
   }
 
+  constructor(props) {
+    super(props);
+    const value = props.value || {};
+    this.state = {
+      cascader: value.cascader || ['浙江', '杭州', '西湖'],
+      address: value.address || '',
+    };
+  }
+
+  valueChange = changedValue => {
+    const { onChange } = this.props;
+    if (onChange) {
+      onChange({
+        ...this.state,
+        ...changedValue,
+      });
+    }
+  };
+
   render() {
+    const { address, cascader } = this.state;
     return (
       <InputGroup compact>
-        <Cascader options={options} style={{ width: '40%' }} />
-        <Input style={{ width: '60%' }} />
+        <Cascader value={cascader} options={options} style={{ width: '40%' }} onChange={value => this.valueChange({ cascader: value })} />
+        <Input value={address} style={{ width: '60%' }} onChange={e => this.valueChange({ address: e.target.value })} />
       </InputGroup>
     );
   }
