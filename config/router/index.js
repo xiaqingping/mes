@@ -40,11 +40,8 @@ module.exports = [
           partner,
           peptide,
           system,
-<<<<<<< HEAD
           personel,
-=======
           purchase,
->>>>>>> develop
           {
             component: './404',
           },
