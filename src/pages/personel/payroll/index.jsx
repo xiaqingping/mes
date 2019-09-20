@@ -7,6 +7,7 @@ import {
   Input,
   Row,
   Select,
+  Popconfirm
 } from 'antd';
 import React, { Component } from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
@@ -38,6 +39,7 @@ class payroll extends Component {
     {
       title: '员工名称',
       dataIndex: 'employeeName',
+      // dataIndex: 'name',
       width: 180,
     },
     {
@@ -83,21 +85,42 @@ class payroll extends Component {
         const { status } = row;
         const { editIndex } = this.state;
         let actions;
+        // if (editIndex !== index && status === 1) {
+        //   actions = (
+        //     <>
+        //       <a>删除</a>
+        //       <Divider type="vertical" />
+        //       <a>修改</a>
+        //       </>
+        //   );
+        // }
+        // if (editIndex === index) {
+        //   actions = (
+        //     <>
+        //       <a>保存</a>
+        //       <Divider type="vertical" />
+        //       <a>退出</a>
+        //     </>
+        //   );
+        // }
+        // return actions;
         if (editIndex !== index && status === 1) {
           actions = (
             <>
-              <a>删除</a>
+              <Popconfirm title="确定作废数据？" onConfirm={() => this.deleteRow(row)}>
+                <a>删除</a>
+              </Popconfirm>
               <Divider type="vertical" />
-              <a>修改</a>
-              </>
+              <a onClick={() => this.editRow(index)}>修改</a>
+            </>
           );
         }
         if (editIndex === index) {
           actions = (
             <>
-              <a>保存</a>
+              <a onClick={() => this.saveRow(index)}>保存</a>
               <Divider type="vertical" />
-              <a>退出</a>
+              <a onClick={() => this.cancelEdit(row, -1)}>退出</a>
             </>
           );
         }
@@ -161,6 +184,17 @@ class payroll extends Component {
       });
       console.log(data);
     });
+    // api.user.getUserList(query, true).then(data => {
+    //   this.setState({
+    //     loading: false,
+    //     list: data.rows,
+    //     pagination: {
+    //       total: data.total,
+    //       current: query.page,
+    //       pageSize: query.rows,
+    //     },
+    //   });
+    // });
   }
   // 渲染表单
   renderForm = () => {

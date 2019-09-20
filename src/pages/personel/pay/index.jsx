@@ -7,6 +7,7 @@ import {
   Input,
   Row,
   Select,
+  Popconfirm
 } from 'antd';
 import React, { Component } from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
@@ -20,7 +21,34 @@ const gridStyle = {
   textAlign: 'center',
   // background:'pink'
 };
-
+// 年
+// const year= [
+//   { id: 2019, name: '2019' },
+//   { id: 2018, name: '2018' },
+//   { id: 2017, name: '2017' },
+//   { id: 2016, name: '2016' },
+//   { id: 2015, name: '2015' }
+// ];
+// 月
+// const month = [
+//   { id: 1, name: '1' },
+//   { id: 2, name: '2' },
+//   { id: 3, name: '3' },
+//   { id: 4, name: '4' },
+//   { id: 5, name: '5' },
+//   { id: 6, name: '6' },
+//   { id: 7, name: '7' },
+//   { id: 8, name: '8' },
+//   { id: 9, name: '9' },
+//   { id: 10, name: '10' },
+//   { id: 11, name: '11' },
+//   { id: 12, name: '12' }
+// ]
+// 状态
+const status = [
+  { value: 0, name: '正常' },
+  { value: 1, name: '已删除' },
+];
 class pay extends Component {
   state = {
     pagination: {
@@ -43,6 +71,7 @@ class pay extends Component {
     {
       title: '员工名称',
       dataIndex: 'employeeName',
+      // dataIndex: 'name',
       width: 180,
     },
     {
@@ -60,6 +89,14 @@ class pay extends Component {
       dataIndex: 'status',
       width: 100,
     },
+    // {
+    //   title: '状态',
+    //   dataIndex: 'status',
+    //   width: 100,
+    //   render(val) {
+    //     return <span>{status[val].name}</span>;
+    //   },
+    // },
     {
       title: '创建人',
       dataIndex: 'createName',
@@ -88,21 +125,42 @@ class pay extends Component {
         const { status } = row;
         const { editIndex } = this.state;
         let actions;
+        // if (editIndex !== index && status === 1) {
+        //   actions = (
+        //     <>
+        //       <a>删除</a>
+        //       <Divider type="vertical" />
+        //       <a>修改</a>
+        //       </>
+        //   );
+        // }
+        // if (editIndex === index) {
+        //   actions = (
+        //     <>
+        //       <a>保存</a>
+        //       <Divider type="vertical" />
+        //       <a>退出</a>
+        //     </>
+        //   );
+        // }
+        // return actions;
         if (editIndex !== index && status === 1) {
           actions = (
             <>
-              <a>删除</a>
+              <Popconfirm title="确定作废数据？" onConfirm={() => this.deleteRow(row)}>
+                <a>删除</a>
+              </Popconfirm>
               <Divider type="vertical" />
-              <a>修改</a>
-              </>
+              <a onClick={() => this.editRow(index)}>修改</a>
+            </>
           );
         }
         if (editIndex === index) {
           actions = (
             <>
-              <a>保存</a>
+              <a onClick={() => this.saveRow(index)}>保存</a>
               <Divider type="vertical" />
-              <a>退出</a>
+              <a onClick={() => this.cancelEdit(row, -1)}>退出</a>
             </>
           );
         }
@@ -114,13 +172,13 @@ class pay extends Component {
   columnss = [
     {
       title: '编号',
-      dataIndex: 'employeeCode',
+      dataIndex: 'typeCode',
       width: 100,
     },
     {
       title: '名称',
-      dataIndex: 'employeeName',
-      width: 180,
+      dataIndex: 'typeName',
+      width: 100,
     },
     {
       title: '类型',
@@ -197,68 +255,67 @@ class pay extends Component {
     return (
       <Form onSubmit={this.handleSearch} layout="inline">
         <Row gutter={{ lg: 24, md: 12, sm: 6 }}>
-          <Col lg={4} md={8} sm={12}>
+          <Col lg={6} md={8} sm={12}>
             <FormItem label="员工编号">
               {getFieldDecorator('code')(<Input />)}
             </FormItem>
           </Col>
-          <Col lg={4} md={8} sm={12}>
+          <Col lg={6} md={8} sm={12}>
             <FormItem label="员工名称">
               {getFieldDecorator('staffName')(<Input />)}
             </FormItem>
           </Col>
-          <Col lg={4} md={8} sm={12}>
+          {/* <Col lg={4} md={8} sm={12}>
             <FormItem label="年">
-              {getFieldDecorator('year')(<Input />)}
-            </FormItem>
-          </Col>
-          <Col lg={4} md={8} sm={12}>
-            <FormItem label="月">
-              {getFieldDecorator('month')(<Input />)}
-            </FormItem>
-          </Col>
-          {/* <Col lg={6} md={8} sm={12}>
-            <FormItem label="年">
-              {getFieldDecorator('year', { initialValue: '0' })(
-                <Select>
-                <Option value="0"></Option>
-                <Option value="1">2019</Option>
-                <Option value="2">2018</Option>
-                <Option value="3">2017</Option>
-                <Option value="4">2016</Option>
-                <Option value="4">2015</Option>
+              <Select>
+                {getFieldDecorator('year', { initialValue: '1' })(
+                  <Select>
+                    {year.map(item => <Option key={item.value} value={item.value}>{item.text}</Option>)}
+                  </Select>,
+                )}
               </Select>,
-              )} 
             </FormItem>
           </Col> */}
-          {/* <Col lg={6} md={8} sm={12}>
-            <FormItem label="月">
-              {getFieldDecorator('month', { initialValue: '0' })(
+          <Col lg={6} md={8} sm={12}>
+            <FormItem label="年">
+              {getFieldDecorator('year', { initialValue: '' })(
                 <Select>
-                  <Option value="0"></Option>
                   <Option value="1">1</Option>
                   <Option value="2">2</Option>
                   <Option value="3">3</Option>
                   <Option value="4">4</Option>
                   <Option value="5">5</Option>
-                  <Option value="6">6</Option>
-                  <Option value="7">7</Option>
-                  <Option value="8">8</Option>
-                  <Option value="9">9</Option>
-                  <Option value="10">10</Option>
-                  <Option value="11">11</Option>
-                  <Option value="12">12</Option>
-              </Select>,
-              )} 
+                  <Option value="5">6</Option>
+                  <Option value="5">7</Option>
+                  <Option value="5">8</Option>
+                  <Option value="5">9</Option>
+                  <Option value="5">10</Option>
+                  <Option value="5">11</Option>
+                  <Option value="5">12</Option>
+                </Select>,
+              )}
             </FormItem>
-          </Col> */}
-          <Col lg={4} md={8} sm={12}>
+          </Col>
+          <Col lg={6} md={8} sm={12}>
+            <FormItem label="月">
+              {getFieldDecorator('month', { initialValue: '' })(
+                <Select>
+                  <Option value="1">2019</Option>
+                  <Option value="2">2018</Option>
+                  <Option value="3">2017</Option>
+                  <Option value="4">2016</Option>
+                  <Option value="5">2015</Option>
+                </Select>,
+              )}
+            </FormItem>
+          </Col>
+          <Col lg={6} md={8} sm={12}>
             <FormItem label="状态">
               {getFieldDecorator('status', { initialValue: '1' })(
                 <Select>
                   <Option value="1">正常</Option>
                   <Option value="2">已删除</Option>
-                </Select>,
+                </Select>
               )}
             </FormItem>
           </Col>
@@ -281,6 +338,7 @@ class pay extends Component {
   handleAdd = () => {
     console.log('add');
   }
+  
   // 作废
   handleDelete = () => {
     console.log('delete');
@@ -311,7 +369,7 @@ class pay extends Component {
                 </Button>
               </div>
               <StandardTable
-                scroll={{ x: 600 }}
+                scroll={{ x: 800 }}
                 selectedRows={selectedRows}
                 loading={loading}
                 data={data}
@@ -325,13 +383,12 @@ class pay extends Component {
           <Card.Grid >
             <p>工资明细</p>
             <div className="tableList">
-              {/* <div className="tableListForm">{this.renderForm()}</div> */}
               <StandardTable
-                scroll={{ x: 600 }}
+                scroll={{ x: 700 }}
                 selectedRows={selectedRows}
                 loading={loading}
                 data={data}
-                columnss={this.columnss}
+                columns={this.columnss}
                 onSelectRow={this.handleSelectRows}
                 onChange={this.handleStandardTableChange}
               />
