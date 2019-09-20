@@ -2,6 +2,7 @@ const seq = require('./seq');
 const partner = require('./partner');
 const peptide = require('./peptide')
 const system = require('./system');
+const purchase = require('./purchase');
 
 module.exports = [
   {
@@ -38,6 +39,7 @@ module.exports = [
           partner,
           peptide,
           system,
+          purchase,
           {
             component: './404',
           },

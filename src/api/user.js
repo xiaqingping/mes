@@ -35,4 +35,9 @@ export default {
   resetPasswords (data) {
     return request(`/user/v1/user/${data.code}/password/reset`, { method: 'PUT', data });
   },
+
+  // 查询角色列表
+  getRoles () {
+    return request('/roles', { method: 'GET' });
+  },
 };
