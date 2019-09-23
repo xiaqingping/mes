@@ -43,7 +43,7 @@ class Order extends Component {
     {
       title: '编号',
       dataIndex: 'code',
-      width: 100,
+      width: 90,
     },
     {
       title: '状态',
