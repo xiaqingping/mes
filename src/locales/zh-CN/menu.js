@@ -13,6 +13,7 @@ export default {
   'menu.seq': '测序管理',
   'menu.seq.order': '测序订单',
   'menu.seq.carrier-series': '载体系列',
+  'menu.seq.carrier': '载体管理',
   'menu.personel': '人事管理',
   'menu.personel.pay': '工资管理',
   'menu.personel.payroll': '工资项管理',

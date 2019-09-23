@@ -3,6 +3,10 @@ const GlobalModel = {
   state: {
     collapsed: false,
     notices: [],
+    commonStatus: [
+      { id: 1, name: '正常' },
+      { id: 2, name: '已删除' },
+    ],
   },
   effects: {
     *fetchNotices(_, { call, put, select }) {
