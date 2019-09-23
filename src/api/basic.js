@@ -46,4 +46,12 @@ export default {
   getProductList(params) {
     return request('/basic/v1/products', { params });
   },
+  // 查询销售范围
+  getSalesRange() {
+    return request('/basic/v1/salesranges');
+  },
+  // 查询采购申请
+  getPurReqList(params) {
+    return request('/basic/v1/purchase_request/easyui', { params });
+  },
 };

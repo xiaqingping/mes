@@ -19,6 +19,7 @@ import router from 'umi/router';
 import Link from 'umi/link';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import StandardTable from '@/components/StandardTable';
+import ChangeModal from './components/ChangeModal';
 
 const FormItem = Form.Item;
 const { Option } = Select;
@@ -109,7 +110,9 @@ class Maintain extends React.Component {
     data: {},
     formValues: {},
     xiaoshuoguishu: [],
-    kaipiaofang: [],
+    // kaipiaofang: [],
+    changeModal: false,
+    recordMesg: undefined,
   };
 
   columns = [
@@ -238,11 +241,11 @@ class Maintain extends React.Component {
         const { code } = record;
         const menu = (
           <Menu>
-            <Menu.Item><a href="">取消冻结</a></Menu.Item>
-            <Menu.Item><a href="">取消认证</a></Menu.Item>
-            <Menu.Item><a href="">变更认证</a></Menu.Item>
-            <Menu.Item><a href="">认证</a></Menu.Item>
-            <Menu.Item><a href="">冻结</a></Menu.Item>
+            <Menu.Item><a href="#" onClick={e => { this.cancelFreeze(e, record) }}>取消冻结</a></Menu.Item>
+            <Menu.Item><a href="#" onClick={e => { this.cancelIdent(e, record) }}>取消认证</a></Menu.Item>
+            <Menu.Item><a href="#" onClick={ e => { this.changeIdent(e, record) }}>变更认证</a></Menu.Item>
+            <Menu.Item><a href="#" onClick={ e => { this.identificate(e, record) }}>认证</a></Menu.Item>
+            <Menu.Item><a href="#" onClick={ e => { this.freezePartner(e, record) }}>冻结</a></Menu.Item>
           </Menu>
         );
         return (
@@ -264,6 +267,41 @@ class Maintain extends React.Component {
     this.getData();
   }
 
+  /** 取消冻结 */
+  cancelFreeze = (e, record) => {
+    e.preventDefault();
+    console.log(record);
+  }
+
+  /** 取消认证 */
+  cancelIdent = (e, record) => {
+    e.preventDefault();
+    console.log(record);
+  }
+
+  /** 变更认证 */
+  changeIdent = (e, record) => {
+    e.preventDefault();
+    this.setState(
+      {
+        changeModal: true,
+        recordMesg: record,
+      },
+    )
+  }
+
+  /** 认证 */
+  identificate = (e, record) => {
+    e.preventDefault();
+    console.log(record);
+  }
+
+  /** 认证 */
+  freezePartner = (e, record) => {
+    e.preventDefault();
+    console.log(record);
+  }
+
   handleSearch = e => {
     e.preventDefault();
     const { form } = this.props;
@@ -280,6 +318,7 @@ class Maintain extends React.Component {
     });
   };
 
+  /** table数据 */
   getData = () => {
     const data = [];
     const { formValues } = this.state;
@@ -328,7 +367,7 @@ class Maintain extends React.Component {
 
   };
 
-  // 查询销售归属
+  /** 查询销售归属 */
   xiaoshuoguishuSearch = value => {
     this.setState({
       xiaoshuoguishu: [
@@ -358,6 +397,7 @@ class Maintain extends React.Component {
     return expandForm ? this.renderAdvancedForm() : this.renderSimpleForm();
   };
 
+  /** 完整筛选条件 */
   renderAdvancedForm() {
     const {
       form: { getFieldDecorator },
@@ -369,22 +409,22 @@ class Maintain extends React.Component {
         <Row gutter={{ xxl: 100, lg: 80 }}>
           <Col xxl={6} lg={8}>
             <FormItem label="编号">
-              {getFieldDecorator('code')(<Input />)}
+              {getFieldDecorator('code')(<Input placeholder="请输入"/>)}
             </FormItem>
           </Col>
           <Col xxl={6} lg={8}>
             <FormItem label="名称">
-              {getFieldDecorator('name')(<Input />)}
+              {getFieldDecorator('name')(<Input placeholder="请输入"/>)}
             </FormItem>
           </Col>
           <Col xxl={6} lg={8}>
             <FormItem label="移动电话">
-              {getFieldDecorator('mobile')(<Input />)}
+              {getFieldDecorator('mobile')(<Input placeholder="请输入"/>)}
             </FormItem>
           </Col>
           <Col xxl={6} lg={8}>
             <FormItem label="Email">
-              {getFieldDecorator('email')(<Input />)}
+              {getFieldDecorator('email')(<Input placeholder="请输入"/>)}
             </FormItem>
           </Col>
           <Col xxl={6} lg={8}>
@@ -431,7 +471,7 @@ class Maintain extends React.Component {
           <Col xxl={6} lg={8}>
             <FormItem label="区域归属">
               {getFieldDecorator('quyu')(
-                <Cascader options={quyuoptions} />,
+                <Cascader options={quyuoptions} placeholder="请选择"/>,
               )}
             </FormItem>
           </Col>
@@ -442,6 +482,7 @@ class Maintain extends React.Component {
                   dataSource={xiaoshuoguishu.map(renderOption)}
                   onSearch={this.xiaoshuoguishuSearch}
                   optionLabelProp="text"
+                  placeholder="请输入"
                 />,
               )}
             </FormItem>
@@ -453,6 +494,7 @@ class Maintain extends React.Component {
                   dataSource={xiaoshuoguishu.map(renderOption)}
                   onSearch={this.xiaoshuoguishuSearch}
                   optionLabelProp="text"
+                  placeholder="请输入"
                 />,
               )}
             </FormItem>
@@ -475,6 +517,7 @@ class Maintain extends React.Component {
     );
   }
 
+  /** 部分筛选条件 */
   renderSimpleForm() {
     const { form } = this.props;
     const { getFieldDecorator } = form;
@@ -483,17 +526,17 @@ class Maintain extends React.Component {
         <Row gutter={{ xxl: 100, lg: 80 }}>
           <Col xxl={6} lg={8}>
             <FormItem label="编号">
-              {getFieldDecorator('code')(<Input />)}
+              {getFieldDecorator('code')(<Input placeholder="请输入"/>)}
             </FormItem>
           </Col>
           <Col xxl={6} lg={8}>
             <FormItem label="名称">
-              {getFieldDecorator('name')(<Input />)}
+              {getFieldDecorator('name')(<Input placeholder="请输入"/>)}
             </FormItem>
           </Col>
           <Col xxl={6} lg={0}>
             <FormItem label="移动电话">
-              {getFieldDecorator('mobile')(<Input />)}
+              {getFieldDecorator('mobile')(<Input placeholder="请输入"/>)}
             </FormItem>
           </Col>
           <Col xxl={6} lg={8}>
@@ -515,8 +558,10 @@ class Maintain extends React.Component {
   }
 
   render() {
-    const { data, selectedRows } = this.state;
+    const { data, selectedRows, changeModal, recordMesg } = this.state;
     const loading = false;
+    const { form } = this.props;
+    const { getFieldDecorator } = form;
 
     return (
       <PageHeaderWrapper>
@@ -539,6 +584,10 @@ class Maintain extends React.Component {
             />
           </div>
         </Card>
+        <ChangeModal
+          changeModal={changeModal}
+          recordMsg={ recordMesg }
+          getFieldDecorator={getFieldDecorator}/>
       </PageHeaderWrapper>
     );
   }

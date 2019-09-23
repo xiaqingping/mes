@@ -245,7 +245,6 @@ class Verification extends React.Component {
     e.preventDefault();
     const { form } = this.props;
     const allValue = form.getFieldsValue();
-    console.log(allValue);
     this.setState({
       formValues: allValue,
     });
@@ -478,6 +477,7 @@ class Verification extends React.Component {
               )}
             </FormItem>
           </Col>
+
         </Row>
         <div style={{ overflow: 'hidden' }}>
           <div style={{ float: 'right', marginBottom: 24 }}>
