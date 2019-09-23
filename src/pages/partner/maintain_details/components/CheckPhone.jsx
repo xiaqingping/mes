@@ -8,8 +8,8 @@ import {
   Select,
   Badge,
 } from 'antd';
-import React, { Component, Fragment } from 'react';
-import styles from './style.less'
+import React, { Component } from 'react';
+import './style.less'
 
 const { Option } = Select;
 const FormItem = Form.Item;
@@ -33,7 +33,13 @@ class CheckPhone extends Component {
 
 
   setModalVisible(phoneVisible) {
-    this.setState({ phoneVisible });
+    this.setState({
+      phoneVisible,
+      status: 1,
+      oneQuestion: null,
+      twoQuestion: null,
+      threeQuestion: null,
+    });
   }
 
   // 用户自行变更验证input的数据
@@ -280,7 +286,7 @@ class CheckPhone extends Component {
           className="check-tabs"
           footer={ null}
         >
-            <Tabs defaultActiveKey="1" onChange={key => { this.tabsChange(key) }}>
+            <Tabs defaultActiveKey="1" onChange={key => { this.tabsChange(key) }} tabBarStyle={{ height: '50px', fontSize: '30px' }}>
               <TabPane tab="用户自行变更" key="1">
               {this.userChange()}
               </TabPane>
