@@ -143,7 +143,7 @@ class Order extends Component {
     loading: false,
     selectedRows: [],
     editIndex: -1,
-    id: 0, // 新增数据时，提供负数id
+    id: 0, // 新增数据时，提供负数id 
   }
 
   columns = [
