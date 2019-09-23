@@ -23,6 +23,7 @@ export default {
   'menu.partner.maintain.details': '客户详情',
   'menu.partner.operation': '操作记录',
   'menu.partner.verification': '验证记录',
+  'menu.peptide': '多肽合成',
   'menu.peptide.order': '多肽订单管理',
   'menu.peptide.purity': '多肽纯度',
   'menu.peptide.product': '多肽合成产品',
