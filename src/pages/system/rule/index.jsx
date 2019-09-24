@@ -78,17 +78,17 @@ class Searchs extends Component {
         <Row gutter={{ lg: 24, md: 12, sm: 6 }}>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="规则名称">
-              {getFieldDecorator('name')(<Input />)}
+              {getFieldDecorator('name')(<Input placeholder="请输入"/>)}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="Client">
-              {getFieldDecorator('client')(<Input />)}
+              {getFieldDecorator('client')(<Input placeholder="请输入"/>)}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="参数">
-              {getFieldDecorator('parameterField')(<Input />)}
+              {getFieldDecorator('parameterField')(<Input placeholder="请输入"/>)}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
@@ -104,8 +104,9 @@ class Searchs extends Component {
           <Col lg={6} md={8} sm={12}>
             <FormItem label="资源">
               {getFieldDecorator('sourcePath')(
-                // <Search onClick={e => { this.showModal() }} />,
-                <Search onSearch={ this.showModal} />,
+                <Search
+                  placeholder="请选择"
+                  onSearch={value => this.showModal(value)} />,
               )}
             </FormItem>
           </Col><Col lg={6} md={8} sm={12}>
@@ -193,7 +194,7 @@ class EditableCell extends React.Component {
  * 页面根组件
  */
 @Form.create()
-class CarrierSeries extends Component {
+class Rule extends Component {
   state = {
     formValues: {
       page: 1,
@@ -317,9 +318,7 @@ class CarrierSeries extends Component {
     },
   ];
 
-  componentDidMount() {
-    //
-  }
+  componentDidMount() {}
 
   handleStandardTableChange = (pagination, filtersArg, sorter) => {
     this.getTableData({
@@ -354,11 +353,6 @@ class CarrierSeries extends Component {
     });
   }
 
-  // 取消编辑
-  cancel = () => {
-    this.setState({ editIndex: -1 });
-  };
-
   // 删除
   deleteRow = row => {
     console.log(row);
@@ -388,6 +382,11 @@ class CarrierSeries extends Component {
       editIndex: index,
     });
   }
+
+  // 取消编辑
+  cancel = () => {
+    this.setState({ editIndex: -1 });
+  };
 
   // 退出编辑
   cancelEdit = (row, index) => {
@@ -432,8 +431,7 @@ class CarrierSeries extends Component {
   };
 
   // 确定
-  handleOk = e => {
-    // console.log(e);
+  handleOk = () => {
     console.log(1);
     this.setState({
       visible: false,
@@ -441,8 +439,7 @@ class CarrierSeries extends Component {
   };
 
   // 取消
-  handleCancel = e => {
-    // console.log(e);
+  handleCancel = () => {
     console.log(2);
     this.setState({
       visible: false,
@@ -492,9 +489,6 @@ class CarrierSeries extends Component {
               <Button icon="plus" type="primary" onClick={() => this.handleAdd()}>
                 新建
               </Button>
-              {/* <Button type="primary" onClick={this.showModal}>
-                Open Modal
-              </Button> */}
             </div>
             <EditableContext.Provider value={this.props.form}>
               <StandardTable
@@ -511,19 +505,19 @@ class CarrierSeries extends Component {
             </EditableContext.Provider>
           </div>
           <Modal
-                title="Basic Modal"
-                visible={this.state.visible}
-                onOk={this.handleOk}
-                onCancel={this.handleCancel}
-              >
-                <p>Some contents...</p>
-                <p>Some contents...</p>
-                <p>Some contents...</p>
-              </Modal>
+            title="Basic Modal"
+            visible={this.state.visible}
+            onOk={this.handleOk}
+            onCancel={this.handleCancel}
+          >
+            <p>Some contents...</p>
+            <p>Some contents...</p>
+            <p>Some contents...</p>
+          </Modal>
         </Card>
       </PageHeaderWrapper>
     );
   }
 }
 
-export default CarrierSeries;
+export default Rule;

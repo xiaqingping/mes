@@ -50,7 +50,7 @@ export default {
   getGroups (params) {
     return request('/dataauth/v1/data/groups/easyui', { params });
   },
-  // 保存
+  // 保存 (新增，删除)
   saveGroups (data) {
     return request('/dataauth/v1/data/groups/list', { method: 'PUT', data });
   },
