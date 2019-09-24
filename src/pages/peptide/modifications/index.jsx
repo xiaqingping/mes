@@ -45,6 +45,7 @@ class Search extends Component {
   renderForm = () => {
     const {
       form: { getFieldDecorator },
+      modificationType,
     } = this.props;
     return (
       <Form onSubmit={this.submit} layout="inline">
@@ -61,9 +62,12 @@ class Search extends Component {
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="修饰类型">
-              {getFieldDecorator('modificationTypeID')(
+              {getFieldDecorator('modificationTypeID', { initialValue: '0' })(
                 <Select>
-                  <Option value="">全部</Option>
+                  <Option value="0">全部</Option>
+                  {modificationType.map(item => <Option key={item.id} value={item.id}>
+                  {item.modificationType}
+                  </Option>)}
                 </Select>)}
             </FormItem>
           </Col>
@@ -153,7 +157,7 @@ class Modifications extends Component {
     loadingSon: false,
     selectedRows: [],
     editIndex: -1,
-    id: 0, // 新增数据时，提供负数id 
+    id: 0, // 新增数据时，提供负数id
     modificationType: [],
     dataSon: [],
   }
@@ -450,6 +454,7 @@ class Modifications extends Component {
       loading,
       dataSon,
       loadingSon,
+      modificationType,
     } = this.state;
     const data = { list, pagination: { current, pageSize, total } };
 
@@ -480,7 +485,7 @@ class Modifications extends Component {
       <PageHeaderWrapper>
         <Card bordered={false}>
           <div className="tableList">
-            <Search getTableData={this.getTableData} />
+            <Search getTableData={this.getTableData} modificationType={ modificationType }/>
             <div className="tableListOperator">
               <Button icon="plus" type="primary" onClick={() => this.handleAdd()}>
                 新建

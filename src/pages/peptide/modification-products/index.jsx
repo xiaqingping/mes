@@ -133,7 +133,7 @@ class ModificationProducts extends Component {
     loading: false,
     selectedRows: [],
     editIndex: -1,
-    id: 0, // 新增数据时，提供负数id 
+    id: 0, // 新增数据时，提供负数id
   }
 
   columns = [
@@ -155,7 +155,7 @@ class ModificationProducts extends Component {
     {
       title: '修饰位置',
       dataIndex: 'modificationPosition',
-      width: 100,
+      width: 110,
       render: text => {
         let val = null;
         peptide.modificationPosition.forEach(item => {
@@ -199,7 +199,7 @@ class ModificationProducts extends Component {
     {
       title: '是否脱盐',
       dataIndex: 'isNeedDesalting',
-      width: 100,
+      width: 110,
       render: text => (text === 1 ? '√' : ''),
     },
     {

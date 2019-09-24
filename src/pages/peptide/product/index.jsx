@@ -10,6 +10,7 @@ import {
   Select,
   message,
   Popconfirm,
+  Checkbox,
 } from 'antd';
 import React, { Component } from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
@@ -25,7 +26,6 @@ const { Option } = Select;
  */
 @Form.create()
 class Search extends Component {
-
   componentDidMount() {
     this.submit();
   }
@@ -58,9 +58,10 @@ class Search extends Component {
           <FormItem label="纯度">
             {getFieldDecorator('purity')(<Select
                   >
-                    {purityValue.map((item) => {
-                      <Option value={item.id}>{item.purity}</Option>
-                    })}
+                    {purityValue.map(item =>
+                      // eslint-disable-next-line no-unused-expressions
+                      <Option key={item.id} value={item.id}>{item.purity}</Option>,
+                    )}
                   </Select>)}
           </FormItem>
         </Col>
@@ -128,6 +129,7 @@ class EditableCell extends React.Component {
             <Form.Item style={{ margin: 0, padding: 0 }}>
               {getFieldDecorator(dataIndex, {
                 rules,
+                valuePropName: 'checked',
                 initialValue: record[dataIndex],
               })(inputType)}
             </Form.Item>
@@ -154,10 +156,10 @@ class Product extends Component {
     loading: false,
     selectedRows: [],
     editIndex: -1,
-    id: 0, // 新增数据时，提供负数id 
-    purityValue:[],
+    id: 0, // 新增数据时，提供负数id
+    purityValue: [],
   }
-  
+
   columns = [
     {
       title: '编号',
@@ -192,7 +194,6 @@ class Product extends Component {
       inputType: <Select
                     showSearch
                     style={{ width: 100 }}
-                    placeholder="Select a person"
                   >
                     <Option value="jack">Jack</Option>
                     <Option value="lucy">Lucy</Option>
@@ -201,32 +202,45 @@ class Product extends Component {
       rules: [
         { required: true, message: '必填' },
       ],
-      render: (text) => {
-        const {purityValue} = this.state;
+      render: text => {
+        const { purityValue } = this.state;
         let val = null;
-        purityValue.map((item) => {
-          if (item.id == text) {
+        purityValue.forEach(item => {
+          if (item.id === text) {
             val = item.purity
           }
         })
         return val;
-      }
+      },
     },
     {
       title: '长度从',
       dataIndex: 'aminoAcidLengthBegin',
       width: 100,
+      editable: true,
+      inputType: <Input />,
+      rules: [
+        { required: true, message: '必填' },
+      ],
     },
     {
       title: '长度至',
       dataIndex: 'aminoAcidLengthEnd',
       width: 100,
+      editable: true,
+      inputType: <Input />,
+      rules: [
+        { required: true, message: '必填' },
+      ],
     },
     {
       title: '是否脱盐',
+      align: 'center',
       dataIndex: 'isNeedDesalting',
       width: 100,
       render: text => (text === 1 ? '√' : ''),
+      editable: true,
+      inputType: <Checkbox style={{ textAlign: 'center' }}/>,
     },
     {
       title: '氨基酸类型',
@@ -236,7 +250,7 @@ class Product extends Component {
     {
       title: '产品编号',
       dataIndex: 'sapProductCode',
-      width: 100,
+      width: 150,
     },
     {
       title: '产品名称',
@@ -245,7 +259,7 @@ class Product extends Component {
     },
     {
       title: '操作',
-      width: 200,
+      width: 150,
       render: (value, row, index) => {
         const { editIndex } = this.state;
         let actions;
@@ -281,7 +295,7 @@ class Product extends Component {
   componentDidMount() {
     api.peptideBase.getPurityAll().then(res => {
       this.setState({
-        purityValue: res
+        purityValue: res,
       })
     })
   }
@@ -394,7 +408,7 @@ class Product extends Component {
       list,
       total,
       loading,
-      purityValue
+      purityValue,
     } = this.state;
     const data = { list, pagination: { current, pageSize, total } };
 
@@ -425,7 +439,7 @@ class Product extends Component {
       <PageHeaderWrapper>
         <Card bordered={false}>
           <div className="tableList">
-            <Search getTableData={this.getTableData}  purityValue={purityValue.map((item) => {return item})}/>
+            <Search getTableData={this.getTableData} purityValue={purityValue.map(item => item)}/>
             <div className="tableListOperator">
               <Button icon="plus" type="primary" onClick={() => this.handleAdd()}>
                 新建
