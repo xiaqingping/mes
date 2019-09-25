@@ -16,7 +16,7 @@ import React, { Component } from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import StandardTable from '@/components/StandardTable';
 import api from '@/api';
-import peptide from '../peptide'
+import { connect } from 'dva';
 
 const EditableContext = React.createContext();
 const FormItem = Form.Item;
@@ -46,6 +46,7 @@ class Search extends Component {
     const {
       form: { getFieldDecorator },
       modificationType,
+      status,
     } = this.props;
     return (
       <Form onSubmit={this.submit} layout="inline">
@@ -73,12 +74,12 @@ class Search extends Component {
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="状态">
-            {getFieldDecorator('status', { initialValue: '1' })(
+            {getFieldDecorator('status', { initialValue: 1 })(
                 <Select>
-                  <Option value="0">全部</Option>
-                  <Option value="1">正常</Option>
-                  <Option value="2">已删除</Option>
-                </Select>)}
+                    {status.map(item =>
+                      <Option key={item.id} value={item.id}>{item.name}</Option>,
+                    )}
+                  </Select>)}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
@@ -144,6 +145,10 @@ class EditableCell extends React.Component {
 /**
  * 页面根组件
  */
+
+@connect(({ peptide }) => ({
+  peptide,
+}))
 @Form.create()
 class Modifications extends Component {
   state = {
@@ -189,7 +194,7 @@ class Modifications extends Component {
       width: 100,
       render: text => {
         let val = null;
-        peptide.modificationPosition.forEach(item => {
+        this.props.peptide.commonData.modificationPosition.forEach(item => {
           if (item.id === text) {
             val = item.name
           }
@@ -457,6 +462,8 @@ class Modifications extends Component {
       modificationType,
     } = this.state;
     const data = { list, pagination: { current, pageSize, total } };
+    const { peptide: { commonData } } = this.props;
+    let tableWidth = 0;
 
     const components = {
       body: {
@@ -465,6 +472,9 @@ class Modifications extends Component {
     };
 
     const columns = this.columns.map(col => {
+      // eslint-disable-next-line no-param-reassign
+      if (!col.width) col.width = 100;
+      tableWidth += col.width;
       if (!col.editable) {
         return col;
       }
@@ -485,7 +495,8 @@ class Modifications extends Component {
       <PageHeaderWrapper>
         <Card bordered={false}>
           <div className="tableList">
-            <Search getTableData={this.getTableData} modificationType={ modificationType }/>
+            <Search getTableData={this.getTableData} modificationType={ modificationType }
+             status={commonData.status}/>
             <div className="tableListOperator">
               <Button icon="plus" type="primary" onClick={() => this.handleAdd()}>
                 新建
@@ -512,7 +523,7 @@ class Modifications extends Component {
               <Col span={9}>
                 <EditableContext.Provider value={this.props.form}>
                   <Table
-                    scroll={{ x: 700 }}
+                    scroll={{ x: tableWidth }}
                     loading={loadingSon}
                     dataSource={dataSon}
                     columns={this.columnSon}

@@ -15,7 +15,7 @@ import React, { Component } from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import StandardTable from '@/components/StandardTable';
 import api from '@/api';
-import peptide from '../peptide'
+import { connect } from 'dva';
 
 const EditableContext = React.createContext();
 const FormItem = Form.Item;
@@ -44,6 +44,7 @@ class Search extends Component {
   renderForm = () => {
     const {
       form: { getFieldDecorator },
+      status,
     } = this.props;
     return (
       <Form onSubmit={this.submit} layout="inline">
@@ -54,15 +55,15 @@ class Search extends Component {
           </FormItem>
         </Col>
         <Col lg={6} md={8} sm={12}>
-          <FormItem label="状态">
-          {getFieldDecorator('status', { initialValue: '1' })(
-              <Select>
-                <Option value="0">全部</Option>
-                <Option value="1">正常</Option>
-                <Option value="2">已删除</Option>
-              </Select>)}
-          </FormItem>
-        </Col>
+            <FormItem label="状态">
+            {getFieldDecorator('status', { initialValue: 1 })(
+                <Select>
+                    {status.map(item =>
+                      <Option key={item.id} value={item.id}>{item.name}</Option>,
+                    )}
+                  </Select>)}
+            </FormItem>
+          </Col>
         <Col lg={6} md={8} sm={12}>
           <span className="submitButtons">
             <Button type="primary" htmlType="submit">
@@ -122,6 +123,9 @@ class EditableCell extends React.Component {
   }
 }
 
+@connect(({ peptide }) => ({
+  peptide,
+}))
 class ModificationProducts extends Component {
   state = {
     formValues: {
@@ -158,7 +162,7 @@ class ModificationProducts extends Component {
       width: 110,
       render: text => {
         let val = null;
-        peptide.modificationPosition.forEach(item => {
+        this.props.peptide.commonData.modificationPosition.forEach(item => {
           if (item.id === text) {
             val = item.name
           }
@@ -443,6 +447,8 @@ class ModificationProducts extends Component {
       loading,
     } = this.state;
     const data = { list, pagination: { current, pageSize, total } };
+    const { peptide: { commonData } } = this.props
+    let tableWidth = 0;
 
     const components = {
       body: {
@@ -451,6 +457,9 @@ class ModificationProducts extends Component {
     };
 
     const columns = this.columns.map(col => {
+      // eslint-disable-next-line no-param-reassign
+      if (!col.width) col.width = 100;
+      tableWidth += col.width;
       if (!col.editable) {
         return col;
       }
@@ -471,7 +480,7 @@ class ModificationProducts extends Component {
       <PageHeaderWrapper>
         <Card bordered={false}>
           <div className="tableList">
-            <Search getTableData={this.getTableData} />
+            <Search getTableData={this.getTableData} status={commonData.status}/>
             <div className="tableListOperator">
               <Button icon="plus" type="primary" onClick={() => this.handleAdd()}>
                 新建
@@ -479,7 +488,7 @@ class ModificationProducts extends Component {
             </div>
             <EditableContext.Provider value={this.props.form}>
               <StandardTable
-                scroll={{ x: 2300 }}
+                scroll={{ x: tableWidth }}
                 rowClassName="editable-row"
                 components={components}
                 selectedRows={selectedRows}

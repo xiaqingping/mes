@@ -16,6 +16,7 @@ import React, { Component } from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import StandardTable from '@/components/StandardTable';
 import api from '@/api';
+import { connect } from 'dva';
 
 const EditableContext = React.createContext();
 const FormItem = Form.Item;
@@ -45,6 +46,7 @@ class Search extends Component {
     const {
       form: { getFieldDecorator },
       purityValue,
+      status,
     } = this.props;
     return (
       <Form onSubmit={this.submit} layout="inline">
@@ -77,12 +79,12 @@ class Search extends Component {
         </Col>
         <Col lg={6} md={8} sm={12}>
           <FormItem label="状态">
-          {getFieldDecorator('status', { initialValue: '1' })(
+          {getFieldDecorator('status', { initialValue: 1 })(
               <Select>
-                <Option value="0">全部</Option>
-                <Option value="1">正常</Option>
-                <Option value="2">已删除</Option>
-              </Select>)}
+                    {status.map(item =>
+                      <Option key={item.id} value={item.id}>{item.name}</Option>,
+                    )}
+                  </Select>)}
           </FormItem>
         </Col>
         <Col lg={6} md={8} sm={12}>
@@ -145,6 +147,9 @@ class EditableCell extends React.Component {
   }
 }
 
+@connect(({ peptide }) => ({
+  peptide,
+}))
 class Product extends Component {
   state = {
     formValues: {
@@ -159,138 +164,6 @@ class Product extends Component {
     id: 0, // 新增数据时，提供负数id
     purityValue: [],
   }
-
-  columns = [
-    {
-      title: '编号',
-      dataIndex: 'code',
-      width: 100,
-    },
-    {
-      title: '提供总量从',
-      dataIndex: 'providerTotalAmountBegin',
-      width: 100,
-      editable: true,
-      inputType: <Input />,
-      rules: [
-        { required: true, message: '必填' },
-      ],
-    },
-    {
-      title: '提供总量至',
-      dataIndex: 'providerTotalAmountEnd',
-      width: 100,
-      editable: true,
-      inputType: <Input />,
-      rules: [
-        { required: true, message: '必填' },
-      ],
-    },
-    {
-      title: '纯度',
-      dataIndex: 'purityID',
-      width: 100,
-      editable: true,
-      inputType: <Select
-                    showSearch
-                    style={{ width: 100 }}
-                  >
-                    <Option value="jack">Jack</Option>
-                    <Option value="lucy">Lucy</Option>
-                    <Option value="tom">Tom</Option>
-                  </Select>,
-      rules: [
-        { required: true, message: '必填' },
-      ],
-      render: text => {
-        const { purityValue } = this.state;
-        let val = null;
-        purityValue.forEach(item => {
-          if (item.id === text) {
-            val = item.purity
-          }
-        })
-        return val;
-      },
-    },
-    {
-      title: '长度从',
-      dataIndex: 'aminoAcidLengthBegin',
-      width: 100,
-      editable: true,
-      inputType: <Input />,
-      rules: [
-        { required: true, message: '必填' },
-      ],
-    },
-    {
-      title: '长度至',
-      dataIndex: 'aminoAcidLengthEnd',
-      width: 100,
-      editable: true,
-      inputType: <Input />,
-      rules: [
-        { required: true, message: '必填' },
-      ],
-    },
-    {
-      title: '是否脱盐',
-      align: 'center',
-      dataIndex: 'isNeedDesalting',
-      width: 100,
-      render: text => (text === 1 ? '√' : ''),
-      editable: true,
-      inputType: <Checkbox style={{ textAlign: 'center' }}/>,
-    },
-    {
-      title: '氨基酸类型',
-      dataIndex: 'aminoAcidType',
-      width: 100,
-    },
-    {
-      title: '产品编号',
-      dataIndex: 'sapProductCode',
-      width: 150,
-    },
-    {
-      title: '产品名称',
-      dataIndex: 'sapProductName',
-      width: 300,
-    },
-    {
-      title: '操作',
-      width: 150,
-      render: (value, row, index) => {
-        const { editIndex } = this.state;
-        let actions;
-        if (editIndex !== index) {
-          if (row.status === 1) {
-            actions = (
-              <Popconfirm title="确定删除数据？" onConfirm={() => this.deleteRow(row)}>
-                <a>删除</a>
-              </Popconfirm>
-            );
-          } else {
-            actions = (
-              <Popconfirm title="确定恢复数据？" onConfirm={() => this.resumeRow(row)}>
-                <a>恢复</a>
-              </Popconfirm>
-            );
-          }
-        }
-        if (editIndex === index) {
-          actions = (
-            <>
-              <a onClick={() => this.saveRow(index)}>保存</a>
-              <Divider type="vertical" />
-              <a onClick={() => this.cancelEdit(row, -1)}>退出</a>
-            </>
-          );
-        }
-        return actions;
-      },
-    },
-  ];
 
   componentDidMount() {
     api.peptideBase.getPurityAll().then(res => {
@@ -411,6 +284,143 @@ class Product extends Component {
       purityValue,
     } = this.state;
     const data = { list, pagination: { current, pageSize, total } };
+    let tableWidth = 0;
+    const { peptide: { commonData } } = this.props
+
+    let columns = [
+      {
+        title: '编号',
+        dataIndex: 'code',
+        width: 100,
+      },
+      {
+        title: '提供总量从',
+        dataIndex: 'providerTotalAmountBegin',
+        width: 150,
+        editable: true,
+        inputType: <Input style={{ width: 100 }}/>,
+        rules: [
+          { required: true, message: '必填' },
+        ],
+      },
+      {
+        title: '提供总量至',
+        dataIndex: 'providerTotalAmountEnd',
+        width: 150,
+        editable: true,
+        inputType: <Input style={{ width: 100 }}/>,
+        rules: [
+          { required: true, message: '必填' },
+        ],
+      },
+      {
+        title: '纯度',
+        dataIndex: 'purityID',
+        width: 150,
+        editable: true,
+        inputType: (
+          <Select style={{ width: 100 }}>
+          {purityValue.map(item =>
+            <Option value={item.id} key={item.id}>{item.purity}</Option>,
+          )}
+          </Select>),
+        rules: [
+          { required: true, message: '必填' },
+        ],
+        render: text => {
+          let val = null;
+          purityValue.forEach(item => {
+            if (item.id === text) {
+              val = item.purity
+            }
+          })
+          return val;
+        },
+      },
+      {
+        title: '长度从',
+        dataIndex: 'aminoAcidLengthBegin',
+        width: 100,
+        editable: true,
+        inputType: <Input style={{ width: 80 }}/>,
+        rules: [
+          { required: true, message: '必填' },
+        ],
+      },
+      {
+        title: '长度至',
+        dataIndex: 'aminoAcidLengthEnd',
+        width: 100,
+        editable: true,
+        inputType: <Input style={{ width: 80 }}/>,
+        rules: [
+          { required: true, message: '必填' },
+        ],
+      },
+      {
+        title: '是否脱盐',
+        align: 'center',
+        dataIndex: 'isNeedDesalting',
+        width: 100,
+        render: text => (text === 1 ? '√' : ''),
+        editable: true,
+        inputType: <Checkbox style={{ textAlign: 'center', display: 'block' }}/>,
+      },
+      {
+        title: '氨基酸类型',
+        dataIndex: 'aminoAcidType',
+        width: 120,
+        editable: true,
+        inputType: (
+          <Select style={{ width: 100 }}>
+              <Option value="L">L</Option>
+              <Option value="D">D</Option>
+          </Select>),
+      },
+      {
+        title: '产品编号',
+        dataIndex: 'sapProductCode',
+        width: 150,
+      },
+      {
+        title: '产品名称',
+        dataIndex: 'sapProductName',
+        width: 300,
+      },
+      {
+        title: '操作',
+        width: 150,
+        render: (value, row, index) => {
+          const { editIndex } = this.state;
+          let actions;
+          if (editIndex !== index) {
+            if (row.status === 1) {
+              actions = (
+                <Popconfirm title="确定删除数据？" onConfirm={() => this.deleteRow(row)}>
+                  <a>删除</a>
+                </Popconfirm>
+              );
+            } else {
+              actions = (
+                <Popconfirm title="确定恢复数据？" onConfirm={() => this.resumeRow(row)}>
+                  <a>恢复</a>
+                </Popconfirm>
+              );
+            }
+          }
+          if (editIndex === index) {
+            actions = (
+              <>
+                <a onClick={() => this.saveRow(index)}>保存</a>
+                <Divider type="vertical" />
+                <a onClick={() => this.cancelEdit(row, -1)}>退出</a>
+              </>
+            );
+          }
+          return actions;
+        },
+      },
+    ];
 
     const components = {
       body: {
@@ -418,7 +428,10 @@ class Product extends Component {
       },
     };
 
-    const columns = this.columns.map(col => {
+    columns = columns.map(col => {
+      // eslint-disable-next-line no-param-reassign
+      if (!col.width) col.width = 100;
+      tableWidth += col.width;
       if (!col.editable) {
         return col;
       }
@@ -439,7 +452,8 @@ class Product extends Component {
       <PageHeaderWrapper>
         <Card bordered={false}>
           <div className="tableList">
-            <Search getTableData={this.getTableData} purityValue={purityValue.map(item => item)}/>
+            <Search getTableData={this.getTableData}
+            purityValue={purityValue.map(item => item)} status={commonData.status}/>
             <div className="tableListOperator">
               <Button icon="plus" type="primary" onClick={() => this.handleAdd()}>
                 新建
@@ -447,7 +461,7 @@ class Product extends Component {
             </div>
             <EditableContext.Provider value={this.props.form}>
               <StandardTable
-                scroll={{ x: 1300 }}
+                scroll={{ x: tableWidth }}
                 rowClassName="editable-row"
                 components={components}
                 selectedRows={selectedRows}
