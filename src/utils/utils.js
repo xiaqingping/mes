@@ -21,3 +21,26 @@ export const isAntDesignProOrDev = () => {
   return isAntDesignPro();
 };
 export const getPageQuery = () => parse(window.location.href.split('?')[1]);
+
+/**
+ * 数据格式化
+ * @param {Array} arr 需要遍历的数组
+ * @param {any} value 输入数据
+ * @param {string} key1 查找字段（默认id）
+ * @param {string} key2 输出字段（默认name）
+ */
+export const formatter = (arr, value, key1, key2) => {
+  if (!arr) return value;
+  if (!(arr instanceof Array)) return value;
+
+  const k1 = key1 || 'id';
+  const k2 = key2 || 'name';
+
+  for (let i = 0; i < arr.length; i++) {
+      // eslint-disable-next-line eqeqeq
+      if (arr[i][k1] == value) {
+          return arr[i][k2];
+      }
+  }
+  return value;
+};

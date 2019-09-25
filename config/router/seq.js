@@ -14,5 +14,10 @@ module.exports = {
       path: '/seq/carrier-series',
       component: './seq/carrier-series',
     },
+    {
+      name: 'carrier',
+      path: '/seq/carrier',
+      component: './seq/carrier',
+    },
   ],
 };

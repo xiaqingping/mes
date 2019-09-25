@@ -1,5 +1,6 @@
 import {
   Button,
+  Icon,
   Card,
   Col,
   Divider,
@@ -25,13 +26,24 @@ const { Option } = Select;
 /**
  * 页面顶部筛选表单
  */
+@connect(({ seq }) => ({
+  carrierSeries: seq.carrierSeries,
+}))
 @Form.create()
 class Search extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      expandForm: false,
+    }
+  }
+
   componentDidMount() {
     this.submit();
   }
 
   submit = e => {
+    console.log(e);
     if (e) e.preventDefault();
     const val = this.props.form.getFieldsValue();
     this.props.getTableData({ page: 1, ...val });
@@ -41,25 +53,48 @@ class Search extends Component {
     this.props.form.resetFields();
   }
 
-  // 渲染表单
-  renderForm = () => {
+  toggleForm = () => {
+    const { expandForm } = this.state;
+    this.setState({
+      expandForm: !expandForm,
+    });
+  };
+
+  renderAdvancedForm() {
     const {
       form: { getFieldDecorator },
     } = this.props;
+
     return (
       <Form onSubmit={this.submit} layout="inline">
-        <Row gutter={{ lg: 24, md: 12, sm: 6 }}>
-          <Col lg={6} md={8} sm={12}>
+        <Row gutter={{ xxl: 100, lg: 80 }}>
+          <Col xxl={6} lg={8}>
             <FormItem label="编号">
               {getFieldDecorator('code')(<Input />)}
             </FormItem>
           </Col>
-          <Col lg={6} md={8} sm={12}>
+          <Col xxl={6} lg={8}>
             <FormItem label="名称">
               {getFieldDecorator('name')(<Input />)}
             </FormItem>
           </Col>
-          <Col lg={6} md={8} sm={12}>
+          <Col xxl={6} lg={8}>
+            <FormItem label="别名">
+              {getFieldDecorator('alias')(<Input />)}
+            </FormItem>
+          </Col>
+          <Col xxl={6} lg={8}>
+            <FormItem label="系列">
+              {getFieldDecorator('seriesId')(
+                <Select>
+                  {this.props.carrierSeries.map(e =>
+                    <Option value={e.id} key={e.id}>{e.name}</Option>,
+                  )}
+                </Select>,
+              )}
+            </FormItem>
+          </Col>
+          <Col xxl={6} lg={8}>
             <FormItem label="状态">
               {getFieldDecorator('status', { initialValue: '1' })(
                 <Select>
@@ -70,7 +105,46 @@ class Search extends Component {
               )}
             </FormItem>
           </Col>
-          <Col lg={6} md={8} sm={12}>
+        </Row>
+        <div style={{ overflow: 'hidden' }}>
+          <div style={{ float: 'right', marginBottom: 24 }}>
+            <Button type="primary" htmlType="submit">
+              查询
+            </Button>
+            <Button style={{ marginLeft: 8 }} onClick={this.handleFormReset}>
+              重置
+            </Button>
+            <a style={{ marginLeft: 8 }} onClick={this.toggleForm}>
+              收起 <Icon type="up" />
+            </a>
+          </div>
+        </div>
+      </Form>
+    );
+  }
+
+  renderSimpleForm() {
+    const { form } = this.props;
+    const { getFieldDecorator } = form;
+    return (
+      <Form onSubmit={this.submit} layout="inline">
+        <Row gutter={{ xxl: 100, lg: 80 }}>
+          <Col xxl={6} lg={8}>
+            <FormItem label="编号">
+              {getFieldDecorator('code')(<Input />)}
+            </FormItem>
+          </Col>
+          <Col xxl={6} lg={8}>
+            <FormItem label="名称">
+              {getFieldDecorator('name')(<Input />)}
+            </FormItem>
+          </Col>
+          <Col xxl={6} lg={0}>
+            <FormItem label="别名">
+              {getFieldDecorator('alias')(<Input />)}
+            </FormItem>
+          </Col>
+          <Col xxl={6} lg={8}>
             <span className="submitButtons">
               <Button type="primary" htmlType="submit">
                 查询
@@ -78,11 +152,20 @@ class Search extends Component {
               <Button style={{ marginLeft: 8 }} onClick={this.handleFormReset}>
                 重置
               </Button>
+              <a style={{ marginLeft: 8 }} onClick={this.toggleForm}>
+                展开 <Icon type="down" />
+              </a>
             </span>
           </Col>
         </Row>
       </Form>
     );
+  }
+
+  // 渲染表单
+  renderForm = () => {
+    const { expandForm } = this.state;
+    return expandForm ? this.renderAdvancedForm() : this.renderSimpleForm();
   }
 
   render() {
@@ -134,11 +217,12 @@ class EditableCell extends React.Component {
 /**
  * 页面根组件
  */
-@connect(({ global }) => ({
+@connect(({ global, seq }) => ({
   commonStatus: global.commonStatus,
+  carrierSeries: seq.carrierSeries,
 }))
 @Form.create()
-class CarrierSeries extends Component {
+class Carrier extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -156,7 +240,10 @@ class CarrierSeries extends Component {
   }
 
   componentDidMount() {
-    //
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'seq/getCarrierSeries',
+    });
   }
 
   handleStandardTableChange = (pagination, filtersArg, sorter) => {
@@ -182,7 +269,7 @@ class CarrierSeries extends Component {
       loading: true,
     });
 
-    api.series.getSeries(query, true).then(res => {
+    api.carrier.getCarrier(query, true).then(res => {
       this.setState({
         list: res.rows,
         total: res.total,
@@ -199,21 +286,29 @@ class CarrierSeries extends Component {
 
   // 作废数据
   deleteRow = row => {
-    api.series.cancelSeries(row.id).then(() => {
+    api.carrier.cancelCarrier(row.id).then(() => {
       this.getTableData();
     });
   };
 
   // 保存
   saveRow = index => {
+    const { carrierSeries } = this.props
     this.props.form.validateFields((error, row) => {
       if (error) return;
+      const series = carrierSeries.filter(e => e.id === row.seriesId)[0];
+
       const { list } = this.state;
-      const newData = { ...list[index], ...row };
+      const newData = {
+        ...list[index],
+        ...row,
+        ...{ seriesName: series.name, seriesCode: series.code },
+      };
+
       if (newData.id > 0) {
-        api.series.updateSeries(newData).then(() => this.getTableData());
+        api.carrier.updateCarrier(newData).then(() => this.getTableData());
       } else {
-        api.series.addSeries(newData).then(() => this.getTableData());
+        api.carrier.addCarrier(newData).then(() => this.getTableData());
       }
     });
   }
@@ -271,7 +366,7 @@ class CarrierSeries extends Component {
       total,
       loading,
     } = this.state;
-    const { commonStatus } = this.props;
+    const { commonStatus, carrierSeries } = this.props;
     const data = { list, pagination: { current, pageSize, total } };
     let tableWidth = 0;
 
@@ -289,12 +384,38 @@ class CarrierSeries extends Component {
       {
         title: '名称',
         dataIndex: 'name',
-        width: 180,
+        width: 150,
         editable: true,
         inputType: <Input />,
         rules: [
           { required: true, message: '必填' },
         ],
+      },
+      {
+        title: '别名',
+        dataIndex: 'alias',
+        width: 150,
+        editable: true,
+        inputType: <Input />,
+      },
+      {
+        title: '系列',
+        dataIndex: 'seriesId',
+        width: 150,
+        editable: true,
+        inputType: (
+          <Select style={{ width: 100 }}>
+            {carrierSeries.map(e =>
+              <Option value={e.id} key={e.id}>{e.name}</Option>,
+            )}
+          </Select>
+        ),
+        rules: [
+          { required: true, message: '必填' },
+        ],
+        render(text) {
+          return formatter(carrierSeries, text);
+        },
       },
       {
         title: '状态',
@@ -306,6 +427,7 @@ class CarrierSeries extends Component {
       {
         title: '创建人',
         dataIndex: 'creatorName',
+        width: 100,
       },
       {
         title: '创建时间',
@@ -315,6 +437,7 @@ class CarrierSeries extends Component {
       {
         title: '修改人',
         dataIndex: 'changerName',
+        width: 100,
       },
       {
         title: '修改时间',
@@ -324,6 +447,7 @@ class CarrierSeries extends Component {
       {
         title: '作废人',
         dataIndex: 'cancelName',
+        width: 100,
       },
       {
         title: '作废时间',
@@ -412,4 +536,4 @@ class CarrierSeries extends Component {
   }
 }
 
-export default CarrierSeries;
+export default Carrier;
