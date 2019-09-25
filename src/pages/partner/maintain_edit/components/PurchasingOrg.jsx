@@ -123,6 +123,7 @@ class Type extends Component {
   render() {
     return (
       <Card
+        title="采购组织"
         bordered={false}
         style={{ marginBottom: '24px' }}
         tabList={tabListNoTitle}

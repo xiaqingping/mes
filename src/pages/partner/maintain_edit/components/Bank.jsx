@@ -1,71 +1,30 @@
 import {
-  Badge,
-  Button,
   Card,
   Col,
-  DatePicker,
-  Divider,
-  Dropdown,
   Form,
-  Icon,
   Input,
-  InputNumber,
-  Menu,
   Row,
   Select,
-  Switch,
-  message,
-  Cascader,
 } from 'antd';
 import React, { Component } from 'react';
 
 const FormItem = Form.Item;
-const InputGroup = Input.Group;
 const { Option } = Select;
-const { RangePicker } = DatePicker;
 
-const tabListNoTitle = [
-  {
-    key: 'kaipiao',
-    tab: '开票银行',
-  },
-  {
-    key: 'fukuan',
-    tab: '付款银行',
-  },
-];
-
-// eslint-disable-next-line react/prefer-stateless-function
 class Bank extends Component {
-  state = {
-    tabKey: 'kaipiao',
+  constructor(props) {
+    super(props);
+    this.state = {};
   }
 
-  onTabChange = key => {
-    this.setState({
-      tabKey: key,
-    });
-  }
-
-  renderChildrenByTabKey = tabKey => {
-    if (tabKey === 'kaipiao') {
-      return this.renderKaipiao();
-    }
-    if (tabKey === 'fukuan') {
-      return this.renderFukuan();
-    }
-    return null;
-  }
-
-  // 开票银行
-  renderKaipiao = () => {
+  renderBank = () => {
     const {
       form: { getFieldDecorator },
     } = this.props;
     return (
       <Form layout="vertical">
         <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
-          <Col md={4}>
+          <Col md={6}>
             <FormItem label="国家">
               {getFieldDecorator('email', {
                 initValue: '1',
@@ -77,7 +36,7 @@ class Bank extends Component {
               )}
             </FormItem>
           </Col>
-          <Col md={4}>
+          <Col md={6}>
             <FormItem label="开户行">
               {getFieldDecorator('kaihubank', {
                 initValue: '1',
@@ -89,19 +48,14 @@ class Bank extends Component {
               )}
             </FormItem>
           </Col>
-          <Col md={4}>
+          <Col md={6}>
             <FormItem label="银行账户">
               {getFieldDecorator('zhanghu')(<Input />)}
             </FormItem>
           </Col>
-          <Col md={4}>
+          <Col md={6}>
             <FormItem label="户名">
               {getFieldDecorator('huming')(<Input />)}
-            </FormItem>
-          </Col>
-          <Col md={8}>
-            <FormItem label="有效期">
-              {getFieldDecorator('time')(<RangePicker />)}
             </FormItem>
           </Col>
         </Row>
@@ -109,23 +63,14 @@ class Bank extends Component {
     );
   }
 
-  // 付款银行
-  renderFukuan = () => (
-    <div>付款</div>
-  )
 
   render() {
-    const { tabKey } = this.state;
     return (
       <Card
+        title="付款银行"
         bordered={false}
-        tabList={tabListNoTitle}
-        activeTabKey={this.state.tabKey}
-        onTabChange={key => {
-          this.onTabChange(key);
-        }}
       >
-        {this.renderChildrenByTabKey(tabKey)}
+        {this.renderBank()}
       </Card>
     );
   }
