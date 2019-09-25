@@ -267,6 +267,19 @@ class DisulfideBondProducts extends Component {
     //
   }
 
+  componentWillReceiveProps(nextProps) {
+    const { peptide:
+      { data },
+     } = nextProps
+    if (nextProps) {
+      this.setState({
+        loading: false,
+        list: data.rows,
+        total: data.total,
+      });
+    }
+  }
+
   // 分页
   handleStandardTableChange = pagination => {
     this.getTableData({
@@ -285,6 +298,7 @@ class DisulfideBondProducts extends Component {
   // 获取表格数据
   getTableData = (options = {}) => {
     const { formValues } = this.state;
+    const { dispatch } = this.props;
     const query = Object.assign({}, formValues, options);
 
     this.setState({
@@ -292,14 +306,10 @@ class DisulfideBondProducts extends Component {
       loading: true,
     });
 
-    api.peptideBase.getdisulfideBondProducts(query).then(res => {
-      this.setState({
-        list: res.rows,
-        total: res.total,
-        loading: false,
-        editIndex: -1,
-      });
-    });
+    dispatch({
+      type: 'peptide/getdisulfideBondProducts',
+      payload: query,
+    })
   }
 
   handleFormReset = () => {

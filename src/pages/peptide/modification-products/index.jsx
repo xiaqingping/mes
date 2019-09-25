@@ -286,6 +286,19 @@ class ModificationProducts extends Component {
     //
   }
 
+  componentWillReceiveProps(nextProps) {
+    const { peptide:
+      { data },
+     } = nextProps
+    if (nextProps) {
+      this.setState({
+        loading: false,
+        list: data.rows,
+        total: data.total,
+      });
+    }
+  }
+
   // 分页
   handleStandardTableChange = pagination => {
     this.getTableData({
@@ -304,12 +317,18 @@ class ModificationProducts extends Component {
   // 获取表格数据
   getTableData = (options = {}) => {
     const { formValues } = this.state;
+    const { dispatch } = this.props;
     const query = Object.assign({}, formValues, options);
 
     this.setState({
       formValues: query,
       loading: true,
     });
+
+    dispatch({
+      type: 'peptide/getModificationProducts',
+      payload: query,
+    })
 
     api.peptideBase.getModificationProducts(query).then(res => {
       this.setState({

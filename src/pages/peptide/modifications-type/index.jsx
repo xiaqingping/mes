@@ -230,6 +230,19 @@ class ModificationsType extends Component {
     //
   }
 
+  componentWillReceiveProps(nextProps) {
+    const { peptide:
+      { data },
+     } = nextProps
+    if (nextProps) {
+      this.setState({
+        loading: false,
+        list: data.rows,
+        total: data.total,
+      });
+    }
+  }
+
   // 分页
   handleStandardTableChange = pagination => {
     this.getTableData({
@@ -249,12 +262,16 @@ class ModificationsType extends Component {
   getTableData = (options = {}) => {
     const { formValues } = this.state;
     const query = Object.assign({}, formValues, options);
-
+    const { dispatch } = this.props;
     this.setState({
       formValues: query,
       loading: true,
     });
 
+    dispatch({
+      type: 'peptide/getModificationTypes',
+      payload: query,
+    })
     api.peptideBase.getModificationTypes(query).then(res => {
       this.setState({
         list: res.rows,
