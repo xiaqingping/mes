@@ -1,11 +1,15 @@
 import {
-  Button,
   Form,
   Row,
   Col,
   Select,
   Switch,
+  Radio,
   Tabs,
+  Card,
+  Cascader,
+  Icon,
+  Empty,
 } from 'antd';
 import React, { Component } from 'react';
 import BillToParty from './BillToParty';
@@ -21,13 +25,10 @@ const { TabPane } = Tabs;
 
 class BasicInfo extends Component {
   state = {
+    tabKey: '生工国内直销',
     salesScope: [
-      { key: 1 },
+      { title: '生工国内直销' },
     ],
-  }
-
-  onTabChange = obj => {
-    this.setState(obj);
   }
 
   renderTabPane = obj => {
@@ -36,10 +37,10 @@ class BasicInfo extends Component {
     } = this.props;
 
     return (
-      <TabPane tab="生工国内电商" key="1">
+      <>
         <Form>
           <Row gutter={32}>
-            <Col span={3}>
+            <Col span={5}>
               <FormItem label="网点归属">
                 {getFieldDecorator('wangdian')(
                   <Select>
@@ -48,7 +49,7 @@ class BasicInfo extends Component {
                 )}
               </FormItem>
             </Col>
-            <Col span={3}>
+            <Col span={5}>
               <FormItem label="默认付款方式">
                 {getFieldDecorator('paytype')(
                   <Select>
@@ -57,7 +58,7 @@ class BasicInfo extends Component {
                 )}
               </FormItem>
             </Col>
-            <Col span={3}>
+            <Col span={5}>
               <FormItem label="币种">
                 {getFieldDecorator('currency')(
                   <Select>
@@ -66,23 +67,19 @@ class BasicInfo extends Component {
                 )}
               </FormItem>
             </Col>
-            <Col span={3}>
-              <FormItem label="客户分类">
-                {getFieldDecorator('type')(
-                  <Select>
-                    <Option value="1">大专院校</Option>
-                  </Select>,
-                )}
-              </FormItem>
-            </Col>
-            <Col span={3}>
-              <FormItem label="随货开票">
-                {getFieldDecorator('kaipiao', { valuePropName: 'checked' })(<Switch />)}
-              </FormItem>
-            </Col>
-            <Col span={3}>
+            <Col span={2}>
               <FormItem label="销售冻结">
                 {getFieldDecorator('dongj', { valuePropName: 'checked' })(<Switch />)}
+              </FormItem>
+            </Col>
+            <Col span={7}>
+              <FormItem label="默认开票类型">
+                {getFieldDecorator('kaipiao', { initialValue: 'a' })(
+                  <Radio.Group>
+                    <Radio.Button value="a">增值税专用发票</Radio.Button>
+                    <Radio.Button value="b">增值税普通发票</Radio.Button>
+                  </Radio.Group>,
+                )}
               </FormItem>
             </Col>
           </Row>
@@ -101,41 +98,115 @@ class BasicInfo extends Component {
             <Salesperson />
           </TabPane>
         </Tabs>
-      </TabPane>
+      </>
     );
   }
 
-  selectSalesScope = value => {
-    console.log(value);
+  onTabChange = tabKey => {
+    if (tabKey === 'select') return;
+    this.setState({
+      tabKey,
+    });
   }
 
-  renderSelect = () => {
-    const list = [
-      { value: '1', title: '生工国内电商' },
-      { value: '2', title: '生工国外电商' },
-      { value: '3', title: '生工国内直销' },
-      { value: '4', title: '生工国外直销' },
+  onChange = obj => {
+    const { salesScope } = this.state;
+    salesScope.push({
+      title: obj[1],
+    });
+    this.setState({ salesScope, tabKey: obj[1] });
+  }
+
+  renderSelectSalesScope = () => {
+    const options = [
+      {
+        value: '生工生物',
+        label: '生工生物',
+        children: [
+          {
+            value: '生工国内直销',
+            label: '生工国内直销',
+          },
+          {
+            value: '生工国内电商',
+            label: '生工国内电商',
+          },
+          {
+            value: '生工国外直销',
+            label: '生工国外直销',
+          },
+          {
+            value: '生工国外电商',
+            label: '生工国外电商',
+          },
+        ],
+      },
+      {
+        value: 'BBI',
+        label: 'BBI',
+        children: [
+          {
+            value: 'BBI国内直销',
+            label: 'BBI国内直销',
+          },
+          {
+            value: 'BBI国内电商',
+            label: 'BBI国内电商',
+          },
+          {
+            value: 'BBI国外直销',
+            label: 'BBI国外直销',
+          },
+          {
+            value: 'BBI国外电商',
+            label: 'BBI国外电商',
+          },
+        ],
+      },
     ];
     return (
-      <Select
-        style={{ marginRight: 24, width: 130 }}
-        placeholder="销售范围"
-        onSelect={this.selectSalesScope}
-      >
-        {list.map(e => <Option value={e.value} key={e.value}>{e.title}</Option>)}
-      </Select>
+      <Cascader options={options} onChange={this.onChange}>
+        <a style={{ fontSize: 14, marginLeft: -16 }} href="#">销售范围 <Icon type="down" style={{ fontSize: 12 }} /></a>
+      </Cascader>
     );
+  }
+
+  closeTab = tabKey => {
+    console.log(tabKey);
   }
 
   render() {
-    const { salesScope } = this.state;
+    const { salesScope, tabKey } = this.state;
+    let tabList = salesScope.map(e => ({ key: e.title, tab: e.title }));
+    tabList = tabList.concat({
+      key: 'select',
+      tab: this.renderSelectSalesScope(),
+    });
+    tabList.forEach(e => {
+      if (e.key === tabKey) {
+        e.tab = (
+          <>{e.tab} <Icon type="close" style={{ fontSize: 12 }} onClick={() => this.closeTab(e.key)} /></>
+        );
+      } else {
+        e.tab = (
+          <>{e.tab} <Icon type="close" style={{ fontSize: 12, visibility: 'hidden' }} /></>
+        );
+      }
+    });
+
     return (
-      <Tabs
-        className={styles.externalTab}
-        tabBarExtraContent={this.renderSelect()}
+      <Card
+        title="销售范围"
+        bordered={false}
+        style={{ marginBottom: '24px' }}
+        tabList={tabList}
+        activeTabKey={tabKey}
+        onTabChange={key => {
+          this.onTabChange(key);
+        }}
       >
-        { salesScope.length > 0 ? salesScope.map(e => this.renderTabPane(e)) : <TabPane tab="空" key="null"></TabPane> }
-      </Tabs>
+        {tabKey ? this.renderTabPane() : <Empty description="暂无销售范围" />}
+      </Card>
     );
   }
 }
