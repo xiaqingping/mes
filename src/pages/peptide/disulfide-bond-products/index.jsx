@@ -15,6 +15,7 @@ import React, { Component } from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import StandardTable from '@/components/StandardTable';
 import api from '@/api';
+import { connect } from 'dva';
 
 const EditableContext = React.createContext();
 const FormItem = Form.Item;
@@ -121,6 +122,9 @@ class EditableCell extends React.Component {
   }
 }
 
+@connect(({ peptide }) => ({
+  peptide,
+}))
 class DisulfideBondProducts extends Component {
   state = {
     formValues: {
@@ -132,7 +136,7 @@ class DisulfideBondProducts extends Component {
     loading: false,
     selectedRows: [],
     editIndex: -1,
-    id: 0, // 新增数据时，提供负数id 
+    id: 0, // 新增数据时，提供负数id
   }
 
   columns = [
@@ -262,6 +266,19 @@ class DisulfideBondProducts extends Component {
     //
   }
 
+  componentWillReceiveProps(nextProps) {
+    const { peptide:
+      { data },
+     } = nextProps
+    if (nextProps) {
+      this.setState({
+        loading: false,
+        list: data.rows,
+        total: data.total,
+      });
+    }
+  }
+
   // 分页
   handleStandardTableChange = pagination => {
     this.getTableData({
@@ -280,6 +297,7 @@ class DisulfideBondProducts extends Component {
   // 获取表格数据
   getTableData = (options = {}) => {
     const { formValues } = this.state;
+    const { dispatch } = this.props;
     const query = Object.assign({}, formValues, options);
 
     this.setState({
@@ -287,14 +305,10 @@ class DisulfideBondProducts extends Component {
       loading: true,
     });
 
-    api.peptideBase.getdisulfideBondProducts(query).then(res => {
-      this.setState({
-        list: res.rows,
-        total: res.total,
-        loading: false,
-        editIndex: -1,
-      });
-    });
+    dispatch({
+      type: 'peptide/getdisulfideBondProducts',
+      payload: query,
+    })
   }
 
   handleFormReset = () => {

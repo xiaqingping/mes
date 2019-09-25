@@ -16,6 +16,7 @@ import React, { Component } from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import StandardTable from '@/components/StandardTable';
 import api from '@/api';
+import { connect } from 'dva';
 
 const EditableContext = React.createContext();
 const FormItem = Form.Item;
@@ -45,6 +46,7 @@ class Search extends Component {
     const {
       form: { getFieldDecorator },
       purityValue,
+      status,
     } = this.props;
     return (
       <Form onSubmit={this.submit} layout="inline">
@@ -77,12 +79,12 @@ class Search extends Component {
         </Col>
         <Col lg={6} md={8} sm={12}>
           <FormItem label="状态">
-          {getFieldDecorator('status', { initialValue: '1' })(
+          {getFieldDecorator('status', { initialValue: 1 })(
               <Select>
-                <Option value="0">全部</Option>
-                <Option value="1">正常</Option>
-                <Option value="2">已删除</Option>
-              </Select>)}
+                    {status.map(item =>
+                      <Option key={item.id} value={item.id}>{item.name}</Option>,
+                    )}
+                  </Select>)}
           </FormItem>
         </Col>
         <Col lg={6} md={8} sm={12}>
@@ -145,6 +147,9 @@ class EditableCell extends React.Component {
   }
 }
 
+@connect(({ peptide }) => ({
+  peptide,
+}))
 class Product extends Component {
   state = {
     formValues: {
@@ -300,6 +305,19 @@ class Product extends Component {
     })
   }
 
+  componentWillReceiveProps(nextProps) {
+    const { peptide:
+      { data },
+     } = nextProps
+    if (nextProps) {
+      this.setState({
+        loading: false,
+        list: data.rows,
+        total: data.total,
+      });
+    }
+  }
+
   // 分页
   handleStandardTableChange = pagination => {
     this.getTableData({
@@ -318,6 +336,7 @@ class Product extends Component {
   // 获取表格数据
   getTableData = (options = {}) => {
     const { formValues } = this.state;
+    const { dispatch } = this.props;
     const query = Object.assign({}, formValues, options);
 
     this.setState({
@@ -325,14 +344,10 @@ class Product extends Component {
       loading: true,
     });
 
-    api.peptideBase.getProduct(query).then(res => {
-      this.setState({
-        list: res.rows,
-        total: res.total,
-        loading: false,
-        editIndex: -1,
-      });
-    });
+    dispatch({
+      type: 'peptide/getProduct',
+      payload: query,
+    })
   }
 
   handleFormReset = () => {
@@ -411,6 +426,8 @@ class Product extends Component {
       purityValue,
     } = this.state;
     const data = { list, pagination: { current, pageSize, total } };
+    let tableWidth = 0;
+    const { peptide: { commonData } } = this.props
 
     const components = {
       body: {
@@ -419,6 +436,9 @@ class Product extends Component {
     };
 
     const columns = this.columns.map(col => {
+      // eslint-disable-next-line no-param-reassign
+      if (!col.width) col.width = 100;
+      tableWidth += col.width;
       if (!col.editable) {
         return col;
       }
@@ -439,7 +459,8 @@ class Product extends Component {
       <PageHeaderWrapper>
         <Card bordered={false}>
           <div className="tableList">
-            <Search getTableData={this.getTableData} purityValue={purityValue.map(item => item)}/>
+            <Search getTableData={this.getTableData}
+            purityValue={purityValue.map(item => item)} status={commonData.status}/>
             <div className="tableListOperator">
               <Button icon="plus" type="primary" onClick={() => this.handleAdd()}>
                 新建
@@ -447,7 +468,7 @@ class Product extends Component {
             </div>
             <EditableContext.Provider value={this.props.form}>
               <StandardTable
-                scroll={{ x: 1300 }}
+                scroll={{ x: tableWidth }}
                 rowClassName="editable-row"
                 components={components}
                 selectedRows={selectedRows}

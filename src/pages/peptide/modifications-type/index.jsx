@@ -15,6 +15,7 @@ import React, { Component } from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import StandardTable from '@/components/StandardTable';
 import api from '@/api';
+import { connect } from 'dva';
 
 const EditableContext = React.createContext();
 const FormItem = Form.Item;
@@ -126,6 +127,9 @@ class EditableCell extends React.Component {
   }
 }
 
+@connect(({ peptide }) => ({
+  peptide,
+}))
 class ModificationsType extends Component {
   state = {
     formValues: {
@@ -137,7 +141,7 @@ class ModificationsType extends Component {
     loading: false,
     selectedRows: [],
     editIndex: -1,
-    id: 0, // 新增数据时，提供负数id 
+    id: 0, // 新增数据时，提供负数id
   }
 
   columns = [
@@ -225,6 +229,19 @@ class ModificationsType extends Component {
     //
   }
 
+  componentWillReceiveProps(nextProps) {
+    const { peptide:
+      { data },
+     } = nextProps
+    if (nextProps) {
+      this.setState({
+        loading: false,
+        list: data.rows,
+        total: data.total,
+      });
+    }
+  }
+
   // 分页
   handleStandardTableChange = pagination => {
     this.getTableData({
@@ -244,12 +261,16 @@ class ModificationsType extends Component {
   getTableData = (options = {}) => {
     const { formValues } = this.state;
     const query = Object.assign({}, formValues, options);
-
+    const { dispatch } = this.props;
     this.setState({
       formValues: query,
       loading: true,
     });
 
+    dispatch({
+      type: 'peptide/getModificationTypes',
+      payload: query,
+    })
     api.peptideBase.getModificationTypes(query).then(res => {
       this.setState({
         list: res.rows,

@@ -321,6 +321,7 @@ class Order extends Component {
     const { peptide:
       { orderList, regions, offices, invtypes, payMethods, payTerms, currencys },
      } = nextProps
+     console.log(orderList)
     if (nextProps) {
       this.setState({
         loading: false,

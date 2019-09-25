@@ -15,7 +15,7 @@ import React, { Component } from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import StandardTable from '@/components/StandardTable';
 import api from '@/api';
-import peptide from '../peptide'
+import { connect } from 'dva';
 
 const EditableContext = React.createContext();
 const FormItem = Form.Item;
@@ -122,6 +122,9 @@ class EditableCell extends React.Component {
   }
 }
 
+@connect(({ peptide }) => ({
+  peptide,
+}))
 class ModificationProducts extends Component {
   state = {
     formValues: {
@@ -158,7 +161,7 @@ class ModificationProducts extends Component {
       width: 110,
       render: text => {
         let val = null;
-        peptide.modificationPosition.forEach(item => {
+        this.props.peptide.commonData.modificationPosition.forEach(item => {
           if (item.id === text) {
             val = item.name
           }
@@ -282,6 +285,19 @@ class ModificationProducts extends Component {
     //
   }
 
+  componentWillReceiveProps(nextProps) {
+    const { peptide:
+      { data },
+     } = nextProps
+    if (nextProps) {
+      this.setState({
+        loading: false,
+        list: data.rows,
+        total: data.total,
+      });
+    }
+  }
+
   // 分页
   handleStandardTableChange = pagination => {
     this.getTableData({
@@ -300,12 +316,18 @@ class ModificationProducts extends Component {
   // 获取表格数据
   getTableData = (options = {}) => {
     const { formValues } = this.state;
+    const { dispatch } = this.props;
     const query = Object.assign({}, formValues, options);
 
     this.setState({
       formValues: query,
       loading: true,
     });
+
+    dispatch({
+      type: 'peptide/getModificationProducts',
+      payload: query,
+    })
 
     api.peptideBase.getModificationProducts(query).then(res => {
       this.setState({

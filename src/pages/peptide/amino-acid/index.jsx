@@ -16,6 +16,7 @@ import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import StandardTable from '@/components/StandardTable';
 import api from '@/api';
 import './style.less'
+import { connect } from 'dva';
 
 const EditableContext = React.createContext();
 const FormItem = Form.Item;
@@ -44,6 +45,7 @@ class Search extends Component {
   renderForm = () => {
     const {
       form: { getFieldDecorator },
+      status,
     } = this.props;
     return (
       <Form onSubmit={this.submit} layout="inline">
@@ -65,12 +67,12 @@ class Search extends Component {
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="状态">
-            {getFieldDecorator('status', { initialValue: '1' })(
+            {getFieldDecorator('status', { initialValue: 1 })(
                 <Select>
-                  <Option value="0">全部</Option>
-                  <Option value="1">正常</Option>
-                  <Option value="2">已删除</Option>
-                </Select>)}
+                    {status.map(item =>
+                      <Option key={item.id} value={item.id}>{item.name}</Option>,
+                    )}
+                  </Select>)}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
@@ -132,6 +134,9 @@ class EditableCell extends React.Component {
   }
 }
 
+@connect(({ peptide }) => ({
+  peptide,
+}))
 class Order extends Component {
   state = {
     formValues: {
@@ -143,7 +148,7 @@ class Order extends Component {
     loading: false,
     selectedRows: [],
     editIndex: -1,
-    id: 0, // 新增数据时，提供负数id 
+    id: 0, // 新增数据时，提供负数id
   }
 
   columns = [
@@ -155,7 +160,7 @@ class Order extends Component {
     {
       title: '名称',
       dataIndex: 'name',
-      width: 100,
+      width: 120,
       editable: true,
       inputType: <Input />,
       rules: [
@@ -288,7 +293,7 @@ class Order extends Component {
     {
       title: '长代码',
       dataIndex: 'longCode',
-      width: 100,
+      width: 300,
       align: 'center',
       render: text => {
         if (!text) return false;
@@ -354,32 +359,11 @@ class Order extends Component {
     //
   }
 
-  // 分页
-  handleStandardTableChange = pagination => {
-    this.getTableData({
-      page: pagination.current,
-      rows: pagination.pageSize,
-    });
-  }
-
-  // 选择行
-  handleSelectRows = rows => {
-    this.setState({
-      selectedRows: rows,
-    });
-  };
-
-  // 获取表格数据
-  getTableData = (options = {}) => {
-    const { formValues } = this.state;
-    const query = Object.assign({}, formValues, options);
-
-    this.setState({
-      formValues: query,
-      loading: true,
-    });
-
-    api.peptideBase.getAminoAcid(query).then(data => {
+  componentWillReceiveProps(nextProps) {
+    const { peptide:
+      { data },
+     } = nextProps
+    if (nextProps) {
       const map = {}; const dest = [];
       for (let i = 0; i < data.rows.length; i++) {
         const ai = data.rows[i];
@@ -433,7 +417,98 @@ class Order extends Component {
         total: dest.length * 2,
         editIndex: -1,
       });
+    }
+  }
+
+  // 分页
+  handleStandardTableChange = pagination => {
+    this.getTableData({
+      page: pagination.current,
+      rows: pagination.pageSize,
     });
+  }
+
+  // 选择行
+  handleSelectRows = rows => {
+    this.setState({
+      selectedRows: rows,
+    });
+  };
+
+  // 获取表格数据
+  getTableData = (options = {}) => {
+    const { formValues } = this.state;
+    const { dispatch } = this.props;
+    const query = Object.assign({}, formValues, options);
+
+    this.setState({
+      formValues: query,
+      loading: true,
+    });
+
+    dispatch({
+      type: 'peptide/getAminoAcid',
+      payload: query,
+    })
+
+    // api.peptideBase.getAminoAcid(query).then(data => {
+    //   const map = {}; const dest = [];
+    //   for (let i = 0; i < data.rows.length; i++) {
+    //     const ai = data.rows[i];
+    //     if (!map[ai.id]) {
+    //       dest.push({
+    //         id: ai.id,
+    //         code: ai.code,
+    //         name: ai.name,
+    //         hydrophilic: ai.hydrophilic,
+    //         hydrophobic: ai.hydrophobic,
+    //         acidic: ai.acidic,
+    //         alkaline: ai.alkaline,
+    //         isCanDisulfideBond: ai.isCanDisulfideBond,
+    //         molecularWeight: ai.molecularWeight,
+    //         isoelectricPoint: ai.isoelectricPoint,
+    //         carboxylationDissociationConstant: ai.carboxylationDissociationConstant,
+    //         aminoDissociationConstant: ai.aminoDissociationConstant,
+    //         status: ai.status,
+    //         creatorName: ai.creatorName,
+    //         createDate: ai.createDate,
+    //         cancelName: ai.cancelName,
+    //         cancelDate: ai.cancelDate,
+    //         aminoAcidType: ai.aminoAcidType,
+    //         longCode: ai.longCode,
+    //         shortCode: ai.shortCode,
+    //       });
+    //       map[ai.id] = ai;
+    //     } else {
+    //       for (let j = 0; j < dest.length; j++) {
+    //         const dj = dest[j];
+    //         if (dj.id === ai.id) {
+    //           dj.cancelName = dj.cancelName || ai.cancelName ?
+    // [dj.cancelName, ai.cancelName] : '';
+    //           dj.cancelDate = dj.cancelDate || ai.cancelDate ?
+    // [dj.cancelDate, ai.cancelDate] : '';
+    //           dj.shortCode = dj.shortCode || ai.shortCode ? [dj.shortCode, ai.shortCode] : '';
+    //           // dj.shortCode = (dj.shortCode ? dj.shortCode : '')
+    //           // + (ai.shortCode ? ` | ${ai.shortCode}` : '');
+    //           dj.longCode = dj.longCode || ai.longCode ? [dj.longCode, ai.longCode] : '';
+    //           // dj.longCode = (dj.longCode ? dj.longCode : '')
+    //           // + (ai.longCode ? ` | ${ai.longCode}` : '');
+    //           dj.aminoAcidType = dj.aminoAcidType || ai.aminoAcidType ?
+    // [dj.aminoAcidType, ai.aminoAcidType] : '';
+    //           // dj.aminoAcidType = (dj.aminoAcidType ? dj.aminoAcidType : '')
+    //           // + (ai.aminoAcidType ? ` | ${ai.aminoAcidType}` : '');
+    //           break;
+    //         }
+    //       }
+    //     }
+    //   }
+    //   this.setState({
+    //     loading: false,
+    //     list: dest,
+    //     total: dest.length * 2,
+    //     editIndex: -1,
+    //   });
+    // });
   }
 
   handleFormReset = () => {
@@ -511,6 +586,8 @@ class Order extends Component {
       loading,
     } = this.state;
     const data = { list, pagination: { current, pageSize, total } };
+    const { peptide: { commonData } } = this.props
+    let tableWidth = 0;
 
     const components = {
       body: {
@@ -519,6 +596,9 @@ class Order extends Component {
     };
 
     const columns = this.columns.map(col => {
+      // eslint-disable-next-line no-param-reassign
+      if (!col.width) col.width = 100;
+      tableWidth += col.width;
       if (!col.editable) {
         return col;
       }
@@ -539,7 +619,7 @@ class Order extends Component {
       <PageHeaderWrapper>
         <Card bordered={false}>
           <div className="tableList">
-            <Search getTableData={this.getTableData} />
+            <Search getTableData={this.getTableData} status={commonData.status}/>
             <div className="tableListOperator">
               <Button icon="plus" type="primary" onClick={() => this.handleAdd()}>
                 新建
@@ -548,7 +628,7 @@ class Order extends Component {
             <EditableContext.Provider value={this.props.form}>
               <StandardTable
                 className="mytables"
-                scroll={{ x: 2500 }}
+                scroll={{ x: tableWidth }}
                 rowClassName="editable-row"
                 components={components}
                 selectedRows={selectedRows}

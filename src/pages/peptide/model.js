@@ -2,8 +2,12 @@ import api from '@/api';
 
 const Model = {
   namespace: 'peptide',
+
   state: {
+    // 订单列表数据
     orderList: [],
+    // 列表数据
+    data: [],
     // 修饰位置
     commonData: {
       modificationPosition: [
@@ -67,6 +71,7 @@ const Model = {
         { id: 1, name: '内部订单' },
       ],
       status: [
+        { id: 0, name: '全部' },
         { id: 1, name: '正常' },
         { id: 2, name: '已删除' },
       ],
@@ -145,10 +150,76 @@ const Model = {
         payload: response,
       });
     },
+
+    // 多肽纯度
+    *getPurity({ payload }, { call, put }) {
+      const response = yield call(api.peptideBase.getPurity, payload);
+      yield put({
+        type: 'list',
+        payload: response,
+      });
+    },
+
+    // 多肽合成产品
+    *getProduct({ payload }, { call, put }) {
+      const response = yield call(api.peptideBase.getProduct, payload);
+      yield put({
+        type: 'list',
+        payload: response,
+      });
+    },
+
+    // 多肽氨基酸
+    *getAminoAcid({ payload }, { call, put }) {
+      const response = yield call(api.peptideBase.getAminoAcid, payload);
+      yield put({
+        type: 'list',
+        payload: response,
+      });
+    },
+
+    // 多肽修饰
+    *getModifications({ payload }, { call, put }) {
+      const response = yield call(api.peptideBase.getModifications, payload);
+      yield put({
+        type: 'list',
+        payload: response,
+      });
+    },
+
+    // 修饰类别
+    *getModificationTypes({ payload }, { call, put }) {
+      const response = yield call(api.peptideBase.getModificationTypes, payload);
+      yield put({
+        type: 'list',
+        payload: response,
+      });
+    },
+
+    // 多肽修饰产品
+    *getModificationProducts({ payload }, { call, put }) {
+      const response = yield call(api.peptideBase.getModificationProducts, payload);
+      yield put({
+        type: 'list',
+        payload: response,
+      });
+    },
+
+    // 多肽二硫键产品
+    *getdisulfideBondProducts({ payload }, { call, put }) {
+      const response = yield call(api.peptideBase.getdisulfideBondProducts, payload);
+      yield put({
+        type: 'list',
+        payload: response,
+      });
+    },
   },
   reducers: {
     orderList(state, action) {
       return { ...state, orderList: action.payload };
+    },
+    list(state, action) {
+      return { ...state, data: action.payload };
     },
     regions(state, action) {
       return { ...state, regions: action.payload };
