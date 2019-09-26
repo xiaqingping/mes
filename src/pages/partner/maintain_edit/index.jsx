@@ -13,15 +13,18 @@ import SalesScope from './components/SalesScope';
 import Credit from './components/Credit';
 import Authentication from './components/Authentication';
 import Address from './components/Address';
-import Type1 from './components/Type1';
+import PurchasingOrg from './components/PurchasingOrg';
 import Bank from './components/Bank';
 
 class CustomerEdit extends Component {
-  state = {
-    width: '100%',
-    tabActiveKey: 'customer',
-    details: {},
-  };
+  constructor(props) {
+    super(props);
+    this.state = {
+      width: '100%',
+      tabActiveKey: 'customer',
+      details: {},
+    };
+  }
 
   componentDidMount() {
     const details = {
@@ -133,7 +136,7 @@ class CustomerEdit extends Component {
           // eslint-disable-next-line no-return-assign
           })(<BasicInfo wrappedComponentRef={form => this.form = form} />)}
         </Card>
-        <Type1></Type1>
+        <PurchasingOrg></PurchasingOrg>
         <Bank></Bank>
       </>
     );

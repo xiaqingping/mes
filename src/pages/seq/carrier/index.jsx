@@ -43,7 +43,6 @@ class Search extends Component {
   }
 
   submit = e => {
-    console.log(e);
     if (e) e.preventDefault();
     const val = this.props.form.getFieldsValue();
     this.props.getTableData({ page: 1, ...val });
