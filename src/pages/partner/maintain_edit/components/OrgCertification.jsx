@@ -15,15 +15,23 @@ import { TelphoneInput } from '@/components/CustomizedFormControls';
 const FormItem = Form.Item;
 const { TextArea } = Input;
 
-// eslint-disable-next-line react/prefer-stateless-function
-class BasicInfo extends Component {
+class OrgCertification extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {};
+  }
+
   render() {
     const {
       form: { getFieldDecorator },
     } = this.props;
 
     return (
-      <Card title="认证资料" bordered={false} style={{ marginBottom: '24px' }}>
+      <Card
+        title="认证资料"
+        bordered={false}
+        style={{ marginBottom: '24px' }}
+      >
         <Form>
           <Row gutter={32}>
             <Col xxl={15} lg={24}>
@@ -101,4 +109,4 @@ class BasicInfo extends Component {
   }
 }
 
-export default Form.create()(BasicInfo);
+export default Form.create()(OrgCertification);

@@ -8,7 +8,7 @@ import React, { Component } from 'react';
 const DescriptionsItem = Descriptions.Item;
 
 // eslint-disable-next-line react/prefer-stateless-function
-class BasicInfo extends Component {
+class OrgCredit extends Component {
   render() {
     return (
       <Card
@@ -38,4 +38,4 @@ class BasicInfo extends Component {
   }
 }
 
-export default BasicInfo;
+export default OrgCredit;
