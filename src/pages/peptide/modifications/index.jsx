@@ -10,6 +10,7 @@ import {
   Select,
   message,
   Popconfirm,
+  Checkbox,
   Table,
 } from 'antd';
 import React, { Component } from 'react';
@@ -126,6 +127,7 @@ class EditableCell extends React.Component {
           <Form.Item style={{ margin: 0 }}>
             {getFieldDecorator(dataIndex, {
               rules,
+              valuePropName: 'checked',
               initialValue: record[dataIndex],
             })(inputType)}
           </Form.Item>
@@ -167,167 +169,6 @@ class Modifications extends Component {
     dataSon: [],
   }
 
-  columns = [
-    {
-      title: '编号',
-      dataIndex: 'code',
-      width: 100,
-    },
-    {
-      title: '修饰名称',
-      dataIndex: 'name',
-      width: 300,
-      editable: true,
-      inputType: <Input />,
-      rules: [
-        { required: true, message: '必填' },
-      ],
-    },
-    {
-      title: '修饰代码',
-      dataIndex: 'modificationCode',
-      width: 100,
-    },
-    {
-      title: '修饰位置',
-      dataIndex: 'modificationPosition',
-      width: 100,
-      render: text => {
-        let val = null;
-        this.props.peptide.commonData.modificationPosition.forEach(item => {
-          if (item.id === text) {
-            val = item.name
-          }
-        })
-        return val;
-      },
-    },
-    {
-      title: '独立修饰',
-      dataIndex: 'isIndependentModification',
-      width: 100,
-      render: text => (text === 1 ? '√' : ''),
-    },
-    {
-      title: '修饰类别',
-      dataIndex: 'modificationTypeID',
-      width: 250,
-      render: text => {
-        const { modificationType } = this.state;
-        let val = null;
-        modificationType.forEach(item => {
-          if (item.id === text) {
-            val = item.modificationType
-          }
-        })
-        return val;
-      },
-    },
-    {
-      title: '状态',
-      dataIndex: 'status',
-      width: 100,
-      render: text => {
-        if (text === 1) return '正常';
-        if (text === 2) return '已删除';
-        return ''
-      },
-    },
-    {
-      title: '创建人',
-      dataIndex: 'creatorName',
-      width: 100,
-    },
-    {
-      title: '创建时间',
-      dataIndex: 'createDate',
-      width: 200,
-    },
-    {
-      title: '删除人',
-      dataIndex: 'cancelName',
-      width: 100,
-    },
-    {
-      title: '删除时间',
-      dataIndex: 'cancelDate',
-      width: 200,
-    },
-    {
-      title: '操作',
-      fixed: 'right',
-      className: 'operate',
-      width: 150,
-      render: (value, row, index) => {
-        const { editIndex } = this.state;
-        let actions;
-        if (editIndex !== index) {
-          if (row.status === 1) {
-            actions = (
-              <Popconfirm title="确定删除数据？" onConfirm={() => this.deleteRow(row)}>
-                <a className="operate">删除</a>
-              </Popconfirm>
-            );
-          } else {
-            actions = (
-              <Popconfirm title="确定恢复数据？" onConfirm={() => this.resumeRow(row)}>
-                <a className="operate">恢复</a>
-              </Popconfirm>
-            );
-          }
-        }
-        if (editIndex === index) {
-          actions = (
-            <>
-              <a className="operate" onClick={() => this.saveRow(index)}>保存</a>
-              <Divider type="vertical" />
-              <a className="operate" onClick={() => this.cancelEdit(row, -1)}>退出</a>
-            </>
-          );
-        }
-        return actions;
-      },
-    },
-  ];
-
-  columnSon = [
-    {
-      title: '编号',
-      dataIndex: 'code',
-      width: 100,
-    },
-    {
-      title: '名称',
-      dataIndex: 'name',
-      width: 180,
-    },
-    {
-      title: '状态',
-      dataIndex: 'status',
-      width: 100,
-      render: text => (text === 1 ? '正常' : '已删除'),
-    },
-    {
-      title: '创建人',
-      dataIndex: 'creatorName',
-      width: 120,
-    },
-    {
-      title: '创建时间',
-      dataIndex: 'createDate',
-      width: 200,
-    },
-    {
-      title: '删除人',
-      dataIndex: 'cancelName',
-      width: 120,
-    },
-    {
-      title: '删除时间',
-      dataIndex: 'cancelDate',
-      width: 200,
-    },
-  ];
 
   componentDidMount() {
     api.peptideBase.getModificationTypesAll().then(res => {
@@ -339,7 +180,7 @@ class Modifications extends Component {
 
   // 设置子值
   dataSon = (v, e) => {
-    if (e.target.className === 'operate' || e.target.className.indexOf('ant-btn-sm') !== -1) {
+    if (e.target.className === 'operate' || e.target.className.indexOf('ant-btn-sm') !== -1 || v.id < 1) {
       return
     }
     this.setState({
@@ -420,7 +261,10 @@ class Modifications extends Component {
     this.props.form.validateFields((error, row) => {
       if (error) return;
       const { list } = this.state;
-      const newData = { ...list[index], ...row };
+      const newData = { ...list[index],
+                        ...row,
+                        isIndependentModification: row.isIndependentModification ? 1 : 0,
+                      };
       if (newData.id > 0) {
         // api.peptideBase.updateSeries(newData).then(() => this.getTableData());
       } else {
@@ -465,13 +309,202 @@ class Modifications extends Component {
     const { peptide: { commonData } } = this.props;
     let tableWidth = 0;
 
+    let columns = [
+      {
+        title: '编号',
+        dataIndex: 'code',
+        width: 100,
+      },
+      {
+        title: '修饰名称',
+        dataIndex: 'name',
+        width: 300,
+        editable: true,
+        inputType: <Input />,
+        rules: [
+          { required: true, message: '必填' },
+        ],
+      },
+      {
+        title: '修饰代码',
+        dataIndex: 'modificationCode',
+        width: 100,
+        editable: true,
+        inputType: <Input />,
+        rules: [
+          { required: true, message: '必填' },
+        ],
+      },
+      {
+        title: '修饰位置',
+        dataIndex: 'modificationPosition',
+        width: 100,
+        editable: true,
+        inputType: (
+          <Select style={{ width: 100 }}>
+          {commonData.modificationPosition.map(item =>
+            <Option value={item.id} key={item.id}>{item.name}</Option>,
+          )}
+          </Select>),
+        rules: [
+          { required: true, message: '必填' },
+        ],
+        render: text => {
+          let val = null;
+          commonData.modificationPosition.forEach(item => {
+            if (item.id === text) {
+              val = item.name
+            }
+          })
+          return val;
+        },
+      },
+      {
+        title: '独立修饰',
+        dataIndex: 'isIndependentModification',
+        align: 'center',
+        width: 100,
+        render: text => (text === 1 ? '√' : ''),
+        editable: true,
+        inputType: <Checkbox style={{ textAlign: 'center', display: 'block' }}/>,
+      },
+      {
+        title: '修饰类别',
+        dataIndex: 'modificationTypeID',
+        width: 250,
+        editable: true,
+        inputType: (
+          <Select style={{ width: 230 }}>
+          {modificationType.map(item =>
+            <Option value={item.id} key={item.id}>{item.modificationType}</Option>,
+          )}
+          </Select>),
+        rules: [
+          { required: true, message: '必填' },
+        ],
+        render: text => {
+          let val = null;
+          modificationType.forEach(item => {
+            if (item.id === text) {
+              val = item.modificationType
+            }
+          })
+          return val;
+        },
+      },
+      {
+        title: '状态',
+        dataIndex: 'status',
+        width: 100,
+        render: text => {
+          if (text === 1) return '正常';
+          if (text === 2) return '已删除';
+          return ''
+        },
+      },
+      {
+        title: '创建人',
+        dataIndex: 'creatorName',
+        width: 100,
+      },
+      {
+        title: '创建时间',
+        dataIndex: 'createDate',
+        width: 200,
+      },
+      {
+        title: '删除人',
+        dataIndex: 'cancelName',
+        width: 100,
+      },
+      {
+        title: '删除时间',
+        dataIndex: 'cancelDate',
+        width: 200,
+      },
+      {
+        title: '操作',
+        fixed: 'right',
+        className: 'operate',
+        width: 150,
+        render: (value, row, index) => {
+          const { editIndex } = this.state;
+          let actions;
+          if (editIndex !== index) {
+            if (row.status === 1) {
+              actions = (
+                <Popconfirm title="确定删除数据？" onConfirm={() => this.deleteRow(row)}>
+                  <a className="operate">删除</a>
+                </Popconfirm>
+              );
+            } else {
+              actions = (
+                <Popconfirm title="确定恢复数据？" onConfirm={() => this.resumeRow(row)}>
+                  <a className="operate">恢复</a>
+                </Popconfirm>
+              );
+            }
+          }
+          if (editIndex === index) {
+            actions = (
+              <>
+                <a className="addNewData" onClick={() => this.saveRow(index)}>保存</a>
+                <Divider type="vertical" />
+                <a onClick={() => this.cancelEdit(row, -1)}>退出</a>
+              </>
+            );
+          }
+          return actions;
+        },
+      },
+    ];
+
+    const columnSon = [
+      {
+        title: '编号',
+        dataIndex: 'code',
+        width: 100,
+      },
+      {
+        title: '名称',
+        dataIndex: 'name',
+        width: 180,
+      },
+      {
+        title: '状态',
+        dataIndex: 'status',
+        width: 100,
+        render: text => (text === 1 ? '正常' : '已删除'),
+      },
+      {
+        title: '创建人',
+        dataIndex: 'creatorName',
+        width: 120,
+      },
+      {
+        title: '创建时间',
+        dataIndex: 'createDate',
+        width: 200,
+      },
+      {
+        title: '删除人',
+        dataIndex: 'cancelName',
+        width: 120,
+      },
+      {
+        title: '删除时间',
+        dataIndex: 'cancelDate',
+        width: 200,
+      },
+    ];
+
     const components = {
       body: {
         cell: EditableCell,
       },
     };
 
-    const columns = this.columns.map(col => {
+    columns = columns.map(col => {
       // eslint-disable-next-line no-param-reassign
       if (!col.width) col.width = 100;
       tableWidth += col.width;
@@ -526,7 +559,7 @@ class Modifications extends Component {
                     scroll={{ x: tableWidth }}
                     loading={loadingSon}
                     dataSource={dataSon}
-                    columns={this.columnSon}
+                    columns={columnSon}
                     pagination={false}
                     rowKey="id"
                   />

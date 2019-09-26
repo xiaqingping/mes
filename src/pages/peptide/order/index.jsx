@@ -15,6 +15,7 @@ import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import StandardTable from '@/components/StandardTable';
 import { connect } from 'dva';
 import { formatter } from '@/utils/utils';
+import api from '@/api';
 
 const EditableContext = React.createContext();
 const FormItem = Form.Item;
@@ -319,14 +320,10 @@ class Order extends Component {
 
   componentWillReceiveProps(nextProps) {
     const { peptide:
-      { orderList, regions, offices, invtypes, payMethods, payTerms, currencys },
+      { regions, offices, invtypes, payMethods, payTerms, currencys },
      } = nextProps
-     console.log(orderList)
     if (nextProps) {
       this.setState({
-        loading: false,
-        list: orderList.rows,
-        total: orderList.total,
         regions,
         offices,
         invtypes,
@@ -353,17 +350,20 @@ class Order extends Component {
   // 获取表格数据
   getTableData = (options = {}) => {
     const { formValues } = this.state;
-    const { dispatch } = this.props;
     const query = Object.assign({}, formValues, options);
     this.setState({
       formValues: query,
       loading: true,
     });
 
-    dispatch({
-      type: 'peptide/getOrder',
-      payload: query,
-    })
+    api.peptideorder.getOrder(query).then(res => {
+      this.setState({
+        list: res.rows,
+        total: res.total,
+        loading: false,
+        editIndex: -1,
+      });
+    });
   }
 
   handleFormReset = () => {
