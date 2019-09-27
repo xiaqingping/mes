@@ -7,40 +7,25 @@ import {
   Row,
   Select,
   Switch,
+  Empty,
+  Icon,
+  Cascader,
 } from 'antd';
 import React, { Component } from 'react';
 
 const FormItem = Form.Item;
 const { Option } = Select;
 
-const tabListNoTitle = [
-  {
-    key: '1',
-    tab: '生工',
-  },
-  {
-    key: '2',
-    tab: 'BBI',
-  },
-  {
-    key: '3',
-    tab: 'NBS',
-  },
-];
-
-// eslint-disable-next-line react/prefer-stateless-function
 class Type extends Component {
-  state = {
-    noTitleKey: '1',
+  constructor(props) {
+    super(props);
+    this.state = {
+      tabKey: '',
+      tabsData: [],
+    }
   }
 
-  onTabChange = key => {
-    this.setState({
-      noTitleKey: key,
-    });
-  }
-
-  renderFukuan = () => {
+  renderTabPane = () => {
     const {
       form: { getFieldDecorator },
     } = this.props;
@@ -120,18 +105,122 @@ class Type extends Component {
     );
   }
 
+  onTabChange = tabKey => {
+    if (tabKey === 'select') return;
+    this.setState({
+      tabKey,
+    });
+  }
+
+  // 级联选泽采购组织时
+  onCascaderChange = obj => {
+    const { tabsData } = this.state;
+    const index = obj.length - 1;
+
+    tabsData.push({
+      title: obj[index],
+    });
+    this.setState({ tabsData, tabKey: obj[index] });
+  }
+
+  renderCascader = () => {
+    const { tabsData } = this.state;
+    const cascaderTitle = tabsData.map(e => e.title);
+    const options = [
+      {
+        value: '生工',
+        label: '生工',
+      },
+      {
+        value: 'BBI',
+        label: 'BBI',
+      },
+      {
+        value: 'NBS',
+        label: 'NBS',
+      },
+    ];
+    options.forEach(e => {
+      if (cascaderTitle.indexOf(e.value) > -1) {
+        e.disabled = true;
+      } else {
+        e.disabled = false;
+      }
+    });
+    return (
+      <Cascader options={options} onChange={this.onCascaderChange}>
+        <a style={{ fontSize: 14, marginLeft: -16 }} href="#">采购组织 <Icon type="down" style={{ fontSize: 12 }} /></a>
+      </Cascader>
+    );
+  }
+
+  closeTab = tabKey => {
+    let index = -1;
+    let key = '';
+    const { tabsData } = this.state;
+
+    // 过滤掉关闭的采购组织
+    const newTabsData = tabsData.filter((e, i) => {
+      if (e.title !== tabKey) return true;
+      index = i;
+      return false;
+    });
+
+    // 根据index决定选中哪个Tab
+    if (newTabsData.length > 0) {
+      // 关闭第一个
+      if (index === 0) {
+        key = newTabsData[0].title;
+      }
+      // 关闭最后一个
+      if (index === tabsData.length - 1) {
+        key = newTabsData[index - 1].title;
+      }
+      // 关闭中间的Tab
+      if (index > 0 && index < tabsData.length - 1) {
+        key = newTabsData[index].title;
+      }
+    } else {
+      key = '';
+    }
+
+    this.setState({
+      tabsData: newTabsData,
+      tabKey: key,
+    });
+  }
+
   render() {
+    const { tabsData, tabKey } = this.state;
+    let tabList = tabsData.map(e => ({ key: e.title, tab: e.title }));
+    tabList = tabList.concat({
+      key: 'select',
+      tab: this.renderCascader(),
+    });
+    tabList.forEach(e => {
+      if (e.key === tabKey) {
+        e.tab = (
+          <>{e.tab} <Icon type="close" style={{ fontSize: 12 }} onClick={() => this.closeTab(e.key)} /></>
+        );
+      } else {
+        e.tab = (
+          <>{e.tab} <Icon type="close" style={{ fontSize: 12, visibility: 'hidden' }} /></>
+        );
+      }
+    });
+
     return (
       <Card
+        title="采购组织"
         bordered={false}
         style={{ marginBottom: '24px' }}
-        tabList={tabListNoTitle}
-        activeTabKey={this.state.noTitleKey}
+        tabList={tabList}
+        activeTabKey={tabKey}
         onTabChange={key => {
           this.onTabChange(key);
         }}
       >
-        {this.renderFukuan()}
+        {tabKey ? this.renderTabPane() : <Empty description="暂无采购组织" />}
       </Card>
     );
   }

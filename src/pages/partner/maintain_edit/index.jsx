@@ -5,23 +5,31 @@ import {
 } from 'antd';
 import React, { Component } from 'react';
 
+import { connect } from 'dva';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import FooterToolbar from '@/components/FooterToolbar';
 
 import BasicInfo from './components/BasicInfo';
 import SalesScope from './components/SalesScope';
-import Credit from './components/Credit';
-import Authentication from './components/Authentication';
+import OrgCredit from './components/OrgCredit';
+import OrgCertification from './components/OrgCertification';
+import PersonCredit from './components/PersonCredit';
+import PersonCertification from './components/PersonCertification';
 import Address from './components/Address';
-import Type1 from './components/Type1';
+import PurchasingOrg from './components/PurchasingOrg';
 import Bank from './components/Bank';
 
+@connect(({ partnerMaintainEdit }) => ({
+  details: partnerMaintainEdit.details,
+}))
 class CustomerEdit extends Component {
-  state = {
-    width: '100%',
-    tabActiveKey: 'customer',
-    details: {},
-  };
+  constructor(props) {
+    super(props);
+    this.state = {
+      width: '100%',
+      tabActiveKey: 'customer',
+    };
+  }
 
   componentDidMount() {
     const details = {
@@ -49,7 +57,11 @@ class CustomerEdit extends Component {
         },
       ],
     };
-    this.setState({ details });
+    this.props.dispatch({
+      type: 'partnerMaintainEdit/setDetails',
+      payload: details,
+    });
+
     window.addEventListener('resize', this.resizeFooterToolbar, { passive: true });
     this.resizeFooterToolbar();
   }
@@ -92,6 +104,17 @@ class CustomerEdit extends Component {
     });
   }
 
+  onBasicInfoChange = data => {
+    const details = {
+      ...this.props.details,
+      basicInfo: data,
+    };
+    this.props.dispatch({
+      type: 'partnerMaintainEdit/setDetails',
+      payload: details,
+    });
+  }
+
   // 客户
   renderCustomer = details => {
     const {
@@ -105,11 +128,24 @@ class CustomerEdit extends Component {
           {getFieldDecorator('basicInfo', {
             initialValue: basicInfo,
           // eslint-disable-next-line no-return-assign
-          })(<BasicInfo wrappedComponentRef={form => this.form = form} />)}
+          })(<BasicInfo wrappedComponentRef={form => this.form = form} onChange={this.onBasicInfoChange} />)}
         </Card>
         <SalesScope></SalesScope>
-        <Credit></Credit>
-        <Authentication></Authentication>
+        {
+          basicInfo.name.select === 2 ?
+          (
+            <>
+              <OrgCredit></OrgCredit>
+              <OrgCertification></OrgCertification>
+            </>
+          ) : (
+            <>
+              <PersonCredit></PersonCredit>
+              <PersonCertification></PersonCertification>
+            </>
+          )
+        }
+
         <Card title="收货地址" bordered={false}>
           {getFieldDecorator('addressList', {
             initialValue: { data: addressList },
@@ -133,14 +169,15 @@ class CustomerEdit extends Component {
           // eslint-disable-next-line no-return-assign
           })(<BasicInfo wrappedComponentRef={form => this.form = form} />)}
         </Card>
-        <Type1></Type1>
+        <PurchasingOrg></PurchasingOrg>
         <Bank></Bank>
       </>
     );
   }
 
   renderContent = () => {
-    const { tabActiveKey, details } = this.state;
+    const { tabActiveKey } = this.state;
+    const { details } = this.props;
 
     switch (tabActiveKey) {
       case 'customer':
@@ -158,6 +195,9 @@ class CustomerEdit extends Component {
 
   render() {
     const { width, tabActiveKey } = this.state;
+    if (!this.props.details) {
+      return null;
+    }
 
     return (
       <PageHeaderWrapper
