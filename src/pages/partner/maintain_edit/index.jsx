@@ -104,10 +104,10 @@ class CustomerEdit extends Component {
     });
   }
 
-  onBasicInfoChange = data => {
+  onDetailsChange = (key, value) => {
     const details = {
       ...this.props.details,
-      basicInfo: data,
+      [key]: value,
     };
     this.props.dispatch({
       type: 'partnerMaintainEdit/setDetails',
@@ -127,8 +127,11 @@ class CustomerEdit extends Component {
         <Card title="基础信息" bordered={false} style={{ marginBottom: '24px' }}>
           {getFieldDecorator('basicInfo', {
             initialValue: basicInfo,
-          // eslint-disable-next-line no-return-assign
-          })(<BasicInfo wrappedComponentRef={form => this.form = form} onChange={this.onBasicInfoChange} />)}
+          })(<BasicInfo
+            // eslint-disable-next-line no-return-assign
+            wrappedComponentRef={form => this.form = form}
+            onChange={data => this.onDetailsChange('basicInfo', data)}
+          />)}
         </Card>
         <SalesScope></SalesScope>
         {
@@ -149,7 +152,7 @@ class CustomerEdit extends Component {
         <Card title="收货地址" bordered={false}>
           {getFieldDecorator('addressList', {
             initialValue: { data: addressList },
-          })(<Address />)}
+          })(<Address onChange={data => this.onDetailsChange('addressList', data.data)} />)}
         </Card>
       </>
     );
@@ -166,8 +169,11 @@ class CustomerEdit extends Component {
         <Card title="基础信息" bordered={false} style={{ marginBottom: '24px' }}>
           {getFieldDecorator('basicInfo', {
             initialValue: basicInfo,
-          // eslint-disable-next-line no-return-assign
-          })(<BasicInfo wrappedComponentRef={form => this.form = form} />)}
+          })(<BasicInfo
+            // eslint-disable-next-line no-return-assign
+            wrappedComponentRef={form => this.form = form}
+            onChange={data => this.onDetailsChange('basicInfo', data)}
+          />)}
         </Card>
         <PurchasingOrg></PurchasingOrg>
         <Bank></Bank>
