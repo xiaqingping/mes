@@ -12,22 +12,25 @@ import {
   Popconfirm,
   Checkbox,
   Table,
+  Modal,
 } from 'antd';
 import React, { Component } from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import StandardTable from '@/components/StandardTable';
 import api from '@/api';
 import { connect } from 'dva';
+import AminoAcid from '@/pages/peptide/components/amino-acid-mask'
 
 const EditableContext = React.createContext();
 const FormItem = Form.Item;
 const { Option } = Select;
+const { Search } = Input;
 
 /**
  * 页面顶部筛选表单
  */
 @Form.create()
-class Search extends Component {
+class SearchPage extends Component {
   componentDidMount() {
     this.submit();
   }
@@ -167,8 +170,12 @@ class Modifications extends Component {
     id: 0, // 新增数据时，提供负数id
     modificationType: [],
     dataSon: [],
+    selectParantData: false,
+    editIndexSon: -1,
+    visible: false, // 遮罩层的判断
+    sonAminoAcid: [], // 子氨基酸值
+    parantData: [], // 父数据
   }
-
 
   componentDidMount() {
     api.peptideBase.getModificationTypesAll().then(res => {
@@ -189,7 +196,9 @@ class Modifications extends Component {
     setTimeout(() => {
         this.setState({
           dataSon: v.details,
+          selectParantData: true,
           loadingSon: false,
+          parantData: v,
         })
       }, 500)
   }
@@ -230,47 +239,102 @@ class Modifications extends Component {
   }
 
   // 退出编辑
-  cancelEdit = (row, index) => {
-    if (row.id > 0) {
-      this.setState({ editIndex: index });
-    } else {
-      const { list } = this.state;
-      this.setState({
-        list: list.filter(e => e.id > 0),
-        editIndex: index,
-      });
-    }
+  cancelEdit = (row, index, son) => {
+    if (son === 'son') {
+      if (row.id > 0) {
+        this.setState({ editIndexSon: index });
+      } else {
+        const { dataSon } = this.state;
+        this.setState({
+          dataSon: dataSon.filter(e => e.id > 0),
+          editIndexSon: index,
+        });
+      }
+    } else if (row.id > 0) {
+        this.setState({ editIndex: index });
+      } else {
+        const { list } = this.state;
+        this.setState({
+          list: list.filter(e => e.id > 0),
+          editIndex: index,
+        });
+      }
   }
 
   // 删除数据
-  deleteRow = row => {
-    api.peptideBase.deleteModifications(row.id).then(() => {
-      this.getTableData();
-    });
+  deleteRow = (row, son) => {
+    if (son === 'son') {
+      api.peptideBase.deleteSuitableAminoAcids(row.id).then(() => {
+        this.getTableData();
+        this.setState({
+          dataSon: [],
+        })
+      });
+    } else {
+      api.peptideBase.deleteModifications(row.id).then(() => {
+        this.getTableData();
+      });
+    }
   };
 
   // 恢复数据
-  resumeRow = row => {
-    api.peptideBase.resumeModifications(row.id).then(() => {
-      this.getTableData();
-    });
+  resumeRow = (row, son) => {
+    if (son === 'son') {
+      api.peptideBase.resumeSuitableAminoAcids(row.id).then(() => {
+        this.getTableData();
+        this.setState({
+          dataSon: [],
+        })
+      });
+    } else {
+      api.peptideBase.resumeModifications(row.id).then(() => {
+        this.getTableData();
+      });
+    }
   };
 
   // 保存
-  saveRow = index => {
-    this.props.form.validateFields((error, row) => {
-      if (error) return;
-      const { list } = this.state;
-      const newData = { ...list[index],
-                        ...row,
-                        isIndependentModification: row.isIndependentModification ? 1 : 0,
-                      };
-      if (newData.id > 0) {
-        // api.peptideBase.updateSeries(newData).then(() => this.getTableData());
-      } else {
-        api.peptideBase.insertModifications(newData).then(() => this.getTableData());
-      }
-    });
+  saveRow = (index, son) => {
+    if (son === 'son') {
+      this.props.form.validateFields(error => {
+        if (error) return;
+        const { parantData, sonAminoAcid } = this.state;
+        this.setState({
+          editIndexSon: -1,
+        });
+        const newData = {
+                          name: sonAminoAcid.name,
+                          code: sonAminoAcid.code,
+                          aminoAcidID: sonAminoAcid.id,
+                          modificationID: parantData.id,
+                        };
+        if (newData.id > 0) {
+          // api.peptideBase.updateSeries(newData).then(() => this.getTableData());
+        } else {
+          api.peptideBase.insertSuitableAminoAcids(newData).then(() => {
+            this.getTableData();
+            this.setState({
+              dataSon: [],
+            })
+          },
+          );
+        }
+      });
+    } else {
+      this.props.form.validateFields((error, row) => {
+        if (error) return;
+        const { list } = this.state;
+        const newData = { ...list[index],
+                          ...row,
+                          isIndependentModification: row.isIndependentModification ? 1 : 0,
+                        };
+        if (newData.id > 0) {
+          // api.peptideBase.updateSeries(newData).then(() => this.getTableData());
+        } else {
+          api.peptideBase.insertModifications(newData).then(() => this.getTableData());
+        }
+      });
+    }
   }
 
   // 新增
@@ -294,6 +358,53 @@ class Modifications extends Component {
     });
   }
 
+  // 新增子数据
+  handleAddSon = () => {
+    const { editIndexSon, id, dataSon, selectParantData } = this.state;
+    if (editIndexSon !== -1) {
+      message.warning('请先保存或退出正在编辑的数据');
+      return;
+    }
+
+    if (!selectParantData) {
+      message.warning('请先选择左侧列表的一行');
+      return;
+    }
+
+    const newId = id - 1;
+    this.setState({
+      id: newId,
+      editIndexSon: 0,
+      sonAminoAcid: [],
+      dataSon: [
+        {
+          id: newId,
+        },
+        ...dataSon,
+      ],
+    });
+  }
+
+  // 打开搜索
+  openMask = () => {
+    this.setState({
+      visible: true,
+    })
+  }
+
+  // 得到搜索的值
+  getSonAminoAcid = data => {
+    this.setState({
+        sonAminoAcid: data,
+        visible: false,
+      })
+      // console.log(data)
+      this.props.form.setFieldsValue({
+        code: data.code,
+        name: data.name,
+      })
+  }
+
   render() {
     const {
       formValues: { page: current, rows: pageSize },
@@ -304,10 +415,13 @@ class Modifications extends Component {
       dataSon,
       loadingSon,
       modificationType,
+      sonAminoAcid,
+      visible,
     } = this.state;
     const data = { list, pagination: { current, pageSize, total } };
     const { peptide: { commonData } } = this.props;
     let tableWidth = 0;
+    let tableWidthSon = 0;
 
     let columns = [
       {
@@ -459,22 +573,36 @@ class Modifications extends Component {
       },
     ];
 
-    const columnSon = [
+    let columnSon = [
       {
         title: '编号',
         dataIndex: 'code',
-        width: 100,
+        width: 120,
+        editable: true,
+        inputType: <Search onSearch={() => this.openMask()} value={sonAminoAcid.code ? sonAminoAcid.code : ''} readOnly/>,
+        rules: [
+          { required: true, message: '必填' },
+        ],
       },
       {
         title: '名称',
         dataIndex: 'name',
-        width: 180,
+        width: 120,
+        editable: true,
+        inputType: <Input value={sonAminoAcid.name ? sonAminoAcid.name : ''} readOnly/>,
+        rules: [
+          { required: true, message: '必填' },
+        ],
       },
       {
         title: '状态',
         dataIndex: 'status',
         width: 100,
-        render: text => (text === 1 ? '正常' : '已删除'),
+        render: text => {
+          if (text === 1) return '正常';
+          if (text === 2) return '已删除';
+          return ''
+        },
       },
       {
         title: '创建人',
@@ -495,6 +623,41 @@ class Modifications extends Component {
         title: '删除时间',
         dataIndex: 'cancelDate',
         width: 200,
+      },
+      {
+        title: '操作',
+        fixed: 'right',
+        className: 'operate',
+        width: 150,
+        render: (value, row, index) => {
+          const { editIndexSon } = this.state;
+          let actions;
+          if (editIndexSon !== index) {
+            if (row.status === 1) {
+              actions = (
+                <Popconfirm title="确定删除数据？" onConfirm={() => this.deleteRow(row, 'son')}>
+                  <a className="operate">删除</a>
+                </Popconfirm>
+              );
+            } else {
+              actions = (
+                <Popconfirm title="确定恢复数据？" onConfirm={() => this.resumeRow(row, 'son')}>
+                  <a className="operate">恢复</a>
+                </Popconfirm>
+              );
+            }
+          }
+          if (editIndexSon === index) {
+            actions = (
+              <>
+                <a className="addNewData" onClick={() => this.saveRow(index, 'son')}>保存</a>
+                <Divider type="vertical" />
+                <a onClick={() => this.cancelEdit(row, -1, 'son')}>退出</a>
+              </>
+            );
+          }
+          return actions;
+        },
       },
     ];
 
@@ -524,11 +687,31 @@ class Modifications extends Component {
       };
     });
 
+    columnSon = columnSon.map(col => {
+      // eslint-disable-next-line no-param-reassign
+      if (!col.width) col.width = 100;
+      tableWidthSon += col.width;
+      if (!col.editable) {
+        return col;
+      }
+      return {
+        ...col,
+        onCell: (record, rowIndex) => ({
+          record,
+          rules: col.rules,
+          inputType: col.inputType,
+          dataIndex: col.dataIndex,
+          title: col.title,
+          editing: rowIndex === this.state.editIndexSon,
+        }),
+      };
+    });
+
     return (
       <PageHeaderWrapper>
         <Card bordered={false}>
           <div className="tableList">
-            <Search getTableData={this.getTableData} modificationType={ modificationType }
+            <SearchPage getTableData={this.getTableData} modificationType={ modificationType }
              status={commonData.status}/>
             <div className="tableListOperator">
               <Button icon="plus" type="primary" onClick={() => this.handleAdd()}>
@@ -538,7 +721,7 @@ class Modifications extends Component {
             <Col span={14}>
               <EditableContext.Provider value={this.props.form}>
                 <StandardTable
-                  scroll={{ x: 1800 }}
+                  scroll={{ x: tableWidth }}
                   rowClassName="editable-row"
                   components={components}
                   selectedRows={selectedRows}
@@ -554,19 +737,25 @@ class Modifications extends Component {
               <Col span={1}>
               </Col>
               <Col span={9}>
+                <Button icon="plus" type="primary" onClick={() => this.handleAddSon()}>
+                  新建
+                </Button>
                 <EditableContext.Provider value={this.props.form}>
                   <Table
-                    scroll={{ x: tableWidth }}
+                    scroll={{ x: tableWidthSon }}
                     loading={loadingSon}
                     dataSource={dataSon}
                     columns={columnSon}
                     pagination={false}
                     rowKey="id"
+                    rowClassName="editable-row"
+                    components={components}
                   />
                 </EditableContext.Provider>
               </Col>
           </div>
         </Card>
+        <AminoAcid getData={v => { this.getSonAminoAcid(v) }} visible={visible}/>
       </PageHeaderWrapper>
     );
   }

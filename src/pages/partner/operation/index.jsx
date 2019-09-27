@@ -4,17 +4,11 @@ import {
   Card,
   Col,
   DatePicker,
-  Divider,
-  Dropdown,
   Form,
   Icon,
   Input,
-  InputNumber,
-  Menu,
   Row,
   Select,
-  message,
-  Table,
   AutoComplete,
 } from 'antd';
 import * as React from 'react';
@@ -25,7 +19,7 @@ import DetailsList from './components/details'
 
 const FormItem = Form.Item;
 const { Option } = Select;
-const { MonthPicker, RangePicker, WeekPicker } = DatePicker;
+const { RangePicker } = DatePicker;
 
 // 状态
 const status = {
@@ -139,7 +133,7 @@ class Operation extends React.Component {
         },
       ],
       filteredValue: this.state.typeValue,
-      onFilter: (value, record) => {
+      onFilter: value => {
         this.changeTypeValue(value)
       },
       onFilterDropdownVisibleChange: e => {
@@ -321,12 +315,13 @@ class Operation extends React.Component {
   };
 
   // 业务伙伴筛选
+  // eslint-disable-next-line consistent-return
   inputValue = value => {
     const arr = []
     if (!value) {
       return false
     }
-    this.data.huoban.map(item => {
+    this.data.huoban.forEach(item => {
       if (item.value.indexOf(value) !== -1) {
         arr.push(item);
       }
