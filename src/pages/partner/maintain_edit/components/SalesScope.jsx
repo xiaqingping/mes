@@ -25,10 +25,8 @@ const { TabPane } = Tabs;
 
 class BasicInfo extends Component {
   state = {
-    tabKey: '生工国内直销',
-    salesScope: [
-      { title: '生工国内直销' },
-    ],
+    tabKey: '',
+    tabsData: [],
   }
 
   renderTabPane = obj => {
@@ -109,15 +107,20 @@ class BasicInfo extends Component {
     });
   }
 
-  onChange = obj => {
-    const { salesScope } = this.state;
-    salesScope.push({
-      title: obj[1],
+  // 级联选泽销售范围时
+  onCascaderChange = obj => {
+    const { tabsData } = this.state;
+    const index = obj.length - 1;
+
+    tabsData.push({
+      title: obj[index],
     });
-    this.setState({ salesScope, tabKey: obj[1] });
+    this.setState({ tabsData, tabKey: obj[index] });
   }
 
-  renderSelectSalesScope = () => {
+  renderCascader = () => {
+    const { tabsData } = this.state;
+    const cascaderTitle = tabsData.map(e => e.title);
     const options = [
       {
         value: '生工生物',
@@ -164,23 +167,64 @@ class BasicInfo extends Component {
         ],
       },
     ];
+    options.forEach(e => {
+      e.children.forEach(e1 => {
+        if (cascaderTitle.indexOf(e1.value) > -1) {
+          e1.disabled = true;
+        } else {
+          e1.disabled = false;
+        }
+      });
+    });
     return (
-      <Cascader options={options} onChange={this.onChange}>
+      <Cascader options={options} onChange={this.onCascaderChange}>
         <a style={{ fontSize: 14, marginLeft: -16 }} href="#">销售范围 <Icon type="down" style={{ fontSize: 12 }} /></a>
       </Cascader>
     );
   }
 
   closeTab = tabKey => {
-    console.log(tabKey);
+    let index = -1;
+    let key = '';
+    const { tabsData } = this.state;
+
+    // 过滤掉关闭的销售范围
+    const newTabsData = tabsData.filter((e, i) => {
+      if (e.title !== tabKey) return true;
+      index = i;
+      return false;
+    });
+
+    // 根据index决定选中哪个Tab
+    if (newTabsData.length > 0) {
+      // 关闭第一个
+      if (index === 0) {
+        key = newTabsData[0].title;
+      }
+      // 关闭最后一个
+      if (index === tabsData.length - 1) {
+        key = newTabsData[index - 1].title;
+      }
+      // 关闭中间的Tab
+      if (index > 0 && index < tabsData.length - 1) {
+        key = newTabsData[index].title;
+      }
+    } else {
+      key = '';
+    }
+
+    this.setState({
+      tabsData: newTabsData,
+      tabKey: key,
+    });
   }
 
   render() {
-    const { salesScope, tabKey } = this.state;
-    let tabList = salesScope.map(e => ({ key: e.title, tab: e.title }));
+    const { tabsData, tabKey } = this.state;
+    let tabList = tabsData.map(e => ({ key: e.title, tab: e.title }));
     tabList = tabList.concat({
       key: 'select',
-      tab: this.renderSelectSalesScope(),
+      tab: this.renderCascader(),
     });
     tabList.forEach(e => {
       if (e.key === tabKey) {
