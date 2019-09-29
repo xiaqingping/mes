@@ -27,7 +27,6 @@ const PersonCertificationAddModal = props => {
   );
 
   const normFile = e => {
-    console.log('Upload event:', e);
     if (Array.isArray(e)) {
       return e;
     }
@@ -86,6 +85,7 @@ const PersonCertificationAddModal = props => {
           listType="picture-card"
           showUploadList
           action="/upload"
+          accept=".jpg,.png"
         >
           {uploadButton}
         </Upload>)}
