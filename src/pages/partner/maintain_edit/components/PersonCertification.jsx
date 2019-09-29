@@ -52,7 +52,7 @@ class PersonCertification extends React.Component {
               <>
                 <a>变更</a>
                 <Divider type="vertical" />
-                <a>删除</a>
+                <a onClick={() => this.removeItem(item.id)}>删除</a>
               </>
             }
           >
@@ -93,6 +93,13 @@ class PersonCertification extends React.Component {
       addModalVisible: !!flag,
     });
   };
+
+  removeItem = id => {
+    const { list } = this.state;
+    this.setState({
+      list: list.filter(e => e.id !== id),
+    });
+  }
 
   handleAdd = data => {
     // const { dispatch } = this.props;
