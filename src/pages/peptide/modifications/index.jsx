@@ -12,7 +12,6 @@ import {
   Popconfirm,
   Checkbox,
   Table,
-  Modal,
 } from 'antd';
 import React, { Component } from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
@@ -124,21 +123,20 @@ class EditableCell extends React.Component {
       rules,
       ...restProps
     } = this.props;
-    return (
-      <td {...restProps}>
-        {editing ? (
-          <Form.Item style={{ margin: 0 }}>
-            {getFieldDecorator(dataIndex, {
-              rules,
-              valuePropName: 'checked',
-              initialValue: record[dataIndex],
-            })(inputType)}
-          </Form.Item>
-        ) : (
-          children
-        )}
-      </td>
-    );
+    if (editing) {
+      return (
+        <td {...restProps} style={{ padding: 0 }}>
+            <Form.Item style={{ margin: 0, padding: 0 }}>
+              {getFieldDecorator(dataIndex, {
+                rules,
+                valuePropName: 'checked',
+                initialValue: record[dataIndex],
+              })(inputType)}
+            </Form.Item>
+        </td>
+      );
+    }
+    return (<td {...restProps}>{children}</td>);
   };
 
 
@@ -190,15 +188,13 @@ class Modifications extends Component {
     if (e.target.className === 'operate' || e.target.className.indexOf('ant-btn-sm') !== -1 || v.id < 1) {
       return
     }
-    this.setState({
-      loadingSon: true,
-    })
     setTimeout(() => {
         this.setState({
           dataSon: v.details,
           selectParantData: true,
           loadingSon: false,
           parantData: v,
+          visible: false,
         })
       }, 500)
   }
@@ -219,7 +215,7 @@ class Modifications extends Component {
   };
 
   // 获取表格数据
-  getTableData = (options = {}) => {
+  getTableData = (options = {}, son) => {
     const { formValues } = this.state;
     const query = Object.assign({}, formValues, options);
 
@@ -229,6 +225,16 @@ class Modifications extends Component {
     });
 
     api.peptideBase.getModifications(query).then(res => {
+      if (son === 'son') {
+        const { parantData } = this.state;
+        res.rows.forEach(item => {
+          if (item.id === parantData.id) {
+            this.setState({
+              dataSon: item.details,
+            })
+          }
+        })
+      }
       this.setState({
         list: res.rows,
         total: res.total,
@@ -312,9 +318,9 @@ class Modifications extends Component {
           // api.peptideBase.updateSeries(newData).then(() => this.getTableData());
         } else {
           api.peptideBase.insertSuitableAminoAcids(newData).then(() => {
-            this.getTableData();
+            this.getTableData([], 'son');
             this.setState({
-              dataSon: [],
+              visible: false,
             })
           },
           );
@@ -392,6 +398,12 @@ class Modifications extends Component {
     })
   }
 
+  closeMask = v => {
+    this.setState({
+      visible: v,
+    })
+  }
+
   // 得到搜索的值
   getSonAminoAcid = data => {
     this.setState({
@@ -432,9 +444,9 @@ class Modifications extends Component {
       {
         title: '修饰名称',
         dataIndex: 'name',
-        width: 300,
+        width: 260,
         editable: true,
-        inputType: <Input />,
+        inputType: <Input style={{ width: '90%' }}/>,
         rules: [
           { required: true, message: '必填' },
         ],
@@ -442,9 +454,9 @@ class Modifications extends Component {
       {
         title: '修饰代码',
         dataIndex: 'modificationCode',
-        width: 100,
+        width: 120,
         editable: true,
-        inputType: <Input />,
+        inputType: <Input style={{ width: '90%' }}/>,
         rules: [
           { required: true, message: '必填' },
         ],
@@ -452,10 +464,10 @@ class Modifications extends Component {
       {
         title: '修饰位置',
         dataIndex: 'modificationPosition',
-        width: 100,
+        width: 140,
         editable: true,
         inputType: (
-          <Select style={{ width: 100 }}>
+          <Select style={{ width: '90%' }}>
           {commonData.modificationPosition.map(item =>
             <Option value={item.id} key={item.id}>{item.name}</Option>,
           )}
@@ -488,7 +500,7 @@ class Modifications extends Component {
         width: 250,
         editable: true,
         inputType: (
-          <Select style={{ width: 230 }}>
+          <Select style={{ width: '90%' }}>
           {modificationType.map(item =>
             <Option value={item.id} key={item.id}>{item.modificationType}</Option>,
           )}
@@ -579,7 +591,7 @@ class Modifications extends Component {
         dataIndex: 'code',
         width: 120,
         editable: true,
-        inputType: <Search onSearch={() => this.openMask()} value={sonAminoAcid.code ? sonAminoAcid.code : ''} readOnly/>,
+        inputType: <Search style={{ width: '90%' }} onSearch={() => this.openMask()} value={sonAminoAcid.code ? sonAminoAcid.code : ''} readOnly/>,
         rules: [
           { required: true, message: '必填' },
         ],
@@ -589,7 +601,7 @@ class Modifications extends Component {
         dataIndex: 'name',
         width: 120,
         editable: true,
-        inputType: <Input value={sonAminoAcid.name ? sonAminoAcid.name : ''} readOnly/>,
+        inputType: <Input style={{ width: '90%' }} value={sonAminoAcid.name ? sonAminoAcid.name : ''} readOnly/>,
         rules: [
           { required: true, message: '必填' },
         ],
@@ -755,7 +767,8 @@ class Modifications extends Component {
               </Col>
           </div>
         </Card>
-        <AminoAcid getData={v => { this.getSonAminoAcid(v) }} visible={visible}/>
+        <AminoAcid getData={v => { this.getSonAminoAcid(v) }} visible={visible}
+        closeMask={ v => { this.closeMask(v) }}/>
       </PageHeaderWrapper>
     );
   }

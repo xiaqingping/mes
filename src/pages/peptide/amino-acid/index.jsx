@@ -365,9 +365,9 @@ class Order extends Component {
       {
         title: '名称',
         dataIndex: 'name',
-        width: 100,
+        width: 85,
         editable: true,
-        inputType: <Input style={{ width: 80 }}/>,
+        inputType: <Input style={{ width: '90%' }}/>,
         rules: [
           { required: true, message: '必填' },
         ],
@@ -375,7 +375,7 @@ class Order extends Component {
       {
         title: '亲水性',
         dataIndex: 'hydrophilic',
-        width: 100,
+        width: 50,
         align: 'center',
         render: text => (text === 1 ? '√' : ''),
         editable: true,
@@ -385,7 +385,7 @@ class Order extends Component {
         title: '疏水性',
         dataIndex: 'hydrophobic',
         align: 'center',
-        width: 100,
+        width: 50,
         render: text => (text === 1 ? '√' : ''),
         editable: true,
         inputType: <Checkbox style={{ textAlign: 'center', display: 'block' }}/>,
@@ -394,7 +394,7 @@ class Order extends Component {
         title: '酸性',
         dataIndex: 'acidic',
         align: 'center',
-        width: 100,
+        width: 35,
         render: text => (text === 1 ? '√' : ''),
         editable: true,
         inputType: <Checkbox style={{ textAlign: 'center', display: 'block' }}/>,
@@ -403,7 +403,7 @@ class Order extends Component {
         title: '碱性',
         dataIndex: 'alkaline',
         align: 'center',
-        width: 100,
+        width: 35,
         render: text => (text === 1 ? '√' : ''),
         editable: true,
         inputType: <Checkbox style={{ textAlign: 'center', display: 'block' }}/>,
@@ -412,7 +412,7 @@ class Order extends Component {
         title: '是否可做二硫键',
         dataIndex: 'isCanDisulfideBond',
         align: 'center',
-        width: 230,
+        width: 110,
         render: text => (text === 1 ? '√' : ''),
         editable: true,
         inputType: <Checkbox style={{ textAlign: 'center', display: 'block' }}/>,
@@ -422,7 +422,7 @@ class Order extends Component {
         dataIndex: 'molecularWeight',
         width: 100,
         editable: true,
-        inputType: <Input style={{ width: 80 }}/>,
+        inputType: <Input style={{ width: '90%' }}/>,
         rules: [
           { required: true, message: '必填' },
         ],
@@ -432,7 +432,7 @@ class Order extends Component {
         dataIndex: 'isoelectricPoint',
         width: 100,
         editable: true,
-        inputType: <Input style={{ width: 80 }}/>,
+        inputType: <Input style={{ width: '90%' }}/>,
         rules: [
           { required: true, message: '必填' },
         ],
@@ -440,9 +440,9 @@ class Order extends Component {
       {
         title: '羧基解离常数',
         dataIndex: 'carboxylationDissociationConstant',
-        width: 200,
+        width: 140,
         editable: true,
-        inputType: <Input style={{ width: 80 }}/>,
+        inputType: <Input style={{ width: '90%' }}/>,
         rules: [
           { required: true, message: '必填' },
         ],
@@ -450,9 +450,9 @@ class Order extends Component {
       {
         title: '氨基解离常数',
         dataIndex: 'aminoDissociationConstant',
-        width: 200,
+        width: 140,
         editable: true,
-        inputType: <Input style={{ width: 80 }}/>,
+        inputType: <Input style={{ width: '90%' }}/>,
         rules: [
           { required: true, message: '必填' },
         ],
@@ -519,16 +519,16 @@ class Order extends Component {
       {
         title: '类型',
         dataIndex: 'aminoAcidType',
-        width: 100,
+        width: 50,
         align: 'center',
         editable: true,
         inputType: (
           <Fragment>
-            <Select style={{ width: 80, display: 'block', margin: '0 auto' }} defaultValue="L">
+            <Select style={{ width: '90%', display: 'block', margin: '0 auto' }} defaultValue="L">
               <Option value="L">L</Option>
             </Select>
             <Divider type="horizontal" style={{ margin: 0 }}/>
-            <Select style={{ width: 80, display: 'block', margin: '0 auto' }} defaultValue="D">
+            <Select style={{ width: '90%', display: 'block', margin: '0 auto' }} defaultValue="D">
               <Option value="D">D</Option>
             </Select>
           </Fragment>
@@ -557,7 +557,7 @@ class Order extends Component {
                 </Fragment>)
         },
         editable: true,
-        inputType: <Input style={{ width: 80, display: 'block', margin: '0 auto' }}/>,
+        inputType: <Input style={{ width: '90%', display: 'block', margin: '0 auto' }}/>,
       },
       {
         title: '短代码',
@@ -574,7 +574,7 @@ class Order extends Component {
                 </Fragment>)
         },
         editable: true,
-        inputType: <Input style={{ width: 80, display: 'block', margin: '0 auto' }}/>,
+        inputType: <Input style={{ width: '90%', display: 'block', margin: '0 auto' }}/>,
       },
       {
         title: '操作',

@@ -156,7 +156,7 @@ class ModificationsType extends Component {
       dataIndex: 'modificationType',
       width: 200,
       editable: true,
-      inputType: <Input />,
+      inputType: <Input style={{ width: '90%' }}/>,
       rules: [
         { required: true, message: '必填' },
       ],

@@ -298,7 +298,7 @@ class Product extends Component {
         dataIndex: 'providerTotalAmountBegin',
         width: 150,
         editable: true,
-        inputType: <Input style={{ width: 100 }}/>,
+        inputType: <Input style={{ width: '90%' }}/>,
         rules: [
           { required: true, message: '必填' },
         ],
@@ -308,7 +308,7 @@ class Product extends Component {
         dataIndex: 'providerTotalAmountEnd',
         width: 150,
         editable: true,
-        inputType: <Input style={{ width: 100 }}/>,
+        inputType: <Input style={{ width: '90%' }}/>,
         rules: [
           { required: true, message: '必填' },
         ],
@@ -319,7 +319,7 @@ class Product extends Component {
         width: 150,
         editable: true,
         inputType: (
-          <Select style={{ width: 100 }}>
+          <Select style={{ width: '90%' }}>
           {purityValue.map(item =>
             <Option value={item.id} key={item.id}>{item.purity}</Option>,
           )}
@@ -342,7 +342,7 @@ class Product extends Component {
         dataIndex: 'aminoAcidLengthBegin',
         width: 100,
         editable: true,
-        inputType: <Input style={{ width: 80 }}/>,
+        inputType: <Input style={{ width: '90%' }}/>,
         rules: [
           { required: true, message: '必填' },
         ],
@@ -352,7 +352,7 @@ class Product extends Component {
         dataIndex: 'aminoAcidLengthEnd',
         width: 100,
         editable: true,
-        inputType: <Input style={{ width: 80 }}/>,
+        inputType: <Input style={{ width: '90%' }}/>,
         rules: [
           { required: true, message: '必填' },
         ],
@@ -372,7 +372,7 @@ class Product extends Component {
         width: 120,
         editable: true,
         inputType: (
-          <Select style={{ width: 100 }}>
+          <Select style={{ width: '90%' }}>
               <Option value="L">L</Option>
               <Option value="D">D</Option>
           </Select>),

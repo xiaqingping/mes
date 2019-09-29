@@ -1,4 +1,4 @@
-// 氨基酸弹框
+// 产品弹框
 import {
   Button,
   Col,
@@ -53,23 +53,53 @@ class Search extends Component {
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
-            <FormItem label="名称">
-              {getFieldDecorator('name')(<Input />)}
+            <FormItem label="产品名称">
+              {getFieldDecorator('desc')(<Input />)}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
-            <FormItem label="代码">
-            {getFieldDecorator('aminoAcidCode')(<Input />)}
+            <FormItem label="英文名称">
+              {getFieldDecorator('edesc')(<Input />)}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
-            <FormItem label="状态">
-            {getFieldDecorator('status', { initialValue: 1 })(
-                <Select>
-                    {status.map(item =>
-                      <Option key={item.id} value={item.id}>{item.name}</Option>,
-                    )}
-                  </Select>)}
+            <FormItem label="旧物料号">
+              {getFieldDecorator('oldCode')(<Input />)}
+            </FormItem>
+          </Col>
+          <Col lg={6} md={8} sm={12}>
+            <FormItem label="客户编号">
+              {getFieldDecorator('customerCode')(<Input />)}
+            </FormItem>
+          </Col>
+          <Col lg={6} md={8} sm={12}>
+            <FormItem label="负责人编号">
+              {getFieldDecorator('subcustomerCode')(<Input />)}
+            </FormItem>
+          </Col>
+          <Col lg={6} md={8} sm={12}>
+            <FormItem label="销售大区">
+              {getFieldDecorator('regionCode')(<Input />)}
+            </FormItem>
+          </Col>
+          <Col lg={6} md={8} sm={12}>
+            <FormItem label="销售网点">
+              {getFieldDecorator('officeCode')(<Input />)}
+            </FormItem>
+          </Col>
+          <Col lg={6} md={8} sm={12}>
+            <FormItem label="销售范围">
+              {getFieldDecorator('range_area')(<Input />)}
+            </FormItem>
+          </Col>
+          <Col lg={6} md={8} sm={12}>
+            <FormItem label="工厂">
+              {getFieldDecorator('stock_factory')(<Input />)}
+            </FormItem>
+          </Col>
+          <Col lg={6} md={8} sm={12}>
+            <FormItem label="品牌">
+              {getFieldDecorator('brandCode')(<Input />)}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
@@ -407,7 +437,7 @@ class Order extends Component {
               <Table
                 dataSource={data.list}
                 columns={columns}
-                scroll={{ x: tableWidth, y: 400 }}
+                scroll={{ x: tableWidth, y: 350 }}
                 pagination={data.pagination}
                 rowKey="code"
                 rowSelection={rowSelection}
