@@ -126,7 +126,7 @@ class EditableCell extends React.Component {
     if (editing) {
       return (
         <td {...restProps} style={{ padding: 0 }}>
-            <Form.Item style={{ margin: 0, padding: 0 }}>
+            <Form.Item>
               {getFieldDecorator(dataIndex, {
                 rules,
                 valuePropName: 'checked',

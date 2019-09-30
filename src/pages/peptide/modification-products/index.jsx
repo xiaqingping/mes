@@ -18,6 +18,7 @@ import StandardTable from '@/components/StandardTable';
 import api from '@/api';
 import { connect } from 'dva';
 import Modifications from '@/pages/peptide/components/modifications-mask'
+import Products from '@/pages/peptide/components/products-mask'
 
 const EditableContext = React.createContext();
 const FormItem = Form.Item;
@@ -108,7 +109,7 @@ class EditableCell extends React.Component {
     if (editing) {
       return (
         <td {...restProps} style={{ padding: 0 }}>
-            <Form.Item style={{ margin: 0, padding: 0 }}>
+            <Form.Item>
               {getFieldDecorator(dataIndex, {
                 rules,
                 valuePropName: 'checked',
@@ -145,6 +146,8 @@ class ModificationProducts extends Component {
     id: 0, // 新增数据时，提供负数id
     sonModification: [],
     visibleModification: false, // 遮罩层的判断
+    sonProducts: [],
+    visibleProducts: false, // 遮罩层的判断
   }
 
   componentDidMount() {
@@ -239,8 +242,20 @@ class ModificationProducts extends Component {
   saveRow = index => {
     this.props.form.validateFields((error, row) => {
       if (error) return;
-      const { list } = this.state;
-      const newData = { ...list[index], ...row };
+      const { list, sonModification } = this.state;
+      const newData = { ...list[index],
+         ...row,
+         isNeedDesalting: row.isNeedDesalting ? 1 : 2,
+         aminoAcidLengthBegin: parseInt(row.aminoAcidLengthBegin, 10),
+         aminoAcidLengthEnd: parseInt(row.aminoAcidLengthEnd, 10),
+         providerTotalAmountBegin: parseInt(row.providerTotalAmountBegin, 10),
+         providerTotalAmountEnd: parseInt(row.providerTotalAmountEnd, 10),
+         modificationCode: sonModification.modificationCode,
+         modificationID: sonModification.id,
+         aminoAcidCode: row.aminoAcidName.split('-')[0],
+         aminoAcidID: row.aminoAcidName.split('-')[1],
+         aminoAcidName: row.aminoAcidName.split('-')[2],
+        };
       if (newData.id > 0) {
         // api.peptideBase.updateSeries(newData).then(() => this.getTableData());
       } else {
@@ -250,36 +265,58 @@ class ModificationProducts extends Component {
   }
 
   // 打开搜索
-  openMask = () => {
-    this.setState({
-      visibleModification: true,
-    })
+  openMask = type => {
+    if (type === 'modifications') {
+      this.setState({
+        visibleModification: true,
+      })
+    } else {
+      this.setState({
+        visibleProducts: true,
+      })
+    }
   }
 
-  closeModificationMask = v => {
-    this.setState({
-      visibleModification: v,
-    })
+  closeMask = (v, type) => {
+    if (type === 'modifications') {
+      this.setState({
+        visibleModification: v,
+      })
+    } else {
+      this.setState({
+        visibleProducts: v,
+      })
+    }
   }
 
   // 得到修饰搜索的值
-  getSonModification = data => {
-    // console.log(data)
-    this.props.form.setFieldsValue({
-      modificationPosition: data.modificationPosition,
-      modificationName: data.name,
-    })
-    // eslint-disable-next-line array-callback-return
-    this.props.peptide.commonData.modificationPosition.map(item => {
-      if (item.id === data.modificationPosition) {
-        // eslint-disable-next-line no-param-reassign
-        data.modificationPosition = item.name
-      }
-    })
-    this.setState({
-      sonModification: data,
-      visibleModification: false,
-    })
+  getSonData = (data, type) => {
+    if (type === 'modifications') {
+      this.props.form.setFieldsValue({
+        modificationPosition: data.modificationPosition,
+        modificationName: data.name,
+      })
+      // eslint-disable-next-line array-callback-return
+      this.props.peptide.commonData.modificationPosition.map(item => {
+        if (item.id === data.modificationPosition) {
+          // eslint-disable-next-line no-param-reassign
+          data.modificationPosition = item.name
+        }
+      })
+      this.setState({
+        sonModification: data,
+        visibleModification: false,
+      })
+    } else {
+      this.setState({
+        sonProducts: data,
+        visibleProducts: false,
+      })
+      this.props.form.setFieldsValue({
+        sapProductCode: data.code,
+        sapProductName: data.name,
+      })
+    }
   }
 
   // 新增
@@ -313,6 +350,8 @@ class ModificationProducts extends Component {
       sonModification,
       visibleModification,
       aminoAcid,
+      visibleProducts,
+      sonProducts,
     } = this.state;
     const data = { list, pagination: { current, pageSize, total } };
     const { peptide: { commonData } } = this.props
@@ -329,7 +368,7 @@ class ModificationProducts extends Component {
         dataIndex: 'modificationName',
         width: 250,
         editable: true,
-        inputType: <Search style={{ width: '90%' }} onSearch={() => this.openMask()} value={sonModification.name ? sonModification.name : ''} readOnly/>,
+        inputType: <Search style={{ width: 230 }} onSearch={() => this.openMask('modifications')} value={sonModification.name ? sonModification.name : ''} readOnly/>,
         rules: [
           { required: true, message: '必填' },
         ],
@@ -339,7 +378,7 @@ class ModificationProducts extends Component {
         dataIndex: 'modificationPosition',
         width: 110,
         editable: true,
-        inputType: <Input style={{ width: '90%' }} value={sonModification.modificationPosition ? sonModification.modificationPosition : ''} readOnly/>,
+        inputType: <Input style={{ width: 90 }} value={sonModification.modificationPosition ? sonModification.modificationPosition : ''} readOnly/>,
         rules: [
           { required: true, message: '必填' },
         ],
@@ -356,12 +395,12 @@ class ModificationProducts extends Component {
       {
         title: '氨基酸',
         dataIndex: 'aminoAcidName',
-        width: 100,
+        width: 120,
         editable: true,
         inputType: (
-          <Select style={{ width: 90 }}>
+          <Select style={{ width: 110 }}>
           {aminoAcid.map(item =>
-            <Option value={item.name} key={item.id}>{item.name}</Option>,
+            <Option value={`${item.code}-${item.id}-${item.name}`} key={item.id}>{item.name}</Option>,
           )}
           </Select>),
         rules: [
@@ -371,10 +410,10 @@ class ModificationProducts extends Component {
       {
         title: '氨基酸类型',
         dataIndex: 'aminoAcidType',
-        width: 120,
+        width: 110,
         editable: true,
         inputType: (
-          <Select style={{ width: 100 }}>
+          <Select style={{ width: 90 }}>
             <Option value="L">L</Option>
             <Option value="D">D</Option>
           </Select>),
@@ -385,9 +424,9 @@ class ModificationProducts extends Component {
       {
         title: '提供总量从',
         dataIndex: 'providerTotalAmountBegin',
-        width: 120,
+        width: 110,
         editable: true,
-        inputType: <Input style={{ width: '90%' }}/>,
+        inputType: <Input style={{ width: 90 }}/>,
         rules: [
           { required: true, message: '必填' },
         ],
@@ -397,7 +436,7 @@ class ModificationProducts extends Component {
         dataIndex: 'providerTotalAmountEnd',
         width: 120,
         editable: true,
-        inputType: <Input style={{ width: '90%' }}/>,
+        inputType: <Input style={{ width: 100 }}/>,
         rules: [
           { required: true, message: '必填' },
         ],
@@ -407,7 +446,7 @@ class ModificationProducts extends Component {
         dataIndex: 'aminoAcidLengthBegin',
         width: 100,
         editable: true,
-        inputType: <Input style={{ width: '90%' }}/>,
+        inputType: <Input style={{ width: 80 }}/>,
         rules: [
           { required: true, message: '必填' },
         ],
@@ -417,7 +456,7 @@ class ModificationProducts extends Component {
         dataIndex: 'aminoAcidLengthEnd',
         width: 100,
         editable: true,
-        inputType: <Input style={{ width: '90%' }}/>,
+        inputType: <Input style={{ width: 80 }}/>,
         rules: [
           { required: true, message: '必填' },
         ],
@@ -435,7 +474,7 @@ class ModificationProducts extends Component {
         dataIndex: 'sapProductCode',
         width: 200,
         editable: true,
-        inputType: <Input style={{ width: '90%' }} value={sonModification.modificationPosition ? sonModification.modificationPosition : ''} readOnly/>,
+        inputType: <Input style={{ width: 180 }} value={sonProducts.code ? sonProducts.code : ''} readOnly/>,
         rules: [
           { required: true, message: '必填' },
         ],
@@ -445,7 +484,7 @@ class ModificationProducts extends Component {
         dataIndex: 'sapProductName',
         width: 300,
         editable: true,
-        inputType: <Search style={{ width: '90%' }} onSearch={() => this.openMask()} value={sonModification.modificationName ? sonModification.modificationName : ''} readOnly/>,
+        inputType: <Search style={{ width: 280 }} onSearch={() => this.openMask('products')} value={sonProducts.name ? sonProducts.name : ''} readOnly/>,
         rules: [
           { required: true, message: '必填' },
         ],
@@ -567,8 +606,10 @@ class ModificationProducts extends Component {
             </EditableContext.Provider>
           </div>
         </Card>
-        <Modifications getData={v => { this.getSonModification(v) }} visible={visibleModification}
-        closeMask={ v => { this.closeModificationMask(v) }}/>
+        <Modifications getData={v => { this.getSonData(v, 'modifications') }} visible={visibleModification}
+        closeMask={ v => { this.closeMask(v, 'modifications') }}/>
+        <Products getData={v => { this.getSonData(v, 'products') }} visible={visibleProducts}
+        closeMask={ v => { this.closeMask(v, 'products') }}/>
       </PageHeaderWrapper>
     );
   }

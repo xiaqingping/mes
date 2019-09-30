@@ -17,7 +17,7 @@ import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import StandardTable from '@/components/StandardTable';
 import api from '@/api';
 import { connect } from 'dva';
-import AminoAcid from '@/pages/peptide/components/products-mask'
+import Products from '@/pages/peptide/components/products-mask'
 
 const EditableContext = React.createContext();
 const FormItem = Form.Item;
@@ -108,7 +108,7 @@ class EditableCell extends React.Component {
     if (editing) {
       return (
         <td {...restProps} style={{ padding: 0 }}>
-            <Form.Item style={{ margin: 0, padding: 0 }}>
+            <Form.Item>
               {getFieldDecorator(dataIndex, {
                 rules,
                 valuePropName: 'checked',
@@ -521,7 +521,7 @@ class DisulfideBondProducts extends Component {
             </EditableContext.Provider>
           </div>
         </Card>
-        <AminoAcid getData={v => { this.getSonProduct(v) }} visible={visible}
+        <Products getData={v => { this.getSonProduct(v) }} visible={visible}
         closeMask={ v => { this.closeMask(v) }}/>
       </PageHeaderWrapper>
     );
