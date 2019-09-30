@@ -295,16 +295,16 @@ class Order extends Component {
              modificationType={ modificationType }/>
             <div className="tableListOperator">
             </div>
-              <Table
-                dataSource={data.list}
-                columns={columns}
-                scroll={{ x: tableWidth, y: 400 }}
-                pagination={data.pagination}
-                rowKey="code"
-                rowSelection={rowSelection}
-                loading={loading}
-                onChange={this.handleStandardTableChange}
-               />
+            <Table
+              dataSource={data.list}
+              columns={columns}
+              scroll={{ x: tableWidth, y: 400 }}
+              pagination={data.pagination}
+              rowKey="code"
+              rowSelection={rowSelection}
+              loading={loading}
+              onChange={this.handleStandardTableChange}
+              />
         </Modal>
       </div>
     );

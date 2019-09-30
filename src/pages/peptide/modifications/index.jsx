@@ -188,6 +188,9 @@ class Modifications extends Component {
     if (e.target.className === 'operate' || e.target.className.indexOf('ant-btn-sm') !== -1 || v.id < 1) {
       return
     }
+    this.setState({
+      loadingSon: true,
+    })
     setTimeout(() => {
         this.setState({
           dataSon: v.details,

@@ -221,11 +221,24 @@ class DisulfideBondProducts extends Component {
     this.props.form.validateFields((error, row) => {
       if (error) return;
       const { list } = this.state;
-      const newData = { ...list[index], ...row };
+      const newData = {
+        ...list[index],
+        ...row,
+        providerTotalAmountBegin: parseInt(row.providerTotalAmountBegin, 10),
+        providerTotalAmountEnd: parseInt(row.providerTotalAmountEnd, 10),
+        aminoAcidLengthBegin: parseInt(row.aminoAcidLengthBegin, 10),
+        aminoAcidLengthEnd: parseInt(row.aminoAcidLengthEnd, 10),
+        isNeedDesalting: row.isNeedDesalting ? 1 : 2,
+      };
       if (newData.id > 0) {
         // api.peptideBase.updateSeries(newData).then(() => this.getTableData());
       } else {
-        api.peptideBase.insertdisulfideBondProducts(newData).then(() => this.getTableData());
+        api.peptideBase.insertdisulfideBondProducts(newData).then(() => {
+          this.getTableData();
+          this.setState({
+            sonProducts: [],
+          })
+        });
       }
     });
   }
@@ -262,6 +275,17 @@ class DisulfideBondProducts extends Component {
         ...list,
       ],
     });
+  }
+
+  getSonProduct = data => {
+    this.setState({
+      sonProducts: data,
+      visible: false,
+    })
+    this.props.form.setFieldsValue({
+      sapProductCode: data.code,
+      sapProductName: data.name,
+    })
   }
 
   render() {
@@ -365,7 +389,7 @@ class DisulfideBondProducts extends Component {
         dataIndex: 'sapProductCode',
         width: 150,
         editable: true,
-        inputType: <Input style={{ width: '90%' }} value={sonProducts.modificationPosition ? sonProducts.modificationPosition : ''} readOnly/>,
+        inputType: <Input style={{ width: '90%' }} value={sonProducts.code ? sonProducts.code : ''} readOnly/>,
         rules: [
           { required: true, message: '必填' },
         ],
@@ -375,7 +399,7 @@ class DisulfideBondProducts extends Component {
         dataIndex: 'sapProductName',
         width: 400,
         editable: true,
-        inputType: <Search style={{ width: '90%' }} onSearch={() => this.openMask()} value={sonProducts.modificationName ? sonProducts.modificationName : ''} readOnly/>,
+        inputType: <Search style={{ width: '90%' }} onSearch={() => this.openMask()} value={sonProducts.name ? sonProducts.name : ''} readOnly/>,
         rules: [
           { required: true, message: '必填' },
         ],
@@ -497,7 +521,7 @@ class DisulfideBondProducts extends Component {
             </EditableContext.Provider>
           </div>
         </Card>
-        <AminoAcid getData={v => { this.getSonAminoAcid(v) }} visible={visible}
+        <AminoAcid getData={v => { this.getSonProduct(v) }} visible={visible}
         closeMask={ v => { this.closeMask(v) }}/>
       </PageHeaderWrapper>
     );

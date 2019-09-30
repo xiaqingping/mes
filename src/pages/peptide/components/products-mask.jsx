@@ -2,7 +2,6 @@
 import {
   Button,
   Col,
-  Divider,
   Form,
   Input,
   Row,
@@ -10,7 +9,7 @@ import {
   Table,
   Modal,
 } from 'antd';
-import React, { Component, Fragment } from 'react';
+import React, { Component } from 'react';
 
 import api from '@/api';
 import './style.less'
@@ -24,8 +23,24 @@ const { Option } = Select;
  */
 @Form.create()
 class Search extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      factorys: [],
+    }
+  }
+
   componentDidMount() {
     this.submit();
+    api.basic.getFactorys().then(data => {
+      this.setState({
+        factorys: data,
+      })
+    })
+  }
+
+  componentWillReceiveProps() {
+
   }
 
   submit = e => {
@@ -42,8 +57,10 @@ class Search extends Component {
   renderForm = () => {
     const {
       form: { getFieldDecorator },
-      status,
+      brands,
+      rangeArea,
     } = this.props;
+    const { factorys } = this.state;
     return (
       <Form onSubmit={this.submit} layout="inline">
         <Row gutter={{ lg: 24, md: 12, sm: 6 }}>
@@ -89,17 +106,34 @@ class Search extends Component {
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="销售范围">
-              {getFieldDecorator('range_area')(<Input />)}
+              {getFieldDecorator('range_area', { initialValue: '10-3110' })(
+                <Select>
+                    {rangeArea.map(item =>
+                      <Option key={item.id} value={item.id}>{item.name}</Option>,
+                    )}
+                </Select>)}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="工厂">
-              {getFieldDecorator('stock_factory')(<Input />)}
+              {getFieldDecorator('stock_factory', { initialValue: '' })(
+                <Select>
+                  <Option value="">全部</Option>
+                    {factorys.map(item =>
+                      <Option key={item.code} value={item.code}>{`${item.code}-${item.name}`}</Option>,
+                    )}
+                </Select>)}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="品牌">
-              {getFieldDecorator('brandCode')(<Input />)}
+            {getFieldDecorator('brandCode', { initialValue: '' })(
+                <Select>
+                  <Option value="">全部</Option>
+                    {brands.map(item =>
+                      <Option key={item.code} value={item.code}>{`${item.code}-${item.name}`}</Option>,
+                    )}
+                </Select>)}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
@@ -138,6 +172,8 @@ class Order extends Component {
     loading: false,
     visible: false, // 遮罩层的判断
     data: [],
+    dataSon: [],
+    loadingSon: false,
   }
 
   componentWillReceiveProps(nextProps) {
@@ -157,6 +193,19 @@ class Order extends Component {
     });
   };
 
+    // 设置子值
+    dataSon = v => {
+      this.setState({
+        loadingSon: true,
+      })
+      setTimeout(() => {
+          this.setState({
+            dataSon: v.stock.storages,
+            loadingSon: false,
+          })
+        }, 500)
+    }
+
   // 分页
   handleStandardTableChange = pagination => {
     this.getTableData({
@@ -168,65 +217,22 @@ class Order extends Component {
   // 获取表格数据
   getTableData = (options = {}) => {
     const { formValues } = this.state;
-    const query = Object.assign({}, formValues, options);
+    const conditions = [];
+    conditions['range.channel'] = options.range_area ? options.range_area.split('-')[0] : '';
+    conditions['range.organization'] = options.range_area ? options.range_area.split('-')[1] : '';
+    conditions['stock.factory'] = options.stock_factory ? options.stock_factory : 3100;
+    const query = Object.assign({}, formValues, options, conditions);
 
     this.setState({
       formValues: query,
       loading: true,
     });
 
-    api.peptideBase.getAminoAcid(query).then(data => {
-      const map = {}; const dest = [];
-      for (let i = 0; i < data.rows.length; i++) {
-        const ai = data.rows[i];
-        if (!map[ai.id]) {
-          dest.push({
-            id: ai.id,
-            code: ai.code,
-            name: ai.name,
-            hydrophilic: ai.hydrophilic,
-            hydrophobic: ai.hydrophobic,
-            acidic: ai.acidic,
-            alkaline: ai.alkaline,
-            isCanDisulfideBond: ai.isCanDisulfideBond,
-            molecularWeight: ai.molecularWeight,
-            isoelectricPoint: ai.isoelectricPoint,
-            carboxylationDissociationConstant: ai.carboxylationDissociationConstant,
-            aminoDissociationConstant: ai.aminoDissociationConstant,
-            status: ai.status,
-            creatorName: ai.creatorName,
-            createDate: ai.createDate,
-            cancelName: ai.cancelName,
-            cancelDate: ai.cancelDate,
-            aminoAcidType: ai.aminoAcidType,
-            longCode: ai.longCode,
-            shortCode: ai.shortCode,
-          });
-          map[ai.id] = ai;
-        } else {
-          for (let j = 0; j < dest.length; j++) {
-            const dj = dest[j];
-            if (dj.id === ai.id) {
-              dj.cancelName = dj.cancelName || ai.cancelName ? [dj.cancelName, ai.cancelName] : '';
-              dj.cancelDate = dj.cancelDate || ai.cancelDate ? [dj.cancelDate, ai.cancelDate] : '';
-              dj.shortCode = dj.shortCode || ai.shortCode ? [dj.shortCode, ai.shortCode] : '';
-              // dj.shortCode = (dj.shortCode ? dj.shortCode : '')
-              // + (ai.shortCode ? ` | ${ai.shortCode}` : '');
-              dj.longCode = dj.longCode || ai.longCode ? [dj.longCode, ai.longCode] : '';
-              // dj.longCode = (dj.longCode ? dj.longCode : '')
-              // + (ai.longCode ? ` | ${ai.longCode}` : '');
-              dj.aminoAcidType = dj.aminoAcidType || ai.aminoAcidType ? [dj.aminoAcidType, ai.aminoAcidType] : '';
-              // dj.aminoAcidType = (dj.aminoAcidType ? dj.aminoAcidType : '')
-              // + (ai.aminoAcidType ? ` | ${ai.aminoAcidType}` : '');
-              break;
-            }
-          }
-        }
-      }
+    api.basic.getProductList(query).then(data => {
       this.setState({
+        list: data,
+        total: data.length,
         loading: false,
-        list: dest,
-        total: dest.length * 2,
       });
     });
   }
@@ -242,6 +248,8 @@ class Order extends Component {
       total,
       loading,
       visible,
+      dataSon,
+      loadingSon,
     } = this.state;
     const data = { list, pagination: { current, pageSize, total } };
     const { peptide: { commonData } } = this.props
@@ -251,157 +259,117 @@ class Order extends Component {
       {
         title: '编号',
         dataIndex: 'code',
+        width: 150,
+      },
+      {
+        title: '产品名称',
+        dataIndex: 'desc',
+        width: 300,
+      },
+      {
+        title: '英文名称',
+        dataIndex: 'edesc',
+        width: 300,
+      },
+      {
+        title: '旧物料号',
+        dataIndex: 'oldCode',
+        width: 150,
+      },
+      {
+        title: '品牌',
+        dataIndex: 'brand',
         width: 100,
       },
       {
-        title: '名称',
-        dataIndex: 'name',
+        title: '包装',
+        dataIndex: 'packing',
         width: 100,
       },
       {
-        title: '亲水性',
-        dataIndex: 'hydrophilic',
-        width: 100,
-        align: 'center',
-        render: text => (text === 1 ? '√' : ''),
-      },
-      {
-        title: '疏水性',
-        dataIndex: 'hydrophobic',
-        align: 'center',
-        width: 100,
-        render: text => (text === 1 ? '√' : ''),
-      },
-      {
-        title: '酸性',
-        dataIndex: 'acidic',
-        align: 'center',
-        width: 100,
-        render: text => (text === 1 ? '√' : ''),
-      },
-      {
-        title: '碱性',
-        dataIndex: 'alkaline',
-        align: 'center',
-        width: 100,
-        render: text => (text === 1 ? '√' : ''),
-      },
-      {
-        title: '是否可做二硫键',
-        dataIndex: 'isCanDisulfideBond',
-        align: 'center',
-        width: 230,
-        render: text => (text === 1 ? '√' : ''),
-      },
-      {
-        title: '分子量',
-        dataIndex: 'molecularWeight',
-        width: 100,
-      },
-      {
-        title: '等电点',
-        dataIndex: 'isoelectricPoint',
-        width: 100,
-      },
-      {
-        title: '羧基解离常数',
-        dataIndex: 'carboxylationDissociationConstant',
+        title: '销售单位',
+        dataIndex: 'salesUnit',
         width: 200,
       },
       {
-        title: '氨基解离常数',
-        dataIndex: 'aminoDissociationConstant',
+        title: '采购单位',
+        dataIndex: 'purchaseUnit',
         width: 200,
+      },
+      {
+        title: '温度条件',
+        dataIndex: 'temperatureCode',
+        width: 200,
+        render: (text, record) => `${record.temperatureCode}-${record.temperature}`,
+      },
+      {
+        title: '危险品标识',
+        dataIndex: 'cas',
+        width: 120,
+      },
+      {
+        title: '产品价格',
+        dataIndex: 'listPrice',
+        width: 100,
+      },
+      {
+        title: '客户折扣',
+        dataIndex: 'custDiscount',
+        width: 100,
+      },
+      {
+        title: '客户价格',
+        dataIndex: 'custPrice',
+        width: 100,
+      },
+      {
+        title: '促销价格',
+        dataIndex: 'promPrice',
+        width: 100,
+      },
+      {
+        title: '库存',
+        dataIndex: 'stock',
+        width: 100,
+        render: (text, record) => record.saleCount,
+      },
+      {
+        title: '到货周期',
+        dataIndex: 'deliPeriod',
+        width: 100,
+        render: (text, record) => {
+          if (record.deliPeriod === 0 && record.prodPeriod === 0) {
+            if (record.stock) {
+              if (record.stock.saleCount > 0) {
+                return '现货';
+              }
+            }
+              return '无货';
+          }
+            return `预计${Math.max(record.deliPeriod, record.prodPeriod)}天到货`;
+        },
       },
       {
         title: '状态',
-        dataIndex: 'status',
-        width: 100,
+        dataIndex: 'saleStatus',
+        width: 150,
         render: text => {
-          if (text === 1) return '正常';
-          if (text === 2) return '已删除';
-          return ''
+          if (text === 'Z1') return '暂停销售'
+          return '状态异常(促销)'
         },
       },
-      {
-        title: '创建人',
-        dataIndex: 'creatorName',
+    ];
+
+    const columnSon = [
+        {
+        title: '仓库',
+        dataIndex: 'storageName',
         width: 100,
       },
       {
-        title: '创建时间',
-        dataIndex: 'createDate',
-        width: 300,
-      },
-      {
-        title: '删除人',
-        dataIndex: 'cancelName',
+        title: '数量',
+        dataIndex: 'saleCount',
         width: 100,
-        render: text => {
-          if (!text) return false;
-          return (<Fragment>
-                    <span>{text[0]}</span>
-                    <Divider type="horizontal" style={{ margin: 0 }}/>
-                    <span>{text[1]}</span>
-                </Fragment>)
-        },
-      },
-      {
-        title: '删除时间',
-        dataIndex: 'cancelDate',
-        width: 300,
-        render: text => {
-          if (!text) return false;
-          return (<Fragment>
-                    <span>{text[0]}</span>
-                    <Divider type="horizontal" style={{ margin: 0 }}/>
-                    <span>{text[1]}</span>
-                </Fragment>)
-        },
-      },
-      {
-        title: '类型',
-        dataIndex: 'aminoAcidType',
-        width: 100,
-        align: 'center',
-        render: text => {
-          if (!text) return false;
-          return (<Fragment>
-                    <span>{text[0]}</span>
-                    <Divider type="horizontal" style={{ margin: 0 }}/>
-                    <span>{text[1]}</span>
-                </Fragment>)
-        },
-      },
-      {
-        title: '长代码',
-        dataIndex: 'longCode',
-        width: 100,
-        align: 'center',
-        double: true,
-        render: text => {
-          if (!text) return false;
-          return (<Fragment>
-                    <span>{text[0]}</span>
-                    <Divider type="horizontal" style={{ margin: 0 }}/>
-                    <span>{text[1]}</span>
-                </Fragment>)
-        },
-      },
-      {
-        title: '短代码',
-        dataIndex: 'shortCode',
-        width: 100,
-        align: 'center',
-        double: true,
-        render: text => {
-          if (!text) return false;
-          return (<Fragment>
-                    <span>{text[0]}</span>
-                    <Divider type="horizontal" style={{ margin: 0 }}/>
-                    <span>{text[1]}</span>
-                </Fragment>)
-        },
       },
     ];
 
@@ -431,19 +399,36 @@ class Order extends Component {
           onOk={this.handleOk}
           onCancel={this.handleCancel}
         >
-            <Search getTableData={this.getTableData} status={commonData.status}/>
+            <Search getTableData={this.getTableData} brands={commonData.brands}
+            rangeArea={commonData.rangeArea}/>
             <div className="tableListOperator">
             </div>
+
               <Table
+                style={{ width: '800px', height: '100%', display: 'inline-block' }}
+                bordered
                 dataSource={data.list}
                 columns={columns}
                 scroll={{ x: tableWidth, y: 350 }}
-                pagination={data.pagination}
                 rowKey="code"
                 rowSelection={rowSelection}
                 loading={loading}
                 onChange={this.handleStandardTableChange}
-               />
+                onRow={record => ({ onClick: e => this.dataSon(record, e) }) }
+                pagination={false}
+                />
+
+              <Table
+                style={{ width: '300px', height: '100%', display: 'inline-block', marginLeft: '50px', verticalAlign: 'top' }}
+                bordered
+                dataSource={dataSon}
+                columns={columnSon}
+                scroll={{ x: 250, y: 350 }}
+                rowKey="storage"
+                loading={loadingSon}
+                pagination={false}
+                />
+
         </Modal>
       </div>
     );
