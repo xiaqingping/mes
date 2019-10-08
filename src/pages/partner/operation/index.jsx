@@ -299,10 +299,12 @@ class Operation extends React.Component {
   // 重置
   handleFormReset = () => {
     this.props.form.resetFields();
+    this.setState({
+      typeValue: [],
+    })
   };
 
   toggleForm = () => {
-    console.log(this.state.typeValue)
     const { expandForm } = this.state;
     this.setState({
       expandForm: !expandForm,
@@ -331,11 +333,6 @@ class Operation extends React.Component {
       partnerVal: arr,
       // allowClear: 'ture',
     });
-  }
-
-  // 清楚按钮
-  inputKeyUp =e => {
-    console.log(e.keyCode);
   }
 
   renderAdvancedForm() {

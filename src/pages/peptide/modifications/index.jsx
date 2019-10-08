@@ -335,7 +335,7 @@ class Modifications extends Component {
         const { list } = this.state;
         const newData = { ...list[index],
                           ...row,
-                          isIndependentModification: row.isIndependentModification ? 1 : 0,
+                          isIndependentModification: row.isIndependentModification ? 1 : 2,
                         };
         if (newData.id > 0) {
           // api.peptideBase.updateSeries(newData).then(() => this.getTableData());

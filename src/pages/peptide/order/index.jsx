@@ -16,6 +16,7 @@ import StandardTable from '@/components/StandardTable';
 import { connect } from 'dva';
 import { formatter } from '@/utils/utils';
 import api from '@/api';
+import OrderMask from '@/pages/peptide/components/order-mask';
 
 const EditableContext = React.createContext();
 const FormItem = Form.Item;
@@ -293,6 +294,7 @@ class Order extends Component {
       payMethods: [], // 付款方式
       payTerms: [], // 付款条件
       currencys: [], // 货币类型
+      visible: false,
     }
   }
 
@@ -377,6 +379,20 @@ class Order extends Component {
     });
   };
 
+  // 打开新建订单页面
+  openOrderMask = () => {
+    this.setState({
+      visible: true,
+    })
+  }
+
+  // 关闭订单
+  closeOrderMask = v => {
+    this.setState({
+      visible: v,
+    })
+  }
+
   renderForm = () => {
     const { expandForm } = this.state;
     return expandForm ? this.renderAdvancedForm() : this.renderSimpleForm();
@@ -402,6 +418,7 @@ class Order extends Component {
       payMethods,
       payTerms,
       currencys,
+      visible,
     } = this.state;
     const { peptide: { commonData } } = this.props
     const data = { list, pagination: { current, pageSize, total } };
@@ -683,7 +700,7 @@ class Order extends Component {
             regions={regions} offices={offices}
             currencys={currencys} commonData={commonData}/>
             <div className="tableListOperator">
-              <Button icon="plus" type="primary">
+              <Button icon="plus" type="primary" onClick={ () => { this.openOrderMask() }}>
                 新建
               </Button>
             </div>
@@ -702,6 +719,7 @@ class Order extends Component {
             </EditableContext.Provider>
           </div>
         </Card>
+        <OrderMask visible={visible} closeMask={ v => this.closeOrderMask(v)}/>
       </PageHeaderWrapper>
     );
   }
