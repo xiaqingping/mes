@@ -9,12 +9,36 @@ import {
 } from 'antd';
 import React from 'react';
 
+import PersonCertificationAddModal from './PersonCertificationAddModal';
+
 const { Paragraph } = Typography;
 
 class PersonCertification extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = {
+      addModalVisible: false,
+      list: [
+        {
+          id: 1,
+          title: '上海交通大学',
+          description: '这是上海交通大学的认证说明，这是上海交通大学的认证说明，这是上海交通大学的认证说明，这是上海交通大学的认证说明，这是上海交通大学的认证说明，',
+          state: 1,
+          picList: [
+            'https://blog.maxmeng.top/images/avatar.jpg',
+          ],
+        },
+        {
+          id: 2,
+          title: '上海大学',
+          description: '这是上海大学认证说明',
+          state: 2,
+          picList: [
+            'https://blog.maxmeng.top/images/avatar.jpg',
+          ],
+        },
+      ],
+    };
   }
 
   renderListItem = item => {
@@ -28,7 +52,7 @@ class PersonCertification extends React.Component {
               <>
                 <a>变更</a>
                 <Divider type="vertical" />
-                <a>删除</a>
+                <a onClick={() => this.removeItem(item.id)}>删除</a>
               </>
             }
           >
@@ -44,7 +68,7 @@ class PersonCertification extends React.Component {
               {item.description}
             </Paragraph>
             <div>
-              <img style={{ width: 80, height: 80 }} src="https://blog.maxmeng.top/images/avatar.jpg" alt=""/>
+              <img style={{ width: 80, height: 80 }} src={item.picList[0]} alt=""/>
             </div>
           </Card>
         </List.Item>
@@ -53,31 +77,61 @@ class PersonCertification extends React.Component {
 
     return (
       <List.Item>
-        <Button type="dashed" style={{ width: '100%', height: 274 }}>
+        <Button
+          type="dashed"
+          style={{ width: '100%', height: 274 }}
+          onClick={() => this.handleModalVisible(true)}
+        >
           <Icon type="plus" /> 提交认证
         </Button>
       </List.Item>
     );
   }
 
+  handleModalVisible = flag => {
+    this.setState({
+      addModalVisible: !!flag,
+    });
+  };
+
+  removeItem = id => {
+    const { list } = this.state;
+    this.setState({
+      list: list.filter(e => e.id !== id),
+    });
+  }
+
+  handleAdd = data => {
+    // const { dispatch } = this.props;
+    // dispatch({
+    //   type: 'listTableList/add',
+    //   payload: {
+    //     desc: fields.desc,
+    //   },
+    // });
+
+    this.handleModalVisible();
+    const obj = {
+      id: Math.random(),
+      title: data.shoupiaofang,
+      description: data.shuoming,
+      state: 2,
+      picList: data.fujian.map(e => e.thumbUrl),
+    };
+    const { list } = this.state;
+    this.setState({
+      list: [...list, obj],
+    });
+  };
+
   render() {
+    const { list, addModalVisible } = this.state;
     const nullData = {};
-    const list = [
-      {
-        id: 1,
-        title: '上海交通大学',
-        description: '这是上海交通大学的认证说明，这是上海交通大学的认证说明，这是上海交通大学的认证说明，这是上海交通大学的认证说明，这是上海交通大学的认证说明，',
-        state: 1,
-        picList: [],
-      },
-      {
-        id: 2,
-        title: '上海大学',
-        description: '这是上海大学认证说明',
-        state: 2,
-        picList: [],
-      },
-    ];
+
+    const parentMethods = {
+      handleAdd: this.handleAdd,
+      handleModalVisible: this.handleModalVisible,
+    };
 
     return (
       <Card
@@ -97,6 +151,7 @@ class PersonCertification extends React.Component {
           dataSource={[...list, nullData]}
           renderItem={this.renderListItem}
         />
+        <PersonCertificationAddModal {...parentMethods} modalVisible={addModalVisible}/>
       </Card>
     );
   }
