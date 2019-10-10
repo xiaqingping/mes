@@ -10,6 +10,14 @@ export default {
   getFactorys() {
     return request('/basic/v1/factorys');
   },
+  // 查询开票类型
+  getInvtypes() {
+    return request('/basic/v1/invtypes');
+  },
+  // 查询币种列表
+  currencys() {
+    return request('/basic/v1/currencys');
+  },
   // 查询仓库
   getStorages() {
     return request('/basic/v1/storages');
