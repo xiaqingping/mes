@@ -57,7 +57,7 @@ class PersonCertification extends React.Component {
             }
           >
             <div style={{ marginBottom: '.8em' }}>
-              <Badge status="success" /> 未认证
+              <Badge status="default" text="未认证" />
             </div>
             <Paragraph
               style={{ minHeight: 42 }}
