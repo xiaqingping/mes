@@ -751,7 +751,14 @@ class Order extends Component {
           payMethods={payMethods}
           currencys={currencys}
         />
-        <CustomerMask visible={visibleCustomer} closeMask={ v => this.closeCustomerMask(v)}/>
+        <CustomerMask
+        visible={visibleCustomer}
+        closeMask={ v => this.closeCustomerMask(v)}
+        regions={regions}
+        offices={offices}
+        payMethods={payMethods}
+        payTerms={payTerms}
+        />
       </PageHeaderWrapper>
     );
   }

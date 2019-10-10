@@ -167,7 +167,7 @@ const Model = {
         payload: response,
       });
     },
-    // 付款方式
+    // 付款条件
     *getPayterms({ payload }, { call, put }) {
       const response = yield call(api.basic.getPayterms, payload);
       yield put({
@@ -175,7 +175,7 @@ const Model = {
         payload: response,
       });
     },
-    // 付款方式
+    // 币种类型
     *getCurrencys({ payload }, { call, put }) {
       const response = yield call(api.basic.currencys, payload);
       yield put({

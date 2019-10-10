@@ -41,7 +41,11 @@ class Search extends Component {
   renderForm = () => {
     const {
       form: { getFieldDecorator },
-      modificationType,
+      regions,
+      offices,
+      payMethods,
+      payTerms,
+      rangeArea,
     } = this.props;
     return (
       <Form onSubmit={this.submit} layout="inline">
@@ -73,27 +77,57 @@ class Search extends Component {
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="大区">
-              {getFieldDecorator('regionCode')(<Input />)}
+              {getFieldDecorator('regionCode', { initialValue: '0' })(
+                <Select>
+                  <Option value="0">全部</Option>
+                  {regions.map(item => <Option key={item.code} value={item.code}>
+                    {`${item.code}-${item.name}`}
+                  </Option>)}
+                </Select>)}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="网点">
-              {getFieldDecorator('officeCode')(<Input />)}
+              {getFieldDecorator('officeCode', { initialValue: '0' })(
+                <Select>
+                  <Option value="0">全部</Option>
+                  {offices.map(item => <Option key={item.code} value={item.code}>
+                    {`${item.code}-${item.name}`}
+                  </Option>)}
+                </Select>)}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="付款方式">
-              {getFieldDecorator('payMethodCode')(<Input />)}
+              {getFieldDecorator('payMethodCode', { initialValue: '0' })(
+                <Select>
+                  <Option value="0">全部</Option>
+                  {payMethods.map(item => <Option key={item.code} value={item.code}>
+                    {`${item.code}-${item.name}`}
+                  </Option>)}
+                </Select>)}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="付款条件">
-              {getFieldDecorator('payTermsCode')(<Input />)}
+              {getFieldDecorator('payTermsCode', { initialValue: '0' })(
+                <Select>
+                  <Option value="0">全部</Option>
+                  {payTerms.map(item => <Option key={item.code} value={item.code}>
+                    {`${item.code}-${item.name}`}
+                  </Option>)}
+                </Select>)}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="销售范围">
-              {getFieldDecorator('rangeOrganization')(<Input />)}
+              {getFieldDecorator('rangeOrganization', { initialValue: '0' })(
+                <Select>
+                  <Option value="0">全部</Option>
+                  {rangeArea.map(item => <Option key={item.id} value={item.id}>
+                    {item.name}
+                  </Option>)}
+                </Select>)}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
@@ -103,13 +137,7 @@ class Search extends Component {
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="销售员名称">
-              {getFieldDecorator('salerName', { initialValue: '0' })(
-                <Select>
-                  <Option value="0">全部</Option>
-                  {modificationType.map(item => <Option key={item.id} value={item.id}>
-                  {item.modificationType}
-                  </Option>)}
-                </Select>)}
+              {getFieldDecorator('salerName')(<Input />)}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
@@ -152,11 +180,6 @@ class Customer extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    api.peptideBase.getModificationTypesAll().then(res => {
-      this.setState({
-        modificationType: res,
-      })
-    })
     this.setState({
       visible: nextProps.visible,
     })
@@ -214,7 +237,7 @@ class Customer extends Component {
       modificationType,
     } = this.state;
     const data = { list, pagination: { current, pageSize, total } };
-    const { peptide: { commonData } } = this.props
+    const { peptide: { commonData }, regions, offices, payMethods, payTerms } = this.props
     let tableWidth = 0;
 
     let columns = [
@@ -321,19 +344,27 @@ class Customer extends Component {
       <div>
         <Modal
           width="1200px"
-          title="多肽修饰列表"
+          title="客户列表"
           visible={visible}
           onOk={this.handleOk}
           onCancel={this.handleCancel}
         >
-            <Search getTableData={this.getTableData} status={commonData.status}
-             modificationType={ modificationType }/>
+            <Search
+              getTableData={this.getTableData}
+              status={commonData.status}
+              modificationType={modificationType}
+              regions={regions}
+              offices={offices}
+              payMethods={payMethods}
+              payTerms={payTerms}
+              rangeArea={commonData.rangeArea}
+             />
             <div className="tableListOperator">
             </div>
             <Table
               dataSource={data.list}
               columns={columns}
-              scroll={{ x: tableWidth, y: 400 }}
+              scroll={{ x: tableWidth, y: 300 }}
               pagination={data.pagination}
               rowKey="code"
               rowSelection={rowSelection}
