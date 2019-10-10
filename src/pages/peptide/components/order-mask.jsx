@@ -15,6 +15,7 @@ import React, { Component } from 'react';
 import api from '@/api';
 import './style.less'
 import { connect } from 'dva';
+import axios from 'axios';
 
 const FormItem = Form.Item;
 const { Option } = Select;
@@ -32,8 +33,21 @@ class SearchPage extends Component {
     }
   }
 
-  addAddress = () => { console.log(123) }
+  componentDidMount() {
+    api.basic.getFactorys().then(data => {
+      this.setState({
+        factorys: data,
+      })
+    })
+  }
 
+  // componentWillReceiveProps() {
+  //   axios.get('https://premes.sangon.com/storage_getAllList').then(data => {
+  //     console.log(123)
+  //   })
+  // }
+
+  addAddress = () => { console.log(123) }
 
   handleFormReset = () => {
     this.props.form.resetFields();
@@ -45,6 +59,14 @@ class SearchPage extends Component {
       form: { getFieldDecorator },
       brands,
       rangeArea,
+      regions,
+      offices,
+      invtypes,
+      payMethods,
+      invoiceByGoodsStatus,
+      deliveryTypeStatus,
+      orderTypeStatus,
+      currencys,
     } = this.props;
     const { factorys } = this.state;
 
@@ -84,8 +106,10 @@ class SearchPage extends Component {
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="销售大区">
-              {getFieldDecorator('regionCode')(<Select>
-                  <Option value="0">全部</Option>
+              {getFieldDecorator('regionCode', { initialValue: '3100' })(<Select dropdownMenuStyle={{ display: 'none' }}>
+                {regions.map(item =>
+                      <Option key={item.code} value={item.code}>{`${item.code}-${item.name}`}</Option>,
+                    )}
                 </Select>)}
             </FormItem>
           </Col>
@@ -94,16 +118,17 @@ class SearchPage extends Component {
               {getFieldDecorator('contactName')(<Search />)}
             </FormItem>
           </Col>
-
           <Col lg={6} md={8} sm={12}>
-            <FormItem label="配送网点">
-              {getFieldDecorator('dofficeCode')(<Select>
-                  <Option value="0">全部</Option>
+            <FormItem label="销售网点">
+              {getFieldDecorator('officeCode', { initialValue: '998' })(<Select dropdownMenuStyle={{ display: 'none' }}>
+                {offices.map(item =>
+                      <Option key={item.code} value={item.code}>{`${item.code}-${item.name}`}</Option>,
+                    )}
                 </Select>)}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
-            <FormItem label="销售网点">
+            <FormItem label="配送网点">
               {getFieldDecorator('dofficeCode')(<Select>
                   <Option value="0">全部</Option>
                 </Select>)}
@@ -128,8 +153,10 @@ class SearchPage extends Component {
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="开票方式">
-              {getFieldDecorator('invoiceType')(<Select>
-                  <Option value="0">全部</Option>
+              {getFieldDecorator('invoiceType', { initialValue: '20' })(<Select>
+                {invtypes.map(item =>
+                      <Option key={item.code} value={item.code}>{`${item.code}-${item.name}`}</Option>,
+                    )}
                 </Select>)}
             </FormItem>
           </Col>
@@ -141,7 +168,9 @@ class SearchPage extends Component {
           <Col lg={6} md={8} sm={12}>
             <FormItem label="付款方式">
               {getFieldDecorator('paymentMethod')(<Select>
-                  <Option value="0">全部</Option>
+                {payMethods.map(item =>
+                      <Option key={item.code} value={item.code}>{`${item.code}-${item.name}`}</Option>,
+                    )}
                 </Select>)}
             </FormItem>
           </Col>
@@ -164,8 +193,10 @@ class SearchPage extends Component {
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="随货开票">
-              {getFieldDecorator('invoiceByGoods')(<Select>
-                  <Option value="0">全部</Option>
+              {getFieldDecorator('invoiceByGoods', { initialValue: 0 })(<Select>
+                {invoiceByGoodsStatus.map(item =>
+                      <Option key={item.id} value={item.id}>{item.name}</Option>,
+                    )}
                 </Select>)}
             </FormItem>
           </Col>
@@ -191,8 +222,10 @@ class SearchPage extends Component {
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="交货方式">
-              {getFieldDecorator('deliveryType')(<Select>
-                  <Option value="0">全部</Option>
+              {getFieldDecorator('deliveryType', { initialValue: '01' })(<Select dropdownMenuStyle={{ display: 'none' }}>
+                {deliveryTypeStatus.map(item =>
+                      <Option key={item.id} value={item.id}>{`${item.id}-${item.name}`}</Option>,
+                    )}
                 </Select>)}
             </FormItem>
           </Col>
@@ -210,8 +243,10 @@ class SearchPage extends Component {
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="工厂">
-              {getFieldDecorator('factory')(<Select>
-                  <Option value="0">全部</Option>
+              {getFieldDecorator('factory', { initialValue: '3100' })(<Select dropdownMenuStyle={{ display: 'none' }}>
+                {factorys.map(item =>
+                      <Option key={item.code} value={item.code}>{`${item.code}-${item.name}`}</Option>,
+                    )}
                 </Select>)}
             </FormItem>
           </Col>
@@ -222,8 +257,10 @@ class SearchPage extends Component {
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="订单类型">
-              {getFieldDecorator('orderType')(<Select>
-                  <Option value="0">全部</Option>
+              {getFieldDecorator('orderTypeStatus', { initialValue: 0 })(<Select>
+                {orderTypeStatus.map(item =>
+                      <Option key={item.id} value={item.id}>{item.name}</Option>,
+                    )}
                 </Select>)}
             </FormItem>
           </Col>
@@ -249,8 +286,10 @@ class SearchPage extends Component {
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="币种">
-              {getFieldDecorator('currency')(<Select>
-                  <Option value="0">全部</Option>
+              {getFieldDecorator('currency', { initialValue: 'CNY' })(<Select dropdownMenuStyle={{ display: 'none' }}>
+                {currencys.map(item =>
+                      <Option key={item.code} value={item.code}>{`${item.code}-${item.name}`}</Option>,
+                    )}
                 </Select>)}
             </FormItem>
           </Col>
@@ -300,11 +339,6 @@ class SearchPage extends Component {
           <Col lg={6} md={8} sm={12}>
             <FormItem label="完成人">
               {getFieldDecorator('finishName')(<Input />)}
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="币种">
-              {getFieldDecorator('currency')(<Input />)}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
@@ -424,7 +458,7 @@ class Order extends Component {
       loadingSon,
     } = this.state;
     const data = { list, pagination: { current, pageSize, total } };
-    const { peptide: { commonData } } = this.props
+    const { peptide: { commonData }, regions, offices, invtypes, payMethods, currencys } = this.props
     let tableWidth = 0;
     let tableWidthSon = 0;
 
@@ -620,7 +654,17 @@ class Order extends Component {
           className="orderMask"
         >
           <div>
-            <SearchPage rangeArea={commonData.rangeArea}/>
+            <SearchPage
+              rangeArea={commonData.rangeArea}
+              regions={regions}
+              offices={offices}
+              invtypes={invtypes}
+              payMethods={payMethods}
+              invoiceByGoodsStatus={commonData.invoiceByGoodsStatus}
+              deliveryTypeStatus= {commonData.deliveryTypeStatus}
+              orderTypeStatus={commonData.orderTypeStatus}
+              currencys={currencys}
+            />
             <Col span={14}>
               <Table
                   dataSource={data.list}

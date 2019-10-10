@@ -17,6 +17,7 @@ import { connect } from 'dva';
 import { formatter } from '@/utils/utils';
 import api from '@/api';
 import OrderMask from '@/pages/peptide/components/order-mask';
+import CustomerMask from '@/pages/peptide/components/customer-mask';
 
 const EditableContext = React.createContext();
 const FormItem = Form.Item;
@@ -58,6 +59,12 @@ class SearchPage extends Component {
     });
   };
 
+  openMask = v => {
+    if (v === 'customer') {
+      this.props.openCustomer(true);
+    }
+  }
+
   renderAdvancedForm() {
     const {
       form: { getFieldDecorator },
@@ -76,22 +83,22 @@ class SearchPage extends Component {
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="客户">
-              {getFieldDecorator('customerCode')(<Search onSearch={value => console.log(value)} />)}
+              {getFieldDecorator('customerCode')(<Search onSearch={() => this.openMask('customer')} />)}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="负责人">
-            {getFieldDecorator('subCustomerCode')(<Search onSearch={value => console.log(value)} />)}
+            {getFieldDecorator('subCustomerCode')(<Search/>)}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="订货人">
-            {getFieldDecorator('contactCode')(<Search onSearch={value => console.log(value)} />)}
+            {getFieldDecorator('contactCode')(<Search/>)}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="销售员">
-            {getFieldDecorator('salerCode')(<Search onSearch={value => console.log(value)} />)}
+            {getFieldDecorator('salerCode')(<Search/>)}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
@@ -133,7 +140,7 @@ class SearchPage extends Component {
               {getFieldDecorator('rangeOrganization', { initialValue: '' })(
                 <Select>
                   {rangeOrganization.map(item =>
-                    <Option key={item.code} value={item.id}>{item.name}</Option>,
+                    <Option key={item.id} value={item.id}>{item.name}</Option>,
                   )}
                   </Select>)}
             </FormItem>
@@ -143,7 +150,7 @@ class SearchPage extends Component {
               {getFieldDecorator('rangeChannel', { initialValue: '' })(
                 <Select>
                  {rangeChannel.map(item =>
-                    <Option key={item.code} value={item.id}>{item.name}</Option>,
+                    <Option key={item.id} value={item.id}>{item.name}</Option>,
                   )}
                   </Select>)}
             </FormItem>
@@ -186,7 +193,7 @@ class SearchPage extends Component {
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="客户">
-              {getFieldDecorator('customerCode')(<Search onSearch={value => console.log(value)} />)}
+              {getFieldDecorator('customerCode')(<Search onSearch={() => this.openMask('customer')} />)}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
@@ -294,7 +301,8 @@ class Order extends Component {
       payMethods: [], // 付款方式
       payTerms: [], // 付款条件
       currencys: [], // 货币类型
-      visible: false,
+      visibleOrder: false,
+      visibleCustomer: false,
     }
   }
 
@@ -382,14 +390,26 @@ class Order extends Component {
   // 打开新建订单页面
   openOrderMask = () => {
     this.setState({
-      visible: true,
+      visibleOrder: true,
+    })
+  }
+
+  openCustomerMask = v => {
+    this.setState({
+      visibleCustomer: v,
     })
   }
 
   // 关闭订单
   closeOrderMask = v => {
     this.setState({
-      visible: v,
+      visibleOrder: v,
+    })
+  }
+
+  closeCustomerMask = v => {
+    this.setState({
+      visibleCustomer: v,
     })
   }
 
@@ -418,7 +438,8 @@ class Order extends Component {
       payMethods,
       payTerms,
       currencys,
-      visible,
+      visibleOrder,
+      visibleCustomer,
     } = this.state;
     const { peptide: { commonData } } = this.props
     const data = { list, pagination: { current, pageSize, total } };
@@ -698,7 +719,9 @@ class Order extends Component {
           <div className="tableList">
             <SearchPage getTableData={this.getTableData}
             regions={regions} offices={offices}
-            currencys={currencys} commonData={commonData}/>
+            currencys={currencys} commonData={commonData}
+            openCustomer={v => this.openCustomerMask(v)}
+            />
             <div className="tableListOperator">
               <Button icon="plus" type="primary" onClick={ () => { this.openOrderMask() }}>
                 新建
@@ -719,7 +742,16 @@ class Order extends Component {
             </EditableContext.Provider>
           </div>
         </Card>
-        <OrderMask visible={visible} closeMask={ v => this.closeOrderMask(v)}/>
+        <OrderMask
+          visible={visibleOrder}
+          closeMask={ v => this.closeOrderMask(v)}
+          regions={regions}
+          offices={offices}
+          invtypes={invtypes}
+          payMethods={payMethods}
+          currencys={currencys}
+        />
+        <CustomerMask visible={visibleCustomer} closeMask={ v => this.closeCustomerMask(v)}/>
       </PageHeaderWrapper>
     );
   }
