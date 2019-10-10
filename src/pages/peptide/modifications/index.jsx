@@ -66,9 +66,9 @@ class SearchPage extends Component {
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="修饰类型">
-              {getFieldDecorator('modificationTypeID', { initialValue: '0' })(
+              {getFieldDecorator('modificationTypeID', { initialValue: '' })(
                 <Select>
-                  <Option value="0">全部</Option>
+                  <Option value="">全部</Option>
                   {modificationType.map(item => <Option key={item.id} value={item.id}>
                   {item.modificationType}
                   </Option>)}

@@ -1,4 +1,4 @@
-// 客户弹框
+// 订货人弹框
 import {
   Button,
   Col,
@@ -41,10 +41,6 @@ class Search extends Component {
   renderForm = () => {
     const {
       form: { getFieldDecorator },
-      regions,
-      offices,
-      payMethods,
-      payTerms,
       rangeArea,
     } = this.props;
     return (
@@ -76,47 +72,13 @@ class Search extends Component {
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
-            <FormItem label="大区">
-              {getFieldDecorator('regionCode', { initialValue: '' })(
-                <Select>
-                  <Option value="">全部</Option>
-                  {regions.map(item => <Option key={item.code} value={item.code}>
-                    {`${item.code}-${item.name}`}
-                  </Option>)}
-                </Select>)}
+            <FormItem label="负责人编号">
+              {getFieldDecorator('subcustomerCode')(<Input />)}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
-            <FormItem label="网点">
-              {getFieldDecorator('officeCode', { initialValue: '' })(
-                <Select>
-                  <Option value="">全部</Option>
-                  {offices.map(item => <Option key={item.code} value={item.code}>
-                    {`${item.code}-${item.name}`}
-                  </Option>)}
-                </Select>)}
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="付款方式">
-              {getFieldDecorator('payMethodCode', { initialValue: '' })(
-                <Select>
-                  <Option value="">全部</Option>
-                  {payMethods.map(item => <Option key={item.code} value={item.code}>
-                    {`${item.code}-${item.name}`}
-                  </Option>)}
-                </Select>)}
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="付款条件">
-              {getFieldDecorator('payTermsCode', { initialValue: '' })(
-                <Select>
-                  <Option value="">全部</Option>
-                  {payTerms.map(item => <Option key={item.code} value={item.code}>
-                    {`${item.code}-${item.name}`}
-                  </Option>)}
-                </Select>)}
+            <FormItem label="负责人名称">
+              {getFieldDecorator('subcustomerName')(<Input />)}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
@@ -128,16 +90,6 @@ class Search extends Component {
                     {item.name}
                   </Option>)}
                 </Select>)}
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="销售员编号">
-              {getFieldDecorator('salerCode')(<Input />)}
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="销售员名称">
-              {getFieldDecorator('salerName')(<Input />)}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
@@ -237,7 +189,7 @@ class Customer extends Component {
       modificationType,
     } = this.state;
     const data = { list, pagination: { current, pageSize, total } };
-    const { peptide: { commonData }, regions, offices, payMethods, payTerms } = this.props
+    const { peptide: { commonData } } = this.props
     let tableWidth = 0;
 
     let columns = [
@@ -247,13 +199,28 @@ class Customer extends Component {
         width: 100,
       },
       {
-        title: '公司',
+        title: '名称',
         dataIndex: 'name',
-        width: 350,
+        width: 100,
+      },
+      {
+        title: '负责人',
+        dataIndex: 'subcustomerCode',
+        width: 100,
+      },
+      {
+        title: '负责人',
+        dataIndex: 'subcustomerName',
+        width: 100,
       },
       {
         title: '电话',
         dataIndex: 'telNo',
+        width: 100,
+      },
+      {
+        title: '分机号',
+        dataIndex: 'extension',
         width: 100,
       },
       {
@@ -267,39 +234,34 @@ class Customer extends Component {
         width: 100,
       },
       {
-        title: '分类',
-        dataIndex: 'type',
+        title: '国家/地区',
+        dataIndex: 'countryName',
         width: 100,
       },
       {
-        title: '大区',
-        dataIndex: 'regionCode',
+        title: '省',
+        dataIndex: 'provinceName',
         width: 100,
       },
       {
-        title: '网点',
-        dataIndex: 'officeCode',
+        title: '市',
+        dataIndex: 'city',
         width: 100,
       },
       {
-        title: '币种',
-        dataIndex: 'currency',
+        title: '区',
+        dataIndex: 'county',
         width: 100,
       },
       {
-        title: '付款方式',
-        dataIndex: 'payMethodCode',
-        width: 100,
+        title: '街道',
+        dataIndex: 'street',
+        width: 200,
       },
       {
-        title: '付款条件',
-        dataIndex: 'payTermsCode',
-        width: 100,
-      },
-      {
-        title: '销售员名称',
-        dataIndex: 'salerName',
-        width: 120,
+        title: '地址',
+        dataIndex: 'address',
+        width: 200,
       },
       {
         title: '销售冻结(当前渠道)',
@@ -310,11 +272,6 @@ class Customer extends Component {
         title: '销售冻结(所有渠道)',
         dataIndex: 'customerFrozen',
         width: 200,
-      },
-      {
-        title: '客户性质',
-        dataIndex: 'industryText',
-        width: 100,
       },
     ];
 
@@ -338,7 +295,7 @@ class Customer extends Component {
       <div>
         <Modal
           width="1200px"
-          title="客户列表"
+          title="订货人列表"
           visible={visible}
           onOk={this.handleOk}
           onCancel={this.handleCancel}
@@ -347,10 +304,6 @@ class Customer extends Component {
               getTableData={this.getTableData}
               status={commonData.status}
               modificationType={modificationType}
-              regions={regions}
-              offices={offices}
-              payMethods={payMethods}
-              payTerms={payTerms}
               rangeArea={commonData.rangeArea}
              />
             <div className="tableListOperator">

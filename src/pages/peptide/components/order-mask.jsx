@@ -1,4 +1,4 @@
-// 产品弹框
+// 多肽订单新增弹框
 import {
   Button,
   Col,
@@ -57,7 +57,6 @@ class SearchPage extends Component {
   renderForm = () => {
     const {
       form: { getFieldDecorator },
-      brands,
       rangeArea,
       regions,
       offices,
@@ -458,7 +457,8 @@ class Order extends Component {
       loadingSon,
     } = this.state;
     const data = { list, pagination: { current, pageSize, total } };
-    const { peptide: { commonData }, regions, offices, invtypes, payMethods, currencys } = this.props
+    const { peptide: { commonData }, regions,
+    offices, invtypes, payMethods, currencys } = this.props
     let tableWidth = 0;
     let tableWidthSon = 0;
 

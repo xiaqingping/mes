@@ -18,6 +18,9 @@ import { formatter } from '@/utils/utils';
 import api from '@/api';
 import OrderMask from '@/pages/peptide/components/order-mask';
 import CustomerMask from '@/pages/peptide/components/customer-mask';
+import SubCustomerMask from '@/pages/peptide/components/SubCustomer-mask';
+import ContactMask from '@/pages/peptide/components/contact-mask';
+import SalerMask from '@/pages/peptide/components/saler-mask';
 
 const EditableContext = React.createContext();
 const FormItem = Form.Item;
@@ -63,6 +66,15 @@ class SearchPage extends Component {
     if (v === 'customer') {
       this.props.openCustomer(true);
     }
+    if (v === 'subCustomer') {
+      this.props.openSubCustomer(true);
+    }
+    if (v === 'contact') {
+      this.props.openContact(true);
+    }
+    if (v === 'saler') {
+      this.props.openSaler(true);
+    }
   }
 
   renderAdvancedForm() {
@@ -88,17 +100,17 @@ class SearchPage extends Component {
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="负责人">
-            {getFieldDecorator('subCustomerCode')(<Search/>)}
+            {getFieldDecorator('subCustomerCode')(<Search onSearch={() => this.openMask('subCustomer')} />)}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="订货人">
-            {getFieldDecorator('contactCode')(<Search/>)}
+            {getFieldDecorator('contactCode')(<Search onSearch={() => this.openMask('contact')} />)}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="销售员">
-            {getFieldDecorator('salerCode')(<Search/>)}
+            {getFieldDecorator('salerCode')(<Search onSearch={() => this.openMask('saler')}/>)}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
@@ -107,7 +119,7 @@ class SearchPage extends Component {
                 <Select>
                   <Option value="">全部</Option>
                   {currencys.map(item =>
-                 <Option key={item.code} value={item.code}>{item.code} - {item.name}</Option>,
+                 <Option key={item.code} value={item.code}>{`${item.code}-${item.name}`}</Option>,
                )}
                 </Select>,
               )}
@@ -119,7 +131,7 @@ class SearchPage extends Component {
                <Select>
                <Option value="">全部</Option>
                {offices.map(item =>
-                 <Option key={item.code} value={item.code}>{item.code} - {item.name}</Option>,
+                 <Option key={item.code} value={item.code}>{`${item.code}-${item.name}`}</Option>,
                )}
                </Select>)}
             </FormItem>
@@ -130,7 +142,7 @@ class SearchPage extends Component {
                 <Select>
                   <Option value="">全部</Option>
                   {regions.map(item =>
-                    <Option key={item.code} value={item.code}>{item.code} - {item.name}</Option>,
+                    <Option key={item.code} value={item.code}>{`${item.code}-${item.name}`}</Option>,
                   )}
                   </Select>)}
             </FormItem>
@@ -198,17 +210,17 @@ class SearchPage extends Component {
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="负责人">
-            {getFieldDecorator('subCustomerCode')(<Search onSearch={value => console.log(value)} />)}
+            {getFieldDecorator('subCustomerCode')(<Search onSearch={() => this.openMask('subCustomer')} />)}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="订货人">
-            {getFieldDecorator('contactCode')(<Search onSearch={value => console.log(value)} />)}
+            {getFieldDecorator('contactCode')(<Search onSearch={() => this.openMask('contact')} />)}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="销售员">
-            {getFieldDecorator('salerCode')(<Search onSearch={value => console.log(value)} />)}
+            {getFieldDecorator('salerCode')(<Search onSearch={() => this.openMask('saler')} />)}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
@@ -303,6 +315,9 @@ class Order extends Component {
       currencys: [], // 货币类型
       visibleOrder: false,
       visibleCustomer: false,
+      visibleSubCustomer: false,
+      visibleContact: false,
+      visibleSaler: false,
     }
   }
 
@@ -394,10 +409,27 @@ class Order extends Component {
     })
   }
 
-  openCustomerMask = v => {
-    this.setState({
-      visibleCustomer: v,
-    })
+  openMask = (v, type) => {
+    if (type === 'customer') {
+      this.setState({
+        visibleCustomer: v,
+      })
+    }
+    if (type === 'subCustomer') {
+      this.setState({
+        visibleSubCustomer: v,
+      })
+    }
+    if (type === 'contact') {
+      this.setState({
+        visibleContact: v,
+      })
+    }
+    if (type === 'saler') {
+      this.setState({
+        visibleSaler: v,
+      })
+    }
   }
 
   // 关闭订单
@@ -407,10 +439,27 @@ class Order extends Component {
     })
   }
 
-  closeCustomerMask = v => {
-    this.setState({
-      visibleCustomer: v,
-    })
+  closeMask = (v, type) => {
+    if (type === 'customer') {
+      this.setState({
+        visibleCustomer: v,
+      })
+    }
+    if (type === 'subCustomer') {
+      this.setState({
+        visibleSubCustomer: v,
+      })
+    }
+    if (type === 'contact') {
+      this.setState({
+        visibleContact: v,
+      })
+    }
+    if (type === 'saler') {
+      this.setState({
+        visibleSaler: v,
+      })
+    }
   }
 
   renderForm = () => {
@@ -440,6 +489,9 @@ class Order extends Component {
       currencys,
       visibleOrder,
       visibleCustomer,
+      visibleSubCustomer,
+      visibleContact,
+      visibleSaler,
     } = this.state;
     const { peptide: { commonData } } = this.props
     const data = { list, pagination: { current, pageSize, total } };
@@ -720,7 +772,10 @@ class Order extends Component {
             <SearchPage getTableData={this.getTableData}
             regions={regions} offices={offices}
             currencys={currencys} commonData={commonData}
-            openCustomer={v => this.openCustomerMask(v)}
+            openCustomer={v => this.openMask(v, 'customer')}
+            openSubCustomer={v => this.openMask(v, 'subCustomer')}
+            openContact={v => this.openMask(v, 'contact')}
+            openSaler={v => this.openMask(v, 'saler')}
             />
             <div className="tableListOperator">
               <Button icon="plus" type="primary" onClick={ () => { this.openOrderMask() }}>
@@ -752,12 +807,33 @@ class Order extends Component {
           currencys={currencys}
         />
         <CustomerMask
-        visible={visibleCustomer}
-        closeMask={ v => this.closeCustomerMask(v)}
-        regions={regions}
-        offices={offices}
-        payMethods={payMethods}
-        payTerms={payTerms}
+          visible={visibleCustomer}
+          closeMask={ v => this.closeMask(v, 'customer')}
+          regions={regions}
+          offices={offices}
+          payMethods={payMethods}
+          payTerms={payTerms}
+        />
+        <SubCustomerMask
+          visible={visibleSubCustomer}
+          closeMask={ v => this.closeMask(v, 'subCustomer')}
+          regions={regions}
+          offices={offices}
+          payMethods={payMethods}
+          payTerms={payTerms}
+          currencys={currencys}
+        />
+        <ContactMask
+          visible={visibleContact}
+          closeMask={ v => this.closeMask(v, 'contact')}
+        />
+        <SalerMask
+          visible={visibleSaler}
+          closeMask={ v => this.closeMask(v, 'saler')}
+          regions={regions}
+          offices={offices}
+          payMethods={payMethods}
+          payTerms={payTerms}
         />
       </PageHeaderWrapper>
     );
