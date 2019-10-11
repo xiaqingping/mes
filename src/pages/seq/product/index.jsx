@@ -19,6 +19,7 @@ import StandardTable from '@/components/StandardTable';
 
 import api from '@/api';
 import { formatter } from '@/utils/utils';
+import ChooseProduct from '@/components/common/basic/ChooseProduct';
 
 const EditableContext = React.createContext();
 const FormItem = Form.Item;
@@ -37,6 +38,7 @@ class Search extends React.Component {
     super(props);
     this.state = {
       expandForm: false,
+      showChooseProduct: true,
     }
   }
 
@@ -83,7 +85,7 @@ class Search extends React.Component {
           </Col>
           <Col xxl={6} lg={8}>
             <FormItem label="SAP编号">
-              {getFieldDecorator('code')(<Input />)}
+              {getFieldDecorator('code')(<Input.Search onSearch={value => console.log(value)} />)}
             </FormItem>
           </Col>
           <Col xxl={6} lg={8}>
@@ -144,7 +146,7 @@ class Search extends React.Component {
           </Col>
           <Col xxl={6} lg={8}>
             <FormItem label="SAP编号">
-              {getFieldDecorator('code')(<Input />)}
+              {getFieldDecorator('code')(<Input.Search onSearch={value => console.log(value)} />)}
             </FormItem>
           </Col>
           <Col xxl={6} lg={0}>
@@ -183,7 +185,10 @@ class Search extends React.Component {
 
   render() {
     return (
-      <div className="tableListForm">{this.renderForm()}</div>
+      <div className="tableListForm">
+        {this.renderForm()}
+        <ChooseProduct />
+      </div>
     );
   }
 }
@@ -425,9 +430,6 @@ class Product extends React.Component {
             )}
           </Select>
         ),
-        // rules: [
-        //   { required: true, message: '必填' },
-        // ],
         editOptions: {
           rules: [
             { required: true, message: '必填' },
@@ -444,6 +446,9 @@ class Product extends React.Component {
         ),
         editOptions: {
           valuePropName: 'checked',
+        },
+        render(text) {
+          return text === 1 ? '√' : '';
         },
       },
       {
