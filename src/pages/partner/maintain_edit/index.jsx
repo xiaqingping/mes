@@ -35,7 +35,7 @@ class CustomerEdit extends Component {
     const details = {
       basicInfo: {
         name: {
-          select: 1,
+          type: 1,
           name: '',
         },
         email: '123@qq.com',
@@ -135,7 +135,7 @@ class CustomerEdit extends Component {
         </Card>
         <SalesScope></SalesScope>
         {
-          basicInfo.name.select === 2 ?
+          basicInfo.name.type === 2 ?
           (
             <>
               <OrgCredit></OrgCredit>

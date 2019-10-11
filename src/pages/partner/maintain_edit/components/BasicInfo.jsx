@@ -8,7 +8,7 @@ import {
 } from 'antd';
 import React, { PureComponent } from 'react';
 import { formatMessage } from 'umi-plugin-react/locale';
-import { EmailInput, NameInput, MobileTelephoneInput, TelphoneInput, AddressInput } from '@/components/CustomizedFormControls';
+import { EmailInput, NameInput, MobileTelephoneInput, TelphoneInput, FaxInput, AddressInput } from '@/components/CustomizedFormControls';
 
 import styles from '../style.less';
 
@@ -71,7 +71,7 @@ class BasicInfo extends PureComponent {
       form: { getFieldDecorator },
     } = this.props;
     const { name, email } = this.state;
-    const MobileDisabled = name && name.select === 2;
+    const MobileDisabled = name && name.type === 2;
 
     return (
       <Form layout="vertical" className={styles.sangonForm}>
@@ -105,23 +105,23 @@ class BasicInfo extends PureComponent {
           </Col>
           <Col md={6} sm={12}>
             <FormItem label="传真">
-              {getFieldDecorator('chuanzhen')(<TelphoneInput onChange={value => this.valueChange('chuanzhen', value)} />)}
+              {getFieldDecorator('fax')(<FaxInput onChange={value => this.valueChange('fax', value)} />)}
             </FormItem>
           </Col>
           <Col md={3} sm={6}>
             <FormItem label="邮政编码">
-              {getFieldDecorator('youbian')(<Input onChange={e => this.valueChange('youbian', e.target.value)} />)}
+              {getFieldDecorator('postCode')(<Input onChange={e => this.valueChange('postCode', e.target.value)} />)}
             </FormItem>
           </Col>
           <Col md={3} sm={6}>
             <FormItem label="时区">
-              {getFieldDecorator('shiqu')(<Input onChange={e => this.valueChange('shiqu', e.target.value)} />)}
+              {getFieldDecorator('timeZoneCode')(<Input onChange={e => this.valueChange('timeZoneCode', e.target.value)} />)}
             </FormItem>
           </Col>
           <Col md={6} sm={12}>
             <FormItem label="语言">
-              {getFieldDecorator('yuyan')(
-                <Select onChange={value => this.valueChange('yuyan', value)} >
+              {getFieldDecorator('languageCode')(
+                <Select onChange={value => this.valueChange('languageCode', value)} >
                   <Option value="1">中文</Option>
                 </Select>,
               )}
@@ -129,8 +129,8 @@ class BasicInfo extends PureComponent {
           </Col>
           <Col md={6} sm={12}>
             <FormItem label="特殊行业类别">
-              {getFieldDecorator('hangye')(
-                <Select onChange={value => this.valueChange('hangye', value)} >
+              {getFieldDecorator('industryCode')(
+                <Select onChange={value => this.valueChange('industryCode', value)} >
                   <Option value="1">军队</Option>
                 </Select>,
               )}
@@ -143,7 +143,7 @@ class BasicInfo extends PureComponent {
           </Col>
           <Col md={6} sm={6}>
             <FormItem label="销售冻结">
-              {getFieldDecorator('dongjie', { valuePropName: 'checked' })(<Switch onChange={value => this.valueChange('dongjie', value)} />)}
+              {getFieldDecorator('salesBan', { valuePropName: 'checked' })(<Switch onChange={value => this.valueChange('salesBan', value)} />)}
             </FormItem>
           </Col>
         </Row>
