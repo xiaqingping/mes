@@ -6,10 +6,11 @@ const baseURLMap = {
   dev: 'https://devapi.sangon.com:8443/api',
   test: 'https://testapi.sangon.com:8443/api',
   pre: 'https://preapi.sangon.com/api',
-  product: 'https://api.sangon.com/api',
+  prod: 'https://api.sangon.com/api',
 };
 
-const env = process.env.ENV || 'pre';
+// BASE_API 是 .env 文件中定义的环境变量，如果没有设置过此环境变量，则默认值为pre（具体查看config.js）。
+const env = BASE_API;
 
 // 创建 axios 实例
 const service = axios.create({
