@@ -63,18 +63,13 @@ class OrgCertification extends Component {
                   </FormItem>
                 </Col>
                 <Col span={8}>
-                  <FormItem label="基本户开户名">
-                    {getFieldDecorator('name')(<Input />)}
-                  </FormItem>
-                </Col>
-                <Col span={16}>
-                  <FormItem label="注册地址">
-                    {getFieldDecorator('address')(<Input />)}
-                  </FormItem>
-                </Col>
-                <Col span={8}>
                   <FormItem label="电话">
                     {getFieldDecorator('tel')(<TelphoneInput />)}
+                  </FormItem>
+                </Col>
+                <Col span={24}>
+                  <FormItem label="注册地址">
+                    {getFieldDecorator('address')(<Input />)}
                   </FormItem>
                 </Col>
               </Row>
