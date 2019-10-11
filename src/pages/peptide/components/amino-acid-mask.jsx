@@ -1,25 +1,21 @@
-// 多肽合成产品
+// 氨基酸弹框
 import {
   Button,
-  Card,
   Col,
   Divider,
   Form,
   Input,
   Row,
   Select,
-  message,
-  Popconfirm,
-  Checkbox,
+  Table,
+  Modal,
 } from 'antd';
 import React, { Component, Fragment } from 'react';
-import { PageHeaderWrapper } from '@ant-design/pro-layout';
-import StandardTable from '@/components/StandardTable';
+
 import api from '@/api';
 import './style.less'
 import { connect } from 'dva';
 
-const EditableContext = React.createContext();
 const FormItem = Form.Item;
 const { Option } = Select;
 
@@ -98,64 +94,6 @@ class Search extends Component {
   }
 }
 
-/**
- * 表格编辑组件
- */
-class EditableCell extends React.Component {
-  renderCell = ({ getFieldDecorator }) => {
-    const {
-      editing,
-      dataIndex,
-      title,
-      inputType,
-      record,
-      index,
-      children,
-      rules,
-      double,
-      ...restProps
-    } = this.props;
-    if (editing) {
-      if (double) {
-        return (
-          <td {...restProps} style={{ padding: 0 }}>
-              <Form.Item style={{ margin: 0, padding: 0 }}>
-                {getFieldDecorator(`${dataIndex}0`, {
-                  rules,
-                  initialValue: record[`${dataIndex}0`],
-                })(inputType)}
-              </Form.Item>
-              <Divider type="horizontal" style={{ margin: 0 }}/>
-              <Form.Item style={{ margin: 0, padding: 0 }}>
-                {getFieldDecorator(`${dataIndex}1`, {
-                  rules,
-                  initialValue: record[`${dataIndex}1`],
-                })(inputType)}
-              </Form.Item>
-          </td>
-        );
-      }
-      return (
-        <td {...restProps} style={{ padding: 0 }}>
-            <Form.Item>
-              {getFieldDecorator(dataIndex, {
-                rules,
-                valuePropName: 'checked',
-                initialValue: record[dataIndex],
-              })(inputType)}
-            </Form.Item>
-        </td>
-      );
-    }
-    return (<td {...restProps}>{children}</td>);
-  };
-
-
-  render() {
-    return <EditableContext.Consumer>{this.renderCell}</EditableContext.Consumer>;
-  }
-}
-
 @connect(({ peptide }) => ({
   peptide,
 }))
@@ -168,14 +106,26 @@ class Order extends Component {
     list: [],
     total: 0,
     loading: false,
-    selectedRows: [],
-    editIndex: -1,
-    id: 0, // 新增数据时，提供负数id
+    visible: false, // 遮罩层的判断
+    data: [],
   }
 
-  componentDidMount() {
-    //
+  componentWillReceiveProps(nextProps) {
+    this.setState({
+      visible: nextProps.visible,
+    })
   }
+
+  handleOk = () => {
+    this.props.getData(this.state.data);
+  };
+
+  handleCancel = () => {
+    this.props.closeMask(false)
+    this.setState({
+      visible: false,
+    });
+  };
 
   // 分页
   handleStandardTableChange = pagination => {
@@ -184,13 +134,6 @@ class Order extends Component {
       rows: pagination.pageSize,
     });
   }
-
-  // 选择行
-  handleSelectRows = rows => {
-    this.setState({
-      selectedRows: rows,
-    });
-  };
 
   // 获取表格数据
   getTableData = (options = {}) => {
@@ -254,7 +197,6 @@ class Order extends Component {
         loading: false,
         list: dest,
         total: dest.length * 2,
-        editIndex: -1,
       });
     });
   }
@@ -263,94 +205,13 @@ class Order extends Component {
     this.props.form.resetFields();
   };
 
-  // 退出编辑
-  cancelEdit = (row, index) => {
-    if (row.id > 0) {
-      this.setState({ editIndex: index });
-    } else {
-      const { list } = this.state;
-      this.setState({
-        list: list.filter(e => e.id > 0),
-        editIndex: index,
-      });
-    }
-  }
-
-  // 删除数据
-  deleteRow = row => {
-    api.peptideBase.deleteAminoAcid(row.id).then(() => {
-      this.getTableData();
-    });
-  };
-
-  // 恢复数据
-  resumeRow = row => {
-    api.peptideBase.resumeAminoAcid(row.id).then(() => {
-      this.getTableData();
-    });
-  };
-
-  // 保存
-  saveRow = index => {
-    this.props.form.validateFields((error, row) => {
-      if (error) return;
-      const { list } = this.state;
-      const newData = { ...list[index],
-                        ...row,
-                        hydrophilic: row.hydrophilic ? 1 : 2,
-                        hydrophobic: row.hydrophobic ? 1 : 2,
-                        acidic: row.acidic ? 1 : 2,
-                        alkaline: row.alkaline ? 1 : 2,
-                        isCanDisulfideBond: row.isCanDisulfideBond ? 1 : 2,
-                        details: [
-                                {
-                                  aminoAcidType: 'L',
-                                  longCode: row.longCode0,
-                                  shortCode: row.shortCode0,
-                                },
-                                {
-                                  aminoAcidType: 'D',
-                                  longCode: row.longCode1,
-                                  shortCode: row.shortCode1,
-                                },
-                              ],
-                      };
-      if (newData.id > 0) {
-        // api.peptideBase.updateSeries(newData).then(() => this.getTableData());
-      } else {
-        api.peptideBase.insertAminoAcid(newData).then(() => this.getTableData());
-      }
-    });
-  }
-
-  // 新增
-  handleAdd = () => {
-    const { editIndex, id, list } = this.state;
-    if (editIndex !== -1) {
-      message.warning('请先保存或退出正在编辑的数据');
-      return;
-    }
-
-    const newId = id - 1;
-    this.setState({
-      id: newId,
-      editIndex: 0,
-      list: [
-        {
-          id: newId,
-        },
-        ...list,
-      ],
-    });
-  }
-
   render() {
     const {
       formValues: { page: current, rows: pageSize },
-      selectedRows,
       list,
       total,
       loading,
+      visible,
     } = this.state;
     const data = { list, pagination: { current, pageSize, total } };
     const { peptide: { commonData } } = this.props
@@ -365,97 +226,62 @@ class Order extends Component {
       {
         title: '名称',
         dataIndex: 'name',
-        width: 85,
-        editable: true,
-        inputType: <Input style={{ width: '90%' }}/>,
-        rules: [
-          { required: true, message: '必填' },
-        ],
+        width: 100,
       },
       {
         title: '亲水性',
         dataIndex: 'hydrophilic',
-        width: 50,
+        width: 100,
         align: 'center',
         render: text => (text === 1 ? '√' : ''),
-        editable: true,
-        inputType: <Checkbox style={{ textAlign: 'center', display: 'block' }}/>,
       },
       {
         title: '疏水性',
         dataIndex: 'hydrophobic',
         align: 'center',
-        width: 50,
+        width: 100,
         render: text => (text === 1 ? '√' : ''),
-        editable: true,
-        inputType: <Checkbox style={{ textAlign: 'center', display: 'block' }}/>,
       },
       {
         title: '酸性',
         dataIndex: 'acidic',
         align: 'center',
-        width: 35,
+        width: 100,
         render: text => (text === 1 ? '√' : ''),
-        editable: true,
-        inputType: <Checkbox style={{ textAlign: 'center', display: 'block' }}/>,
       },
       {
         title: '碱性',
         dataIndex: 'alkaline',
         align: 'center',
-        width: 35,
+        width: 100,
         render: text => (text === 1 ? '√' : ''),
-        editable: true,
-        inputType: <Checkbox style={{ textAlign: 'center', display: 'block' }}/>,
       },
       {
         title: '是否可做二硫键',
         dataIndex: 'isCanDisulfideBond',
         align: 'center',
-        width: 110,
+        width: 230,
         render: text => (text === 1 ? '√' : ''),
-        editable: true,
-        inputType: <Checkbox style={{ textAlign: 'center', display: 'block' }}/>,
       },
       {
         title: '分子量',
         dataIndex: 'molecularWeight',
         width: 100,
-        editable: true,
-        inputType: <Input style={{ width: '90%' }}/>,
-        rules: [
-          { required: true, message: '必填' },
-        ],
       },
       {
         title: '等电点',
         dataIndex: 'isoelectricPoint',
         width: 100,
-        editable: true,
-        inputType: <Input style={{ width: '90%' }}/>,
-        rules: [
-          { required: true, message: '必填' },
-        ],
       },
       {
         title: '羧基解离常数',
         dataIndex: 'carboxylationDissociationConstant',
-        width: 140,
-        editable: true,
-        inputType: <Input style={{ width: '90%' }}/>,
-        rules: [
-          { required: true, message: '必填' },
-        ],
+        width: 200,
       },
       {
         title: '氨基解离常数',
         dataIndex: 'aminoDissociationConstant',
-        width: 140,
-        editable: true,
-        inputType: <Input style={{ width: '90%' }}/>,
-        rules: [
-          { required: true, message: '必填' },
-        ],
+        width: 200,
       },
       {
         title: '状态',
@@ -476,19 +302,6 @@ class Order extends Component {
         title: '创建时间',
         dataIndex: 'createDate',
         width: 300,
-        // render: (value, row, index) => {
-        //   const obj = {
-        //     children: value,
-        //     props: {},
-        //   };
-        //   if (index % 2 === 0) {
-        //     obj.props.rowSpan = 2;
-        //   }
-        //   if (index % 2 === 1) {
-        //     obj.props.rowSpan = 0;
-        //   }
-        //   return obj;
-        // },
       },
       {
         title: '删除人',
@@ -519,20 +332,8 @@ class Order extends Component {
       {
         title: '类型',
         dataIndex: 'aminoAcidType',
-        width: 50,
+        width: 100,
         align: 'center',
-        editable: true,
-        inputType: (
-          <Fragment>
-            <Select style={{ width: '90%', display: 'block', margin: '0 auto' }} defaultValue="L">
-              <Option value="L">L</Option>
-            </Select>
-            <Divider type="horizontal" style={{ margin: 0 }}/>
-            <Select style={{ width: '90%', display: 'block', margin: '0 auto' }} defaultValue="D">
-              <Option value="D">D</Option>
-            </Select>
-          </Fragment>
-        ),
         render: text => {
           if (!text) return false;
           return (<Fragment>
@@ -556,8 +357,6 @@ class Order extends Component {
                     <span>{text[1]}</span>
                 </Fragment>)
         },
-        editable: true,
-        inputType: <Input style={{ width: '90%', display: 'block', margin: '0 auto' }}/>,
       },
       {
         title: '短代码',
@@ -573,100 +372,50 @@ class Order extends Component {
                     <span>{text[1]}</span>
                 </Fragment>)
         },
-        editable: true,
-        inputType: <Input style={{ width: '90%', display: 'block', margin: '0 auto' }}/>,
-      },
-      {
-        title: '操作',
-        width: 150,
-        align: 'center',
-        fixed: 'right',
-        render: (value, row, index) => {
-          const { editIndex } = this.state;
-          let actions;
-          if (editIndex !== index) {
-            if (row.status === 1) {
-              actions = (
-                <Popconfirm title="确定删除数据？" onConfirm={() => this.deleteRow(row)}>
-                  <a>删除</a>
-                </Popconfirm>
-              );
-            } else {
-              actions = (
-                <Popconfirm title="确定恢复数据？" onConfirm={() => this.resumeRow(row)}>
-                  <a>恢复</a>
-                </Popconfirm>
-              );
-            }
-          }
-          if (editIndex === index) {
-            actions = (
-              <>
-                <a onClick={() => this.saveRow(index)}>保存</a>
-                <Divider type="vertical" />
-                <a onClick={() => this.cancelEdit(row, -1)}>退出</a>
-              </>
-            );
-          }
-          return actions;
-        },
       },
     ];
 
-    const components = {
-      body: {
-        cell: EditableCell,
-      },
-    };
 
     columns = columns.map(col => {
       // eslint-disable-next-line no-param-reassign
       if (!col.width) col.width = 100;
       tableWidth += col.width;
-      if (!col.editable) {
-        return col;
-      }
-      return {
-        ...col,
-        onCell: (record, rowIndex) => ({
-          record,
-          rules: col.rules,
-          inputType: col.inputType,
-          dataIndex: col.dataIndex,
-          title: col.title,
-          editing: rowIndex === this.state.editIndex,
-          double: col.double,
-        }),
-      };
+      return col
     });
 
+    const rowSelection = {
+      type: 'radio',
+      onChange: (selectedRowKeys, selectedRows) => {
+          this.setState({
+              data: selectedRows[0],
+            })
+        },
+    }
+
     return (
-      <PageHeaderWrapper>
-        <Card bordered={false}>
-          <div className="tableList">
+      <div>
+        <Modal
+          width="1200px"
+          title="多肽氨基酸列表"
+          visible={visible}
+          onOk={this.handleOk}
+          onCancel={this.handleCancel}
+        >
             <Search getTableData={this.getTableData} status={commonData.status}/>
             <div className="tableListOperator">
-              <Button icon="plus" type="primary" onClick={() => this.handleAdd()}>
-                新建
-              </Button>
             </div>
-            <EditableContext.Provider value={this.props.form}>
-              <StandardTable
-                className="mytables"
-                scroll={{ x: tableWidth }}
-                rowClassName="editable-row"
-                components={components}
-                selectedRows={selectedRows}
-                loading={loading}
-                data={data}
+              <Table
+                dataSource={data.list}
                 columns={columns}
-                onSelectRow={this.handleSelectRows}
+                scroll={{ x: tableWidth, y: 400 }}
+                pagination={data.pagination}
+                rowKey="code"
+                rowSelection={rowSelection}
+                loading={loading}
                 onChange={this.handleStandardTableChange}
-              />
-            </EditableContext.Provider>
-          </div>
-        </Card>
-      </PageHeaderWrapper>
+               />
+        </Modal>
+      </div>
     );
   }
 }
