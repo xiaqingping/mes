@@ -11,17 +11,21 @@ import {
   Icon,
   Cascader,
 } from 'antd';
-import React, { Component } from 'react';
+import { connect } from 'dva';
+import React from 'react';
 
 const FormItem = Form.Item;
 const { Option } = Select;
 
-class Type extends Component {
+@connect(({ partnerMaintainEdit }) => ({
+  details: partnerMaintainEdit.details,
+}), undefined, undefined, { withRef: true })
+class PurchasingOrg extends React.Component {
   constructor(props) {
     super(props);
+    const { details: { purchaseOrganizationList: tabsData } } = this.props;
     this.state = {
-      tabKey: '',
-      tabsData: [],
+      tabKey: (tabsData && tabsData[0] && tabsData[0].purchaseOrganizationCode) || '',
     }
   }
 
@@ -29,6 +33,7 @@ class Type extends Component {
     const {
       form: { getFieldDecorator },
     } = this.props;
+
     return (
       <Form layout="vertical">
         <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
@@ -114,18 +119,28 @@ class Type extends Component {
 
   // 级联选泽采购组织时
   onCascaderChange = obj => {
-    const { tabsData } = this.state;
+    const { details } = this.props;
+    const { purchaseOrganizationList: tabsData } = details;
     const index = obj.length - 1;
 
-    tabsData.push({
-      title: obj[index],
+    const data = [].concat(tabsData, {
+      purchaseOrganizationCode: obj[index],
     });
-    this.setState({ tabsData, tabKey: obj[index] });
+
+    this.props.dispatch({
+      type: 'partnerMaintainEdit/setDetails',
+      payload: { ...details, ...{ purchaseOrganizationList: data } },
+    });
+
+    this.setState({
+      tabKey: obj[index],
+    });
   }
 
   renderCascader = () => {
-    const { tabsData } = this.state;
-    const cascaderTitle = tabsData.map(e => e.title);
+    const { details } = this.props;
+    const { purchaseOrganizationList: tabsData } = details;
+    const cascaderTitle = tabsData.map(e => e.purchaseOrganizationCode);
     const options = [
       {
         value: '生工',
@@ -157,11 +172,12 @@ class Type extends Component {
   closeTab = tabKey => {
     let index = -1;
     let key = '';
-    const { tabsData } = this.state;
+    const { details } = this.props;
+    const { purchaseOrganizationList: tabsData } = details;
 
     // 过滤掉关闭的采购组织
     const newTabsData = tabsData.filter((e, i) => {
-      if (e.title !== tabKey) return true;
+      if (e.purchaseOrganizationCode !== tabKey) return true;
       index = i;
       return false;
     });
@@ -170,29 +186,39 @@ class Type extends Component {
     if (newTabsData.length > 0) {
       // 关闭第一个
       if (index === 0) {
-        key = newTabsData[0].title;
+        key = newTabsData[0].purchaseOrganizationCode;
       }
       // 关闭最后一个
       if (index === tabsData.length - 1) {
-        key = newTabsData[index - 1].title;
+        key = newTabsData[index - 1].purchaseOrganizationCode;
       }
       // 关闭中间的Tab
       if (index > 0 && index < tabsData.length - 1) {
-        key = newTabsData[index].title;
+        key = newTabsData[index].purchaseOrganizationCode;
       }
     } else {
       key = '';
     }
 
+    this.props.dispatch({
+      type: 'partnerMaintainEdit/setDetails',
+      payload: { ...details, ...{ purchaseOrganizationList: newTabsData } },
+    });
     this.setState({
-      tabsData: newTabsData,
       tabKey: key,
     });
   }
 
   render() {
-    const { tabsData, tabKey } = this.state;
-    let tabList = tabsData.map(e => ({ key: e.title, tab: e.title }));
+    const { tabKey } = this.state;
+    const { details } = this.props;
+    const { purchaseOrganizationList: tabsData } = details;
+
+    let tabList = tabsData.map(e => ({
+      key: e.purchaseOrganizationCode,
+      tab: e.purchaseOrganizationCode,
+    }));
+
     tabList = tabList.concat({
       key: 'select',
       tab: this.renderCascader(),
@@ -226,4 +252,4 @@ class Type extends Component {
   }
 }
 
-export default Form.create()(Type);
+export default Form.create()(PurchasingOrg);
