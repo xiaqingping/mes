@@ -248,7 +248,7 @@ export class TelphoneInput extends React.Component {
     const value = props.value || {};
     this.state = {
       telephoneCountryCode: value.telephoneCountryCode || '+86',
-      provincial: value.provincial || '',
+      telephoneAreaCode: value.telephoneAreaCode || '',
       telephone: value.telephone || '',
       telephoneExtension: value.telephoneExtension || '',
     };
@@ -265,14 +265,14 @@ export class TelphoneInput extends React.Component {
   };
 
   render() {
-    const { telephoneCountryCode, provincial, telephone, telephoneExtension } = this.state;
+    const { telephoneCountryCode, telephoneAreaCode, telephone, telephoneExtension } = this.state;
     return (
       <InputGroup compact>
         <Select value={telephoneCountryCode} style={{ width: '30%' }} onChange={val => this.valueChange({ telephoneCountryCode: val })}>
           <Option value="+86">+86</Option>
           <Option value="+01">+01</Option>
         </Select>
-        <Input value={provincial} style={{ width: '20%' }} onChange={e => this.valueChange({ provincial: e.target.value })}/>
+        <Input value={telephoneAreaCode} style={{ width: '20%' }} onChange={e => this.valueChange({ telephoneAreaCode: e.target.value })}/>
         <Input value={telephone} style={{ width: '30%' }} onChange={e => this.valueChange({ telephone: e.target.value })}/>
         <Input value={telephoneExtension} style={{ width: '20%' }} onChange={e => this.valueChange({ telephoneExtension: e.target.value })}/>
       </InputGroup>
@@ -296,7 +296,7 @@ export class FaxInput extends React.Component {
     const value = props.value || {};
     this.state = {
       faxCountryCode: value.faxCountryCode || '+86',
-      provincial: value.provincial || '',
+      faxAreaCode: value.faxAreaCode || '',
       fax: value.fax || '',
       faxExtension: value.faxExtension || '',
     };
@@ -313,14 +313,14 @@ export class FaxInput extends React.Component {
   };
 
   render() {
-    const { faxCountryCode, provincial, fax, faxExtension } = this.state;
+    const { faxCountryCode, faxAreaCode, fax, faxExtension } = this.state;
     return (
       <InputGroup compact>
         <Select value={faxCountryCode} style={{ width: '30%' }} onChange={val => this.valueChange({ faxCountryCode: val })}>
           <Option value="+86">+86</Option>
           <Option value="+01">+01</Option>
         </Select>
-        <Input value={provincial} style={{ width: '20%' }} onChange={e => this.valueChange({ provincial: e.target.value })}/>
+        <Input value={faxAreaCode} style={{ width: '20%' }} onChange={e => this.valueChange({ faxAreaCode: e.target.value })}/>
         <Input value={fax} style={{ width: '30%' }} onChange={e => this.valueChange({ fax: e.target.value })}/>
         <Input value={faxExtension} style={{ width: '20%' }} onChange={e => this.valueChange({ faxExtension: e.target.value })}/>
       </InputGroup>

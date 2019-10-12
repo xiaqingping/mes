@@ -46,11 +46,13 @@ class CustomerEdit extends Component {
         email: '123@qq.com',
         telephone: {
           telephoneCountryCode: '+86',
+          telephoneAreaCode: '1234',
           telephone: '57072136',
           telephoneExtension: '2136',
         },
         fax: {
           faxCountryCode: '+86',
+          faxAreaCode: '1234',
           fax: '54072136',
           faxExtension: '2136',
         },
@@ -100,6 +102,7 @@ class CustomerEdit extends Component {
         notes: '这是一段认证说明',
         telephone: {
           telephoneCountryCode: '+86',
+          telephoneAreaCode: '1234',
           telephone: '57072136',
           telephoneExtension: '2136',
         },
@@ -137,15 +140,15 @@ class CustomerEdit extends Component {
       // 采购组织
       purchaseOrganizationList: [
         {
-          purchaseOrganizationCode: '',
-          salerName: '',
-          salerTelephoneCountryCode: '',
-          salerTelephone: '',
-          payTermsCode: '',
-          currencyCode: '',
+          purchaseOrganizationCode: 'BBI',
+          salerName: '张三',
+          salerTelephoneCountryCode: '+86',
+          salerTelephone: '18735818888',
+          payTermsCode: '1',
+          currencyCode: '1',
           levelCode: '1',
-          invoicePostInReceive: '',
-          purchaseGroupCode: '',
+          invoicePostInReceive: true,
+          purchaseGroupCode: '1',
           deliveryPlanDays: '1',
         },
       ],
