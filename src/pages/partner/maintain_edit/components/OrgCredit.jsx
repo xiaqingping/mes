@@ -4,12 +4,20 @@ import {
   Divider,
 } from 'antd';
 import React, { Component } from 'react';
+import { connect } from 'dva';
 
 const DescriptionsItem = Descriptions.Item;
 
-// eslint-disable-next-line react/prefer-stateless-function
+
+@connect(({ partnerMaintainEdit }) => ({
+  details: partnerMaintainEdit.details,
+}))
 class OrgCredit extends Component {
   render() {
+    const { details } = this.props;
+    const { creditList } = details;
+    const data = creditList[0];
+
     return (
       <Card
         title="信贷数据"
@@ -28,10 +36,10 @@ class OrgCredit extends Component {
           layout="vertical"
           column={4}
         >
-          <DescriptionsItem label="额度">20000 CNY 1天后调整</DescriptionsItem>
-          <DescriptionsItem label="临时额度">40000 CNY 25天后调整</DescriptionsItem>
-          <DescriptionsItem label="付款周期">开票后60天到期</DescriptionsItem>
-          <DescriptionsItem label="账单间隔">每月5日开票</DescriptionsItem>
+          <DescriptionsItem label="额度">{data.credit} {data.currencyCode} 1天后调整</DescriptionsItem>
+          <DescriptionsItem label="临时额度">{data.tempCreditLimit} {data.currencyCode} 25天后到期</DescriptionsItem>
+          <DescriptionsItem label="付款周期">开票后{data.billingCycle}天到期</DescriptionsItem>
+          <DescriptionsItem label="账单间隔">每月{data.billingDay}日开票</DescriptionsItem>
         </Descriptions>
       </Card>
     );

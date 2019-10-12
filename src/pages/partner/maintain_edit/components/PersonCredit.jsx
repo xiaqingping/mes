@@ -4,7 +4,11 @@ import {
   List,
 } from 'antd';
 import React from 'react';
+import { connect } from 'dva';
 
+@connect(({ partnerMaintainEdit }) => ({
+  details: partnerMaintainEdit.details,
+}))
 class PersonCredit extends React.Component {
   constructor(props) {
     super(props);
@@ -12,37 +16,29 @@ class PersonCredit extends React.Component {
   }
 
   renderListItem = item => (
-      <List.Item key={item.id}>
-        <Card
-          hoverable
-          title={item.title}
-          extra={
-            <>
-              <a>额度调整</a>
-              <Divider type="vertical" />
-              <a>临时额度</a>
-            </>
-          }
-        >
-          <span>2000 CNY 1天后调整</span><br/>
-          <span>4000 CNY 25天后到期</span><br/>
-          <span>开票后65天到期</span><br/>
-          <span>每月5日开票</span>
-        </Card>
-      </List.Item>
-    )
+    <List.Item key={item.invoicePartyId}>
+      <Card
+        hoverable
+        title={item.invoicePartyName}
+        extra={
+          <>
+            <a>额度调整</a>
+            <Divider type="vertical" />
+            <a>临时额度</a>
+          </>
+        }
+      >
+        <span>{item.credit} {item.currencyCode} 1天后调整</span><br/>
+        <span>{item.tempCreditLimit} {item.currencyCode} 25天后到期</span><br/>
+        <span>开票后{item.billingCycle}天到期</span><br/>
+        <span>每月{item.billingDay}日开票</span>
+      </Card>
+    </List.Item>
+  )
 
   render() {
-    const list = [
-      {
-        id: 1,
-        title: '上海交通大学',
-      },
-      {
-        id: 2,
-        title: '上海大学',
-      },
-    ];
+    const { details } = this.props;
+    const { creditList } = details;
 
     return (
       <Card
@@ -59,7 +55,7 @@ class PersonCredit extends React.Component {
             sm: 1,
             xs: 1,
           }}
-          dataSource={list}
+          dataSource={creditList}
           renderItem={this.renderListItem}
         />
       </Card>

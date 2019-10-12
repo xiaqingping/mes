@@ -188,7 +188,7 @@ export class NameInput extends React.Component {
 }
 
 // 移动电话
-export class MobileTelephoneInput extends React.Component {
+export class MobilePhoneInput extends React.Component {
   static getDerivedStateFromProps(nextProps) {
     if ('value' in nextProps) {
       return {

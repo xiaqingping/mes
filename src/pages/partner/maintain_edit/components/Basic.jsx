@@ -6,27 +6,32 @@ import {
   Select,
   Switch,
 } from 'antd';
-import React, { PureComponent } from 'react';
+import React from 'react';
+import { connect } from 'dva';
 import { formatMessage } from 'umi-plugin-react/locale';
-import { EmailInput, NameInput, MobileTelephoneInput, TelphoneInput, FaxInput, AddressInput } from '@/components/CustomizedFormControls';
+import { EmailInput, NameInput, MobilePhoneInput, TelphoneInput, FaxInput, AddressInput } from '@/components/CustomizedFormControls';
 
 import styles from '../style.less';
 
 const FormItem = Form.Item;
 const { Option } = Select;
 
-class BasicInfo extends PureComponent {
-  static getDerivedStateFromProps(nextProps) {
-    return {
-      ...nextProps.value,
-    };
-  }
+@connect(({ partnerMaintainEdit }) => ({
+  details: partnerMaintainEdit.details,
+}))
+class Basic extends React.Component {
+  // static getDerivedStateFromProps(nextProps) {
+  //   return {
+  //     ...nextProps.value,
+  //   };
+  // }
 
   constructor(props) {
     super(props);
-    this.state = {
-      ...props.value,
-    };
+    console.log(props);
+    // this.state = {
+    //   ...props.value,
+    // };
   }
 
   validate = () => {
@@ -69,8 +74,9 @@ class BasicInfo extends PureComponent {
   render() {
     const {
       form: { getFieldDecorator },
+      details,
     } = this.props;
-    const { name, email } = this.state;
+    const { name, email } = details.basic;
     const MobileDisabled = name && name.type === 2;
 
     return (
@@ -86,9 +92,9 @@ class BasicInfo extends PureComponent {
           </Col>
           <Col md={6} sm={12}>
             <FormItem label="移动电话">
-              {getFieldDecorator('mobile', {
+              {getFieldDecorator('mobilePhone', {
                 initialValue: { disabled: MobileDisabled },
-              })(<MobileTelephoneInput onChange={value => this.valueChange('mobile', value)} />)}
+              })(<MobilePhoneInput onChange={value => this.valueChange('mobilePhone', value)} />)}
             </FormItem>
           </Col>
           <Col md={6} sm={12}>
@@ -100,7 +106,7 @@ class BasicInfo extends PureComponent {
           </Col>
           <Col md={6} sm={12}>
             <FormItem label="电话">
-              {getFieldDecorator('tel')(<TelphoneInput onChange={value => this.valueChange('tel', value)} />)}
+              {getFieldDecorator('telephone')(<TelphoneInput onChange={value => this.valueChange('telephone', value)} />)}
             </FormItem>
           </Col>
           <Col md={6} sm={12}>
@@ -152,4 +158,4 @@ class BasicInfo extends PureComponent {
   }
 }
 
-export default Form.create()(BasicInfo);
+export default Form.create()(Basic);
