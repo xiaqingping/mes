@@ -20,6 +20,7 @@ import Link from 'umi/link';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import StandardTable from '@/components/StandardTable';
 import ChangeModal from './components/ChangeModal';
+import styles from './index.less';
 
 const FormItem = Form.Item;
 const { Option } = Select;
@@ -37,6 +38,10 @@ const renzhengMap = {
   2: {
     value: 'success',
     text: '已认证',
+  },
+  3: {
+    value: 'warning',
+    text: '部分认证',
   },
 };
 
@@ -63,6 +68,30 @@ const wanzhengMap = {
     text: '完整',
   },
 };
+
+// 移动电话
+const mobileIden = {
+  0: {
+    value: 'default',
+    text: '未认证',
+  },
+  1: {
+    value: 'success',
+    text: '已认证',
+  },
+}
+
+// 邮箱
+const emailIden = {
+  0: {
+    value: 'default',
+    text: '未认证',
+  },
+  1: {
+    value: 'success',
+    text: '已认证',
+  },
+}
 
 // 区域
 const quyuoptions = [
@@ -108,7 +137,7 @@ class Maintain extends React.Component {
     selectedRows: [],
     expandForm: false,
     data: {},
-    formValues: {},
+    // formValues: {},
     xiaoshuoguishu: [],
     // kaipiaofang: [],
     changeModal: false,
@@ -119,25 +148,25 @@ class Maintain extends React.Component {
     {
       title: '客户编号',
       dataIndex: 'code',
-      width: 100,
-      render(val) {
+      // width: 100,
+      render(val, record) {
         return (
           <Link to={`/partner/maintain/details/${val}`}>
-            <Icon type="home" />
-            {val}
+            <Icon type="home" /> &nbsp;{record.name}
+            <div>{val}</div>
           </Link>
         );
       },
     },
-    {
-      title: '名称',
-      dataIndex: 'name',
-      width: 250,
-    },
+    // {
+    //   title: '名称',
+    //   dataIndex: 'name',
+    //   width: 100,
+    // },
     {
       title: '认证',
-      dataIndex: 'renzheng',
-      width: 100,
+      dataIndex: 'certificationStatus',
+      // width: 100,
       filters: [
         {
           value: 'default',
@@ -151,6 +180,10 @@ class Maintain extends React.Component {
           value: 'success',
           text: '已认证',
         },
+        {
+          value: 'warning',
+          text: '部分认证',
+        },
       ],
       render(val) {
         return <Badge status={renzhengMap[val].value} text={renzhengMap[val].text} />;
@@ -158,8 +191,8 @@ class Maintain extends React.Component {
     },
     {
       title: '冻结',
-      dataIndex: 'dongjie',
-      width: 100,
+      dataIndex: 'salesBan',
+      // width: 100,
       filters: [
         {
           value: 'error',
@@ -177,8 +210,8 @@ class Maintain extends React.Component {
     },
     {
       title: '客户',
-      dataIndex: 'wanzheng',
-      width: 100,
+      dataIndex: 'customerDataStatus',
+      // width: 100,
       filters: [
         {
           value: 'default',
@@ -196,8 +229,8 @@ class Maintain extends React.Component {
     },
     {
       title: '供应商',
-      dataIndex: 'gongyings',
-      width: 100,
+      dataIndex: 'vendorDataStatus',
+      // width: 100,
       filters: [
         {
           value: 'default',
@@ -214,24 +247,31 @@ class Maintain extends React.Component {
       },
     },
     {
-      title: '移动电话',
-      dataIndex: 'mobile',
-      width: 100,
-    },
-    {
-      title: 'Email',
-      dataIndex: 'email',
-      width: 200,
-    },
-    {
-      title: '电话',
-      dataIndex: 'phone',
-      width: 150,
+      title: '联系方式',
+      dataIndex: 'mobilePhone',
+      // width: 100,
+      render(val, records) {
+        return <>
+                 <div>
+                    {val}
+                    &nbsp;&nbsp;
+                    <Badge status={mobileIden[records.mobilePhoneVerifyStatus].value} />
+                  </div>
+                  <div>
+                    {records.email}
+                    &nbsp;&nbsp;
+                    <Badge status={emailIden[records.emailVerifyStatus].value} />
+                  </div>
+                </>
+      },
     },
     {
       title: '地址',
       dataIndex: 'address',
-      width: 300,
+      // width: 200,
+      render(val) {
+        return <div className={styles.hideAdress}>{val}</div>
+      },
     },
     {
       fixed: 'right',
@@ -311,32 +351,33 @@ class Maintain extends React.Component {
         ...fieldsValue,
         updatedAt: fieldsValue.updatedAt && fieldsValue.updatedAt.valueOf(),
       };
-      this.setState({
-        formValues: values,
-      });
-      this.getData();
+      // this.setState({
+      //   formValues: values,
+      // });
+      this.getData(values);
     });
   };
 
   /** table数据 */
-  getData = () => {
+  getData = values => {
     const data = [];
-    const { formValues } = this.state;
-    console.log(formValues);
+    // const { formValues } = this.state;
+    console.log(values);
     for (let i = 0; i < 25; i++) {
       data.push({
         id: i + 1,
+        type: 1, // 1人，2组织
         code: 100000 + (i + 1),
         name: `name${i}`,
-        renzheng: 1,
-        dongjie: 0,
-        wanzheng: 1,
-        gongyings: 1,
-        type: 1, // 1人，2组织
-        mobile: '18735818888',
+        certificationStatus: 1,
+        salesBan: 0,
+        customerDataStatus: 1,
+        vendorDataStatus: 1,
+        mobilePhone: '15300772583',
+        mobilePhoneVerifyStatus: 0,
+        emailVerifyStatus: 1,
         email: '123@qq.com',
-        phone: '123456789',
-        address: '上海市松江区',
+        address: '江西省 南昌市 昌北经济开发区 川杨新苑三期 12号楼 501室',
       });
     }
     this.setState({
@@ -419,7 +460,7 @@ class Maintain extends React.Component {
           </Col>
           <Col xxl={6} lg={8}>
             <FormItem label="移动电话">
-              {getFieldDecorator('mobile')(<Input placeholder="请输入"/>)}
+              {getFieldDecorator('mobilePhone')(<Input placeholder="请输入"/>)}
             </FormItem>
           </Col>
           <Col xxl={6} lg={8}>
@@ -429,18 +470,19 @@ class Maintain extends React.Component {
           </Col>
           <Col xxl={6} lg={8}>
             <FormItem label="认证状态">
-              {getFieldDecorator('renzheng')(
+              {getFieldDecorator('certificationStatusList')(
                 <Select maxTagCount={1} maxTagTextLength={2} placeholder="请选择" mode="multiple">
                   <Option value="0">未认证</Option>
                   <Option value="1">已认证</Option>
                   <Option value="2">审核中</Option>
+                  <Option value="3">部分认证</Option>
                 </Select>,
               )}
             </FormItem>
           </Col>
           <Col xxl={6} lg={8}>
             <FormItem label="销售冻结">
-              {getFieldDecorator('xiaoshou')(
+              {getFieldDecorator('salesBan')(
                 <Select placeholder="请选择">
                   <Option value="0">冻结</Option>
                   <Option value="1">活跃</Option>
@@ -450,7 +492,7 @@ class Maintain extends React.Component {
           </Col>
           <Col xxl={6} lg={8}>
             <FormItem label="客户数据">
-              {getFieldDecorator('shuju')(
+              {getFieldDecorator('customerDateStatus')(
                 <Select placeholder="请选择">
                   <Option value="0">完整</Option>
                   <Option value="1">不完整</Option>
@@ -460,7 +502,7 @@ class Maintain extends React.Component {
           </Col>
           <Col xxl={6} lg={8}>
             <FormItem label="供应商数据">
-              {getFieldDecorator('gongyingsshuju')(
+              {getFieldDecorator('vendorDataStatus')(
                 <Select placeholder="请选择">
                   <Option value="0">完整</Option>
                   <Option value="1">不完整</Option>
@@ -470,14 +512,14 @@ class Maintain extends React.Component {
           </Col>
           <Col xxl={6} lg={8}>
             <FormItem label="区域归属">
-              {getFieldDecorator('quyu')(
+              {getFieldDecorator('regionalAttr')(
                 <Cascader options={quyuoptions} placeholder="请选择"/>,
               )}
             </FormItem>
           </Col>
           <Col xxl={6} lg={8}>
             <FormItem label="销售归属">
-              {getFieldDecorator('xiaoshouguishu')(
+              {getFieldDecorator('salerCode')(
                 <AutoComplete
                   dataSource={xiaoshuoguishu.map(renderOption)}
                   onSearch={this.xiaoshuoguishuSearch}
@@ -488,8 +530,8 @@ class Maintain extends React.Component {
             </FormItem>
           </Col>
           <Col xxl={6} lg={8}>
-            <FormItem label="开票方">
-              {getFieldDecorator('kaipiao')(
+            <FormItem label="收票方">
+              {getFieldDecorator('invoicePartyId')(
                 <AutoComplete
                   dataSource={xiaoshuoguishu.map(renderOption)}
                   onSearch={this.xiaoshuoguishuSearch}
@@ -536,7 +578,7 @@ class Maintain extends React.Component {
           </Col>
           <Col xxl={6} lg={0}>
             <FormItem label="移动电话">
-              {getFieldDecorator('mobile')(<Input placeholder="请输入"/>)}
+              {getFieldDecorator('mobilePhone')(<Input placeholder="请输入"/>)}
             </FormItem>
           </Col>
           <Col xxl={6} lg={8}>
@@ -587,7 +629,7 @@ class Maintain extends React.Component {
         <ChangeModal
           changeModal={changeModal}
           recordMsg={ recordMesg }
-          getFieldDecorator={getFieldDecorator}/>
+          form={form}/>
       </PageHeaderWrapper>
     );
   }
