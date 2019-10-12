@@ -115,7 +115,7 @@ class Operation extends React.Component {
       title: '业务伙伴',
       dataIndex: 'huoban',
       render(text, record) {
-          return text ? <span><Icon type="user" /> {text}<br/><span>&nbsp;&nbsp;&nbsp;&nbsp;{record.phone}</span></span> : ''
+          return text ? <span><Icon type="user" /> {text}<br/><span style={{ color: '#C2C2C2' }}>{record.phone}</span></span> : ''
       },
     },
     {
@@ -132,18 +132,6 @@ class Operation extends React.Component {
           text: '修改',
         },
       ],
-      filteredValue: this.state.typeValue,
-      onFilter: value => {
-        this.changeTypeValue(value)
-      },
-      onFilterDropdownVisibleChange: e => {
-        if (e) {
-          this.val = [];
-        } else if (!this.select) {
-            this.setState({ typeValue: [] })
-          }
-          this.select = false
-      },
       render(text) {
         return text === 1 ? '新建' : '修改'
     },
@@ -171,19 +159,10 @@ class Operation extends React.Component {
       title: '操作人',
       dataIndex: 'actionman',
       align: 'center',
-      width: 100,
-    },
-    {
-      title: '操作时间',
-      dataIndex: 'actiontime',
-      align: 'center',
-      width: 100,
-    },
-    {
-      title: '业务伙伴编号',
-      dataIndex: 'partnerCode',
-      align: 'center',
-      width: 150,
+      width: 250,
+      render(val, record) {
+        return <span>{record.huoban}<br/><span>{record.huoban}</span></span>;
+      },
     },
     {
       fixed: 'right',
@@ -208,21 +187,6 @@ class Operation extends React.Component {
     this.setState({
       detailsVisible: true,
       detailsValue: record,
-    })
-  }
-
-
-  changeTypeValue = e => {
-    this.select = true;
-    if (typeof e === 'string') {
-      if (this.val.indexOf(e) < 0) {
-        this.val.push(e)
-      }
-    } else {
-      this.val = e;
-    }
-     this.setState({
-      typeValue: this.val,
     })
   }
 
@@ -362,7 +326,7 @@ class Operation extends React.Component {
           <Col lg={6} md={8} sm={12}>
             <FormItem label="类型">
               {getFieldDecorator('type', typeValue ? { initialValue: typeValue } : 'type')(
-                <Select mode="multiple" onChange={e => this.changeTypeValue(e)}>
+                <Select mode="multiple">
                   <Option value="1">新建</Option>
                   <Option value="2">修改</Option>
                 </Select>,
@@ -433,7 +397,7 @@ class Operation extends React.Component {
           <Col lg={6} md={8} sm={12}>
             <FormItem label="类型">
               {getFieldDecorator('type', typeValue ? { initialValue: typeValue } : 'type')(
-                <Select mode="multiple" onChange={e => this.changeTypeValue(e)}>
+                <Select mode="multiple">
                   <Option value="1">新建</Option>
                   <Option value="2">修改</Option>
                 </Select>,

@@ -15,7 +15,7 @@ import React, { Component } from 'react';
 import api from '@/api';
 import './style.less'
 import { connect } from 'dva';
-import axios from 'axios';
+import AddressMask from './address-mask'
 
 const FormItem = Form.Item;
 const { Option } = Select;
@@ -30,6 +30,7 @@ class SearchPage extends Component {
     super(props);
     this.state = {
       factorys: [],
+      plusStatus: false,
     }
   }
 
@@ -41,22 +42,23 @@ class SearchPage extends Component {
     })
   }
 
-  // componentWillReceiveProps() {
-  //   axios.get('https://premes.sangon.com/storage_getAllList').then(data => {
-  //     console.log(123)
-  //   })
-  // }
-
   addAddress = () => { console.log(123) }
 
   handleFormReset = () => {
     this.props.form.resetFields();
   }
 
+  // 修改加号颜色
+  changePlusStatus = v => {
+    this.setState({
+      plusStatus: v,
+    })
+  }
+
   // 渲染表单
   renderForm = () => {
     const {
-      form: { getFieldDecorator },
+      form: { getFieldDecorator, getFieldValue },
       rangeArea,
       regions,
       offices,
@@ -66,8 +68,9 @@ class SearchPage extends Component {
       deliveryTypeStatus,
       orderTypeStatus,
       currencys,
+      openAddressMask,
     } = this.props;
-    const { factorys } = this.state;
+    const { factorys, plusStatus } = this.state;
 
     return (
       <Form layout="inline">
@@ -251,7 +254,7 @@ class SearchPage extends Component {
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="产品金额">
-              {getFieldDecorator('productAmount')(<Input />)}
+              {getFieldDecorator('productAmount', { initialValue: 9546.23.toFixed(2) })(<Input readOnly/>)}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
@@ -265,12 +268,12 @@ class SearchPage extends Component {
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="运费">
-              {getFieldDecorator('freight')(<Input />)}
+              {getFieldDecorator('freight', { initialValue: 23.00.toFixed(2) })(<Input />)}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="订单金额">
-              {getFieldDecorator('amount')(<Input />)}
+              {getFieldDecorator('amount', { initialValue: (parseFloat(getFieldValue('productAmount')) + parseFloat(getFieldValue('freight'))).toFixed(2) })(<Input readOnly/>)}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
@@ -299,10 +302,11 @@ class SearchPage extends Component {
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="地址">
-              {getFieldDecorator('address')(<Select>
+              {getFieldDecorator('address')(
+                <Select>
                   <Option value="0">全部</Option>
                 </Select>)}
-                <div style={{ position: 'absolute', top: '-8px', right: '40px' }} onClick={() => { this.addAddress() }}><Icon type="plus" /></div>
+                <div style={{ position: 'absolute', top: '-8px', right: '40px', cursor: 'pointer' }} onMouseLeave={() => { this.changePlusStatus(false) }} onMouseEnter={() => { this.changePlusStatus(true) }} onClick={openAddressMask}><Icon type="plus" className={plusStatus ? 'select-plus' : ''} style={{ color: 'green', opacity: '0.4' }}/></div>
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
@@ -383,6 +387,7 @@ class Order extends Component {
     data: [],
     dataSon: [],
     loadingSon: false,
+    visibleAddress: false,
   }
 
   componentWillReceiveProps(nextProps) {
@@ -402,18 +407,32 @@ class Order extends Component {
     });
   };
 
-    // 设置子值
-    dataSon = v => {
-      this.setState({
-        loadingSon: true,
-      })
-      setTimeout(() => {
-          this.setState({
-            dataSon: v.stock.storages,
-            loadingSon: false,
-          })
-        }, 500)
-    }
+  // 设置子值
+  dataSon = v => {
+    this.setState({
+      loadingSon: true,
+    })
+    setTimeout(() => {
+        this.setState({
+          dataSon: v.stock.storages,
+          loadingSon: false,
+        })
+    }, 500)
+  }
+
+  // 打开地址新增
+  openAddressMask = () => {
+    this.setState({
+      visibleAddress: true,
+    })
+  }
+
+  // 关闭地址新增
+  closeAddressMask = v => {
+    this.setState({
+      visibleAddress: v,
+    })
+  }
 
   // 分页
   handleStandardTableChange = pagination => {
@@ -455,6 +474,7 @@ class Order extends Component {
       visible,
       dataSon,
       loadingSon,
+      visibleAddress,
     } = this.state;
     const data = { list, pagination: { current, pageSize, total } };
     const { peptide: { commonData }, regions,
@@ -664,6 +684,7 @@ class Order extends Component {
               deliveryTypeStatus= {commonData.deliveryTypeStatus}
               orderTypeStatus={commonData.orderTypeStatus}
               currencys={currencys}
+              openAddressMask={this.openAddressMask}
             />
             <Col span={14}>
               <Table
@@ -686,6 +707,7 @@ class Order extends Component {
                   loading={loading}
                   />
             </Col>
+            <AddressMask visible={visibleAddress} closeMask={ v => this.closeAddressMask(v)}/>
           </div>
         </Modal>
     );

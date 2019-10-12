@@ -1,3 +1,4 @@
+import { Icon } from 'antd';
 import React, { Component } from 'react';
 import { connect } from 'dva';
 
@@ -49,6 +50,13 @@ class CustomerDetails extends Component {
     });
   };
 
+  title = () => (
+      <div>
+        <span>查看 123</span>&nbsp;&nbsp;&nbsp;&nbsp;
+        <a title="编辑"><Icon type="edit" style={{ color: 'black' }} /></a>
+      </div>
+    )
+
   render() {
     const { tabActiveKey } = this.state;
     const contentList = {
@@ -63,6 +71,7 @@ class CustomerDetails extends Component {
       <PageHeaderWrapper
         tabActiveKey={tabActiveKey}
         onTabChange={this.onTabChange}
+        title={this.title()}
         style={{ paddingBottom: '0px' }}
         tabList={[
           {

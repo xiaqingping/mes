@@ -66,7 +66,7 @@ class CheckPhone extends Component {
     handleQuestion = e => {
       e.preventDefault();
       this.props.form.validateFields((err, values) => {
-        if (values.qone) {
+        if (values.qone && parseInt(values.qone, 10) === 2) {
           this.setState({
             oneQuestion: 'success',
           })
@@ -75,7 +75,7 @@ class CheckPhone extends Component {
             oneQuestion: 'error',
           })
         }
-        if (values.qtwo) {
+        if (values.qtwo && parseInt(values.qtwo, 10) === 4) {
           this.setState({
             twoQuestion: 'success',
           })
@@ -84,7 +84,7 @@ class CheckPhone extends Component {
             twoQuestion: 'error',
           })
         }
-        if (values.qthree) {
+        if (values.qthree && parseInt(values.qthree, 10) === 9) {
           this.setState({
             threeQuestion: 'success',
           })
@@ -168,30 +168,57 @@ class CheckPhone extends Component {
         <Form layout="inline" style={{ textAlign: 'center', paddingTop: '20px' }} onSubmit={this.handleQuestion}>
           <FormItem label="问题一" className="tools" hasFeedback validateStatus={oneQuestion}>
             <div style={{ width: '300px', border: '1px solid #D6D6D6', textAlign: 'left', paddingLeft: '10px', height: '30px', lineHeight: '30px', marginTop: '5px', borderRadius: '3px' }}>
-              <span>我的姓氏是？</span>
+              <span>1+1=？</span>
             </div>
             {getFieldDecorator('qone', {
-              rules: [{ required: true, message: '请输入内容' }],
+              rules: [
+                { required: true, message: '请输入内容' },
+                { validator: (rule, value, callback) => {
+                    if (parseInt(value, 10) !== 2) {
+                      callback('回答错误');
+                    }
+                    callback();
+                  },
+                },
+              ],
             })(
               <Input style={{ width: '300px' }} placeholder="请输入"/>,
             )}
           </FormItem>
           <FormItem label="问题二" className="tools" hasFeedback validateStatus={twoQuestion}>
           <div style={{ width: '300px', border: '1px solid #D6D6D6', textAlign: 'left', paddingLeft: '10px', height: '30px', lineHeight: '30px', marginTop: '5px', borderRadius: '3px' }}>
-              <span>我的大学是？</span>
+              <span>2*2=？</span>
             </div>
             {getFieldDecorator('qtwo', {
-              rules: [{ required: true, message: '请输入内容' }],
+              rules: [
+                { required: true, message: '请输入内容' },
+                { validator: (rule, value, callback) => {
+                    if (parseInt(value, 10) !== 4) {
+                      callback('回答错误');
+                    }
+                    callback();
+                  },
+                },
+              ],
             })(
               <Input style={{ width: '300px' }} placeholder="请输入"/>,
             )}
           </FormItem>
           <FormItem label="问题三" style={{ paddingBottom: '30px' }} hasFeedback validateStatus={threeQuestion} className="tools">
           <div style={{ width: '300px', border: '1px solid #D6D6D6', textAlign: 'left', paddingLeft: '10px', height: '30px', lineHeight: '30px', marginTop: '5px', borderRadius: '3px' }}>
-              <span>我的高中母校是？</span>
+              <span>10-1=？</span>
             </div>
             {getFieldDecorator('qthree', {
-              rules: [{ required: true, message: '请输入内容' }],
+              rules: [
+                { required: true, message: '请输入内容' },
+                { validator: (rule, value, callback) => {
+                    if (parseInt(value, 10) !== 9) {
+                      callback('回答错误');
+                    }
+                    callback();
+                  },
+                },
+              ],
             })(
               <Input style={{ width: '300px' }} placeholder="请输入"/>,
             )}
@@ -249,10 +276,9 @@ class CheckPhone extends Component {
       <Form layout="inline" onSubmit={this.handleNext}>
           <div style={{ height: '200px', textAlign: 'center', paddingTop: '68px' }}>
             <FormItem label="验证方式">
-            {getFieldDecorator('type')(
+            {getFieldDecorator('type', { initialValue: '1' })(
             <Select style={{ width: '300px' }} placeholder="选择验证方式（问题）">
               <Option value="1">问题方式</Option>
-              <Option value="2">联系方式</Option>
             </Select>)}
             </FormItem>
           </div>

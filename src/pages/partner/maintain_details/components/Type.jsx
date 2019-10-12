@@ -6,7 +6,7 @@ import {
   Badge,
 } from 'antd';
 import React, { Component } from 'react';
-import styles from './style.less'
+import './style.less'
 
 const { TabPane } = Tabs;
 
@@ -58,8 +58,16 @@ class BasicInfo extends Component {
     },
     {
       title: '售达方',
-      width: 800,
+      width: 500,
       dataIndex: 'saler_name',
+    },
+    {
+      title: '状态',
+      width: 400,
+      dataIndex: 'status',
+      render(val) {
+        return <Badge status={status[val].value} text={status[val].text}/>;
+      },
     },
     {
       title: '操作',
@@ -94,8 +102,16 @@ class BasicInfo extends Component {
   columns3 = [
     {
       title: '名称',
-      width: 500,
+      width: 700,
       dataIndex: 'name',
+    },
+    {
+      title: '状态',
+      width: 400,
+      dataIndex: 'status',
+      render(val) {
+        return <Badge status={status[val].value} text={status[val].text}/>;
+      },
     },
     {
       align: 'center',
@@ -109,19 +125,19 @@ class BasicInfo extends Component {
   columns4 = [
     {
       title: '名称',
-      width: 500,
+      width: 1200,
       dataIndex: 'name',
     },
     {
       align: 'center',
       title: '操作',
       render: (text, record) => (
-          <a>删除</a>
+          <a>变更</a>
         ),
     },
   ];
 
-  componentWillReceiveProps () {
+  componentWillMount () {
     this.getData()
   }
 
@@ -149,6 +165,8 @@ class BasicInfo extends Component {
     const { list } = this.state;
     return (
       <Card
+        title="销售范围"
+        className="check-tabs"
         bordered={false}
         style={{ width: '100%', marginBottom: '24px' }}
         tabList={tabListNoTitle}
@@ -160,19 +178,17 @@ class BasicInfo extends Component {
         <Descriptions
           className="s-descriptions"
           layout="vertical"
-          column={7}
+          column={5}
         >
           <DescriptionsItem label="网点归属">华东大区/山东网点</DescriptionsItem>
           <DescriptionsItem label="默认付款方式">银行付款</DescriptionsItem>
           <DescriptionsItem label="币种">意大利里拉</DescriptionsItem>
-          <DescriptionsItem label="客户分类">客户</DescriptionsItem>
-          <DescriptionsItem label="随货开票">是</DescriptionsItem>
           <DescriptionsItem label="销售冻结">活跃</DescriptionsItem>
           <DescriptionsItem label="默认开票类型">增值税专用发票</DescriptionsItem>
         </Descriptions>
         <div style={{ border: '1px solid #E6E6E6', width: '100%', height: '100%' }}>
           <Tabs defaultActiveKey="1" className="tabs">
-            <TabPane tab="开票方" key="1">
+            <TabPane tab="收票方" key="1">
               <Table dataSource={list} columns={this.columns1} size="small" pagination={false} rowKey={(r, i) => (i)}/>
             </TabPane>
             <TabPane tab="售达方" key="2">

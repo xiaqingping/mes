@@ -18,7 +18,7 @@ import { formatter } from '@/utils/utils';
 import api from '@/api';
 import OrderMask from '@/pages/peptide/components/order-mask';
 import CustomerMask from '@/pages/peptide/components/customer-mask';
-import SubCustomerMask from '@/pages/peptide/components/SubCustomer-mask';
+import SubCustomerMask from '@/pages/peptide/components/subCustomer-mask';
 import ContactMask from '@/pages/peptide/components/contact-mask';
 import SalerMask from '@/pages/peptide/components/saler-mask';
 
