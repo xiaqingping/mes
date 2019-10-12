@@ -89,7 +89,6 @@ const brands = [
   { code: 'MBI', name: 'MBI' },
 ]
 
-
 const applyColumns = [
   {
     title: '员工',
@@ -562,7 +561,6 @@ class PurchaseApply extends React.Component {
 
   /** table数据源 */
   getData = allValue => {
-    console.log(allValue);
     api.basic.getPurReqList(allValue).then(res => {
       this.setState({
         loading: false,

@@ -9,9 +9,11 @@ import {
   Col,
   Select,
   Switch,
+  Cascader,
 } from 'antd';
 import React, { Component } from 'react';
-import { TelphoneInput } from '@/components/CustomizedFormControls'
+import { TelphoneInput } from '@/components/CustomizedFormControls';
+// import { PersonalForm } from '@/pages/partner/maintain/components/PersonalForm';
 
 const FormItem = Form.Item;
 const InputGroup = Input.Group;
@@ -35,6 +37,17 @@ const formItemLayoutGroup = {
   wrapperCol: {
     xs: { span: 10 },
     sm: { span: 16 },
+  },
+};
+
+const formItemLayoutEng = {
+  labelCol: {
+    xs: { span: 10 },
+    sm: { span: 3 },
+  },
+  wrapperCol: {
+    xs: { span: 10 },
+    sm: { span: 20 },
   },
 };
 
@@ -82,12 +95,47 @@ class AddressGroup extends Component {
   }
 
   render () {
+    const options = [
+      {
+        value: 'zhejiang',
+        label: '中国',
+        children: [
+          {
+            value: 'hangzhou',
+            label: 'Hangzhou',
+            children: [
+              {
+                value: 'xihu',
+                label: 'West Lake',
+              },
+            ],
+          },
+        ],
+      },
+      {
+        value: 'jiangsu',
+        label: '美国',
+        children: [
+          {
+            value: '密歇根州',
+            label: '德州',
+            children: [
+              {
+                value: '北海',
+                label: '纽约',
+              },
+            ],
+          },
+        ],
+      },
+    ];
     return (
       <InputGroup compact>
-        <Select defaultValue="中国" style={{ width: '20%' }}>
+        {/* <Select defaultValue="中国" style={{ width: '20%' }}>
           <Option value="中国">中国</Option>
           <Option value="美国"> 美国</Option>
-        </Select>
+        </Select> */}
+        <Cascader style={{ width: '20%' }} options={options} placeholder="请选择" />
         <Input style={{ width: '80%' }} defaultValue="Xihu District, Hangzhou" />
       </InputGroup>
     )
@@ -100,7 +148,7 @@ class ChangeModal extends Component {
     this.state = {
       changeModal: false,
       recordMsg: undefined,
-      getFieldDecorator: undefined,
+      form: this.props.form,
       loading: false,
       personalShow: true,
       groupNameShow: true,
@@ -113,26 +161,34 @@ class ChangeModal extends Component {
   /** props更新时调用 */
   componentWillReceiveProps (props) {
     let { changeModal } = props;
-    const { recordMsg, getFieldDecorator } = props;
+    const { recordMsg } = props;
+    const { form } = this.state;
     if (recordMsg === undefined) {
       changeModal = false
     }
     this.setState({
       changeModal,
       recordMsg,
-      getFieldDecorator,
+      form,
       loading: false,
     });
   }
 
   /** 关闭Modal */
   setModal1Visible = () => {
-    this.setState({
-      changeModal: false,
-      recordMsg: undefined,
-      getFieldDecorator: undefined,
-      loading: false,
-    })
+    // e.preventDefault();
+    console.log(this.props)
+    this.perForm.props.form.validateFields((err, values) => {
+      if (!err) {
+        console.log(values);
+      }
+    });
+    // this.setState({
+    //   changeModal: false,
+    //   recordMsg: undefined,
+    //   getFieldDecorator: undefined,
+    //   loading: false,
+    // })
   }
 
   /** 上传图片 */
@@ -166,19 +222,21 @@ class ChangeModal extends Component {
 
   personalShow = () => (
     <>
-      <Icon type="user" /> <span>Leo wang</span> <a href="#" onClick = {event => this.updetaPersonal(event)}>修改</a>
+      <Form.Item label="名称">
+        <Icon type="user" /> <span>Leo wang</span> <a href="#" onClick = {event => this.updetaPersonal(event)}>修改</a>
+      </Form.Item>
     </>
   )
 
-  persnalInput = () => (
-    <InputGroup compact>
-      <Select defaultValue="Zhejiang" style={{ width: '20%' }}>
-        <Option value="Zhejiang"><Icon type="user" /> Zhejiang</Option>
-        <Option value="Jiangsu"><Icon type="user" /> Jiangsu</Option>
-      </Select>
-      <Input style={{ width: '80%' }} defaultValue="Xihu District, Hangzhou" />
-    </InputGroup>
-  )
+  persnalInput = () => {
+    const { form } = this.state;
+    const { getFieldDecorator } = form;
+    return (
+      <Form.Item label="名称">
+        {getFieldDecorator('name')(<NameGroup/>)}
+      </Form.Item>
+    )
+  }
 
   renderGroupNameForm = () => {
     const { groupNameShow } = this.state;
@@ -194,7 +252,8 @@ class ChangeModal extends Component {
   )
 
   groupNameInput = () => {
-    const { getFieldDecorator } = this.state;
+    const { form } = this.state;
+    const { getFieldDecorator } = form;
     return (
     <Col lg={24} md={12} sm={12}>
       <FormItem label="名称" labelCol={{ span: 4 }} wrapperCol={{ span: 20 }}>
@@ -225,7 +284,8 @@ class ChangeModal extends Component {
   )
 
   groupAdressInput = () => {
-    const { getFieldDecorator } = this.state;
+    const { form } = this.state;
+    const { getFieldDecorator } = form;
     return (
     <Col lg={24} md={12} sm={12}>
       <FormItem label="联系地址" labelCol={{ span: 4 }} wrapperCol={{ span: 20 }}>
@@ -262,7 +322,8 @@ class ChangeModal extends Component {
   )
 
   groupInstruInput = () => {
-    const { getFieldDecorator } = this.state;
+    const { form } = this.state;
+    const { getFieldDecorator } = form;
     return (
     <Col lg={12} md={12} sm={12}>
       <FormItem label="特殊行业类别">
@@ -294,7 +355,8 @@ class ChangeModal extends Component {
   }
 
   groupUsaInput = () => {
-    const { getFieldDecorator } = this.state;
+    const { form } = this.state;
+    const { getFieldDecorator } = form;
     return (
       <FormItem label="名称">
         {getFieldDecorator('name')(<AddressGroup/>)}
@@ -302,13 +364,16 @@ class ChangeModal extends Component {
     )
   }
 
-  render () {
-    const { changeModal, recordMsg, getFieldDecorator } = this.state;
+  saveFormRef = formRef => {
+    this.formRef = formRef;
+  };
 
+  render () {
+    const { changeModal, recordMsg, form } = this.state;
+    const { getFieldDecorator } = form;
     const { TextArea } = Input;
     let modelContent;
     const { imageUrl } = this.state;
-
     const uploadButton = (
       <div>
         <Icon type={this.state.loading ? 'loading' : 'plus'} />
@@ -334,11 +399,9 @@ class ChangeModal extends Component {
     if (recordMsg && recordMsg.id === 1) {
       modelContent = <>
         <Form {...formItemLayout}>
-          <Form.Item label="名称">
-           {this.renderPerform()}
-          </Form.Item>
+          {this.renderPerform()}
           <Form.Item label="认证说明">
-            {getFieldDecorator('idenText')(<TextArea rows={2} />)}
+            {getFieldDecorator('idenText')(<TextArea rows={2}/>)}
           </Form.Item>
           <Form.Item label="认证图片">
             {getFieldDecorator('idenImg')(uploadModal)}
@@ -354,7 +417,7 @@ class ChangeModal extends Component {
           <Row gutter={32}>
             <>
               { this.renderGroupNameForm() }
-              { this.renderAdressForm()}
+              { this.renderAdressForm() }
             </>
             <Col lg={12} md={12} sm={12}>
               <FormItem label="增值税专用发票资质">
@@ -413,6 +476,24 @@ class ChangeModal extends Component {
         <Form {...formItemLayout}>
            { this.renderUsaForm() }
           <FormItem label="免税认证号">
+            {getFieldDecorator('regisAddress')(<Input placeholder="请输入"/>)}
+          </FormItem>
+          <Form.Item label="认证说明">
+            {getFieldDecorator('idenText')(<TextArea rows={2} />)}
+          </Form.Item>
+          <Form.Item label="认证图片">
+            {getFieldDecorator('idenImg')(uploadModal)}
+          </Form.Item>
+        </Form>
+      </>
+    }
+
+    // 英国变更
+    if (recordMsg && recordMsg.id === 4) {
+      modelContent = <>
+        <Form {...formItemLayoutEng} labelAlign="left">
+           { this.renderUsaForm() }
+          <FormItem label="增值税登记号">
             {getFieldDecorator('regisAddress')(<Input placeholder="请输入"/>)}
           </FormItem>
           <Form.Item label="认证说明">
