@@ -1,6 +1,5 @@
 import {
   Button,
-  Icon,
   Card,
   Col,
   Divider,
@@ -8,16 +7,19 @@ import {
   Input,
   Row,
   Select,
+  Checkbox,
   message,
   Popconfirm,
+  Icon,
 } from 'antd';
-import React, { Component } from 'react';
+import React from 'react';
 import { connect } from 'dva';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import StandardTable from '@/components/StandardTable';
 
 import api from '@/api';
 import { formatter } from '@/utils/utils';
+import ChooseProduct from '@/components/common/basic/ChooseProduct';
 
 const EditableContext = React.createContext();
 const FormItem = Form.Item;
@@ -27,14 +29,16 @@ const { Option } = Select;
  * 页面顶部筛选表单
  */
 @connect(({ seq }) => ({
-  carrierSeries: seq.carrierSeries,
+  sampleType: seq.sampleType,
+  seqType: seq.seqType,
 }))
 @Form.create()
-class Search extends Component {
+class Search extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       expandForm: false,
+      showChooseProduct: true,
     }
   }
 
@@ -62,31 +66,33 @@ class Search extends Component {
   renderAdvancedForm() {
     const {
       form: { getFieldDecorator },
+      sampleType,
+      seqType,
     } = this.props;
 
     return (
       <Form onSubmit={this.submit} layout="inline">
         <Row gutter={{ xxl: 100, lg: 80 }}>
           <Col xxl={6} lg={8}>
-            <FormItem label="编号">
-              {getFieldDecorator('code')(<Input />)}
-            </FormItem>
-          </Col>
-          <Col xxl={6} lg={8}>
-            <FormItem label="名称">
-              {getFieldDecorator('name')(<Input />)}
-            </FormItem>
-          </Col>
-          <Col xxl={6} lg={8}>
-            <FormItem label="别名">
-              {getFieldDecorator('alias')(<Input />)}
-            </FormItem>
-          </Col>
-          <Col xxl={6} lg={8}>
-            <FormItem label="系列">
-              {getFieldDecorator('seriesId')(
+            <FormItem label="状态">
+              {getFieldDecorator('status', { initialValue: '1' })(
                 <Select>
-                  {this.props.carrierSeries.map(e =>
+                  <Option value="1">正常</Option>
+                  <Option value="2">已删除</Option>
+                </Select>,
+              )}
+            </FormItem>
+          </Col>
+          <Col xxl={6} lg={8}>
+            <FormItem label="SAP编号">
+              {getFieldDecorator('code')(<Input.Search onSearch={value => console.log(value)} />)}
+            </FormItem>
+          </Col>
+          <Col xxl={6} lg={8}>
+            <FormItem label="样品类型">
+              {getFieldDecorator('sampleTypeId')(
+                <Select>
+                  {sampleType.map(e =>
                     <Option value={e.id} key={e.id}>{e.name}</Option>,
                   )}
                 </Select>,
@@ -94,12 +100,12 @@ class Search extends Component {
             </FormItem>
           </Col>
           <Col xxl={6} lg={8}>
-            <FormItem label="状态">
-              {getFieldDecorator('status', { initialValue: '1' })(
+            <FormItem label="测序类型">
+              {getFieldDecorator('seqTypeId')(
                 <Select>
-                  <Option value="">全部</Option>
-                  <Option value="1">正常</Option>
-                  <Option value="2">已删除</Option>
+                  {seqType.map(e =>
+                    <Option value={e.id} key={e.id}>{e.name}</Option>,
+                  )}
                 </Select>,
               )}
             </FormItem>
@@ -129,18 +135,28 @@ class Search extends Component {
       <Form onSubmit={this.submit} layout="inline">
         <Row gutter={{ xxl: 100, lg: 80 }}>
           <Col xxl={6} lg={8}>
-            <FormItem label="编号">
-              {getFieldDecorator('code')(<Input />)}
+            <FormItem label="状态">
+              {getFieldDecorator('status', { initialValue: '1' })(
+                <Select>
+                  <Option value="1">正常</Option>
+                  <Option value="2">已删除</Option>
+                </Select>,
+              )}
             </FormItem>
           </Col>
           <Col xxl={6} lg={8}>
-            <FormItem label="名称">
-              {getFieldDecorator('name')(<Input />)}
+            <FormItem label="SAP编号">
+              {getFieldDecorator('code')(<Input.Search onSearch={value => console.log(value)} />)}
             </FormItem>
           </Col>
           <Col xxl={6} lg={0}>
-            <FormItem label="别名">
-              {getFieldDecorator('alias')(<Input />)}
+            <FormItem label="样品类型">
+              {getFieldDecorator('sampleTypeId', { initialValue: '' })(
+                <Select>
+                  <Option value="1">PCR产物(已纯化)</Option>
+                  <Option value="2">PCR产物(未纯化)</Option>
+                </Select>,
+              )}
             </FormItem>
           </Col>
           <Col xxl={6} lg={8}>
@@ -169,11 +185,13 @@ class Search extends Component {
 
   render() {
     return (
-      <div className="tableListForm">{this.renderForm()}</div>
+      <div className="tableListForm">
+        {this.renderForm()}
+        <ChooseProduct />
+      </div>
     );
   }
 }
-
 
 /**
  * 表格编辑组件
@@ -188,7 +206,7 @@ class EditableCell extends React.Component {
       record,
       index,
       children,
-      rules,
+      editOptions,
       ...restProps
     } = this.props;
     return (
@@ -196,8 +214,8 @@ class EditableCell extends React.Component {
         {editing ? (
           <Form.Item>
             {getFieldDecorator(dataIndex, {
-              rules,
               initialValue: record[dataIndex],
+              ...editOptions,
             })(inputType)}
           </Form.Item>
         ) : (
@@ -212,16 +230,16 @@ class EditableCell extends React.Component {
   }
 }
 
-
 /**
  * 页面根组件
  */
 @connect(({ global, seq }) => ({
   commonStatus: global.commonStatus,
-  carrierSeries: seq.carrierSeries,
+  sampleType: seq.sampleType,
+  seqType: seq.seqType,
 }))
 @Form.create()
-class Carrier extends Component {
+class Product extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -241,7 +259,11 @@ class Carrier extends Component {
   componentDidMount() {
     const { dispatch } = this.props;
     dispatch({
-      type: 'seq/getCarrierSeries',
+      type: 'seq/getSampleType',
+    });
+
+    dispatch({
+      type: 'seq/getSeqType',
     });
   }
 
@@ -268,7 +290,7 @@ class Carrier extends Component {
       loading: true,
     });
 
-    api.carrier.getCarrier(query, true).then(res => {
+    api.sampletype.getSeqProduct(query, true).then(res => {
       this.setState({
         list: res.rows,
         total: res.total,
@@ -285,41 +307,22 @@ class Carrier extends Component {
 
   // 作废数据
   deleteRow = row => {
-    api.carrier.cancelCarrier(row.id).then(() => {
+    api.sampletype.cancelSeqProduct(row.id).then(() => {
       this.getTableData();
     });
   };
 
   // 保存
   saveRow = index => {
-    const { carrierSeries } = this.props
     this.props.form.validateFields((error, row) => {
       if (error) return;
-      const series = carrierSeries.filter(e => e.id === row.seriesId)[0];
-
       const { list } = this.state;
-      const newData = {
-        ...list[index],
-        ...row,
-        ...{ seriesName: series.name, seriesCode: series.code },
-      };
-
+      const newData = { ...list[index], ...row };
       if (newData.id > 0) {
-        api.carrier.updateCarrier(newData).then(() => this.getTableData());
+        // 没有修改
       } else {
-        api.carrier.addCarrier(newData).then(() => this.getTableData());
+        api.sampletype.addSeqProduct(newData).then(() => this.getTableData());
       }
-    });
-  }
-
-  // 开启编辑
-  editRow = index => {
-    if (this.state.editIndex !== -1) {
-      message.warning('请先保存或退出正在编辑的数据');
-      return;
-    }
-    this.setState({
-      editIndex: index,
     });
   }
 
@@ -365,7 +368,11 @@ class Carrier extends Component {
       total,
       loading,
     } = this.state;
-    const { commonStatus, carrierSeries } = this.props;
+    const {
+      commonStatus,
+      sampleType,
+      seqType,
+    } = this.props;
     const data = { list, pagination: { current, pageSize, total } };
     let tableWidth = 0;
 
@@ -377,43 +384,71 @@ class Carrier extends Component {
 
     let columns = [
       {
-        title: '编号',
-        dataIndex: 'code',
+        title: 'SAP产品编号',
+        dataIndex: 'productCode',
+        width: 140,
       },
       {
-        title: '名称',
-        dataIndex: 'name',
-        width: 150,
+        title: 'SAP产品名称',
+        dataIndex: 'productName',
+        width: 180,
         editable: true,
         inputType: <Input />,
-        rules: [
-          { required: true, message: '必填' },
-        ],
+        editOptions: {
+          rules: [
+            { required: true, message: '必填' },
+          ],
+        },
       },
       {
-        title: '别名',
-        dataIndex: 'alias',
-        width: 150,
-        editable: true,
-        inputType: <Input />,
-      },
-      {
-        title: '系列',
-        dataIndex: 'seriesId',
-        width: 150,
+        title: '样品类型',
+        dataIndex: 'sampleTypeName',
+        width: 180,
         editable: true,
         inputType: (
-          <Select style={{ width: 100 }}>
-            {carrierSeries.map(e =>
+          <Select style={{ width: '100%' }}>
+            {sampleType.map(e =>
               <Option value={e.id} key={e.id}>{e.name}</Option>,
             )}
           </Select>
         ),
-        rules: [
-          { required: true, message: '必填' },
-        ],
+        editOptions: {
+          rules: [
+            { required: true, message: '必填' },
+          ],
+        },
+      },
+      {
+        title: '测序类型',
+        dataIndex: 'seqTypeName',
+        width: 180,
+        editable: true,
+        inputType: (
+          <Select style={{ width: '100%' }}>
+            {seqType.map(e =>
+              <Option value={e.id} key={e.id}>{e.name}</Option>,
+            )}
+          </Select>
+        ),
+        editOptions: {
+          rules: [
+            { required: true, message: '必填' },
+          ],
+        },
+      },
+      {
+        title: '统一附加费',
+        dataIndex: 'surcharge',
+        width: 120,
+        editable: true,
+        inputType: (
+          <Checkbox />
+        ),
+        editOptions: {
+          valuePropName: 'checked',
+        },
         render(text) {
-          return formatter(carrierSeries, text);
+          return text === 1 ? '√' : '';
         },
       },
       {
@@ -426,7 +461,6 @@ class Carrier extends Component {
       {
         title: '创建人',
         dataIndex: 'creatorName',
-        width: 100,
       },
       {
         title: '创建时间',
@@ -434,19 +468,8 @@ class Carrier extends Component {
         width: 200,
       },
       {
-        title: '修改人',
-        dataIndex: 'changerName',
-        width: 100,
-      },
-      {
-        title: '修改时间',
-        dataIndex: 'changeDate',
-        width: 200,
-      },
-      {
         title: '作废人',
         dataIndex: 'cancelName',
-        width: 100,
       },
       {
         title: '作废时间',
@@ -467,8 +490,6 @@ class Carrier extends Component {
                 <Popconfirm title="确定作废数据？" onConfirm={() => this.deleteRow(row)}>
                   <a>删除</a>
                 </Popconfirm>
-                <Divider type="vertical" />
-                <a onClick={() => this.editRow(index)}>修改</a>
               </>
             );
           }
@@ -496,7 +517,7 @@ class Carrier extends Component {
         ...col,
         onCell: (record, rowIndex) => ({
           record,
-          rules: col.rules,
+          editOptions: col.editOptions,
           inputType: col.inputType,
           dataIndex: col.dataIndex,
           title: col.title,
@@ -535,4 +556,4 @@ class Carrier extends Component {
   }
 }
 
-export default Carrier;
+export default Product;

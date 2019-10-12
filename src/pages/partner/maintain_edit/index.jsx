@@ -5,51 +5,104 @@ import {
 } from 'antd';
 import React, { Component } from 'react';
 
+import { connect } from 'dva';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import FooterToolbar from '@/components/FooterToolbar';
 
-import BasicInfo from './components/BasicInfo';
+import Basic from './components/Basic';
 import SalesScope from './components/SalesScope';
-import Credit from './components/Credit';
-import Authentication from './components/Authentication';
+import OrgCredit from './components/OrgCredit';
+import OrgCertification from './components/OrgCertification';
+import PersonCredit from './components/PersonCredit';
+import PersonCertification from './components/PersonCertification';
 import Address from './components/Address';
-import Type1 from './components/Type1';
+import PurchasingOrg from './components/PurchasingOrg';
 import Bank from './components/Bank';
 
+@connect(({ partnerMaintainEdit }) => ({
+  details: partnerMaintainEdit.details,
+}))
 class CustomerEdit extends Component {
-  state = {
-    width: '100%',
-    tabActiveKey: 'customer',
-    details: {},
-  };
+  constructor(props) {
+    super(props);
+    this.state = {
+      width: '100%',
+      tabActiveKey: 'customer',
+    };
+  }
 
   componentDidMount() {
     const details = {
-      basicInfo: {
+      // 基础信息
+      basic: {
         name: {
-          select: 1,
+          type: 2,
           name: '',
         },
         email: '123@qq.com',
       },
+      // 销售范围
+      salesRangeList: [],
+      // 信贷数据
+      creditList: [
+        {
+          invoicePartyId: 123,
+          invoicePartyCode: 12345,
+          invoicePartyName: '上海交通大学',
+          currencyCode: 'CNY',
+          credit: '40000',
+          creditPeriod: '30',
+          tempCreditLimit: '60000',
+          tempCreditLimitExpirationDate: '2019-10-30',
+          billingCycle: '50',
+          billingDay: '25',
+          lastEvaluationDate: '2019-10-01',
+        },
+      ],
+      // 组织认证
+      organizationCertification: {
+        specialInvoice: true,
+        taxNo: 123,
+        bankCode: 12345,
+        bankAccount: '60045612378',
+        address: '注册地址',
+        notes: '这是一段认证说明',
+        attachmentList: [
+          { code: 'https://blog.maxmeng.top/images/avatar.jpg', name: '照片', type: 'image' },
+        ],
+      },
+      // 负责人认证
+      piCertification: [
+        {
+          id: 1,
+          invoicePartyId: 123,
+          invoicePartyCode: 12345,
+          invoicePartyName: '上海交通大学',
+          status: 1,
+          notes: '这是一段认证说明',
+          attachmentList: [
+            { code: 'https://blog.maxmeng.top/images/avatar.jpg', name: '照片', type: 'image' },
+          ],
+        },
+      ],
       addressList: [
         {
           id: 1,
           name: 'name',
-          telephone: '18735818888',
-          postcode: '123456',
-          address: '上海市松江区香闵路698号',
-        },
-        {
-          id: 2,
-          name: 'name2',
-          telephone: '18735818888',
-          postcode: '123456',
+          phone: {
+            mobilePhoneCountryCode: '+86',
+            mobilePhone: '18735812924',
+          },
+          postCode: '123456',
           address: '上海市松江区香闵路698号',
         },
       ],
     };
-    this.setState({ details });
+    this.props.dispatch({
+      type: 'partnerMaintainEdit/setDetails',
+      payload: details,
+    });
+
     window.addEventListener('resize', this.resizeFooterToolbar, { passive: true });
     this.resizeFooterToolbar();
   }
@@ -92,28 +145,55 @@ class CustomerEdit extends Component {
     });
   }
 
+  onDetailsChange = (key, value) => {
+    const details = {
+      ...this.props.details,
+      [key]: value,
+    };
+    this.props.dispatch({
+      type: 'partnerMaintainEdit/setDetails',
+      payload: details,
+    });
+  }
+
   // 客户
   renderCustomer = details => {
     const {
       form: { getFieldDecorator },
     } = this.props;
-    const { basicInfo, addressList } = details;
+    const { basic, addressList } = details;
 
     return (
       <>
         <Card title="基础信息" bordered={false} style={{ marginBottom: '24px' }}>
-          {getFieldDecorator('basicInfo', {
-            initialValue: basicInfo,
-          // eslint-disable-next-line no-return-assign
-          })(<BasicInfo wrappedComponentRef={form => this.form = form} />)}
+          {getFieldDecorator('basic', {
+            initialValue: basic,
+          })(<Basic
+            // eslint-disable-next-line no-return-assign
+            wrappedComponentRef={form => this.form = form}
+            onChange={data => this.onDetailsChange('basic', data)}
+          />)}
         </Card>
         <SalesScope></SalesScope>
-        <Credit></Credit>
-        <Authentication></Authentication>
+        {
+          basic.name.type === 2 ?
+          (
+            <>
+              <OrgCredit></OrgCredit>
+              <OrgCertification></OrgCertification>
+            </>
+          ) : (
+            <>
+              <PersonCredit></PersonCredit>
+              <PersonCertification></PersonCertification>
+            </>
+          )
+        }
+
         <Card title="收货地址" bordered={false}>
           {getFieldDecorator('addressList', {
             initialValue: { data: addressList },
-          })(<Address />)}
+          })(<Address onChange={data => this.onDetailsChange('addressList', data.data)} />)}
         </Card>
       </>
     );
@@ -124,23 +204,27 @@ class CustomerEdit extends Component {
     const {
       form: { getFieldDecorator },
     } = this.props;
-    const { basicInfo } = details;
+    const { basic } = details;
     return (
       <>
         <Card title="基础信息" bordered={false} style={{ marginBottom: '24px' }}>
-          {getFieldDecorator('basicInfo', {
-            initialValue: basicInfo,
-          // eslint-disable-next-line no-return-assign
-          })(<BasicInfo wrappedComponentRef={form => this.form = form} />)}
+          {getFieldDecorator('basic', {
+            initialValue: basic,
+          })(<Basic
+            // eslint-disable-next-line no-return-assign
+            wrappedComponentRef={form => this.form = form}
+            onChange={data => this.onDetailsChange('basic', data)}
+          />)}
         </Card>
-        <Type1></Type1>
+        <PurchasingOrg></PurchasingOrg>
         <Bank></Bank>
       </>
     );
   }
 
   renderContent = () => {
-    const { tabActiveKey, details } = this.state;
+    const { tabActiveKey } = this.state;
+    const { details } = this.props;
 
     switch (tabActiveKey) {
       case 'customer':
@@ -158,6 +242,9 @@ class CustomerEdit extends Component {
 
   render() {
     const { width, tabActiveKey } = this.state;
+    if (!this.props.details) {
+      return null;
+    }
 
     return (
       <PageHeaderWrapper

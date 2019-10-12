@@ -158,7 +158,7 @@ export class NameInput extends React.Component {
     super(props);
     const value = props.value || {};
     this.state = {
-      select: value.select || 1,
+      type: value.type || 1,
       name: value.name || '',
     };
   }
@@ -174,10 +174,10 @@ export class NameInput extends React.Component {
   };
 
   render() {
-    const { select, name } = this.state;
+    const { type, name } = this.state;
     return (
       <InputGroup compact>
-        <Select value={select} style={{ width: '40%' }} onChange={val => this.valueChange({ select: val })}>
+        <Select value={type} style={{ width: '40%' }} onChange={val => this.valueChange({ type: val })}>
           <Option value={1}><Icon type="user" /> 个人</Option>
           <Option value={2}><Icon type="home" /> 组织</Option>
         </Select>
@@ -188,7 +188,7 @@ export class NameInput extends React.Component {
 }
 
 // 移动电话
-export class MobileTelephoneInput extends React.Component {
+export class MobilePhoneInput extends React.Component {
   static getDerivedStateFromProps(nextProps) {
     if ('value' in nextProps) {
       return {
@@ -202,8 +202,8 @@ export class MobileTelephoneInput extends React.Component {
     super(props);
     const value = props.value || {};
     this.state = {
-      area: value.area || '+86',
-      code: value.code || '',
+      mobilePhoneCountryCode: value.mobilePhoneCountryCode || '+86',
+      mobilePhone: value.mobilePhone || '',
       disabled: value.disabled,
     };
   }
@@ -219,20 +219,20 @@ export class MobileTelephoneInput extends React.Component {
   };
 
   render() {
-    const { area, code, disabled } = this.state;
+    const { mobilePhoneCountryCode, mobilePhone, disabled } = this.state;
     return (
       <InputGroup compact>
-        <Select disabled={disabled} value={area} style={{ width: '40%' }} onChange={val => this.valueChange({ area: val })}>
+        <Select disabled={disabled} value={mobilePhoneCountryCode} style={{ width: '40%' }} onChange={val => this.valueChange({ mobilePhoneCountryCode: val })}>
           <Option value="+86">+86</Option>
           <Option value="+01">+01</Option>
         </Select>
-        <Input disabled={disabled} value={code} style={{ width: '60%' }} onChange={e => this.valueChange({ code: e.target.value })} />
+        <Input disabled={disabled} value={mobilePhone} style={{ width: '60%' }} onChange={e => this.valueChange({ mobilePhone: e.target.value })} />
       </InputGroup>
     );
   }
 }
 
-// 电话 & 传真
+// 电话
 export class TelphoneInput extends React.Component {
   static getDerivedStateFromProps(nextProps) {
     if ('value' in nextProps) {
@@ -247,10 +247,10 @@ export class TelphoneInput extends React.Component {
     super(props);
     const value = props.value || {};
     this.state = {
-      area: value.area || '+86',
+      telephoneCountryCode: value.telephoneCountryCode || '+86',
       provincial: value.provincial || '',
-      code: value.code || '',
-      extension: value.extension || '',
+      telephone: value.telephone || '',
+      telephoneExtension: value.telephoneExtension || '',
     };
   }
 
@@ -265,16 +265,64 @@ export class TelphoneInput extends React.Component {
   };
 
   render() {
-    const { area, provincial, code, extension } = this.state;
+    const { telephoneCountryCode, provincial, telephone, telephoneExtension } = this.state;
     return (
       <InputGroup compact>
-        <Select value={area} style={{ width: '30%' }} onChange={val => this.valueChange({ area: val })}>
+        <Select value={telephoneCountryCode} style={{ width: '30%' }} onChange={val => this.valueChange({ telephoneCountryCode: val })}>
           <Option value="+86">+86</Option>
           <Option value="+01">+01</Option>
         </Select>
         <Input value={provincial} style={{ width: '20%' }} onChange={e => this.valueChange({ provincial: e.target.value })}/>
-        <Input value={code} style={{ width: '30%' }} onChange={e => this.valueChange({ code: e.target.value })}/>
-        <Input value={extension} style={{ width: '20%' }} onChange={e => this.valueChange({ extension: e.target.value })}/>
+        <Input value={telephone} style={{ width: '30%' }} onChange={e => this.valueChange({ telephone: e.target.value })}/>
+        <Input value={telephoneExtension} style={{ width: '20%' }} onChange={e => this.valueChange({ telephoneExtension: e.target.value })}/>
+      </InputGroup>
+    );
+  }
+}
+
+// 传真
+export class FaxInput extends React.Component {
+  static getDerivedStateFromProps(nextProps) {
+    if ('value' in nextProps) {
+      return {
+        ...(nextProps.value || {}),
+      };
+    }
+    return null;
+  }
+
+  constructor(props) {
+    super(props);
+    const value = props.value || {};
+    this.state = {
+      faxCountryCode: value.faxCountryCode || '+86',
+      provincial: value.provincial || '',
+      fax: value.fax || '',
+      faxExtension: value.faxExtension || '',
+    };
+  }
+
+  valueChange = changedValue => {
+    const { onChange } = this.props;
+    if (onChange) {
+      onChange({
+        ...this.state,
+        ...changedValue,
+      });
+    }
+  };
+
+  render() {
+    const { faxCountryCode, provincial, fax, faxExtension } = this.state;
+    return (
+      <InputGroup compact>
+        <Select value={faxCountryCode} style={{ width: '30%' }} onChange={val => this.valueChange({ faxCountryCode: val })}>
+          <Option value="+86">+86</Option>
+          <Option value="+01">+01</Option>
+        </Select>
+        <Input value={provincial} style={{ width: '20%' }} onChange={e => this.valueChange({ provincial: e.target.value })}/>
+        <Input value={fax} style={{ width: '30%' }} onChange={e => this.valueChange({ fax: e.target.value })}/>
+        <Input value={faxExtension} style={{ width: '20%' }} onChange={e => this.valueChange({ faxExtension: e.target.value })}/>
       </InputGroup>
     );
   }

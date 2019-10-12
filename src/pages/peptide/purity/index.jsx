@@ -15,6 +15,7 @@ import React, { Component } from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import StandardTable from '@/components/StandardTable';
 import api from '@/api';
+import { connect } from 'dva';
 
 const EditableContext = React.createContext();
 const FormItem = Form.Item;
@@ -43,6 +44,7 @@ class Search extends Component {
   renderForm = () => {
     const {
       form: { getFieldDecorator },
+      status,
     } = this.props;
     return (
       <Form onSubmit={this.submit} layout="inline">
@@ -59,12 +61,12 @@ class Search extends Component {
         </Col>
         <Col lg={6} md={8} sm={12}>
           <FormItem label="状态">
-          {getFieldDecorator('status', { initialValue: '1' })(
+          {getFieldDecorator('status', { initialValue: 1 })(
               <Select>
-                <Option value="0">全部</Option>
-                <Option value="1">正常</Option>
-                <Option value="2">已删除</Option>
-              </Select>)}
+                    {status.map(item =>
+                      <Option key={item.id} value={item.id}>{item.name}</Option>,
+                    )}
+                  </Select>)}
           </FormItem>
         </Col>
         <Col lg={6} md={8} sm={12}>
@@ -90,7 +92,7 @@ class Search extends Component {
 }
 
 /**
- * 表格编辑组件 
+ * 表格编辑组件
  */
 class EditableCell extends React.Component {
   renderCell = ({ getFieldDecorator }) => {
@@ -108,7 +110,7 @@ class EditableCell extends React.Component {
     if (editing) {
       return (
         <td {...restProps} style={{ padding: 0 }}>
-            <Form.Item style={{ margin: 0, padding: 0 }}>
+            <Form.Item>
               {getFieldDecorator(dataIndex, {
                 rules,
                 initialValue: record[dataIndex],
@@ -126,6 +128,9 @@ class EditableCell extends React.Component {
   }
 }
 
+@connect(({ peptide }) => ({
+  peptide,
+}))
 class Order extends Component {
   state = {
     formValues: {
@@ -139,87 +144,6 @@ class Order extends Component {
     editIndex: -1,
     id: 0, // 新增数据时，提供负数id
   }
-
-  columns = [
-    {
-      title: '编号',
-      dataIndex: 'code',
-      width: 100,
-    },
-    {
-      title: '纯度',
-      dataIndex: 'purity',
-      width: 100,
-      editable: true,
-      inputType: <Input />,
-      rules: [
-        { required: true, message: '必填' },
-      ],
-    },
-    {
-      title: '状态',
-      dataIndex: 'status',
-      width: 100,
-      render: text => {
-        if (text === 1) return '正常';
-        if (text === 2) return '已删除';
-        return ''
-      },
-    },
-    {
-      title: '创建人',
-      dataIndex: 'creatorName',
-      width: 100,
-    },
-    {
-      title: '创建日期',
-      dataIndex: 'createDate',
-      width: 200,
-    },
-    {
-      title: '删除人',
-      dataIndex: 'cancelName',
-      width: 100,
-    },
-    {
-      title: '删除时间',
-      dataIndex: 'cancelDate',
-      width: 200,
-    },
-    {
-      title: '操作',
-      width: 200,
-      render: (value, row, index) => {
-        const { editIndex } = this.state;
-        let actions;
-        if (editIndex !== index) {
-          if (row.status === 1) {
-            actions = (
-              <Popconfirm title="确定删除数据？" onConfirm={() => this.deleteRow(row)}>
-                <a>删除</a>
-              </Popconfirm>
-            );
-          } else {
-            actions = (
-              <Popconfirm title="确定恢复数据？" onConfirm={() => this.resumeRow(row)}>
-                <a>恢复</a>
-              </Popconfirm>
-            );
-          }
-        }
-        if (editIndex === index) {
-          actions = (
-            <>
-              <a onClick={() => this.saveRow(index)}>保存</a>
-              <Divider type="vertical" />
-              <a onClick={() => this.cancelEdit(row, -1)}>退出</a>
-            </>
-          );
-        }
-        return actions;
-      },
-    },
-  ];
 
   componentDidMount() {
     //
@@ -336,6 +260,89 @@ class Order extends Component {
       loading,
     } = this.state;
     const data = { list, pagination: { current, pageSize, total } };
+    const { peptide: { commonData } } = this.props
+    let tableWidth = 0;
+
+    let columns = [
+      {
+        title: '编号',
+        dataIndex: 'code',
+        width: 100,
+      },
+      {
+        title: '纯度',
+        dataIndex: 'purity',
+        width: 100,
+        editable: true,
+        inputType: <Input />,
+        rules: [
+          { required: true, message: '必填' },
+        ],
+      },
+      {
+        title: '状态',
+        dataIndex: 'status',
+        width: 100,
+        render: text => {
+          if (text === 1) return '正常';
+          if (text === 2) return '已删除';
+          return ''
+        },
+      },
+      {
+        title: '创建人',
+        dataIndex: 'creatorName',
+        width: 100,
+      },
+      {
+        title: '创建日期',
+        dataIndex: 'createDate',
+        width: 200,
+      },
+      {
+        title: '删除人',
+        dataIndex: 'cancelName',
+        width: 100,
+      },
+      {
+        title: '删除时间',
+        dataIndex: 'cancelDate',
+        width: 200,
+      },
+      {
+        title: '操作',
+        width: 200,
+        render: (value, row, index) => {
+          const { editIndex } = this.state;
+          let actions;
+          if (editIndex !== index) {
+            if (row.status === 1) {
+              actions = (
+                <Popconfirm title="确定删除数据？" onConfirm={() => this.deleteRow(row)}>
+                  <a>删除</a>
+                </Popconfirm>
+              );
+            } else {
+              actions = (
+                <Popconfirm title="确定恢复数据？" onConfirm={() => this.resumeRow(row)}>
+                  <a>恢复</a>
+                </Popconfirm>
+              );
+            }
+          }
+          if (editIndex === index) {
+            actions = (
+              <>
+                <a onClick={() => this.saveRow(index)}>保存</a>
+                <Divider type="vertical" />
+                <a onClick={() => this.cancelEdit(row, -1)}>退出</a>
+              </>
+            );
+          }
+          return actions;
+        },
+      },
+    ];
 
     const components = {
       body: {
@@ -343,7 +350,10 @@ class Order extends Component {
       },
     };
 
-    const columns = this.columns.map(col => {
+    columns = columns.map(col => {
+      // eslint-disable-next-line no-param-reassign
+      if (!col.width) col.width = 100;
+      tableWidth += col.width;
       if (!col.editable) {
         return col;
       }
@@ -364,7 +374,7 @@ class Order extends Component {
       <PageHeaderWrapper>
         <Card bordered={false}>
           <div className="tableList">
-            <Search getTableData={this.getTableData} />
+            <Search getTableData={this.getTableData} status={commonData.status}/>
             <div className="tableListOperator">
               <Button icon="plus" type="primary" onClick={() => this.handleAdd()}>
                 新建
@@ -372,7 +382,7 @@ class Order extends Component {
             </div>
             <EditableContext.Provider value={this.props.form}>
               <StandardTable
-                scroll={{ x: 1300 }}
+                scroll={{ x: tableWidth }}
                 rowClassName="editable-row"
                 components={components}
                 selectedRows={selectedRows}
