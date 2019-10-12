@@ -40,85 +40,112 @@ const preTypeAll = [
     {
       value: 1,
       text: '变更验证邮箱',
+      status: 'warning',
     },
     {
       value: 2,
       text: '变更验证手机',
+      status: 'warning',
     },
     {
       value: 3,
       text: '认证',
+      status: 'warning',
     },
     {
       value: 4,
       text: '绑定售达方',
+      status: 'warning',
     },
     {
       value: 5,
       text: '验证手机',
+      status: 'warning',
     },
     {
       value: 6,
       text: '验证邮箱',
+      status: 'warning',
     },
   ]
 class Verification extends React.Component {
   /** table属性数据 */
   columns = [
     {
-      title: '编号',
+      title: '编号/操作编号',
       dataIndex: 'code',
+      // width: 150,
+      render (value) {
+        return <><div>{value.code}</div><div>{value.actCode}</div></>
+      },
     },
-    {
-      title: '操作编号',
-      dataIndex: 'actCode',
-    },
+    // {
+    //   title: '操作编号',
+    //   dataIndex: 'actCode',
+    // },
     {
       title: '业务伙伴',
       dataIndex: 'partnerName',
+      // width: 150,
+      render(value) {
+        return <>
+          <div><Icon type="user" /> <span>{value.name}</span></div>
+          <div>{value.code}</div>
+        </>
+      },
     },
     {
       title: '类型',
       dataIndex: 'preType',
+      filters: preTypeAll,
+      // width: 150,
       render(value) {
-        return <span> {preTypeAll[value].text}</span>
+        return <Badge status= {preTypeAll[value].status} text={preTypeAll[value].text} />
       },
     },
     {
       title: '状态',
       dataIndex: 'preState',
       filters: preStateAll,
+      // width: 150,
       render(value) {
         return <Badge status={preStateAll[value].status} text={preStateAll[value].text} />
       },
     },
-    {
-      title: '完成时间',
-      dataIndex: 'finishTime',
-    },
+    // {
+    //   title: '完成时间',
+    //   dataIndex: 'finishTime',
+    // },
     {
       title: '过期时间',
       dataIndex: 'overTime',
+      // width: 140,
     },
     {
-      title: '审核人',
+      title: '操作人',
       dataIndex: 'reviewName',
+      render(value) {
+        return <><div>{value.name}</div> <div>{value.time}</div></>
+      },
     },
     {
       fiexd: 'right',
       title: '操作',
       width: 150,
       render: (text, record) => {
-        const { preState } = record;
-        const check = <a href="#" onClick={ e => { this.verifyPartner(record, e) }}>审核</a>;
+        // const { preState } = record;
+        // const check = <a href="#" onClick={ e => { this.verifyPartner(record, e) }}>审核</a>;
         const view = <a href="#" onClick={ e => { this.checkPartner(record, e) }} >查看</a>;
-        const allAction = <Fragment><a href="#" onClick={ e => { this.checkPartner(record, e) }}>查看</a>&nbsp;&nbsp;&nbsp;&nbsp;<a herf="#" onClick={ e => { this.verifyPartner(record, e) }}>审核</a></Fragment>;
-        if (preState === 2) {
-          return allAction;
-        } if (preState === 1) {
-          return view;
-        }
-          return check;
+        // const allAction = <Fragment><a href="#"
+        // onClick={ e => { this.checkPartner(record, e) }}>查看</a><a herf="#"
+        // onClick={ e => { this.verifyPartner(record, e) }}>审核</a></Fragment>;
+        // if (preState === 2) {
+        //   return allAction;
+        // } if (preState === 1) {
+        //   return view;
+        // }
+        //   return check;
+        return view;
       },
     },
   ]
@@ -191,6 +218,7 @@ class Verification extends React.Component {
     inputPartner: undefined,
     showModal: false,
     recordMsg: undefined,
+    clickType: '',
   };
 
   /** 第一次渲染之后调用 */
@@ -206,14 +234,22 @@ class Verification extends React.Component {
     for (let i = 0; i < 6; i++) {
       data.push({
         id: i + 1,
-        code: 100000 + (i + 1),
-        actCode: 200000,
-        partnerName: `name${i}`,
+        code: {
+          code: 100000 + (i + 1),
+          actCode: 200000,
+        },
+        partnerName: {
+          name: `name${i}`,
+          code: '123456789',
+        },
         preType: i,
         preState: 2,
-        finishTime: '2019-09-05',
+        finishTime: '2019-09-05 16:30:28',
         overTime: '2019-09-06',
-        reviewName: `张${i}`,
+        reviewName: {
+          name: `张${i}`,
+          time: '2016-6-17 16:30:28',
+        },
       });
     }
     this.setState({
@@ -228,7 +264,12 @@ class Verification extends React.Component {
 
   /** 审核Table */
   verifyPartner = (record, event) => {
-    event.preventDefault()
+    event.preventDefault();
+    this.setState({
+      showModal: true,
+      recordMsg: record,
+      clickType: '02',
+    });
   }
 
   /** 查看Table */
@@ -237,6 +278,7 @@ class Verification extends React.Component {
     this.setState({
       showModal: true,
       recordMsg: record,
+      clickType: '01',
     });
   }
 
@@ -310,6 +352,10 @@ class Verification extends React.Component {
   /** 状态输入事件 */
   preStateChange = value => {
     console.log(value);
+  }
+
+  saveFormRef = formRef => {
+    this.formRef = formRef;
   }
 
   /** 部分筛选条件 */
@@ -499,12 +545,11 @@ class Verification extends React.Component {
   render() {
     const { data, selectedRows } = this.state;
     const loading = false;
-    const { showModal } = this.state;
-    const { recordMsg } = this.state;
+    const { showModal, clickType, recordMsg } = this.state;
     return (
       <PageHeaderWrapper title="验证记录">
         <Card bordered={false}>
-        <div className="tableList">
+          <div className="tableList">
             <div className="tableListForm">{this.renderForm()}</div>
             <div className="tableListOperator">
               {/* <Button icon="plus" type="primary" onClick={() => this.handleModalVisible()}>
@@ -522,9 +567,12 @@ class Verification extends React.Component {
             />
           </div>
         </Card>
-        <CheckModal showModal={showModal} recordMsg={recordMsg}/>
+        <CheckModal
+          showModal={showModal}
+          recordMsg={recordMsg}
+          clickType={clickType}
+          wrappedComponentRef={this.saveFormRef}/>
       </PageHeaderWrapper>
-
     );
   }
 }

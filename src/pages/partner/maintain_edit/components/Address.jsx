@@ -7,8 +7,9 @@ import {
   Form,
 } from 'antd';
 import React from 'react';
+import { connect } from 'dva';
 
-import { MobileTelephoneInput } from '@/components/CustomizedFormControls'
+import { MobilePhoneInput } from '@/components/CustomizedFormControls'
 
 const EditableContext = React.createContext();
 
@@ -22,7 +23,7 @@ class EditableCell extends React.Component {
       record,
       index,
       children,
-      rules,
+      editOptions,
       ...restProps
     } = this.props;
     return (
@@ -30,8 +31,8 @@ class EditableCell extends React.Component {
         {editing ? (
           <Form.Item>
             {getFieldDecorator(dataIndex, {
-              rules,
               initialValue: record[dataIndex],
+              ...editOptions,
             })(inputType)}
           </Form.Item>
         ) : (
@@ -41,30 +42,20 @@ class EditableCell extends React.Component {
     );
   };
 
-
   render() {
     return <EditableContext.Consumer>{this.renderCell}</EditableContext.Consumer>;
   }
 }
 
+@connect(({ partnerMaintainEdit }) => ({
+  details: partnerMaintainEdit.details,
+}))
 class EditableTable extends React.Component {
-  static getDerivedStateFromProps(props) {
-    if ('value' in props) {
-      return {
-        data: props.value.data || [],
-        editIndex: typeof props.value.editIndex === 'number' ? props.value.editIndex : -1,
-      };
-    }
-    return null;
-  }
-
   constructor(props) {
     super(props);
-    const value = props.value || {};
     this.state = {
-      data: value.data,
-      editIndex: value.editIndex || -1,
-    };
+      editIndex: -1,
+    }
     this.columns = [
       {
         title: '姓名',
@@ -72,35 +63,41 @@ class EditableTable extends React.Component {
         width: '15%',
         editable: true,
         inputType: <Input />,
-        rules: [
-          { required: true },
-        ],
+        editOptions: {
+          rules: [
+            { required: true },
+          ],
+        },
       },
       {
         title: '移动电话',
-        dataIndex: 'telephone',
+        dataIndex: 'phone',
         width: '20%',
         editable: true,
-        inputType: <MobileTelephoneInput />,
-        rules: [
-          { required: true },
-        ],
+        inputType: <MobilePhoneInput />,
+        editOptions: {
+          rules: [
+            { required: true },
+          ],
+        },
         render(text) {
           if (typeof text === 'object') {
-            return text.area + text.code;
+            return text.mobilePhoneCountryCode + text.mobilePhone;
           }
           return text;
         },
       },
       {
         title: '邮编',
-        dataIndex: 'postcode',
+        dataIndex: 'postCode',
         width: '10%',
         editable: true,
         inputType: <InputNumber />,
-        rules: [
-          { required: true },
-        ],
+        editOptions: {
+          rules: [
+            { required: true },
+          ],
+        },
       },
       {
         title: '地址',
@@ -108,9 +105,11 @@ class EditableTable extends React.Component {
         width: '35%',
         editable: true,
         inputType: <Input />,
-        rules: [
-          { required: true },
-        ],
+        editOptions: {
+          rules: [
+            { required: true },
+          ],
+        },
       },
       {
         title: '操作',
@@ -124,7 +123,7 @@ class EditableTable extends React.Component {
               <>
                 <a onClick={() => this.save(index)}>保存</a>
                 <Divider type="vertical" />
-                <a onClick={() => this.cancel(index)}>取消</a>
+                <a onClick={() => this.cancel(record)}>取消</a>
               </>
             );
           }
@@ -141,55 +140,68 @@ class EditableTable extends React.Component {
     ];
   }
 
-  valueChange = changedValue => {
-    const { onChange } = this.props;
-    if (onChange) {
-      onChange({
-        ...this.state,
-        ...changedValue,
-      });
-    }
-  };
-
   addRow = () => {
-    const { data } = this.state;
-    data.push({
-      id: -1,
+    const { details } = this.props;
+    const { addressList } = details;
+
+    const data = [...addressList, { id: -1 }]
+    this.props.dispatch({
+      type: 'partnerMaintainEdit/setDetails',
+      payload: { ...details, addressList: data },
     });
-    this.valueChange({ data, editIndex: data.length - 1 });
+    this.setState({ editIndex: data.length - 1 });
   }
 
   deleteRow = index => {
-    const { data } = this.state;
-    data.splice(index, 1);
-    this.valueChange({ data });
+    const { details } = this.props;
+    const { addressList } = details;
+
+    const data = addressList.filter((e, i) => i !== index);
+    this.props.dispatch({
+      type: 'partnerMaintainEdit/setDetails',
+      payload: { ...details, addressList: data },
+    });
   }
 
-  cancel = () => {
-    this.valueChange({ editIndex: -1 });
+  cancel = row => {
+    if (row.id < 0) {
+      const { details } = this.props;
+      const { addressList } = details;
+
+      const data = addressList.filter(e => e.id !== row.id);
+      this.props.dispatch({
+        type: 'partnerMaintainEdit/setDetails',
+        payload: { ...details, addressList: data },
+      });
+    }
+    this.setState({ editIndex: -1 });
   };
 
   save = index => {
     this.props.form.validateFields((error, row) => {
       if (error) return;
-      const data = [...this.state.data];
-      const item = data[index];
-      data.splice(index, 1, {
-        ...item,
-        ...row,
+      const { details } = this.props;
+      const { addressList } = details;
+
+      const data = addressList.map((e, i) => {
+        if (i === index) return { ...e, ...row };
+        return e;
       });
-      this.valueChange({
-        data,
-        editIndex: -1,
+      this.props.dispatch({
+        type: 'partnerMaintainEdit/setDetails',
+        payload: { ...details, addressList: data },
       });
+      console.log({ ...details, addressList: data });
+      this.setState({ editIndex: -1 });
     });
   }
 
   edit(index) {
-    this.valueChange({ editIndex: index });
+    this.setState({ editIndex: index });
   }
 
   render() {
+    const { addressList } = this.props.details;
     const components = {
       body: {
         cell: EditableCell,
@@ -204,7 +216,7 @@ class EditableTable extends React.Component {
         ...col,
         onCell: (record, rowIndex) => ({
           record,
-          rules: col.rules,
+          editOptions: col.editOptions,
           inputType: col.inputType,
           dataIndex: col.dataIndex,
           title: col.title,
@@ -218,7 +230,7 @@ class EditableTable extends React.Component {
         <Table
           rowKey="id"
           components={components}
-          dataSource={this.state.data}
+          dataSource={addressList}
           columns={columns}
           rowClassName="editable-row"
           pagination={false}

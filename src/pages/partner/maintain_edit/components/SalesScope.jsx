@@ -23,7 +23,7 @@ const FormItem = Form.Item;
 const { Option } = Select;
 const { TabPane } = Tabs;
 
-class BasicInfo extends Component {
+class Basic extends Component {
   state = {
     tabKey: '',
     tabsData: [],
@@ -255,4 +255,4 @@ class BasicInfo extends Component {
   }
 }
 
-export default Form.create()(BasicInfo);
+export default Form.create()(Basic);
