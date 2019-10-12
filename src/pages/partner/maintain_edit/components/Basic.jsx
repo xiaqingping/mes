@@ -5,6 +5,7 @@ import {
   Row,
   Select,
   Switch,
+  Card,
 } from 'antd';
 import React from 'react';
 import { connect } from 'dva';
@@ -18,28 +19,11 @@ const { Option } = Select;
 
 @connect(({ partnerMaintainEdit }) => ({
   details: partnerMaintainEdit.details,
-}))
+}), undefined, undefined, { withRef: true })
 class Basic extends React.Component {
-  // static getDerivedStateFromProps(nextProps) {
-  //   return {
-  //     ...nextProps.value,
-  //   };
-  // }
-
-  constructor(props) {
-    super(props);
-    console.log(props);
-    // this.state = {
-    //   ...props.value,
-    // };
-  }
-
   validate = () => {
-    const {
-      form: { validateFieldsAndScroll },
-    } = this.props;
-    validateFieldsAndScroll((error, values) => {
-      console.log(values);
+    const { form } = this.props;
+    form.validateFieldsAndScroll((error, values) => {
       if (!error) {
         //
       }
@@ -55,105 +39,114 @@ class Basic extends React.Component {
   };
 
   valueChange = (key, value) => {
-    if (!('value' in this.props)) {
-      this.setState({ [key]: value });
-    }
-    this.triggerChange({ [key]: value });
-  }
+    const { details } = this.props;
+    const { basic } = details;
+    const data = { ...basic, ...{ [key]: value } };
 
-  triggerChange = changedValue => {
-    const { onChange } = this.props;
-    if (onChange) {
-      onChange({
-        ...this.state,
-        ...changedValue,
-      });
-    }
-  };
+    this.props.dispatch({
+      type: 'partnerMaintainEdit/setDetails',
+      payload: { ...details, ...{ basic: data } },
+    });
+  }
 
   render() {
     const {
       form: { getFieldDecorator },
-      details,
+      details: { basic },
     } = this.props;
-    const { name, email } = details.basic;
-    const MobileDisabled = name && name.type === 2;
+    const MobileDisabled = basic.name && basic.name.type === 2;
 
     return (
-      <Form layout="vertical" className={styles.sangonForm}>
-        <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
-          <Col md={6} sm={12}>
-            <FormItem label="名称">
-              {getFieldDecorator('name', {
-                initialValue: name,
-                rules: [{ validator: this.checkNameInput }],
-              })(<NameInput onChange={value => this.valueChange('name', value)} />)}
-            </FormItem>
-          </Col>
-          <Col md={6} sm={12}>
-            <FormItem label="移动电话">
-              {getFieldDecorator('mobilePhone', {
-                initialValue: { disabled: MobileDisabled },
-              })(<MobilePhoneInput onChange={value => this.valueChange('mobilePhone', value)} />)}
-            </FormItem>
-          </Col>
-          <Col md={6} sm={12}>
-            <FormItem label="邮箱">
-              {getFieldDecorator('email', {
-                initialValue: { email },
-              })(<EmailInput onChange={value => this.valueChange('email', value)} />)}
-            </FormItem>
-          </Col>
-          <Col md={6} sm={12}>
-            <FormItem label="电话">
-              {getFieldDecorator('telephone')(<TelphoneInput onChange={value => this.valueChange('telephone', value)} />)}
-            </FormItem>
-          </Col>
-          <Col md={6} sm={12}>
-            <FormItem label="传真">
-              {getFieldDecorator('fax')(<FaxInput onChange={value => this.valueChange('fax', value)} />)}
-            </FormItem>
-          </Col>
-          <Col md={3} sm={6}>
-            <FormItem label="邮政编码">
-              {getFieldDecorator('postCode')(<Input onChange={e => this.valueChange('postCode', e.target.value)} />)}
-            </FormItem>
-          </Col>
-          <Col md={3} sm={6}>
-            <FormItem label="时区">
-              {getFieldDecorator('timeZoneCode')(<Input onChange={e => this.valueChange('timeZoneCode', e.target.value)} />)}
-            </FormItem>
-          </Col>
-          <Col md={6} sm={12}>
-            <FormItem label="语言">
-              {getFieldDecorator('languageCode')(
-                <Select onChange={value => this.valueChange('languageCode', value)} >
-                  <Option value="1">中文</Option>
-                </Select>,
-              )}
-            </FormItem>
-          </Col>
-          <Col md={6} sm={12}>
-            <FormItem label="特殊行业类别">
-              {getFieldDecorator('industryCode')(
-                <Select onChange={value => this.valueChange('industryCode', value)} >
-                  <Option value="1">军队</Option>
-                </Select>,
-              )}
-            </FormItem>
-          </Col>
-          <Col md={18} sm={24}>
-            <FormItem label="通讯地址">
-              {getFieldDecorator('address')(<AddressInput onChange={value => this.valueChange('address', value)} />)}
-            </FormItem>
-          </Col>
-          <Col md={6} sm={6}>
-            <FormItem label="销售冻结">
-              {getFieldDecorator('salesBan', { valuePropName: 'checked' })(<Switch onChange={value => this.valueChange('salesBan', value)} />)}
-            </FormItem>
-          </Col>
-        </Row>
-      </Form>
+      <Card title="基础信息" bordered={false} style={{ marginBottom: '24px' }}>
+        <Form layout="vertical" className={styles.sangonForm}>
+          <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
+            <Col md={6} sm={12}>
+              <FormItem label="名称">
+                {getFieldDecorator('name', {
+                  initialValue: basic.name,
+                  rules: [{ validator: this.checkNameInput }],
+                })(<NameInput onChange={value => this.valueChange('name', value)} />)}
+              </FormItem>
+            </Col>
+            <Col md={6} sm={12}>
+              <FormItem label="移动电话">
+                {getFieldDecorator('mobilePhone', {
+                  initialValue: { disabled: MobileDisabled, ...basic.mobilePhone },
+                })(<MobilePhoneInput onChange={value => this.valueChange('mobilePhone', value)} />)}
+              </FormItem>
+            </Col>
+            <Col md={6} sm={12}>
+              <FormItem label="邮箱">
+                {getFieldDecorator('email', {
+                  initialValue: { email: basic.email },
+                })(<EmailInput onChange={value => this.valueChange('email', value)} />)}
+              </FormItem>
+            </Col>
+            <Col md={6} sm={12}>
+              <FormItem label="电话">
+                {getFieldDecorator('telephone', {
+                  initialValue: basic.telephone,
+                })(<TelphoneInput onChange={value => this.valueChange('telephone', value)} />)}
+              </FormItem>
+            </Col>
+            <Col md={6} sm={12}>
+              <FormItem label="传真">
+                {getFieldDecorator('fax', {
+                  initialValue: basic.fax,
+                })(<FaxInput onChange={value => this.valueChange('fax', value)} />)}
+              </FormItem>
+            </Col>
+            <Col md={3} sm={6}>
+              <FormItem label="邮政编码">
+                {getFieldDecorator('postCode', {
+                  initialValue: basic.postCode,
+                })(<Input onChange={e => this.valueChange('postCode', e.target.value)} />)}
+              </FormItem>
+            </Col>
+            <Col md={3} sm={6}>
+              <FormItem label="时区">
+                {getFieldDecorator('timeZoneCode', {
+                  initialValue: basic.timeZoneCode,
+                })(<Input onChange={e => this.valueChange('timeZoneCode', e.target.value)} />)}
+              </FormItem>
+            </Col>
+            <Col md={6} sm={12}>
+              <FormItem label="语言">
+                {getFieldDecorator('languageCode', {
+                  initialValue: basic.languageCode,
+                })(
+                  <Select onChange={value => this.valueChange('languageCode', value)} >
+                    <Option value="1">中文</Option>
+                  </Select>,
+                )}
+              </FormItem>
+            </Col>
+            <Col md={6} sm={12}>
+              <FormItem label="特殊行业类别">
+                {getFieldDecorator('industryCode', {
+                  initialValue: basic.industryCode,
+                })(
+                  <Select onChange={value => this.valueChange('industryCode', value)} >
+                    <Option value="1">军队</Option>
+                  </Select>,
+                )}
+              </FormItem>
+            </Col>
+            <Col md={18} sm={24}>
+              <FormItem label="通讯地址">
+                {getFieldDecorator('address', {
+                  initialValue: basic.address,
+                })(<AddressInput onChange={value => this.valueChange('address', value)} />)}
+              </FormItem>
+            </Col>
+            <Col md={6} sm={6}>
+              <FormItem label="销售冻结">
+                {getFieldDecorator('salesBan', { valuePropName: 'checked' })(<Switch onChange={value => this.valueChange('salesBan', value)} />)}
+              </FormItem>
+            </Col>
+          </Row>
+        </Form>
+      </Card>
     );
   }
 }
