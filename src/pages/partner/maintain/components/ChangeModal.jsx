@@ -8,10 +8,12 @@ import {
   Row,
   Col,
   Select,
-
+  Switch,
+  Cascader,
 } from 'antd';
 import React, { Component } from 'react';
-import { TelphoneInput } from '@/components/CustomizedFormControls'
+import { TelphoneInput } from '@/components/CustomizedFormControls';
+// import { PersonalForm } from '@/pages/partner/maintain/components/PersonalForm';
 
 const FormItem = Form.Item;
 const InputGroup = Input.Group;
@@ -33,8 +35,19 @@ const formItemLayoutGroup = {
     sm: { span: 8 },
   },
   wrapperCol: {
-    xs: { span: 12 },
+    xs: { span: 10 },
     sm: { span: 16 },
+  },
+};
+
+const formItemLayoutEng = {
+  labelCol: {
+    xs: { span: 10 },
+    sm: { span: 3 },
+  },
+  wrapperCol: {
+    xs: { span: 10 },
+    sm: { span: 20 },
   },
 };
 
@@ -56,41 +69,126 @@ function beforeUpload(file) {
   return isJpgOrPng && isLt2M;
 }
 
+class NameGroup extends Component {
+  constructor (props) {
+    super(props);
+    this.state = {};
+  }
+
+  render () {
+    return (
+      <InputGroup compact>
+        <Select defaultValue="Zhejiang" style={{ width: '20%' }}>
+          <Option value="Zhejiang"><Icon type="user" /> Zhejiang</Option>
+          <Option value="Jiangsu"><Icon type="user" /> Jiangsu</Option>
+        </Select>
+        <Input style={{ width: '80%' }} defaultValue="Xihu District, Hangzhou" />
+      </InputGroup>
+    )
+  }
+}
+
+class AddressGroup extends Component {
+  constructor (props) {
+    super(props);
+    this.state = {};
+  }
+
+  render () {
+    const options = [
+      {
+        value: 'zhejiang',
+        label: '中国',
+        children: [
+          {
+            value: 'hangzhou',
+            label: 'Hangzhou',
+            children: [
+              {
+                value: 'xihu',
+                label: 'West Lake',
+              },
+            ],
+          },
+        ],
+      },
+      {
+        value: 'jiangsu',
+        label: '美国',
+        children: [
+          {
+            value: '密歇根州',
+            label: '德州',
+            children: [
+              {
+                value: '北海',
+                label: '纽约',
+              },
+            ],
+          },
+        ],
+      },
+    ];
+    return (
+      <InputGroup compact>
+        {/* <Select defaultValue="中国" style={{ width: '20%' }}>
+          <Option value="中国">中国</Option>
+          <Option value="美国"> 美国</Option>
+        </Select> */}
+        <Cascader style={{ width: '20%' }} options={options} placeholder="请选择" />
+        <Input style={{ width: '80%' }} defaultValue="Xihu District, Hangzhou" />
+      </InputGroup>
+    )
+  }
+}
+
 class ChangeModal extends Component {
   constructor (props) {
     super(props);
     this.state = {
       changeModal: false,
       recordMsg: undefined,
-      getFieldDecorator: undefined,
+      form: this.props.form,
       loading: false,
       personalShow: true,
+      groupNameShow: true,
+      groupAdressShow: true,
+      groupIndustryShow: true,
+      groupUsaShow: true,
     }
   }
 
   /** props更新时调用 */
   componentWillReceiveProps (props) {
     let { changeModal } = props;
-    const { recordMsg, getFieldDecorator } = props;
+    const { recordMsg } = props;
+    const { form } = this.state;
     if (recordMsg === undefined) {
       changeModal = false
     }
     this.setState({
       changeModal,
       recordMsg,
-      getFieldDecorator,
+      form,
       loading: false,
     });
   }
 
   /** 关闭Modal */
   setModal1Visible = () => {
-    this.setState({
-      changeModal: false,
-      recordMsg: undefined,
-      getFieldDecorator: undefined,
-      loading: false,
-    })
+    // e.preventDefault();
+    console.log(this.props)
+    this.perForm.props.form.validateFields((err, values) => {
+      if (!err) {
+        console.log(values);
+      }
+    });
+    // this.setState({
+    //   changeModal: false,
+    //   recordMsg: undefined,
+    //   getFieldDecorator: undefined,
+    //   loading: false,
+    // })
   }
 
   /** 上传图片 */
@@ -123,29 +221,159 @@ class ChangeModal extends Component {
   }
 
   personalShow = () => (
-     <>
-    <Icon type="user" /> <span>Leo wang</span> <a href="#" onClick = {event => this.updetaPersonal(event)}>修改</a>
+    <>
+      <Form.Item label="名称">
+        <Icon type="user" /> <span>Leo wang</span> <a href="#" onClick = {event => this.updetaPersonal(event)}>修改</a>
+      </Form.Item>
     </>
   )
 
-  persnalInput = () => (
-    <InputGroup compact>
-      <Select defaultValue="Zhejiang" style={{ width: '20%' }}>
-        <Option value="Zhejiang"><Icon type="user" /> Zhejiang</Option>
-        <Option value="Jiangsu"><Icon type="user" /> Jiangsu</Option>
-      </Select>
-      <Input style={{ width: '80%' }} defaultValue="Xihu District, Hangzhou" />
-    </InputGroup>
+  persnalInput = () => {
+    const { form } = this.state;
+    const { getFieldDecorator } = form;
+    return (
+      <Form.Item label="名称">
+        {getFieldDecorator('name')(<NameGroup/>)}
+      </Form.Item>
     )
+  }
+
+  renderGroupNameForm = () => {
+    const { groupNameShow } = this.state;
+    return groupNameShow ? this.groupNameShow() : this.groupNameInput();
+  }
+
+  groupNameShow = () => (
+    <Col lg={24} md={12} sm={12}>
+      <FormItem label="名称" labelCol={{ span: 4 }} wrapperCol={{ span: 20 }}>
+        <Icon type="home" /> <span>上海交通大学附属高中上海交通大学附属高中</span> <a href="#" onClick = {event => this.updetaNameGroup(event)}>修改</a>
+      </FormItem>
+    </Col>
+  )
+
+  groupNameInput = () => {
+    const { form } = this.state;
+    const { getFieldDecorator } = form;
+    return (
+    <Col lg={24} md={12} sm={12}>
+      <FormItem label="名称" labelCol={{ span: 4 }} wrapperCol={{ span: 20 }}>
+        {getFieldDecorator('name')(<NameGroup/>)}
+      </FormItem>
+    </Col>
+    )
+  }
+
+  updetaNameGroup = e => {
+    e.preventDefault();
+    this.setState({
+      groupNameShow: false,
+    })
+  }
+
+  renderAdressForm = () => {
+    const { groupAdressShow } = this.state;
+    return groupAdressShow ? this.groupAdressShow() : this.groupAdressInput();
+  }
+
+  groupAdressShow = () => (
+    <Col lg={24} md={12} sm={12}>
+      <FormItem label="联系地址" labelCol={{ span: 4 }} wrapperCol={{ span: 20 }}>
+        <span>中国 新疆省 乌鲁木齐市 乌鲁木齐镇 呼伦贝尔村 内蒙古街道 莲花路123号</span> <a href="#" onClick = {event => this.updateAdressGroup(event)}>修改</a>
+      </FormItem>
+    </Col>
+  )
+
+  groupAdressInput = () => {
+    const { form } = this.state;
+    const { getFieldDecorator } = form;
+    return (
+    <Col lg={24} md={12} sm={12}>
+      <FormItem label="联系地址" labelCol={{ span: 4 }} wrapperCol={{ span: 20 }}>
+        {getFieldDecorator('address')(<AddressGroup/>)}
+      </FormItem>
+    </Col>
+    )
+  }
+
+  updateAdressGroup = e => {
+    e.preventDefault();
+    this.setState({
+      groupAdressShow: false,
+    })
+  }
+
+  renderIndustryForm = () => {
+    const { groupIndustryShow } = this.state;
+    return groupIndustryShow ? this.groupInstruShow() : this.groupInstruInput();
+  }
+
+  updateIndustryGroup = () => {
+    this.setState({
+      groupIndustryShow: false,
+    })
+  }
+
+  groupInstruShow = () => (
+    <Col lg={12} md={12} sm={12}>
+      <FormItem label="特殊行业类别">
+        <span>军属类</span> <a href="#" onClick = {event => this.updateIndustryGroup(event)}>修改</a>
+      </FormItem>
+    </Col>
+  )
+
+  groupInstruInput = () => {
+    const { form } = this.state;
+    const { getFieldDecorator } = form;
+    return (
+    <Col lg={12} md={12} sm={12}>
+      <FormItem label="特殊行业类别">
+        {getFieldDecorator('industry')(
+          <Select placeholder="请选择">
+            <Option value="01">军属类</Option>
+            <Option value="02">其他</Option>
+          </Select>)}
+      </FormItem>
+    </Col>
+    )
+  }
+
+  renderUsaForm = () => {
+    const { groupUsaShow } = this.state;
+    return groupUsaShow ? this.groupUsaShow() : this.groupUsaInput();
+  }
+
+  groupUsaShow = () => (
+    <FormItem label="名称">
+      <Icon type="home" /> <span>Willian Jafferson Clinton</span> <a href="#" onClick = {event => this.updetaUsaGroup(event)}>修改</a>
+    </FormItem>
+  )
+
+  updetaUsaGroup = () => {
+    this.setState({
+      groupUsaShow: false,
+    })
+  }
+
+  groupUsaInput = () => {
+    const { form } = this.state;
+    const { getFieldDecorator } = form;
+    return (
+      <FormItem label="名称">
+        {getFieldDecorator('name')(<AddressGroup/>)}
+      </FormItem>
+    )
+  }
+
+  saveFormRef = formRef => {
+    this.formRef = formRef;
+  };
 
   render () {
-    const { changeModal, recordMsg, getFieldDecorator } = this.state;
-
+    const { changeModal, recordMsg, form } = this.state;
+    const { getFieldDecorator } = form;
     const { TextArea } = Input;
     let modelContent;
     const { imageUrl } = this.state;
-
-
     const uploadButton = (
       <div>
         <Icon type={this.state.loading ? 'loading' : 'plus'} />
@@ -171,11 +399,9 @@ class ChangeModal extends Component {
     if (recordMsg && recordMsg.id === 1) {
       modelContent = <>
         <Form {...formItemLayout}>
-          <Form.Item label="名称">
-           {this.renderPerform()}
-          </Form.Item>
+          {this.renderPerform()}
           <Form.Item label="认证说明">
-            {getFieldDecorator('idenText')(<TextArea rows={2} />)}
+            {getFieldDecorator('idenText')(<TextArea rows={2}/>)}
           </Form.Item>
           <Form.Item label="认证图片">
             {getFieldDecorator('idenImg')(uploadModal)}
@@ -187,11 +413,36 @@ class ChangeModal extends Component {
     // 组织变更
     if (recordMsg && recordMsg.id === 2) {
       modelContent = <>
-        <Form {...formItemLayoutGroup}>
-          <Row>
+        <Form {...formItemLayoutGroup} labelAlign="left">
+          <Row gutter={32}>
+            <>
+              { this.renderGroupNameForm() }
+              { this.renderAdressForm() }
+            </>
+            <Col lg={12} md={12} sm={12}>
+              <FormItem label="增值税专用发票资质">
+                {getFieldDecorator('natural')(<Switch checkedChildren="开" unCheckedChildren="关" checked />)}
+              </FormItem>
+            </Col>
+            { this.renderIndustryForm() }
             <Col lg={12} md={12} sm={12}>
               <FormItem label="统一社会信用代码">
                 {getFieldDecorator('socialCode')(<Input placeholder="请输入"/>)}
+              </FormItem>
+            </Col>
+            <Col lg={12} md={12} sm={12}>
+              <FormItem label="基本户开户银行">
+                {getFieldDecorator('bankName')(<Input placeholder="请输入"/>)}
+              </FormItem>
+            </Col>
+            <Col lg={12} md={12} sm={12}>
+              <FormItem label="基本户开户账号">
+                {getFieldDecorator('bankCount')(<Input placeholder="请输入"/>)}
+              </FormItem>
+            </Col>
+            <Col lg={12} md={12} sm={12}>
+              <FormItem label="基本户开户名">
+                {getFieldDecorator('acountName')(<Input placeholder="请输入"/>)}
               </FormItem>
             </Col>
             <Col lg={12} md={12} sm={12}>
@@ -200,22 +451,7 @@ class ChangeModal extends Component {
               </FormItem>
             </Col>
             <Col lg={12} md={12} sm={12}>
-                <FormItem label="基本户开户银行">
-                  {getFieldDecorator('bankName')(<Input placeholder="请输入"/>)}
-                </FormItem>
-              </Col>
-              <Col lg={12} md={12} sm={12}>
-                <FormItem label="基本户开户账号">
-                  {getFieldDecorator('bankCount')(<Input placeholder="请输入"/>)}
-                </FormItem>
-              </Col>
-              <Col lg={12} md={12} sm={12}>
-                <FormItem label="基本户开户名">
-                  {getFieldDecorator('acountName')(<Input placeholder="请输入"/>)}
-                </FormItem>
-            </Col>
-            <Col lg={24} md={12} sm={12}>
-                <FormItem label="注册地址" labelCol={{ span: 4 }} wrapperCol={{ span: 20 }}>
+                <FormItem label="注册地址">
                   {getFieldDecorator('regisAddress')(<Input placeholder="请输入"/>)}
                 </FormItem>
             </Col>
@@ -232,6 +468,42 @@ class ChangeModal extends Component {
           </Row>
         </Form>
         </>
+    }
+
+    // 美国变更
+    if (recordMsg && recordMsg.id === 3) {
+      modelContent = <>
+        <Form {...formItemLayout}>
+           { this.renderUsaForm() }
+          <FormItem label="免税认证号">
+            {getFieldDecorator('regisAddress')(<Input placeholder="请输入"/>)}
+          </FormItem>
+          <Form.Item label="认证说明">
+            {getFieldDecorator('idenText')(<TextArea rows={2} />)}
+          </Form.Item>
+          <Form.Item label="认证图片">
+            {getFieldDecorator('idenImg')(uploadModal)}
+          </Form.Item>
+        </Form>
+      </>
+    }
+
+    // 英国变更
+    if (recordMsg && recordMsg.id === 4) {
+      modelContent = <>
+        <Form {...formItemLayoutEng} labelAlign="left">
+           { this.renderUsaForm() }
+          <FormItem label="增值税登记号">
+            {getFieldDecorator('regisAddress')(<Input placeholder="请输入"/>)}
+          </FormItem>
+          <Form.Item label="认证说明">
+            {getFieldDecorator('idenText')(<TextArea rows={2} />)}
+          </Form.Item>
+          <Form.Item label="认证图片">
+            {getFieldDecorator('idenImg')(uploadModal)}
+          </Form.Item>
+        </Form>
+      </>
     }
     return (
         <div>
