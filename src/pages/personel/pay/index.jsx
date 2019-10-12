@@ -90,6 +90,7 @@ class Search extends Component {
             <FormItem label="状态">
               {getFieldDecorator('status', { initialValue: '1' })(
                 <Select>
+                  <Option value="0">全部</Option>
                   <Option value="1">正常</Option>
                   <Option value="2">已删除</Option>
                 </Select>
@@ -338,20 +339,8 @@ class Modifications extends Component {
       formValues: query,
       loading: true,
     });
-
-    // api.series.getSeries(query, true).then(data => {
-    //   this.setState({
-    //     loading: false,
-    //     list: data.rows,
-    //     pagination: {
-    //       total: data.total,
-    //       current: query.page,
-    //       pageSize: query.rows,
-    //     },
-    //   });
-    //   // console.log(data);
-    // });
-    api.peptideBase.getModifications(query).then(res => {
+    // pay
+    api.pay.getPay(query).then(res => {
       this.setState({
         list: res.rows,
         total: res.total,
@@ -359,6 +348,15 @@ class Modifications extends Component {
         editIndex: -1,
       });
     });
+    
+    // api.peptideBase.getModifications(query).then(res => {
+    //   this.setState({
+    //     list: res.rows,
+    //     total: res.total,
+    //     loading: false,
+    //     editIndex: -1,
+    //   });
+    // });
   }
 
   // 退出编辑
