@@ -50,7 +50,7 @@ const PersonCertificationAddModal = props => {
         }}
         label="收票方"
       >
-        {form.getFieldDecorator('shoupiaofang', {
+        {form.getFieldDecorator('invoicePartyName', {
           rules: [{ required: true }],
         })(<Input />)}
       </FormItem>
@@ -63,7 +63,7 @@ const PersonCertificationAddModal = props => {
         }}
         label="认证说明"
       >
-        {form.getFieldDecorator('shuoming', {
+        {form.getFieldDecorator('notes', {
           rules: [{ required: true }],
         })(<Input.TextArea />)}
       </FormItem>
@@ -76,9 +76,9 @@ const PersonCertificationAddModal = props => {
         }}
         label="认证附件"
       >
-        {form.getFieldDecorator('fujian', {
+        {form.getFieldDecorator('attachmentList', {
           rules: [{ required: true }],
-          valuePropName: 'fileList',
+          valuePropName: 'attachmentList',
           getValueFromEvent: normFile,
         })(<Upload
           name="file"
