@@ -27,7 +27,7 @@ class CustomerEdit extends Component {
     super(props);
     this.state = {
       width: '100%',
-      tabActiveKey: 'customer',
+      tabActiveKey: 'vendor',
     };
   }
 
@@ -36,10 +36,41 @@ class CustomerEdit extends Component {
       // 基础信息
       basic: {
         name: {
-          type: 2,
+          type: 1,
           name: '',
         },
+        mobilePhone: {
+          mobilePhoneCountryCode: '+86',
+          mobilePhone: '18735812924',
+        },
         email: '123@qq.com',
+        telephone: {
+          telephoneCountryCode: '+86',
+          telephone: '57072136',
+          telephoneExtension: '2136',
+        },
+        fax: {
+          faxCountryCode: '+86',
+          fax: '54072136',
+          faxExtension: '2136',
+        },
+        postCode: '200000',
+        timeZoneCode: '8',
+        languageCode: '1',
+        industryCode: '1',
+        address: {
+          countryCode: '',
+          countryName: '',
+          provinceCode: '',
+          provinceName: '',
+          cityCode: '',
+          cityName: '',
+          countyCode: '',
+          countyName: '',
+          streetCode: '',
+          streetName: '',
+          address: '',
+        },
       },
       // 销售范围
       salesRangeList: [],
@@ -67,6 +98,11 @@ class CustomerEdit extends Component {
         bankAccount: '60045612378',
         address: '注册地址',
         notes: '这是一段认证说明',
+        telephone: {
+          telephoneCountryCode: '+86',
+          telephone: '57072136',
+          telephoneExtension: '2136',
+        },
         attachmentList: [
           { code: 'https://blog.maxmeng.top/images/avatar.jpg', name: '照片', type: 'image' },
         ],
@@ -85,6 +121,7 @@ class CustomerEdit extends Component {
           ],
         },
       ],
+      // 收货地址
       addressList: [
         {
           id: 1,
@@ -97,6 +134,28 @@ class CustomerEdit extends Component {
           address: '上海市松江区香闵路698号',
         },
       ],
+      // 采购组织
+      purchaseOrganizationList: [
+        {
+          purchaseOrganizationCode: '',
+          salerName: '',
+          salerTelephoneCountryCode: '',
+          salerTelephone: '',
+          payTermsCode: '',
+          currencyCode: '',
+          levelCode: '1',
+          invoicePostInReceive: '',
+          purchaseGroupCode: '',
+          deliveryPlanDays: '1',
+        },
+      ],
+      // 付款银行
+      paymentBank: {
+        countryCode: '1',
+        bankCode: '1',
+        bankAccount: '6666666666',
+        bankAccountName: 'Max',
+      },
     };
     this.props.dispatch({
       type: 'partnerMaintainEdit/setDetails',
@@ -131,93 +190,55 @@ class CustomerEdit extends Component {
   };
 
   validate = () => {
-    const {
-      form: { validateFieldsAndScroll },
-    } = this.props;
-    // 验证表单
-    // console.log(this.form.validate());
-
-    validateFieldsAndScroll((error, values) => {
-      console.log(values);
-      if (!error) {
-        //
-      }
-    });
-  }
-
-  onDetailsChange = (key, value) => {
-    const details = {
-      ...this.props.details,
-      [key]: value,
-    };
-    this.props.dispatch({
-      type: 'partnerMaintainEdit/setDetails',
-      payload: details,
-    });
+    console.log(this.props.details)
+    // TODO: 子组件方法
+    // this.basicView.wrappedInstance.validate();
   }
 
   // 客户
   renderCustomer = details => {
-    const {
-      form: { getFieldDecorator },
-    } = this.props;
-    const { basic, addressList } = details;
+    const { basic } = details;
+    const type = (basic.name && basic.name.type) || 1;
 
     return (
       <>
-        <Card title="基础信息" bordered={false} style={{ marginBottom: '24px' }}>
-          {getFieldDecorator('basic', {
-            initialValue: basic,
-          })(<Basic
-            // eslint-disable-next-line no-return-assign
-            wrappedComponentRef={form => this.form = form}
-            onChange={data => this.onDetailsChange('basic', data)}
-          />)}
-        </Card>
-        <SalesScope></SalesScope>
+        <Basic
+          // eslint-disable-next-line no-return-assign
+          wrappedComponentRef={ref => this.basicView = ref}
+        />
+        <SalesScope />
         {
-          basic.name.type === 2 ?
+          type === 2 ?
           (
             <>
-              <OrgCredit></OrgCredit>
-              <OrgCertification></OrgCertification>
+              <OrgCredit />
+              <OrgCertification />
             </>
           ) : (
             <>
-              <PersonCredit></PersonCredit>
-              <PersonCertification></PersonCertification>
+              <PersonCredit />
+              <PersonCertification />
             </>
           )
         }
-
-        <Card title="收货地址" bordered={false}>
-          {getFieldDecorator('addressList', {
-            initialValue: { data: addressList },
-          })(<Address onChange={data => this.onDetailsChange('addressList', data.data)} />)}
-        </Card>
+        <Address />
       </>
     );
   }
 
   // 供应商
-  renderSupplier = details => {
-    const {
-      form: { getFieldDecorator },
-    } = this.props;
+  renderVendor = details => {
     const { basic } = details;
+    const type = (basic.name && basic.name.type) || 1;
     return (
       <>
-        <Card title="基础信息" bordered={false} style={{ marginBottom: '24px' }}>
-          {getFieldDecorator('basic', {
-            initialValue: basic,
-          })(<Basic
-            // eslint-disable-next-line no-return-assign
-            wrappedComponentRef={form => this.form = form}
-            onChange={data => this.onDetailsChange('basic', data)}
-          />)}
-        </Card>
-        <PurchasingOrg></PurchasingOrg>
-        <Bank></Bank>
+        <Basic
+          // eslint-disable-next-line no-return-assign
+          wrappedComponentRef={form => this.form = form}
+        />
+        <PurchasingOrg />
+        <Bank />
+        { type === 2 ? <OrgCertification /> : null }
       </>
     );
   }
@@ -230,8 +251,8 @@ class CustomerEdit extends Component {
       case 'customer':
          return this.renderCustomer(details);
 
-      case 'supplier':
-        return this.renderSupplier(details);
+      case 'vendor':
+        return this.renderVendor(details);
 
       default:
           break;
@@ -258,7 +279,7 @@ class CustomerEdit extends Component {
             tab: '客户',
           },
           {
-            key: 'supplier',
+            key: 'vendor',
             tab: '供应商',
           },
         ]}

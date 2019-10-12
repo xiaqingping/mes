@@ -34,7 +34,7 @@ class Type extends Component {
         <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
           <Col md={6}>
             <FormItem label="订单货币">
-              {getFieldDecorator('email')(
+              {getFieldDecorator('currencyCode')(
                 <Select>
                   <Option value="1">人民币</Option>
                   <Option value="2">美元</Option>
@@ -44,7 +44,7 @@ class Type extends Component {
           </Col>
           <Col md={6}>
             <FormItem label="付款条件">
-              {getFieldDecorator('kaihubank')(
+              {getFieldDecorator('payTermsCode')(
                 <Select>
                   <Option value="1">条件1</Option>
                   <Option value="2">条件2</Option>
@@ -54,17 +54,17 @@ class Type extends Component {
           </Col>
           <Col md={6}>
             <FormItem label="销售人员">
-              {getFieldDecorator('zhanghu')(<Input />)}
+              {getFieldDecorator('salerName')(<Input />)}
             </FormItem>
           </Col>
           <Col md={6}>
             <FormItem label="销售人员电话">
-              {getFieldDecorator('huming')(<Input />)}
+              {getFieldDecorator('salerTelephone')(<Input />)}
             </FormItem>
           </Col>
           <Col md={6}>
             <FormItem label="供应商级别">
-              {getFieldDecorator('jibie')(
+              {getFieldDecorator('levelCode')(
                 <Select>
                   <Option value="1">级别1</Option>
                   <Option value="2">级别2</Option>
@@ -74,12 +74,12 @@ class Type extends Component {
           </Col>
           <Col md={6}>
             <FormItem label="收货时发票过账">
-              {getFieldDecorator('guozhang', { valuePropName: 'checked' })(<Switch />)}
+              {getFieldDecorator('invoicePostInReceive', { valuePropName: 'checked' })(<Switch />)}
             </FormItem>
           </Col>
           <Col md={6}>
             <FormItem label="采购组">
-              {getFieldDecorator('caigouzu')(
+              {getFieldDecorator('purchaseGroupCode')(
                 <Select>
                   <Option value="1">组1</Option>
                   <Option value="2">组2</Option>
@@ -89,7 +89,7 @@ class Type extends Component {
           </Col>
           <Col md={6}>
             <FormItem label="计划交货时间">
-              {getFieldDecorator('time', {
+              {getFieldDecorator('deliveryPlanDays', {
                 initialValue: 1,
               })(
                 <InputNumber
