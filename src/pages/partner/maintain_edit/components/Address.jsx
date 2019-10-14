@@ -5,6 +5,7 @@ import {
   InputNumber,
   Divider,
   Form,
+  Card,
 } from 'antd';
 import React from 'react';
 import { connect } from 'dva';
@@ -191,7 +192,6 @@ class EditableTable extends React.Component {
         type: 'partnerMaintainEdit/setDetails',
         payload: { ...details, addressList: data },
       });
-      console.log({ ...details, addressList: data });
       this.setState({ editIndex: -1 });
     });
   }
@@ -226,28 +226,30 @@ class EditableTable extends React.Component {
     });
 
     return (
-      <EditableContext.Provider value={this.props.form}>
-        <Table
-          rowKey="id"
-          components={components}
-          dataSource={addressList}
-          columns={columns}
-          rowClassName="editable-row"
-          pagination={false}
-        />
-        <Button
-          style={{
-            width: '100%',
-            marginTop: 16,
-            marginBottom: 8,
-          }}
-          type="dashed"
-          onClick={this.addRow}
-          icon="plus"
-        >
-          新增
-        </Button>
-      </EditableContext.Provider>
+      <Card title="收货地址" bordered={false}>
+        <EditableContext.Provider value={this.props.form}>
+          <Table
+            rowKey="id"
+            components={components}
+            dataSource={addressList}
+            columns={columns}
+            rowClassName="editable-row"
+            pagination={false}
+          />
+          <Button
+            style={{
+              width: '100%',
+              marginTop: 16,
+              marginBottom: 8,
+            }}
+            type="dashed"
+            onClick={this.addRow}
+            icon="plus"
+          >
+            新增
+          </Button>
+        </EditableContext.Provider>
+      </Card>
     );
   }
 }
