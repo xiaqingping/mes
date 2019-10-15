@@ -1,6 +1,5 @@
 import {
   Form,
-  Card,
   Button,
 } from 'antd';
 import React, { Component } from 'react';

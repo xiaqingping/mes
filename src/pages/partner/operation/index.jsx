@@ -14,7 +14,6 @@ import {
 import * as React from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import StandardTable from '@/components/StandardTable';
-import api from '@/api'
 import DetailsList from './components/details'
 
 const FormItem = Form.Item;
@@ -113,9 +112,9 @@ class Operation extends React.Component {
     },
     {
       title: '业务伙伴',
-      dataIndex: 'huoban',
+      dataIndex: 'bpCode',
       render(text, record) {
-          return text ? <span><Icon type="user" /> {text}<br/><span style={{ color: '#C2C2C2' }}>{record.phone}</span></span> : ''
+          return text ? <span><Icon type="user" /> {text}<br/><span style={{ color: '#C2C2C2' }}>{record.bpName}</span></span> : ''
       },
     },
     {
@@ -152,16 +151,16 @@ class Operation extends React.Component {
         },
       ],
       render(val, record) {
-        return <span><Badge status={status[val].value} text={status[val].text}/><br/><span style={{ marginLeft: 85 }}>{val === 2 ? record.actiontime : ''}</span></span>;
+        return <span><Badge status={status[val].value} text={status[val].text}/><br/><span style={{ marginLeft: 85 }}>{val === 2 ? record.finishDate : ''}</span></span>;
       },
     },
     {
       title: '操作人',
-      dataIndex: 'actionman',
-      align: 'center',
-      width: 250,
+      dataIndex: 'operatorName',
+      width: 300,
+      className: 'marginLeft',
       render(val, record) {
-        return <span>{record.huoban}<br/><span>{record.huoban}</span></span>;
+        return <span>{val}<br/><span style={{ color: '#C2C2C2' }}>{record.operatorDate}</span></span>;
       },
     },
     {
@@ -196,13 +195,14 @@ class Operation extends React.Component {
       data.push({
         id: i + 1,
         code: 100000 + (i + 1),
-        huoban: `name${i}`,
-        phone: `1${Math.ceil((Math.random() + 0.0001) * 10000000000)}`,
+        bpCode: `name${i}`,
+        bpName: `1${Math.ceil((Math.random() + 0.0001) * 10000000000)}`,
         type: Math.ceil((Math.random() + 0.0001) * 2),
         status: Math.ceil((Math.random() + 0.0001) * 2),
-        actionman: `action${i + 10}`,
-        actiontime: `2019-9-${Math.ceil((Math.random() + 0.0001) * 30)} 12:30:59`,
-        partnerCode: Math.ceil((Math.random() + 0.0001) * 100000), // 1人，2组织
+        finishDate: `2018-9-${Math.ceil((Math.random() + 0.0001) * 30)} 12:30:59`,
+        operatorName: `action${i + 10}`,
+        operatorDate: `2019-9-${Math.ceil((Math.random() + 0.0001) * 30)} 12:30:59`,
+        // partnerCode: Math.ceil((Math.random() + 0.0001) * 100000), // 1人，2组织
       });
     }
     this.setState({

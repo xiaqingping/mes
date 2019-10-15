@@ -1,3 +1,5 @@
+// eslint-disable-next-line eslint-comments/disable-enable-pair
+/* eslint-disable no-nested-ternary */
 import {
   Button,
   Modal,
@@ -22,6 +24,8 @@ class CheckPhone extends Component {
     oneQuestion: null,
     twoQuestion: null,
     threeQuestion: null,
+    time: 60,
+    btnText: 1,
   };
 
   componentWillReceiveProps (nextProps) {
@@ -40,6 +44,7 @@ class CheckPhone extends Component {
       twoQuestion: null,
       threeQuestion: null,
     });
+    this.props.checkPhone(phoneVisible)
   }
 
   // 用户自行变更验证input的数据
@@ -104,7 +109,10 @@ class CheckPhone extends Component {
     handleCode = e => {
       e.preventDefault();
       if (this.props.form.getFieldValue('code')) {
+        clearInterval(this.timer)
         this.setState({
+          time: 60,
+          btnText: 1,
           status: 6,
         })
       }
@@ -112,7 +120,39 @@ class CheckPhone extends Component {
 
   // 获取验证码功能
   getCode = () => {
-    if (!this.props.form.getFieldValue('userPhone')) { console.log(123) }
+    if (this.props.form.getFieldValue('userPhone')) {
+      // 发送验证码接口
+      this.time();
+    }
+  }
+
+  // 倒计时
+  time = () => {
+    // 清除可能存在的定时器
+    clearInterval(this.timer)
+    const { time } = this.state
+    // 创建（重新赋值）定时器
+    this.timer = setInterval(() => {
+        // 当前时间回显-1
+        this.setState({
+            time: time - 1,
+            btnText: 3,
+        }, () => {
+            // 判断修改后时间是否小于1达到最小时间
+            if (this.state.time <= 0) {
+                // 清除定时器
+                clearInterval(this.timer)
+                this.setState({
+                  btnText: 2,
+                  time: 60,
+                })
+                // 结束定时器循环
+                return
+            }
+            // 循环自调用
+            this.time()
+        })
+    }, 1000)
   }
 
   // 用户自行变更
@@ -153,7 +193,7 @@ class CheckPhone extends Component {
     const {
       form: { getFieldDecorator },
     } = this.props;
-    const { status, oneQuestion, twoQuestion, threeQuestion } = this.state;
+    const { status, oneQuestion, twoQuestion, threeQuestion, btnText, time } = this.state;
     const prefixSelector = getFieldDecorator('prefix', {
       initialValue: '86',
     })(
@@ -254,8 +294,8 @@ class CheckPhone extends Component {
               <FormItem label="验证码" style={{ margin: '20px 16px 60px 0' }}>
                 {getFieldDecorator('code')(<Input style={{ width: '180px' }} placeholder="请输入短信验证码"/>)}
                 &nbsp;&nbsp;&nbsp;&nbsp;
-                <Button type="primary" ghost onClick={() => { this.getCode() }}>
-                  获取验证码
+                <Button type="primary" disabled={btnText === 3} ghost onClick={() => { this.getCode() }} style={{ width: '100px' }}>
+                  {(btnText === 1 ? '获取验证码' : (btnText === 2 ? '重新发送' : `${time}秒`))}
                 </Button>
               </FormItem>
             </div>
@@ -306,6 +346,7 @@ class CheckPhone extends Component {
     return (
       <div>
         <Modal
+          destroyOnClose
           visible={this.state.phoneVisible}
           onOk={() => this.setModalVisible(false)}
           onCancel={() => this.setModalVisible(false)}

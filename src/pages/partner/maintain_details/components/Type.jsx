@@ -69,12 +69,12 @@ class BasicInfo extends Component {
         return <Badge status={status[val].value} text={status[val].text}/>;
       },
     },
-    {
-      title: '操作',
-      render: (text, record) => (
-          <a>删除</a>
-        ),
-    },
+    // {
+    //   title: '操作',
+    //   render: (text, record) => (
+    //       <a>删除</a>
+    //     ),
+    // },
   ];
 
   columns2 = [
@@ -91,12 +91,12 @@ class BasicInfo extends Component {
         return <Badge status={status[val].value} text={status[val].text}/>;
       },
     },
-    {
-      title: '操作',
-      render: (text, record) => (
-          <a>删除</a>
-        ),
-    },
+    // {
+    //   title: '操作',
+    //   render: (text, record) => (
+    //       <a>删除</a>
+    //     ),
+    // },
   ];
 
   columns3 = [
@@ -113,13 +113,13 @@ class BasicInfo extends Component {
         return <Badge status={status[val].value} text={status[val].text}/>;
       },
     },
-    {
-      align: 'center',
-      title: '操作',
-      render: (text, record) => (
-          <a>删除</a>
-        ),
-    },
+    // {
+    //   align: 'center',
+    //   title: '操作',
+    //   render: (text, record) => (
+    //       <a>删除</a>
+    //     ),
+    // },
   ];
 
   columns4 = [
@@ -128,13 +128,13 @@ class BasicInfo extends Component {
       width: 1200,
       dataIndex: 'name',
     },
-    {
-      align: 'center',
-      title: '操作',
-      render: (text, record) => (
-          <a>变更</a>
-        ),
-    },
+    // {
+    //   align: 'center',
+    //   title: '操作',
+    //   render: (text, record) => (
+    //       <a>变更</a>
+    //     ),
+    // },
   ];
 
   componentWillMount () {
