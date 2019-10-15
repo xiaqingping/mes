@@ -71,7 +71,8 @@ class EditableCell extends React.Component {
 }
 
 @connect(({ partnerMaintainEdit }) => ({
-  details: partnerMaintainEdit.details,
+  details: partnerMaintainEdit.details || {},
+  addressList: (partnerMaintainEdit.details && partnerMaintainEdit.details.addressList) || [],
 }))
 class EditableTable extends React.Component {
   constructor(props) {
@@ -180,10 +181,9 @@ class EditableTable extends React.Component {
   }
 
   addRow = () => {
-    const { details } = this.props;
-    const { addressList } = details;
+    const { details, addressList } = this.props;
 
-    const data = [...addressList, { id: -1 }]
+    const data = [...addressList, { id: -1 }];
     this.props.dispatch({
       type: 'partnerMaintainEdit/setDetails',
       payload: { ...details, addressList: data },
@@ -192,8 +192,7 @@ class EditableTable extends React.Component {
   }
 
   deleteRow = index => {
-    const { details } = this.props;
-    const { addressList } = details;
+    const { details, addressList } = this.props;
 
     const data = addressList.filter((e, i) => i !== index);
     this.props.dispatch({
@@ -204,8 +203,7 @@ class EditableTable extends React.Component {
 
   cancel = row => {
     if (row.id < 0) {
-      const { details } = this.props;
-      const { addressList } = details;
+      const { details, addressList } = this.props;
 
       const data = addressList.filter(e => e.id !== row.id);
       this.props.dispatch({
@@ -219,8 +217,7 @@ class EditableTable extends React.Component {
   save = index => {
     this.props.form.validateFields((error, row) => {
       if (error) return;
-      const { details } = this.props;
-      const { addressList } = details;
+      const { details, addressList } = this.props;
 
       const data = addressList.map((e, i) => {
         if (i === index) return { ...e, ...row, ...row.mobilePhone, ...row.address };
@@ -239,7 +236,7 @@ class EditableTable extends React.Component {
   }
 
   render() {
-    const { addressList } = this.props.details;
+    const { addressList } = this.props;
     const components = {
       body: {
         cell: EditableCell,

@@ -49,35 +49,45 @@ class Basic extends Component {
             </Col>
             <Col span={5}>
               <FormItem label="默认付款方式">
-                {getFieldDecorator('paytype')(
+                {getFieldDecorator('defaultPayMethodCode')(
                   <Select>
                     <Option value="1">网银</Option>
                   </Select>,
                 )}
               </FormItem>
             </Col>
-            <Col span={5}>
+            <Col span={4}>
               <FormItem label="币种">
-                {getFieldDecorator('currency')(
+                {getFieldDecorator('currencyCode')(
                   <Select>
                     <Option value="1">人民币</Option>
                   </Select>,
                 )}
               </FormItem>
             </Col>
-            <Col span={2}>
-              <FormItem label="销售冻结">
-                {getFieldDecorator('dongj', { valuePropName: 'checked' })(<Switch />)}
-              </FormItem>
-            </Col>
             <Col span={7}>
               <FormItem label="默认开票类型">
-                {getFieldDecorator('kaipiao', { initialValue: 'a' })(
+                {getFieldDecorator('defaultInvoiceTypeCode', { initialValue: 'a' })(
                   <Radio.Group>
                     <Radio.Button value="a">增值税专用发票</Radio.Button>
                     <Radio.Button value="b">增值税普通发票</Radio.Button>
                   </Radio.Group>,
                 )}
+              </FormItem>
+            </Col>
+            {/* <Col span={6}>
+              <FormItem label="税分类">
+                {getFieldDecorator('taxTypeCode', { initialValue: 'a' })(
+                  <Radio.Group>
+                    <Radio.Button value="1">免税</Radio.Button>
+                    <Radio.Button value="2">收税</Radio.Button>
+                  </Radio.Group>,
+                )}
+              </FormItem>
+            </Col> */}
+            <Col span={3}>
+              <FormItem label="销售冻结">
+                {getFieldDecorator('salesBan', { valuePropName: 'checked' })(<Switch disabled />)}
               </FormItem>
             </Col>
           </Row>

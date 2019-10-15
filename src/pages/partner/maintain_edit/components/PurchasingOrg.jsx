@@ -19,7 +19,9 @@ const FormItem = Form.Item;
 const { Option } = Select;
 
 @connect(({ partnerMaintainEdit }) => ({
-  details: partnerMaintainEdit.details,
+  details: partnerMaintainEdit.details || {},
+  // eslint-disable-next-line max-len
+  purchaseOrganizationList: (partnerMaintainEdit.details && partnerMaintainEdit.details.purchaseOrganizationList) || [],
 }), undefined, undefined, { withRef: true })
 class PurchasingOrg extends React.Component {
   constructor(props) {
@@ -32,8 +34,7 @@ class PurchasingOrg extends React.Component {
 
   valueChange = (key, value) => {
     const { tabKey } = this.state;
-    const { details } = this.props;
-    const { purchaseOrganizationList } = details;
+    const { details, purchaseOrganizationList } = this.props;
     const data = purchaseOrganizationList.map(e => {
       if (e.purchaseOrganizationCode === tabKey) {
         if (key === 'salerTelephone') {
@@ -56,9 +57,8 @@ class PurchasingOrg extends React.Component {
     const { tabKey } = this.state;
     const {
       form: { getFieldDecorator },
-      details,
+      purchaseOrganizationList: tabsData,
     } = this.props;
-    const { purchaseOrganizationList: tabsData } = details;
     const data = tabsData.filter(e => e.purchaseOrganizationCode === tabKey)[0];
 
     return (
@@ -171,8 +171,7 @@ class PurchasingOrg extends React.Component {
 
   // 级联选泽采购组织时
   onCascaderChange = obj => {
-    const { details } = this.props;
-    const { purchaseOrganizationList: tabsData } = details;
+    const { details, purchaseOrganizationList: tabsData } = this.props;
     const index = obj.length - 1;
 
     const data = [].concat(tabsData, {
@@ -190,8 +189,7 @@ class PurchasingOrg extends React.Component {
   }
 
   renderCascader = () => {
-    const { details } = this.props;
-    const { purchaseOrganizationList: tabsData } = details;
+    const { purchaseOrganizationList: tabsData } = this.props;
     const cascaderTitle = tabsData.map(e => e.purchaseOrganizationCode);
     const options = [
       {
@@ -224,8 +222,7 @@ class PurchasingOrg extends React.Component {
   closeTab = tabKey => {
     let index = -1;
     let key = '';
-    const { details } = this.props;
-    const { purchaseOrganizationList: tabsData } = details;
+    const { details, purchaseOrganizationList: tabsData } = this.props;
 
     // 过滤掉关闭的采购组织
     const newTabsData = tabsData.filter((e, i) => {
@@ -263,8 +260,7 @@ class PurchasingOrg extends React.Component {
 
   render() {
     const { tabKey } = this.state;
-    const { details } = this.props;
-    const { purchaseOrganizationList: tabsData } = details;
+    const { purchaseOrganizationList: tabsData } = this.props;
 
     let tabList = tabsData.map(e => ({
       key: e.purchaseOrganizationCode,
