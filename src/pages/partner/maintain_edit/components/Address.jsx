@@ -10,7 +10,7 @@ import {
 import React from 'react';
 import { connect } from 'dva';
 
-import { MobilePhoneInput } from '@/components/CustomizedFormControls'
+import { MobilePhoneInput, AddressInput } from '@/components/CustomizedFormControls'
 
 const EditableContext = React.createContext();
 
@@ -27,12 +27,34 @@ class EditableCell extends React.Component {
       editOptions,
       ...restProps
     } = this.props;
+
+    let initialValue;
+    if (editing) {
+      initialValue = record[dataIndex];
+      if (dataIndex === 'mobilePhone') {
+        initialValue = {
+          mobilePhone: record.mobilePhone,
+          mobilePhoneCountryCode: record.mobilePhoneCountryCode,
+        }
+      }
+      if (dataIndex === 'address') {
+        initialValue = {
+          countryCode: record.countryCode,
+          provinceCode: record.provinceCode,
+          cityCode: record.cityCode,
+          countyCode: record.countyCode,
+          streetCode: record.streetCode,
+          address: record.address,
+        }
+      }
+    }
+
     return (
       <td {...restProps}>
         {editing ? (
           <Form.Item>
             {getFieldDecorator(dataIndex, {
-              initialValue: record[dataIndex],
+              initialValue,
               ...editOptions,
             })(inputType)}
           </Form.Item>
@@ -72,7 +94,7 @@ class EditableTable extends React.Component {
       },
       {
         title: '移动电话',
-        dataIndex: 'phone',
+        dataIndex: 'mobilePhone',
         width: '20%',
         editable: true,
         inputType: <MobilePhoneInput />,
@@ -81,11 +103,8 @@ class EditableTable extends React.Component {
             { required: true },
           ],
         },
-        render(text) {
-          if (typeof text === 'object') {
-            return text.mobilePhoneCountryCode + text.mobilePhone;
-          }
-          return text;
+        render(text, record) {
+          return record.mobilePhoneCountryCode + record.mobilePhone;
         },
       },
       {
@@ -105,11 +124,22 @@ class EditableTable extends React.Component {
         dataIndex: 'address',
         width: '35%',
         editable: true,
-        inputType: <Input />,
+        inputType: <AddressInput onChange={value => this.valueChange('address', value)} />,
         editOptions: {
           rules: [
             { required: true },
           ],
+        },
+        render: (text, record) => {
+          const addressList = [
+            record.countryName,
+            record.provinceName,
+            record.cityName,
+            record.countyName,
+            record.streetName,
+            record.address,
+          ];
+          return addressList.filter(e => e).join(' ');
         },
       },
       {
@@ -139,6 +169,14 @@ class EditableTable extends React.Component {
         },
       },
     ];
+  }
+
+  valueChange = (key, value) => {
+    if (key === 'address') {
+      this.props.form.setFieldsValue({
+        address: value,
+      });
+    }
   }
 
   addRow = () => {
@@ -185,7 +223,7 @@ class EditableTable extends React.Component {
       const { addressList } = details;
 
       const data = addressList.map((e, i) => {
-        if (i === index) return { ...e, ...row };
+        if (i === index) return { ...e, ...row, ...row.mobilePhone, ...row.address };
         return e;
       });
       this.props.dispatch({

@@ -1,6 +1,5 @@
 import {
   Form,
-  Card,
   Button,
 } from 'antd';
 import React, { Component } from 'react';
@@ -27,7 +26,7 @@ class CustomerEdit extends Component {
     super(props);
     this.state = {
       width: '100%',
-      tabActiveKey: 'vendor',
+      tabActiveKey: 'customer',
     };
   }
 
@@ -35,44 +34,37 @@ class CustomerEdit extends Component {
     const details = {
       // 基础信息
       basic: {
-        name: {
-          type: 1,
-          name: '',
-        },
-        mobilePhone: {
-          mobilePhoneCountryCode: '+86',
-          mobilePhone: '18735812924',
-        },
+        type: 1,
+        name: 'max',
+        // 手机
+        mobilePhoneCountryCode: '+86',
+        mobilePhone: '18735812924',
         email: '123@qq.com',
-        telephone: {
-          telephoneCountryCode: '+86',
-          telephoneAreaCode: '1234',
-          telephone: '57072136',
-          telephoneExtension: '2136',
-        },
-        fax: {
-          faxCountryCode: '+86',
-          faxAreaCode: '1234',
-          fax: '54072136',
-          faxExtension: '2136',
-        },
+        // 电话
+        telephoneCountryCode: '+86',
+        telephoneAreaCode: '1234',
+        telephone: '57072136',
+        telephoneExtension: '2136',
+        // 传真
+        faxCountryCode: '+86',
+        faxAreaCode: '1234',
+        fax: '54072136',
+        faxExtension: '2136',
+        // 邮编
         postCode: '200000',
+        // 时区
         timeZoneCode: '8',
+        // 语言
         languageCode: '1',
+        // 行业类别
         industryCode: '1',
-        address: {
-          countryCode: '',
-          countryName: '',
-          provinceCode: '',
-          provinceName: '',
-          cityCode: '',
-          cityName: '',
-          countyCode: '',
-          countyName: '',
-          streetCode: '',
-          streetName: '',
-          address: '',
-        },
+        // 地址
+        countryCode: 'china',
+        provinceCode: 'shanxi',
+        cityCode: 'taiyuan',
+        countyCode: 'xiaodian',
+        streetCode: 'xuefu',
+        address: '888号',
       },
       // 销售范围
       salesRangeList: [],
@@ -100,12 +92,10 @@ class CustomerEdit extends Component {
         bankAccount: '60045612378',
         address: '注册地址',
         notes: '这是一段认证说明',
-        telephone: {
-          telephoneCountryCode: '+86',
-          telephoneAreaCode: '1234',
-          telephone: '57072136',
-          telephoneExtension: '2136',
-        },
+        telephoneCountryCode: '+86',
+        telephoneAreaCode: '1234',
+        telephone: '57072136',
+        telephoneExtension: '2136',
         attachmentList: [
           { code: 'https://blog.maxmeng.top/images/avatar.jpg', name: '照片', type: 'image' },
         ],
@@ -129,10 +119,8 @@ class CustomerEdit extends Component {
         {
           id: 1,
           name: 'name',
-          phone: {
-            mobilePhoneCountryCode: '+86',
-            mobilePhone: '18735812924',
-          },
+          mobilePhone: '18735812924',
+          mobilePhoneCountryCode: '+86',
           postCode: '123456',
           address: '上海市松江区香闵路698号',
         },

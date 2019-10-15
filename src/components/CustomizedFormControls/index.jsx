@@ -6,39 +6,46 @@ import {
   AutoComplete,
 } from 'antd';
 import React from 'react';
+import { switchCase } from '@babel/types';
 
 const InputGroup = Input.Group;
 const { Option } = Select;
 const options = [
   {
-    value: '浙江',
-    label: '浙江',
+    value: 'china',
+    label: '中国',
     children: [
       {
-        value: '杭州',
-        label: '杭州',
+        value: 'shanxi',
+        label: '山西省',
         children: [
           {
-            value: '西湖',
-            label: '西湖',
+            value: 'taiyuan',
+            label: '太原市',
+            children: [
+              {
+                value: 'xiaodian',
+                label: '小店区',
+                children: [
+                  {
+                    value: 'xuefu',
+                    label: '学府街',
+                  },
+                ],
+              },
+            ],
           },
         ],
       },
     ],
   },
   {
-    value: '江苏',
-    label: '江苏',
+    value: 'USA',
+    label: '美国',
     children: [
       {
-        value: '南京',
-        label: '南京',
-        children: [
-          {
-            value: '中华门',
-            label: '中华门',
-          },
-        ],
+        value: 'huashengd',
+        label: '华盛顿',
       },
     ],
   },
@@ -158,7 +165,7 @@ export class NameInput extends React.Component {
     super(props);
     const value = props.value || {};
     this.state = {
-      type: value.type || 1,
+      type: value.type || '',
       name: value.name || '',
     };
   }
@@ -204,7 +211,6 @@ export class MobilePhoneInput extends React.Component {
     this.state = {
       mobilePhoneCountryCode: value.mobilePhoneCountryCode || '+86',
       mobilePhone: value.mobilePhone || '',
-      disabled: value.disabled,
     };
   }
 
@@ -219,14 +225,14 @@ export class MobilePhoneInput extends React.Component {
   };
 
   render() {
-    const { mobilePhoneCountryCode, mobilePhone, disabled } = this.state;
+    const { mobilePhoneCountryCode, mobilePhone } = this.state;
     return (
       <InputGroup compact>
-        <Select disabled={disabled} value={mobilePhoneCountryCode} style={{ width: '40%' }} onChange={val => this.valueChange({ mobilePhoneCountryCode: val })}>
+        <Select value={mobilePhoneCountryCode} style={{ width: '40%' }} onChange={val => this.valueChange({ mobilePhoneCountryCode: val })}>
           <Option value="+86">+86</Option>
           <Option value="+01">+01</Option>
         </Select>
-        <Input disabled={disabled} value={mobilePhone} style={{ width: '60%' }} onChange={e => this.valueChange({ mobilePhone: e.target.value })} />
+        <Input value={mobilePhone} style={{ width: '60%' }} onChange={e => this.valueChange({ mobilePhone: e.target.value })} />
       </InputGroup>
     );
   }
@@ -342,27 +348,55 @@ export class AddressInput extends React.Component {
   constructor(props) {
     super(props);
     const value = props.value || {};
+    // const cascader = [
+    //   value.countryCode,
+    //   value.provinceCode,
+    //   value.cityCode,
+    //   value.countyCode,
+    //   value.streetCode,
+    // ]
     this.state = {
-      cascader: value.cascader || ['浙江', '杭州', '西湖'],
-      address: value.address || '',
+      // cascader: cascader || [],
+      // address: value.address || '',
+      ...value,
     };
   }
 
   valueChange = changedValue => {
+    let obj = changedValue;
+
+    if (Object.keys(changedValue).indexOf('cascader') > -1) {
+      const { option } = changedValue;
+      obj = {
+        countryCode: (option[0] && option[0].value) || '',
+        countryName: (option[0] && option[0].label) || '',
+        provinceCode: (option[1] && option[1].value) || '',
+        provinceName: (option[1] && option[1].label) || '',
+        cityCode: (option[2] && option[2].value) || '',
+        cityName: (option[2] && option[2].label) || '',
+        countyCode: (option[3] && option[3].value) || '',
+        countyName: (option[3] && option[3].label) || '',
+        streetCode: (option[4] && option[4].value) || '',
+        streetName: (option[4] && option[4].label) || '',
+      };
+    }
+
     const { onChange } = this.props;
+
     if (onChange) {
       onChange({
         ...this.state,
-        ...changedValue,
+        ...obj,
       });
     }
   };
 
   render() {
-    const { address, cascader } = this.state;
+    const { address, countryCode, provinceCode, cityCode, countyCode, streetCode } = this.state;
+    const cascader = [countryCode, provinceCode, cityCode, countyCode, streetCode];
     return (
       <InputGroup compact>
-        <Cascader value={cascader} options={options} style={{ width: '40%' }} onChange={value => this.valueChange({ cascader: value })} />
+        <Cascader value={cascader} options={options} style={{ width: '40%' }} onChange={(value, option) => this.valueChange({ cascader: value, option })} />
         <Input value={address} style={{ width: '60%' }} onChange={e => this.valueChange({ address: e.target.value })} />
       </InputGroup>
     );

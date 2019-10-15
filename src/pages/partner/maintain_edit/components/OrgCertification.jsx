@@ -35,7 +35,14 @@ class OrgCertification extends Component {
         type: e.type,
       }));
     }
-    const data = { ...organizationCertification, ...{ [key]: value } };
+
+    let obj = {
+      [key]: value,
+    }
+
+    if (key === 'telephone') obj = value;
+
+    const data = { ...organizationCertification, ...obj };
 
     this.props.dispatch({
       type: 'partnerMaintainEdit/setDetails',
@@ -117,7 +124,12 @@ class OrgCertification extends Component {
                 <Col span={8}>
                   <FormItem label="电话">
                     {getFieldDecorator('telephone', {
-                      initialValue: orgData.telephone,
+                      initialValue: {
+                        telephoneCountryCode: orgData.telephoneCountryCode,
+                        telephoneAreaCode: orgData.telephoneAreaCode,
+                        telephone: orgData.telephone,
+                        telephoneExtension: orgData.telephoneExtension,
+                      },
                     })(<TelphoneInput onChange={value => this.valueChange('telephone', value)} />)}
                   </FormItem>
                 </Col>
