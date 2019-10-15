@@ -17,7 +17,9 @@ const FormItem = Form.Item;
 const { TextArea } = Input;
 
 @connect(({ partnerMaintainEdit }) => ({
-  details: partnerMaintainEdit.details,
+  details: partnerMaintainEdit.details || {},
+  // eslint-disable-next-line max-len
+  organizationCertification: (partnerMaintainEdit.details && partnerMaintainEdit.details.organizationCertification) || { attachmentList: [] },
 }))
 class OrgCertification extends Component {
   constructor(props) {
@@ -26,8 +28,8 @@ class OrgCertification extends Component {
   }
 
   valueChange = (key, value) => {
-    const { details } = this.props;
-    const { organizationCertification } = details;
+    const { details, organizationCertification } = this.props;
+    // const { organizationCertification } = details;
     if (key === 'attachmentList') {
       value = value.fileList.map(e => ({
         code: 'https://blog.maxmeng.top/images/avatar.jpg',
@@ -35,7 +37,14 @@ class OrgCertification extends Component {
         type: e.type,
       }));
     }
-    const data = { ...organizationCertification, ...{ [key]: value } };
+
+    let obj = {
+      [key]: value,
+    }
+
+    if (key === 'telephone') obj = value;
+
+    const data = { ...organizationCertification, ...obj };
 
     this.props.dispatch({
       type: 'partnerMaintainEdit/setDetails',
@@ -46,10 +55,11 @@ class OrgCertification extends Component {
   render() {
     const {
       form: { getFieldDecorator },
-      details: { organizationCertification: orgData },
+      // details: { organizationCertification: orgData },
+      organizationCertification: orgData,
     } = this.props;
 
-    const fileList = orgData.attachmentList.map(e => ({
+    const fileList = orgData.attachmentList && orgData.attachmentList.map(e => ({
       uid: e.code,
       name: e.name,
       url: e.code,
@@ -117,7 +127,12 @@ class OrgCertification extends Component {
                 <Col span={8}>
                   <FormItem label="电话">
                     {getFieldDecorator('telephone', {
-                      initialValue: orgData.telephone,
+                      initialValue: {
+                        telephoneCountryCode: orgData.telephoneCountryCode,
+                        telephoneAreaCode: orgData.telephoneAreaCode,
+                        telephone: orgData.telephone,
+                        telephoneExtension: orgData.telephoneExtension,
+                      },
                     })(<TelphoneInput onChange={value => this.valueChange('telephone', value)} />)}
                   </FormItem>
                 </Col>

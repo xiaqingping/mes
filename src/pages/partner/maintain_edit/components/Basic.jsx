@@ -18,7 +18,8 @@ const FormItem = Form.Item;
 const { Option } = Select;
 
 @connect(({ partnerMaintainEdit }) => ({
-  details: partnerMaintainEdit.details,
+  details: partnerMaintainEdit.details || {},
+  basic: (partnerMaintainEdit.details && partnerMaintainEdit.details.basic) || {},
 }), undefined, undefined, { withRef: true })
 class Basic extends React.Component {
   validate = () => {
@@ -39,9 +40,22 @@ class Basic extends React.Component {
   };
 
   valueChange = (key, value) => {
-    const { details } = this.props;
-    const { basic } = details;
-    const data = { ...basic, ...{ [key]: value } };
+    const { details, basic } = this.props;
+    let obj = {
+      [key]: value,
+    }
+
+    const keyList = [
+      'name',
+      'mobilePhone',
+      'telephone',
+      'fax',
+      'email',
+      'address',
+    ]
+    if (keyList.indexOf(key) > -1) obj = value;
+
+    const data = { ...basic, ...obj };
 
     this.props.dispatch({
       type: 'partnerMaintainEdit/setDetails',
@@ -52,9 +66,8 @@ class Basic extends React.Component {
   render() {
     const {
       form: { getFieldDecorator },
-      details: { basic },
+      basic,
     } = this.props;
-    const MobileDisabled = basic.name && basic.name.type === 2;
 
     return (
       <Card title="基础信息" bordered={false} style={{ marginBottom: '24px' }}>
@@ -63,7 +76,10 @@ class Basic extends React.Component {
             <Col md={6} sm={12}>
               <FormItem label="名称">
                 {getFieldDecorator('name', {
-                  initialValue: basic.name,
+                  initialValue: {
+                    type: basic.type,
+                    name: basic.name,
+                  },
                   rules: [{ validator: this.checkNameInput }],
                 })(<NameInput onChange={value => this.valueChange('name', value)} />)}
               </FormItem>
@@ -71,7 +87,10 @@ class Basic extends React.Component {
             <Col md={6} sm={12}>
               <FormItem label="移动电话">
                 {getFieldDecorator('mobilePhone', {
-                  initialValue: { disabled: MobileDisabled, ...basic.mobilePhone },
+                  initialValue: {
+                    mobilePhoneCountryCode: basic.mobilePhoneCountryCode,
+                    mobilePhone: basic.mobilePhone,
+                  },
                 })(<MobilePhoneInput onChange={value => this.valueChange('mobilePhone', value)} />)}
               </FormItem>
             </Col>
@@ -85,14 +104,24 @@ class Basic extends React.Component {
             <Col md={6} sm={12}>
               <FormItem label="电话">
                 {getFieldDecorator('telephone', {
-                  initialValue: basic.telephone,
+                  initialValue: {
+                    telephoneCountryCode: basic.telephoneCountryCode,
+                    telephoneAreaCode: basic.telephoneAreaCode,
+                    telephone: basic.telephone,
+                    telephoneExtension: basic.telephoneExtension,
+                  },
                 })(<TelphoneInput onChange={value => this.valueChange('telephone', value)} />)}
               </FormItem>
             </Col>
             <Col md={6} sm={12}>
               <FormItem label="传真">
                 {getFieldDecorator('fax', {
-                  initialValue: basic.fax,
+                  initialValue: {
+                    faxCountryCode: basic.faxCountryCode,
+                    faxAreaCode: basic.faxAreaCode,
+                    fax: basic.fax,
+                    faxExtension: basic.faxExtension,
+                  },
                 })(<FaxInput onChange={value => this.valueChange('fax', value)} />)}
               </FormItem>
             </Col>
@@ -115,8 +144,9 @@ class Basic extends React.Component {
                 {getFieldDecorator('languageCode', {
                   initialValue: basic.languageCode,
                 })(
-                  <Select onChange={value => this.valueChange('languageCode', value)} >
+                  <Select open={false} onChange={value => this.valueChange('languageCode', value)} >
                     <Option value="1">中文</Option>
+                    <Option value="2">英文</Option>
                   </Select>,
                 )}
               </FormItem>
@@ -135,13 +165,22 @@ class Basic extends React.Component {
             <Col md={18} sm={24}>
               <FormItem label="通讯地址">
                 {getFieldDecorator('address', {
-                  initialValue: basic.address,
+                  initialValue: {
+                    countryCode: basic.countryCode,
+                    provinceCode: basic.provinceCode,
+                    cityCode: basic.cityCode,
+                    countyCode: basic.countyCode,
+                    streetCode: basic.streetCode,
+                    address: basic.address,
+                  },
                 })(<AddressInput onChange={value => this.valueChange('address', value)} />)}
               </FormItem>
             </Col>
             <Col md={6} sm={6}>
               <FormItem label="销售冻结">
-                {getFieldDecorator('salesBan', { valuePropName: 'checked' })(<Switch onChange={value => this.valueChange('salesBan', value)} />)}
+                {getFieldDecorator('salesBan', { valuePropName: 'checked' })(
+                  <Switch onChange={value => this.valueChange('salesBan', value)} />,
+                )}
               </FormItem>
             </Col>
           </Row>
