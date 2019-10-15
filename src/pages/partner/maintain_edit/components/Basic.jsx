@@ -18,7 +18,8 @@ const FormItem = Form.Item;
 const { Option } = Select;
 
 @connect(({ partnerMaintainEdit }) => ({
-  details: partnerMaintainEdit.details,
+  details: partnerMaintainEdit.details || {},
+  basic: (partnerMaintainEdit.details && partnerMaintainEdit.details.basic) || {},
 }), undefined, undefined, { withRef: true })
 class Basic extends React.Component {
   validate = () => {
@@ -39,8 +40,7 @@ class Basic extends React.Component {
   };
 
   valueChange = (key, value) => {
-    const { details } = this.props;
-    const { basic } = details;
+    const { details, basic } = this.props;
     let obj = {
       [key]: value,
     }
@@ -66,7 +66,7 @@ class Basic extends React.Component {
   render() {
     const {
       form: { getFieldDecorator },
-      details: { basic },
+      basic,
     } = this.props;
 
     return (
@@ -179,7 +179,7 @@ class Basic extends React.Component {
             <Col md={6} sm={6}>
               <FormItem label="销售冻结">
                 {getFieldDecorator('salesBan', { valuePropName: 'checked' })(
-                  <Switch disabled onChange={value => this.valueChange('salesBan', value)} />,
+                  <Switch onChange={value => this.valueChange('salesBan', value)} />,
                 )}
               </FormItem>
             </Col>

@@ -7,7 +7,8 @@ import React from 'react';
 import { connect } from 'dva';
 
 @connect(({ partnerMaintainEdit }) => ({
-  details: partnerMaintainEdit.details,
+  details: partnerMaintainEdit.details || {},
+  creditList: (partnerMaintainEdit.details && partnerMaintainEdit.details.creditList) || [],
 }))
 class PersonCredit extends React.Component {
   constructor(props) {
@@ -37,8 +38,7 @@ class PersonCredit extends React.Component {
   )
 
   render() {
-    const { details } = this.props;
-    const { creditList } = details;
+    const { creditList } = this.props;
 
     return (
       <Card

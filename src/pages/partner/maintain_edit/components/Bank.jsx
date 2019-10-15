@@ -13,7 +13,9 @@ const FormItem = Form.Item;
 const { Option } = Select;
 
 @connect(({ partnerMaintainEdit }) => ({
-  details: partnerMaintainEdit.details,
+  details: partnerMaintainEdit.details || {},
+  basic: (partnerMaintainEdit.details && partnerMaintainEdit.details.basic) || {},
+  paymentBank: (partnerMaintainEdit.details && partnerMaintainEdit.details.paymentBank) || {},
 }), undefined, undefined, { withRef: true })
 class Bank extends Component {
   constructor(props) {
@@ -22,8 +24,7 @@ class Bank extends Component {
   }
 
   valueChange = (key, value) => {
-    const { details } = this.props;
-    const { paymentBank } = details;
+    const { details, paymentBank } = this.props;
     const data = { ...paymentBank, ...{ [key]: value } };
 
     this.props.dispatch({
@@ -35,10 +36,10 @@ class Bank extends Component {
   render() {
     const {
       form: { getFieldDecorator },
-      details,
+      basic,
+      paymentBank,
     } = this.props;
-    const { basic, paymentBank } = details;
-    const type = (basic.name && basic.name.type) || 1;
+    const type = basic.type || 1;
 
     return (
       <Card
