@@ -8,36 +8,22 @@ import {
   Badge,
 } from 'antd';
 import React from 'react';
+import { connect } from 'dva';
 
 import PersonCertificationAddModal from './PersonCertificationAddModal';
 
 const { Paragraph } = Typography;
 
+@connect(({ partnerMaintainEdit }) => ({
+  details: partnerMaintainEdit.details || {},
+  // eslint-disable-next-line max-len
+  piCertification: (partnerMaintainEdit.details && partnerMaintainEdit.details.piCertification) || [],
+}))
 class PersonCertification extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       addModalVisible: false,
-      list: [
-        {
-          id: 1,
-          title: '上海交通大学',
-          description: '这是上海交通大学的认证说明，这是上海交通大学的认证说明，这是上海交通大学的认证说明，这是上海交通大学的认证说明，这是上海交通大学的认证说明，',
-          state: 1,
-          picList: [
-            'https://blog.maxmeng.top/images/avatar.jpg',
-          ],
-        },
-        {
-          id: 2,
-          title: '上海大学',
-          description: '这是上海大学认证说明',
-          state: 2,
-          picList: [
-            'https://blog.maxmeng.top/images/avatar.jpg',
-          ],
-        },
-      ],
     };
   }
 
@@ -47,7 +33,7 @@ class PersonCertification extends React.Component {
         <List.Item key={item.id}>
           <Card
             hoverable
-            title={item.title}
+            title={item.invoicePartyName}
             extra={
               <>
                 <a>变更</a>
@@ -65,10 +51,10 @@ class PersonCertification extends React.Component {
                 rows: 2,
               }}
             >
-              {item.description}
+              {item.notes}
             </Paragraph>
             <div>
-              <img style={{ width: 80, height: 80 }} src={item.picList[0]} alt=""/>
+              <img style={{ width: 80, height: 80 }} src={item.attachmentList[0].code} alt=""/>
             </div>
           </Card>
         </List.Item>
@@ -95,37 +81,44 @@ class PersonCertification extends React.Component {
   };
 
   removeItem = id => {
-    const { list } = this.state;
-    this.setState({
-      list: list.filter(e => e.id !== id),
+    const { details, piCertification } = this.props;
+
+    const data = piCertification.filter(e => e.id !== id);
+    this.props.dispatch({
+      type: 'partnerMaintainEdit/setDetails',
+      payload: { ...details, piCertification: data },
     });
   }
 
   handleAdd = data => {
-    // const { dispatch } = this.props;
-    // dispatch({
-    //   type: 'listTableList/add',
-    //   payload: {
-    //     desc: fields.desc,
-    //   },
-    // });
+    const { details, piCertification } = this.props;
 
+    const attachmentList = data.attachmentList.map(e => ({
+      code: e.thumbUrl,
+      name: e.name,
+      type: e.type,
+    }));
     this.handleModalVisible();
     const obj = {
       id: Math.random(),
-      title: data.shoupiaofang,
-      description: data.shuoming,
-      state: 2,
-      picList: data.fujian.map(e => e.thumbUrl),
+      invoicePartyId: 123,
+      invoicePartyCode: 12345,
+      invoicePartyName: data.invoicePartyName,
+      status: 1,
+      notes: data.notes,
+      attachmentList,
     };
-    const { list } = this.state;
-    this.setState({
-      list: [...list, obj],
+
+    const newdata = [...piCertification, obj];
+    this.props.dispatch({
+      type: 'partnerMaintainEdit/setDetails',
+      payload: { ...details, piCertification: newdata },
     });
   };
 
   render() {
-    const { list, addModalVisible } = this.state;
+    const { piCertification } = this.props;
+    const { addModalVisible } = this.state;
     const nullData = {};
 
     const parentMethods = {
@@ -148,7 +141,7 @@ class PersonCertification extends React.Component {
             sm: 1,
             xs: 1,
           }}
-          dataSource={[...list, nullData]}
+          dataSource={[...piCertification, nullData]}
           renderItem={this.renderListItem}
         />
         <PersonCertificationAddModal {...parentMethods} modalVisible={addModalVisible}/>

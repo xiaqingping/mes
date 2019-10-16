@@ -11,7 +11,8 @@ import {
   Icon,
   Empty,
 } from 'antd';
-import React, { Component } from 'react';
+import React from 'react';
+import { connect } from 'dva';
 import BillToParty from './BillToParty';
 import SoldToParty from './SoldToParty';
 import ShipToParty from './ShipToParty';
@@ -23,7 +24,11 @@ const FormItem = Form.Item;
 const { Option } = Select;
 const { TabPane } = Tabs;
 
-class BasicInfo extends Component {
+@connect(({ partnerMaintainEdit }) => ({
+  details: partnerMaintainEdit.details || {},
+  salesRangeList: (partnerMaintainEdit.details && partnerMaintainEdit.details.salesRangeList) || [],
+}))
+class Basic extends React.Component {
   state = {
     tabKey: '',
     tabsData: [],
@@ -32,7 +37,9 @@ class BasicInfo extends Component {
   renderTabPane = obj => {
     const {
       form: { getFieldDecorator },
+      details: { basic = {} },
     } = this.props;
+    const { countryCode = 'china' } = basic;
 
     return (
       <>
@@ -49,35 +56,53 @@ class BasicInfo extends Component {
             </Col>
             <Col span={5}>
               <FormItem label="默认付款方式">
-                {getFieldDecorator('paytype')(
+                {getFieldDecorator('defaultPayMethodCode')(
                   <Select>
                     <Option value="1">网银</Option>
                   </Select>,
                 )}
               </FormItem>
             </Col>
-            <Col span={5}>
+            <Col span={4}>
               <FormItem label="币种">
-                {getFieldDecorator('currency')(
+                {getFieldDecorator('currencyCode')(
                   <Select>
                     <Option value="1">人民币</Option>
                   </Select>,
                 )}
               </FormItem>
             </Col>
-            <Col span={2}>
+            {
+              (countryCode === 'china' || !countryCode) ? (
+                <Col span={7}>
+                  <FormItem label="默认开票类型">
+                    {getFieldDecorator('defaultInvoiceTypeCode', { initialValue: 'a' })(
+                      <Radio.Group>
+                        <Radio.Button value="a">增值税专用发票</Radio.Button>
+                        <Radio.Button value="b">增值税普通发票</Radio.Button>
+                      </Radio.Group>,
+                    )}
+                  </FormItem>
+                </Col>
+              ) : null
+            }
+            {
+              (countryCode !== 'china' && countryCode) ? (
+                <Col span={6}>
+                  <FormItem label="税分类">
+                    {getFieldDecorator('taxTypeCode', { initialValue: 'a' })(
+                      <Select>
+                        <Option value="1">免税</Option>
+                        <Option value="2">必须上税</Option>
+                      </Select>,
+                    )}
+                  </FormItem>
+                </Col>
+              ) : null
+            }
+            <Col span={3}>
               <FormItem label="销售冻结">
-                {getFieldDecorator('dongj', { valuePropName: 'checked' })(<Switch />)}
-              </FormItem>
-            </Col>
-            <Col span={7}>
-              <FormItem label="默认开票类型">
-                {getFieldDecorator('kaipiao', { initialValue: 'a' })(
-                  <Radio.Group>
-                    <Radio.Button value="a">增值税专用发票</Radio.Button>
-                    <Radio.Button value="b">增值税普通发票</Radio.Button>
-                  </Radio.Group>,
-                )}
+                {getFieldDecorator('salesBan', { valuePropName: 'checked' })(<Switch disabled />)}
               </FormItem>
             </Col>
           </Row>
@@ -255,4 +280,4 @@ class BasicInfo extends Component {
   }
 }
 
-export default Form.create()(BasicInfo);
+export default Form.create()(Basic);
