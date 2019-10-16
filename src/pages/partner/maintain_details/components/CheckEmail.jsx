@@ -127,18 +127,19 @@ class CheckEmail extends Component {
   }
 
   // 获取验证码功能
+  // eslint-disable-next-line consistent-return
   getCode = () => {
     const {
       emailAccount,
     } = this.props;
-    if (this.props.form.getFieldValue('userEmail')) {
-      // 发送验证码接口
-      this.time();
+    if (!this.props.form.getFieldValue('userEmail') && !emailAccount) {
+      return false;
     }
-    if (emailAccount) {
-      // 发送验证码接口
-      this.time();
-    }
+    this.time();
+    this.setState({
+      btnText: 3,
+      time: 60,
+    })
   }
 
   // 倒计时
@@ -151,7 +152,6 @@ class CheckEmail extends Component {
         // 当前时间回显-1
         this.setState({
             time: time - 1,
-            btnText: 3,
         }, () => {
             // 判断修改后时间是否小于1达到最小时间
             if (this.state.time <= 0) {

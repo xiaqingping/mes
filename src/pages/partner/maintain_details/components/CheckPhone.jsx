@@ -57,72 +57,76 @@ class CheckPhone extends Component {
     }
   };
 
-    // 人工辅助变更验证input的数据
-    handleNext = e => {
-      e.preventDefault();
-      if (this.props.form.getFieldValue('type')) {
-        this.setState({
-          status: 4,
-        })
-      }
-    };
-
-    // 人工提交问题
-    handleQuestion = e => {
-      e.preventDefault();
-      this.props.form.validateFields((err, values) => {
-        if (values.qone && parseInt(values.qone, 10) === 2) {
-          this.setState({
-            oneQuestion: 'success',
-          })
-        } else {
-          this.setState({
-            oneQuestion: 'error',
-          })
-        }
-        if (values.qtwo && parseInt(values.qtwo, 10) === 4) {
-          this.setState({
-            twoQuestion: 'success',
-          })
-        } else {
-          this.setState({
-            twoQuestion: 'error',
-          })
-        }
-        if (values.qthree && parseInt(values.qthree, 10) === 9) {
-          this.setState({
-            threeQuestion: 'success',
-          })
-        } else {
-          this.setState({
-            threeQuestion: 'error',
-          })
-        }
-        if (!err) {
-          this.setState({
-            status: 5,
-          })
-        }
-      });
-    };
-
-    handleCode = e => {
-      e.preventDefault();
-      if (this.props.form.getFieldValue('code')) {
-        clearInterval(this.timer)
-        this.setState({
-          time: 60,
-          btnText: 1,
-          status: 6,
-        })
-      }
+  // 人工辅助变更验证input的数据
+  handleNext = e => {
+    e.preventDefault();
+    if (this.props.form.getFieldValue('type')) {
+      this.setState({
+        status: 4,
+      })
     }
+  };
+
+  // 人工提交问题
+  handleQuestion = e => {
+    e.preventDefault();
+    this.props.form.validateFields((err, values) => {
+      if (values.qone && parseInt(values.qone, 10) === 2) {
+        this.setState({
+          oneQuestion: 'success',
+        })
+      } else {
+        this.setState({
+          oneQuestion: 'error',
+        })
+      }
+      if (values.qtwo && parseInt(values.qtwo, 10) === 4) {
+        this.setState({
+          twoQuestion: 'success',
+        })
+      } else {
+        this.setState({
+          twoQuestion: 'error',
+        })
+      }
+      if (values.qthree && parseInt(values.qthree, 10) === 9) {
+        this.setState({
+          threeQuestion: 'success',
+        })
+      } else {
+        this.setState({
+          threeQuestion: 'error',
+        })
+      }
+      if (!err) {
+        this.setState({
+          status: 5,
+        })
+      }
+    });
+  };
+
+  handleCode = e => {
+    e.preventDefault();
+    if (this.props.form.getFieldValue('code')) {
+      clearInterval(this.timer)
+      this.setState({
+        time: 60,
+        btnText: 1,
+        status: 6,
+      })
+    }
+  }
 
   // 获取验证码功能
   getCode = () => {
     if (this.props.form.getFieldValue('userPhone')) {
       // 发送验证码接口
       this.time();
+      this.setState({
+        btnText: 3,
+        time: 60,
+      })
     }
   }
 

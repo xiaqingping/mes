@@ -12,7 +12,7 @@ import HomeAuthentication from './components/HomeAuthentication';
 import AbroadAuthentication from './components/AbroadAuthentication';
 import Address from './components/Address';
 import Bank from './components/Bank';
-import PurchasingOrg from './components/PurchasingOrg'
+import PurchasingOrg from './components/PurchasingOrg';
 
 
 @connect(({ partnerMaintainEdit }) => ({
@@ -28,43 +28,37 @@ class CustomerDetails extends Component {
     const details = {
       // 基础信息
       basic: {
-        type: 1,
+        id: 1,
+        type: 2,
+        code: 110,
         name: '张三',
-        telephoneCountryCode: 3,
-        mobilePhone: {
-          mobilePhoneCountryCode: '+86',
-          mobilePhone: '18735812924',
-        },
-        email: '123@qq.com',
-        telephone: {
-          telephoneCountryCode: '+86',
-          telephoneAreaCode: '1234',
-          telephone: '57072136',
-          telephoneExtension: '2136',
-        },
-        fax: {
-          faxCountryCode: '+86',
-          faxAreaCode: '1234',
-          fax: '54072136',
-          faxExtension: '2136',
-        },
+        certificationStatus: 1,
+        mobilePhoneCountryCode: '+86',
+        mobilePhone: 13212345678,
+        mobilePhoneVerifyStatus: 1,
+        email: '12345678@qq.com',
+        emailVerifyStatus: 1,
+        telephoneCountryCode: '+86',
+        telephoneAreaCode: '021',
+        telephone: '57771234',
+        telephoneExtension: '6354',
+        faxCountryCode: '+86',
+        faxAreaCode: '1234',
+        fax: '54072136',
+        faxExtension: '2136',
         postCode: '200000',
-        timeZoneCode: '8',
-        languageCode: '1',
-        industryCode: '1',
-        address: {
-          countryCode: '',
-          countryName: '',
-          provinceCode: '',
-          provinceName: '',
-          cityCode: '',
-          cityName: '',
-          countyCode: '',
-          countyName: '',
-          streetCode: '',
-          streetName: '',
-          address: '',
-        },
+        timeZoneCode: 'UTC',
+        languageCode: '中文',
+        industryCode: '生物类',
+        countryCode: '1001',
+        countryName: '中国',
+        cityCode: '021',
+        cityName: '上海市',
+        countyCode: '011',
+        countyName: '松江区',
+        streetCode: '43223',
+        streetName: '香闵路',
+        address: '上海市松江区香闵路******号',
       },
       // 销售范围
       salesRangeList: [],
