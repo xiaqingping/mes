@@ -17,10 +17,15 @@ import styles from '../style.less';
 const FormItem = Form.Item;
 const { Option } = Select;
 
-@connect(({ partnerMaintainEdit }) => ({
-  details: partnerMaintainEdit.details || {},
-  basic: (partnerMaintainEdit.details && partnerMaintainEdit.details.basic) || {},
-}), undefined, undefined, { withRef: true })
+@connect(({ partnerMaintainEdit }) => {
+  const details = partnerMaintainEdit.details || {};
+  const basic = details.basic || {};
+  const customer = details.customer || {};
+  const salesBan = customer.salesBan || false;
+  const vendor = details.vendor || {};
+  const invoicePostBan = vendor.invoicePostBan || false;
+  return { details, basic, customer, salesBan, vendor, invoicePostBan };
+}, undefined, undefined, { withRef: true })
 class Basic extends React.Component {
   validate = () => {
     const { form } = this.props;
@@ -40,9 +45,29 @@ class Basic extends React.Component {
   };
 
   valueChange = (key, value) => {
-    const { details, basic } = this.props;
+    const { details, basic, customer, vendor } = this.props;
     let obj = {
       [key]: value,
+    }
+
+    // 销售冻结
+    if (key === 'salesBan') {
+      const newCustomer = { ...customer, ...obj };
+      this.props.dispatch({
+        type: 'partnerMaintainEdit/setDetails',
+        payload: { ...details, ...{ customer: newCustomer } },
+      });
+      return;
+    }
+
+    // 采购冻结
+    if (key === 'invoicePostBan') {
+      const newVendor = { ...vendor, ...obj };
+      this.props.dispatch({
+        type: 'partnerMaintainEdit/setDetails',
+        payload: { ...details, ...{ vendor: newVendor } },
+      });
+      return;
     }
 
     const keyList = [
@@ -55,11 +80,11 @@ class Basic extends React.Component {
     ]
     if (keyList.indexOf(key) > -1) obj = value;
 
-    const data = { ...basic, ...obj };
+    const newBasic = { ...basic, ...obj };
 
     this.props.dispatch({
       type: 'partnerMaintainEdit/setDetails',
-      payload: { ...details, ...{ basic: data } },
+      payload: { ...details, ...{ basic: newBasic } },
     });
   }
 
@@ -68,6 +93,8 @@ class Basic extends React.Component {
       form: { getFieldDecorator },
       basic,
       tabActiveKey,
+      salesBan,
+      invoicePostBan,
     } = this.props;
 
     return (
@@ -181,7 +208,10 @@ class Basic extends React.Component {
               tabActiveKey === 'customer' ? (
                 <Col md={6} sm={6}>
                   <FormItem label="销售冻结">
-                    {getFieldDecorator('salesBan', { valuePropName: 'checked' })(
+                    {getFieldDecorator('salesBan', {
+                      initialValue: salesBan,
+                      valuePropName: 'checked',
+                    })(
                       <Switch onChange={value => this.valueChange('salesBan', value)} />,
                     )}
                   </FormItem>
@@ -192,7 +222,10 @@ class Basic extends React.Component {
               tabActiveKey === 'vendor' ? (
                 <Col md={6} sm={6}>
                   <FormItem label="采购冻结">
-                    {getFieldDecorator('invoicePostBan', { valuePropName: 'checked' })(
+                    {getFieldDecorator('invoicePostBan', {
+                      initialValue: invoicePostBan,
+                      valuePropName: 'checked',
+                    })(
                       <Switch onChange={value => this.valueChange('invoicePostBan', value)} />,
                     )}
                   </FormItem>

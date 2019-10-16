@@ -24,10 +24,12 @@ const FormItem = Form.Item;
 const { Option } = Select;
 const { TabPane } = Tabs;
 
-@connect(({ partnerMaintainEdit }) => ({
-  details: partnerMaintainEdit.details || {},
-  salesRangeList: (partnerMaintainEdit.details && partnerMaintainEdit.details.salesRangeList) || [],
-}))
+@connect(({ partnerMaintainEdit }) => {
+  const details = partnerMaintainEdit.details || {};
+  const customer = details.customer || { };
+  const salesRangeList = customer.salesRangeList || [];
+  return { details, customer, salesRangeList };
+}, undefined, undefined, { withRef: true })
 class Basic extends React.Component {
   state = {
     tabKey: '',
