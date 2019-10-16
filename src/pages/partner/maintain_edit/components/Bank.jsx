@@ -12,11 +12,13 @@ import { connect } from 'dva';
 const FormItem = Form.Item;
 const { Option } = Select;
 
-@connect(({ partnerMaintainEdit }) => ({
-  details: partnerMaintainEdit.details || {},
-  basic: (partnerMaintainEdit.details && partnerMaintainEdit.details.basic) || {},
-  paymentBank: (partnerMaintainEdit.details && partnerMaintainEdit.details.paymentBank) || {},
-}), undefined, undefined, { withRef: true })
+@connect(({ partnerMaintainEdit }) => {
+  const details = partnerMaintainEdit.details || {};
+  const basic = details.basic || {};
+  const vendor = details.vendor || { };
+  const paymentBank = vendor.paymentBank || {};
+  return { details, basic, vendor, paymentBank };
+}, undefined, undefined, { withRef: true })
 class Bank extends Component {
   constructor(props) {
     super(props);
@@ -24,12 +26,15 @@ class Bank extends Component {
   }
 
   valueChange = (key, value) => {
-    const { details, paymentBank } = this.props;
-    const data = { ...paymentBank, ...{ [key]: value } };
+    const { details, vendor, paymentBank } = this.props;
+
+    const newPaymentBank = { ...paymentBank, ...{ [key]: value } };
+    const newVendor = { ...vendor, ...{ paymentBank: newPaymentBank } };
+    const newDetails = { ...details, ...{ vendor: newVendor } }
 
     this.props.dispatch({
       type: 'partnerMaintainEdit/setDetails',
-      payload: { ...details, ...{ paymentBank: data } },
+      payload: newDetails,
     });
   }
 
