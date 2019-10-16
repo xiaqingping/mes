@@ -11,7 +11,8 @@ import {
   Icon,
   Empty,
 } from 'antd';
-import React, { Component } from 'react';
+import React from 'react';
+import { connect } from 'dva';
 import BillToParty from './BillToParty';
 import SoldToParty from './SoldToParty';
 import ShipToParty from './ShipToParty';
@@ -23,7 +24,11 @@ const FormItem = Form.Item;
 const { Option } = Select;
 const { TabPane } = Tabs;
 
-class Basic extends Component {
+@connect(({ partnerMaintainEdit }) => ({
+  details: partnerMaintainEdit.details || {},
+  salesRangeList: (partnerMaintainEdit.details && partnerMaintainEdit.details.salesRangeList) || [],
+}))
+class Basic extends React.Component {
   state = {
     tabKey: '',
     tabsData: [],
@@ -32,7 +37,9 @@ class Basic extends Component {
   renderTabPane = obj => {
     const {
       form: { getFieldDecorator },
+      details: { basic = {} },
     } = this.props;
+    const { countryCode = 'china' } = basic;
 
     return (
       <>
@@ -65,26 +72,34 @@ class Basic extends Component {
                 )}
               </FormItem>
             </Col>
-            <Col span={7}>
-              <FormItem label="默认开票类型">
-                {getFieldDecorator('defaultInvoiceTypeCode', { initialValue: 'a' })(
-                  <Radio.Group>
-                    <Radio.Button value="a">增值税专用发票</Radio.Button>
-                    <Radio.Button value="b">增值税普通发票</Radio.Button>
-                  </Radio.Group>,
-                )}
-              </FormItem>
-            </Col>
-            {/* <Col span={6}>
-              <FormItem label="税分类">
-                {getFieldDecorator('taxTypeCode', { initialValue: 'a' })(
-                  <Radio.Group>
-                    <Radio.Button value="1">免税</Radio.Button>
-                    <Radio.Button value="2">收税</Radio.Button>
-                  </Radio.Group>,
-                )}
-              </FormItem>
-            </Col> */}
+            {
+              (countryCode === 'china' || !countryCode) ? (
+                <Col span={7}>
+                  <FormItem label="默认开票类型">
+                    {getFieldDecorator('defaultInvoiceTypeCode', { initialValue: 'a' })(
+                      <Radio.Group>
+                        <Radio.Button value="a">增值税专用发票</Radio.Button>
+                        <Radio.Button value="b">增值税普通发票</Radio.Button>
+                      </Radio.Group>,
+                    )}
+                  </FormItem>
+                </Col>
+              ) : null
+            }
+            {
+              (countryCode !== 'china' && countryCode) ? (
+                <Col span={6}>
+                  <FormItem label="税分类">
+                    {getFieldDecorator('taxTypeCode', { initialValue: 'a' })(
+                      <Select>
+                        <Option value="1">免税</Option>
+                        <Option value="2">必须上税</Option>
+                      </Select>,
+                    )}
+                  </FormItem>
+                </Col>
+              ) : null
+            }
             <Col span={3}>
               <FormItem label="销售冻结">
                 {getFieldDecorator('salesBan', { valuePropName: 'checked' })(<Switch disabled />)}

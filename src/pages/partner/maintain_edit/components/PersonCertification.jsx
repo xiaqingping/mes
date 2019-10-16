@@ -114,10 +114,6 @@ class PersonCertification extends React.Component {
       type: 'partnerMaintainEdit/setDetails',
       payload: { ...details, piCertification: newdata },
     });
-    // const { list } = this.state;
-    // this.setState({
-    //   list: [...list, obj],
-    // });
   };
 
   render() {

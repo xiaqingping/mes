@@ -67,6 +67,7 @@ class Basic extends React.Component {
     const {
       form: { getFieldDecorator },
       basic,
+      tabActiveKey,
     } = this.props;
 
     return (
@@ -176,13 +177,28 @@ class Basic extends React.Component {
                 })(<AddressInput onChange={value => this.valueChange('address', value)} />)}
               </FormItem>
             </Col>
-            <Col md={6} sm={6}>
-              <FormItem label="销售冻结">
-                {getFieldDecorator('salesBan', { valuePropName: 'checked' })(
-                  <Switch onChange={value => this.valueChange('salesBan', value)} />,
-                )}
-              </FormItem>
-            </Col>
+            {
+              tabActiveKey === 'customer' ? (
+                <Col md={6} sm={6}>
+                  <FormItem label="销售冻结">
+                    {getFieldDecorator('salesBan', { valuePropName: 'checked' })(
+                      <Switch onChange={value => this.valueChange('salesBan', value)} />,
+                    )}
+                  </FormItem>
+                </Col>
+              ) : null
+            }
+            {
+              tabActiveKey === 'vendor' ? (
+                <Col md={6} sm={6}>
+                  <FormItem label="采购冻结">
+                    {getFieldDecorator('invoicePostBan', { valuePropName: 'checked' })(
+                      <Switch onChange={value => this.valueChange('invoicePostBan', value)} />,
+                    )}
+                  </FormItem>
+                </Col>
+              ) : null
+            }
           </Row>
         </Form>
       </Card>

@@ -24,7 +24,9 @@ import Bank from './components/Bank';
 class CustomerEdit extends Component {
   constructor(props) {
     super(props);
+    const editType = props.location.pathname.indexOf('/add') > -1 ? 'add' : 'update';
     this.state = {
+      editType,
       width: '100%',
       tabActiveKey: 'customer',
     };
@@ -181,19 +183,20 @@ class CustomerEdit extends Component {
   };
 
   validate = () => {
-    console.log(this.props.details)
     // TODO: 子组件方法
     // this.basicView.wrappedInstance.validate();
   }
 
   // 客户
   renderCustomer = details => {
+    const { editType, tabActiveKey } = this.state;
     const { basic } = details;
     const type = (basic && basic.type) || 1;
 
     return (
       <>
         <Basic
+          tabActiveKey={tabActiveKey}
           // eslint-disable-next-line no-return-assign
           wrappedComponentRef={ref => this.basicView = ref}
         />
@@ -202,12 +205,12 @@ class CustomerEdit extends Component {
           type === 2 ?
           (
             <>
-              <OrgCredit />
+              { editType === 'update' ? <OrgCredit /> : null }
               <OrgCertification />
             </>
           ) : (
             <>
-              <PersonCredit />
+              { editType === 'update' ? <PersonCredit /> : null }
               <PersonCertification />
             </>
           )
@@ -219,11 +222,13 @@ class CustomerEdit extends Component {
 
   // 供应商
   renderVendor = details => {
+    const { tabActiveKey } = this.state;
     const { basic } = details;
     const type = (basic && basic.type) || 1;
     return (
       <>
         <Basic
+          tabActiveKey={tabActiveKey}
           // eslint-disable-next-line no-return-assign
           wrappedComponentRef={form => this.form = form}
         />
