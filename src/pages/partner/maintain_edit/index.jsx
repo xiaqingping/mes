@@ -9,7 +9,7 @@ import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import FooterToolbar from '@/components/FooterToolbar';
 
 import Basic from './components/Basic';
-import SalesScope from './components/SalesScope';
+import SalesArea from './components/SalesArea';
 import OrgCredit from './components/OrgCredit';
 import OrgCertification from './components/OrgCertification';
 import PersonCredit from './components/PersonCredit';
@@ -34,11 +34,6 @@ class CustomerEdit extends Component {
   }
 
   componentDidMount() {
-    // const details = {
-    //   // 销售范围
-    //   salesRangeList: [],
-    // };
-
     window.addEventListener('resize', this.resizeFooterToolbar, { passive: true });
     this.resizeFooterToolbar();
   }
@@ -85,7 +80,7 @@ class CustomerEdit extends Component {
           // eslint-disable-next-line no-return-assign
           wrappedComponentRef={ref => this.basicView = ref}
         />
-        <SalesScope />
+        <SalesArea />
         {
           type === 2 ?
           (
@@ -144,13 +139,10 @@ class CustomerEdit extends Component {
 
   render() {
     const { width, tabActiveKey } = this.state;
-    if (!this.props.details) {
-      return null;
-    }
 
     return (
       <PageHeaderWrapper
-        title="修改 100001"
+        title="新增业务伙伴"
         tabActiveKey={tabActiveKey}
         onTabChange={this.onTabChange}
         style={{ paddingBottom: 0 }}

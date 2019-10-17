@@ -37,19 +37,24 @@ export const readDetails = {
   },
   // 客户数据
   customer: {
+    // 税收城市
+    taxesCityCode: '',
+    // 税收县
+    taxesCountyCode: '',
     // 销售冻结
-    salesBan: false,
+    salesOrderBlock: false,
     // 销售范围列表
-    salesRangeList: [
+    salesAreaList: [
       {
         salesOrganizationCode: '',
-        salesChannelCode: '',
+        distributionChannelCode: '',
         regionCode: '',
         officeCode: '',
-        defaultPayMethodCode: '',
+        defaultPaymentMethodCode: '',
         currencyCode: '',
+        salesOrderBlock: false,
         defaultInvoiceTypeCode: '',
-        taxTypeCode: '',
+        taxClassificCode: '',
         invoicePartyList: [
           {
             id: '',
@@ -89,19 +94,19 @@ export const readDetails = {
   // 供应商数据
   vendor: {
     // 采购冻结
-    invoicePostBan: false,
+    invoicePostBlock: false,
     // 采购组织列表
-    purchaseOrganizationList: [
+    purchasingOrganizationList: [
       {
-        purchaseOrganizationCode: 'BBI',
+        purchasingOrganizationCode: 'BBI',
         salerName: '张三',
         salerTelephoneCountryCode: '+86',
         salerTelephone: '18735818888',
-        payTermsCode: '1',
+        paymentTermsCode: '1',
         currencyCode: '1',
         levelCode: '1',
         invoicePostInReceive: true,
-        purchaseGroupCode: '1',
+        purchasingGroupCode: '1',
         deliveryPlanDays: '1',
       },
     ],
@@ -190,18 +195,18 @@ export const addDetails = {
   // 客户数据
   customer: {
     // 销售冻结
-    salesBan: false,
+    salesOrderBlock: false,
     // 销售范围列表
-    salesRangeList: [
+    salesAreaList: [
       {
         salesOrganizationCode: '',
-        salesChannelCode: '',
+        distributionChannelCode: '',
         regionCode: '',
         officeCode: '',
-        defaultPayMethodCode: '',
+        defaultPaymentMethodCode: '',
         currencyCode: '',
         defaultInvoiceTypeCode: '',
-        taxTypeCode: '',
+        taxClassificCode: '',
         invoicePartyList: [
           {
             id: '',
@@ -239,19 +244,19 @@ export const addDetails = {
   // 供应商数据
   vendor: {
     // 采购冻结
-    invoicePostBan: false,
+    invoicePostBlock: false,
     // 采购组织列表
-    purchaseOrganizationList: [
+    purchasingOrganizationList: [
       {
-        purchaseOrganizationCode: 'BBI',
+        purchasingOrganizationCode: 'BBI',
         salerName: '张三',
         salerTelephoneCountryCode: '+86',
         salerTelephone: '18735818888',
-        payTermsCode: '1',
+        paymentTermsCode: '1',
         currencyCode: '1',
         levelCode: '1',
         invoicePostInReceive: true,
-        purchaseGroupCode: '1',
+        purchasingGroupCode: '1',
         deliveryPlanDays: '1',
       },
     ],
@@ -316,17 +321,17 @@ export const updateDetails = {
   },
   // 客户
   customer: {
-    salesBan: false,
-    salesRangeList: [
+    salesOrderBlock: false,
+    salesAreaList: [
       {
         salesOrganizationCode: '',
-        salesChannelCode: '',
+        distributionChannelCode: '',
         regionCode: '',
         officeCode: '',
-        defaultPayMethodCode: '',
+        defaultPaymentMethodCode: '',
         currencyCode: '',
         defaultInvoiceTypeCode: '',
-        taxTypeCode: '',
+        taxClassificCode: '',
         // 收票方
         newInvoicePartyList: [{ id: '', soldToPartyId: '' }],
         deleteInvoicePartyList: [{ id: '', soldToPartyId: '' }],
@@ -349,19 +354,19 @@ export const updateDetails = {
   // 供应商
   vendor: {
     // 采购冻结
-    invoicePostBan: false,
+    invoicePostBlock: false,
     // 采购组织列表
-    purchaseOrganizationList: [
+    purchasingOrganizationList: [
       {
-        purchaseOrganizationCode: 'BBI',
+        purchasingOrganizationCode: 'BBI',
         salerName: '张三',
         salerTelephoneCountryCode: '+86',
         salerTelephone: '18735818888',
-        payTermsCode: '1',
+        paymentTermsCode: '1',
         currencyCode: '1',
         levelCode: '1',
         invoicePostInReceive: true,
-        purchaseGroupCode: '1',
+        purchasingGroupCode: '1',
         deliveryPlanDays: '1',
       },
     ],

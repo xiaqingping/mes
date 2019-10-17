@@ -4,7 +4,7 @@ import {
 } from 'antd';
 import React from 'react';
 
-class BillToParty extends React.Component {
+class InvoiceParty extends React.Component {
   constructor(props) {
     super(props);
     this.state = {};
@@ -45,4 +45,4 @@ class BillToParty extends React.Component {
   }
 }
 
-export default BillToParty;
+export default InvoiceParty;

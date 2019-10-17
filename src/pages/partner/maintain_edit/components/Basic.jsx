@@ -21,10 +21,10 @@ const { Option } = Select;
   const details = partnerMaintainEdit.details || {};
   const basic = details.basic || {};
   const customer = details.customer || {};
-  const salesBan = customer.salesBan || false;
+  const salesOrderBlock = customer.salesOrderBlock || false;
   const vendor = details.vendor || {};
-  const invoicePostBan = vendor.invoicePostBan || false;
-  return { details, basic, customer, salesBan, vendor, invoicePostBan };
+  const invoicePostBlock = vendor.invoicePostBlock || false;
+  return { details, basic, customer, salesOrderBlock, vendor, invoicePostBlock };
 }, undefined, undefined, { withRef: true })
 class Basic extends React.Component {
   validate = () => {
@@ -51,7 +51,7 @@ class Basic extends React.Component {
     }
 
     // 销售冻结
-    if (key === 'salesBan') {
+    if (key === 'salesOrderBlock') {
       const newCustomer = { ...customer, ...obj };
       this.props.dispatch({
         type: 'partnerMaintainEdit/setDetails',
@@ -61,7 +61,7 @@ class Basic extends React.Component {
     }
 
     // 采购冻结
-    if (key === 'invoicePostBan') {
+    if (key === 'invoicePostBlock') {
       const newVendor = { ...vendor, ...obj };
       this.props.dispatch({
         type: 'partnerMaintainEdit/setDetails',
@@ -93,8 +93,8 @@ class Basic extends React.Component {
       form: { getFieldDecorator },
       basic,
       tabActiveKey,
-      salesBan,
-      invoicePostBan,
+      salesOrderBlock,
+      invoicePostBlock,
     } = this.props;
 
     return (
@@ -208,11 +208,11 @@ class Basic extends React.Component {
               tabActiveKey === 'customer' ? (
                 <Col md={6} sm={6}>
                   <FormItem label="销售冻结">
-                    {getFieldDecorator('salesBan', {
-                      initialValue: salesBan,
+                    {getFieldDecorator('salesOrderBlock', {
+                      initialValue: salesOrderBlock,
                       valuePropName: 'checked',
                     })(
-                      <Switch onChange={value => this.valueChange('salesBan', value)} />,
+                      <Switch onChange={value => this.valueChange('salesOrderBlock', value)} />,
                     )}
                   </FormItem>
                 </Col>
@@ -222,11 +222,11 @@ class Basic extends React.Component {
               tabActiveKey === 'vendor' ? (
                 <Col md={6} sm={6}>
                   <FormItem label="采购冻结">
-                    {getFieldDecorator('invoicePostBan', {
-                      initialValue: invoicePostBan,
+                    {getFieldDecorator('invoicePostBlock', {
+                      initialValue: invoicePostBlock,
                       valuePropName: 'checked',
                     })(
-                      <Switch onChange={value => this.valueChange('invoicePostBan', value)} />,
+                      <Switch onChange={value => this.valueChange('invoicePostBlock', value)} />,
                     )}
                   </FormItem>
                 </Col>
