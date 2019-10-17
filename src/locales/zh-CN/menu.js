@@ -22,7 +22,7 @@ export default {
   'menu.partner.maintain': '伙伴维护',
   'menu.partner.maintain.add': '新增',
   'menu.partner.maintain.edit': '修改',
-  'menu.partner.maintain.details': '客户详情',
+  'menu.partner.maintain.details': '查看',
   'menu.partner.operation': '操作记录',
   'menu.partner.verification': '验证记录',
   'menu.peptide': '多肽合成',

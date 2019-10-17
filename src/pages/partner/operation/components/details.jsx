@@ -2,12 +2,11 @@ import {
   Badge,
   Form,
   Table,
-  Input,
   Drawer,
 } from 'antd';
 import * as React from 'react';
 // import api from '@/api'
-import styles from './style.less'
+import './style.less'
 
 // 状态
 const status = {
@@ -38,19 +37,19 @@ class Details extends React.Component {
   columns = [
     {
       title: '字段',
-      dataIndex: 'field',
+      dataIndex: 'fieldName',
     },
     {
       title: '新值',
-      dataIndex: 'new_value',
+      dataIndex: 'newValue',
     },
     {
       title: '旧值',
-      dataIndex: 'old_value',
+      dataIndex: 'oldValue',
     },
     {
       title: '关键字',
-      dataIndex: 'key',
+      dataIndex: 'keyword',
     },
     {
       title: '状态',
@@ -61,7 +60,7 @@ class Details extends React.Component {
     },
     {
       title: '验证记录编号',
-      dataIndex: 'check_code',
+      dataIndex: 'checkCode',
     },
   ];
 
@@ -79,12 +78,12 @@ class Details extends React.Component {
     for (let i = 0; i < 20; i++) {
       data.push({
         id: i + 1,
-        field: 100000 + (i + 1),
-        new_value: detailsValue ? detailsValue.huoban : '',
-        old_value: detailsValue ? detailsValue.actionman : '',
-        key: `${Math.ceil((Math.random() + 0.0001) * 10000)}/${Math.ceil((Math.random() + 0.0001) * 100)}`,
+        fieldName: 100000 + (i + 1),
+        newValue: detailsValue ? detailsValue.huoban : '',
+        oldValue: detailsValue ? detailsValue.actionman : '',
+        keyword: `${Math.ceil((Math.random() + 0.0001) * 10000)}/${Math.ceil((Math.random() + 0.0001) * 100)}`,
         status: Math.ceil((Math.random() + 0.0001) * 4),
-        check_code: Math.ceil((Math.random() + 0.0001) * 100000000),
+        checkCode: Math.ceil((Math.random() + 0.0001) * 100000000),
       });
     }
     this.setState({
