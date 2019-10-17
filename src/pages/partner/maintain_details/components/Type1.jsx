@@ -1,27 +1,11 @@
 import {
-  Badge,
-  Button,
   Card,
-  Col,
-  DatePicker,
-  Divider,
-  Dropdown,
   Form,
-  Icon,
-  Input,
-  InputNumber,
-  Menu,
-  Row,
-  Select,
-  Switch,
-  message,
-  Cascader,
   Descriptions,
 } from 'antd';
 import React, { Component } from 'react';
+import './style.less'
 
-const FormItem = Form.Item;
-const { Option } = Select;
 const DescriptionsItem = Descriptions.Item;
 
 const tabListNoTitle = [
@@ -55,6 +39,7 @@ class Type extends Component {
     return (
       <Card
         bordered={false}
+        className="check-tabs"
         style={{ width: '100%', marginBottom: '24px' }}
         tabList={tabListNoTitle}
         activeTabKey={this.state.noTitleKey}

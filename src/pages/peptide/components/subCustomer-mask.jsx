@@ -1,4 +1,4 @@
-// 客户弹框
+// 负责人弹框
 import {
   Button,
   Col,
@@ -46,6 +46,7 @@ class Search extends Component {
       payMethods,
       payTerms,
       rangeArea,
+      currencys,
     } = this.props;
     return (
       <Form onSubmit={this.submit} layout="inline">
@@ -76,6 +77,16 @@ class Search extends Component {
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
+            <FormItem label="客户编号">
+              {getFieldDecorator('customerCode')(<Input />)}
+            </FormItem>
+          </Col>
+          <Col lg={6} md={8} sm={12}>
+            <FormItem label="客户名称">
+              {getFieldDecorator('customerName')(<Input />)}
+            </FormItem>
+          </Col>
+          <Col lg={6} md={8} sm={12}>
             <FormItem label="大区">
               {getFieldDecorator('regionCode', { initialValue: '' })(
                 <Select>
@@ -92,6 +103,17 @@ class Search extends Component {
                 <Select>
                   <Option value="">全部</Option>
                   {offices.map(item => <Option key={item.code} value={item.code}>
+                    {`${item.code}-${item.name}`}
+                  </Option>)}
+                </Select>)}
+            </FormItem>
+          </Col>
+          <Col lg={6} md={8} sm={12}>
+            <FormItem label="币种">
+              {getFieldDecorator('currency', { initialValue: '' })(
+                <Select>
+                  <Option value="">全部</Option>
+                  {currencys.map(item => <Option key={item.code} value={item.code}>
                     {`${item.code}-${item.name}`}
                   </Option>)}
                 </Select>)}
@@ -120,6 +142,16 @@ class Search extends Component {
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
+            <FormItem label="销售员编号">
+              {getFieldDecorator('salerCode')(<Input />)}
+            </FormItem>
+          </Col>
+          <Col lg={6} md={8} sm={12}>
+            <FormItem label="销售员名称">
+              {getFieldDecorator('salerName')(<Input />)}
+            </FormItem>
+          </Col>
+          <Col lg={6} md={8} sm={12}>
             <FormItem label="销售范围">
               {getFieldDecorator('rangeOrganization', { initialValue: '' })(
                 <Select>
@@ -128,16 +160,6 @@ class Search extends Component {
                     {item.name}
                   </Option>)}
                 </Select>)}
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="销售员编号">
-              {getFieldDecorator('salerCode')(<Input />)}
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="销售员名称">
-              {getFieldDecorator('salerName')(<Input />)}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
@@ -165,7 +187,7 @@ class Search extends Component {
 @connect(({ peptide }) => ({
   peptide,
 }))
-class Customer extends Component {
+class SubCustomer extends Component {
   state = {
     formValues: {
       page: 1,
@@ -237,7 +259,8 @@ class Customer extends Component {
       modificationType,
     } = this.state;
     const data = { list, pagination: { current, pageSize, total } };
-    const { peptide: { commonData }, regions, offices, payMethods, payTerms } = this.props
+    const { peptide: { commonData }, regions,
+    offices, payMethods, payTerms, currencys } = this.props
     let tableWidth = 0;
 
     let columns = [
@@ -247,7 +270,7 @@ class Customer extends Component {
         width: 100,
       },
       {
-        title: '公司',
+        title: '名称',
         dataIndex: 'name',
         width: 350,
       },
@@ -267,8 +290,18 @@ class Customer extends Component {
         width: 100,
       },
       {
-        title: '分类',
-        dataIndex: 'type',
+        title: '客户编号',
+        dataIndex: 'customerCode',
+        width: 100,
+      },
+      {
+        title: '客户名称',
+        dataIndex: 'customerName',
+        width: 100,
+      },
+      {
+        title: '客户分类',
+        dataIndex: 'custType',
         width: 100,
       },
       {
@@ -297,9 +330,29 @@ class Customer extends Component {
         width: 100,
       },
       {
+        title: '销售员',
+        dataIndex: 'salerCode',
+        width: 100,
+      },
+      {
         title: '销售员名称',
         dataIndex: 'salerName',
         width: 120,
+      },
+      {
+        title: '增值税号',
+        dataIndex: 'vatCode',
+        width: 100,
+      },
+      {
+        title: '信用额度',
+        dataIndex: 'credit',
+        width: 100,
+      },
+      {
+        title: '余额',
+        dataIndex: 'balance',
+        width: 100,
       },
       {
         title: '销售冻结(当前渠道)',
@@ -310,11 +363,6 @@ class Customer extends Component {
         title: '销售冻结(所有渠道)',
         dataIndex: 'customerFrozen',
         width: 200,
-      },
-      {
-        title: '客户性质',
-        dataIndex: 'industryText',
-        width: 100,
       },
     ];
 
@@ -338,7 +386,7 @@ class Customer extends Component {
       <div>
         <Modal
           width="1200px"
-          title="客户列表"
+          title="负责人列表"
           visible={visible}
           onOk={this.handleOk}
           onCancel={this.handleCancel}
@@ -352,6 +400,7 @@ class Customer extends Component {
               payMethods={payMethods}
               payTerms={payTerms}
               rangeArea={commonData.rangeArea}
+              currencys={currencys}
              />
             <div className="tableListOperator">
             </div>
@@ -371,4 +420,4 @@ class Customer extends Component {
   }
 }
 
-export default Form.create()(Customer);
+export default Form.create()(SubCustomer);
