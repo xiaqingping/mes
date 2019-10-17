@@ -15,7 +15,9 @@ import PersonCertificationAddModal from './PersonCertificationAddModal';
 const { Paragraph } = Typography;
 
 @connect(({ partnerMaintainEdit }) => ({
-  details: partnerMaintainEdit.details,
+  details: partnerMaintainEdit.details || {},
+  // eslint-disable-next-line max-len
+  piCertification: (partnerMaintainEdit.details && partnerMaintainEdit.details.piCertification) || [],
 }))
 class PersonCertification extends React.Component {
   constructor(props) {
@@ -79,8 +81,7 @@ class PersonCertification extends React.Component {
   };
 
   removeItem = id => {
-    const { details } = this.props;
-    const { piCertification } = details;
+    const { details, piCertification } = this.props;
 
     const data = piCertification.filter(e => e.id !== id);
     this.props.dispatch({
@@ -90,8 +91,7 @@ class PersonCertification extends React.Component {
   }
 
   handleAdd = data => {
-    const { details } = this.props;
-    const { piCertification } = details;
+    const { details, piCertification } = this.props;
 
     const attachmentList = data.attachmentList.map(e => ({
       code: e.thumbUrl,
@@ -114,15 +114,10 @@ class PersonCertification extends React.Component {
       type: 'partnerMaintainEdit/setDetails',
       payload: { ...details, piCertification: newdata },
     });
-    // const { list } = this.state;
-    // this.setState({
-    //   list: [...list, obj],
-    // });
   };
 
   render() {
-    const { details } = this.props;
-    const { piCertification } = details;
+    const { piCertification } = this.props;
     const { addModalVisible } = this.state;
     const nullData = {};
 

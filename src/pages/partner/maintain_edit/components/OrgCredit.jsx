@@ -10,13 +10,13 @@ const DescriptionsItem = Descriptions.Item;
 
 
 @connect(({ partnerMaintainEdit }) => ({
-  details: partnerMaintainEdit.details,
+  details: partnerMaintainEdit.details || {},
+  creditList: (partnerMaintainEdit.details && partnerMaintainEdit.details.creditList) || [],
 }))
 class OrgCredit extends Component {
   render() {
-    const { details } = this.props;
-    const { creditList } = details;
-    const data = creditList[0];
+    const { creditList } = this.props;
+    const data = (creditList && creditList[0]) || {};
 
     return (
       <Card

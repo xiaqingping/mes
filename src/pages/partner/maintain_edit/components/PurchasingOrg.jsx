@@ -11,31 +11,33 @@ import {
   Icon,
   Cascader,
 } from 'antd';
-import React, { Component } from 'react';
+import { connect } from 'dva';
+import React from 'react';
+import { MobilePhoneInput } from '@/components/CustomizedFormControls';
 
 const FormItem = Form.Item;
 const { Option } = Select;
 
-class Type extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      tabKey: '',
-      tabsData: [],
-    }
-  }
-
-  renderTabPane = () => {
+@Form.create()
+class FormContent extends React.Component {
+  render() {
     const {
       form: { getFieldDecorator },
+      data,
+      tabKey,
+      valueChange,
     } = this.props;
+
+    if (tabKey !== data.purchasingOrganizationCode) return null;
     return (
       <Form layout="vertical">
         <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
           <Col md={6}>
             <FormItem label="订单货币">
-              {getFieldDecorator('email')(
-                <Select>
+              {getFieldDecorator('currencyCode', {
+                initialValue: data.currencyCode,
+              })(
+                <Select onChange={value => valueChange('currencyCode', value)}>
                   <Option value="1">人民币</Option>
                   <Option value="2">美元</Option>
                 </Select>,
@@ -44,8 +46,10 @@ class Type extends Component {
           </Col>
           <Col md={6}>
             <FormItem label="付款条件">
-              {getFieldDecorator('kaihubank')(
-                <Select>
+              {getFieldDecorator('paymentTermsCode', {
+                initialValue: data.paymentTermsCode,
+              })(
+                <Select onChange={value => valueChange('paymentTermsCode', value)}>
                   <Option value="1">条件1</Option>
                   <Option value="2">条件2</Option>
                 </Select>,
@@ -54,18 +58,31 @@ class Type extends Component {
           </Col>
           <Col md={6}>
             <FormItem label="销售人员">
-              {getFieldDecorator('zhanghu')(<Input />)}
+              {getFieldDecorator('salerName', {
+                initialValue: data.salerName,
+              })(
+                <Input onChange={e => valueChange('salerName', e.target.value)}/>,
+              )}
             </FormItem>
           </Col>
           <Col md={6}>
             <FormItem label="销售人员电话">
-              {getFieldDecorator('huming')(<Input />)}
+              {getFieldDecorator('salerTelephone', {
+                initialValue: {
+                  mobilePhoneCountryCode: data.salerTelephoneCountryCode,
+                  mobilePhone: data.salerTelephone,
+                },
+              })(
+                <MobilePhoneInput onChange={value => valueChange('salerTelephone', value)}/>,
+              )}
             </FormItem>
           </Col>
           <Col md={6}>
             <FormItem label="供应商级别">
-              {getFieldDecorator('jibie')(
-                <Select>
+              {getFieldDecorator('levelCode', {
+                initialValue: data.levelCode,
+              })(
+                <Select onChange={value => valueChange('levelCode', value)}>
                   <Option value="1">级别1</Option>
                   <Option value="2">级别2</Option>
                 </Select>,
@@ -74,13 +91,20 @@ class Type extends Component {
           </Col>
           <Col md={6}>
             <FormItem label="收货时发票过账">
-              {getFieldDecorator('guozhang', { valuePropName: 'checked' })(<Switch />)}
+              {getFieldDecorator('invoicePostInReceive', {
+                valuePropName: 'checked',
+                initialValue: data.invoicePostInReceive,
+              })(
+                <Switch onChange={value => valueChange('invoicePostInReceive', value)}/>)
+              }
             </FormItem>
           </Col>
           <Col md={6}>
             <FormItem label="采购组">
-              {getFieldDecorator('caigouzu')(
-                <Select>
+              {getFieldDecorator('purchasingGroupCode', {
+                initialValue: data.purchasingGroupCode,
+              })(
+                <Select onChange={value => valueChange('purchasingGroupCode', value)}>
                   <Option value="1">组1</Option>
                   <Option value="2">组2</Option>
                 </Select>,
@@ -89,13 +113,14 @@ class Type extends Component {
           </Col>
           <Col md={6}>
             <FormItem label="计划交货时间">
-              {getFieldDecorator('time', {
-                initialValue: 1,
+              {getFieldDecorator('deliveryPlanDays', {
+                initialValue: data.deliveryPlanDays,
               })(
                 <InputNumber
                   min={1}
                   formatter={value => `${value}天`}
                   parser={value => value.replace('天', '')}
+                  onChange={value => valueChange('deliveryPlanDays', value)}
                 />,
               )}
             </FormItem>
@@ -104,28 +129,77 @@ class Type extends Component {
       </Form>
     );
   }
+}
+
+@connect(({ partnerMaintainEdit }) => {
+  const details = partnerMaintainEdit.details || {};
+  const vendor = details.vendor || { };
+  const purchasingOrganizationList = vendor.purchasingOrganizationList || [];
+  return { details, vendor, purchasingOrganizationList };
+}, undefined, undefined, { withRef: true })
+class PurchasingOrg extends React.Component {
+  constructor(props) {
+    super(props);
+    const { purchasingOrganizationList: tabsData } = this.props;
+    this.state = {
+      tabKey: (tabsData && tabsData[0] && tabsData[0].purchasingOrganizationCode) || '',
+    }
+  }
+
+  valueChange = (key, value) => {
+    const { tabKey } = this.state;
+    const { details, vendor, purchasingOrganizationList } = this.props;
+
+    const newPurchasingOrganizationList = purchasingOrganizationList.map(e => {
+      if (e.purchasingOrganizationCode === tabKey) {
+        if (key === 'salerTelephone') {
+          e.salerTelephone = value.mobilePhone;
+          e.salerTelephoneCountryCode = value.mobilePhoneCountryCode;
+        } else {
+          e[key] = value;
+        }
+      }
+      return e;
+    });
+    const newVendor = { ...vendor, ...{ purchasingOrganizationList: newPurchasingOrganizationList } };
+    const newDetails = { ...details, ...{ vendor: newVendor } };
+
+    this.props.dispatch({
+      type: 'partnerMaintainEdit/setDetails',
+      payload: newDetails,
+    });
+  }
 
   onTabChange = tabKey => {
     if (tabKey === 'select') return;
-    this.setState({
-      tabKey,
-    });
+    this.setState({ tabKey });
   }
 
   // 级联选泽采购组织时
   onCascaderChange = obj => {
-    const { tabsData } = this.state;
+    const { details, vendor, purchasingOrganizationList: tabsData } = this.props;
     const index = obj.length - 1;
 
-    tabsData.push({
-      title: obj[index],
+    const newPurchasingOrganizationList = [].concat(tabsData, {
+      purchasingOrganizationCode: obj[index],
     });
-    this.setState({ tabsData, tabKey: obj[index] });
+
+    const newVendor = { ...vendor, ...{ purchasingOrganizationList: newPurchasingOrganizationList } };
+    const newDetails = { ...details, ...{ vendor: newVendor } };
+
+    this.props.dispatch({
+      type: 'partnerMaintainEdit/setDetails',
+      payload: newDetails,
+    });
+
+    this.setState({
+      tabKey: obj[index],
+    });
   }
 
   renderCascader = () => {
-    const { tabsData } = this.state;
-    const cascaderTitle = tabsData.map(e => e.title);
+    const { purchasingOrganizationList: tabsData } = this.props;
+    const cascaderTitle = tabsData.map(e => e.purchasingOrganizationCode);
     const options = [
       {
         value: '生工',
@@ -157,11 +231,11 @@ class Type extends Component {
   closeTab = tabKey => {
     let index = -1;
     let key = '';
-    const { tabsData } = this.state;
+    const { details, vendor, purchasingOrganizationList: tabsData } = this.props;
 
     // 过滤掉关闭的采购组织
     const newTabsData = tabsData.filter((e, i) => {
-      if (e.title !== tabKey) return true;
+      if (e.purchasingOrganizationCode !== tabKey) return true;
       index = i;
       return false;
     });
@@ -170,29 +244,39 @@ class Type extends Component {
     if (newTabsData.length > 0) {
       // 关闭第一个
       if (index === 0) {
-        key = newTabsData[0].title;
+        key = newTabsData[0].purchasingOrganizationCode;
       }
       // 关闭最后一个
       if (index === tabsData.length - 1) {
-        key = newTabsData[index - 1].title;
+        key = newTabsData[index - 1].purchasingOrganizationCode;
       }
       // 关闭中间的Tab
       if (index > 0 && index < tabsData.length - 1) {
-        key = newTabsData[index].title;
+        key = newTabsData[index].purchasingOrganizationCode;
       }
     } else {
       key = '';
     }
 
-    this.setState({
-      tabsData: newTabsData,
-      tabKey: key,
+    const newVendor = { ...vendor, ...{ purchasingOrganizationList: newTabsData } };
+    const newDetails = { ...details, ...{ vendor: newVendor } };
+
+    this.props.dispatch({
+      type: 'partnerMaintainEdit/setDetails',
+      payload: newDetails,
     });
+    this.setState({ tabKey: key });
   }
 
   render() {
-    const { tabsData, tabKey } = this.state;
-    let tabList = tabsData.map(e => ({ key: e.title, tab: e.title }));
+    const { tabKey } = this.state;
+    const { purchasingOrganizationList: tabsData } = this.props;
+
+    let tabList = tabsData.map(e => ({
+      key: e.purchasingOrganizationCode,
+      tab: e.purchasingOrganizationCode,
+    }));
+
     tabList = tabList.concat({
       key: 'select',
       tab: this.renderCascader(),
@@ -220,10 +304,18 @@ class Type extends Component {
           this.onTabChange(key);
         }}
       >
-        {tabKey ? this.renderTabPane() : <Empty description="暂无采购组织" />}
+        {tabKey ?
+          tabsData.map(e =>
+            <FormContent
+              key={e.purchasingOrganizationCode}
+              valueChange={this.valueChange}
+              tabKey={tabKey}
+              data={e} />,
+          ) : <Empty description="暂无采购组织" />
+        }
       </Card>
     );
   }
 }
 
-export default Form.create()(Type);
+export default PurchasingOrg;
