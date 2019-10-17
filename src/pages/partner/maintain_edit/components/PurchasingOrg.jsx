@@ -28,7 +28,7 @@ class FormContent extends React.Component {
       valueChange,
     } = this.props;
 
-    if (tabKey !== data.purchaseOrganizationCode) return null;
+    if (tabKey !== data.purchasingOrganizationCode) return null;
     return (
       <Form layout="vertical">
         <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
@@ -46,10 +46,10 @@ class FormContent extends React.Component {
           </Col>
           <Col md={6}>
             <FormItem label="付款条件">
-              {getFieldDecorator('payTermsCode', {
-                initialValue: data.payTermsCode,
+              {getFieldDecorator('paymentTermsCode', {
+                initialValue: data.paymentTermsCode,
               })(
-                <Select onChange={value => valueChange('payTermsCode', value)}>
+                <Select onChange={value => valueChange('paymentTermsCode', value)}>
                   <Option value="1">条件1</Option>
                   <Option value="2">条件2</Option>
                 </Select>,
@@ -101,10 +101,10 @@ class FormContent extends React.Component {
           </Col>
           <Col md={6}>
             <FormItem label="采购组">
-              {getFieldDecorator('purchaseGroupCode', {
-                initialValue: data.purchaseGroupCode,
+              {getFieldDecorator('purchasingGroupCode', {
+                initialValue: data.purchasingGroupCode,
               })(
-                <Select onChange={value => valueChange('purchaseGroupCode', value)}>
+                <Select onChange={value => valueChange('purchasingGroupCode', value)}>
                   <Option value="1">组1</Option>
                   <Option value="2">组2</Option>
                 </Select>,
@@ -134,24 +134,24 @@ class FormContent extends React.Component {
 @connect(({ partnerMaintainEdit }) => {
   const details = partnerMaintainEdit.details || {};
   const vendor = details.vendor || { };
-  const purchaseOrganizationList = vendor.purchaseOrganizationList || [];
-  return { details, vendor, purchaseOrganizationList };
+  const purchasingOrganizationList = vendor.purchasingOrganizationList || [];
+  return { details, vendor, purchasingOrganizationList };
 }, undefined, undefined, { withRef: true })
 class PurchasingOrg extends React.Component {
   constructor(props) {
     super(props);
-    const { purchaseOrganizationList: tabsData } = this.props;
+    const { purchasingOrganizationList: tabsData } = this.props;
     this.state = {
-      tabKey: (tabsData && tabsData[0] && tabsData[0].purchaseOrganizationCode) || '',
+      tabKey: (tabsData && tabsData[0] && tabsData[0].purchasingOrganizationCode) || '',
     }
   }
 
   valueChange = (key, value) => {
     const { tabKey } = this.state;
-    const { details, vendor, purchaseOrganizationList } = this.props;
+    const { details, vendor, purchasingOrganizationList } = this.props;
 
-    const newPurchaseOrganizationList = purchaseOrganizationList.map(e => {
-      if (e.purchaseOrganizationCode === tabKey) {
+    const newPurchasingOrganizationList = purchasingOrganizationList.map(e => {
+      if (e.purchasingOrganizationCode === tabKey) {
         if (key === 'salerTelephone') {
           e.salerTelephone = value.mobilePhone;
           e.salerTelephoneCountryCode = value.mobilePhoneCountryCode;
@@ -161,7 +161,7 @@ class PurchasingOrg extends React.Component {
       }
       return e;
     });
-    const newVendor = { ...vendor, ...{ purchaseOrganizationList: newPurchaseOrganizationList } };
+    const newVendor = { ...vendor, ...{ purchasingOrganizationList: newPurchasingOrganizationList } };
     const newDetails = { ...details, ...{ vendor: newVendor } };
 
     this.props.dispatch({
@@ -177,14 +177,14 @@ class PurchasingOrg extends React.Component {
 
   // 级联选泽采购组织时
   onCascaderChange = obj => {
-    const { details, vendor, purchaseOrganizationList: tabsData } = this.props;
+    const { details, vendor, purchasingOrganizationList: tabsData } = this.props;
     const index = obj.length - 1;
 
-    const newPurchaseOrganizationList = [].concat(tabsData, {
-      purchaseOrganizationCode: obj[index],
+    const newPurchasingOrganizationList = [].concat(tabsData, {
+      purchasingOrganizationCode: obj[index],
     });
 
-    const newVendor = { ...vendor, ...{ purchaseOrganizationList: newPurchaseOrganizationList } };
+    const newVendor = { ...vendor, ...{ purchasingOrganizationList: newPurchasingOrganizationList } };
     const newDetails = { ...details, ...{ vendor: newVendor } };
 
     this.props.dispatch({
@@ -198,8 +198,8 @@ class PurchasingOrg extends React.Component {
   }
 
   renderCascader = () => {
-    const { purchaseOrganizationList: tabsData } = this.props;
-    const cascaderTitle = tabsData.map(e => e.purchaseOrganizationCode);
+    const { purchasingOrganizationList: tabsData } = this.props;
+    const cascaderTitle = tabsData.map(e => e.purchasingOrganizationCode);
     const options = [
       {
         value: '生工',
@@ -231,11 +231,11 @@ class PurchasingOrg extends React.Component {
   closeTab = tabKey => {
     let index = -1;
     let key = '';
-    const { details, vendor, purchaseOrganizationList: tabsData } = this.props;
+    const { details, vendor, purchasingOrganizationList: tabsData } = this.props;
 
     // 过滤掉关闭的采购组织
     const newTabsData = tabsData.filter((e, i) => {
-      if (e.purchaseOrganizationCode !== tabKey) return true;
+      if (e.purchasingOrganizationCode !== tabKey) return true;
       index = i;
       return false;
     });
@@ -244,21 +244,21 @@ class PurchasingOrg extends React.Component {
     if (newTabsData.length > 0) {
       // 关闭第一个
       if (index === 0) {
-        key = newTabsData[0].purchaseOrganizationCode;
+        key = newTabsData[0].purchasingOrganizationCode;
       }
       // 关闭最后一个
       if (index === tabsData.length - 1) {
-        key = newTabsData[index - 1].purchaseOrganizationCode;
+        key = newTabsData[index - 1].purchasingOrganizationCode;
       }
       // 关闭中间的Tab
       if (index > 0 && index < tabsData.length - 1) {
-        key = newTabsData[index].purchaseOrganizationCode;
+        key = newTabsData[index].purchasingOrganizationCode;
       }
     } else {
       key = '';
     }
 
-    const newVendor = { ...vendor, ...{ purchaseOrganizationList: newTabsData } };
+    const newVendor = { ...vendor, ...{ purchasingOrganizationList: newTabsData } };
     const newDetails = { ...details, ...{ vendor: newVendor } };
 
     this.props.dispatch({
@@ -270,11 +270,11 @@ class PurchasingOrg extends React.Component {
 
   render() {
     const { tabKey } = this.state;
-    const { purchaseOrganizationList: tabsData } = this.props;
+    const { purchasingOrganizationList: tabsData } = this.props;
 
     let tabList = tabsData.map(e => ({
-      key: e.purchaseOrganizationCode,
-      tab: e.purchaseOrganizationCode,
+      key: e.purchasingOrganizationCode,
+      tab: e.purchasingOrganizationCode,
     }));
 
     tabList = tabList.concat({
@@ -307,7 +307,7 @@ class PurchasingOrg extends React.Component {
         {tabKey ?
           tabsData.map(e =>
             <FormContent
-              key={e.purchaseOrganizationCode}
+              key={e.purchasingOrganizationCode}
               valueChange={this.valueChange}
               tabKey={tabKey}
               data={e} />,
