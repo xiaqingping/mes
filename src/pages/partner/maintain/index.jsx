@@ -438,6 +438,34 @@ class Maintain extends React.Component {
     return expandForm ? this.renderAdvancedForm() : this.renderSimpleForm();
   };
 
+  // form in modal
+  perSaveFormRef = formRef => {
+    this.performRef = formRef;
+  };
+
+  // get values of form in modal
+  getValues = () => {
+    const { form } = this.performRef.props;
+    form.validateFields((err, values) => {
+      if (err) {
+        return;
+      }
+
+      console.log(values);
+    })
+
+    const allValues = form.getFieldsValue();
+    console.log(allValues);
+  }
+
+  // close the modal
+  closeModal = () => {
+    this.setState({
+      changeModal: false,
+      recordMesg: undefined,
+    })
+  }
+
   /** 完整筛选条件 */
   renderAdvancedForm() {
     const {
@@ -602,8 +630,6 @@ class Maintain extends React.Component {
   render() {
     const { data, selectedRows, changeModal, recordMesg } = this.state;
     const loading = false;
-    const { form } = this.props;
-    const { getFieldDecorator } = form;
 
     return (
       <PageHeaderWrapper>
@@ -627,9 +653,11 @@ class Maintain extends React.Component {
           </div>
         </Card>
         <ChangeModal
+          wrappedComponentRef={this.perSaveFormRef}
           changeModal={changeModal}
           recordMsg={ recordMesg }
-          form={form}/>
+          closeModal={this.closeModal}
+          getValues={this.getValues}/>
       </PageHeaderWrapper>
     );
   }
