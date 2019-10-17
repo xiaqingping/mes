@@ -7,29 +7,12 @@ import {
 } from 'antd';
 import React, { Component } from 'react';
 import './style.less'
+import { connect } from 'dva';
+
 
 const { TabPane } = Tabs;
 
 const DescriptionsItem = Descriptions.Item;
-
-const tabListNoTitle = [
-  {
-    key: '1',
-    tab: '生工国内电商',
-  },
-  {
-    key: '2',
-    tab: '生工国外电商',
-  },
-  {
-    key: '3',
-    tab: '生工国内直销',
-  },
-  {
-    key: '4',
-    tab: '生工国外直销',
-  },
-];
 
 // 状态
 const status = {
@@ -43,6 +26,9 @@ const status = {
   },
 };
 
+@connect(({ partnerMaintainEdit }) => ({
+  details: partnerMaintainEdit.details,
+}))
 // eslint-disable-next-line react/prefer-stateless-function
 class BasicInfo extends Component {
   state = {
@@ -141,6 +127,15 @@ class BasicInfo extends Component {
     this.getData()
   }
 
+  tabListNoTitle = () => {
+    const { details: { customer: { salesAreaList } } } = this.props;
+    const data = [];
+    salesAreaList.map(item => {
+      data.push({ key: item.salesOrganizationCode, tab: item.distributionChannelCode })
+    })
+    return data
+  }
+
   getData = () => {
     const data = [];
     for (let i = 0; i < 5; i++) {
@@ -162,30 +157,38 @@ class BasicInfo extends Component {
   }
 
   render() {
-    const { list } = this.state;
+    const { list, noTitleKey } = this.state;
+    const { details: { customer: { salesAreaList } } } = this.props;
     return (
       <Card
         title="销售范围"
         className="check-tabs"
         bordered={false}
         style={{ width: '100%', marginBottom: '24px' }}
-        tabList={tabListNoTitle}
-        activeTabKey={this.state.noTitleKey}
+        tabList={this.tabListNoTitle()}
+        activeTabKey={noTitleKey}
         onTabChange={key => {
           this.onTabChange(key);
         }}
       >
-        <Descriptions
-          className="s-descriptions"
-          layout="vertical"
-          column={5}
-        >
-          <DescriptionsItem label="网点归属">华东大区/山东网点</DescriptionsItem>
-          <DescriptionsItem label="默认付款方式">银行付款</DescriptionsItem>
-          <DescriptionsItem label="币种">意大利里拉</DescriptionsItem>
-          <DescriptionsItem label="销售冻结">活跃</DescriptionsItem>
-          <DescriptionsItem label="默认开票类型">增值税专用发票</DescriptionsItem>
-        </Descriptions>
+        { salesAreaList.map(item => {
+          if (parseInt(item.salesOrganizationCode, 10) === parseInt(noTitleKey, 10)) {
+            return (
+              <Descriptions
+              className="s-descriptions"
+              layout="vertical"
+              column={5}
+              key={item.regionCode}
+              >
+                <DescriptionsItem label="网点归属">{item.regionCode}/{item.officeCode}</DescriptionsItem>
+                <DescriptionsItem label="默认付款方式">{item.defaultPaymentMethodCode}</DescriptionsItem>
+                <DescriptionsItem label="币种">{item.currencyCode}</DescriptionsItem>
+                <DescriptionsItem label="默认开票类型">{item.defaultnvoiceTypeCode}</DescriptionsItem>
+            <DescriptionsItem label="销售冻结">{item.salesOrderBlock === 1 ? <span><Badge status="success"/> 活跃</span> : <span><Badge status="error"/> 冻结</span>} </DescriptionsItem>
+              </Descriptions>
+            )
+          }
+        })}
         <div style={{ border: '1px solid #E6E6E6', width: '100%', height: '100%' }}>
           <Tabs defaultActiveKey="1" className="tabs">
             <TabPane tab="收票方" key="1">
