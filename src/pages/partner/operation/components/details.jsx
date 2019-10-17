@@ -24,7 +24,7 @@ const status = {
   },
   4: {
     value: 'error',
-    text: '验证失败',
+    text: '已拒绝',
   },
 };
 
@@ -60,7 +60,23 @@ class Details extends React.Component {
     },
     {
       title: '验证记录编号',
-      dataIndex: 'checkCode',
+      dataIndex: 'verifyRecordList',
+      render(val) {
+        let data = '';
+        // eslint-disable-next-line array-callback-return
+        val.map((item, index) => {
+            if (item.code) {
+              if (index < 2) {
+                data += `${item.code}<br/>`
+              } else {
+                data += '……'
+              }
+            }
+          },
+        )
+        // eslint-disable-next-line react/no-danger
+        return <span dangerouslySetInnerHTML={{ __html: data }} />
+      },
     },
   ];
 
@@ -73,17 +89,30 @@ class Details extends React.Component {
     this.getData(detailsValue);
   }
 
-  getData = detailsValue => {
+  getData = () => {
     const data = [];
-    for (let i = 0; i < 20; i++) {
+    for (let i = 0; i < 10; i++) {
       data.push({
         id: i + 1,
         fieldName: 100000 + (i + 1),
-        newValue: detailsValue ? detailsValue.huoban : '',
-        oldValue: detailsValue ? detailsValue.actionman : '',
+        newValue: '张三',
+        oldValue: '李四',
         keyword: `${Math.ceil((Math.random() + 0.0001) * 10000)}/${Math.ceil((Math.random() + 0.0001) * 100)}`,
         status: Math.ceil((Math.random() + 0.0001) * 4),
-        checkCode: Math.ceil((Math.random() + 0.0001) * 100000000),
+        verifyRecordList: [
+          {
+            id: i + 1,
+            code: Math.ceil((Math.random() + 0.0001) * 100000000),
+          },
+          {
+            id: i + 2,
+            code: Math.ceil((Math.random() + 0.0001) * 100000000),
+          },
+          {
+            id: i + 3,
+            code: Math.ceil((Math.random() + 0.0001) * 100000000),
+          },
+      ],
       });
     }
     this.setState({
@@ -98,6 +127,7 @@ class Details extends React.Component {
   };
 
   onClose = () => {
+    this.props.detailsVisibleClose(false)
     this.setState({
       visible: false,
     });
@@ -115,7 +145,7 @@ class Details extends React.Component {
           width= "600"
           className="myTables"
         >
-            <Table dataSource={list} columns={this.columns} size="small" pagination={false}/>
+            <Table dataSource={list} rowKey={record => record.id} columns={this.columns} size="small" pagination={false}/>
         </Drawer>
       </div>
     );
