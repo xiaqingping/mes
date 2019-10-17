@@ -109,12 +109,13 @@ class Operation extends React.Component {
     {
       title: '编号',
       dataIndex: 'code',
+      width: 140,
     },
     {
       title: '业务伙伴',
       dataIndex: 'bpCode',
       render(text, record) {
-          return text ? <span><Icon type="user" /> {text}<br/><span style={{ color: '#C2C2C2' }}>{record.bpName}</span></span> : ''
+          return text ? <span style={{ color: '#222222' }}><Icon type="user" /> {text}<br/><span style={{ color: '#999999' }}>{record.bpName}</span></span> : ''
       },
     },
     {
@@ -160,7 +161,7 @@ class Operation extends React.Component {
       width: 300,
       className: 'marginLeft',
       render(val, record) {
-        return <span>{val}<br/><span style={{ color: '#C2C2C2' }}>{record.operatorDate}</span></span>;
+        return <span style={{ color: '#222222' }}>{val}<br/><span style={{ color: '#666666' }}>{record.operatorDate}</span></span>;
       },
     },
     {
@@ -275,6 +276,12 @@ class Operation extends React.Component {
     });
   };
 
+  detailsVisibleClose = v => {
+    this.setState({
+      detailsVisible: v,
+    })
+  }
+
   renderForm = () => {
     const { expandForm } = this.state;
     return expandForm ? this.renderAdvancedForm() : this.renderSimpleForm();
@@ -369,7 +376,6 @@ class Operation extends React.Component {
     );
   }
 
-
   renderSimpleForm() {
     const { form } = this.props;
     const { getFieldDecorator } = form;
@@ -397,7 +403,7 @@ class Operation extends React.Component {
           <Col lg={6} md={8} sm={12}>
             <FormItem label="类型">
               {getFieldDecorator('type', typeValue ? { initialValue: typeValue } : 'type')(
-                <Select mode="multiple">
+                <Select mode="multiple" showArrow onSelect={() => { console.log(123) }}>
                   <Option value="1">新建</Option>
                   <Option value="2">修改</Option>
                 </Select>,
@@ -447,7 +453,9 @@ class Operation extends React.Component {
             />
           </div>
         </Card>
-        <DetailsList detailsVisible={detailsVisible} detailsValue={detailsValue}/>
+        <DetailsList detailsVisible={detailsVisible}
+        detailsVisibleClose={v => { this.detailsVisibleClose(v) }}
+        detailsValue={detailsValue}/>
       </PageHeaderWrapper>
     );
   }
