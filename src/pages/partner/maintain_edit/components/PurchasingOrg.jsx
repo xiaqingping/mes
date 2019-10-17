@@ -161,7 +161,10 @@ class PurchasingOrg extends React.Component {
       }
       return e;
     });
-    const newVendor = { ...vendor, ...{ purchasingOrganizationList: newPurchasingOrganizationList } };
+    const newVendor = {
+      ...vendor,
+      ...{ purchasingOrganizationList: newPurchasingOrganizationList },
+    };
     const newDetails = { ...details, ...{ vendor: newVendor } };
 
     this.props.dispatch({
@@ -184,7 +187,10 @@ class PurchasingOrg extends React.Component {
       purchasingOrganizationCode: obj[index],
     });
 
-    const newVendor = { ...vendor, ...{ purchasingOrganizationList: newPurchasingOrganizationList } };
+    const newVendor = {
+      ...vendor,
+      ...{ purchasingOrganizationList: newPurchasingOrganizationList },
+    };
     const newDetails = { ...details, ...{ vendor: newVendor } };
 
     this.props.dispatch({
