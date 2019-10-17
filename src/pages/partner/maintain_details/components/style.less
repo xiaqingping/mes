@@ -40,7 +40,7 @@
         margin-bottom: 0
     }
     // 去掉：号
-    .ant-form-item-label > label::after {
+    .ant-form-item-label > label::after, .ant-descriptions-item-colon::after  {
       content: '' !important
     }
     // tab的高度变大
@@ -64,5 +64,12 @@
     font-size: 15px;
     text-align: left;
     color: rgba(0, 0, 0, 0.85);
+  }
+
+  // 额度弹框顶部样式
+  .quotaStyle {
+    .ant-modal-header{
+      height: 55px;
+    }
   }
 }

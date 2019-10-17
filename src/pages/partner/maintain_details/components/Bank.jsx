@@ -4,6 +4,7 @@ import {
   Descriptions,
 } from 'antd';
 import React, { Component } from 'react';
+import './style.less'
 
 const DescriptionsItem = Descriptions.Item;
 
@@ -12,7 +13,7 @@ class Bank extends Component {
 
   render() {
     return (
-      <Card title="付款银行" bordered={false} style={{ marginBottom: '24px' }}>
+      <Card title="付款银行" bordered={false} style={{ marginBottom: '24px' }} className="check-tabs">
         <Descriptions
           className="s-descriptions"
           layout="vertical"
