@@ -9,7 +9,7 @@ import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import FooterToolbar from '@/components/FooterToolbar';
 
 import Basic from './components/Basic';
-import SalesScope from './components/SalesScope';
+import SalesArea from './components/SalesArea';
 import OrgCredit from './components/OrgCredit';
 import OrgCertification from './components/OrgCertification';
 import PersonCredit from './components/PersonCredit';
@@ -29,132 +29,11 @@ class CustomerEdit extends Component {
       editType,
       width: '100%',
       tabActiveKey: 'customer',
+      // tabActiveKey: 'vendor',
     };
   }
 
   componentDidMount() {
-    // const details = {
-    //   // 基础信息
-    //   basic: {
-    //     type: 1,
-    //     name: 'max',
-    //     // 手机
-    //     mobilePhoneCountryCode: '+86',
-    //     mobilePhone: '18735812924',
-    //     email: '123@qq.com',
-    //     // 电话
-    //     telephoneCountryCode: '+86',
-    //     telephoneAreaCode: '1234',
-    //     telephone: '57072136',
-    //     telephoneExtension: '2136',
-    //     // 传真
-    //     faxCountryCode: '+86',
-    //     faxAreaCode: '1234',
-    //     fax: '54072136',
-    //     faxExtension: '2136',
-    //     // 邮编
-    //     postCode: '200000',
-    //     // 时区
-    //     timeZoneCode: '8',
-    //     // 语言
-    //     languageCode: '1',
-    //     // 行业类别
-    //     industryCode: '1',
-    //     // 地址
-    //     countryCode: 'china',
-    //     provinceCode: 'shanxi',
-    //     cityCode: 'taiyuan',
-    //     countyCode: 'xiaodian',
-    //     streetCode: 'xuefu',
-    //     address: '888号',
-    //   },
-    //   // 销售范围
-    //   salesRangeList: [],
-    //   // 信贷数据
-    //   creditList: [
-    //     {
-    //       invoicePartyId: 123,
-    //       invoicePartyCode: 12345,
-    //       invoicePartyName: '上海交通大学',
-    //       currencyCode: 'CNY',
-    //       credit: '40000',
-    //       creditPeriod: '30',
-    //       tempCreditLimit: '60000',
-    //       tempCreditLimitExpirationDate: '2019-10-30',
-    //       billingCycle: '50',
-    //       billingDay: '25',
-    //       lastEvaluationDate: '2019-10-01',
-    //     },
-    //   ],
-    //   // 组织认证
-    //   organizationCertification: {
-    //     specialInvoice: true,
-    //     taxNo: 123,
-    //     bankCode: 12345,
-    //     bankAccount: '60045612378',
-    //     address: '注册地址',
-    //     notes: '这是一段认证说明',
-    //     telephoneCountryCode: '+86',
-    //     telephoneAreaCode: '1234',
-    //     telephone: '57072136',
-    //     telephoneExtension: '2136',
-    //     attachmentList: [
-    //       { code: 'https://blog.maxmeng.top/images/avatar.jpg', name: '照片', type: 'image' },
-    //     ],
-    //   },
-    //   // 负责人认证
-    //   piCertification: [
-    //     {
-    //       id: 1,
-    //       invoicePartyId: 123,
-    //       invoicePartyCode: 12345,
-    //       invoicePartyName: '上海交通大学',
-    //       status: 1,
-    //       notes: '这是一段认证说明',
-    //       attachmentList: [
-    //         { code: 'https://blog.maxmeng.top/images/avatar.jpg', name: '照片', type: 'image' },
-    //       ],
-    //     },
-    //   ],
-    //   // 收货地址
-    //   addressList: [
-    //     {
-    //       id: 1,
-    //       name: 'name',
-    //       mobilePhone: '18735812924',
-    //       mobilePhoneCountryCode: '+86',
-    //       postCode: '123456',
-    //       address: '上海市松江区香闵路698号',
-    //     },
-    //   ],
-    //   // 采购组织
-    //   purchaseOrganizationList: [
-    //     {
-    //       purchaseOrganizationCode: 'BBI',
-    //       salerName: '张三',
-    //       salerTelephoneCountryCode: '+86',
-    //       salerTelephone: '18735818888',
-    //       payTermsCode: '1',
-    //       currencyCode: '1',
-    //       levelCode: '1',
-    //       invoicePostInReceive: true,
-    //       purchaseGroupCode: '1',
-    //       deliveryPlanDays: '1',
-    //     },
-    //   ],
-    //   // 付款银行
-    //   paymentBank: {
-    //     countryCode: '1',
-    //     bankCode: '1',
-    //     bankAccount: '6666666666',
-    //     bankAccountName: 'Max',
-    //   },
-    // };
-    // this.props.dispatch({
-    //   type: 'partnerMaintainEdit/setDetails',
-    //   payload: details,
-    // });
-
     window.addEventListener('resize', this.resizeFooterToolbar, { passive: true });
     this.resizeFooterToolbar();
   }
@@ -183,6 +62,7 @@ class CustomerEdit extends Component {
   };
 
   validate = () => {
+    console.log(this.props.details);
     // TODO: 子组件方法
     // this.basicView.wrappedInstance.validate();
   }
@@ -200,7 +80,7 @@ class CustomerEdit extends Component {
           // eslint-disable-next-line no-return-assign
           wrappedComponentRef={ref => this.basicView = ref}
         />
-        <SalesScope />
+        <SalesArea />
         {
           type === 2 ?
           (
@@ -259,13 +139,10 @@ class CustomerEdit extends Component {
 
   render() {
     const { width, tabActiveKey } = this.state;
-    if (!this.props.details) {
-      return null;
-    }
 
     return (
       <PageHeaderWrapper
-        title="修改 100001"
+        title="新增业务伙伴"
         tabActiveKey={tabActiveKey}
         onTabChange={this.onTabChange}
         style={{ paddingBottom: 0 }}

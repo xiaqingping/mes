@@ -50,7 +50,7 @@ class EditableCell extends React.Component {
 }
 
 @Form.create()
-class SoldToParty extends React.Component {
+class InvoiceParty extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -69,9 +69,14 @@ class SoldToParty extends React.Component {
         ],
       },
       {
-        title: '状态',
-        dataIndex: 'linkVerifyStatus',
+        title: '售达方',
+        dataIndex: 'soldToPartyName',
         width: '40%',
+        editable: true,
+        inputType: <Input />,
+        rules: [
+          { required: true },
+        ],
       },
       {
         title: '操作',
@@ -204,4 +209,4 @@ class SoldToParty extends React.Component {
   }
 }
 
-export default SoldToParty;
+export default InvoiceParty;

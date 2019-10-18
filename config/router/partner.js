@@ -2,7 +2,7 @@
 module.exports = {
   path: '/partner',
   name: 'partner',
-  icon: 'smile',
+  icon: 'user',
   routes: [
     {
       name: 'maintain',

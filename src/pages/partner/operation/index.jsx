@@ -14,7 +14,6 @@ import {
 import * as React from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import StandardTable from '@/components/StandardTable';
-import api from '@/api'
 import DetailsList from './components/details'
 
 const FormItem = Form.Item;
@@ -110,12 +109,13 @@ class Operation extends React.Component {
     {
       title: '编号',
       dataIndex: 'code',
+      width: 140,
     },
     {
       title: '业务伙伴',
-      dataIndex: 'huoban',
+      dataIndex: 'bpCode',
       render(text, record) {
-          return text ? <span><Icon type="user" /> {text}<br/><span>&nbsp;&nbsp;&nbsp;&nbsp;{record.phone}</span></span> : ''
+          return text ? <span style={{ color: '#222222' }}><Icon type="user" /> {text}<br/><span style={{ color: '#999999' }}>{record.bpName}</span></span> : ''
       },
     },
     {
@@ -132,18 +132,6 @@ class Operation extends React.Component {
           text: '修改',
         },
       ],
-      filteredValue: this.state.typeValue,
-      onFilter: value => {
-        this.changeTypeValue(value)
-      },
-      onFilterDropdownVisibleChange: e => {
-        if (e) {
-          this.val = [];
-        } else if (!this.select) {
-            this.setState({ typeValue: [] })
-          }
-          this.select = false
-      },
       render(text) {
         return text === 1 ? '新建' : '修改'
     },
@@ -164,26 +152,17 @@ class Operation extends React.Component {
         },
       ],
       render(val, record) {
-        return <span><Badge status={status[val].value} text={status[val].text}/><br/><span style={{ marginLeft: 85 }}>{val === 2 ? record.actiontime : ''}</span></span>;
+        return <span><Badge status={status[val].value} text={status[val].text}/><br/><span style={{ marginLeft: 85 }}>{val === 2 ? record.finishDate : ''}</span></span>;
       },
     },
     {
       title: '操作人',
-      dataIndex: 'actionman',
-      align: 'center',
-      width: 100,
-    },
-    {
-      title: '操作时间',
-      dataIndex: 'actiontime',
-      align: 'center',
-      width: 100,
-    },
-    {
-      title: '业务伙伴编号',
-      dataIndex: 'partnerCode',
-      align: 'center',
-      width: 150,
+      dataIndex: 'operatorName',
+      width: 300,
+      className: 'marginLeft',
+      render(val, record) {
+        return <span style={{ color: '#222222' }}>{val}<br/><span style={{ color: '#666666' }}>{record.operatorDate}</span></span>;
+      },
     },
     {
       fixed: 'right',
@@ -211,34 +190,20 @@ class Operation extends React.Component {
     })
   }
 
-
-  changeTypeValue = e => {
-    this.select = true;
-    if (typeof e === 'string') {
-      if (this.val.indexOf(e) < 0) {
-        this.val.push(e)
-      }
-    } else {
-      this.val = e;
-    }
-     this.setState({
-      typeValue: this.val,
-    })
-  }
-
   getData = () => {
     const data = [];
     for (let i = 0; i < 30; i++) {
       data.push({
         id: i + 1,
         code: 100000 + (i + 1),
-        huoban: `name${i}`,
-        phone: `1${Math.ceil((Math.random() + 0.0001) * 10000000000)}`,
+        bpCode: `name${i}`,
+        bpName: `1${Math.ceil((Math.random() + 0.0001) * 10000000000)}`,
         type: Math.ceil((Math.random() + 0.0001) * 2),
         status: Math.ceil((Math.random() + 0.0001) * 2),
-        actionman: `action${i + 10}`,
-        actiontime: `2019-9-${Math.ceil((Math.random() + 0.0001) * 30)} 12:30:59`,
-        partnerCode: Math.ceil((Math.random() + 0.0001) * 100000), // 1人，2组织
+        finishDate: `2018-9-${Math.ceil((Math.random() + 0.0001) * 30)} 12:30:59`,
+        operatorName: `action${i + 10}`,
+        operatorDate: `2019-9-${Math.ceil((Math.random() + 0.0001) * 30)} 12:30:59`,
+        // partnerCode: Math.ceil((Math.random() + 0.0001) * 100000), // 1人，2组织
       });
     }
     this.setState({
@@ -311,6 +276,12 @@ class Operation extends React.Component {
     });
   };
 
+  detailsVisibleClose = v => {
+    this.setState({
+      detailsVisible: v,
+    })
+  }
+
   renderForm = () => {
     const { expandForm } = this.state;
     return expandForm ? this.renderAdvancedForm() : this.renderSimpleForm();
@@ -362,7 +333,7 @@ class Operation extends React.Component {
           <Col lg={6} md={8} sm={12}>
             <FormItem label="类型">
               {getFieldDecorator('type', typeValue ? { initialValue: typeValue } : 'type')(
-                <Select mode="multiple" onChange={e => this.changeTypeValue(e)}>
+                <Select mode="multiple">
                   <Option value="1">新建</Option>
                   <Option value="2">修改</Option>
                 </Select>,
@@ -405,7 +376,6 @@ class Operation extends React.Component {
     );
   }
 
-
   renderSimpleForm() {
     const { form } = this.props;
     const { getFieldDecorator } = form;
@@ -433,7 +403,7 @@ class Operation extends React.Component {
           <Col lg={6} md={8} sm={12}>
             <FormItem label="类型">
               {getFieldDecorator('type', typeValue ? { initialValue: typeValue } : 'type')(
-                <Select mode="multiple" onChange={e => this.changeTypeValue(e)}>
+                <Select mode="multiple" showArrow onSelect={() => { console.log(123) }}>
                   <Option value="1">新建</Option>
                   <Option value="2">修改</Option>
                 </Select>,
@@ -483,7 +453,9 @@ class Operation extends React.Component {
             />
           </div>
         </Card>
-        <DetailsList detailsVisible={detailsVisible} detailsValue={detailsValue}/>
+        <DetailsList detailsVisible={detailsVisible}
+        detailsVisibleClose={v => { this.detailsVisibleClose(v) }}
+        detailsValue={detailsValue}/>
       </PageHeaderWrapper>
     );
   }

@@ -70,10 +70,12 @@ class EditableCell extends React.Component {
   }
 }
 
-@connect(({ partnerMaintainEdit }) => ({
-  details: partnerMaintainEdit.details || {},
-  addressList: (partnerMaintainEdit.details && partnerMaintainEdit.details.addressList) || [],
-}))
+@connect(({ partnerMaintainEdit }) => {
+  const details = partnerMaintainEdit.details || {};
+  const customer = details.customer || { };
+  const addressList = customer.addressList || [];
+  return { details, customer, addressList };
+})
 class EditableTable extends React.Component {
   constructor(props) {
     super(props);
@@ -181,35 +183,27 @@ class EditableTable extends React.Component {
   }
 
   addRow = () => {
-    const { details, addressList } = this.props;
+    const { addressList } = this.props;
 
-    const data = [...addressList, { id: -1 }];
-    this.props.dispatch({
-      type: 'partnerMaintainEdit/setDetails',
-      payload: { ...details, addressList: data },
-    });
-    this.setState({ editIndex: data.length - 1 });
+    const newAddressList = [...addressList, { id: -1 }];
+
+    this.setStore(newAddressList);
+    this.setState({ editIndex: newAddressList.length - 1 });
   }
 
   deleteRow = index => {
-    const { details, addressList } = this.props;
-
-    const data = addressList.filter((e, i) => i !== index);
-    this.props.dispatch({
-      type: 'partnerMaintainEdit/setDetails',
-      payload: { ...details, addressList: data },
-    });
+    const { addressList } = this.props;
+    const newAddressList = addressList.filter((e, i) => i !== index);
+    this.setStore(newAddressList);
   }
 
   cancel = row => {
     if (row.id < 0) {
-      const { details, addressList } = this.props;
+      const { addressList } = this.props;
 
-      const data = addressList.filter(e => e.id !== row.id);
-      this.props.dispatch({
-        type: 'partnerMaintainEdit/setDetails',
-        payload: { ...details, addressList: data },
-      });
+      const newAddressList = addressList.filter(e => e.id !== row.id);
+
+      this.setStore(newAddressList);
     }
     this.setState({ editIndex: -1 });
   };
@@ -217,17 +211,26 @@ class EditableTable extends React.Component {
   save = index => {
     this.props.form.validateFields((error, row) => {
       if (error) return;
-      const { details, addressList } = this.props;
+      const { addressList } = this.props;
 
-      const data = addressList.map((e, i) => {
+      const newAddressList = addressList.map((e, i) => {
         if (i === index) return { ...e, ...row, ...row.mobilePhone, ...row.address };
         return e;
       });
-      this.props.dispatch({
-        type: 'partnerMaintainEdit/setDetails',
-        payload: { ...details, addressList: data },
-      });
+
+      this.setStore(newAddressList);
       this.setState({ editIndex: -1 });
+    });
+  }
+
+  setStore = newAddressList => {
+    const { details, customer } = this.props;
+
+    const newCustomer = { ...customer, ...{ addressList: newAddressList } };
+    const newDetails = { ...details, ...{ customer: newCustomer } };
+    this.props.dispatch({
+      type: 'partnerMaintainEdit/setDetails',
+      payload: newDetails,
     });
   }
 
