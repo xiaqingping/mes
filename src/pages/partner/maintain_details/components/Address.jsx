@@ -4,6 +4,7 @@ import {
   Badge,
 } from 'antd';
 import React, { Component } from 'react';
+import { connect } from 'dva';
 
 const columns = [
   {
@@ -12,7 +13,7 @@ const columns = [
   },
   {
     title: '移动电话',
-    dataIndex: 'mobile',
+    dataIndex: 'mobilePhone',
     render(val) {
       return (
         <Badge status="error" text={val}/>
@@ -21,7 +22,7 @@ const columns = [
   },
   {
     title: '邮编',
-    dataIndex: 'youbian',
+    dataIndex: 'postCode',
   },
   {
     title: '地址',
@@ -33,24 +34,18 @@ const columns = [
   },
 ];
 
+@connect(({ partnerMaintainEdit }) => ({
+  details: partnerMaintainEdit.details,
+}))
 // eslint-disable-next-line react/prefer-stateless-function
 class BasicInfo extends Component {
   render() {
-    const dataSource = [
-      {
-        id: 1,
-        name: 'name',
-        mobile: '18735818888',
-        youbian: '123456',
-        address: '上海市松江区',
-      },
-    ];
-
+    const { details: { customer: { addressList } } } = this.props
     return (
       <Card title="收货地址" bordered={false} style={{ marginBottom: '24px' }}>
         <Table
           rowKey="id"
-          dataSource={dataSource}
+          dataSource={addressList}
           columns={columns}
           pagination={false}
         ></Table>

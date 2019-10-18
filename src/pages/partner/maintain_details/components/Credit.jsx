@@ -5,11 +5,15 @@ import {
 } from 'antd';
 import React, { Component } from 'react';
 import './style.less'
+import { connect } from 'dva';
 import FixedQuota from './FixedQuota'
 import TemporaryQuota from './TemporaryQuota'
 
 const DescriptionsItem = Descriptions.Item;
 
+@connect(({ partnerMaintainEdit }) => ({
+  details: partnerMaintainEdit.details,
+}))
 // eslint-disable-next-line react/prefer-stateless-function
 class BasicInfo extends Component {
   state = {
@@ -31,8 +35,8 @@ class BasicInfo extends Component {
     })
   }
 
-  titleType = () => (
-    <div>
+  titleContent = () => (
+    <div style={{ lineHeight: '24px' }}>
       <span>信贷数据</span>
       <span style={{ float: 'right', fontSize: '14px' }}>
         <a onClick={ () => { this.fixedQuota(true) } }>额度调整</a>
@@ -44,9 +48,10 @@ class BasicInfo extends Component {
 
   render() {
     const { fixedVisible, temporaryVisible } = this.state
+    const { details: { creditList } } = this.props;
     return (
       <Card
-        title={this.titleType()}
+        title={this.titleContent()}
         className="check-tabs"
         bordered={false}
         style={{ marginBottom: '24px' }}>
@@ -55,10 +60,10 @@ class BasicInfo extends Component {
           layout="vertical"
           column={4}
         >
-          <DescriptionsItem label="额度">20000 CNY 1天</DescriptionsItem>
-          <DescriptionsItem label="临时额度">5600000 CNY 2天</DescriptionsItem>
-          <DescriptionsItem label="付款周期">开票后60天到期</DescriptionsItem>
-          <DescriptionsItem label="账单间隔">每月5日开票</DescriptionsItem>
+          <DescriptionsItem label="额度">{creditList.credit}</DescriptionsItem>
+          <DescriptionsItem label="临时额度">{creditList.tempCreditLimit}</DescriptionsItem>
+          <DescriptionsItem label="付款周期">{creditList.creditPeriod}</DescriptionsItem>
+          <DescriptionsItem label="账单间隔">{creditList.billingDay}</DescriptionsItem>
         </Descriptions>
         <FixedQuota visible={fixedVisible}
         fixedQuota={v => { this.fixedQuota(v) }}

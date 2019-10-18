@@ -14,7 +14,8 @@ const DescriptionsItem = Descriptions.Item;
 
 // eslint-disable-next-line react/prefer-stateless-function
 @connect(({ partnerMaintainEdit }) => ({
-  details: partnerMaintainEdit.details,
+  details: partnerMaintainEdit.type === 'supplier' ? partnerMaintainEdit.supplier : partnerMaintainEdit.details,
+  type: partnerMaintainEdit.type,
 }))
 class BasicInfo extends Component {
   state = {
@@ -38,7 +39,7 @@ class BasicInfo extends Component {
 
   render() {
     const { phoneShow, emailShow } = this.state;
-    const { details: { basic } } = this.props;
+    const { details: { basic }, type } = this.props;
     return (
       <Card
         title="基础信息"
@@ -60,7 +61,7 @@ class BasicInfo extends Component {
           <DescriptionsItem span={2} label="语言">{basic.languageCode}</DescriptionsItem>
           <DescriptionsItem span={2} label="特性行业类别">{basic.industryCode}&nbsp;&nbsp;&nbsp;<a>变更</a></DescriptionsItem>
           <DescriptionsItem span={6} label="通讯地址">{basic.address}</DescriptionsItem>
-          <DescriptionsItem span={2} label="销售冻结"><Badge status="error"/>&nbsp;冻结</DescriptionsItem>
+          <DescriptionsItem span={2} label={type === 'supplier' ? '采购冻结' : '销售冻结'}><Badge status="error"/>&nbsp;冻结</DescriptionsItem>
         </Descriptions>
         <CheckPhone phoneShow={phoneShow} checkPhone={v => { this.checkPhone(v) }}/>
         <CheckEmail emailShow={emailShow} checkEmail={v => { this.checkEmail(v) }}/>

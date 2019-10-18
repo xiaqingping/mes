@@ -9,6 +9,7 @@ import {
   // Modal,
 } from 'antd';
 import React, { Component } from 'react';
+import { connect } from 'dva';
 import './style.less'
 
 const DescriptionsItem = Descriptions.Item;
@@ -22,16 +23,19 @@ const DescriptionsItem = Descriptions.Item;
 //   });
 // }
 
+@connect(({ partnerMaintainEdit }) => ({
+  details: partnerMaintainEdit.details,
+}))
 class BasicInfo extends Component {
   state = {
     // fileList: [],
     // previewVisible: false,
     // previewImage: '',
-    imageData: [
-      { imageUrl: 'https://os.alipayobjects.com/rmsportal/QBnOOoLaAfKPirc.png' },
-      { imageUrl: 'https://os.alipayobjects.com/rmsportal/QBnOOoLaAfKPirc.png' },
-      { imageUrl: 'https://os.alipayobjects.com/rmsportal/QBnOOoLaAfKPirc.png' },
-    ],
+    // imageData: [
+    //   { imageUrl: 'https://os.alipayobjects.com/rmsportal/QBnOOoLaAfKPirc.png' },
+    //   { imageUrl: 'https://os.alipayobjects.com/rmsportal/QBnOOoLaAfKPirc.png' },
+    //   { imageUrl: 'https://os.alipayobjects.com/rmsportal/QBnOOoLaAfKPirc.png' },
+    // ],
   };
 
   // handleCancel = () => this.setState({ previewVisible: false });
@@ -52,7 +56,7 @@ class BasicInfo extends Component {
 
   render() {
     // const { fileList, previewVisible, previewImage } = this.state;
-      const { imageData } = this.state
+      const { details } = this.props;
     // const uploadButton = (
     //   <div>
     //     <Icon type="plus" />
@@ -68,13 +72,13 @@ class BasicInfo extends Component {
               layout="vertical"
               column={3}
             >
-              <DescriptionsItem label="认证状态"><Badge status="success"/>已认证&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a>变更</a>&nbsp;&nbsp;<a>取消认证</a></DescriptionsItem>
-              <DescriptionsItem label="增值税专用发票资质">是</DescriptionsItem>
-              <DescriptionsItem label="统一社会信用代码">11111111111</DescriptionsItem>
-              <DescriptionsItem label="基本户开户银行">工商银行</DescriptionsItem>
-              <DescriptionsItem label="基本户开户账号">基本户开户账号</DescriptionsItem>
-              <DescriptionsItem label="电话号码">+86-0358-57072136-1234</DescriptionsItem>
-              <DescriptionsItem span={3} label="注册地址">上海市松江区香闵路698号</DescriptionsItem>
+              <DescriptionsItem label="认证状态">{ details.basic.certificationStatus === 1 ? <><Badge status="success"/><span>已认证</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a>变更</a>&nbsp;&nbsp;<a>取消认证</a></> : <><Badge status="error"/><span>未认证</span></>}</DescriptionsItem>
+              <DescriptionsItem label="增值税专用发票资质">{details.organizationCertification.specialInvoice === 1 ? '是' : ''}</DescriptionsItem>
+              <DescriptionsItem label="统一社会信用代码">{details.organizationCertification.taxNo}</DescriptionsItem>
+              <DescriptionsItem label="基本户开户银行">{details.organizationCertification.bankCode}</DescriptionsItem>
+              <DescriptionsItem label="基本户开户账号">{details.organizationCertification.bankAccount}</DescriptionsItem>
+              <DescriptionsItem label="电话号码">{details.basic.telephoneCountryCode}-{details.basic.telephoneAreaCode}-{details.basic.telephone}-{details.basic.telephoneExtension}</DescriptionsItem>
+              <DescriptionsItem span={3} label="注册地址">{details.organizationCertification.address}</DescriptionsItem>
               <DescriptionsItem label="认证图片">
                 {/* <div className="clearfix">
                   <Upload
@@ -91,12 +95,11 @@ class BasicInfo extends Component {
                   </Modal>
                 </div> */}
                 <ul style={{ padding: '0' }}>
-                  {imageData.map((item, index) => (
+                  {details.organizationCertification.attachmentList.map((item, index) => (
                       // eslint-disable-next-line react/no-array-index-key
-                      <li key={index} style={{ width: '100px', height: '100px', border: '1px solid #D9D9D9', textAlign: 'center', lineHeight: '94px', borderRadius: '5px', float: 'left', marginRight: '10px' }}><img src={item.imageUrl} alt="" width="90" height="90"/></li>
+                      <li key={index} style={{ width: '100px', height: '100px', border: '1px solid #D9D9D9', textAlign: 'center', lineHeight: '94px', borderRadius: '5px', float: 'left', marginRight: '10px' }}>{item.type === 'image' ? <img src={item.code} alt="" width="90" height="90"/> : ''}</li>
                     ))}
                 </ul>
-
               </DescriptionsItem>
             </Descriptions>
           </Col>
@@ -106,7 +109,7 @@ class BasicInfo extends Component {
               layout="vertical"
               column={1}
             >
-              <DescriptionsItem label="认证说明">说明说明说明说明说明说明说明说明说明说明说明说明说明说明</DescriptionsItem>
+              <DescriptionsItem label="认证说明">{details.organizationCertification.notes}</DescriptionsItem>
             </Descriptions>
           </Col>
         </Row>
