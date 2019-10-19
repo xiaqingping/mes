@@ -15,7 +15,7 @@ import './style.less'
 const DescriptionsItem = Descriptions.Item;
 
 @connect(({ partnerMaintainEdit }) => ({
-  details: partnerMaintainEdit.details,
+  details: partnerMaintainEdit.type === 'supplier' ? partnerMaintainEdit.supplier : partnerMaintainEdit.details,
 }))
 class BasicInfo extends Component {
   state = {

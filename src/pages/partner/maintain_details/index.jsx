@@ -138,7 +138,7 @@ class CustomerDetails extends Component {
             countyName: '',
             streetCode: '',
             streetName: '',
-            address: '上海市松江区香闵路698号',
+            address: '上海市松江区香闵路698号上海市松江区香闵路698号上海市松江区香闵路698号上海市松江区香闵路698号',
             name: '大王',
             mobilePhoneCountryCode: '',
             mobilePhone: '15012345678',
@@ -276,7 +276,7 @@ class CustomerDetails extends Component {
         invoicePostBlock: '',
         purchasingOrganizationList: [
           {
-            purchasingOrganizationCode: '采购组织',
+            purchasingOrganizationCode: 'BBI',
             salerName: '销售员',
             salerTelephoneCountryCode: '销售员电话国家',
             salerTelephone: '销售员电话',
@@ -288,16 +288,16 @@ class CustomerDetails extends Component {
             deliveryPlanDays: '计划交货时间',
           },
           {
-            purchasingOrganizationCode: '采购组织',
-            salerName: '销售员',
+            purchasingOrganizationCode: 'NBS',
+            salerName: '王五',
             salerTelephoneCountryCode: '销售员电话国家',
-            salerTelephone: '销售员电话',
-            paymentTermsCode: '付款条件',
-            currencyCode: '币种',
-            levelCode: '供应商等级',
-            invoicePostInReceive: '收货时发票过账',
-            purchasingGroupCode: '采购组',
-            deliveryPlanDays: '计划交货时间',
+            salerTelephone: '15555555555',
+            paymentTermsCode: '看着办',
+            currencyCode: '美元',
+            levelCode: '5',
+            invoicePostInReceive: '是',
+            purchasingGroupCode: '王族',
+            deliveryPlanDays: '5天',
           },
         ],
         // 付款银行
@@ -331,9 +331,9 @@ class CustomerDetails extends Component {
         bankCode: 12345,
         bankAccount: '60045612378',
         address: '上海市松江区*****注册',
-        notes: '这是一段认证说明',
+        notes: '这是一段认证说明123',
         attachmentList: [
-          { code: 'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1571310110031&di=c5c3557d5172db919d831cca34586e4c&imgtype=0&src=http%3A%2F%2F5b0988e595225.cdn.sohucs.com%2Fimages%2F20170718%2Fdc7a88ed8b5146368b068fc71c8c8533.jpeg', name: '照片', type: 'image' },
+          { code: 'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1571461183194&di=988ae3492cd61dcd8acd8381a14996ed&imgtype=0&src=http%3A%2F%2Fimg.51ztzj.com%2Fupload%2Fimage%2F20150213%2Fdn201502034005_670x419.jpg', name: '照片', type: 'image' },
         ],
       },
     };
@@ -445,7 +445,6 @@ class CustomerDetails extends Component {
 
   render() {
     const { tabActiveKey } = this.state;
-    console.log(tabActiveKey)
     const { customer } = this.props;
     if (!customer) {
       return null;
