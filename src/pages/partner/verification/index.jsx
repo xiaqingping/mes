@@ -14,6 +14,7 @@ import React, { Fragment } from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import StandardTable from '@/components/StandardTable';
 import CheckModal from '@/components/CheckModal';
+import styles from './index.less';
 
 const FormItem = Form.Item;
 const { RangePicker } = DatePicker;
@@ -89,8 +90,8 @@ class Verification extends React.Component {
       // width: 150,
       render(value, record) {
         return <>
-          <div><Icon type="user" /> <span>{record.bpName}</span></div>
-          <div>{record.bpCode}</div>
+          <div className={styles.partName}><Icon type="user" /> <span>{record.bpName}</span></div>
+          <div className={styles.partCode}>{record.bpCode}</div>
         </>
       },
     },
@@ -108,8 +109,11 @@ class Verification extends React.Component {
       dataIndex: 'status',
       filters: preStateAll,
       // width: 150,
-      render(value) {
-        return <Badge status={preStateAll[value].status} text={preStateAll[value].text} />
+      render(value, record) {
+        return <>
+        <Badge status={preStateAll[value].status} text={preStateAll[value].text} />
+        <div>{record.operationDate}</div>
+        </>
       },
     },
     // {
@@ -559,6 +563,7 @@ class Verification extends React.Component {
               columns={this.columns}
               onSelectRow={this.handleSelectRows}
               onChange={this.handleStandardTableChange}
+              className={styles.dataTable}
             />
           </div>
         </Card>

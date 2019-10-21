@@ -146,23 +146,18 @@ class Maintain extends React.Component {
 
   columns = [
     {
-      title: '客户编号',
+      title: '业务伙伴',
       dataIndex: 'code',
       // width: 100,
       render(val, record) {
         return (
-          <Link to={`/partner/maintain/details/${val}`}>
+          <Link className={styles.partNer} to={`/partner/maintain/details/${val}`}>
             <Icon type="home" /> &nbsp;{record.name}
-            <div>{val}</div>
+            <div className={styles.partCode}>{val}</div>
           </Link>
         );
       },
     },
-    // {
-    //   title: '名称',
-    //   dataIndex: 'name',
-    //   width: 100,
-    // },
     {
       title: '认证',
       dataIndex: 'certificationStatus',
@@ -642,6 +637,7 @@ class Maintain extends React.Component {
               </Button>
             </div>
             <StandardTable
+              className={styles.dataTable}
               scroll={{ x: 1600 }}
               selectedRows={selectedRows}
               loading={loading}
