@@ -285,38 +285,42 @@ const RecordListForm = Form.create()(
           <ul className={styles.contenList}>
             <li>
               <Row>
-                <Col span={4}>状态：</Col>
-                <Col span={20}>{dataList.status}</Col>
+                <Col span={4} className={styles.labelName}>状态：</Col>
+                <Col span={20} className={styles.labelVal}>{dataList.status}</Col>
               </Row>
             </li>
             <li>
               <Row>
-                <Col span={4}>操作人：</Col>
-                <Col span={20}>{dataList.operatorName}</Col>
+                <Col span={4} className={styles.labelName}>操作人：</Col>
+                <Col span={20} className={styles.labelVal}>{dataList.operatorName}</Col>
               </Row>
             </li>
             <li>
               <Row>
-                <Col span={4}>名称：</Col>
-                <Col span={20}>{dataList.approverName}</Col>
+                <Col span={4} className={styles.labelName}>名称：</Col>
+                <Col span={20} className={styles.labelVal}>{dataList.approverName}</Col>
               </Row>
             </li>
             <li>
               <Row>
-                <Col span={4}>收票方：</Col>
-                <Col span={20}>{dataList.piCertification.invoicePartyName}</Col>
+                <Col span={4} className={styles.labelName}>收票方：</Col>
+                <Col
+                  span={20}
+                  className={styles.labelVal}>
+                    {dataList.piCertification.invoicePartyName}
+                </Col>
               </Row>
             </li>
             <li>
               <Row>
-                <Col span={4}>认证说明：</Col>
-                <Col span={20}>{dataList.piCertification.note}</Col>
+                <Col span={4} className={styles.labelName}>认证说明：</Col>
+                <Col span={20} className={styles.labelVal}>{dataList.piCertification.note}</Col>
               </Row>
             </li>
             <li>
               <Row>
-                <Col span={4}>附件：</Col>
-                <Col span={20}>{dataList.attachmentList[0].name}</Col>
+                <Col span={4} className={styles.labelName}>附件：</Col>
+                <Col span={20} className={styles.labelVal}>{dataList.attachmentList[0].name}</Col>
               </Row>
             </li>
           </ul>
@@ -407,32 +411,32 @@ class CheckModal extends React.Component {
           <ul className={styles.contenList}>
             <li>
               <Row>
-                <Col span={8}>变更类型：</Col>
-                <Col span={16}>{changePhoneData.type}</Col>
+                <Col span={8} className={styles.labelName}>变更类型：</Col>
+                <Col span={16} className={styles.labelVal}>{changePhoneData.type}</Col>
               </Row>
             </li>
             <li>
               <Row>
-                <Col span={8}>变更渠道：</Col>
-                <Col span={16}>{changePhoneData.channel}</Col>
+                <Col span={8} className={styles.labelName}>变更渠道：</Col>
+                <Col span={16} className={styles.labelVal}>{changePhoneData.channel}</Col>
               </Row>
             </li>
             <li>
               <Row>
-                <Col span={8}>验证方式：</Col>
-                <Col span={16}>{changePhoneData.verifyType}</Col>
+                <Col span={8} className={styles.labelName}>验证方式：</Col>
+                <Col span={16} className={styles.labelVal}>{changePhoneData.verifyType}</Col>
               </Row>
             </li>
             <li>
               <Row>
-                <Col span={8}>原手机：</Col>
-                <Col span={16}>{changePhoneData.oldMobilePhone}</Col>
+                <Col span={8} className={styles.labelName}>原手机：</Col>
+                <Col span={16} className={styles.labelVal}>{changePhoneData.oldMobilePhone}</Col>
               </Row>
             </li>
             <li>
               <Row>
-                <Col span={8}>验证码：</Col>
-                <Col span={16}>
+                <Col span={8} className={styles.labelName}>验证码：</Col>
+                <Col span={16} className={styles.labelVal}>
                   {changePhoneData.oldContactInfoVerifyCode}&nbsp;&nbsp;&nbsp;&nbsp;
                   <Badge
                     status={verifyData[changePhoneData.oldContactInfoVerifyStatus].value}
@@ -442,26 +446,34 @@ class CheckModal extends React.Component {
             </li>
             <li>
               <Row>
-                <Col span={8}>验证码过期时间：</Col>
-                <Col span={16}>{changePhoneData.oldContactInfoVerifyCodeExpireDate}</Col>
+                <Col span={8} className={styles.labelName}>验证码过期时间：</Col>
+                <Col
+                  span={16}
+                  className={styles.labelVal}>
+                    {changePhoneData.oldContactInfoVerifyCodeExpireDate}
+                </Col>
               </Row>
             </li>
             <li>
               <Row>
-                <Col span={8}>最后发送时间：</Col>
-                <Col span={16}>{changePhoneData.oldContactInfoVerifyCodeLastSendDate}</Col>
+                <Col span={8} className={styles.labelName}>最后发送时间：</Col>
+                <Col
+                  span={16}
+                  className={styles.labelVal}>
+                    {changePhoneData.oldContactInfoVerifyCodeLastSendDate}
+                </Col>
               </Row>
             </li>
             <li>
               <Row>
-                <Col span={8}>新手机：</Col>
-                <Col span={16}>{changePhoneData.newMobilePhone}</Col>
+                <Col span={8} className={styles.labelName}>新手机：</Col>
+                <Col span={16} className={styles.labelVal}>{changePhoneData.newMobilePhone}</Col>
               </Row>
             </li>
             <li>
               <Row>
-                <Col span={8}>验证码：</Col>
-                <Col span={16}>
+                <Col span={8} className={styles.labelName}>验证码：</Col>
+                <Col span={16} className={styles.labelVal}>
                   {changePhoneData.newContactInfoVerifyCode}&nbsp;&nbsp;
                     <a onClick={e => { this.reSent(e) }}>重发</a>&nbsp;&nbsp;&nbsp;&nbsp;
                     <a onClick={e => { this.reSent(e) }}>完成验证</a>
@@ -470,14 +482,22 @@ class CheckModal extends React.Component {
             </li>
             <li>
               <Row>
-                <Col span={8}>验证码过期时间：</Col>
-                <Col span={16}>{changePhoneData.newContactInfoVerifyCodeExpireDate}</Col>
+                <Col span={8} className={styles.labelName}>验证码过期时间：</Col>
+                <Col
+                  span={16}
+                  className={styles.labelVal}>
+                    {changePhoneData.newContactInfoVerifyCodeExpireDate}
+                </Col>
               </Row>
             </li>
             <li>
               <Row>
-                <Col span={8}>最后发送时间：</Col>
-                <Col span={16}>{changePhoneData.newContactInfoVerifyCodeLastSendDate}</Col>
+                <Col span={8} className={styles.labelName}>最后发送时间：</Col>
+                <Col
+                  span={16}
+                  className={styles.labelVal}>
+                    {changePhoneData.newContactInfoVerifyCodeLastSendDate}
+                </Col>
               </Row>
             </li>
           </ul>
@@ -504,26 +524,34 @@ class CheckModal extends React.Component {
           <ul className={styles.contenList}>
             <li>
               <Row>
-                <Col span={4}>名称：</Col>
-                <Col span={20}>{piData.organizationCertification.name}</Col>
+                <Col span={4} className={styles.labelName}>名称：</Col>
+                <Col
+                  span={20}
+                  className={styles.labelVal}>
+                    {piData.organizationCertification.name}
+                </Col>
               </Row>
             </li>
             <li>
               <Row>
-                <Col span={4}>收票方：</Col>
-                <Col span={20}>{piData.piCertification.invoicePartyName}</Col>
+                <Col span={4} className={styles.labelName}>收票方：</Col>
+                <Col
+                  span={20}
+                  className={styles.labelVal}>
+                    {piData.piCertification.invoicePartyName}
+                </Col>
               </Row>
             </li>
             <li>
               <Row>
-                <Col span={4}>认证说明：</Col>
-                <Col span={20}>{piData.piCertification.notes}</Col>
+                <Col span={4} className={styles.labelName}>认证说明：</Col>
+                <Col span={20} className={styles.labelVal}>{piData.piCertification.notes}</Col>
               </Row>
             </li>
             <li>
               <Row>
-                <Col span={4}>附件：</Col>
-                <Col span={20}>{piData.attachmentList[0].name}</Col>
+                <Col span={4} className={styles.labelName}>附件：</Col>
+                <Col span={20} className={styles.labelVal}>{piData.attachmentList[0].name}</Col>
               </Row>
             </li>
             <li>
@@ -553,26 +581,35 @@ class CheckModal extends React.Component {
           <ul className={styles.contenList}>
             <li>
               <Row>
-                <Col span={8}>送达方：</Col>
-                <Col span={16}>{bindingData.shipToPartyCode} {bindingData.shipToPartyName}</Col>
+                <Col span={8} className={styles.labelName}>送达方：</Col>
+                <Col
+                  span={16}
+                  className={styles.labelVal}>
+                    {bindingData.shipToPartyCode} {bindingData.shipToPartyName}
+                </Col>
               </Row>
             </li>
             <li>
               <Row>
-                <Col span={8}>售达方：</Col>
-                <Col span={16}>{bindingData.soldToPartyCode} {bindingData.soldToPartyName}</Col>
+                <Col span={8} className={styles.labelName}>售达方：</Col>
+                <Col
+                  span={16}
+                  className={styles.labelVal}>
+                    {bindingData.soldToPartyCode}
+                    {bindingData.soldToPartyName}
+                  </Col>
               </Row>
             </li>
             <li>
               <Row>
-                <Col span={8}>验证类型：</Col>
-                <Col span={16}>{bindingData.type}</Col>
+                <Col span={8} className={styles.labelName}>验证类型：</Col>
+                <Col span={16} className={styles.labelVal}>{bindingData.type}</Col>
               </Row>
             </li>
             <li>
               <Row>
-                <Col span={8}>验证码：</Col>
-                <Col span={16}>
+                <Col span={8} className={styles.labelName}>验证码：</Col>
+                <Col span={16} className={styles.labelVal}>
                   {bindingData.verifyCode}&nbsp;&nbsp;&nbsp;&nbsp;
                   <Badge
                     status={verifyData[bindingData.status].value}
@@ -582,14 +619,14 @@ class CheckModal extends React.Component {
             </li>
             <li>
               <Row>
-                <Col span={8}>验证码过期时间：</Col>
-                <Col span={16}>{bindingData.expireDate}</Col>
+                <Col span={8} className={styles.labelName}>验证码过期时间：</Col>
+                <Col span={16} className={styles.labelVal}>{bindingData.expireDate}</Col>
               </Row>
             </li>
             <li>
               <Row>
-                <Col span={8}>最后发送时间：</Col>
-                <Col span={16}>{bindingData.lastSendDate}</Col>
+                <Col span={8} className={styles.labelName}>最后发送时间：</Col>
+                <Col span={16} className={styles.labelVal}>{bindingData.lastSendDate}</Col>
               </Row>
             </li>
           </ul>
@@ -610,34 +647,34 @@ class CheckModal extends React.Component {
           <ul className={styles.contenList}>
             <li>
               <Row>
-                <Col span={8}>验证类型：</Col>
-                <Col span={16}>{checkPhoneData.type}</Col>
+                <Col span={8} className={styles.labelName}>验证类型：</Col>
+                <Col span={16} className={styles.labelVal}>{checkPhoneData.type}</Col>
               </Row>
             </li>
             <li>
               <Row>
-                <Col span={8}>验证渠道：</Col>
-                <Col span={16}>{checkPhoneData.channel}</Col>
+                <Col span={8} className={styles.labelName}>验证渠道：</Col>
+                <Col span={16} className={styles.labelVal}>{checkPhoneData.channel}</Col>
               </Row>
             </li>
             <li>
               <Row>
-                <Col span={8}>手机：</Col>
-                <Col span={16}>{checkPhoneData.mobilePhone}</Col>
+                <Col span={8} className={styles.labelName}>手机：</Col>
+                <Col span={16} className={styles.labelVal}>{checkPhoneData.mobilePhone}</Col>
               </Row>
             </li>
             <li>
               <Row>
-                <Col span={8}>邮箱：</Col>
-                <Col span={16}>
+                <Col span={8} className={styles.labelName}>邮箱：</Col>
+                <Col span={16} className={styles.labelVal}>
                   {checkPhoneData.email}
                 </Col>
               </Row>
             </li>
             <li>
               <Row>
-                <Col span={8}>验证码：</Col>
-                <Col span={16}>
+                <Col span={8} className={styles.labelName}>验证码：</Col>
+                <Col span={16} className={styles.labelVal}>
                   {checkPhoneData.verifyCode}&nbsp;&nbsp;&nbsp;&nbsp;
                   <Badge
                     status={verifyData[checkPhoneData.status].value}
@@ -647,14 +684,14 @@ class CheckModal extends React.Component {
             </li>
             <li>
               <Row>
-                <Col span={8}>验证码过期时间：</Col>
-                <Col span={16}>{checkPhoneData.expireDate}</Col>
+                <Col span={8} className={styles.labelName}>验证码过期时间：</Col>
+                <Col span={16} className={styles.labelVal}>{checkPhoneData.expireDate}</Col>
               </Row>
             </li>
             <li>
               <Row>
-                <Col span={8}>最后发送时间：</Col>
-                <Col span={16}>{checkPhoneData.lastSendDate}</Col>
+                <Col span={8} className={styles.labelName}>最后发送时间：</Col>
+                <Col span={16} className={styles.labelVal}>{checkPhoneData.lastSendDate}</Col>
               </Row>
             </li>
           </ul>

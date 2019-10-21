@@ -19,7 +19,7 @@ import StandardTable from '@/components/StandardTable';
 
 import api from '@/api';
 import { formatter } from '@/utils/utils';
-import ChooseProduct from '@/components/common/basic/ChooseProduct';
+import ChooseProduct from '@/components/choosse/Product';
 
 const EditableContext = React.createContext();
 const FormItem = Form.Item;
