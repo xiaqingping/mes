@@ -1,3 +1,7 @@
+// eslint-disable-next-line eslint-comments/disable-enable-pair
+/* eslint-disable consistent-return */
+// eslint-disable-next-line eslint-comments/disable-enable-pair
+/* eslint-disable array-callback-return */
 import {
   Card,
   Descriptions,
@@ -179,12 +183,13 @@ class BasicInfo extends Component {
               layout="vertical"
               column={5}
               key={item.regionCode}
+              style={{ marginBottom: '20px' }}
               >
                 <DescriptionsItem label="网点归属">{item.regionCode}/{item.officeCode}</DescriptionsItem>
                 <DescriptionsItem label="默认付款方式">{item.defaultPaymentMethodCode}</DescriptionsItem>
                 <DescriptionsItem label="币种">{item.currencyCode}</DescriptionsItem>
                 <DescriptionsItem label="默认开票类型">{item.defaultnvoiceTypeCode}</DescriptionsItem>
-            <DescriptionsItem label="销售冻结">{item.salesOrderBlock === 1 ? <span><Badge status="success"/> 活跃</span> : <span><Badge status="error"/> 冻结</span>} </DescriptionsItem>
+                <DescriptionsItem label="销售冻结">{item.salesOrderBlock === 1 ? <span><Badge status="success"/> 活跃</span> : <span><Badge status="error"/> 冻结</span>} </DescriptionsItem>
               </Descriptions>
             )
           }

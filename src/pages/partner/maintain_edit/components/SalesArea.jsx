@@ -16,7 +16,7 @@ import { connect } from 'dva';
 import InvoiceParty from './InvoiceParty';
 import SoldToParty from './SoldToParty';
 import ShipToParty from './ShipToParty';
-import Salesperson from './Salesperson';
+import SalesPerson from './SalesPerson';
 
 import styles from '../style.less';
 
@@ -134,6 +134,9 @@ class SalesArea extends React.Component {
   }
 
   valueChange = (key, value) => {
+    console.log('********* valueChange *********')
+    console.log(key)
+    console.log(value)
     const { tabKey } = this.state;
     const { details, customer, salesAreaList } = this.props;
 
@@ -333,17 +336,33 @@ class SalesArea extends React.Component {
                   data={e}
                 />
                 <Tabs className={styles.internalTab}>
-                  <TabPane tab="开票方" key="InvoiceParty">
-                    <InvoiceParty />
+                  <TabPane tab="收票方" key="InvoiceParty">
+                    <InvoiceParty
+                      tableData={e.invoicePartyList || []}
+                      tableKey="invoicePartyList"
+                      valueChange={this.valueChange}
+                    />
                   </TabPane>
                   <TabPane tab="售达方" key="SoldToParty">
-                    <SoldToParty />
+                    <SoldToParty
+                      tableData={e.soldToPartyList || []}
+                      tableKey="soldToPartyList"
+                      valueChange={this.valueChange}
+                    />
                   </TabPane>
                   <TabPane tab="送达方" key="ShipToParty">
-                    <ShipToParty />
+                    <ShipToParty
+                      tableData={e.shipToPartyList || []}
+                      tableKey="shipToPartyList"
+                      valueChange={this.valueChange}
+                    />
                   </TabPane>
-                  <TabPane tab="销售员" key="Salesperson">
-                    <Salesperson />
+                  <TabPane tab="销售员" key="SalesPerson">
+                    <SalesPerson
+                      tableData={e.salerList || []}
+                      tableKey="salerList"
+                      valueChange={this.valueChange}
+                    />
                   </TabPane>
                 </Tabs>
               </div>

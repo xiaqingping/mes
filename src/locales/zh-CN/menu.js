@@ -19,7 +19,7 @@ export default {
   'menu.personel.pay': '工资管理',
   'menu.personel.payroll': '工资项管理',
   'menu.partner': '业务伙伴',
-  'menu.partner.maintain': '伙伴维护',
+  'menu.partner.maintain': '业务伙伴 ',
   'menu.partner.maintain.add': '新增',
   'menu.partner.maintain.edit': '修改',
   'menu.partner.maintain.details': '查看',
