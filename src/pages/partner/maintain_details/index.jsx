@@ -5,6 +5,7 @@ import { connect } from 'dva';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import PersonCertification from '@/pages/partner/maintain_edit/components/PersonCertification';
 import PersonCredit from '@/pages/partner/maintain_edit/components/PersonCredit';
+import { Link } from 'react-router-dom'
 import BasicInfo from './components/BasicInfo';
 import Type from './components/Type';
 import Credit from './components/Credit';
@@ -16,7 +17,9 @@ import PurchasingOrg from './components/PurchasingOrg';
 
 
 @connect(({ partnerMaintainEdit }) => ({
-  details: partnerMaintainEdit.details,
+  customer: partnerMaintainEdit.details,
+  type: partnerMaintainEdit.type,
+  supplier: partnerMaintainEdit.supplier,
 }))
 class CustomerDetails extends Component {
   state = {
@@ -29,7 +32,7 @@ class CustomerDetails extends Component {
       // 基础信息
       basic: {
         id: 1,
-        type: 2,
+        type: 1,
         code: 110,
         name: '张三',
         certificationStatus: 1,
@@ -38,7 +41,7 @@ class CustomerDetails extends Component {
         mobilePhoneVerifyStatus: 1,
         email: '12345678@qq.com',
         emailVerifyStatus: 1,
-        telephoneCountryCode: '+86',
+        telephoneCountryCode: 2,
         telephoneAreaCode: '021',
         telephone: '57771234',
         telephoneExtension: '6354',
@@ -73,7 +76,12 @@ class CustomerDetails extends Component {
           currencyCode: '人民币',
           salesOrderBlock: 1,
           defaultnvoiceTypeCode: '增值税专用发票',
-          taxClassificCode: '免税' },
+          taxClassificCode: '免税',
+          invoicePartyList: this.getInvoice(),
+          soldToPartyList: this.getSold(),
+          shipToPartyList: this.getShip(),
+          salerList: this.getSaler(),
+        },
           {
             salesOrganizationCode: 2,
             distributionChannelCode: '生工国外电商',
@@ -83,6 +91,10 @@ class CustomerDetails extends Component {
             currencyCode: '美元',
             defaultnvoiceTypeCode: '增值税专用发票',
             taxClassificCode: '免税',
+            invoicePartyList: this.getInvoice(),
+            soldToPartyList: this.getSold(),
+            shipToPartyList: this.getShip(),
+            salerList: this.getSaler(),
           },
           {
             salesOrganizationCode: 3,
@@ -93,6 +105,10 @@ class CustomerDetails extends Component {
             currencyCode: '人民币',
             defaultnvoiceTypeCode: '增值税专用发票',
             taxClassificCode: '免税',
+            invoicePartyList: this.getInvoice(),
+            soldToPartyList: this.getSold(),
+            shipToPartyList: this.getShip(),
+            salerList: this.getSaler(),
           },
           {
             salesOrganizationCode: 4,
@@ -103,12 +119,56 @@ class CustomerDetails extends Component {
             currencyCode: '英镑',
             defaultnvoiceTypeCode: '增值税专用发票',
             taxClassificCode: '免税',
+            invoicePartyList: this.getInvoice(),
+            soldToPartyList: this.getSold(),
+            shipToPartyList: this.getShip(),
+            salerList: this.getSaler(),
+          },
+        ],
+        // 收货地址
+        addressList: [
+          {
+            id: 1,
+            countryCode: 'name',
+            countryName: '',
+            provinceCode: '',
+            provinceName: '',
+            cityCode: '',
+            cityName: '',
+            countyCode: '',
+            countyName: '',
+            streetCode: '',
+            streetName: '',
+            address: '上海市松江区香闵路698号上海市松江区香闵路698号上海市松江区香闵路698号上海市松江区香闵路698号',
+            name: '大王',
+            mobilePhoneCountryCode: '',
+            mobilePhone: '15012345678',
+            postCode: '201200',
+            source: '',
+          },
+          {
+            id: 2,
+            countryCode: 'name',
+            countryName: '',
+            provinceCode: '',
+            provinceName: '',
+            cityCode: '',
+            cityName: '',
+            countyCode: '',
+            countyName: '',
+            streetCode: '',
+            streetName: '',
+            address: '上海市松江区香闵路***号',
+            name: '小王',
+            mobilePhoneCountryCode: '',
+            mobilePhone: '15112345678',
+            postCode: '201600',
+            source: '',
           },
         ],
       },
       // 信贷数据
-      creditList: [
-        {
+      creditList: {
           invoicePartyId: 123,
           invoicePartyCode: 12345,
           invoicePartyName: '上海交通大学',
@@ -121,14 +181,13 @@ class CustomerDetails extends Component {
           billingDay: '25',
           lastEvaluationDate: '2019-10-01',
         },
-      ],
       // 组织认证
       organizationCertification: {
         specialInvoice: true,
         taxNo: 123,
         bankCode: 12345,
         bankAccount: '60045612378',
-        address: '注册地址',
+        address: '上海市松江区*****注册',
         notes: '这是一段认证说明',
         telephone: {
           telephoneCountryCode: '+86',
@@ -137,7 +196,7 @@ class CustomerDetails extends Component {
           telephoneExtension: '2136',
         },
         attachmentList: [
-          { code: 'https://blog.maxmeng.top/images/avatar.jpg', name: '照片', type: 'image' },
+          { code: 'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1571310110031&di=c5c3557d5172db919d831cca34586e4c&imgtype=0&src=http%3A%2F%2F5b0988e595225.cdn.sohucs.com%2Fimages%2F20170718%2Fdc7a88ed8b5146368b068fc71c8c8533.jpeg', name: '照片', type: 'image' },
         ],
       },
       // 负责人认证
@@ -150,21 +209,8 @@ class CustomerDetails extends Component {
           status: 1,
           notes: '这是一段认证说明',
           attachmentList: [
-            { code: 'https://blog.maxmeng.top/images/avatar.jpg', name: '照片', type: 'image' },
+            { code: 'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1571310110031&di=c5c3557d5172db919d831cca34586e4c&imgtype=0&src=http%3A%2F%2F5b0988e595225.cdn.sohucs.com%2Fimages%2F20170718%2Fdc7a88ed8b5146368b068fc71c8c8533.jpeg', name: '照片', type: 'image' },
           ],
-        },
-      ],
-      // 收货地址
-      addressList: [
-        {
-          id: 1,
-          name: 'name',
-          phone: {
-            mobilePhoneCountryCode: '+86',
-            mobilePhone: '18735812924',
-          },
-          postCode: '123456',
-          address: '上海市松江区香闵路698号',
         },
       ],
       // 采购组织
@@ -190,9 +236,115 @@ class CustomerDetails extends Component {
         bankAccountName: 'Max',
       },
     };
+    const supplier = {
+      // 基础信息
+      basic: {
+        id: 1,
+        type: 1,
+        code: 110,
+        name: '李四',
+        certificationStatus: 1,
+        mobilePhoneCountryCode: '+86',
+        mobilePhone: 13212345678,
+        mobilePhoneVerifyStatus: 1,
+        email: 'abdc@qq.com',
+        emailVerifyStatus: 1,
+        telephoneCountryCode: 3,
+        telephoneAreaCode: '021',
+        telephone: '57771234',
+        telephoneExtension: '6354',
+        faxCountryCode: '+86',
+        faxAreaCode: '1234',
+        fax: '54072136',
+        faxExtension: '2136',
+        postCode: '200000',
+        timeZoneCode: 'UTC',
+        languageCode: '中文',
+        industryCode: '生物类',
+        countryCode: '1001',
+        countryName: '中国',
+        provinceCOde: '021',
+        provinceName: '上海',
+        cityCode: '021',
+        cityName: '上海市',
+        countyCode: '011',
+        countyName: '松江区',
+        streetCode: '43223',
+        streetName: '香闵路',
+        address: '上海市松江区香闵路******号',
+      },
+      vendor: {
+        invoicePostBlock: '',
+        purchasingOrganizationList: [
+          {
+            purchasingOrganizationCode: 'BBI',
+            salerName: '销售员',
+            salerTelephoneCountryCode: '销售员电话国家',
+            salerTelephone: '销售员电话',
+            paymentTermsCode: '付款条件',
+            currencyCode: '币种',
+            levelCode: '供应商等级',
+            invoicePostInReceive: '收货时发票过账',
+            purchasingGroupCode: '采购组',
+            deliveryPlanDays: '计划交货时间',
+          },
+          {
+            purchasingOrganizationCode: 'NBS',
+            salerName: '王五',
+            salerTelephoneCountryCode: '销售员电话国家',
+            salerTelephone: '15555555555',
+            paymentTermsCode: '看着办',
+            currencyCode: '美元',
+            levelCode: '5',
+            invoicePostInReceive: '是',
+            purchasingGroupCode: '王族',
+            deliveryPlanDays: '5天',
+          },
+        ],
+        // 付款银行
+        paymentBank: {
+          countryCode: '中国',
+          bankCode: '1',
+          bankName: '生工发展银行',
+          bankAccount: '888888',
+          bankAccountName: 'niko',
+        },
+      },
+      // 信贷数据
+      creditList: {
+          invoicePartyId: 123,
+          invoicePartyCode: 12345,
+          invoicePartyName: '上海交通大学',
+          currencyCode: 'CNY',
+          credit: '40000',
+          creditPeriod: '30',
+          tempCreditLimit: '60000',
+          tempCreditLimitExpirationDate: '2019-10-30',
+          billingCycle: '50',
+          billingDay: '25',
+          lastEvaluationDate: '2019-10-01',
+        },
+      // 组织认证
+      organizationCertification: {
+        effectiveDate: '生效时间',
+        specialInvoice: true,
+        taxNo: 123,
+        bankCode: 12345,
+        bankAccount: '60045612378',
+        address: '上海市松江区*****注册',
+        notes: '这是一段认证说明123',
+        attachmentList: [
+          { code: 'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1571461183194&di=988ae3492cd61dcd8acd8381a14996ed&imgtype=0&src=http%3A%2F%2Fimg.51ztzj.com%2Fupload%2Fimage%2F20150213%2Fdn201502034005_670x419.jpg', name: '照片', type: 'image' },
+        ],
+      },
+    };
     this.props.dispatch({
       type: 'partnerMaintainEdit/setDetails',
       payload: details,
+    });
+    this.props.dispatch({
+      type: 'partnerMaintainEdit/setSupplier',
+      payload: supplier,
     });
     window.addEventListener('resize', this.resizeFooterToolbar, { passive: true });
     this.resizeFooterToolbar();
@@ -201,6 +353,66 @@ class CustomerDetails extends Component {
   componentWillUnmount() {
     window.removeEventListener('resize', this.resizeFooterToolbar);
   }
+
+  // 收票方数据
+  getInvoice = () => {
+    const data = [];
+    for (let i = 0; i < 5; i++) {
+      data.push({
+        id: i,
+        name: `${Math.ceil((Math.random() + 0.0001) * 100000000)} 上海复旦大学`,
+        code: Math.ceil((Math.random() + 0.0001) * 100000000),
+        type: Math.ceil((Math.random() + 0.0001) * 2),
+        soldToPartyId: i,
+        soldTopartyCode: Math.ceil((Math.random() + 0.0001) * 100000000),
+        soldToPartyName: `${Math.ceil((Math.random() + 0.0001) * 100000000)} 上海同济大学`,
+        verifyStatus: Math.ceil((Math.random() + 0.0001) * 2),
+      });
+    }
+    return data
+  };
+
+  // 售达方数据
+  getSold = () => {
+    const data = [];
+    for (let i = 0; i < 5; i++) {
+      data.push({
+        id: i,
+        name: `${Math.ceil((Math.random() + 0.0001) * 100000000)} 上海复旦大学`,
+        code: Math.ceil((Math.random() + 0.0001) * 100000000),
+        type: Math.ceil((Math.random() + 0.0001) * 2),
+        linkVerifyStatus: Math.ceil((Math.random() + 0.0001) * 2),
+      });
+    }
+    return data
+  }
+
+  // 送达方数据
+  getShip = () => {
+    const data = [];
+    for (let i = 0; i < 5; i++) {
+      data.push({
+        id: i,
+        name: `${Math.ceil((Math.random() + 0.0001) * 100000000)} 上海复旦大学`,
+        code: Math.ceil((Math.random() + 0.0001) * 100000000),
+        type: Math.ceil((Math.random() + 0.0001) * 2),
+        verifyStatus: Math.ceil((Math.random() + 0.0001) * 2),
+      });
+    }
+    return data
+  }
+
+    // 销售员数据
+    getSaler = () => {
+      const data = [];
+      for (let i = 0; i < 5; i++) {
+        data.push({
+          name: `${Math.ceil((Math.random() + 0.0001) * 100000000)} 上海复旦大学`,
+          code: Math.ceil((Math.random() + 0.0001) * 100000000),
+        });
+      }
+      return data
+    }
 
   resizeFooterToolbar = () => {
     requestAnimationFrame(() => {
@@ -216,6 +428,10 @@ class CustomerDetails extends Component {
   };
 
   onTabChange = tabActiveKey => {
+    this.props.dispatch({
+      type: 'partnerMaintainEdit/setType',
+      payload: tabActiveKey,
+    });
     this.setState({
       tabActiveKey,
     });
@@ -224,14 +440,14 @@ class CustomerDetails extends Component {
   title = () => (
       <div>
         <span>查看 123</span>&nbsp;&nbsp;&nbsp;&nbsp;
-        <a title="编辑"><Icon type="edit" style={{ color: 'black' }} /></a>
+        <Link to="/partner/maintain/edit/100001"><Icon type="edit" style={{ color: 'black' }} /></Link>
       </div>
     )
 
   render() {
     const { tabActiveKey } = this.state;
-    const { details } = this.props;
-    if (!details) {
+    const { customer } = this.props;
+    if (!customer) {
       return null;
     }
 
@@ -241,13 +457,12 @@ class CustomerDetails extends Component {
         <BasicInfo/>
         <Type/>
         {
-          details.basic.type === 1 ?
+          customer.basic.type === 1 ?
           (
             <>
               <Credit/>
-              {details.basic.telephoneCountryCode === 1 ?
-              <HomeAuthentication/> : <AbroadAuthentication
-              abroadType={details.basic.telephoneCountryCode}/>}
+              {customer.basic.telephoneCountryCode === 1 ?
+              <HomeAuthentication/> : <AbroadAuthentication/>}
             </>
           ) : (
             <>
@@ -265,12 +480,12 @@ class CustomerDetails extends Component {
         <PurchasingOrg/>
         <Bank/>
         {
-          details.basic.type === 1 ?
+          customer.basic.type === 1 ?
           (
             <>
-              {details.basic.telephoneCountryCode === 1 ?
+              {customer.basic.telephoneCountryCode === 1 ?
               <HomeAuthentication/> : <AbroadAuthentication
-              abroadType={details.basic.telephoneCountryCode}/>}
+              abroadType={customer.basic.telephoneCountryCode}/>}
             </>
           ) : ''
         }
