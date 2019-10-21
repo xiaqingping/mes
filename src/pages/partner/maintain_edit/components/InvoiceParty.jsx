@@ -7,6 +7,9 @@ import {
 } from 'antd';
 import React from 'react';
 
+import ChooseInvoiceParty from '@/components/choosse/InvoiceParty';
+
+const { Search } = Input;
 const EditableContext = React.createContext();
 
 class EditableCell extends React.Component {
@@ -56,54 +59,8 @@ class InvoiceParty extends React.Component {
     this.state = {
       editIndex: -1,
       id: 0,
+      modalVisible: false,
     };
-    this.columns = [
-      {
-        title: '名称',
-        dataIndex: 'name',
-        width: '40%',
-        editable: true,
-        inputType: <Input />,
-        rules: [
-          { required: true },
-        ],
-      },
-      {
-        title: '售达方',
-        dataIndex: 'soldToPartyName',
-        width: '40%',
-        editable: true,
-        inputType: <Input />,
-        rules: [
-          { required: true },
-        ],
-      },
-      {
-        title: '操作',
-        dataIndex: 'actions',
-        render: (text, record, index) => {
-          const { editIndex } = this.state;
-          const editable = editIndex === index;
-          if (editable) {
-            return (
-              <>
-                <a onClick={() => this.save(index)}>保存</a>
-                <Divider type="vertical" />
-                <a onClick={() => this.cancel(record)}>取消</a>
-              </>
-            );
-          }
-
-          return (
-            <>
-              <a onClick={() => this.deleteRow(index)}>删除</a>
-              <Divider type="vertical" />
-              <a onClick={() => this.edit(index)}>修改</a>
-            </>
-          );
-        },
-      },
-    ];
   }
 
   addRow = () => {
@@ -153,19 +110,68 @@ class InvoiceParty extends React.Component {
     valueChange(tableKey, newTableData);
   }
 
-  edit(index) {
+  edit = index => {
     this.setState({ editIndex: index });
   }
 
   render() {
     const { tableData } = this.props;
+    const { modalVisible } = this.state;
     const components = {
       body: {
         cell: EditableCell,
       },
     };
 
-    const columns = this.columns.map(col => {
+    let columns = [
+      {
+        title: '名称',
+        dataIndex: 'name',
+        width: '40%',
+        editable: true,
+        inputType: <Search onSearch={() => this.ChooseInvoiceParty.changeVisible(true)} />,
+        rules: [
+          { required: true },
+        ],
+      },
+      {
+        title: '售达方',
+        dataIndex: 'soldToPartyName',
+        width: '40%',
+        editable: true,
+        inputType: <Input />,
+        rules: [
+          { required: true },
+        ],
+      },
+      {
+        title: '操作',
+        dataIndex: 'actions',
+        render: (text, record, index) => {
+          const { editIndex } = this.state;
+          const editable = editIndex === index;
+          if (editable) {
+            return (
+              <>
+                <a onClick={() => this.save(index)}>保存</a>
+                <Divider type="vertical" />
+                <a onClick={() => this.cancel(record)}>取消</a>
+              </>
+            );
+          }
+
+          return (
+            <>
+              <a onClick={() => this.deleteRow(index)}>删除</a>
+              <Divider type="vertical" />
+              <a onClick={() => this.edit(index)}>修改</a>
+            </>
+          );
+        },
+      },
+    ];
+
+    columns = columns.map(col => {
       if (!col.editable) {
         return col;
       }
@@ -181,6 +187,8 @@ class InvoiceParty extends React.Component {
         }),
       };
     });
+
+    console.log(modalVisible)
 
     return (
       <EditableContext.Provider value={this.props.form}>
@@ -204,6 +212,7 @@ class InvoiceParty extends React.Component {
         >
           新增
         </Button>
+        <ChooseInvoiceParty ref={ref => { this.ChooseInvoiceParty = ref }} />
       </EditableContext.Provider>
     );
   }
