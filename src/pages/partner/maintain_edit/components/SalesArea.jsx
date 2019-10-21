@@ -134,9 +134,6 @@ class SalesArea extends React.Component {
   }
 
   valueChange = (key, value) => {
-    console.log('********* valueChange *********')
-    console.log(key)
-    console.log(value)
     const { tabKey } = this.state;
     const { details, customer, salesAreaList } = this.props;
 
