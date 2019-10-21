@@ -1,5 +1,5 @@
 /**
- * SAP 产品
+ * 选择 SAP 产品
  */
 import {
   Modal,

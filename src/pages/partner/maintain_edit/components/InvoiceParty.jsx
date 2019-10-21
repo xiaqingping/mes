@@ -59,18 +59,18 @@ class InvoiceParty extends React.Component {
     this.state = {
       editIndex: -1,
       id: 0,
-      modalVisible: false,
     };
   }
 
   addRow = () => {
     const { tableData } = this.props;
     let { id } = this.state;
+    const newId = --id;
 
-    const newTableData = [...tableData, { id: --id }];
+    const newTableData = [...tableData, { id: newId }];
 
     this.setStore(newTableData);
-    this.setState({ editIndex: newTableData.length - 1, id });
+    this.setState({ editIndex: newTableData.length - 1, id: newId });
   }
 
   deleteRow = index => {
@@ -96,7 +96,7 @@ class InvoiceParty extends React.Component {
       const { tableData } = this.props;
 
       const newTableData = tableData.map((e, i) => {
-        if (i === index) return { ...e, ...row, ...row.mobilePhone, ...row.address };
+        if (i === index) return { ...e, ...row };
         return e;
       });
 
@@ -114,9 +114,19 @@ class InvoiceParty extends React.Component {
     this.setState({ editIndex: index });
   }
 
+  selectChooseModalData = row => {
+    const { editIndex } = this.state;
+    const { tableData } = this.props;
+
+    const newTableData = tableData.map((e, i) => {
+      if (i === editIndex) return { ...e, ...row };
+      return e;
+    });
+    this.setStore(newTableData);
+  }
+
   render() {
     const { tableData } = this.props;
-    const { modalVisible } = this.state;
     const components = {
       body: {
         cell: EditableCell,
@@ -130,9 +140,11 @@ class InvoiceParty extends React.Component {
         width: '40%',
         editable: true,
         inputType: <Search onSearch={() => this.ChooseInvoiceParty.changeVisible(true)} />,
-        rules: [
-          { required: true },
-        ],
+        editOptions: {
+          rules: [
+            { required: true },
+          ],
+        },
       },
       {
         title: '售达方',
@@ -140,9 +152,11 @@ class InvoiceParty extends React.Component {
         width: '40%',
         editable: true,
         inputType: <Input />,
-        rules: [
-          { required: true },
-        ],
+        editOptions: {
+          rules: [
+            { required: true },
+          ],
+        },
       },
       {
         title: '操作',
@@ -188,8 +202,6 @@ class InvoiceParty extends React.Component {
       };
     });
 
-    console.log(modalVisible)
-
     return (
       <EditableContext.Provider value={this.props.form}>
         <Table
@@ -212,7 +224,10 @@ class InvoiceParty extends React.Component {
         >
           新增
         </Button>
-        <ChooseInvoiceParty ref={ref => { this.ChooseInvoiceParty = ref }} />
+        <ChooseInvoiceParty
+          ref={ref => { this.ChooseInvoiceParty = ref }}
+          selectChooseModalData={this.selectChooseModalData}
+        />
       </EditableContext.Provider>
     );
   }
