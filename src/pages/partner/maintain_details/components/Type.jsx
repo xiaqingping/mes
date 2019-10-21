@@ -8,6 +8,7 @@ import {
   Table,
   Tabs,
   Badge,
+  Icon,
 } from 'antd';
 import React, { Component } from 'react';
 import './style.less'
@@ -44,18 +45,24 @@ class BasicInfo extends Component {
       title: '名称',
       width: 500,
       dataIndex: 'name',
+      render(text, record) {
+          return <><Icon type={record.type === 1 ? 'home' : 'user'}/> {text}</>
+      },
     },
     {
       title: '售达方',
       width: 500,
       dataIndex: 'soldToPartyName',
+      render(text, record) {
+        return <><Icon type={record.type === 1 ? 'home' : 'user'}/> {text}</>
+      },
     },
     {
       title: '状态',
       width: 400,
       dataIndex: 'verifyStatus',
-      render(val) {
-        return <Badge status={status[val].value} text={status[val].text}/>;
+      render(text) {
+        return <Badge status={status[text].value} text={status[text].text}/>;
       },
     },
     // {
@@ -71,13 +78,16 @@ class BasicInfo extends Component {
       title: '名称',
       width: 500,
       dataIndex: 'name',
+      render(text, record) {
+        return <><Icon type={record.type === 1 ? 'home' : 'user'}/> {text}</>
+      },
     },
     {
       title: '状态',
       width: 600,
       dataIndex: 'linkVerifyStatus',
-      render(val) {
-        return <Badge status={status[val].value} text={status[val].text}/>;
+      render(text) {
+        return <Badge status={status[text].value} text={status[text].text}/>;
       },
     },
     // {
@@ -93,13 +103,16 @@ class BasicInfo extends Component {
       title: '名称',
       width: 700,
       dataIndex: 'name',
+      render(text, record) {
+        return <><Icon type={record.type === 1 ? 'home' : 'user'}/> {text}</>
+      },
     },
     {
       title: '状态',
       width: 400,
       dataIndex: 'verifyStatus',
-      render(val) {
-        return <Badge status={status[val].value} text={status[val].text}/>;
+      render(text) {
+        return <Badge status={status[text].value} text={status[text].text}/>;
       },
     },
     // {
@@ -116,6 +129,9 @@ class BasicInfo extends Component {
       title: '名称',
       width: 1200,
       dataIndex: 'name',
+      render(text, record) {
+        return <><Icon type={record.type === 1 ? 'home' : 'user'}/> {text}</>
+      },
     },
     // {
     //   align: 'center',
@@ -139,20 +155,6 @@ class BasicInfo extends Component {
     })
     return data
   }
-
-  // getData = () => {
-  //   const data = [];
-  //   for (let i = 0; i < 5; i++) {
-  //     data.push({
-  //       name: `${Math.ceil((Math.random() + 0.0001) * 100000000)} 上海复旦大学`,
-  //       saler_name: `${Math.ceil((Math.random() + 0.0001) * 100000000)} 交通大学售达方`,
-  //       status: Math.ceil((Math.random() + 0.0001) * 2),
-  //     });
-  //   }
-  //   this.setState({
-  //       list: data,
-  //   });
-  // };
 
   onTabChange = key => {
     this.setState({
@@ -191,7 +193,7 @@ class BasicInfo extends Component {
                   <DescriptionsItem label="默认付款方式">{item.defaultPaymentMethodCode}</DescriptionsItem>
                   <DescriptionsItem label="币种">{item.currencyCode}</DescriptionsItem>
                   <DescriptionsItem label="默认开票类型">{item.defaultnvoiceTypeCode}</DescriptionsItem>
-                  <DescriptionsItem label="销售冻结">{item.salesOrderBlock === 1 ? <span><Badge status="success"/> 活跃</span> : <span><Badge status="error"/> 冻结</span>} </DescriptionsItem>
+                  <DescriptionsItem label="销售冻结">{item.salesOrderBlock === 1 ? <span><Badge status="success"/>活跃</span> : <span><Badge status="error"/>冻结</span>} </DescriptionsItem>
                 </Descriptions>
                 <div style={{ border: '1px solid #E6E6E6', width: '100%', height: '100%' }}>
                   <Tabs defaultActiveKey="1" className="tabs">

@@ -5,6 +5,7 @@ import { connect } from 'dva';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import PersonCertification from '@/pages/partner/maintain_edit/components/PersonCertification';
 import PersonCredit from '@/pages/partner/maintain_edit/components/PersonCredit';
+import { Link } from 'react-router-dom'
 import BasicInfo from './components/BasicInfo';
 import Type from './components/Type';
 import Credit from './components/Credit';
@@ -439,7 +440,7 @@ class CustomerDetails extends Component {
   title = () => (
       <div>
         <span>查看 123</span>&nbsp;&nbsp;&nbsp;&nbsp;
-        <a title="编辑"><Icon type="edit" style={{ color: 'black' }} /></a>
+        <Link to="/partner/maintain/edit/100001"><Icon type="edit" style={{ color: 'black' }} /></Link>
       </div>
     )
 

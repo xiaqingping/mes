@@ -5,27 +5,14 @@ import {
 } from 'antd';
 import React, { Component } from 'react';
 import { connect } from 'dva';
+import Flag from '@/assets/imgs/flag.jpg'
+import './style.less'
 
 @connect(({ partnerMaintainEdit }) => ({
   details: partnerMaintainEdit.details,
 }))
 // eslint-disable-next-line react/prefer-stateless-function
 class BasicInfo extends Component {
-  subString = (str, len) => {
-    // eslint-disable-next-line no-control-regex
-    const regexp = /[^\x00-\xff]/g;
-    if (str.replace(regexp, 'aa').length <= len) {
-      return str;
-    }
-    const m = Math.floor(len / 2);
-    for (let i = m, j = str.length; i < j; i++) {
-      if (str.substring(0, i).replace(regexp, 'aa').length >= len) {
-        return `${str.substring(0, i)}...`;
-      }
-    }
-    return str;
-  }
-
   render() {
     const { details: { customer: { addressList } } } = this.props
     const columns = [
@@ -38,9 +25,10 @@ class BasicInfo extends Component {
         title: '移动电话',
         dataIndex: 'mobilePhone',
         width: 300,
-        render(val) {
+        render(text) {
           return (
-            <Badge status="error" text={val}/>
+            // eslint-disable-next-line jsx-a11y/alt-text
+            <><img src={Flag} width="10" height="10" style={{ borderRadius: '50%', marginBottom: '3px' }}/>&nbsp;&nbsp;{text}</>
           );
         },
       },
@@ -53,7 +41,7 @@ class BasicInfo extends Component {
         title: '地址',
         dataIndex: 'address',
         width: 500,
-        render: text => this.subString(text, 30 * 2),
+        render: text => <div className="addEllipsis" style={{ width: '300px' }}>{text}</div>,
       },
       {
         title: '操作',
