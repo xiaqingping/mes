@@ -333,7 +333,7 @@ class Operation extends React.Component {
           <Col lg={6} md={8} sm={12}>
             <FormItem label="类型">
               {getFieldDecorator('type', typeValue ? { initialValue: typeValue } : 'type')(
-                <Select mode="multiple">
+                <Select mode="multiple" showArrow>
                   <Option value="1">新建</Option>
                   <Option value="2">修改</Option>
                 </Select>,
@@ -343,7 +343,7 @@ class Operation extends React.Component {
           <Col lg={6} md={8} sm={12}>
             <FormItem label="状态">
               {getFieldDecorator('status')(
-                <Select mode="multiple">
+                <Select mode="multiple" showArrow>
                   <Option value="1">未完成</Option>
                   <Option value="2">已完成</Option>
                   <Option value="3">部分完成</Option>
