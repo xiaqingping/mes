@@ -1,5 +1,5 @@
 /**
- * 选择收票方
+ * 选择销售员
  */
 import {
   Modal,
@@ -11,7 +11,7 @@ import {
 } from 'antd';
 import React from 'react';
 
-class ChooseInvoiceParty extends React.Component {
+class ChooseSalesperson extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -48,7 +48,7 @@ class ChooseInvoiceParty extends React.Component {
     const tableWidth = 0;
     const columns = [
       {
-        title: '收票方',
+        title: '销售员',
         dataIndex: 'name',
         filterIcon: filtered => (
           <Icon type="search" style={{ color: filtered ? '#1890ff' : undefined }} />
@@ -131,6 +131,10 @@ class ChooseInvoiceParty extends React.Component {
         ),
       },
       {
+        title: '收票方',
+        dataIndex: 'shoupiao',
+      },
+      {
         title: '操作',
         dataIndex: 'actions',
         render: (text, record) => (
@@ -141,7 +145,7 @@ class ChooseInvoiceParty extends React.Component {
 
     return (
       <Modal
-        title="收票方"
+        title="销售员"
         visible={this.state.visible}
         width="1200px"
       >
@@ -156,4 +160,4 @@ class ChooseInvoiceParty extends React.Component {
   }
 }
 
-export default ChooseInvoiceParty;
+export default ChooseSalesperson;

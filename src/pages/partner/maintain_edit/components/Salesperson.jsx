@@ -7,6 +7,9 @@ import {
 } from 'antd';
 import React from 'react';
 
+import ChooseSalesperson from '@/components/choosse/Salesperson';
+
+const { Search } = Input;
 const EditableContext = React.createContext();
 
 class EditableCell extends React.Component {
@@ -57,16 +60,91 @@ class SalesPerson extends React.Component {
       editIndex: -1,
       id: 0,
     };
-    this.columns = [
+  }
+
+  addRow = () => {
+    const { tableData } = this.props;
+    const { id } = this.state;
+    const newId = id - 1;
+
+    const newTableData = [...tableData, { id: newId }];
+
+    this.setStore(newTableData);
+    this.setState({ editIndex: newTableData.length - 1, id: newId });
+  }
+
+  deleteRow = index => {
+    const { tableData } = this.props;
+    const newTableData = tableData.filter((e, i) => i !== index);
+    this.setStore(newTableData);
+  }
+
+  cancel = row => {
+    if (row.id < 0) {
+      const { tableData } = this.props;
+
+      const newTableData = tableData.filter(e => e.id !== row.id);
+
+      this.setStore(newTableData);
+    }
+    this.setState({ editIndex: -1 });
+  };
+
+  save = index => {
+    this.props.form.validateFields((error, row) => {
+      if (error) return;
+      const { tableData } = this.props;
+
+      const newTableData = tableData.map((e, i) => {
+        if (i === index) return { ...e, ...row };
+        return e;
+      });
+
+      this.setStore(newTableData);
+      this.setState({ editIndex: -1 });
+    });
+  }
+
+  setStore = newTableData => {
+    const { tableKey, valueChange } = this.props;
+    valueChange(tableKey, newTableData);
+  }
+
+  edit = index => {
+    this.setState({ editIndex: index });
+  }
+
+  selectChooseModalData = row => {
+    const { editIndex } = this.state;
+    const { tableData } = this.props;
+
+    const newTableData = tableData.map((e, i) => {
+      if (i === editIndex) return { ...e, ...row };
+      return e;
+    });
+    this.setStore(newTableData);
+  }
+
+  render() {
+    const { tableData } = this.props;
+    const components = {
+      body: {
+        cell: EditableCell,
+      },
+    };
+
+    let columns = [
       {
         title: '名称',
         dataIndex: 'name',
         width: '80%',
         editable: true,
-        inputType: <Input />,
-        rules: [
-          { required: true },
-        ],
+        inputType: <Search onSearch={() => this.ChooseSalesperson.changeVisible(true)} />,
+        editOptions: {
+          rules: [
+            { required: true },
+          ],
+        },
       },
       {
         title: '操作',
@@ -94,68 +172,8 @@ class SalesPerson extends React.Component {
         },
       },
     ];
-  }
 
-  addRow = () => {
-    const { tableData } = this.props;
-    let { id } = this.state;
-
-    const newTableData = [...tableData, { id: --id }];
-
-    this.setStore(newTableData);
-    this.setState({ editIndex: newTableData.length - 1, id });
-  }
-
-  deleteRow = index => {
-    const { tableData } = this.props;
-    const newTableData = tableData.filter((e, i) => i !== index);
-    this.setStore(newTableData);
-  }
-
-  cancel = row => {
-    if (row.id < 0) {
-      const { tableData } = this.props;
-
-      const newTableData = tableData.filter(e => e.id !== row.id);
-
-      this.setStore(newTableData);
-    }
-    this.setState({ editIndex: -1 });
-  };
-
-  save = index => {
-    this.props.form.validateFields((error, row) => {
-      if (error) return;
-      const { tableData } = this.props;
-
-      const newTableData = tableData.map((e, i) => {
-        if (i === index) return { ...e, ...row, ...row.mobilePhone, ...row.address };
-        return e;
-      });
-
-      this.setStore(newTableData);
-      this.setState({ editIndex: -1 });
-    });
-  }
-
-  setStore = newTableData => {
-    const { tableKey, valueChange } = this.props;
-    valueChange(tableKey, newTableData);
-  }
-
-  edit(index) {
-    this.setState({ editIndex: index });
-  }
-
-  render() {
-    const { tableData } = this.props;
-    const components = {
-      body: {
-        cell: EditableCell,
-      },
-    };
-
-    const columns = this.columns.map(col => {
+    columns = columns.map(col => {
       if (!col.editable) {
         return col;
       }
@@ -194,6 +212,10 @@ class SalesPerson extends React.Component {
         >
           新增
         </Button>
+        <ChooseSalesperson
+          ref={ref => { this.ChooseSalesperson = ref }}
+          selectChooseModalData={this.selectChooseModalData}
+        />
       </EditableContext.Provider>
     );
   }

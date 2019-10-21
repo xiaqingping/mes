@@ -10,6 +10,7 @@ import {
 import React from 'react';
 import { connect } from 'dva';
 
+import { validateForm } from '@/utils/utils';
 import { MobilePhoneInput, AddressInput } from '@/components/CustomizedFormControls'
 
 const EditableContext = React.createContext();
@@ -81,6 +82,7 @@ class EditableTable extends React.Component {
     super(props);
     this.state = {
       editIndex: -1,
+      id: 0,
     }
     this.columns = [
       {
@@ -182,13 +184,21 @@ class EditableTable extends React.Component {
     }
   }
 
-  addRow = () => {
+  addRow = async () => {
+    const { id, editIndex } = this.state;
     const { addressList } = this.props;
+    const newId = id - 1;
 
-    const newAddressList = [...addressList, { id: -1 }];
+    if (editIndex !== -1) {
+      const validateResult = await validateForm(this.props.form);
+      if (!validateResult[0]) return false;
+    }
+
+    const newAddressList = [...addressList, { id: newId }];
 
     this.setStore(newAddressList);
-    this.setState({ editIndex: newAddressList.length - 1 });
+    this.setState({ editIndex: newAddressList.length - 1, id: newId });
+    return true;
   }
 
   deleteRow = index => {
@@ -208,19 +218,21 @@ class EditableTable extends React.Component {
     this.setState({ editIndex: -1 });
   };
 
-  save = index => {
-    this.props.form.validateFields((error, row) => {
-      if (error) return;
-      const { addressList } = this.props;
+  save = async index => {
+    const validateResult = await validateForm(this.props.form);
+    if (!validateResult[0]) return false;
 
-      const newAddressList = addressList.map((e, i) => {
-        if (i === index) return { ...e, ...row, ...row.mobilePhone, ...row.address };
-        return e;
-      });
+    const row = validateResult[1];
+    const { addressList } = this.props;
 
-      this.setStore(newAddressList);
-      this.setState({ editIndex: -1 });
+    const newAddressList = addressList.map((e, i) => {
+      if (i === index) return { ...e, ...row, ...row.mobilePhone, ...row.address };
+      return e;
     });
+
+    this.setStore(newAddressList);
+    this.setState({ editIndex: -1 });
+    return true;
   }
 
   setStore = newAddressList => {
