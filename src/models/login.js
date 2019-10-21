@@ -21,7 +21,7 @@ const Model = {
           response = yield call(user.loginByCode, payload);
         }
 
-        response.avatar = 'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1571310110031&di=c5c3557d5172db919d831cca34586e4c&imgtype=0&src=http%3A%2F%2F5b0988e595225.cdn.sohucs.com%2Fimages%2F20170718%2Fdc7a88ed8b5146368b068fc71c8c8533.jpeg';
+        response.avatar = 'https://blog.maxmeng.top/images/avatar.jpg';
 
         localStorage.setItem('user', JSON.stringify(response));
         yield put({
