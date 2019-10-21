@@ -64,8 +64,8 @@ class SoldToParty extends React.Component {
 
   addRow = () => {
     const { tableData } = this.props;
-    let { id } = this.state;
-    const newId = --id;
+    const { id } = this.state;
+    const newId = id - 1;
 
     const newTableData = [...tableData, { id: newId }];
 
