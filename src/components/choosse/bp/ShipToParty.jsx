@@ -1,5 +1,5 @@
 /**
- * 选择销售员
+ * 选择送达方
  */
 import {
   Modal,
@@ -11,7 +11,7 @@ import {
 } from 'antd';
 import React from 'react';
 
-class ChooseSalesperson extends React.Component {
+class ChooseShipToParty extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -48,7 +48,7 @@ class ChooseSalesperson extends React.Component {
     const tableWidth = 0;
     const columns = [
       {
-        title: '销售员',
+        title: '送达方',
         dataIndex: 'name',
         filterIcon: filtered => (
           <Icon type="search" style={{ color: filtered ? '#1890ff' : undefined }} />
@@ -145,9 +145,11 @@ class ChooseSalesperson extends React.Component {
 
     return (
       <Modal
-        title="销售员"
+        title="送达方"
         visible={this.state.visible}
         width="1200px"
+        onCancel={() => this.changeVisible(false)}
+        footer={null}
       >
         <Table
           rowKey="id"
@@ -160,4 +162,4 @@ class ChooseSalesperson extends React.Component {
   }
 }
 
-export default ChooseSalesperson;
+export default ChooseShipToParty;

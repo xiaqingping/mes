@@ -144,6 +144,8 @@ class ChooseInvoiceParty extends React.Component {
         title="收票方"
         visible={this.state.visible}
         width="1200px"
+        onCancel={() => this.changeVisible(false)}
+        footer={null}
       >
         <Table
           rowKey="id"

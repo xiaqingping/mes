@@ -54,3 +54,9 @@ export const validateForm = form =>
   form.validateFields()
     .then(data => [true, data])
     .catch(error => [false, error]);
+
+/**
+ * 获取表单的值（不验证）
+ * @param {*} form
+ */
+export const getFormValue = form => form.getFieldsValue();
