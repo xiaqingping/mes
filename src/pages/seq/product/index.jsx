@@ -144,7 +144,7 @@ class TopForm extends React.Component {
           </Col>
           <Col xxl={6} lg={8}>
             <FormItem label="SAP编号">
-              {getFieldDecorator('productCode')(<Search readOnly onSearch={() => this.ChooseProduct.changeVisible(true)} />)}
+              {getFieldDecorator('productCode')(<Search onSearch={() => this.ChooseProduct.changeVisible(true)} />)}
             </FormItem>
           </Col>
           <Col xxl={6} lg={0}>
