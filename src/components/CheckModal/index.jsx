@@ -1,8 +1,25 @@
-import { Modal, Badge, Form } from 'antd';
+import {
+  Modal,
+  Badge,
+  Form,
+  Row,
+  Col,
+} from 'antd';
 import React from 'react';
 import styles from './index.less';
 
 const FormItem = Form.Item;
+/** verify state */
+const verifyData = {
+  0: {
+    value: 'erroer',
+    text: '未验证',
+  },
+  1: {
+    value: 'success',
+    text: '已完成',
+  },
+}
 /** 变更手机号和邮箱数据 */
 const changeNumber = [
   {
@@ -218,43 +235,24 @@ const idenPersonal = [
   },
 ]
 
-const dataList = [
-  {
-    index: 0,
-    title: '状态',
-    content: '已完成（张三）',
+// 个人认证记录
+const dataList = {
+  status: '已完成（张三）',
+  operatorName: '李斯',
+  approverName: '王某某',
+  type: '人员',
+  piCertification: {
+    invoicePartyName: '上海复旦大学',
+    note: '此处为认证说明此处为认证说明此处为认证说明此处为认证说明此处为认证说明此处为认证说明',
   },
-  {
-    index: 1,
-    title: '操作人',
-    content: '李斯',
-  },
-  {
-    index: 2,
-    title: '名称',
-    content: '王某某',
-  },
-  {
-    index: 3,
-    title: '认证类型',
-    content: '人员',
-  },
-  {
-    index: 4,
-    title: '注册地址',
-    content: '上海市松江区向民路6987号',
-  },
-  {
-    index: 5,
-    title: '认证说明',
-    content: '此处为认证说明此处为认证说明此处为认证说明此处为认证说明',
-  },
-  {
-    index: 6,
-    title: '附件',
-    content: '已完成',
-  },
-]
+  attachmentList: [
+    {
+      code: '123',
+      name: '这里是图片',
+    },
+  ],
+}
+
 
 const RecordListForm = Form.create()(
   class extends React.Component {
@@ -281,14 +279,51 @@ const RecordListForm = Form.create()(
           destroyOnClose
           footer={null}
           className={styles.xxx}
-          title="认证记录"
+          title="认证历史（PI）"
           visible = {showList}
           onCancel={closeListForm}>
-          <Form>
-            <FormItem label="姓名">
-              123
-            </FormItem>
-          </Form>
+          <ul className={styles.contenList}>
+            <li>
+              <Row>
+                <Col span={4} className={styles.labelName}>状态：</Col>
+                <Col span={20} className={styles.labelVal}>{dataList.status}</Col>
+              </Row>
+            </li>
+            <li>
+              <Row>
+                <Col span={4} className={styles.labelName}>操作人：</Col>
+                <Col span={20} className={styles.labelVal}>{dataList.operatorName}</Col>
+              </Row>
+            </li>
+            <li>
+              <Row>
+                <Col span={4} className={styles.labelName}>名称：</Col>
+                <Col span={20} className={styles.labelVal}>{dataList.approverName}</Col>
+              </Row>
+            </li>
+            <li>
+              <Row>
+                <Col span={4} className={styles.labelName}>收票方：</Col>
+                <Col
+                  span={20}
+                  className={styles.labelVal}>
+                    {dataList.piCertification.invoicePartyName}
+                </Col>
+              </Row>
+            </li>
+            <li>
+              <Row>
+                <Col span={4} className={styles.labelName}>认证说明：</Col>
+                <Col span={20} className={styles.labelVal}>{dataList.piCertification.note}</Col>
+              </Row>
+            </li>
+            <li>
+              <Row>
+                <Col span={4} className={styles.labelName}>附件：</Col>
+                <Col span={20} className={styles.labelVal}>{dataList.attachmentList[0].name}</Col>
+              </Row>
+            </li>
+          </ul>
         </Modal>
       )
     }
@@ -344,87 +379,336 @@ class CheckModal extends React.Component {
   }
 
   render () {
+    let piData;
     const { recordMsg, clickType, showList } = this.state;
     let modalTitle;
-    let changeData = [];
+    const changeData = [];
+    let modelContent;
     const actionResent = <a onClick={e => { this.reSent(e) }}>重发</a>
     const actionFinesh = <Badge status="success" text="已完成" />
     if (recordMsg === undefined) {
       return false;
     }
     if (clickType === '01') { // 查看进来
-      if (recordMsg.preType === 0 || recordMsg.preType === 1) {
+      if (recordMsg.type === 0 || recordMsg.type === 1) {
         modalTitle = '变更已验证手机和邮箱'
-        changeData = changeNumber;
-      } else if (recordMsg.preType === 2) {
+        const changePhoneData = {
+          type: '验证手机',
+          channel: '自助验证',
+          verifyType: '手机',
+          oldMobilePhone: '+86 15968749968',
+          oldContactInfoVerifyCode: '1****6',
+          oldContactInfoVerifyCodeExpireDate: '2019-06-12 13：00：00',
+          oldContactInfoVerifyCodeLastSendDate: '2019-06-12 13：00：00',
+          newMobilePhone: '+86 15968749966',
+          newContactInfoVerifyCode: '1*****3',
+          newContactInfoVerifyCodeExpireDate: '2019-06-12 13：00：00',
+          newContactInfoVerifyCodeLastSendDate: '2019-06-12 13：00：00',
+          oldContactInfoVerifyStatus: 1,
+          newContactInfoVerifyStatus: 1,
+        }
+        modelContent = <>
+          <ul className={styles.contenList}>
+            <li>
+              <Row>
+                <Col span={8} className={styles.labelName}>变更类型：</Col>
+                <Col span={16} className={styles.labelVal}>{changePhoneData.type}</Col>
+              </Row>
+            </li>
+            <li>
+              <Row>
+                <Col span={8} className={styles.labelName}>变更渠道：</Col>
+                <Col span={16} className={styles.labelVal}>{changePhoneData.channel}</Col>
+              </Row>
+            </li>
+            <li>
+              <Row>
+                <Col span={8} className={styles.labelName}>验证方式：</Col>
+                <Col span={16} className={styles.labelVal}>{changePhoneData.verifyType}</Col>
+              </Row>
+            </li>
+            <li>
+              <Row>
+                <Col span={8} className={styles.labelName}>原手机：</Col>
+                <Col span={16} className={styles.labelVal}>{changePhoneData.oldMobilePhone}</Col>
+              </Row>
+            </li>
+            <li>
+              <Row>
+                <Col span={8} className={styles.labelName}>验证码：</Col>
+                <Col span={16} className={styles.labelVal}>
+                  {changePhoneData.oldContactInfoVerifyCode}&nbsp;&nbsp;&nbsp;&nbsp;
+                  <Badge
+                    status={verifyData[changePhoneData.oldContactInfoVerifyStatus].value}
+                    text={verifyData[changePhoneData.oldContactInfoVerifyStatus].text} />
+                </Col>
+              </Row>
+            </li>
+            <li>
+              <Row>
+                <Col span={8} className={styles.labelName}>验证码过期时间：</Col>
+                <Col
+                  span={16}
+                  className={styles.labelVal}>
+                    {changePhoneData.oldContactInfoVerifyCodeExpireDate}
+                </Col>
+              </Row>
+            </li>
+            <li>
+              <Row>
+                <Col span={8} className={styles.labelName}>最后发送时间：</Col>
+                <Col
+                  span={16}
+                  className={styles.labelVal}>
+                    {changePhoneData.oldContactInfoVerifyCodeLastSendDate}
+                </Col>
+              </Row>
+            </li>
+            <li>
+              <Row>
+                <Col span={8} className={styles.labelName}>新手机：</Col>
+                <Col span={16} className={styles.labelVal}>{changePhoneData.newMobilePhone}</Col>
+              </Row>
+            </li>
+            <li>
+              <Row>
+                <Col span={8} className={styles.labelName}>验证码：</Col>
+                <Col span={16} className={styles.labelVal}>
+                  {changePhoneData.newContactInfoVerifyCode}&nbsp;&nbsp;
+                    <a onClick={e => { this.reSent(e) }}>重发</a>&nbsp;&nbsp;&nbsp;&nbsp;
+                    <a onClick={e => { this.reSent(e) }}>完成验证</a>
+                </Col>
+              </Row>
+            </li>
+            <li>
+              <Row>
+                <Col span={8} className={styles.labelName}>验证码过期时间：</Col>
+                <Col
+                  span={16}
+                  className={styles.labelVal}>
+                    {changePhoneData.newContactInfoVerifyCodeExpireDate}
+                </Col>
+              </Row>
+            </li>
+            <li>
+              <Row>
+                <Col span={8} className={styles.labelName}>最后发送时间：</Col>
+                <Col
+                  span={16}
+                  className={styles.labelVal}>
+                    {changePhoneData.newContactInfoVerifyCodeLastSendDate}
+                </Col>
+              </Row>
+            </li>
+          </ul>
+        </>
+      } else if (recordMsg.type === 2) {
         modalTitle = '认证';
-        changeData = idenData;
-      } else if (recordMsg.preType === 3) {
+        // get PI data
+        piData = {
+          organizationCertification: {
+            name: '王某某',
+          },
+          piCertification: {
+            invoicePartyName: '上海复旦大学',
+            notes: '此处为认证说明此处为认证说明此处为认证说明此处为认证说明此处为认证说明此处为认证说明',
+          },
+          attachmentList: [
+            {
+              name: '这里是图片',
+            },
+          ],
+        }
+
+        modelContent = <>
+          <ul className={styles.contenList}>
+            <li>
+              <Row>
+                <Col span={4} className={styles.labelName}>名称：</Col>
+                <Col
+                  span={20}
+                  className={styles.labelVal}>
+                    {piData.organizationCertification.name}
+                </Col>
+              </Row>
+            </li>
+            <li>
+              <Row>
+                <Col span={4} className={styles.labelName}>收票方：</Col>
+                <Col
+                  span={20}
+                  className={styles.labelVal}>
+                    {piData.piCertification.invoicePartyName}
+                </Col>
+              </Row>
+            </li>
+            <li>
+              <Row>
+                <Col span={4} className={styles.labelName}>认证说明：</Col>
+                <Col span={20} className={styles.labelVal}>{piData.piCertification.notes}</Col>
+              </Row>
+            </li>
+            <li>
+              <Row>
+                <Col span={4} className={styles.labelName}>附件：</Col>
+                <Col span={20} className={styles.labelVal}>{piData.attachmentList[0].name}</Col>
+              </Row>
+            </li>
+            <li>
+              <Row>
+                <Col span={4}>
+                  <a href="#" className={styles.recoedHis} onClick={this.recordList}>认证历史</a>
+                </Col>
+              </Row>
+            </li>
+          </ul>
+         </>
+      } else if (recordMsg.type === 3) {
         modalTitle = '绑定售达方';
-        changeData = saleData;
-      } else if (recordMsg.preType === 4 || recordMsg.preType === 5) {
+        const bindingData = {
+          shipToPartyName: '某某某',
+          shipToPartyCode: '0564555',
+          soldToPartyName: '某某某',
+          soldToPartyCode: '0564555',
+          type: '手机',
+          status: '1',
+          mobilePhone: '15968674996',
+          verifyCode: '159686',
+          expireDate: '2019-06-12 13:00:00',
+          lastSendDate: '2019-06-12 13:00:00',
+        }
+        modelContent = <>
+          <ul className={styles.contenList}>
+            <li>
+              <Row>
+                <Col span={8} className={styles.labelName}>送达方：</Col>
+                <Col
+                  span={16}
+                  className={styles.labelVal}>
+                    {bindingData.shipToPartyCode} {bindingData.shipToPartyName}
+                </Col>
+              </Row>
+            </li>
+            <li>
+              <Row>
+                <Col span={8} className={styles.labelName}>售达方：</Col>
+                <Col
+                  span={16}
+                  className={styles.labelVal}>
+                    {bindingData.soldToPartyCode}
+                    {bindingData.soldToPartyName}
+                  </Col>
+              </Row>
+            </li>
+            <li>
+              <Row>
+                <Col span={8} className={styles.labelName}>验证类型：</Col>
+                <Col span={16} className={styles.labelVal}>{bindingData.type}</Col>
+              </Row>
+            </li>
+            <li>
+              <Row>
+                <Col span={8} className={styles.labelName}>验证码：</Col>
+                <Col span={16} className={styles.labelVal}>
+                  {bindingData.verifyCode}&nbsp;&nbsp;&nbsp;&nbsp;
+                  <Badge
+                    status={verifyData[bindingData.status].value}
+                    text={verifyData[bindingData.status].text} />
+                </Col>
+              </Row>
+            </li>
+            <li>
+              <Row>
+                <Col span={8} className={styles.labelName}>验证码过期时间：</Col>
+                <Col span={16} className={styles.labelVal}>{bindingData.expireDate}</Col>
+              </Row>
+            </li>
+            <li>
+              <Row>
+                <Col span={8} className={styles.labelName}>最后发送时间：</Col>
+                <Col span={16} className={styles.labelVal}>{bindingData.lastSendDate}</Col>
+              </Row>
+            </li>
+          </ul>
+         </>
+      } else if (recordMsg.type === 4 || recordMsg.type === 5) {
         modalTitle = '验证手机和邮箱';
-        changeData = idenPhoneData;
-      }
-    } else if (clickType === '02') { // 审核进来 下面为模拟不同的认证类型
-      if (recordMsg.preType === 0 || recordMsg.preType === 1) { // 个人认证
-        modalTitle = '认证（个人）';
-        changeData = idenPersonal;
-      } else if (recordMsg.preType === 2) {
-        modalTitle = '认证';
-        changeData = idenData;
-      } else if (recordMsg.preType === 3) {
-        modalTitle = '绑定售达方';
-        changeData = saleData;
-      } else if (recordMsg.preType === 4 || recordMsg.preType === 5) {
-        modalTitle = '验证手机和邮箱';
-        changeData = idenPhoneData;
+        const checkPhoneData = {
+          type: '邮箱验证',
+          channel: '登录验证',
+          mobilePhone: '15968749966',
+          email: '540595443@qq.com',
+          verifyCode: '159686',
+          status: 1,
+          expireDate: '2019-06-12 13:00:00',
+          lastSendDate: '2019-06-12 13:00:00',
+        }
+        modelContent = <>
+          <ul className={styles.contenList}>
+            <li>
+              <Row>
+                <Col span={8} className={styles.labelName}>验证类型：</Col>
+                <Col span={16} className={styles.labelVal}>{checkPhoneData.type}</Col>
+              </Row>
+            </li>
+            <li>
+              <Row>
+                <Col span={8} className={styles.labelName}>验证渠道：</Col>
+                <Col span={16} className={styles.labelVal}>{checkPhoneData.channel}</Col>
+              </Row>
+            </li>
+            <li>
+              <Row>
+                <Col span={8} className={styles.labelName}>手机：</Col>
+                <Col span={16} className={styles.labelVal}>{checkPhoneData.mobilePhone}</Col>
+              </Row>
+            </li>
+            <li>
+              <Row>
+                <Col span={8} className={styles.labelName}>邮箱：</Col>
+                <Col span={16} className={styles.labelVal}>
+                  {checkPhoneData.email}
+                </Col>
+              </Row>
+            </li>
+            <li>
+              <Row>
+                <Col span={8} className={styles.labelName}>验证码：</Col>
+                <Col span={16} className={styles.labelVal}>
+                  {checkPhoneData.verifyCode}&nbsp;&nbsp;&nbsp;&nbsp;
+                  <Badge
+                    status={verifyData[checkPhoneData.status].value}
+                    text={verifyData[checkPhoneData.status].text} />
+                </Col>
+              </Row>
+            </li>
+            <li>
+              <Row>
+                <Col span={8} className={styles.labelName}>验证码过期时间：</Col>
+                <Col span={16} className={styles.labelVal}>{checkPhoneData.expireDate}</Col>
+              </Row>
+            </li>
+            <li>
+              <Row>
+                <Col span={8} className={styles.labelName}>最后发送时间：</Col>
+                <Col span={16} className={styles.labelVal}>{checkPhoneData.lastSendDate}</Col>
+              </Row>
+            </li>
+          </ul>
+         </>
       }
     }
 
-    if (changeData.length === 0) {
-      return false;
-    }
-    const modelContent = <>
-      <Form labelAlign="left">
-          {
-            changeData.map(mes =>
-            <Form.Item
-              labelCol={ { span: 7 }}
-              wrapperCol={{ span: 15 }}
-              label={mes.titel}
-              key={mes.id}>{
-              mes.id === 16 || mes.id === 115 ? <>{mes.content.map(img => <><img className={styles.imgStyle} key={img.index} src={img.src} alt="认证附件"/></>)}</> : <> {mes.content}</>
-            } {
-              (mes.id === 4) && <>
-              &nbsp;&nbsp;&nbsp;&nbsp; { actionResent }
-            </>
-            }
-            {
-              (mes.id === 11) && <>
-              &nbsp;&nbsp;&nbsp;&nbsp; { actionFinesh }
-              </>
-            }
-          </Form.Item>)
-        }
-        {
-          ((recordMsg.preType === 0 || recordMsg.preType === 1) && (clickType === '02')) && <>
-          <Form.Item>
-            <a href="#" className={styles.recoedHis} onClick={this.recordList}>认证记录</a>
-          </Form.Item>
-          </>
-        }
-      </Form>
-    </>
     return (
       <div style={{ position: 'absolute', right: 0 }} >
         <Modal
           className={styles.xxx}
           title={ modalTitle }
-          footer={null}
           visible={this.state.modal1Visible}
           onOk={() => this.setModal1Visible(false)}
           onCancel={() => this.setModal1Visible(false)}
+          cancelText="拒绝"
+          okText="审核"
         >
         { modelContent }
         </Modal>

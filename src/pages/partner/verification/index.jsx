@@ -14,6 +14,7 @@ import React, { Fragment } from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import StandardTable from '@/components/StandardTable';
 import CheckModal from '@/components/CheckModal';
+import styles from './index.less';
 
 const FormItem = Form.Item;
 const { RangePicker } = DatePicker;
@@ -75,8 +76,8 @@ class Verification extends React.Component {
       title: '编号/操作编号',
       dataIndex: 'code',
       // width: 150,
-      render (value) {
-        return <><div>{value.code}</div><div>{value.actCode}</div></>
+      render (value, record) {
+        return <><div>{value}</div><div>{record.operationRecordCode}</div></>
       },
     },
     // {
@@ -85,18 +86,18 @@ class Verification extends React.Component {
     // },
     {
       title: '业务伙伴',
-      dataIndex: 'partnerName',
+      dataIndex: 'bpId',
       // width: 150,
-      render(value) {
+      render(value, record) {
         return <>
-          <div><Icon type="user" /> <span>{value.name}</span></div>
-          <div>{value.code}</div>
+          <div className={styles.partName}><Icon type="user" /> <span>{record.bpName}</span></div>
+          <div className={styles.partCode}>{record.bpCode}</div>
         </>
       },
     },
     {
       title: '类型',
-      dataIndex: 'preType',
+      dataIndex: 'type',
       filters: preTypeAll,
       // width: 150,
       render(value) {
@@ -105,11 +106,14 @@ class Verification extends React.Component {
     },
     {
       title: '状态',
-      dataIndex: 'preState',
+      dataIndex: 'status',
       filters: preStateAll,
       // width: 150,
-      render(value) {
-        return <Badge status={preStateAll[value].status} text={preStateAll[value].text} />
+      render(value, record) {
+        return <>
+        <Badge status={preStateAll[value].status} text={preStateAll[value].text} />
+        <div>{record.operationDate}</div>
+        </>
       },
     },
     // {
@@ -118,14 +122,14 @@ class Verification extends React.Component {
     // },
     {
       title: '过期时间',
-      dataIndex: 'overTime',
+      dataIndex: 'expireDate',
       // width: 140,
     },
     {
       title: '操作人',
-      dataIndex: 'reviewName',
-      render(value) {
-        return <><div>{value.name}</div> <div>{value.time}</div></>
+      dataIndex: 'operatorName',
+      render(value, record) {
+        return <><div>{value}</div> <div>{record.operationDate}</div></>
       },
     },
     {
@@ -234,22 +238,17 @@ class Verification extends React.Component {
     for (let i = 0; i < 6; i++) {
       data.push({
         id: i + 1,
-        code: {
-          code: 100000 + (i + 1),
-          actCode: 200000,
-        },
-        partnerName: {
-          name: `name${i}`,
-          code: '123456789',
-        },
-        preType: i,
-        preState: 2,
-        finishTime: '2019-09-05 16:30:28',
-        overTime: '2019-09-06',
-        reviewName: {
-          name: `张${i}`,
-          time: '2016-6-17 16:30:28',
-        },
+        code: 100000 + (i + 1),
+        bpOperationRecordCode: 200000,
+        operationRecordCode: 123456,
+        bpName: `name${i}`,
+        bpCode: '123456789',
+        type: i,
+        status: 2,
+        expireDate: '2019-09-05 16:30:28',
+        finishDate: '2019-09-06',
+        operatorName: `张${i}`,
+        operationDate: '2016-6-17 16:30:28',
       });
     }
     this.setState({
@@ -381,12 +380,12 @@ class Verification extends React.Component {
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="操作编号">
-              {getFieldDecorator('actCode')(<Input placeholder="请输入"/>)}
+              {getFieldDecorator('bpOperationRecordCode')(<Input placeholder="请输入"/>)}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="业务伙伴">
-              {getFieldDecorator('partnerName', { initialValue: this.state.inputPartner })(
+              {getFieldDecorator('bpId', { initialValue: this.state.inputPartner })(
                 <Select
                  showSearch
                  placeholder="请输入"
@@ -443,12 +442,12 @@ class Verification extends React.Component {
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="操作编号">
-              {getFieldDecorator('actCode')(<Input placeholder="请输入"/>)}
+              {getFieldDecorator('bpCode')(<Input placeholder="请输入"/>)}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="业务伙伴">
-            {getFieldDecorator('partnerName', { initialValue: this.state.inputPartner })(
+            {getFieldDecorator('bpId', { initialValue: this.state.inputPartner })(
                 <Select
                  showSearch
                  placeholder="请输入"
@@ -465,7 +464,7 @@ class Verification extends React.Component {
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="类型">
-              {getFieldDecorator('preType')(
+              {getFieldDecorator('type')(
                 <Select
                   mode="multiple"
                   placeholder="请选择"
@@ -484,7 +483,7 @@ class Verification extends React.Component {
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="状态">
-              {getFieldDecorator('preSate')(
+              {getFieldDecorator('statusList')(
                 <Select
                   mode="multiple"
                   placeholder="请选择"
@@ -519,7 +518,7 @@ class Verification extends React.Component {
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="审核人">
-              {getFieldDecorator('checkMan')(
+              {getFieldDecorator('approverCode')(
                 <Input placeholder="请输入"/>,
               )}
             </FormItem>
@@ -564,6 +563,7 @@ class Verification extends React.Component {
               columns={this.columns}
               onSelectRow={this.handleSelectRows}
               onChange={this.handleStandardTableChange}
+              className={styles.dataTable}
             />
           </div>
         </Card>

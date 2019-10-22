@@ -146,23 +146,18 @@ class Maintain extends React.Component {
 
   columns = [
     {
-      title: '客户编号',
+      title: '业务伙伴',
       dataIndex: 'code',
       // width: 100,
       render(val, record) {
         return (
-          <Link to={`/partner/maintain/details/${val}`}>
+          <Link className={styles.partNer} to={`/partner/maintain/details/${val}`}>
             <Icon type="home" /> &nbsp;{record.name}
-            <div>{val}</div>
+            <div className={styles.partCode}>{val}</div>
           </Link>
         );
       },
     },
-    // {
-    //   title: '名称',
-    //   dataIndex: 'name',
-    //   width: 100,
-    // },
     {
       title: '认证',
       dataIndex: 'certificationStatus',
@@ -438,6 +433,34 @@ class Maintain extends React.Component {
     return expandForm ? this.renderAdvancedForm() : this.renderSimpleForm();
   };
 
+  // form in modal
+  perSaveFormRef = formRef => {
+    this.performRef = formRef;
+  };
+
+  // get values of form in modal
+  getValues = () => {
+    const { form } = this.performRef.props;
+    form.validateFields((err, values) => {
+      if (err) {
+        return;
+      }
+
+      console.log(values);
+    })
+
+    const allValues = form.getFieldsValue();
+    console.log(allValues);
+  }
+
+  // close the modal
+  closeModal = () => {
+    this.setState({
+      changeModal: false,
+      recordMesg: undefined,
+    })
+  }
+
   /** 完整筛选条件 */
   renderAdvancedForm() {
     const {
@@ -602,8 +625,6 @@ class Maintain extends React.Component {
   render() {
     const { data, selectedRows, changeModal, recordMesg } = this.state;
     const loading = false;
-    const { form } = this.props;
-    const { getFieldDecorator } = form;
 
     return (
       <PageHeaderWrapper>
@@ -616,6 +637,7 @@ class Maintain extends React.Component {
               </Button>
             </div>
             <StandardTable
+              className={styles.dataTable}
               scroll={{ x: 1600 }}
               selectedRows={selectedRows}
               loading={loading}
@@ -627,9 +649,11 @@ class Maintain extends React.Component {
           </div>
         </Card>
         <ChangeModal
+          wrappedComponentRef={this.perSaveFormRef}
           changeModal={changeModal}
           recordMsg={ recordMesg }
-          form={form}/>
+          closeModal={this.closeModal}
+          getValues={this.getValues}/>
       </PageHeaderWrapper>
     );
   }

@@ -23,8 +23,18 @@ const { Search } = Input;
 
 // 角色
 const roles = {
-  67: { value: 67, text: 'BBI_基因' },
-  56: { value: 56, text: '多肽订单' },
+  66: { id: 66, text: '测序制备反应' },
+  65: { id: 65, text: '测序制备' },
+  64: { id: 64, text: '测序项目' },
+  63: { id: 63, text: '测序负责人' },
+  62: { id: 62, text: '测序分析' },
+  61: { id: 61, text: '测序反应' },
+  60: { id: 60, text: '多肽审核' },
+  59: { id: 59, text: '多肽制单' },
+  58: { id: 58, text: '未使用' },
+  57: { id: 57, text: '国际业务' },
+  56: { value: 56, text: '基因实验查看' },
+  55: { value: 55, text: '销售代表（仅查看）' },
   53: { value: 53, text: '代理商' },
   52: { value: 52, text: '客服订单' },
   51: { value: 51, text: '其他部门' },
@@ -43,8 +53,8 @@ const roles = {
   34: { value: 34, text: '财务' },
   33: { value: 33, text: '人事' },
   32: { value: 32, text: '仓库' },
-  5: { value: 5, text: '采购员' },
-  1: { value: 1, text: '系统管理员' },
+  5: { value: 5, text: '系统管理员' },
+  1: { value: 1, text: '管理员' },
   0: { value: 0, text: '0' },
 };
 const roleList = [

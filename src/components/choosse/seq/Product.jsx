@@ -1,25 +1,23 @@
+/**
+ * 选择 SAP 产品
+ */
 import {
   Modal,
   Table,
   Button,
   Layout,
-  Card,
   Col,
-  Divider,
   Form,
   Input,
   Row,
   Select,
-  Checkbox,
-  message,
-  Popconfirm,
   Icon,
 } from 'antd';
 import React from 'react';
 // import { connect } from 'dva';
 
 import api from '@/api';
-import { formatter } from '@/utils/utils';
+// import { formatter } from '@/utils/utils';
 
 const FormItem = Form.Item;
 const { Option } = Select;
@@ -183,24 +181,38 @@ class ChooseProduct extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      loading: false,
       visible: false,
-      productList: [],
+      table1Data: [],
+      table2Data: [],
     }
   }
 
+  changeVisible = visible => {
+    this.setState({ visible });
+  }
+
   getTableData = () => {
+    this.setState({ loading: true });
+
     api.basic.getProductList({
       page: 1,
       rows: 10,
     }).then(res => {
       this.setState({
-        productList: res,
+        table1Data: res,
+        loading: false,
       })
     });
   }
 
-  render() {
-    const { productList } = this.state;
+  selectRow = row => {
+    this.props.selectChooseModalData(row);
+    this.setState({ visible: false });
+  }
+
+  // 设置表格1的列属性
+  setColumnsToTable1 = () => {
     let columns = [
       {
         title: '编号',
@@ -243,6 +255,7 @@ class ChooseProduct extends React.Component {
       {
         title: '危险品标识',
         dataIndex: 'cas',
+        width: 120,
       },
       {
         title: '产品价格',
@@ -272,6 +285,14 @@ class ChooseProduct extends React.Component {
         title: '状态',
         dataIndex: 'saleStatus',
       },
+      {
+        title: '操作',
+        dataIndex: 'actions',
+        fixed: 'right',
+        render: (text, record) => (
+          <a onClick={() => this.selectRow(record)}>选择</a>
+        ),
+      },
     ];
 
     let tableWidth = 0;
@@ -285,29 +306,67 @@ class ChooseProduct extends React.Component {
         ...col,
       };
     });
+    return { columns, tableWidth };
+  }
+
+  // 设置表格2的列属性
+  setColumnsToTable2 = () => {
+    const columns = [
+      {
+        title: '仓库',
+        dataIndex: 'storageName',
+      },
+      {
+        title: '数量',
+        dataIndex: 'saleCount',
+      },
+    ];
+
+    return { columns };
+  }
+
+  setTable2Data = data => {
+    const table2Data = data && data.stock && data.stock.storages ? data.stock.storages : [];
+    this.setState({
+      table2Data,
+    });
+  }
+
+  render() {
+    const { loading, table1Data, table2Data, visible } = this.state;
+    const table1 = this.setColumnsToTable1();
+    const table2 = this.setColumnsToTable2();
 
     return (
       <Modal
         title="产品列表"
-        visible={this.state.visible}
+        visible={visible}
         width="1200px"
+        onCancel={() => this.changeVisible(false)}
+        footer={null}
       >
         <Search getTableData={this.getTableData} />
         <Layout>
           <Content style={{ background: '#fff', paddingRight: '10px' }}>
             <Table
               rowKey="id"
-              scroll={{ x: tableWidth }}
-              dataSource={productList}
-              columns={columns}
+              loading={loading}
+              scroll={{ x: table1.tableWidth, y: 500 }}
+              dataSource={table1Data}
+              columns={table1.columns}
+              onRow={record => ({
+                onClick: () => {
+                  this.setTable2Data(record);
+                },
+              })}
             />
           </Content>
           <Sider style={{ background: '#fff' }}>
             <Table
               rowKey="id"
-              scroll={{ x: tableWidth }}
-              dataSource={productList}
-              columns={columns}
+              scroll={{ y: 500 }}
+              dataSource={table2Data}
+              columns={table2.columns}
             />
           </Sider>
         </Layout>

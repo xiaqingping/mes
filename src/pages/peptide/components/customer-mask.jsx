@@ -1,4 +1,4 @@
-// 多肽修饰弹框
+// 客户弹框
 import {
   Button,
   Col,
@@ -77,9 +77,9 @@ class Search extends Component {
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="大区">
-              {getFieldDecorator('regionCode', { initialValue: '0' })(
+              {getFieldDecorator('regionCode', { initialValue: '' })(
                 <Select>
-                  <Option value="0">全部</Option>
+                  <Option value="">全部</Option>
                   {regions.map(item => <Option key={item.code} value={item.code}>
                     {`${item.code}-${item.name}`}
                   </Option>)}
@@ -88,9 +88,9 @@ class Search extends Component {
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="网点">
-              {getFieldDecorator('officeCode', { initialValue: '0' })(
+              {getFieldDecorator('officeCode', { initialValue: '' })(
                 <Select>
-                  <Option value="0">全部</Option>
+                  <Option value="">全部</Option>
                   {offices.map(item => <Option key={item.code} value={item.code}>
                     {`${item.code}-${item.name}`}
                   </Option>)}
@@ -99,9 +99,9 @@ class Search extends Component {
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="付款方式">
-              {getFieldDecorator('payMethodCode', { initialValue: '0' })(
+              {getFieldDecorator('payMethodCode', { initialValue: '' })(
                 <Select>
-                  <Option value="0">全部</Option>
+                  <Option value="">全部</Option>
                   {payMethods.map(item => <Option key={item.code} value={item.code}>
                     {`${item.code}-${item.name}`}
                   </Option>)}
@@ -110,9 +110,9 @@ class Search extends Component {
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="付款条件">
-              {getFieldDecorator('payTermsCode', { initialValue: '0' })(
+              {getFieldDecorator('payTermsCode', { initialValue: '' })(
                 <Select>
-                  <Option value="0">全部</Option>
+                  <Option value="">全部</Option>
                   {payTerms.map(item => <Option key={item.code} value={item.code}>
                     {`${item.code}-${item.name}`}
                   </Option>)}
@@ -121,9 +121,9 @@ class Search extends Component {
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="销售范围">
-              {getFieldDecorator('rangeOrganization', { initialValue: '0' })(
+              {getFieldDecorator('rangeOrganization', { initialValue: '' })(
                 <Select>
-                  <Option value="0">全部</Option>
+                  <Option value="">全部</Option>
                   {rangeArea.map(item => <Option key={item.id} value={item.id}>
                     {item.name}
                   </Option>)}
@@ -264,7 +264,6 @@ class Customer extends Component {
       {
         title: '邮箱',
         dataIndex: 'email',
-        align: 'center',
         width: 100,
       },
       {
@@ -276,11 +275,6 @@ class Customer extends Component {
         title: '大区',
         dataIndex: 'regionCode',
         width: 100,
-        render: text => {
-          if (text === 1) return '正常';
-          if (text === 2) return '已删除';
-          return ''
-        },
       },
       {
         title: '网点',

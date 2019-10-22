@@ -3,6 +3,10 @@ import { connect } from 'dva';
 import { Redirect } from 'umi';
 import PageLoading from '@/components/PageLoading';
 
+@connect(({ user, loading }) => ({
+  currentUser: user.currentUser,
+  loading: loading.models.user,
+}))
 class SecurityLayout extends React.Component {
   state = {
     isReady: false,
@@ -19,7 +23,6 @@ class SecurityLayout extends React.Component {
       dispatch({
         type: 'user/fetchCurrent',
       });
-      // console.log(JSON.parse(localStorage.getItem('user')));
       // dispatch({
       //   type: 'user/saveCurrent',
       //   paylod: JSON.parse(localStorage.getItem('user')),
@@ -29,13 +32,14 @@ class SecurityLayout extends React.Component {
 
   render() {
     const { isReady } = this.state;
-    const { children, loading, currentUser } = this.props;
+    const { children, loading } = this.props;
+    const authorization = localStorage.getItem('token');
 
-    if ((!currentUser.authorization && loading) || !isReady) {
+    if ((!authorization && loading) || !isReady) {
       return <PageLoading />;
     }
 
-    if (!currentUser.authorization) {
+    if (!authorization) {
       return <Redirect to="/user/login"></Redirect>;
     }
 
@@ -43,7 +47,4 @@ class SecurityLayout extends React.Component {
   }
 }
 
-export default connect(({ user, loading }) => ({
-  currentUser: user.currentUser,
-  loading: loading.models.user,
-}))(SecurityLayout);
+export default SecurityLayout;

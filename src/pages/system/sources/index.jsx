@@ -23,18 +23,90 @@ const type = [
   { value: 'PUT', text: 'PUT' },
 ];
 
+
+/**
+ * 页面顶部筛选表单
+ */
+@Form.create()
+class Searchs extends Component {
+  componentDidMount() {
+    this.submit();
+  }
+
+  submit = e => {
+    if (e) e.preventDefault();
+    const val = this.props.form.getFieldsValue();
+    this.props.getTableData({ page: 1, ...val });
+  }
+
+  // 重置
+  handleFormReset = () => {
+    this.props.form.resetFields();
+  }
+
+  // 渲染表单
+  renderForm = () => {
+    const {
+      form: { getFieldDecorator },
+    } = this.props;
+
+    return (
+      <Form onSubmit={this.submit} layout="inline">
+        <Row gutter={{ lg: 24, md: 12, sm: 6 }}>
+          <Col lg={6} md={8} sm={12}>
+            <FormItem label="Client">
+              {getFieldDecorator('client')(<Input placeholder="请输入"/>)}
+            </FormItem>
+          </Col>
+          <Col lg={6} md={8} sm={12}>
+            <FormItem label="Type">
+              {getFieldDecorator('type', { initialValue: '' })(
+                <Select>
+                  <Option value="">全部</Option>
+                  {type.map(item => <Option key={item.value} value={item.value}>{item.text}</Option>)}
+                </Select>,
+              )}
+            </FormItem>
+          </Col>
+          <Col lg={6} md={8} sm={12}>
+            <span className="submitButtons">
+              <Button type="primary" htmlType="submit">
+                查询
+              </Button>
+              <Button style={{ marginLeft: 8 }} onClick={this.handleFormReset}>
+                重置
+              </Button>
+            </span>
+          </Col>
+        </Row>
+      </Form>
+    );
+  }
+
+  render() {
+    return (
+      <div className="tableListForm">{this.renderForm()}</div>
+    );
+  }
+}
+
+/**
+ * 页面根组件
+ */
+@Form.create()
 class User extends Component {
   state = {
-    pagination: {
-      current: 1,
-      pageSize: 10,
-      total: 0,
+    formValues: {
+      page: 1,
+      rows: 10,
     },
     list: [],
+    total: 0,
     loading: false,
     selectedRows: [],
   }
 
+  // 设置列
   columns = [
     {
       title: 'client',
@@ -59,14 +131,9 @@ class User extends Component {
   ];
 
   componentDidMount() {
-    this.getTableData();
   }
 
-  handleSearch = e => {
-    e.preventDefault();
-    this.getTableData({ page: 1 });
-  }
-
+  // 分页
   handleStandardTableChange = (pagination, filtersArg, sorter) => {
     this.getTableData({
       page: pagination.current,
@@ -74,6 +141,7 @@ class User extends Component {
     });
   }
 
+  // 选择行
   handleSelectRows = rows => {
     this.setState({
       selectedRows: rows,
@@ -82,29 +150,26 @@ class User extends Component {
 
   // 获取表格数据
   getTableData = (options = {}) => {
+    const { formValues } = this.state;
+    const query = Object.assign({}, formValues, options);
+
     this.setState({
+      formValues: query,
       loading: true,
     });
-    const { form } = this.props;
-    const { pagination: { current: page, pageSize: rows } } = this.state;
-    const query = Object.assign(form.getFieldsValue(), { page, rows }, options);
 
     api.system.getSources(query, true).then(data => {
       this.setState({
-        loading: false,
         list: data.rows,
-        pagination: {
-          total: data.total,
-          current: query.page,
-          pageSize: query.rows,
-        },
+        total: data.total,
+        loading: false,
       });
     });
   }
 
-  // 新增
-  handleAdd = () => {
-    console.log('add');
+  // 重置
+  handleFormReset = () => {
+    this.props.form.resetFields();
   }
 
   // 渲染表单
@@ -149,16 +214,22 @@ class User extends Component {
   }
 
   render() {
-    const { list, pagination, loading, selectedRows } = this.state;
-    const data = { list, pagination };
+    const {
+      formValues: { page: current, rows: pageSize },
+      selectedRows,
+      list,
+      total,
+      loading,
+    } = this.state;
+    const data = { list, pagination: { current, pageSize, total } };
 
     return (
       <PageHeaderWrapper>
         <Card bordered={false}>
           <div className="tableList">
-            <div className="tableListForm">{this.renderForm()}</div>
+            <Searchs getTableData={this.getTableData} />
             <StandardTable
-              scroll={{ x: 1300 }}
+              scroll={{ x: 1000 }}
               selectedRows={selectedRows}
               loading={loading}
               data={data}
