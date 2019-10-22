@@ -227,10 +227,10 @@ class Modifications extends Component {
       loading: true,
     });
 
-    api.peptideBase.getModifications(query).then(data => {
+    api.peptideBase.getModifications(query).then(res => {
       if (son === 'son') {
         const { parantData } = this.state;
-        data.rows.forEach(item => {
+        res.rows.forEach(item => {
           if (item.id === parantData.id) {
             this.setState({
               dataSon: item.details,
@@ -239,8 +239,8 @@ class Modifications extends Component {
         })
       }
       this.setState({
-        list: data.rows,
-        total: data.total,
+        list: res.rows,
+        total: res.total,
         loading: false,
         editIndex: -1,
       });
