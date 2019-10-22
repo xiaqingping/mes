@@ -62,42 +62,58 @@ class Search extends React.Component {
       <Form onSubmit={this.submit} layout="inline">
         <Row gutter={{ xxl: 100, lg: 80 }}>
           <Col xxl={6} lg={8}>
-            <FormItem label="状态">
-              {getFieldDecorator('status', { initialValue: '1' })(
-                <Select>
-                  <Option value="1">正常</Option>
-                  <Option value="2">已删除</Option>
-                </Select>,
-              )}
-            </FormItem>
-          </Col>
-          <Col xxl={6} lg={8}>
-            <FormItem label="SAP编号">
+            <FormItem label="编号">
               {getFieldDecorator('code')(<Input />)}
             </FormItem>
           </Col>
           <Col xxl={6} lg={8}>
-            <FormItem label="样品类型">
-              {getFieldDecorator('sampleTypeId')(
-                // <Select>
-                //   {sampleType.map(e =>
-                //     <Option value={e.id} key={e.id}>{e.name}</Option>,
-                //   )}
-                // </Select>,
-                <Input />,
-              )}
+            <FormItem label="产品名称">
+              {getFieldDecorator('desc')(<Input />)}
             </FormItem>
           </Col>
           <Col xxl={6} lg={8}>
-            <FormItem label="测序类型">
-              {getFieldDecorator('seqTypeId')(
-                // <Select>
-                //   {seqType.map(e =>
-                //     <Option value={e.id} key={e.id}>{e.name}</Option>,
-                //   )}
-                // </Select>,
-                <Input />,
-              )}
+            <FormItem label="英文名称">
+              {getFieldDecorator('edesc')(<Input />)}
+            </FormItem>
+          </Col>
+          <Col xxl={6} lg={8}>
+            <FormItem label="旧物料号">
+              {getFieldDecorator('oldCode')(<Input />)}
+            </FormItem>
+          </Col>
+          <Col xxl={6} lg={8}>
+            <FormItem label="客户编号">
+              {getFieldDecorator('customerCode')(<Input />)}
+            </FormItem>
+          </Col>
+          <Col xxl={6} lg={8}>
+            <FormItem label="负责人编号">
+              {getFieldDecorator('subcustomerCode')(<Input />)}
+            </FormItem>
+          </Col>
+          <Col xxl={6} lg={8}>
+            <FormItem label="销售大区">
+              {getFieldDecorator('regionCode')(<Input />)}
+            </FormItem>
+          </Col>
+          <Col xxl={6} lg={8}>
+            <FormItem label="销售大区">
+              {getFieldDecorator('officeCode')(<Input />)}
+            </FormItem>
+          </Col>
+          <Col xxl={6} lg={8}>
+            <FormItem label="销售范围">
+              {getFieldDecorator('range')(<Input />)}
+            </FormItem>
+          </Col>
+          <Col xxl={6} lg={8}>
+            <FormItem label="工厂">
+              {getFieldDecorator('factory')(<Input />)}
+            </FormItem>
+          </Col>
+          <Col xxl={6} lg={8}>
+            <FormItem label="品牌">
+              {getFieldDecorator('brandCode')(<Input />)}
             </FormItem>
           </Col>
         </Row>
@@ -130,18 +146,13 @@ class Search extends React.Component {
             </FormItem>
           </Col>
           <Col xxl={6} lg={8}>
-            <FormItem label="名称">
-              {getFieldDecorator('code')(<Input />)}
+            <FormItem label="产品名称">
+              {getFieldDecorator('desc')(<Input />)}
             </FormItem>
           </Col>
           <Col xxl={6} lg={0}>
-            <FormItem label="样品类型">
-              {getFieldDecorator('sampleTypeId', { initialValue: '' })(
-                <Select>
-                  <Option value="1">PCR产物(已纯化)</Option>
-                  <Option value="2">PCR产物(未纯化)</Option>
-                </Select>,
-              )}
+            <FormItem label="英文名称">
+              {getFieldDecorator('edesc')(<Input />)}
             </FormItem>
           </Col>
           <Col xxl={6} lg={8}>
@@ -370,7 +381,6 @@ class ChooseProduct extends React.Component {
             />
           </Sider>
         </Layout>
-
       </Modal>
     );
   }
