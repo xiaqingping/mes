@@ -35,6 +35,11 @@ class Search extends Component {
     this.props.getTableData({ page: 1,...val});
   }
 
+  updown= e => {
+    const val = this.props.form.getFieldsValue();
+    this.props.getTableData({ page: 1,...val});
+    console.log(1);
+  }
   // 渲染表单
   renderForm = () => {
     const {
@@ -102,8 +107,8 @@ class Search extends Component {
               <Button type="primary" htmlType="submit">
                 查询
               </Button>
-              {/* <Button style={{ marginLeft: 8 }} onClick={this.handleFormReset}>
-                重置
+              {/* <Button htmlType="updown">
+                上传
               </Button> */}
             </span>
           </Col>
@@ -340,16 +345,7 @@ class Modifications extends Component {
       loading: true,
     });
     // pay
-    api.pay.getPay(query).then(res => {
-      this.setState({
-        list: res.rows,
-        total: res.total,
-        loading: false,
-        editIndex: -1,
-      });
-    });
-    
-    // api.peptideBase.getModifications(query).then(res => {
+    // api.pay.getPay(query).then(res => {
     //   this.setState({
     //     list: res.rows,
     //     total: res.total,
@@ -357,6 +353,15 @@ class Modifications extends Component {
     //     editIndex: -1,
     //   });
     // });
+    
+    api.peptideBase.getModifications(query).then(res => {
+      this.setState({
+        list: res.rows,
+        total: res.total,
+        loading: false,
+        editIndex: -1,
+      });
+    });
   }
 
   // 退出编辑
