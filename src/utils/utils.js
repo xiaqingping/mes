@@ -44,3 +44,19 @@ export const formatter = (arr, value, key1, key2) => {
   }
   return value;
 };
+
+/**
+ * 验证表单所有字段
+ *   正确返回 [true, data]
+ *   错误返回 [false, error]
+ */
+export const validateForm = form =>
+  form.validateFields()
+    .then(data => [true, data])
+    .catch(error => [false, error]);
+
+/**
+ * 获取表单的值（不验证）
+ * @param {*} form
+ */
+export const getFormValue = form => form.getFieldsValue();

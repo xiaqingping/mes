@@ -1,5 +1,5 @@
 /**
- * 收票方
+ * 选择收票方
  */
 import {
   Modal,
@@ -36,6 +36,11 @@ class ChooseInvoiceParty extends React.Component {
 
   handleReset = data => {
     console.log(data);
+  }
+
+  selectRow = row => {
+    this.props.selectChooseModalData(row);
+    this.setState({ visible: false });
   }
 
   render() {
@@ -128,6 +133,9 @@ class ChooseInvoiceParty extends React.Component {
       {
         title: '操作',
         dataIndex: 'actions',
+        render: (text, record) => (
+          <a onClick={() => this.selectRow(record)}>选择</a>
+        ),
       },
     ];
 
@@ -136,6 +144,8 @@ class ChooseInvoiceParty extends React.Component {
         title="收票方"
         visible={this.state.visible}
         width="1200px"
+        onCancel={() => this.changeVisible(false)}
+        footer={null}
       >
         <Table
           rowKey="id"
