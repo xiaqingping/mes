@@ -7,7 +7,7 @@ import {
 } from 'antd';
 import React from 'react';
 
-import ChooseInvoiceParty from '@/components/choosse/InvoiceParty';
+import ChooseInvoiceParty from '@/components/choosse/bp/InvoiceParty';
 
 const { Search } = Input;
 const EditableContext = React.createContext();

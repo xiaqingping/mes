@@ -33,7 +33,10 @@ const err = error => {
 
       if (data.type === 41 && data.code === 40000) {
         localStorage.removeItem('token');
-        router.push(`/user/login?redirect=${window.location.href}`);
+        const URL = window.location.href;
+        if (URL.indexOf('/user/login') === -1) {
+          router.push(`/user/login?redirect=${window.location.href}`);
+        }
       }
     } else {
       errMsg = [errMsg];

@@ -7,7 +7,7 @@ import {
 } from 'antd';
 import React from 'react';
 
-import ChooseShipToParty from '@/components/choosse/ShipToParty';
+import ChooseShipToParty from '@/components/choosse/bp/ShipToParty';
 
 const { Search } = Input;
 const EditableContext = React.createContext();

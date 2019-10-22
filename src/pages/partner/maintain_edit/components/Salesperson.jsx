@@ -7,7 +7,7 @@ import {
 } from 'antd';
 import React from 'react';
 
-import ChooseSalesperson from '@/components/choosse/Salesperson';
+import ChooseSalesperson from '@/components/choosse/bp/Salesperson';
 
 const { Search } = Input;
 const EditableContext = React.createContext();
