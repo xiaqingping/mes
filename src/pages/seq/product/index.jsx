@@ -83,7 +83,7 @@ class TopForm extends React.Component {
           </Col>
           <Col xxl={6} lg={8}>
             <FormItem label="SAP编号">
-              {getFieldDecorator('code')(<Search onSearch={() => this.ChooseProduct.changeVisible(true)} />)}
+              {getFieldDecorator('productCode')(<Search onSearch={() => this.ChooseProduct.changeVisible(true)} />)}
             </FormItem>
           </Col>
           <Col xxl={6} lg={8}>
@@ -144,7 +144,7 @@ class TopForm extends React.Component {
           </Col>
           <Col xxl={6} lg={8}>
             <FormItem label="SAP编号">
-              {getFieldDecorator('code')(<Search onSearch={() => this.ChooseProduct.changeVisible(true)} />)}
+              {getFieldDecorator('productCode')(<Search readOnly onSearch={() => this.ChooseProduct.changeVisible(true)} />)}
             </FormItem>
           </Col>
           <Col xxl={6} lg={0}>
@@ -183,7 +183,7 @@ class TopForm extends React.Component {
 
   selectChooseModalData = data => {
     this.props.form.setFieldsValue({
-      code: data.code,
+      productCode: data.code,
     });
   }
 
