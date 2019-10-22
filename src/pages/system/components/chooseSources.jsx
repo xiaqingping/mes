@@ -1,15 +1,14 @@
 import {
   Button,
-  Card,
   Col,
   Form,
   Input,
   Row,
   Select,
+  Modal,
+  Table,
 } from 'antd';
 import React, { Component } from 'react';
-import { PageHeaderWrapper } from '@ant-design/pro-layout';
-import StandardTable from '@/components/StandardTable';
 import api from '@/api';
 
 const FormItem = Form.Item;
@@ -23,12 +22,11 @@ const type = [
   { value: 'PUT', text: 'PUT' },
 ];
 
-
 /**
  * 页面顶部筛选表单
  */
 @Form.create()
-class Searchs extends Component {
+class Search extends Component {
   componentDidMount() {
     this.submit();
   }
@@ -63,7 +61,9 @@ class Searchs extends Component {
               {getFieldDecorator('type', { initialValue: '' })(
                 <Select>
                   <Option value="">全部</Option>
-                  {type.map(item => <Option key={item.value} value={item.value}>{item.text}</Option>)}
+                  {type.map(item =>
+                    <Option key={item.value} value={item.value}>{item.text}</Option>,
+                  )}
                 </Select>,
               )}
             </FormItem>
@@ -94,7 +94,7 @@ class Searchs extends Component {
  * 页面根组件
  */
 @Form.create()
-class User extends Component {
+class Sources extends Component {
   state = {
     formValues: {
       page: 1,
@@ -103,7 +103,6 @@ class User extends Component {
     list: [],
     total: 0,
     loading: false,
-    selectedRows: [],
   }
 
   // 设置列
@@ -130,7 +129,11 @@ class User extends Component {
     },
   ];
 
-  componentDidMount() {
+  // 接收父页面传值
+  componentWillReceiveProps(nextProps) {
+    this.setState({
+      visible: nextProps.visible,
+    })
   }
 
   // 分页
@@ -138,13 +141,6 @@ class User extends Component {
     this.getTableData({
       page: pagination.current,
       rows: pagination.pageSize,
-    });
-  }
-
-  // 选择行
-  handleSelectRows = rows => {
-    this.setState({
-      selectedRows: rows,
     });
   }
 
@@ -160,88 +156,69 @@ class User extends Component {
 
     api.system.getSources(query, true).then(data => {
       this.setState({
+        loading: false,
         list: data.rows,
         total: data.total,
-        loading: false,
       });
     });
   }
 
-  // 重置
-  handleFormReset = () => {
-    this.props.form.resetFields();
-  }
+  // 点击确定
+  handleOk = () => {
+    this.props.getData(this.state.data);
+  };
 
-  // 渲染表单
-  renderForm = () => this.renderAdvancedForm()
-
-  // 显示搜索全部
-  renderAdvancedForm() {
-    const {
-      form: { getFieldDecorator },
-    } = this.props;
-    return (
-      <Form onSubmit={this.handleSearch} layout="inline">
-        <Row gutter={{ lg: 24, md: 12, sm: 6 }}>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="Client">
-              {getFieldDecorator('client')(<Input />)}
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="Type">
-              {getFieldDecorator('type', { initialValue: '' })(
-                <Select>
-                  <Option value="">全部</Option>
-                  {type.map(item => <Option key={item.value} value={item.value}>{item.text}</Option>)}
-                </Select>,
-              )}
-            </FormItem>
-          </Col>
-        </Row>
-        <div style={{ overflow: 'hidden' }}>
-          <div style={{ float: 'right', marginBottom: 24 }}>
-            <Button type="primary" htmlType="submit">
-              查询
-            </Button>
-            <Button style={{ marginLeft: 8 }} onClick={this.handleFormReset}>
-              重置
-            </Button>
-          </div>
-        </div>
-      </Form>
-    );
-  }
+  // 点击取消
+  handleCancel = () => {
+    this.props.closeMask(false)
+    this.setState({
+      visible: false,
+    });
+  };
 
   render() {
     const {
       formValues: { page: current, rows: pageSize },
-      selectedRows,
       list,
       total,
       loading,
+      visible,
     } = this.state;
     const data = { list, pagination: { current, pageSize, total } };
 
+    const rowSelection = {
+      type: 'radio',
+      onChange: (selectedRowKeys, selectedRows) => {
+          this.setState({
+              data: selectedRows[0],
+            })
+        },
+    }
+
     return (
-      <PageHeaderWrapper>
-        <Card bordered={false}>
-          <div className="tableList">
-            <Searchs getTableData={this.getTableData} />
-            <StandardTable
-              scroll={{ x: 1000 }}
-              selectedRows={selectedRows}
+      <div>
+        <Modal
+          width="1200px"
+          title="规则列表"
+          visible={visible}
+          onOk={this.handleOk}
+          onCancel={this.handleCancel}
+        >
+          <Search getTableData={this.getTableData} />
+            <Table
+              scroll={{ x: 800, y: 400 }}
               loading={loading}
-              data={data}
+              dataSource={data.list}
+              pagination={data.pagination}
+              rowSelection={rowSelection}
+              rowKey="id"
               columns={this.columns}
-              onSelectRow={this.handleSelectRows}
               onChange={this.handleStandardTableChange}
             />
-          </div>
-        </Card>
-      </PageHeaderWrapper>
+        </Modal>
+      </div>
     );
   }
 }
 
-export default Form.create()(User);
+export default Form.create()(Sources);

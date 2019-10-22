@@ -9,12 +9,13 @@ import {
   Select,
   message,
   Popconfirm,
-  Modal,
+  // Modal,
 } from 'antd';
 import React, { Component } from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import StandardTable from '@/components/StandardTable';
 import api from '@/api';
+import ChooseSources from '@/pages/system/components/ChooseSources'
 
 const EditableContext = React.createContext();
 const FormItem = Form.Item;
@@ -49,6 +50,13 @@ const statuList = [
   { value: 1, text: '过期' },
 ];
 
+const provinceData = ['Zhejiang', 'Jiangsu'];
+const cityData = {
+  Zhejiang: ['11', '12', '13'],
+  Jiangsu: ['66', '62', '63'],
+};
+
+
 /**
  * 页面顶部筛选表单
  */
@@ -64,6 +72,7 @@ class Searchs extends Component {
     this.props.getTableData({ page: 1, ...val });
   }
 
+  // 重置
   handleFormReset = () => {
     this.props.form.resetFields();
   }
@@ -78,17 +87,17 @@ class Searchs extends Component {
         <Row gutter={{ lg: 24, md: 12, sm: 6 }}>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="规则名称">
-              {getFieldDecorator('name')(<Input />)}
+              {getFieldDecorator('name')(<Input placeholder="请输入"/>)}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="Client">
-              {getFieldDecorator('client')(<Input />)}
+              {getFieldDecorator('client')(<Input placeholder="请输入"/>)}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="参数">
-              {getFieldDecorator('parameterField')(<Input />)}
+              {getFieldDecorator('parameterField')(<Input placeholder="请输入"/>)}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
@@ -96,7 +105,9 @@ class Searchs extends Component {
               {getFieldDecorator('sourceType')(
                 <Select placeholder="请选择">
                   <Option value="">全部</Option>
-                  {typeList.map(item => <Option key={item.value} value={item.value}>{item.text}</Option>)}
+                  {typeList.map(item =>
+                    <Option key={item.value} value={item.value}>{item.text}</Option>,
+                  )}
                 </Select>,
               )}
             </FormItem>
@@ -104,16 +115,20 @@ class Searchs extends Component {
           <Col lg={6} md={8} sm={12}>
             <FormItem label="资源">
               {getFieldDecorator('sourcePath')(
-                // <Search onClick={e => { this.showModal() }} />,
-                <Search onSearch={ this.showModal} />,
-              )}
+                <Search
+                  placeholder="请选择"
+                  onSearch={value => this.showModal(value)}
+              />)}
             </FormItem>
-          </Col><Col lg={6} md={8} sm={12}>
+          </Col>
+          <Col lg={6} md={8} sm={12}>
             <FormItem label="参数类型">
               {getFieldDecorator('paramType')(
                 <Select placeholder="请选择">
                   <Option value="">全部</Option>
-                  {paramTypeList.map(item => <Option key={item.value} value={item.value}>{item.text}</Option>)}
+                  {paramTypeList.map(item =>
+                    <Option key={item.value} value={item.value}>{item.text}</Option>,
+                  )}
                 </Select>,
               )}
             </FormItem>
@@ -122,7 +137,9 @@ class Searchs extends Component {
             <FormItem label="状态">
               {getFieldDecorator('status')(
                 <Select placeholder="请选择">
-                  {statuList.map(item => <Option key={item.value} value={item.value}>{item.text}</Option>)}
+                  {statuList.map(item =>
+                    <Option key={item.value} value={item.value}>{item.text}</Option>,
+                  )}
                 </Select>,
               )}
             </FormItem>
@@ -193,7 +210,7 @@ class EditableCell extends React.Component {
  * 页面根组件
  */
 @Form.create()
-class CarrierSeries extends Component {
+class Rule extends Component {
   state = {
     formValues: {
       page: 1,
@@ -206,15 +223,19 @@ class CarrierSeries extends Component {
     editIndex: -1,
     id: 0, // 新增数据时，提供负数id
     visible: false,
+    sourcesList: [],
+    cities: cityData[provinceData[0]],
+    secondCity: cityData[provinceData[0]][0],
   }
 
+  // 设置列
   columns = [
     {
       title: '规则名称',
       dataIndex: 'name',
       width: 200,
       editable: true,
-      inputType: <Input />,
+      inputType: <Input style={{ width: '90%' }} readOnly />,
       rules: [
         { required: true, message: '必填' },
       ],
@@ -223,55 +244,117 @@ class CarrierSeries extends Component {
       title: 'Client',
       dataIndex: 'sourceClient',
       width: 200,
+      editable: true,
+      inputType: <Input style={{ width: '90%' }} readOnly />,
+      rules: [
+        { required: true, message: '必填' },
+      ],
     },
     {
       title: 'Type',
       dataIndex: 'sourceType',
       width: 100,
+      editable: true,
+      inputType: <Input style={{ width: '90%' }} readOnly />,
+      rules: [
+        { required: true, message: '必填' },
+      ],
     },
     {
       title: '资源',
       dataIndex: 'sourcePath',
       width: 200,
       editable: true,
-      inputType: <Search />,
-      // inputType: <Search onClick={e => { console.log(this) }}/>,
+      inputType: <Search style={{ width: '90%' }} onSearch={() => this.openMask()} readOnly/>,
+      rules: [
+        { required: true, message: '必填' },
+      ],
     },
     {
       title: '资源描述',
       dataIndex: 'sourceDesc',
       width: 200,
+      editable: true,
+      inputType: <Input style={{ width: '90%' }} readOnly />,
+      rules: [
+        { required: true, message: '必填' },
+      ],
     },
     {
       title: '参数类型',
       dataIndex: 'paramType',
-      width: 100,
+      width: 150,
+      editable: true,
+      inputType: (
+        <Select style={{ width: '90%' }} onChange={this.handleProvinceChange}>
+          {/* <Option value="1">参数</Option>
+          <Option value="2">属性</Option>
+          <Option value="3">接口</Option> */}
+          {provinceData.map(province => (
+            <Option key={province}>{province}</Option>
+          ))}
+        </Select>),
+      rules: [
+        { required: true, message: '必填' },
+      ],
       render(val) {
         if (val === undefined) {
           return '';
         }
         return <span>{paramType[val].text}</span>;
       },
+
     },
     {
       title: '参数',
       dataIndex: 'parameterField',
       width: 150,
+      editable: true,
+      inputType: (
+        <Select style={{ width: '90%' }} value={this.state.secondCity} onChange={this.onSecondCityChange}>
+          {this.state.cities.map(city => (
+            <Option key={city}>{city}</Option>
+          ))}
+          {/* <Option value="L">L</Option>
+          <Option value="D">D</Option> */}
+        </Select>),
+      rules: [
+        { required: true, message: '必填' },
+      ],
     },
     {
       title: '参数描述',
       dataIndex: 'parameterDesc',
-      width: 100,
+      width: 150,
+      editable: true,
+      inputType: <Input />,
+      rules: [
+        { required: true, message: '必填' },
+      ],
     },
     {
       title: 'OP',
       dataIndex: 'op',
       width: 100,
+      editable: true,
+      inputType: <Input style={{ width: '90%' }} readOnly />,
+      rules: [
+        { required: true, message: '必填' },
+      ],
     },
     {
       title: '值',
       dataIndex: 'value',
       width: 150,
+      editable: true,
+      inputType: (
+        <Select style={{ width: '90%' }}>
+          <Option value="L">L</Option>
+          <Option value="D">D</Option>
+        </Select>),
+      rules: [
+        { required: true, message: '必填' },
+      ],
     },
     {
       title: '状态',
@@ -298,8 +381,6 @@ class CarrierSeries extends Component {
               <Popconfirm title="确定作废数据？" onConfirm={() => this.deleteRow(row)}>
                 <a>删除</a>
               </Popconfirm>
-              {/* <Divider type="vertical" />
-              <a onClick={() => this.editRow(index)}>修改</a> */}
             </>
           );
         }
@@ -317,10 +398,23 @@ class CarrierSeries extends Component {
     },
   ];
 
-  componentDidMount() {
-    //
-  }
+  componentDidMount() {}
 
+  handleProvinceChange = value => {
+    console.log(value);
+    this.setState({
+      cities: cityData[value],
+      secondCity: cityData[value][0],
+    });
+  };
+
+  onSecondCityChange = value => {
+    this.setState({
+      secondCity: value,
+    });
+  };
+
+  // 分页
   handleStandardTableChange = (pagination, filtersArg, sorter) => {
     this.getTableData({
       page: pagination.current,
@@ -328,6 +422,7 @@ class CarrierSeries extends Component {
     });
   }
 
+  // 选择行
   handleSelectRows = rows => {
     this.setState({
       selectedRows: rows,
@@ -354,54 +449,6 @@ class CarrierSeries extends Component {
     });
   }
 
-  // 取消编辑
-  cancel = () => {
-    this.setState({ editIndex: -1 });
-  };
-
-  // 删除
-  deleteRow = row => {
-    console.log(row);
-    // api.series.cancelSeries(row.id).then(() => {
-    //   this.getTableData();
-    // });
-  };
-
-  // 保存
-  saveRow = index => {
-    console.log(index);
-    // this.props.form.validateFields((error, row) => {
-    //   if (error) return;
-    //   const { list } = this.state;
-    //   const newData = { ...list[index], ...row };
-    //   if (newData.id > 0) {
-    //     api.series.updateSeries(newData).then(() => this.getTableData());
-    //   } else {
-    //     api.series.addSeries(newData).then(() => this.getTableData());
-    //   }
-    // });
-  }
-
-  // 开启编辑
-  editRow = index => {
-    this.setState({
-      editIndex: index,
-    });
-  }
-
-  // 退出编辑
-  cancelEdit = (row, index) => {
-    if (row.id > 0) {
-      this.setState({ editIndex: index });
-    } else {
-      const { list } = this.state;
-      this.setState({
-        list: list.filter(e => e.id > 0),
-        editIndex: index,
-      });
-    }
-  }
-
   // 新增
   handleAdd = () => {
     const { editIndex, id, list } = this.state;
@@ -423,31 +470,101 @@ class CarrierSeries extends Component {
     });
   }
 
-  // 显示model弹窗
-  showModal = () => {
-    console.log(123);
+  // 保存
+  saveRow = index => {
+    // console.log(index);
+    this.props.form.validateFields((error, row) => {
+      if (error) return;
+      const { list } = this.state;
+      const newData = { ...list[index], ...row };
+      console.log(newData);
+      // if (newData.id > 0) {
+      //   api.series.updateSeries(newData).then(() => this.getTableData());
+      // } else {
+      //   api.series.addSeries(newData).then(() => this.getTableData());
+      // }
+    });
+  }
+
+  // 删除
+  deleteRow = row => {
+    console.log(row);
+    // api.series.cancelSeries(row.id).then(() => {
+    //   this.getTableData();
+    // });
+  };
+
+  // 开启编辑
+  editRow = index => {
+    this.setState({
+      editIndex: index,
+    });
+  }
+
+  // 取消编辑
+  cancel = () => {
+    this.setState({ editIndex: -1 });
+  };
+
+  // 退出编辑
+  cancelEdit = (row, index) => {
+    if (row.id > 0) {
+      this.setState({ editIndex: index });
+    } else {
+      const { list } = this.state;
+      this.setState({
+        list: list.filter(e => e.id > 0),
+        editIndex: index,
+      });
+    }
+  }
+
+    // 打开搜索
+  openMask = () => {
     this.setState({
       visible: true,
-    });
-  };
+    })
+  }
 
-  // 确定
-  handleOk = e => {
-    // console.log(e);
-    console.log(1);
+  // 关闭搜索
+  closeMask = v => {
     this.setState({
-      visible: false,
-    });
-  };
+      visible: v,
+    })
+  }
 
-  // 取消
-  handleCancel = e => {
-    // console.log(e);
-    console.log(2);
+  // 得到搜索的值
+  getSources = data => {
+    if (data.id) {
+      api.system.getSourcesParameterList(data.id).then(res => {
+        if (!res.parameterList) {
+          data.parameterList = [];
+        } else {
+          data.parameterList = res.parameterList;
+        }
+        if (!res.fparameterList) {
+          data.fparameterList = [];
+        } else {
+          data.fparameterList = res.fparameterList;
+        }
+        if (!res.ivalidateList) {
+          data.ivalidateList = [];
+        } else {
+          data.ivalidateList = res.ivalidateList;
+        }
+      });
+    }
     this.setState({
+      sourcesList: data,
       visible: false,
-    });
-  };
+    })
+    this.props.form.setFieldsValue({
+      sourceClient: data.client,
+      sourceType: data.type,
+      sourcePath: data.path,
+      sourceDesc: data.desc,
+    })
+  }
 
   render() {
     const {
@@ -457,6 +574,7 @@ class CarrierSeries extends Component {
       total,
       loading,
       visible,
+      sourcesList,
     } = this.state;
     const data = { list, pagination: { current, pageSize, total } };
 
@@ -492,9 +610,6 @@ class CarrierSeries extends Component {
               <Button icon="plus" type="primary" onClick={() => this.handleAdd()}>
                 新建
               </Button>
-              {/* <Button type="primary" onClick={this.showModal}>
-                Open Modal
-              </Button> */}
             </div>
             <EditableContext.Provider value={this.props.form}>
               <StandardTable
@@ -510,20 +625,12 @@ class CarrierSeries extends Component {
               />
             </EditableContext.Provider>
           </div>
-          <Modal
-                title="Basic Modal"
-                visible={this.state.visible}
-                onOk={this.handleOk}
-                onCancel={this.handleCancel}
-              >
-                <p>Some contents...</p>
-                <p>Some contents...</p>
-                <p>Some contents...</p>
-              </Modal>
         </Card>
+        <ChooseSources getData={v => { this.getSources(v) }} visible={visible}
+        closeMask={ v => { this.closeMask(v) }}/>
       </PageHeaderWrapper>
     );
   }
 }
 
-export default CarrierSeries;
+export default Rule;

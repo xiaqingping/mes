@@ -6,7 +6,7 @@
 import request from '@/utils/request';
 
 export default {
-  /** ****************************** 员工列表 *********************************** */
+  /** ****************************** 用户 *********************************** */
   // 查询
   getClients (params) {
     return request('/dataauth/v1/data/clients/easyui', { params });
@@ -45,12 +45,12 @@ export default {
     return request('/dataauth/v1/data/rules/easyui', { method: 'PUT', data });
   },
 
-  /** ****************************** 权限分组 *********************************** */
+  /** ****************************** 分组 *********************************** */
   // 查询
   getGroups (params) {
     return request('/dataauth/v1/data/groups/easyui', { params });
   },
-  // 保存
+  // 保存 (新增，删除)
   saveGroups (data) {
     return request('/dataauth/v1/data/groups/list', { method: 'PUT', data });
   },
