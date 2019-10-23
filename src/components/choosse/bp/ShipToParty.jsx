@@ -78,33 +78,8 @@ class ChooseShipToParty extends React.Component {
         ),
       },
       {
-        title: '认证',
-        dataIndex: 'renz',
-        filters: [
-          { value: 1, text: '已认证' },
-          { value: 2, text: '未认证' },
-          { value: 3, text: '审核种' },
-        ],
-      },
-      {
-        title: '冻结',
-        dataIndex: 'dongj',
-        filters: [
-          { value: 1, text: '冻结' },
-          { value: 2, text: '活跃' },
-        ],
-      },
-      {
-        title: '完整',
-        dataIndex: 'wanz',
-        filters: [
-          { value: 1, text: '完整' },
-          { value: 2, text: '不完整' },
-        ],
-      },
-      {
         title: '联系方式',
-        dataIndex: 'email',
+        dataIndex: 'contactInfo',
         filterIcon: filtered => (
           <Icon type="search" style={{ color: filtered ? '#1890ff' : undefined }} />
         ),
@@ -129,10 +104,6 @@ class ChooseShipToParty extends React.Component {
             </Button>
           </div>
         ),
-      },
-      {
-        title: '收票方',
-        dataIndex: 'shoupiao',
       },
       {
         title: '操作',

@@ -8,6 +8,7 @@ import {
   AutoComplete,
   Input,
   Icon,
+  Cascader,
 } from 'antd';
 import React from 'react';
 
@@ -55,9 +56,7 @@ class ChooseSalesperson extends React.Component {
         ),
         filterDropdown: ({ selectedKeys, confirm, clearFilters }) => (
           <div style={{ width: 210, padding: 8 }}>
-            <AutoComplete
-              style={{ width: 188, marginBottom: 8, display: 'block' }}
-            />
+            <AutoComplete style={{ width: 188, marginBottom: 8, display: 'block' }} />
             <Button
               type="primary"
               onClick={() => this.handleSearch(selectedKeys, confirm)}
@@ -78,33 +77,36 @@ class ChooseSalesperson extends React.Component {
         ),
       },
       {
-        title: '认证',
-        dataIndex: 'renz',
-        filters: [
-          { value: 1, text: '已认证' },
-          { value: 2, text: '未认证' },
-          { value: 3, text: '审核种' },
-        ],
-      },
-      {
-        title: '冻结',
-        dataIndex: 'dongj',
-        filters: [
-          { value: 1, text: '冻结' },
-          { value: 2, text: '活跃' },
-        ],
-      },
-      {
-        title: '完整',
-        dataIndex: 'wanz',
-        filters: [
-          { value: 1, text: '完整' },
-          { value: 2, text: '不完整' },
-        ],
+        title: '区域归属',
+        dataIndex: 'area',
+        filterIcon: filtered => (
+          <Icon type="search" style={{ color: filtered ? '#1890ff' : undefined }} />
+        ),
+        filterDropdown: ({ selectedKeys, confirm, clearFilters }) => (
+          <div style={{ width: 210, padding: 8 }}>
+            <Cascader style={{ width: 188, marginBottom: 8, display: 'block' }} options={[]} />
+            <Button
+              type="primary"
+              onClick={() => this.handleSearch(selectedKeys, confirm)}
+              icon="search"
+              size="small"
+              style={{ width: 90, marginRight: 8 }}
+            >
+              搜索
+            </Button>
+            <Button
+              onClick={() => this.handleReset(clearFilters)}
+              size="small"
+              style={{ width: 90 }}
+            >
+              重置
+            </Button>
+          </div>
+        ),
       },
       {
         title: '联系方式',
-        dataIndex: 'email',
+        dataIndex: 'contactInfo',
         filterIcon: filtered => (
           <Icon type="search" style={{ color: filtered ? '#1890ff' : undefined }} />
         ),
@@ -129,10 +131,6 @@ class ChooseSalesperson extends React.Component {
             </Button>
           </div>
         ),
-      },
-      {
-        title: '收票方',
-        dataIndex: 'shoupiao',
       },
       {
         title: '操作',
