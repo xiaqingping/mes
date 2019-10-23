@@ -61,10 +61,48 @@ class CustomerEdit extends Component {
     });
   };
 
+  // 提交
   validate = () => {
-    console.log(this.props.details);
     // TODO: 子组件方法
     // this.basicView.wrappedInstance.validate();
+
+    // 在这里做数据验证，验证通过后，根据情况做数据转换，然后再提交
+
+
+    const { editType } = this.state;
+    if (editType === 'add') {
+      this.add();
+    } else {
+      this.update();
+    }
+  }
+
+  // 新增
+  add = () => {
+    const data = JSON.parse(JSON.stringify(this.props.details)) || {};
+    const customer = data.customer || {};
+    const salesAreaList = customer.salesAreaList || [];
+
+    salesAreaList.forEach(e => {
+      const soldToPartyList = e.soldToPartyList || [];
+      const shipToPartyList = e.shipToPartyList || [];
+      const salerList = e.salerList || [];
+
+      delete e.soldToPartyList;
+      delete e.shipToPartyList;
+      delete e.salerList;
+
+      e.soldToPartyIdList = soldToPartyList.map(e1 => e1.id);
+      e.shipToPartyIdList = shipToPartyList.map(e1 => e1.id);
+      e.salerCodeList = salerList.map(e1 => e1.id);
+    });
+
+    console.log(data);
+  }
+
+  // 修改
+  update = () => {
+
   }
 
   // 客户

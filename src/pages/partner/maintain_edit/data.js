@@ -239,7 +239,7 @@ export const addDetails = {
         // soldToPartyList: [{ id: '', type: '', code: '', name: '', linkVerifyStatus: '' }],
         shipToPartyIdList: [123],
         // shipToPartyList: [{ id: '', type: '', code: '', name: '', verifyStatus: '' }],
-        salerCodeLIst: ['123'],
+        salerCodeList: ['123'],
         // salerList: [{ code: '', name: '' }],
       },
     ],
@@ -360,8 +360,8 @@ export const updateDetails = {
         newShipToPartyIdList: [123],
         deleteShipToPartyIdList: [123],
         // 销售员
-        newSalerCodeLIst: ['123'],
-        deleteSalerCodeLIst: ['123'],
+        newsalerCodeList: ['123'],
+        deletesalerCodeList: ['123'],
       },
     ],
     // 地址

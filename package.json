@@ -59,7 +59,7 @@
     "redux": "^4.0.1",
     "umi": "^2.10.7",
     "umi-plugin-pro-block": "^1.3.6",
-    "umi-plugin-react": "^1.12.7",
+    "umi-plugin-react": "^1.12.8",
     "webpack-theme-color-replacer": "^1.3.2"
   },
   "devDependencies": {
