@@ -6,11 +6,16 @@
 export const readDetails = {
   // 基础数据
   basic: {
+    id: '',
     type: 1,
+    code: '',
     name: '',
+    certificationStatus: '',
     mobilePhoneCountryCode: '',
     mobilePhone: '',
+    mobilePhoneVerifyStatus: '',
     email: '',
+    emailVerifyStatus: '',
     telephoneCountryCode: '',
     telephoneAreaCode: '',
     telephone: '',
@@ -91,6 +96,7 @@ export const readDetails = {
     // 收货地址列表
     addressList: [
       {
+        id: '',
         name: '',
         mobilePhone: '',
         mobilePhoneCountryCode: '',
@@ -106,6 +112,7 @@ export const readDetails = {
         streetCode: '',
         streetName: '',
         address: '',
+        source: '',
       },
     ],
   },
@@ -132,6 +139,7 @@ export const readDetails = {
     paymentBank: {
       countryCode: '1',
       bankCode: '1',
+      bankName: '1',
       bankAccount: '6666666666',
       bankAccountName: 'Max',
     },

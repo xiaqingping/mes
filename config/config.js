@@ -18,11 +18,9 @@ const plugins = [
         hmr: true,
       },
       locale: {
-        // default false
         enable: true,
-        // default zh-CN
         default: 'zh-CN',
-        // default true, when it is true, will use `navigator.language` overwrite default
+        // 为true时，用navigator.language的值作为默认语言
         baseNavigator: true,
       },
       dynamicImport: {

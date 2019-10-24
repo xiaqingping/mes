@@ -36,6 +36,11 @@ class CustomerEdit extends Component {
   componentDidMount() {
     window.addEventListener('resize', this.resizeFooterToolbar, { passive: true });
     this.resizeFooterToolbar();
+
+    console.log(123);
+    this.props.dispatch({
+      type: 'basic/getCountrys',
+    });
   }
 
   componentWillUnmount() {
