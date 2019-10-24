@@ -39,7 +39,8 @@ class CustomerEdit extends Component {
 
     console.log(123);
     this.props.dispatch({
-      type: 'basic/getCountrys',
+      type: 'basic/getCache',
+      payload: { type: 'countrys' },
     });
   }
 
