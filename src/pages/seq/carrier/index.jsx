@@ -197,6 +197,7 @@ class EditableCell extends React.Component {
       rules,
       ...restProps
     } = this.props;
+    if (editing) console.log(this.props);
     return (
       <td {...restProps}>
         {editing ? (
@@ -251,7 +252,7 @@ class Carrier extends Component {
     });
   }
 
-  handleStandardTableChange = (pagination, filtersArg, sorter) => {
+  handleStandardTableChange = pagination => {
     this.getTableData({
       page: pagination.current,
       rows: pagination.pageSize,

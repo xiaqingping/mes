@@ -44,8 +44,9 @@ class TopForm extends React.Component {
 
   submit = e => {
     if (e) e.preventDefault();
-    const val = this.props.form.getFieldsValue();
-    this.props.getTableData({ page: 1, ...val });
+    // const val = this.props.form.getFieldsValue();
+    // this.props.getTableData({ page: 1, ...val });
+    this.props.getTableData({ page: 1 });
   }
 
   getFormData = () => getFormValue(this.props.form);

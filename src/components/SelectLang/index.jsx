@@ -2,17 +2,29 @@ import { Icon, Menu } from 'antd';
 import { formatMessage, getLocale, setLocale } from 'umi-plugin-react/locale';
 import React from 'react';
 import classNames from 'classnames';
+import { connect } from 'dva';
 import HeaderDropdown from '../HeaderDropdown';
 import styles from './index.less';
 
 const SelectLang = props => {
-  const { className } = props;
+  const { className, dispatch } = props;
   const selectedLang = getLocale();
+
+  const setLanguageCode = lang => {
+    dispatch({
+      type: 'global/changeLanguageCode',
+      payload: lang,
+    });
+  };
+
+  setLanguageCode(selectedLang);
 
   const changeLang = ({ key }) => {
     document.documentElement.setAttribute('lang', key);
     setLocale(key, false);
+    setLanguageCode(key);
   };
+
 
   const locales = ['zh-CN', 'en-US'];
   const languageLabels = {
@@ -23,6 +35,7 @@ const SelectLang = props => {
     'zh-CN': '🇨🇳',
     'en-US': '🇺🇸',
   };
+
   const langMenu = (
     <Menu className={styles.menu} selectedKeys={[selectedLang]} onClick={changeLang}>
       {locales.map(locale => (
@@ -49,4 +62,6 @@ const SelectLang = props => {
   );
 };
 
-export default SelectLang;
+export default connect(({ global }) => ({
+  languageCode: global.languageCode,
+}))(SelectLang);

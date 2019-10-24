@@ -73,8 +73,10 @@ service.interceptors.request.use(config => {
 
   const token = localStorage.getItem('token');
   if (token) {
-    // eslint-disable-next-line no-param-reassign
-    config.headers.Authorization = token;
+    if (config.url.indexOf('180.167.32.168') === -1) {
+      // eslint-disable-next-line no-param-reassign
+      config.headers.Authorization = token;
+    }
   }
   return config;
 }, err);
