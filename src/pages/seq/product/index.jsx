@@ -304,9 +304,10 @@ class Product extends React.Component {
       this.setState({
         list: res.rows,
         pagination: { ...pagination, total: res.total },
-        loading: false,
         editIndex: -1,
       });
+    }).finally(() => {
+      this.setState({ loading: false });
     });
   }
 

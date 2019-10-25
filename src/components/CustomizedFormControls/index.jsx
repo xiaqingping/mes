@@ -6,7 +6,7 @@ import {
   AutoComplete,
 } from 'antd';
 import React from 'react';
-import { switchCase } from '@babel/types';
+import { connect } from 'dva';
 
 const InputGroup = Input.Group;
 const { Option } = Select;
@@ -195,6 +195,9 @@ export class NameInput extends React.Component {
 }
 
 // 移动电话
+@connect(({ basic }) => ({
+  countryDiallingCodes: basic.countryDiallingCodes,
+}))
 export class MobilePhoneInput extends React.Component {
   static getDerivedStateFromProps(nextProps) {
     if ('value' in nextProps) {
@@ -209,7 +212,7 @@ export class MobilePhoneInput extends React.Component {
     super(props);
     const value = props.value || {};
     this.state = {
-      mobilePhoneCountryCode: value.mobilePhoneCountryCode || '+86',
+      mobilePhoneCountryCode: value.mobilePhoneCountryCode || '',
       mobilePhone: value.mobilePhone || '',
     };
   }
@@ -226,11 +229,20 @@ export class MobilePhoneInput extends React.Component {
 
   render() {
     const { mobilePhoneCountryCode, mobilePhone } = this.state;
+    const { countryDiallingCodes } = this.props;
     return (
       <InputGroup compact>
         <Select value={mobilePhoneCountryCode} style={{ width: '40%' }} onChange={val => this.valueChange({ mobilePhoneCountryCode: val })}>
-          <Option value="+86">+86</Option>
-          <Option value="+01">+01</Option>
+          {
+            countryDiallingCodes.map(e => (
+              <Option
+                key={e.countryCode + e.diallingCode}
+                value={e.diallingCode}
+              >
+                {e.countryCode} {e.diallingCode}
+              </Option>
+            ))
+          }
         </Select>
         <Input value={mobilePhone} style={{ width: '60%' }} onChange={e => this.valueChange({ mobilePhone: e.target.value })} />
       </InputGroup>
@@ -239,6 +251,9 @@ export class MobilePhoneInput extends React.Component {
 }
 
 // 电话
+@connect(({ basic }) => ({
+  countryDiallingCodes: basic.countryDiallingCodes,
+}))
 export class TelphoneInput extends React.Component {
   static getDerivedStateFromProps(nextProps) {
     if ('value' in nextProps) {
@@ -253,7 +268,7 @@ export class TelphoneInput extends React.Component {
     super(props);
     const value = props.value || {};
     this.state = {
-      telephoneCountryCode: value.telephoneCountryCode || '+86',
+      telephoneCountryCode: value.telephoneCountryCode || '',
       telephoneAreaCode: value.telephoneAreaCode || '',
       telephone: value.telephone || '',
       telephoneExtension: value.telephoneExtension || '',
@@ -272,11 +287,20 @@ export class TelphoneInput extends React.Component {
 
   render() {
     const { telephoneCountryCode, telephoneAreaCode, telephone, telephoneExtension } = this.state;
+    const { countryDiallingCodes } = this.props;
     return (
       <InputGroup compact>
         <Select value={telephoneCountryCode} style={{ width: '30%' }} onChange={val => this.valueChange({ telephoneCountryCode: val })}>
-          <Option value="+86">+86</Option>
-          <Option value="+01">+01</Option>
+          {
+            countryDiallingCodes.map(e => (
+              <Option
+                key={e.countryCode + e.diallingCode}
+                value={e.diallingCode}
+              >
+                {e.countryCode} {e.diallingCode}
+              </Option>
+            ))
+          }
         </Select>
         <Input value={telephoneAreaCode} style={{ width: '20%' }} onChange={e => this.valueChange({ telephoneAreaCode: e.target.value })}/>
         <Input value={telephone} style={{ width: '30%' }} onChange={e => this.valueChange({ telephone: e.target.value })}/>

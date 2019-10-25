@@ -31,6 +31,10 @@ class CustomerEdit extends Component {
       tabActiveKey: 'customer',
       // tabActiveKey: 'vendor',
     };
+    this.props.dispatch({
+      type: 'partnerMaintainEdit/setEditType',
+      payload: editType,
+    });
   }
 
   componentDidMount() {
@@ -41,6 +45,16 @@ class CustomerEdit extends Component {
       type: 'basic/getCache',
       payload: { type: 'countrys' },
     });
+    this.props.dispatch({
+      type: 'basic/getCache',
+      payload: { type: 'countryDiallingCodes' },
+    });
+    this.props.dispatch({
+      type: 'basic/getCache',
+      payload: { type: 'industryCategories' },
+    });
+
+    // industryCategories
   }
 
   componentWillUnmount() {
