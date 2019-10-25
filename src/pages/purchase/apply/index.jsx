@@ -653,7 +653,7 @@ class PurchaseApply extends React.Component {
     this.setState({
       productLoading: true,
     });
-    api.basic.getProductList(allValue).then(data => {
+    api.basic.getProducts(allValue).then(data => {
       this.setState({
         productLoading: false,
         procductList: {
@@ -741,7 +741,7 @@ class PurchaseApply extends React.Component {
   }
 
   getSalesRange = () => {
-    api.basic.getSalesRange().then(data => {
+    api.basic.getSalesRanges().then(data => {
       this.setState({
         getSalesRange: data,
       });

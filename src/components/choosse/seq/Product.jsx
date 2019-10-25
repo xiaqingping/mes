@@ -206,7 +206,7 @@ class ChooseProduct extends React.Component {
   getTableData = () => {
     this.setState({ loading: true });
 
-    api.basic.getProductList({
+    api.basic.getProducts({
       page: 1,
       rows: 10,
     }).then(res => {
