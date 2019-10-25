@@ -15,7 +15,7 @@ export default {
     return request('/basic/v1/invtypes');
   },
   // 查询币种列表
-  currencys() {
+  getCurrencys() {
     return request('/basic/v1/currencys');
   },
   // 查询仓库
@@ -51,11 +51,11 @@ export default {
     return request('/basic/v1/subcustomer');
   },
   // 查询产品
-  getProductList(params) {
+  getProducts(params) {
     return request('/basic/v1/products', { params });
   },
   // 查询销售范围
-  getSalesRange() {
+  getSalesRanges() {
     return request('/basic/v1/salesranges');
   },
   // 查询采购申请
@@ -66,7 +66,7 @@ export default {
   // 国际化数据接口
   // 国家主数据
   getCountrys () {
-    return request('http://180.167.32.168:8001/countrys/v1');
+    return request('/countrys/v1');
   },
   // 地区(省)主数据
   getProvinces () {

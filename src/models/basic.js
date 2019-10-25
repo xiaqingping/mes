@@ -57,18 +57,58 @@ const BasicModel = {
     salesOrderBlocks: [],
     // 公司代码主数据
     companys: [],
-
+    // 供应商帐户组主数据（T077Y ）
+    vonderAccountGroups: [],
+    // 客户帐户组主数据（T077D(T077X) ）
+    customerAccountGroups: [],
+    // 排序码主数据
+    sortKeys: [],
+    // 支付方式主数据(供应商公司代码数据)
+    paymentMethods: [],
+    // 采购组主数据
+    purchaseGroups: [],
+    // 销售组织 + 公司代码数据
+    salesOrganizationCompany: [],
+    // 销售组织 + 分销渠道 + 工厂数据
+    salesOrganizationDistributionChannelPlant: [],
+    // 工厂主数据
+    plants: [],
+    // 销售范围+销售办事处(大区)数据
+    salesAreaRegion: [],
+    // 公司代码+工厂数据
+    companyPlant: [],
+    // 采购组织数据
+    purchaseOrganizations: [],
+    // 采购组织对应公司代码关系数据
+    purchaseOrganizationCompany: [],
+    // 国家+税收类别主数据
+    countryTaxOutputCategory: [],
+    // 税收城市代码主数据
+    taxesCitys: [],
+    // 税收县代码主数据
+    taxesCounties: [],
+    // 行业类别
+    industryCategories: [],
+    // 国家+时区
+    countryTimeZone: [],
+    // 国家+（省）地区+时区
+    countryProvinceTimeZone: [],
   },
   effects: {
     *getCache({ payload }, { call, put }) {
       const { type, options } = payload;
+      let response;
 
       // 数据请求接口
       const methods = {
         countrys: basic.getCountrys,
       }
 
-      const response = yield call(methods[type], options);
+      try {
+        response = yield call(methods[type], options);
+      } catch (error) {
+        console.log(error);
+      }
 
       yield put({
         type: 'setCache',

@@ -228,7 +228,7 @@ class Order extends Component {
       loading: true,
     });
 
-    api.basic.getProductList(query).then(data => {
+    api.basic.getProducts(query).then(data => {
       this.setState({
         list: data,
         total: data.length,

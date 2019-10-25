@@ -177,7 +177,7 @@ const Model = {
     },
     // 币种类型
     *getCurrencys({ payload }, { call, put }) {
-      const response = yield call(api.basic.currencys, payload);
+      const response = yield call(api.basic.getCurrencys, payload);
       yield put({
         type: 'currencys',
         payload: response,
