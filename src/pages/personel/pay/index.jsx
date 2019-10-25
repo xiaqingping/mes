@@ -7,9 +7,14 @@ import {
   Input,
   Row,
   Select,
-  Popconfirm
+  Popconfirm,
+  Upload,
+  Message,
+  Icon,
+  Table,
 } from 'antd';
 import React, { Component } from 'react';
+import { connect } from 'dva';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import StandardTable from '@/components/StandardTable';
 import api from '@/api';
@@ -21,25 +26,24 @@ const { Option } = Select;
 /**
  * 页面顶部筛选表单
  */
+@connect(({ personel }) => ({
+  year: personel.year,
+  month: personel.month,
+}))
 @Form.create()
 class Search extends Component {
-
+  
   componentDidMount() {
     this.submit();
   }
 
-  // // 查询
+  // 查询
   submit = e => {
     if (e) e.preventDefault();
     const val = this.props.form.getFieldsValue();
     this.props.getTableData({ page: 1,...val});
   }
 
-  updown= e => {
-    const val = this.props.form.getFieldsValue();
-    this.props.getTableData({ page: 1,...val});
-    console.log(1);
-  }
   // 渲染表单
   renderForm = () => {
     const {
@@ -59,43 +63,32 @@ class Search extends Component {
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
+            
             <FormItem label="年">
-              {getFieldDecorator('year', { initialValue: '' })(
-                <Select>
-                  <Option value="1">1</Option>
-                  <Option value="2">2</Option>
-                  <Option value="3">3</Option>
-                  <Option value="4">4</Option>
-                  <Option value="5">5</Option>
-                  <Option value="5">6</Option>
-                  <Option value="5">7</Option>
-                  <Option value="5">8</Option>
-                  <Option value="5">9</Option>
-                  <Option value="5">10</Option>
-                  <Option value="5">11</Option>
-                  <Option value="5">12</Option>
-                </Select>,
+              {getFieldDecorator('year')(
+                <Select allowClear={true}>
+                  {this.props.year.map(e =>
+                    <Option value={e.id} key={e.id}>{e.name}</Option>,
+                  )}
+                </Select>
               )}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="月">
-              {getFieldDecorator('month', { initialValue: '' })(
-                <Select>
-                  <Option value="1">2019</Option>
-                  <Option value="2">2018</Option>
-                  <Option value="3">2017</Option>
-                  <Option value="4">2016</Option>
-                  <Option value="5">2015</Option>
+              {getFieldDecorator('month')(
+                <Select allowClear={true}>
+                  {this.props.month.map(e =>
+                    <Option value={e.id} key={e.id}>{e.name}</Option>,
+                  )}
                 </Select>,
               )}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="状态">
-              {getFieldDecorator('status', { initialValue: '1' })(
-                <Select>
-                  <Option value="0">全部</Option>
+              {getFieldDecorator('status', { initialValue: '2' })(
+                <Select allowClear={true}>
                   <Option value="1">正常</Option>
                   <Option value="2">已删除</Option>
                 </Select>
@@ -104,12 +97,9 @@ class Search extends Component {
           </Col>
           <Col lg={6} md={8} sm={12}>
             <span className="submitButtons">
-              <Button type="primary" htmlType="submit">
+              <Button type="primary" htmlType="submit" >
                 查询
               </Button>
-              {/* <Button htmlType="updown">
-                上传
-              </Button> */}
             </span>
           </Col>
         </Row>
@@ -164,6 +154,10 @@ class EditableCell extends React.Component {
 /**
  * 页面根组件
  */
+@connect(({ personel }) => ({
+  year: personel.year, //年
+  month: personel.month, //月
+}))
 @Form.create()
 class Modifications extends Component {
   state = {
@@ -178,8 +172,7 @@ class Modifications extends Component {
     selectedRows: [],
     editIndex: -1,
     id: 0, // 新增数据时，提供负数id 
-    modificationType: [],
-    dataSon: [],
+    dataSons: [],
   }
   // state = {
   //   pagination: {
@@ -199,6 +192,7 @@ class Modifications extends Component {
       title: '员工编号',
       dataIndex: 'employeeCode',
       width: 100,
+
     },
     {
       title: '员工名称',
@@ -249,14 +243,12 @@ class Modifications extends Component {
         const { status } = row;
         const { editIndex } = this.state;
         let actions;
-        if (editIndex !== index && status === 1) {
+        if (editIndex !== index) {
           actions = (
             <>
               <Popconfirm title="确定作废数据？" onConfirm={() => this.deleteRow(row)}>
                 <a>删除</a>
               </Popconfirm>
-              <Divider type="vertical" />
-              <a onClick={() => this.editRow(index)}>修改</a>
             </>
           );
         }
@@ -298,28 +290,32 @@ class Modifications extends Component {
     }
   ];
 
-  componentDidMount() {
-    api.series.getSeries().then(res => {
-      this.setState({
-        modificationType: res,
-      })
-    })
-  }
+  // componentDidMount() {
+  //   api.series.getSeries().then(res => {
+  //     this.setState({
+  //       modificationType: res,
+  //     })
+  //   })
+  // }
 
-  // 设置子值
+  // 点击获取子值
   dataSon = (v, e) => {
-    if (e.target.className === 'operate' || e.target.className.indexOf('ant-btn-sm') !== -1) {
+    if (e.target.className === 'operate' || e.target.className.indexOf('ant-btn-sm') !== -1 || v.id < 1) {
       return
     }
     this.setState({
       loadingSon: true,
-    })
-    setTimeout(() => {
-        this.setState({
-          dataSon: v.details,
-          loadingSon: false,
-        })
-      }, 500)
+    });
+    api.pay.getPays(v.id, true).then(res => {
+      this.setState({
+        dataSons: res,
+        loadingSon: false,
+        editIndex: -1,
+        parantData: v,
+        selectParantData: true,
+      });
+    });
+    
   }
   // 分页
   handleStandardTableChange = pagination => {
@@ -344,17 +340,8 @@ class Modifications extends Component {
       formValues: query,
       loading: true,
     });
-    // pay
-    // api.pay.getPay(query).then(res => {
-    //   this.setState({
-    //     list: res.rows,
-    //     total: res.total,
-    //     loading: false,
-    //     editIndex: -1,
-    //   });
-    // });
     
-    api.peptideBase.getModifications(query).then(res => {
+    api.pay.getPay(query).then(res => {
       this.setState({
         list: res.rows,
         total: res.total,
@@ -379,27 +366,23 @@ class Modifications extends Component {
 
   // 删除数据
   deleteRow = row => {
-   console.log(1);
+  //  console.log(1);
+   api.peptideBase.deleteModificationTypes(row.id).then(() => {
+    this.getTableData();
+    });
   };
-
-  // 恢复数据
-  resumeRow = row => {
-    console.log(2);
-  };
-
+  
   // 保存
   saveRow = index => {
-    console.log(3);
-  }
-
-  // 开启编辑，修改
-  editRow = index => {
-    if (this.state.editIndex !== -1) {
-      message.warning('请先保存或退出正在编辑的数据');
-      return;
-    }
-    this.setState({
-      editIndex: index,
+    this.props.form.validateFields((error, row) => {
+      if (error) return;
+      const { list } = this.state;
+      const newData = { ...list[index], ...row };
+      if (newData.id > 0) {
+        // api.peptideBase.updateSeries(newData).then(() => this.getTableData());
+      } else {
+        api.peptideBase.insertPurity(newData).then(() => this.getTableData());
+      }
     });
   }
 
@@ -424,6 +407,60 @@ class Modifications extends Component {
     });
   }
 
+  // states = {
+  //   fileList: [],//存放上传信息：比如路径、文件名
+  //   imgList: [],//存放回显信息：修改时的路径、文件名
+
+  // };
+  //form表单提交事件
+  // handleSubmit = e => {
+  //   const { dispatch, form } = this.props;
+  //   e.preventDefault();
+  //   form.validateFieldsAndScroll((err, values) => {
+  //       if (!err) {
+  //           const { imgList } = this.state
+  //           values.imgList = JSON.stringify(imgList);
+  //           console.log('values', values);
+  //       }
+  //   });
+  // };
+  //上传事件
+  // onChange = ({ fileList }) => {
+  //   console.log('file', fileList);
+  //   let imgList = [];
+  //   fileList.map(function (item, key) {
+  //     if (item.response && item.response.success) {
+  //       console.log('item.response',item.response);
+  //       imgList.push({ url: item.response.url, Name: item.response.name });//这的参数具体看上传成功后返回的值，打印的item.response
+  //     } else {
+  //         //回显
+  //         if (item.url) {
+  //             //拼接'http:// 如果路径可以直接使用不需要拼接
+  //             imgList.push({ url: item.url.replace('http://', ""), Name: item.name });
+  //         }
+  //       }
+  //   });
+  //   this.setState({ fileList, imgList });
+  // }
+  // 上传文件
+  handleChange = info => {
+    let fileList = [...info.fileList];
+
+    // 1. Limit the number of uploaded files限制上传文件的数量
+    // Only to show two recent uploaded files, and old ones will be replaced by the new只显示最近上传的两个文件，旧的将被新的取代
+    fileList = fileList.slice(-2);
+
+    // 2. Read from response and show file link读取响应并显示文件链接
+    fileList = fileList.map(file => {
+      if (file.response) {
+        // Component will show file.url as link组件将显示文件。url链接
+        file.url = file.response.url;
+      }
+      return file;
+    });
+
+    this.setState({ fileList });
+  };
   render() {
     const {
       formValues: { page: current, rows: pageSize },
@@ -431,17 +468,15 @@ class Modifications extends Component {
       list,
       total,
       loading,
-      dataSon,
+      dataSons,
       loadingSon,
     } = this.state;
     const data = { list, pagination: { current, pageSize, total } };
-
     const components = {
       body: {
         cell: EditableCell,
       },
     };
-
     const columns = this.columns.map(col => {
       if (!col.editable) {
         return col;
@@ -459,20 +494,65 @@ class Modifications extends Component {
       };
     });
 
+
+    const columnSon = this.columnSon.map(col => {
+      if (!col.editable) {
+        return col;
+      }
+      return {
+        ...col,
+        onCell: (record, rowIndex) => ({
+          record,
+          rules: col.rules,
+          inputType: col.inputType,
+          dataIndex: col.dataIndex,
+          title: col.title,
+          editing: rowIndex === this.state.editIndex,
+        }),
+      };
+    });
+
+    // 子列表分页设置
+    const paginationProps = {
+      total: list.length,
+      showSizeChanger: true,
+      showQuickJumper: true,
+    };
+    
+    // const { fileList } = this.state
+    const props = {
+      name: 'filename',//name得看接口需求，name与接口需要的name一致
+      action: 'https://devapi.sangon.com:8443/api/pay/v1/date/excel',//接口路径
+      onChange: this.handleChange,
+      data: {  },//接口需要的参数，无参数可以不写
+      multiple: true,//支持多个文件
+      // showUploadList: true,//展示文件列表
+    }
+    
     return (
       <PageHeaderWrapper>
         <Card bordered={false}>
           <div className="tableList">
             <Search getTableData={this.getTableData} />
             <div className="tableListOperator">
-              <Button icon="plus" type="primary" onClick={() => this.handleAdd()}>
+              {/* <Button icon="plus" type="primary" onClick={() => this.handleAdd()}>
                 新建
-              </Button>
+              </Button> */}
+              {/* <Upload>
+                <Button type="primary" icon="upload" style={{ marginLeft: 8 }}  {...props} fileList={fileList} onChange={this.onChange}>
+                  上传
+                </Button>
+              </Upload> */}
+              <Upload {...props} fileList={this.state.fileList}  style={{ marginLeft: 8 }}>
+                <Button type="primary" icon="upload" >
+                  上传
+                </Button>
+              </Upload>
             </div>
             <Col span={14}>
               <EditableContext.Provider value={this.props.form}>
                 <StandardTable
-                  scroll={{ x: 1800 }}
+                  scroll={{ x: 1500 }}
                   rowClassName="editable-row"
                   components={components}
                   selectedRows={selectedRows}
@@ -484,30 +564,24 @@ class Modifications extends Component {
                   onChange={this.handleStandardTableChange}
                 />
               </EditableContext.Provider>
-              </Col>
-              <Col span={1}>
-              </Col>
-              <Col span={9}>
-                <EditableContext.Provider value={this.props.form}>
-                  {/* <Table
-                    scroll={{ x: 700 }}
-                    loading={loadingSon}
-                    dataSource={dataSon}
-                    columns={this.columnSon}
-                    pagination={false}
-                    rowKey="id"
-                  /> */}
-                  <StandardTable
-                    scroll={{ x: 800 }}
-                    selectedRows={selectedRows}
-                    loading={loading}
-                    data={data}
-                    columns={this.columns}
-                    onSelectRow={this.handleSelectRows}
-                    onChange={this.handleStandardTableChange}
-                  />
+            </Col>
+            <Col span={1}>
+            </Col>
+            <Col span={9}>
+              <p>工资明细</p>
+              <EditableContext.Provider value={this.props.form}>
+                <Table
+                  scroll={{ x: 300 }}
+                  components={components}
+                  loading={loading}
+                  dataSource={dataSons}
+                  // rowKey="id"
+                  rowKey={record => record.id}
+                  columns={columnSon}
+                  pagination={paginationProps}
+                />
                 </EditableContext.Provider>
-              </Col>
+            </Col>
           </div>
         </Card>
       </PageHeaderWrapper>
