@@ -34,4 +34,8 @@ export default {
   deleteTypepays(params) {
     return request(`/pay/v1/type/${params}/invalid`, { method: 'PUT' });
   },
+  // 员工工资详细
+  getPays (id) {
+    return request(`/pay/v1/item/date/${id}?userCode=${100102}`);
+  },
 };
