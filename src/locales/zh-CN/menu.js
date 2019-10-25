@@ -36,7 +36,7 @@ export default {
   'menu.peptide.disulfide-bond-products': '多肽二硫键产品',
   'menu.system': '系统管理',
   'menu.system.user': '用户管理',
-  'menu.system.code-rule': '编号权限',
+  'menu.system.code-rule': '编号规则',
   'menu.system.authorization': '用户权限',
   'menu.system.sources': '资源',
   'menu.system.rule': '规则',

@@ -40,9 +40,9 @@ export default {
   getRules (params) {
     return request('/dataauth/v1/data/rules/easyui', { params });
   },
-  // 保存 (新增，删除)
+  // 保存 (新增，删除，修改)
   saveRules (data) {
-    return request('/dataauth/v1/data/rules/easyui', { method: 'PUT', data });
+    return request('/dataauth/v1/data/rules/list', { method: 'PUT', data });
   },
 
   /** ****************************** 分组 *********************************** */
@@ -50,7 +50,7 @@ export default {
   getGroups (params) {
     return request('/dataauth/v1/data/groups/easyui', { params });
   },
-  // 保存 (新增，删除)
+  // 保存 (新增，删除，修改)
   saveGroups (data) {
     return request('/dataauth/v1/data/groups/list', { method: 'PUT', data });
   },
@@ -59,7 +59,7 @@ export default {
   getGroupRules (params) {
     return request(`/dataauth/v1/data/grouprules/easyui/${params}/rules`);
   },
-  // 保存 (新增，删除)
+  // 保存 (新增，删除，修改)
   saveGroupRules (data) {
     return request('/dataauth/v1/data/grouprules/list', { method: 'PUT', data });
   },
