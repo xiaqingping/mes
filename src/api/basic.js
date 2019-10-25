@@ -22,7 +22,7 @@ export default {
   getStorages() {
     return request('/basic/v1/storages');
   },
-  // // 查询网点列表
+  // 查询网点列表 TODO:已废弃
   // getOffices() {
   //   return request('/basic/v1/offices');
   // },
@@ -34,7 +34,7 @@ export default {
   getPayterms() {
     return request('/basic/v1/payterms');
   },
-  // 查询大区
+  // 查询大区 TODO:已废弃
   // getRegions() {
   //   return request('/basic/v1/regions');
   // },
@@ -66,7 +66,7 @@ export default {
   // 国际化数据接口
   // 国家主数据
   getCountrys () {
-    return request('/countrys/v1');
+    return request('http://180.167.32.168:8001/countrys/v1');
   },
   // 地区(省)主数据
   getProvinces () {
