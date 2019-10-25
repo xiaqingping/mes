@@ -36,7 +36,7 @@ const PersonelModel = {
   },
   effects: {
     *getCarrierSeries({ payload }, { call, put }) {
-      const response = yield call(api.series.getSeries, payload);
+      const response = yield call(api.pay.getPay, payload);
       yield put({
         type: 'personelPay',
         payload: response,
@@ -45,9 +45,10 @@ const PersonelModel = {
   },
   reducers: {
     personelPay(state, action) {
-      const data = (action.payload && action.payload.filter(e => e.status === 1)) || [];
-      return { ...state, carrierSeries: data };
-    },
+      // const data = (action.payload && action.payload.filter(e => e.status === 1)) || [];
+      // return { ...state, carrierSeries: data };
+      return { ...state, personelPay: action.payload };
+    }
   },
 };
 export default PersonelModel;

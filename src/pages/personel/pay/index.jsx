@@ -575,8 +575,9 @@ class Modifications extends Component {
                   components={components}
                   loading={loading}
                   dataSource={dataSons}
-                  // rowKey="id"
-                  rowKey={record => record.id}
+                  rowKey="id"
+                  // rowKey={record => record.id}
+                  // rowKey={row=>row.id}
                   columns={columnSon}
                   pagination={paginationProps}
                 />
