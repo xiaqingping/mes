@@ -6,11 +6,16 @@
 export const readDetails = {
   // 基础数据
   basic: {
+    id: '',
     type: 1,
+    code: '',
     name: '',
+    certificationStatus: '',
     mobilePhoneCountryCode: '',
     mobilePhone: '',
+    mobilePhoneVerifyStatus: '',
     email: '',
+    emailVerifyStatus: '',
     telephoneCountryCode: '',
     telephoneAreaCode: '',
     telephone: '',
@@ -91,6 +96,7 @@ export const readDetails = {
     // 收货地址列表
     addressList: [
       {
+        id: '',
         name: '',
         mobilePhone: '',
         mobilePhoneCountryCode: '',
@@ -106,6 +112,7 @@ export const readDetails = {
         streetCode: '',
         streetName: '',
         address: '',
+        source: '',
       },
     ],
   },
@@ -132,6 +139,7 @@ export const readDetails = {
     paymentBank: {
       countryCode: '1',
       bankCode: '1',
+      bankName: '1',
       bankAccount: '6666666666',
       bankAccountName: 'Max',
     },
@@ -239,7 +247,7 @@ export const addDetails = {
         // soldToPartyList: [{ id: '', type: '', code: '', name: '', linkVerifyStatus: '' }],
         shipToPartyIdList: [123],
         // shipToPartyList: [{ id: '', type: '', code: '', name: '', verifyStatus: '' }],
-        salerCodeLIst: ['123'],
+        salerCodeList: ['123'],
         // salerList: [{ code: '', name: '' }],
       },
     ],
@@ -360,8 +368,8 @@ export const updateDetails = {
         newShipToPartyIdList: [123],
         deleteShipToPartyIdList: [123],
         // 销售员
-        newSalerCodeLIst: ['123'],
-        deleteSalerCodeLIst: ['123'],
+        newsalerCodeList: ['123'],
+        deletesalerCodeList: ['123'],
       },
     ],
     // 地址

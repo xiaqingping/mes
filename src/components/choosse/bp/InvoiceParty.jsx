@@ -79,7 +79,7 @@ class ChooseInvoiceParty extends React.Component {
       },
       {
         title: '认证',
-        dataIndex: 'renz',
+        dataIndex: 'certificationStatus',
         filters: [
           { value: 1, text: '已认证' },
           { value: 2, text: '未认证' },
@@ -88,7 +88,7 @@ class ChooseInvoiceParty extends React.Component {
       },
       {
         title: '冻结',
-        dataIndex: 'dongj',
+        dataIndex: 'salesOrderBlock',
         filters: [
           { value: 1, text: '冻结' },
           { value: 2, text: '活跃' },
@@ -96,7 +96,7 @@ class ChooseInvoiceParty extends React.Component {
       },
       {
         title: '完整',
-        dataIndex: 'wanz',
+        dataIndex: 'dataStatus',
         filters: [
           { value: 1, text: '完整' },
           { value: 2, text: '不完整' },
@@ -104,7 +104,7 @@ class ChooseInvoiceParty extends React.Component {
       },
       {
         title: '联系方式',
-        dataIndex: 'email',
+        dataIndex: 'contactInfo',
         filterIcon: filtered => (
           <Icon type="search" style={{ color: filtered ? '#1890ff' : undefined }} />
         ),

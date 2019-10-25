@@ -103,13 +103,18 @@ class Basic extends React.Component {
           <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
             <Col md={6} sm={12}>
               <FormItem label="名称">
-                {getFieldDecorator('name', {
+                {/* {getFieldDecorator('name', {
                   initialValue: {
                     type: basic.type,
                     name: basic.name,
                   },
                   rules: [{ validator: this.checkNameInput }],
-                })(<NameInput onChange={value => this.valueChange('name', value)} />)}
+                })(<NameInput onChange={value => this.valueChange('name', value)} />)} */}
+                <p style={{ lineHeight: '32px' }}>
+                  <span>组织</span>
+                  <span>MaxMeng</span>
+                  <span>审核中</span>
+                </p>
               </FormItem>
             </Col>
             <Col md={6} sm={12}>

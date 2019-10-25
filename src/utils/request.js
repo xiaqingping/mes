@@ -73,8 +73,14 @@ service.interceptors.request.use(config => {
 
   const token = localStorage.getItem('token');
   if (token) {
-    // eslint-disable-next-line no-param-reassign
-    config.headers.Authorization = token;
+    if (config.url.indexOf('http://180.167.32.168:8001/') === -1) {
+      // eslint-disable-next-line no-param-reassign
+      config.headers.Authorization = token;
+    } else {
+      // basic 因为跨域问题，使用了 webpack 的代理访问
+      config.url = config.url.replace('http://180.167.32.168:8001/', '/basic/api/');
+      config.baseURL = '/';
+    }
   }
   return config;
 }, err);

@@ -26,6 +26,7 @@ import peptideorder from './peptideorder';
 import pay from './pay';
 import system from './system';
 import serial from './serial';
+import bp from './bp';
 
 export default {
   area,
@@ -56,6 +57,7 @@ export default {
   pay,
   system,
   serial,
+  bp,
 };
 
 export {
@@ -87,4 +89,5 @@ export {
   pay,
   system,
   serial,
+  bp,
 };

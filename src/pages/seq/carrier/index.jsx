@@ -68,6 +68,17 @@ class Search extends Component {
       <Form onSubmit={this.submit} layout="inline">
         <Row gutter={{ xxl: 100, lg: 80 }}>
           <Col xxl={6} lg={8}>
+            <FormItem label="状态">
+              {getFieldDecorator('status', { initialValue: '1' })(
+                <Select>
+                  <Option value="">全部</Option>
+                  <Option value="1">正常</Option>
+                  <Option value="2">已删除</Option>
+                </Select>,
+              )}
+            </FormItem>
+          </Col>
+          <Col xxl={6} lg={8}>
             <FormItem label="编号">
               {getFieldDecorator('code')(<Input />)}
             </FormItem>
@@ -89,17 +100,6 @@ class Search extends Component {
                   {this.props.carrierSeries.map(e =>
                     <Option value={e.id} key={e.id}>{e.name}</Option>,
                   )}
-                </Select>,
-              )}
-            </FormItem>
-          </Col>
-          <Col xxl={6} lg={8}>
-            <FormItem label="状态">
-              {getFieldDecorator('status', { initialValue: '1' })(
-                <Select>
-                  <Option value="">全部</Option>
-                  <Option value="1">正常</Option>
-                  <Option value="2">已删除</Option>
                 </Select>,
               )}
             </FormItem>
@@ -129,18 +129,24 @@ class Search extends Component {
       <Form onSubmit={this.submit} layout="inline">
         <Row gutter={{ xxl: 100, lg: 80 }}>
           <Col xxl={6} lg={8}>
+            <FormItem label="状态">
+              {getFieldDecorator('status', { initialValue: '1' })(
+                <Select>
+                  <Option value="">全部</Option>
+                  <Option value="1">正常</Option>
+                  <Option value="2">已删除</Option>
+                </Select>,
+              )}
+            </FormItem>
+          </Col>
+          <Col xxl={6} lg={8}>
             <FormItem label="编号">
               {getFieldDecorator('code')(<Input />)}
             </FormItem>
           </Col>
-          <Col xxl={6} lg={8}>
+          <Col xxl={6} lg={0}>
             <FormItem label="名称">
               {getFieldDecorator('name')(<Input />)}
-            </FormItem>
-          </Col>
-          <Col xxl={6} lg={0}>
-            <FormItem label="别名">
-              {getFieldDecorator('alias')(<Input />)}
             </FormItem>
           </Col>
           <Col xxl={6} lg={8}>
@@ -191,6 +197,7 @@ class EditableCell extends React.Component {
       rules,
       ...restProps
     } = this.props;
+    if (editing) console.log(this.props);
     return (
       <td {...restProps}>
         {editing ? (
@@ -245,7 +252,7 @@ class Carrier extends Component {
     });
   }
 
-  handleStandardTableChange = (pagination, filtersArg, sorter) => {
+  handleStandardTableChange = pagination => {
     this.getTableData({
       page: pagination.current,
       rows: pagination.pageSize,
