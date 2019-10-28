@@ -218,7 +218,6 @@ class Basic extends React.Component {
                   initialValue: basic.industryCode,
                 })(
                   <Select onChange={value => this.valueChange('industryCode', value)} >
-                    {/* <Option value="1">军队</Option> */}
                     {
                       industryCategories.map(e => (
                         <Option key={e.code} value={e.code}>{e.name}</Option>

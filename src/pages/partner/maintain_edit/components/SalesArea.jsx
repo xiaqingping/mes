@@ -25,27 +25,49 @@ const { Option } = Select;
 const { TabPane } = Tabs;
 
 @Form.create()
+@connect(({ global, basicCache, bpEdit }) => {
+  function byLangFilter(e) {
+    return e.languageCode === global.languageCode;
+  }
+  // 基础数据
+  // 大区+网点
+  const regionOffice = basicCache.regionOffice.filter(byLangFilter);
+  // 付款方式
+  const salesPaymentMethods = basicCache.salesPaymentMethods.filter(byLangFilter);
+  // 币种
+  const currencies = basicCache.currencies.filter(byLangFilter);
+
+  // 业务伙伴数据
+  const details = bpEdit.details || {};
+  const basicInfo = details.basic || {};
+  return { salesPaymentMethods, regionOffice, currencies, basicInfo };
+})
 class FormContent extends React.Component {
   render() {
     const {
       form: { getFieldDecorator },
-      basic = {},
+      basicInfo,
       data,
       valueChange,
+      salesPaymentMethods,
+      regionOffice,
+      currencies,
     } = this.props;
-    const { countryCode = 'china' } = basic;
+    const countryCode = basicInfo.countryCode || 'china';
 
     return (
       <Form>
         <Row gutter={32}>
           <Col span={5}>
             <FormItem label="网点归属">
-              {getFieldDecorator('officeCode', {
+              {getFieldDecorator('regionOffice', {
                 initialValue: [data.regionCode, data.officeCode],
               })(
-                <Select onChange={value => valueChange('officeCode', value)}>
-                  <Option value="1">上海</Option>
-                </Select>,
+                <Cascader
+                  fieldNames={ { label: 'name', value: 'code', children: 'officeList' } }
+                  onChange={value => valueChange('regionOffice', value)}
+                  options={regionOffice}
+                />,
               )}
             </FormItem>
           </Col>
@@ -55,7 +77,11 @@ class FormContent extends React.Component {
                 initialValue: data.defaultPaymentMethodCode,
               })(
                 <Select onChange={value => valueChange('defaultPaymentMethodCode', value)}>
-                  <Option value="1">网银</Option>
+                  {
+                    salesPaymentMethods.map(e =>
+                      <Option key={e.code} value={e.code}>{e.name}</Option>,
+                    )
+                  }
                 </Select>,
               )}
             </FormItem>
@@ -66,7 +92,11 @@ class FormContent extends React.Component {
                 initialValue: data.currencyCode,
               })(
                 <Select onChange={value => valueChange('currencyCode', value)}>
-                  <Option value="1">人民币</Option>
+                  {
+                    currencies.map(e =>
+                      <Option key={e.code} value={e.code}>{e.shortText}</Option>,
+                    )
+                  }
                 </Select>,
               )}
             </FormItem>
@@ -95,8 +125,8 @@ class FormContent extends React.Component {
                     initialValue: data.taxClassificCode,
                   })(
                     <Select onChange={value => valueChange('taxClassificCode', value)}>
-                      <Option value="1">免税</Option>
-                      <Option value="2">上税</Option>
+                      <Option value="0">免税</Option>
+                      <Option value="1">必须上税</Option>
                     </Select>,
                   )}
                 </FormItem>
@@ -119,10 +149,10 @@ class FormContent extends React.Component {
 
 @connect(({ bpEdit }) => {
   const details = bpEdit.details || {};
-  const basic = details.basic || {};
+  const basicInfo = details.basic || {};
   const customer = details.customer || { };
   const salesAreaList = customer.salesAreaList || [];
-  return { details, basic, customer, salesAreaList };
+  return { details, basicInfo, customer, salesAreaList };
 }, undefined, undefined, { withRef: true })
 class SalesArea extends React.Component {
   constructor(props) {
@@ -139,7 +169,7 @@ class SalesArea extends React.Component {
 
     const newSalesAreaList = salesAreaList.map(e => {
       if (e.title === tabKey) {
-        if (key === 'officeCode') {
+        if (key === 'regionOffice') {
           const [regionCode, officeCode] = value;
           e.regionCode = regionCode;
           e.officeCode = officeCode;

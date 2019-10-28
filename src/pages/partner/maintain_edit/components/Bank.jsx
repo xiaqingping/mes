@@ -12,12 +12,20 @@ import { connect } from 'dva';
 const FormItem = Form.Item;
 const { Option } = Select;
 
-@connect(({ bpEdit }) => {
+@connect(({ global, basicCache, bpEdit }) => {
+  function byLangFilter(e) {
+    return e.languageCode === global.languageCode;
+  }
+  // 业务伙伴数据
   const details = bpEdit.details || {};
   const basic = details.basic || {};
   const vendor = details.vendor || { };
   const paymentBank = vendor.paymentBank || {};
-  return { details, basic, vendor, paymentBank };
+
+  // 基础数据
+  // 国家
+  const countrys = basicCache.countrys.filter(byLangFilter);
+  return { details, basic, vendor, paymentBank, countrys };
 }, undefined, undefined, { withRef: true })
 class Bank extends Component {
   constructor(props) {
@@ -43,6 +51,7 @@ class Bank extends Component {
       form: { getFieldDecorator },
       basic,
       paymentBank,
+      countrys,
     } = this.props;
     const type = basic.type || 1;
 
@@ -60,8 +69,11 @@ class Bank extends Component {
                   initialValue: paymentBank.countryCode,
                 })(
                   <Select onChange={value => this.valueChange('countryCode', value)}>
-                    <Option value="1">中国</Option>
-                    <Option value="2">美国</Option>
+                    {
+                      countrys.map(e =>
+                        <Option key={e.code} value={e.code}>{e.name}</Option>,
+                      )
+                    }
                   </Select>,
                 )}
               </FormItem>

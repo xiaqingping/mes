@@ -28,8 +28,8 @@ class CustomerEdit extends Component {
     this.state = {
       editType,
       width: '100%',
-      tabActiveKey: 'customer',
-      // tabActiveKey: 'vendor',
+      // tabActiveKey: 'customer',
+      tabActiveKey: 'vendor',
     };
     this.props.dispatch({
       type: 'bpEdit/setEditType',
@@ -40,25 +40,65 @@ class CustomerEdit extends Component {
   componentDidMount() {
     window.addEventListener('resize', this.resizeFooterToolbar, { passive: true });
     this.resizeFooterToolbar();
-
-    this.props.dispatch({
-      type: 'basicCache/getCache',
-      payload: { type: 'countrys' },
-    });
-    this.props.dispatch({
-      type: 'basicCache/getCache',
-      payload: { type: 'countryDiallingCodes' },
-    });
-    this.props.dispatch({
-      type: 'basicCache/getCache',
-      payload: { type: 'industryCategories' },
-    });
-
-    // industryCategories
+    this.getCacheData();
   }
 
   componentWillUnmount() {
     window.removeEventListener('resize', this.resizeFooterToolbar);
+  }
+
+  // 获取此页面需要用到的基础数据
+  getCacheData() {
+    // 国家
+    this.props.dispatch({
+      type: 'basicCache/getCache',
+      payload: { type: 'countrys' },
+    });
+    // 国家拨号代码
+    this.props.dispatch({
+      type: 'basicCache/getCache',
+      payload: { type: 'countryDiallingCodes' },
+    });
+    // 行业类别
+    this.props.dispatch({
+      type: 'basicCache/getCache',
+      payload: { type: 'industryCategories' },
+    });
+    // 付款方式
+    this.props.dispatch({
+      type: 'basicCache/getCache',
+      payload: { type: 'salesPaymentMethods' },
+    });
+    // 大区+网点
+    this.props.dispatch({
+      type: 'basicCache/getCache',
+      payload: { type: 'regionOffice' },
+    });
+    // 货币
+    this.props.dispatch({
+      type: 'basicCache/getCache',
+      payload: { type: 'currencies' },
+    });
+    // 税分类
+    this.props.dispatch({
+      type: 'basicCache/getCache',
+      payload: { type: 'taxOutputClassifics' },
+    });
+    // 付款条件
+    this.props.dispatch({
+      type: 'basicCache/getCache',
+      payload: { type: 'paymentTerms' },
+    });
+    // 采购组
+    this.props.dispatch({
+      type: 'basicCache/getCache',
+      payload: { type: 'purchaseGroups' },
+    });
+    // 采购组织
+    this.props.dispatch({
+      type: 'basicCache/getCache',
+      payload: { type: 'purchaseOrganizations' },
+    });
   }
 
   resizeFooterToolbar = () => {
@@ -86,7 +126,6 @@ class CustomerEdit extends Component {
     // this.basicView.wrappedInstance.validate();
 
     // 在这里做数据验证，验证通过后，根据情况做数据转换，然后再提交
-
 
     const { editType } = this.state;
     if (editType === 'add') {
@@ -121,7 +160,7 @@ class CustomerEdit extends Component {
 
   // 修改
   update = () => {
-
+    console.log(this.props.details);
   }
 
   // 客户
