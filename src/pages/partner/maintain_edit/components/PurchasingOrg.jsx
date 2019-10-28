@@ -131,8 +131,8 @@ class FormContent extends React.Component {
   }
 }
 
-@connect(({ partnerMaintainEdit }) => {
-  const details = partnerMaintainEdit.details || {};
+@connect(({ bpEdit }) => {
+  const details = bpEdit.details || {};
   const vendor = details.vendor || { };
   const purchasingOrganizationList = vendor.purchasingOrganizationList || [];
   return { details, vendor, purchasingOrganizationList };
@@ -168,7 +168,7 @@ class PurchasingOrg extends React.Component {
     const newDetails = { ...details, ...{ vendor: newVendor } };
 
     this.props.dispatch({
-      type: 'partnerMaintainEdit/setDetails',
+      type: 'bpEdit/setDetails',
       payload: newDetails,
     });
   }
@@ -194,7 +194,7 @@ class PurchasingOrg extends React.Component {
     const newDetails = { ...details, ...{ vendor: newVendor } };
 
     this.props.dispatch({
-      type: 'partnerMaintainEdit/setDetails',
+      type: 'bpEdit/setDetails',
       payload: newDetails,
     });
 
@@ -268,7 +268,7 @@ class PurchasingOrg extends React.Component {
     const newDetails = { ...details, ...{ vendor: newVendor } };
 
     this.props.dispatch({
-      type: 'partnerMaintainEdit/setDetails',
+      type: 'bpEdit/setDetails',
       payload: newDetails,
     });
     this.setState({ tabKey: key });

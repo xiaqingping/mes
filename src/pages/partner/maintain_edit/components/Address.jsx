@@ -71,8 +71,8 @@ class EditableCell extends React.Component {
   }
 }
 
-@connect(({ partnerMaintainEdit }) => {
-  const details = partnerMaintainEdit.details || {};
+@connect(({ bpEdit }) => {
+  const details = bpEdit.details || {};
   const customer = details.customer || { };
   const addressList = customer.addressList || [];
   return { details, customer, addressList };
@@ -241,7 +241,7 @@ class EditableTable extends React.Component {
     const newCustomer = { ...customer, ...{ addressList: newAddressList } };
     const newDetails = { ...details, ...{ customer: newCustomer } };
     this.props.dispatch({
-      type: 'partnerMaintainEdit/setDetails',
+      type: 'bpEdit/setDetails',
       payload: newDetails,
     });
   }

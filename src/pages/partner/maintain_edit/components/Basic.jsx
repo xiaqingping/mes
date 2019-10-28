@@ -17,14 +17,32 @@ import styles from '../style.less';
 const FormItem = Form.Item;
 const { Option } = Select;
 
-@connect(({ partnerMaintainEdit }) => {
-  const details = partnerMaintainEdit.details || {};
-  const basic = details.basic || {};
+@connect(({ global, basicCache, bpEdit }) => {
+  // 1. 业务伙伴数据
+  const { editType } = bpEdit;
+  const details = bpEdit.details || {};
+  const basicInfo = details.basic || {};
   const customer = details.customer || {};
   const salesOrderBlock = customer.salesOrderBlock || false;
   const vendor = details.vendor || {};
   const invoicePostBlock = vendor.invoicePostBlock || false;
-  return { details, basic, customer, salesOrderBlock, vendor, invoicePostBlock };
+
+  // 2. 基础数据
+  // 行业类别
+  const industryCategories = basicCache.industryCategories.filter(
+    e => e.languageCode === global.languageCode,
+  );
+
+  return {
+    editType,
+    details,
+    basic: basicInfo,
+    customer,
+    salesOrderBlock,
+    vendor,
+    invoicePostBlock,
+    industryCategories,
+  };
 }, undefined, undefined, { withRef: true })
 class Basic extends React.Component {
   validate = () => {
@@ -54,7 +72,7 @@ class Basic extends React.Component {
     if (key === 'salesOrderBlock') {
       const newCustomer = { ...customer, ...obj };
       this.props.dispatch({
-        type: 'partnerMaintainEdit/setDetails',
+        type: 'bpEdit/setDetails',
         payload: { ...details, ...{ customer: newCustomer } },
       });
       return;
@@ -64,7 +82,7 @@ class Basic extends React.Component {
     if (key === 'invoicePostBlock') {
       const newVendor = { ...vendor, ...obj };
       this.props.dispatch({
-        type: 'partnerMaintainEdit/setDetails',
+        type: 'bpEdit/setDetails',
         payload: { ...details, ...{ vendor: newVendor } },
       });
       return;
@@ -83,7 +101,7 @@ class Basic extends React.Component {
     const newBasic = { ...basic, ...obj };
 
     this.props.dispatch({
-      type: 'partnerMaintainEdit/setDetails',
+      type: 'bpEdit/setDetails',
       payload: { ...details, ...{ basic: newBasic } },
     });
   }
@@ -91,10 +109,12 @@ class Basic extends React.Component {
   render() {
     const {
       form: { getFieldDecorator },
+      editType,
       basic,
       tabActiveKey,
       salesOrderBlock,
       invoicePostBlock,
+      industryCategories,
     } = this.props;
 
     return (
@@ -103,18 +123,26 @@ class Basic extends React.Component {
           <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
             <Col md={6} sm={12}>
               <FormItem label="名称">
-                {/* {getFieldDecorator('name', {
-                  initialValue: {
-                    type: basic.type,
-                    name: basic.name,
-                  },
-                  rules: [{ validator: this.checkNameInput }],
-                })(<NameInput onChange={value => this.valueChange('name', value)} />)} */}
-                <p style={{ lineHeight: '32px' }}>
-                  <span>组织</span>
-                  <span>MaxMeng</span>
-                  <span>审核中</span>
-                </p>
+                {
+                  editType === 'add' ? (
+                    getFieldDecorator('name', {
+                      initialValue: {
+                        type: basic.type,
+                        name: basic.name,
+                      },
+                      rules: [{ validator: this.checkNameInput }],
+                    })(<NameInput onChange={value => this.valueChange('name', value)} />)
+                  ) : null
+                }
+                {
+                  editType === 'update' ? (
+                    <p style={{ lineHeight: '32px' }}>
+                      <span>组织 </span>
+                      <span>MaxMeng </span>
+                      <span>审核中</span>
+                    </p>
+                  ) : null
+                }
               </FormItem>
             </Col>
             <Col md={6} sm={12}>
@@ -190,7 +218,12 @@ class Basic extends React.Component {
                   initialValue: basic.industryCode,
                 })(
                   <Select onChange={value => this.valueChange('industryCode', value)} >
-                    <Option value="1">军队</Option>
+                    {/* <Option value="1">军队</Option> */}
+                    {
+                      industryCategories.map(e => (
+                        <Option key={e.code} value={e.code}>{e.name}</Option>
+                      ))
+                    }
                   </Select>,
                 )}
               </FormItem>

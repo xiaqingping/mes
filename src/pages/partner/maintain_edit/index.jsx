@@ -18,8 +18,8 @@ import Address from './components/Address';
 import PurchasingOrg from './components/PurchasingOrg';
 import Bank from './components/Bank';
 
-@connect(({ partnerMaintainEdit }) => ({
-  details: partnerMaintainEdit.details || {},
+@connect(({ bpEdit }) => ({
+  details: bpEdit.details || {},
 }))
 class CustomerEdit extends Component {
   constructor(props) {
@@ -31,17 +31,30 @@ class CustomerEdit extends Component {
       tabActiveKey: 'customer',
       // tabActiveKey: 'vendor',
     };
+    this.props.dispatch({
+      type: 'bpEdit/setEditType',
+      payload: editType,
+    });
   }
 
   componentDidMount() {
     window.addEventListener('resize', this.resizeFooterToolbar, { passive: true });
     this.resizeFooterToolbar();
 
-    console.log(123);
     this.props.dispatch({
-      type: 'basic/getCache',
+      type: 'basicCache/getCache',
       payload: { type: 'countrys' },
     });
+    this.props.dispatch({
+      type: 'basicCache/getCache',
+      payload: { type: 'countryDiallingCodes' },
+    });
+    this.props.dispatch({
+      type: 'basicCache/getCache',
+      payload: { type: 'industryCategories' },
+    });
+
+    // industryCategories
   }
 
   componentWillUnmount() {

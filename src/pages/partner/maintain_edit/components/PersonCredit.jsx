@@ -6,9 +6,9 @@ import {
 import React from 'react';
 import { connect } from 'dva';
 
-@connect(({ partnerMaintainEdit }) => ({
-  details: partnerMaintainEdit.details || {},
-  creditList: (partnerMaintainEdit.details && partnerMaintainEdit.details.creditList) || [],
+@connect(({ bpEdit }) => ({
+  details: bpEdit.details || {},
+  creditList: (bpEdit.details && bpEdit.details.creditList) || [],
 }))
 class PersonCredit extends React.Component {
   constructor(props) {

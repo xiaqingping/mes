@@ -16,10 +16,10 @@ import { TelphoneInput } from '@/components/CustomizedFormControls';
 const FormItem = Form.Item;
 const { TextArea } = Input;
 
-@connect(({ partnerMaintainEdit }) => ({
-  details: partnerMaintainEdit.details || {},
+@connect(({ bpEdit }) => ({
+  details: bpEdit.details || {},
   organizationCertification: (
-    partnerMaintainEdit.details && partnerMaintainEdit.details.organizationCertification
+    bpEdit.details && bpEdit.details.organizationCertification
   ) || { attachmentList: [] },
 }))
 class OrgCertification extends Component {
@@ -47,7 +47,7 @@ class OrgCertification extends Component {
     const data = { ...organizationCertification, ...obj };
 
     this.props.dispatch({
-      type: 'partnerMaintainEdit/setDetails',
+      type: 'bpEdit/setDetails',
       payload: { ...details, ...{ organizationCertification: data } },
     });
   }
