@@ -117,8 +117,8 @@ class FormContent extends React.Component {
   }
 }
 
-@connect(({ partnerMaintainEdit }) => {
-  const details = partnerMaintainEdit.details || {};
+@connect(({ bpEdit }) => {
+  const details = bpEdit.details || {};
   const basic = details.basic || {};
   const customer = details.customer || { };
   const salesAreaList = customer.salesAreaList || [];
@@ -153,7 +153,7 @@ class SalesArea extends React.Component {
     const newDetails = { ...details, ...{ customer: newCustomer } };
 
     this.props.dispatch({
-      type: 'partnerMaintainEdit/setDetails',
+      type: 'bpEdit/setDetails',
       payload: newDetails,
     });
   }
@@ -176,7 +176,7 @@ class SalesArea extends React.Component {
     const newDetails = { ...details, ...{ customer: newCustomer } };
 
     this.props.dispatch({
-      type: 'partnerMaintainEdit/setDetails',
+      type: 'bpEdit/setDetails',
       payload: newDetails,
     });
 
@@ -284,7 +284,7 @@ class SalesArea extends React.Component {
     const newDetails = { ...details, ...{ customer: newCustomer } };
 
     this.props.dispatch({
-      type: 'partnerMaintainEdit/setDetails',
+      type: 'bpEdit/setDetails',
       payload: newDetails,
     });
     this.setState({ tabKey: key });

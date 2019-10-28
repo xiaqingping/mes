@@ -1,5 +1,5 @@
 const SeqModel = {
-  namespace: 'partnerMaintainEdit',
+  namespace: 'bpEdit',
   state: {
     details: null,
     editType: '',

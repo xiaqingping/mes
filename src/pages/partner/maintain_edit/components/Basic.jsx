@@ -17,10 +17,10 @@ import styles from '../style.less';
 const FormItem = Form.Item;
 const { Option } = Select;
 
-@connect(({ global, basic, partnerMaintainEdit }) => {
+@connect(({ global, basicCache, bpEdit }) => {
   // 1. 业务伙伴数据
-  const { editType } = partnerMaintainEdit;
-  const details = partnerMaintainEdit.details || {};
+  const { editType } = bpEdit;
+  const details = bpEdit.details || {};
   const basicInfo = details.basic || {};
   const customer = details.customer || {};
   const salesOrderBlock = customer.salesOrderBlock || false;
@@ -29,7 +29,7 @@ const { Option } = Select;
 
   // 2. 基础数据
   // 行业类别
-  const industryCategories = basic.industryCategories.filter(
+  const industryCategories = basicCache.industryCategories.filter(
     e => e.languageCode === global.languageCode,
   );
 
@@ -72,7 +72,7 @@ class Basic extends React.Component {
     if (key === 'salesOrderBlock') {
       const newCustomer = { ...customer, ...obj };
       this.props.dispatch({
-        type: 'partnerMaintainEdit/setDetails',
+        type: 'bpEdit/setDetails',
         payload: { ...details, ...{ customer: newCustomer } },
       });
       return;
@@ -82,7 +82,7 @@ class Basic extends React.Component {
     if (key === 'invoicePostBlock') {
       const newVendor = { ...vendor, ...obj };
       this.props.dispatch({
-        type: 'partnerMaintainEdit/setDetails',
+        type: 'bpEdit/setDetails',
         payload: { ...details, ...{ vendor: newVendor } },
       });
       return;
@@ -101,7 +101,7 @@ class Basic extends React.Component {
     const newBasic = { ...basic, ...obj };
 
     this.props.dispatch({
-      type: 'partnerMaintainEdit/setDetails',
+      type: 'bpEdit/setDetails',
       payload: { ...details, ...{ basic: newBasic } },
     });
   }

@@ -9,9 +9,9 @@ import { connect } from 'dva';
 const DescriptionsItem = Descriptions.Item;
 
 
-@connect(({ partnerMaintainEdit }) => ({
-  details: partnerMaintainEdit.details || {},
-  creditList: (partnerMaintainEdit.details && partnerMaintainEdit.details.creditList) || [],
+@connect(({ bpEdit }) => ({
+  details: bpEdit.details || {},
+  creditList: (bpEdit.details && bpEdit.details.creditList) || [],
 }))
 class OrgCredit extends Component {
   render() {
