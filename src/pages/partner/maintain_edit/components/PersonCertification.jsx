@@ -14,10 +14,10 @@ import PersonCertificationAddModal from './PersonCertificationAddModal';
 
 const { Paragraph } = Typography;
 
-@connect(({ partnerMaintainEdit }) => ({
-  details: partnerMaintainEdit.details || {},
+@connect(({ bpEdit }) => ({
+  details: bpEdit.details || {},
   // eslint-disable-next-line max-len
-  piCertification: (partnerMaintainEdit.details && partnerMaintainEdit.details.piCertification) || [],
+  piCertification: (bpEdit.details && bpEdit.details.piCertification) || [],
 }))
 class PersonCertification extends React.Component {
   constructor(props) {
@@ -85,7 +85,7 @@ class PersonCertification extends React.Component {
 
     const data = piCertification.filter(e => e.id !== id);
     this.props.dispatch({
-      type: 'partnerMaintainEdit/setDetails',
+      type: 'bpEdit/setDetails',
       payload: { ...details, piCertification: data },
     });
   }
@@ -111,7 +111,7 @@ class PersonCertification extends React.Component {
 
     const newdata = [...piCertification, obj];
     this.props.dispatch({
-      type: 'partnerMaintainEdit/setDetails',
+      type: 'bpEdit/setDetails',
       payload: { ...details, piCertification: newdata },
     });
   };

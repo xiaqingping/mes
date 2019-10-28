@@ -12,8 +12,8 @@ import { connect } from 'dva';
 const FormItem = Form.Item;
 const { Option } = Select;
 
-@connect(({ partnerMaintainEdit }) => {
-  const details = partnerMaintainEdit.details || {};
+@connect(({ bpEdit }) => {
+  const details = bpEdit.details || {};
   const basic = details.basic || {};
   const vendor = details.vendor || { };
   const paymentBank = vendor.paymentBank || {};
@@ -33,7 +33,7 @@ class Bank extends Component {
     const newDetails = { ...details, ...{ vendor: newVendor } }
 
     this.props.dispatch({
-      type: 'partnerMaintainEdit/setDetails',
+      type: 'bpEdit/setDetails',
       payload: newDetails,
     });
   }

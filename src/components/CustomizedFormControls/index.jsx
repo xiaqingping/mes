@@ -195,8 +195,8 @@ export class NameInput extends React.Component {
 }
 
 // 移动电话
-@connect(({ basic }) => ({
-  countryDiallingCodes: basic.countryDiallingCodes,
+@connect(({ basicCache }) => ({
+  countryDiallingCodes: basicCache.countryDiallingCodes,
 }))
 export class MobilePhoneInput extends React.Component {
   static getDerivedStateFromProps(nextProps) {
@@ -251,8 +251,8 @@ export class MobilePhoneInput extends React.Component {
 }
 
 // 电话
-@connect(({ basic }) => ({
-  countryDiallingCodes: basic.countryDiallingCodes,
+@connect(({ basicCache }) => ({
+  countryDiallingCodes: basicCache.countryDiallingCodes,
 }))
 export class TelphoneInput extends React.Component {
   static getDerivedStateFromProps(nextProps) {
