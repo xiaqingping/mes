@@ -307,7 +307,13 @@ class Modifications extends Component {
         dataIndex: 'type',
         width: 180,
         editable: true,
-        // inputType: <Input style={{ width: '90%' }} readOnly/>,
+        render: text => {
+          if (text === 1) return '工资项目';
+          if (text === 2) return '扣款项目';
+          if (text === 3) return '代发项目';
+          if (text === 4) return '代缴项目';
+          return ''
+        },
         inputType: (
           <Select style={{ width: 100 }}>
             {this.props.type.map(e =>
@@ -319,16 +325,6 @@ class Modifications extends Component {
           { required: true, message: '必填' },
         ],
       },
-      // {
-      //   title: '排序',
-      //   dataIndex: 'serial',
-      //   width: 180,
-      //   editable: true,
-      //   inputType: <Input style={{ width: '90%' }} readOnly/>,
-      //   rules: [
-      //     { required: true, message: '必填' },
-      //   ],
-      // },
       {
         title: '排序',
         dataIndex: 'serial',
@@ -344,6 +340,11 @@ class Modifications extends Component {
         title: '状态',
         dataIndex: 'status',
         width: 100,
+        render: text => {
+          if (text === 1) return '正常';
+          if (text === 2) return '已删除';
+          return ''
+        },
       },
       {
         title: '创建人',

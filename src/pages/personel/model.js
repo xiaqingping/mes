@@ -3,6 +3,8 @@ import api from '@/api';
 const PersonelModel = {
   namespace: 'personel',
   state: {
+    // 类型
+    // carrierSeries:[],
     // 月
     month: [
       { id:1,name:'1' },
@@ -35,7 +37,7 @@ const PersonelModel = {
     ]
   },
   effects: {
-    *getCarrierSeries({ payload }, { call, put }) {
+    *getPay({ payload }, { call, put }) {
       const response = yield call(api.pay.getPay, payload);
       yield put({
         type: 'personelPay',
