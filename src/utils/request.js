@@ -77,9 +77,14 @@ service.interceptors.request.use(config => {
       // eslint-disable-next-line no-param-reassign
       config.headers.Authorization = token;
     } else {
-      // basic 因为跨域问题，使用了 webpack 的代理访问
-      config.url = config.url.replace('http://180.167.32.168:8001/', '/basic/api/');
-      config.baseURL = '/';
+      // basic 因为跨域问题，使用了 webpack 的代理访问，只在开发时生效 TODO:
+      // eslint-disable-next-line no-lonely-if
+      if (process.env.NODE_ENV === 'developmen') {
+        config.url = config.url.replace('http://180.167.32.168:8001/', '/basic/api/');
+        config.baseURL = '/';
+      } else {
+        config.url = config.url.replace('http://180.167.32.168:8001/', '/');
+      }
     }
   }
   return config;
