@@ -28,8 +28,8 @@ class CustomerEdit extends Component {
     this.state = {
       editType,
       width: '100%',
-      // tabActiveKey: 'customer',
-      tabActiveKey: 'vendor',
+      tabActiveKey: 'customer',
+      // tabActiveKey: 'vendor',
     };
     this.props.dispatch({
       type: 'bpEdit/setEditType',
@@ -45,6 +45,10 @@ class CustomerEdit extends Component {
 
   componentWillUnmount() {
     window.removeEventListener('resize', this.resizeFooterToolbar);
+    this.props.dispatch({
+      type: 'bpEdit/setDetails',
+      payload: {},
+    });
   }
 
   // 获取此页面需要用到的基础数据
@@ -98,6 +102,21 @@ class CustomerEdit extends Component {
     this.props.dispatch({
       type: 'basicCache/getCache',
       payload: { type: 'purchaseOrganizations' },
+    });
+    // 销售范围
+    this.props.dispatch({
+      type: 'basicCache/getCache',
+      payload: { type: 'salesArea' },
+    });
+    // 销售组织
+    this.props.dispatch({
+      type: 'basicCache/getCache',
+      payload: { type: 'salesOrganizations' },
+    });
+    // 分销渠道
+    this.props.dispatch({
+      type: 'basicCache/getCache',
+      payload: { type: 'distributionChannels' },
     });
   }
 
