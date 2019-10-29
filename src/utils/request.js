@@ -84,6 +84,7 @@ service.interceptors.request.use(config => {
         config.baseURL = '/';
       } else {
         config.url = config.url.replace('http://180.167.32.168:8001/', '/');
+        config.headers.Authorization = token;
       }
     }
   }
