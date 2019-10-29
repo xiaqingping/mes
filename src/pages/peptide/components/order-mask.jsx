@@ -25,6 +25,9 @@ const { Search } = Input;
  * 页面顶部筛选表单
  */
 @Form.create()
+@connect(({ peptide }) => ({
+  peptide,
+}))
 class SearchPage extends Component {
   constructor(props) {
     super(props);
@@ -59,15 +62,14 @@ class SearchPage extends Component {
   renderForm = () => {
     const {
       form: { getFieldDecorator, getFieldValue },
-      rangeArea,
-      regions,
-      offices,
-      invtypes,
-      payMethods,
-      invoiceByGoodsStatus,
-      deliveryTypeStatus,
-      orderTypeStatus,
-      currencys,
+      peptide: {
+        commonData,
+        regions,
+        offices,
+        invtypes,
+        payMethods,
+        currencys,
+      },
       openAddressMask,
     } = this.props;
     const { factorys, plusStatus } = this.state;
@@ -95,7 +97,7 @@ class SearchPage extends Component {
           <Col lg={6} md={8} sm={12}>
             <FormItem label="销售范围">
               {getFieldDecorator('range', { initialValue: '10-3110' })(<Select>
-                  {rangeArea.map(item =>
+                  {commonData.rangeArea.map(item =>
                       <Option key={item.id} value={item.id}>{item.name}</Option>,
                     )}
                 </Select>)}
@@ -196,7 +198,7 @@ class SearchPage extends Component {
           <Col lg={6} md={8} sm={12}>
             <FormItem label="随货开票">
               {getFieldDecorator('invoiceByGoods', { initialValue: 0 })(<Select>
-                {invoiceByGoodsStatus.map(item =>
+                {commonData.invoiceByGoodsStatus.map(item =>
                       <Option key={item.id} value={item.id}>{item.name}</Option>,
                     )}
                 </Select>)}
@@ -225,7 +227,7 @@ class SearchPage extends Component {
           <Col lg={6} md={8} sm={12}>
             <FormItem label="交货方式">
               {getFieldDecorator('deliveryType', { initialValue: '01' })(<Select dropdownMenuStyle={{ display: 'none' }}>
-                {deliveryTypeStatus.map(item =>
+                {commonData.deliveryTypeStatus.map(item =>
                       <Option key={item.id} value={item.id}>{`${item.id}-${item.name}`}</Option>,
                     )}
                 </Select>)}
@@ -260,7 +262,7 @@ class SearchPage extends Component {
           <Col lg={6} md={8} sm={12}>
             <FormItem label="订单类型">
               {getFieldDecorator('orderTypeStatus', { initialValue: 0 })(<Select>
-                {orderTypeStatus.map(item =>
+                {commonData.orderTypeStatus.map(item =>
                       <Option key={item.id} value={item.id}>{item.name}</Option>,
                     )}
                 </Select>)}
@@ -384,24 +386,24 @@ class Order extends Component {
     total: 0,
     loading: false,
     visible: false, // 遮罩层的判断
-    data: [],
     dataSon: [],
     loadingSon: false,
     visibleAddress: false,
   }
 
-  componentWillReceiveProps(nextProps) {
-    this.setState({
-      visible: nextProps.visible,
-    })
+  componentDidMount() {
+    this.props.onRef(this)
+  }
+
+  visibleShow = visible => {
+    this.setState({ visible })
   }
 
   handleOk = () => {
-    this.props.getData(this.state.data);
+    this.handleCancel()
   };
 
   handleCancel = () => {
-    this.props.closeMask(false)
     this.setState({
       visible: false,
     });
@@ -657,7 +659,8 @@ class Order extends Component {
       type: 'radio',
       onChange: (selectedRowKeys, selectedRows) => {
           this.setState({
-              data: selectedRows[0],
+              dataSon: selectedRows[0],
+              loadingSon: true,
             })
         },
     }
@@ -701,10 +704,10 @@ class Order extends Component {
             <Col span={1}></Col>
             <Col span={9}>
               <Table
-                  dataSource={data.list}
+                  dataSource={dataSon}
                   columns={columnSon}
                   scroll={{ x: tableWidthSon, y: 400 }}
-                  loading={loading}
+                  loading={loadingSon}
                   />
             </Col>
             <AddressMask visible={visibleAddress} closeMask={ v => this.closeAddressMask(v)}/>

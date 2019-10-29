@@ -40,7 +40,6 @@ npm run build
 
 ### 生产环境
 
-## [全局数据](/docs/全局数据.md)
 
 ## 负责人
 <details>

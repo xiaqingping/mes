@@ -38,7 +38,7 @@ export default {
     return request('/peptide-base/v1/synthesisProducts/easyui', { params });
   },
 
-  // 创建氨基酸
+  // 创建合成产品
   insertProduct(params) {
     return request('/peptide-base/v1/synthesisProducts', { method: 'POST', data: params });
   },

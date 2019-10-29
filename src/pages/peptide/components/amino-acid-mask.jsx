@@ -110,18 +110,22 @@ class Order extends Component {
     data: [],
   }
 
-  componentWillReceiveProps(nextProps) {
-    this.setState({
-      visible: nextProps.visible,
-    })
+  componentDidMount () {
+    this.props.onRef(this);
+  }
+
+  visibleShow = visible => {
+    this.setState({ visible })
   }
 
   handleOk = () => {
-    this.props.getData(this.state.data);
+    if (this.state.data.length !== 0) {
+      this.props.getData(this.state.data);
+      this.handleCancel()
+    }
   };
 
   handleCancel = () => {
-    this.props.closeMask(false)
     this.setState({
       visible: false,
     });

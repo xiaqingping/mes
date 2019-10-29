@@ -143,7 +143,6 @@ class DisulfideBondProducts extends Component {
     editIndex: -1,
     id: 0, // 新增数据时，提供负数id
     sonProducts: [],
-    visible: false,
   }
 
   componentDidMount() {
@@ -200,6 +199,18 @@ class DisulfideBondProducts extends Component {
         editIndex: index,
       });
     }
+    this.clearInput()
+  }
+
+  // 清空弹框的选择内容
+  clearInput = () => {
+    this.props.form.setFieldsValue({
+      sapProductCode: '',
+      sapProductName: '',
+    });
+    this.setState({
+      sonProducts: [],
+    })
   }
 
   // 删除数据
@@ -235,25 +246,10 @@ class DisulfideBondProducts extends Component {
       } else {
         api.peptideBase.insertdisulfideBondProducts(newData).then(() => {
           this.getTableData();
-          this.setState({
-            sonProducts: [],
-          })
+          this.clearInput();
         });
       }
     });
-  }
-
-  // 打开搜索
-  openMask = () => {
-    this.setState({
-      visible: true,
-    })
-  }
-
-  closeMask = v => {
-    this.setState({
-      visible: v,
-    })
   }
 
   // 新增
@@ -280,7 +276,6 @@ class DisulfideBondProducts extends Component {
   getSonProduct = data => {
     this.setState({
       sonProducts: data,
-      visible: false,
     })
     this.props.form.setFieldsValue({
       sapProductCode: data.code,
@@ -296,7 +291,6 @@ class DisulfideBondProducts extends Component {
       total,
       loading,
       sonProducts,
-      visible,
     } = this.state;
     const data = { list, pagination: { current, pageSize, total } };
     const { peptide: { commonData } } = this.props
@@ -397,9 +391,9 @@ class DisulfideBondProducts extends Component {
       {
         title: '产品名称',
         dataIndex: 'sapProductName',
-        width: 400,
+        width: 300,
         editable: true,
-        inputType: <Search style={{ width: '90%' }} onSearch={() => this.openMask()} value={sonProducts.name ? sonProducts.name : ''} readOnly/>,
+        inputType: <Search style={{ width: '90%' }} onSearch={() => this.productShow.visibleShow(true)} value={sonProducts.name ? sonProducts.name : ''} readOnly/>,
         rules: [
           { required: true, message: '必填' },
         ],
@@ -521,8 +515,7 @@ class DisulfideBondProducts extends Component {
             </EditableContext.Provider>
           </div>
         </Card>
-        <Products getData={v => { this.getSonProduct(v) }} visible={visible}
-        closeMask={ v => { this.closeMask(v) }}/>
+        <Products getData={v => { this.getSonProduct(v) }} onRef={ ref => {this.productShow = ref}}/>
       </PageHeaderWrapper>
     );
   }
