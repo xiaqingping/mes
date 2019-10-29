@@ -165,8 +165,7 @@ class Product extends Component {
     editIndex: -1,
     id: 0, // 新增数据时，提供负数id
     purityValue: [],
-    visible: false,
-    sonProducts: []
+    sonProducts: [],
   }
 
   componentDidMount() {
@@ -215,7 +214,7 @@ class Product extends Component {
   getMaskData = v => {
     this.props.form.setFieldsValue({
       sapProductCode: v.code,
-      sapProductName: v.name
+      sapProductName: v.name,
     });
     this.setState({
       sonProducts: v,
@@ -226,7 +225,7 @@ class Product extends Component {
   clearInput = () => {
     this.props.form.setFieldsValue({
       sapProductCode: '',
-      sapProductName: ''
+      sapProductName: '',
     });
     this.setState({
       sonProducts: [],
@@ -271,7 +270,8 @@ class Product extends Component {
       if (error) return;
       const { list } = this.state;
       const newData = { ...list[index],
-        ...row, isNeedDesalting: row.isNeedDesalting ? 1 : 2,
+        ...row,
+isNeedDesalting: row.isNeedDesalting ? 1 : 2,
         aminoAcidMinimumCharge: 0,
         purityID: row.purityID.split('-')[0],
         purityCode: row.purityID.split('-')[1],
@@ -284,7 +284,7 @@ class Product extends Component {
           () => {
             this.getTableData();
             this.clearInput()
-          }
+          },
         );
       }
     });
@@ -319,7 +319,6 @@ class Product extends Component {
       total,
       loading,
       purityValue,
-      visible,
       sonProducts,
     } = this.state;
     const data = { list, pagination: { current, pageSize, total } };
@@ -421,7 +420,7 @@ class Product extends Component {
         dataIndex: 'sapProductCode',
         width: 150,
         editable: true,
-        inputType: <Input style={{ width: '90%' }}  value={sonProducts.code ? sonProducts.code : ''} readOnly/>,
+        inputType: <Input style={{ width: '90%' }} value={sonProducts.code ? sonProducts.code : ''} readOnly/>,
         rules: [
           { required: true, message: '必填' },
         ],
@@ -523,7 +522,8 @@ class Product extends Component {
             </EditableContext.Provider>
           </div>
         </Card>
-        <Products onRef={ ref => {this.productShow = ref}} getData={ v => {this.getMaskData(v)} }/>
+        <Products onRef={ ref => { this.productShow = ref }}
+        getData={ v => { this.getMaskData(v) } }/>
       </PageHeaderWrapper>
     );
   }

@@ -270,7 +270,7 @@ class SearchPage extends Component {
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="运费">
-              {getFieldDecorator('freight', { initialValue: 23.00.toFixed(2) })(<Input />)}
+              {getFieldDecorator('freight', { initialValue: 0.00.toFixed(2) })(<Input />)}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>

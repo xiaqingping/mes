@@ -515,7 +515,8 @@ class DisulfideBondProducts extends Component {
             </EditableContext.Provider>
           </div>
         </Card>
-        <Products getData={v => { this.getSonProduct(v) }} onRef={ ref => {this.productShow = ref}}/>
+        <Products getData={v => { this.getSonProduct(v) }}
+        onRef={ ref => { this.productShow = ref }}/>
       </PageHeaderWrapper>
     );
   }

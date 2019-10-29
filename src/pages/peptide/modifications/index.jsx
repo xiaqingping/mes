@@ -759,8 +759,8 @@ class Modifications extends Component {
               </Col>
           </div>
         </Card>
-        <AminoAcid getData={v => { this.getSonAminoAcid(v) }} 
-        onRef={ ref => this.AminoAcidShow = ref }/>
+        <AminoAcid getData={v => { this.getSonAminoAcid(v) }}
+        onRef={ ref => { this.AminoAcidShow = ref }}/>
       </PageHeaderWrapper>
     );
   }
