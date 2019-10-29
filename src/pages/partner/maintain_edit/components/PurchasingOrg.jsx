@@ -19,6 +19,20 @@ const FormItem = Form.Item;
 const { Option } = Select;
 
 @Form.create()
+@connect(({ global, basicCache }) => {
+  function byLangFilter(e) {
+    return e.languageCode === global.languageCode;
+  }
+  // 基础数据
+  // 币种
+  const currencies = basicCache.currencies.filter(byLangFilter);
+  // 付款条件
+  const paymentTerms = basicCache.paymentTerms.filter(byLangFilter);
+  // 采购组
+  const { purchaseGroups } = basicCache;
+
+  return { currencies, paymentTerms, purchaseGroups };
+})
 class FormContent extends React.Component {
   render() {
     const {
@@ -26,6 +40,9 @@ class FormContent extends React.Component {
       data,
       tabKey,
       valueChange,
+      currencies,
+      paymentTerms,
+      purchaseGroups,
     } = this.props;
 
     if (tabKey !== data.purchasingOrganizationCode) return null;
@@ -38,8 +55,11 @@ class FormContent extends React.Component {
                 initialValue: data.currencyCode,
               })(
                 <Select onChange={value => valueChange('currencyCode', value)}>
-                  <Option value="1">人民币</Option>
-                  <Option value="2">美元</Option>
+                  {
+                    currencies.map(e =>
+                      <Option key={e.code} value={e.code}>{e.shortText}</Option>,
+                    )
+                  }
                 </Select>,
               )}
             </FormItem>
@@ -50,8 +70,11 @@ class FormContent extends React.Component {
                 initialValue: data.paymentTermsCode,
               })(
                 <Select onChange={value => valueChange('paymentTermsCode', value)}>
-                  <Option value="1">条件1</Option>
-                  <Option value="2">条件2</Option>
+                  {
+                    paymentTerms.map(e =>
+                      <Option key={e.code} value={e.code}>{e.name}</Option>,
+                    )
+                  }
                 </Select>,
               )}
             </FormItem>
@@ -105,8 +128,11 @@ class FormContent extends React.Component {
                 initialValue: data.purchasingGroupCode,
               })(
                 <Select onChange={value => valueChange('purchasingGroupCode', value)}>
-                  <Option value="1">组1</Option>
-                  <Option value="2">组2</Option>
+                  {
+                    purchaseGroups.map(e =>
+                      <Option key={e.code} value={e.code}>{e.name}</Option>,
+                    )
+                  }
                 </Select>,
               )}
             </FormItem>
@@ -131,11 +157,16 @@ class FormContent extends React.Component {
   }
 }
 
-@connect(({ bpEdit }) => {
+@connect(({ bpEdit, basicCache }) => {
+  // BP数据
   const details = bpEdit.details || {};
   const vendor = details.vendor || { };
   const purchasingOrganizationList = vendor.purchasingOrganizationList || [];
-  return { details, vendor, purchasingOrganizationList };
+
+  // 基础数据
+  // 采购组织
+  const { purchaseOrganizations } = basicCache;
+  return { details, vendor, purchasingOrganizationList, purchaseOrganizations };
 }, undefined, undefined, { withRef: true })
 class PurchasingOrg extends React.Component {
   constructor(props) {
@@ -204,32 +235,24 @@ class PurchasingOrg extends React.Component {
   }
 
   renderCascader = () => {
-    const { purchasingOrganizationList: tabsData } = this.props;
-    const cascaderTitle = tabsData.map(e => e.purchasingOrganizationCode);
-    const options = [
-      {
-        value: '生工',
-        label: '生工',
-      },
-      {
-        value: 'BBI',
-        label: 'BBI',
-      },
-      {
-        value: 'NBS',
-        label: 'NBS',
-      },
-    ];
-    options.forEach(e => {
-      if (cascaderTitle.indexOf(e.value) > -1) {
-        e.disabled = true;
-      } else {
-        e.disabled = false;
+    const { purchasingOrganizationList: tabsData, purchaseOrganizations } = this.props;
+    const codeList = tabsData.map(e => e.purchasingOrganizationCode);
+
+    const options = purchaseOrganizations.map(e => {
+      let disabled = false;
+      if (codeList.indexOf(e.code) > -1) {
+        disabled = true;
       }
+      return { ...e, disabled };
     });
     return (
-      <Cascader options={options} onChange={this.onCascaderChange}>
-        <a style={{ fontSize: 14, marginLeft: -16 }} href="#">采购组织 <Icon type="down" style={{ fontSize: 12 }} /></a>
+      <Cascader
+        options={options}
+        onChange={this.onCascaderChange}
+        fieldNames={{ label: 'name', value: 'code' }}>
+        <a style={{ fontSize: 14, marginLeft: -16 }} href="#">
+          采购组织 <Icon type="down" style={{ fontSize: 12 }} />
+        </a>
       </Cascader>
     );
   }
@@ -276,11 +299,14 @@ class PurchasingOrg extends React.Component {
 
   render() {
     const { tabKey } = this.state;
-    const { purchasingOrganizationList: tabsData } = this.props;
+    const {
+      purchasingOrganizationList: tabsData,
+      purchaseOrganizations,
+    } = this.props;
 
     let tabList = tabsData.map(e => ({
       key: e.purchasingOrganizationCode,
-      tab: e.purchasingOrganizationCode,
+      tab: purchaseOrganizations.filter(e1 => e1.code === e.purchasingOrganizationCode)[0].name,
     }));
 
     tabList = tabList.concat({
