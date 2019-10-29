@@ -197,7 +197,8 @@ class SalesArea extends React.Component {
     const { details, customer, salesAreaList } = this.props;
 
     const newSalesAreaList = salesAreaList.map(e => {
-      if (e.title === tabKey) {
+      const itemKey = `${e.salesOrganizationCode}-${e.distributionChannelCode}`;
+      if (itemKey === tabKey) {
         if (key === 'regionOffice') {
           const [regionCode, officeCode] = value;
           e.regionCode = regionCode;
