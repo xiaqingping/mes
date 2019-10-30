@@ -79,7 +79,7 @@ service.interceptors.request.use(config => {
     } else {
       // basic 因为跨域问题，使用了 webpack 的代理访问，只在开发时生效 TODO:
       // eslint-disable-next-line no-lonely-if
-      if (process.env.NODE_ENV === 'developmen') {
+      if (process.env.NODE_ENV === 'development') {
         config.url = config.url.replace('http://180.167.32.168:8001/', '/basic/api/');
         config.baseURL = '/';
       } else {

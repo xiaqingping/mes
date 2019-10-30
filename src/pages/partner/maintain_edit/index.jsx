@@ -1,6 +1,7 @@
 import {
   Form,
   Button,
+  Spin,
 } from 'antd';
 import React, { Component } from 'react';
 
@@ -18,6 +19,8 @@ import Address from './components/Address';
 import PurchasingOrg from './components/PurchasingOrg';
 import Bank from './components/Bank';
 
+import { bp } from '@/api'
+
 @connect(({ bpEdit }) => ({
   details: bpEdit.details || {},
 }))
@@ -26,6 +29,8 @@ class CustomerEdit extends Component {
     super(props);
     const editType = props.location.pathname.indexOf('/add') > -1 ? 'add' : 'update';
     this.state = {
+      oldDetails: {}, // 修改模式下，应保存一份原始数据，以便提交时，对比数据并调整数据结构
+      pageLoading: false,
       editType,
       width: '100%',
       tabActiveKey: 'customer',
@@ -41,6 +46,7 @@ class CustomerEdit extends Component {
     window.addEventListener('resize', this.resizeFooterToolbar, { passive: true });
     this.resizeFooterToolbar();
     this.getCacheData();
+    this.getBpDetails();
   }
 
   componentWillUnmount() {
@@ -49,6 +55,23 @@ class CustomerEdit extends Component {
       type: 'bpEdit/setDetails',
       payload: {},
     });
+  }
+
+  // 编辑模式为修改时，获取BP数据
+  getBpDetails = () => {
+    const { editType } = this.state;
+    if (editType !== 'update') return;
+
+    this.setState({ pageLoading: true });
+
+    const { id } = this.props.match.params;
+    const details = {};
+    console.log(id);
+    // bp.getBPCustomer(id);
+    // bp.getBPVendor(id);
+    // bp.getBPOrgCertification(id);
+    // bp.getBPPiCertification(id);
+    this.setState({ pageLoading: false, oldDetails: details });
   }
 
   // 获取此页面需要用到的基础数据
@@ -175,11 +198,20 @@ class CustomerEdit extends Component {
     });
 
     console.log(data);
+    bp.addBP(data).then(res => {
+      console.log(res);
+    });
   }
 
   // 修改
   update = () => {
+    const { oldDetails } = this.state;
+
     console.log(this.props.details);
+    const data = {};
+    bp.updateBP(data).then(res => {
+      console.log(res);
+    });
   }
 
   // 客户
@@ -253,7 +285,7 @@ class CustomerEdit extends Component {
   }
 
   render() {
-    const { width, tabActiveKey } = this.state;
+    const { width, tabActiveKey, pageLoading } = this.state;
 
     return (
       <PageHeaderWrapper
@@ -272,13 +304,15 @@ class CustomerEdit extends Component {
           },
         ]}
       >
-        <div style={{ paddingBottom: 50 }}>
-          {this.renderContent()}
-        </div>
-        <FooterToolbar style={{ width }}>
-          <Button>取消</Button>
-          <Button type="primary" onClick={this.validate}>提交</Button>
-        </FooterToolbar>
+        <Spin spinning={pageLoading}>
+          <div style={{ paddingBottom: 50 }}>
+            {this.renderContent()}
+          </div>
+          <FooterToolbar style={{ width }}>
+            <Button>取消</Button>
+            <Button type="primary" onClick={this.validate}>提交</Button>
+          </FooterToolbar>
+        </Spin>
       </PageHeaderWrapper>
     );
   }
