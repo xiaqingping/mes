@@ -129,9 +129,9 @@ class BasicInfo extends Component {
       title: '名称',
       width: 1200,
       dataIndex: 'name',
-      render(text, record) {
-        return <><Icon type={record.type === 1 ? 'home' : 'user'}/> {text}</>
-      },
+      // render(text, record) {
+      //   return <><Icon type={record.type === 1 ? 'home' : 'user'}/> {text}</>
+      // },
     },
     // {
     //   align: 'center',

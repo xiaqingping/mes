@@ -59,9 +59,9 @@ class Search extends Component {
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="修饰类型">
-              {getFieldDecorator('modificationTypeID', { initialValue: '' })(
+              {getFieldDecorator('modificationTypeID', { initialValue: '0' })(
                 <Select>
-                  <Option value="">全部</Option>
+                  <Option value="0">全部</Option>
                   {modificationType.map(item => <Option key={item.id} value={item.id}>
                   {item.modificationType}
                   </Option>)}
@@ -117,6 +117,10 @@ class Order extends Component {
     modificationType: [],
   }
 
+  componentDidMount() {
+    this.props.onRef(this);
+  }
+
   componentWillReceiveProps(nextProps) {
     api.peptideBase.getModificationTypesAll().then(res => {
       this.setState({
@@ -128,12 +132,18 @@ class Order extends Component {
     })
   }
 
+  visibleShow = visible => {
+    this.setState({ visible })
+  }
+
   handleOk = () => {
-    this.props.getData(this.state.data);
+    if (this.state.data.length !== 0) {
+      this.props.getData(this.state.data);
+      this.handleCancel()
+    }
   };
 
   handleCancel = () => {
-    this.props.closeMask(false);
     this.setState({
       visible: false,
     });

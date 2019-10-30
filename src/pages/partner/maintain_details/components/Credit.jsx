@@ -60,10 +60,10 @@ class BasicInfo extends Component {
           layout="vertical"
           column={4}
         >
-          <DescriptionsItem label="额度">{creditList.credit}</DescriptionsItem>
-          <DescriptionsItem label="临时额度">{creditList.tempCreditLimit}</DescriptionsItem>
-          <DescriptionsItem label="付款周期">{creditList.creditPeriod}</DescriptionsItem>
-          <DescriptionsItem label="账单间隔">{creditList.billingDay}</DescriptionsItem>
+          <DescriptionsItem label="额度">{creditList[0].credit}</DescriptionsItem>
+          <DescriptionsItem label="临时额度">{creditList[0].tempCreditLimit}</DescriptionsItem>
+          <DescriptionsItem label="付款周期">{creditList[0].creditPeriod}</DescriptionsItem>
+          <DescriptionsItem label="账单间隔">{creditList[0].billingDay}</DescriptionsItem>
         </Descriptions>
         <FixedQuota visible={fixedVisible}
         fixedQuota={v => { this.fixedQuota(v) }}

@@ -62,28 +62,38 @@ class SearchPage extends Component {
     });
   };
 
-  openMask = v => {
-    if (v === 'customer') {
-      this.props.openCustomer(true);
+  getMaskData = (v, type) => {
+    if (type === 'customer') {
+      this.props.form.setFieldsValue({
+        customerCode: v.code,
+      });
     }
-    if (v === 'subCustomer') {
-      this.props.openSubCustomer(true);
+    if (type === 'subCustomer') {
+      this.props.form.setFieldsValue({
+        subCustomerCode: v.code,
+      });
     }
-    if (v === 'contact') {
-      this.props.openContact(true);
+    if (type === 'contact') {
+      this.props.form.setFieldsValue({
+        contactCode: v.code,
+      });
     }
-    if (v === 'saler') {
-      this.props.openSaler(true);
+    if (type === 'saler') {
+      this.props.form.setFieldsValue({
+        salerCode: v.code,
+      });
     }
   }
 
   renderAdvancedForm() {
     const {
       form: { getFieldDecorator },
-      regions,
-      offices,
-      currencys,
-      commonData: { rangeOrganization, rangeChannel },
+      peptide: {
+        regions,
+        offices,
+        currencys,
+        commonData,
+      },
     } = this.props;
     return (
       <Form onSubmit={this.submit} layout="inline">
@@ -95,22 +105,22 @@ class SearchPage extends Component {
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="客户">
-              {getFieldDecorator('customerCode')(<Search onSearch={() => this.openMask('customer')} />)}
+              {getFieldDecorator('customerCode')(<Search onSearch={() => this.showCustomer.visibleShow(true)} />)}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="负责人">
-            {getFieldDecorator('subCustomerCode')(<Search onSearch={() => this.openMask('subCustomer')} />)}
+            {getFieldDecorator('subCustomerCode')(<Search onSearch={() => this.showSubCustomer.visibleShow(true)} />)}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="订货人">
-            {getFieldDecorator('contactCode')(<Search onSearch={() => this.openMask('contact')} />)}
+            {getFieldDecorator('contactCode')(<Search onSearch={() => this.showContact.visibleShow(true)} />)}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="销售员">
-            {getFieldDecorator('salerCode')(<Search onSearch={() => this.openMask('saler')}/>)}
+            {getFieldDecorator('salerCode')(<Search onSearch={() => this.showSaler.visibleShow(true)} />)}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
@@ -151,7 +161,7 @@ class SearchPage extends Component {
             <FormItem label="销售组织">
               {getFieldDecorator('rangeOrganization', { initialValue: '' })(
                 <Select>
-                  {rangeOrganization.map(item =>
+                  {commonData.rangeOrganization.map(item =>
                     <Option key={item.id} value={item.id}>{item.name}</Option>,
                   )}
                   </Select>)}
@@ -161,7 +171,7 @@ class SearchPage extends Component {
             <FormItem label="销售渠道">
               {getFieldDecorator('rangeChannel', { initialValue: '' })(
                 <Select>
-                 {rangeChannel.map(item =>
+                 {commonData.rangeChannel.map(item =>
                     <Option key={item.id} value={item.id}>{item.name}</Option>,
                   )}
                   </Select>)}
@@ -205,22 +215,22 @@ class SearchPage extends Component {
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="客户">
-              {getFieldDecorator('customerCode')(<Search onSearch={() => this.openMask('customer')} />)}
+              {getFieldDecorator('customerCode')(<Search onSearch={() => this.showCustomer.visibleShow(true)} />)}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="负责人">
-            {getFieldDecorator('subCustomerCode')(<Search onSearch={() => this.openMask('subCustomer')} />)}
+            {getFieldDecorator('subCustomerCode')(<Search onSearch={() => this.showSubCustomer.visibleShow(true)} />)}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="订货人">
-            {getFieldDecorator('contactCode')(<Search onSearch={() => this.openMask('contact')} />)}
+            {getFieldDecorator('contactCode')(<Search onSearch={() => this.showContact.visibleShow(true)} />)}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="销售员">
-            {getFieldDecorator('salerCode')(<Search onSearch={() => this.openMask('saler')} />)}
+            {getFieldDecorator('salerCode')(<Search onSearch={() => this.showSaler.visibleShow(true)} />)}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
@@ -249,7 +259,25 @@ class SearchPage extends Component {
 
   render() {
     return (
-      <div className="tableListForm">{this.renderForm()}</div>
+      <div className="tableListForm">
+      {this.renderForm()}
+      <CustomerMask
+        onRef={ref => { this.showCustomer = ref }}
+        getData={v => this.getMaskData(v, 'customer')}
+        />
+      <SubCustomerMask
+        onRef={ref => { this.showSubCustomer = ref }}
+        getData={v => this.getMaskData(v, 'subCustomer')}
+      />
+      <ContactMask
+        onRef={ref => { this.showContact = ref }}
+        getData={v => this.getMaskData(v, 'contact')}
+      />
+      <SalerMask
+        onRef={ref => { this.showSaler = ref }}
+        getData={v => this.getMaskData(v, 'saler')}
+      />
+      </div>
     );
   }
 }
@@ -313,11 +341,6 @@ class Order extends Component {
       payMethods: [], // 付款方式
       payTerms: [], // 付款条件
       currencys: [], // 货币类型
-      visibleOrder: false,
-      visibleCustomer: false,
-      visibleSubCustomer: false,
-      visibleContact: false,
-      visibleSaler: false,
     }
   }
 
@@ -402,66 +425,6 @@ class Order extends Component {
     });
   };
 
-  // 打开新建订单页面
-  openOrderMask = () => {
-    this.setState({
-      visibleOrder: true,
-    })
-  }
-
-  openMask = (v, type) => {
-    if (type === 'customer') {
-      this.setState({
-        visibleCustomer: v,
-      })
-    }
-    if (type === 'subCustomer') {
-      this.setState({
-        visibleSubCustomer: v,
-      })
-    }
-    if (type === 'contact') {
-      this.setState({
-        visibleContact: v,
-      })
-    }
-    if (type === 'saler') {
-      this.setState({
-        visibleSaler: v,
-      })
-    }
-  }
-
-  // 关闭订单
-  closeOrderMask = v => {
-    this.setState({
-      visibleOrder: v,
-    })
-  }
-
-  closeMask = (v, type) => {
-    if (type === 'customer') {
-      this.setState({
-        visibleCustomer: v,
-      })
-    }
-    if (type === 'subCustomer') {
-      this.setState({
-        visibleSubCustomer: v,
-      })
-    }
-    if (type === 'contact') {
-      this.setState({
-        visibleContact: v,
-      })
-    }
-    if (type === 'saler') {
-      this.setState({
-        visibleSaler: v,
-      })
-    }
-  }
-
   renderForm = () => {
     const { expandForm } = this.state;
     return expandForm ? this.renderAdvancedForm() : this.renderSimpleForm();
@@ -487,11 +450,6 @@ class Order extends Component {
       payMethods,
       payTerms,
       currencys,
-      visibleOrder,
-      visibleCustomer,
-      visibleSubCustomer,
-      visibleContact,
-      visibleSaler,
     } = this.state;
     const { peptide: { commonData } } = this.props
     const data = { list, pagination: { current, pageSize, total } };
@@ -529,7 +487,7 @@ class Order extends Component {
       {
         title: '备注',
         dataIndex: 'remark',
-        width: 100,
+        width: 200,
       },
       {
         title: '订货人手机',
@@ -769,16 +727,9 @@ class Order extends Component {
       <PageHeaderWrapper>
         <Card bordered={false}>
           <div className="tableList">
-            <SearchPage getTableData={this.getTableData}
-            regions={regions} offices={offices}
-            currencys={currencys} commonData={commonData}
-            openCustomer={v => this.openMask(v, 'customer')}
-            openSubCustomer={v => this.openMask(v, 'subCustomer')}
-            openContact={v => this.openMask(v, 'contact')}
-            openSaler={v => this.openMask(v, 'saler')}
-            />
+            <SearchPage getTableData={this.getTableData} />
             <div className="tableListOperator">
-              <Button icon="plus" type="primary" onClick={ () => { this.openOrderMask() }}>
+              <Button icon="plus" type="primary" onClick={ () => { this.showOrder.visibleShow(true) }}>
                 新建
               </Button>
             </div>
@@ -798,42 +749,7 @@ class Order extends Component {
           </div>
         </Card>
         <OrderMask
-          visible={visibleOrder}
-          closeMask={ v => this.closeOrderMask(v)}
-          regions={regions}
-          offices={offices}
-          invtypes={invtypes}
-          payMethods={payMethods}
-          currencys={currencys}
-        />
-        <CustomerMask
-          visible={visibleCustomer}
-          closeMask={ v => this.closeMask(v, 'customer')}
-          regions={regions}
-          offices={offices}
-          payMethods={payMethods}
-          payTerms={payTerms}
-        />
-        <SubCustomerMask
-          visible={visibleSubCustomer}
-          closeMask={ v => this.closeMask(v, 'subCustomer')}
-          regions={regions}
-          offices={offices}
-          payMethods={payMethods}
-          payTerms={payTerms}
-          currencys={currencys}
-        />
-        <ContactMask
-          visible={visibleContact}
-          closeMask={ v => this.closeMask(v, 'contact')}
-        />
-        <SalerMask
-          visible={visibleSaler}
-          closeMask={ v => this.closeMask(v, 'saler')}
-          regions={regions}
-          offices={offices}
-          payMethods={payMethods}
-          payTerms={payTerms}
+          onRef={ref => { this.showOrder = ref }}
         />
       </PageHeaderWrapper>
     );

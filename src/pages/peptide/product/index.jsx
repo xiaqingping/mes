@@ -15,18 +15,20 @@ import {
 import React, { Component } from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import StandardTable from '@/components/StandardTable';
+import Products from '@/pages/peptide/components/products-mask'
 import api from '@/api';
 import { connect } from 'dva';
 
 const EditableContext = React.createContext();
 const FormItem = Form.Item;
 const { Option } = Select;
+const { Search } = Input;
 
 /**
  * 页面顶部筛选表单
  */
 @Form.create()
-class Search extends Component {
+class SearchPage extends Component {
   componentDidMount() {
     this.submit();
   }
@@ -163,6 +165,7 @@ class Product extends Component {
     editIndex: -1,
     id: 0, // 新增数据时，提供负数id
     purityValue: [],
+    sonProducts: [],
   }
 
   componentDidMount() {
@@ -208,6 +211,27 @@ class Product extends Component {
     });
   }
 
+  getMaskData = v => {
+    this.props.form.setFieldsValue({
+      sapProductCode: v.code,
+      sapProductName: v.name,
+    });
+    this.setState({
+      sonProducts: v,
+    })
+  }
+
+  // 清空弹框的选择内容
+  clearInput = () => {
+    this.props.form.setFieldsValue({
+      sapProductCode: '',
+      sapProductName: '',
+    });
+    this.setState({
+      sonProducts: [],
+    })
+  }
+
   handleFormReset = () => {
     this.props.form.resetFields();
   };
@@ -223,6 +247,7 @@ class Product extends Component {
         editIndex: index,
       });
     }
+    this.clearInput()
   }
 
   // 删除数据
@@ -244,11 +269,23 @@ class Product extends Component {
     this.props.form.validateFields((error, row) => {
       if (error) return;
       const { list } = this.state;
-      const newData = { ...list[index], ...row };
+      const newData = { ...list[index],
+        ...row,
+isNeedDesalting: row.isNeedDesalting ? 1 : 2,
+        aminoAcidMinimumCharge: 0,
+        purityID: row.purityID.split('-')[0],
+        purityCode: row.purityID.split('-')[1],
+        purityName: row.purityID.split('-')[2],
+      };
       if (newData.id > 0) {
         // api.peptideBase.updateSeries(newData).then(() => this.getTableData());
       } else {
-        api.peptideBase.insertProduct(newData).then(() => this.getTableData());
+        api.peptideBase.insertProduct(newData).then(
+          () => {
+            this.getTableData();
+            this.clearInput()
+          },
+        );
       }
     });
   }
@@ -282,6 +319,7 @@ class Product extends Component {
       total,
       loading,
       purityValue,
+      sonProducts,
     } = this.state;
     const data = { list, pagination: { current, pageSize, total } };
     let tableWidth = 0;
@@ -321,7 +359,7 @@ class Product extends Component {
         inputType: (
           <Select style={{ width: '90%' }}>
           {purityValue.map(item =>
-            <Option value={item.id} key={item.id}>{item.purity}</Option>,
+            <Option value={`${item.id}-${item.code}-${item.name}`} key={item.id}>{item.purity}</Option>,
           )}
           </Select>),
         rules: [
@@ -381,11 +419,21 @@ class Product extends Component {
         title: '产品编号',
         dataIndex: 'sapProductCode',
         width: 150,
+        editable: true,
+        inputType: <Input style={{ width: '90%' }} value={sonProducts.code ? sonProducts.code : ''} readOnly/>,
+        rules: [
+          { required: true, message: '必填' },
+        ],
       },
       {
         title: '产品名称',
         dataIndex: 'sapProductName',
         width: 300,
+        editable: true,
+        inputType: <Search style={{ width: '90%' }} onSearch={() => this.productShow.visibleShow(true)} value={sonProducts.name ? sonProducts.name : ''} readOnly/>,
+        rules: [
+          { required: true, message: '必填' },
+        ],
       },
       {
         title: '操作',
@@ -452,7 +500,7 @@ class Product extends Component {
       <PageHeaderWrapper>
         <Card bordered={false}>
           <div className="tableList">
-            <Search getTableData={this.getTableData}
+            <SearchPage getTableData={this.getTableData}
             purityValue={purityValue.map(item => item)} status={commonData.status}/>
             <div className="tableListOperator">
               <Button icon="plus" type="primary" onClick={() => this.handleAdd()}>
@@ -474,6 +522,8 @@ class Product extends Component {
             </EditableContext.Provider>
           </div>
         </Card>
+        <Products onRef={ ref => { this.productShow = ref }}
+        getData={ v => { this.getMaskData(v) } }/>
       </PageHeaderWrapper>
     );
   }

@@ -176,18 +176,24 @@ class Order extends Component {
     loadingSon: false,
   }
 
-  componentWillReceiveProps(nextProps) {
+  componentDidMount() {
+    this.props.onRef(this)
+  }
+
+  visibleShow = visible => {
     this.setState({
-      visible: nextProps.visible,
+      visible,
     })
   }
 
   handleOk = () => {
-    this.props.getData(this.state.data);
+    if (this.state.data.length !== 0) {
+      this.props.getData(this.state.data);
+      this.handleCancel()
+    }
   };
 
   handleCancel = () => {
-    this.props.closeMask(false)
     this.setState({
       visible: false,
     });
@@ -264,12 +270,12 @@ class Order extends Component {
       {
         title: '产品名称',
         dataIndex: 'desc',
-        width: 300,
+        width: 250,
       },
       {
         title: '英文名称',
         dataIndex: 'edesc',
-        width: 300,
+        width: 250,
       },
       {
         title: '旧物料号',
@@ -300,7 +306,7 @@ class Order extends Component {
         title: '温度条件',
         dataIndex: 'temperatureCode',
         width: 200,
-        render: (text, record) => `${record.temperatureCode}-${record.temperature}`,
+        render: (text, record) => `${record.temperatureCode ? `${record.temperatureCode}-` : ''}${record.temperature}`,
       },
       {
         title: '危险品标识',
@@ -394,7 +400,7 @@ class Order extends Component {
       <div>
         <Modal
           width="1200px"
-          title="多肽氨基酸列表"
+          title="产品列表"
           visible={visible}
           onOk={this.handleOk}
           onCancel={this.handleCancel}
@@ -409,7 +415,7 @@ class Order extends Component {
                 bordered
                 dataSource={data.list}
                 columns={columns}
-                scroll={{ x: tableWidth, y: 350 }}
+                scroll={{ x: tableWidth + 100, y: 350 }}
                 rowKey="code"
                 rowSelection={rowSelection}
                 loading={loading}

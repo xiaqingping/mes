@@ -22,6 +22,9 @@ const { Option } = Select;
  * 页面顶部筛选表单
  */
 @Form.create()
+@connect(({ peptide }) => ({
+  peptide,
+}))
 class Search extends Component {
   componentDidMount() {
     this.submit();
@@ -41,11 +44,8 @@ class Search extends Component {
   renderForm = () => {
     const {
       form: { getFieldDecorator },
-      regions,
-      offices,
-      payMethods,
-      payTerms,
-      rangeArea,
+      peptide:
+      { regions, offices, payMethods, payTerms, commonData },
     } = this.props;
     return (
       <Form onSubmit={this.submit} layout="inline">
@@ -124,7 +124,7 @@ class Search extends Component {
               {getFieldDecorator('rangeOrganization', { initialValue: '' })(
                 <Select>
                   <Option value="">全部</Option>
-                  {rangeArea.map(item => <Option key={item.id} value={item.id}>
+                  {commonData.rangeArea.map(item => <Option key={item.id} value={item.id}>
                     {item.name}
                   </Option>)}
                 </Select>)}
@@ -179,18 +179,27 @@ class Customer extends Component {
     modificationType: [],
   }
 
-  componentWillReceiveProps(nextProps) {
-    this.setState({
-      visible: nextProps.visible,
-    })
+  componentDidMount() {
+    this.props.onRef(this)
+  }
+  // componentWillReceiveProps(nextProps) {
+  //   this.setState({
+  //     visible: nextProps.visible,
+  //   })
+  // }
+
+  visibleShow = visible => {
+    this.setState({ visible })
   }
 
   handleOk = () => {
-    this.props.getData(this.state.data);
+    if (this.state.data.length !== 0) {
+      this.props.getData(this.state.data);
+      this.handleCancel()
+    }
   };
 
   handleCancel = () => {
-    this.props.closeMask(false);
     this.setState({
       visible: false,
     });
@@ -237,7 +246,7 @@ class Customer extends Component {
       modificationType,
     } = this.state;
     const data = { list, pagination: { current, pageSize, total } };
-    const { peptide: { commonData }, regions, offices, payMethods, payTerms } = this.props
+    const { peptide: { commonData } } = this.props
     let tableWidth = 0;
 
     let columns = [
@@ -347,11 +356,6 @@ class Customer extends Component {
               getTableData={this.getTableData}
               status={commonData.status}
               modificationType={modificationType}
-              regions={regions}
-              offices={offices}
-              payMethods={payMethods}
-              payTerms={payTerms}
-              rangeArea={commonData.rangeArea}
              />
             <div className="tableListOperator">
             </div>

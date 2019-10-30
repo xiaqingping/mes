@@ -22,6 +22,9 @@ const { Option } = Select;
  * 页面顶部筛选表单
  */
 @Form.create()
+@connect(({ peptide }) => ({
+  peptide,
+}))
 class Search extends Component {
   componentDidMount() {
     this.submit();
@@ -41,12 +44,8 @@ class Search extends Component {
   renderForm = () => {
     const {
       form: { getFieldDecorator },
-      regions,
-      offices,
-      payMethods,
-      payTerms,
-      rangeArea,
-      currencys,
+      peptide:
+      { regions, offices, payMethods, payTerms, currencys, commonData },
     } = this.props;
     return (
       <Form onSubmit={this.submit} layout="inline">
@@ -156,7 +155,7 @@ class Search extends Component {
               {getFieldDecorator('rangeOrganization', { initialValue: '' })(
                 <Select>
                   <Option value="">全部</Option>
-                  {rangeArea.map(item => <Option key={item.id} value={item.id}>
+                  {commonData.rangeArea.map(item => <Option key={item.id} value={item.id}>
                     {item.name}
                   </Option>)}
                 </Select>)}
@@ -201,18 +200,22 @@ class SubCustomer extends Component {
     modificationType: [],
   }
 
-  componentWillReceiveProps(nextProps) {
-    this.setState({
-      visible: nextProps.visible,
-    })
+  componentDidMount() {
+    this.props.onRef(this)
+  }
+
+  visibleShow = visible => {
+    this.setState({ visible })
   }
 
   handleOk = () => {
-    this.props.getData(this.state.data);
+    if (this.state.data.length !== 0) {
+      this.props.getData(this.state.data);
+      this.handleCancel()
+    }
   };
 
   handleCancel = () => {
-    this.props.closeMask(false);
     this.setState({
       visible: false,
     });
