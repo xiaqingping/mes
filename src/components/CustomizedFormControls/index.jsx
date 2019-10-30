@@ -236,10 +236,10 @@ export class MobilePhoneInput extends React.Component {
           {
             countryDiallingCodes.map(e => (
               <Option
-                key={e.countryCode + e.diallingCode}
+                key={e.diallingCode}
                 value={e.diallingCode}
               >
-                {e.countryCode} {e.diallingCode}
+                {e.diallingCode}
               </Option>
             ))
           }
@@ -294,10 +294,10 @@ export class TelphoneInput extends React.Component {
           {
             countryDiallingCodes.map(e => (
               <Option
-                key={e.countryCode + e.diallingCode}
+                key={e.diallingCode}
                 value={e.diallingCode}
               >
-                {e.countryCode} {e.diallingCode}
+                {e.diallingCode}
               </Option>
             ))
           }
@@ -311,6 +311,9 @@ export class TelphoneInput extends React.Component {
 }
 
 // 传真
+@connect(({ basicCache }) => ({
+  countryDiallingCodes: basicCache.countryDiallingCodes,
+}))
 export class FaxInput extends React.Component {
   static getDerivedStateFromProps(nextProps) {
     if ('value' in nextProps) {
@@ -344,11 +347,20 @@ export class FaxInput extends React.Component {
 
   render() {
     const { faxCountryCode, faxAreaCode, fax, faxExtension } = this.state;
+    const { countryDiallingCodes } = this.props;
     return (
       <InputGroup compact>
         <Select value={faxCountryCode} style={{ width: '30%' }} onChange={val => this.valueChange({ faxCountryCode: val })}>
-          <Option value="+86">+86</Option>
-          <Option value="+01">+01</Option>
+          {
+            countryDiallingCodes.map(e => (
+              <Option
+                key={e.diallingCode}
+                value={e.diallingCode}
+              >
+                {e.diallingCode}
+              </Option>
+            ))
+          }
         </Select>
         <Input value={faxAreaCode} style={{ width: '20%' }} onChange={e => this.valueChange({ faxAreaCode: e.target.value })}/>
         <Input value={fax} style={{ width: '30%' }} onChange={e => this.valueChange({ fax: e.target.value })}/>
