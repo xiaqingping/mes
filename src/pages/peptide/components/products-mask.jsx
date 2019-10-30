@@ -398,7 +398,7 @@ class Order extends Component {
     //       this.setState({
     //           data: selectedRows[0],
     //         })
-    //     },
+    //    },
     // }
 
     return (
