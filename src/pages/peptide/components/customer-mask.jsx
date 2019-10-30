@@ -175,7 +175,6 @@ class Customer extends Component {
     total: 0,
     loading: false,
     visible: false, // 遮罩层的判断
-    data: [],
     modificationType: [],
   }
 
@@ -192,11 +191,9 @@ class Customer extends Component {
     this.setState({ visible })
   }
 
-  handleOk = () => {
-    if (this.state.data.length !== 0) {
-      this.props.getData(this.state.data);
-      this.handleCancel()
-    }
+  handleSelect = data => {
+    this.props.getData(data);
+    this.handleCancel()
   };
 
   handleCancel = () => {
@@ -325,6 +322,14 @@ class Customer extends Component {
         dataIndex: 'industryText',
         width: 100,
       },
+      {
+        title: '操作',
+        dataIndex: 'actions',
+        fixed: 'right',
+        render: (text, record) => (
+          <a onClick={() => this.handleSelect(record)}>选择</a>
+        ),
+      },
     ];
 
     columns = columns.map(col => {
@@ -334,14 +339,14 @@ class Customer extends Component {
       return col
     });
 
-    const rowSelection = {
-      type: 'radio',
-      onChange: (selectedRowKeys, selectedRows) => {
-          this.setState({
-              data: selectedRows[0],
-            })
-        },
-    }
+    // const rowSelection = {
+    //   type: 'radio',
+    //   onChange: (selectedRowKeys, selectedRows) => {
+    //       this.setState({
+    //           data: selectedRows[0],
+    //         })
+    //     },
+    // }
 
     return (
       <div>
@@ -351,6 +356,7 @@ class Customer extends Component {
           visible={visible}
           onOk={this.handleOk}
           onCancel={this.handleCancel}
+          footer={null}
         >
             <Search
               getTableData={this.getTableData}
@@ -365,7 +371,7 @@ class Customer extends Component {
               scroll={{ x: tableWidth, y: 300 }}
               pagination={data.pagination}
               rowKey="code"
-              rowSelection={rowSelection}
+              // rowSelection={rowSelection}
               loading={loading}
               onChange={this.handleStandardTableChange}
               />

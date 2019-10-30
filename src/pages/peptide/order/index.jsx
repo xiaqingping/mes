@@ -30,8 +30,9 @@ const { Search } = Input;
 
 
 @Form.create()
-@connect(({ peptide }) => ({
+@connect(({ peptide, global }) => ({
   peptide,
+  language: global.languageCode,
 }))
 class SearchPage extends Component {
   constructor(props) {
@@ -319,8 +320,9 @@ class EditableCell extends React.Component {
   }
 }
 
-@connect(({ peptide }) => ({
+@connect(({ peptide, global }) => ({
   peptide,
+  language: global.languageCode,
 }))
 class Order extends Component {
   constructor(props) {
@@ -351,6 +353,7 @@ class Order extends Component {
     })
     dispatch({
       type: 'peptide/getOffices', // 销售网点
+      payload: { type: 'offices' },
     })
     dispatch({
       type: 'peptide/getInvtypes', // 开票方式
@@ -368,12 +371,16 @@ class Order extends Component {
 
   componentWillReceiveProps(nextProps) {
     const { peptide:
-      { regions, offices, invtypes, payMethods, payTerms, currencys },
+      { regions, offices, invtypes, payMethods, payTerms, currencys, language },
      } = nextProps
     if (nextProps) {
       this.setState({
-        regions,
-        offices,
+        regions: regions.filter(
+          e => e.languageCode === language,
+        ),
+        offices: offices.filter(
+          e => e.languageCode === language,
+        ),
         invtypes,
         payMethods,
         payTerms,
@@ -454,7 +461,6 @@ class Order extends Component {
     const { peptide: { commonData } } = this.props
     const data = { list, pagination: { current, pageSize, total } };
     let tableWidth = 0;
-
     let columns = [
       {
         title: '编号',

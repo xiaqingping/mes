@@ -107,7 +107,6 @@ class Order extends Component {
     total: 0,
     loading: false,
     visible: false, // 遮罩层的判断
-    data: [],
   }
 
   componentDidMount () {
@@ -118,11 +117,9 @@ class Order extends Component {
     this.setState({ visible })
   }
 
-  handleOk = () => {
-    if (this.state.data.length !== 0) {
-      this.props.getData(this.state.data);
-      this.handleCancel()
-    }
+  handleSelect = data => {
+    this.props.getData(data);
+    this.handleCancel()
   };
 
   handleCancel = () => {
@@ -377,6 +374,14 @@ class Order extends Component {
                 </Fragment>)
         },
       },
+      {
+        title: '操作',
+        dataIndex: 'actions',
+        fixed: 'right',
+        render: (text, record) => (
+          <a onClick={() => this.handleSelect(record)}>选择</a>
+        ),
+      },
     ];
 
 
@@ -387,14 +392,14 @@ class Order extends Component {
       return col
     });
 
-    const rowSelection = {
-      type: 'radio',
-      onChange: (selectedRowKeys, selectedRows) => {
-          this.setState({
-              data: selectedRows[0],
-            })
-        },
-    }
+    // const rowSelection = {
+    //   type: 'radio',
+    //   onChange: (selectedRowKeys, selectedRows) => {
+    //       this.setState({
+    //           data: selectedRows[0],
+    //         })
+    //     },
+    // }
 
     return (
       <div>
@@ -404,6 +409,7 @@ class Order extends Component {
           visible={visible}
           onOk={this.handleOk}
           onCancel={this.handleCancel}
+          footer={null}
         >
             <Search getTableData={this.getTableData} status={commonData.status}/>
             <div className="tableListOperator">
@@ -414,7 +420,7 @@ class Order extends Component {
                 scroll={{ x: tableWidth, y: 400 }}
                 pagination={data.pagination}
                 rowKey="code"
-                rowSelection={rowSelection}
+                // rowSelection={rowSelection}
                 loading={loading}
                 onChange={this.handleStandardTableChange}
                />

@@ -25,8 +25,9 @@ const { Search } = Input;
  * 页面顶部筛选表单
  */
 @Form.create()
-@connect(({ peptide }) => ({
+@connect(({ peptide, global }) => ({
   peptide,
+  language: global.languageCode,
 }))
 class SearchPage extends Component {
   constructor(props) {
@@ -71,8 +72,15 @@ class SearchPage extends Component {
         currencys,
       },
       openAddressMask,
+      language,
     } = this.props;
     const { factorys, plusStatus } = this.state;
+    const regionsData = regions.filter(
+      e => e.languageCode === language,
+    )
+    const officesData = offices.filter(
+      e => e.languageCode === language,
+    )
 
     return (
       <Form layout="inline">
@@ -111,7 +119,7 @@ class SearchPage extends Component {
           <Col lg={6} md={8} sm={12}>
             <FormItem label="销售大区">
               {getFieldDecorator('regionCode', { initialValue: '3100' })(<Select dropdownMenuStyle={{ display: 'none' }}>
-                {regions.map(item =>
+                {regionsData.map(item =>
                       <Option key={item.code} value={item.code}>{`${item.code}-${item.name}`}</Option>,
                     )}
                 </Select>)}
@@ -125,7 +133,7 @@ class SearchPage extends Component {
           <Col lg={6} md={8} sm={12}>
             <FormItem label="销售网点">
               {getFieldDecorator('officeCode', { initialValue: '998' })(<Select dropdownMenuStyle={{ display: 'none' }}>
-                {offices.map(item =>
+                {officesData.map(item =>
                       <Option key={item.code} value={item.code}>{`${item.code}-${item.name}`}</Option>,
                     )}
                 </Select>)}

@@ -171,7 +171,6 @@ class Order extends Component {
     total: 0,
     loading: false,
     visible: false, // 遮罩层的判断
-    data: [],
     dataSon: [],
     loadingSon: false,
   }
@@ -186,11 +185,9 @@ class Order extends Component {
     })
   }
 
-  handleOk = () => {
-    if (this.state.data.length !== 0) {
-      this.props.getData(this.state.data);
-      this.handleCancel()
-    }
+  handleSelect = data => {
+    this.props.getData(data);
+    this.handleCancel()
   };
 
   handleCancel = () => {
@@ -364,6 +361,14 @@ class Order extends Component {
           return '状态异常(促销)'
         },
       },
+      {
+        title: '操作',
+        dataIndex: 'actions',
+        fixed: 'right',
+        render: (text, record) => (
+          <a onClick={() => this.handleSelect(record)}>选择</a>
+        ),
+      },
     ];
 
     const columnSon = [
@@ -387,14 +392,14 @@ class Order extends Component {
       return col
     });
 
-    const rowSelection = {
-      type: 'radio',
-      onChange: (selectedRowKeys, selectedRows) => {
-          this.setState({
-              data: selectedRows[0],
-            })
-        },
-    }
+    // const rowSelection = {
+    //   type: 'radio',
+    //   onChange: (selectedRowKeys, selectedRows) => {
+    //       this.setState({
+    //           data: selectedRows[0],
+    //         })
+    //     },
+    // }
 
     return (
       <div>
@@ -404,6 +409,7 @@ class Order extends Component {
           visible={visible}
           onOk={this.handleOk}
           onCancel={this.handleCancel}
+          footer={null}
         >
             <Search getTableData={this.getTableData} brands={commonData.brands}
             rangeArea={commonData.rangeArea}/>
@@ -415,9 +421,9 @@ class Order extends Component {
                 bordered
                 dataSource={data.list}
                 columns={columns}
-                scroll={{ x: tableWidth + 100, y: 350 }}
+                scroll={{ x: tableWidth, y: 350 }}
                 rowKey="code"
-                rowSelection={rowSelection}
+                // rowSelection={rowSelection}
                 loading={loading}
                 onChange={this.handleStandardTableChange}
                 onRow={record => ({ onClick: e => this.dataSon(record, e) }) }
