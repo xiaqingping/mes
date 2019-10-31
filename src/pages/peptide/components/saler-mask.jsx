@@ -22,8 +22,9 @@ const { Option } = Select;
  * 页面顶部筛选表单
  */
 @Form.create()
-@connect(({ peptide }) => ({
+@connect(({ peptide, global }) => ({
   peptide,
+  language: global.languageCode,
 }))
 class Search extends Component {
   componentDidMount() {
@@ -44,31 +45,38 @@ class Search extends Component {
   renderForm = () => {
     const {
       form: { getFieldDecorator },
-      peptide:
-      { regions, offices },
+      peptide,
+      language,
     } = this.props;
+
+    const regions = peptide.regions.filter(
+      e => e.languageCode === language,
+    )
+    const offices = peptide.offices.filter(
+      e => e.languageCode === language,
+    )
     return (
       <Form onSubmit={this.submit} layout="inline">
         <Row gutter={{ lg: 24, md: 12, sm: 6 }}>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="编号">
-              {getFieldDecorator('code')(<Input />)}
+              {getFieldDecorator('code')(<Input style={{ width: '192px' }}/>)}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="姓名">
-              {getFieldDecorator('name')(<Input />)}
+              {getFieldDecorator('name')(<Input style={{ width: '192px' }}/>)}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="销售组织">
-              {getFieldDecorator('organizationName')(<Input />)}
+              {getFieldDecorator('organizationName')(<Input style={{ width: '192px' }}/>)}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="大区">
               {getFieldDecorator('regionCode', { initialValue: '' })(
-                <Select>
+                <Select style={{ width: '192px' }}>
                   <Option value="">全部</Option>
                   {regions.map(item => <Option key={item.code} value={item.code}>
                     {`${item.code}-${item.name}`}
@@ -79,7 +87,7 @@ class Search extends Component {
           <Col lg={6} md={8} sm={12}>
             <FormItem label="网点">
               {getFieldDecorator('officeCode', { initialValue: '' })(
-                <Select>
+                <Select style={{ width: '192px' }}>
                   <Option value="">全部</Option>
                   {offices.map(item => <Option key={item.code} value={item.code}>
                     {`${item.code}-${item.name}`}
@@ -89,17 +97,17 @@ class Search extends Component {
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="部门">
-              {getFieldDecorator('department')(<Input />)}
+              {getFieldDecorator('department')(<Input style={{ width: '192px' }}/>)}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="个人手机">
-              {getFieldDecorator('personalMobNo')(<Input />)}
+              {getFieldDecorator('personalMobNo')(<Input style={{ width: '192px' }}/>)}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="工作手机">
-              {getFieldDecorator('mobNo')(<Input />)}
+              {getFieldDecorator('mobNo')(<Input style={{ width: '192px' }}/>)}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
@@ -293,6 +301,7 @@ class Saler extends Component {
           visible={visible}
           onOk={this.handleOk}
           onCancel={this.handleCancel}
+          footer={null}
         >
             <Search
               getTableData={this.getTableData}

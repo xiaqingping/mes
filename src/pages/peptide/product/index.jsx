@@ -60,7 +60,7 @@ class SearchPage extends Component {
         </Col>
         <Col lg={6} md={8} sm={12}>
           <FormItem label="纯度">
-            {getFieldDecorator('purity')(<Select
+            {getFieldDecorator('purityID')(<Select
                   >
                     {purityValue.map(item =>
                       // eslint-disable-next-line no-unused-expressions
@@ -268,10 +268,11 @@ class Product extends Component {
   saveRow = index => {
     this.props.form.validateFields((error, row) => {
       if (error) return;
+      console.log(row.purityID)
       const { list } = this.state;
       const newData = { ...list[index],
         ...row,
-isNeedDesalting: row.isNeedDesalting ? 1 : 2,
+        isNeedDesalting: row.isNeedDesalting ? 1 : 2,
         aminoAcidMinimumCharge: 0,
         purityID: row.purityID.split('-')[0],
         purityCode: row.purityID.split('-')[1],
@@ -359,7 +360,7 @@ isNeedDesalting: row.isNeedDesalting ? 1 : 2,
         inputType: (
           <Select style={{ width: '90%' }}>
           {purityValue.map(item =>
-            <Option value={`${item.id}-${item.code}-${item.name}`} key={item.id}>{item.purity}</Option>,
+            <Option value={`${item.id}-${item.code}-${item.purity}`} key={item.id}>{item.purity}</Option>,
           )}
           </Select>),
         rules: [
@@ -501,7 +502,7 @@ isNeedDesalting: row.isNeedDesalting ? 1 : 2,
         <Card bordered={false}>
           <div className="tableList">
             <SearchPage getTableData={this.getTableData}
-            purityValue={purityValue.map(item => item)} status={commonData.status}/>
+            purityValue={purityValue} status={commonData.status}/>
             <div className="tableListOperator">
               <Button icon="plus" type="primary" onClick={() => this.handleAdd()}>
                 新建

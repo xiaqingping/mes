@@ -90,12 +90,22 @@ class SearchPage extends Component {
     const {
       form: { getFieldDecorator },
       peptide: {
-        regions,
-        offices,
-        currencys,
         commonData,
       },
+      peptide,
+      language,
     } = this.props;
+    const regions = peptide.regions.filter(
+      e => e.languageCode === language,
+    )
+
+    const offices = peptide.offices.filter(
+      e => e.languageCode === language,
+    )
+    const currencys = peptide.currencys.filter(
+      e => e.languageCode === language,
+    )
+
     return (
       <Form onSubmit={this.submit} layout="inline">
         <Row gutter={{ lg: 24, md: 12, sm: 6 }}>
@@ -130,8 +140,8 @@ class SearchPage extends Component {
                 <Select>
                   <Option value="">全部</Option>
                   {currencys.map(item =>
-                 <Option key={item.code} value={item.code}>{`${item.code}-${item.name}`}</Option>,
-               )}
+                  <Option key={item.code} value={item.code}>{`${item.code}-${item.shortText}`}</Option>,
+                )}
                 </Select>,
               )}
             </FormItem>
@@ -139,12 +149,12 @@ class SearchPage extends Component {
           <Col lg={6} md={8} sm={12}>
             <FormItem label="销售网点">
               {getFieldDecorator('officeCode', { initialValue: '' })(
-               <Select>
-               <Option value="">全部</Option>
-               {offices.map(item =>
-                 <Option key={item.code} value={item.code}>{`${item.code}-${item.name}`}</Option>,
-               )}
-               </Select>)}
+                <Select>
+                <Option value="">全部</Option>
+                {offices.map(item =>
+                  <Option key={item.code} value={item.code}>{`${item.code}-${item.name}`}</Option>,
+                )}
+                </Select>)}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
@@ -172,7 +182,7 @@ class SearchPage extends Component {
             <FormItem label="销售渠道">
               {getFieldDecorator('rangeChannel', { initialValue: '' })(
                 <Select>
-                 {commonData.rangeChannel.map(item =>
+                  {commonData.rangeChannel.map(item =>
                     <Option key={item.id} value={item.id}>{item.name}</Option>,
                   )}
                   </Select>)}
@@ -337,56 +347,39 @@ class Order extends Component {
       loading: false,
       selectedRows: [],
       editIndex: -1,
-      regions: [], // 销售大区
-      offices: [], // 销售网点
-      invtypes: [], // 开票方式
-      payMethods: [], // 付款方式
-      payTerms: [], // 付款条件
-      currencys: [], // 货币类型
     }
   }
 
   componentDidMount() {
     const { dispatch } = this.props;
     dispatch({
-      type: 'peptide/getRegions', // 销售大区
+      type: 'peptide/getCache', // 销售大区
+      payload: { type: 'regions' },
     })
     dispatch({
-      type: 'peptide/getOffices', // 销售网点
+      type: 'peptide/getCache', // 销售网点
       payload: { type: 'offices' },
     })
     dispatch({
-      type: 'peptide/getInvtypes', // 开票方式
+      type: 'peptide/getCache', // 开票方式
+      payload: { type: 'invtypes' },
     })
     dispatch({
-      type: 'peptide/getPaymethods', // 付款方式
+      type: 'peptide/getCache', // 付款方式
+      payload: { type: 'paymethods' },
     })
     dispatch({
-      type: 'peptide/getPayterms', // 付款条件
+      type: 'peptide/getCache', // 付款条件
+      payload: { type: 'payterms' },
     })
     dispatch({
-      type: 'peptide/getCurrencys', // 货币类型
+      type: 'peptide/getCache', // 货币类型
+      payload: { type: 'currencys' },
     })
-  }
-
-  componentWillReceiveProps(nextProps) {
-    const { peptide:
-      { regions, offices, invtypes, payMethods, payTerms, currencys, language },
-     } = nextProps
-    if (nextProps) {
-      this.setState({
-        regions: regions.filter(
-          e => e.languageCode === language,
-        ),
-        offices: offices.filter(
-          e => e.languageCode === language,
-        ),
-        invtypes,
-        payMethods,
-        payTerms,
-        currencys,
-      });
-    }
+    dispatch({
+      type: 'peptide/getCache', // 销售范围
+      payload: { type: 'salesranges' },
+    })
   }
 
   handleStandardTableChange = pagination => {
@@ -451,14 +444,20 @@ class Order extends Component {
       list,
       total,
       loading,
-      regions,
-      offices,
-      invtypes,
-      payMethods,
-      payTerms,
-      currencys,
     } = this.state;
-    const { peptide: { commonData } } = this.props
+
+    const { peptide: { commonData, invtypes, paymethods, payterms },
+     peptide, language } = this.props
+
+    const regions = peptide.regions.filter(
+      e => e.languageCode === language,
+    )
+    const offices = peptide.offices.filter(
+      e => e.languageCode === language,
+    )
+    const currencys = peptide.currencys.filter(
+      e => e.languageCode === language,
+    )
     const data = { list, pagination: { current, pageSize, total } };
     let tableWidth = 0;
     let columns = [
@@ -558,7 +557,7 @@ class Order extends Component {
         dataIndex: 'paymentMethod',
         width: 100,
         render(text) {
-          return formatter(payMethods, text, 'code', 'name');
+          return formatter(paymethods, text, 'code', 'name');
         },
       },
       {
@@ -566,7 +565,7 @@ class Order extends Component {
         dataIndex: 'paymentTerm',
         width: 250,
         render(text) {
-          return `${text} - ${formatter(payTerms, text, 'code', 'name')}`;
+          return `${text} - ${formatter(payterms, text, 'code', 'name')}`;
         },
       },
       {

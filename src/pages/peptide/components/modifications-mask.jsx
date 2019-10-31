@@ -113,7 +113,6 @@ class Order extends Component {
     total: 0,
     loading: false,
     visible: false, // 遮罩层的判断
-    data: [],
     modificationType: [],
   }
 

@@ -22,6 +22,9 @@ const { Option } = Select;
  * 页面顶部筛选表单
  */
 @Form.create()
+@connect(({ peptide }) => ({
+  peptide,
+}))
 class Search extends Component {
   componentDidMount() {
     this.submit();
@@ -41,53 +44,53 @@ class Search extends Component {
   renderForm = () => {
     const {
       form: { getFieldDecorator },
-      rangeArea,
+      peptide: { salesranges },
     } = this.props;
     return (
       <Form onSubmit={this.submit} layout="inline">
         <Row gutter={{ lg: 24, md: 12, sm: 6 }}>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="编号">
-              {getFieldDecorator('code')(<Input />)}
+              {getFieldDecorator('code')(<Input style={{ width: '192px' }}/>)}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="名称">
-              {getFieldDecorator('name')(<Input />)}
+              {getFieldDecorator('name')(<Input style={{ width: '192px' }}/>)}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="电话">
-              {getFieldDecorator('telNo')(<Input />)}
+              {getFieldDecorator('telNo')(<Input style={{ width: '192px' }}/>)}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="手机">
-              {getFieldDecorator('mobNo')(<Input />)}
+              {getFieldDecorator('mobNo')(<Input style={{ width: '192px' }}/>)}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="邮箱">
-              {getFieldDecorator('email')(<Input />)}
+              {getFieldDecorator('email')(<Input style={{ width: '192px' }}/>)}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="负责人编号">
-              {getFieldDecorator('subcustomerCode')(<Input />)}
+              {getFieldDecorator('subcustomerCode')(<Input style={{ width: '192px' }}/>)}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="负责人名称">
-              {getFieldDecorator('subcustomerName')(<Input />)}
+              {getFieldDecorator('subcustomerName')(<Input style={{ width: '192px' }}/>)}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="销售范围">
               {getFieldDecorator('rangeOrganization', { initialValue: '' })(
-                <Select>
+                <Select style={{ width: '192px' }}>
                   <Option value="">全部</Option>
-                  {rangeArea.map(item => <Option key={item.id} value={item.id}>
-                    {item.name}
+                  {salesranges.map(item => <Option key={`${item.organization}${item.channel}`} value={`${item.channelName} - ${item.organizationName}`}>
+                  {`${item.channelName} - ${item.organizationName}`}
                   </Option>)}
                 </Select>)}
             </FormItem>
@@ -308,12 +311,12 @@ class Customer extends Component {
           visible={visible}
           onOk={this.handleOk}
           onCancel={this.handleCancel}
+          footer={null}
         >
             <Search
               getTableData={this.getTableData}
               status={commonData.status}
               modificationType={modificationType}
-              rangeArea={commonData.rangeArea}
              />
             <div className="tableListOperator">
             </div>
