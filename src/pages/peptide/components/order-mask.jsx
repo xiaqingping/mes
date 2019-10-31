@@ -25,7 +25,11 @@ const { Search } = Input;
  * 页面顶部筛选表单
  */
 @Form.create()
-class SearchPage extends Component {
+@connect(({ peptide, global }) => ({
+  peptide,
+  language: global.languageCode,
+}))
+class AddPage extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -59,19 +63,25 @@ class SearchPage extends Component {
   renderForm = () => {
     const {
       form: { getFieldDecorator, getFieldValue },
-      rangeArea,
-      regions,
-      offices,
-      invtypes,
-      payMethods,
-      invoiceByGoodsStatus,
-      deliveryTypeStatus,
-      orderTypeStatus,
-      currencys,
+      peptide: {
+        commonData,
+        invtypes,
+        paymethods,
+      },
+      peptide,
       openAddressMask,
+      language,
     } = this.props;
     const { factorys, plusStatus } = this.state;
-
+    const regions = peptide.regions.filter(
+      e => e.languageCode === language,
+    )
+    const offices = peptide.offices.filter(
+      e => e.languageCode === language,
+    )
+    const currencys = peptide.currencys.filter(
+      e => e.languageCode === language,
+    )
     return (
       <Form layout="inline">
         <Row gutter={{ lg: 24, md: 12, sm: 6 }}>
@@ -95,7 +105,7 @@ class SearchPage extends Component {
           <Col lg={6} md={8} sm={12}>
             <FormItem label="销售范围">
               {getFieldDecorator('range', { initialValue: '10-3110' })(<Select>
-                  {rangeArea.map(item =>
+                  {commonData.rangeArea.map(item =>
                       <Option key={item.id} value={item.id}>{item.name}</Option>,
                     )}
                 </Select>)}
@@ -170,7 +180,7 @@ class SearchPage extends Component {
           <Col lg={6} md={8} sm={12}>
             <FormItem label="付款方式">
               {getFieldDecorator('paymentMethod')(<Select>
-                {payMethods.map(item =>
+                {paymethods.map(item =>
                       <Option key={item.code} value={item.code}>{`${item.code}-${item.name}`}</Option>,
                     )}
                 </Select>)}
@@ -196,7 +206,7 @@ class SearchPage extends Component {
           <Col lg={6} md={8} sm={12}>
             <FormItem label="随货开票">
               {getFieldDecorator('invoiceByGoods', { initialValue: 0 })(<Select>
-                {invoiceByGoodsStatus.map(item =>
+                {commonData.invoiceByGoodsStatus.map(item =>
                       <Option key={item.id} value={item.id}>{item.name}</Option>,
                     )}
                 </Select>)}
@@ -225,7 +235,7 @@ class SearchPage extends Component {
           <Col lg={6} md={8} sm={12}>
             <FormItem label="交货方式">
               {getFieldDecorator('deliveryType', { initialValue: '01' })(<Select dropdownMenuStyle={{ display: 'none' }}>
-                {deliveryTypeStatus.map(item =>
+                {commonData.deliveryTypeStatus.map(item =>
                       <Option key={item.id} value={item.id}>{`${item.id}-${item.name}`}</Option>,
                     )}
                 </Select>)}
@@ -260,7 +270,7 @@ class SearchPage extends Component {
           <Col lg={6} md={8} sm={12}>
             <FormItem label="订单类型">
               {getFieldDecorator('orderTypeStatus', { initialValue: 0 })(<Select>
-                {orderTypeStatus.map(item =>
+                {commonData.orderTypeStatus.map(item =>
                       <Option key={item.id} value={item.id}>{item.name}</Option>,
                     )}
                 </Select>)}
@@ -268,7 +278,7 @@ class SearchPage extends Component {
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="运费">
-              {getFieldDecorator('freight', { initialValue: 23.00.toFixed(2) })(<Input />)}
+              {getFieldDecorator('freight', { initialValue: 0.00.toFixed(2) })(<Input />)}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
@@ -290,7 +300,7 @@ class SearchPage extends Component {
             <FormItem label="币种">
               {getFieldDecorator('currency', { initialValue: 'CNY' })(<Select dropdownMenuStyle={{ display: 'none' }}>
                 {currencys.map(item =>
-                      <Option key={item.code} value={item.code}>{`${item.code}-${item.name}`}</Option>,
+                      <Option key={item.code} value={item.code}>{`${item.code}-${item.shortText}`}</Option>,
                     )}
                 </Select>)}
             </FormItem>
@@ -371,8 +381,9 @@ class SearchPage extends Component {
   }
 }
 
-@connect(({ peptide }) => ({
+@connect(({ peptide, global }) => ({
   peptide,
+  language: global.languageCode,
 }))
 class Order extends Component {
   state = {
@@ -384,24 +395,24 @@ class Order extends Component {
     total: 0,
     loading: false,
     visible: false, // 遮罩层的判断
-    data: [],
     dataSon: [],
     loadingSon: false,
     visibleAddress: false,
   }
 
-  componentWillReceiveProps(nextProps) {
-    this.setState({
-      visible: nextProps.visible,
-    })
+  componentDidMount() {
+    this.props.onRef(this)
+  }
+
+  visibleShow = visible => {
+    this.setState({ visible })
   }
 
   handleOk = () => {
-    this.props.getData(this.state.data);
+    this.handleCancel()
   };
 
   handleCancel = () => {
-    this.props.closeMask(false)
     this.setState({
       visible: false,
     });
@@ -477,8 +488,6 @@ class Order extends Component {
       visibleAddress,
     } = this.state;
     const data = { list, pagination: { current, pageSize, total } };
-    const { peptide: { commonData }, regions,
-    offices, invtypes, payMethods, currencys } = this.props
     let tableWidth = 0;
     let tableWidthSon = 0;
 
@@ -638,7 +647,6 @@ class Order extends Component {
       },
     ];
 
-
     columns = columns.map(col => {
       // eslint-disable-next-line no-param-reassign
       if (!col.width) col.width = 100;
@@ -657,7 +665,8 @@ class Order extends Component {
       type: 'radio',
       onChange: (selectedRowKeys, selectedRows) => {
           this.setState({
-              data: selectedRows[0],
+              dataSon: selectedRows[0],
+              loadingSon: true,
             })
         },
     }
@@ -674,16 +683,7 @@ class Order extends Component {
           className="orderMask"
         >
           <div>
-            <SearchPage
-              rangeArea={commonData.rangeArea}
-              regions={regions}
-              offices={offices}
-              invtypes={invtypes}
-              payMethods={payMethods}
-              invoiceByGoodsStatus={commonData.invoiceByGoodsStatus}
-              deliveryTypeStatus= {commonData.deliveryTypeStatus}
-              orderTypeStatus={commonData.orderTypeStatus}
-              currencys={currencys}
+            <AddPage
               openAddressMask={this.openAddressMask}
             />
             <Col span={14}>
@@ -701,10 +701,10 @@ class Order extends Component {
             <Col span={1}></Col>
             <Col span={9}>
               <Table
-                  dataSource={data.list}
+                  dataSource={dataSon}
                   columns={columnSon}
                   scroll={{ x: tableWidthSon, y: 400 }}
-                  loading={loading}
+                  loading={loadingSon}
                   />
             </Col>
             <AddressMask visible={visibleAddress} closeMask={ v => this.closeAddressMask(v)}/>

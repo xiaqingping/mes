@@ -62,15 +62,17 @@ class PurchasingOrg extends React.Component {
   onCascaderChange = obj => {
     const { details } = this.props;
     const { vendor: { purchasingOrganizationList: tabsData } } = details;
+    let { vendor } = details;
     const index = obj.length - 1;
 
     const data = [].concat(tabsData, {
       purchasingOrganizationCode: obj[index],
     });
 
+    vendor = { ...vendor, ...{ purchasingOrganizationList: data } }
     this.props.dispatch({
-      type: 'partnerMaintainEdit/setDetails',
-      payload: { ...details, ...{ vendor: { purchasingOrganizationList: data } } },
+      type: 'partnerMaintainEdit/setSupplier',
+      payload: { ...details, vendor },
     });
 
     this.setState({
@@ -115,7 +117,7 @@ class PurchasingOrg extends React.Component {
     let key = '';
     const { details } = this.props;
     const { vendor: { purchasingOrganizationList: tabsData } } = details;
-
+    let { vendor } = details;
     // 过滤掉关闭的采购组织
     const newTabsData = tabsData.filter((e, i) => {
       if (e.purchasingOrganizationCode !== tabKey) return true;
@@ -141,9 +143,10 @@ class PurchasingOrg extends React.Component {
       key = '';
     }
 
+    vendor = { ...vendor, ...{ purchasingOrganizationList: newTabsData } }
     this.props.dispatch({
-      type: 'partnerMaintainEdit/setDetails',
-      payload: { ...details, ...{ vendor: { purchasingOrganizationList: newTabsData } } },
+      type: 'partnerMaintainEdit/setSupplier',
+      payload: { ...details, vendor },
     });
     this.setState({
       tabKey: key,
@@ -175,7 +178,7 @@ class PurchasingOrg extends React.Component {
         );
       }
     });
-  console.log(this.renderTabPane())
+
     return (
       <Card
         title="采购组织"

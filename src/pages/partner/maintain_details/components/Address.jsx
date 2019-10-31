@@ -1,7 +1,6 @@
 import {
   Card,
   Table,
-  Badge,
 } from 'antd';
 import React, { Component } from 'react';
 import { connect } from 'dva';
