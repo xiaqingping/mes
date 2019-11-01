@@ -65,7 +65,7 @@ RNA合成：王星名
 |   |   |—— **.js 各模块路由
 |   |   |—— index.js 路由入口
 |   |
-|   |—— config.js 配置主入口
+|   |—— config.js 编译时配置文件
 |
 |—— public/ 静态资源文件
 |
@@ -93,8 +93,11 @@ RNA合成：王星名
 |   |
 |   |—— utils/ 工具函数
 |   |
+|   |—— app.js 运行时配置文件
 |   |—— global.jsx 项目入口
 |   |—— global.less 全局样式
+|
+|—— .env 环境变量文件（不提交到远程仓库）
 |
 |—— .gitignore
 |
@@ -108,3 +111,4 @@ RNA合成：王星名
 </code>
 </pre>
 </details>
+mailto:
