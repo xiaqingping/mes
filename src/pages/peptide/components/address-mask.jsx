@@ -199,7 +199,6 @@ class Order extends Component {
       visible,
     } = this.state;
     const data = { list, pagination: { current, pageSize, total } };
-    const { peptide: { commonData } } = this.props
     let tableWidth = 0;
 
     let columns = [

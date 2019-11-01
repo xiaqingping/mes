@@ -15,7 +15,7 @@ import React, { Component } from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import StandardTable from '@/components/StandardTable';
 import api from '@/api';
-import ChooseSources from '@/pages/system/components/ChooseSources'
+import ChooseSources from '@/components/choosse/system/chooseSources'
 
 const EditableContext = React.createContext();
 const FormItem = Form.Item;
@@ -62,6 +62,12 @@ const cityData = {
  */
 @Form.create()
 class Searchs extends Component {
+  state = {
+    visible: false,
+    // cities: cityData[provinceData[0]],
+    // secondCity: cityData[provinceData[0]][0],
+  }
+
   componentDidMount() {
     this.submit();
   }
@@ -72,9 +78,46 @@ class Searchs extends Component {
     this.props.getTableData({ page: 1, ...val });
   }
 
+  // handleProvinceChange = value => {
+  //   console.log(value);
+  //   this.setState({
+  //     cities: cityData[value],
+  //     secondCity: cityData[value][0],
+  //   });
+  // };
+
+  // onSecondCityChange = value => {
+  //   this.setState({
+  //     secondCity: value,
+  //   });
+  // };
+
   // 重置
   handleFormReset = () => {
     this.props.form.resetFields();
+  }
+
+  // 打开搜索
+  openMaskSources = () => {
+    this.setState({
+      visible: true,
+    })
+  }
+
+  closeMaskSources = v => {
+    this.setState({
+      visible: v,
+    })
+  }
+
+  // 得到搜索的值
+  getSources = data => {
+    this.setState({
+      visible: false,
+    })
+    this.props.form.setFieldsValue({
+      sourcePath: data.path,
+    })
   }
 
   // 渲染表单
@@ -82,9 +125,40 @@ class Searchs extends Component {
     const {
       form: { getFieldDecorator },
     } = this.props;
+    const { visible } = this.state;
     return (
       <Form onSubmit={this.submit} layout="inline">
         <Row gutter={{ lg: 24, md: 12, sm: 6 }}>
+          {/* <Col lg={6} md={8} sm={12}>
+            <FormItem label="sheng">
+              {getFieldDecorator('sheng')(
+              <Select
+                defaultValue={provinceData[0]}
+                style={{ width: 120 }}
+                onChange={this.handleProvinceChange}
+              >
+                {provinceData.map(province => (
+                  <Option key={province}>{province}</Option>
+                ))}
+              </Select>,
+              )}
+            </FormItem>
+          </Col>
+          <Col lg={6} md={8} sm={12}>
+            <FormItem label="shi">
+              {getFieldDecorator('shi')(
+              <Select
+                style={{ width: 120 }}
+                value={this.state.secondCity}
+                onChange={this.onSecondCityChange}
+              >
+                {this.state.cities.map(city => (
+                  <Option key={city}>{city}</Option>
+                ))}
+              </Select>,
+              )}
+            </FormItem>
+          </Col> */}
           <Col lg={6} md={8} sm={12}>
             <FormItem label="规则名称">
               {getFieldDecorator('name')(<Input placeholder="请输入"/>)}
@@ -114,11 +188,7 @@ class Searchs extends Component {
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="资源">
-              {getFieldDecorator('sourcePath')(
-                <Search
-                  placeholder="请选择"
-                  onSearch={value => this.showModal(value)}
-              />)}
+              {getFieldDecorator('sourcePath')(<Search placeholder="请选择" onSearch={() => this.openMaskSources()} />)}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
@@ -160,8 +230,16 @@ class Searchs extends Component {
   }
 
   render() {
+    const { visible } = this.state;
     return (
-      <div className="tableListForm">{this.renderForm()}</div>
+      <div className="tableListForm">
+        {this.renderForm()}
+        <ChooseSources
+          visible={visible}
+          getData={v => { this.getSources(v) }}
+          closeMask={ v => { this.closeMaskSources(v) }}
+        />
+      </div>
     );
   }
 }
@@ -311,7 +389,7 @@ class Rule extends Component {
       width: 150,
       editable: true,
       inputType: (
-        <Select style={{ width: '90%' }} value={this.state.secondCity} onChange={this.onSecondCityChange}>
+        <Select style={{ width: '90%' }} initialValue={this.state.secondCity} onChange={this.onSecondCityChange}>
           {this.state.cities.map(city => (
             <Option key={city}>{city}</Option>
           ))}
@@ -429,6 +507,9 @@ class Rule extends Component {
     });
   };
 
+  /**
+   * 增删改查
+   */
   // 获取表格数据
   getTableData = (options = {}) => {
     const { formValues } = this.state;
@@ -488,12 +569,17 @@ class Rule extends Component {
 
   // 删除
   deleteRow = row => {
-    console.log(row);
-    // api.series.cancelSeries(row.id).then(() => {
-    //   this.getTableData();
-    // });
+    row.mark = 'D';
+    const rows = [];
+    rows[0] = row;
+    api.system.saveRules(rows).then(() => {
+      this.getTableData();
+    });
   };
 
+  /**
+   * 编辑行
+   */
   // 开启编辑
   editRow = index => {
     this.setState({
@@ -519,7 +605,11 @@ class Rule extends Component {
     }
   }
 
-    // 打开搜索
+
+  /**
+   * 弹出搜索框
+   */
+  // 打开搜索
   openMask = () => {
     this.setState({
       visible: true,
@@ -534,7 +624,7 @@ class Rule extends Component {
   }
 
   // 得到搜索的值
-  getSources = data => {
+  getData = data => {
     if (data.id) {
       api.system.getSourcesParameterList(data.id).then(res => {
         if (!res.parameterList) {
@@ -575,6 +665,7 @@ class Rule extends Component {
       loading,
       visible,
       sourcesList,
+      cities,
     } = this.state;
     const data = { list, pagination: { current, pageSize, total } };
 
@@ -626,8 +717,11 @@ class Rule extends Component {
             </EditableContext.Provider>
           </div>
         </Card>
-        <ChooseSources getData={v => { this.getSources(v) }} visible={visible}
-        closeMask={ v => { this.closeMask(v) }}/>
+        <ChooseSources
+          visible={visible}
+          getData={v => { this.getData(v) }}
+          closeMask={ v => { this.closeMaskSources(v) }}
+        />
       </PageHeaderWrapper>
     );
   }

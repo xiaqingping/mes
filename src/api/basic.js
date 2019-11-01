@@ -16,7 +16,7 @@ export default {
   },
   // 查询币种列表
   getCurrencys() {
-    return request('/basic/v1/currencys');
+    return request('http://180.167.32.168:8001/currencies/v1');
   },
   // 查询仓库
   getStorages() {
@@ -47,7 +47,7 @@ export default {
     return request('/basic/v1/products', { params });
   },
   // 查询销售范围
-  getSalesRanges() {
+  getSalesranges() {
     return request('/basic/v1/salesranges');
   },
   // 查询采购申请

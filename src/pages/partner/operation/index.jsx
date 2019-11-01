@@ -61,6 +61,7 @@ class Operation extends React.Component {
     partnerVal: [],
   };
 
+  // 业务伙伴搜索数据
   data = {
     huoban: [
       {
@@ -100,10 +101,6 @@ class Operation extends React.Component {
     },
   ],
   };
-
-  val = [];
-
-  select = false;
 
   columns = [
     {
@@ -182,6 +179,7 @@ class Operation extends React.Component {
     })
   }
 
+  // 弹窗显示和详情数据保存
   showDrawer = (record, e) => {
     e.preventDefault();
     this.setState({
@@ -190,6 +188,7 @@ class Operation extends React.Component {
     })
   }
 
+  // 假数据制作
   getData = () => {
     const data = [];
     for (let i = 0; i < 30; i++) {
@@ -269,6 +268,7 @@ class Operation extends React.Component {
     })
   };
 
+  // 展开还是收起
   toggleForm = () => {
     const { expandForm } = this.state;
     this.setState({
@@ -276,6 +276,7 @@ class Operation extends React.Component {
     });
   };
 
+  // 弹框关闭
   detailsVisibleClose = v => {
     this.setState({
       detailsVisible: v,
@@ -427,7 +428,6 @@ class Operation extends React.Component {
       </Form>
     );
   }
-
 
   render() {
     const { list, pagination, loading, selectedRows, detailsVisible, detailsValue } = this.state;

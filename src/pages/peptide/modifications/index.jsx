@@ -66,9 +66,9 @@ class SearchPage extends Component {
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="修饰类型">
-              {getFieldDecorator('modificationTypeID', { initialValue: '' })(
+              {getFieldDecorator('modificationTypeID', { initialValue: '0' })(
                 <Select>
-                  <Option value="">全部</Option>
+                  <Option value="0">全部</Option>
                   {modificationType.map(item => <Option key={item.id} value={item.id}>
                   {item.modificationType}
                   </Option>)}
@@ -170,7 +170,6 @@ class Modifications extends Component {
     dataSon: [],
     selectParantData: false,
     editIndexSon: -1,
-    visible: false, // 遮罩层的判断
     sonAminoAcid: [], // 子氨基酸值
     parantData: [], // 父数据
   }
@@ -197,7 +196,6 @@ class Modifications extends Component {
           selectParantData: true,
           loadingSon: false,
           parantData: v,
-          visible: false,
         })
       }, 500)
   }
@@ -308,23 +306,20 @@ class Modifications extends Component {
       this.props.form.validateFields(error => {
         if (error) return;
         const { parantData, sonAminoAcid } = this.state;
-        this.setState({
-          editIndexSon: -1,
-        });
         const newData = {
-                          name: sonAminoAcid.name,
-                          code: sonAminoAcid.code,
-                          aminoAcidID: sonAminoAcid.id,
-                          modificationID: parantData.id,
-                        };
+          name: sonAminoAcid.name,
+          code: sonAminoAcid.code,
+          aminoAcidID: sonAminoAcid.id,
+          modificationID: parantData.id,
+        };
         if (newData.id > 0) {
           // api.peptideBase.updateSeries(newData).then(() => this.getTableData());
         } else {
           api.peptideBase.insertSuitableAminoAcids(newData).then(() => {
-            this.getTableData([], 'son');
             this.setState({
-              visible: false,
-            })
+              editIndexSon: -1,
+            });
+            this.getTableData([], 'son');
           },
           );
         }
@@ -394,30 +389,25 @@ class Modifications extends Component {
     });
   }
 
-  // 打开搜索
-  openMask = () => {
-    this.setState({
-      visible: true,
-    })
-  }
-
-  closeMask = v => {
-    this.setState({
-      visible: v,
-    })
-  }
-
   // 得到搜索的值
   getSonAminoAcid = data => {
     this.setState({
         sonAminoAcid: data,
-        visible: false,
-      })
-      // console.log(data)
-      this.props.form.setFieldsValue({
-        code: data.code,
-        name: data.name,
-      })
+    })
+    this.props.form.setFieldsValue({
+      code: data.code,
+      name: data.name,
+    })
+  }
+
+  clearInput = () => {
+    this.setState({
+      sonAminoAcid: [],
+    })
+    this.props.form.setFieldsValue({
+      code: '',
+      name: '',
+    })
   }
 
   render() {
@@ -431,7 +421,6 @@ class Modifications extends Component {
       loadingSon,
       modificationType,
       sonAminoAcid,
-      visible,
     } = this.state;
     const data = { list, pagination: { current, pageSize, total } };
     const { peptide: { commonData } } = this.props;
@@ -594,7 +583,7 @@ class Modifications extends Component {
         dataIndex: 'code',
         width: 120,
         editable: true,
-        inputType: <Search style={{ width: '90%' }} onSearch={() => this.openMask()} value={sonAminoAcid.code ? sonAminoAcid.code : ''} readOnly/>,
+        inputType: <Search style={{ width: '90%' }} onSearch={() => this.AminoAcidShow.visibleShow(true)} value={sonAminoAcid.code ? sonAminoAcid.code : ''} readOnly/>,
         rules: [
           { required: true, message: '必填' },
         ],
@@ -770,8 +759,8 @@ class Modifications extends Component {
               </Col>
           </div>
         </Card>
-        <AminoAcid getData={v => { this.getSonAminoAcid(v) }} visible={visible}
-        closeMask={ v => { this.closeMask(v) }}/>
+        <AminoAcid getData={v => { this.getSonAminoAcid(v) }}
+        onRef={ ref => { this.AminoAcidShow = ref }}/>
       </PageHeaderWrapper>
     );
   }
