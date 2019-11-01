@@ -268,6 +268,7 @@ class SearchPage extends Component {
     return expandForm ? this.renderAdvancedForm() : this.renderSimpleForm();
   }
 
+
   render() {
     return (
       <div className="tableListForm">
