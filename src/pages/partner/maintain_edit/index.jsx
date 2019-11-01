@@ -162,9 +162,47 @@ class CustomerEdit extends Component {
   // 修改
   update = () => {
     const { oldDetails } = this.state;
+    const data = JSON.parse(JSON.stringify(this.props.details)) || {};
+    const customer = data.customer || {};
+    const salesAreaList = customer.salesAreaList || [];
+    const addressList = customer.addressList || [];
 
-    console.log(this.props.details);
-    const data = {};
+    // TODO:
+    // 新增收票方
+    salesAreaList.newInvoicePartyList = [];
+    salesAreaList.invoicePartyList.forEach(e => {
+      if (e.id > 0) return;
+      salesAreaList.newInvoicePartyList.push({ id: e.id, soldToPartyId: e.soldToPartyId });
+    });
+    // 删除收票方
+    salesAreaList.deleteInvoicePartyList = [];
+
+    // 新增售达方
+    salesAreaList.newSoldToPartyIdList = [];
+    // 删除售达方
+    salesAreaList.deleteSoldToPartyIdList = [];
+
+    // 新增送达方
+    salesAreaList.newShipToPartyIdList = [];
+    // 删除送达方
+    salesAreaList.deleteShipToPartyIdList = [];
+
+    // 新增销售员
+    salesAreaList.newsalerCodeList = [];
+    // 删除销售员
+    salesAreaList.deletesalerCodeList = [];
+
+    // 新增地址
+    customer.newAddressList = [];
+    addressList.forEach(e => {
+      if (e.id > 0) return;
+      customer.newAddressList.push(e);
+    });
+    // 修改地址
+    customer.modifyAddressList = [];
+    // 删除地址
+    customer.deleteAddressIdList = [];
+
     bp.updateBP(data).then(res => {
       console.log(res);
     });
