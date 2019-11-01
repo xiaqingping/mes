@@ -76,70 +76,26 @@ class CustomerEdit extends Component {
 
   // 获取此页面需要用到的基础数据
   getCacheData() {
-    // 国家
-    this.props.dispatch({
-      type: 'basicCache/getCache',
-      payload: { type: 'countrys' },
-    });
-    // 国家拨号代码
-    this.props.dispatch({
-      type: 'basicCache/getCache',
-      payload: { type: 'countryDiallingCodes' },
-    });
-    // 行业类别
-    this.props.dispatch({
-      type: 'basicCache/getCache',
-      payload: { type: 'industryCategories' },
-    });
-    // 付款方式
-    this.props.dispatch({
-      type: 'basicCache/getCache',
-      payload: { type: 'salesPaymentMethods' },
-    });
-    // 大区+网点
-    this.props.dispatch({
-      type: 'basicCache/getCache',
-      payload: { type: 'regionOffice' },
-    });
-    // 货币
-    this.props.dispatch({
-      type: 'basicCache/getCache',
-      payload: { type: 'currencies' },
-    });
-    // 税分类
-    this.props.dispatch({
-      type: 'basicCache/getCache',
-      payload: { type: 'taxOutputClassifics' },
-    });
-    // 付款条件
-    this.props.dispatch({
-      type: 'basicCache/getCache',
-      payload: { type: 'paymentTerms' },
-    });
-    // 采购组
-    this.props.dispatch({
-      type: 'basicCache/getCache',
-      payload: { type: 'purchaseGroups' },
-    });
-    // 采购组织
-    this.props.dispatch({
-      type: 'basicCache/getCache',
-      payload: { type: 'purchaseOrganizations' },
-    });
-    // 销售范围
-    this.props.dispatch({
-      type: 'basicCache/getCache',
-      payload: { type: 'salesArea' },
-    });
-    // 销售组织
-    this.props.dispatch({
-      type: 'basicCache/getCache',
-      payload: { type: 'salesOrganizations' },
-    });
-    // 分销渠道
-    this.props.dispatch({
-      type: 'basicCache/getCache',
-      payload: { type: 'distributionChannels' },
+    const basicCacheList = [
+      { type: 'countrys' }, // 国家
+      { type: 'countryDiallingCodes' }, // 国家拨号代码
+      { type: 'industryCategories' }, // 行业类别
+      { type: 'salesPaymentMethods' }, // 付款方式
+      { type: 'regionOffice' }, // 大区+网点
+      { type: 'currencies' }, // 货币
+      { type: 'taxOutputClassifics' }, // 税分类
+      { type: 'paymentTerms' }, // 付款条件
+      { type: 'purchaseGroups' }, // 采购组
+      { type: 'purchaseOrganizations' }, // 采购组织
+      { type: 'salesArea' }, // 销售范围
+      { type: 'salesOrganizations' }, // 销售组织
+      { type: 'distributionChannels' }, // 分销渠道
+    ];
+    basicCacheList.forEach(item => {
+      this.props.dispatch({
+        type: 'basicCache/getCache',
+        payload: item,
+      });
     });
   }
 
@@ -206,9 +162,47 @@ class CustomerEdit extends Component {
   // 修改
   update = () => {
     const { oldDetails } = this.state;
+    const data = JSON.parse(JSON.stringify(this.props.details)) || {};
+    const customer = data.customer || {};
+    const salesAreaList = customer.salesAreaList || [];
+    const addressList = customer.addressList || [];
 
-    console.log(this.props.details);
-    const data = {};
+    // TODO:
+    // 新增收票方
+    salesAreaList.newInvoicePartyList = [];
+    salesAreaList.invoicePartyList.forEach(e => {
+      if (e.id > 0) return;
+      salesAreaList.newInvoicePartyList.push({ id: e.id, soldToPartyId: e.soldToPartyId });
+    });
+    // 删除收票方
+    salesAreaList.deleteInvoicePartyList = [];
+
+    // 新增售达方
+    salesAreaList.newSoldToPartyIdList = [];
+    // 删除售达方
+    salesAreaList.deleteSoldToPartyIdList = [];
+
+    // 新增送达方
+    salesAreaList.newShipToPartyIdList = [];
+    // 删除送达方
+    salesAreaList.deleteShipToPartyIdList = [];
+
+    // 新增销售员
+    salesAreaList.newsalerCodeList = [];
+    // 删除销售员
+    salesAreaList.deletesalerCodeList = [];
+
+    // 新增地址
+    customer.newAddressList = [];
+    addressList.forEach(e => {
+      if (e.id > 0) return;
+      customer.newAddressList.push(e);
+    });
+    // 修改地址
+    customer.modifyAddressList = [];
+    // 删除地址
+    customer.deleteAddressIdList = [];
+
     bp.updateBP(data).then(res => {
       console.log(res);
     });
