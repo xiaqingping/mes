@@ -102,7 +102,7 @@ class SearchPage extends Component {
     const offices = peptide.offices.filter(
       e => e.languageCode === language,
     )
-    const currencys = peptide.currencys.filter(
+    const currencies = peptide.currencies.filter(
       e => e.languageCode === language,
     )
 
@@ -139,7 +139,7 @@ class SearchPage extends Component {
               {getFieldDecorator('currency', { initialValue: '' })(
                 <Select>
                   <Option value="">全部</Option>
-                  {currencys.map(item =>
+                  {currencies.map(item =>
                   <Option key={item.code} value={item.code}>{`${item.code}-${item.shortText}`}</Option>,
                 )}
                 </Select>,
@@ -374,7 +374,7 @@ class Order extends Component {
     })
     dispatch({
       type: 'peptide/getCache', // 货币类型
-      payload: { type: 'currencys' },
+      payload: { type: 'currencies' },
     })
     dispatch({
       type: 'peptide/getCache', // 销售范围
@@ -455,7 +455,7 @@ class Order extends Component {
     const offices = peptide.offices.filter(
       e => e.languageCode === language,
     )
-    const currencys = peptide.currencys.filter(
+    const currencies = peptide.currencies.filter(
       e => e.languageCode === language,
     )
     const data = { list, pagination: { current, pageSize, total } };
@@ -593,7 +593,7 @@ class Order extends Component {
         dataIndex: 'currency',
         width: 100,
         render(text) {
-          return formatter(currencys.code, text);
+          return formatter(currencies.code, text);
         },
       },
       {

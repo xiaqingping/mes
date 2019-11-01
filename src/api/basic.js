@@ -14,10 +14,10 @@ export default {
   getInvtypes() {
     return request('/basic/v1/invtypes');
   },
-  // 查询币种列表
-  getCurrencys() {
-    return request('http://180.167.32.168:8001/currencies/v1');
-  },
+  // // 查询币种列表
+  // getCurrencys() {
+  //   return request('/basic/v1/currencys');
+  // },
   // 查询仓库
   getStorages() {
     return request('/basic/v1/storages');

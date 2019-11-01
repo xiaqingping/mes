@@ -118,7 +118,7 @@ const Model = {
     // 付款条件
     payterms: [],
     // 币种类型
-    currencys: [],
+    currencies: [],
     // 销售范围
     salesranges: [],
   },

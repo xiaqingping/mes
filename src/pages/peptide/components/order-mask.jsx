@@ -65,6 +65,7 @@ class AddPage extends Component {
       form: { getFieldDecorator, getFieldValue },
       peptide: {
         commonData,
+        salesranges,
         invtypes,
         paymethods,
       },
@@ -79,7 +80,7 @@ class AddPage extends Component {
     const offices = peptide.offices.filter(
       e => e.languageCode === language,
     )
-    const currencys = peptide.currencys.filter(
+    const currencies = peptide.currencies.filter(
       e => e.languageCode === language,
     )
     return (
@@ -104,10 +105,12 @@ class AddPage extends Component {
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="销售范围">
-              {getFieldDecorator('range', { initialValue: '10-3110' })(<Select>
-                  {commonData.rangeArea.map(item =>
-                      <Option key={item.id} value={item.id}>{item.name}</Option>,
-                    )}
+              {getFieldDecorator('rangeOrganization', { initialValue: '' })(
+                <Select>
+                  <Option value="">全部</Option>
+                  {salesranges.map(item => <Option key={`${item.organization}${item.channel}`} value={`${item.channelName} - ${item.organizationName}`}>
+                  {`${item.channelName} - ${item.organizationName}`}
+                  </Option>)}
                 </Select>)}
             </FormItem>
           </Col>
@@ -299,7 +302,7 @@ class AddPage extends Component {
           <Col lg={6} md={8} sm={12}>
             <FormItem label="币种">
               {getFieldDecorator('currency', { initialValue: 'CNY' })(<Select dropdownMenuStyle={{ display: 'none' }}>
-                {currencys.map(item =>
+                {currencies.map(item =>
                       <Option key={item.code} value={item.code}>{`${item.code}-${item.shortText}`}</Option>,
                     )}
                 </Select>)}
