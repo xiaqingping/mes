@@ -20,6 +20,7 @@ import PurchasingOrg from './components/PurchasingOrg';
 import Bank from './components/Bank';
 
 import { bp } from '@/api'
+import { diff } from '@/utils/utils';
 
 @connect(({ bpEdit }) => ({
   details: bpEdit.details || {},
@@ -165,7 +166,6 @@ class CustomerEdit extends Component {
     const data = JSON.parse(JSON.stringify(this.props.details)) || {};
     const customer = data.customer || {};
     const salesAreaList = customer.salesAreaList || [];
-    const addressList = customer.addressList || [];
 
     // TODO:
     // 新增收票方
@@ -192,16 +192,15 @@ class CustomerEdit extends Component {
     // 删除销售员
     salesAreaList.deletesalerCodeList = [];
 
+    const preAddressList = oldDetails.customer.addressList;
+    const nextAddressList = customer.addressList;
+    const addressDiff = diff(preAddressList, nextAddressList);
     // 新增地址
-    customer.newAddressList = [];
-    addressList.forEach(e => {
-      if (e.id > 0) return;
-      customer.newAddressList.push(e);
-    });
+    customer.newAddressList = addressDiff.add;
     // 修改地址
-    customer.modifyAddressList = [];
+    customer.modifyAddressList = addressDiff.update;
     // 删除地址
-    customer.deleteAddressIdList = [];
+    customer.deleteAddressIdList = addressDiff.del;
 
     bp.updateBP(data).then(res => {
       console.log(res);
