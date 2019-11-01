@@ -76,70 +76,26 @@ class CustomerEdit extends Component {
 
   // 获取此页面需要用到的基础数据
   getCacheData() {
-    // 国家
-    this.props.dispatch({
-      type: 'basicCache/getCache',
-      payload: { type: 'countrys' },
-    });
-    // 国家拨号代码
-    this.props.dispatch({
-      type: 'basicCache/getCache',
-      payload: { type: 'countryDiallingCodes' },
-    });
-    // 行业类别
-    this.props.dispatch({
-      type: 'basicCache/getCache',
-      payload: { type: 'industryCategories' },
-    });
-    // 付款方式
-    this.props.dispatch({
-      type: 'basicCache/getCache',
-      payload: { type: 'salesPaymentMethods' },
-    });
-    // 大区+网点
-    this.props.dispatch({
-      type: 'basicCache/getCache',
-      payload: { type: 'regionOffice' },
-    });
-    // 货币
-    this.props.dispatch({
-      type: 'basicCache/getCache',
-      payload: { type: 'currencies' },
-    });
-    // 税分类
-    this.props.dispatch({
-      type: 'basicCache/getCache',
-      payload: { type: 'taxOutputClassifics' },
-    });
-    // 付款条件
-    this.props.dispatch({
-      type: 'basicCache/getCache',
-      payload: { type: 'paymentTerms' },
-    });
-    // 采购组
-    this.props.dispatch({
-      type: 'basicCache/getCache',
-      payload: { type: 'purchaseGroups' },
-    });
-    // 采购组织
-    this.props.dispatch({
-      type: 'basicCache/getCache',
-      payload: { type: 'purchaseOrganizations' },
-    });
-    // 销售范围
-    this.props.dispatch({
-      type: 'basicCache/getCache',
-      payload: { type: 'salesArea' },
-    });
-    // 销售组织
-    this.props.dispatch({
-      type: 'basicCache/getCache',
-      payload: { type: 'salesOrganizations' },
-    });
-    // 分销渠道
-    this.props.dispatch({
-      type: 'basicCache/getCache',
-      payload: { type: 'distributionChannels' },
+    const basicCacheList = [
+      { type: 'countrys' }, // 国家
+      { type: 'countryDiallingCodes' }, // 国家拨号代码
+      { type: 'industryCategories' }, // 行业类别
+      { type: 'salesPaymentMethods' }, // 付款方式
+      { type: 'regionOffice' }, // 大区+网点
+      { type: 'currencies' }, // 货币
+      { type: 'taxOutputClassifics' }, // 税分类
+      { type: 'paymentTerms' }, // 付款条件
+      { type: 'purchaseGroups' }, // 采购组
+      { type: 'purchaseOrganizations' }, // 采购组织
+      { type: 'salesArea' }, // 销售范围
+      { type: 'salesOrganizations' }, // 销售组织
+      { type: 'distributionChannels' }, // 分销渠道
+    ];
+    basicCacheList.forEach(item => {
+      this.props.dispatch({
+        type: 'basicCache/getCache',
+        payload: item,
+      });
     });
   }
 
