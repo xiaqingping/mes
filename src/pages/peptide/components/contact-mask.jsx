@@ -44,7 +44,7 @@ class Search extends Component {
   renderForm = () => {
     const {
       form: { getFieldDecorator },
-      peptide: { salesranges },
+      peptide: { salesRanges },
     } = this.props;
     return (
       <Form onSubmit={this.submit} layout="inline">
@@ -89,7 +89,7 @@ class Search extends Component {
               {getFieldDecorator('rangeOrganization', { initialValue: '' })(
                 <Select style={{ width: '192px' }}>
                   <Option value="">全部</Option>
-                  {salesranges.map(item => <Option key={`${item.organization}${item.channel}`} value={`${item.channelName} - ${item.organizationName}`}>
+                  {salesRanges.map(item => <Option key={`${item.organization}${item.channel}`} value={`${item.channelName} - ${item.organizationName}`}>
                   {`${item.channelName} - ${item.organizationName}`}
                   </Option>)}
                 </Select>)}

@@ -366,11 +366,11 @@ class Order extends Component {
     })
     dispatch({
       type: 'peptide/getCache', // 付款方式
-      payload: { type: 'paymethods' },
+      payload: { type: 'payMethods' },
     })
     dispatch({
       type: 'peptide/getCache', // 付款条件
-      payload: { type: 'payterms' },
+      payload: { type: 'payTerms' },
     })
     dispatch({
       type: 'peptide/getCache', // 货币类型
@@ -378,7 +378,7 @@ class Order extends Component {
     })
     dispatch({
       type: 'peptide/getCache', // 销售范围
-      payload: { type: 'salesranges' },
+      payload: { type: 'SalesRanges' },
     })
   }
 
@@ -446,7 +446,7 @@ class Order extends Component {
       loading,
     } = this.state;
 
-    const { peptide: { commonData, invtypes, paymethods, payterms },
+    const { peptide: { commonData, invtypes, payMethods, payTerms },
      peptide, language } = this.props
 
     const regions = peptide.regions.filter(
@@ -557,7 +557,7 @@ class Order extends Component {
         dataIndex: 'paymentMethod',
         width: 100,
         render(text) {
-          return formatter(paymethods, text, 'code', 'name');
+          return formatter(payMethods, text, 'code', 'name');
         },
       },
       {
@@ -565,7 +565,7 @@ class Order extends Component {
         dataIndex: 'paymentTerm',
         width: 250,
         render(text) {
-          return `${text} - ${formatter(payterms, text, 'code', 'name')}`;
+          return `${text} - ${formatter(payTerms, text, 'code', 'name')}`;
         },
       },
       {

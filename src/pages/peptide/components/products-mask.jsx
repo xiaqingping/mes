@@ -62,7 +62,7 @@ class Search extends Component {
       form: { getFieldDecorator },
       brands,
       peptide:
-      { salesranges },
+      { salesRanges },
     } = this.props;
     const { factorys } = this.state;
 
@@ -114,7 +114,7 @@ class Search extends Component {
               {getFieldDecorator('range_area', { initialValue: '10-3110' })(
                 <Select style={{ width: '192px' }}>
                   <Option value="">全部</Option>
-                  {salesranges.map(item => <Option key={`${item.organization}${item.channel}`} value={`${item.channel}-${item.organization}`}>
+                  {salesRanges.map(item => <Option key={`${item.organization}${item.channel}`} value={`${item.channel}-${item.organization}`}>
                   {`${item.channelName} - ${item.organizationName}`}
                   </Option>)}
                 </Select>)}

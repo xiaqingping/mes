@@ -114,13 +114,13 @@ const Model = {
     // 开票类型
     invtypes: [],
     // 付款方式
-    paymethods: [],
+    payMethods: [],
     // 付款条件
-    payterms: [],
+    payTerms: [],
     // 币种类型
     currencies: [],
     // 销售范围
-    salesranges: [],
+    salesRanges: [],
   },
   effects: {
     /**

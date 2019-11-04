@@ -65,9 +65,9 @@ class AddPage extends Component {
       form: { getFieldDecorator, getFieldValue },
       peptide: {
         commonData,
-        salesranges,
+        salesRanges,
         invtypes,
-        paymethods,
+        payMethods,
       },
       peptide,
       openAddressMask,
@@ -108,7 +108,7 @@ class AddPage extends Component {
               {getFieldDecorator('rangeOrganization', { initialValue: '' })(
                 <Select>
                   <Option value="">全部</Option>
-                  {salesranges.map(item => <Option key={`${item.organization}${item.channel}`} value={`${item.channelName} - ${item.organizationName}`}>
+                  {salesRanges.map(item => <Option key={`${item.organization}${item.channel}`} value={`${item.channelName} - ${item.organizationName}`}>
                   {`${item.channelName} - ${item.organizationName}`}
                   </Option>)}
                 </Select>)}
@@ -183,7 +183,7 @@ class AddPage extends Component {
           <Col lg={6} md={8} sm={12}>
             <FormItem label="付款方式">
               {getFieldDecorator('paymentMethod')(<Select>
-                {paymethods.map(item =>
+                {payMethods.map(item =>
                       <Option key={item.code} value={item.code}>{`${item.code}-${item.name}`}</Option>,
                     )}
                 </Select>)}
