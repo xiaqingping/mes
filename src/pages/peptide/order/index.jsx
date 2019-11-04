@@ -398,7 +398,15 @@ class Order extends Component {
   // 获取表格数据
   getTableData = (options = {}) => {
     const { formValues } = this.state;
-    const query = Object.assign({}, formValues, options);
+    const query = Object.assign(
+      {},
+      formValues,
+      options,
+      // {
+      //   createDateBegin: options.wanchengshijian ? options.wanchengshijian[0].format('YYYY-MM-DD') : '',
+      //   createDateEnd: options.wanchengshijian ? options.wanchengshijian[1].format('YYYY-MM-DD') : '',
+      // },
+    );
     this.setState({
       formValues: query,
       loading: true,
