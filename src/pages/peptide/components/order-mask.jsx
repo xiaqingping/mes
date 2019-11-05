@@ -15,7 +15,11 @@ import React, { Component } from 'react';
 import api from '@/api';
 import './style.less'
 import { connect } from 'dva';
-import AddressMask from './address-mask'
+import AddressMask from './address-mask';
+import CustomerMask from '@/pages/peptide/components/customer-mask';
+import SubCustomerMask from '@/pages/peptide/components/subCustomer-mask';
+import ContactMask from '@/pages/peptide/components/contact-mask';
+import SalerMask from '@/pages/peptide/components/saler-mask';
 
 const FormItem = Form.Item;
 const { Option } = Select;
@@ -50,6 +54,29 @@ class AddPage extends Component {
 
   handleFormReset = () => {
     this.props.form.resetFields();
+  }
+
+  getMaskData = (v, type) => {
+    if (type === 'customer') {
+      this.props.form.setFieldsValue({
+        customerName: v.name,
+      });
+    }
+    if (type === 'subCustomer') {
+      this.props.form.setFieldsValue({
+        subCustomerName: v.name,
+      });
+    }
+    if (type === 'contact') {
+      this.props.form.setFieldsValue({
+        contactName: v.name,
+      });
+    }
+    if (type === 'saler') {
+      this.props.form.setFieldsValue({
+        salerName: v.name,
+      });
+    }
   }
 
   // 修改加号颜色
@@ -100,7 +127,7 @@ class AddPage extends Component {
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="客户">
-              {getFieldDecorator('customerName')(<Search />)}
+              {getFieldDecorator('customerName')(<Search onSearch={() => this.showCustomer.visibleShow(true)} />)}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
@@ -116,7 +143,7 @@ class AddPage extends Component {
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="负责人">
-              {getFieldDecorator('subCustomerName')(<Search />)}
+              {getFieldDecorator('subCustomerName')(<Search onSearch={() => this.showSubCustomer.visibleShow(true)} />)}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
@@ -130,7 +157,7 @@ class AddPage extends Component {
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="订货人">
-              {getFieldDecorator('contactName')(<Search />)}
+              {getFieldDecorator('contactName')(<Search onSearch={() => this.showContact.visibleShow(true)} />)}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
@@ -151,7 +178,7 @@ class AddPage extends Component {
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="销售员">
-              {getFieldDecorator('salerName')(<Input />)}
+              {getFieldDecorator('salerName')(<Search onSearch={() => this.showSaler.visibleShow(true)} />)}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
@@ -379,7 +406,25 @@ class AddPage extends Component {
 
   render() {
     return (
-      <div className="tableListForm">{this.renderForm()}</div>
+      <div className="tableListForm">
+      {this.renderForm()}
+      <CustomerMask
+        onRef={ref => { this.showCustomer = ref }}
+        getData={v => this.getMaskData(v, 'customer')}
+        />
+      <SubCustomerMask
+        onRef={ref => { this.showSubCustomer = ref }}
+        getData={v => this.getMaskData(v, 'subCustomer')}
+      />
+      <ContactMask
+        onRef={ref => { this.showContact = ref }}
+        getData={v => this.getMaskData(v, 'contact')}
+      />
+      <SalerMask
+        onRef={ref => { this.showSaler = ref }}
+        getData={v => this.getMaskData(v, 'saler')}
+      />
+      </div>
     );
   }
 }

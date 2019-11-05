@@ -248,6 +248,7 @@ class Product extends Component {
       });
     }
     this.clearInput()
+    this.getTableData()
   }
 
   // 删除数据
@@ -298,7 +299,7 @@ class Product extends Component {
       message.warning('请先保存或退出正在编辑的数据');
       return;
     }
-
+    list.pop();
     const newId = id - 1;
     this.setState({
       id: newId,
