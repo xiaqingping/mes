@@ -22,6 +22,9 @@ const { Option } = Select;
  * 页面顶部筛选表单
  */
 @Form.create()
+@connect(({ peptide }) => ({
+  peptide,
+}))
 class Search extends Component {
   constructor(props) {
     super(props);
@@ -58,9 +61,11 @@ class Search extends Component {
     const {
       form: { getFieldDecorator },
       brands,
-      rangeArea,
+      peptide:
+      { salesRanges },
     } = this.props;
     const { factorys } = this.state;
+
     return (
       <Form onSubmit={this.submit} layout="inline">
         <Row gutter={{ lg: 24, md: 12, sm: 6 }}>
@@ -107,10 +112,11 @@ class Search extends Component {
           <Col lg={6} md={8} sm={12}>
             <FormItem label="销售范围">
               {getFieldDecorator('range_area', { initialValue: '10-3110' })(
-                <Select>
-                    {rangeArea.map(item =>
-                      <Option key={item.id} value={item.id}>{item.name}</Option>,
-                    )}
+                <Select style={{ width: '192px' }}>
+                  <Option value="">全部</Option>
+                  {salesRanges.map(item => <Option key={`${item.organization}${item.channel}`} value={`${item.channel}-${item.organization}`}>
+                  {`${item.channelName} - ${item.organizationName}`}
+                  </Option>)}
                 </Select>)}
             </FormItem>
           </Col>
@@ -201,9 +207,10 @@ class Order extends Component {
       this.setState({
         loadingSon: true,
       })
+
       setTimeout(() => {
           this.setState({
-            dataSon: v.stock.storages,
+            dataSon: v.stock ? v.stock.storages : [],
             loadingSon: false,
           })
         }, 500)

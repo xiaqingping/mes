@@ -13,9 +13,14 @@ import {
 import React, { Component } from 'react';
 
 import api from '@/api';
-import './style.less'
+import './style.less';
 import { connect } from 'dva';
-import AddressMask from './address-mask'
+import AddressMask from './address-mask';
+import CustomerMask from '@/pages/peptide/components/customer-mask';
+import SubCustomerMask from '@/pages/peptide/components/subCustomer-mask';
+import ContactMask from '@/pages/peptide/components/contact-mask';
+import SalerMask from '@/pages/peptide/components/saler-mask';
+import LoadMask from '@/pages/peptide/components/load-mask'
 
 const FormItem = Form.Item;
 const { Option } = Select;
@@ -46,10 +51,38 @@ class AddPage extends Component {
     })
   }
 
+  // 获取批量导入序列
+  loadData = v => {
+    console.log(v)
+  }
+
   addAddress = () => { console.log(123) }
 
   handleFormReset = () => {
     this.props.form.resetFields();
+  }
+
+  getMaskData = (v, type) => {
+    if (type === 'customer') {
+      this.props.form.setFieldsValue({
+        customerName: v.name,
+      });
+    }
+    if (type === 'subCustomer') {
+      this.props.form.setFieldsValue({
+        subCustomerName: v.name,
+      });
+    }
+    if (type === 'contact') {
+      this.props.form.setFieldsValue({
+        contactName: v.name,
+      });
+    }
+    if (type === 'saler') {
+      this.props.form.setFieldsValue({
+        salerName: v.name,
+      });
+    }
   }
 
   // 修改加号颜色
@@ -59,17 +92,25 @@ class AddPage extends Component {
     })
   }
 
+  handleSubmit = e => {
+    e.preventDefault();
+    this.props.form.validateFields((err, values) => {
+      if (err) return
+      console.log(values)
+    });
+  };
+
   // 渲染表单
   renderForm = () => {
     const {
       form: { getFieldDecorator, getFieldValue },
       peptide: {
         commonData,
+        salesRanges,
         invtypes,
-        paymethods,
+        payMethods,
       },
       peptide,
-      openAddressMask,
       language,
     } = this.props;
     const { factorys, plusStatus } = this.state;
@@ -79,11 +120,11 @@ class AddPage extends Component {
     const offices = peptide.offices.filter(
       e => e.languageCode === language,
     )
-    const currencys = peptide.currencys.filter(
+    const currencies = peptide.currencies.filter(
       e => e.languageCode === language,
     )
     return (
-      <Form layout="inline">
+      <Form layout="inline" onSubmit={this.handleSubmit} className="myForm">
         <Row gutter={{ lg: 24, md: 12, sm: 6 }}>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="订单编号">
@@ -99,21 +140,27 @@ class AddPage extends Component {
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="客户">
-              {getFieldDecorator('customerName')(<Search />)}
+              {getFieldDecorator('customerName', {
+                 rules: [{ required: true }],
+              })(<Search onSearch={() => this.showCustomer.visibleShow(true)} />)}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="销售范围">
-              {getFieldDecorator('range', { initialValue: '10-3110' })(<Select>
-                  {commonData.rangeArea.map(item =>
-                      <Option key={item.id} value={item.id}>{item.name}</Option>,
-                    )}
+              {getFieldDecorator('rangeOrganization', { initialValue: '' })(
+                <Select>
+                  <Option value="">全部</Option>
+                  {salesRanges.map(item => <Option key={`${item.organization}${item.channel}`} value={`${item.channelName} - ${item.organizationName}`}>
+                  {`${item.channelName} - ${item.organizationName}`}
+                  </Option>)}
                 </Select>)}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="负责人">
-              {getFieldDecorator('subCustomerName')(<Search />)}
+              {getFieldDecorator('subCustomerName', {
+                 rules: [{ required: true }],
+              })(<Search onSearch={() => this.showSubCustomer.visibleShow(true)} />)}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
@@ -127,7 +174,9 @@ class AddPage extends Component {
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="订货人">
-              {getFieldDecorator('contactName')(<Search />)}
+              {getFieldDecorator('contactName', {
+                 rules: [{ required: true }],
+              })(<Search onSearch={() => this.showContact.visibleShow(true)} />)}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
@@ -141,14 +190,18 @@ class AddPage extends Component {
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="配送网点">
-              {getFieldDecorator('dofficeCode')(<Select>
+              {getFieldDecorator('dofficeCode', {
+                 rules: [{ required: true }],
+              })(<Select>
                   <Option value="0">全部</Option>
                 </Select>)}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="销售员">
-              {getFieldDecorator('salerName')(<Input />)}
+              {getFieldDecorator('salerName', {
+                 rules: [{ required: true }],
+              })(<Search onSearch={() => this.showSaler.visibleShow(true)} />)}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
@@ -179,8 +232,10 @@ class AddPage extends Component {
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="付款方式">
-              {getFieldDecorator('paymentMethod')(<Select>
-                {paymethods.map(item =>
+              {getFieldDecorator('paymentMethod', {
+                 rules: [{ required: true }],
+              })(<Select>
+                {payMethods.map(item =>
                       <Option key={item.code} value={item.code}>{`${item.code}-${item.name}`}</Option>,
                     )}
                 </Select>)}
@@ -193,7 +248,9 @@ class AddPage extends Component {
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="付款条件">
-              {getFieldDecorator('paymentTerm')(<Select>
+              {getFieldDecorator('paymentTerm', {
+                 rules: [{ required: true }],
+              })(<Select>
                   <Option value="0">全部</Option>
                 </Select>)}
             </FormItem>
@@ -288,18 +345,22 @@ class AddPage extends Component {
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="订货人邮箱">
-              {getFieldDecorator('contactEmail')(<Input />)}
+              {getFieldDecorator('contactEmail', {
+                 rules: [{ required: true }],
+              })(<Input />)}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="订货人手机">
-              {getFieldDecorator('contactMobile')(<Input />)}
+              {getFieldDecorator('contactMobile', {
+                 rules: [{ required: true }],
+              })(<Input />)}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="币种">
               {getFieldDecorator('currency', { initialValue: 'CNY' })(<Select dropdownMenuStyle={{ display: 'none' }}>
-                {currencys.map(item =>
+                {currencies.map(item =>
                       <Option key={item.code} value={item.code}>{`${item.code}-${item.shortText}`}</Option>,
                     )}
                 </Select>)}
@@ -316,7 +377,7 @@ class AddPage extends Component {
                 <Select>
                   <Option value="0">全部</Option>
                 </Select>)}
-                <div style={{ position: 'absolute', top: '-8px', right: '40px', cursor: 'pointer' }} onMouseLeave={() => { this.changePlusStatus(false) }} onMouseEnter={() => { this.changePlusStatus(true) }} onClick={openAddressMask}><Icon type="plus" className={plusStatus ? 'select-plus' : ''} style={{ color: 'green', opacity: '0.4' }}/></div>
+                <div style={{ position: 'absolute', top: '-8px', right: '40px', cursor: 'pointer' }} onMouseLeave={() => { this.changePlusStatus(false) }} onMouseEnter={() => { this.changePlusStatus(true) }} onClick={() => this.showAddress.visibleShow(true)}><Icon type="plus" className={plusStatus ? 'select-plus' : ''} style={{ color: 'green', opacity: '0.4' }}/></div>
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
@@ -359,9 +420,12 @@ class AddPage extends Component {
               {getFieldDecorator('finishDate')(<Input />)}
             </FormItem>
           </Col>
-          <Col lg={6} md={8} sm={12}>
+          <Col lg={6} md={8} sm={12} style={{ marginTop: '20px' }}>
             <span className="submitButtons">
-              <Button type="primary" htmlType="submit">
+              <Button onClick={ () => this.showLoad.visibleShow(true)}>
+                批量导入序列
+              </Button>
+              <Button style={{ marginLeft: 8 }} type="primary" htmlType="submit">
                 查询
               </Button>
               <Button style={{ marginLeft: 8 }} onClick={this.handleFormReset}>
@@ -376,7 +440,27 @@ class AddPage extends Component {
 
   render() {
     return (
-      <div className="tableListForm">{this.renderForm()}</div>
+      <div className="tableListForm">
+      {this.renderForm()}
+      <CustomerMask
+        onRef={ref => { this.showCustomer = ref }}
+        getData={v => this.getMaskData(v, 'customer')}
+        />
+      <SubCustomerMask
+        onRef={ref => { this.showSubCustomer = ref }}
+        getData={v => this.getMaskData(v, 'subCustomer')}
+      />
+      <ContactMask
+        onRef={ref => { this.showContact = ref }}
+        getData={v => this.getMaskData(v, 'contact')}
+      />
+      <SalerMask
+        onRef={ref => { this.showSaler = ref }}
+        getData={v => this.getMaskData(v, 'saler')}
+      />
+      <AddressMask onRef={ref => { this.showAddress = ref }}/>
+      <LoadMask onRef={ref => { this.showLoad = ref }} getData={ v => this.loadData(v)}/>
+      </div>
     );
   }
 }
@@ -397,7 +481,6 @@ class Order extends Component {
     visible: false, // 遮罩层的判断
     dataSon: [],
     loadingSon: false,
-    visibleAddress: false,
   }
 
   componentDidMount() {
@@ -429,20 +512,6 @@ class Order extends Component {
           loadingSon: false,
         })
     }, 500)
-  }
-
-  // 打开地址新增
-  openAddressMask = () => {
-    this.setState({
-      visibleAddress: true,
-    })
-  }
-
-  // 关闭地址新增
-  closeAddressMask = v => {
-    this.setState({
-      visibleAddress: v,
-    })
   }
 
   // 分页
@@ -485,7 +554,6 @@ class Order extends Component {
       visible,
       dataSon,
       loadingSon,
-      visibleAddress,
     } = this.state;
     const data = { list, pagination: { current, pageSize, total } };
     let tableWidth = 0;
@@ -707,7 +775,6 @@ class Order extends Component {
                   loading={loadingSon}
                   />
             </Col>
-            <AddressMask visible={visibleAddress} closeMask={ v => this.closeAddressMask(v)}/>
           </div>
         </Modal>
     );

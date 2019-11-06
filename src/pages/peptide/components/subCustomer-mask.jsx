@@ -46,7 +46,7 @@ class Search extends Component {
     const {
       form: { getFieldDecorator },
       peptide:
-      { paymethods, payterms, salesranges },
+      { payMethods, payTerms, salesRanges },
       peptide,
       language,
     } = this.props;
@@ -57,9 +57,10 @@ class Search extends Component {
     const offices = peptide.offices.filter(
       e => e.languageCode === language,
     )
-    const currencys = peptide.currencys.filter(
+    const currencies = peptide.currencies.filter(
       e => e.languageCode === language,
     )
+
     return (
       <Form onSubmit={this.submit} layout="inline">
         <Row gutter={{ lg: 24, md: 12, sm: 6 }}>
@@ -125,8 +126,8 @@ class Search extends Component {
               {getFieldDecorator('currency', { initialValue: '' })(
                 <Select style={{ width: '192px' }}>
                   <Option value="">全部</Option>
-                  {currencys.map(item => <Option key={item.code} value={item.code}>
-                    {`${item.code}-${item.name}`}
+                  {currencies.map(item => <Option key={item.code} value={item.code}>
+                    {`${item.code}-${item.shortText}`}
                   </Option>)}
                 </Select>)}
             </FormItem>
@@ -136,7 +137,7 @@ class Search extends Component {
               {getFieldDecorator('payMethodCode', { initialValue: '' })(
                 <Select style={{ width: '192px' }}>
                   <Option value="">全部</Option>
-                  {paymethods.map(item => <Option key={item.code} value={item.code}>
+                  {payMethods.map(item => <Option key={item.code} value={item.code}>
                     {`${item.code}-${item.name}`}
                   </Option>)}
                 </Select>)}
@@ -147,7 +148,7 @@ class Search extends Component {
               {getFieldDecorator('payTermsCode', { initialValue: '' })(
                 <Select style={{ width: '200px' }}>
                   <Option value="">全部</Option>
-                  {payterms.map(item => <Option key={item.code} value={item.code}>
+                  {payTerms.map(item => <Option key={item.code} value={item.code}>
                     {`${item.code}-${item.name}`}
                   </Option>)}
                 </Select>)}
@@ -168,7 +169,7 @@ class Search extends Component {
               {getFieldDecorator('rangeOrganization', { initialValue: '' })(
                 <Select style={{ width: '192px' }}>
                   <Option value="">全部</Option>
-                  {salesranges.map(item => <Option key={`${item.organization}${item.channel}`} value={`${item.channelName} - ${item.organizationName}`}>
+                  {salesRanges.map(item => <Option key={`${item.organization}${item.channel}`} value={`${item.channelName} - ${item.organizationName}`}>
                   {`${item.channelName} - ${item.organizationName}`}
                   </Option>)}
                 </Select>)}

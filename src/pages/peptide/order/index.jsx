@@ -102,7 +102,7 @@ class SearchPage extends Component {
     const offices = peptide.offices.filter(
       e => e.languageCode === language,
     )
-    const currencys = peptide.currencys.filter(
+    const currencies = peptide.currencies.filter(
       e => e.languageCode === language,
     )
 
@@ -139,7 +139,7 @@ class SearchPage extends Component {
               {getFieldDecorator('currency', { initialValue: '' })(
                 <Select>
                   <Option value="">全部</Option>
-                  {currencys.map(item =>
+                  {currencies.map(item =>
                   <Option key={item.code} value={item.code}>{`${item.code}-${item.shortText}`}</Option>,
                 )}
                 </Select>,
@@ -366,19 +366,19 @@ class Order extends Component {
     })
     dispatch({
       type: 'peptide/getCache', // 付款方式
-      payload: { type: 'paymethods' },
+      payload: { type: 'payMethods' },
     })
     dispatch({
       type: 'peptide/getCache', // 付款条件
-      payload: { type: 'payterms' },
+      payload: { type: 'payTerms' },
     })
     dispatch({
       type: 'peptide/getCache', // 货币类型
-      payload: { type: 'currencys' },
+      payload: { type: 'currencies' },
     })
     dispatch({
       type: 'peptide/getCache', // 销售范围
-      payload: { type: 'salesranges' },
+      payload: { type: 'SalesRanges' },
     })
   }
 
@@ -398,7 +398,15 @@ class Order extends Component {
   // 获取表格数据
   getTableData = (options = {}) => {
     const { formValues } = this.state;
-    const query = Object.assign({}, formValues, options);
+    const query = Object.assign(
+      {},
+      formValues,
+      options,
+      // {
+      //   createDateBegin: options.wanchengshijian ? options.wanchengshijian[0].format('YYYY-MM-DD') : '',
+      //   createDateEnd: options.wanchengshijian ? options.wanchengshijian[1].format('YYYY-MM-DD') : '',
+      // },
+    );
     this.setState({
       formValues: query,
       loading: true,
@@ -446,7 +454,7 @@ class Order extends Component {
       loading,
     } = this.state;
 
-    const { peptide: { commonData, invtypes, paymethods, payterms },
+    const { peptide: { commonData, invtypes, payMethods, payTerms },
      peptide, language } = this.props
 
     const regions = peptide.regions.filter(
@@ -455,7 +463,7 @@ class Order extends Component {
     const offices = peptide.offices.filter(
       e => e.languageCode === language,
     )
-    const currencys = peptide.currencys.filter(
+    const currencies = peptide.currencies.filter(
       e => e.languageCode === language,
     )
     const data = { list, pagination: { current, pageSize, total } };
@@ -557,7 +565,7 @@ class Order extends Component {
         dataIndex: 'paymentMethod',
         width: 100,
         render(text) {
-          return formatter(paymethods, text, 'code', 'name');
+          return formatter(payMethods, text, 'code', 'name');
         },
       },
       {
@@ -565,7 +573,7 @@ class Order extends Component {
         dataIndex: 'paymentTerm',
         width: 250,
         render(text) {
-          return `${text} - ${formatter(payterms, text, 'code', 'name')}`;
+          return `${text} - ${formatter(payTerms, text, 'code', 'name')}`;
         },
       },
       {
@@ -593,7 +601,7 @@ class Order extends Component {
         dataIndex: 'currency',
         width: 100,
         render(text) {
-          return formatter(currencys.code, text);
+          return formatter(currencies.code, text);
         },
       },
       {

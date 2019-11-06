@@ -233,7 +233,7 @@ class ModificationProducts extends Component {
     });
     this.setState({
       sonProducts: [],
-      sonModification: []
+      sonModification: [],
     })
   }
 
@@ -272,7 +272,9 @@ class ModificationProducts extends Component {
       if (newData.id > 0) {
         // api.peptideBase.updateSeries(newData).then(() => this.getTableData());
       } else {
-        api.peptideBase.insertModificationProducts(newData).then(() => {this.getTableData(); this.clearInput()});
+        api.peptideBase.insertModificationProducts(newData).then(
+          () => { this.getTableData(); this.clearInput() },
+          );
       }
     });
   }
@@ -449,6 +451,7 @@ class ModificationProducts extends Component {
         title: '是否脱盐',
         dataIndex: 'isNeedDesalting',
         width: 110,
+        align: 'center',
         render: text => (text === 1 ? '√' : ''),
         editable: true,
         inputType: <Checkbox style={{ textAlign: 'center', display: 'block' }}/>,
@@ -591,9 +594,9 @@ class ModificationProducts extends Component {
           </div>
         </Card>
         <Modifications getData={v => { this.getSonData(v, 'modifications') }}
-        onRef={ ref => {this.modificationShow = ref}}/>
+        onRef={ ref => { this.modificationShow = ref }}/>
         <Products getData={v => { this.getSonData(v, 'products') }}
-        onRef={ ref => {this.productShow = ref}}/>
+        onRef={ ref => { this.productShow = ref }}/>
       </PageHeaderWrapper>
     );
   }

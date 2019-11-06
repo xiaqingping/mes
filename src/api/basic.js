@@ -14,20 +14,20 @@ export default {
   getInvtypes() {
     return request('/basic/v1/invtypes');
   },
-  // 查询币种列表
-  getCurrencys() {
-    return request('http://180.167.32.168:8001/currencies/v1');
-  },
+  // // 查询币种列表
+  // getCurrencys() {
+  //   return request('/basic/v1/currencys');
+  // },
   // 查询仓库
   getStorages() {
     return request('/basic/v1/storages');
   },
   // 查询付款方式
-  getPaymethods() {
+  getPayMethods() {
     return request('/basic/v1/paymethods');
   },
   // 查询付款条件
-  getPayterms() {
+  getPayTerms() {
     return request('/basic/v1/payterms');
   },
   // 查询订货人
@@ -47,7 +47,7 @@ export default {
     return request('/basic/v1/products', { params });
   },
   // 查询销售范围
-  getSalesranges() {
+  getSalesRanges() {
     return request('/basic/v1/salesranges');
   },
   // 查询采购申请
