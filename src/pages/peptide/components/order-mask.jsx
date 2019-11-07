@@ -8,6 +8,8 @@ import {
   Select,
   Table,
   Modal,
+  message,
+  Divider,
   Icon,
 } from 'antd';
 import React, { Component } from 'react';
@@ -25,6 +27,7 @@ import LoadMask from '@/pages/peptide/components/load-mask'
 const FormItem = Form.Item;
 const { Option } = Select;
 const { Search } = Input;
+const EditableContext = React.createContext();
 
 /**
  * 页面顶部筛选表单
@@ -53,7 +56,15 @@ class AddPage extends Component {
 
   // 获取批量导入序列
   loadData = v => {
-    console.log(v)
+    // eslint-disable-next-line no-param-reassign
+    v = v.replace(/[\uff0c]/g, ',');
+    const val = v.split('\n');
+    let data = [];
+    // eslint-disable-next-line array-callback-return
+    val.map(item => {
+      data = [...data, item.split(',')]
+    })
+    this.props.handleAdd(data)
   }
 
   addAddress = () => { console.log(123) }
@@ -465,6 +476,45 @@ class AddPage extends Component {
   }
 }
 
+
+/**
+ * 表格编辑组件
+ */
+class EditableCell extends React.Component {
+  renderCell = ({ getFieldDecorator }) => {
+    const {
+      editing,
+      dataIndex,
+      title,
+      inputType,
+      record,
+      index,
+      children,
+      rules,
+      ...restProps
+    } = this.props;
+    if (editing) {
+      return (
+        <td {...restProps} style={{ padding: 0 }}>
+            <Form.Item>
+              {getFieldDecorator(dataIndex, {
+                rules,
+                valuePropName: 'checked',
+                initialValue: record[dataIndex],
+              })(inputType)}
+            </Form.Item>
+        </td>
+      );
+    }
+    return (<td {...restProps}>{children}</td>);
+  };
+
+
+  render() {
+    return <EditableContext.Consumer>{this.renderCell}</EditableContext.Consumer>;
+  }
+}
+
 @connect(({ peptide, global }) => ({
   peptide,
   language: global.languageCode,
@@ -481,10 +531,13 @@ class Order extends Component {
     visible: false, // 遮罩层的判断
     dataSon: [],
     loadingSon: false,
+    id: 0, // 新增数据时，提供负数id
+    editIndex: -1,
   }
 
   componentDidMount() {
     this.props.onRef(this)
+    this.getTableData()
   }
 
   visibleShow = visible => {
@@ -523,27 +576,143 @@ class Order extends Component {
   }
 
   // 获取表格数据
-  getTableData = (options = {}) => {
+  getTableData = (options = {}, son) => {
     const { formValues } = this.state;
-    const conditions = [];
-    conditions['range.channel'] = options.range_area ? options.range_area.split('-')[0] : '';
-    conditions['range.organization'] = options.range_area ? options.range_area.split('-')[1] : '';
-    conditions['stock.factory'] = options.stock_factory ? options.stock_factory : 3100;
-    const query = Object.assign({}, formValues, options, conditions);
+    const query = Object.assign({}, formValues, options);
 
     this.setState({
       formValues: query,
       loading: true,
     });
 
-    api.basic.getProducts(query).then(data => {
+    api.peptideBase.getModifications(query).then(res => {
+      if (son === 'son') {
+        const { parantData } = this.state;
+        res.rows.forEach(item => {
+          if (item.id === parantData.id) {
+            this.setState({
+              dataSon: item.details,
+            })
+          }
+        })
+      }
       this.setState({
-        list: data,
-        total: data.length,
+        list: res.rows,
+        total: res.total,
         loading: false,
+        editIndex: -1,
       });
     });
   }
+
+  // 保存
+  saveRow = (index, son) => {
+    if (son === 'son') {
+      this.props.form.validateFields(error => {
+        if (error) return;
+        const { parantData, sonAminoAcid } = this.state;
+        const newData = {
+          name: sonAminoAcid.name,
+          code: sonAminoAcid.code,
+          aminoAcidID: sonAminoAcid.id,
+          modificationID: parantData.id,
+        };
+        if (newData.id > 0) {
+          // api.peptideBase.updateSeries(newData).then(() => this.getTableData());
+        } else {
+          api.peptideBase.insertSuitableAminoAcids(newData).then(() => {
+            this.getTableData([], 'son');
+          },
+          );
+        }
+      });
+    } else {
+      this.props.form.validateFields((error, row) => {
+        if (error) return;
+        const { list } = this.state;
+        const newData = { ...list[index],
+                          ...row,
+                          isIndependentModification: row.isIndependentModification ? 1 : 2,
+                        };
+        if (newData.id > 0) {
+          // api.peptideBase.updateSeries(newData).then(() => this.getTableData());
+        } else {
+          api.peptideBase.insertModifications(newData).then(() => this.getTableData());
+        }
+      });
+    }
+  }
+
+  // 新增
+  handleAdd = data => {
+    const { editIndex, id, list } = this.state;
+    if (editIndex !== -1) {
+      message.warning('请先保存或退出正在编辑的数据');
+      return;
+    }
+
+    const arrId = [];
+    let strId = '';
+    // eslint-disable-next-line array-callback-return
+    data.map((item, key) => {
+      arrId.push({ id: id - key - 1, name: 'name' })
+      strId = `${strId + (id - key - 1)},`
+    })
+    this.setState({
+      id: arrId[0],
+      editIndex: strId,
+      list: [
+        ...arrId,
+        ...list,
+      ],
+    });
+  }
+
+  // 删除指定的值
+  removeValue = (arr, val) => {
+    for (let i = 0; i < arr.length; i++) {
+      if (arr[i].toString() === val.toString()) {
+        arr.splice(i, 1);
+        break;
+      }
+    }
+  }
+
+  // 退出编辑
+  cancelEdit = (row, index) => {
+    if (row.id > 0) {
+      this.setState({ editIndex: -1 });
+    } else {
+      const { list, editIndex } = this.state;
+      let flag = 0;
+      const arrEditIndex = editIndex.split(',');
+      const deleteIndex = -(index + 1);
+      this.removeValue(arrEditIndex, deleteIndex);
+      this.setState({
+        list: list.filter(e => e.id !== row.id),
+        editIndex: arrEditIndex.join(','),
+      });
+      list.forEach(e => {
+        if (e.id < 0) {
+          flag++
+        }
+      })
+      if (flag === 1) {
+        this.setState({
+          list: list.filter(e => e.id > 0),
+          editIndex: -1,
+          id: 0,
+        })
+      }
+    }
+  }
+
+  // 删除数据
+  deleteRow = row => {
+    api.peptideBase.deletePurity(row.id).then(() => {
+      this.getTableData();
+    });
+  };
 
   render() {
     const {
@@ -554,6 +723,7 @@ class Order extends Component {
       visible,
       dataSon,
       loadingSon,
+      editIndex,
     } = this.state;
     const data = { list, pagination: { current, pageSize, total } };
     let tableWidth = 0;
@@ -569,6 +739,11 @@ class Order extends Component {
         title: '多肽名称',
         dataIndex: 'name',
         width: 100,
+        editable: true,
+        inputType: <Input style={{ width: '90%' }}/>,
+        rules: [
+          { required: true, message: '必填' },
+        ],
       },
       {
         title: '提供总量(mg)',
@@ -675,6 +850,25 @@ class Order extends Component {
         dataIndex: 'notes',
         width: 100,
       },
+      {
+        title: '操作',
+        fixed: 'right',
+        className: 'operate',
+        width: 150,
+        render: (value, row, index) => {
+          let actions;
+          if (editIndex.toString().indexOf(row.id) !== -1) {
+            actions = (
+              <>
+                <a className="addNewData" onClick={() => this.saveRow(index)}>保存</a>
+                <Divider type="vertical" />
+                <a onClick={() => this.cancelEdit(row, index)}>退出</a>
+              </>
+            );
+          }
+          return actions;
+        },
+      },
     ];
 
     let columnSon = [
@@ -715,11 +909,32 @@ class Order extends Component {
       },
     ];
 
+    const components = {
+      body: {
+        cell: EditableCell,
+      },
+    };
+    // const rowNum = editIndex.substr(0, editIndex.length - 1).split(',')
     columns = columns.map(col => {
       // eslint-disable-next-line no-param-reassign
       if (!col.width) col.width = 100;
       tableWidth += col.width;
-      return col
+      if (!col.editable) {
+        return col;
+      }
+      const editId = editIndex === -1 ? editIndex : editIndex.split(',').length - 2;
+      return {
+        ...col,
+        onCell: (record, rowIndex) => ({
+          record,
+          rules: col.rules,
+          inputType: col.inputType,
+          dataIndex: col.dataIndex,
+          title: col.title,
+          // editing: editId.toString().indexOf((-(rowIndex + 1)).toString()) !== -1,
+          editing: rowIndex <= editId,
+        }),
+      };
     });
 
     columnSon = columnSon.map(col => {
@@ -728,17 +943,6 @@ class Order extends Component {
       tableWidthSon += col.width;
       return col
     });
-
-    const rowSelection = {
-      type: 'radio',
-      onChange: (selectedRowKeys, selectedRows) => {
-          this.setState({
-              dataSon: selectedRows[0],
-              loadingSon: true,
-            })
-        },
-    }
-
     return (
         <Modal
           width="100%"
@@ -753,25 +957,29 @@ class Order extends Component {
           <div>
             <AddPage
               openAddressMask={this.openAddressMask}
+              handleAdd={this.handleAdd}
             />
             <Col span={14}>
-              <Table
-                  dataSource={data.list}
-                  columns={columns}
-                  scroll={{ x: tableWidth, y: 400 }}
-                  pagination={data.pagination}
-                  rowKey="code"
-                  rowSelection={rowSelection}
-                  loading={loading}
-                  onChange={this.handleStandardTableChange}
-                  />
+              <EditableContext.Provider value={this.props.form}>
+                <Table
+                    dataSource={data.list}
+                    columns={columns}
+                    scroll={{ x: tableWidth, y: 300 }}
+                    pagination={data.pagination}
+                    rowKey="id"
+                    loading={loading}
+                    onChange={this.handleStandardTableChange}
+                    components={components}
+                    rowClassName="editable-row"
+                    />
+              </EditableContext.Provider>
             </Col>
             <Col span={1}></Col>
             <Col span={9}>
               <Table
                   dataSource={dataSon}
                   columns={columnSon}
-                  scroll={{ x: tableWidthSon, y: 400 }}
+                  scroll={{ x: tableWidthSon, y: 300 }}
                   loading={loadingSon}
                   />
             </Col>
