@@ -259,7 +259,7 @@ class Product extends React.Component {
       list: [],
       loading: false,
       selectedRows: [],
-      editIndex: -1,
+      editKey: null,
       id: 0, // 新增数据时，提供负数id
     }
   }
@@ -303,8 +303,12 @@ class Product extends React.Component {
     api.sampletype.getSeqProduct(query, true).then(res => {
       this.setState({
         list: res.rows,
-        pagination: { ...pagination, total: res.total },
-        editIndex: -1,
+        pagination: {
+          current: query.page,
+          pageSize: query.rows,
+          total: res.total,
+        },
+        editKey: null,
       });
     }).finally(() => {
       this.setState({ loading: false });
@@ -312,9 +316,9 @@ class Product extends React.Component {
   }
 
   // 取消编辑
-  cancel = () => {
-    this.setState({ editIndex: -1 });
-  };
+  // cancel = () => {
+  //   this.setState({ editKey: null });
+  // };
 
   // 作废数据
   deleteRow = row => {
@@ -348,22 +352,22 @@ class Product extends React.Component {
   }
 
   // 退出编辑
-  cancelEdit = (row, index) => {
+  cancelEdit = (row, key) => {
     if (row.id > 0) {
-      this.setState({ editIndex: index });
+      this.setState({ editKey: key });
     } else {
       const { list } = this.state;
       this.setState({
         list: list.filter(e => e.id > 0),
-        editIndex: index,
+        editKey: key,
       });
     }
   }
 
   // 新增
   handleAdd = () => {
-    const { editIndex, id, list } = this.state;
-    if (editIndex !== -1) {
+    const { editKey, id, list } = this.state;
+    if (editKey) {
       message.warning('请先保存或退出正在编辑的数据');
       return;
     }
@@ -371,7 +375,7 @@ class Product extends React.Component {
     const newId = id - 1;
     this.setState({
       id: newId,
-      editIndex: 0,
+      editKey: newId,
       list: [
         {
           id: newId,
@@ -497,9 +501,9 @@ class Product extends React.Component {
         width: 120,
         render: (value, row, index) => {
           const { status } = row;
-          const { editIndex } = this.state;
+          const { editKey } = this.state;
           let actions;
-          if (editIndex !== index && status === 1) {
+          if (editKey !== row.id && status === 1) {
             actions = (
               <>
                 <Popconfirm title="确定作废数据？" onConfirm={() => this.deleteRow(row)}>
@@ -508,12 +512,12 @@ class Product extends React.Component {
               </>
             );
           }
-          if (editIndex === index) {
+          if (editKey === row.id) {
             actions = (
               <>
                 <a onClick={() => this.saveRow(index)}>保存</a>
                 <Divider type="vertical" />
-                <a onClick={() => this.cancelEdit(row, -1)}>退出</a>
+                <a onClick={() => this.cancelEdit(row, null)}>退出</a>
               </>
             );
           }
@@ -530,13 +534,13 @@ class Product extends React.Component {
       }
       return {
         ...col,
-        onCell: (record, rowIndex) => ({
+        onCell: record => ({
           record,
           editOptions: col.editOptions,
           inputType: col.inputType,
           dataIndex: col.dataIndex,
           title: col.title,
-          editing: rowIndex === this.state.editIndex,
+          editing: record.id === this.state.editKey,
         }),
       };
     });

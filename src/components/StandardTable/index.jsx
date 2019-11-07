@@ -1,4 +1,4 @@
-import { Alert, Table } from 'antd';
+import { Alert, Table, Pagination } from 'antd';
 import React, { Component, Fragment } from 'react';
 import styles from './index.less';
 
@@ -67,6 +67,10 @@ class StandardTable extends Component {
     }
   };
 
+  handlePaginationChange = (current, pageSize) => {
+    this.handleTableChange({ current, pageSize });
+  }
+
   cleanSelectedKeys = () => {
     if (this.handleRowSelectChange) {
       this.handleRowSelectChange([], []);
@@ -129,9 +133,15 @@ class StandardTable extends Component {
           rowKey={rowKey || 'id'}
           rowSelection={rowSelection}
           dataSource={list}
-          pagination={paginationProps}
+          pagination={false}
           onChange={this.handleTableChange}
           {...rest}
+        />
+        <Pagination
+          className={styles.pagination}
+          onChange={this.handlePaginationChange}
+          onShowSizeChange={this.handlePaginationChange}
+          {...paginationProps}
         />
       </div>
     );
