@@ -60,10 +60,6 @@ class StandardTable extends Component {
   };
 
   handleTableChange = (pagination, filters, sorter, ...rest) => {
-    console.log(pagination);
-    console.log(filters);
-    console.log(sorter);
-    console.log(...rest);
     const { onChange } = this.props;
 
     if (onChange) {
