@@ -148,11 +148,11 @@ class Maintain extends React.Component {
     {
       title: '业务伙伴',
       dataIndex: 'code',
-      // width: 100,
+      width: 250,
       render(val, record) {
         return (
           <Link className={styles.partNer} to={`/partner/maintain/details/${val}`}>
-            <Icon type="home" /> &nbsp;{record.name}
+            <Icon type={record.type === 1 ? 'home' : 'user'} /> &nbsp;{record.name}
             <div className={styles.partCode}>{val}</div>
           </Link>
         );
@@ -186,7 +186,7 @@ class Maintain extends React.Component {
     },
     {
       title: '冻结',
-      dataIndex: 'salesBan',
+      dataIndex: 'salesOrderBlock',
       // width: 100,
       filters: [
         {
@@ -250,12 +250,13 @@ class Maintain extends React.Component {
                  <div>
                     {val}
                     &nbsp;&nbsp;
-                    <Badge status={mobileIden[records.mobilePhoneVerifyStatus].value} />
+                    {records.mobilePhoneVerifyStatus === 1 ? <Badge status={mobileIden[records.mobilePhoneVerifyStatus].value} /> : ''}
                   </div>
                   <div>
                     {records.email}
                     &nbsp;&nbsp;
-                    <Badge status={emailIden[records.emailVerifyStatus].value} />
+                    {records.emailVerifyStatus === 1 ? <Badge status={emailIden[records.emailVerifyStatus].value} /> : ''}
+
                   </div>
                 </>
       },
@@ -276,11 +277,20 @@ class Maintain extends React.Component {
         const { code } = record;
         const menu = (
           <Menu>
-            <Menu.Item><a href="#" onClick={e => { this.cancelFreeze(e, record) }}>取消冻结</a></Menu.Item>
-            <Menu.Item><a href="#" onClick={e => { this.cancelIdent(e, record) }}>取消认证</a></Menu.Item>
-            <Menu.Item><a href="#" onClick={ e => { this.changeIdent(e, record) }}>变更认证</a></Menu.Item>
+            {record.salesOrderBlock === 1 ? <Menu.Item><a href="#" onClick={e => { this.cancelFreeze(e, record) }}>取消冻结</a></Menu.Item> : <Menu.Item><a href="#" onClick={ e => { this.freezePartner(e, record) }}>冻结</a></Menu.Item>}
+            {record.certificationStatus === 1 ?
+              <Menu.Item>
+                <a href="#" onClick={e => { this.cancelIdent(e, record) }}>取消认证</a>
+              </Menu.Item>
+            : ''
+            }
+            {record.certificationStatus === 1 ?
+              <Menu.Item>
+                <a href="#" onClick={ e => { this.changeIdent(e, record) }}>变更认证</a>
+              </Menu.Item>
+            :
             <Menu.Item><a href="#" onClick={ e => { this.identificate(e, record) }}>认证</a></Menu.Item>
-            <Menu.Item><a href="#" onClick={ e => { this.freezePartner(e, record) }}>冻结</a></Menu.Item>
+            }
           </Menu>
         );
         return (
@@ -358,19 +368,19 @@ class Maintain extends React.Component {
     const data = [];
     // const { formValues } = this.state;
     console.log(values);
-    for (let i = 0; i < 25; i++) {
+    for (let i = 0; i < 10; i++) {
       data.push({
         id: i + 1,
         type: 1, // 1人，2组织
         code: 100000 + (i + 1),
         name: `name${i}`,
         certificationStatus: 1,
-        salesBan: 0,
+        salesOrderBlock: 1,
         customerDataStatus: 1,
         vendorDataStatus: 1,
         mobilePhone: '15300772583',
-        mobilePhoneVerifyStatus: 0,
-        emailVerifyStatus: 1,
+        mobilePhoneVerifyStatus: 1,
+        emailVerifyStatus: 0,
         email: '123@qq.com',
         address: '江西省 南昌市 昌北经济开发区 川杨新苑三期 12号楼 501室',
       });
@@ -505,7 +515,7 @@ class Maintain extends React.Component {
           </Col>
           <Col xxl={6} lg={8}>
             <FormItem label="销售冻结">
-              {getFieldDecorator('salesBan')(
+              {getFieldDecorator('salesOrderBlock')(
                 <Select placeholder="请选择">
                   <Option value="0">冻结</Option>
                   <Option value="1">活跃</Option>

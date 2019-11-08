@@ -491,8 +491,10 @@ class EditableCell extends React.Component {
       index,
       children,
       rules,
+      value,
       ...restProps
     } = this.props;
+    // console.log(record[dataIndex])
     if (editing) {
       return (
         <td {...restProps} style={{ padding: 0 }}>
@@ -500,7 +502,7 @@ class EditableCell extends React.Component {
               {getFieldDecorator(dataIndex, {
                 rules,
                 valuePropName: 'checked',
-                initialValue: record[dataIndex],
+                initialValue: value,
               })(inputType)}
             </Form.Item>
         </td>
@@ -537,7 +539,6 @@ class Order extends Component {
 
   componentDidMount() {
     this.props.onRef(this)
-    this.getTableData()
   }
 
   visibleShow = visible => {
@@ -606,41 +607,24 @@ class Order extends Component {
   }
 
   // 保存
-  saveRow = (index, son) => {
-    if (son === 'son') {
-      this.props.form.validateFields(error => {
-        if (error) return;
-        const { parantData, sonAminoAcid } = this.state;
-        const newData = {
-          name: sonAminoAcid.name,
-          code: sonAminoAcid.code,
-          aminoAcidID: sonAminoAcid.id,
-          modificationID: parantData.id,
-        };
-        if (newData.id > 0) {
-          // api.peptideBase.updateSeries(newData).then(() => this.getTableData());
-        } else {
-          api.peptideBase.insertSuitableAminoAcids(newData).then(() => {
-            this.getTableData([], 'son');
-          },
-          );
-        }
-      });
-    } else {
+  saveRow = (val, index) => {
       this.props.form.validateFields((error, row) => {
-        if (error) return;
+        // if (error) return;
         const { list } = this.state;
-        const newData = { ...list[index],
-                          ...row,
-                          isIndependentModification: row.isIndependentModification ? 1 : 2,
-                        };
-        if (newData.id > 0) {
-          // api.peptideBase.updateSeries(newData).then(() => this.getTableData());
-        } else {
-          api.peptideBase.insertModifications(newData).then(() => this.getTableData());
-        }
+        // const newData = { ...list[index],
+        //                   ...row,
+        //                   isIndependentModification: row.isIndependentModification ? 1 : 2,
+        //                 };
+        // if (newData.id > 0) {
+        //   // api.peptideBase.updateSeries(newData).then(() => this.getTableData());
+        // } else {
+        //   api.peptideBase.insertModifications(newData).then(() => this.getTableData());
+        // }
+        console.log(list[index])
+        // console.log(row)
+        // console.log(index)
+        this.cancelEdit(val, index)
       });
-    }
   }
 
   // 新增
@@ -655,7 +639,7 @@ class Order extends Component {
     let strId = '';
     // eslint-disable-next-line array-callback-return
     data.map((item, key) => {
-      arrId.push({ id: id - key - 1, name: 'name' })
+      arrId.push({ id: id - key - 1, name: item[0], providerTotalAmount: item[1] })
       strId = `${strId + (id - key - 1)},`
     })
     this.setState({
@@ -728,7 +712,6 @@ class Order extends Component {
     const data = { list, pagination: { current, pageSize, total } };
     let tableWidth = 0;
     let tableWidthSon = 0;
-
     let columns = [
       {
         title: '编号',
@@ -740,7 +723,6 @@ class Order extends Component {
         dataIndex: 'name',
         width: 100,
         editable: true,
-        inputType: <Input style={{ width: '90%' }}/>,
         rules: [
           { required: true, message: '必填' },
         ],
@@ -749,6 +731,10 @@ class Order extends Component {
         title: '提供总量(mg)',
         dataIndex: 'providerTotalAmount',
         width: 150,
+        editable: true,
+        rules: [
+          { required: true, message: '必填' },
+        ],
       },
       {
         title: '提供总量(mg)',
@@ -860,7 +846,7 @@ class Order extends Component {
           if (editIndex.toString().indexOf(row.id) !== -1) {
             actions = (
               <>
-                <a className="addNewData" onClick={() => this.saveRow(index)}>保存</a>
+                <a className="addNewData" onClick={() => this.saveRow(row, index)}>保存</a>
                 <Divider type="vertical" />
                 <a onClick={() => this.cancelEdit(row, index)}>退出</a>
               </>
@@ -928,9 +914,10 @@ class Order extends Component {
         onCell: (record, rowIndex) => ({
           record,
           rules: col.rules,
-          inputType: col.inputType,
-          dataIndex: col.dataIndex,
+          inputType: <Input style={{ width: '90%' }} defaultValue={list[rowIndex][col.dataIndex]}/>,
+          dataIndex: col.dataIndex + rowIndex,
           title: col.title,
+          value: list[rowIndex][col.dataIndex],
           // editing: editId.toString().indexOf((-(rowIndex + 1)).toString()) !== -1,
           editing: rowIndex <= editId,
         }),

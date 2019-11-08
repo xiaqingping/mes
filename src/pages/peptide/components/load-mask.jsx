@@ -71,7 +71,7 @@ class Load extends Component {
         </Button>,
       ]}
     >
-      <Text style={{ margin: '0' }}>多肽名称，提供总量（mg），是否脱盐（是或否），纯度（%），多肽序列，分装管数。支持逗号和空格。</Text >
+      <Text style={{ margin: '0' }}>多肽名称，提供总量（mg），是否脱盐（是或否），纯度（%），多肽序列，分装管数。支持逗号。</Text >
       <TextArea
       rows={6}
       style={{ resize: 'none' }}
