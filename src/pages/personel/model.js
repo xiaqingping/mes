@@ -3,8 +3,11 @@ import api from '@/api';
 const PersonelModel = {
   namespace: 'personel',
   state: {
-    // 类型
-    // carrierSeries:[],
+    // 状态
+    status:[
+      { id:1,name:'正常' },
+      { id:2,name:'已删除' }
+    ],
     // 月
     month: [
       { id:1,name:'1' },

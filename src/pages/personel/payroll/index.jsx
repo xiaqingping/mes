@@ -14,7 +14,7 @@ import React, { Component } from 'react';
 import { connect } from 'dva';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import StandardTable from '@/components/StandardTable';
-import api from '@/api';
+import api, { serial } from '@/api';
 // import { formatter } from '@/utils/utils';
 
 const EditableContext = React.createContext();
@@ -28,6 +28,7 @@ const { Option } = Select;
 
 @connect(({ personel }) => ({
   type: personel.type,
+  status: personel.status,
 }))
 @Form.create()
 class Search extends Component {
@@ -76,9 +77,10 @@ class Search extends Component {
             <FormItem label="状态">
               {getFieldDecorator('status')(
                 <Select allowClear={true}>
-                  <Option value="1">正常</Option>
-                  <Option value="2">已删除</Option>
-                </Select>,
+                {this.props.status.map(e =>
+                  <Option value={e.id} key={e.id}>{e.name}</Option>,
+                )}
+              </Select>,
               )}
             </FormItem>
           </Col>
@@ -156,33 +158,11 @@ class Modifications extends Component {
     },
     list: [],
     total: 0,
-    loading: false,
+    loading: true,
     selectedRows: [],
     editIndex: -1,
     id: 0, // 新增数据时，提供负数id 
   }
-
-  // 获取表格数据
-  getTableData = (options = {}) => {
-    const { formValues } = this.state;
-    const query = Object.assign({}, formValues, options);
-
-    this.setState({
-      formValues: query,
-      loading: true,
-    });
-    
-    api.pay.getTypepay(query).then(res => {
-      this.setState({
-        list: res,
-        total: res.total,
-        loading: false,
-        editIndex: -1,
-      });
-      // console.log(res);
-    });
-  }
-
   // 分页
   handleStandardTableChange = pagination => {
     this.getTableData({
@@ -197,6 +177,26 @@ class Modifications extends Component {
       selectedRows: rows,
     });
   };
+  // 获取表格数据
+  getTableData = (options = {}) => {
+    const { formValues } = this.state;
+    const query = Object.assign({}, formValues, options);
+
+    this.setState({
+      formValues: query,
+      loading: true,
+    });
+    
+    api.pay.getTypepay(query,true).then(res => {
+      this.setState({
+        list: res.rows,
+        total: res.total,
+        loading: false,
+        editIndex: -1,
+      });
+      console.log(res);
+    });
+  }
 
   // 修改,开启编辑
   editRow = index => {
@@ -229,12 +229,10 @@ class Modifications extends Component {
   }
   // 保存和修改之后的保存
   saveRow = index => {
-    // console.log(1);
     this.props.form.validateFields((error, row) => {
       if (error) return;
       const { list } = this.state;
       const newData = { ...list[index], ...row };
-      console.log(newData);
 
       if (newData.id < 0) {
         api.pay.increaseTypepay(newData).then(() => this.getTableData());
@@ -262,10 +260,35 @@ class Modifications extends Component {
         ...list,
       ],
       
-    },
-    // console.log(list)
-    );
-    // console.log(newId);
+    });
+  }
+  // 排序验证
+  checkNameInput = (rule, value, callback) => {
+    // const {value,serial,list} =this.state;
+    // let newSerail;
+    // // console.log(newSerail);
+    // this.setState({
+    //   serial:newSerail,
+    //   editIndex:0,
+    //   list:[
+    //     {
+    //       serial:newSerail
+    //     },
+    //     ...list,
+    //   ]
+    // });
+    // console.log(list);
+    // if (value.name) {
+    //   callback();
+    //   return;
+    // }
+    // console.log(value.name);
+    if (serial == newSerial) {
+      callback('排序不能重复');
+    } else {
+      
+    }
+    callback();
 
   }
 
@@ -278,6 +301,7 @@ class Modifications extends Component {
       loading,
     } = this.state;
     const data = { list, pagination: { current, pageSize, total } };
+    // console.log(data);
     let tableWidth = 0;
 
     const components = {
@@ -333,6 +357,7 @@ class Modifications extends Component {
         inputType: <Input style={{ width: '90%' }}/>,
         rules: [
           { required: true, message: '必填' },
+          { validator: this.checkNameInput},
         ],
       },
       
@@ -401,10 +426,6 @@ class Modifications extends Component {
     
 
     columns = columns.map(col => {
-      // tableWidth += col.width;
-      // if (!col.editable) {
-      //   return col;
-      // }
       if (!col.width) col.width = 100;
       tableWidth += col.width;
       if (!col.editable) {

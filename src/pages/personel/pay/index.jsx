@@ -176,17 +176,6 @@ class Modifications extends Component {
     id: 0, // 新增数据时，提供负数id 
     dataSons: [],
   }
-  // state = {
-  //   pagination: {
-  //     current: 1,
-  //     pageSize: 10,
-  //     total: 0,
-  //   },
-  //   list: [],
-  //   loading: false,
-  //   selectedRows: [],
-  //   editIndex: -1,
-  // }
 
   // 工资管理
   columns = [
@@ -355,6 +344,7 @@ class Modifications extends Component {
         loading: false,
         editIndex: -1,
       });
+      // console.log(res);
     });
   }
 
