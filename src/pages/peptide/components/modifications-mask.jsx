@@ -59,9 +59,9 @@ class Search extends Component {
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="修饰类型">
-              {getFieldDecorator('modificationTypeID', { initialValue: '' })(
+              {getFieldDecorator('modificationTypeID', { initialValue: '0' })(
                 <Select>
-                  <Option value="">全部</Option>
+                  <Option value="0">全部</Option>
                   {modificationType.map(item => <Option key={item.id} value={item.id}>
                   {item.modificationType}
                   </Option>)}
@@ -113,8 +113,11 @@ class Order extends Component {
     total: 0,
     loading: false,
     visible: false, // 遮罩层的判断
-    data: [],
     modificationType: [],
+  }
+
+  componentDidMount() {
+    this.props.onRef(this);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -128,12 +131,16 @@ class Order extends Component {
     })
   }
 
-  handleOk = () => {
-    this.props.getData(this.state.data);
+  visibleShow = visible => {
+    this.setState({ visible })
+  }
+
+  handleSelect = data => {
+    this.props.getData(data);
+    this.handleCancel()
   };
 
   handleCancel = () => {
-    this.props.closeMask(false);
     this.setState({
       visible: false,
     });
@@ -264,6 +271,14 @@ class Order extends Component {
         dataIndex: 'cancelDate',
         width: 200,
       },
+      {
+        title: '操作',
+        dataIndex: 'actions',
+        fixed: 'right',
+        render: (text, record) => (
+          <a onClick={() => this.handleSelect(record)}>选择</a>
+        ),
+      },
     ];
 
     columns = columns.map(col => {
@@ -273,14 +288,14 @@ class Order extends Component {
       return col
     });
 
-    const rowSelection = {
-      type: 'radio',
-      onChange: (selectedRowKeys, selectedRows) => {
-          this.setState({
-              data: selectedRows[0],
-            })
-        },
-    }
+    // const rowSelection = {
+    //   type: 'radio',
+    //   onChange: (selectedRowKeys, selectedRows) => {
+    //       this.setState({
+    //           data: selectedRows[0],
+    //         })
+    //     },
+    // }
 
     return (
       <div>
@@ -290,6 +305,7 @@ class Order extends Component {
           visible={visible}
           onOk={this.handleOk}
           onCancel={this.handleCancel}
+          footer={null}
         >
             <Search getTableData={this.getTableData} status={commonData.status}
              modificationType={ modificationType }/>
@@ -301,7 +317,7 @@ class Order extends Component {
               scroll={{ x: tableWidth, y: 400 }}
               pagination={data.pagination}
               rowKey="code"
-              rowSelection={rowSelection}
+              // rowSelection={rowSelection}
               loading={loading}
               onChange={this.handleStandardTableChange}
               />

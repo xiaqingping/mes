@@ -70,18 +70,26 @@ class Order extends Component {
     visible: false,
   }
 
-  componentWillReceiveProps(nextProps) {
-    this.setState({
-      visible: nextProps.visible,
-    })
+  componentDidMount() {
+    this.props.onRef(this)
   }
 
+  visibleShow = visible => {
+    this.setState({
+      visible,
+    })
+  }
+  // componentWillReceiveProps(nextProps) {
+  //   this.setState({
+  //     visible: nextProps.visible,
+  //   })
+  // }
+
   handleOk = () => {
-    this.props.getData(this.state.data);
+    this.handleCancel()
   };
 
   handleCancel = () => {
-    this.props.closeMask(false);
     this.setState({
       visible: false,
     });
@@ -199,7 +207,6 @@ class Order extends Component {
       visible,
     } = this.state;
     const data = { list, pagination: { current, pageSize, total } };
-    const { peptide: { commonData } } = this.props
     let tableWidth = 0;
 
     let columns = [
@@ -372,6 +379,7 @@ class Order extends Component {
       onOk={this.handleOk}
       onCancel={this.handleCancel}
       keyboard={false}
+      maskClosable={false}
     >
           <div className="tableList">
             <div className="tableListOperator">

@@ -5,7 +5,8 @@ import { connect } from 'dva';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import PersonCertification from '@/pages/partner/maintain_edit/components/PersonCertification';
 import PersonCredit from '@/pages/partner/maintain_edit/components/PersonCredit';
-import { Link } from 'react-router-dom'
+// eslint-disable-next-line import/no-extraneous-dependencies
+import { Link } from 'react-router-dom';
 import BasicInfo from './components/BasicInfo';
 import Type from './components/Type';
 import Credit from './components/Credit';
@@ -168,7 +169,8 @@ class CustomerDetails extends Component {
         ],
       },
       // 信贷数据
-      creditList: {
+      creditList: [
+        {
           invoicePartyId: 123,
           invoicePartyCode: 12345,
           invoicePartyName: '上海交通大学',
@@ -181,6 +183,20 @@ class CustomerDetails extends Component {
           billingDay: '25',
           lastEvaluationDate: '2019-10-01',
         },
+        {
+          invoicePartyId: 123,
+          invoicePartyCode: 12345,
+          invoicePartyName: '上海交通大学',
+          currencyCode: 'CNY',
+          credit: '40000',
+          creditPeriod: '30',
+          tempCreditLimit: '60000',
+          tempCreditLimitExpirationDate: '2019-10-30',
+          billingCycle: '50',
+          billingDay: '25',
+          lastEvaluationDate: '2019-10-01',
+        },
+      ],
       // 组织认证
       organizationCertification: {
         specialInvoice: true,
@@ -437,12 +453,28 @@ class CustomerDetails extends Component {
     });
   };
 
-  title = () => (
+  title = () => {
+    const { match: { params: { id } } } = this.props;
+    return (
       <div>
         <span>查看 123</span>&nbsp;&nbsp;&nbsp;&nbsp;
-        <Link to="/partner/maintain/edit/100001"><Icon type="edit" style={{ color: 'black' }} /></Link>
+        <Link to={`/partner/maintain/edit/${id}`} onClick={() => {
+          this.props.dispatch({
+            type: 'partnerMaintainEdit/setDetails',
+            payload: null,
+          })
+          this.props.dispatch({
+            type: 'partnerMaintainEdit/setType',
+            payload: null,
+          })
+          this.props.dispatch({
+            type: 'partnerMaintainEdit/setSupplier',
+            payload: null,
+          })
+        }}><Icon type="edit" style={{ color: 'black' }} /></Link>
       </div>
     )
+}
 
   render() {
     const { tabActiveKey } = this.state;

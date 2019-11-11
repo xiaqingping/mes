@@ -10,7 +10,14 @@ import {
 import React from 'react';
 import { connect } from 'dva';
 import { formatMessage } from 'umi-plugin-react/locale';
-import { EmailInput, NameInput, MobilePhoneInput, TelphoneInput, FaxInput, AddressInput } from '@/components/CustomizedFormControls';
+import {
+  EmailInput,
+  NameInput,
+  MobilePhoneInput,
+  TelphoneInput,
+  FaxInput,
+  AddressInput,
+} from '@/components/CustomizedFormControls';
 
 import styles from '../style.less';
 
@@ -48,6 +55,7 @@ class Basic extends React.Component {
   validate = () => {
     const { form } = this.props;
     form.validateFieldsAndScroll((error, values) => {
+      console.log(values);
       if (!error) {
         //
       }
@@ -164,14 +172,27 @@ class Basic extends React.Component {
             </Col>
             <Col md={6} sm={12}>
               <FormItem label="电话">
-                {getFieldDecorator('telephone', {
-                  initialValue: {
-                    telephoneCountryCode: basic.telephoneCountryCode,
-                    telephoneAreaCode: basic.telephoneAreaCode,
-                    telephone: basic.telephone,
-                    telephoneExtension: basic.telephoneExtension,
-                  },
-                })(<TelphoneInput onChange={value => this.valueChange('telephone', value)} />)}
+                {
+                  editType === 'add' ? (
+                    getFieldDecorator('telephone', {
+                      initialValue: {
+                        telephoneCountryCode: basic.telephoneCountryCode,
+                        telephoneAreaCode: basic.telephoneAreaCode,
+                        telephone: basic.telephone,
+                        telephoneExtension: basic.telephoneExtension,
+                      },
+                    })(<TelphoneInput onChange={value => this.valueChange('telephone', value)} />)
+                  ) : null
+                }
+                {
+                  editType === 'update' ? (
+                    <p style={{ lineHeight: '32px' }}>
+                      <span>+86 </span>
+                      <span>0565-57776954-6598 </span>
+                      <a href="#">变更</a>
+                    </p>
+                  ) : null
+                }
               </FormItem>
             </Col>
             <Col md={6} sm={12}>
@@ -218,7 +239,6 @@ class Basic extends React.Component {
                   initialValue: basic.industryCode,
                 })(
                   <Select onChange={value => this.valueChange('industryCode', value)} >
-                    {/* <Option value="1">军队</Option> */}
                     {
                       industryCategories.map(e => (
                         <Option key={e.code} value={e.code}>{e.name}</Option>

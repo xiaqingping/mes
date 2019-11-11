@@ -145,9 +145,7 @@ class ModificationProducts extends Component {
     aminoAcid: [], // 氨基酸
     id: 0, // 新增数据时，提供负数id
     sonModification: [],
-    visibleModification: false, // 遮罩层的判断
     sonProducts: [],
-    visibleProducts: false, // 遮罩层的判断
   }
 
   componentDidMount() {
@@ -222,6 +220,21 @@ class ModificationProducts extends Component {
         editIndex: index,
       });
     }
+    this.clearInput()
+  }
+
+  // 清空弹框的选择内容
+  clearInput = () => {
+    this.props.form.setFieldsValue({
+      sapProductCode: '',
+      sapProductName: '',
+      modificationPosition: '',
+      modificationName: '',
+    });
+    this.setState({
+      sonProducts: [],
+      sonModification: [],
+    })
   }
 
   // 删除数据
@@ -259,34 +272,11 @@ class ModificationProducts extends Component {
       if (newData.id > 0) {
         // api.peptideBase.updateSeries(newData).then(() => this.getTableData());
       } else {
-        api.peptideBase.insertModificationProducts(newData).then(() => this.getTableData());
+        api.peptideBase.insertModificationProducts(newData).then(
+          () => { this.getTableData(); this.clearInput() },
+          );
       }
     });
-  }
-
-  // 打开搜索
-  openMask = type => {
-    if (type === 'modifications') {
-      this.setState({
-        visibleModification: true,
-      })
-    } else {
-      this.setState({
-        visibleProducts: true,
-      })
-    }
-  }
-
-  closeMask = (v, type) => {
-    if (type === 'modifications') {
-      this.setState({
-        visibleModification: v,
-      })
-    } else {
-      this.setState({
-        visibleProducts: v,
-      })
-    }
   }
 
   // 得到修饰搜索的值
@@ -305,12 +295,10 @@ class ModificationProducts extends Component {
       })
       this.setState({
         sonModification: data,
-        visibleModification: false,
       })
     } else {
       this.setState({
         sonProducts: data,
-        visibleProducts: false,
       })
       this.props.form.setFieldsValue({
         sapProductCode: data.code,
@@ -348,9 +336,7 @@ class ModificationProducts extends Component {
       total,
       loading,
       sonModification,
-      visibleModification,
       aminoAcid,
-      visibleProducts,
       sonProducts,
     } = this.state;
     const data = { list, pagination: { current, pageSize, total } };
@@ -368,7 +354,7 @@ class ModificationProducts extends Component {
         dataIndex: 'modificationName',
         width: 250,
         editable: true,
-        inputType: <Search style={{ width: 230 }} onSearch={() => this.openMask('modifications')} value={sonModification.name ? sonModification.name : ''} readOnly/>,
+        inputType: <Search style={{ width: 230 }} onSearch={() => this.modificationShow.visibleShow(true)} value={sonModification.name ? sonModification.name : ''} readOnly/>,
         rules: [
           { required: true, message: '必填' },
         ],
@@ -465,6 +451,7 @@ class ModificationProducts extends Component {
         title: '是否脱盐',
         dataIndex: 'isNeedDesalting',
         width: 110,
+        align: 'center',
         render: text => (text === 1 ? '√' : ''),
         editable: true,
         inputType: <Checkbox style={{ textAlign: 'center', display: 'block' }}/>,
@@ -484,7 +471,7 @@ class ModificationProducts extends Component {
         dataIndex: 'sapProductName',
         width: 300,
         editable: true,
-        inputType: <Search style={{ width: 280 }} onSearch={() => this.openMask('products')} value={sonProducts.name ? sonProducts.name : ''} readOnly/>,
+        inputType: <Search style={{ width: 280 }} onSearch={() => this.productShow.visibleShow(true)} value={sonProducts.name ? sonProducts.name : ''} readOnly/>,
         rules: [
           { required: true, message: '必填' },
         ],
@@ -606,10 +593,10 @@ class ModificationProducts extends Component {
             </EditableContext.Provider>
           </div>
         </Card>
-        <Modifications getData={v => { this.getSonData(v, 'modifications') }} visible={visibleModification}
-        closeMask={ v => { this.closeMask(v, 'modifications') }}/>
-        <Products getData={v => { this.getSonData(v, 'products') }} visible={visibleProducts}
-        closeMask={ v => { this.closeMask(v, 'products') }}/>
+        <Modifications getData={v => { this.getSonData(v, 'modifications') }}
+        onRef={ ref => { this.modificationShow = ref }}/>
+        <Products getData={v => { this.getSonData(v, 'products') }}
+        onRef={ ref => { this.productShow = ref }}/>
       </PageHeaderWrapper>
     );
   }

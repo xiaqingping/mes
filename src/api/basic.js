@@ -14,30 +14,22 @@ export default {
   getInvtypes() {
     return request('/basic/v1/invtypes');
   },
-  // 查询币种列表
-  getCurrencys() {
-    return request('/basic/v1/currencys');
-  },
+  // // 查询币种列表
+  // getCurrencys() {
+  //   return request('/basic/v1/currencys');
+  // },
   // 查询仓库
   getStorages() {
     return request('/basic/v1/storages');
   },
-  // 查询网点列表 TODO:已废弃
-  // getOffices() {
-  //   return request('/basic/v1/offices');
-  // },
   // 查询付款方式
-  getPaymethods() {
+  getPayMethods() {
     return request('/basic/v1/paymethods');
   },
   // 查询付款条件
-  getPayterms() {
+  getPayTerms() {
     return request('/basic/v1/payterms');
   },
-  // 查询大区 TODO:已废弃
-  // getRegions() {
-  //   return request('/basic/v1/regions');
-  // },
   // 查询订货人
   getContacts() {
     return request('/basic/v1/contacts');

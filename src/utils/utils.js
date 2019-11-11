@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import { parse } from 'querystring';
 /* eslint no-useless-escape:0 import/prefer-default-export:0 */
 
@@ -57,6 +58,46 @@ export const validateForm = form =>
 
 /**
  * 获取表单的值（不验证）
- * @param {*} form
+ * @param {Object}} form
  */
 export const getFormValue = form => form.getFieldsValue();
+
+/**
+ * 生成UUID
+ */
+export const guid = () => {
+  function S4() {
+    // eslint-disable-next-line no-bitwise
+    return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
+  }
+  return (S4() + S4() + S4() + S4() + S4() + S4() + S4() + S4());
+};
+
+/**
+ * 深度对比两个对象数组，返回 next 相对与 pre 的（新增、修改、删除）对象
+ * @param {Array[Object]} pre 旧的对象数组
+ * @param {Array[Object]} next 新的对象数组
+ * @param {String} key 新旧数据有相同的key，说明是同一条数据，需要深度对比，字段有无变更
+ */
+export const diff = (pre, next, key = 'id') => {
+  // next中，key 为负值，则是新增数据
+  const add = [];
+  next.forEach(e => {
+    if (e[key] && e[key] < 0) {
+      add.push(e);
+    }
+  });
+
+  // 在next中，过滤掉add数据 = 已有数据未修改 + 已有数据修改
+  const nextOther = _.differenceWith(next, add, _.isEqual);
+
+  // 在nextOther中，过滤掉pre数据 = 已有数据修改
+  const update = _.differenceWith(nextOther, pre, _.isEqual);
+
+  // pre有，next没有，则是删除数据
+  const del = pre.filter(preItem =>
+    !nextOther.some(nextOtherItem => nextOtherItem[key] === preItem[key]),
+  );
+
+  return { add, del, update };
+};

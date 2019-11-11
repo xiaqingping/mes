@@ -22,6 +22,9 @@ const { Option } = Select;
  * 页面顶部筛选表单
  */
 @Form.create()
+@connect(({ peptide }) => ({
+  peptide,
+}))
 class Search extends Component {
   constructor(props) {
     super(props);
@@ -58,9 +61,11 @@ class Search extends Component {
     const {
       form: { getFieldDecorator },
       brands,
-      rangeArea,
+      peptide:
+      { salesRanges },
     } = this.props;
     const { factorys } = this.state;
+
     return (
       <Form onSubmit={this.submit} layout="inline">
         <Row gutter={{ lg: 24, md: 12, sm: 6 }}>
@@ -107,10 +112,11 @@ class Search extends Component {
           <Col lg={6} md={8} sm={12}>
             <FormItem label="销售范围">
               {getFieldDecorator('range_area', { initialValue: '10-3110' })(
-                <Select>
-                    {rangeArea.map(item =>
-                      <Option key={item.id} value={item.id}>{item.name}</Option>,
-                    )}
+                <Select style={{ width: '192px' }}>
+                  <Option value="">全部</Option>
+                  {salesRanges.map(item => <Option key={`${item.organization}${item.channel}`} value={`${item.channel}-${item.organization}`}>
+                  {`${item.channelName} - ${item.organizationName}`}
+                  </Option>)}
                 </Select>)}
             </FormItem>
           </Col>
@@ -171,23 +177,26 @@ class Order extends Component {
     total: 0,
     loading: false,
     visible: false, // 遮罩层的判断
-    data: [],
     dataSon: [],
     loadingSon: false,
   }
 
-  componentWillReceiveProps(nextProps) {
+  componentDidMount() {
+    this.props.onRef(this)
+  }
+
+  visibleShow = visible => {
     this.setState({
-      visible: nextProps.visible,
+      visible,
     })
   }
 
-  handleOk = () => {
-    this.props.getData(this.state.data);
+  handleSelect = data => {
+    this.props.getData(data);
+    this.handleCancel()
   };
 
   handleCancel = () => {
-    this.props.closeMask(false)
     this.setState({
       visible: false,
     });
@@ -198,9 +207,10 @@ class Order extends Component {
       this.setState({
         loadingSon: true,
       })
+
       setTimeout(() => {
           this.setState({
-            dataSon: v.stock.storages,
+            dataSon: v.stock ? v.stock.storages : [],
             loadingSon: false,
           })
         }, 500)
@@ -264,12 +274,12 @@ class Order extends Component {
       {
         title: '产品名称',
         dataIndex: 'desc',
-        width: 300,
+        width: 250,
       },
       {
         title: '英文名称',
         dataIndex: 'edesc',
-        width: 300,
+        width: 250,
       },
       {
         title: '旧物料号',
@@ -300,7 +310,7 @@ class Order extends Component {
         title: '温度条件',
         dataIndex: 'temperatureCode',
         width: 200,
-        render: (text, record) => `${record.temperatureCode}-${record.temperature}`,
+        render: (text, record) => `${record.temperatureCode ? `${record.temperatureCode}-` : ''}${record.temperature}`,
       },
       {
         title: '危险品标识',
@@ -358,6 +368,14 @@ class Order extends Component {
           return '状态异常(促销)'
         },
       },
+      {
+        title: '操作',
+        dataIndex: 'actions',
+        fixed: 'right',
+        render: (text, record) => (
+          <a onClick={() => this.handleSelect(record)}>选择</a>
+        ),
+      },
     ];
 
     const columnSon = [
@@ -381,23 +399,24 @@ class Order extends Component {
       return col
     });
 
-    const rowSelection = {
-      type: 'radio',
-      onChange: (selectedRowKeys, selectedRows) => {
-          this.setState({
-              data: selectedRows[0],
-            })
-        },
-    }
+    // const rowSelection = {
+    //   type: 'radio',
+    //   onChange: (selectedRowKeys, selectedRows) => {
+    //       this.setState({
+    //           data: selectedRows[0],
+    //         })
+    //    },
+    // }
 
     return (
       <div>
         <Modal
           width="1200px"
-          title="多肽氨基酸列表"
+          title="产品列表"
           visible={visible}
           onOk={this.handleOk}
           onCancel={this.handleCancel}
+          footer={null}
         >
             <Search getTableData={this.getTableData} brands={commonData.brands}
             rangeArea={commonData.rangeArea}/>
@@ -411,7 +430,7 @@ class Order extends Component {
                 columns={columns}
                 scroll={{ x: tableWidth, y: 350 }}
                 rowKey="code"
-                rowSelection={rowSelection}
+                // rowSelection={rowSelection}
                 loading={loading}
                 onChange={this.handleStandardTableChange}
                 onRow={record => ({ onClick: e => this.dataSon(record, e) }) }

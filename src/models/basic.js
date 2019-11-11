@@ -132,15 +132,21 @@ const BasicModel = {
         } else {
           const methodName = `get${type.slice(0, 1).toUpperCase()}${type.slice(1)}`;
           if (!basic[methodName]) {
-            console.log(`${namespace} getCache type=${type} 对应的接口不存在`);
+            console.error(`${namespace} getCache type=${type} 对应的接口不存在`);
             return;
           }
           method = basic[methodName];
         }
 
         // 五：请求数据
-        targetState = yield call(method, options);
+        try {
+          targetState = yield call(method, options);
+        } catch (error) {
+          console.error(`${namespace} getCache type=${type} 接口请求失败`);
+        }
       }
+
+      if (!targetState) return;
 
       // 六：设置数据
       yield put({

@@ -1,13 +1,14 @@
-import api from '@/api';
+import basic from '@/api/basic';
 
+const namespace = 'peptide';
 const Model = {
-  namespace: 'peptide',
+  namespace,
 
   state: {
-    // 订单列表数据
-    orderList: [],
-    // 列表数据
-    data: [],
+    // // 订单列表数据
+    // orderList: [],
+    // // 列表数据
+    // data: [],
     // 修饰位置
     commonData: {
       modificationPosition: [
@@ -41,13 +42,6 @@ const Model = {
         { id: 10, name: '直销' },
         { id: 20, name: '电商' },
         { id: 99, name: '公司间' },
-      ],
-      // 销售范围
-      rangeArea: [
-        { id: '10-3110', name: '直销-国内' },
-        { id: '10-3120', name: '直销-国外' },
-        { id: '99-3120', name: '公司间-国外' },
-        { id: '20-3110', name: '电商-国内' },
       ],
       // 交货方式
       deliveryTypeStatus: [
@@ -109,10 +103,10 @@ const Model = {
       { code: 'MBI', name: 'MBI' },
     ],
     },
-    // 修饰类型
-    modificationTypes: [],
-    // 纯度
-    purity: [],
+    // // 修饰类型
+    // modificationTypes: [],
+    // // 纯度
+    // purity: [],
     // 销售大区
     regions: [],
     // 销售网点
@@ -124,153 +118,79 @@ const Model = {
     // 付款条件
     payTerms: [],
     // 币种类型
-    currencys: [],
+    currencies: [],
+    // 销售范围
+    salesRanges: [],
   },
   effects: {
-    // 多肽订单
-    *getOrder({ payload }, { call, put }) {
-      const response = yield call(api.peptideorder.getOrder, payload);
-      yield put({
-        type: 'orderList',
-        payload: response,
-      });
-    },
-    // 销售大区
-    *getRegions({ payload }, { call, put }) {
-      const response = yield call(api.basic.getRegions, payload);
-      yield put({
-        type: 'regions',
-        payload: response,
-      });
-    },
-    // 销售网点
-    *getOffices({ payload }, { call, put }) {
-      const response = yield call(api.basic.getOffices, payload);
-      yield put({
-        type: 'offices',
-        payload: response,
-      });
-    },
-    // 开票类型
-    *getInvtypes({ payload }, { call, put }) {
-      const response = yield call(api.basic.getInvtypes, payload);
-      yield put({
-        type: 'invtypes',
-        payload: response,
-      });
-    },
-    // 付款方式
-    *getPaymethods({ payload }, { call, put }) {
-      const response = yield call(api.basic.getPaymethods, payload);
-      yield put({
-        type: 'payMethods',
-        payload: response,
-      });
-    },
-    // 付款条件
-    *getPayterms({ payload }, { call, put }) {
-      const response = yield call(api.basic.getPayterms, payload);
-      yield put({
-        type: 'payTerms',
-        payload: response,
-      });
-    },
-    // 币种类型
-    *getCurrencys({ payload }, { call, put }) {
-      const response = yield call(api.basic.getCurrencys, payload);
-      yield put({
-        type: 'currencys',
-        payload: response,
-      });
-    },
+    /**
+     * 获取此命名空间内的缓存数据
+     * @param {Object} payload = {type：要请求的缓存数据, options：请求上传递的参数}
+     */
+    *getCache(action, effects) {
+      const { payload } = action;
+      const { call, put, select } = effects;
+      const { type, options } = payload;
 
-    // 多肽纯度
-    *getPurity({ payload }, { call, put }) {
-      const response = yield call(api.peptideBase.getPurity, payload);
-      yield put({
-        type: 'list',
-        payload: response,
-      });
-    },
+      let targetState;
 
-    // 多肽合成产品
-    *getProduct({ payload }, { call, put }) {
-      const response = yield call(api.peptideBase.getProduct, payload);
-      yield put({
-        type: 'list',
-        payload: response,
-      });
-    },
+      // 一：如果目标上已经有数据了，则放弃本次请求
+      targetState = yield select(state => state[namespace][type]);
+      // 类型：数组，检查 length
+      if (targetState instanceof Array && targetState.length > 0) return;
 
-    // 多肽氨基酸
-    *getAminoAcid({ payload }, { call, put }) {
-      const response = yield call(api.peptideBase.getAminoAcid, payload);
-      yield put({
-        type: 'list',
-        payload: response,
-      });
-    },
+      // 二：检查浏览器缓存数据是否有目标数据
+      targetState = JSON.parse(localStorage.getItem(`${namespace}/${type}`));
 
-    // 多肽修饰
-    *getModifications({ payload }, { call, put }) {
-      const response = yield call(api.peptideBase.getModifications, payload);
-      yield put({
-        type: 'list',
-        payload: response,
-      });
-    },
+      if (!targetState) {
+        // 三：数据请求接口
+        const methods = {
+          // countrys: basic.getCountrys,
+        }
 
-    // 修饰类别
-    *getModificationTypes({ payload }, { call, put }) {
-      const response = yield call(api.peptideBase.getModificationTypes, payload);
-      yield put({
-        type: 'list',
-        payload: response,
-      });
-    },
+        // 四：确定请求方法
+        // example: type = countrys，则 methodName = getCountrys，如果你的接口命名规则与此不同，则需要将你的方法写到 methods 里
+        let method;
+        if (methods[type]) {
+          method = methods[type];
+        } else {
+          const methodName = `get${type.slice(0, 1).toUpperCase()}${type.slice(1)}`;
+          if (!basic[methodName]) {
+            console.error(`${namespace} getCache type=${type} 对应的接口不存在`);
+            return;
+          }
+          method = basic[methodName];
+        }
 
-    // 多肽修饰产品
-    *getModificationProducts({ payload }, { call, put }) {
-      const response = yield call(api.peptideBase.getModificationProducts, payload);
-      yield put({
-        type: 'list',
-        payload: response,
-      });
-    },
+        // 五：请求数据
+        try {
+          targetState = yield call(method, options);
+        } catch (error) {
+          console.error(`${namespace} getCache type=${type} 接口请求失败`);
+        }
+      }
 
-    // 多肽二硫键产品
-    *getdisulfideBondProducts({ payload }, { call, put }) {
-      const response = yield call(api.peptideBase.getdisulfideBondProducts, payload);
+      if (!targetState) return;
+
+      // 六：设置数据
       yield put({
-        type: 'list',
-        payload: response,
+        type: 'setCache',
+        payload: { type, targetState },
       });
     },
   },
   reducers: {
-    orderList(state, action) {
-      return { ...state, orderList: action.payload };
-    },
-    list(state, action) {
-      return { ...state, data: action.payload };
-    },
-    regions(state, action) {
-      return { ...state, regions: action.payload };
-    },
-    offices(state, action) {
-      return { ...state, offices: action.payload };
-    },
-    invtypes(state, action) {
-      return { ...state, invtypes: action.payload };
-    },
-    payMethods(state, action) {
-      return { ...state, payMethods: action.payload };
-    },
-    payTerms(state, action) {
-      return { ...state, payTerms: action.payload };
-    },
-    currencys(state, action) {
-      return { ...state, currencys: action.payload };
+    setCache(state, { payload }) {
+      const { type, targetState } = payload;
+
+      // 数据处理方法
+      const format = {};
+
+      const data = (format[type] && format[type](targetState)) || targetState;
+
+      // 将数据存到浏览器缓存中
+      localStorage.setItem(`${namespace}/${type}`, JSON.stringify(data));
+      return { ...state, [type]: data };
     },
   },
 };
