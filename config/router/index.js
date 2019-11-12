@@ -4,6 +4,7 @@ const partner = require('./partner');
 const peptide = require('./peptide')
 const system = require('./system');
 const purchase = require('./purchase');
+const hts = require('./hts');
 
 module.exports = [
   {
@@ -42,6 +43,7 @@ module.exports = [
           system,
           personel,
           purchase,
+          hts,
           {
             component: './404',
           },
