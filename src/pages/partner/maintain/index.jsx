@@ -276,7 +276,7 @@ class Maintain extends React.Component {
       render: (text, record) => {
         const { code } = record;
         const menu = (
-          <Menu>
+          <Menu style={{ padding: 0 }}>
             {record.salesOrderBlock === 1 ? <Menu.Item><a href="#" onClick={e => { this.cancelFreeze(e, record) }}>取消冻结</a></Menu.Item> : <Menu.Item><a href="#" onClick={ e => { this.freezePartner(e, record) }}>冻结</a></Menu.Item>}
             {record.certificationStatus === 1 ?
               <Menu.Item>

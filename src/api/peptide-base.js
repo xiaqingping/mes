@@ -7,14 +7,9 @@ import request from '@/utils/request';
 
 export default {
   /** ****************************** 多肽纯度 *********************************** */
-  // 获取纯度(全部)
-  getPurityAll(params = { status: 1 }) {
-    return request('/peptide-base/v1/puritys', { params });
-  },
-
-  // 获取纯度列表（分页获取）
-  getPurity(params) {
-    return request('/peptide-base/v1/puritys/easyui', { params });
+  // 获取纯度列表
+  getPurity(params = { status: 1 }, easyui) {
+    return request(`/peptide-base/v1/puritys${easyui ? '/easyui' : ''}`, { params });
   },
 
   // 创建纯度
@@ -55,18 +50,13 @@ export default {
 
   /** ****************************** 多肽氨基酸 *********************************** */
   // 获取氨基酸
-  getAminoAcid(params = { status: 1 }) {
-    return request('/peptide-base/v1/aminoAcid/easyui', { params });
+  getAminoAcid(params = { status: 1 }, easyui) {
+    return request(`/peptide-base/v1/aminoAcid${easyui ? '/easyui' : ''}`, { params });
   },
 
   // 创建氨基酸
   insertAminoAcid(params) {
     return request('/peptide-base/v1/aminoAcid', { method: 'POST', data: params });
-  },
-
-  // 获取氨基酸(全部)
-  getAminoAcidAll(params = { status: 1 }) {
-    return request('/peptide-base/v1/aminoAcid', { params });
   },
 
   // 恢复氨基酸
@@ -81,8 +71,8 @@ export default {
 
   /** ****************************** 多肽修饰 ******************************* */
   // 获取修饰
-  getModifications(params) {
-    return request('/peptide-base/v1/modifications/easyui', { params });
+  getModifications(params, easyui) {
+    return request(`/peptide-base/v1/modifications${easyui ? '/easyui' : ''}`, { params });
   },
 
   // 创建修饰
@@ -101,14 +91,9 @@ export default {
   },
 
   /** ****************************** 多肽修饰类别 ******************************* */
-  // 获取修饰类别（全部）
-  getModificationTypesAll(params = { status: 1 }) {
-    return request('/peptide-base/v1/modificationTypes', { params });
-  },
-
   // 获取修饰类别（分页获取）
-  getModificationTypes(params) {
-    return request('/peptide-base/v1/modificationTypes/easyui', { params });
+  getModificationTypes(params, easyui) {
+    return request(`/peptide-base/v1/modificationTypes${easyui ? '/easyui' : ''}`, { params });
   },
 
   // 创建修饰类别

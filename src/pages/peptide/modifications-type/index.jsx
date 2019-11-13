@@ -254,7 +254,7 @@ class ModificationsType extends Component {
       loading: true,
     });
 
-    api.peptideBase.getModificationTypes(query).then(res => {
+    api.peptideBase.getModificationTypes(query, true).then(res => {
       this.setState({
         list: res.rows,
         total: res.total,

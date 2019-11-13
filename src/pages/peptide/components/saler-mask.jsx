@@ -185,7 +185,7 @@ class Saler extends Component {
       loading: true,
     });
 
-    api.peptideBase.getModifications(query).then(res => {
+    api.peptideBase.getModifications(query, true).then(res => {
       this.setState({
         list: res.rows,
         total: res.total,

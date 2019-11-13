@@ -175,7 +175,7 @@ class Modifications extends Component {
   }
 
   componentDidMount() {
-    api.peptideBase.getModificationTypesAll().then(res => {
+    api.peptideBase.getModificationTypes().then(res => {
       this.setState({
         modificationType: res,
       })
@@ -184,7 +184,7 @@ class Modifications extends Component {
 
   // 设置子值
   dataSon = (v, e) => {
-    if (e.target.className === 'operate' || e.target.className.indexOf('ant-btn-sm') !== -1 || v.id < 1) {
+    if (e.target.className === 'operate' || e.target.className.indexOf('ant-btn-sm') !== -1 || v.id < 1) { // 点击范围控制
       return
     }
     this.setState({
@@ -225,7 +225,7 @@ class Modifications extends Component {
       loading: true,
     });
 
-    api.peptideBase.getModifications(query).then(res => {
+    api.peptideBase.getModifications(query, true).then(res => {
       if (son === 'son') {
         const { parantData } = this.state;
         res.rows.forEach(item => {

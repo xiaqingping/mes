@@ -139,7 +139,8 @@ class Verification extends React.Component {
       render: (text, record) => {
         // const { preState } = record;
         // const check = <a href="#" onClick={ e => { this.verifyPartner(record, e) }}>审核</a>;
-        const view = <a href="#" onClick={ e => { this.checkPartner(record, e) }} >查看</a>;
+        // const view = <a href="#" onClick={ e => { this.checkPartner(record, e) }} >查看</a>;
+        const view = <a href="#" onClick={ e => { this.checkShow.visibleShow(record, '01', true) }} >查看</a>;
         // const allAction = <Fragment><a href="#"
         // onClick={ e => { this.checkPartner(record, e) }}>查看</a><a herf="#"
         // onClick={ e => { this.verifyPartner(record, e) }}>审核</a></Fragment>;
@@ -568,9 +569,10 @@ class Verification extends React.Component {
           </div>
         </Card>
         <CheckModal
-          showModal={showModal}
-          recordMsg={recordMsg}
-          clickType={clickType}
+          // showModal={showModal}
+          // recordMsg={recordMsg}
+          // clickType={clickType}
+          onRef = { ref => {this.checkShow = ref}}
           wrappedComponentRef={this.saveFormRef}/>
       </PageHeaderWrapper>
     );

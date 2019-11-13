@@ -22,7 +22,7 @@ import CustomerMask from '@/pages/peptide/components/customer-mask';
 import SubCustomerMask from '@/pages/peptide/components/subCustomer-mask';
 import ContactMask from '@/pages/peptide/components/contact-mask';
 import SalerMask from '@/pages/peptide/components/saler-mask';
-import LoadMask from '@/pages/peptide/components/load-mask'
+import LoadMask from '@/pages/peptide/components/load-mask';
 
 const FormItem = Form.Item;
 const { Option } = Select;
@@ -107,7 +107,7 @@ class AddPage extends Component {
     e.preventDefault();
     this.props.form.validateFields((err, values) => {
       if (err) return
-      console.log(values)
+      this.props.handleAdd([], values)
     });
   };
 
@@ -152,7 +152,7 @@ class AddPage extends Component {
           <Col lg={6} md={8} sm={12}>
             <FormItem label="客户">
               {getFieldDecorator('customerName', {
-                 rules: [{ required: true }],
+                //  rules: [{ required: true }],
               })(<Search onSearch={() => this.showCustomer.visibleShow(true)} />)}
             </FormItem>
           </Col>
@@ -170,7 +170,7 @@ class AddPage extends Component {
           <Col lg={6} md={8} sm={12}>
             <FormItem label="负责人">
               {getFieldDecorator('subCustomerName', {
-                 rules: [{ required: true }],
+                //  rules: [{ required: true }],
               })(<Search onSearch={() => this.showSubCustomer.visibleShow(true)} />)}
             </FormItem>
           </Col>
@@ -186,7 +186,7 @@ class AddPage extends Component {
           <Col lg={6} md={8} sm={12}>
             <FormItem label="订货人">
               {getFieldDecorator('contactName', {
-                 rules: [{ required: true }],
+                //  rules: [{ required: true }],
               })(<Search onSearch={() => this.showContact.visibleShow(true)} />)}
             </FormItem>
           </Col>
@@ -202,7 +202,7 @@ class AddPage extends Component {
           <Col lg={6} md={8} sm={12}>
             <FormItem label="配送网点">
               {getFieldDecorator('dofficeCode', {
-                 rules: [{ required: true }],
+                //  rules: [{ required: true }],
               })(<Select>
                   <Option value="0">全部</Option>
                 </Select>)}
@@ -211,7 +211,7 @@ class AddPage extends Component {
           <Col lg={6} md={8} sm={12}>
             <FormItem label="销售员">
               {getFieldDecorator('salerName', {
-                 rules: [{ required: true }],
+                //  rules: [{ required: true }],
               })(<Search onSearch={() => this.showSaler.visibleShow(true)} />)}
             </FormItem>
           </Col>
@@ -244,7 +244,7 @@ class AddPage extends Component {
           <Col lg={6} md={8} sm={12}>
             <FormItem label="付款方式">
               {getFieldDecorator('paymentMethod', {
-                 rules: [{ required: true }],
+                //  rules: [{ required: true }],
               })(<Select>
                 {payMethods.map(item =>
                       <Option key={item.code} value={item.code}>{`${item.code}-${item.name}`}</Option>,
@@ -260,7 +260,7 @@ class AddPage extends Component {
           <Col lg={6} md={8} sm={12}>
             <FormItem label="付款条件">
               {getFieldDecorator('paymentTerm', {
-                 rules: [{ required: true }],
+                //  rules: [{ required: true }],
               })(<Select>
                   <Option value="0">全部</Option>
                 </Select>)}
@@ -357,14 +357,14 @@ class AddPage extends Component {
           <Col lg={6} md={8} sm={12}>
             <FormItem label="订货人邮箱">
               {getFieldDecorator('contactEmail', {
-                 rules: [{ required: true }],
+                //  rules: [{ required: true }],
               })(<Input />)}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="订货人手机">
               {getFieldDecorator('contactMobile', {
-                 rules: [{ required: true }],
+                //  rules: [{ required: true }],
               })(<Input />)}
             </FormItem>
           </Col>
@@ -437,7 +437,7 @@ class AddPage extends Component {
                 批量导入序列
               </Button>
               <Button style={{ marginLeft: 8 }} type="primary" htmlType="submit">
-                查询
+                新增
               </Button>
               <Button style={{ marginLeft: 8 }} onClick={this.handleFormReset}>
                 重置
@@ -535,10 +535,22 @@ class Order extends Component {
     loadingSon: false,
     id: 0, // 新增数据时，提供负数id
     editIndex: -1,
+    purityValue: [],
+    modificationType: [],
   }
 
   componentDidMount() {
-    this.props.onRef(this)
+    this.props.onRef(this);
+    api.peptideBase.getPurity().then(res => {
+      this.setState({
+        purityValue: res,
+      })
+    })
+    api.peptideBase.getModifications({ modificationPosition: 1, status: 1 }).then(res => {
+      this.setState({
+        modificationType: res,
+      })
+    })
   }
 
   visibleShow = visible => {
@@ -586,7 +598,7 @@ class Order extends Component {
       loading: true,
     });
 
-    api.peptideBase.getModifications(query).then(res => {
+    api.peptideBase.getModifications(query, true).then(res => {
       if (son === 'son') {
         const { parantData } = this.state;
         res.rows.forEach(item => {
@@ -620,7 +632,7 @@ class Order extends Component {
         // } else {
         //   api.peptideBase.insertModifications(newData).then(() => this.getTableData());
         // }
-        console.log(list[index])
+        console.log(list[index], error, row)
         // console.log(row)
         // console.log(index)
         this.cancelEdit(val, index)
@@ -635,21 +647,43 @@ class Order extends Component {
       return;
     }
 
-    const arrId = [];
+    const arrData = [];
     let strId = '';
     // eslint-disable-next-line array-callback-return
     data.map((item, key) => {
-      arrId.push({ id: id - key - 1, name: item[0], providerTotalAmount: item[1] })
+      arrData.push({
+        id: id - key - 1,
+        name: item[0],
+        providerTotalAmount: item[1],
+        isNeedDesalting: item[2] === '是' ? '是' : '否',
+        peptidePurityId: item[3],
+        sequence: item[4],
+        subpackage: item[5],
+      })
       strId = `${strId + (id - key - 1)},`
     })
-    this.setState({
-      id: arrId[0],
-      editIndex: strId,
-      list: [
-        ...arrId,
-        ...list,
-      ],
-    });
+    if (arrData.length === 0) {
+      const newId = id - 1;
+      this.setState({
+        id: newId,
+        editIndex: '-1,',
+        list: [
+          {
+            id: newId,
+          },
+          ...list,
+        ],
+      });
+    } else {
+      this.setState({
+        id: arrData[0],
+        editIndex: strId,
+        list: [
+          ...arrData,
+          ...list,
+        ],
+      });
+    }
   }
 
   // 删除指定的值
@@ -698,6 +732,34 @@ class Order extends Component {
     });
   };
 
+  // 选择input
+  // eslint-disable-next-line consistent-return
+  selectType = (data, type, selectList, widthValue) => {
+    if (type === 'input') {
+      return <Input style={{ width: `${widthValue}px` }} defaultValue={data}/>
+    }
+    if (type === 'inputReadOnly') {
+      return <Input style={{ width: `${widthValue}px` }} defaultValue={data} readOnly/>
+    }
+    if (type === 'select') {
+      return (<Select style={{ width: `${widthValue}px` }} defaultValue={data === '是' || data === '否' ? data : '' }>
+              {selectList.map(item =>
+                <Option key={item.id} value={item.id}>{item.name}</Option>,
+              )}
+        </Select>)
+    }
+  }
+
+  // 格式化数据
+  formatterData = (arr, id = 'id', name = 'name') => {
+    const val = [];
+    // eslint-disable-next-line array-callback-return
+    arr.map(item => {
+      val.push({ id: item[id], name: item[name] })
+    })
+    return val;
+  }
+
   render() {
     const {
       formValues: { page: current, rows: pageSize },
@@ -708,6 +770,8 @@ class Order extends Component {
       dataSon,
       loadingSon,
       editIndex,
+      purityValue,
+      modificationType,
     } = this.state;
     const data = { list, pagination: { current, pageSize, total } };
     let tableWidth = 0;
@@ -723,6 +787,7 @@ class Order extends Component {
         dataIndex: 'name',
         width: 100,
         editable: true,
+        inputType: 'input',
         rules: [
           { required: true, message: '必填' },
         ],
@@ -732,109 +797,239 @@ class Order extends Component {
         dataIndex: 'providerTotalAmount',
         width: 150,
         editable: true,
+        inputType: 'input',
         rules: [
           { required: true, message: '必填' },
         ],
       },
       {
-        title: '提供总量(mg)',
+        title: '是否脱盐',
         dataIndex: 'isNeedDesalting',
-        width: 150,
+        width: 100,
+        editable: true,
+        inputType: 'select',
+        selectList: [
+          { id: 1, name: '是' },
+          { id: 2, name: '否' },
+        ],
+        rules: [
+          { required: true, message: '必填' },
+        ],
       },
       {
         title: '纯度',
         dataIndex: 'peptidePurityId',
         width: 100,
+        editable: true,
+        inputType: 'select',
+        selectList: this.formatterData(purityValue, 'id', 'purity'),
+        rules: [
+          { required: true, message: '必填' },
+        ],
       },
       {
         title: '序列',
         dataIndex: 'sequence',
-        width: 100,
+        width: 150,
+        editable: true,
+        inputType: 'input',
+        rules: [
+          { required: true, message: '必填' },
+        ],
       },
       {
         title: '氨基酸数',
         dataIndex: 'aminoAcidCount',
         width: 100,
+        editable: true,
+        inputType: 'inputReadOnly',
+        rules: [
+          { required: true, message: '必填' },
+        ],
+      },
+      {
+        title: '氨基酸金额',
+        dataIndex: 'aminoAcidAmount',
+        width: 120,
+        editable: true,
+        inputType: 'inputReadOnly',
+        rules: [
+          { required: true, message: '必填' },
+        ],
       },
       {
         title: '氨基端修饰',
         dataIndex: 'aminoModificationName',
-        width: 120,
+        width: 200,
+        editable: true,
+        inputType: 'select',
+        selectList: this.formatterData(modificationType),
+        rules: [
+          { required: true, message: '必填' },
+        ],
       },
       {
         title: '氨基端修饰金额',
         dataIndex: 'aminoModificationPrice',
         width: 150,
+        editable: true,
+        inputType: 'input',
+        rules: [
+          { required: true, message: '必填' },
+        ],
       },
       {
         title: '氨基端修饰SAP产品编号',
         dataIndex: 'aminoSapProductCode',
         width: 200,
+        editable: true,
+        inputType: 'inputReadOnly',
+        rules: [
+          { required: true, message: '必填' },
+        ],
       },
       {
         title: '氨基端修饰SAP产品名称',
         dataIndex: 'aminoSapProductName',
         width: 200,
+        editable: true,
+        inputType: 'inputReadOnly',
+        rules: [
+          { required: true, message: '必填' },
+        ],
       },
       {
         title: '羧基端修饰',
         dataIndex: 'carboxyModificationName',
         width: 120,
+        editable: true,
+        inputType: 'select',
+        selectList: [],
+        rules: [
+          { required: true, message: '必填' },
+        ],
       },
       {
         title: '羧基端修饰金额',
         dataIndex: 'carboxyModificationPrice',
         width: 170,
+        editable: true,
+        inputType: 'input',
+        rules: [
+          { required: true, message: '必填' },
+        ],
       },
       {
         title: '羧基端修饰SAP产品编号',
         dataIndex: 'carboxySapProductCode',
         width: 200,
+        editable: true,
+        inputType: 'inputReadOnly',
+        rules: [
+          { required: true, message: '必填' },
+        ],
       },
       {
         title: '羧基端修饰SAP产品名称',
         dataIndex: 'carboxySapProductName',
         width: 200,
+        editable: true,
+        inputType: 'inputReadOnly',
+        rules: [
+          { required: true, message: '必填' },
+        ],
       },
       {
         title: '中间修饰',
         dataIndex: 'middleModification',
         width: 100,
+        editable: true,
+        inputType: 'select',
+        selectList: [],
+        rules: [
+          { required: true, message: '必填' },
+        ],
       },
       {
         title: '中间修饰数量',
         dataIndex: 'middleModificationDetailCount',
         width: 150,
+        editable: true,
+        inputType: 'inputReadOnly',
+        rules: [
+          { required: true, message: '必填' },
+        ],
+      },
+      {
+        title: '中间修饰金额',
+        dataIndex: 'middleModificationDetailAmount',
+        width: 150,
+        editable: true,
+        inputType: 'inputReadOnly',
+        rules: [
+          { required: true, message: '必填' },
+        ],
       },
       {
         title: '二硫键',
-        dataIndex: 'middleModificationDetailAmount',
+        dataIndex: 'disulfideBond',
         width: 100,
+        editable: true,
+        inputType: 'select',
+        selectList: [],
+        rules: [
+          { required: true, message: '必填' },
+        ],
       },
       {
         title: '二硫键数量',
         dataIndex: 'disulfideBondDetailCount',
         width: 120,
+        editable: true,
+        inputType: 'inputReadOnly',
+        rules: [
+          { required: true, message: '必填' },
+        ],
       },
       {
         title: '二硫键金额',
         dataIndex: 'disulfideBondDetailAmount',
         width: 120,
+        editable: true,
+        inputType: 'inputReadOnly',
+        rules: [
+          { required: true, message: '必填' },
+        ],
       },
       {
         title: '分装管数',
         dataIndex: 'subpackage',
         width: 100,
+        editable: true,
+        inputType: 'input',
+        rules: [
+          { required: true, message: '必填' },
+        ],
       },
       {
         title: '金额',
         dataIndex: 'totalAmount',
         width: 100,
+        editable: true,
+        inputType: 'inputReadOnly',
+        rules: [
+          { required: true, message: '必填' },
+        ],
       },
       {
         title: '备注',
         dataIndex: 'notes',
         width: 100,
+        editable: true,
+        inputType: 'input',
+        rules: [
+          { required: true, message: '必填' },
+        ],
       },
       {
         title: '操作',
@@ -908,18 +1103,22 @@ class Order extends Component {
       if (!col.editable) {
         return col;
       }
-      const editId = editIndex === -1 ? editIndex : editIndex.split(',').length - 2;
+      const editId = editIndex === -1 || editIndex === 0 ? editIndex : editIndex.split(',').length - 2;
       return {
         ...col,
         onCell: (record, rowIndex) => ({
           record,
           rules: col.rules,
-          inputType: <Input style={{ width: '90%' }} defaultValue={list[rowIndex][col.dataIndex]}/>,
+          inputType: this.selectType(
+            list[rowIndex][col.dataIndex],
+            col.inputType, col.selectList,
+            col.width ? col.width - 10 : 90,
+            ),
           dataIndex: col.dataIndex + rowIndex,
           title: col.title,
           value: list[rowIndex][col.dataIndex],
           // editing: editId.toString().indexOf((-(rowIndex + 1)).toString()) !== -1,
-          editing: rowIndex <= editId,
+          editing: (rowIndex <= editId) || (rowIndex === editIndex),
         }),
       };
     });

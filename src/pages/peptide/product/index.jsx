@@ -169,7 +169,7 @@ class Product extends Component {
   }
 
   componentDidMount() {
-    api.peptideBase.getPurityAll().then(res => {
+    api.peptideBase.getPurity({ status: 1 }).then(res => {
       this.setState({
         purityValue: res,
       })
