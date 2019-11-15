@@ -69,7 +69,7 @@ export default {
 
   // 根据业务伙伴ID禁止客户销售接口
   customerSalesOrderBlock(id) {
-    return request(`/partner/v1/${id}/customer/salesOrderBlock`, { method: 'POST' });
+    return request(`/partner/v1/${id}/customer/salesBan`, { method: 'POST' });
   },
   // 根据业务伙伴ID激活客户销售接口
   customerSalesActivation(id) {

@@ -149,7 +149,7 @@ class ModificationProducts extends Component {
   }
 
   componentDidMount() {
-    api.peptideBase.getAminoAcid().then(data => {
+    api.peptideBase.getAminoAcid({ status: 1 }, true).then(data => {
       const map = {};
       const dest = [];
       for (let i = 0; i < data.rows.length; i++) {

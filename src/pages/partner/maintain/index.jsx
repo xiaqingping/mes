@@ -21,21 +21,22 @@ import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import StandardTable from '@/components/StandardTable';
 import ChangeModal from './components/ChangeModal';
 import styles from './index.less';
+import api from '@/api';
 
 const FormItem = Form.Item;
 const { Option } = Select;
 
 // 认证
 const renzhengMap = {
-  0: {
+  1: {
     value: 'default',
     text: '未认证',
   },
-  1: {
+ 2: {
     value: 'processing',
     text: '审核中',
   },
-  2: {
+  4: {
     value: 'success',
     text: '已认证',
   },
@@ -47,11 +48,11 @@ const renzhengMap = {
 
 // 冻结
 const dongjieMap = {
-  0: {
+  1: {
     value: 'error',
     text: '冻结',
   },
-  1: {
+  2: {
     value: 'success',
     text: '活跃',
   },
@@ -59,7 +60,7 @@ const dongjieMap = {
 
 // 完整
 const wanzhengMap = {
-  0: {
+  2: {
     value: 'default',
     text: '不完整',
   },
@@ -96,7 +97,7 @@ const emailIden = {
 // 区域
 const quyuoptions = [
   {
-    value: 'hudong',
+    value: 'huadong',
     label: '华东大区',
     children: [
       {
@@ -134,26 +135,32 @@ function renderOption(item) {
 
 class Maintain extends React.Component {
   state = {
+    formValues: {
+      page: 1,
+      pageSize: 10,
+    },
     selectedRows: [],
     expandForm: false,
-    data: {},
+    list: [],
+    total: 0,
     // formValues: {},
     xiaoshuoguishu: [],
     // kaipiaofang: [],
     changeModal: false,
     recordMesg: undefined,
+    loading: false,
   };
 
   columns = [
     {
       title: '业务伙伴',
       dataIndex: 'code',
-      // width: 100,
+      width: 250,
       render(val, record) {
         return (
-          <Link className={styles.partNer} to={`/partner/maintain/details/${val}`}>
-            <Icon type="home" /> &nbsp;{record.name}
-            <div className={styles.partCode}>{val}</div>
+          <Link className={styles.partNer} to={`/partner/maintain/details/${record.id}`}>
+            <Icon type={record.type === 1 ? 'user' : 'home'} /> &nbsp;{record.name}
+              <div className={styles.partCode}>{val}</div>
           </Link>
         );
       },
@@ -186,7 +193,7 @@ class Maintain extends React.Component {
     },
     {
       title: '冻结',
-      dataIndex: 'salesBan',
+      dataIndex: 'salesOrderBlock',
       // width: 100,
       filters: [
         {
@@ -199,8 +206,10 @@ class Maintain extends React.Component {
         },
       ],
       filterMultiple: false,
-      render(val) {
-        return <Badge status={dongjieMap[val].value} text={dongjieMap[val].text} />;
+      render: val => {
+        if (val) {
+          return <Badge status={dongjieMap[val].value} text={dongjieMap[val].text} />
+        }
       },
     },
     {
@@ -250,12 +259,12 @@ class Maintain extends React.Component {
                  <div>
                     {val}
                     &nbsp;&nbsp;
-                    <Badge status={mobileIden[records.mobilePhoneVerifyStatus].value} />
+                    {records.mobilePhoneVerifyStatus === 1 ? <Badge status={mobileIden[records.mobilePhoneVerifyStatus].value} /> : ''}
                   </div>
                   <div>
                     {records.email}
                     &nbsp;&nbsp;
-                    <Badge status={emailIden[records.emailVerifyStatus].value} />
+                    {records.emailVerifyStatus === 1 ? <Badge status={emailIden[records.emailVerifyStatus].value} /> : ''}
                   </div>
                 </>
       },
@@ -275,12 +284,21 @@ class Maintain extends React.Component {
       render: (text, record) => {
         const { code } = record;
         const menu = (
-          <Menu>
-            <Menu.Item><a href="#" onClick={e => { this.cancelFreeze(e, record) }}>取消冻结</a></Menu.Item>
-            <Menu.Item><a href="#" onClick={e => { this.cancelIdent(e, record) }}>取消认证</a></Menu.Item>
-            <Menu.Item><a href="#" onClick={ e => { this.changeIdent(e, record) }}>变更认证</a></Menu.Item>
+          <Menu style={{ padding: 0 }}>
+            {record.salesOrderBlock === 1 ? <Menu.Item><a href="#" onClick={e => { this.cancelFreeze(e, record) }}>取消冻结</a></Menu.Item> : <Menu.Item><a href="#" onClick={ e => { this.freezePartner(e, record) }}>冻结</a></Menu.Item>}
+            {record.certificationStatus === 1 ?
+              <Menu.Item>
+                <a href="#" onClick={e => { this.cancelIdent(e, record) }}>取消认证</a>
+              </Menu.Item>
+            : ''
+            }
+            {record.certificationStatus === 1 ?
+              <Menu.Item>
+                <a href="#" onClick={ e => { this.changeIdent(e, record) }}>变更认证</a>
+              </Menu.Item>
+            :
             <Menu.Item><a href="#" onClick={ e => { this.identificate(e, record) }}>认证</a></Menu.Item>
-            <Menu.Item><a href="#" onClick={ e => { this.freezePartner(e, record) }}>冻结</a></Menu.Item>
+            }
           </Menu>
         );
         return (
@@ -299,14 +317,24 @@ class Maintain extends React.Component {
   ];
 
   componentDidMount() {
-    this.getData();
+    this.getTableData();
   }
 
-  /** 取消冻结 */
+  /** 激活 */
   cancelFreeze = (e, record) => {
     e.preventDefault();
-    console.log(record);
+    api.bp.customerSalesActivation(record.id).then(() => {
+      this.getTableData()
+    })
   }
+
+    /** 冻结 */
+    freezePartner = (e, record) => {
+      e.preventDefault();
+      api.bp.customerSalesOrderBlock(record.id).then(() => {
+        this.getTableData()
+      })
+    }
 
   /** 取消认证 */
   cancelIdent = (e, record) => {
@@ -331,57 +359,53 @@ class Maintain extends React.Component {
     console.log(record);
   }
 
-  /** 认证 */
-  freezePartner = (e, record) => {
-    e.preventDefault();
-    console.log(record);
-  }
-
   handleSearch = e => {
     e.preventDefault();
     const { form } = this.props;
     form.validateFields((err, fieldsValue) => {
       if (err) return;
-      const values = {
-        ...fieldsValue,
-        updatedAt: fieldsValue.updatedAt && fieldsValue.updatedAt.valueOf(),
-      };
+      if (fieldsValue.certificationStatusList) {
+        if (fieldsValue.certificationStatusList[0]) {
+          // eslint-disable-next-line no-param-reassign
+          fieldsValue.certificationStatusList = fieldsValue.certificationStatusList.join(',')
+        }
+      }
+      if (fieldsValue.regionalAttr) {
+        if (fieldsValue.regionalAttr[0]) {
+          // eslint-disable-next-line prefer-destructuring
+          fieldsValue.regionCode = fieldsValue.regionalAttr[0]
+        }
+        if (fieldsValue.regionalAttr[1]) {
+          // eslint-disable-next-line prefer-destructuring
+          fieldsValue.officeCode = fieldsValue.regionalAttr[1]
+        }
+      }
+      // const values = {
+      //   ...fieldsValue,
+      //   // updatedAt: fieldsValue.updatedAt && fieldsValue.updatedAt.valueOf(),
+      // };
+      // console.log(values)
       // this.setState({
       //   formValues: values,
       // });
-      this.getData(values);
+      this.getTableData(fieldsValue);
     });
   };
 
   /** table数据 */
-  getData = values => {
-    const data = [];
-    // const { formValues } = this.state;
-    console.log(values);
-    for (let i = 0; i < 25; i++) {
-      data.push({
-        id: i + 1,
-        type: 1, // 1人，2组织
-        code: 100000 + (i + 1),
-        name: `name${i}`,
-        certificationStatus: 1,
-        salesBan: 0,
-        customerDataStatus: 1,
-        vendorDataStatus: 1,
-        mobilePhone: '15300772583',
-        mobilePhoneVerifyStatus: 0,
-        emailVerifyStatus: 1,
-        email: '123@qq.com',
-        address: '江西省 南昌市 昌北经济开发区 川杨新苑三期 12号楼 501室',
-      });
-    }
+  getTableData = (options = {}) => {
+    const { formValues: { pageSize } } = this.state;
+    const query = Object.assign({}, { page: 1, pageSize }, options);
     this.setState({
-      data: {
-        pagination: {
-          pageSize: 10,
-        },
-        list: data,
-      },
+      formValues: query,
+      loading: true,
+    });
+    api.bp.getBPList(query).then(res => {
+      this.setState({
+        list: res.results,
+        total: res.total,
+        loading: false,
+      });
     });
   }
 
@@ -395,12 +419,16 @@ class Maintain extends React.Component {
     });
   };
 
-  handleStandardTableChange = () => {
-
-  };
+  // 分页
+  handleStandardTableChange = pagination => {
+    this.getTableData({
+      page: pagination.current,
+      pageSize: pagination.pageSize,
+    });
+  }
 
   handleFormReset = () => {
-
+    this.props.form.resetFields();
   };
 
   /** 查询销售归属 */
@@ -494,9 +522,9 @@ class Maintain extends React.Component {
           <Col xxl={6} lg={8}>
             <FormItem label="认证状态">
               {getFieldDecorator('certificationStatusList')(
-                <Select maxTagCount={1} maxTagTextLength={2} placeholder="请选择" mode="multiple">
-                  <Option value="0">未认证</Option>
-                  <Option value="1">已认证</Option>
+                <Select placeholder="请选择" maxTagCount={1} mode="multiple">
+                  <Option value="1">未认证</Option>
+                  <Option value="4">已认证</Option>
                   <Option value="2">审核中</Option>
                   <Option value="3">部分认证</Option>
                 </Select>,
@@ -505,9 +533,9 @@ class Maintain extends React.Component {
           </Col>
           <Col xxl={6} lg={8}>
             <FormItem label="销售冻结">
-              {getFieldDecorator('salesBan')(
+              {getFieldDecorator('salesOrderBlock')(
                 <Select placeholder="请选择">
-                  <Option value="0">冻结</Option>
+                  <Option value="2">冻结</Option>
                   <Option value="1">活跃</Option>
                 </Select>,
               )}
@@ -515,10 +543,10 @@ class Maintain extends React.Component {
           </Col>
           <Col xxl={6} lg={8}>
             <FormItem label="客户数据">
-              {getFieldDecorator('customerDateStatus')(
+              {getFieldDecorator('customerDataStatus')(
                 <Select placeholder="请选择">
-                  <Option value="0">完整</Option>
-                  <Option value="1">不完整</Option>
+                  <Option value="1">完整</Option>
+                  <Option value="2">不完整</Option>
                 </Select>,
               )}
             </FormItem>
@@ -527,8 +555,8 @@ class Maintain extends React.Component {
             <FormItem label="供应商数据">
               {getFieldDecorator('vendorDataStatus')(
                 <Select placeholder="请选择">
-                  <Option value="0">完整</Option>
-                  <Option value="1">不完整</Option>
+                  <Option value="1">完整</Option>
+                  <Option value="2">不完整</Option>
                 </Select>,
               )}
             </FormItem>
@@ -623,9 +651,9 @@ class Maintain extends React.Component {
   }
 
   render() {
-    const { data, selectedRows, changeModal, recordMesg } = this.state;
-    const loading = false;
-
+    const { formValues: { page: current, pageSize },
+    list, selectedRows, changeModal, recordMesg, loading, total } = this.state;
+    const data = { list, pagination: { current, pageSize, total } };
     return (
       <PageHeaderWrapper>
         <Card bordered={false}>
@@ -641,6 +669,7 @@ class Maintain extends React.Component {
               scroll={{ x: 1600 }}
               selectedRows={selectedRows}
               loading={loading}
+              rowKey={record => record.code }
               data={data}
               columns={this.columns}
               onSelectRow={this.handleSelectRows}

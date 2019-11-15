@@ -202,7 +202,7 @@ class Order extends Component {
       loading: true,
     });
 
-    api.peptideBase.getAminoAcid(query).then(data => {
+    api.peptideBase.getAminoAcid(query, true).then(data => {
       const map = {}; const dest = [];
       for (let i = 0; i < data.rows.length; i++) {
         const ai = data.rows[i];

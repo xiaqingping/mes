@@ -174,7 +174,7 @@ class Order extends Component {
       loading: true,
     });
 
-    api.peptideBase.getPurity(query).then(res => {
+    api.peptideBase.getPurity(query, true).then(res => {
       this.setState({
         list: res.rows,
         total: res.total,

@@ -423,7 +423,6 @@ const ChangeModal = Form.create()(
           <div className="ant-upload-text">点击上传</div>
         </div>
       );
-
       const uploadModal = <>
         <Upload
           name="avatar"
@@ -437,9 +436,8 @@ const ChangeModal = Form.create()(
           {imageUrl ? <img src={imageUrl} alt="avatar" style={{ width: '100%' }} /> : uploadButton}
         </Upload>
       </>
-
       // 个人变更
-      if (recordMsg && recordMsg.id === 1) {
+      if (recordMsg && recordMsg.type === 1) {
         modelContent = <>
           <Form {...formItemLayout}>
             {this.renderPerform(name)}

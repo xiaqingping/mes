@@ -121,7 +121,7 @@ class Order extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    api.peptideBase.getModificationTypesAll().then(res => {
+    api.peptideBase.getModificationTypes().then(res => {
       this.setState({
         modificationType: res,
       })
@@ -164,7 +164,7 @@ class Order extends Component {
       loading: true,
     });
 
-    api.peptideBase.getModifications(query).then(res => {
+    api.peptideBase.getModifications(query, true).then(res => {
       this.setState({
         list: res.rows,
         total: res.total,

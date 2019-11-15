@@ -8,7 +8,7 @@ import {
 import React from 'react';
 import styles from './index.less';
 
-const FormItem = Form.Item;
+// const FormItem = Form.Item;
 /** verify state */
 const verifyData = {
   0: {
@@ -20,220 +20,220 @@ const verifyData = {
     text: '已完成',
   },
 }
-/** 变更手机号和邮箱数据 */
-const changeNumber = [
-  {
-    id: 1,
-    titel: '变更类型',
-    content: '验证手机',
-  },
-  {
-    id: 2,
-    titel: '变更渠道',
-    content: '自助验证',
-  },
-  {
-    id: 12,
-    titel: '验证方式',
-    content: '登录验证',
-  },
-  {
-    id: 3,
-    titel: '原手机',
-    content: '19822666358',
-  },
-  {
-    id: 4,
-    titel: '验证码',
-    content: '123456',
-    action: '重发',
-  },
-  {
-    id: 5,
-    titel: '验证码过期时间',
-    content: '2019-6-20 13：00：00',
-  },
-  {
-    id: 6,
-    titel: '最后发送时间',
-    content: '2019-6-20 12：00：00',
-  },
-  {
-    id: 7,
-    titel: '新手机',
-    content: '1530077524',
-  },
-  {
-    id: 8,
-    titel: '验证码',
-    content: '2019613',
-  },
-  {
-    id: 9,
-    titel: '验证码过期时间',
-    content: '2019-6-20 13：00：00',
-  },
-  {
-    id: 10,
-    titel: '最后发送时间',
-    content: '2019-6-20 13：00：00',
-  },
-  {
-    id: 11,
-    titel: '验证码',
-    content: '159687',
-    action: '完成',
-  },
-]
+// /** 变更手机号和邮箱数据 */
+// const changeNumber = [
+//   {
+//     id: 1,
+//     titel: '变更类型',
+//     content: '验证手机',
+//   },
+//   {
+//     id: 2,
+//     titel: '变更渠道',
+//     content: '自助验证',
+//   },
+//   {
+//     id: 12,
+//     titel: '验证方式',
+//     content: '登录验证',
+//   },
+//   {
+//     id: 3,
+//     titel: '原手机',
+//     content: '19822666358',
+//   },
+//   {
+//     id: 4,
+//     titel: '验证码',
+//     content: '123456',
+//     action: '重发',
+//   },
+//   {
+//     id: 5,
+//     titel: '验证码过期时间',
+//     content: '2019-6-20 13：00：00',
+//   },
+//   {
+//     id: 6,
+//     titel: '最后发送时间',
+//     content: '2019-6-20 12：00：00',
+//   },
+//   {
+//     id: 7,
+//     titel: '新手机',
+//     content: '1530077524',
+//   },
+//   {
+//     id: 8,
+//     titel: '验证码',
+//     content: '2019613',
+//   },
+//   {
+//     id: 9,
+//     titel: '验证码过期时间',
+//     content: '2019-6-20 13：00：00',
+//   },
+//   {
+//     id: 10,
+//     titel: '最后发送时间',
+//     content: '2019-6-20 13：00：00',
+//   },
+//   {
+//     id: 11,
+//     titel: '验证码',
+//     content: '159687',
+//     action: '完成',
+//   },
+// ]
 
-/** 认证数据 */
-const idenData = [
-  {
-    id: 13,
-    titel: '认证类型',
-    content: '人员',
-  },
-  {
-    id: 14,
-    titel: '注册地址',
-    content: '上海市松江区向民路6987号',
-  },
-  {
-    id: 15,
-    titel: '认证说明',
-    content: '此处是认证说明此处是认证说明此处是认证说明此处是认证说明此处是认证说明',
-  },
-  {
-    id: 16,
-    titel: '附件',
-    content: [
-      {
-        src: '/favicon.png',
-        index: 111111111,
-      }, {
-        src: '/icons/icon-128x128.png',
-        index: 222222222222,
-      },
-    ],
-  },
-]
+// /** 认证数据 */
+// const idenData = [
+//   {
+//     id: 13,
+//     titel: '认证类型',
+//     content: '人员',
+//   },
+//   {
+//     id: 14,
+//     titel: '注册地址',
+//     content: '上海市松江区向民路6987号',
+//   },
+//   {
+//     id: 15,
+//     titel: '认证说明',
+//     content: '此处是认证说明此处是认证说明此处是认证说明此处是认证说明此处是认证说明',
+//   },
+//   {
+//     id: 16,
+//     titel: '附件',
+//     content: [
+//       {
+//         src: '/favicon.png',
+//         index: 111111111,
+//       }, {
+//         src: '/icons/icon-128x128.png',
+//         index: 222222222222,
+//       },
+//     ],
+//   },
+// ]
 
-/** 绑定售达方数据 */
-const saleData = [
-  {
-    id: 17,
-    titel: '售达方编号',
-    content: '89666588554',
-  },
-  {
-    id: 18,
-    titel: '售达方名称',
-    content: '某某某某某',
-  },
-  {
-    id: 19,
-    titel: '验证类型',
-    content: '手机',
-  },
-  {
-    id: 20,
-    titel: '手机',
-    content: '19500772581',
-  },
-  {
-    id: 11,
-    titel: '验证码',
-    content: '159687',
-    action: '完成',
-  },
-  {
-    id: 9,
-    titel: '验证码过期时间',
-    content: '2019-6-20 13：00：00',
-  },
-  {
-    id: 10,
-    titel: '最后发送时间',
-    content: '2019-6-20 13：00：00',
-  },
-];
+// /** 绑定售达方数据 */
+// const saleData = [
+//   {
+//     id: 17,
+//     titel: '售达方编号',
+//     content: '89666588554',
+//   },
+//   {
+//     id: 18,
+//     titel: '售达方名称',
+//     content: '某某某某某',
+//   },
+//   {
+//     id: 19,
+//     titel: '验证类型',
+//     content: '手机',
+//   },
+//   {
+//     id: 20,
+//     titel: '手机',
+//     content: '19500772581',
+//   },
+//   {
+//     id: 11,
+//     titel: '验证码',
+//     content: '159687',
+//     action: '完成',
+//   },
+//   {
+//     id: 9,
+//     titel: '验证码过期时间',
+//     content: '2019-6-20 13：00：00',
+//   },
+//   {
+//     id: 10,
+//     titel: '最后发送时间',
+//     content: '2019-6-20 13：00：00',
+//   },
+// ];
 
-/** 验证手机和邮箱 */
-const idenPhoneData = [
-  {
-    id: 1,
-    titel: '验证类型',
-    content: '验证邮箱',
-  },
-  {
-    id: 2,
-    titel: '验证渠道',
-    content: '登录验证',
-  },
-  {
-    id: 20,
-    titel: '手机',
-    content: '19500772581',
-  },
-  {
-    id: 21,
-    titel: '邮箱',
-    content: '65495887@qq.com',
-  },
-  {
-    id: 11,
-    titel: '验证码',
-    content: '159687',
-    action: '完成',
-  },
-  {
-    id: 9,
-    titel: '验证码过期时间',
-    content: '2019-6-20 13：00：00',
-  },
-  {
-    id: 10,
-    titel: '最后发送时间',
-    content: '2019-6-20 13：00：00',
-  },
-]
+// /** 验证手机和邮箱 */
+// const idenPhoneData = [
+//   {
+//     id: 1,
+//     titel: '验证类型',
+//     content: '验证邮箱',
+//   },
+//   {
+//     id: 2,
+//     titel: '验证渠道',
+//     content: '登录验证',
+//   },
+//   {
+//     id: 20,
+//     titel: '手机',
+//     content: '19500772581',
+//   },
+//   {
+//     id: 21,
+//     titel: '邮箱',
+//     content: '65495887@qq.com',
+//   },
+//   {
+//     id: 11,
+//     titel: '验证码',
+//     content: '159687',
+//     action: '完成',
+//   },
+//   {
+//     id: 9,
+//     titel: '验证码过期时间',
+//     content: '2019-6-20 13：00：00',
+//   },
+//   {
+//     id: 10,
+//     titel: '最后发送时间',
+//     content: '2019-6-20 13：00：00',
+//   },
+// ]
 
-/** 个人认证 */
-const idenPersonal = [
-  {
-    id: 111,
-    titel: '名称',
-    content: '王某某',
-  },
-  {
-    id: 112,
-    titel: '认证类型',
-    content: '人员',
-  },
-  {
-    id: 113,
-    titel: '注册地址',
-    content: '上海市松江区向民路6987号',
-  },
-  {
-    id: 114,
-    titel: '认证说明',
-    content: '此处为认证说明此处为认证说明此处为认证说明此处为认证说明此处为认证说明此处为认证说明此处为认证说明',
-  },
-  {
-    id: 115,
-    titel: '附件',
-    content: [
-      {
-        src: '/favicon.png',
-        index: 312,
-      }, {
-        src: '/icons/icon-128x128.png',
-        index: 313,
-      },
-    ],
-  },
-]
+// /** 个人认证 */
+// const idenPersonal = [
+//   {
+//     id: 111,
+//     titel: '名称',
+//     content: '王某某',
+//   },
+//   {
+//     id: 112,
+//     titel: '认证类型',
+//     content: '人员',
+//   },
+//   {
+//     id: 113,
+//     titel: '注册地址',
+//     content: '上海市松江区向民路6987号',
+//   },
+//   {
+//     id: 114,
+//     titel: '认证说明',
+//     content: '此处为认证说明此处为认证说明此处为认证说明此处为认证说明此处为认证说明此处为认证说明此处为认证说明',
+//   },
+//   {
+//     id: 115,
+//     titel: '附件',
+//     content: [
+//       {
+//         src: '/favicon.png',
+//         index: 312,
+//       }, {
+//         src: '/icons/icon-128x128.png',
+//         index: 313,
+//       },
+//     ],
+//   },
+// ]
 
 // 个人认证记录
 const dataList = {
@@ -247,8 +247,12 @@ const dataList = {
   },
   attachmentList: [
     {
-      code: '123',
-      name: '这里是图片',
+      type: 'image',
+      name: 'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1571310110031&di=c5c3557d5172db919d831cca34586e4c&imgtype=0&src=http%3A%2F%2F5b0988e595225.cdn.sohucs.com%2Fimages%2F20170718%2Fdc7a88ed8b5146368b068fc71c8c8533.jpeg',
+    },
+    {
+      type: 'image',
+      name: 'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1571310110031&di=c5c3557d5172db919d831cca34586e4c&imgtype=0&src=http%3A%2F%2F5b0988e595225.cdn.sohucs.com%2Fimages%2F20170718%2Fdc7a88ed8b5146368b068fc71c8c8533.jpeg',
     },
   ],
 }
@@ -278,6 +282,7 @@ const RecordListForm = Form.create()(
         <Modal
           destroyOnClose
           footer={null}
+          width="410px"
           className={styles.xxx}
           title="认证历史（PI）"
           visible = {showList}
@@ -320,7 +325,14 @@ const RecordListForm = Form.create()(
             <li>
               <Row>
                 <Col span={4} className={styles.labelName}>附件：</Col>
-                <Col span={20} className={styles.labelVal}>{dataList.attachmentList[0].name}</Col>
+                <Col span={20} className={styles.labelVal}>
+                  <ul style={{ padding: '0' }}>
+                    {dataList.attachmentList.map((item, index) => (
+                        // eslint-disable-next-line react/no-array-index-key
+                        <li key={index} style={{ width: '100px', height: '100px', border: '1px solid #D9D9D9', textAlign: 'center', lineHeight: '94px', borderRadius: '5px', float: 'left', marginRight: '30px' }}>{item.type === 'image' ? <img src={item.name} alt="" width="90" height="90"/> : ''}</li>
+                      ))}
+                  </ul>
+                </Col>
               </Row>
             </li>
           </ul>
@@ -341,23 +353,37 @@ class CheckModal extends React.Component {
     }
   }
 
-  /** props更新事调用 */
-  componentWillReceiveProps (props) {
-    let { showModal } = props;
-    const { recordMsg, clickType } = props;
-    if (recordMsg === undefined) {
-      showModal = false;
-    }
-    this.setState({
-      modal1Visible: showModal,
-      recordMsg,
-      clickType,
-    });
+  // /** props更新事调用 */
+  // componentWillReceiveProps (props) {
+  //   let { showModal } = props;
+  //   const { recordMsg, clickType } = props;
+  //   if (recordMsg === undefined) {
+  //     showModal = false;
+  //   }
+  //   this.setState({
+  //     modal1Visible: showModal,
+  //     recordMsg,
+  //     clickType,
+  //   });
+  // }
+
+  componentDidMount() {
+    this.props.onRef(this)
   }
+
 
   /** 控制模态框状态 */
   setModal1Visible(modal1Visible) {
     this.setState({ modal1Visible });
+  }
+
+
+  visibleShow = (recordMsg, clickType, visible) => {
+    this.setState({
+      modal1Visible: recordMsg ? visible : false,
+      recordMsg,
+      clickType,
+    });
   }
 
   closeListForm = () => {
@@ -382,10 +408,10 @@ class CheckModal extends React.Component {
     let piData;
     const { recordMsg, clickType, showList } = this.state;
     let modalTitle;
-    const changeData = [];
+    // const changeData = [];
     let modelContent;
-    const actionResent = <a onClick={e => { this.reSent(e) }}>重发</a>
-    const actionFinesh = <Badge status="success" text="已完成" />
+    // const actionResent = <a onClick={e => { this.reSent(e) }}>重发</a>
+    // const actionFinesh = <Badge status="success" text="已完成" />
     if (recordMsg === undefined) {
       return false;
     }
@@ -515,7 +541,12 @@ class CheckModal extends React.Component {
           },
           attachmentList: [
             {
-              name: '这里是图片',
+              type: 'image',
+              name: 'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1571310110031&di=c5c3557d5172db919d831cca34586e4c&imgtype=0&src=http%3A%2F%2F5b0988e595225.cdn.sohucs.com%2Fimages%2F20170718%2Fdc7a88ed8b5146368b068fc71c8c8533.jpeg',
+            },
+            {
+              type: 'image',
+              name: 'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1571310110031&di=c5c3557d5172db919d831cca34586e4c&imgtype=0&src=http%3A%2F%2F5b0988e595225.cdn.sohucs.com%2Fimages%2F20170718%2Fdc7a88ed8b5146368b068fc71c8c8533.jpeg',
             },
           ],
         }
@@ -551,12 +582,21 @@ class CheckModal extends React.Component {
             <li>
               <Row>
                 <Col span={4} className={styles.labelName}>附件：</Col>
-                <Col span={20} className={styles.labelVal}>{piData.attachmentList[0].name}</Col>
+                {/* <Col span={20} className={styles.labelVal}>
+                {piData.attachmentList[0].name}</Col> */}
+                <Col span={20} className={styles.labelVal}>
+                  <ul style={{ padding: '0' }}>
+                    {piData.attachmentList.map((item, index) => (
+                        // eslint-disable-next-line react/no-array-index-key
+                        <li key={index} style={{ width: '100px', height: '100px', border: '1px solid #D9D9D9', textAlign: 'center', lineHeight: '94px', borderRadius: '5px', float: 'left', marginRight: '30px' }}>{item.type === 'image' ? <img src={item.name} alt="" width="90" height="90"/> : ''}</li>
+                      ))}
+                  </ul>
+                </Col>
               </Row>
             </li>
             <li>
               <Row>
-                <Col span={4}>
+                <Col span={6}>
                   <a href="#" className={styles.recoedHis} onClick={this.recordList}>认证历史</a>
                 </Col>
               </Row>
@@ -703,6 +743,7 @@ class CheckModal extends React.Component {
       <div style={{ position: 'absolute', right: 0 }} >
         <Modal
           className={styles.xxx}
+          width="410px"
           title={ modalTitle }
           visible={this.state.modal1Visible}
           onOk={() => this.setModal1Visible(false)}
