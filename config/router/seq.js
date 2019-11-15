@@ -49,10 +49,10 @@ module.exports = {
       path: '/seq/sample-prepare',
       component: './seq/sample-prepare',
     },
-    // {
-    //   name: 'samplefeature',
-    //   path: '/seq/samplefeature',
-    //   component: './seq/samplefeature',
-    // },
+    {
+      name: 'seqfactory',
+      path: '/seq/seqfactory',
+      component: './seq/seqfactory',
+    },
   ],
 };

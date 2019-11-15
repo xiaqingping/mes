@@ -20,6 +20,8 @@ export default {
   'menu.seq.sample-feature': '样品特性',
   'menu.seq.seqdevice': '测序仪',
   'menu.seq.sample-prepare': '样品用量',
+  'menu.seq.seqfactory':'测序点',
+  // 'menu.seq.seqfactory':'测序点',
   'menu.personel': '人事管理',
   'menu.personel.pay': '工资管理',
   'menu.personel.payroll': '工资项管理',

@@ -51,6 +51,18 @@ const SeqModel = {
       { id:11,name:'郑州测序点' },
       { id:12,name:'长沙测序点' },
     ],
+    // factory测序点工厂
+    factory:[
+      { id:3100,name:'生工上海工厂' },
+      { id:3101,name:'生工北京工厂' },
+      { id:3102,name:'生工广州工厂' },
+      { id:3103,name:'生工武汉工厂' },
+      { id:3105,name:'生工成都工厂' },
+      { id:3106,name:'生工青岛工厂' },
+      { id:3107,name:'生工南京工厂' },
+      { id:3108,name:'生工郑州工厂' },
+      { id:3109,name:'生工长春工厂' },
+    ]
   },
   effects: {
     *getCarrierSeries({ payload }, { call, put }) {

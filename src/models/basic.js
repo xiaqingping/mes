@@ -93,6 +93,10 @@ const INIT_STATE = {
   countryTimeZone: [],
   // 国家+（省）地区+时区
   countryProvinceTimeZone: [],
+  // 仓库
+  storages: [],
+  // 工厂
+  factorys: [],
 };
 
 const BasicModel = {
