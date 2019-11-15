@@ -23,11 +23,13 @@ const plugins = [
         // 为true时，用navigator.language的值作为默认语言
         baseNavigator: true,
       },
-      dynamicImport: {
-        loadingComponent: './components/PageLoading/index',
-        webpackChunkName: true,
-        level: 3,
-      },
+      // 按需加载配置
+      // dynamicImport: {
+      //   loadingComponent: './components/PageLoading/index',
+      //   webpackChunkName: true,
+      //   level: 3,
+      // },
+      dynamicImport: true,
       pwa: pwa
         ? {
             workboxPluginMode: 'InjectManifest',

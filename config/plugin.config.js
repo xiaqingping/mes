@@ -96,6 +96,22 @@ export default config => {
             return 'misc';
           },
         },
+        keshi: {
+          name: 'keshi',
+          test: module => {
+            const packageName = getModulePackageName(module) || '';
+
+            if (packageName) {
+              return [
+                'd3',
+                'echarts',
+                'zrender',
+              ].includes(packageName);
+            }
+
+            return false;
+          },
+        }
       },
     });
 };
