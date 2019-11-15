@@ -589,7 +589,7 @@ class Order extends Component {
   }
 
   // 获取表格数据
-  getTableData = (options = {}, son) => {
+  getTableData = (options = {}) => {
     const { formValues } = this.state;
     const query = Object.assign({}, formValues, options);
 
@@ -599,16 +599,6 @@ class Order extends Component {
     });
 
     api.peptideBase.getModifications(query, true).then(res => {
-      if (son === 'son') {
-        const { parantData } = this.state;
-        res.rows.forEach(item => {
-          if (item.id === parantData.id) {
-            this.setState({
-              dataSon: item.details,
-            })
-          }
-        })
-      }
       this.setState({
         list: res.rows,
         total: res.total,
@@ -651,6 +641,10 @@ class Order extends Component {
     let strId = '';
     // eslint-disable-next-line array-callback-return
     data.map((item, key) => {
+      // console.log(item)
+      if (item.length === 1 && item[0] === '') {
+        return false
+      }
       arrData.push({
         id: id - key - 1,
         name: item[0],
@@ -709,6 +703,7 @@ class Order extends Component {
       this.setState({
         list: list.filter(e => e.id !== row.id),
         editIndex: arrEditIndex.join(','),
+        dataSon: [],
       });
       list.forEach(e => {
         if (e.id < 0) {
@@ -732,10 +727,84 @@ class Order extends Component {
     });
   };
 
-  // 选择input
+  // 键盘点击回车触发
+  keyDownEvent = (e, rowIndex) => {
+    if (e.nativeEvent.keyCode === 13) {
+      if (this.props.form.getFieldValue(`providerTotalAmount${rowIndex}`) && this.props.form.getFieldValue(`peptidePurityId${rowIndex}`)) {
+        api.peptideBase.getAminoAcid({ shortCode: this.props.form.getFieldValue(`providerTotalAmount${rowIndex}`) }).then(data => {
+          const map = {}; const dest = [];
+          for (let i = 0; i < data.length; i++) {
+            const ai = data[i];
+            if (ai.shortCode[0] === this.props.form.getFieldValue(`sequence${rowIndex}`) || ai.shortCode[1] === this.props.form.getFieldValue(`sequence${rowIndex}`)) {
+              if (!map[ai.id]) {
+                  dest.push({
+                    id: ai.id,
+                    code: ai.code,
+                    aminoAcidID: ai.name,
+                    hydrophilic: ai.hydrophilic,
+                    hydrophobic: ai.hydrophobic,
+                    acidic: ai.acidic,
+                    alkaline: ai.alkaline,
+                    isCanDisulfideBond: ai.isCanDisulfideBond,
+                    molecularWeight: ai.molecularWeight,
+                    isoelectricPoint: ai.isoelectricPoint,
+                    carboxylationDissociationConstant: ai.carboxylationDissociationConstant,
+                    aminoDissociationConstant: ai.aminoDissociationConstant,
+                    status: ai.status,
+                    creatorName: ai.creatorName,
+                    createDate: ai.createDate,
+                    cancelName: ai.cancelName,
+                    cancelDate: ai.cancelDate,
+                    aminoAcidType: ai.aminoAcidType,
+                    longCode: ai.longCode,
+                    shortCode: ai.shortCode,
+                  });
+                map[ai.id] = ai;
+              } else {
+                for (let j = 0; j < dest.length; j++) {
+                  const dj = dest[j];
+                  if (dj.id === ai.id) {
+                    dj.cancelName = dj.cancelName || ai.cancelName ? [dj.cancelName, ai.cancelName] : '';
+                    dj.cancelDate = dj.cancelDate || ai.cancelDate ? [dj.cancelDate, ai.cancelDate] : '';
+                    dj.shortCode = dj.shortCode || ai.shortCode ? [dj.shortCode, ai.shortCode] : '';
+                    // dj.shortCode = (dj.shortCode ? dj.shortCode : '')
+                    // + (ai.shortCode ? ` | ${ai.shortCode}` : '');
+                    dj.longCode = dj.longCode || ai.longCode ? [dj.longCode, ai.longCode] : '';
+                    // dj.longCode = (dj.longCode ? dj.longCode : '')
+                    // + (ai.longCode ? ` | ${ai.longCode}` : '');
+                    dj.aminoAcidType = dj.aminoAcidType || ai.aminoAcidType ? [dj.aminoAcidType, ai.aminoAcidType] : '';
+                    // dj.aminoAcidType = (dj.aminoAcidType ? dj.aminoAcidType : '')
+                    // + (ai.aminoAcidType ? ` | ${ai.aminoAcidType}` : '');
+                    break;
+                  }
+                }
+              }
+            }
+          }
+          this.setState({
+            loadingSon: false,
+            dataSon: dest,
+          });
+        });
+      }
+    }
+  }
+
+  /**
+   * 选择input
+   * @param {string} data 表单的默认数据
+   * @param {string} type 表单的类型
+   * @param {array} selectList select的默认数据
+   * @param {int} widthValue 表单宽度的值
+   * @param {int} rowIndex 当前指针位置
+   * @param {string} event 事件
+  */
   // eslint-disable-next-line consistent-return
-  selectType = (data, type, selectList, widthValue) => {
+  selectType = (data, type, selectList, widthValue, rowIndex, event) => {
     if (type === 'input') {
+      if (event === 'onkeydown') {
+        return <Input style={{ width: `${widthValue}px` }} onKeyDown={e => this.keyDownEvent(e, rowIndex)}/>
+      }
       return <Input style={{ width: `${widthValue}px` }} defaultValue={data}/>
     }
     if (type === 'inputReadOnly') {
@@ -833,6 +902,7 @@ class Order extends Component {
         width: 150,
         editable: true,
         inputType: 'input',
+        event: 'onkeydown',
         rules: [
           { required: true, message: '必填' },
         ],
@@ -1056,7 +1126,7 @@ class Order extends Component {
         {
         title: '氨基酸',
         dataIndex: 'aminoAcidID',
-        width: 80,
+        width: 100,
       },
       {
         title: '类型',
@@ -1066,7 +1136,7 @@ class Order extends Component {
       {
         title: '长代码',
         dataIndex: 'longCode',
-        width: 80,
+        width: 100,
       },
       {
         title: '短代码',
@@ -1113,6 +1183,8 @@ class Order extends Component {
             list[rowIndex][col.dataIndex],
             col.inputType, col.selectList,
             col.width ? col.width - 10 : 90,
+            rowIndex,
+            col.event,
             ),
           dataIndex: col.dataIndex + rowIndex,
           title: col.title,

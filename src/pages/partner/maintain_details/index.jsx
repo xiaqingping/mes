@@ -15,6 +15,7 @@ import AbroadAuthentication from './components/AbroadAuthentication';
 import Address from './components/Address';
 import Bank from './components/Bank';
 import PurchasingOrg from './components/PurchasingOrg';
+import api from '@/api';
 
 
 @connect(({ partnerMaintainEdit }) => ({
@@ -29,6 +30,15 @@ class CustomerDetails extends Component {
   };
 
   componentDidMount() {
+    console.log(this.props.match.params.id)
+
+    api.bp.getBPVendor(this.props.match.params.id).then(res => {
+      console.log(res)
+      this.props.dispatch({
+        type: 'partnerMaintainEdit/setDetails',
+        payload: res,
+      });
+    })
     const details = {
       // 基础信息
       basic: {
@@ -354,10 +364,10 @@ class CustomerDetails extends Component {
         ],
       },
     };
-    this.props.dispatch({
-      type: 'partnerMaintainEdit/setDetails',
-      payload: details,
-    });
+    // this.props.dispatch({
+    //   type: 'partnerMaintainEdit/setDetails',
+    //   payload: details,
+    // });
     this.props.dispatch({
       type: 'partnerMaintainEdit/setSupplier',
       payload: supplier,
@@ -492,14 +502,14 @@ class CustomerDetails extends Component {
           customer.basic.type === 1 ?
           (
             <>
-              <Credit/>
-              {customer.basic.telephoneCountryCode === 1 ?
-              <HomeAuthentication/> : <AbroadAuthentication/>}
+              <PersonCredit/>
+              <PersonCertification/>
             </>
           ) : (
             <>
-              <PersonCredit/>
-              <PersonCertification/>
+              <Credit/>
+              {customer.basic.telephoneCountryCode === 1 ?
+              <HomeAuthentication/> : <AbroadAuthentication/>}
             </>
           )
         }

@@ -164,7 +164,9 @@ class BasicInfo extends Component {
 
   render() {
     const { noTitleKey } = this.state;
-    const { details: { customer: { salesAreaList } } } = this.props;
+    // const { details: { customer: { salesAreaList } } } = this.props;
+    const { details: { customer } } = this.props;
+    const salesAreaList = customer ? customer.salesAreaList : ''
 
     return (
       <Card
@@ -172,13 +174,13 @@ class BasicInfo extends Component {
         className="check-tabs"
         bordered={false}
         style={{ width: '100%', marginBottom: '24px' }}
-        tabList={this.tabListNoTitle()}
+        tabList={salesAreaList ? this.tabListNoTitle() : ''}
         activeTabKey={noTitleKey}
         onTabChange={key => {
           this.onTabChange(key);
         }}
       >
-        { salesAreaList.map(item => {
+        {salesAreaList ? salesAreaList.map(item => {
           if (parseInt(item.salesOrganizationCode, 10) === parseInt(noTitleKey, 10)) {
             return (
               <div key={item.regionCode}>
@@ -214,7 +216,9 @@ class BasicInfo extends Component {
               </div>
             )
           }
-        })}
+        })
+        : '暂无数据'
+      }
       </Card>
     );
   }
