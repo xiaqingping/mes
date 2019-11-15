@@ -282,6 +282,7 @@ class Carrier extends Component {
         loading: false,
         editIndex: -1,
       });
+      console.log(res);
     });
   }
 

@@ -30,6 +30,14 @@ export default {
   getSampleFeature(params, easyui) {
     return request(`/sampletype/v1/samplefeature${easyui ? '/easyui' : ''}`, { params });
   },
+  // 新增
+  addSampleFeature(data) {
+    return request('/sampletype/v1/sampletypes', { method: 'POST', data });
+  },
+  // 作废
+  cancelSampleFeature(id) {
+    return request(`/sampletype/v1/sampletypes/${id}`, { method: 'DELETE' });
+  },
   // 查询样品特性明细
   getSampleFeatureDetail(id) {
     return request(`/sampletype/v1/samplefeaturedetail/${id}/detail`);

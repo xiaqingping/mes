@@ -14,7 +14,7 @@ import React, { Component } from 'react';
 import { connect } from 'dva';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import StandardTable from '@/components/StandardTable';
-import api, { serial } from '@/api';
+import api from '@/api';
 // import { formatter } from '@/utils/utils';
 
 const EditableContext = React.createContext();
@@ -26,10 +26,6 @@ const { Option } = Select;
  * 页面顶部筛选表单
  */
 
-@connect(({ personel }) => ({
-  type: personel.type,
-  status: personel.status,
-}))
 @Form.create()
 class Search extends Component {
   componentDidMount() {
@@ -62,25 +58,13 @@ class Search extends Component {
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
-            <FormItem label="类型">
-              {getFieldDecorator('type')(
-                <Select allowClear={true}>
-                  {this.props.type.map(e =>
-                    <Option value={e.id} key={e.id}>{e.name}</Option>,
-                  )}
-                </Select>,
-              )}
-            </FormItem>
-          </Col>
-          
-          <Col lg={6} md={8} sm={12}>
             <FormItem label="状态">
-              {getFieldDecorator('status')(
-                <Select allowClear={true}>
-                {this.props.status.map(e =>
-                  <Option value={e.id} key={e.id}>{e.name}</Option>,
-                )}
-              </Select>,
+              {getFieldDecorator('status', { initialValue: '1' })(
+                <Select>
+                  <Option value="">全部</Option>
+                  <Option value="1">正常</Option>
+                  <Option value="2">已删除</Option>
+                </Select>,
               )}
             </FormItem>
           </Col>
@@ -145,9 +129,6 @@ class EditableCell extends React.Component {
 /**
  * 页面根组件
  */
-@connect(({ personel }) => ({
-  type: personel.type,
-}))
 @Form.create()
 class Modifications extends Component {
 
@@ -187,7 +168,7 @@ class Modifications extends Component {
       loading: true,
     });
     
-    api.pay.getTypepay(query,true).then(res => {
+    api.sampletype.getSampleType(query,true).then(res => {
       this.setState({
         list: res.rows,
         total: res.total,
@@ -223,7 +204,7 @@ class Modifications extends Component {
   }
   // 删除数据
   deleteRow = row => {
-    api.pay.deleteTypepays(row.id).then(() => {
+    api.sampletype.cancelSampleType(row.id).then(() => {
       this.getTableData();
     });
   }
@@ -235,9 +216,9 @@ class Modifications extends Component {
       const newData = { ...list[index], ...row };
 
       if (newData.id < 0) {
-        api.pay.increaseTypepay(newData).then(() => this.getTableData());
+        api.sampletype.addSampleType(newData).then(() => this.getTableData());
       } else {
-        api.pay.increaseTypepay(newData).then(() => this.getTableData());
+        api.sampletype.addSampleType(newData).then(() => this.getTableData());
       }
     });
   }
@@ -327,40 +308,15 @@ class Modifications extends Component {
         ],
       },
       {
-        title: '类型',
-        dataIndex: 'type',
+        title: '简写',
+        dataIndex: 'alias',
         width: 180,
         editable: true,
-        render: text => {
-          if (text === 1) return '工资项目';
-          if (text === 2) return '扣款项目';
-          if (text === 3) return '代发项目';
-          if (text === 4) return '代缴项目';
-          return ''
-        },
-        inputType: (
-          <Select style={{ width: 100 }}>
-            {this.props.type.map(e =>
-              <Option value={e.id} key={e.id}>{e.name}</Option>,
-            )}
-          </Select>
-        ),
+        inputType: <Input />,
         rules: [
           { required: true, message: '必填' },
         ],
       },
-      {
-        title: '排序',
-        dataIndex: 'serial',
-        width: 180,
-        editable: true,
-        inputType: <Input style={{ width: '90%' }}/>,
-        rules: [
-          { required: true, message: '必填' },
-          { validator: this.checkNameInput},
-        ],
-      },
-      
       {
         title: '状态',
         dataIndex: 'status',
@@ -382,13 +338,12 @@ class Modifications extends Component {
         width: 200,
       },
       {
-        title: '修改人',
-        dataIndex: 'updateName',
-        width: 100,
+        title: '作废人',
+        dataIndex: 'cancelName',
       },
       {
-        title: '修改时间',
-        dataIndex: 'updateDate',
+        title: '作废时间',
+        dataIndex: 'cancelDate',
         width: 200,
       },
       {
@@ -475,4 +430,5 @@ class Modifications extends Component {
   }
 }
 export default Modifications;
+
 

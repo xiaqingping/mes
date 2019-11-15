@@ -18,6 +18,7 @@ import { connect } from 'dva';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import StandardTable from '@/components/StandardTable';
 import api from '@/api';
+// import { formatter } from '@/utils/utils';
 
 const EditableContext = React.createContext();
 const FormItem = Form.Item;
@@ -160,6 +161,7 @@ class EditableCell extends React.Component {
 }))
 @Form.create()
 class Modifications extends Component {
+  
   state = {
     formValues: {
       page: 1,
@@ -174,17 +176,6 @@ class Modifications extends Component {
     id: 0, // 新增数据时，提供负数id 
     dataSons: [],
   }
-  // state = {
-  //   pagination: {
-  //     current: 1,
-  //     pageSize: 10,
-  //     total: 0,
-  //   },
-  //   list: [],
-  //   loading: false,
-  //   selectedRows: [],
-  //   editIndex: -1,
-  // }
 
   // 工资管理
   columns = [
@@ -214,6 +205,11 @@ class Modifications extends Component {
       title: '状态',
       dataIndex: 'status',
       width: 100,
+      render: text => {
+        if (text === 1) return '正常';
+        if (text === 2) return '已删除';
+        return ''
+      },
     },
     {
       title: '创建人',
@@ -348,6 +344,7 @@ class Modifications extends Component {
         loading: false,
         editIndex: -1,
       });
+      // console.log(res);
     });
   }
 

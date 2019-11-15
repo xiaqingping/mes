@@ -3,6 +3,11 @@ import api from '@/api';
 const PersonelModel = {
   namespace: 'personel',
   state: {
+    // 状态
+    status:[
+      { id:1,name:'正常' },
+      { id:2,name:'已删除' }
+    ],
     // 月
     month: [
       { id:1,name:'1' },
@@ -35,7 +40,7 @@ const PersonelModel = {
     ]
   },
   effects: {
-    *getCarrierSeries({ payload }, { call, put }) {
+    *getPay({ payload }, { call, put }) {
       const response = yield call(api.pay.getPay, payload);
       yield put({
         type: 'personelPay',

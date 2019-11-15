@@ -8,42 +8,40 @@ import {
   Row,
   Select,
   message,
-  Popconfirm
+  Popconfirm,
 } from 'antd';
 import React, { Component } from 'react';
 import { connect } from 'dva';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import StandardTable from '@/components/StandardTable';
-import api, { serial } from '@/api';
-// import { formatter } from '@/utils/utils';
+
+import api from '@/api';
+import { formatter } from '@/utils/utils';
 
 const EditableContext = React.createContext();
 const FormItem = Form.Item;
 const { Option } = Select;
 
-
 /**
  * 页面顶部筛选表单
  */
-
-@connect(({ personel }) => ({
-  type: personel.type,
-  status: personel.status,
-}))
 @Form.create()
 class Search extends Component {
   componentDidMount() {
     this.submit();
   }
 
-  // 查询
   submit = e => {
     if (e) e.preventDefault();
     const val = this.props.form.getFieldsValue();
-    this.props.getTableData({ page: 1,...val});
+    this.props.getTableData({ page: 1, ...val });
   }
 
-  // 渲染头部表单
+  handleFormReset = () => {
+    this.props.form.resetFields();
+  }
+
+  // 渲染表单
   renderForm = () => {
     const {
       form: { getFieldDecorator },
@@ -62,25 +60,18 @@ class Search extends Component {
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
-            <FormItem label="类型">
-              {getFieldDecorator('type')(
-                <Select allowClear={true}>
-                  {this.props.type.map(e =>
-                    <Option value={e.id} key={e.id}>{e.name}</Option>,
-                  )}
-                </Select>,
-              )}
+            <FormItem label="别名">
+              {getFieldDecorator('alias')(<Input />)}
             </FormItem>
           </Col>
-          
           <Col lg={6} md={8} sm={12}>
             <FormItem label="状态">
-              {getFieldDecorator('status')(
-                <Select allowClear={true}>
-                {this.props.status.map(e =>
-                  <Option value={e.id} key={e.id}>{e.name}</Option>,
-                )}
-              </Select>,
+              {getFieldDecorator('status', { initialValue: '1' })(
+                <Select>
+                  <Option value="">全部</Option>
+                  <Option value="1">正常</Option>
+                  <Option value="2">已删除</Option>
+                </Select>,
               )}
             </FormItem>
           </Col>
@@ -89,18 +80,21 @@ class Search extends Component {
               <Button type="primary" htmlType="submit">
                 查询
               </Button>
+              <Button style={{ marginLeft: 8 }} onClick={this.handleFormReset}>
+                重置
+              </Button>
             </span>
           </Col>
         </Row>
       </Form>
     );
   }
+
   render() {
     return (
       <div className="tableListForm">{this.renderForm()}</div>
     );
   }
-  
 }
 
 
@@ -136,47 +130,53 @@ class EditableCell extends React.Component {
     );
   };
 
-
   render() {
     return <EditableContext.Consumer>{this.renderCell}</EditableContext.Consumer>;
   }
 }
 
+
 /**
  * 页面根组件
  */
-@connect(({ personel }) => ({
-  type: personel.type,
+@connect(({ global }) => ({
+  commonStatus: global.commonStatus,
 }))
 @Form.create()
-class Modifications extends Component {
-
-  state = {
-    formValues: {
-      page: 1,
-      rows: 10,
-    },
-    list: [],
-    total: 0,
-    loading: true,
-    selectedRows: [],
-    editIndex: -1,
-    id: 0, // 新增数据时，提供负数id 
+class CarrierSeries extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      formValues: {
+        page: 1,
+        rows: 10,
+      },
+      list: [],
+      total: 0,
+      loading: false,
+      selectedRows: [],
+      editIndex: -1,
+      id: 0, // 新增数据时，提供负数id
+    }
   }
-  // 分页
-  handleStandardTableChange = pagination => {
+
+  componentDidMount() {
+    //
+  }
+
+  handleStandardTableChange = (pagination, filtersArg, sorter) => {
     this.getTableData({
       page: pagination.current,
       rows: pagination.pageSize,
     });
   }
-  
-  // 选择行
+
   handleSelectRows = rows => {
     this.setState({
       selectedRows: rows,
     });
   };
+
   // 获取表格数据
   getTableData = (options = {}) => {
     const { formValues } = this.state;
@@ -186,19 +186,44 @@ class Modifications extends Component {
       formValues: query,
       loading: true,
     });
-    
-    api.pay.getTypepay(query,true).then(res => {
+
+    api.sampletype.getSampleResistance(query, true).then(res => {
       this.setState({
         list: res.rows,
         total: res.total,
         loading: false,
         editIndex: -1,
       });
-      console.log(res);
     });
   }
 
-  // 修改,开启编辑
+  // 取消编辑
+  cancel = () => {
+    this.setState({ editIndex: -1 });
+  };
+
+  // 作废数据
+  deleteRow = row => {
+    api.sampletype.cancelSampleResistance(row.id).then(() => {
+      this.getTableData();
+    });
+  };
+
+  // 保存
+  saveRow = index => {
+    this.props.form.validateFields((error, row) => {
+      if (error) return;
+      const { list } = this.state;
+      const newData = { ...list[index], ...row };
+      if (newData.id > 0) {
+        api.sampletype.addSampleResistance(newData).then(() => this.getTableData());
+      } else {
+        api.sampletype.addSampleResistance(newData).then(() => this.getTableData());
+      }
+    });
+  }
+
+  // 开启编辑
   editRow = index => {
     if (this.state.editIndex !== -1) {
       message.warning('请先保存或退出正在编辑的数据');
@@ -221,26 +246,7 @@ class Modifications extends Component {
       });
     }
   }
-  // 删除数据
-  deleteRow = row => {
-    api.pay.deleteTypepays(row.id).then(() => {
-      this.getTableData();
-    });
-  }
-  // 保存和修改之后的保存
-  saveRow = index => {
-    this.props.form.validateFields((error, row) => {
-      if (error) return;
-      const { list } = this.state;
-      const newData = { ...list[index], ...row };
 
-      if (newData.id < 0) {
-        api.pay.increaseTypepay(newData).then(() => this.getTableData());
-      } else {
-        api.pay.increaseTypepay(newData).then(() => this.getTableData());
-      }
-    });
-  }
   // 新增
   handleAdd = () => {
     const { editIndex, id, list } = this.state;
@@ -259,37 +265,7 @@ class Modifications extends Component {
         },
         ...list,
       ],
-      
     });
-  }
-  // 排序验证
-  checkNameInput = (rule, value, callback) => {
-    // const {value,serial,list} =this.state;
-    // let newSerail;
-    // // console.log(newSerail);
-    // this.setState({
-    //   serial:newSerail,
-    //   editIndex:0,
-    //   list:[
-    //     {
-    //       serial:newSerail
-    //     },
-    //     ...list,
-    //   ]
-    // });
-    // console.log(list);
-    // if (value.name) {
-    //   callback();
-    //   return;
-    // }
-    // console.log(value.name);
-    if (serial == newSerial) {
-      callback('排序不能重复');
-    } else {
-      
-    }
-    callback();
-
   }
 
   render() {
@@ -300,8 +276,8 @@ class Modifications extends Component {
       total,
       loading,
     } = this.state;
+    const { commonStatus } = this.props;
     const data = { list, pagination: { current, pageSize, total } };
-    // console.log(data);
     let tableWidth = 0;
 
     const components = {
@@ -314,67 +290,37 @@ class Modifications extends Component {
       {
         title: '编号',
         dataIndex: 'code',
-        width: 100,
       },
       {
         title: '名称',
         dataIndex: 'name',
         width: 180,
         editable: true,
-        inputType: <Input style={{ width: '90%' }}/>,
+        inputType: <Input />,
         rules: [
           { required: true, message: '必填' },
         ],
       },
       {
-        title: '类型',
-        dataIndex: 'type',
+        title: '别名',
+        dataIndex: 'alias',
         width: 180,
         editable: true,
-        render: text => {
-          if (text === 1) return '工资项目';
-          if (text === 2) return '扣款项目';
-          if (text === 3) return '代发项目';
-          if (text === 4) return '代缴项目';
-          return ''
-        },
-        inputType: (
-          <Select style={{ width: 100 }}>
-            {this.props.type.map(e =>
-              <Option value={e.id} key={e.id}>{e.name}</Option>,
-            )}
-          </Select>
-        ),
+        inputType: <Input />,
         rules: [
           { required: true, message: '必填' },
         ],
       },
-      {
-        title: '排序',
-        dataIndex: 'serial',
-        width: 180,
-        editable: true,
-        inputType: <Input style={{ width: '90%' }}/>,
-        rules: [
-          { required: true, message: '必填' },
-          { validator: this.checkNameInput},
-        ],
-      },
-      
       {
         title: '状态',
         dataIndex: 'status',
-        width: 100,
-        render: text => {
-          if (text === 1) return '正常';
-          if (text === 2) return '已删除';
-          return ''
+        render(text) {
+          return formatter(commonStatus, text);
         },
       },
       {
         title: '创建人',
-        dataIndex: 'createName',
-        width: 100,
+        dataIndex: 'creatorName',
       },
       {
         title: '创建时间',
@@ -382,13 +328,12 @@ class Modifications extends Component {
         width: 200,
       },
       {
-        title: '修改人',
-        dataIndex: 'updateName',
-        width: 100,
+        title: '作废人',
+        dataIndex: 'cancelName',
       },
       {
-        title: '修改时间',
-        dataIndex: 'updateDate',
+        title: '作废时间',
+        dataIndex: 'cancelDate',
         width: 200,
       },
       {
@@ -423,7 +368,6 @@ class Modifications extends Component {
         },
       },
     ];
-    
 
     columns = columns.map(col => {
       if (!col.width) col.width = 100;
@@ -448,7 +392,7 @@ class Modifications extends Component {
       <PageHeaderWrapper>
         <Card bordered={false}>
           <div className="tableList">
-            <Search  getTableData={this.getTableData}/>
+            <Search getTableData={this.getTableData} />
             <div className="tableListOperator">
               <Button icon="plus" type="primary" onClick={() => this.handleAdd()}>
                 新建
@@ -458,8 +402,8 @@ class Modifications extends Component {
               <StandardTable
                 scroll={{ x: tableWidth }}
                 rowClassName="editable-row"
-                selectedRows={selectedRows}
                 components={components}
+                selectedRows={selectedRows}
                 loading={loading}
                 data={data}
                 columns={columns}
@@ -467,12 +411,11 @@ class Modifications extends Component {
                 onChange={this.handleStandardTableChange}
               />
             </EditableContext.Provider>
-            
           </div>
         </Card>
       </PageHeaderWrapper>
     );
   }
 }
-export default Modifications;
 
+export default CarrierSeries;

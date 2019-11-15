@@ -24,7 +24,7 @@ export default {
   },
   // 获取工资类型
   getTypepay(params) {
-    return request('/pay/v1/type', { params });
+    return request('/pay/v1/type/easyui', { params });
   },
   // 保存工资类型
   increaseTypepay(params) {
