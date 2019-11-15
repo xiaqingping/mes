@@ -55,5 +55,5 @@ export default {
   'menu.purchase.bank': 'Bank Subjects',
   'menu.purchase.supplier': 'Supplier Subjects',
   'menu.hts': '高通量',
-  'menu.hts.home': '首页',
+  'menu.hts.home': '示例',
 };

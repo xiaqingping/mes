@@ -140,7 +140,7 @@ const Model = {
       if (targetState instanceof Array && targetState.length > 0) return;
 
       // 二：检查浏览器缓存数据是否有目标数据
-      targetState = JSON.parse(localStorage.getItem(`${namespace}/${type}`));
+      targetState = JSON.parse(sessionStorage.getItem(`${namespace}/${type}`));
 
       if (!targetState) {
         // 三：数据请求接口
@@ -189,7 +189,7 @@ const Model = {
       const data = (format[type] && format[type](targetState)) || targetState;
 
       // 将数据存到浏览器缓存中
-      localStorage.setItem(`${namespace}/${type}`, JSON.stringify(data));
+      sessionStorage.setItem(`${namespace}/${type}`, JSON.stringify(data));
       return { ...state, [type]: data };
     },
   },
