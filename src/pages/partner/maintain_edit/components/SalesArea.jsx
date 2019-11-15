@@ -314,7 +314,7 @@ class SalesArea extends React.Component {
 
     // 过滤掉关闭的采购组织
     const newTabsData = tabsData.filter((e, i) => {
-      if (e.title !== tabKey) return true;
+      if (`${e.salesOrganizationCode}-${e.distributionChannelCode}` !== tabKey) return true;
       index = i;
       return false;
     });
