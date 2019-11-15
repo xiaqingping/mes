@@ -47,4 +47,6 @@ export default {
   'menu.purchase.payment': 'Payment Apply',
   'menu.purchase.bank': 'Bank Subjects',
   'menu.purchase.supplier': 'Supplier Subjects',
+  'menu.hts': '高通量',
+  'menu.hts.home': '示例',
 };

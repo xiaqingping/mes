@@ -47,4 +47,6 @@ export default {
   'menu.purchase.payment': '付款申请',
   'menu.purchase.bank': '银行科目',
   'menu.purchase.supplier': '供应商科目',
+  'menu.hts': '高通量',
+  'menu.hts.home': '示例',
 };
