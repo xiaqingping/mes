@@ -44,6 +44,11 @@ class CustomerEdit extends Component {
   }
 
   componentDidMount() {
+    this.props.dispatch({
+      type: 'bpEdit/addInitDetails',
+      payload: {},
+    });
+
     window.addEventListener('resize', this.resizeFooterToolbar, { passive: true });
     this.resizeFooterToolbar();
     this.getCacheData();
@@ -91,6 +96,7 @@ class CustomerEdit extends Component {
       { type: 'salesArea' }, // 销售范围
       { type: 'salesOrganizations' }, // 销售组织
       { type: 'distributionChannels' }, // 分销渠道
+      { type: 'countryTimeZone' }, // 国家+时区
     ];
     basicCacheList.forEach(item => {
       this.props.dispatch({

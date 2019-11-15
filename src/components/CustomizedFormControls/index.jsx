@@ -230,16 +230,17 @@ export class MobilePhoneInput extends React.Component {
   render() {
     const { mobilePhoneCountryCode, mobilePhone } = this.state;
     const { countryDiallingCodes } = this.props;
+
     return (
       <InputGroup compact>
         <Select value={mobilePhoneCountryCode} style={{ width: '40%' }} onChange={val => this.valueChange({ mobilePhoneCountryCode: val })}>
           {
             countryDiallingCodes.map(e => (
               <Option
-                key={e.diallingCode}
-                value={e.diallingCode}
+                key={e.countryCode}
+                value={e.countryCode}
               >
-                {e.diallingCode}
+                {e.countryCode} {e.diallingCode}
               </Option>
             ))
           }
@@ -294,10 +295,10 @@ export class TelphoneInput extends React.Component {
           {
             countryDiallingCodes.map(e => (
               <Option
-                key={e.diallingCode}
-                value={e.diallingCode}
+                key={e.countryCode}
+                value={e.countryCode}
               >
-                {e.diallingCode}
+                {e.countryCode} {e.diallingCode}
               </Option>
             ))
           }
@@ -354,10 +355,10 @@ export class FaxInput extends React.Component {
           {
             countryDiallingCodes.map(e => (
               <Option
-                key={e.diallingCode}
-                value={e.diallingCode}
+                key={e.countryCode}
+                value={e.countryCode}
               >
-                {e.diallingCode}
+                {e.countryCode} {e.diallingCode}
               </Option>
             ))
           }

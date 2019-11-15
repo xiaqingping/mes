@@ -1,6 +1,6 @@
 /*
  * 合作伙伴
- *
+ * https://devapi.sangon.com:8443/api/partner/swagger-ui.html
  */
 
 import request from '@/utils/request';
@@ -80,8 +80,8 @@ export default {
   // 检查业务伙伴移动电话是否存在 { mobilePhone: xxx }
   // 检查业务伙伴邮箱是否存在 { email: xxx }
   // 检查业务伙伴税号是否存在 { taxNo: xxx }
-  checkBPFields(data) {
-    return request('/partner/v1/check', { method: 'POST', data });
+  checkBPFields(params) {
+    return request('/partner/v1/check', { method: 'POST', params });
   },
 
   // 查询所有业务伙伴类型为组织的数据（带分页）

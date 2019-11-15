@@ -18,7 +18,8 @@ import {
   FaxInput,
   AddressInput,
 } from '@/components/CustomizedFormControls';
-
+// import _ from 'lodash';
+import bp from '@/api/bp';
 import styles from '../style.less';
 
 const FormItem = Form.Item;
@@ -30,9 +31,9 @@ const { Option } = Select;
   const details = bpEdit.details || {};
   const basicInfo = details.basic || {};
   const customer = details.customer || {};
-  const salesOrderBlock = customer.salesOrderBlock || false;
+  const salesOrderBlock = customer.salesOrderBlock || 2;
   const vendor = details.vendor || {};
-  const invoicePostBlock = vendor.invoicePostBlock || false;
+  const invoicePostBlock = vendor.invoicePostBlock || 2;
 
   // 2. 基础数据
   // 行业类别
@@ -62,13 +63,44 @@ class Basic extends React.Component {
     });
   }
 
-  checkNameInput = (rule, value, callback) => {
+  checkNameInput = async (rule, value, callback) => {
     if (value.name) {
-      callback();
+      const res = await bp.checkBPFields({ name: value.name });
+      if (!res) {
+        callback();
+        return;
+      }
+      callback('名称重复');
       return;
     }
     callback(formatMessage({ id: 'partner.maintain.requireName' }));
   };
+
+  checkEmail = async (rule, value, callback) => {
+    if (value.email) {
+      const res = await bp.checkBPFields({ email: value.email });
+      if (!res) {
+        callback();
+        return;
+      }
+      callback('邮箱重复');
+      return;
+    }
+    callback('邮箱必填');
+  }
+
+  checkMobilePhone = async (rule, value, callback) => {
+    if (value.mobilePhone) {
+      const res = await bp.checkBPFields({ mobilePhone: value.mobilePhone });
+      if (!res) {
+        callback();
+        return;
+      }
+      callback('移动电话重复');
+      return;
+    }
+    callback('移动电话必填');
+  }
 
   valueChange = (key, value) => {
     const { details, basic, customer, vendor } = this.props;
@@ -78,6 +110,8 @@ class Basic extends React.Component {
 
     // 销售冻结
     if (key === 'salesOrderBlock') {
+      // eslint-disable-next-line no-unused-expressions
+      value ? (obj[key] = 1) : (obj[key] = 2);
       const newCustomer = { ...customer, ...obj };
       this.props.dispatch({
         type: 'bpEdit/setDetails',
@@ -88,6 +122,8 @@ class Basic extends React.Component {
 
     // 采购冻结
     if (key === 'invoicePostBlock') {
+      // eslint-disable-next-line no-unused-expressions
+      value ? (obj[key] = 1) : (obj[key] = 2);
       const newVendor = { ...vendor, ...obj };
       this.props.dispatch({
         type: 'bpEdit/setDetails',
@@ -160,6 +196,7 @@ class Basic extends React.Component {
                     mobilePhoneCountryCode: basic.mobilePhoneCountryCode,
                     mobilePhone: basic.mobilePhone,
                   },
+                  rules: [{ validator: this.checkMobilePhone }],
                 })(<MobilePhoneInput onChange={value => this.valueChange('mobilePhone', value)} />)}
               </FormItem>
             </Col>
@@ -167,6 +204,7 @@ class Basic extends React.Component {
               <FormItem label="邮箱">
                 {getFieldDecorator('email', {
                   initialValue: { email: basic.email },
+                  rules: [{ validator: this.checkEmail }],
                 })(<EmailInput onChange={value => this.valueChange('email', value)} />)}
               </FormItem>
             </Col>
@@ -267,7 +305,7 @@ class Basic extends React.Component {
                 <Col md={6} sm={6}>
                   <FormItem label="销售冻结">
                     {getFieldDecorator('salesOrderBlock', {
-                      initialValue: salesOrderBlock,
+                      initialValue: salesOrderBlock === 1,
                       valuePropName: 'checked',
                     })(
                       <Switch onChange={value => this.valueChange('salesOrderBlock', value)} />,
@@ -281,7 +319,7 @@ class Basic extends React.Component {
                 <Col md={6} sm={6}>
                   <FormItem label="采购冻结">
                     {getFieldDecorator('invoicePostBlock', {
-                      initialValue: invoicePostBlock,
+                      initialValue: invoicePostBlock === 1,
                       valuePropName: 'checked',
                     })(
                       <Switch onChange={value => this.valueChange('invoicePostBlock', value)} />,
