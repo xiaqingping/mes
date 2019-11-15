@@ -24,12 +24,12 @@ const plugins = [
         baseNavigator: true,
       },
       // 按需加载配置
-      // dynamicImport: {
-      //   loadingComponent: './components/PageLoading/index',
-      //   webpackChunkName: true,
-      //   level: 3,
-      // },
-      dynamicImport: true,
+      dynamicImport: {
+        loadingComponent: './components/PageLoading/index',
+        webpackChunkName: true,
+        level: 3,
+      },
+      // dynamicImport: true,
       pwa: pwa
         ? {
             workboxPluginMode: 'InjectManifest',
