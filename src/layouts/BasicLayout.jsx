@@ -57,7 +57,7 @@ const BasicLayout = props => {
       logo={logo}
       onCollapse={handleMenuCollapse}
       menuItemRender={(menuItemProps, defaultDom) => {
-        if (menuItemProps.isUrl) {
+        if (menuItemProps.isUrl || menuItemProps.children) {
           return defaultDom;
         }
 
