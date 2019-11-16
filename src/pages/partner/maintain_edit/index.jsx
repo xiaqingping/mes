@@ -104,6 +104,16 @@ class CustomerEdit extends Component {
         payload: item,
       });
     });
+
+    const areaCacheList = [
+      { type: 'countrys', options: 0 },
+    ];
+    areaCacheList.forEach(item => {
+      this.props.dispatch({
+        type: 'areaCache/getCache',
+        payload: item,
+      });
+    });
   }
 
   resizeFooterToolbar = () => {
