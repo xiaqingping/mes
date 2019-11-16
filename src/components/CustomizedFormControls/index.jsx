@@ -8,48 +8,10 @@ import {
 import React from 'react';
 import { connect } from 'dva';
 
+import area from '@/api/area';
+
 const InputGroup = Input.Group;
 const { Option } = Select;
-const options = [
-  {
-    value: 'china',
-    label: '中国',
-    children: [
-      {
-        value: 'shanxi',
-        label: '山西省',
-        children: [
-          {
-            value: 'taiyuan',
-            label: '太原市',
-            children: [
-              {
-                value: 'xiaodian',
-                label: '小店区',
-                children: [
-                  {
-                    value: 'xuefu',
-                    label: '学府街',
-                  },
-                ],
-              },
-            ],
-          },
-        ],
-      },
-    ],
-  },
-  {
-    value: 'USA',
-    label: '美国',
-    children: [
-      {
-        value: 'huashengd',
-        label: '华盛顿',
-      },
-    ],
-  },
-];
 
 // TODO: 是否可以用高阶组件组件包裹
 function formControl (WrappedComponent) {
@@ -372,6 +334,11 @@ export class FaxInput extends React.Component {
 }
 
 // 地址
+@connect(({ areaCache }) => {
+  const { countrys } = areaCache;
+  const newCountrys = countrys.map(e => ({ ...e, isLeaf: false }));
+  return { countrys: newCountrys };
+})
 export class AddressInput extends React.Component {
   static getDerivedStateFromProps(nextProps) {
     if ('value' in nextProps) {
@@ -405,16 +372,16 @@ export class AddressInput extends React.Component {
     if (Object.keys(changedValue).indexOf('cascader') > -1) {
       const { option } = changedValue;
       obj = {
-        countryCode: (option[0] && option[0].value) || '',
-        countryName: (option[0] && option[0].label) || '',
-        provinceCode: (option[1] && option[1].value) || '',
-        provinceName: (option[1] && option[1].label) || '',
-        cityCode: (option[2] && option[2].value) || '',
-        cityName: (option[2] && option[2].label) || '',
-        countyCode: (option[3] && option[3].value) || '',
-        countyName: (option[3] && option[3].label) || '',
-        streetCode: (option[4] && option[4].value) || '',
-        streetName: (option[4] && option[4].label) || '',
+        countryCode: (option[0] && option[0].id) || '',
+        countryName: (option[0] && option[0].name) || '',
+        provinceCode: (option[1] && option[1].id) || '',
+        provinceName: (option[1] && option[1].name) || '',
+        cityCode: (option[2] && option[2].id) || '',
+        cityName: (option[2] && option[2].name) || '',
+        countyCode: (option[3] && option[3].id) || '',
+        countyName: (option[3] && option[3].name) || '',
+        streetCode: (option[4] && option[4].id) || '',
+        streetName: (option[4] && option[4].name) || '',
       };
     }
 
@@ -428,12 +395,31 @@ export class AddressInput extends React.Component {
     }
   };
 
+  loadData = selectedOptions => {
+    const targetOption = selectedOptions[selectedOptions.length - 1];
+    targetOption.loading = true;
+
+    area.byParentIdGetArea(targetOption.id).then(res => {
+      // targetOption.loading = false;
+      targetOption.children = res;
+      console.log(this.props.countrys);
+    });
+  }
+
   render() {
     const { address, countryCode, provinceCode, cityCode, countyCode, streetCode } = this.state;
     const cascader = [countryCode, provinceCode, cityCode, countyCode, streetCode];
     return (
       <InputGroup compact>
-        <Cascader value={cascader} options={options} style={{ width: '40%' }} onChange={(value, option) => this.valueChange({ cascader: value, option })} />
+        <Cascader
+          value={cascader}
+          fieldNames={{ label: 'name', value: 'id', children: 'children' }}
+          options={this.props.countrys}
+          loadData={this.loadData}
+          style={{ width: '40%' }}
+          onChange={(value, option) => this.valueChange({ cascader: value, option })}
+          changeOnSelect
+        />
         <Input value={address} style={{ width: '60%' }} onChange={e => this.valueChange({ address: e.target.value })} />
       </InputGroup>
     );

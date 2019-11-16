@@ -18,7 +18,7 @@ import {
   FaxInput,
   AddressInput,
 } from '@/components/CustomizedFormControls';
-// import _ from 'lodash';
+import _ from 'lodash';
 import bp from '@/api/bp';
 import styles from '../style.less';
 
@@ -53,6 +53,14 @@ const { Option } = Select;
   };
 }, undefined, undefined, { withRef: true })
 class Basic extends React.Component {
+  constructor(props) {
+    super(props);
+    // 异步验证做节流处理
+    this.checkNameInput = _.debounce(this.checkNameInput, 500);
+    this.checkEmail = _.debounce(this.checkEmail, 500);
+    this.checkMobilePhone = _.debounce(this.checkMobilePhone, 500);
+  }
+
   validate = () => {
     const { form } = this.props;
     form.validateFieldsAndScroll((error, values) => {
@@ -63,43 +71,39 @@ class Basic extends React.Component {
     });
   }
 
-  checkNameInput = async (rule, value, callback) => {
-    if (value.name) {
-      const res = await bp.checkBPFields({ name: value.name });
-      if (!res) {
-        callback();
-        return;
-      }
-      callback('名称重复');
+  checkNameInput = (rule, value, callback) => {
+    if (!value.name) {
+      callback(formatMessage({ id: 'partner.maintain.requireName' }));
       return;
     }
-    callback(formatMessage({ id: 'partner.maintain.requireName' }));
-  };
 
-  checkEmail = async (rule, value, callback) => {
-    if (value.email) {
-      const res = await bp.checkBPFields({ email: value.email });
+    bp.checkBPFields({ name: value.name }).then(res => {
       if (!res) {
         callback();
-        return;
+      } else {
+        callback('名称重复');
       }
-      callback('邮箱重复');
-      return;
-    }
-    callback('邮箱必填');
+    });
   }
 
-  checkMobilePhone = async (rule, value, callback) => {
-    if (value.mobilePhone) {
-      const res = await bp.checkBPFields({ mobilePhone: value.mobilePhone });
+  checkEmail = (rule, value, callback) => {
+    bp.checkBPFields({ email: value.email }).then(res => {
       if (!res) {
         callback();
-        return;
+      } else {
+        callback('邮箱重复');
       }
-      callback('移动电话重复');
-      return;
-    }
-    callback('移动电话必填');
+    });
+  }
+
+  checkMobilePhone = (rule, value, callback) => {
+    bp.checkBPFields({ mobilePhone: value.mobilePhone }).then(res => {
+      if (!res) {
+        callback();
+      } else {
+        callback('移动电话重复');
+      }
+    });
   }
 
   valueChange = (key, value) => {
@@ -174,7 +178,7 @@ class Basic extends React.Component {
                         type: basic.type,
                         name: basic.name,
                       },
-                      rules: [{ validator: this.checkNameInput }],
+                      rules: [{ asyncValidator: this.checkNameInput }],
                     })(<NameInput onChange={value => this.valueChange('name', value)} />)
                   ) : null
                 }
