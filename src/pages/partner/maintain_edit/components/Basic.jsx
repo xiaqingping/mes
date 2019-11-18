@@ -50,6 +50,8 @@ const { Option } = Select;
     vendor,
     invoicePostBlock,
     industryCategories,
+    countryTimeZone: basicCache.countryTimeZone,
+    countryProvinceTimeZone: basicCache.countryProvinceTimeZone,
   };
 }, undefined, undefined, { withRef: true })
 class Basic extends React.Component {
@@ -87,6 +89,11 @@ class Basic extends React.Component {
   }
 
   checkEmail = (rule, value, callback) => {
+    if (!value.email) {
+      callback('邮箱必填');
+      return;
+    }
+
     bp.checkBPFields({ email: value.email }).then(res => {
       if (!res) {
         callback();
@@ -97,6 +104,11 @@ class Basic extends React.Component {
   }
 
   checkMobilePhone = (rule, value, callback) => {
+    if (!value.mobilePhone) {
+      callback('移动电话必填');
+      return;
+    }
+
     bp.checkBPFields({ mobilePhone: value.mobilePhone }).then(res => {
       if (!res) {
         callback();
@@ -110,6 +122,36 @@ class Basic extends React.Component {
     const { details, basic, customer, vendor } = this.props;
     let obj = {
       [key]: value,
+    }
+
+    // 地址 决定了语言和时区
+    if (key === 'address') {
+      obj.timeZoneCode = '';
+      // 根据国家编号确定时区
+      if (value.countryCode) {
+        this.props.countryTimeZone.forEach(e => {
+          if (e.countryCode === value.countryCode) {
+            obj.timeZoneCode = e.timeZone;
+          }
+        });
+      }
+      // 根据省编号确定时区
+      if (value.provinceCode) {
+        this.props.countryProvinceTimeZone.forEach(e => {
+          if (e.countryCode === value.countryCode && e.provinceCode === value.provinceCode) {
+            obj.timeZoneCode = e.timeZone;
+          }
+        });
+      }
+
+      // 确定语言
+      if (value.countryName === '中国') {
+        obj.languageCode = 'ZH';
+      } else if (value.countryName && value.countryName !== '中国') {
+        obj.languageCode = 'EN';
+      } else {
+        obj.languageCode = '';
+      }
     }
 
     // 销售冻结
@@ -144,7 +186,13 @@ class Basic extends React.Component {
       'email',
       'address',
     ]
-    if (keyList.indexOf(key) > -1) obj = value;
+    if (keyList.indexOf(key) > -1) {
+      if (key === 'address') {
+        obj = { ...obj, languageCode: obj.languageCode, timeZoneCode: obj.timeZoneCode };
+      } else {
+        obj = value;
+      }
+    }
 
     const newBasic = { ...basic, ...obj };
 
@@ -269,8 +317,8 @@ class Basic extends React.Component {
                   initialValue: basic.languageCode,
                 })(
                   <Select open={false} onChange={value => this.valueChange('languageCode', value)} >
-                    <Option value="1">中文</Option>
-                    <Option value="2">英文</Option>
+                    <Option value="ZH">中文</Option>
+                    <Option value="EN">英文</Option>
                   </Select>,
                 )}
               </FormItem>

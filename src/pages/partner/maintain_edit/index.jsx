@@ -20,7 +20,7 @@ import PurchasingOrg from './components/PurchasingOrg';
 import Bank from './components/Bank';
 
 import { bp } from '@/api'
-import { diff } from '@/utils/utils';
+import { validateForm, diff } from '@/utils/utils';
 
 @connect(({ bpEdit }) => ({
   details: bpEdit.details || {},
@@ -97,6 +97,7 @@ class CustomerEdit extends Component {
       { type: 'salesOrganizations' }, // 销售组织
       { type: 'distributionChannels' }, // 分销渠道
       { type: 'countryTimeZone' }, // 国家+时区
+      { type: 'countryProvinceTimeZone' }, // 国家+时区
     ];
     basicCacheList.forEach(item => {
       this.props.dispatch({
@@ -136,11 +137,11 @@ class CustomerEdit extends Component {
   };
 
   // 提交
-  validate = () => {
-    // TODO: 子组件方法
-    // this.basicView.wrappedInstance.validate();
-
-    // 在这里做数据验证，验证通过后，根据情况做数据转换，然后再提交
+  validate = async () => {
+    // 验证basic
+    const basicForm = this.basicView.wrappedInstance.props.form;
+    const basicResult = await validateForm(basicForm)
+    if (!basicResult[0]) return;
 
     const { editType } = this.state;
     if (editType === 'add') {
