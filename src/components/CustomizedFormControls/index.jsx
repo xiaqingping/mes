@@ -13,48 +13,6 @@ import area from '@/api/area';
 const InputGroup = Input.Group;
 const { Option } = Select;
 
-// TODO: 是否可以用高阶组件组件包裹
-function formControl (WrappedComponent) {
-  return class extends React.Component {
-    static getDerivedStateFromProps(nextProps) {
-      if ('value' in nextProps) {
-        return {
-          ...nextProps.value,
-        };
-      }
-      return null;
-    }
-
-    constructor(props) {
-      super(props);
-      this.state = {
-        ...props.value,
-      };
-    }
-
-    valueChange = (key, value) => {
-      if (!('value' in this.props)) {
-        this.setState({ [key]: value });
-      }
-      this.triggerChange({ [key]: value });
-    }
-
-    triggerChange = changedValue => {
-      const { onChange } = this.props;
-      if (onChange) {
-        onChange({
-          ...this.state,
-          ...changedValue,
-        });
-      }
-    };
-
-    render() {
-      return <WrappedComponent data={this.state.data} {...this.props} />;
-    }
-  }
-}
-
 // Email
 export class EmailInput extends React.Component {
   static getDerivedStateFromProps(nextProps) {
@@ -202,7 +160,8 @@ export class MobilePhoneInput extends React.Component {
                 key={e.countryCode}
                 value={e.countryCode}
               >
-                {e.countryCode} {e.diallingCode}
+                <div className="select-countryPic-box" style={{ backgroundImage: `url(/country/${e.countryCode}.png)` }}>&nbsp;</div>
+                {e.diallingCode}
               </Option>
             ))
           }
@@ -260,7 +219,8 @@ export class TelphoneInput extends React.Component {
                 key={e.countryCode}
                 value={e.countryCode}
               >
-                {e.countryCode} {e.diallingCode}
+                <div className="select-countryPic-box" style={{ backgroundImage: `url(/country/${e.countryCode}.png)` }}>&nbsp;</div>
+                {e.diallingCode}
               </Option>
             ))
           }
@@ -320,7 +280,8 @@ export class FaxInput extends React.Component {
                 key={e.countryCode}
                 value={e.countryCode}
               >
-                {e.countryCode} {e.diallingCode}
+                <div className="select-countryPic-box" style={{ backgroundImage: `url(/country/${e.countryCode}.png)` }}>&nbsp;</div>
+                {e.diallingCode}
               </Option>
             ))
           }
