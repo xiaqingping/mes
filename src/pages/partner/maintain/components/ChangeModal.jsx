@@ -1,3 +1,4 @@
+/* eslint-disable radix */
 import {
   Modal,
   Form,
@@ -12,7 +13,9 @@ import {
   Cascader,
 } from 'antd';
 import React, { Component } from 'react';
+import { connect } from 'dva';
 import { TelphoneInput } from '@/components/CustomizedFormControls';
+import api from '@/api';
 
 const FormItem = Form.Item;
 const InputGroup = Input.Group;
@@ -168,18 +171,25 @@ class AddressGroup extends Component {
           <Option value="美国"> 美国</Option>
         </Select> */}
         <Cascader style={{ width: '20%' }} options={options} placeholder="请选择" />
-        <Input style={{ width: '80%' }} defaultValue="Xihu District, Hangzhou" />
+        <Input style={{ width: '80%' }} placeholder="详细地址" />
       </InputGroup>
     )
   }
 }
 
-const ChangeModal = Form.create()(
-  class extends Component {
+@connect(({ global, basicCache }) => {
+  const industryCategories = basicCache.industryCategories.filter(
+    e => e.languageCode === global.languageCode,
+  );
+  return {
+    industryCategories,
+  };
+})
+class ChangeModal extends Component {
     constructor (props) {
       super(props);
       this.state = {
-        changeModal: this.props.changeModal,
+        changeModal: false,
         recordMsg: undefined,
         form: this.props.form,
         loading: false,
@@ -189,23 +199,52 @@ const ChangeModal = Form.create()(
         groupIndustryShow: true,
         groupUsaShow: true,
         name: '',
+        userData: [],
       }
     }
 
+    componentDidMount() {
+      this.props.onRef(this)
+    }
+
     /** props更新时调用 */
-    componentWillReceiveProps (props) {
-      let { changeModal } = props;
-      const { recordMsg } = props;
-      const { form } = this.state;
-      if (recordMsg === undefined) {
-        changeModal = false
+    visibleShow = (changeModal, recordMsg) => {
+      if (recordMsg) {
+        if (recordMsg.type === 1) {
+          api.bp.getBPPiCertification(recordMsg.id).then(res => {
+            this.setState({
+              userData: res,
+            })
+          })
+        } else {
+          api.bp.getBPOrgCertification(recordMsg.id).then(res => {
+            this.setState({
+              userData: res,
+            })
+          })
+        }
+        this.setState({
+          changeModal,
+          recordMsg,
+          loading: false,
+        });
       }
+    }
+
+    handleOk = () => {
+
+    }
+
+    handleCancel = () => {
       this.setState({
-        changeModal,
-        recordMsg,
-        form,
-        loading: false,
-      });
+        changeModal: false,
+        recordMsg: null,
+        personalShow: true,
+        groupNameShow: true,
+        groupAdressShow: true,
+        groupIndustryShow: true,
+        groupUsaShow: true,
+      })
     }
 
     /** 上传图片 */
@@ -273,20 +312,25 @@ const ChangeModal = Form.create()(
     /** Group */
 
     renderGroupNameForm = () => {
-      const { groupNameShow, name } = this.state;
-      return groupNameShow ? this.groupNameShow() : this.groupNameInput(name);
+      const { groupNameShow } = this.state;
+      return groupNameShow ? this.groupNameShow() : this.groupNameInput();
     }
 
-    groupNameShow = () => (
-      <Col lg={24} md={12} sm={12}>
-        <FormItem label="名称" labelCol={{ span: 4 }} wrapperCol={{ span: 20 }}>
-          <Icon type="home" /> <span>上海交通大学附属高中上海交通大学附属高中</span> <a href="#" onClick = {event => this.updetaNameGroup(event)}>修改</a>
-        </FormItem>
-      </Col>
-    )
+    groupNameShow = () => {
+      const { recordMsg } = this.state;
+      if (recordMsg) {
+        return (
+          <Col lg={24} md={12} sm={12}>
+            <FormItem label="名称" labelCol={{ span: 4 }} wrapperCol={{ span: 20 }}>
+              <Icon type="home" /> <span>{recordMsg.name}</span> <a href="#" onClick = {event => this.updetaNameGroup(event, recordMsg)}>修改</a>
+            </FormItem>
+          </Col>
+        )
+      }
+    }
 
-    groupNameInput = name => {
-      const { form } = this.state;
+    groupNameInput = () => {
+      const { form, name } = this.state;
       const { getFieldDecorator } = form;
       // let isNameFinish = false;
       // if (form.getFieldsValue().msg && form.getFieldsValue().msg.name === '') {
@@ -304,12 +348,14 @@ const ChangeModal = Form.create()(
       )
     }
 
-    updetaNameGroup = e => {
+    updetaNameGroup = (e, userData) => {
       e.preventDefault();
-      this.setState({
-        groupNameShow: false,
-        name: '上海交通大学附属高中上海交通大学附属高中',
-      })
+      if (userData) {
+        this.setState({
+          groupNameShow: false,
+          name: userData.name,
+        })
+      }
     }
 
     renderAdressForm = () => {
@@ -317,13 +363,18 @@ const ChangeModal = Form.create()(
       return groupAdressShow ? this.groupAdressShow() : this.groupAdressInput();
     }
 
-    groupAdressShow = () => (
-      <Col lg={24} md={12} sm={12}>
-        <FormItem label="联系地址" labelCol={{ span: 4 }} wrapperCol={{ span: 20 }}>
-          <span>中国 新疆省 乌鲁木齐市 乌鲁木齐镇 呼伦贝尔村 内蒙古街道 莲花路123号</span> <a href="#" onClick = {event => this.updateAdressGroup(event)}>修改</a>
-        </FormItem>
-      </Col>
-    )
+    groupAdressShow = () => {
+      const { recordMsg } = this.state;
+      if (recordMsg) {
+        return (
+          <Col lg={24} md={12} sm={12}>
+            <FormItem label="联系地址" labelCol={{ span: 4 }} wrapperCol={{ span: 20 }}>
+              <span>{recordMsg.address}</span> <a href="#" onClick = {event => this.updateAdressGroup(event)}>修改</a>
+            </FormItem>
+          </Col>
+        )
+      }
+    }
 
     groupAdressInput = () => {
       const { form } = this.state;
@@ -355,24 +406,36 @@ const ChangeModal = Form.create()(
       })
     }
 
-    groupInstruShow = () => (
-      <Col lg={12} md={12} sm={12}>
-        <FormItem label="行业类别">
-          <span>军属类</span> <a href="#" onClick = {event => this.updateIndustryGroup(event)}>修改</a>
-        </FormItem>
-      </Col>
-    )
+    groupInstruShow = () => {
+        const { userData: { basic } } = this.state;
+        const { industryCategories } = this.props;
+        return (
+        <Col lg={12} md={12} sm={12}>
+          <FormItem label="行业类别">
+        <span>{
+          industryCategories.forEach(item => {
+            if (item.code === basic.industryCode) {
+              return item.name
+            }
+          })
+        }</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#" onClick = {event => this.updateIndustryGroup(event)}>修改</a>
+          </FormItem>
+        </Col>
+      )
+    }
 
     groupInstruInput = () => {
       const { form } = this.state;
       const { getFieldDecorator } = form;
+      const { industryCategories } = this.props;
       return (
       <Col lg={12} md={12} sm={12}>
-        <FormItem label="特殊行业类别">
+        <FormItem label="行业类别">
           {getFieldDecorator('industry')(
             <Select placeholder="请选择">
-              <Option value="01">军属类</Option>
-              <Option value="02">其他</Option>
+              {industryCategories.map(item =>
+                <Option key={item.code} value={item.code}>{item.name}</Option>,
+              )}
             </Select>)}
         </FormItem>
       </Col>
@@ -406,13 +469,13 @@ const ChangeModal = Form.create()(
       )
     }
 
-    saveFormRef = formRef => {
-      this.formRef = formRef;
-    };
-
     render () {
-      const { changeModal, recordMsg, name } = this.state;
-      const { form, getValues, closeModal } = this.props;
+      const { changeModal, recordMsg, name, userData } = this.state;
+      const { basic } = userData;
+      if (!basic) return null;
+      // const { form, getValues, closeModal } = this.props;
+      // console.log(getValues)
+      const { form } = this.state;
       const { getFieldDecorator } = form;
       const { TextArea } = Input;
       let modelContent;
@@ -449,7 +512,7 @@ const ChangeModal = Form.create()(
                     message: '请填写认证说明！',
                   },
                 ],
-              })(<TextArea rows={2}/>)}
+              })(<TextArea rows={2} style={{ resize: 'none' }}/>)}
             </Form.Item>
             <Form.Item label="认证图片">
               {getFieldDecorator('idenImg', {
@@ -464,9 +527,8 @@ const ChangeModal = Form.create()(
           </Form>
         </>
       }
-
       // 组织变更
-      if (recordMsg && recordMsg.id === 2) {
+      if (recordMsg && recordMsg.type === 2 && (recordMsg.countyCode === 'CN' || !recordMsg.countyCode)) {
         modelContent = <>
           <Form {...formItemLayoutGroup} labelAlign="left">
             <Row gutter={32}>
@@ -476,19 +538,28 @@ const ChangeModal = Form.create()(
               </>
               <Col lg={12} md={12} sm={12}>
                 <FormItem label="电话">
-                  {getFieldDecorator('phoneNum')(<TelphoneInput/>)}
+                  {getFieldDecorator('phoneNum', {
+                    initialValue: {
+                      telephoneCountryCode: basic.telephoneCountryCode,
+                      telephoneAreaCode: basic.telephoneAreaCode,
+                      telephone: basic.telephone,
+                      telephoneExtension: basic.telephoneExtension,
+                    },
+                  })(<TelphoneInput/>)}
                 </FormItem>
               </Col>
               { this.renderIndustryForm() }
               <Col lg={12} md={12} sm={12}>
                 <FormItem label="增值税专用发票资质">
-                  {getFieldDecorator('specialInvoice')(<Switch checkedChildren="开" unCheckedChildren="关" checked />)}
+                  {getFieldDecorator('specialInvoice')(<Switch checkedChildren="开" unCheckedChildren="关" defaultChecked={userData.organizationCertification ? (parseInt(userData.organizationCertification.specialInvoice) === 1) : false} />)}
                 </FormItem>
               </Col>
 
               <Col lg={12} md={12} sm={12}>
                 <FormItem label="统一社会信用代码">
                   {getFieldDecorator('taxNo', {
+                    // eslint-disable-next-line no-nested-ternary
+                    initialValue: userData.organizationCertification ? (userData.organizationCertification.taxNo ? userData.organizationCertification.taxNo : '') : '',
                     rules: [
                       {
                         required: true,
@@ -501,6 +572,8 @@ const ChangeModal = Form.create()(
               <Col lg={12} md={12} sm={12}>
                 <FormItem label="基本户开户银行">
                   {getFieldDecorator('bankCode', {
+                    // eslint-disable-next-line no-nested-ternary
+                    initialValue: userData.organizationCertification ? (userData.organizationCertification.bankCode ? userData.organizationCertification.bankCode : '') : '',
                     rules: [
                       {
                         required: true,
@@ -513,6 +586,8 @@ const ChangeModal = Form.create()(
               <Col lg={12} md={12} sm={12}>
                 <FormItem label="基本户开户账号">
                   {getFieldDecorator('bankAccount', {
+                    // eslint-disable-next-line no-nested-ternary
+                    initialValue: userData.organizationCertification ? (userData.organizationCertification.bankAccount ? userData.organizationCertification.bankAccount : '') : '',
                     rules: [
                       {
                         required: true,
@@ -530,6 +605,8 @@ const ChangeModal = Form.create()(
               <Col lg={24} md={12} sm={12}>
                   <FormItem label="注册地址" labelCol={{ span: 4 }} wrapperCol={{ span: 20 }}>
                     {getFieldDecorator('regisAddress', {
+                    // eslint-disable-next-line no-nested-ternary
+                    initialValue: userData.organizationCertification ? (userData.organizationCertification.address ? userData.organizationCertification.address : '') : '',
                     rules: [
                       {
                         required: true,
@@ -542,6 +619,8 @@ const ChangeModal = Form.create()(
               <Col lg={24} md={12} sm={12}>
                 <Form.Item label="认证说明" labelCol={{ span: 4 }} wrapperCol={{ span: 20 }}>
                   {getFieldDecorator('idenText', {
+                    // eslint-disable-next-line no-nested-ternary
+                    initialValue: userData.organizationCertification ? (userData.organizationCertification.notes ? userData.organizationCertification.notes : '') : '',
                     rules: [
                       {
                         required: true,
@@ -562,7 +641,7 @@ const ChangeModal = Form.create()(
       }
 
       // 美国变更
-      if (recordMsg && recordMsg.id === 3) {
+      if (recordMsg && recordMsg.type === 2 && recordMsg.countyCode === 'US') {
         modelContent = <>
           <Form {...formItemLayout}>
              { this.renderUsaForm() }
@@ -594,7 +673,7 @@ const ChangeModal = Form.create()(
       }
 
       // 英国变更
-      if (recordMsg && recordMsg.id === 4) {
+      if (recordMsg && recordMsg.id === 2 && recordMsg.countyCode === 'GB') {
         modelContent = <>
           <Form {...formItemLayoutEng} labelAlign="left">
              { this.renderUsaForm() }
@@ -621,20 +700,18 @@ const ChangeModal = Form.create()(
           <div>
             <Modal
               width = {1130}
-              destroyOnClose
               centered
               title="变更认证资料"
               visible={changeModal}
-              onOk={getValues}
-              onCancel={closeModal}
+              onOk={this.handleOk}
+              onCancel={this.handleCancel}
+              destroyOnClose
             >
              { modelContent }
             </Modal>
           </div>
       )
     }
-  },
-)
+}
 
-
-export default ChangeModal;
+export default Form.create()(ChangeModal);

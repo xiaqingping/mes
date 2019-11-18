@@ -32,7 +32,7 @@ class CustomerDetails extends Component {
   componentDidMount() {
     console.log(this.props.match.params.id)
 
-    api.bp.getBPVendor(this.props.match.params.id).then(res => {
+    api.bp.getBPCustomer(this.props.match.params.id).then(res => {
       console.log(res)
       this.props.dispatch({
         type: 'partnerMaintainEdit/setDetails',
@@ -498,7 +498,7 @@ class CustomerDetails extends Component {
         <>
         <BasicInfo/>
         <Type/>
-        {
+        {/* {
           customer.basic.type === 1 ?
           (
             <>
@@ -512,8 +512,8 @@ class CustomerDetails extends Component {
               <HomeAuthentication/> : <AbroadAuthentication/>}
             </>
           )
-        }
-        <Address/>
+        } */}
+        {/* <Address/> */}
       </>
       ),
       supplier: (

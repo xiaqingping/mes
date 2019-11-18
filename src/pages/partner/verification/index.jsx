@@ -572,7 +572,7 @@ class Verification extends React.Component {
           // showModal={showModal}
           // recordMsg={recordMsg}
           // clickType={clickType}
-          onRef = { ref => {this.checkShow = ref}}
+          onRef = { ref => { this.checkShow = ref }}
           wrappedComponentRef={this.saveFormRef}/>
       </PageHeaderWrapper>
     );

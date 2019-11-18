@@ -14,7 +14,8 @@ import {
 import * as React from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import StandardTable from '@/components/StandardTable';
-import DetailsList from './components/details'
+import DetailsList from './components/details';
+import api from '@/api';
 
 const FormItem = Form.Item;
 const { Option } = Select;
@@ -46,12 +47,12 @@ function renderOption(item) {
 
 class Operation extends React.Component {
   state = {
-    pagination: {
-      current: 1,
+    formValues: {
+      page: 1,
       pageSize: 10,
-      total: 0,
     },
     list: [],
+    total: 0,
     loading: false,
     selectedRows: [],
     detailsVisible: false,
@@ -173,7 +174,7 @@ class Operation extends React.Component {
 
   componentDidMount() {
     // this.getTableData();
-    this.getData();
+    this.getTableData();
     this.setState({
       partnerVal: this.data.huoban,
     })
@@ -189,29 +190,29 @@ class Operation extends React.Component {
   }
 
   // 假数据制作
-  getData = () => {
-    const data = [];
-    for (let i = 0; i < 30; i++) {
-      data.push({
-        id: i + 1,
-        code: 100000 + (i + 1),
-        bpCode: `name${i}`,
-        bpName: `1${Math.ceil((Math.random() + 0.0001) * 10000000000)}`,
-        type: Math.ceil((Math.random() + 0.0001) * 2),
-        status: Math.ceil((Math.random() + 0.0001) * 2),
-        finishDate: `2018-9-${Math.ceil((Math.random() + 0.0001) * 30)} 12:30:59`,
-        operatorName: `action${i + 10}`,
-        operatorDate: `2019-9-${Math.ceil((Math.random() + 0.0001) * 30)} 12:30:59`,
-        // partnerCode: Math.ceil((Math.random() + 0.0001) * 100000), // 1人，2组织
-      });
-    }
-    this.setState({
-        pagination: {
-          pageSize: 10,
-        },
-        list: data,
-    });
-  };
+  // getData = () => {
+  //   const data = [];
+  //   for (let i = 0; i < 30; i++) {
+  //     data.push({
+  //       id: i + 1,
+  //       code: 100000 + (i + 1),
+  //       bpCode: `name${i}`,
+  //       bpName: `1${Math.ceil((Math.random() + 0.0001) * 10000000000)}`,
+  //       type: Math.ceil((Math.random() + 0.0001) * 2),
+  //       status: Math.ceil((Math.random() + 0.0001) * 2),
+  //       finishDate: `2018-9-${Math.ceil((Math.random() + 0.0001) * 30)} 12:30:59`,
+  //       operatorName: `action${i + 10}`,
+  //       operatorDate: `2019-9-${Math.ceil((Math.random() + 0.0001) * 30)} 12:30:59`,
+  //       // partnerCode: Math.ceil((Math.random() + 0.0001) * 100000), // 1人，2组织
+  //     });
+  //   }
+  //   this.setState({
+  //       pagination: {
+  //         pageSize: 10,
+  //       },
+  //       list: data,
+  //   });
+  // };
 
   handleSearch = e => {
     e.preventDefault();
@@ -239,26 +240,21 @@ class Operation extends React.Component {
   };
 
   // 获取表格数据
-  // getTableData = (options = {}) => {
-  //   this.setState({
-  //     loading: true,
-  //   });
-  //   const { form } = this.props;
-  //   const { pagination: { current: page, pageSize: rows } } = this.state;
-  //   const query = Object.assign(form.getFieldsValue(), { page, rows }, options);
-
-  //   api.series.getSeries(query, true).then(data => {
-  //     this.setState({
-  //       loading: false,
-  //       list: data.rows,
-  //       pagination: {
-  //         total: data.total,
-  //         current: query.page,
-  //         pageSize: query.rows,
-  //       },
-  //     });
-  //   });
-  // }
+  getTableData = (options = {}) => {
+    const { formValues: { pageSize } } = this.state;
+    const query = Object.assign({}, { page: 1, pageSize }, options);
+    this.setState({
+      formValues: query,
+      loading: true,
+    });
+    api.bp.getOperationRecords(query).then(res => {
+      this.setState({
+        list: res.results,
+        total: res.total,
+        loading: false,
+      });
+    });
+  }
 
   // 重置
   handleFormReset = () => {
@@ -430,8 +426,9 @@ class Operation extends React.Component {
   }
 
   render() {
-    const { list, pagination, loading, selectedRows, detailsVisible, detailsValue } = this.state;
-    const data = { list, pagination };
+    const { formValues: { page: current, pageSize },
+    list, total, loading, selectedRows, detailsVisible, detailsValue } = this.state;
+    const data = { list, pagination: { current, pageSize, total } };
     return (
       <PageHeaderWrapper>
         <Card bordered={false}>
