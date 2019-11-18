@@ -54,11 +54,11 @@ class BasicInfo extends Component {
           layout="vertical"
           column={8}
         >
-          <DescriptionsItem span={2} label="名称"><Icon type={basic.type === 1 ? 'home' : 'user'} />&nbsp;&nbsp;{basic.name}&nbsp;&nbsp;&nbsp;<a>变更</a></DescriptionsItem>
+          <DescriptionsItem span={2} label="名称"><Icon type={basic.type === 1 ? 'user' : 'home'} />&nbsp;&nbsp;{basic.name}&nbsp;&nbsp;&nbsp;<a>变更</a></DescriptionsItem>
           <DescriptionsItem span={2} label="移动电话"><img src={Flag} width="10" height="10" style={{ borderRadius: '50%', marginBottom: '3px' }}/>&nbsp;&nbsp;{basic.mobilePhoneCountryCode}&nbsp;&nbsp;{basic.mobilePhone}&nbsp;&nbsp;&nbsp;<a onClick={() => { this.checkPhone(true) }}>变更</a></DescriptionsItem>
           <DescriptionsItem span={2} label="邮箱">{basic.email}&nbsp;&nbsp;&nbsp;<a onClick={() => { this.checkEmail(true) }}>变更</a></DescriptionsItem>
-          <DescriptionsItem span={2} label="电话"><img src={Flag} width="10" height="10" style={{ borderRadius: '50%', marginBottom: '3px' }}/>&nbsp;&nbsp;{basic.telephoneCountryCode}&nbsp;&nbsp;{basic.telephoneAreaCode}-{basic.telephone}-{basic.telephoneExtension}&nbsp;&nbsp;&nbsp;<a>变更</a></DescriptionsItem>
-          <DescriptionsItem span={2} label="传真"><img src={Flag} width="10" height="10" style={{ borderRadius: '50%', marginBottom: '3px' }}/>&nbsp;&nbsp;{basic.faxCountryCode}&nbsp;&nbsp;{basic.faxAreaCode}-{basic.fax}-{basic.faxExtension}</DescriptionsItem>
+          <DescriptionsItem span={2} label="电话"><img src={Flag} width="10" height="10" style={{ borderRadius: '50%', marginBottom: '3px' }}/>&nbsp;&nbsp;{basic.telephoneCountryCode}&nbsp;&nbsp;{basic.telephoneAreaCode}{basic.telephone ? `-${basic.telephone}` : ''}{basic.telephoneExtension ? `-${basic.telephoneExtension}--` : ''}&nbsp;&nbsp;&nbsp;<a>变更</a></DescriptionsItem>
+          <DescriptionsItem span={2} label="传真"><img src={Flag} width="10" height="10" style={{ borderRadius: '50%', marginBottom: '3px' }}/>&nbsp;&nbsp;{basic.faxCountryCode}&nbsp;&nbsp;{basic.faxAreaCode}{basic.fax ? `${basic.fax}-` : ''}{basic.faxExtension ? `${basic.faxExtension}-` : ''}</DescriptionsItem>
           <DescriptionsItem span={1} label="邮政编码">{basic.postCode}</DescriptionsItem>
           <DescriptionsItem span={1} label="时区">{basic.timeZoneCode}</DescriptionsItem>
           <DescriptionsItem span={2} label="语言">{basic.languageCode}</DescriptionsItem>

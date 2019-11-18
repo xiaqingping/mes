@@ -19,6 +19,7 @@ import router from 'umi/router';
 import Link from 'umi/link';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import StandardTable from '@/components/StandardTable';
+import { connect } from 'dva';
 import ChangeModal from './components/ChangeModal';
 import styles from './index.less';
 import api from '@/api';
@@ -133,6 +134,7 @@ function renderOption(item) {
   );
 }
 
+@connect(({ basicCache }) => basicCache)
 class Maintain extends React.Component {
   state = {
     formValues: {
@@ -286,18 +288,21 @@ class Maintain extends React.Component {
         const menu = (
           <Menu style={{ padding: 0 }}>
             {record.salesOrderBlock === 1 ? <Menu.Item><a href="#" onClick={e => { this.cancelFreeze(e, record) }}>取消冻结</a></Menu.Item> : <Menu.Item><a href="#" onClick={ e => { this.freezePartner(e, record) }}>冻结</a></Menu.Item>}
-            {record.certificationStatus === 1 ?
+            {record.certificationStatus === 4 ?
               <Menu.Item>
                 <a href="#" onClick={e => { this.cancelIdent(e, record) }}>取消认证</a>
               </Menu.Item>
             : ''
             }
-            {record.certificationStatus === 1 ?
+            {record.certificationStatus === 4 ?
               <Menu.Item>
                 <a href="#" onClick={ e => { this.changeIdent(e, record) }}>变更认证</a>
               </Menu.Item>
-            :
-            <Menu.Item><a href="#" onClick={ e => { this.identificate(e, record) }}>认证</a></Menu.Item>
+            : ''
+            }
+            {record.certificationStatus === 1 ?
+              <Menu.Item><a href="#" onClick={ () => { this.showChange.visibleShow(true, record) }}>认证</a></Menu.Item>
+            : ''
             }
           </Menu>
         );
@@ -317,6 +322,10 @@ class Maintain extends React.Component {
   ];
 
   componentDidMount() {
+    this.props.dispatch({
+      type: 'basicCache/getCache',
+      payload: { type: 'industryCategories' },
+    });
     this.getTableData();
   }
 
@@ -354,10 +363,15 @@ class Maintain extends React.Component {
   }
 
   /** 认证 */
-  identificate = (e, record) => {
-    e.preventDefault();
-    console.log(record);
-  }
+  // identificate = (e, record) => {
+  //   e.preventDefault();
+  //   this.setState(
+  //     {
+  //       changeModal: true,
+  //       recordMesg: record,
+  //     },
+  //   )
+  // }
 
   handleSearch = e => {
     e.preventDefault();
@@ -473,7 +487,6 @@ class Maintain extends React.Component {
       if (err) {
         return;
       }
-
       console.log(values);
     })
 
@@ -681,7 +694,7 @@ class Maintain extends React.Component {
           wrappedComponentRef={this.perSaveFormRef}
           changeModal={changeModal}
           recordMsg={ recordMesg }
-          closeModal={this.closeModal}
+          onRef={ref => { this.showChange = ref }}
           getValues={this.getValues}/>
       </PageHeaderWrapper>
     );
