@@ -336,14 +336,18 @@ export class FaxInput extends React.Component {
 // 地址
 @connect(({ areaCache }) => {
   const { countrys } = areaCache;
-  const newCountrys = countrys.map(e => ({ ...e, isLeaf: false }));
-  return { countrys: newCountrys };
+  return { countrys };
 })
 export class AddressInput extends React.Component {
-  static getDerivedStateFromProps(nextProps) {
+  static getDerivedStateFromProps(nextProps, preState) {
+    const countrys = (
+      (preState.countrys && preState.countrys.length > 0 && preState.countrys)
+      || nextProps.countrys);
+
     if ('value' in nextProps) {
       return {
         ...(nextProps.value || {}),
+        countrys,
       };
     }
     return null;
@@ -352,17 +356,9 @@ export class AddressInput extends React.Component {
   constructor(props) {
     super(props);
     const value = props.value || {};
-    // const cascader = [
-    //   value.countryCode,
-    //   value.provinceCode,
-    //   value.cityCode,
-    //   value.countyCode,
-    //   value.streetCode,
-    // ]
     this.state = {
-      // cascader: cascader || [],
-      // address: value.address || '',
       ...value,
+      countrys: [],
     };
   }
 
@@ -372,15 +368,15 @@ export class AddressInput extends React.Component {
     if (Object.keys(changedValue).indexOf('cascader') > -1) {
       const { option } = changedValue;
       obj = {
-        countryCode: (option[0] && option[0].id) || '',
+        countryCode: (option[0] && option[0].code) || '',
         countryName: (option[0] && option[0].name) || '',
-        provinceCode: (option[1] && option[1].id) || '',
+        provinceCode: (option[1] && option[1].code) || '',
         provinceName: (option[1] && option[1].name) || '',
-        cityCode: (option[2] && option[2].id) || '',
+        cityCode: (option[2] && option[2].code) || '',
         cityName: (option[2] && option[2].name) || '',
-        countyCode: (option[3] && option[3].id) || '',
+        countyCode: (option[3] && option[3].code) || '',
         countyName: (option[3] && option[3].name) || '',
-        streetCode: (option[4] && option[4].id) || '',
+        streetCode: (option[4] && option[4].code) || '',
         streetName: (option[4] && option[4].name) || '',
       };
     }
@@ -389,7 +385,6 @@ export class AddressInput extends React.Component {
 
     if (onChange) {
       onChange({
-        ...this.state,
         ...obj,
       });
     }
@@ -397,12 +392,16 @@ export class AddressInput extends React.Component {
 
   loadData = selectedOptions => {
     const targetOption = selectedOptions[selectedOptions.length - 1];
+    if (targetOption.children) return;
     targetOption.loading = true;
 
     area.byParentIdGetArea(targetOption.id).then(res => {
-      // targetOption.loading = false;
+      targetOption.loading = false;
       targetOption.children = res;
-      console.log(this.props.countrys);
+      this.setState({
+        // eslint-disable-next-line react/no-access-state-in-setstate
+        countrys: [...this.state.countrys],
+      });
     });
   }
 
@@ -413,8 +412,8 @@ export class AddressInput extends React.Component {
       <InputGroup compact>
         <Cascader
           value={cascader}
-          fieldNames={{ label: 'name', value: 'id', children: 'children' }}
-          options={this.props.countrys}
+          fieldNames={{ label: 'name', value: 'code', children: 'children' }}
+          options={this.state.countrys}
           loadData={this.loadData}
           style={{ width: '40%' }}
           onChange={(value, option) => this.valueChange({ cascader: value, option })}
