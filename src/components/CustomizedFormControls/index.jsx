@@ -19,7 +19,6 @@ export class EmailInput extends React.Component {
     if ('value' in nextProps) {
       return {
         email: nextProps.value.email || '',
-        dataSource: nextProps.value.dataSource || [],
       };
     }
     return null;
@@ -48,17 +47,19 @@ export class EmailInput extends React.Component {
       dataSource = suffix.map(domain => `${changedValue.email}@${domain}`);
     }
 
+    this.setState({ dataSource });
+    const { dataSource: dataList, ...newState } = this.state;
+
     if (onChange) {
       onChange({
-        ...this.state,
-        dataSource,
+        ...newState,
         ...changedValue,
       });
     }
   };
 
   render() {
-    const { email, dataSource = [] } = this.state;
+    const { email, dataSource } = this.state;
 
     return (
       <AutoComplete
@@ -343,9 +344,11 @@ export class AddressInput extends React.Component {
     }
 
     const { onChange } = this.props;
+    const { countrys, ...otherState } = this.state;
 
     if (onChange) {
       onChange({
+        ...otherState,
         ...obj,
       });
     }

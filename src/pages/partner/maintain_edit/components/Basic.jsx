@@ -63,15 +63,15 @@ class Basic extends React.Component {
     this.checkMobilePhone = _.debounce(this.checkMobilePhone, 500);
   }
 
-  validate = () => {
-    const { form } = this.props;
-    form.validateFieldsAndScroll((error, values) => {
-      console.log(values);
-      if (!error) {
-        //
-      }
-    });
-  }
+  // validate = () => {
+  //   const { form } = this.props;
+  //   form.validateFieldsAndScroll((error, values) => {
+  //     console.log(values);
+  //     if (!error) {
+  //       //
+  //     }
+  //   });
+  // }
 
   checkNameInput = (rule, value, callback) => {
     if (!value.name) {
@@ -188,7 +188,7 @@ class Basic extends React.Component {
     ]
     if (keyList.indexOf(key) > -1) {
       if (key === 'address') {
-        obj = { ...obj, languageCode: obj.languageCode, timeZoneCode: obj.timeZoneCode };
+        obj = { ...value, languageCode: obj.languageCode, timeZoneCode: obj.timeZoneCode };
       } else {
         obj = value;
       }
@@ -308,7 +308,7 @@ class Basic extends React.Component {
               <FormItem label="时区">
                 {getFieldDecorator('timeZoneCode', {
                   initialValue: basic.timeZoneCode,
-                })(<Input onChange={e => this.valueChange('timeZoneCode', e.target.value)} />)}
+                })(<Input readOnly onChange={e => this.valueChange('timeZoneCode', e.target.value)} />)}
               </FormItem>
             </Col>
             <Col md={6} sm={12}>

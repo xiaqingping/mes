@@ -11,28 +11,27 @@ import {
   Cascader,
 } from 'antd';
 import React from 'react';
+import employees from '@/api/employees';
 
-class ChooseSalesperson extends React.Component {
+class ChooseSalesPerson extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       visible: false,
-      list: [
-        {
-          id: 1,
-          code: '123456789',
-          name: '上海交通大学',
-        },
-      ],
+      list: [],
     };
   }
 
   changeVisible = visible => {
     this.setState({ visible });
+    if (visible) this.handleSearch({ page: 1 });
   }
 
   handleSearch = data => {
     console.log(data);
+    employees.getSaler({ page: 1, pageSize: 10 }).then(res => {
+      console.log(res);
+    });
   }
 
   handleReset = data => {
@@ -160,4 +159,4 @@ class ChooseSalesperson extends React.Component {
   }
 }
 
-export default ChooseSalesperson;
+export default ChooseSalesPerson;

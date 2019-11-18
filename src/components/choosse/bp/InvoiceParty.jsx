@@ -10,28 +10,27 @@ import {
   Icon,
 } from 'antd';
 import React from 'react';
+import bp from '@/api/bp';
 
 class ChooseInvoiceParty extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       visible: false,
-      list: [
-        {
-          id: 1,
-          code: '123456789',
-          name: '上海交通大学',
-        },
-      ],
+      list: [],
     };
   }
 
   changeVisible = visible => {
     this.setState({ visible });
+    if (visible) this.handleSearch({ page: 1 });
   }
 
   handleSearch = data => {
     console.log(data);
+    bp.getInvoiceParty({ page: 1, pageSize: 10 }).then(res => {
+      console.log(res);
+    });
   }
 
   handleReset = data => {
