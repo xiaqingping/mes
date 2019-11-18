@@ -188,7 +188,7 @@ class SalesArea extends React.Component {
     const { salesAreaList: tabsData } = this.props;
 
     this.state = {
-      tabKey: (tabsData && tabsData[0] && tabsData[0].title) || '',
+      tabKey: (tabsData && tabsData[0] && `${tabsData[0].salesOrganizationCode}-${tabsData[0].distributionChannelCode}`) || '',
     }
   }
 

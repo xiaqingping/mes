@@ -129,6 +129,7 @@ class EditableTable extends React.Component {
         dataIndex: 'address',
         width: '35%',
         editable: true,
+        // inputType: <AddressInput />,
         inputType: <AddressInput onChange={value => this.valueChange('address', value)} />,
         editOptions: {
           rules: [
@@ -150,7 +151,7 @@ class EditableTable extends React.Component {
       {
         title: '操作',
         dataIndex: 'actions',
-        width: '10%',
+        width: '12%',
         render: (text, record, index) => {
           const { editIndex } = this.state;
           const editable = editIndex === index;

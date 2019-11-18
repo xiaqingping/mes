@@ -139,9 +139,9 @@ class CustomerEdit extends Component {
   // 提交
   validate = async () => {
     // 验证basic
-    const basicForm = this.basicView.wrappedInstance.props.form;
-    const basicResult = await validateForm(basicForm)
-    if (!basicResult[0]) return;
+    // const basicForm = this.basicView.wrappedInstance.props.form;
+    // const basicResult = await validateForm(basicForm)
+    // if (!basicResult[0]) return;
 
     const { editType } = this.state;
     if (editType === 'add') {
@@ -172,7 +172,26 @@ class CustomerEdit extends Component {
     });
 
     console.log(data);
-    bp.addBP(data).then(res => {
+    const { tabActiveKey } = this.state;
+    let newData = {};
+    if (tabActiveKey === 'customer') {
+      newData = {
+        basic: data.basic,
+        customer: data.customer,
+      }
+    } else {
+      newData = {
+        basic: data.basic,
+        vendor: data.vendor,
+      }
+    }
+    if (data.basic.type === 1) {
+      // newData.piCertificationList = data.piCertificationList;
+    } else {
+      // newData.organizationCertification = data.organizationCertification;
+    }
+
+    bp.addBP(newData).then(res => {
       console.log(res);
     });
   }

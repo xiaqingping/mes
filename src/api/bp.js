@@ -84,16 +84,16 @@ export default {
     return request('/partner/v1/check', { method: 'POST', params });
   },
 
-  // 查询所有业务伙伴类型为组织的数据（带分页）
-  getOrgBP(params) {
+  // 查询所有业务伙伴类型为组织的数据（带分页） 开票方
+  getInvoiceParty(params) {
     return request('/partner/v1/org', { params });
   },
-  // 查询所有客户类型为人员的业务伙伴（包含开票方子列表）
-  getPersonBPCarryInvoicePartys(params) {
-    return request('/partner/v1/person/invoicePartys', { params });
+  // 查询所有客户类型为人员的业务伙伴（包含开票方子列表） 售达方
+  getSoldToParty(params) {
+    return request('/partner/v1/person/invoiceTos', { params });
   },
-  // 查询所有客户类型为人员的业务伙伴
-  getPersonBP(params) {
+  // 查询所有客户类型为人员的业务伙伴  送达方
+  getShipToParty(params) {
     return request('/partner/v1/person', { params });
   },
 
