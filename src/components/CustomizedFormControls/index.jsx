@@ -160,7 +160,7 @@ export class MobilePhoneInput extends React.Component {
                 key={e.countryCode}
                 value={e.countryCode}
               >
-                <div className="select-countryPic-box" style={{ backgroundImage: `url(/country/${e.countryCode}.png)` }}>&nbsp;</div>
+                <div className="select-countryPic-box" style={{ backgroundImage: `url(/images/country/${e.countryCode}.png)` }}>&nbsp;</div>
                 {e.diallingCode}
               </Option>
             ))
@@ -219,7 +219,7 @@ export class TelphoneInput extends React.Component {
                 key={e.countryCode}
                 value={e.countryCode}
               >
-                <div className="select-countryPic-box" style={{ backgroundImage: `url(/country/${e.countryCode}.png)` }}>&nbsp;</div>
+                <div className="select-countryPic-box" style={{ backgroundImage: `url(/images/country/${e.countryCode}.png)` }}>&nbsp;</div>
                 {e.diallingCode}
               </Option>
             ))
@@ -280,7 +280,7 @@ export class FaxInput extends React.Component {
                 key={e.countryCode}
                 value={e.countryCode}
               >
-                <div className="select-countryPic-box" style={{ backgroundImage: `url(/country/${e.countryCode}.png)` }}>&nbsp;</div>
+                <div className="select-countryPic-box" style={{ backgroundImage: `url(/images/country/${e.countryCode}.png)` }}>&nbsp;</div>
                 {e.diallingCode}
               </Option>
             ))
