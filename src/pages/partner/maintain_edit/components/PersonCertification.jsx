@@ -11,13 +11,15 @@ import React from 'react';
 import { connect } from 'dva';
 
 import PersonCertificationAddModal from './PersonCertificationAddModal';
+import disk from '@/api/disk';
 
 const { Paragraph } = Typography;
 
-@connect(({ bpEdit }) => ({
+@connect(({ bpEdit, user }) => ({
   details: bpEdit.details || {},
   // eslint-disable-next-line max-len
   piCertification: (bpEdit.details && bpEdit.details.piCertification) || [],
+  authorization: user.currentUser.authorization,
 }))
 class PersonCertification extends React.Component {
   constructor(props) {
@@ -54,7 +56,12 @@ class PersonCertification extends React.Component {
               {item.notes}
             </Paragraph>
             <div>
-              <img style={{ width: 80, height: 80 }} src={item.attachmentList[0].code} alt=""/>
+              {
+                item.attachmentList.map(pic => {
+                  const url = disk.downloadFiles(pic.code, { view: true });
+                  return <img style={{ width: 80, height: 80, marginRight: 5 }} src={url} alt=""/>;
+                })
+              }
             </div>
           </Card>
         </List.Item>
@@ -98,14 +105,16 @@ class PersonCertification extends React.Component {
   }
 
   handleAdd = data => {
+    console.log(data);
     const { details, piCertification } = this.props;
 
     const attachmentList = data.attachmentList.map(e => ({
-      code: e.thumbUrl,
+      code: (e.response && e.response[0]) || '',
       name: e.name,
       type: e.type,
     }));
     this.handleModalVisible();
+
     const obj = {
       id: Math.random(),
       invoicePartyId: 123,
@@ -117,10 +126,7 @@ class PersonCertification extends React.Component {
     };
 
     const newdata = [...piCertification, obj];
-    // this.props.dispatch({
-    //   type: 'bpEdit/setDetails',
-    //   payload: { ...details, piCertification: newdata },
-    // });
+
     this.props.dispatch({
       type: 'bpEdit/setState',
       payload: {

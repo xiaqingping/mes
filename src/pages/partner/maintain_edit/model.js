@@ -14,7 +14,9 @@ const SeqModel = {
     // 新增BP时初始化数据结构
     addInitDetails(state) {
       const details = {
-        basic: {},
+        basic: {
+          type: 1,
+        },
         customer: {
           taxesCityCode: null,
           taxesCountyCode: null,

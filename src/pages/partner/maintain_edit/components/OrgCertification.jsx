@@ -15,7 +15,7 @@ import React, { Component } from 'react';
 import { connect } from 'dva';
 import { TelphoneInput } from '@/components/CustomizedFormControls';
 import disk from '@/api/disk';
-import basic from '@/api/basic';
+import basicAPI from '@/api/basic';
 
 const FormItem = Form.Item;
 const { TextArea } = Input;
@@ -88,7 +88,7 @@ class OrgCertification extends Component {
   }
 
   fetchBank = value => {
-    basic.getBanks({
+    basicAPI.getBanks({
       codeOrFullName: value,
     }).then(bank => {
       this.setState({ bank });
