@@ -5,9 +5,12 @@ import {
   Input,
   Row,
   Select,
+  Spin,
 } from 'antd';
 import React, { Component } from 'react';
 import { connect } from 'dva';
+import debounce from 'lodash/debounce';
+import basicApi from '@/api/basic';
 
 const FormItem = Form.Item;
 const { Option } = Select;
@@ -30,7 +33,12 @@ const { Option } = Select;
 class Bank extends Component {
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = {
+      bank: [],
+      bankFetching: false,
+    };
+    // 防抖
+    this.fetchBank = debounce(this.fetchBank, 800);
   }
 
   valueChange = (key, value) => {
@@ -40,9 +48,24 @@ class Bank extends Component {
     const newVendor = { ...vendor, ...{ paymentBank: newPaymentBank } };
     const newDetails = { ...details, ...{ vendor: newVendor } }
 
+    // this.props.dispatch({
+    //   type: 'bpEdit/setDetails',
+    //   payload: newDetails,
+    // });
     this.props.dispatch({
-      type: 'bpEdit/setDetails',
-      payload: newDetails,
+      type: 'bpEdit/setState',
+      payload: {
+        type: 'details',
+        data: newDetails,
+      },
+    });
+  }
+
+  fetchBank = value => {
+    basicApi.getBanks({
+      codeOrFullName: value,
+    }).then(bank => {
+      this.setState({ bank });
     });
   }
 
@@ -54,6 +77,7 @@ class Bank extends Component {
       countrys,
     } = this.props;
     const type = basic.type || 1;
+    const { bank, bankFetching } = this.state;
 
     return (
       <Card
@@ -67,6 +91,7 @@ class Bank extends Component {
               <FormItem label="国家">
                 {getFieldDecorator('countryCode', {
                   initialValue: paymentBank.countryCode,
+                  rules: [{ required: true }],
                 })(
                   <Select onChange={value => this.valueChange('countryCode', value)}>
                     {
@@ -82,10 +107,18 @@ class Bank extends Component {
               <FormItem label="开户行">
                 {getFieldDecorator('bankCode', {
                   initialValue: paymentBank.bankCode,
+                  rules: [{ required: true }],
                 })(
-                  <Select onChange={value => this.valueChange('bankCode', value)}>
-                    <Option value="1">工商银行</Option>
-                    <Option value="2">中国银行</Option>
+                  <Select
+                    showSearch
+                    notFoundContent={bankFetching ? <Spin size="small" /> : null}
+                    filterOption={false}
+                    onSearch={this.fetchBank}
+                    onChange={value => this.valueChange('bankCode', value)}
+                  >
+                    {bank.map(d => (
+                      <Option key={d.code} value={d.code}>{d.fullName}</Option>
+                    ))}
                   </Select>,
                 )}
               </FormItem>
@@ -94,6 +127,7 @@ class Bank extends Component {
               <FormItem label="银行账户">
                 {getFieldDecorator('bankAccount', {
                   initialValue: paymentBank.bankAccount,
+                  rules: [{ required: true }],
                 })(<Input onChange={e => this.valueChange('bankAccount', e.target.value)} />)}
               </FormItem>
             </Col>
@@ -101,6 +135,7 @@ class Bank extends Component {
               <FormItem label="户名">
                 {getFieldDecorator('bankAccountName', {
                   initialValue: paymentBank.bankAccountName,
+                  rules: [{ required: true }],
                 })(<Input onChange={e => this.valueChange('bankAccountName', e.target.value)} />)}
               </FormItem>
             </Col>

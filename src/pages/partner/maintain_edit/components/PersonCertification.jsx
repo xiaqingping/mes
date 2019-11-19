@@ -84,9 +84,16 @@ class PersonCertification extends React.Component {
     const { details, piCertification } = this.props;
 
     const data = piCertification.filter(e => e.id !== id);
+    // this.props.dispatch({
+    //   type: 'bpEdit/setDetails',
+    //   payload: { ...details, piCertification: data },
+    // });
     this.props.dispatch({
-      type: 'bpEdit/setDetails',
-      payload: { ...details, piCertification: data },
+      type: 'bpEdit/setState',
+      payload: {
+        type: 'details',
+        data: { ...details, piCertification: data },
+      },
     });
   }
 
@@ -110,9 +117,16 @@ class PersonCertification extends React.Component {
     };
 
     const newdata = [...piCertification, obj];
+    // this.props.dispatch({
+    //   type: 'bpEdit/setDetails',
+    //   payload: { ...details, piCertification: newdata },
+    // });
     this.props.dispatch({
-      type: 'bpEdit/setDetails',
-      payload: { ...details, piCertification: newdata },
+      type: 'bpEdit/setState',
+      payload: {
+        type: 'details',
+        data: { ...details, piCertification: newdata },
+      },
     });
   };
 

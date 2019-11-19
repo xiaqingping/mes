@@ -59,7 +59,7 @@ class FormContent extends React.Component {
       regionOffice,
       currencies,
     } = this.props;
-    const countryCode = basicInfo.countryCode || 'china';
+    const countryCode = basicInfo.countryCode || 'CN';
 
     return (
       <Form>
@@ -108,7 +108,7 @@ class FormContent extends React.Component {
             </FormItem>
           </Col>
           {
-            (countryCode === 'china' || !countryCode) ? (
+            (countryCode === 'CN' || !countryCode) ? (
               <Col span={7}>
                 <FormItem label="默认开票类型">
                   {getFieldDecorator('defaultInvoiceTypeCode', {
@@ -124,7 +124,7 @@ class FormContent extends React.Component {
             ) : null
           }
           {
-            (countryCode !== 'china' && countryCode) ? (
+            (countryCode !== 'CN' && countryCode) ? (
               <Col span={6}>
                 <FormItem label="税分类">
                   {getFieldDecorator('taxClassificCode', {
@@ -212,9 +212,16 @@ class SalesArea extends React.Component {
     const newCustomer = { ...customer, ...{ salesAreaList: newSalesAreaList } };
     const newDetails = { ...details, ...{ customer: newCustomer } };
 
+    // this.props.dispatch({
+    //   type: 'bpEdit/setDetails',
+    //   payload: newDetails,
+    // });
     this.props.dispatch({
-      type: 'bpEdit/setDetails',
-      payload: newDetails,
+      type: 'bpEdit/setState',
+      payload: {
+        type: 'details',
+        data: newDetails,
+      },
     });
   }
 
@@ -237,9 +244,16 @@ class SalesArea extends React.Component {
     const newCustomer = { ...customer, ...{ salesAreaList: newSalesAreaList } };
     const newDetails = { ...details, ...{ customer: newCustomer } };
 
+    // this.props.dispatch({
+    //   type: 'bpEdit/setDetails',
+    //   payload: newDetails,
+    // });
     this.props.dispatch({
-      type: 'bpEdit/setDetails',
-      payload: newDetails,
+      type: 'bpEdit/setState',
+      payload: {
+        type: 'details',
+        data: newDetails,
+      },
     });
 
     this.setState({
@@ -340,9 +354,16 @@ class SalesArea extends React.Component {
     const newCustomer = { ...customer, ...{ salesAreaList: newTabsData } };
     const newDetails = { ...details, ...{ customer: newCustomer } };
 
+    // this.props.dispatch({
+    //   type: 'bpEdit/setDetails',
+    //   payload: newDetails,
+    // });
     this.props.dispatch({
-      type: 'bpEdit/setDetails',
-      payload: newDetails,
+      type: 'bpEdit/setState',
+      payload: {
+        type: 'details',
+        data: newDetails,
+      },
     });
     this.setState({ tabKey: key });
   }

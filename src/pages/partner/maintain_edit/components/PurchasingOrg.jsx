@@ -52,6 +52,7 @@ class FormContent extends React.Component {
           <Col md={6}>
             <FormItem label="订单货币">
               {getFieldDecorator('currencyCode', {
+                rules: [{ required: true }],
                 initialValue: data.currencyCode,
               })(
                 <Select onChange={value => valueChange('currencyCode', value)}>
@@ -67,6 +68,7 @@ class FormContent extends React.Component {
           <Col md={6}>
             <FormItem label="付款条件">
               {getFieldDecorator('paymentTermsCode', {
+                rules: [{ required: true }],
                 initialValue: data.paymentTermsCode,
               })(
                 <Select onChange={value => valueChange('paymentTermsCode', value)}>
@@ -82,6 +84,7 @@ class FormContent extends React.Component {
           <Col md={6}>
             <FormItem label="销售人员">
               {getFieldDecorator('salerName', {
+                rules: [{ required: true }],
                 initialValue: data.salerName,
               })(
                 <Input onChange={e => valueChange('salerName', e.target.value)}/>,
@@ -91,6 +94,7 @@ class FormContent extends React.Component {
           <Col md={6}>
             <FormItem label="销售人员电话">
               {getFieldDecorator('salerTelephone', {
+                rules: [{ required: true }],
                 initialValue: {
                   mobilePhoneCountryCode: data.salerTelephoneCountryCode,
                   mobilePhone: data.salerTelephone,
@@ -103,6 +107,7 @@ class FormContent extends React.Component {
           <Col md={6}>
             <FormItem label="供应商级别">
               {getFieldDecorator('levelCode', {
+                rules: [{ required: true }],
                 initialValue: data.levelCode,
               })(
                 <Select onChange={value => valueChange('levelCode', value)}>
@@ -115,6 +120,7 @@ class FormContent extends React.Component {
           <Col md={6}>
             <FormItem label="收货时发票过账">
               {getFieldDecorator('invoicePostInReceive', {
+                rules: [{ required: true }],
                 valuePropName: 'checked',
                 initialValue: data.invoicePostInReceive,
               })(
@@ -125,6 +131,7 @@ class FormContent extends React.Component {
           <Col md={6}>
             <FormItem label="采购组">
               {getFieldDecorator('purchasingGroupCode', {
+                rules: [{ required: true }],
                 initialValue: data.purchasingGroupCode,
               })(
                 <Select onChange={value => valueChange('purchasingGroupCode', value)}>
@@ -140,6 +147,7 @@ class FormContent extends React.Component {
           <Col md={6}>
             <FormItem label="计划交货时间">
               {getFieldDecorator('deliveryPlanDays', {
+                rules: [{ required: true }],
                 initialValue: data.deliveryPlanDays,
               })(
                 <InputNumber
@@ -198,9 +206,16 @@ class PurchasingOrg extends React.Component {
     };
     const newDetails = { ...details, ...{ vendor: newVendor } };
 
+    // this.props.dispatch({
+    //   type: 'bpEdit/setDetails',
+    //   payload: newDetails,
+    // });
     this.props.dispatch({
-      type: 'bpEdit/setDetails',
-      payload: newDetails,
+      type: 'bpEdit/setState',
+      payload: {
+        type: 'details',
+        data: newDetails,
+      },
     });
   }
 
@@ -224,9 +239,16 @@ class PurchasingOrg extends React.Component {
     };
     const newDetails = { ...details, ...{ vendor: newVendor } };
 
+    // this.props.dispatch({
+    //   type: 'bpEdit/setDetails',
+    //   payload: newDetails,
+    // });
     this.props.dispatch({
-      type: 'bpEdit/setDetails',
-      payload: newDetails,
+      type: 'bpEdit/setState',
+      payload: {
+        type: 'details',
+        data: newDetails,
+      },
     });
 
     this.setState({
@@ -290,9 +312,16 @@ class PurchasingOrg extends React.Component {
     const newVendor = { ...vendor, ...{ purchasingOrganizationList: newTabsData } };
     const newDetails = { ...details, ...{ vendor: newVendor } };
 
+    // this.props.dispatch({
+    //   type: 'bpEdit/setDetails',
+    //   payload: newDetails,
+    // });
     this.props.dispatch({
-      type: 'bpEdit/setDetails',
-      payload: newDetails,
+      type: 'bpEdit/setState',
+      payload: {
+        type: 'details',
+        data: newDetails,
+      },
     });
     this.setState({ tabKey: key });
   }

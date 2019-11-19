@@ -8,16 +8,23 @@ import {
   Upload,
   Icon,
   Badge,
+  Select,
+  Spin,
 } from 'antd';
 import React, { Component } from 'react';
 import { connect } from 'dva';
 import { TelphoneInput } from '@/components/CustomizedFormControls';
+import disk from '@/api/disk';
+import basic from '@/api/basic';
 
 const FormItem = Form.Item;
 const { TextArea } = Input;
+const { Option } = Select;
 
-@connect(({ bpEdit }) => ({
+@connect(({ bpEdit, user }) => ({
   details: bpEdit.details || {},
+  uuid: bpEdit.uuid,
+  authorization: user.currentUser.authorization,
   organizationCertification: (
     bpEdit.details && bpEdit.details.organizationCertification
   ) || { attachmentList: [] },
@@ -25,17 +32,28 @@ const { TextArea } = Input;
 class OrgCertification extends Component {
   constructor(props) {
     super(props);
-    this.state = {};
+    const uploadUrl = disk.uploadMoreFiles('bp_organization_certification', this.props.uuid);
+
+    this.state = {
+      uploadUrl,
+      bank: [],
+      bankFetching: false,
+    };
   }
 
   valueChange = (key, value) => {
     const { details, organizationCertification } = this.props;
     if (key === 'attachmentList') {
-      value = value.fileList.map(e => ({
-        code: 'https://blog.maxmeng.top/images/avatar.jpg',
-        name: e.name,
-        type: e.type,
-      }));
+      if (value.file.response) {
+        value = value.fileList.map(e => {
+          console.log(e.response);
+          return {
+            code: (e.response && e.response[0]) || '',
+            name: e.name,
+            type: e.type,
+          };
+        });
+      }
     }
 
     let obj = {
@@ -47,15 +65,18 @@ class OrgCertification extends Component {
     const data = { ...organizationCertification, ...obj };
 
     this.props.dispatch({
-      type: 'bpEdit/setDetails',
-      payload: { ...details, ...{ organizationCertification: data } },
+      type: 'bpEdit/setState',
+      payload: {
+        type: 'details',
+        data: { ...details, ...{ organizationCertification: data } },
+      },
     });
   }
 
   uploadButton = () => (
     <div>
       <Icon type="plus" />
-      <div className="ant-upload-text">Upload</div>
+      <div className="ant-upload-text">Upload <br/>支持jpg/png</div>
     </div>
   )
 
@@ -66,17 +87,21 @@ class OrgCertification extends Component {
     return e && e.fileList;
   }
 
+  fetchBank = value => {
+    basic.getBanks({
+      codeOrFullName: value,
+    }).then(bank => {
+      this.setState({ bank });
+    });
+  }
+
   renderChina = () => {
     const {
       form: { getFieldDecorator },
       organizationCertification: orgData,
+      authorization,
     } = this.props;
-
-    const fileList = orgData.attachmentList && orgData.attachmentList.map(e => ({
-      uid: e.code,
-      name: e.name,
-      url: e.code,
-    }));
+    const { uploadUrl, bank, bankFetching } = this.state;
 
     return (
       <Form>
@@ -100,6 +125,7 @@ class OrgCertification extends Component {
                 <FormItem label="统一社会信用代码">
                   {getFieldDecorator('taxNo', {
                     initialValue: orgData.taxNo,
+                    rules: [{ required: true }],
                   })(<Input onChange={e => this.valueChange('taxNo', e.target.value)} />)}
                 </FormItem>
               </Col>
@@ -107,13 +133,27 @@ class OrgCertification extends Component {
                 <FormItem label="基本户开户银行">
                   {getFieldDecorator('bankCode', {
                     initialValue: orgData.bankCode,
-                  })(<Input onChange={e => this.valueChange('bankCode', e.target.value)} />)}
+                    rules: [{ required: true }],
+                  })(
+                    <Select
+                      showSearch
+                      notFoundContent={bankFetching ? <Spin size="small" /> : null}
+                      filterOption={false}
+                      onSearch={this.fetchBank}
+                      onChange={value => this.valueChange('bankCode', value)}
+                    >
+                      {bank.map(d => (
+                        <Option key={d.code} value={d.code}>{d.fullName}</Option>
+                      ))}
+                    </Select>,
+                  )}
                 </FormItem>
               </Col>
               <Col span={8}>
                 <FormItem label="基本户开户账号">
                   {getFieldDecorator('bankAccount', {
                     initialValue: orgData.bankAccount,
+                    rules: [{ required: true }],
                   })(<Input onChange={e => this.valueChange('bankAccount', e.target.value)} />)}
                 </FormItem>
               </Col>
@@ -126,6 +166,7 @@ class OrgCertification extends Component {
                       telephone: orgData.telephone,
                       telephoneExtension: orgData.telephoneExtension,
                     },
+                    rules: [{ required: true }],
                   })(<TelphoneInput onChange={value => this.valueChange('telephone', value)} />)}
                 </FormItem>
               </Col>
@@ -133,6 +174,7 @@ class OrgCertification extends Component {
                 <FormItem label="注册地址">
                   {getFieldDecorator('address', {
                     initialValue: orgData.address,
+                    rules: [{ required: true }],
                   })(<Input onChange={e => this.valueChange('address', e.target.value)} />)}
                 </FormItem>
               </Col>
@@ -142,6 +184,7 @@ class OrgCertification extends Component {
             <FormItem label="认证说明">
               {getFieldDecorator('notes', {
                 initialValue: orgData.notes,
+                rules: [{ required: true }],
               })(<TextArea rows={11} onChange={e => this.valueChange('notes', e.target.value)} />)}
             </FormItem>
           </Col>
@@ -151,15 +194,16 @@ class OrgCertification extends Component {
             <FormItem label="认证图片">
               {getFieldDecorator('attachmentList', {
                 rules: [{ required: true }],
-                valuePropName: 'attachmentList',
+                valuePropName: 'fileList',
                 getValueFromEvent: this.normFile,
               })(<Upload
-                name="file"
+                name="files"
+                multiple
                 listType="picture-card"
                 showUploadList
-                action="/upload"
+                action={uploadUrl}
                 accept=".jpg,.png"
-                fileList={fileList}
+                headers={{ Authorization: authorization }}
                 onChange={value => this.valueChange('attachmentList', value)}
               >
                 {this.uploadButton()}
@@ -238,10 +282,10 @@ class OrgCertification extends Component {
     const { countryCode } = basic;
     let form;
     switch (countryCode) {
-      case 'china':
+      case 'CN':
         form = this.renderChina;
         break;
-      case 'USA':
+      case 'US':
         form = this.renderOther;
         break;
       default:

@@ -69,8 +69,8 @@ export default {
     return request('/taxNumberCategories/v1');
   },
   // 银行主数据
-  getBanks () {
-    return request('/banks/v1');
+  getBanks (params) {
+    return request('/banks/v1', { params });
   },
   // BP角色主数据(非隐藏)
   getBpRoles () {

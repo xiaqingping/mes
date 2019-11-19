@@ -3,14 +3,13 @@ const SeqModel = {
   state: {
     details: null,
     editType: '',
+    uuid: '',
   },
   effects: {},
   reducers: {
-    setDetails(state, action) {
-      return { ...state, details: action.payload };
-    },
-    setEditType(state, action) {
-      return { ...state, editType: action.payload };
+    setState(state, action) {
+      const { payload: { type, data } } = action;
+      return { ...state, [type]: data };
     },
     // 新增BP时初始化数据结构
     addInitDetails(state) {
