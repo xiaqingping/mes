@@ -17,9 +17,16 @@ const DescriptionsItem = Descriptions.Item;
 class PurchasingOrg extends React.Component {
   constructor(props) {
     super(props);
-    const { details: { vendor: { purchasingOrganizationList: tabsData } } } = this.props;
-    this.state = {
-      tabKey: (tabsData && tabsData[0] && tabsData[0].purchasingOrganizationCode) || '',
+    const { details: { vendor } } = this.props;
+    if (vendor) {
+      const { purchasingOrganizationList: tabsData } = vendor;
+      this.state = {
+        tabKey: tabsData && tabsData[0] && tabsData[0].purchasingOrganizationCode,
+      }
+    } else {
+      this.state = {
+        tabKey: '',
+      }
     }
   }
 
@@ -154,43 +161,44 @@ class PurchasingOrg extends React.Component {
   }
 
   render() {
-    const { tabKey } = this.state;
     const { details } = this.props;
-    const { vendor: { purchasingOrganizationList: tabsData } } = details;
-
-    let tabList = tabsData.map(e => ({
-      key: e.purchasingOrganizationCode,
-      tab: e.purchasingOrganizationCode,
-    }));
-
-    tabList = tabList.concat({
-      key: 'select',
-      tab: this.renderCascader(),
-    });
-    tabList.forEach(e => {
-      if (e.key === tabKey) {
-        e.tab = (
-          <>{e.tab} <Icon type="close" style={{ fontSize: 12 }} onClick={() => this.closeTab(e.key)} /></>
-        );
-      } else {
-        e.tab = (
-          <>{e.tab} <Icon type="close" style={{ fontSize: 12, visibility: 'hidden' }} /></>
-        );
-      }
-    });
+    const { tabKey } = this.state;
+    let tabList = ''
+    if (tabKey) {
+      const { vendor: { purchasingOrganizationList: tabsData } } = details;
+      tabList = tabsData.map(e => ({
+        key: e.purchasingOrganizationCode,
+        tab: e.purchasingOrganizationCode,
+      }));
+      tabList = tabList.concat({
+        key: 'select',
+        tab: this.renderCascader(),
+      });
+      tabList.forEach(e => {
+        if (e.key === tabKey) {
+          e.tab = (
+            <>{e.tab} <Icon type="close" style={{ fontSize: 12 }} onClick={() => this.closeTab(e.key)} /></>
+          );
+        } else {
+          e.tab = (
+            <>{e.tab} <Icon type="close" style={{ fontSize: 12, visibility: 'hidden' }} /></>
+          );
+        }
+      });
+    }
 
     return (
       <Card
         title="采购组织"
         bordered={false}
         style={{ marginBottom: '24px' }}
-        tabList={tabList}
+        tabList={tabKey ? tabList : ''}
         activeTabKey={tabKey}
         onTabChange={key => {
           this.onTabChange(key);
         }}
       >
-        {tabKey ? this.renderTabPane() : <Empty description="暂无采购组织" />}
+        {tabKey ? this.renderTabPane() : <Empty />}
       </Card>
     );
   }

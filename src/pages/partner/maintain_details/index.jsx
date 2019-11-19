@@ -3,8 +3,8 @@ import React, { Component } from 'react';
 import { connect } from 'dva';
 
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
-import PersonCertification from '@/pages/partner/maintain_edit/components/PersonCertification';
-import PersonCredit from '@/pages/partner/maintain_edit/components/PersonCredit';
+import PersonCertification from './components/PersonCertification';
+import PersonCredit from './components/PersonCredit';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { Link } from 'react-router-dom';
 import BasicInfo from './components/BasicInfo';
@@ -30,23 +30,14 @@ class CustomerDetails extends Component {
   };
 
   componentDidMount() {
-    console.log(this.props.match.params.id)
-
-    api.bp.getBPCustomer(this.props.match.params.id).then(res => {
-      console.log(res)
-      this.props.dispatch({
-        type: 'partnerMaintainEdit/setDetails',
-        payload: res,
-      });
-    })
     const details = {
       // 基础信息
       basic: {
         id: 1,
-        type: 1,
+        type: 2,
         code: 110,
         name: '张三',
-        certificationStatus: 1,
+        certificationStatus: 4,
         mobilePhoneCountryCode: '+86',
         mobilePhone: 13212345678,
         mobilePhoneVerifyStatus: 1,
@@ -269,7 +260,7 @@ class CustomerDetails extends Component {
         type: 1,
         code: 110,
         name: '李四',
-        certificationStatus: 1,
+        certificationStatus: 4,
         mobilePhoneCountryCode: '+86',
         mobilePhone: 13212345678,
         mobilePhoneVerifyStatus: 1,
@@ -364,14 +355,26 @@ class CustomerDetails extends Component {
         ],
       },
     };
+    api.bp.getBPCustomer(this.props.match.params.id).then(res => {
+      this.props.dispatch({
+        type: 'partnerMaintainEdit/setDetails',
+        payload: res,
+      });
+    })
+    api.bp.getBPVendor(this.props.match.params.id).then(res => {
+      this.props.dispatch({
+        type: 'partnerMaintainEdit/setSupplier',
+        payload: res,
+      });
+    })
     // this.props.dispatch({
     //   type: 'partnerMaintainEdit/setDetails',
     //   payload: details,
     // });
-    this.props.dispatch({
-      type: 'partnerMaintainEdit/setSupplier',
-      payload: supplier,
-    });
+    // this.props.dispatch({
+    //   type: 'partnerMaintainEdit/setSupplier',
+    //   payload: supplier,
+    // });
     window.addEventListener('resize', this.resizeFooterToolbar, { passive: true });
     this.resizeFooterToolbar();
   }
@@ -498,7 +501,7 @@ class CustomerDetails extends Component {
         <>
         <BasicInfo/>
         <Type/>
-        {/* {
+        {
           customer.basic.type === 1 ?
           (
             <>
@@ -508,12 +511,12 @@ class CustomerDetails extends Component {
           ) : (
             <>
               <Credit/>
-              {customer.basic.telephoneCountryCode === 1 ?
+              {customer.basic.countryCode === 'CN' ?
               <HomeAuthentication/> : <AbroadAuthentication/>}
             </>
           )
-        } */}
-        {/* <Address/> */}
+        }
+        <Address/>
       </>
       ),
       supplier: (
@@ -522,10 +525,10 @@ class CustomerDetails extends Component {
         <PurchasingOrg/>
         <Bank/>
         {
-          customer.basic.type === 1 ?
+          customer.basic.type === 2 ?
           (
             <>
-              {customer.basic.telephoneCountryCode === 1 ?
+              {customer.basic.countryCode === 'CN' ?
               <HomeAuthentication/> : <AbroadAuthentication
               abroadType={customer.basic.telephoneCountryCode}/>}
             </>

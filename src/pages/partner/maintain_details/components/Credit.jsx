@@ -2,6 +2,7 @@ import {
   Card,
   Descriptions,
   Divider,
+  Empty,
 } from 'antd';
 import React, { Component } from 'react';
 import './style.less'
@@ -49,28 +50,32 @@ class BasicInfo extends Component {
   render() {
     const { fixedVisible, temporaryVisible } = this.state
     const { details: { creditList } } = this.props;
+
     return (
       <Card
         title={this.titleContent()}
         className="check-tabs"
         bordered={false}
         style={{ marginBottom: '24px' }}>
-        <Descriptions
+        {creditList.length !== 0 ? <>
+          <Descriptions
           className="s-descriptions"
           layout="vertical"
           column={4}
-        >
-          <DescriptionsItem label="额度">{creditList[0].credit}</DescriptionsItem>
-          <DescriptionsItem label="临时额度">{creditList[0].tempCreditLimit}</DescriptionsItem>
-          <DescriptionsItem label="付款周期">{creditList[0].creditPeriod}</DescriptionsItem>
-          <DescriptionsItem label="账单间隔">{creditList[0].billingDay}</DescriptionsItem>
-        </Descriptions>
-        <FixedQuota visible={fixedVisible}
-        fixedQuota={v => { this.fixedQuota(v) }}
-        />
-        <TemporaryQuota visible={temporaryVisible}
-        temporaryQuota={v => { this.temporaryQuota(v) }}
-        />
+          >
+            <DescriptionsItem label="额度">{creditList[0].credit}</DescriptionsItem>
+            <DescriptionsItem label="临时额度">{creditList[0].tempCreditLimit}</DescriptionsItem>
+            <DescriptionsItem label="付款周期">{creditList[0].creditPeriod}</DescriptionsItem>
+            <DescriptionsItem label="账单间隔">{creditList[0].billingDay}</DescriptionsItem>
+          </Descriptions>
+          <FixedQuota visible={fixedVisible}
+          fixedQuota={v => { this.fixedQuota(v) }}
+          />
+          <TemporaryQuota visible={temporaryVisible}
+          temporaryQuota={v => { this.temporaryQuota(v) }}
+          /></>
+        : <Empty />
+        }
       </Card>
     );
   }
