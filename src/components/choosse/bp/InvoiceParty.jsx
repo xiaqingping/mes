@@ -3,11 +3,11 @@
  */
 import {
   Modal,
-  Table,
   Button,
   AutoComplete,
   Input,
   Icon,
+  Table,
 } from 'antd';
 import React from 'react';
 import bp from '@/api/bp';
@@ -17,19 +17,40 @@ class ChooseInvoiceParty extends React.Component {
     super(props);
     this.state = {
       visible: false,
+      loading: false,
       list: [],
+      pagination: {
+        current: 1,
+        pageSize: 10,
+        total: 0,
+      },
     };
   }
 
   changeVisible = visible => {
     this.setState({ visible });
-    if (visible) this.handleSearch({ page: 1 });
+    if (visible) this.getTableData({ page: 1 });
   }
 
-  handleSearch = data => {
-    console.log(data);
-    bp.getInvoiceParty({ page: 1, pageSize: 10 }).then(res => {
-      console.log(res);
+  getTableData = (options = {}) => {
+    const { pagination } = this.state;
+    const query = Object.assign({}, {
+      page: pagination.current,
+      pageSize: pagination.pageSize,
+    }, options);
+
+    this.setState({ loading: true });
+    bp.getInvoiceParty(query).then(res => {
+      this.setState({
+        list: res.results,
+        pagination: {
+          current: query.page,
+          pageSize: query.pageSize,
+          total: res.total,
+        },
+      });
+    }).finally(() => {
+      this.setState({ loading: false });
     });
   }
 
@@ -37,14 +58,26 @@ class ChooseInvoiceParty extends React.Component {
     console.log(data);
   }
 
+  handleStandardTableChange = ({ current, pageSize, total }) => {
+    const pagination = { current, pageSize, total };
+    this.setState({ pagination }, () => {
+      this.getTableData();
+    });
+  }
+
   selectRow = row => {
     this.props.selectChooseModalData(row);
     this.setState({ visible: false });
   }
 
-  render() {
-    const { list } = this.state;
-    const tableWidth = 0;
+  tableChange = ({ current, pageSize, total }) => {
+    const pagination = { current, pageSize, total };
+    this.setState({ pagination }, () => {
+      this.getTableData();
+    });
+  }
+
+  getColumns = () => {
     const columns = [
       {
         title: '收票方',
@@ -59,7 +92,7 @@ class ChooseInvoiceParty extends React.Component {
             />
             <Button
               type="primary"
-              onClick={() => this.handleSearch(selectedKeys, confirm)}
+              onClick={() => this.getTableData(selectedKeys, confirm)}
               icon="search"
               size="small"
               style={{ width: 90, marginRight: 8 }}
@@ -114,7 +147,7 @@ class ChooseInvoiceParty extends React.Component {
             />
             <Button
               type="primary"
-              onClick={() => this.handleSearch(selectedKeys, confirm)}
+              onClick={() => this.getTableData(selectedKeys, confirm)}
               icon="search"
               size="small"
               style={{ width: 90, marginRight: 8 }}
@@ -137,11 +170,18 @@ class ChooseInvoiceParty extends React.Component {
         ),
       },
     ];
+    return columns;
+  }
+
+  render() {
+    const { list, loading, pagination, visible } = this.state;
+    const tableWidth = 0;
+    const columns = this.getColumns();
 
     return (
       <Modal
         title="收票方"
-        visible={this.state.visible}
+        visible={visible}
         width="1200px"
         onCancel={() => this.changeVisible(false)}
         footer={null}
@@ -151,6 +191,9 @@ class ChooseInvoiceParty extends React.Component {
           scroll={{ x: tableWidth }}
           dataSource={list}
           columns={columns}
+          loading={loading}
+          onChange={this.tableChange}
+          pagination={{ ...pagination }}
         />
       </Modal>
     );

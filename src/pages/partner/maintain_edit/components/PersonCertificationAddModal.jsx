@@ -6,92 +6,124 @@ import {
   Icon,
 } from 'antd';
 import React from 'react';
+import { connect } from 'dva';
+import disk from '@/api/disk';
+import ChooseInvoiceParty from '@/components/choosse/bp/InvoiceParty';
 
 const FormItem = Form.Item;
+const { Search } = Input;
 
-const PersonCertificationAddModal = props => {
-  const { modalVisible, form, handleAdd, handleModalVisible } = props;
+@connect(({ bpEdit, user }) => ({
+  details: bpEdit.details || {},
+  uuid: bpEdit.uuid,
+  authorization: user.currentUser.authorization,
+}))
+class PersonCertificationAddModal extends React.Component {
+  constructor(props) {
+    super(props);
+    const uploadUrl = disk.uploadMoreFiles('bp_organization_certification', this.props.uuid);
 
-  const okHandle = () => {
+    this.state = {
+      uploadUrl,
+      invoiceParty: {},
+    };
+  }
+
+  okHandle = () => {
+    const { form } = this.props;
+    const { invoiceParty } = this.state;
     form.validateFields((err, fieldsValue) => {
       if (err) return;
       form.resetFields();
-      handleAdd(fieldsValue);
+      this.props.handleAdd({ ...fieldsValue, ...invoiceParty });
     });
   };
-  const uploadButton = (
+
+  uploadButton = () => (
     <div>
       <Icon type="plus" />
       <div className="ant-upload-text">Upload</div>
     </div>
   );
 
-  const normFile = e => {
+  normFile = e => {
     if (Array.isArray(e)) {
       return e;
     }
     return e && e.fileList;
   };
 
-  return (
-    <Modal
-      destroyOnClose
-      title="PI认证"
-      visible={modalVisible}
-      onOk={okHandle}
-      onCancel={() => handleModalVisible()}
-    >
-      <FormItem
-        labelCol={{
-          span: 5,
-        }}
-        wrapperCol={{
-          span: 15,
-        }}
-        label="收票方"
+  selectChooseModalData = data => {
+    this.props.form.setFieldsValue({
+      invoicePartyName: data.name,
+    });
+    this.setState({
+      invoiceParty: {
+        invoicePartyName: data.name,
+        invoicePartyCode: data.code,
+        invoicePartyId: data.id,
+      },
+    });
+  }
+
+  render() {
+    const { modalVisible, form, handleModalVisible, authorization } = this.props;
+    const { uploadUrl } = this.state;
+
+    return (
+      <Modal
+        destroyOnClose
+        title="PI认证"
+        visible={modalVisible}
+        onOk={this.okHandle}
+        onCancel={() => handleModalVisible()}
       >
-        {form.getFieldDecorator('invoicePartyName', {
-          rules: [{ required: true }],
-        })(<Input />)}
-      </FormItem>
-      <FormItem
-        labelCol={{
-          span: 5,
-        }}
-        wrapperCol={{
-          span: 15,
-        }}
-        label="认证说明"
-      >
-        {form.getFieldDecorator('notes', {
-          rules: [{ required: true }],
-        })(<Input.TextArea />)}
-      </FormItem>
-      <FormItem
-        labelCol={{
-          span: 5,
-        }}
-        wrapperCol={{
-          span: 15,
-        }}
-        label="认证附件"
-      >
-        {form.getFieldDecorator('attachmentList', {
-          rules: [{ required: true }],
-          valuePropName: 'attachmentList',
-          getValueFromEvent: normFile,
-        })(<Upload
-          name="file"
-          listType="picture-card"
-          showUploadList
-          action="/upload"
-          accept=".jpg,.png"
+        <FormItem
+          labelCol={{ span: 5 }}
+          wrapperCol={{ span: 15 }}
+          label="收票方"
         >
-          {uploadButton}
-        </Upload>)}
-      </FormItem>
-    </Modal>
-  );
-};
+          {form.getFieldDecorator('invoicePartyName', {
+            rules: [{ required: true }],
+          })(<Search onSearch={() => this.ChooseInvoiceParty.changeVisible(true)} />)}
+        </FormItem>
+        <FormItem
+          labelCol={{ span: 5 }}
+          wrapperCol={{ span: 15 }}
+          label="认证说明"
+        >
+          {form.getFieldDecorator('notes', {
+            rules: [{ required: true }],
+          })(<Input.TextArea />)}
+        </FormItem>
+        <FormItem
+          labelCol={{ span: 5 }}
+          wrapperCol={{ span: 15 }}
+          label="认证图片"
+        >
+          {form.getFieldDecorator('attachmentList', {
+            rules: [{ required: true }],
+            valuePropName: 'fileList',
+            getValueFromEvent: this.normFile,
+          })(<Upload
+            name="files"
+            multiple
+            listType="picture-card"
+            showUploadList
+            action={uploadUrl}
+            accept=".jpg,.png"
+            headers={{ Authorization: authorization }}
+          >
+            {this.uploadButton()}
+          </Upload>)}
+        </FormItem>
+        <ChooseInvoiceParty
+          ref={ref => { this.ChooseInvoiceParty = ref }}
+          selectChooseModalData={this.selectChooseModalData}
+        />
+      </Modal>
+    );
+  }
+}
 
 export default Form.create()(PersonCertificationAddModal);

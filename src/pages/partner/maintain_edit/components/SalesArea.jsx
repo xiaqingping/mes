@@ -354,10 +354,6 @@ class SalesArea extends React.Component {
     const newCustomer = { ...customer, ...{ salesAreaList: newTabsData } };
     const newDetails = { ...details, ...{ customer: newCustomer } };
 
-    // this.props.dispatch({
-    //   type: 'bpEdit/setDetails',
-    //   payload: newDetails,
-    // });
     this.props.dispatch({
       type: 'bpEdit/setState',
       payload: {

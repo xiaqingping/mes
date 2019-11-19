@@ -39,21 +39,18 @@ export default {
     return request('/zuul/api/disk/v1/files/copy', { method: 'POST' });
   },
   // 单个下载文件
-  downloadFiles(id) {
-    return request(`/zuul/api/disk/v1/files/download/${id}`);
+  downloadFiles(id, params) {
+    if (params && params.view) return `${baseURL}/disk/v1/files/download/${id}?Authorization=${localStorage.token}&view=true`;
+    return request(`/zuul/api/disk/v1/files/download/${id}`, { params });
   },
   // 批量上传文件
   uploadMoreFiles(sourceKey, sourceCode) {
     if (!verifySourceKey(sourceKey)) return false;
-    // eslint-disable-next-line max-len
-    // return request(`/zuul/api/disk/v1/files/upload_more/${sourceKey}/${sourceCode}`, { method: 'POST' });
     return `${new URL(baseURL).origin}/zuul/api/disk/v1/files/upload_more/${sourceKey}/${sourceCode}`;
   },
   // 单个上传文件
   uploadFiles(sourceKey, sourceCode) {
     if (!verifySourceKey(sourceKey)) return false;
-    // eslint-disable-next-line max-len
-    // return request(`/zuul/api/disk/v1/files/upload/${sourceKey}/${sourceCode}`, { method: 'POST' });
     return `${new URL(baseURL).origin}/zuul/api/disk/v1/files/upload/${sourceKey}/${sourceCode}`;
   },
 };
