@@ -8,15 +8,22 @@ import {
   message,
   Row,
   Col,
+  List,
   Select,
   Switch,
   Cascader,
+  Card,
+  Divider,
+  Badge,
+  Typography,
 } from 'antd';
 import React, { Component } from 'react';
 import { connect } from 'dva';
 import { TelphoneInput } from '@/components/CustomizedFormControls';
 import api from '@/api';
+import authorize from '@/components/Authorized/Secured';
 
+const { Paragraph } = Typography;
 const FormItem = Form.Item;
 const InputGroup = Input.Group;
 const { Option } = Select;
@@ -39,6 +46,25 @@ const formItemLayoutGroup = {
   wrapperCol: {
     xs: { span: 10 },
     sm: { span: 16 },
+  },
+};
+
+const renzhengMap = {
+  1: {
+    value: 'default',
+    text: '未认证',
+  },
+ 2: {
+    value: 'processing',
+    text: '审核中',
+  },
+  4: {
+    value: 'success',
+    text: '已认证',
+  },
+  3: {
+    value: 'warning',
+    text: '部分认证',
   },
 };
 
@@ -275,15 +301,15 @@ class ChangeModal extends Component {
 
     renderPerform = name => {
       const { personalShow } = this.state;
-      return personalShow ? this.personalShow() : this.persnalInput(name);
+      return personalShow ? this.personalShow(name) : this.persnalInput(name);
     }
 
-    personalShow = () => (
-      <>
+    personalShow = name => (
+      <div style={{ marginLeft: '30%' }}>
         <Form.Item label="名称">
-          <Icon type="user" /> <span>Leo wang</span> <a href="#" onClick = {event => this.updetaPersonal(event)}>修改</a>
+          &nbsp;&nbsp;&nbsp;&nbsp;<Icon type="user" /> &nbsp;<span>{name}</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="#" onClick = {event => this.updetaPersonal(event)}>修改</a>
         </Form.Item>
-      </>
+      </div>
     )
 
     persnalInput = name => {
@@ -469,8 +495,47 @@ class ChangeModal extends Component {
       )
     }
 
+    renderListItem = item => {
+      console.log(item)
+      if (item && item.id) {
+        return (
+          <List.Item key={item.id}>
+            <Card
+              hoverable
+              title={item.invoicePartyName}
+              extra={
+                <>
+                  <a>变更</a>
+                  <Divider type="vertical" />
+                  <a onClick={() => this.removeItem(item.id)}>删除</a>
+                </>
+              }
+            >
+              <div style={{ marginBottom: '.8em' }}>
+                <Badge status={renzhengMap[item.invoicePartyCode].value}
+                text={renzhengMap[item.invoicePartyCode].text}/>
+              </div>
+              <Paragraph
+                style={{ minHeight: 42 }}
+                ellipsis={{
+                  rows: 2,
+                }}
+              >
+                {item.notes}
+              </Paragraph>
+              <div>
+                {item.attachmentList.map(v =>
+                  <img style={{ width: 90, height: 90, margin: '0 20px 20px 0', border: '1px #ECECEC solid', padding: '5px', borderRadius: '5px' }} src={v.code} alt=""/>,
+                )}
+              </div>
+            </Card>
+          </List.Item>
+        );
+      }
+    }
+
     render () {
-      const { changeModal, recordMsg, name, userData } = this.state;
+      const { changeModal, recordMsg, userData } = this.state;
       const { basic } = userData;
       if (!basic) return null;
       // const { form, getValues, closeModal } = this.props;
@@ -503,8 +568,8 @@ class ChangeModal extends Component {
       if (recordMsg && recordMsg.type === 1) {
         modelContent = <>
           <Form {...formItemLayout}>
-            {this.renderPerform(name)}
-            <Form.Item label="认证说明">
+            {this.renderPerform(userData.basic.name)}
+            {/* <Form.Item label="认证说明">
               {getFieldDecorator('notes', {
                 rules: [
                   {
@@ -523,7 +588,19 @@ class ChangeModal extends Component {
                   },
                 ],
               })(uploadModal)}
-            </Form.Item>
+            </Form.Item> */}
+                    <List
+                      rowKey="id"
+                      grid={{
+                        gutter: 24,
+                        lg: 3,
+                        md: 2,
+                        sm: 1,
+                        xs: 1,
+                      }}
+                      dataSource={ userData.piCertificationList}
+                      renderItem={this.renderListItem}
+                    />
           </Form>
         </>
       }
