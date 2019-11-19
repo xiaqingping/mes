@@ -3,7 +3,7 @@
  * https://devapi.sangon.com:8443/api/disk/swagger-ui.html
  */
 
-import request from '@/utils/request';
+import request, { baseURL } from '@/utils/request';
 
 const sourceKeyList = [
   // 采购管理
@@ -28,28 +28,32 @@ function verifySourceKey(sourceKey) {
 export default {
   // 查询文件
   getFiles() {
-    return request('/disk/v1/files');
+    return request('/zuul/api/disk/v1/files');
   },
   // 删除文件
   deleteFiles(id) {
-    return request(`/disk/v1/files/${id}`, { method: 'DELETE' });
+    return request(`/zuul/api/disk/v1/files/${id}`, { method: 'DELETE' });
   },
   // 复制文件
   copyFiles() {
-    return request('/disk/v1/files/copy', { method: 'POST' });
+    return request('/zuul/api/disk/v1/files/copy', { method: 'POST' });
   },
   // 单个下载文件
   downloadFiles(id) {
-    return request(`/disk/v1/files/download/${id}`);
+    return request(`/zuul/api/disk/v1/files/download/${id}`);
   },
   // 批量上传文件
   uploadMoreFiles(sourceKey, sourceCode) {
     if (!verifySourceKey(sourceKey)) return false;
-    return request(`/disk/v1/files/upload_more/${sourceKey}/${sourceCode}`, { method: 'POST' });
+    // eslint-disable-next-line max-len
+    // return request(`/zuul/api/disk/v1/files/upload_more/${sourceKey}/${sourceCode}`, { method: 'POST' });
+    return `${new URL(baseURL).origin}/zuul/api/disk/v1/files/upload_more/${sourceKey}/${sourceCode}`;
   },
   // 单个上传文件
   uploadFiles(sourceKey, sourceCode) {
     if (!verifySourceKey(sourceKey)) return false;
-    return request(`/disk/v1/files/upload/${sourceKey}/${sourceCode}`, { method: 'POST' });
+    // eslint-disable-next-line max-len
+    // return request(`/zuul/api/disk/v1/files/upload/${sourceKey}/${sourceCode}`, { method: 'POST' });
+    return `${new URL(baseURL).origin}/zuul/api/disk/v1/files/upload/${sourceKey}/${sourceCode}`;
   },
 };

@@ -117,7 +117,7 @@ class EditableTable extends React.Component {
         dataIndex: 'postCode',
         width: '10%',
         editable: true,
-        inputType: <InputNumber />,
+        inputType: <Input />,
         editOptions: {
           rules: [
             { required: true },
@@ -129,7 +129,6 @@ class EditableTable extends React.Component {
         dataIndex: 'address',
         width: '35%',
         editable: true,
-        // inputType: <AddressInput />,
         inputType: <AddressInput onChange={value => this.valueChange('address', value)} />,
         editOptions: {
           rules: [
@@ -241,9 +240,16 @@ class EditableTable extends React.Component {
 
     const newCustomer = { ...customer, ...{ addressList: newAddressList } };
     const newDetails = { ...details, ...{ customer: newCustomer } };
+    // this.props.dispatch({
+    //   type: 'bpEdit/setDetails',
+    //   payload: newDetails,
+    // });
     this.props.dispatch({
-      type: 'bpEdit/setDetails',
-      payload: newDetails,
+      type: 'bpEdit/setState',
+      payload: {
+        type: 'details',
+        data: newDetails,
+      },
     });
   }
 

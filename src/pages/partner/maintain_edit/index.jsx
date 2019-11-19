@@ -20,7 +20,7 @@ import PurchasingOrg from './components/PurchasingOrg';
 import Bank from './components/Bank';
 
 import { bp } from '@/api'
-import { validateForm, diff } from '@/utils/utils';
+import { validateForm, diff, guid } from '@/utils/utils';
 
 @connect(({ bpEdit }) => ({
   details: bpEdit.details || {},
@@ -38,8 +38,18 @@ class CustomerEdit extends Component {
       // tabActiveKey: 'vendor',
     };
     this.props.dispatch({
-      type: 'bpEdit/setEditType',
-      payload: editType,
+      type: 'bpEdit/setState',
+      payload: {
+        type: 'editType',
+        data: editType,
+      },
+    });
+    this.props.dispatch({
+      type: 'bpEdit/setState',
+      payload: {
+        type: 'uuid',
+        data: guid(),
+      },
     });
   }
 
@@ -58,8 +68,11 @@ class CustomerEdit extends Component {
   componentWillUnmount() {
     window.removeEventListener('resize', this.resizeFooterToolbar);
     this.props.dispatch({
-      type: 'bpEdit/setDetails',
-      payload: {},
+      type: 'bpEdit/setState',
+      payload: {
+        type: 'details',
+        data: {},
+      },
     });
   }
 
@@ -144,6 +157,7 @@ class CustomerEdit extends Component {
     // if (!basicResult[0]) return;
 
     const { editType } = this.state;
+    console.log(this.state.details);
     if (editType === 'add') {
       this.add();
     } else {
@@ -171,7 +185,6 @@ class CustomerEdit extends Component {
       e.salerCodeList = salerList.map(e1 => e1.id);
     });
 
-    console.log(data);
     const { tabActiveKey } = this.state;
     let newData = {};
     if (tabActiveKey === 'customer') {
@@ -186,11 +199,12 @@ class CustomerEdit extends Component {
       }
     }
     if (data.basic.type === 1) {
-      // newData.piCertificationList = data.piCertificationList;
+      newData.piCertificationList = data.piCertificationList;
     } else {
-      // newData.organizationCertification = data.organizationCertification;
+      newData.organizationCertification = data.organizationCertification;
     }
 
+    console.log(newData);
     bp.addBP(newData).then(res => {
       console.log(res);
     });
@@ -247,7 +261,7 @@ class CustomerEdit extends Component {
   renderCustomer = details => {
     const { editType, tabActiveKey } = this.state;
     const { basic } = details;
-    const type = (basic && basic.type) || 1;
+    const type = basic && basic.type;
 
     return (
       <>
@@ -264,12 +278,16 @@ class CustomerEdit extends Component {
               { editType === 'update' ? <OrgCredit /> : null }
               <OrgCertification />
             </>
-          ) : (
+          ) : null
+        }
+        {
+          type === 1 ?
+          (
             <>
-              { editType === 'update' ? <PersonCredit /> : null }
+            { editType === 'update' ? <PersonCredit /> : null }
               <PersonCertification />
             </>
-          )
+          ) : null
         }
         <Address />
       </>

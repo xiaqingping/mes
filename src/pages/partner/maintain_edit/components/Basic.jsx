@@ -159,9 +159,16 @@ class Basic extends React.Component {
       // eslint-disable-next-line no-unused-expressions
       value ? (obj[key] = 1) : (obj[key] = 2);
       const newCustomer = { ...customer, ...obj };
+      // this.props.dispatch({
+      //   type: 'bpEdit/setDetails',
+      //   payload: { ...details, ...{ customer: newCustomer } },
+      // });
       this.props.dispatch({
-        type: 'bpEdit/setDetails',
-        payload: { ...details, ...{ customer: newCustomer } },
+        type: 'bpEdit/setState',
+        payload: {
+          type: 'details',
+          data: { ...details, ...{ customer: newCustomer } },
+        },
       });
       return;
     }
@@ -171,9 +178,16 @@ class Basic extends React.Component {
       // eslint-disable-next-line no-unused-expressions
       value ? (obj[key] = 1) : (obj[key] = 2);
       const newVendor = { ...vendor, ...obj };
+      // this.props.dispatch({
+      //   type: 'bpEdit/setDetails',
+      //   payload: { ...details, ...{ vendor: newVendor } },
+      // });
       this.props.dispatch({
-        type: 'bpEdit/setDetails',
-        payload: { ...details, ...{ vendor: newVendor } },
+        type: 'bpEdit/setState',
+        payload: {
+          type: 'details',
+          data: { ...details, ...{ vendor: newVendor } },
+        },
       });
       return;
     }
@@ -196,9 +210,16 @@ class Basic extends React.Component {
 
     const newBasic = { ...basic, ...obj };
 
+    // this.props.dispatch({
+    //   type: 'bpEdit/setDetails',
+    //   payload: { ...details, ...{ basic: newBasic } },
+    // });
     this.props.dispatch({
-      type: 'bpEdit/setDetails',
-      payload: { ...details, ...{ basic: newBasic } },
+      type: 'bpEdit/setState',
+      payload: {
+        type: 'details',
+        data: { ...details, ...{ basic: newBasic } },
+      },
     });
   }
 
