@@ -7,7 +7,7 @@ import {
 } from 'antd';
 import React from 'react';
 
-import ChooseSalesperson from '@/components/choosse/bp/Salesperson';
+import ChooseSalesPerson from '@/components/choosse/bp/SalesPerson';
 
 const { Search } = Input;
 const EditableContext = React.createContext();
@@ -125,6 +125,10 @@ class SalesPerson extends React.Component {
     this.setStore(newTableData);
   }
 
+  searchSalesPerson = () => {
+    this.ChooseSalesPerson.wrappedInstance.changeVisible(true)
+  }
+
   render() {
     const { tableData } = this.props;
     const components = {
@@ -139,7 +143,7 @@ class SalesPerson extends React.Component {
         dataIndex: 'name',
         width: '80%',
         editable: true,
-        inputType: <Search onSearch={() => this.ChooseSalesperson.changeVisible(true)} />,
+        inputType: <Search onSearch={this.searchSalesPerson} />,
         editOptions: {
           rules: [
             { required: true },
@@ -212,8 +216,8 @@ class SalesPerson extends React.Component {
         >
           新增
         </Button>
-        <ChooseSalesperson
-          ref={ref => { this.ChooseSalesperson = ref }}
+        <ChooseSalesPerson
+          ref={ref => { this.ChooseSalesPerson = ref }}
           selectChooseModalData={this.selectChooseModalData}
         />
       </EditableContext.Provider>

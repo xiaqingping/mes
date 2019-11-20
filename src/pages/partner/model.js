@@ -27,6 +27,19 @@ const SeqModel = {
       { id: 1, name: '人员' },
       { id: 2, name: '组织' },
     ],
+    // 国家代码
+    CountryCode: [
+      { id: 'CN', name: '中国' },
+      { id: 'AU', name: '澳大利亚' },
+      { id: 'GB', name: '英国' },
+      { id: 'HK', name: '中国香港' },
+      { id: 'KR', name: '韩国' },
+      { id: 'MO', name: '中国澳门' },
+      { id: 'TW', name: '中国台湾' },
+      { id: 'US', name: '美国' },
+      { id: 'DE', name: '德国' },
+      { id: 'EU', name: '欧盟' },
+    ],
     // 客户数据状态
     CustomerDataStatus: [
       { id: 1, name: '完整' },

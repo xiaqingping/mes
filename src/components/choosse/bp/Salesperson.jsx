@@ -11,8 +11,15 @@ import {
   Cascader,
 } from 'antd';
 import React from 'react';
+import { connect } from 'dva';
 import employees from '@/api/employees';
+import { formatter } from '@/utils/utils'
 
+@connect(({ partnerMaintainEdit }) => ({
+  BpCertificationStatus: partnerMaintainEdit.BpCertificationStatus,
+  SalesOrderBlock: partnerMaintainEdit.SalesOrderBlock,
+  CustomerDataStatus: partnerMaintainEdit.CustomerDataStatus,
+}), null, null, { withRef: true })
 class ChooseSalesPerson extends React.Component {
   constructor(props) {
     super(props);
@@ -43,7 +50,7 @@ class ChooseSalesPerson extends React.Component {
     this.setState({ loading: true });
     employees.getSaler(query).then(res => {
       this.setState({
-        list: res.results,
+        list: res.result,
         pagination: {
           current: query.page,
           pageSize: query.pageSize,
@@ -121,6 +128,12 @@ class ChooseSalesPerson extends React.Component {
             </Button>
           </div>
         ),
+        render: (text, row) => {
+          const area = [];
+          if (row.regionName) area.push(row.regionName);
+          if (row.officeName) area.push(row.officeName);
+          return area.join(area.length === 2 ? '/' : '');
+        },
       },
       {
         title: '联系方式',
@@ -149,6 +162,24 @@ class ChooseSalesPerson extends React.Component {
             </Button>
           </div>
         ),
+        render: (text, row) => {
+          const mobilePhoneArr = [];
+          if (row.mobilePhoneCountryCode) mobilePhoneArr.push(row.mobilePhoneCountryCode);
+          if (row.mobilePhone) mobilePhoneArr.push(row.mobilePhone);
+          return (
+            <>
+              {
+                mobilePhoneArr.length > 0 ? (
+                  <>
+                    <span>{mobilePhoneArr.join('-')}</span>
+                    <br/>
+                  </>
+                ) : null
+              }
+              <span>{row.email}</span>
+            </>
+          );
+        },
       },
       {
         title: '操作',

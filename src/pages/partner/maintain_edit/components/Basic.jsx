@@ -25,7 +25,7 @@ import styles from '../style.less';
 const FormItem = Form.Item;
 const { Option } = Select;
 
-@connect(({ global, basicCache, bpEdit }) => {
+@connect(({ partnerMaintainEdit, basicCache, bpEdit }) => {
   // 1. 业务伙伴数据
   const { editType } = bpEdit;
   const details = bpEdit.details || {};
@@ -37,9 +37,10 @@ const { Option } = Select;
 
   // 2. 基础数据
   // 行业类别
-  const industryCategories = basicCache.industryCategories.filter(
-    e => e.languageCode === global.languageCode,
-  );
+  // const industryCategories = basicCache.industryCategories.filter(
+  //   e => e.languageCode === global.languageCode,
+  // );
+  const industryCategories = partnerMaintainEdit.Industry;
 
   return {
     editType,
@@ -57,6 +58,9 @@ const { Option } = Select;
 class Basic extends React.Component {
   constructor(props) {
     super(props);
+    this.state = {
+      industrySelectOpen: true,
+    };
     // 异步验证做节流处理
     this.checkNameInput = _.debounce(this.checkNameInput, 500);
     this.checkEmail = _.debounce(this.checkEmail, 500);
@@ -124,6 +128,17 @@ class Basic extends React.Component {
       [key]: value,
     }
 
+    // 名字-类型为个人时，行业类别为个人，且不可更改
+    if (key === 'name') {
+      if (value.type === 1) {
+        obj.name.industryCode = '06';
+        this.setState({ industrySelectOpen: true });
+      } else {
+        if (basic.industryCode === '06') obj.name.industryCode = '';
+        this.setState({ industrySelectOpen: true });
+      }
+    }
+
     // 地址 决定了语言和时区
     if (key === 'address') {
       obj.timeZoneCode = '';
@@ -159,10 +174,7 @@ class Basic extends React.Component {
       // eslint-disable-next-line no-unused-expressions
       value ? (obj[key] = 1) : (obj[key] = 2);
       const newCustomer = { ...customer, ...obj };
-      // this.props.dispatch({
-      //   type: 'bpEdit/setDetails',
-      //   payload: { ...details, ...{ customer: newCustomer } },
-      // });
+
       this.props.dispatch({
         type: 'bpEdit/setState',
         payload: {
@@ -178,10 +190,7 @@ class Basic extends React.Component {
       // eslint-disable-next-line no-unused-expressions
       value ? (obj[key] = 1) : (obj[key] = 2);
       const newVendor = { ...vendor, ...obj };
-      // this.props.dispatch({
-      //   type: 'bpEdit/setDetails',
-      //   payload: { ...details, ...{ vendor: newVendor } },
-      // });
+
       this.props.dispatch({
         type: 'bpEdit/setState',
         payload: {
@@ -209,11 +218,8 @@ class Basic extends React.Component {
     }
 
     const newBasic = { ...basic, ...obj };
+    console.log(obj);
 
-    // this.props.dispatch({
-    //   type: 'bpEdit/setDetails',
-    //   payload: { ...details, ...{ basic: newBasic } },
-    // });
     this.props.dispatch({
       type: 'bpEdit/setState',
       payload: {
@@ -233,6 +239,9 @@ class Basic extends React.Component {
       invoicePostBlock,
       industryCategories,
     } = this.props;
+    const { industrySelectOpen } = this.state;
+    const industryOption = {};
+    if (!industrySelectOpen) industryOption.open = industrySelectOpen;
 
     return (
       <Card title="基础信息" bordered={false} style={{ marginBottom: '24px' }}>
@@ -349,11 +358,26 @@ class Basic extends React.Component {
                 {getFieldDecorator('industryCode', {
                   initialValue: basic.industryCode,
                 })(
-                  <Select onChange={value => this.valueChange('industryCode', value)} >
+                  <Select
+                    { ...industryOption }
+                    onChange={value => this.valueChange('industryCode', value)}
+                  >
                     {
-                      industryCategories.map(e => (
-                        <Option key={e.code} value={e.code}>{e.name}</Option>
-                      ))
+                      industryCategories.map(e => {
+                        if (basic.type === 1) {
+                          if (e.id !== '06') {
+                            return <Option disabled key={e.id} value={e.id}>{e.name}</Option>
+                          }
+                          return <Option key={e.id} value={e.id}>{e.name}</Option>
+                        }
+                        if (basic.type === 2) {
+                          if (e.id === '06') {
+                            return <Option disabled key={e.id} value={e.id}>{e.name}</Option>
+                          }
+                          return <Option key={e.id} value={e.id}>{e.name}</Option>
+                        }
+                        return null;
+                      })
                     }
                   </Select>,
                 )}

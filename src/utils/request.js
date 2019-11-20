@@ -19,34 +19,64 @@ const service = axios.create({
   timeout: 6000,
 });
 
-const err = error => {
-  if (error.response) {
-    let errMsg = ['系统异常,请与系统管理员联系!'];
-    const data = error.response && error.response.data;
+const requestErr = error => {
+  let errMsg = ['系统异常,请与系统管理员联系!'];
+  const data = error.response && error.response.data;
 
-    if (data) {
-      if (data.message) {
-        errMsg = [data.message];
-      }
-      if (data.details && data.details.length > 0) {
-        errMsg = data.details;
-      }
-
-      if (data.type === 41 && data.code === 40000) {
-        localStorage.removeItem('token');
-        const URL = window.location.href;
-        if (URL.indexOf('/user/login') === -1) {
-          router.push(`/user/login?redirect=${window.location.href}`);
-        }
-      }
-    } else {
-      errMsg = [errMsg];
+  if (data) {
+    if (data.message) {
+      errMsg = [data.message];
+    }
+    if (data.details && data.details.length > 0) {
+      errMsg = data.details;
     }
 
-    notification.error({
-      message: (data && data.desc) || '错误提示',
-      description: errMsg.join('，') || '请求错误！',
-    });
+    if (data.type === 41 && data.code === 40000) {
+      localStorage.removeItem('token');
+      const URL = window.location.href;
+      if (URL.indexOf('/user/login') === -1) {
+        router.push(`/user/login?redirect=${window.location.href}`);
+      }
+    }
+  } else {
+    errMsg = [errMsg];
+  }
+
+  notification.error({
+    message: (data && data.desc) || '错误提示',
+    description: errMsg.join('，') || '请求错误！',
+  });
+}
+
+const err = error => {
+  if (error.response) {
+    // let errMsg = ['系统异常,请与系统管理员联系!'];
+    const data = error.response && error.response.data;
+
+    // if (data) {
+    //   if (data.message) {
+    //     errMsg = [data.message];
+    //   }
+    //   if (data.details && data.details.length > 0) {
+    //     errMsg = data.details;
+    //   }
+
+    //   if (data.type === 41 && data.code === 40000) {
+    //     localStorage.removeItem('token');
+    //     const URL = window.location.href;
+    //     if (URL.indexOf('/user/login') === -1) {
+    //       router.push(`/user/login?redirect=${window.location.href}`);
+    //     }
+    //   }
+    // } else {
+    //   errMsg = [errMsg];
+    // }
+
+    // notification.error({
+    //   message: (data && data.desc) || '错误提示',
+    //   description: errMsg.join('，') || '请求错误！',
+    // });
+    requestErr(error);
     return Promise.reject(data);
   }
   return Promise.reject(error.response);
@@ -85,4 +115,4 @@ service.interceptors.request.use(config => {
 service.interceptors.response.use(response => response.data, err);
 
 export default service;
-export { baseURL };
+export { baseURL, requestErr };
