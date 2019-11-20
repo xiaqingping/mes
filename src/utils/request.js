@@ -19,9 +19,9 @@ const service = axios.create({
   timeout: 6000,
 });
 
-const requestErr = error => {
+const requestErr = response => {
   let errMsg = ['系统异常,请与系统管理员联系!'];
-  const data = error.response && error.response.data;
+  const data = response && response.data;
 
   if (data) {
     if (data.message) {
@@ -49,37 +49,13 @@ const requestErr = error => {
 }
 
 const err = error => {
-  if (error.response) {
-    // let errMsg = ['系统异常,请与系统管理员联系!'];
-    const data = error.response && error.response.data;
-
-    // if (data) {
-    //   if (data.message) {
-    //     errMsg = [data.message];
-    //   }
-    //   if (data.details && data.details.length > 0) {
-    //     errMsg = data.details;
-    //   }
-
-    //   if (data.type === 41 && data.code === 40000) {
-    //     localStorage.removeItem('token');
-    //     const URL = window.location.href;
-    //     if (URL.indexOf('/user/login') === -1) {
-    //       router.push(`/user/login?redirect=${window.location.href}`);
-    //     }
-    //   }
-    // } else {
-    //   errMsg = [errMsg];
-    // }
-
-    // notification.error({
-    //   message: (data && data.desc) || '错误提示',
-    //   description: errMsg.join('，') || '请求错误！',
-    // });
-    requestErr(error);
+  const { response } = error;
+  if (response) {
+    const { data } = response;
+    requestErr(data);
     return Promise.reject(data);
   }
-  return Promise.reject(error.response);
+  return Promise.reject(response);
 };
 
 // 请求拦截
