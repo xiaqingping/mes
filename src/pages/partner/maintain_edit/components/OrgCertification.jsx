@@ -16,6 +16,7 @@ import { connect } from 'dva';
 import { TelphoneInput } from '@/components/CustomizedFormControls';
 import disk from '@/api/disk';
 import basicAPI from '@/api/basic';
+import { requestErr } from '@/utils/request';
 
 const FormItem = Form.Item;
 const { TextArea } = Input;
@@ -44,9 +45,11 @@ class OrgCertification extends Component {
   valueChange = (key, value) => {
     const { details, organizationCertification } = this.props;
     if (key === 'attachmentList') {
+      console.log(value);
       if (value.file.response) {
         value = value.fileList.map(e => {
           console.log(e.response);
+          if (e.status === 'error') requestErr(e.response);
           return {
             code: (e.response && e.response[0]) || '',
             name: e.name,

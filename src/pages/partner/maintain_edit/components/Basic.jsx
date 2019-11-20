@@ -218,7 +218,6 @@ class Basic extends React.Component {
     }
 
     const newBasic = { ...basic, ...obj };
-    console.log(obj);
 
     this.props.dispatch({
       type: 'bpEdit/setState',
