@@ -10,26 +10,54 @@ import {
   Icon,
 } from 'antd';
 import React from 'react';
+import { connect } from 'dva';
 import bp from '@/api/bp';
+import { formatter } from '@/utils/utils'
 
+@connect(({ partnerMaintainEdit }) => ({
+  BpCertificationStatus: partnerMaintainEdit.BpCertificationStatus,
+  SalesOrderBlock: partnerMaintainEdit.SalesOrderBlock,
+  CustomerDataStatus: partnerMaintainEdit.CustomerDataStatus,
+}), null, null, { withRef: true })
 class ChooseSoldToParty extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       visible: false,
+      loading: false,
       list: [],
+      pagination: {
+        current: 1,
+        pageSize: 10,
+        total: 0,
+      },
     };
   }
 
   changeVisible = visible => {
     this.setState({ visible });
-    if (visible) this.handleSearch({ page: 1 });
+    if (visible) this.getTableData({ page: 1 });
   }
 
-  handleSearch = data => {
-    console.log(data);
-    bp.getSoldToParty({ page: 1, pageSize: 10 }).then(res => {
-      console.log(res);
+  getTableData = (options = {}) => {
+    const { pagination } = this.state;
+    const query = Object.assign({}, {
+      page: pagination.current,
+      pageSize: pagination.pageSize,
+    }, options);
+
+    this.setState({ loading: true });
+    bp.getSoldToParty(query).then(res => {
+      this.setState({
+        list: res.results,
+        pagination: {
+          current: query.page,
+          pageSize: query.pageSize,
+          total: res.total,
+        },
+      });
+    }).finally(() => {
+      this.setState({ loading: false });
     });
   }
 
@@ -42,9 +70,15 @@ class ChooseSoldToParty extends React.Component {
     this.setState({ visible: false });
   }
 
-  render() {
-    const { list } = this.state;
-    const tableWidth = 0;
+  tableChange = ({ current, pageSize, total }) => {
+    const pagination = { current, pageSize, total };
+    this.setState({ pagination }, () => {
+      this.getTableData();
+    });
+  }
+
+  getColumns = () => {
+    const { BpCertificationStatus, SalesOrderBlock, CustomerDataStatus } = this.props;
     const columns = [
       {
         title: '售达方',
@@ -59,7 +93,7 @@ class ChooseSoldToParty extends React.Component {
             />
             <Button
               type="primary"
-              onClick={() => this.handleSearch(selectedKeys, confirm)}
+              onClick={() => this.getTableData(selectedKeys, confirm)}
               icon="search"
               size="small"
               style={{ width: 90, marginRight: 8 }}
@@ -75,31 +109,40 @@ class ChooseSoldToParty extends React.Component {
             </Button>
           </div>
         ),
+        render: (text, row) => (
+          <>
+            <span style={{ color: '#222' }}><Icon type={row.type === 1 ? 'user' : 'home'} /> {row.name}</span>
+            <br/>
+            <span style={{ color: '#999' }}>{row.code}</span>
+          </>
+        ),
       },
       {
         title: '认证',
         dataIndex: 'certificationStatus',
-        filters: [
-          { value: 1, text: '已认证' },
-          { value: 2, text: '未认证' },
-          { value: 3, text: '审核种' },
-        ],
+        filters: BpCertificationStatus.map(e => ({
+          value: e.id,
+          text: e.name,
+        })),
+        render: text => formatter(BpCertificationStatus, text),
       },
       {
         title: '冻结',
         dataIndex: 'salesOrderBlock',
-        filters: [
-          { value: 1, text: '冻结' },
-          { value: 2, text: '活跃' },
-        ],
+        filters: SalesOrderBlock.map(e => ({
+          value: e.id,
+          text: e.name,
+        })),
+        render: text => formatter(SalesOrderBlock, text),
       },
       {
         title: '完整',
-        dataIndex: 'dataStatus',
-        filters: [
-          { value: 1, text: '完整' },
-          { value: 2, text: '不完整' },
-        ],
+        dataIndex: 'customerDataStatus',
+        filters: CustomerDataStatus.map(e => ({
+          value: e.id,
+          text: e.name,
+        })),
+        render: text => formatter(CustomerDataStatus, text),
       },
       {
         title: '联系方式',
@@ -114,7 +157,7 @@ class ChooseSoldToParty extends React.Component {
             />
             <Button
               type="primary"
-              onClick={() => this.handleSearch(selectedKeys, confirm)}
+              onClick={() => this.getTableData(selectedKeys, confirm)}
               icon="search"
               size="small"
               style={{ width: 90, marginRight: 8 }}
@@ -128,6 +171,24 @@ class ChooseSoldToParty extends React.Component {
             </Button>
           </div>
         ),
+        render: (text, row) => {
+          const mobilePhoneArr = [];
+          if (row.mobilePhoneCountryCode) mobilePhoneArr.push(row.mobilePhoneCountryCode);
+          if (row.mobilePhone) mobilePhoneArr.push(row.mobilePhone);
+          return (
+            <>
+              {
+                mobilePhoneArr.length > 0 ? (
+                  <>
+                    <span>{mobilePhoneArr.join('-')}</span>
+                    <br/>
+                  </>
+                ) : null
+              }
+              <span>{row.email}</span>
+            </>
+          );
+        },
       },
       {
         title: '收票方',
@@ -141,20 +202,28 @@ class ChooseSoldToParty extends React.Component {
         ),
       },
     ];
+    return columns;
+  }
+
+  render() {
+    const { list, loading, pagination, visible } = this.state;
+    const columns = this.getColumns();
 
     return (
       <Modal
         title="售达方"
-        visible={this.state.visible}
+        visible={visible}
         width="1200px"
         onCancel={() => this.changeVisible(false)}
         footer={null}
       >
         <Table
           rowKey="id"
-          scroll={{ x: tableWidth }}
           dataSource={list}
           columns={columns}
+          loading={loading}
+          onChange={this.tableChange}
+          pagination={{ ...pagination }}
         />
       </Modal>
     );

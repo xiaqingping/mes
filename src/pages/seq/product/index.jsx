@@ -32,7 +32,7 @@ const { Search } = Input;
 @connect(({ seq }) => ({
   sampleType: seq.sampleType,
   seqType: seq.seqType,
-}), undefined, undefined, { withRef: true })
+}), null, null, { withRef: true })
 @Form.create()
 class TopForm extends React.Component {
   constructor(props) {

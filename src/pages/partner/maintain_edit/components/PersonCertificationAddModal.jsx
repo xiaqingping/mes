@@ -66,6 +66,10 @@ class PersonCertificationAddModal extends React.Component {
     });
   }
 
+  searchInvoiceParty = () => {
+    this.ChooseInvoiceParty.wrappedInstance.changeVisible(true)
+  }
+
   render() {
     const { modalVisible, form, handleModalVisible, authorization } = this.props;
     const { uploadUrl } = this.state;
@@ -85,7 +89,7 @@ class PersonCertificationAddModal extends React.Component {
         >
           {form.getFieldDecorator('invoicePartyName', {
             rules: [{ required: true }],
-          })(<Search onSearch={() => this.ChooseInvoiceParty.changeVisible(true)} />)}
+          })(<Search readOnly onSearch={this.searchInvoiceParty} />)}
         </FormItem>
         <FormItem
           labelCol={{ span: 5 }}

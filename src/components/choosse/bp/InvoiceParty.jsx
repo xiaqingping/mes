@@ -10,8 +10,15 @@ import {
   Table,
 } from 'antd';
 import React from 'react';
+import { connect } from 'dva';
 import bp from '@/api/bp';
+import { formatter } from '@/utils/utils'
 
+@connect(({ partnerMaintainEdit }) => ({
+  BpCertificationStatus: partnerMaintainEdit.BpCertificationStatus,
+  SalesOrderBlock: partnerMaintainEdit.SalesOrderBlock,
+  CustomerDataStatus: partnerMaintainEdit.CustomerDataStatus,
+}), null, null, { withRef: true })
 class ChooseInvoiceParty extends React.Component {
   constructor(props) {
     super(props);
@@ -78,6 +85,7 @@ class ChooseInvoiceParty extends React.Component {
   }
 
   getColumns = () => {
+    const { BpCertificationStatus, SalesOrderBlock, CustomerDataStatus } = this.props;
     const columns = [
       {
         title: '收票方',
@@ -108,31 +116,40 @@ class ChooseInvoiceParty extends React.Component {
             </Button>
           </div>
         ),
+        render: (text, row) => (
+          <>
+            <span style={{ color: '#222' }}><Icon type={row.type === 1 ? 'user' : 'home'} /> {row.name}</span>
+            <br/>
+            <span style={{ color: '#999' }}>{row.code}</span>
+          </>
+        ),
       },
       {
         title: '认证',
         dataIndex: 'certificationStatus',
-        filters: [
-          { value: 1, text: '已认证' },
-          { value: 2, text: '未认证' },
-          { value: 3, text: '审核种' },
-        ],
+        filters: BpCertificationStatus.map(e => ({
+          value: e.id,
+          text: e.name,
+        })),
+        render: text => formatter(BpCertificationStatus, text),
       },
       {
         title: '冻结',
         dataIndex: 'salesOrderBlock',
-        filters: [
-          { value: 1, text: '冻结' },
-          { value: 2, text: '活跃' },
-        ],
+        filters: SalesOrderBlock.map(e => ({
+          value: e.id,
+          text: e.name,
+        })),
+        render: text => formatter(SalesOrderBlock, text),
       },
       {
         title: '完整',
-        dataIndex: 'dataStatus',
-        filters: [
-          { value: 1, text: '完整' },
-          { value: 2, text: '不完整' },
-        ],
+        dataIndex: 'customerDataStatus',
+        filters: CustomerDataStatus.map(e => ({
+          value: e.id,
+          text: e.name,
+        })),
+        render: text => formatter(CustomerDataStatus, text),
       },
       {
         title: '联系方式',
@@ -161,6 +178,26 @@ class ChooseInvoiceParty extends React.Component {
             </Button>
           </div>
         ),
+        render: (text, row) => {
+          const telephoneArr = [];
+          if (row.telephoneCountryCode) telephoneArr.push(row.telephoneCountryCode);
+          if (row.telephoneAreaCode) telephoneArr.push(row.telephoneAreaCode);
+          if (row.telephone) telephoneArr.push(row.telephone);
+          if (row.telephoneExtension) telephoneArr.push(row.telephoneExtension);
+          return (
+            <>
+              {
+                telephoneArr.length > 0 ? (
+                  <>
+                    <span>{telephoneArr.join('-')}</span>
+                    <br/>
+                  </>
+                ) : null
+              }
+              <span>{row.email}</span>
+            </>
+          );
+        },
       },
       {
         title: '操作',
@@ -175,7 +212,6 @@ class ChooseInvoiceParty extends React.Component {
 
   render() {
     const { list, loading, pagination, visible } = this.state;
-    const tableWidth = 0;
     const columns = this.getColumns();
 
     return (
@@ -188,7 +224,6 @@ class ChooseInvoiceParty extends React.Component {
       >
         <Table
           rowKey="id"
-          scroll={{ x: tableWidth }}
           dataSource={list}
           columns={columns}
           loading={loading}

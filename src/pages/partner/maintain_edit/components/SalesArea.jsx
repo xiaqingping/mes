@@ -181,7 +181,7 @@ class FormContent extends React.Component {
     salesOrganizations,
     distributionChannels,
   };
-}, undefined, undefined, { withRef: true })
+}, null, null, { withRef: true })
 class SalesArea extends React.Component {
   constructor(props) {
     super(props);

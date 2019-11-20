@@ -53,7 +53,7 @@ const { Option } = Select;
     countryTimeZone: basicCache.countryTimeZone,
     countryProvinceTimeZone: basicCache.countryProvinceTimeZone,
   };
-}, undefined, undefined, { withRef: true })
+}, null, null, { withRef: true })
 class Basic extends React.Component {
   constructor(props) {
     super(props);

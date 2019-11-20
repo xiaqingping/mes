@@ -175,7 +175,7 @@ class FormContent extends React.Component {
   // 采购组织
   const { purchaseOrganizations } = basicCache;
   return { details, vendor, purchasingOrganizationList, purchaseOrganizations };
-}, undefined, undefined, { withRef: true })
+}, null, null, { withRef: true })
 class PurchasingOrg extends React.Component {
   constructor(props) {
     super(props);

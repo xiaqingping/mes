@@ -18,19 +18,40 @@ class ChooseSalesPerson extends React.Component {
     super(props);
     this.state = {
       visible: false,
+      loading: false,
       list: [],
+      pagination: {
+        current: 1,
+        pageSize: 10,
+        total: 0,
+      },
     };
   }
 
   changeVisible = visible => {
     this.setState({ visible });
-    if (visible) this.handleSearch({ page: 1 });
+    if (visible) this.getTableData({ page: 1 });
   }
 
-  handleSearch = data => {
-    console.log(data);
-    employees.getSaler({ page: 1, pageSize: 10 }).then(res => {
-      console.log(res);
+  getTableData = (options = {}) => {
+    const { pagination } = this.state;
+    const query = Object.assign({}, {
+      page: pagination.current,
+      pageSize: pagination.pageSize,
+    }, options);
+
+    this.setState({ loading: true });
+    employees.getSaler(query).then(res => {
+      this.setState({
+        list: res.results,
+        pagination: {
+          current: query.page,
+          pageSize: query.pageSize,
+          total: res.total,
+        },
+      });
+    }).finally(() => {
+      this.setState({ loading: false });
     });
   }
 
@@ -43,9 +64,7 @@ class ChooseSalesPerson extends React.Component {
     this.setState({ visible: false });
   }
 
-  render() {
-    const { list } = this.state;
-    const tableWidth = 0;
+  getColumns = () => {
     const columns = [
       {
         title: '销售员',
@@ -58,7 +77,7 @@ class ChooseSalesPerson extends React.Component {
             <AutoComplete style={{ width: 188, marginBottom: 8, display: 'block' }} />
             <Button
               type="primary"
-              onClick={() => this.handleSearch(selectedKeys, confirm)}
+              onClick={() => this.getTableData(selectedKeys, confirm)}
               icon="search"
               size="small"
               style={{ width: 90, marginRight: 8 }}
@@ -86,7 +105,7 @@ class ChooseSalesPerson extends React.Component {
             <Cascader style={{ width: 188, marginBottom: 8, display: 'block' }} options={[]} />
             <Button
               type="primary"
-              onClick={() => this.handleSearch(selectedKeys, confirm)}
+              onClick={() => this.getTableData(selectedKeys, confirm)}
               icon="search"
               size="small"
               style={{ width: 90, marginRight: 8 }}
@@ -116,7 +135,7 @@ class ChooseSalesPerson extends React.Component {
             />
             <Button
               type="primary"
-              onClick={() => this.handleSearch(selectedKeys, confirm)}
+              onClick={() => this.getTableData(selectedKeys, confirm)}
               icon="search"
               size="small"
               style={{ width: 90, marginRight: 8 }}
@@ -139,20 +158,28 @@ class ChooseSalesPerson extends React.Component {
         ),
       },
     ];
+    return columns;
+  }
+
+  render() {
+    const { list, loading, pagination, visible } = this.state;
+    const columns = this.getColumns();
 
     return (
       <Modal
         title="销售员"
-        visible={this.state.visible}
+        visible={visible}
         width="1200px"
         onCancel={() => this.changeVisible(false)}
         footer={null}
       >
         <Table
           rowKey="id"
-          scroll={{ x: tableWidth }}
           dataSource={list}
           columns={columns}
+          loading={loading}
+          onChange={this.tableChange}
+          pagination={{ ...pagination }}
         />
       </Modal>
     );

@@ -29,7 +29,7 @@ const { Option } = Select;
   // 国家
   const countrys = basicCache.countrys.filter(byLangFilter);
   return { details, basic, vendor, paymentBank, countrys };
-}, undefined, undefined, { withRef: true })
+}, null, null, { withRef: true })
 class Bank extends Component {
   constructor(props) {
     super(props);
