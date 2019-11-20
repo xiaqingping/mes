@@ -130,6 +130,7 @@ class StandardTable extends Component {
           />
         </div>
         <Table
+          size="small"
           rowKey={rowKey || 'id'}
           rowSelection={rowSelection}
           dataSource={list}

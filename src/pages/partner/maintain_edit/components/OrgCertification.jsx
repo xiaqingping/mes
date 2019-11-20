@@ -219,13 +219,9 @@ class OrgCertification extends Component {
     const {
       form: { getFieldDecorator },
       organizationCertification: orgData,
+      authorization,
     } = this.props;
-
-    const fileList = orgData.attachmentList && orgData.attachmentList.map(e => ({
-      uid: e.code,
-      name: e.name,
-      url: e.code,
-    }));
+    const { uploadUrl } = this.state;
 
     return (
       <Form>
@@ -250,15 +246,16 @@ class OrgCertification extends Component {
             <FormItem label="认证图片">
               {getFieldDecorator('attachmentList', {
                 rules: [{ required: true }],
-                valuePropName: 'attachmentList',
+                valuePropName: 'fileList',
                 getValueFromEvent: this.normFile,
               })(<Upload
-                name="file"
+                name="files"
+                multiple
                 listType="picture-card"
                 showUploadList
-                action="/upload"
+                action={uploadUrl}
                 accept=".jpg,.png"
-                fileList={fileList}
+                headers={{ Authorization: authorization }}
                 onChange={value => this.valueChange('attachmentList', value)}
               >
                 {this.uploadButton()}
@@ -281,17 +278,12 @@ class OrgCertification extends Component {
     const { details: { basic } } = this.props;
     const { countryCode } = basic;
     let form;
-    switch (countryCode) {
-      case 'CN':
-        form = this.renderChina;
-        break;
-      case 'US':
-        form = this.renderOther;
-        break;
-      default:
-        form = this.renderChina;
-        break;
-    }
+
+    if (!countryCode) form = this.renderChina;
+    if (countryCode) form = this.renderOther;
+    if (countryCode === 'CN') form = this.renderChina;
+    if (countryCode === 'US') form = this.renderOther;
+    if (countryCode === 'GB') form = this.renderChina;
     return form();
   }
 
