@@ -125,6 +125,10 @@ class ShipToParty extends React.Component {
     this.setStore(newTableData);
   }
 
+  searchShipToParty = () => {
+    this.ChooseShipToParty.wrappedInstance.changeVisible(true)
+  }
+
   render() {
     const { tableData } = this.props;
     const components = {
@@ -138,7 +142,7 @@ class ShipToParty extends React.Component {
         dataIndex: 'name',
         width: '40%',
         editable: true,
-        inputType: <Search onSearch={() => this.ChooseShipToParty.changeVisible(true)} />,
+        inputType: <Search onSearch={this.searchShipToParty} />,
         editOptions: {
           rules: [
             { required: true },

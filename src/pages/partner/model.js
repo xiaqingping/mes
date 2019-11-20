@@ -27,6 +27,11 @@ const SeqModel = {
       { id: 1, name: '人员' },
       { id: 2, name: '组织' },
     ],
+    // 客户数据状态
+    CustomerDataStatus: [
+      { id: 1, name: '完整' },
+      { id: 2, name: '不完整' },
+    ],
     // 邮箱认证状态
     EmailVerifyStatus: [
       { id: 'N', name: '未验证' },

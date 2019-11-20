@@ -125,6 +125,10 @@ class SoldToParty extends React.Component {
     this.setStore(newTableData);
   }
 
+  searchSoldToParty = () => {
+    this.ChooseSoldToParty.wrappedInstance.changeVisible(true)
+  }
+
   render() {
     const { tableData } = this.props;
     const components = {
@@ -139,7 +143,7 @@ class SoldToParty extends React.Component {
         dataIndex: 'name',
         width: '40%',
         editable: true,
-        inputType: <Search onSearch={() => this.ChooseSoldToParty.changeVisible(true)} />,
+        inputType: <Search onSearch={this.searchSoldToParty} />,
         editOptions: {
           rules: [
             { required: true },

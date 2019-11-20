@@ -10,26 +10,53 @@ import {
   Icon,
 } from 'antd';
 import React from 'react';
+import { connect } from 'dva';
 import bp from '@/api/bp';
 
+@connect(({ partnerMaintainEdit }) => ({
+  BpCertificationStatus: partnerMaintainEdit.BpCertificationStatus,
+  SalesOrderBlock: partnerMaintainEdit.SalesOrderBlock,
+  CustomerDataStatus: partnerMaintainEdit.CustomerDataStatus,
+}), null, null, { withRef: true })
 class ChooseShipToParty extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       visible: false,
+      loading: false,
       list: [],
+      pagination: {
+        current: 1,
+        pageSize: 10,
+        total: 0,
+      },
     };
   }
 
   changeVisible = visible => {
     this.setState({ visible });
-    if (visible) this.handleSearch({ page: 1 });
+    if (visible) this.getTableData({ page: 1 });
   }
 
-  handleSearch = data => {
-    console.log(data);
-    bp.getShipToParty({ page: 1, pageSize: 10 }).then(res => {
-      console.log(res);
+  getTableData = (options = {}) => {
+    const { pagination } = this.state;
+    const query = Object.assign({}, {
+      page: pagination.current,
+      pageSize: pagination.pageSize,
+    }, options);
+
+    this.setState({ loading: true });
+    bp.getShipToParty(query).then(res => {
+      this.setState({
+        list: res.results,
+        pagination: {
+          current: query.page,
+          pageSize: query.pageSize,
+          total: res.total,
+        },
+      });
+    }).finally(() => {
+      this.setState({ loading: false });
     });
   }
 
@@ -42,9 +69,7 @@ class ChooseShipToParty extends React.Component {
     this.setState({ visible: false });
   }
 
-  render() {
-    const { list } = this.state;
-    const tableWidth = 0;
+  getColumns = () => {
     const columns = [
       {
         title: '送达方',
@@ -59,7 +84,7 @@ class ChooseShipToParty extends React.Component {
             />
             <Button
               type="primary"
-              onClick={() => this.handleSearch(selectedKeys, confirm)}
+              onClick={() => this.getTableData(selectedKeys, confirm)}
               icon="search"
               size="small"
               style={{ width: 90, marginRight: 8 }}
@@ -75,6 +100,13 @@ class ChooseShipToParty extends React.Component {
             </Button>
           </div>
         ),
+        render: (text, row) => (
+          <>
+            <span style={{ color: '#222' }}><Icon type={row.type === 1 ? 'user' : 'home'} /> {row.name}</span>
+            <br/>
+            <span style={{ color: '#999' }}>{row.code}</span>
+          </>
+        ),
       },
       {
         title: '联系方式',
@@ -89,7 +121,7 @@ class ChooseShipToParty extends React.Component {
             />
             <Button
               type="primary"
-              onClick={() => this.handleSearch(selectedKeys, confirm)}
+              onClick={() => this.getTableData(selectedKeys, confirm)}
               icon="search"
               size="small"
               style={{ width: 90, marginRight: 8 }}
@@ -103,6 +135,24 @@ class ChooseShipToParty extends React.Component {
             </Button>
           </div>
         ),
+        render: (text, row) => {
+          const mobilePhoneArr = [];
+          if (row.mobilePhoneCountryCode) mobilePhoneArr.push(row.mobilePhoneCountryCode);
+          if (row.mobilePhone) mobilePhoneArr.push(row.mobilePhone);
+          return (
+            <>
+              {
+                mobilePhoneArr.length > 0 ? (
+                  <>
+                    <span>{mobilePhoneArr.join('-')}</span>
+                    <br/>
+                  </>
+                ) : null
+              }
+              <span>{row.email}</span>
+            </>
+          );
+        },
       },
       {
         title: '操作',
@@ -112,20 +162,28 @@ class ChooseShipToParty extends React.Component {
         ),
       },
     ];
+    return columns;
+  }
+
+  render() {
+    const { list, loading, pagination, visible } = this.state;
+    const columns = this.getColumns();
 
     return (
       <Modal
         title="送达方"
-        visible={this.state.visible}
+        visible={visible}
         width="1200px"
         onCancel={() => this.changeVisible(false)}
         footer={null}
       >
         <Table
           rowKey="id"
-          scroll={{ x: tableWidth }}
           dataSource={list}
           columns={columns}
+          loading={loading}
+          onChange={this.tableChange}
+          pagination={{ ...pagination }}
         />
       </Modal>
     );

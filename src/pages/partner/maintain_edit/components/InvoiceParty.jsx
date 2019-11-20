@@ -125,6 +125,10 @@ class InvoiceParty extends React.Component {
     this.setStore(newTableData);
   }
 
+  searchInvoiceParty = () => {
+    this.ChooseInvoiceParty.wrappedInstance.changeVisible(true)
+  }
+
   render() {
     const { tableData } = this.props;
     const components = {
@@ -139,7 +143,7 @@ class InvoiceParty extends React.Component {
         dataIndex: 'name',
         width: '40%',
         editable: true,
-        inputType: <Search onSearch={() => this.ChooseInvoiceParty.changeVisible(true)} />,
+        inputType: <Search onSearch={this.searchInvoiceParty} />,
         editOptions: {
           rules: [
             { required: true },

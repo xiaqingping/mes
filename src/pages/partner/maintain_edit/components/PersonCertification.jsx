@@ -26,6 +26,7 @@ class PersonCertification extends React.Component {
     super(props);
     this.state = {
       addModalVisible: false,
+      id: 0,
     };
   }
 
@@ -59,7 +60,12 @@ class PersonCertification extends React.Component {
               {
                 item.attachmentList.map(pic => {
                   const url = disk.downloadFiles(pic.code, { view: true });
-                  return <img style={{ width: 80, height: 80, marginRight: 5 }} src={url} alt=""/>;
+                  return <img
+                    key={pic.code}
+                    style={{ width: 80, height: 80, marginRight: 5 }}
+                    src={url}
+                    alt={pic.name}
+                  />;
                 })
               }
             </div>
@@ -91,10 +97,7 @@ class PersonCertification extends React.Component {
     const { details, piCertification } = this.props;
 
     const data = piCertification.filter(e => e.id !== id);
-    // this.props.dispatch({
-    //   type: 'bpEdit/setDetails',
-    //   payload: { ...details, piCertification: data },
-    // });
+
     this.props.dispatch({
       type: 'bpEdit/setState',
       payload: {
@@ -105,8 +108,8 @@ class PersonCertification extends React.Component {
   }
 
   handleAdd = data => {
-    console.log(data);
     const { details, piCertification } = this.props;
+    const { id } = this.state;
 
     const attachmentList = data.attachmentList.map(e => ({
       code: (e.response && e.response[0]) || '',
@@ -114,9 +117,12 @@ class PersonCertification extends React.Component {
       type: e.type,
     }));
     this.handleModalVisible();
+    const newId = id - 1;
+
+    this.setState({ id: newId });
 
     const obj = {
-      id: Math.random(),
+      id: newId,
       invoicePartyId: 123,
       invoicePartyCode: 12345,
       invoicePartyName: data.invoicePartyName,
