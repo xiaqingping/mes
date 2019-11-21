@@ -115,8 +115,9 @@ class FormContent extends React.Component {
                 initialValue: data.levelCode,
               })(
                 <Select onChange={value => valueChange('levelCode', value)}>
-                  <Option value="1">级别1</Option>
-                  <Option value="2">级别2</Option>
+                  <Option value="A">重要</Option>
+                  <Option value="B">比较重要</Option>
+                  <Option value="C">一般</Option>
                 </Select>,
               )}
             </FormItem>
