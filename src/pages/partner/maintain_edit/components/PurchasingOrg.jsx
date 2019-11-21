@@ -10,10 +10,13 @@ import {
   Empty,
   Icon,
   Cascader,
+  AutoComplete,
 } from 'antd';
 import { connect } from 'dva';
 import React from 'react';
+import _ from 'lodash';
 import { MobilePhoneInput } from '@/components/CustomizedFormControls';
+import employees from '@/api/employees';
 
 const FormItem = Form.Item;
 const { Option } = Select;
@@ -94,9 +97,7 @@ class FormContent extends React.Component {
               {getFieldDecorator('salerName', {
                 rules: [{ required: true }],
                 initialValue: data.salerName,
-              })(
-                <Input onChange={e => valueChange('salerName', e.target.value)}/>,
-              )}
+              })(<Input onChange={e => valueChange('salerName', e.target.value)} />)}
             </FormItem>
           </Col>
           <Col md={6}>
@@ -112,6 +113,8 @@ class FormContent extends React.Component {
               )}
             </FormItem>
           </Col>
+        </Row>
+        <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
           <Col md={6}>
             <FormItem label="供应商级别">
               {getFieldDecorator('levelCode', {
