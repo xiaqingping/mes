@@ -124,13 +124,17 @@ class Basic extends React.Component {
   }
 
   checkAddress = (rule, value, callback) => {
-    const { changedValue: { option = [] } } = value;
+    const { address, changedValue: { option = [] } } = value;
     if (option.length > 0) {
       const last = option[option.length - 1];
       if (last.isMustLow === 1 && last.level !== 5) {
         callback('必须选择下一级');
         return;
       }
+    }
+    if (!address) {
+      callback('详细地址必填');
+      return;
     }
     callback();
   }
@@ -343,6 +347,7 @@ class Basic extends React.Component {
               <FormItem label="邮政编码">
                 {getFieldDecorator('postCode', {
                   initialValue: basic.postCode,
+                  rules: [{ pattern: /^\d+$/, message: '必须数字' }],
                 })(<Input onChange={e => this.valueChange('postCode', e.target.value)} />)}
               </FormItem>
             </Col>

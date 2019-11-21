@@ -93,7 +93,10 @@ class Bank extends Component {
                   initialValue: paymentBank.countryCode,
                   rules: [{ required: true }],
                 })(
-                  <Select onChange={value => this.valueChange('countryCode', value)}>
+                  <Select
+                    showSearch
+                    filterOption={(input, option) => option.props.children.indexOf(input) >= 0}
+                    onChange={value => this.valueChange('countryCode', value)}>
                     {
                       countrys.map(e =>
                         <Option key={e.code} value={e.code}>{e.name}</Option>,

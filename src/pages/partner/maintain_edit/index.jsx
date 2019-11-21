@@ -156,8 +156,9 @@ class CustomerEdit extends Component {
     // const basicResult = await validateForm(basicForm)
     // if (!basicResult[0]) return;
 
-    const { editType } = this.state;
     console.log(this.state.details);
+
+    const { editType } = this.state;
     if (editType === 'add') {
       this.add();
     } else {
