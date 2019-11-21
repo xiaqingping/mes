@@ -2,13 +2,13 @@ import {
   Button,
   Table,
   Input,
-  InputNumber,
   Divider,
   Form,
   Card,
 } from 'antd';
 import React from 'react';
 import { connect } from 'dva';
+import _ from 'lodash';
 
 import { validateForm } from '@/utils/utils';
 import { MobilePhoneInput, AddressInput } from '@/components/CustomizedFormControls'
@@ -119,9 +119,7 @@ class EditableTable extends React.Component {
         editable: true,
         inputType: <Input />,
         editOptions: {
-          rules: [
-            { required: true },
-          ],
+          rules: [{ pattern: /^\d+$/, message: '必须数字' }],
         },
       },
       {
@@ -172,16 +170,23 @@ class EditableTable extends React.Component {
         },
       },
     ];
+    // 防抖
+    this.checkAddress = _.debounce(this.checkAddress, 500);
   }
 
   checkAddress = (rule, value, callback) => {
-    const { changedValue: { option = [] } } = value;
+    const { address, changedValue = {} } = value;
+    const { option = [] } = changedValue;
     if (option.length > 0) {
       const last = option[option.length - 1];
       if (last.isMustLow === 1 && last.level !== 5) {
         callback('必须选择下一级');
         return;
       }
+    }
+    if (!address) {
+      callback('详细地址必填');
+      return;
     }
     callback();
   }

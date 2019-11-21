@@ -210,7 +210,16 @@ class SalesArea extends React.Component {
 
     const newSalesAreaList = salesAreaList.map(e => {
       const itemKey = `${e.salesOrganizationCode}-${e.distributionChannelCode}`;
-      if (itemKey === tabKey) {
+      // 如果本次修改的是直销[10]或电商[20]，则生成另一个对应的key
+      let matchKey;
+      const arr = ['10', '20'];
+      const codeIndex = arr.indexOf(tabKey.split('-')[1]);
+      if (codeIndex !== -1) {
+        arr.splice(codeIndex, 1);
+        matchKey = `${e.salesOrganizationCode}-${arr[0]}`;
+      }
+
+      if (itemKey === tabKey || itemKey === matchKey) {
         if (key === 'regionOffice') {
           const [regionCode, officeCode] = value;
           e.regionCode = regionCode;
@@ -240,15 +249,31 @@ class SalesArea extends React.Component {
 
   // 级联选泽销售范围时
   onCascaderChange = arr => {
+    const { salesArea } = this.formatSalesArea();
     const [salesOrganizationCode, distributionChannelCode] = arr;
     const { details, customer, salesAreaList: tabsData } = this.props;
-
     const tabKey = `${salesOrganizationCode}-${distributionChannelCode}`;
-    const newSalesAreaList = [].concat(tabsData, {
-      salesOrganizationCode,
-      distributionChannelCode,
-    });
 
+    // 新增的数据，最多可以一次新增两条，当同一个销售组织下，同时存在直销[10]和电商[20]两个销售渠道时
+    // 新增一个时，会把另一个也新增进去
+    const addArr = [];
+    if (distributionChannelCode === '10' || distributionChannelCode === '20') {
+      salesArea.forEach(e1 => {
+        if (e1.value === salesOrganizationCode) {
+          e1.children.forEach(e2 => {
+            if (e2.value === '10' || e2.value === '20') {
+              addArr.push({
+                salesOrganizationCode: e1.value,
+                distributionChannelCode: e2.value,
+              });
+            }
+          });
+        }
+      });
+    }
+    if (addArr.length !== 2) addArr.push({ salesOrganizationCode, distributionChannelCode });
+
+    const newSalesAreaList = [].concat(tabsData, ...addArr);
     const newCustomer = { ...customer, ...{ salesAreaList: newSalesAreaList } };
     const newDetails = { ...details, ...{ customer: newCustomer } };
 

@@ -152,12 +152,13 @@ class CustomerEdit extends Component {
   // 提交
   validate = async () => {
     // 验证basic
-    // const basicForm = this.basicView.wrappedInstance.props.form;
-    // const basicResult = await validateForm(basicForm)
-    // if (!basicResult[0]) return;
+    const basicForm = this.basicView.wrappedInstance.props.form;
+    const basicResult = await validateForm(basicForm)
+    if (!basicResult[0]) return;
+
+    console.log(this.state.details);
 
     const { editType } = this.state;
-    console.log(this.state.details);
     if (editType === 'add') {
       this.add();
     } else {
