@@ -55,7 +55,11 @@ class FormContent extends React.Component {
                 rules: [{ required: true }],
                 initialValue: data.currencyCode,
               })(
-                <Select onChange={value => valueChange('currencyCode', value)}>
+                <Select
+                  onChange={value => valueChange('currencyCode', value)}
+                  showSearch
+                  filterOption={(input, option) => option.props.children.indexOf(input) >= 0}
+                >
                   {
                     currencies.map(e =>
                       <Option key={e.code} value={e.code}>{e.shortText}</Option>,

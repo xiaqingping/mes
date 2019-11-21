@@ -154,7 +154,13 @@ export class MobilePhoneInput extends React.Component {
 
     return (
       <InputGroup compact>
-        <Select value={mobilePhoneCountryCode} style={{ width: '40%' }} onChange={val => this.valueChange({ mobilePhoneCountryCode: val })}>
+        <Select
+          style={{ width: '40%' }}
+          value={mobilePhoneCountryCode}
+          onChange={val => this.valueChange({ mobilePhoneCountryCode: val })}
+          showSearch
+          filterOption={(input, option) => option.props.children[1].indexOf(input) >= 0}
+        >
           {
             countryDiallingCodes.map(e => (
               <Option
@@ -213,7 +219,13 @@ export class TelphoneInput extends React.Component {
     const { countryDiallingCodes } = this.props;
     return (
       <InputGroup compact>
-        <Select value={telephoneCountryCode} style={{ width: '30%' }} onChange={val => this.valueChange({ telephoneCountryCode: val })}>
+        <Select
+          value={telephoneCountryCode}
+          style={{ width: '30%' }}
+          onChange={val => this.valueChange({ telephoneCountryCode: val })}
+          showSearch
+          filterOption={(input, option) => option.props.children[1].indexOf(input) >= 0}
+        >
           {
             countryDiallingCodes.map(e => (
               <Option
@@ -274,7 +286,13 @@ export class FaxInput extends React.Component {
     const { countryDiallingCodes } = this.props;
     return (
       <InputGroup compact>
-        <Select value={faxCountryCode} style={{ width: '30%' }} onChange={val => this.valueChange({ faxCountryCode: val })}>
+        <Select
+          value={faxCountryCode}
+          style={{ width: '30%' }}
+          onChange={val => this.valueChange({ faxCountryCode: val })}
+          showSearch
+          filterOption={(input, option) => option.props.children[1].indexOf(input) >= 0}
+        >
           {
             countryDiallingCodes.map(e => (
               <Option

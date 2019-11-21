@@ -13,6 +13,7 @@ import {
 } from 'antd';
 import React, { Component } from 'react';
 import { connect } from 'dva';
+import debounce from 'lodash/debounce';
 import { TelphoneInput } from '@/components/CustomizedFormControls';
 import disk from '@/api/disk';
 import basicAPI from '@/api/basic';
@@ -40,15 +41,15 @@ class OrgCertification extends Component {
       bank: [],
       bankFetching: false,
     };
+    // 防抖
+    this.fetchBank = debounce(this.fetchBank, 800);
   }
 
   valueChange = (key, value) => {
     const { details, organizationCertification } = this.props;
     if (key === 'attachmentList') {
-      console.log(value);
       if (value.file.response) {
         value = value.fileList.map(e => {
-          console.log(e.response);
           if (e.status === 'error') requestErr(e.response);
           return {
             code: (e.response && e.response[0]) || '',

@@ -97,7 +97,11 @@ class FormContent extends React.Component {
               {getFieldDecorator('currencyCode', {
                 initialValue: data.currencyCode,
               })(
-                <Select onChange={value => valueChange('currencyCode', value)}>
+                <Select
+                  showSearch
+                  filterOption={(input, option) => option.props.children.indexOf(input) >= 0}
+                  onChange={value => valueChange('currencyCode', value)}
+                >
                   {
                     currencies.map(e =>
                       <Option key={e.code} value={e.code}>{e.shortText}</Option>,
@@ -212,10 +216,6 @@ class SalesArea extends React.Component {
     const newCustomer = { ...customer, ...{ salesAreaList: newSalesAreaList } };
     const newDetails = { ...details, ...{ customer: newCustomer } };
 
-    // this.props.dispatch({
-    //   type: 'bpEdit/setDetails',
-    //   payload: newDetails,
-    // });
     this.props.dispatch({
       type: 'bpEdit/setState',
       payload: {
@@ -244,10 +244,6 @@ class SalesArea extends React.Component {
     const newCustomer = { ...customer, ...{ salesAreaList: newSalesAreaList } };
     const newDetails = { ...details, ...{ customer: newCustomer } };
 
-    // this.props.dispatch({
-    //   type: 'bpEdit/setDetails',
-    //   payload: newDetails,
-    // });
     this.props.dispatch({
       type: 'bpEdit/setState',
       payload: {

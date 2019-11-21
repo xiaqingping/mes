@@ -19,9 +19,8 @@ const service = axios.create({
   timeout: 6000,
 });
 
-const requestErr = response => {
+const requestErr = data => {
   let errMsg = ['系统异常,请与系统管理员联系!'];
-  const data = response && response.data;
 
   if (data) {
     if (data.message) {
@@ -49,13 +48,10 @@ const requestErr = response => {
 }
 
 const err = error => {
-  const { response } = error;
-  if (response) {
-    const { data } = response;
-    requestErr(data);
-    return Promise.reject(data);
-  }
-  return Promise.reject(response);
+  const { response = {} } = error;
+  const { data } = response;
+  requestErr(data);
+  return Promise.reject(data);
 };
 
 // 请求拦截

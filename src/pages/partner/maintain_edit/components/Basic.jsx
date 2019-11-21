@@ -375,7 +375,7 @@ class Basic extends React.Component {
                           }
                           return <Option key={e.id} value={e.id}>{e.name}</Option>
                         }
-                        return null;
+                        return <Option key={e.id} value={e.id}>{e.name}</Option>
                       })
                     }
                   </Select>,

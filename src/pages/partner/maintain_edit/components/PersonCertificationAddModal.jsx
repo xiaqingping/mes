@@ -9,6 +9,7 @@ import React from 'react';
 import { connect } from 'dva';
 import disk from '@/api/disk';
 import ChooseInvoiceParty from '@/components/choosse/bp/InvoiceParty';
+import { requestErr } from '@/utils/request';
 
 const FormItem = Form.Item;
 const { Search } = Input;
@@ -66,6 +67,16 @@ class PersonCertificationAddModal extends React.Component {
     });
   }
 
+  valueChange = (key, value) => {
+    if (key === 'attachmentList') {
+      if (value.file.response) {
+        value.fileList.forEach(e => {
+          if (e.status === 'error') requestErr(e.response);
+        });
+      }
+    }
+  }
+
   searchInvoiceParty = () => {
     this.ChooseInvoiceParty.wrappedInstance.changeVisible(true)
   }
@@ -117,6 +128,7 @@ class PersonCertificationAddModal extends React.Component {
             action={uploadUrl}
             accept=".jpg,.png"
             headers={{ Authorization: authorization }}
+            onChange={value => this.valueChange('attachmentList', value)}
           >
             {this.uploadButton()}
           </Upload>)}
