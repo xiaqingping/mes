@@ -175,7 +175,8 @@ class EditableTable extends React.Component {
   }
 
   checkAddress = (rule, value, callback) => {
-    const { address, changedValue: { option = [] } } = value;
+    const { address, changedValue = {} } = value;
+    const { option = [] } = changedValue;
     if (option.length > 0) {
       const last = option[option.length - 1];
       if (last.isMustLow === 1 && last.level !== 5) {
