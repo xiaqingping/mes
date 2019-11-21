@@ -19,7 +19,7 @@ const FormItem = Form.Item;
 const { Option } = Select;
 
 @Form.create()
-@connect(({ global, basicCache }) => {
+@connect(({ global, basicCache, partnerMaintainEdit }) => {
   function byLangFilter(e) {
     return e.languageCode === global.languageCode;
   }
@@ -31,7 +31,10 @@ const { Option } = Select;
   // 采购组
   const { purchaseGroups } = basicCache;
 
-  return { currencies, paymentTerms, purchaseGroups };
+  // 供应商级别
+  const { VendorLevelCode } = partnerMaintainEdit;
+
+  return { currencies, paymentTerms, purchaseGroups, VendorLevelCode };
 })
 class FormContent extends React.Component {
   render() {
@@ -43,6 +46,7 @@ class FormContent extends React.Component {
       currencies,
       paymentTerms,
       purchaseGroups,
+      VendorLevelCode,
     } = this.props;
 
     if (tabKey !== data.purchasingOrganizationCode) return null;
@@ -115,9 +119,9 @@ class FormContent extends React.Component {
                 initialValue: data.levelCode,
               })(
                 <Select onChange={value => valueChange('levelCode', value)}>
-                  <Option value="A">重要</Option>
-                  <Option value="B">比较重要</Option>
-                  <Option value="C">一般</Option>
+                  {
+                    VendorLevelCode.map(e => <Option key={e.id} value={e.id}>{e.name}</Option>)
+                  }
                 </Select>,
               )}
             </FormItem>
@@ -211,10 +215,6 @@ class PurchasingOrg extends React.Component {
     };
     const newDetails = { ...details, ...{ vendor: newVendor } };
 
-    // this.props.dispatch({
-    //   type: 'bpEdit/setDetails',
-    //   payload: newDetails,
-    // });
     this.props.dispatch({
       type: 'bpEdit/setState',
       payload: {
@@ -244,10 +244,6 @@ class PurchasingOrg extends React.Component {
     };
     const newDetails = { ...details, ...{ vendor: newVendor } };
 
-    // this.props.dispatch({
-    //   type: 'bpEdit/setDetails',
-    //   payload: newDetails,
-    // });
     this.props.dispatch({
       type: 'bpEdit/setState',
       payload: {
@@ -317,10 +313,6 @@ class PurchasingOrg extends React.Component {
     const newVendor = { ...vendor, ...{ purchasingOrganizationList: newTabsData } };
     const newDetails = { ...details, ...{ vendor: newVendor } };
 
-    // this.props.dispatch({
-    //   type: 'bpEdit/setDetails',
-    //   payload: newDetails,
-    // });
     this.props.dispatch({
       type: 'bpEdit/setState',
       payload: {

@@ -65,6 +65,7 @@ class Basic extends React.Component {
     this.checkNameInput = _.debounce(this.checkNameInput, 500);
     this.checkEmail = _.debounce(this.checkEmail, 500);
     this.checkMobilePhone = _.debounce(this.checkMobilePhone, 500);
+    this.checkAddress = _.debounce(this.checkAddress, 500);
   }
 
   // validate = () => {
@@ -120,6 +121,18 @@ class Basic extends React.Component {
         callback('移动电话重复');
       }
     });
+  }
+
+  checkAddress = (rule, value, callback) => {
+    const { changedValue: { option = [] } } = value;
+    if (option.length > 0) {
+      const last = option[option.length - 1];
+      if (last.isMustLow === 1 && last.level !== 5) {
+        callback('必须选择下一级');
+        return;
+      }
+    }
+    callback();
   }
 
   valueChange = (key, value) => {
@@ -385,6 +398,7 @@ class Basic extends React.Component {
             <Col md={18} sm={24}>
               <FormItem label="通讯地址">
                 {getFieldDecorator('address', {
+                  rules: [{ asyncValidator: this.checkAddress }],
                   initialValue: {
                     countryCode: basic.countryCode,
                     provinceCode: basic.provinceCode,

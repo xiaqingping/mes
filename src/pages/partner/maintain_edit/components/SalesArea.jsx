@@ -25,7 +25,7 @@ const { Option } = Select;
 const { TabPane } = Tabs;
 
 @Form.create()
-@connect(({ global, basicCache, bpEdit }) => {
+@connect(({ global, basicCache, bpEdit, partnerMaintainEdit }) => {
   function byLangFilter(e) {
     return e.languageCode === global.languageCode;
   }
@@ -41,11 +41,15 @@ const { TabPane } = Tabs;
   const details = bpEdit.details || {};
   const basicInfo = details.basic || {};
 
+  // 默认开票类型
+  const { DefaultInvoiceType } = partnerMaintainEdit;
+
   return {
     salesPaymentMethods,
     regionOffice,
     currencies,
     basicInfo,
+    DefaultInvoiceType,
   };
 })
 class FormContent extends React.Component {
@@ -58,6 +62,7 @@ class FormContent extends React.Component {
       salesPaymentMethods,
       regionOffice,
       currencies,
+      DefaultInvoiceType,
     } = this.props;
     const countryCode = basicInfo.countryCode || 'CN';
 
@@ -119,8 +124,11 @@ class FormContent extends React.Component {
                     initialValue: data.defaultInvoiceTypeCode,
                   })(
                     <Radio.Group onChange={e => valueChange('defaultInvoiceTypeCode', e.target.value)}>
-                      <Radio.Button value="a">增值税专用发票</Radio.Button>
-                      <Radio.Button value="b">增值税普通发票</Radio.Button>
+                      {
+                        DefaultInvoiceType.map(e =>
+                          <Radio.Button key={e.id} value={e.id}>{e.name}</Radio.Button>,
+                        )
+                      }
                     </Radio.Group>,
                   )}
                 </FormItem>

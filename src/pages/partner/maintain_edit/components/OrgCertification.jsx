@@ -219,7 +219,7 @@ class OrgCertification extends Component {
     );
   }
 
-  renderOther = () => {
+  renderOther = countryCode => {
     const {
       form: { getFieldDecorator },
       organizationCertification: orgData,
@@ -238,7 +238,7 @@ class OrgCertification extends Component {
                 </FormItem>
               </Col>
               <Col span={24}>
-                <FormItem label="增值税登记号">
+                <FormItem label={countryCode === 'US' ? '免税认证号' : '增值税登记号'}>
                   {getFieldDecorator('taxNo', {
                     initialValue: orgData.taxNo,
                   })(<Input onChange={e => this.valueChange('taxNo', e.target.value)} />)}
@@ -283,12 +283,12 @@ class OrgCertification extends Component {
     const { countryCode } = basic;
     let form;
 
-    if (!countryCode) form = this.renderChina;
-    if (countryCode) form = this.renderOther;
-    if (countryCode === 'CN') form = this.renderChina;
-    if (countryCode === 'US') form = this.renderOther;
-    if (countryCode === 'GB') form = this.renderChina;
-    return form();
+    if (!countryCode) form = this.renderChina();
+    if (countryCode) form = this.renderOther(countryCode); // 非中国，默认显示英国
+    if (countryCode === 'CN') form = this.renderChina();
+    if (countryCode === 'US') form = this.renderOther(countryCode);
+    if (countryCode === 'GB') form = this.renderChina(countryCode);
+    return form;
   }
 
   render() {

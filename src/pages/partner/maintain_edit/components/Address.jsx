@@ -131,9 +131,7 @@ class EditableTable extends React.Component {
         editable: true,
         inputType: <AddressInput onChange={value => this.valueChange('address', value)} />,
         editOptions: {
-          rules: [
-            { required: true },
-          ],
+          rules: [{ asyncValidator: this.checkAddress }],
         },
         render: (text, record) => {
           const addressList = [
@@ -174,6 +172,18 @@ class EditableTable extends React.Component {
         },
       },
     ];
+  }
+
+  checkAddress = (rule, value, callback) => {
+    const { changedValue: { option = [] } } = value;
+    if (option.length > 0) {
+      const last = option[option.length - 1];
+      if (last.isMustLow === 1 && last.level !== 5) {
+        callback('必须选择下一级');
+        return;
+      }
+    }
+    callback();
   }
 
   valueChange = (key, value) => {
@@ -240,10 +250,7 @@ class EditableTable extends React.Component {
 
     const newCustomer = { ...customer, ...{ addressList: newAddressList } };
     const newDetails = { ...details, ...{ customer: newCustomer } };
-    // this.props.dispatch({
-    //   type: 'bpEdit/setDetails',
-    //   payload: newDetails,
-    // });
+
     this.props.dispatch({
       type: 'bpEdit/setState',
       payload: {

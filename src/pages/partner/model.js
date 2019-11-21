@@ -45,6 +45,11 @@ const SeqModel = {
       { id: 1, name: '完整' },
       { id: 2, name: '不完整' },
     ],
+    // 默认开票类型
+    DefaultInvoiceType: [
+      { id: 10, name: '增值税专用发票' },
+      { id: 20, name: '增值税普通发票' },
+    ],
     // 邮箱认证状态
     EmailVerifyStatus: [
       { id: 'N', name: '未验证' },
@@ -101,6 +106,8 @@ const SeqModel = {
     // 供应商级别
     VendorLevelCode: [
       { id: 'A', name: '重要' },
+      { id: 'B', name: '比较重要' },
+      { id: 'C', name: '一般' },
     ],
     // 验证记录-关联售达方记录-验证结果
     VerifyLinkSoldToPartyStatus: [
