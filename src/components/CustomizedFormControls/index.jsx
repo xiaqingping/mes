@@ -323,11 +323,13 @@ export class AddressInput extends React.Component {
     const countrys = (
       (preState.countrys && preState.countrys.length > 0 && preState.countrys)
       || nextProps.countrys);
+    const { changedValue } = preState;
 
     if ('value' in nextProps) {
       return {
         ...(nextProps.value || {}),
         countrys,
+        changedValue,
       };
     }
     return null;
@@ -339,6 +341,7 @@ export class AddressInput extends React.Component {
     this.state = {
       ...value,
       countrys: [],
+      changedValue: {},
     };
   }
 
@@ -367,6 +370,7 @@ export class AddressInput extends React.Component {
     if (onChange) {
       onChange({
         ...otherState,
+        changedValue,
         ...obj,
       });
     }
@@ -388,7 +392,14 @@ export class AddressInput extends React.Component {
   }
 
   render() {
-    const { address, countryCode, provinceCode, cityCode, countyCode, streetCode } = this.state;
+    const {
+      address,
+      countryCode,
+      provinceCode,
+      cityCode,
+      countyCode,
+      streetCode,
+    } = this.state;
     const cascader = [countryCode, provinceCode, cityCode, countyCode, streetCode];
     return (
       <InputGroup compact>
