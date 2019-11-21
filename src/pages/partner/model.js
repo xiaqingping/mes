@@ -98,6 +98,10 @@ const SeqModel = {
       { id: 1, name: '是' },
       { id: 2, name: '否' },
     ],
+    // 供应商级别
+    VendorLevelCode: [
+      { id: 'A', name: '重要' },
+    ],
     // 验证记录-关联售达方记录-验证结果
     VerifyLinkSoldToPartyStatus: [
       { id: 1, name: '验证中' },
