@@ -10,7 +10,6 @@ import {
   Form,
   Input,
   Row,
-  Select,
   Icon,
 } from 'antd';
 import React from 'react';
@@ -20,7 +19,6 @@ import api from '@/api';
 // import { formatter } from '@/utils/utils';
 
 const FormItem = Form.Item;
-const { Option } = Select;
 const { Sider, Content } = Layout;
 
 @Form.create()
@@ -308,6 +306,7 @@ class ChooseProduct extends React.Component {
 
     let tableWidth = 0;
     columns = columns.map(col => {
+      // eslint-disable-next-line no-param-reassign
       if (!col.width) col.width = 100;
       tableWidth += col.width;
       if (!col.editable) {

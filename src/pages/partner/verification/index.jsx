@@ -15,6 +15,7 @@ import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import StandardTable from '@/components/StandardTable';
 import CheckModal from '@/components/CheckModal';
 import styles from './index.less';
+import api from '@/api';
 
 const FormItem = Form.Item;
 const { RangePicker } = DatePicker;
@@ -218,12 +219,18 @@ class Verification extends React.Component {
   state = {
     expandForm: false,
     selectedRows: [],
-    data: {},
+    list: [],
+    total: 0,
     allPartner: this.allPartner,
     inputPartner: undefined,
     showModal: false,
+    loading: false,
     recordMsg: undefined,
     clickType: '',
+    formValues: {
+      page: 1,
+      pageSize: 10,
+    },
   };
 
   /** 第一次渲染之后调用 */
@@ -232,33 +239,21 @@ class Verification extends React.Component {
   }
 
   /** table数据源 */
-  getData = () => {
-    const data = [];
-    const { formValues } = this.state;
-    console.log(formValues);
-    for (let i = 0; i < 6; i++) {
-      data.push({
-        id: i + 1,
-        code: 100000 + (i + 1),
-        bpOperationRecordCode: 200000,
-        operationRecordCode: 123456,
-        bpName: `name${i}`,
-        bpCode: '123456789',
-        type: i,
-        status: 2,
-        expireDate: '2019-09-05 16:30:28',
-        finishDate: '2019-09-06',
-        operatorName: `张${i}`,
-        operationDate: '2016-6-17 16:30:28',
-      });
-    }
+  getData = (options = {}) => {
+    const { formValues: { pageSize } } = this.state;
+    const query = Object.assign({}, { page: 1, pageSize }, options);
     this.setState({
-      data: {
-        pagination: {
-          pageSize: 10,
-        },
-        list: data,
-      },
+      formValues: query,
+      loading: true,
+    });
+
+    api.bp.getVerifyRecords(query).then(res => {
+      console.log(res)
+      this.setState({
+        list: res.results,
+        total: res.total,
+        loading: false,
+      });
     });
   }
 
@@ -543,9 +538,8 @@ class Verification extends React.Component {
   }
 
   render() {
-    const { data, selectedRows } = this.state;
-    const loading = false;
-    const { showModal, clickType, recordMsg } = this.state;
+    const { formValues: { page: current, pageSize }, list, selectedRows, total, loading } = this.state;
+    const data = { list, pagination: { current, pageSize, total } };
     return (
       <PageHeaderWrapper title="验证记录">
         <Card bordered={false}>
@@ -569,9 +563,6 @@ class Verification extends React.Component {
           </div>
         </Card>
         <CheckModal
-          // showModal={showModal}
-          // recordMsg={recordMsg}
-          // clickType={clickType}
           onRef = { ref => { this.checkShow = ref }}
           wrappedComponentRef={this.saveFormRef}/>
       </PageHeaderWrapper>

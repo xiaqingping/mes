@@ -247,6 +247,7 @@ class Operation extends React.Component {
       formValues: query,
       loading: true,
     });
+    console.log(query)
     api.bp.getOperationRecords(query).then(res => {
       this.setState({
         list: res.results,

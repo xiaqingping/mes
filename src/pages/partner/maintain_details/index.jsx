@@ -221,7 +221,7 @@ class CustomerDetails extends Component {
         {
           id: 1,
           invoicePartyId: 123,
-          invoicePartyCode: 12345,
+          invoicePartyCode: 1,
           invoicePartyName: '上海交通大学11',
           status: 1,
           notes: '这是一段认证说明',

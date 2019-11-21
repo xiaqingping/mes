@@ -173,22 +173,23 @@ class Maintain extends React.Component {
       // width: 100,
       filters: [
         {
-          value: 'default',
+          value: '1',
           text: '未认证',
         },
         {
-          value: 'processing',
+          value: '2',
           text: '审核中',
         },
         {
-          value: 'success',
-          text: '已认证',
-        },
-        {
-          value: 'warning',
+          value: '3',
           text: '部分认证',
         },
+        {
+          value: '4',
+          text: '已认证',
+        },
       ],
+      onFilter: (value, record) => { console.log(value) },
       render(val) {
         return <Badge status={renzhengMap[val].value} text={renzhengMap[val].text} />;
       },
@@ -326,6 +327,10 @@ class Maintain extends React.Component {
       type: 'basicCache/getCache',
       payload: { type: 'industryCategories' },
     });
+    this.props.dispatch({
+      type: 'basicCache/getCache',
+      payload: { type: 'countryDiallingCodes' },
+    });
     this.getTableData();
   }
 
@@ -414,6 +419,7 @@ class Maintain extends React.Component {
       formValues: query,
       loading: true,
     });
+    console.log(query)
     api.bp.getBPList(query).then(res => {
       this.setState({
         list: res.results,
@@ -537,9 +543,9 @@ class Maintain extends React.Component {
               {getFieldDecorator('certificationStatusList')(
                 <Select placeholder="请选择" maxTagCount={1} mode="multiple">
                   <Option value="1">未认证</Option>
-                  <Option value="4">已认证</Option>
                   <Option value="2">审核中</Option>
                   <Option value="3">部分认证</Option>
+                  <Option value="4">已认证</Option>
                 </Select>,
               )}
             </FormItem>
