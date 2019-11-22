@@ -27,6 +27,7 @@ import pay from './pay';
 import system from './system';
 import serial from './serial';
 import bp from './bp';
+import employees from './employees'
 
 export default {
   area,
@@ -58,6 +59,7 @@ export default {
   system,
   serial,
   bp,
+  employees,
 };
 
 export {
@@ -90,4 +92,5 @@ export {
   system,
   serial,
   bp,
+  employees,
 };

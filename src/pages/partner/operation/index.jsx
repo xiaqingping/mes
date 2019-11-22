@@ -103,75 +103,6 @@ class Operation extends React.Component {
   ],
   };
 
-  columns = [
-    {
-      title: '编号',
-      dataIndex: 'code',
-      width: 140,
-    },
-    {
-      title: '业务伙伴',
-      dataIndex: 'bpCode',
-      render(text, record) {
-          return text ? <span style={{ color: '#222222' }}><Icon type="user" /> {text}<br/><span style={{ color: '#999999' }}>{record.bpName}</span></span> : ''
-      },
-    },
-    {
-      title: '类型',
-      dataIndex: 'type',
-      width: 120,
-      filters: [
-        {
-          value: '1',
-          text: '新建',
-        },
-        {
-          value: '2',
-          text: '修改',
-        },
-      ],
-      render(text) {
-        return text === 1 ? '新建' : '修改'
-    },
-    },
-    {
-      title: '状态',
-      dataIndex: 'status',
-      width: 300,
-      align: 'center',
-      filters: [
-        {
-          value: '1',
-          text: '未完成',
-        },
-        {
-          value: '2',
-          text: '已完成',
-        },
-      ],
-      render(val, record) {
-        return <span><Badge status={status[val].value} text={status[val].text}/><br/><span style={{ marginLeft: 85 }}>{val === 2 ? record.finishDate : ''}</span></span>;
-      },
-    },
-    {
-      title: '操作人',
-      dataIndex: 'operatorName',
-      width: 300,
-      className: 'marginLeft',
-      render(val, record) {
-        return <span style={{ color: '#222222' }}>{val}<br/><span style={{ color: '#666666' }}>{record.operatorDate}</span></span>;
-      },
-    },
-    {
-      fixed: 'right',
-      title: '操作',
-      width: 150,
-      render: (text, record) => (
-          <a onClick={ e => this.showDrawer(record, e)}>查看</a>
-        ),
-    },
-  ];
-
   componentDidMount() {
     // this.getTableData();
     this.getTableData();
@@ -189,48 +120,21 @@ class Operation extends React.Component {
     })
   }
 
-  // 假数据制作
-  // getData = () => {
-  //   const data = [];
-  //   for (let i = 0; i < 30; i++) {
-  //     data.push({
-  //       id: i + 1,
-  //       code: 100000 + (i + 1),
-  //       bpCode: `name${i}`,
-  //       bpName: `1${Math.ceil((Math.random() + 0.0001) * 10000000000)}`,
-  //       type: Math.ceil((Math.random() + 0.0001) * 2),
-  //       status: Math.ceil((Math.random() + 0.0001) * 2),
-  //       finishDate: `2018-9-${Math.ceil((Math.random() + 0.0001) * 30)} 12:30:59`,
-  //       operatorName: `action${i + 10}`,
-  //       operatorDate: `2019-9-${Math.ceil((Math.random() + 0.0001) * 30)} 12:30:59`,
-  //       // partnerCode: Math.ceil((Math.random() + 0.0001) * 100000), // 1人，2组织
-  //     });
-  //   }
-  //   this.setState({
-  //       pagination: {
-  //         pageSize: 10,
-  //       },
-  //       list: data,
-  //   });
-  // };
-
   handleSearch = e => {
-    e.preventDefault();
-    // this.getTableData({ page: 1 });
-    this.getData({ page: 1 });
+    if (e) e.preventDefault();
+    const val = this.props.form.getFieldsValue();
+    this.getTableData({ page: 1, ...val });
   }
 
+  // 分页
   handleStandardTableChange = (pagination, filtersArg) => {
-    // this.getTableData({
-    //   page: pagination.current,
-    //   rows: pagination.pageSize,
-    //   ...filtersArg,
-    // });
-    this.getData({
-      page: pagination.current,
-      rows: pagination.pageSize,
-      ...filtersArg,
-    });
+    if (JSON.stringify(pagination) !== '{}') {
+      this.getTableData({
+        page: pagination.current,
+        rows: pagination.pageSize,
+        ...filtersArg,
+      });
+    }
   }
 
   handleSelectRows = rows => {
@@ -242,7 +146,19 @@ class Operation extends React.Component {
   // 获取表格数据
   getTableData = (options = {}) => {
     const { formValues: { pageSize } } = this.state;
-    const query = Object.assign({}, { page: 1, pageSize }, options);
+    // const query = Object.assign({}, { page: 1, pageSize }, options);
+    const query = Object.assign(
+      {},
+      { page: 1, pageSize },
+      options,
+      {
+        beginFinishDate: options.wanchengshijian ?
+        options.wanchengshijian[0].format('YYYY-MM-DD') : '',
+        endFinishDate: options.wanchengshijian ?
+        options.wanchengshijian[1].format('YYYY-MM-DD') : '',
+        statusList: options.statusList ? options.statusList.join(',') : '',
+      },
+    );
     this.setState({
       formValues: query,
       loading: true,
@@ -253,6 +169,10 @@ class Operation extends React.Component {
         total: res.total,
         loading: false,
       });
+    }).catch(() => {
+      this.setState({
+        loading: false,
+      })
     });
   }
 
@@ -278,11 +198,6 @@ class Operation extends React.Component {
       detailsVisible: v,
     })
   }
-
-  renderForm = () => {
-    const { expandForm } = this.state;
-    return expandForm ? this.renderAdvancedForm() : this.renderSimpleForm();
-  };
 
   // 业务伙伴筛选
   // eslint-disable-next-line consistent-return
@@ -318,7 +233,7 @@ class Operation extends React.Component {
           </Col>
           <Col lg={6} md={8} sm={12}>
           <FormItem label="业务伙伴">
-              {getFieldDecorator('yewuhuoban')(
+              {getFieldDecorator('bpId')(
               <AutoComplete
                 onSearch={this.inputValue}
                 dataSource={partnerVal.map(renderOption)}
@@ -330,7 +245,8 @@ class Operation extends React.Component {
           <Col lg={6} md={8} sm={12}>
             <FormItem label="类型">
               {getFieldDecorator('type', typeValue ? { initialValue: typeValue } : 'type')(
-                <Select mode="multiple" showArrow>
+                <Select>
+                {/* <Select mode="multiple" showArrow> */}
                   <Option value="1">新建</Option>
                   <Option value="2">修改</Option>
                 </Select>,
@@ -339,7 +255,7 @@ class Operation extends React.Component {
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="状态">
-              {getFieldDecorator('status')(
+              {getFieldDecorator('statusList')(
                 <Select mode="multiple" showArrow>
                   <Option value="1">未完成</Option>
                   <Option value="2">已完成</Option>
@@ -373,67 +289,87 @@ class Operation extends React.Component {
     );
   }
 
-  renderSimpleForm() {
-    const { form } = this.props;
-    const { getFieldDecorator } = form;
-    const { typeValue, partnerVal } = this.state;
-    return (
-      <Form onSubmit={this.handleSearch} layout="inline">
-        <Row gutter={{ lg: 24, md: 12, sm: 6 }}>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="编号">
-              {getFieldDecorator('code')(<Input />)}
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-          <FormItem label="业务伙伴">
-              {getFieldDecorator('yewuhuoban')(
-              <AutoComplete
-                allowClear
-                onSearch={this.inputValue}
-                dataSource={partnerVal.map(renderOption)}
-                placeholder="请输入"
-                optionLabelProp="value"
-                />)}
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="类型">
-              {getFieldDecorator('type', typeValue ? { initialValue: typeValue } : 'type')(
-                <Select mode="multiple" showArrow onSelect={() => { console.log(123) }}>
-                  <Option value="1">新建</Option>
-                  <Option value="2">修改</Option>
-                </Select>,
-              )}
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <span className="submitButtons">
-              <Button type="primary" htmlType="submit">
-                查询
-              </Button>
-              <Button style={{ marginLeft: 8 }} onClick={this.handleFormReset}>
-                重置
-              </Button>
-              <a style={{ marginLeft: 8 }} onClick={this.toggleForm}>
-                展开 <Icon type="down" />
-              </a>
-            </span>
-          </Col>
-        </Row>
-      </Form>
-    );
-  }
-
   render() {
     const { formValues: { page: current, pageSize },
     list, total, loading, selectedRows, detailsVisible, detailsValue } = this.state;
     const data = { list, pagination: { current, pageSize, total } };
+
+    const columns = [
+      {
+        title: '编号',
+        dataIndex: 'code',
+        width: 140,
+      },
+      {
+        title: '业务伙伴',
+        dataIndex: 'bpCode',
+        render(text, record) {
+            return text ? <span style={{ color: '#222222' }}><Icon type="user" /> {text}<br/><span style={{ color: '#999999' }}>{record.bpName}</span></span> : ''
+        },
+      },
+      {
+        title: '类型',
+        dataIndex: 'type',
+        width: 120,
+        filters: [
+          {
+            value: '1',
+            text: '新建',
+          },
+          {
+            value: '2',
+            text: '修改',
+          },
+        ],
+        onFilter: (value, record) => record.type.toString().indexOf(value.toString()) === 0,
+        render(text) {
+          return text === 1 ? '新建' : '修改'
+        },
+      },
+      {
+        title: '状态',
+        dataIndex: 'status',
+        width: 300,
+        align: 'center',
+        filters: [
+          {
+            value: '1',
+            text: '未完成',
+          },
+          {
+            value: '2',
+            text: '已完成',
+          },
+        ],
+        onFilter: (value, record) => record.status.toString().indexOf(value.toString()) === 0,
+        render(val, record) {
+          return <span><Badge status={status[val].value} text={status[val].text}/><br/><span style={{ marginLeft: 85 }}>{val === 2 ? record.finishDate : ''}</span></span>;
+        },
+      },
+      {
+        title: '操作人',
+        dataIndex: 'operatorName',
+        width: 300,
+        className: 'marginLeft',
+        render(val, record) {
+          return <span style={{ color: '#222222' }}>{val}<br/><span style={{ color: '#666666' }}>{record.operatorDate}</span></span>;
+        },
+      },
+      {
+        fixed: 'right',
+        title: '操作',
+        width: 150,
+        render: (text, record) => (
+            <a onClick={ e => this.showDrawer(record, e)}>查看</a>
+          ),
+      },
+    ];
+
     return (
       <PageHeaderWrapper>
         <Card bordered={false}>
           <div className="tableList">
-            <div className="tableListForm">{this.renderForm()}</div>
+            <div className="tableListForm">{this.renderAdvancedForm()}</div>
             <div className="tableListOperator">
               {/* <Button icon="plus" type="primary" onClick={() => this.handleAdd()}>
                 新建
@@ -444,7 +380,7 @@ class Operation extends React.Component {
               selectedRows={selectedRows}
               loading={loading}
               data={data}
-              columns={this.columns}
+              columns={columns}
               onSelectRow={this.handleSelectRows}
               onChange={this.handleStandardTableChange}
             />

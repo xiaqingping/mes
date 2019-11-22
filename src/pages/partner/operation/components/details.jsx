@@ -5,7 +5,7 @@ import {
   Drawer,
 } from 'antd';
 import * as React from 'react';
-// import api from '@/api'
+import api from '@/api'
 import './style.less'
 
 // 状态
@@ -37,22 +37,27 @@ class Details extends React.Component {
   columns = [
     {
       title: '字段',
+      width: 200,
       dataIndex: 'fieldName',
     },
     {
       title: '新值',
+      width: 100,
       dataIndex: 'newValue',
     },
     {
       title: '旧值',
+      width: 100,
       dataIndex: 'oldValue',
     },
     {
       title: '关键字',
+      width: 100,
       dataIndex: 'keyword',
     },
     {
       title: '状态',
+      width: 100,
       dataIndex: 'status',
       render(val) {
         return <Badge status={status[val].value} text={status[val].text}/>;
@@ -61,19 +66,22 @@ class Details extends React.Component {
     {
       title: '验证记录编号',
       dataIndex: 'verifyRecordList',
+      width: 140,
       render(val) {
         let data = '';
         // eslint-disable-next-line array-callback-return
-        val.map((item, index) => {
-            if (item.code) {
-              if (index < 2) {
-                data += `${item.code}<br/>`
-              } else {
-                data += '……'
+        if (val) {
+          val.map((item, index) => {
+              if (item.code) {
+                if (index < 2) {
+                  data += `${item.code}<br/>`
+                } else {
+                  data += '……'
+                }
               }
-            }
-          },
-        )
+            },
+          )
+        }
         // eslint-disable-next-line react/no-danger
         return <span dangerouslySetInnerHTML={{ __html: data }} />
       },
@@ -89,35 +97,14 @@ class Details extends React.Component {
     this.getData(detailsValue);
   }
 
-  getData = () => {
-    const data = [];
-    for (let i = 0; i < 10; i++) {
-      data.push({
-        id: i + 1,
-        fieldName: 100000 + (i + 1),
-        newValue: '张三',
-        oldValue: '李四',
-        keyword: `${Math.ceil((Math.random() + 0.0001) * 10000)}/${Math.ceil((Math.random() + 0.0001) * 100)}`,
-        status: Math.ceil((Math.random() + 0.0001) * 4),
-        verifyRecordList: [
-          {
-            id: i + 1,
-            code: Math.ceil((Math.random() + 0.0001) * 100000000),
-          },
-          {
-            id: i + 2,
-            code: Math.ceil((Math.random() + 0.0001) * 100000000),
-          },
-          {
-            id: i + 3,
-            code: Math.ceil((Math.random() + 0.0001) * 100000000),
-          },
-      ],
-      });
+  getData = detailsValue => {
+    if (detailsValue) {
+      api.bp.getOperationItems(detailsValue.id).then(res => {
+        this.setState({
+          list: res,
+        })
+      })
     }
-    this.setState({
-        list: data,
-    });
   };
 
   showDrawer = () => {
@@ -145,7 +132,7 @@ class Details extends React.Component {
           width= "600"
           className="myTables"
         >
-            <Table dataSource={list} rowKey={record => record.id} columns={this.columns} size="small" pagination={false}/>
+            <Table dataSource={list} rowKey={(record, index) => index} columns={this.columns} size="small" pagination={false}/>
         </Drawer>
       </div>
     );

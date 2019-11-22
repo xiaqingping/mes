@@ -15,13 +15,17 @@ import {
   Card,
   Divider,
   Badge,
+  Button,
   Typography,
 } from 'antd';
 import React, { Component } from 'react';
 import { connect } from 'dva';
 import { TelphoneInput } from '@/components/CustomizedFormControls';
 import api from '@/api';
-import authorize from '@/components/Authorized/Secured';
+import './index.less';
+import disk from '@/api/disk';
+import { guid } from '@/utils/utils';
+import PersonCertificationAddModal from '@/pages/partner/maintain_details/components/PersonCertificationAddModal';
 
 const { Paragraph } = Typography;
 const FormItem = Form.Item;
@@ -86,7 +90,7 @@ function getBase64(img, callback) {
 }
 
 function beforeUpload(file) {
-  const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png';
+  const isJpgOrPng = file.type === 'image/jpeg';
   if (!isJpgOrPng) {
     message.error('You can only upload JPG/PNG file!');
   }
@@ -152,63 +156,96 @@ class NameGroup extends Component {
 class AddressGroup extends Component {
   constructor (props) {
     super(props);
-    this.state = {};
+    this.state = {
+      countryCode: [],
+      popupVisible: false,
+    };
+  }
+
+  componentWillMount () {
+    api.area.byParentIdGetArea(0).then(res => { this.setState({ countryCode: res }) })
+  }
+
+  // 选择地区
+  selectArea = (v, o) => {
+    if (o.length === 0) return false;
+    const { countryCode } = this.state;
+    if (o[o.length - 1].isHaveLow === 2) {
+      this.setState({
+        popupVisible: false,
+      })
+      this.passVal(o, 1);
+      return false;
+    }
+    if (parseInt(o[0].isHaveLow, 10) === 1) {
+      api.area.byParentIdGetArea(o[o.length - 1].id).then(res => {
+        countryCode.map((item1, key1) => {
+          if (item1.code === v[0]) {
+            // countryCode[key].push({ children: res })
+            if (parseInt(item1.level, 10) === 1 && parseInt(res[0].level, 10) === 2) {
+              countryCode[key1].children = res;
+            }
+            if (parseInt(res[0].level, 10) > 2) {
+              item1.children.map((item2, key2) => {
+                if (item2.code === v[1]) {
+                  if (parseInt(item2.level, 10) === 2 && parseInt(res[0].level, 10) === 3) {
+                    countryCode[key1].children[key2].children = res;
+                  }
+                  if (parseInt(res[0].level, 10) > 3) {
+                    item2.children.map((item3, key3) => {
+                      if (item3.code === v[2]) {
+                        if (parseInt(item3.level, 10) === 3 && parseInt(res[0].level, 10) === 4) {
+                          countryCode[key1].children[key2].children[key3].children = res;
+                        }
+                        if (parseInt(res[0].level, 10) > 4) {
+                          item3.children.map((item4, key4) => {
+                            if (item4.code === v[3]) {
+                              if (parseInt(item4.level, 10) === 4 && parseInt(res[0].level, 10) === 5) {
+                                countryCode[key1].children[key2].children[key3].children[key4].children = res;
+                              }
+                            }
+                          })
+                        }
+                      }
+                    })
+                  }
+                }
+              })
+            }
+          }
+        })
+        this.setState({
+          countryCode,
+        })
+      })
+    }
+  }
+
+  // 传递省市区和详细地址的值
+  passVal = (address, type) => {
+    this.props.addressVal(address, type)
   }
 
   render () {
-    const options = [
-      {
-        value: 'zhejiang',
-        label: '中国',
-        children: [
-          {
-            value: 'hangzhou',
-            label: 'Hangzhou',
-            children: [
-              {
-                value: 'xihu',
-                label: 'West Lake',
-              },
-            ],
-          },
-        ],
-      },
-      {
-        value: 'jiangsu',
-        label: '美国',
-        children: [
-          {
-            value: '密歇根州',
-            label: '德州',
-            children: [
-              {
-                value: '北海',
-                label: '纽约',
-              },
-            ],
-          },
-        ],
-      },
-    ];
+    const { countryCode, popupVisible } = this.state;
     return (
       <InputGroup compact>
-        {/* <Select defaultValue="中国" style={{ width: '20%' }}>
-          <Option value="中国">中国</Option>
-          <Option value="美国"> 美国</Option>
-        </Select> */}
-        <Cascader style={{ width: '20%' }} options={options} placeholder="请选择" />
-        <Input style={{ width: '80%' }} placeholder="详细地址" />
+        <Cascader style={{ width: '40%' }} onChange={(value, selectedOptions) => this.selectArea(value, selectedOptions)} options={countryCode} placeholder="请选择" fieldNames={{ label: 'name', value: 'code' }} popupVisible={popupVisible} onClick={() => { this.setState({ popupVisible: !popupVisible }) }}/>
+        <Input style={{ width: '60%' }} placeholder="详细地址" onChange={e => this.passVal(e.target.value, 2)} />
       </InputGroup>
     )
   }
 }
 
-@connect(({ global, basicCache }) => {
+@connect(({ global, basicCache, user, partnerMaintain }) => {
   const industryCategories = basicCache.industryCategories.filter(
     e => e.languageCode === global.languageCode,
   );
   return {
     industryCategories,
+    countryDiallingCodes: basicCache.countryDiallingCodes,
+    authorization: user.currentUser.authorization,
+    details: partnerMaintain.details,
   };
 })
 class ChangeModal extends Component {
@@ -226,11 +263,20 @@ class ChangeModal extends Component {
         groupUsaShow: true,
         name: '',
         userData: [],
+        submitNext: 1,
+        specialInvoice: false,
+        addModalVisible: false,
+        area: [],
+        address: '',
       }
     }
 
     componentDidMount() {
       this.props.onRef(this)
+      this.props.dispatch({
+        type: 'basicCache/setState',
+        payload: { type: 'countryDiallingCodes' },
+      })
     }
 
     /** props更新时调用 */
@@ -246,6 +292,7 @@ class ChangeModal extends Component {
           api.bp.getBPOrgCertification(recordMsg.id).then(res => {
             this.setState({
               userData: res,
+              specialInvoice: res.organizationCertification ? parseInt(res.organizationCertification.specialInvoice) === 1 : false,
             })
           })
         }
@@ -257,8 +304,55 @@ class ChangeModal extends Component {
       }
     }
 
-    handleOk = () => {
+    handleOk = e => {
+      if (e) e.preventDefault();
+      const { address, area, recordMsg } = this.state;
+      this.props.form.validateFields((error, row) => {
+        if (error) return;
+        let data = {};
+        data = {
+          basic: {
+            id: recordMsg.id,
+            name: row.msg.name,
+            countryCode: area[0] ? area[0].code : '',
+            provinceCode: area[1] ? area[1].code : '',
+            cityCode: area[2] ? area[2].code : '',
+            countyCode: area[3] ? area[3].code : '',
+            streetCode: area[4] ? area[4].code : '',
+            address,
+            industryCode: row.industryCode,
+            telephoneCountryCode: row.phoneNum.telephoneCountryCode,
+            telephoneAreaCode: row.phoneNum.telephoneAreaCode,
+            telephone: row.phoneNum.telephone,
+            telephoneExtension: row.phoneNum.telephoneExtension,
+          },
+          organizationCertification: {
+            specialInvoice: row.specialInvoice ? 1 : 2,
+            taxNo: row.taxNo,
+            bankCode: row.bankCode,
+            bankAccount: row.bankAccount,
+            address: row.regisAddress,
+            notes: row.notes,
+            attachmentList: row.idenImg,
+          },
+        }
+        api.bp.updateBPOrgCertification(data).then(res => {
+          console.log(res)
+        })
+      });
+    }
 
+    addressVal = (address, type) => {
+      if (type === 1) {
+        this.setState({
+          area: address,
+        })
+      }
+      if (type === 2) {
+        this.setState({
+          address,
+        })
+      }
     }
 
     handleCancel = () => {
@@ -270,11 +364,13 @@ class ChangeModal extends Component {
         groupAdressShow: true,
         groupIndustryShow: true,
         groupUsaShow: true,
+        submitNext: 1,
       })
     }
 
     /** 上传图片 */
     handleChange = info => {
+      // const data = [];
       if (info.file.status === 'uploading') {
         this.setState({ loading: true });
         return;
@@ -287,8 +383,25 @@ class ChangeModal extends Component {
             loading: false,
           }),
         );
+        if (info.file.response) {
+          // info.fileList.map(e => {
+          //   data.push({
+          //     code: (e.response && e.response[0]) || '',
+          //     name: e.name,
+          //     type: e.type,
+          //   });
+          // });
+          // eslint-disable-next-line consistent-return
+          this.props.form.setFieldsValue({
+            idenImg: {
+              code: (info.file.response && info.file.response[0]) || '',
+              name: info.file.name,
+              type: info.file.type,
+            },
+          })
+        }
       }
-    };
+    }
 
     /** person */
     updetaPersonal = e => {
@@ -408,7 +521,7 @@ class ChangeModal extends Component {
       return (
       <Col lg={24} md={12} sm={12}>
         <FormItem label="联系地址" labelCol={{ span: 4 }} wrapperCol={{ span: 20 }}>
-          {getFieldDecorator('address')(<AddressGroup/>)}
+          {getFieldDecorator('address')(<AddressGroup addressVal={this.addressVal}/>)}
         </FormItem>
       </Col>
       )
@@ -495,8 +608,18 @@ class ChangeModal extends Component {
       )
     }
 
+    removeItem = id => {
+      const { details, piCertification } = this.props;
+
+      console.log(id)
+      // const data = piCertification.filter(e => e.id !== id);
+      // this.props.dispatch({
+      //   type: 'partnerMaintainEdit/setDetails',
+      //   payload: { ...details, piCertification: data },
+      // });
+    }
+
     renderListItem = item => {
-      console.log(item)
       if (item && item.id) {
         return (
           <List.Item key={item.id}>
@@ -505,8 +628,6 @@ class ChangeModal extends Component {
               title={item.invoicePartyName}
               extra={
                 <>
-                  <a>变更</a>
-                  <Divider type="vertical" />
                   <a onClick={() => this.removeItem(item.id)}>删除</a>
                 </>
               }
@@ -532,11 +653,58 @@ class ChangeModal extends Component {
           </List.Item>
         );
       }
+
+      return (
+        <List.Item>
+          <Button
+            type="dashed"
+            style={{ width: '100%', height: 304 }}
+            onClick={() => this.handleModalVisible(true)}
+          >
+            <Icon type="plus" /> 新增认证
+          </Button>
+        </List.Item>
+      );
     }
 
+    handleModalVisible = flag => {
+      this.setState({
+        addModalVisible: !!flag,
+      });
+    };
+
+    handleAdd = data => {
+      const { details, piCertification } = this.props;
+      const attachmentList = data.attachmentList.map(e => ({
+        code: e.thumbUrl,
+        name: e.name,
+        type: e.type,
+      }));
+      this.handleModalVisible();
+      const obj = {
+        id: Math.random(),
+        invoicePartyId: 123,
+        invoicePartyCode: 12345,
+        invoicePartyName: data.invoicePartyName,
+        status: 1,
+        notes: data.notes,
+        attachmentList,
+      };
+
+      const newdata = [...piCertification, obj];
+      this.props.dispatch({
+        type: 'partnerMaintain/setDetails',
+        payload: { ...details, piCertificationList: newdata },
+      });
+    };
+
     render () {
-      const { changeModal, recordMsg, userData } = this.state;
+      const { changeModal, recordMsg, userData, submitNext, specialInvoice, addModalVisible } = this.state;
+      const { piCertificationList } = userData;
       const { basic } = userData;
+      const nullData = {};
+      const uploadUrl = disk.uploadFiles('bp_organization_certification', guid());
+      let modelWidth = 970;
       if (!basic) return null;
       // const { form, getValues, closeModal } = this.props;
       // console.log(getValues)
@@ -553,61 +721,58 @@ class ChangeModal extends Component {
       );
       const uploadModal = <>
         <Upload
-          name="avatar"
+          name="file"
           listType="picture-card"
           className="avatar-uploader"
           showUploadList={false}
-          action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
+          action={uploadUrl}
           beforeUpload={beforeUpload}
           onChange={this.handleChange}
+          headers={{ Authorization: this.props.authorization }}
+          accept=".jpg"
         >
-          {imageUrl ? <img src={imageUrl} alt="avatar" style={{ width: '100%' }} /> : uploadButton}
+          {imageUrl ? <img src={imageUrl} alt="avatar" width="80" height="80" /> : uploadButton}
         </Upload>
+        <div style={{ color: '#ADADAD', marginTop: '-30px', marginBottom: '20px' }}>只支持 .jpg 格式</div>
       </>
       // 个人变更
       if (recordMsg && recordMsg.type === 1) {
+        modelWidth = 830;
+
+        const parentMethods = {
+          handleAdd: this.handleAdd,
+          handleModalVisible: this.handleModalVisible,
+        };
         modelContent = <>
           <Form {...formItemLayout}>
             {this.renderPerform(userData.basic.name)}
-            {/* <Form.Item label="认证说明">
-              {getFieldDecorator('notes', {
-                rules: [
-                  {
-                    required: true,
-                    message: '请填写认证说明！',
-                  },
-                ],
-              })(<TextArea rows={2} style={{ resize: 'none' }}/>)}
-            </Form.Item>
-            <Form.Item label="认证图片">
-              {getFieldDecorator('idenImg', {
-                rules: [
-                  {
-                    required: true,
-                    message: '请上传认证图片！',
-                  },
-                ],
-              })(uploadModal)}
-            </Form.Item> */}
-                    <List
-                      rowKey="id"
-                      grid={{
-                        gutter: 24,
-                        lg: 3,
-                        md: 2,
-                        sm: 1,
-                        xs: 1,
-                      }}
-                      dataSource={ userData.piCertificationList}
-                      renderItem={this.renderListItem}
-                    />
+            <Row gutter={32}>
+            <List
+              rowKey="id"
+              grid={{
+                gutter: 24,
+                lg: 2,
+                md: 2,
+                sm: 1,
+                xs: 1,
+              }}
+              dataSource={[...piCertificationList, nullData]}
+              renderItem={this.renderListItem}
+            />
+            <PersonCertificationAddModal {...parentMethods} modalVisible={addModalVisible}/>
+            <Divider style={{ margin: 0 }}/>
+            <Button htmlType="submit" type="primary" style={{ float: 'right', margin: '10px 20px' }}>
+                提交
+            </Button>
+            </Row>
           </Form>
         </>
       }
       // 组织变更
       if (recordMsg && recordMsg.type === 2 && (recordMsg.countyCode === 'CN' || !recordMsg.countyCode)) {
+        modelWidth = 1130;
         modelContent = <>
-          <Form {...formItemLayoutGroup} labelAlign="left">
+          <Form {...formItemLayoutGroup} labelAlign="left" onSubmit={this.handleOk}>
             <Row gutter={32}>
               <>
                 { this.renderGroupNameForm() }
@@ -628,7 +793,11 @@ class ChangeModal extends Component {
               { this.renderIndustryForm() }
               <Col lg={12} md={12} sm={12}>
                 <FormItem label="增值税专用发票资质">
-                  {getFieldDecorator('specialInvoice')(<Switch checkedChildren="开" unCheckedChildren="关" defaultChecked={userData.organizationCertification ? (parseInt(userData.organizationCertification.specialInvoice) === 1) : false} />)}
+                  {getFieldDecorator('specialInvoice')(<Switch checkedChildren="开" unCheckedChildren="关" onChange={() => {
+                    this.setState({
+                      specialInvoice: !specialInvoice,
+                    })
+                  }} checked={specialInvoice} />)}
                 </FormItem>
               </Col>
 
@@ -695,7 +864,7 @@ class ChangeModal extends Component {
               </Col>
               <Col lg={24} md={12} sm={12}>
                 <Form.Item label="认证说明" labelCol={{ span: 4 }} wrapperCol={{ span: 20 }}>
-                  {getFieldDecorator('idenText', {
+                  {getFieldDecorator('notes', {
                     // eslint-disable-next-line no-nested-ternary
                     initialValue: userData.organizationCertification ? (userData.organizationCertification.notes ? userData.organizationCertification.notes : '') : '',
                     rules: [
@@ -712,6 +881,10 @@ class ChangeModal extends Component {
                 {getFieldDecorator('idenImg')(uploadModal)}
                </Form.Item>
               </Col>
+              <Divider style={{ margin: 0 }}/>
+              <Button htmlType="submit" type="primary" style={{ float: 'right', margin: '10px 20px' }}>
+                  提交
+              </Button>
             </Row>
           </Form>
           </>
@@ -719,6 +892,7 @@ class ChangeModal extends Component {
 
       // 美国变更
       if (recordMsg && recordMsg.type === 2 && recordMsg.countyCode === 'US') {
+        modelWidth = 800;
         modelContent = <>
           <Form {...formItemLayout}>
              { this.renderUsaForm() }
@@ -745,12 +919,17 @@ class ChangeModal extends Component {
             <Form.Item label="认证图片">
               {getFieldDecorator('idenImg')(uploadModal)}
             </Form.Item>
+            <Divider style={{ margin: 0 }}/>
+            <Button htmlType="submit" type="primary" style={{ float: 'right', margin: '10px 20px 0 0' }}>
+                提交
+            </Button>
           </Form>
         </>
       }
 
       // 英国变更
       if (recordMsg && recordMsg.id === 2 && recordMsg.countyCode === 'GB') {
+        modelWidth = 800;
         modelContent = <>
           <Form {...formItemLayoutEng} labelAlign="left">
              { this.renderUsaForm() }
@@ -770,21 +949,35 @@ class ChangeModal extends Component {
             <Form.Item label="认证图片">
               {getFieldDecorator('idenImg')(uploadModal)}
             </Form.Item>
+            <Divider style={{ margin: 0 }}/>
+            <Button htmlType="submit" type="primary" style={{ float: 'right', margin: '10px 20px 0 0' }}>
+                提交
+            </Button>
           </Form>
         </>
       }
+
+      // 提交通过页面
+      const passPage = <>
+        <div style={{ height: '180px', textAlign: 'center', paddingTop: '40px' }}>
+          <Icon type="check-circle" style={{ fontSize: '40px', color: '#54C31F' }}/>
+          <h4 style={{ fontWeight: '600', margin: '30px 0 20px' }}>您的资料已提交，请耐心等待审核</h4>
+        </div>
+      </>
       return (
           <div>
             <Modal
-              width = {1130}
+              width = {submitNext === 1 ? modelWidth : 400}
               centered
-              title="变更认证资料"
+              title={submitNext === 1 ? '变更认证资料' : ''}
               visible={changeModal}
-              onOk={this.handleOk}
               onCancel={this.handleCancel}
               destroyOnClose
+              maskClosable={false}
+              footer={null}
+              className="myModel"
             >
-             { modelContent }
+             { submitNext === 1 ? modelContent : passPage }
             </Modal>
           </div>
       )

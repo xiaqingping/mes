@@ -85,7 +85,7 @@ class PersonCertification extends React.Component {
 
     const data = piCertification.filter(e => e.id !== id);
     this.props.dispatch({
-      type: 'bpEdit/setDetails',
+      type: 'partnerMaintainEdit/setDetails',
       payload: { ...details, piCertification: data },
     });
   }
@@ -111,7 +111,7 @@ class PersonCertification extends React.Component {
 
     const newdata = [...piCertification, obj];
     this.props.dispatch({
-      type: 'bpEdit/setDetails',
+      type: 'partnerMaintainEdit/setDetails',
       payload: { ...details, piCertification: newdata },
     });
   };
@@ -120,7 +120,6 @@ class PersonCertification extends React.Component {
     const { piCertification } = this.props;
     const { addModalVisible } = this.state;
     const nullData = {};
-
     const parentMethods = {
       handleAdd: this.handleAdd,
       handleModalVisible: this.handleModalVisible,
