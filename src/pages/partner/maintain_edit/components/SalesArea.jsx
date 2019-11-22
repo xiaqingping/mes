@@ -1,16 +1,4 @@
-import {
-  Form,
-  Row,
-  Col,
-  Select,
-  Switch,
-  Radio,
-  Tabs,
-  Card,
-  Cascader,
-  Icon,
-  Empty,
-} from 'antd';
+import { Form, Row, Col, Select, Switch, Radio, Tabs, Card, Cascader, Icon, Empty } from 'antd';
 import React from 'react';
 import { connect } from 'dva';
 import InvoiceParty from './InvoiceParty';
@@ -75,7 +63,7 @@ class FormContent extends React.Component {
                 initialValue: [data.regionCode, data.officeCode],
               })(
                 <Cascader
-                  fieldNames={ { label: 'name', value: 'code', children: 'officeList' } }
+                  fieldNames={{ label: 'name', value: 'code', children: 'officeList' }}
                   onChange={value => valueChange('regionOffice', value)}
                   options={regionOffice}
                 />,
@@ -88,11 +76,11 @@ class FormContent extends React.Component {
                 initialValue: data.defaultPaymentMethodCode,
               })(
                 <Select onChange={value => valueChange('defaultPaymentMethodCode', value)}>
-                  {
-                    salesPaymentMethods.map(e =>
-                      <Option key={e.code} value={e.code}>{e.name}</Option>,
-                    )
-                  }
+                  {salesPaymentMethods.map(e => (
+                    <Option key={e.code} value={e.code}>
+                      {e.name}
+                    </Option>
+                  ))}
                 </Select>,
               )}
             </FormItem>
@@ -107,50 +95,46 @@ class FormContent extends React.Component {
                   filterOption={(input, option) => option.props.children.indexOf(input) >= 0}
                   onChange={value => valueChange('currencyCode', value)}
                 >
-                  {
-                    currencies.map(e =>
-                      <Option key={e.code} value={e.code}>{e.shortText}</Option>,
-                    )
-                  }
+                  {currencies.map(e => (
+                    <Option key={e.code} value={e.code}>
+                      {e.shortText}
+                    </Option>
+                  ))}
                 </Select>,
               )}
             </FormItem>
           </Col>
-          {
-            (countryCode === 'CN' || !countryCode) ? (
-              <Col span={7}>
-                <FormItem label="默认开票类型">
-                  {getFieldDecorator('defaultInvoiceTypeCode', {
-                    initialValue: data.defaultInvoiceTypeCode,
-                  })(
-                    <Radio.Group onChange={e => valueChange('defaultInvoiceTypeCode', e.target.value)}>
-                      {
-                        DefaultInvoiceType.map(e =>
-                          <Radio.Button key={e.id} value={e.id}>{e.name}</Radio.Button>,
-                        )
-                      }
-                    </Radio.Group>,
-                  )}
-                </FormItem>
-              </Col>
-            ) : null
-          }
-          {
-            (countryCode !== 'CN' && countryCode) ? (
-              <Col span={6}>
-                <FormItem label="税分类">
-                  {getFieldDecorator('taxClassificCode', {
-                    initialValue: data.taxClassificCode,
-                  })(
-                    <Select onChange={value => valueChange('taxClassificCode', value)}>
-                      <Option value="0">免税</Option>
-                      <Option value="1">必须上税</Option>
-                    </Select>,
-                  )}
-                </FormItem>
-              </Col>
-            ) : null
-          }
+          {countryCode === 'CN' || !countryCode ? (
+            <Col span={7}>
+              <FormItem label="默认开票类型">
+                {getFieldDecorator('defaultInvoiceTypeCode', {
+                  initialValue: data.defaultInvoiceTypeCode,
+                })(
+                  <Radio.Group onChange={e => valueChange('defaultInvoiceTypeCode', e.target.value)}>
+                    {DefaultInvoiceType.map(e => (
+                      <Radio.Button key={e.id} value={e.id}>
+                        {e.name}
+                      </Radio.Button>
+                    ))}
+                  </Radio.Group>,
+                )}
+              </FormItem>
+            </Col>
+          ) : null}
+          {countryCode !== 'CN' && countryCode ? (
+            <Col span={6}>
+              <FormItem label="税分类">
+                {getFieldDecorator('taxClassificCode', {
+                  initialValue: data.taxClassificCode,
+                })(
+                  <Select onChange={value => valueChange('taxClassificCode', value)}>
+                    <Option value="0">免税</Option>
+                    <Option value="1">必须上税</Option>
+                  </Select>,
+                )}
+              </FormItem>
+            </Col>
+          ) : null}
           <Col span={3}>
             <FormItem label="销售冻结">
               {getFieldDecorator('salesOrderBlock', {
@@ -165,43 +149,50 @@ class FormContent extends React.Component {
   }
 }
 
-@connect(({ global, basicCache, bpEdit }) => {
-  function byLangFilter(e) {
-    return e.languageCode === global.languageCode;
-  }
+@connect(
+  ({ global, basicCache, bpEdit }) => {
+    function byLangFilter(e) {
+      return e.languageCode === global.languageCode;
+    }
 
-  // BP数据
-  const details = bpEdit.details || {};
-  const basicInfo = details.basic || {};
-  const customer = details.customer || { };
-  const salesAreaList = customer.salesAreaList || [];
+    // BP数据
+    const details = bpEdit.details || {};
+    const basicInfo = details.basic || {};
+    const customer = details.customer || {};
+    const salesAreaList = customer.salesAreaList || [];
 
-  // 基础数据
-  // 销售范围
-  const { salesArea } = basicCache;
-  // 销售组织
-  const salesOrganizations = basicCache.salesOrganizations.filter(byLangFilter);
-  // 分销渠道
-  const distributionChannels = basicCache.distributionChannels.filter(byLangFilter);
+    // 基础数据
+    // 销售范围
+    const { salesArea } = basicCache;
+    // 销售组织
+    const salesOrganizations = basicCache.salesOrganizations.filter(byLangFilter);
+    // 分销渠道
+    const distributionChannels = basicCache.distributionChannels.filter(byLangFilter);
 
-  return {
-    details,
-    basicInfo,
-    customer,
-    salesAreaList,
-    salesArea,
-    salesOrganizations,
-    distributionChannels,
-  };
-}, null, null, { withRef: true })
+    return {
+      details,
+      basicInfo,
+      customer,
+      salesAreaList,
+      salesArea,
+      salesOrganizations,
+      distributionChannels,
+    };
+  },
+  null,
+  null,
+  { withRef: true },
+)
 class SalesArea extends React.Component {
   constructor(props) {
     super(props);
     const { salesAreaList: tabsData } = this.props;
 
     this.state = {
-      tabKey: (tabsData && tabsData[0] && `${tabsData[0].salesOrganizationCode}-${tabsData[0].distributionChannelCode}`) || '',
-    }
+      tabKey:
+        (tabsData && tabsData[0] && `${tabsData[0].salesOrganizationCode}-${tabsData[0].distributionChannelCode}`) ||
+        '',
+    };
   }
 
   valueChange = (key, value) => {
@@ -240,12 +231,12 @@ class SalesArea extends React.Component {
         data: newDetails,
       },
     });
-  }
+  };
 
   onTabChange = tabKey => {
     if (tabKey === 'select') return;
     this.setState({ tabKey });
-  }
+  };
 
   // 级联选泽销售范围时
   onCascaderChange = arr => {
@@ -288,7 +279,7 @@ class SalesArea extends React.Component {
     this.setState({
       tabKey,
     });
-  }
+  };
 
   renderCascader = options => {
     const { salesAreaList: tabsData } = this.props;
@@ -309,10 +300,12 @@ class SalesArea extends React.Component {
 
     return (
       <Cascader options={options} onChange={this.onCascaderChange}>
-        <a style={{ fontSize: 14, marginLeft: -16 }} href="#">销售范围 <Icon type="down" style={{ fontSize: 12 }} /></a>
+        <a style={{ fontSize: 14, marginLeft: -16 }} href="#">
+          销售范围 <Icon type="down" style={{ fontSize: 12 }} />
+        </a>
       </Cascader>
     );
-  }
+  };
 
   formatSalesArea = () => {
     const { salesArea, salesOrganizations, distributionChannels } = this.props;
@@ -348,7 +341,7 @@ class SalesArea extends React.Component {
       distributionChannelsMap,
       salesArea: arr,
     };
-  }
+  };
 
   closeTab = tabKey => {
     let index = -1;
@@ -391,17 +384,21 @@ class SalesArea extends React.Component {
       },
     });
     this.setState({ tabKey: key });
-  }
+  };
 
   render() {
     const { salesAreaList: tabsData } = this.props;
-    const { tabKey } = this.state;
+    let { tabKey } = this.state;
     const { salesArea, salesOrganizationsMap, distributionChannelsMap } = this.formatSalesArea();
+
+    // 如有有数据，但没有选中，则默认选中第一条
+    if (!tabKey && tabsData.length > 0) {
+      tabKey = `${tabsData[0].salesOrganizationCode}-${tabsData[0].distributionChannelCode}`;
+    }
 
     let tabList = tabsData.map(e => ({
       key: `${e.salesOrganizationCode}-${e.distributionChannelCode}`,
-      tab: salesOrganizationsMap[e.salesOrganizationCode] +
-        distributionChannelsMap[e.distributionChannelCode],
+      tab: salesOrganizationsMap[e.salesOrganizationCode] + distributionChannelsMap[e.distributionChannelCode],
     }));
 
     tabList = tabList.concat({
@@ -411,11 +408,15 @@ class SalesArea extends React.Component {
     tabList.forEach(e => {
       if (e.key === tabKey) {
         e.tab = (
-          <>{e.tab} <Icon type="close" style={{ fontSize: 12 }} onClick={() => this.closeTab(e.key)} /></>
+          <>
+            {e.tab} <Icon type="close" style={{ fontSize: 12 }} onClick={() => this.closeTab(e.key)} />
+          </>
         );
       } else {
         e.tab = (
-          <>{e.tab} <Icon type="close" style={{ fontSize: 12, visibility: 'hidden' }} /></>
+          <>
+            {e.tab} <Icon type="close" style={{ fontSize: 12, visibility: 'hidden' }} />
+          </>
         );
       }
     });
@@ -431,17 +432,13 @@ class SalesArea extends React.Component {
           this.onTabChange(key);
         }}
       >
-        {tabKey ?
+        {tabKey ? (
           tabsData.map(e => {
             const key = `${e.salesOrganizationCode}-${e.distributionChannelCode}`;
             if (tabKey !== key) return null;
             return (
               <div key={key}>
-                <FormContent
-                  valueChange={this.valueChange}
-                  tabKey={tabKey}
-                  data={e}
-                />
+                <FormContent valueChange={this.valueChange} tabKey={tabKey} data={e} />
                 <Tabs className={styles.internalTab}>
                   <TabPane tab="收票方" key="InvoiceParty">
                     <InvoiceParty
@@ -465,16 +462,15 @@ class SalesArea extends React.Component {
                     />
                   </TabPane>
                   <TabPane tab="销售员" key="SalesPerson">
-                    <SalesPerson
-                      tableData={e.salerList || []}
-                      tableKey="salerList"
-                      valueChange={this.valueChange}
-                    />
+                    <SalesPerson tableData={e.salerList || []} tableKey="salerList" valueChange={this.valueChange} />
                   </TabPane>
                 </Tabs>
               </div>
             );
-          }) : <Empty description="暂无销售范围" />}
+          })
+        ) : (
+          <Empty description="暂无销售范围" />
+        )}
       </Card>
     );
   }

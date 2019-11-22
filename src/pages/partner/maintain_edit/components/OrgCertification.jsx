@@ -1,16 +1,4 @@
-import {
-  Card,
-  Row,
-  Col,
-  Form,
-  Input,
-  Switch,
-  Upload,
-  Icon,
-  Badge,
-  Select,
-  Spin,
-} from 'antd';
+import { Card, Row, Col, Form, Input, Switch, Upload, Icon, Badge, Select, Spin } from 'antd';
 import React, { Component } from 'react';
 import { connect } from 'dva';
 import debounce from 'lodash/debounce';
@@ -27,9 +15,8 @@ const { Option } = Select;
   details: bpEdit.details || {},
   uuid: bpEdit.uuid,
   authorization: user.currentUser.authorization,
-  organizationCertification: (
-    bpEdit.details && bpEdit.details.organizationCertification
-  ) || { attachmentList: [] },
+  // eslint-disable-next-line max-len
+  organizationCertification: (bpEdit.details && bpEdit.details.organizationCertification) || { attachmentList: [] },
 }))
 class OrgCertification extends Component {
   constructor(props) {
@@ -47,9 +34,14 @@ class OrgCertification extends Component {
 
   valueChange = (key, value) => {
     const { details, organizationCertification } = this.props;
+
+    let obj = {
+      [key]: value,
+    };
+
     if (key === 'attachmentList') {
       if (value.file.response) {
-        value = value.fileList.map(e => {
+        obj[key] = value.fileList.map(e => {
           if (e.status === 'error') requestErr(e.response);
           return {
             code: (e.response && e.response[0]) || '',
@@ -58,10 +50,6 @@ class OrgCertification extends Component {
           };
         });
       }
-    }
-
-    let obj = {
-      [key]: value,
     }
 
     if (key === 'telephone') obj = value;
@@ -75,29 +63,38 @@ class OrgCertification extends Component {
         data: { ...details, ...{ organizationCertification: data } },
       },
     });
-  }
+  };
 
   uploadButton = () => (
     <div>
       <Icon type="plus" />
-      <div className="ant-upload-text">Upload <br/>支持jpg/png</div>
+      <div className="ant-upload-text">
+        Upload <br />
+        支持jpg/png
+      </div>
     </div>
-  )
+  );
 
   normFile = e => {
     if (Array.isArray(e)) {
       return e;
     }
     return e && e.fileList;
-  }
+  };
 
   fetchBank = value => {
-    basicAPI.getBanks({
-      codeOrFullName: value,
-    }).then(bank => {
-      this.setState({ bank });
-    });
-  }
+    if (!value) {
+      this.setState({ bank: [] });
+      return;
+    }
+    basicAPI
+      .getBanks({
+        codeOrFullName: value,
+      })
+      .then(bank => {
+        this.setState({ bank });
+      });
+  };
 
   renderChina = () => {
     const {
@@ -114,7 +111,8 @@ class OrgCertification extends Component {
             <Row gutter={32}>
               <Col span={8}>
                 <FormItem label="认证状态">
-                  <Badge status="default" />未认证
+                  <Badge status="default" />
+                  未认证
                 </FormItem>
               </Col>
               <Col span={8}>
@@ -147,7 +145,9 @@ class OrgCertification extends Component {
                       onChange={value => this.valueChange('bankCode', value)}
                     >
                       {bank.map(d => (
-                        <Option key={d.code} value={d.code}>{d.fullName}</Option>
+                        <Option key={d.code} value={d.code}>
+                          {d.fullName}
+                        </Option>
                       ))}
                     </Select>,
                   )}
@@ -200,24 +200,26 @@ class OrgCertification extends Component {
                 rules: [{ required: true }],
                 valuePropName: 'fileList',
                 getValueFromEvent: this.normFile,
-              })(<Upload
-                name="files"
-                multiple
-                listType="picture-card"
-                showUploadList
-                action={uploadUrl}
-                accept=".jpg,.png"
-                headers={{ Authorization: authorization }}
-                onChange={value => this.valueChange('attachmentList', value)}
-              >
-                {this.uploadButton()}
-              </Upload>)}
+              })(
+                <Upload
+                  name="files"
+                  multiple
+                  listType="picture-card"
+                  showUploadList
+                  action={uploadUrl}
+                  accept=".jpg,.png"
+                  headers={{ Authorization: authorization }}
+                  onChange={value => this.valueChange('attachmentList', value)}
+                >
+                  {this.uploadButton()}
+                </Upload>,
+              )}
             </FormItem>
           </Col>
         </Row>
       </Form>
     );
-  }
+  };
 
   renderOther = countryCode => {
     const {
@@ -234,7 +236,8 @@ class OrgCertification extends Component {
             <Row>
               <Col span={24}>
                 <FormItem label="认证状态">
-                  <Badge status="default" />未认证
+                  <Badge status="default" />
+                  未认证
                 </FormItem>
               </Col>
               <Col span={24}>
@@ -252,18 +255,20 @@ class OrgCertification extends Component {
                 rules: [{ required: true }],
                 valuePropName: 'fileList',
                 getValueFromEvent: this.normFile,
-              })(<Upload
-                name="files"
-                multiple
-                listType="picture-card"
-                showUploadList
-                action={uploadUrl}
-                accept=".jpg,.png"
-                headers={{ Authorization: authorization }}
-                onChange={value => this.valueChange('attachmentList', value)}
-              >
-                {this.uploadButton()}
-              </Upload>)}
+              })(
+                <Upload
+                  name="files"
+                  multiple
+                  listType="picture-card"
+                  showUploadList
+                  action={uploadUrl}
+                  accept=".jpg,.png"
+                  headers={{ Authorization: authorization }}
+                  onChange={value => this.valueChange('attachmentList', value)}
+                >
+                  {this.uploadButton()}
+                </Upload>,
+              )}
             </FormItem>
           </Col>
           <Col span={10}>
@@ -276,10 +281,12 @@ class OrgCertification extends Component {
         </Row>
       </Form>
     );
-  }
+  };
 
   renderForm = () => {
-    const { details: { basic } } = this.props;
+    const {
+      details: { basic },
+    } = this.props;
     const { countryCode } = basic;
     let form;
 
@@ -289,15 +296,11 @@ class OrgCertification extends Component {
     if (countryCode === 'US') form = this.renderOther(countryCode);
     if (countryCode === 'GB') form = this.renderChina(countryCode);
     return form;
-  }
+  };
 
   render() {
     return (
-      <Card
-        title="认证资料"
-        bordered={false}
-        style={{ marginBottom: '24px' }}
-      >
+      <Card title="认证资料" bordered={false} style={{ marginBottom: '24px' }}>
         {this.renderForm()}
       </Card>
     );

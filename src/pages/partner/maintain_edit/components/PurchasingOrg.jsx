@@ -1,19 +1,6 @@
-import {
-  Card,
-  Col,
-  Form,
-  Input,
-  InputNumber,
-  Row,
-  Select,
-  Switch,
-  Empty,
-  Icon,
-  Cascader,
-} from 'antd';
+import { Card, Col, Form, Input, InputNumber, Row, Select, Switch, Empty, Icon, Cascader } from 'antd';
 import { connect } from 'dva';
 import React from 'react';
-import _ from 'lodash';
 import { MobilePhoneInput } from '@/components/CustomizedFormControls';
 
 const FormItem = Form.Item;
@@ -65,11 +52,11 @@ class FormContent extends React.Component {
                   showSearch
                   filterOption={(input, option) => option.props.children.indexOf(input) >= 0}
                 >
-                  {
-                    currencies.map(e =>
-                      <Option key={e.code} value={e.code}>{e.shortText}</Option>,
-                    )
-                  }
+                  {currencies.map(e => (
+                    <Option key={e.code} value={e.code}>
+                      {e.shortText}
+                    </Option>
+                  ))}
                 </Select>,
               )}
             </FormItem>
@@ -81,11 +68,11 @@ class FormContent extends React.Component {
                 initialValue: data.paymentTermsCode,
               })(
                 <Select onChange={value => valueChange('paymentTermsCode', value)}>
-                  {
-                    paymentTerms.map(e =>
-                      <Option key={e.code} value={e.code}>{e.name}</Option>,
-                    )
-                  }
+                  {paymentTerms.map(e => (
+                    <Option key={e.code} value={e.code}>
+                      {e.name}
+                    </Option>
+                  ))}
                 </Select>,
               )}
             </FormItem>
@@ -106,9 +93,7 @@ class FormContent extends React.Component {
                   mobilePhoneCountryCode: data.salerTelephoneCountryCode,
                   mobilePhone: data.salerTelephone,
                 },
-              })(
-                <MobilePhoneInput onChange={value => valueChange('salerTelephone', value)}/>,
-              )}
+              })(<MobilePhoneInput onChange={value => valueChange('salerTelephone', value)} />)}
             </FormItem>
           </Col>
         </Row>
@@ -120,9 +105,11 @@ class FormContent extends React.Component {
                 initialValue: data.levelCode,
               })(
                 <Select onChange={value => valueChange('levelCode', value)}>
-                  {
-                    VendorLevelCode.map(e => <Option key={e.id} value={e.id}>{e.name}</Option>)
-                  }
+                  {VendorLevelCode.map(e => (
+                    <Option key={e.id} value={e.id}>
+                      {e.name}
+                    </Option>
+                  ))}
                 </Select>,
               )}
             </FormItem>
@@ -133,9 +120,7 @@ class FormContent extends React.Component {
                 rules: [{ required: true }],
                 valuePropName: 'checked',
                 initialValue: data.invoicePostInReceive,
-              })(
-                <Switch onChange={value => valueChange('invoicePostInReceive', value)}/>)
-              }
+              })(<Switch onChange={value => valueChange('invoicePostInReceive', value)} />)}
             </FormItem>
           </Col>
           <Col md={6}>
@@ -145,11 +130,11 @@ class FormContent extends React.Component {
                 initialValue: data.purchasingGroupCode,
               })(
                 <Select onChange={value => valueChange('purchasingGroupCode', value)}>
-                  {
-                    purchaseGroups.map(e =>
-                      <Option key={e.code} value={e.code}>{e.name}</Option>,
-                    )
-                  }
+                  {purchaseGroups.map(e => (
+                    <Option key={e.code} value={e.code}>
+                      {e.name}
+                    </Option>
+                  ))}
                 </Select>,
               )}
             </FormItem>
@@ -175,24 +160,29 @@ class FormContent extends React.Component {
   }
 }
 
-@connect(({ bpEdit, basicCache }) => {
-  // BP数据
-  const details = bpEdit.details || {};
-  const vendor = details.vendor || { };
-  const purchasingOrganizationList = vendor.purchasingOrganizationList || [];
+@connect(
+  ({ bpEdit, basicCache }) => {
+    // BP数据
+    const details = bpEdit.details || {};
+    const vendor = details.vendor || {};
+    const purchasingOrganizationList = vendor.purchasingOrganizationList || [];
 
-  // 基础数据
-  // 采购组织
-  const { purchaseOrganizations } = basicCache;
-  return { details, vendor, purchasingOrganizationList, purchaseOrganizations };
-}, null, null, { withRef: true })
+    // 基础数据
+    // 采购组织
+    const { purchaseOrganizations } = basicCache;
+    return { details, vendor, purchasingOrganizationList, purchaseOrganizations };
+  },
+  null,
+  null,
+  { withRef: true },
+)
 class PurchasingOrg extends React.Component {
   constructor(props) {
     super(props);
     const { purchasingOrganizationList: tabsData } = this.props;
     this.state = {
       tabKey: (tabsData && tabsData[0] && tabsData[0].purchasingOrganizationCode) || '',
-    }
+    };
   }
 
   valueChange = (key, value) => {
@@ -223,12 +213,12 @@ class PurchasingOrg extends React.Component {
         data: newDetails,
       },
     });
-  }
+  };
 
   onTabChange = tabKey => {
     if (tabKey === 'select') return;
     this.setState({ tabKey });
-  }
+  };
 
   // 级联选泽采购组织时
   onCascaderChange = obj => {
@@ -256,7 +246,7 @@ class PurchasingOrg extends React.Component {
     this.setState({
       tabKey: obj[index],
     });
-  }
+  };
 
   renderCascader = () => {
     const { purchasingOrganizationList: tabsData, purchaseOrganizations } = this.props;
@@ -270,16 +260,13 @@ class PurchasingOrg extends React.Component {
       return { ...e, disabled };
     });
     return (
-      <Cascader
-        options={options}
-        onChange={this.onCascaderChange}
-        fieldNames={{ label: 'name', value: 'code' }}>
+      <Cascader options={options} onChange={this.onCascaderChange} fieldNames={{ label: 'name', value: 'code' }}>
         <a style={{ fontSize: 14, marginLeft: -16 }} href="#">
           采购组织 <Icon type="down" style={{ fontSize: 12 }} />
         </a>
       </Cascader>
     );
-  }
+  };
 
   closeTab = tabKey => {
     let index = -1;
@@ -322,14 +309,16 @@ class PurchasingOrg extends React.Component {
       },
     });
     this.setState({ tabKey: key });
-  }
+  };
 
   render() {
-    const { tabKey } = this.state;
-    const {
-      purchasingOrganizationList: tabsData,
-      purchaseOrganizations,
-    } = this.props;
+    let { tabKey } = this.state;
+    const { purchasingOrganizationList: tabsData, purchaseOrganizations } = this.props;
+
+    // 如有有数据，但没有选中，则默认选中第一条
+    if (!tabKey && tabsData.length > 0) {
+      tabKey = tabsData[0].purchasingOrganizationCode;
+    }
 
     let tabList = tabsData.map(e => ({
       key: e.purchasingOrganizationCode,
@@ -343,11 +332,15 @@ class PurchasingOrg extends React.Component {
     tabList.forEach(e => {
       if (e.key === tabKey) {
         e.tab = (
-          <>{e.tab} <Icon type="close" style={{ fontSize: 12 }} onClick={() => this.closeTab(e.key)} /></>
+          <>
+            {e.tab} <Icon type="close" style={{ fontSize: 12 }} onClick={() => this.closeTab(e.key)} />
+          </>
         );
       } else {
         e.tab = (
-          <>{e.tab} <Icon type="close" style={{ fontSize: 12, visibility: 'hidden' }} /></>
+          <>
+            {e.tab} <Icon type="close" style={{ fontSize: 12, visibility: 'hidden' }} />
+          </>
         );
       }
     });
@@ -363,15 +356,13 @@ class PurchasingOrg extends React.Component {
           this.onTabChange(key);
         }}
       >
-        {tabKey ?
-          tabsData.map(e =>
-            <FormContent
-              key={e.purchasingOrganizationCode}
-              valueChange={this.valueChange}
-              tabKey={tabKey}
-              data={e} />,
-          ) : <Empty description="暂无采购组织" />
-        }
+        {tabKey ? (
+          tabsData.map(e => (
+            <FormContent key={e.purchasingOrganizationCode} valueChange={this.valueChange} tabKey={tabKey} data={e} />
+          ))
+        ) : (
+          <Empty description="暂无采购组织" />
+        )}
       </Card>
     );
   }
