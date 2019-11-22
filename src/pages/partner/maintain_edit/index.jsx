@@ -28,7 +28,6 @@ class CustomerEdit extends Component {
     const editType = props.location.pathname.indexOf('/add') > -1 ? 'add' : 'update';
     this.state = {
       oldDetails: {}, // 修改模式下，应保存一份原始数据，以便提交时，对比数据并调整数据结构
-      // pageLoading: loading.effects['bpEdit/readBPDetails'] || false,
       editType,
       width: '100%',
       tabActiveKey: 'customer',

@@ -17,6 +17,7 @@ import {
 import React from 'react';
 import router from 'umi/router';
 import Link from 'umi/link';
+import querystring from 'querystring';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import StandardTable from '@/components/StandardTable';
 import { connect } from 'dva';
@@ -33,7 +34,7 @@ const renzhengMap = {
     value: 'default',
     text: '未认证',
   },
- 2: {
+  2: {
     value: 'processing',
     text: '审核中',
   },
@@ -81,7 +82,7 @@ const mobileIden = {
     value: 'success',
     text: '已认证',
   },
-}
+};
 
 // 邮箱
 const emailIden = {
@@ -93,7 +94,7 @@ const emailIden = {
     value: 'success',
     text: '已认证',
   },
-}
+};
 
 // 区域
 const quyuoptions = [
@@ -162,7 +163,7 @@ class Maintain extends React.Component {
         return (
           <Link className={styles.partNer} to={`/partner/maintain/details/${record.id}`}>
             <Icon type={record.type === 1 ? 'user' : 'home'} /> &nbsp;{record.name}
-              <div className={styles.partCode}>{val}</div>
+            <div className={styles.partCode}>{val}</div>
           </Link>
         );
       },
@@ -210,8 +211,9 @@ class Maintain extends React.Component {
       filterMultiple: false,
       render: val => {
         if (val) {
-          return <Badge status={dongjieMap[val].value} text={dongjieMap[val].text} />
+          return <Badge status={dongjieMap[val].value} text={dongjieMap[val].text} />;
         }
+        return null;
       },
     },
     {
@@ -257,18 +259,24 @@ class Maintain extends React.Component {
       dataIndex: 'mobilePhone',
       // width: 100,
       render(val, records) {
-        return <>
-                 <div>
-                    {val}
-                    &nbsp;&nbsp;
-                    {records.mobilePhoneVerifyStatus === 1 ? <Badge status={mobileIden[records.mobilePhoneVerifyStatus].value} /> : ''}
-                  </div>
-                  <div>
-                    {records.email}
-                    &nbsp;&nbsp;
-                    {records.emailVerifyStatus === 1 ? <Badge status={emailIden[records.emailVerifyStatus].value} /> : ''}
-                  </div>
-                </>
+        return (
+          <>
+            <div>
+              {val}
+              &nbsp;&nbsp;
+              {records.mobilePhoneVerifyStatus === 1 ? (
+                <Badge status={mobileIden[records.mobilePhoneVerifyStatus].value} />
+              ) : (
+                ''
+              )}
+            </div>
+            <div>
+              {records.email}
+              &nbsp;&nbsp;
+              {records.emailVerifyStatus === 1 ? <Badge status={emailIden[records.emailVerifyStatus].value} /> : ''}
+            </div>
+          </>
+        );
       },
     },
     {
@@ -276,7 +284,7 @@ class Maintain extends React.Component {
       dataIndex: 'address',
       // width: 200,
       render(val) {
-        return <div className={styles.hideAdress}>{val}</div>
+        return <div className={styles.hideAdress}>{val}</div>;
       },
     },
     {
@@ -287,28 +295,81 @@ class Maintain extends React.Component {
         const { id } = record;
         const menu = (
           <Menu style={{ padding: 0 }}>
-            {record.salesOrderBlock === 1 ? <Menu.Item><a href="#" onClick={e => { this.cancelFreeze(e, record) }}>取消冻结</a></Menu.Item> : <Menu.Item><a href="#" onClick={ e => { this.freezePartner(e, record) }}>冻结</a></Menu.Item>}
-            {record.certificationStatus === 4 ?
+            {record.salesOrderBlock === 1 ? (
               <Menu.Item>
-                <a href="#" onClick={e => { this.cancelIdent(e, record) }}>取消认证</a>
+                <a
+                  href="#"
+                  onClick={e => {
+                    this.cancelFreeze(e, record);
+                  }}
+                >
+                  取消冻结
+                </a>
               </Menu.Item>
-            : ''
-            }
-            {record.certificationStatus === 4 ?
+            ) : (
               <Menu.Item>
-                <a href="#" onClick={ e => { this.changeIdent(e, record) }}>变更认证</a>
+                <a
+                  href="#"
+                  onClick={e => {
+                    this.freezePartner(e, record);
+                  }}
+                >
+                  冻结
+                </a>
               </Menu.Item>
-            : ''
-            }
-            {record.certificationStatus === 1 ?
-              <Menu.Item><a href="#" onClick={ () => { this.showChange.visibleShow(true, record) }}>认证</a></Menu.Item>
-            : ''
-            }
+            )}
+            {record.certificationStatus === 4 ? (
+              <Menu.Item>
+                <a
+                  href="#"
+                  onClick={e => {
+                    this.cancelIdent(e, record);
+                  }}
+                >
+                  取消认证
+                </a>
+              </Menu.Item>
+            ) : (
+              ''
+            )}
+            {record.certificationStatus === 4 ? (
+              <Menu.Item>
+                <a
+                  href="#"
+                  onClick={e => {
+                    this.changeIdent(e, record);
+                  }}
+                >
+                  变更认证
+                </a>
+              </Menu.Item>
+            ) : (
+              ''
+            )}
+            {record.certificationStatus === 1 ? (
+              <Menu.Item>
+                <a
+                  href="#"
+                  onClick={() => {
+                    this.showChange.visibleShow(true, record);
+                  }}
+                >
+                  认证
+                </a>
+              </Menu.Item>
+            ) : (
+              ''
+            )}
           </Menu>
         );
+        const link = `/partner/maintain/edit/${id}?${querystring.stringify({
+          type: record.type,
+          customerDataStatus: record.customerDataStatus,
+          vendorDataStatus: record.vendorDataStatus,
+        })}`;
         return (
           <>
-            <Link to={`/partner/maintain/edit/${id}?type=${record.type}`}>修改</Link>
+            <Link to={link}>修改</Link>
             <Divider type="vertical" />
             <Dropdown overlay={menu}>
               <a className="ant-dropdown-link">
@@ -333,34 +394,32 @@ class Maintain extends React.Component {
   cancelFreeze = (e, record) => {
     e.preventDefault();
     api.bp.customerSalesActivation(record.id).then(() => {
-      this.getTableData()
-    })
-  }
+      this.getTableData();
+    });
+  };
 
-    /** 冻结 */
-    freezePartner = (e, record) => {
-      e.preventDefault();
-      api.bp.customerSalesOrderBlock(record.id).then(() => {
-        this.getTableData()
-      })
-    }
+  /** 冻结 */
+  freezePartner = (e, record) => {
+    e.preventDefault();
+    api.bp.customerSalesOrderBlock(record.id).then(() => {
+      this.getTableData();
+    });
+  };
 
   /** 取消认证 */
   cancelIdent = (e, record) => {
     e.preventDefault();
     console.log(record);
-  }
+  };
 
   /** 变更认证 */
   changeIdent = (e, record) => {
     e.preventDefault();
-    this.setState(
-      {
-        changeModal: true,
-        recordMesg: record,
-      },
-    )
-  }
+    this.setState({
+      changeModal: true,
+      recordMesg: record,
+    });
+  };
 
   /** 认证 */
   // identificate = (e, record) => {
@@ -381,17 +440,17 @@ class Maintain extends React.Component {
       if (fieldsValue.certificationStatusList) {
         if (fieldsValue.certificationStatusList[0]) {
           // eslint-disable-next-line no-param-reassign
-          fieldsValue.certificationStatusList = fieldsValue.certificationStatusList.join(',')
+          fieldsValue.certificationStatusList = fieldsValue.certificationStatusList.join(',');
         }
       }
       if (fieldsValue.regionalAttr) {
         if (fieldsValue.regionalAttr[0]) {
           // eslint-disable-next-line prefer-destructuring
-          fieldsValue.regionCode = fieldsValue.regionalAttr[0]
+          fieldsValue.regionCode = fieldsValue.regionalAttr[0];
         }
         if (fieldsValue.regionalAttr[1]) {
           // eslint-disable-next-line prefer-destructuring
-          fieldsValue.officeCode = fieldsValue.regionalAttr[1]
+          fieldsValue.officeCode = fieldsValue.regionalAttr[1];
         }
       }
       // const values = {
@@ -408,7 +467,9 @@ class Maintain extends React.Component {
 
   /** table数据 */
   getTableData = (options = {}) => {
-    const { formValues: { pageSize } } = this.state;
+    const {
+      formValues: { pageSize },
+    } = this.state;
     const query = Object.assign({}, { page: 1, pageSize }, options);
     this.setState({
       formValues: query,
@@ -421,7 +482,7 @@ class Maintain extends React.Component {
         loading: false,
       });
     });
-  }
+  };
 
   handleModalVisible = () => {
     router.push('/partner/maintain/add');
@@ -439,7 +500,7 @@ class Maintain extends React.Component {
       page: pagination.current,
       pageSize: pagination.pageSize,
     });
-  }
+  };
 
   handleFormReset = () => {
     this.props.form.resetFields();
@@ -461,7 +522,7 @@ class Maintain extends React.Component {
         },
       ],
     });
-  }
+  };
 
   toggleForm = () => {
     const { expandForm } = this.state;
@@ -488,19 +549,19 @@ class Maintain extends React.Component {
         return;
       }
       console.log(values);
-    })
+    });
 
     const allValues = form.getFieldsValue();
     console.log(allValues);
-  }
+  };
 
   // close the modal
   closeModal = () => {
     this.setState({
       changeModal: false,
       recordMesg: undefined,
-    })
-  }
+    });
+  };
 
   /** 完整筛选条件 */
   renderAdvancedForm() {
@@ -513,24 +574,16 @@ class Maintain extends React.Component {
       <Form onSubmit={this.handleSearch} layout="inline">
         <Row gutter={{ xxl: 100, lg: 80 }}>
           <Col xxl={6} lg={8}>
-            <FormItem label="编号">
-              {getFieldDecorator('code')(<Input placeholder="请输入"/>)}
-            </FormItem>
+            <FormItem label="编号">{getFieldDecorator('code')(<Input placeholder="请输入" />)}</FormItem>
           </Col>
           <Col xxl={6} lg={8}>
-            <FormItem label="名称">
-              {getFieldDecorator('name')(<Input placeholder="请输入"/>)}
-            </FormItem>
+            <FormItem label="名称">{getFieldDecorator('name')(<Input placeholder="请输入" />)}</FormItem>
           </Col>
           <Col xxl={6} lg={8}>
-            <FormItem label="移动电话">
-              {getFieldDecorator('mobilePhone')(<Input placeholder="请输入"/>)}
-            </FormItem>
+            <FormItem label="移动电话">{getFieldDecorator('mobilePhone')(<Input placeholder="请输入" />)}</FormItem>
           </Col>
           <Col xxl={6} lg={8}>
-            <FormItem label="Email">
-              {getFieldDecorator('email')(<Input placeholder="请输入"/>)}
-            </FormItem>
+            <FormItem label="Email">{getFieldDecorator('email')(<Input placeholder="请输入" />)}</FormItem>
           </Col>
           <Col xxl={6} lg={8}>
             <FormItem label="认证状态">
@@ -576,9 +629,7 @@ class Maintain extends React.Component {
           </Col>
           <Col xxl={6} lg={8}>
             <FormItem label="区域归属">
-              {getFieldDecorator('regionalAttr')(
-                <Cascader options={quyuoptions} placeholder="请选择"/>,
-              )}
+              {getFieldDecorator('regionalAttr')(<Cascader options={quyuoptions} placeholder="请选择" />)}
             </FormItem>
           </Col>
           <Col xxl={6} lg={8}>
@@ -631,19 +682,13 @@ class Maintain extends React.Component {
       <Form onSubmit={this.handleSearch} layout="inline">
         <Row gutter={{ xxl: 100, lg: 80 }}>
           <Col xxl={6} lg={8}>
-            <FormItem label="编号">
-              {getFieldDecorator('code')(<Input placeholder="请输入"/>)}
-            </FormItem>
+            <FormItem label="编号">{getFieldDecorator('code')(<Input placeholder="请输入" />)}</FormItem>
           </Col>
           <Col xxl={6} lg={8}>
-            <FormItem label="名称">
-              {getFieldDecorator('name')(<Input placeholder="请输入"/>)}
-            </FormItem>
+            <FormItem label="名称">{getFieldDecorator('name')(<Input placeholder="请输入" />)}</FormItem>
           </Col>
           <Col xxl={6} lg={0}>
-            <FormItem label="移动电话">
-              {getFieldDecorator('mobilePhone')(<Input placeholder="请输入"/>)}
-            </FormItem>
+            <FormItem label="移动电话">{getFieldDecorator('mobilePhone')(<Input placeholder="请输入" />)}</FormItem>
           </Col>
           <Col xxl={6} lg={8}>
             <span className="submitButtons">
@@ -664,8 +709,15 @@ class Maintain extends React.Component {
   }
 
   render() {
-    const { formValues: { page: current, pageSize },
-    list, selectedRows, changeModal, recordMesg, loading, total } = this.state;
+    const {
+      formValues: { page: current, pageSize },
+      list,
+      selectedRows,
+      changeModal,
+      recordMesg,
+      loading,
+      total,
+    } = this.state;
     const data = { list, pagination: { current, pageSize, total } };
     return (
       <PageHeaderWrapper>
@@ -682,7 +734,7 @@ class Maintain extends React.Component {
               scroll={{ x: 1600 }}
               selectedRows={selectedRows}
               loading={loading}
-              rowKey={record => record.code }
+              rowKey={record => record.code}
               data={data}
               columns={this.columns}
               onSelectRow={this.handleSelectRows}
@@ -693,9 +745,12 @@ class Maintain extends React.Component {
         <ChangeModal
           wrappedComponentRef={this.perSaveFormRef}
           changeModal={changeModal}
-          recordMsg={ recordMesg }
-          onRef={ref => { this.showChange = ref }}
-          getValues={this.getValues}/>
+          recordMsg={recordMesg}
+          onRef={ref => {
+            this.showChange = ref;
+          }}
+          getValues={this.getValues}
+        />
       </PageHeaderWrapper>
     );
   }
