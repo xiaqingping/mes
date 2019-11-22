@@ -1,4 +1,17 @@
-import { Card, Col, Form, Input, InputNumber, Row, Select, Switch, Empty, Icon, Cascader } from 'antd';
+import {
+  Card,
+  Col,
+  Form,
+  Input,
+  InputNumber,
+  Row,
+  Select,
+  Switch,
+  Empty,
+  Icon,
+  Cascader,
+} from 'antd';
+
 import { connect } from 'dva';
 import React from 'react';
 import { MobilePhoneInput } from '@/components/CustomizedFormControls';
@@ -260,7 +273,11 @@ class PurchasingOrg extends React.Component {
       return { ...e, disabled };
     });
     return (
-      <Cascader options={options} onChange={this.onCascaderChange} fieldNames={{ label: 'name', value: 'code' }}>
+      <Cascader
+        options={options}
+        onChange={this.onCascaderChange}
+        fieldNames={{ label: 'name', value: 'code' }}
+      >
         <a style={{ fontSize: 14, marginLeft: -16 }} href="#">
           采购组织 <Icon type="down" style={{ fontSize: 12 }} />
         </a>
@@ -333,7 +350,8 @@ class PurchasingOrg extends React.Component {
       if (e.key === tabKey) {
         e.tab = (
           <>
-            {e.tab} <Icon type="close" style={{ fontSize: 12 }} onClick={() => this.closeTab(e.key)} />
+            {e.tab}{' '}
+            <Icon type="close" style={{ fontSize: 12 }} onClick={() => this.closeTab(e.key)} />
           </>
         );
       } else {
@@ -358,7 +376,12 @@ class PurchasingOrg extends React.Component {
       >
         {tabKey ? (
           tabsData.map(e => (
-            <FormContent key={e.purchasingOrganizationCode} valueChange={this.valueChange} tabKey={tabKey} data={e} />
+            <FormContent
+              key={e.purchasingOrganizationCode}
+              valueChange={this.valueChange}
+              tabKey={tabKey}
+              data={e}
+            />
           ))
         ) : (
           <Empty description="暂无采购组织" />
