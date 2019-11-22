@@ -284,7 +284,7 @@ class Maintain extends React.Component {
       title: '操作',
       width: 170,
       render: (text, record) => {
-        const { code } = record;
+        const { id } = record;
         const menu = (
           <Menu style={{ padding: 0 }}>
             {record.salesOrderBlock === 1 ? <Menu.Item><a href="#" onClick={e => { this.cancelFreeze(e, record) }}>取消冻结</a></Menu.Item> : <Menu.Item><a href="#" onClick={ e => { this.freezePartner(e, record) }}>冻结</a></Menu.Item>}
@@ -308,7 +308,7 @@ class Maintain extends React.Component {
         );
         return (
           <>
-            <Link to={`/partner/maintain/edit/${code}`}>修改</Link>
+            <Link to={`/partner/maintain/edit/${id}?type=${record.type}`}>修改</Link>
             <Divider type="vertical" />
             <Dropdown overlay={menu}>
               <a className="ant-dropdown-link">

@@ -10,13 +10,11 @@ import {
   Empty,
   Icon,
   Cascader,
-  AutoComplete,
 } from 'antd';
 import { connect } from 'dva';
 import React from 'react';
 import _ from 'lodash';
 import { MobilePhoneInput } from '@/components/CustomizedFormControls';
-import employees from '@/api/employees';
 
 const FormItem = Form.Item;
 const { Option } = Select;
