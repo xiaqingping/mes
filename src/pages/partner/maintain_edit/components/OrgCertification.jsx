@@ -15,7 +15,6 @@ const { Option } = Select;
   details: bpEdit.details || {},
   uuid: bpEdit.uuid,
   authorization: user.currentUser.authorization,
-  // eslint-disable-next-line max-len
   organizationCertification: (bpEdit.details && bpEdit.details.organizationCertification) || { attachmentList: [] },
 }))
 class OrgCertification extends Component {
