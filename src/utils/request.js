@@ -16,7 +16,7 @@ const baseURL = baseURLMap[env];
 // 创建 axios 实例
 const service = axios.create({
   baseURL: baseURLMap[env],
-  timeout: 60000,
+  timeout: 6000,
 });
 
 const requestErr = data => {

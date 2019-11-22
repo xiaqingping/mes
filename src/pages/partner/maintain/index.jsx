@@ -20,6 +20,7 @@ import Link from 'umi/link';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import StandardTable from '@/components/StandardTable';
 import { connect } from 'dva';
+import _ from 'lodash';
 import ChangeModal from './components/ChangeModal';
 import styles from './index.less';
 import api from '@/api';
@@ -95,34 +96,6 @@ const emailIden = {
   },
 }
 
-// 区域
-const quyuoptions = [
-  {
-    value: 'huadong',
-    label: '华东大区',
-    children: [
-      {
-        value: 'anhui',
-        label: '安徽分点',
-      },
-      {
-        value: 'shanghai',
-        label: '上海分点',
-      },
-    ],
-  },
-  {
-    value: 'dongbei',
-    label: '东北大区',
-    children: [
-      {
-        value: 'changchun',
-        label: '长春分点',
-      },
-    ],
-  },
-];
-
 function renderOption(item) {
   return (
     <Option key={item.value} text={item.value}>
@@ -134,9 +107,16 @@ function renderOption(item) {
   );
 }
 
-@connect(({ basicCache }) => basicCache)
+@connect(({ basicCache, global }) => {
+  const regionOffice = basicCache.regionOffice.filter(e => e.languageCode === global.languageCode)
+  return ({
+    regionOffice,
+  })
+})
 class Maintain extends React.Component {
-  state = {
+constructor(props) {
+  super(props);
+  this.state = {
     formValues: {
       page: 1,
       pageSize: 10,
@@ -151,176 +131,11 @@ class Maintain extends React.Component {
     changeModal: false,
     recordMesg: undefined,
     loading: false,
+    searchVal: {},
   };
-
-  columns = [
-    {
-      title: '业务伙伴',
-      dataIndex: 'code',
-      width: 250,
-      render(val, record) {
-        return (
-          <Link className={styles.partNer} to={`/partner/maintain/details/${record.id}`}>
-            <Icon type={record.type === 1 ? 'user' : 'home'} /> &nbsp;{record.name}
-              <div className={styles.partCode}>{val}</div>
-          </Link>
-        );
-      },
-    },
-    {
-      title: '认证',
-      dataIndex: 'certificationStatus',
-      // width: 100,
-      filters: [
-        {
-          value: '1',
-          text: '未认证',
-        },
-        {
-          value: '2',
-          text: '审核中',
-        },
-        {
-          value: '3',
-          text: '部分认证',
-        },
-        {
-          value: '4',
-          text: '已认证',
-        },
-      ],
-      onFilter: (value, record) => { console.log(value) },
-      render(val) {
-        return <Badge status={renzhengMap[val].value} text={renzhengMap[val].text} />;
-      },
-    },
-    {
-      title: '冻结',
-      dataIndex: 'salesOrderBlock',
-      // width: 100,
-      filters: [
-        {
-          value: 'error',
-          text: '冻结',
-        },
-        {
-          value: 'success',
-          text: '活跃',
-        },
-      ],
-      filterMultiple: false,
-      render: val => {
-        if (val) {
-          return <Badge status={dongjieMap[val].value} text={dongjieMap[val].text} />
-        }
-      },
-    },
-    {
-      title: '客户',
-      dataIndex: 'customerDataStatus',
-      // width: 100,
-      filters: [
-        {
-          value: 'default',
-          text: '不完整',
-        },
-        {
-          value: 'success',
-          text: '完整',
-        },
-      ],
-      filterMultiple: false,
-      render(val) {
-        return <Badge status={wanzhengMap[val].value} text={wanzhengMap[val].text} />;
-      },
-    },
-    {
-      title: '供应商',
-      dataIndex: 'vendorDataStatus',
-      // width: 100,
-      filters: [
-        {
-          value: 'default',
-          text: '不完整',
-        },
-        {
-          value: 'success',
-          text: '完整',
-        },
-      ],
-      filterMultiple: false,
-      render(val) {
-        return <Badge status={wanzhengMap[val].value} text={wanzhengMap[val].text} />;
-      },
-    },
-    {
-      title: '联系方式',
-      dataIndex: 'mobilePhone',
-      // width: 100,
-      render(val, records) {
-        return <>
-                 <div>
-                    {val}
-                    &nbsp;&nbsp;
-                    {records.mobilePhoneVerifyStatus === 1 ? <Badge status={mobileIden[records.mobilePhoneVerifyStatus].value} /> : ''}
-                  </div>
-                  <div>
-                    {records.email}
-                    &nbsp;&nbsp;
-                    {records.emailVerifyStatus === 1 ? <Badge status={emailIden[records.emailVerifyStatus].value} /> : ''}
-                  </div>
-                </>
-      },
-    },
-    {
-      title: '地址',
-      dataIndex: 'address',
-      // width: 200,
-      render(val) {
-        return <div className={styles.hideAdress}>{val}</div>
-      },
-    },
-    {
-      fixed: 'right',
-      title: '操作',
-      width: 170,
-      render: (text, record) => {
-        const { id } = record;
-        const menu = (
-          <Menu style={{ padding: 0 }}>
-            {record.salesOrderBlock === 1 ? <Menu.Item><a href="#" onClick={e => { this.cancelFreeze(e, record) }}>取消冻结</a></Menu.Item> : <Menu.Item><a href="#" onClick={ e => { this.freezePartner(e, record) }}>冻结</a></Menu.Item>}
-            {record.certificationStatus === 4 ?
-              <Menu.Item>
-                <a href="#" onClick={e => { this.cancelIdent(e, record) }}>取消认证</a>
-              </Menu.Item>
-            : ''
-            }
-            {record.certificationStatus === 4 ?
-              <Menu.Item>
-                <a href="#" onClick={ e => { this.changeIdent(e, record) }}>变更认证</a>
-              </Menu.Item>
-            : ''
-            }
-            {record.certificationStatus === 1 ?
-              <Menu.Item><a href="#" onClick={ () => { this.showChange.visibleShow(true, record) }}>认证</a></Menu.Item>
-            : ''
-            }
-          </Menu>
-        );
-        return (
-          <>
-            <Link to={`/partner/maintain/edit/${id}?type=${record.type}`}>修改</Link>
-            <Divider type="vertical" />
-            <Dropdown overlay={menu}>
-              <a className="ant-dropdown-link">
-                更多操作 <Icon type="down" />
-              </a>
-            </Dropdown>
-          </>
-        );
-      },
-    },
-  ];
+  this.callSaler = _.debounce(this.callSaler, 1000);
+  this.callCustomer = _.debounce(this.callCustomer, 1000);
+}
 
   componentDidMount() {
     this.props.dispatch({
@@ -331,7 +146,25 @@ class Maintain extends React.Component {
       type: 'basicCache/getCache',
       payload: { type: 'countryDiallingCodes' },
     });
+    this.props.dispatch({
+      type: 'basicCache/getCache',
+      payload: { type: 'regionOffice' },
+    });
     this.getTableData();
+  }
+
+  // 销售归属查询
+  callSaler = value => {
+    api.employees.getSaler({ code_or_name: value }).then(res => {
+      console.log(res)
+    })
+  }
+
+  // 收票方查询
+  callCustomer = value => {
+    api.bp.getOrgCustomerByCodeOrName({ code_or_name: value }).then(res => {
+      console.log(res)
+    })
   }
 
   /** 激活 */
@@ -398,6 +231,7 @@ class Maintain extends React.Component {
           // eslint-disable-next-line prefer-destructuring
           fieldsValue.officeCode = fieldsValue.regionalAttr[1]
         }
+        delete fieldsValue.regionalAttr
       }
       // const values = {
       //   ...fieldsValue,
@@ -407,6 +241,9 @@ class Maintain extends React.Component {
       // this.setState({
       //   formValues: values,
       // });
+      this.setState({
+        searchVal: fieldsValue,
+      })
       this.getTableData(fieldsValue);
     });
   };
@@ -419,11 +256,14 @@ class Maintain extends React.Component {
       formValues: query,
       loading: true,
     });
-    console.log(query)
     api.bp.getBPList(query).then(res => {
       this.setState({
         list: res.results,
         total: res.total,
+        loading: false,
+      });
+    }).catch(() => {
+      this.setState({
         loading: false,
       });
     });
@@ -441,10 +281,14 @@ class Maintain extends React.Component {
 
   // 分页
   handleStandardTableChange = pagination => {
-    this.getTableData({
-      page: pagination.current,
-      pageSize: pagination.pageSize,
-    });
+    if (JSON.stringify(pagination) !== '{}') {
+      const { searchVal } = this.state
+      this.getTableData({
+        ...searchVal,
+        page: pagination.current,
+        pageSize: pagination.pageSize,
+      });
+    }
   }
 
   handleFormReset = () => {
@@ -452,21 +296,31 @@ class Maintain extends React.Component {
   };
 
   /** 查询销售归属 */
-  xiaoshuoguishuSearch = value => {
-    this.setState({
-      xiaoshuoguishu: [
-        {
-          id: 1,
-          code: 11111,
-          value: `第一个${value}`,
-        },
-        {
-          id: 2,
-          code: 22222,
-          value: `第二个${value}`,
-        },
-      ],
-    });
+  searchSaler = value => {
+    // this.setState({
+    //   xiaoshuoguishu: [
+    //     {
+    //       id: 1,
+    //       code: 11111,
+    //       value: `第一个${value}`,
+    //     },
+    //     {
+    //       id: 2,
+    //       code: 22222,
+    //       value: `第二个${value}`,
+    //     },
+    //   ],
+    // });
+    if (value) {
+      this.callSaler(value)
+    }
+  }
+
+  /** 查询收票方 */
+  searchCustomer = value => {
+    if (value) {
+      this.callCustomer(value)
+    }
   }
 
   toggleForm = () => {
@@ -512,8 +366,10 @@ class Maintain extends React.Component {
   renderAdvancedForm() {
     const {
       form: { getFieldDecorator },
+      regionOffice,
     } = this.props;
     const { xiaoshuoguishu } = this.state;
+
 
     return (
       <Form onSubmit={this.handleSearch} layout="inline">
@@ -583,7 +439,7 @@ class Maintain extends React.Component {
           <Col xxl={6} lg={8}>
             <FormItem label="区域归属">
               {getFieldDecorator('regionalAttr')(
-                <Cascader options={quyuoptions} placeholder="请选择"/>,
+                <Cascader options={regionOffice} placeholder="请选择" fieldNames={{ label: 'name', value: 'code', children: 'officeList' }}/>,
               )}
             </FormItem>
           </Col>
@@ -592,7 +448,7 @@ class Maintain extends React.Component {
               {getFieldDecorator('salerCode')(
                 <AutoComplete
                   dataSource={xiaoshuoguishu.map(renderOption)}
-                  onSearch={this.xiaoshuoguishuSearch}
+                  onSearch={this.searchSaler}
                   optionLabelProp="text"
                   placeholder="请输入"
                 />,
@@ -604,7 +460,7 @@ class Maintain extends React.Component {
               {getFieldDecorator('invoicePartyId')(
                 <AutoComplete
                   dataSource={xiaoshuoguishu.map(renderOption)}
-                  onSearch={this.xiaoshuoguishuSearch}
+                  onSearch={this.searchCustomer}
                   optionLabelProp="text"
                   placeholder="请输入"
                 />,
@@ -673,6 +529,181 @@ class Maintain extends React.Component {
     const { formValues: { page: current, pageSize },
     list, selectedRows, changeModal, recordMesg, loading, total } = this.state;
     const data = { list, pagination: { current, pageSize, total } };
+    const columns = [
+      {
+        title: '业务伙伴',
+        dataIndex: 'code',
+        width: 250,
+        render(val, record) {
+          return (
+            <Link className={styles.partNer} to={`/partner/maintain/details/${record.id}`}>
+              <Icon type={record.type === 1 ? 'user' : 'home'} /> &nbsp;{record.name}
+                <div className={styles.partCode}>{val}</div>
+            </Link>
+          );
+        },
+      },
+      {
+        title: '认证',
+        dataIndex: 'certificationStatus',
+        // width: 100,
+        filters: [
+          {
+            value: '1',
+            text: '未认证',
+          },
+          {
+            value: '2',
+            text: '审核中',
+          },
+          {
+            value: '3',
+            text: '部分认证',
+          },
+          {
+            value: '4',
+            text: '已认证',
+          },
+        ],
+        onFilter: (value, record) =>
+        record.certificationStatus.toString().indexOf(value.toString()) === 0,
+        render(val) {
+          return <Badge status={renzhengMap[val].value} text={renzhengMap[val].text} />;
+        },
+      },
+      {
+        title: '冻结',
+        dataIndex: 'salesOrderBlock',
+        // width: 100,
+        filters: [
+          {
+            value: '1',
+            text: '冻结',
+          },
+          {
+            value: '2',
+            text: '活跃',
+          },
+        ],
+        filterMultiple: false,
+        onFilter: (value, record) =>
+        record.salesOrderBlock.toString().indexOf(value.toString()) === 0,
+        render: val => {
+          if (val) {
+            return <Badge status={dongjieMap[val].value} text={dongjieMap[val].text} />
+          }
+        },
+      },
+      {
+        title: '客户',
+        dataIndex: 'customerDataStatus',
+        // width: 100,
+        filters: [
+          {
+            value: '2',
+            text: '不完整',
+          },
+          {
+            value: '1',
+            text: '完整',
+          },
+        ],
+        filterMultiple: false,
+        onFilter: (value, record) =>
+        record.customerDataStatus.toString().indexOf(value.toString()) === 0,
+        render(val) {
+          return <Badge status={wanzhengMap[val].value} text={wanzhengMap[val].text} />;
+        },
+      },
+      {
+        title: '供应商',
+        dataIndex: 'vendorDataStatus',
+        // width: 100,
+        filters: [
+          {
+            value: '2',
+            text: '不完整',
+          },
+          {
+            value: '1',
+            text: '完整',
+          },
+        ],
+        filterMultiple: false,
+        onFilter: (value, record) =>
+        record.vendorDataStatus.toString().indexOf(value.toString()) === 0,
+        render(val) {
+          return <Badge status={wanzhengMap[val].value} text={wanzhengMap[val].text} />;
+        },
+      },
+      {
+        title: '联系方式',
+        dataIndex: 'mobilePhone',
+        // width: 100,
+        render(val, records) {
+          return <>
+                   <div>
+                      {val}
+                      &nbsp;&nbsp;
+                      {records.mobilePhoneVerifyStatus === 1 ? <Badge status={mobileIden[records.mobilePhoneVerifyStatus].value} /> : ''}
+                    </div>
+                    <div>
+                      {records.email}
+                      &nbsp;&nbsp;
+                      {records.emailVerifyStatus === 1 ? <Badge status={emailIden[records.emailVerifyStatus].value} /> : ''}
+                    </div>
+                  </>
+        },
+      },
+      {
+        title: '地址',
+        dataIndex: 'address',
+        // width: 200,
+        render(val) {
+          return <div className={styles.hideAdress}>{val}</div>
+        },
+      },
+      {
+        fixed: 'right',
+        title: '操作',
+        width: 170,
+        render: (text, record) => {
+          const { id } = record;
+          const menu = (
+            <Menu style={{ padding: 0 }}>
+              {record.salesOrderBlock === 1 ? <Menu.Item><a href="#" onClick={e => { this.cancelFreeze(e, record) }}>取消冻结</a></Menu.Item> : <Menu.Item><a href="#" onClick={ e => { this.freezePartner(e, record) }}>冻结</a></Menu.Item>}
+              {record.certificationStatus === 4 ?
+                <Menu.Item>
+                  <a href="#" onClick={e => { this.cancelIdent(e, record) }}>取消认证</a>
+                </Menu.Item>
+              : ''
+              }
+              {record.certificationStatus === 4 ?
+                <Menu.Item>
+                  <a href="#" onClick={ e => { this.changeIdent(e, record) }}>变更认证</a>
+                </Menu.Item>
+              : ''
+              }
+              {record.certificationStatus === 1 ?
+                <Menu.Item><a href="#" onClick={ () => { this.showChange.visibleShow(true, record) }}>认证</a></Menu.Item>
+              : ''
+              }
+            </Menu>
+          );
+          return (
+            <>
+              <Link to={`/partner/maintain/edit/${id}?type=${record.type}`}>修改</Link>
+              <Divider type="vertical" />
+              <Dropdown overlay={menu}>
+                <a className="ant-dropdown-link">
+                  更多操作 <Icon type="down" />
+                </a>
+              </Dropdown>
+            </>
+          );
+        },
+      },
+    ];
     return (
       <PageHeaderWrapper>
         <Card bordered={false}>
@@ -690,7 +721,7 @@ class Maintain extends React.Component {
               loading={loading}
               rowKey={record => record.code }
               data={data}
-              columns={this.columns}
+              columns={columns}
               onSelectRow={this.handleSelectRows}
               onChange={this.handleStandardTableChange}
             />

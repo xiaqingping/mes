@@ -254,6 +254,10 @@ class Verification extends React.Component {
         total: res.total,
         loading: false,
       });
+    }).catch(() => {
+      this.setState({
+        loading: false,
+      })
     });
   }
 
