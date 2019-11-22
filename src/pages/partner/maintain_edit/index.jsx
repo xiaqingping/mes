@@ -19,7 +19,7 @@ import Address from './components/Address';
 import PurchasingOrg from './components/PurchasingOrg';
 import Bank from './components/Bank';
 
-import { bp } from '@/api'
+import { bp } from '@/api';
 import { validateForm, diff, guid } from '@/utils/utils';
 
 @connect(({ bpEdit }) => ({
@@ -83,14 +83,13 @@ class CustomerEdit extends Component {
 
     this.setState({ pageLoading: true });
 
-    const { id } = this.props.match.params;
-    const details = {};
-    console.log(id);
-    // bp.getBPCustomer(id);
-    // bp.getBPVendor(id);
-    // bp.getBPOrgCertification(id);
-    // bp.getBPPiCertification(id);
-    this.setState({ pageLoading: false, oldDetails: details });
+    const { location, match, dispatch } = this.props;
+    const { params: { id } } = match;
+    const { query: { type } } = location;
+    dispatch({
+      type: 'bpEdit/readBPDetails',
+      payload: { id, type },
+    });
   }
 
   // 获取此页面需要用到的基础数据
