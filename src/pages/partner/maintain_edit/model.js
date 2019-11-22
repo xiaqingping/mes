@@ -3,8 +3,13 @@ import bp from '@/api/bp';
 const SeqModel = {
   namespace: 'bpEdit',
   state: {
+    // 修改BP时，把查询到的BP详细数据做一个备份
+    oldDetails: null,
+    // BP 详细数据
     details: null,
+    // 编辑状态 add 新增，update 修改
     editType: '',
+    // 上传图片使用
     uuid: '',
   },
   effects: {
@@ -21,7 +26,11 @@ const SeqModel = {
 
         yield put({
           type: 'setState',
-          payload: { type: 'details', data: details },
+          payload: { type: 'details', data: JSON.parse(JSON.stringify(details)) },
+        });
+        yield put({
+          type: 'setState',
+          payload: { type: 'oldDetails', data: JSON.parse(JSON.stringify(details)) },
         });
       } catch (error) {
         console.log(error);
@@ -30,7 +39,6 @@ const SeqModel = {
   },
   reducers: {
     setState(state, action) {
-      console.log(action);
       const {
         payload: { type, data },
       } = action;
@@ -41,8 +49,8 @@ const SeqModel = {
       const details = {
         basic: {},
         customer: {
-          taxesCityCode: null,
-          taxesCountyCode: null,
+          // taxesCityCode: null,
+          // taxesCountyCode: null,
           salesOrderBlock: 2,
           salesAreaList: [],
           addressList: [],

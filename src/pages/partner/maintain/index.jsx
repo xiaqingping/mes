@@ -17,6 +17,7 @@ import {
 import React from 'react';
 import router from 'umi/router';
 import Link from 'umi/link';
+import querystring from 'querystring';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import StandardTable from '@/components/StandardTable';
 import { connect } from 'dva';
@@ -34,7 +35,7 @@ const renzhengMap = {
     value: 'default',
     text: '未认证',
   },
- 2: {
+  2: {
     value: 'processing',
     text: '审核中',
   },
@@ -82,7 +83,7 @@ const mobileIden = {
     value: 'success',
     text: '已认证',
   },
-}
+};
 
 // 邮箱
 const emailIden = {
@@ -94,7 +95,7 @@ const emailIden = {
     value: 'success',
     text: '已认证',
   },
-}
+};
 
 function renderOption(item) {
   return (
@@ -171,34 +172,32 @@ constructor(props) {
   cancelFreeze = (e, record) => {
     e.preventDefault();
     api.bp.customerSalesActivation(record.id).then(() => {
-      this.getTableData()
-    })
-  }
+      this.getTableData();
+    });
+  };
 
-    /** 冻结 */
-    freezePartner = (e, record) => {
-      e.preventDefault();
-      api.bp.customerSalesOrderBlock(record.id).then(() => {
-        this.getTableData()
-      })
-    }
+  /** 冻结 */
+  freezePartner = (e, record) => {
+    e.preventDefault();
+    api.bp.customerSalesOrderBlock(record.id).then(() => {
+      this.getTableData();
+    });
+  };
 
   /** 取消认证 */
   cancelIdent = (e, record) => {
     e.preventDefault();
     console.log(record);
-  }
+  };
 
   /** 变更认证 */
   changeIdent = (e, record) => {
     e.preventDefault();
-    this.setState(
-      {
-        changeModal: true,
-        recordMesg: record,
-      },
-    )
-  }
+    this.setState({
+      changeModal: true,
+      recordMesg: record,
+    });
+  };
 
   /** 认证 */
   // identificate = (e, record) => {
@@ -219,17 +218,17 @@ constructor(props) {
       if (fieldsValue.certificationStatusList) {
         if (fieldsValue.certificationStatusList[0]) {
           // eslint-disable-next-line no-param-reassign
-          fieldsValue.certificationStatusList = fieldsValue.certificationStatusList.join(',')
+          fieldsValue.certificationStatusList = fieldsValue.certificationStatusList.join(',');
         }
       }
       if (fieldsValue.regionalAttr) {
         if (fieldsValue.regionalAttr[0]) {
           // eslint-disable-next-line prefer-destructuring
-          fieldsValue.regionCode = fieldsValue.regionalAttr[0]
+          fieldsValue.regionCode = fieldsValue.regionalAttr[0];
         }
         if (fieldsValue.regionalAttr[1]) {
           // eslint-disable-next-line prefer-destructuring
-          fieldsValue.officeCode = fieldsValue.regionalAttr[1]
+          fieldsValue.officeCode = fieldsValue.regionalAttr[1];
         }
         delete fieldsValue.regionalAttr
       }
@@ -250,7 +249,9 @@ constructor(props) {
 
   /** table数据 */
   getTableData = (options = {}) => {
-    const { formValues: { pageSize } } = this.state;
+    const {
+      formValues: { pageSize },
+    } = this.state;
     const query = Object.assign({}, { page: 1, pageSize }, options);
     this.setState({
       formValues: query,
@@ -267,7 +268,7 @@ constructor(props) {
         loading: false,
       });
     });
-  }
+  };
 
   handleModalVisible = () => {
     router.push('/partner/maintain/add');
@@ -348,19 +349,19 @@ constructor(props) {
         return;
       }
       console.log(values);
-    })
+    });
 
     const allValues = form.getFieldsValue();
     console.log(allValues);
-  }
+  };
 
   // close the modal
   closeModal = () => {
     this.setState({
       changeModal: false,
       recordMesg: undefined,
-    })
-  }
+    });
+  };
 
   /** 完整筛选条件 */
   renderAdvancedForm() {
@@ -375,24 +376,16 @@ constructor(props) {
       <Form onSubmit={this.handleSearch} layout="inline">
         <Row gutter={{ xxl: 100, lg: 80 }}>
           <Col xxl={6} lg={8}>
-            <FormItem label="编号">
-              {getFieldDecorator('code')(<Input placeholder="请输入"/>)}
-            </FormItem>
+            <FormItem label="编号">{getFieldDecorator('code')(<Input placeholder="请输入" />)}</FormItem>
           </Col>
           <Col xxl={6} lg={8}>
-            <FormItem label="名称">
-              {getFieldDecorator('name')(<Input placeholder="请输入"/>)}
-            </FormItem>
+            <FormItem label="名称">{getFieldDecorator('name')(<Input placeholder="请输入" />)}</FormItem>
           </Col>
           <Col xxl={6} lg={8}>
-            <FormItem label="移动电话">
-              {getFieldDecorator('mobilePhone')(<Input placeholder="请输入"/>)}
-            </FormItem>
+            <FormItem label="移动电话">{getFieldDecorator('mobilePhone')(<Input placeholder="请输入" />)}</FormItem>
           </Col>
           <Col xxl={6} lg={8}>
-            <FormItem label="Email">
-              {getFieldDecorator('email')(<Input placeholder="请输入"/>)}
-            </FormItem>
+            <FormItem label="Email">{getFieldDecorator('email')(<Input placeholder="请输入" />)}</FormItem>
           </Col>
           <Col xxl={6} lg={8}>
             <FormItem label="认证状态">
@@ -493,19 +486,13 @@ constructor(props) {
       <Form onSubmit={this.handleSearch} layout="inline">
         <Row gutter={{ xxl: 100, lg: 80 }}>
           <Col xxl={6} lg={8}>
-            <FormItem label="编号">
-              {getFieldDecorator('code')(<Input placeholder="请输入"/>)}
-            </FormItem>
+            <FormItem label="编号">{getFieldDecorator('code')(<Input placeholder="请输入" />)}</FormItem>
           </Col>
           <Col xxl={6} lg={8}>
-            <FormItem label="名称">
-              {getFieldDecorator('name')(<Input placeholder="请输入"/>)}
-            </FormItem>
+            <FormItem label="名称">{getFieldDecorator('name')(<Input placeholder="请输入" />)}</FormItem>
           </Col>
           <Col xxl={6} lg={0}>
-            <FormItem label="移动电话">
-              {getFieldDecorator('mobilePhone')(<Input placeholder="请输入"/>)}
-            </FormItem>
+            <FormItem label="移动电话">{getFieldDecorator('mobilePhone')(<Input placeholder="请输入" />)}</FormItem>
           </Col>
           <Col xxl={6} lg={8}>
             <span className="submitButtons">
@@ -526,8 +513,15 @@ constructor(props) {
   }
 
   render() {
-    const { formValues: { page: current, pageSize },
-    list, selectedRows, changeModal, recordMesg, loading, total } = this.state;
+    const {
+      formValues: { page: current, pageSize },
+      list,
+      selectedRows,
+      changeModal,
+      recordMesg,
+      loading,
+      total,
+    } = this.state;
     const data = { list, pagination: { current, pageSize, total } };
     const columns = [
       {
@@ -719,7 +713,7 @@ constructor(props) {
               scroll={{ x: 1600 }}
               selectedRows={selectedRows}
               loading={loading}
-              rowKey={record => record.code }
+              rowKey={record => record.code}
               data={data}
               columns={columns}
               onSelectRow={this.handleSelectRows}
@@ -730,9 +724,12 @@ constructor(props) {
         <ChangeModal
           wrappedComponentRef={this.perSaveFormRef}
           changeModal={changeModal}
-          recordMsg={ recordMesg }
-          onRef={ref => { this.showChange = ref }}
-          getValues={this.getValues}/>
+          recordMsg={recordMesg}
+          onRef={ref => {
+            this.showChange = ref;
+          }}
+          getValues={this.getValues}
+        />
       </PageHeaderWrapper>
     );
   }

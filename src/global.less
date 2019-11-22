@@ -31,20 +31,20 @@ ol {
 
 .ant-page-header {
   .ant-page-header-heading-title {
-    font-size: 16px;
     color: #666;
+    font-size: 16px;
   }
 }
 
 // 下拉选择框中的国家图片
 .select-countryPic-box {
   display: inline-block;
-  margin-right: 5px;
-  width: 20px;
+  width: 14px;
   height: 100%;
-  background-size: 20px;
+  margin-right: 5px;
   background-repeat: no-repeat;
   background-position: center;
+  background-size: 14px;
 }
 
 // 表格布局
@@ -60,8 +60,8 @@ ol {
   }
   .ant-table-small {
     border: none;
-    .ant-table-thead>tr>th {
-      background: #fafafa!important;
+    .ant-table-thead > tr > th {
+      background: #fafafa !important;
     }
   }
 }
@@ -93,25 +93,22 @@ ol {
   }
 }
 
-// 编辑表格错误提示位置
 :global {
+  // 编辑表格错误提示位置
   .editable-row {
     .ant-form-item {
       margin: 0;
     }
     .ant-form-explain {
       position: absolute;
-      font-size: 12px;
       margin-top: -4px;
+      font-size: 12px;
     }
   }
-}
-
-// 描述列表
-:global {
+  // 描述列表
   .s-descriptions {
     &.ant-descriptions {
-      .ant-descriptions-row:nth-child(2n+1) {
+      .ant-descriptions-row:nth-child(2n + 1) {
         .ant-descriptions-item {
           padding-bottom: 12px;
         }

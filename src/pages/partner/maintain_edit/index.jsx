@@ -19,6 +19,7 @@ import { bp } from '@/api';
 import { validateForm, diff, guid } from '@/utils/utils';
 
 @connect(({ loading, bpEdit }) => ({
+  oldDetails: bpEdit.oldDetails || {},
   details: bpEdit.details || {},
   pageLoading: loading.effects['bpEdit/readBPDetails'] || false,
 }))
@@ -27,8 +28,6 @@ class CustomerEdit extends Component {
     super(props);
     const editType = props.location.pathname.indexOf('/add') > -1 ? 'add' : 'update';
     this.state = {
-      oldDetails: {}, // 修改模式下，应保存一份原始数据，以便提交时，对比数据并调整数据结构
-      // pageLoading: loading.effects['bpEdit/readBPDetails'] || false,
       editType,
       width: '100%',
       tabActiveKey: 'customer',
@@ -152,8 +151,6 @@ class CustomerEdit extends Component {
     const basicResult = await validateForm(basicForm);
     if (!basicResult[0]) return;
 
-    console.log(this.state.details);
-
     const { editType } = this.state;
     if (editType === 'add') {
       this.add();
@@ -209,7 +206,7 @@ class CustomerEdit extends Component {
 
   // 修改
   update = () => {
-    const { oldDetails } = this.state;
+    const { oldDetails } = this.props;
     const data = JSON.parse(JSON.stringify(this.props.details)) || {};
     const customer = data.customer || {};
     const salesAreaList = customer.salesAreaList || [];

@@ -1,33 +1,17 @@
-import {
-  Button,
-  Table,
-  Input,
-  Divider,
-  Form,
-  Card,
-} from 'antd';
+import { Button, Table, Input, Divider, Form, Card } from 'antd';
 import React from 'react';
 import { connect } from 'dva';
 import _ from 'lodash';
+import { validateForm, formatter } from '@/utils/utils';
 
-import { validateForm } from '@/utils/utils';
-import { MobilePhoneInput, AddressInput } from '@/components/CustomizedFormControls'
+import { MobilePhoneInput, AddressInput } from '@/components/CustomizedFormControls';
 
 const EditableContext = React.createContext();
 
 class EditableCell extends React.Component {
   renderCell = ({ getFieldDecorator }) => {
-    const {
-      editing,
-      dataIndex,
-      title,
-      inputType,
-      record,
-      index,
-      children,
-      editOptions,
-      ...restProps
-    } = this.props;
+    // eslint-disable-next-line max-len
+    const { editing, dataIndex, title, inputType, record, index, children, editOptions, ...restProps } = this.props;
 
     let initialValue;
     if (editing) {
@@ -36,7 +20,7 @@ class EditableCell extends React.Component {
         initialValue = {
           mobilePhone: record.mobilePhone,
           mobilePhoneCountryCode: record.mobilePhoneCountryCode,
-        }
+        };
       }
       if (dataIndex === 'address') {
         initialValue = {
@@ -46,7 +30,7 @@ class EditableCell extends React.Component {
           countyCode: record.countyCode,
           streetCode: record.streetCode,
           address: record.address,
-        }
+        };
       }
     }
 
@@ -71,11 +55,15 @@ class EditableCell extends React.Component {
   }
 }
 
-@connect(({ bpEdit }) => {
+@connect(({ basicCache, bpEdit }) => {
   const details = bpEdit.details || {};
-  const customer = details.customer || { };
+  const customer = details.customer || {};
   const addressList = customer.addressList || [];
-  return { details, customer, addressList };
+
+  // 基础数据
+  // 国家拨号代码
+  const { countryDiallingCodes } = basicCache;
+  return { countryDiallingCodes, details, customer, addressList };
 })
 class EditableTable extends React.Component {
   constructor(props) {
@@ -83,8 +71,110 @@ class EditableTable extends React.Component {
     this.state = {
       editIndex: -1,
       id: 0,
+    };
+
+    // 防抖
+    this.checkAddress = _.debounce(this.checkAddress, 500);
+  }
+
+  checkAddress = (rule, value, callback) => {
+    const { address, changedValue = {} } = value;
+    const { option = [] } = changedValue;
+    if (option.length > 0) {
+      const last = option[option.length - 1];
+      if (last.isMustLow === 1 && last.level !== 5) {
+        callback('必须选择下一级');
+        return;
+      }
     }
-    this.columns = [
+    if (!address) {
+      callback('详细地址必填');
+      return;
+    }
+    callback();
+  };
+
+  valueChange = (key, value) => {
+    if (key === 'address') {
+      this.props.form.setFieldsValue({
+        address: value,
+      });
+    }
+  };
+
+  addRow = async () => {
+    const { id, editIndex } = this.state;
+    const { addressList } = this.props;
+    const newId = id - 1;
+
+    if (editIndex !== -1) {
+      const validateResult = await validateForm(this.props.form);
+      if (!validateResult[0]) return false;
+    }
+
+    const newAddressList = [...addressList, { id: newId }];
+
+    this.setStore(newAddressList);
+    this.setState({ editIndex: newAddressList.length - 1, id: newId });
+    return true;
+  };
+
+  deleteRow = index => {
+    const { addressList } = this.props;
+    const newAddressList = addressList.filter((e, i) => i !== index);
+    this.setStore(newAddressList);
+  };
+
+  cancel = row => {
+    if (row.id < 0) {
+      const { addressList } = this.props;
+
+      const newAddressList = addressList.filter(e => e.id !== row.id);
+
+      this.setStore(newAddressList);
+    }
+    this.setState({ editIndex: -1 });
+  };
+
+  save = async index => {
+    const validateResult = await validateForm(this.props.form);
+    if (!validateResult[0]) return false;
+
+    const row = validateResult[1];
+    const { addressList } = this.props;
+
+    const newAddressList = addressList.map((e, i) => {
+      if (i === index) return { ...e, ...row, ...row.mobilePhone, ...row.address };
+      return e;
+    });
+
+    this.setStore(newAddressList);
+    this.setState({ editIndex: -1 });
+    return true;
+  };
+
+  setStore = newAddressList => {
+    const { details, customer } = this.props;
+
+    const newCustomer = { ...customer, ...{ addressList: newAddressList } };
+    const newDetails = { ...details, ...{ customer: newCustomer } };
+
+    this.props.dispatch({
+      type: 'bpEdit/setState',
+      payload: {
+        type: 'details',
+        data: newDetails,
+      },
+    });
+  };
+
+  edit = index => {
+    this.setState({ editIndex: index });
+  };
+
+  getColumns = () => {
+    const { countryDiallingCodes } = this.props;
+    const columns = [
       {
         title: '姓名',
         dataIndex: 'name',
@@ -92,9 +182,7 @@ class EditableTable extends React.Component {
         editable: true,
         inputType: <Input />,
         editOptions: {
-          rules: [
-            { required: true },
-          ],
+          rules: [{ required: true }],
         },
       },
       {
@@ -104,12 +192,17 @@ class EditableTable extends React.Component {
         editable: true,
         inputType: <MobilePhoneInput />,
         editOptions: {
-          rules: [
-            { required: true },
-          ],
+          rules: [{ required: true }],
         },
         render(text, record) {
-          return record.mobilePhoneCountryCode + record.mobilePhone;
+          const diallingCode = formatter(
+            countryDiallingCodes,
+            record.mobilePhoneCountryCode,
+            'countryCode',
+            'diallingCode',
+          );
+          if (diallingCode) return `+${diallingCode} ${record.mobilePhone}`;
+          return record.mobilePhone;
         },
       },
       {
@@ -129,7 +222,7 @@ class EditableTable extends React.Component {
         editable: true,
         inputType: <AddressInput onChange={value => this.valueChange('address', value)} />,
         editOptions: {
-          rules: [{ asyncValidator: this.checkAddress }],
+          rules: [{ validator: this.checkAddress }],
         },
         render: (text, record) => {
           const addressList = [
@@ -170,104 +263,8 @@ class EditableTable extends React.Component {
         },
       },
     ];
-    // 防抖
-    this.checkAddress = _.debounce(this.checkAddress, 500);
-  }
-
-  checkAddress = (rule, value, callback) => {
-    const { address, changedValue = {} } = value;
-    const { option = [] } = changedValue;
-    if (option.length > 0) {
-      const last = option[option.length - 1];
-      if (last.isMustLow === 1 && last.level !== 5) {
-        callback('必须选择下一级');
-        return;
-      }
-    }
-    if (!address) {
-      callback('详细地址必填');
-      return;
-    }
-    callback();
-  }
-
-  valueChange = (key, value) => {
-    if (key === 'address') {
-      this.props.form.setFieldsValue({
-        address: value,
-      });
-    }
-  }
-
-  addRow = async () => {
-    const { id, editIndex } = this.state;
-    const { addressList } = this.props;
-    const newId = id - 1;
-
-    if (editIndex !== -1) {
-      const validateResult = await validateForm(this.props.form);
-      if (!validateResult[0]) return false;
-    }
-
-    const newAddressList = [...addressList, { id: newId }];
-
-    this.setStore(newAddressList);
-    this.setState({ editIndex: newAddressList.length - 1, id: newId });
-    return true;
-  }
-
-  deleteRow = index => {
-    const { addressList } = this.props;
-    const newAddressList = addressList.filter((e, i) => i !== index);
-    this.setStore(newAddressList);
-  }
-
-  cancel = row => {
-    if (row.id < 0) {
-      const { addressList } = this.props;
-
-      const newAddressList = addressList.filter(e => e.id !== row.id);
-
-      this.setStore(newAddressList);
-    }
-    this.setState({ editIndex: -1 });
+    return columns;
   };
-
-  save = async index => {
-    const validateResult = await validateForm(this.props.form);
-    if (!validateResult[0]) return false;
-
-    const row = validateResult[1];
-    const { addressList } = this.props;
-
-    const newAddressList = addressList.map((e, i) => {
-      if (i === index) return { ...e, ...row, ...row.mobilePhone, ...row.address };
-      return e;
-    });
-
-    this.setStore(newAddressList);
-    this.setState({ editIndex: -1 });
-    return true;
-  }
-
-  setStore = newAddressList => {
-    const { details, customer } = this.props;
-
-    const newCustomer = { ...customer, ...{ addressList: newAddressList } };
-    const newDetails = { ...details, ...{ customer: newCustomer } };
-
-    this.props.dispatch({
-      type: 'bpEdit/setState',
-      payload: {
-        type: 'details',
-        data: newDetails,
-      },
-    });
-  }
-
-  edit(index) {
-    this.setState({ editIndex: index });
-  }
 
   render() {
     const { addressList } = this.props;
@@ -277,7 +274,7 @@ class EditableTable extends React.Component {
       },
     };
 
-    const columns = this.columns.map(col => {
+    const columns = this.getColumns().map(col => {
       if (!col.editable) {
         return col;
       }
