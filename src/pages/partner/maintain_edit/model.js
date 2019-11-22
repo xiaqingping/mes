@@ -1,3 +1,5 @@
+import bp from '@/api/bp';
+
 const SeqModel = {
   namespace: 'bpEdit',
   state: {
@@ -5,9 +7,40 @@ const SeqModel = {
     editType: '',
     uuid: '',
   },
-  effects: {},
+  effects: {
+    // 根据参数，获取BP详细数据
+    *readBPDetails({ payload }, { call, put }) {
+      try {
+        const { id, type } = payload;
+        const details = {};
+        // 客户数据
+        const customer = yield call(bp.getBPCustomer, id);
+        // 供应商数据
+        const vendor = yield call(bp.getBPVendor, id);
+        // PI认证
+        let piCertification = {};
+        // 组织认证
+        let orgCertification = {};
+
+        if (+type === 1) {
+          piCertification = yield call(bp.getBPPiCertification, id);
+        } else {
+          orgCertification = yield call(bp.getBPOrgCertification, id);
+        }
+        console.log(1);
+
+        yield put({
+          type: 'setState',
+          payload: { type: 'details', data: details },
+        });
+      } catch (error) {
+        console.log(error);
+      }
+    },
+  },
   reducers: {
     setState(state, action) {
+      console.log(action);
       const { payload: { type, data } } = action;
       return { ...state, [type]: data };
     },
