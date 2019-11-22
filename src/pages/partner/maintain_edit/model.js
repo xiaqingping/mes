@@ -11,23 +11,13 @@ const SeqModel = {
     // 根据参数，获取BP详细数据
     *readBPDetails({ payload }, { call, put }) {
       try {
-        const { id, type } = payload;
-        const details = {};
+        const { id } = payload;
         // 客户数据
         const customer = yield call(bp.getBPCustomer, id);
         // 供应商数据
         const vendor = yield call(bp.getBPVendor, id);
-        // PI认证
-        let piCertification = {};
-        // 组织认证
-        let orgCertification = {};
 
-        if (+type === 1) {
-          piCertification = yield call(bp.getBPPiCertification, id);
-        } else {
-          orgCertification = yield call(bp.getBPOrgCertification, id);
-        }
-        console.log(1);
+        const details = { ...customer, ...vendor };
 
         yield put({
           type: 'setState',
@@ -41,7 +31,9 @@ const SeqModel = {
   reducers: {
     setState(state, action) {
       console.log(action);
-      const { payload: { type, data } } = action;
+      const {
+        payload: { type, data },
+      } = action;
       return { ...state, [type]: data };
     },
     // 新增BP时初始化数据结构
