@@ -1,12 +1,4 @@
-import {
-  Col,
-  Form,
-  Input,
-  Row,
-  Select,
-  Switch,
-  Card,
-} from 'antd';
+import { Icon, Col, Form, Input, Row, Select, Switch, Card } from 'antd';
 import React from 'react';
 import { connect } from 'dva';
 import { formatMessage } from 'umi-plugin-react/locale';
@@ -25,36 +17,43 @@ import styles from '../style.less';
 const FormItem = Form.Item;
 const { Option } = Select;
 
-@connect(({ partnerMaintainEdit, basicCache, bpEdit }) => {
-  // 1. 业务伙伴数据
-  const { editType } = bpEdit;
-  const details = bpEdit.details || {};
-  const basicInfo = details.basic || {};
-  const customer = details.customer || {};
-  const salesOrderBlock = customer.salesOrderBlock || 2;
-  const vendor = details.vendor || {};
-  const invoicePostBlock = vendor.invoicePostBlock || 2;
+@connect(
+  ({ partnerMaintainEdit, basicCache, bpEdit }) => {
+    // 1. 业务伙伴数据
+    const { editType } = bpEdit;
+    const oldDetails = bpEdit.oldDetails || {};
+    const details = bpEdit.details || {};
+    const basicInfo = details.basic || {};
+    const customer = details.customer || {};
+    const salesOrderBlock = customer.salesOrderBlock || 2;
+    const vendor = details.vendor || {};
+    const invoicePostBlock = vendor.invoicePostBlock || 2;
 
-  // 2. 基础数据
-  // 行业类别
-  // const industryCategories = basicCache.industryCategories.filter(
-  //   e => e.languageCode === global.languageCode,
-  // );
-  const industryCategories = partnerMaintainEdit.Industry;
+    // 2. 基础数据
+    // 行业类别
+    // const industryCategories = basicCache.industryCategories.filter(
+    //   e => e.languageCode === global.languageCode,
+    // );
+    const industryCategories = partnerMaintainEdit.Industry;
 
-  return {
-    editType,
-    details,
-    basic: basicInfo,
-    customer,
-    salesOrderBlock,
-    vendor,
-    invoicePostBlock,
-    industryCategories,
-    countryTimeZone: basicCache.countryTimeZone,
-    countryProvinceTimeZone: basicCache.countryProvinceTimeZone,
-  };
-}, null, null, { withRef: true })
+    return {
+      oldDetails,
+      editType,
+      details,
+      basic: basicInfo,
+      customer,
+      salesOrderBlock,
+      vendor,
+      invoicePostBlock,
+      industryCategories,
+      countryTimeZone: basicCache.countryTimeZone,
+      countryProvinceTimeZone: basicCache.countryProvinceTimeZone,
+    };
+  },
+  null,
+  null,
+  { withRef: true },
+)
 class Basic extends React.Component {
   constructor(props) {
     super(props);
@@ -91,7 +90,7 @@ class Basic extends React.Component {
         callback('名称重复');
       }
     });
-  }
+  };
 
   checkEmail = (rule, value, callback) => {
     if (!value.email) {
@@ -99,14 +98,24 @@ class Basic extends React.Component {
       return;
     }
 
-    bp.checkBPFields({ email: value.email }).then(res => {
-      if (!res) {
+    if (this.props.editType === 'update') {
+      const oldEmail = this.props.oldDetails.basic.email;
+      if (value.email === oldEmail) {
         callback();
-      } else {
-        callback('邮箱重复');
+        return;
       }
-    });
-  }
+    }
+
+    bp.checkBPFields({ email: value.email })
+      .then(res => {
+        if (!res) {
+          callback();
+        } else {
+          callback('邮箱重复');
+        }
+      })
+      .catch(() => callback('接口验证失败'));
+  };
 
   checkMobilePhone = (rule, value, callback) => {
     if (!value.mobilePhone) {
@@ -114,14 +123,25 @@ class Basic extends React.Component {
       return;
     }
 
-    bp.checkBPFields({ mobilePhone: value.mobilePhone }).then(res => {
-      if (!res) {
+    // 修改时业务伙伴时，并且电话号码===旧电话号码（没有修改），则不进行后台验证
+    if (this.props.editType === 'update') {
+      const oldMobilePhone = this.props.oldDetails.basic.mobilePhone;
+      if (value.mobilePhone === oldMobilePhone) {
         callback();
-      } else {
-        callback('移动电话重复');
+        return;
       }
-    });
-  }
+    }
+
+    bp.checkBPFields({ mobilePhone: value.mobilePhone })
+      .then(res => {
+        if (!res) {
+          callback();
+        } else {
+          callback('移动电话重复');
+        }
+      })
+      .catch(() => callback('验证失败'));
+  };
 
   checkAddress = (rule, value, callback) => {
     const { address, changedValue = {} } = value;
@@ -138,13 +158,13 @@ class Basic extends React.Component {
       return;
     }
     callback();
-  }
+  };
 
   valueChange = (key, value) => {
     const { details, basic, customer, vendor } = this.props;
     let obj = {
       [key]: value,
-    }
+    };
 
     // 名字-类型为个人时，行业类别为个人，且不可更改
     if (key === 'name') {
@@ -219,14 +239,7 @@ class Basic extends React.Component {
       return;
     }
 
-    const keyList = [
-      'name',
-      'mobilePhone',
-      'telephone',
-      'fax',
-      'email',
-      'address',
-    ]
+    const keyList = ['name', 'mobilePhone', 'telephone', 'fax', 'email', 'address'];
     if (keyList.indexOf(key) > -1) {
       if (key === 'address') {
         obj = { ...value, languageCode: obj.languageCode, timeZoneCode: obj.timeZoneCode };
@@ -244,7 +257,7 @@ class Basic extends React.Component {
         data: { ...details, ...{ basic: newBasic } },
       },
     });
-  }
+  };
 
   render() {
     const {
@@ -266,26 +279,32 @@ class Basic extends React.Component {
           <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
             <Col md={6} sm={12}>
               <FormItem label="名称">
-                {
-                  editType === 'add' ? (
-                    getFieldDecorator('name', {
+                {editType === 'add'
+                  ? getFieldDecorator('name', {
                       initialValue: {
                         type: basic.type,
                         name: basic.name,
                       },
-                      rules: [{ asyncValidator: this.checkNameInput }],
+                      rules: [{ validator: this.checkNameInput }],
                     })(<NameInput onChange={value => this.valueChange('name', value)} />)
-                  ) : null
-                }
-                {
-                  editType === 'update' ? (
-                    <p style={{ lineHeight: '32px' }}>
-                      <span>组织 </span>
-                      <span>MaxMeng </span>
-                      <span>审核中</span>
-                    </p>
-                  ) : null
-                }
+                  : null}
+                {editType === 'update' ? (
+                  <p style={{ lineHeight: '32px' }}>
+                    {basic.type === 1 ? (
+                      <span>
+                        <Icon type="user" />
+                        &nbsp;个人
+                      </span>
+                    ) : null}
+                    {basic.type === 2 ? (
+                      <span>
+                        <Icon type="home" />
+                        组织
+                      </span>
+                    ) : null}
+                    <span> {basic.name} </span>
+                  </p>
+                ) : null}
               </FormItem>
             </Col>
             <Col md={6} sm={12}>
@@ -309,9 +328,8 @@ class Basic extends React.Component {
             </Col>
             <Col md={6} sm={12}>
               <FormItem label="电话">
-                {
-                  editType === 'add' ? (
-                    getFieldDecorator('telephone', {
+                {editType === 'add'
+                  ? getFieldDecorator('telephone', {
                       initialValue: {
                         telephoneCountryCode: basic.telephoneCountryCode,
                         telephoneAreaCode: basic.telephoneAreaCode,
@@ -319,17 +337,14 @@ class Basic extends React.Component {
                         telephoneExtension: basic.telephoneExtension,
                       },
                     })(<TelphoneInput onChange={value => this.valueChange('telephone', value)} />)
-                  ) : null
-                }
-                {
-                  editType === 'update' ? (
-                    <p style={{ lineHeight: '32px' }}>
-                      <span>+86 </span>
-                      <span>0565-57776954-6598 </span>
-                      <a href="#">变更</a>
-                    </p>
-                  ) : null
-                }
+                  : null}
+                {editType === 'update' ? (
+                  <p style={{ lineHeight: '32px' }}>
+                    <span>+86 </span>
+                    <span>0565-57776954-6598 </span>
+                    <a href="#">变更</a>
+                  </p>
+                ) : null}
               </FormItem>
             </Col>
             <Col md={6} sm={12}>
@@ -364,7 +379,7 @@ class Basic extends React.Component {
                 {getFieldDecorator('languageCode', {
                   initialValue: basic.languageCode,
                 })(
-                  <Select open={false} onChange={value => this.valueChange('languageCode', value)} >
+                  <Select open={false} onChange={value => this.valueChange('languageCode', value)}>
                     <Option value="ZH">中文</Option>
                     <Option value="EN">英文</Option>
                   </Select>,
@@ -376,27 +391,42 @@ class Basic extends React.Component {
                 {getFieldDecorator('industryCode', {
                   initialValue: basic.industryCode,
                 })(
-                  <Select
-                    { ...industryOption }
-                    onChange={value => this.valueChange('industryCode', value)}
-                  >
-                    {
-                      industryCategories.map(e => {
-                        if (basic.type === 1) {
-                          if (e.id !== '06') {
-                            return <Option disabled key={e.id} value={e.id}>{e.name}</Option>
-                          }
-                          return <Option key={e.id} value={e.id}>{e.name}</Option>
+                  <Select {...industryOption} onChange={value => this.valueChange('industryCode', value)}>
+                    {industryCategories.map(e => {
+                      if (basic.type === 1) {
+                        if (e.id !== '06') {
+                          return (
+                            <Option disabled key={e.id} value={e.id}>
+                              {e.name}
+                            </Option>
+                          );
                         }
-                        if (basic.type === 2) {
-                          if (e.id === '06') {
-                            return <Option disabled key={e.id} value={e.id}>{e.name}</Option>
-                          }
-                          return <Option key={e.id} value={e.id}>{e.name}</Option>
+                        return (
+                          <Option key={e.id} value={e.id}>
+                            {e.name}
+                          </Option>
+                        );
+                      }
+                      if (basic.type === 2) {
+                        if (e.id === '06') {
+                          return (
+                            <Option disabled key={e.id} value={e.id}>
+                              {e.name}
+                            </Option>
+                          );
                         }
-                        return <Option key={e.id} value={e.id}>{e.name}</Option>
-                      })
-                    }
+                        return (
+                          <Option key={e.id} value={e.id}>
+                            {e.name}
+                          </Option>
+                        );
+                      }
+                      return (
+                        <Option key={e.id} value={e.id}>
+                          {e.name}
+                        </Option>
+                      );
+                    })}
                   </Select>,
                 )}
               </FormItem>
@@ -404,7 +434,7 @@ class Basic extends React.Component {
             <Col md={18} sm={24}>
               <FormItem label="通讯地址">
                 {getFieldDecorator('address', {
-                  rules: [{ asyncValidator: this.checkAddress }],
+                  rules: [{ validator: this.checkAddress }],
                   initialValue: {
                     countryCode: basic.countryCode,
                     provinceCode: basic.provinceCode,
@@ -416,34 +446,26 @@ class Basic extends React.Component {
                 })(<AddressInput onChange={value => this.valueChange('address', value)} />)}
               </FormItem>
             </Col>
-            {
-              tabActiveKey === 'customer' ? (
-                <Col md={6} sm={6}>
-                  <FormItem label="销售冻结">
-                    {getFieldDecorator('salesOrderBlock', {
-                      initialValue: salesOrderBlock === 1,
-                      valuePropName: 'checked',
-                    })(
-                      <Switch onChange={value => this.valueChange('salesOrderBlock', value)} />,
-                    )}
-                  </FormItem>
-                </Col>
-              ) : null
-            }
-            {
-              tabActiveKey === 'vendor' ? (
-                <Col md={6} sm={6}>
-                  <FormItem label="采购冻结">
-                    {getFieldDecorator('invoicePostBlock', {
-                      initialValue: invoicePostBlock === 1,
-                      valuePropName: 'checked',
-                    })(
-                      <Switch onChange={value => this.valueChange('invoicePostBlock', value)} />,
-                    )}
-                  </FormItem>
-                </Col>
-              ) : null
-            }
+            {tabActiveKey === 'customer' ? (
+              <Col md={6} sm={6}>
+                <FormItem label="销售冻结">
+                  {getFieldDecorator('salesOrderBlock', {
+                    initialValue: salesOrderBlock === 1,
+                    valuePropName: 'checked',
+                  })(<Switch onChange={value => this.valueChange('salesOrderBlock', value)} />)}
+                </FormItem>
+              </Col>
+            ) : null}
+            {tabActiveKey === 'vendor' ? (
+              <Col md={6} sm={6}>
+                <FormItem label="采购冻结">
+                  {getFieldDecorator('invoicePostBlock', {
+                    initialValue: invoicePostBlock === 1,
+                    valuePropName: 'checked',
+                  })(<Switch onChange={value => this.valueChange('invoicePostBlock', value)} />)}
+                </FormItem>
+              </Col>
+            ) : null}
           </Row>
         </Form>
       </Card>
