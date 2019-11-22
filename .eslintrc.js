@@ -5,7 +5,7 @@ const myEslint = _.merge({}, strictEslint, {
   rules: {
     'no-plusplus': 'off',
     'no-console': 'off',
-    'max-len': ['error', { code: 120 }],
+    'max-len': ['error', { code: 100 }],
   },
 });
 
