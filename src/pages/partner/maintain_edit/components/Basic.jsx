@@ -303,6 +303,7 @@ class Basic extends React.Component {
                       </span>
                     ) : null}
                     <span> {basic.name} </span>
+                    <a href="#">变更</a>
                   </p>
                 ) : null}
               </FormItem>
@@ -340,9 +341,9 @@ class Basic extends React.Component {
                   : null}
                 {editType === 'update' ? (
                   <p style={{ lineHeight: '32px' }}>
-                    <span>+86 </span>
-                    <span>0565-57776954-6598 </span>
-                    <a href="#">变更</a>
+                    <span>{basic.telephoneCountryCode} </span>
+                    {`${basic.telephoneAreaCode}-${basic.telephone}-${basic.telephoneExtension}`}
+                    <a href="#"> 变更</a>
                   </p>
                 ) : null}
               </FormItem>
@@ -371,7 +372,12 @@ class Basic extends React.Component {
               <FormItem label="时区">
                 {getFieldDecorator('timeZoneCode', {
                   initialValue: basic.timeZoneCode,
-                })(<Input readOnly onChange={e => this.valueChange('timeZoneCode', e.target.value)} />)}
+                })(
+                  <Input
+                    readOnly
+                    onChange={e => this.valueChange('timeZoneCode', e.target.value)}
+                  />,
+                )}
               </FormItem>
             </Col>
             <Col md={6} sm={12}>
@@ -391,7 +397,10 @@ class Basic extends React.Component {
                 {getFieldDecorator('industryCode', {
                   initialValue: basic.industryCode,
                 })(
-                  <Select {...industryOption} onChange={value => this.valueChange('industryCode', value)}>
+                  <Select
+                    {...industryOption}
+                    onChange={value => this.valueChange('industryCode', value)}
+                  >
                     {industryCategories.map(e => {
                       if (basic.type === 1) {
                         if (e.id !== '06') {
