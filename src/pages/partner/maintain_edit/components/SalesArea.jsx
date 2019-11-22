@@ -110,7 +110,9 @@ class FormContent extends React.Component {
                 {getFieldDecorator('defaultInvoiceTypeCode', {
                   initialValue: data.defaultInvoiceTypeCode,
                 })(
-                  <Radio.Group onChange={e => valueChange('defaultInvoiceTypeCode', e.target.value)}>
+                  <Radio.Group
+                    onChange={e => valueChange('defaultInvoiceTypeCode', e.target.value)}
+                  >
                     {DefaultInvoiceType.map(e => (
                       <Radio.Button key={e.id} value={e.id}>
                         {e.name}
@@ -138,7 +140,7 @@ class FormContent extends React.Component {
           <Col span={3}>
             <FormItem label="销售冻结">
               {getFieldDecorator('salesOrderBlock', {
-                initialValue: data.salesOrderBlock,
+                initialValue: data.salesOrderBlock === 1,
                 valuePropName: 'checked',
               })(<Switch disabled />)}
             </FormItem>
@@ -190,7 +192,9 @@ class SalesArea extends React.Component {
 
     this.state = {
       tabKey:
-        (tabsData && tabsData[0] && `${tabsData[0].salesOrganizationCode}-${tabsData[0].distributionChannelCode}`) ||
+        (tabsData &&
+          tabsData[0] &&
+          `${tabsData[0].salesOrganizationCode}-${tabsData[0].distributionChannelCode}`) ||
         '',
     };
   }
@@ -283,7 +287,9 @@ class SalesArea extends React.Component {
 
   renderCascader = options => {
     const { salesAreaList: tabsData } = this.props;
-    const cascaderTitle = tabsData.map(e => `${e.salesOrganizationCode}-${e.distributionChannelCode}`);
+    const cascaderTitle = tabsData.map(
+      e => `${e.salesOrganizationCode}-${e.distributionChannelCode}`,
+    );
 
     options.forEach(e => {
       let childrenDisabledLength = 0;
@@ -398,7 +404,9 @@ class SalesArea extends React.Component {
 
     let tabList = tabsData.map(e => ({
       key: `${e.salesOrganizationCode}-${e.distributionChannelCode}`,
-      tab: salesOrganizationsMap[e.salesOrganizationCode] + distributionChannelsMap[e.distributionChannelCode],
+      tab:
+        salesOrganizationsMap[e.salesOrganizationCode] +
+        distributionChannelsMap[e.distributionChannelCode],
     }));
 
     tabList = tabList.concat({
@@ -409,7 +417,8 @@ class SalesArea extends React.Component {
       if (e.key === tabKey) {
         e.tab = (
           <>
-            {e.tab} <Icon type="close" style={{ fontSize: 12 }} onClick={() => this.closeTab(e.key)} />
+            {e.tab}{' '}
+            <Icon type="close" style={{ fontSize: 12 }} onClick={() => this.closeTab(e.key)} />
           </>
         );
       } else {
@@ -462,7 +471,11 @@ class SalesArea extends React.Component {
                     />
                   </TabPane>
                   <TabPane tab="销售员" key="SalesPerson">
-                    <SalesPerson tableData={e.salerList || []} tableKey="salerList" valueChange={this.valueChange} />
+                    <SalesPerson
+                      tableData={e.salerList || []}
+                      tableKey="salerList"
+                      valueChange={this.valueChange}
+                    />
                   </TabPane>
                 </Tabs>
               </div>

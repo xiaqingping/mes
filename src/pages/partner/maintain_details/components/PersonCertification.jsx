@@ -1,12 +1,4 @@
-import {
-  Button,
-  Card,
-  Icon,
-  List,
-  Typography,
-  Divider,
-  Badge,
-} from 'antd';
+import { Button, Card, Icon, List, Typography, Divider, Badge } from 'antd';
 import React from 'react';
 import { connect } from 'dva';
 
@@ -16,8 +8,8 @@ const { Paragraph } = Typography;
 
 @connect(({ partnerMaintainEdit }) => ({
   details: partnerMaintainEdit.details || {},
-  // eslint-disable-next-line max-len
-  piCertification: (partnerMaintainEdit.details && partnerMaintainEdit.details.piCertification) || [],
+  piCertification:
+    (partnerMaintainEdit.details && partnerMaintainEdit.details.piCertification) || [],
 }))
 class PersonCertification extends React.Component {
   constructor(props) {
@@ -54,7 +46,7 @@ class PersonCertification extends React.Component {
               {item.notes}
             </Paragraph>
             <div>
-              <img style={{ width: 80, height: 80 }} src={item.attachmentList[0].code} alt=""/>
+              <img style={{ width: 80, height: 80 }} src={item.attachmentList[0].code} alt="" />
             </div>
           </Card>
         </List.Item>
@@ -72,7 +64,7 @@ class PersonCertification extends React.Component {
         </Button>
       </List.Item>
     );
-  }
+  };
 
   handleModalVisible = flag => {
     this.setState({
@@ -88,7 +80,7 @@ class PersonCertification extends React.Component {
       type: 'bpEdit/setDetails',
       payload: { ...details, piCertification: data },
     });
-  }
+  };
 
   handleAdd = data => {
     const { details, piCertification } = this.props;
@@ -127,11 +119,7 @@ class PersonCertification extends React.Component {
     };
 
     return (
-      <Card
-        title="PI认证"
-        bordered={false}
-        style={{ marginBottom: '24px' }}
-      >
+      <Card title="PI认证" bordered={false} style={{ marginBottom: '24px' }}>
         <List
           rowKey="id"
           grid={{
@@ -144,7 +132,7 @@ class PersonCertification extends React.Component {
           dataSource={[...piCertification, nullData]}
           renderItem={this.renderListItem}
         />
-        <PersonCertificationAddModal {...parentMethods} modalVisible={addModalVisible}/>
+        <PersonCertificationAddModal {...parentMethods} modalVisible={addModalVisible} />
       </Card>
     );
   }

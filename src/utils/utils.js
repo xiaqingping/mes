@@ -2,25 +2,9 @@ import _ from 'lodash';
 import { parse } from 'querystring';
 /* eslint no-useless-escape:0 import/prefer-default-export:0 */
 
+// eslint-disable-next-line max-len
 const reg = /(((^https?:(?:\/\/)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+(?::\d+)?|(?:www.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\+=&;%@.\w_]*)#?(?:[\w]*))?)$/;
 export const isUrl = path => reg.test(path);
-export const isAntDesignPro = () => {
-  if (ANT_DESIGN_PRO_ONLY_DO_NOT_USE_IN_YOUR_PRODUCTION === 'site') {
-    return true;
-  }
-
-  return window.location.hostname === 'preview.pro.ant.design';
-}; // 给官方演示站点用，用于关闭真实开发环境不需要使用的特性
-
-export const isAntDesignProOrDev = () => {
-  const { NODE_ENV } = process.env;
-
-  if (NODE_ENV === 'development') {
-    return true;
-  }
-
-  return isAntDesignPro();
-};
 export const getPageQuery = () => parse(window.location.href.split('?')[1]);
 
 /**
@@ -38,10 +22,10 @@ export const formatter = (arr, value, key1, key2) => {
   const k2 = key2 || 'name';
 
   for (let i = 0; i < arr.length; i++) {
-      // eslint-disable-next-line eqeqeq
-      if (arr[i][k1] == value) {
-          return arr[i][k2];
-      }
+    // eslint-disable-next-line eqeqeq
+    if (arr[i][k1] == value) {
+      return arr[i][k2];
+    }
   }
   return value;
 };
@@ -52,7 +36,8 @@ export const formatter = (arr, value, key1, key2) => {
  *   错误返回 [false, error]
  */
 export const validateForm = form =>
-  form.validateFields()
+  form
+    .validateFields()
     .then(data => [true, data])
     .catch(error => [false, error]);
 
@@ -70,7 +55,7 @@ export const guid = () => {
     // eslint-disable-next-line no-bitwise
     return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
   }
-  return (S4() + S4() + S4() + S4() + S4() + S4() + S4() + S4());
+  return S4() + S4() + S4() + S4() + S4() + S4() + S4() + S4();
 };
 
 /**
@@ -95,8 +80,8 @@ export const diff = (pre, next, key = 'id') => {
   const update = _.differenceWith(nextOther, pre, _.isEqual);
 
   // pre有，next没有，则是删除数据
-  const del = pre.filter(preItem =>
-    !nextOther.some(nextOtherItem => nextOtherItem[key] === preItem[key]),
+  const del = pre.filter(
+    preItem => !nextOther.some(nextOtherItem => nextOtherItem[key] === preItem[key]),
   );
 
   return { add, del, update };

@@ -47,8 +47,8 @@ const SeqModel = {
     ],
     // 默认开票类型
     DefaultInvoiceType: [
-      { id: 10, name: '增值税专用发票' },
-      { id: 20, name: '增值税普通发票' },
+      { id: '10', name: '增值税专用发票' },
+      { id: '20', name: '增值税普通发票' },
     ],
     // 邮箱认证状态
     EmailVerifyStatus: [
@@ -90,9 +90,7 @@ const SeqModel = {
       { id: 2, name: '正常' },
     ],
     // 装运条件
-    ShippingCondition: [
-      { id: '01', name: '标准' },
-    ],
+    ShippingCondition: [{ id: '01', name: '标准' }],
     // 增值税专用发票资质
     SpecialInvoice: [
       { id: 1, name: '是' },
