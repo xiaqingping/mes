@@ -1,8 +1,4 @@
-import {
-  Form,
-  Button,
-  Spin,
-} from 'antd';
+import { Form, Button, Spin } from 'antd';
 import React, { Component } from 'react';
 
 import { connect } from 'dva';
@@ -22,8 +18,9 @@ import Bank from './components/Bank';
 import { bp } from '@/api';
 import { validateForm, diff, guid } from '@/utils/utils';
 
-@connect(({ bpEdit }) => ({
+@connect(({ loading, bpEdit }) => ({
   details: bpEdit.details || {},
+  pageLoading: loading.effects['bpEdit/readBPDetails'] || false,
 }))
 class CustomerEdit extends Component {
   constructor(props) {
@@ -31,7 +28,7 @@ class CustomerEdit extends Component {
     const editType = props.location.pathname.indexOf('/add') > -1 ? 'add' : 'update';
     this.state = {
       oldDetails: {}, // 修改模式下，应保存一份原始数据，以便提交时，对比数据并调整数据结构
-      pageLoading: false,
+      // pageLoading: loading.effects['bpEdit/readBPDetails'] || false,
       editType,
       width: '100%',
       tabActiveKey: 'customer',
@@ -81,16 +78,18 @@ class CustomerEdit extends Component {
     const { editType } = this.state;
     if (editType !== 'update') return;
 
-    this.setState({ pageLoading: true });
-
     const { location, match, dispatch } = this.props;
-    const { params: { id } } = match;
-    const { query: { type } } = location;
+    const {
+      params: { id },
+    } = match;
+    const {
+      query: { type },
+    } = location;
     dispatch({
       type: 'bpEdit/readBPDetails',
       payload: { id, type },
     });
-  }
+  };
 
   // 获取此页面需要用到的基础数据
   getCacheData() {
@@ -118,9 +117,7 @@ class CustomerEdit extends Component {
       });
     });
 
-    const areaCacheList = [
-      { type: 'countrys', options: 0 },
-    ];
+    const areaCacheList = [{ type: 'countrys', options: 0 }];
     areaCacheList.forEach(item => {
       this.props.dispatch({
         type: 'areaCache/getCache',
@@ -152,7 +149,7 @@ class CustomerEdit extends Component {
   validate = async () => {
     // 验证basic
     const basicForm = this.basicView.wrappedInstance.props.form;
-    const basicResult = await validateForm(basicForm)
+    const basicResult = await validateForm(basicForm);
     if (!basicResult[0]) return;
 
     console.log(this.state.details);
@@ -163,7 +160,7 @@ class CustomerEdit extends Component {
     } else {
       this.update();
     }
-  }
+  };
 
   // 新增
   add = () => {
@@ -191,12 +188,12 @@ class CustomerEdit extends Component {
       newData = {
         basic: data.basic,
         customer: data.customer,
-      }
+      };
     } else {
       newData = {
         basic: data.basic,
         vendor: data.vendor,
-      }
+      };
     }
     if (data.basic.type === 1) {
       newData.piCertificationList = data.piCertificationList;
@@ -208,7 +205,7 @@ class CustomerEdit extends Component {
     bp.addBP(newData).then(res => {
       console.log(res);
     });
-  }
+  };
 
   // 修改
   update = () => {
@@ -255,7 +252,7 @@ class CustomerEdit extends Component {
     bp.updateBP(data).then(res => {
       console.log(res);
     });
-  }
+  };
 
   // 客户
   renderCustomer = details => {
@@ -268,31 +265,25 @@ class CustomerEdit extends Component {
         <Basic
           tabActiveKey={tabActiveKey}
           // eslint-disable-next-line no-return-assign
-          wrappedComponentRef={ref => this.basicView = ref}
+          wrappedComponentRef={ref => (this.basicView = ref)}
         />
         <SalesArea />
-        {
-          type === 2 ?
-          (
-            <>
-              { editType === 'update' ? <OrgCredit /> : null }
-              <OrgCertification />
-            </>
-          ) : null
-        }
-        {
-          type === 1 ?
-          (
-            <>
-            { editType === 'update' ? <PersonCredit /> : null }
-              <PersonCertification />
-            </>
-          ) : null
-        }
+        {type === 2 ? (
+          <>
+            {editType === 'update' ? <OrgCredit /> : null}
+            <OrgCertification />
+          </>
+        ) : null}
+        {type === 1 ? (
+          <>
+            {editType === 'update' ? <PersonCredit /> : null}
+            <PersonCertification />
+          </>
+        ) : null}
         <Address />
       </>
     );
-  }
+  };
 
   // 供应商
   renderVendor = details => {
@@ -304,14 +295,14 @@ class CustomerEdit extends Component {
         <Basic
           tabActiveKey={tabActiveKey}
           // eslint-disable-next-line no-return-assign
-          wrappedComponentRef={form => this.form = form}
+          wrappedComponentRef={form => (this.form = form)}
         />
         <PurchasingOrg />
         <Bank />
-        { type === 2 ? <OrgCertification /> : null }
+        {type === 2 ? <OrgCertification /> : null}
       </>
     );
-  }
+  };
 
   renderContent = () => {
     const { tabActiveKey } = this.state;
@@ -319,20 +310,21 @@ class CustomerEdit extends Component {
 
     switch (tabActiveKey) {
       case 'customer':
-         return this.renderCustomer(details);
+        return this.renderCustomer(details);
 
       case 'vendor':
         return this.renderVendor(details);
 
       default:
-          break;
+        break;
     }
 
     return null;
-  }
+  };
 
   render() {
-    const { width, tabActiveKey, pageLoading } = this.state;
+    const { width, tabActiveKey } = this.state;
+    const { pageLoading } = this.props;
 
     return (
       <PageHeaderWrapper
@@ -352,12 +344,12 @@ class CustomerEdit extends Component {
         ]}
       >
         <Spin spinning={pageLoading}>
-          <div style={{ paddingBottom: 50 }}>
-            {this.renderContent()}
-          </div>
+          <div style={{ paddingBottom: 50 }}>{this.renderContent()}</div>
           <FooterToolbar style={{ width }}>
             <Button>取消</Button>
-            <Button type="primary" onClick={this.validate}>提交</Button>
+            <Button type="primary" onClick={this.validate}>
+              提交
+            </Button>
           </FooterToolbar>
         </Spin>
       </PageHeaderWrapper>
