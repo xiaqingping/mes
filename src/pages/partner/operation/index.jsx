@@ -14,6 +14,8 @@ import {
 import * as React from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import StandardTable from '@/components/StandardTable';
+import { connect } from 'dva';
+import _ from 'lodash';
 import DetailsList from './components/details';
 import api from '@/api';
 
@@ -21,96 +23,49 @@ const FormItem = Form.Item;
 const { Option } = Select;
 const { RangePicker } = DatePicker;
 
-// 状态
-const status = {
-  1: {
-    value: 'default',
-    text: '未完成',
-  },
-  2: {
-    value: 'warning',
-    text: '部分完成',
-  },
-  3: {
-    value: 'success',
-    text: '已完成',
-  },
-};
-
- // 业务伙伴搜索数据
- const data = {
-  huoban: [
-    {
-    id: 1,
-    code: '100',
-    value: '张1',
-  },
-  {
-    id: 2,
-    code: '101',
-    value: '张2',
-  },
-  {
-    id: 3,
-    code: '102',
-    value: '张3',
-  },
-  {
-    id: 4,
-    code: '103',
-    value: '张4',
-  },
-  {
-    id: 5,
-    code: '104',
-    value: '张5',
-  },
-  {
-    id: 6,
-    code: '105',
-    value: '张6',
-  },
-  {
-    id: 7,
-    code: '106',
-    value: '张7',
-  },
-],
-};
-
 function renderOption(item) {
   return (
-    <Option key={item.value} text={item.value}>
+    <Option key={item.id} text={item.name}>
       <div style={{ display: 'flex' }}>
         <span><Icon type="user" /></span>&nbsp;&nbsp;
         <span>{item.code}</span>&nbsp;&nbsp;
-        <span>{item.value}</span>
+        <span>{item.name}</span>
       </div>
     </Option>
   );
 }
 
+@connect(({ partnerMaintainEdit }) => ({ status: partnerMaintainEdit.operationStatus }))
 class Operation extends React.Component {
-  state = {
-    formValues: {
-      page: 1,
-      pageSize: 10,
-    },
-    list: [],
-    total: 0,
-    loading: false,
-    selectedRows: [],
-    detailsVisible: false,
-    detailsValue: null,
-    // editIndex: -1,
-    typeValue: [],
-    partnerVal: data.huoban,
-  };
+  constructor(props) {
+    super(props)
+    this.state = {
+      formValues: {
+        page: 1,
+        pageSize: 10,
+      },
+      list: [],
+      total: 0,
+      loading: false,
+      selectedRows: [],
+      detailsVisible: false,
+      detailsValue: null,
+      // editIndex: -1,
+      typeValue: [],
+      partnerVal: [],
+    };
+    this.callParter = _.debounce(this.callParter, 500);
+  }
+
 
   componentDidMount() {
-    // this.getTableData();
     this.getTableData();
   }
+
+    // 业务伙伴查询
+    callParter = value => {
+      api.bp.getPartnerName({ code_or_name: value }).then(res => { this.setState({ partnerVal: res }) })
+    }
 
   // 弹窗显示和详情数据保存
   showDrawer = (record, e) => {
@@ -148,17 +103,23 @@ class Operation extends React.Component {
   getTableData = (options = {}) => {
     const { formValues: { pageSize } } = this.state;
     // const query = Object.assign({}, { page: 1, pageSize }, options);
+    let newData = [];
+    if (options.wanchengshijian) {
+      newData = {
+        ...newData,
+        beginFinishDate: options.wanchengshijian[0].format('YYYY-MM-DD'),
+        endFinishDate: options.wanchengshijian[1].format('YYYY-MM-DD'),
+      }
+      delete options.wanchengshijian
+    }
+    if (options.statusList) {
+      newData = { ...newData, statusList: options.statusList.join(',') }
+    }
     const query = Object.assign(
       {},
       { page: 1, pageSize },
       options,
-      {
-        beginFinishDate: options.wanchengshijian ?
-        options.wanchengshijian[0].format('YYYY-MM-DD') : '',
-        endFinishDate: options.wanchengshijian ?
-        options.wanchengshijian[1].format('YYYY-MM-DD') : '',
-        statusList: options.statusList ? options.statusList.join(',') : '',
-      },
+      newData,
     );
     this.setState({
       formValues: query,
@@ -207,8 +168,9 @@ class Operation extends React.Component {
     if (!value) {
       return false
     }
-    data.huoban.forEach(item => {
-      if (item.value.indexOf(value) !== -1) {
+    this.callParter(value)
+    this.state.partnerVal.forEach(item => {
+      if (item.name.indexOf(value) !== -1) {
         arr.push(item);
       }
       if (item.code.indexOf(value) !== -1 && arr.indexOf(item)) { arr.push(item); }
@@ -259,8 +221,8 @@ class Operation extends React.Component {
               {getFieldDecorator('statusList')(
                 <Select mode="multiple" showArrow>
                   <Option value="1">未完成</Option>
-                  <Option value="2">已完成</Option>
-                  <Option value="3">部分完成</Option>
+                  <Option value="2">部分完成</Option>
+                  <Option value="3">已完成</Option>
                 </Select>,
               )}
             </FormItem>
@@ -293,8 +255,8 @@ class Operation extends React.Component {
   render() {
     const { formValues: { page: current, pageSize },
     list, total, loading, selectedRows, detailsVisible, detailsValue } = this.state;
-    const data = { list, pagination: { current, pageSize, total } };
-
+    const { status } = this.props;
+    const dataList = { list, pagination: { current, pageSize, total } };
     const columns = [
       {
         title: '编号',
@@ -305,7 +267,7 @@ class Operation extends React.Component {
         title: '业务伙伴',
         dataIndex: 'bpCode',
         render(text, record) {
-            return text ? <span style={{ color: '#222222' }}><Icon type="user" /> {text}<br/><span style={{ color: '#999999' }}>{record.bpName}</span></span> : ''
+            return <span style={{ color: '#222222' }}><Icon type="user" />{record.bpName} <br/><span style={{ color: '#999999' }}>{text}</span></span>
         },
       },
       {
@@ -383,7 +345,7 @@ class Operation extends React.Component {
               scroll={{ x: 1300 }}
               selectedRows={selectedRows}
               loading={loading}
-              data={data}
+              data={dataList}
               columns={columns}
               onSelectRow={this.handleSelectRows}
               onChange={this.handleStandardTableChange}
