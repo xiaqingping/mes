@@ -249,12 +249,20 @@ class Basic extends React.Component {
     }
 
     const newBasic = { ...basic, ...obj };
+    let newDetails = { ...details, ...{ basic: newBasic } };
+
+    // 电话 类型为组织时，认证资料的电话与基础信息的电话保持一致
+    if (key === 'telephone' && basic.type === 2) {
+      console.log(value);
+      // organizationCertification
+      newDetails = { ...newDetails, ...{ organizationCertification: { ...value } } };
+    }
 
     this.props.dispatch({
       type: 'bpEdit/setState',
       payload: {
         type: 'details',
-        data: { ...details, ...{ basic: newBasic } },
+        data: newDetails,
       },
     });
   };
