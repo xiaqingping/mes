@@ -302,7 +302,7 @@ export const addDetails = {
     bankAccount: '60045612378',
     address: '注册地址',
     notes: '这是一段认证说明',
-    attachmentList: '',
+    attachmentList: 'uuid',
   },
   // 负责人认证
   piCertificationList: [
@@ -310,7 +310,7 @@ export const addDetails = {
       id: -1,
       invoicePartyId: 123,
       notes: '这是一段认证说明',
-      attachmentList: '',
+      attachmentList: 'uuid',
     },
   ],
 };

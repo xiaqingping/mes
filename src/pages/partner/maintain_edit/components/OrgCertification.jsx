@@ -6,6 +6,7 @@ import { TelphoneInput } from '@/components/CustomizedFormControls';
 import disk from '@/api/disk';
 import basicAPI from '@/api/basic';
 import { requestErr } from '@/utils/request';
+import { guid } from '@/utils/utils';
 
 const FormItem = Form.Item;
 const { TextArea } = Input;
@@ -13,11 +14,9 @@ const { Option } = Select;
 
 @connect(({ bpEdit, user }) => {
   const details = bpEdit.details || {};
-  const { uuid } = bpEdit;
   const organizationCertification = details.organizationCertification || { attachmentList: [] };
   return {
     details,
-    uuid,
     organizationCertification,
     authorization: user.currentUser.authorization,
   };
@@ -25,7 +24,25 @@ const { Option } = Select;
 class OrgCertification extends Component {
   constructor(props) {
     super(props);
-    const uploadUrl = disk.uploadMoreFiles('bp_organization_certification', this.props.uuid);
+    const { details, organizationCertification } = this.props;
+
+    let uuid;
+    if (organizationCertification.uuid) {
+      // eslint-disable-next-line prefer-destructuring
+      uuid = organizationCertification.uuid;
+    } else {
+      uuid = guid();
+      organizationCertification.uuid = uuid;
+      this.props.dispatch({
+        type: 'bpEdit/setState',
+        payload: {
+          type: 'details',
+          data: { ...details, ...{ organizationCertification } },
+        },
+      });
+    }
+
+    const uploadUrl = disk.uploadMoreFiles('bp_organization_certification', uuid);
 
     this.state = {
       uploadUrl,
