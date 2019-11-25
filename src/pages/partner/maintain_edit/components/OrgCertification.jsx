@@ -12,7 +12,6 @@ const { TextArea } = Input;
 const { Option } = Select;
 
 @connect(({ bpEdit, user }) => {
-  console.log();
   const details = bpEdit.details || {};
   const { uuid } = bpEdit;
   const organizationCertification = details.organizationCertification || { attachmentList: [] };

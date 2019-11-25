@@ -1,6 +1,7 @@
-import { Form, Button, Spin } from 'antd';
+import { Form, Button, Spin, message } from 'antd';
 import React, { Component } from 'react';
 
+import router from 'umi/router';
 import { connect } from 'dva';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import FooterToolbar from '@/components/FooterToolbar';
@@ -10,13 +11,13 @@ import SalesArea from './components/SalesArea';
 import OrgCredit from './components/OrgCredit';
 import OrgCertification from './components/OrgCertification';
 import PersonCredit from './components/PersonCredit';
-import PersonCertification from './components/PersonCertification';
+import PICertification from './components/PICertification';
 import Address from './components/Address';
 import PurchasingOrg from './components/PurchasingOrg';
 import Bank from './components/Bank';
 
 import { bp } from '@/api';
-import { validateForm, diff, guid } from '@/utils/utils';
+import { validateForm, diff } from '@/utils/utils';
 
 @connect(({ loading, bpEdit }) => ({
   oldDetails: bpEdit.oldDetails || {},
@@ -38,13 +39,6 @@ class CustomerEdit extends Component {
       payload: {
         type: 'editType',
         data: editType,
-      },
-    });
-    this.props.dispatch({
-      type: 'bpEdit/setState',
-      payload: {
-        type: 'uuid',
-        data: guid(),
       },
     });
   }
@@ -194,13 +188,22 @@ class CustomerEdit extends Component {
     }
     if (data.basic.type === 1) {
       newData.piCertificationList = data.piCertificationList;
+      newData.piCertificationList.forEach(e => {
+        e.attachmentList = e.uuid;
+        delete e.uuid;
+      });
     } else {
       newData.organizationCertification = data.organizationCertification;
+      newData.organizationCertification.attachmentList = newData.organizationCertification.uuid;
+      delete newData.organizationCertification.uuid;
     }
 
     console.log(newData);
+    // return;
     bp.addBP(newData).then(res => {
       console.log(res);
+      message.success('新增业务伙伴成功');
+      router.push('/partner/maintain');
     });
   };
 
@@ -248,6 +251,8 @@ class CustomerEdit extends Component {
 
     bp.updateBP(data).then(res => {
       console.log(res);
+      message.success('修改业务伙伴成功');
+      router.push('/partner/maintain');
     });
   };
 
@@ -274,7 +279,7 @@ class CustomerEdit extends Component {
         {type === 1 ? (
           <>
             {editType === 'update' ? <PersonCredit /> : null}
-            <PersonCertification />
+            <PICertification />
           </>
         ) : null}
         <Address />

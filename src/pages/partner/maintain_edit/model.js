@@ -9,8 +9,6 @@ const SeqModel = {
     details: null,
     // 编辑状态 add 新增，update 修改
     editType: '',
-    // 上传图片使用
-    uuid: '',
   },
   effects: {
     // 根据参数，获取BP详细数据
@@ -47,7 +45,9 @@ const SeqModel = {
     // 新增BP时初始化数据结构
     addInitDetails(state) {
       const details = {
-        basic: {},
+        basic: {
+          type: 1,
+        },
         customer: {
           // taxesCityCode: null,
           // taxesCountyCode: null,
