@@ -17,7 +17,8 @@ import PurchasingOrg from './components/PurchasingOrg';
 import Bank from './components/Bank';
 
 import { bp } from '@/api';
-import { validateForm, diff } from '@/utils/utils';
+// import { validateForm, diff } from '@/utils/utils';
+import { diff } from '@/utils/utils';
 
 @connect(({ loading, bpEdit }) => ({
   oldDetails: bpEdit.oldDetails || {},
@@ -141,9 +142,9 @@ class CustomerEdit extends Component {
   // 提交
   validate = async () => {
     // 验证basic
-    const basicForm = this.basicView.wrappedInstance.props.form;
-    const basicResult = await validateForm(basicForm);
-    if (!basicResult[0]) return;
+    // const basicForm = this.basicView.wrappedInstance.props.form;
+    // const basicResult = await validateForm(basicForm);
+    // if (!basicResult[0]) return;
 
     const { editType } = this.state;
     if (editType === 'add') {
