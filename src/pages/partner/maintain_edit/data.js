@@ -188,7 +188,7 @@ export const readDetails = {
       lastEvaluationDate: '2019-10-01',
     },
   ],
-}
+};
 
 // 新增BP数据结构
 export const addDetails = {
@@ -302,9 +302,7 @@ export const addDetails = {
     bankAccount: '60045612378',
     address: '注册地址',
     notes: '这是一段认证说明',
-    attachmentList: [
-      { code: 'https://blog.maxmeng.top/images/avatar.jpg', name: '照片', type: 'image' },
-    ],
+    attachmentList: 'uuid',
   },
   // 负责人认证
   piCertificationList: [
@@ -312,12 +310,10 @@ export const addDetails = {
       id: -1,
       invoicePartyId: 123,
       notes: '这是一段认证说明',
-      attachmentList: [
-        { code: 'https://blog.maxmeng.top/images/avatar.jpg', name: '照片', type: 'image' },
-      ],
+      attachmentList: 'uuid',
     },
   ],
-}
+};
 
 // 修改BP数据结构
 export const updateDetails = {

@@ -6,21 +6,43 @@ import { TelphoneInput } from '@/components/CustomizedFormControls';
 import disk from '@/api/disk';
 import basicAPI from '@/api/basic';
 import { requestErr } from '@/utils/request';
+import { guid } from '@/utils/utils';
 
 const FormItem = Form.Item;
 const { TextArea } = Input;
 const { Option } = Select;
 
-@connect(({ bpEdit, user }) => ({
-  details: bpEdit.details || {},
-  uuid: bpEdit.uuid,
-  authorization: user.currentUser.authorization,
-  organizationCertification: (bpEdit.details && bpEdit.details.organizationCertification) || { attachmentList: [] },
-}))
+@connect(({ bpEdit, user }) => {
+  const details = bpEdit.details || {};
+  const organizationCertification = details.organizationCertification || { attachmentList: [] };
+  return {
+    details,
+    organizationCertification,
+    authorization: user.currentUser.authorization,
+  };
+})
 class OrgCertification extends Component {
   constructor(props) {
     super(props);
-    const uploadUrl = disk.uploadMoreFiles('bp_organization_certification', this.props.uuid);
+    const { details, organizationCertification } = this.props;
+
+    let uuid;
+    if (organizationCertification.uuid) {
+      // eslint-disable-next-line prefer-destructuring
+      uuid = organizationCertification.uuid;
+    } else {
+      uuid = guid();
+      organizationCertification.uuid = uuid;
+      this.props.dispatch({
+        type: 'bpEdit/setState',
+        payload: {
+          type: 'details',
+          data: { ...details, ...{ organizationCertification } },
+        },
+      });
+    }
+
+    const uploadUrl = disk.uploadMoreFiles('bp_organization_certification', uuid);
 
     this.state = {
       uploadUrl,
@@ -32,11 +54,21 @@ class OrgCertification extends Component {
   }
 
   valueChange = (key, value) => {
-    const { details, organizationCertification } = this.props;
+    const { details, organizationCertification, form } = this.props;
 
     let obj = {
       [key]: value,
     };
+
+    // 设置 增值税专用发票资质默认值
+    const formData = form.getFieldsValue();
+    if (
+      Object.keys(organizationCertification).indexOf('specialInvoice') === -1 &&
+      Object.keys(formData).indexOf('specialInvoice') !== -1
+    ) {
+      if (formData.specialInvoice) organizationCertification.specialInvoice = 1;
+      if (!formData.specialInvoice) organizationCertification.specialInvoice = 2;
+    }
 
     if (key === 'attachmentList') {
       if (value.file.response) {
@@ -52,6 +84,11 @@ class OrgCertification extends Component {
     }
 
     if (key === 'telephone') obj = value;
+
+    if (key === 'specialInvoice') {
+      if (value) obj[key] = 1;
+      if (!value) obj[key] = 2;
+    }
 
     const data = { ...organizationCertification, ...obj };
 
@@ -118,7 +155,7 @@ class OrgCertification extends Component {
                 <FormItem label="增值税专用发票资质">
                   {getFieldDecorator('specialInvoice', {
                     valuePropName: 'checked',
-                    initialValue: orgData.specialInvoice,
+                    initialValue: orgData.specialInvoice === 1,
                   })(<Switch onChange={value => this.valueChange('specialInvoice', value)} />)}
                 </FormItem>
               </Col>
