@@ -55,7 +55,7 @@ const SeqModel = {
         },
         vendor: {
           invoicePostBlock: 2,
-          purchasingOrganizationList: [],
+          purchaseOrganizationList: [],
           paymentBank: {},
         },
         organizationCertification: {},

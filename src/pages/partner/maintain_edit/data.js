@@ -121,7 +121,7 @@ export const readDetails = {
     // 采购冻结
     invoicePostBlock: false,
     // 采购组织列表
-    purchasingOrganizationList: [
+    purchaseOrganizationList: [
       {
         purchasingOrganizationCode: 'BBI',
         salerName: '张三',
@@ -272,7 +272,7 @@ export const addDetails = {
     // 采购冻结
     invoicePostBlock: false,
     // 采购组织列表
-    purchasingOrganizationList: [
+    purchaseOrganizationList: [
       {
         purchasingOrganizationCode: 'BBI',
         salerName: '张三',
@@ -378,7 +378,7 @@ export const updateDetails = {
     // 采购冻结
     invoicePostBlock: false,
     // 采购组织列表
-    purchasingOrganizationList: [
+    purchaseOrganizationList: [
       {
         purchasingOrganizationCode: 'BBI',
         salerName: '张三',
