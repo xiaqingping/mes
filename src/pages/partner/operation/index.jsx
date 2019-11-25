@@ -28,9 +28,54 @@ const status = {
     text: '未完成',
   },
   2: {
+    value: 'warning',
+    text: '部分完成',
+  },
+  3: {
     value: 'success',
     text: '已完成',
   },
+};
+
+ // 业务伙伴搜索数据
+ const data = {
+  huoban: [
+    {
+    id: 1,
+    code: '100',
+    value: '张1',
+  },
+  {
+    id: 2,
+    code: '101',
+    value: '张2',
+  },
+  {
+    id: 3,
+    code: '102',
+    value: '张3',
+  },
+  {
+    id: 4,
+    code: '103',
+    value: '张4',
+  },
+  {
+    id: 5,
+    code: '104',
+    value: '张5',
+  },
+  {
+    id: 6,
+    code: '105',
+    value: '张6',
+  },
+  {
+    id: 7,
+    code: '106',
+    value: '张7',
+  },
+],
 };
 
 function renderOption(item) {
@@ -59,56 +104,12 @@ class Operation extends React.Component {
     detailsValue: null,
     // editIndex: -1,
     typeValue: [],
-    partnerVal: [],
-  };
-
-  // 业务伙伴搜索数据
-  data = {
-    huoban: [
-      {
-      id: 1,
-      code: '100',
-      value: '张1',
-    },
-    {
-      id: 2,
-      code: '101',
-      value: '张2',
-    },
-    {
-      id: 3,
-      code: '102',
-      value: '张3',
-    },
-    {
-      id: 4,
-      code: '103',
-      value: '张4',
-    },
-    {
-      id: 5,
-      code: '104',
-      value: '张5',
-    },
-    {
-      id: 6,
-      code: '105',
-      value: '张6',
-    },
-    {
-      id: 7,
-      code: '106',
-      value: '张7',
-    },
-  ],
+    partnerVal: data.huoban,
   };
 
   componentDidMount() {
     // this.getTableData();
     this.getTableData();
-    this.setState({
-      partnerVal: this.data.huoban,
-    })
   }
 
   // 弹窗显示和详情数据保存
@@ -206,7 +207,7 @@ class Operation extends React.Component {
     if (!value) {
       return false
     }
-    this.data.huoban.forEach(item => {
+    data.huoban.forEach(item => {
       if (item.value.indexOf(value) !== -1) {
         arr.push(item);
       }
@@ -329,8 +330,7 @@ class Operation extends React.Component {
       {
         title: '状态',
         dataIndex: 'status',
-        width: 300,
-        align: 'center',
+        width: 200,
         filters: [
           {
             value: '1',
@@ -338,12 +338,16 @@ class Operation extends React.Component {
           },
           {
             value: '2',
+            text: '部分完成',
+          },
+          {
+            value: '3',
             text: '已完成',
           },
         ],
         onFilter: (value, record) => record.status.toString().indexOf(value.toString()) === 0,
         render(val, record) {
-          return <span><Badge status={status[val].value} text={status[val].text}/><br/><span style={{ marginLeft: 85 }}>{val === 2 ? record.finishDate : ''}</span></span>;
+          return <span><Badge status={status[val].value} text={status[val].text}/><br/><span style={{ marginLeft: 85 }}>{val === 3 ? record.finishDate : ''}</span></span>;
         },
       },
       {
