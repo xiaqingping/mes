@@ -124,20 +124,36 @@ const SeqModel = {
     ],
     // 验证记录状态
     VerifyRecordStatus: [
-      { id: 1, name: '验证中' },
-      { id: 2, name: '已验证' },
-      { id: 3, name: '已拒绝' },
+      { value: 1, text: '验证中', status: 'warning' },
+      { value: 2, text: '已验证', status: 'success' },
+      { value: 3, text: '已拒绝', status: 'error' },
     ],
     // 验证类型
     VerifyRecordType: [
-      { id: 1, name: '组织认证' },
-      { id: 2, name: '人员认证' },
-      { id: 3, name: '绑定售达方' },
-      { id: 4, name: '验证手机' },
-      { id: 5, name: '验证邮箱' },
-      { id: 6, name: '变更验证手机' },
-      { id: 7, name: '变更验证邮箱' },
+      { value: 1, text: '组织认证' },
+      { value: 2, text: '人员认证' },
+      { value: 3, text: '绑定售达方' },
+      { value: 4, text: '验证手机' },
+      { value: 5, text: '验证邮箱' },
+      { value: 6, text: '变更验证手机' },
+      { value: 7, text: '变更验证邮箱' },
     ],
+
+    // 操作记录状态
+    operationStatus: {
+      1: {
+        value: 'default',
+        text: '未完成',
+      },
+      2: {
+        value: 'warning',
+        text: '部分完成',
+      },
+      3: {
+        value: 'success',
+        text: '已完成',
+      },
+    },
   },
   effects: {},
   reducers: {
