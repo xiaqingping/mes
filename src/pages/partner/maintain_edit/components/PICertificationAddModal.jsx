@@ -21,8 +21,6 @@ const { Search } = Input;
 )
 class PICertificationAddModal extends React.Component {
   constructor(props) {
-    console.log('((((((((((((((');
-    console.log(props);
     super(props);
     this.state = {
       invoiceParty: props.data || {},
@@ -58,12 +56,33 @@ class PICertificationAddModal extends React.Component {
   };
 
   valueChange = (key, value) => {
+    const { invoiceParty } = this.state;
     if (key === 'attachmentList') {
+      const attachmentList = [];
       if (value.file.response) {
         value.fileList.forEach(e => {
           if (e.status === 'error') requestErr(e.response);
+          if (e.old) {
+            attachmentList.push({
+              code: e.uid,
+              name: e.name,
+              type: e.type,
+            });
+          } else {
+            attachmentList.push({
+              code: (e.response && e.response[0]) || '',
+              name: e.name,
+              type: e.type,
+            });
+          }
         });
       }
+      this.setState({
+        invoiceParty: {
+          ...invoiceParty,
+          attachmentList,
+        },
+      });
     }
   };
 
@@ -72,10 +91,22 @@ class PICertificationAddModal extends React.Component {
   };
 
   render() {
-    console.log(123);
     const { form, authorization } = this.props;
     const { uuid, invoiceParty } = this.state;
     const uploadUrl = disk.uploadMoreFiles('bp_organization_certification', uuid);
+
+    if (!invoiceParty.attachmentList) invoiceParty.attachmentList = [];
+    const fileList = invoiceParty.attachmentList.map(e => {
+      const url = disk.downloadFiles(e.code, { view: true });
+      return {
+        old: true,
+        uid: e.code,
+        name: e.name,
+        type: e.type,
+        status: 'done',
+        url,
+      };
+    });
 
     return (
       <>
@@ -94,6 +125,7 @@ class PICertificationAddModal extends React.Component {
           </FormItem>
           <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="认证图片">
             {form.getFieldDecorator('attachmentList', {
+              initialValue: fileList,
               rules: [{ required: true }],
               valuePropName: 'fileList',
               getValueFromEvent: this.normFile,

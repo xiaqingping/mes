@@ -71,11 +71,7 @@ class PersonCertification extends React.Component {
 
     return (
       <List.Item>
-        <Button
-          type="dashed"
-          style={{ width: '100%', height: 274 }}
-          onClick={() => this.handleModalVisible(true)}
-        >
+        <Button type="dashed" style={{ width: '100%', height: 274 }} onClick={this.addNewItem}>
           <Icon type="plus" /> 提交认证
         </Button>
       </List.Item>
@@ -103,6 +99,13 @@ class PersonCertification extends React.Component {
     });
   };
 
+  addNewItem = () => {
+    this.setState({
+      updateItemData: {},
+    });
+    this.handleModalVisible(true);
+  };
+
   // 变更项
   updateItem = data => {
     this.setState({
@@ -126,11 +129,6 @@ class PersonCertification extends React.Component {
     const { details, piCertificationList } = this.props;
     const { id } = this.state;
 
-    const attachmentList = data.attachmentList.map(e => ({
-      code: (e.response && e.response[0]) || '',
-      name: e.name,
-      type: e.type,
-    }));
     this.handleModalVisible();
     const newId = id - 1;
 
@@ -144,10 +142,16 @@ class PersonCertification extends React.Component {
       invoicePartyName: data.invoicePartyName,
       status: 1,
       notes: data.notes,
-      attachmentList,
+      attachmentList: data.attachmentList,
     };
 
-    const newdata = [...piCertificationList, obj];
+    let newdata = [...piCertificationList, obj];
+    if (data.id) {
+      newdata = piCertificationList.map(e => {
+        if (e.id === data.id) return data;
+        return e;
+      });
+    }
 
     this.props.dispatch({
       type: 'bpEdit/setState',

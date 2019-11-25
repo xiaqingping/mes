@@ -249,6 +249,7 @@ class CustomerEdit extends Component {
     // 删除地址
     customer.deleteAddressIdList = addressDiff.del;
 
+    // return;
     bp.updateBP(data).then(res => {
       console.log(res);
       message.success('修改业务伙伴成功');
