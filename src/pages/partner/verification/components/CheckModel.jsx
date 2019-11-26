@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 import {
   Modal,
   Badge,
@@ -7,6 +8,7 @@ import {
   Button,
 } from 'antd';
 import React from 'react';
+import { connect } from 'dva';
 import styles from './index.less';
 import api from '@/api';
 
@@ -105,7 +107,8 @@ const RecordListForm = Form.create()(
 
     render () {
       const { showList, historyRecord } = this.state;
-      const { closeListForm } = this.props;
+      const { closeListForm, recordMsg: { type } } = this.props;
+      const typeName = parseInt(type, 10) === 1 ? 'organizationCertification' : 'piCertification';
       if (historyRecord.length === 0) return null
       return (
         <Modal
@@ -113,7 +116,7 @@ const RecordListForm = Form.create()(
           footer={null}
           width="410px"
           className={styles.xxx}
-          title="认证历史（PI）"
+          title="认证历史"
           visible = {showList}
           onCancel={closeListForm}>
           <ul className={styles.contenList}>
@@ -135,22 +138,123 @@ const RecordListForm = Form.create()(
                 </Col>
               </Row>
             </li>
+            { parseInt(type, 10) === 2 ?
+            <>
+              <li>
+                <Row>
+                  <Col span={4} className={styles.labelName}>名称：</Col>
+                  <Col span={20} className={styles.labelVal}>{historyRecord.piCertification.name}</Col>
+                </Row>
+              </li>
+              <li>
+                <Row>
+                  <Col span={4} className={styles.labelName}>收票方：</Col>
+                  <Col
+                    span={20}
+                    className={styles.labelVal}>
+                      {historyRecord.piCertification.billToPartyName}
+                  </Col>
+                </Row>
+              </li>
+            </>
+            :
+            (historyRecord.organizationCertification.countryCode === 'CN' ?
+            <>
+              <li>
+                <Row>
+                  <Col span={10} className={styles.labelName}>国家：</Col>
+                  <Col
+                    span={14}
+                    className={styles.labelVal}>
+                      {historyRecord.organizationCertification.countryName}
+                  </Col>
+                </Row>
+              </li>
+              <li>
+                <Row>
+                  <Col span={10} className={styles.labelName}>联系电话：</Col>
+                  <Col
+                    span={14}
+                    className={styles.labelVal}>
+                      {historyRecord.organizationCertification.telephoneAreaCode ? `+${historyRecord.organizationCertification.telephoneAreaCode} ` : ''}{historyRecord.organizationCertification.telephone}
+                  </Col>
+                </Row>
+              </li>
+              <li>
+                <Row>
+                  <Col span={10} className={styles.labelName}>行业类别：</Col>
+                  <Col
+                    span={14}
+                    className={styles.labelVal}>
+                      {historyRecord.organizationCertification.industryCode}
+                  </Col>
+                </Row>
+              </li>
+              <li>
+                <Row>
+                  <Col span={10} className={styles.labelName}>增值税专用发票资质：</Col>
+                  <Col
+                    span={14}
+                    className={styles.labelVal}>
+                      {/* {detailsValue.specialInvoice} */}
+                      {historyRecord.organizationCertification.specialInvoice ? historyRecord.organizationCertification.filter(item => item.id === historyRecord.organizationCertification.specialInvoice)[0].name : ''}
+                  </Col>
+                </Row>
+              </li>
+              <li>
+                <Row>
+                  <Col span={10} className={styles.labelName}>统一社会信用代码：</Col>
+                  <Col
+                    span={14}
+                    className={styles.labelVal}>
+                      {historyRecord.organizationCertification.taxNo}
+                  </Col>
+                </Row>
+              </li>
+              <li>
+                <Row>
+                  <Col span={10} className={styles.labelName}>基本户开户银行：</Col>
+                  <Col
+                    span={14}
+                    className={styles.labelVal}>
+                      {historyRecord.organizationCertification.bankCode}
+                  </Col>
+                </Row>
+              </li>
+              <li>
+                <Row>
+                  <Col span={10} className={styles.labelName}>基本户开户账号：</Col>
+                  <Col
+                    span={14}
+                    className={styles.labelVal}>
+                      {historyRecord.organizationCertification.bankAccount}
+                  </Col>
+                </Row>
+              </li>
+              <li>
+                <Row>
+                  <Col span={10} className={styles.labelName}>注册地址：</Col>
+                  <Col
+                    span={14}
+                    className={styles.labelVal}>
+                      {historyRecord.organizationCertification.registeredAddress}
+                  </Col>
+                </Row>
+              </li>
+            </>
+            :
             <li>
               <Row>
-                <Col span={4} className={styles.labelName}>名称：</Col>
-                <Col span={20} className={styles.labelVal}>{historyRecord.piCertification.name}</Col>
-              </Row>
-            </li>
-            <li>
-              <Row>
-                <Col span={4} className={styles.labelName}>收票方：</Col>
+                <Col span={10} className={styles.labelName}>{historyRecord.organizationCertification.countryCode === 'US' ? '免税认证号' : '增值税登记号'}：</Col>
                 <Col
-                  span={20}
+                  span={14}
                   className={styles.labelVal}>
-                    {historyRecord.piCertification.billToPartyName}
+                    {historyRecord.organizationCertification.taxNo}
                 </Col>
               </Row>
-            </li>
+            </li>)
+            }
+
             <li>
               <Row>
                 <Col span={4} className={styles.labelName}>认证说明：</Col>
@@ -162,7 +266,7 @@ const RecordListForm = Form.create()(
                 <Col span={4} className={styles.labelName}>附件：</Col>
                 <Col span={20} className={styles.labelVal}>
                   <ul style={{ padding: '0' }}>
-                    {historyRecord.piCertification.attachmentList.map((item, index) => (
+                    {historyRecord[typeName].attachmentList.map((item, index) => (
                         // eslint-disable-next-line react/no-array-index-key
                         <li key={index} style={{ width: '100px', height: '100px', border: '1px solid #D9D9D9', textAlign: 'center', lineHeight: '94px', borderRadius: '5px', float: 'left', marginRight: '30px' }}>{item.type === 'image' ? <img src={item.name} alt="" width="90" height="90"/> : ''}</li>
                       ))}
@@ -177,6 +281,9 @@ const RecordListForm = Form.create()(
   },
 )
 
+@connect(({ partnerMaintainEdit }) => ({
+  SpecialInvoice: partnerMaintainEdit.SpecialInvoice,
+}))
 class CheckModel extends React.Component {
   constructor (props) {
     super(props);
@@ -189,20 +296,6 @@ class CheckModel extends React.Component {
     }
   }
 
-  // /** props更新事调用 */
-  // componentWillReceiveProps (props) {
-  //   let { showModal } = props;
-  //   const { recordMsg, clickType } = props;
-  //   if (recordMsg === undefined) {
-  //     showModal = false;
-  //   }
-  //   this.setState({
-  //     modal1Visible: showModal,
-  //     recordMsg,
-  //     clickType,
-  //   });
-  // }
-
   componentDidMount() {
     this.props.onRef(this)
   }
@@ -213,6 +306,7 @@ class CheckModel extends React.Component {
     // 组织认证
     if (clickType === 1) {
       api.bp.getOrgCertificationVerifyRecords(recordMsg.id).then(res => {
+        console.log(res)
         this.setState({
           detailsValue: res,
         })
@@ -250,10 +344,14 @@ class CheckModel extends React.Component {
         })
       })
     }
+    this.setState({
+      recordMsg,
+      clickType,
+    })
   }
 
   /** 控制模态框状态 */
-  setModal1Visible(modal1Visible) {
+  setModal1Visible = modal1Visible => {
     this.setState({ modal1Visible });
   }
 
@@ -261,8 +359,6 @@ class CheckModel extends React.Component {
   visibleShow = (recordMsg, clickType, visible) => {
     this.setState({
       modal1Visible: recordMsg ? visible : false,
-      recordMsg,
-      clickType,
     });
   }
 
@@ -286,6 +382,7 @@ class CheckModel extends React.Component {
 
   render () {
     const { recordMsg, showList, detailsValue, clickType } = this.state;
+    const { SpecialInvoice } = this.props;
     if (!detailsValue) return null
     let modalTitle;
     // const changeData = [];
@@ -452,10 +549,10 @@ class CheckModel extends React.Component {
               {piData.attachmentList[0].name}</Col> */}
               <Col span={20} className={styles.labelVal}>
                 <ul style={{ padding: '0' }}>
-                  {detailsValue.attachmentList.map((item, index) => (
+                  {detailsValue.attachmentList ? detailsValue.attachmentList.map((item, index) => (
                       // eslint-disable-next-line react/no-array-index-key
                       <li key={index} style={{ width: '100px', height: '100px', border: '1px solid #D9D9D9', textAlign: 'center', lineHeight: '94px', borderRadius: '5px', float: 'left', marginRight: '30px' }}>{item.type === 'image' ? <img src={item.name} alt="" width="90" height="90"/> : ''}</li>
-                    ))}
+                    )) : ''}
                 </ul>
               </Col>
             </Row>
@@ -586,111 +683,127 @@ class CheckModel extends React.Component {
         <ul className={styles.contenList}>
           <li>
             <Row>
-              <Col span={4} className={styles.labelName}>名称：</Col>
+              <Col span={10} className={styles.labelName}>名称：</Col>
               <Col
-                span={20}
+                span={14}
                 className={styles.labelVal}>
-                  {/* {detailsValue.bpName} */}
+                  {detailsValue.bpName}
               </Col>
             </Row>
           </li>
+          {detailsValue.countryCode === 'CN' ?
+          <>
+            <li>
+              <Row>
+                <Col span={10} className={styles.labelName}>国家：</Col>
+                <Col
+                  span={14}
+                  className={styles.labelVal}>
+                    {detailsValue.countryName}
+                </Col>
+              </Row>
+            </li>
+            <li>
+              <Row>
+                <Col span={10} className={styles.labelName}>联系电话：</Col>
+                <Col
+                  span={14}
+                  className={styles.labelVal}>
+                    {detailsValue.telephoneAreaCode ? `+${detailsValue.telephoneAreaCode} ` : ''}{detailsValue.telephone}
+                </Col>
+              </Row>
+            </li>
+            <li>
+              <Row>
+                <Col span={10} className={styles.labelName}>行业类别：</Col>
+                <Col
+                  span={14}
+                  className={styles.labelVal}>
+                    {detailsValue.industryCode}
+                </Col>
+              </Row>
+            </li>
+            <li>
+              <Row>
+                <Col span={10} className={styles.labelName}>增值税专用发票资质：</Col>
+                <Col
+                  span={14}
+                  className={styles.labelVal}>
+                    {/* {detailsValue.specialInvoice} */}
+                    {detailsValue.specialInvoice ? SpecialInvoice.filter(item => item.id === detailsValue.specialInvoice)[0].name : ''}
+                </Col>
+              </Row>
+            </li>
+            <li>
+              <Row>
+                <Col span={10} className={styles.labelName}>统一社会信用代码：</Col>
+                <Col
+                  span={14}
+                  className={styles.labelVal}>
+                    {detailsValue.taxNo}
+                </Col>
+              </Row>
+            </li>
+            <li>
+              <Row>
+                <Col span={10} className={styles.labelName}>基本户开户银行：</Col>
+                <Col
+                  span={14}
+                  className={styles.labelVal}>
+                    {detailsValue.bankCode}
+                </Col>
+              </Row>
+            </li>
+            <li>
+              <Row>
+                <Col span={10} className={styles.labelName}>基本户开户账号：</Col>
+                <Col
+                  span={14}
+                  className={styles.labelVal}>
+                    {detailsValue.bankAccount}
+                </Col>
+              </Row>
+            </li>
+            <li>
+              <Row>
+                <Col span={10} className={styles.labelName}>注册地址：</Col>
+                <Col
+                  span={14}
+                  className={styles.labelVal}>
+                    {detailsValue.registeredAddress}
+                </Col>
+              </Row>
+            </li>
+          </>
+          :
           <li>
             <Row>
-              <Col span={4} className={styles.labelName}>国家：</Col>
+              <Col span={10} className={styles.labelName}>{detailsValue.countryCode === 'US' ? '免税认证号' : '增值税登记号'}：</Col>
               <Col
-                span={20}
+                span={14}
                 className={styles.labelVal}>
-                  {/* {detailsValue.invoicePartyName} */}
+                  {detailsValue.taxNo}
               </Col>
             </Row>
           </li>
+          }
           <li>
             <Row>
-              <Col span={4} className={styles.labelName}>联系电话：</Col>
-              <Col
-                span={20}
-                className={styles.labelVal}>
-                  {/* {detailsValue.invoicePartyName} */}
-              </Col>
+              <Col span={10} className={styles.labelName}>认证说明：</Col>
+              <Col span={14} className={styles.labelVal}>{detailsValue.notes}</Col>
             </Row>
           </li>
           <li>
             <Row>
-              <Col span={4} className={styles.labelName}>行业类别：</Col>
-              <Col
-                span={20}
-                className={styles.labelVal}>
-                  {/* {detailsValue.invoicePartyName} */}
-              </Col>
-            </Row>
-          </li>
-          <li>
-            <Row>
-              <Col span={4} className={styles.labelName}>增值税专用发票资质：</Col>
-              <Col
-                span={20}
-                className={styles.labelVal}>
-                  {/* {detailsValue.invoicePartyName} */}
-              </Col>
-            </Row>
-          </li>
-          <li>
-            <Row>
-              <Col span={4} className={styles.labelName}>统一社会信用代码：</Col>
-              <Col
-                span={20}
-                className={styles.labelVal}>
-                  {/* {detailsValue.invoicePartyName} */}
-              </Col>
-            </Row>
-          </li>
-          <li>
-            <Row>
-              <Col span={4} className={styles.labelName}>基本户开户银行：</Col>
-              <Col
-                span={20}
-                className={styles.labelVal}>
-                  {/* {detailsValue.invoicePartyName} */}
-              </Col>
-            </Row>
-          </li>
-          <li>
-            <Row>
-              <Col span={4} className={styles.labelName}>基本户开户账号：</Col>
-              <Col
-                span={20}
-                className={styles.labelVal}>
-                  {/* {detailsValue.invoicePartyName} */}
-              </Col>
-            </Row>
-          </li>
-          <li>
-            <Row>
-              <Col span={4} className={styles.labelName}>注册地址：</Col>
-              <Col
-                span={20}
-                className={styles.labelVal}>
-                  {/* {detailsValue.invoicePartyName} */}
-              </Col>
-            </Row>
-          </li>
-          <li>
-            <Row>
-              <Col span={4} className={styles.labelName}>认证说明：</Col>
-              <Col span={20} className={styles.labelVal}>{detailsValue.notes}</Col>
-            </Row>
-          </li>
-          <li>
-            <Row>
-              <Col span={4} className={styles.labelName}>附件：</Col>
+              <Col span={9} className={styles.labelName}>附件：</Col>
               {/* <Col span={20} className={styles.labelVal}>
               {piData.attachmentList[0].name}</Col> */}
-              <Col span={20} className={styles.labelVal}>
+              <Col span={15} className={styles.labelVal}>
                 <ul style={{ padding: '0' }}>
-                  {detailsValue.attachmentList.map((item, index) => (
+                  {detailsValue.attachmentList ? detailsValue.attachmentList.map((item, index) => (
                       // eslint-disable-next-line react/no-array-index-key
                       <li key={index} style={{ width: '100px', height: '100px', border: '1px solid #D9D9D9', textAlign: 'center', lineHeight: '94px', borderRadius: '5px', float: 'left', marginRight: '30px' }}>{item.type === 'image' ? <img src={item.name} alt="" width="90" height="90"/> : ''}</li>
-                    ))}
+                    )) : ''}
                 </ul>
               </Col>
             </Row>
@@ -715,14 +828,6 @@ class CheckModel extends React.Component {
           visible={this.state.modal1Visible}
           onOk={() => this.setModal1Visible(false)}
           onCancel={() => this.setModal1Visible(false)}
-          footer={clickType === 1 || clickType === 2 ? [
-            <Button key="back" onClick={this.setModal1Visible(false)}>
-              拒绝
-            </Button>,
-            <Button key="submit" type="primary" onClick={this.handleOk}>
-              审核
-            </Button>,
-          ] : null}
           destroyOnClose
         >
         { modelContent }

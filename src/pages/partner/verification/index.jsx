@@ -14,7 +14,7 @@ import {
 import React, { Fragment } from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import StandardTable from '@/components/StandardTable';
-import CheckModal from '@/components/CheckModal';
+import CheckModel from './components/CheckModel';
 import { connect } from 'dva';
 import styles from './index.less';
 import api from '@/api';
@@ -97,6 +97,8 @@ class Verification extends React.Component {
       selectedRows: [],
       list: [],
       total: 0,
+      record: [],
+      type: null,
       allPartner: this.allPartner,
       inputPartner: undefined,
       showModal: false,
@@ -235,39 +237,6 @@ class Verification extends React.Component {
     return expandForm ? this.renderAdvancedForm() : this.renderSimpleForm();
   }
 
-  /** 业务伙伴输入框查询 */
-  searchPartner = value => {
-    this.fetch(value, data => {
-      this.setState({ allPartner: data })
-    })
-  };
-
-  /** 请求业务伙伴数据 */
-  fetch = (value, callback) => {
-    if (value === '') return;
-    callback([
-      {
-        value: 96806578,
-        text: '王二狗',
-      },
-    ]);
-  }
-
-  /** 业务伙伴输入事件 */
-  valueChange = value => {
-    this.setState({ inputPartner: value })
-  }
-
-  /** 类型输入事件 */
-  preTypeChange = value => {
-    console.log(value);
-  }
-
-  /** 状态输入事件 */
-  preStateChange = value => {
-    console.log(value);
-  }
-
   saveFormRef = formRef => {
     this.formRef = formRef;
   }
@@ -303,7 +272,7 @@ class Verification extends React.Component {
   }
 
   /** 部分筛选条件 */
-  renderSimpleForm () {
+  renderSimpleForm = () => {
     const { form } = this.props;
     const { partnerVal } = this.state;
     const { getFieldDecorator } = form;
@@ -354,15 +323,7 @@ class Verification extends React.Component {
     const {
       form: { getFieldDecorator }, preTypeAll, preStateAll,
     } = this.props;
-    const options = this.state.allPartner.map(d =>
-      <Option key={d.value}>
-        <Fragment>
-          <span> <Icon type="user" /> </span>
-          <span> {d.value} </span>
-          <span> {d.text} </span>
-        </Fragment>
-      </Option>,
-    )
+    const { partnerVal } = this.state;
 
     return (
       <Form onSubmit={this.handleSearch} layout="inline">
@@ -378,20 +339,14 @@ class Verification extends React.Component {
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
-            <FormItem label="业务伙伴">
-            {getFieldDecorator('bpId', { initialValue: this.state.inputPartner })(
-                <Select
-                 showSearch
-                 placeholder="请输入"
-                 defaultActiveFirstOption={false}
-                 showArrow={false}
-                 filterOption={false}
-                 onSearch={this.searchPartner}
-                 onChange={this.valueChange}
-                 notFoundContent = { <a> 没有找到该业务伙伴 </a>}>
-                    { options }
-                 </Select>,
-              )}
+          <FormItem label="业务伙伴">
+              {getFieldDecorator('bpId')(
+              <AutoComplete
+                onSearch={this.inputValue}
+                dataSource={partnerVal.map(this.renderOption)}
+                placeholder="请输入"
+                optionLabelProp="text"
+                />)}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
@@ -399,7 +354,6 @@ class Verification extends React.Component {
               {getFieldDecorator('type')(
                 <Select
                   placeholder="请选择"
-                  onChange={this.preTypeChange}
                   optionLabelProp="label">
                   {
                     preTypeAll.map(state => <Option
@@ -418,7 +372,6 @@ class Verification extends React.Component {
                 <Select
                   mode="multiple"
                   placeholder="请选择"
-                  onChange={this.preStateChange}
                   optionLabelProp="label">
                   {
                     preStateAll.map(state =>
@@ -472,8 +425,15 @@ class Verification extends React.Component {
     )
   }
 
+  detailsValue = (record, type) => {
+    this.setState({
+      record,
+      type,
+    })
+  }
+
   render() {
-    const { formValues: { page: current, pageSize }, list, selectedRows, total, loading } = this.state;
+    const { formValues: { page: current, pageSize }, list, selectedRows, total, loading, record, type } = this.state;
     const { preTypeAll, preStateAll } = this.props
     const data = { list, pagination: { current, pageSize, total } };
     const columns = [
@@ -501,6 +461,7 @@ class Verification extends React.Component {
         dataIndex: 'type',
         filters: preTypeAll,
         width: 150,
+        onFilter: (value, record) => record.type.toString().indexOf(value.toString()) === 0,
         render: value => preTypeAll[value - 1].text,
       },
       {
@@ -508,6 +469,7 @@ class Verification extends React.Component {
         dataIndex: 'status',
         filters: preStateAll,
         width: 150,
+        onFilter: (value, record) => record.status.toString().indexOf(value.toString()) === 0,
         render(value, record) {
           return <>
           <Badge status={preStateAll[value - 1].status} text={preStateAll[value - 1].text} />
@@ -539,7 +501,7 @@ class Verification extends React.Component {
           // const { preState } = record;
           // const check = <a href="#" onClick={ e => { this.verifyPartner(record, e) }}>审核</a>;
           // const view = <a href="#" onClick={ e => { this.checkPartner(record, e) }} >查看</a>;
-          const view = <a href="#" onClick={ e => { this.checkShow.visibleShow(record, record.type, true) }} >查看</a>;
+          const view = <a href="#" onClick={ e => { this.checkShow.visibleShow(record, record.type, true, this.detailsValue(record, record.type)) }} >查看</a>;
           // const allAction = <Fragment><a href="#"
           // onClick={ e => { this.checkPartner(record, e) }}>查看</a><a herf="#"
           // onClick={ e => { this.verifyPartner(record, e) }}>审核</a></Fragment>;
@@ -576,8 +538,10 @@ class Verification extends React.Component {
             />
           </div>
         </Card>
-        <CheckModal
+        <CheckModel
           onRef = { ref => { this.checkShow = ref }}
+          record = {record}
+          type = {type}
           wrappedComponentRef={this.saveFormRef}/>
       </PageHeaderWrapper>
     );
