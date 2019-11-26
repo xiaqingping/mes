@@ -226,6 +226,10 @@ class CustomerEdit extends Component {
 
   // 验证客户数据
   validateCustomer = async () => {
+    const { details } = this.props;
+    const { customer } = details;
+    const { salesAreaList, addressList } = customer;
+
     // 默认验证结果为：通过
     let validateResult = 1;
 
@@ -235,6 +239,22 @@ class CustomerEdit extends Component {
       const result = await validateForm(viewform);
       if (!result[0]) {
         message.error('基础数据不完整');
+        validateResult = 2;
+      }
+    }
+
+    // 销售范围
+    if (!(validateResult === 2)) {
+      if (salesAreaList.length === 0) {
+        message.error('缺少销售范围');
+        validateResult = 2;
+      }
+    }
+
+    // 收获地址
+    if (!(validateResult === 2)) {
+      if (addressList.length === 0) {
+        message.error('缺少收获地址');
         validateResult = 2;
       }
     }
@@ -258,6 +278,10 @@ class CustomerEdit extends Component {
 
   // 验证供应商数据
   validateVendor = async () => {
+    const { details } = this.props;
+    const { vendor } = details;
+    const { purchaseOrganizationList } = vendor;
+
     // 默认验证结果为：通过
     let validateResult = 1;
 
@@ -267,6 +291,14 @@ class CustomerEdit extends Component {
       const result = await validateForm(viewform);
       if (!result[0]) {
         message.error('基础数据不完整');
+        validateResult = 2;
+      }
+    }
+
+    // 采购组织
+    if (!(validateResult === 2)) {
+      if (purchaseOrganizationList.length === 0) {
+        message.error('缺少采购组织');
         validateResult = 2;
       }
     }
@@ -366,12 +398,14 @@ class CustomerEdit extends Component {
     });
 
     let newData = {};
+    // 客户数据必须 或者 客户数据必须没有设置并且当前Tab处于客户页
     if (customerRequired === 1 || (customerRequired === 0 && tabActiveKey === 'customer')) {
       newData = {
         ...newData,
         ...{ basic: data.basic, customer: data.customer },
       };
     }
+    // 供应商数据必须 或者 供应商数据必须没有设置并且当前Tab处于供应商页
     if (vendorRequired || (vendorRequired === 0 && tabActiveKey === 'vendor')) {
       newData = {
         ...newData,
