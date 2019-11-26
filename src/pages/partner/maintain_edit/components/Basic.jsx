@@ -10,7 +10,7 @@ import {
   FaxInput,
   AddressInput,
 } from '@/components/CustomizedFormControls';
-import _ from 'lodash';
+import debounce from 'lodash/debounce';
 import bp from '@/api/bp';
 import styles from '../style.less';
 
@@ -63,21 +63,11 @@ class Basic extends React.Component {
       industrySelectOpen: true,
     };
     // 异步验证做节流处理
-    this.checkNameInput = _.debounce(this.checkNameInput, 500);
-    this.checkEmail = _.debounce(this.checkEmail, 500);
-    this.checkMobilePhone = _.debounce(this.checkMobilePhone, 500);
-    this.checkAddress = _.debounce(this.checkAddress, 500);
+    this.checkNameInput = debounce(this.checkNameInput, 500);
+    this.checkEmail = debounce(this.checkEmail, 500);
+    this.checkMobilePhone = debounce(this.checkMobilePhone, 500);
+    this.checkAddress = debounce(this.checkAddress, 500);
   }
-
-  // validate = () => {
-  //   const { form } = this.props;
-  //   form.validateFieldsAndScroll((error, values) => {
-  //     console.log(values);
-  //     if (!error) {
-  //       //
-  //     }
-  //   });
-  // }
 
   checkNameInput = (rule, value, callback) => {
     if (!value.name) {

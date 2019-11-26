@@ -248,6 +248,15 @@ class CustomerEdit extends Component {
       if (salesAreaList.length === 0) {
         message.error('缺少销售范围');
         validateResult = 2;
+      } else if (this.salesAreaView) {
+        const viewform = this.salesAreaView.wrappedInstance.childrenForm;
+        if (viewform) {
+          const result = await validateForm(viewform);
+          if (!result[0]) {
+            message.error('销售范围数据不完整');
+            validateResult = 2;
+          }
+        }
       }
     }
 
@@ -282,9 +291,6 @@ class CustomerEdit extends Component {
     const { vendor } = details;
     const { purchaseOrganizationList } = vendor;
 
-    // console.log(this.PurchasingOrgView);
-    // return;
-
     // 默认验证结果为：通过
     let validateResult = 1;
 
@@ -303,6 +309,15 @@ class CustomerEdit extends Component {
       if (purchaseOrganizationList.length === 0) {
         message.error('缺少采购组织');
         validateResult = 2;
+      } else if (this.purchasingOrgView) {
+        const viewform = this.purchasingOrgView.wrappedInstance.childrenForm;
+        if (viewform) {
+          const result = await validateForm(viewform);
+          if (!result[0]) {
+            message.error('采购组织数据不完整');
+            validateResult = 2;
+          }
+        }
       }
     }
 
@@ -335,7 +350,6 @@ class CustomerEdit extends Component {
 
   // 提交
   validate = async () => {
-    console.log('提交');
     const {
       tabActiveKey,
       customerRequired,
@@ -513,7 +527,10 @@ class CustomerEdit extends Component {
           // eslint-disable-next-line no-return-assign
           wrappedComponentRef={ref => (this.basicView = ref)}
         />
-        <SalesArea />
+        <SalesArea
+          // eslint-disable-next-line no-return-assign
+          ref={ref => (this.salesAreaView = ref)}
+        />
         {type === 2 ? (
           <>
             {editType === 'update' ? <OrgCredit /> : null}
@@ -548,7 +565,7 @@ class CustomerEdit extends Component {
         />
         <PurchasingOrg
           // eslint-disable-next-line no-return-assign
-          wrappedComponentRef={ref => (this.PurchasingOrgView = ref)}
+          ref={ref => (this.purchasingOrgView = ref)}
         />
         <Bank
           // eslint-disable-next-line no-return-assign
