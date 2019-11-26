@@ -282,6 +282,9 @@ class CustomerEdit extends Component {
     const { vendor } = details;
     const { purchaseOrganizationList } = vendor;
 
+    // console.log(this.PurchasingOrgView);
+    // return;
+
     // 默认验证结果为：通过
     let validateResult = 1;
 
@@ -332,37 +335,39 @@ class CustomerEdit extends Component {
 
   // 提交
   validate = async () => {
-    const { customerRequired, customerValidate, vendorRequired, vendorValidate } = this.state;
+    console.log('提交');
+    const {
+      tabActiveKey,
+      customerRequired,
+      customerValidate,
+      vendorRequired,
+      vendorValidate,
+    } = this.state;
 
-    // 客户必须
-    if (customerRequired === 0 || customerRequired === 1) {
-      // 客户数据没有验证过
-      if (customerValidate === 0) {
-        const result = await this.validateCustomer();
-        if (result === 2) {
-          message.warning('客户数据未验证通过');
-          return;
-        }
-      }
-      // 客户数据没有验证通过
-      if (customerValidate === 2) {
+    // 验证逻辑
+    // 1)先验证当前页数据（因为当前页可能修改过，因此不能使用历史验证结果）
+    // 2)再检查另一页是否必须，如果必须，则使用历史验证结果
+
+    // 当前处于客户Tab
+    if (tabActiveKey === 'customer') {
+      const result = await this.validateCustomer();
+      if (result === 2) {
         message.warning('客户数据未验证通过');
         return;
       }
-    }
-
-    // 供应商必须
-    if (vendorRequired === 0 || vendorRequired === 1) {
-      // 客户数据没有验证过
-      if (vendorValidate === 0) {
-        const result = await this.validateVendor();
-        if (result === 2) {
-          message.warning('客户数据未验证通过');
-          return;
-        }
+      if (vendorRequired === 1 && vendorValidate === 2) {
+        message.warning('供应商数据未验证通过');
+        return;
       }
-      // 客户数据没有验证通过
-      if (vendorValidate === 2) {
+    }
+    // 当前处于供应商Tab
+    if (tabActiveKey === 'vendor') {
+      const result = await this.validateVendor();
+      if (result === 2) {
+        message.warning('供应商数据未验证通过');
+        return;
+      }
+      if (customerRequired === 1 && customerValidate === 2) {
         message.warning('客户数据未验证通过');
         return;
       }
@@ -541,7 +546,10 @@ class CustomerEdit extends Component {
           // eslint-disable-next-line no-return-assign
           wrappedComponentRef={ref => (this.basicView = ref)}
         />
-        <PurchasingOrg />
+        <PurchasingOrg
+          // eslint-disable-next-line no-return-assign
+          wrappedComponentRef={ref => (this.PurchasingOrgView = ref)}
+        />
         <Bank
           // eslint-disable-next-line no-return-assign
           wrappedComponentRef={ref => (this.bankView = ref)}
@@ -613,8 +621,6 @@ class CustomerEdit extends Component {
   };
 
   render() {
-    console.log('state:');
-    console.log(this.state);
     const { width, tabActiveKey } = this.state;
     const { pageLoading } = this.props;
     const customerTab = this.renderCustomerTab();
