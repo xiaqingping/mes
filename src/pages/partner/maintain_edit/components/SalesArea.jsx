@@ -50,7 +50,7 @@ class FormContent extends React.Component {
   }
 
   checkRegionOffice = (rule, value, callback) => {
-    if (!value.regionCode || !value.officeCode) {
+    if (!value[0] || !value[1]) {
       callback('请选择网点归属');
       return;
     }
