@@ -200,25 +200,17 @@ class PurchasingOrg extends React.Component {
 
   valueChange = (key, value) => {
     const { tabKey } = this.state;
-    const { details, vendor, purchaseOrganizationList /* form */ } = this.props;
-
-    // 设置 增值税专用发票资质默认值
-    // const formData = form.getFieldsValue();
-    // if (
-    //   Object.keys(organizationCertification).indexOf('invoicePostInReceive') === -1 &&
-    //   Object.keys(formData).indexOf('invoicePostInReceive') !== -1
-    // ) {
-    //   if (formData.invoicePostInReceive) organizationCertification.invoicePostInReceive = 1;
-    //   if (!formData.invoicePostInReceive) organizationCertification.invoicePostInReceive = 2;
-    // }
+    const { details, vendor, purchaseOrganizationList } = this.props;
 
     const newPurchaseOrganizationList = purchaseOrganizationList.map(e => {
       if (e.purchasingOrganizationCode === tabKey) {
+        e[key] = value;
         if (key === 'salerTelephone') {
           e.salerTelephone = value.mobilePhone;
           e.salerTelephoneCountryCode = value.mobilePhoneCountryCode;
-        } else {
-          e[key] = value;
+        }
+        if (key === 'invoicePostInReceive') {
+          e[key] = value ? 1 : 2;
         }
       }
       return e;
@@ -250,6 +242,7 @@ class PurchasingOrg extends React.Component {
 
     const newPurchaseOrganizationList = [].concat(tabsData, {
       purchasingOrganizationCode: obj[index],
+      invoicePostInReceive: 2,
     });
 
     const newVendor = {
