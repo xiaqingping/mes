@@ -4,7 +4,7 @@ import { connect } from 'dva';
 import InvoiceParty from './InvoiceParty';
 import SoldToParty from './SoldToParty';
 import ShipToParty from './ShipToParty';
-import SalesPerson from './SalesPersonI';
+import SalesPerson from './SalesPerson';
 
 import styles from '../style.less';
 
