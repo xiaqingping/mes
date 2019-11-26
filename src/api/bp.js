@@ -132,6 +132,10 @@ export default {
   getOperationItems(operationRecordId) {
     return request(`/businessPartners/v1/operationRecords/${operationRecordId}/operationItems`);
   },
+  // 获取业务伙伴名称和code接口
+  getPartnerName(params) {
+    return request('/businessPartners/v1/code/name', { params })
+  },
 
   // 验证记录
   // 验证记录列表查询接口（带分页）

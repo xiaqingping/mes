@@ -25,7 +25,8 @@ import api from '@/api';
 import './index.less';
 import disk from '@/api/disk';
 import { guid } from '@/utils/utils';
-import PersonCertificationAddModal from '@/pages/partner/maintain_details/components/PersonCertificationAddModal';
+import PersonCertificationAddModal from
+'@/pages/partner/maintain_details/components/PersonCertificationAddModal';
 
 const { Paragraph } = Typography;
 const FormItem = Form.Item;
@@ -365,6 +366,7 @@ class ChangeModal extends Component {
         groupIndustryShow: true,
         groupUsaShow: true,
         submitNext: 1,
+        userData: [],
       })
     }
 
@@ -691,11 +693,11 @@ class ChangeModal extends Component {
         attachmentList,
       };
 
-      const newdata = [...piCertification, obj];
-      this.props.dispatch({
-        type: 'partnerMaintain/setDetails',
-        payload: { ...details, piCertificationList: newdata },
-      });
+      // const newdata = [...piCertification, obj];
+      // this.props.dispatch({
+      //   type: 'partnerMaintain/setDetails',
+      //   payload: { ...details, piCertificationList: newdata },
+      // });
     };
 
     render () {
@@ -735,6 +737,7 @@ class ChangeModal extends Component {
         </Upload>
         <div style={{ color: '#ADADAD', marginTop: '-30px', marginBottom: '20px' }}>只支持 .jpg 格式</div>
       </>
+      // if (recordMsg.code === userData.basic.code) {}
       // 个人变更
       if (recordMsg && recordMsg.type === 1) {
         modelWidth = 830;

@@ -9,153 +9,25 @@ import {
   Badge,
   DatePicker,
   Select,
+  AutoComplete,
 } from 'antd';
 import React, { Fragment } from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import StandardTable from '@/components/StandardTable';
 import CheckModal from '@/components/CheckModal';
+import { connect } from 'dva';
 import styles from './index.less';
 import api from '@/api';
 
 const FormItem = Form.Item;
 const { RangePicker } = DatePicker;
 const { Option } = Select;
-const preStateAll = [
-  {
-    value: 1,
-    text: '已完成',
-    status: 'success',
-  },
-  {
-    value: 2,
-    text: '验证中',
-    status: 'warning',
-  },
-  {
-    value: 3,
-    text: '审核中',
-    status: 'warning',
-  },
-]
-  /** 类型数据 */
-const preTypeAll = [
-    {
-      value: 1,
-      text: '变更验证邮箱',
-      status: 'warning',
-    },
-    {
-      value: 2,
-      text: '变更验证手机',
-      status: 'warning',
-    },
-    {
-      value: 3,
-      text: '认证',
-      status: 'warning',
-    },
-    {
-      value: 4,
-      text: '绑定售达方',
-      status: 'warning',
-    },
-    {
-      value: 5,
-      text: '验证手机',
-      status: 'warning',
-    },
-    {
-      value: 6,
-      text: '验证邮箱',
-      status: 'warning',
-    },
-  ]
-class Verification extends React.Component {
-  /** table属性数据 */
-  columns = [
-    {
-      title: '编号/操作编号',
-      dataIndex: 'code',
-      // width: 150,
-      render (value, record) {
-        return <><div>{value}</div><div>{record.operationRecordCode}</div></>
-      },
-    },
-    // {
-    //   title: '操作编号',
-    //   dataIndex: 'actCode',
-    // },
-    {
-      title: '业务伙伴',
-      dataIndex: 'bpId',
-      // width: 150,
-      render(value, record) {
-        return <>
-          <div className={styles.partName}><Icon type="user" /> <span>{record.bpName}</span></div>
-          <div className={styles.partCode}>{record.bpCode}</div>
-        </>
-      },
-    },
-    {
-      title: '类型',
-      dataIndex: 'type',
-      filters: preTypeAll,
-      // width: 150,
-      render(value) {
-        return <Badge status= {preTypeAll[value].status} text={preTypeAll[value].text} />
-      },
-    },
-    {
-      title: '状态',
-      dataIndex: 'status',
-      filters: preStateAll,
-      // width: 150,
-      render(value, record) {
-        return <>
-        <Badge status={preStateAll[value].status} text={preStateAll[value].text} />
-        <div>{record.operationDate}</div>
-        </>
-      },
-    },
-    // {
-    //   title: '完成时间',
-    //   dataIndex: 'finishTime',
-    // },
-    {
-      title: '过期时间',
-      dataIndex: 'expireDate',
-      // width: 140,
-    },
-    {
-      title: '操作人',
-      dataIndex: 'operatorName',
-      render(value, record) {
-        return <><div>{value}</div> <div>{record.operationDate}</div></>
-      },
-    },
-    {
-      fiexd: 'right',
-      title: '操作',
-      width: 150,
-      render: (text, record) => {
-        // const { preState } = record;
-        // const check = <a href="#" onClick={ e => { this.verifyPartner(record, e) }}>审核</a>;
-        // const view = <a href="#" onClick={ e => { this.checkPartner(record, e) }} >查看</a>;
-        const view = <a href="#" onClick={ e => { this.checkShow.visibleShow(record, '01', true) }} >查看</a>;
-        // const allAction = <Fragment><a href="#"
-        // onClick={ e => { this.checkPartner(record, e) }}>查看</a><a herf="#"
-        // onClick={ e => { this.verifyPartner(record, e) }}>审核</a></Fragment>;
-        // if (preState === 2) {
-        //   return allAction;
-        // } if (preState === 1) {
-        //   return view;
-        // }
-        //   return check;
-        return view;
-      },
-    },
-  ]
 
+@connect(({ partnerMaintainEdit }) => ({
+  preTypeAll: partnerMaintainEdit.VerifyRecordType,
+  preStateAll: partnerMaintainEdit.VerifyRecordStatus,
+}))
+class Verification extends React.Component {
   /** 业务伙伴数据 */
   allPartner = [
     {
@@ -216,39 +88,73 @@ class Verification extends React.Component {
   // ]
 
   /** 状态 */
-  state = {
-    expandForm: false,
-    selectedRows: [],
-    list: [],
-    total: 0,
-    allPartner: this.allPartner,
-    inputPartner: undefined,
-    showModal: false,
-    loading: false,
-    recordMsg: undefined,
-    clickType: '',
-    formValues: {
-      page: 1,
-      pageSize: 10,
-    },
-  };
+
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      expandForm: false,
+      selectedRows: [],
+      list: [],
+      total: 0,
+      allPartner: this.allPartner,
+      inputPartner: undefined,
+      showModal: false,
+      loading: false,
+      recordMsg: undefined,
+      clickType: '',
+      formValues: {
+        page: 1,
+        pageSize: 10,
+      },
+      partnerVal: [],
+    };
+    this.callParter = _.debounce(this.callParter, 500);
+  }
 
   /** 第一次渲染之后调用 */
   componentDidMount() {
     this.getData();
   }
 
+  // 业务伙伴查询
+  callParter = value => {
+    api.bp.getPartnerName({ code_or_name: value }).then(res => { this.setState({ partnerVal: res }) })
+  }
+
   /** table数据源 */
   getData = (options = {}) => {
     const { formValues: { pageSize } } = this.state;
-    const query = Object.assign({}, { page: 1, pageSize }, options);
+    let newData = [];
+
+    if (options.statusList) {
+      newData = { ...newData, statusList: options.statusList.join(',') }
+    }
+
+    if (options.wanchengshijian) {
+      newData = {
+        ...newData,
+        beginFinishDate: options.wanchengshijian[0].format('YYYY-MM-DD'),
+        endFinishDate: options.wanchengshijian[1].format('YYYY-MM-DD'),
+      }
+      delete options.wanchengshijian
+    }
+
+    if (options.overTime) {
+      newData = {
+        ...newData,
+        beginExpireDate: options.overTime[0].format('YYYY-MM-DD'),
+        endExpireDate: options.overTime[1].format('YYYY-MM-DD'),
+      }
+      delete options.overTime
+    }
+    const query = Object.assign({}, { page: 1, pageSize }, options, newData);
     this.setState({
       formValues: query,
       loading: true,
     });
 
     api.bp.getVerifyRecords(query).then(res => {
-      console.log(res)
       this.setState({
         list: res.results,
         total: res.total,
@@ -283,15 +189,10 @@ class Verification extends React.Component {
 
   /** 查询 */
   handleSearch = e => {
-    e.preventDefault();
-    const { form } = this.props;
-    const allValue = form.getFieldsValue();
-    console.log(allValue);
-    this.setState({
-      formValues: allValue,
-    });
-    this.getData();
-  };
+    if (e) e.preventDefault();
+    const val = this.props.form.getFieldsValue();
+    this.getData({ page: 1, ...val });
+  }
 
   /** 选中table事件 */
   handleSelectRows = rows => {
@@ -301,9 +202,15 @@ class Verification extends React.Component {
   };
 
   /** 选中项发生变化时的回调 */
-  handleStandardTableChange = () => {
-    console.log(3);
-  };
+  handleStandardTableChange = (pagination, filtersArg) => {
+    if (JSON.stringify(pagination) !== '{}') {
+      this.getData({
+        page: pagination.current,
+        rows: pagination.pageSize,
+        ...filtersArg,
+      });
+    }
+  }
 
   /** 筛选条件显示与隐藏 */
   toggleForm = () => {
@@ -313,6 +220,14 @@ class Verification extends React.Component {
       recordMsg: undefined,
     })
   }
+
+  // 重置
+  handleFormReset = () => {
+    this.props.form.resetFields();
+    // this.setState({
+    //   typeValue: [],
+    // })
+  };
 
   /** 渲染筛选条件 */
   renderForm = () => {
@@ -357,19 +272,41 @@ class Verification extends React.Component {
     this.formRef = formRef;
   }
 
+  renderOption = item => (
+      <Option key={item.id} text={item.name}>
+        <div style={{ display: 'flex' }}>
+          <span><Icon type="user" /></span>&nbsp;&nbsp;
+          <span>{item.code}</span>&nbsp;&nbsp;
+          <span>{item.name}</span>
+        </div>
+      </Option>
+    )
+
+      // 业务伙伴筛选
+  // eslint-disable-next-line consistent-return
+  inputValue = value => {
+    const arr = []
+    if (!value) {
+      return false
+    }
+    this.callParter(value)
+    this.state.partnerVal.forEach(item => {
+      if (item.name.indexOf(value) !== -1) {
+        arr.push(item);
+      }
+      if (item.code.indexOf(value) !== -1 && arr.indexOf(item)) { arr.push(item); }
+    })
+    this.setState({
+      partnerVal: arr,
+      // allowClear: 'ture',
+    });
+  }
+
   /** 部分筛选条件 */
   renderSimpleForm () {
     const { form } = this.props;
+    const { partnerVal } = this.state;
     const { getFieldDecorator } = form;
-    const options = this.state.allPartner.map(d =>
-      <Option key={d.value}>
-        <Fragment>
-          <span> <Icon type="user" /> </span> &nbsp;&nbsp;
-          <span> {d.value} </span> &nbsp;&nbsp;
-          <span> {d.text} </span>
-        </Fragment>
-      </Option>,
-    )
     return (
       <Form onSubmit={this.handleSearch} layout="inline">
         <Row gutter={{ lg: 24, md: 12, sm: 6 }}>
@@ -384,20 +321,14 @@ class Verification extends React.Component {
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
-            <FormItem label="业务伙伴">
-              {getFieldDecorator('bpId', { initialValue: this.state.inputPartner })(
-                <Select
-                 showSearch
-                 placeholder="请输入"
-                 defaultActiveFirstOption={false}
-                 showArrow={false}
-                 filterOption={false}
-                 onSearch={this.searchPartner}
-                 onChange={this.valueChange}
-                 notFoundContent = { <a> 没有找到该业务伙伴 </a>}>
-                    { options }
-                 </Select>,
-              )}
+          <FormItem label="业务伙伴">
+              {getFieldDecorator('bpId')(
+              <AutoComplete
+                onSearch={this.inputValue}
+                dataSource={partnerVal.map(this.renderOption)}
+                placeholder="请输入"
+                optionLabelProp="text"
+                />)}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
@@ -421,7 +352,7 @@ class Verification extends React.Component {
   /** 完整筛选条件 */
   renderAdvancedForm = () => {
     const {
-      form: { getFieldDecorator },
+      form: { getFieldDecorator }, preTypeAll, preStateAll,
     } = this.props;
     const options = this.state.allPartner.map(d =>
       <Option key={d.value}>
@@ -432,6 +363,7 @@ class Verification extends React.Component {
         </Fragment>
       </Option>,
     )
+
     return (
       <Form onSubmit={this.handleSearch} layout="inline">
         <Row gutter={{ lg: 24, md: 12, sm: 6 }}>
@@ -466,7 +398,6 @@ class Verification extends React.Component {
             <FormItem label="类型">
               {getFieldDecorator('type')(
                 <Select
-                  mode="multiple"
                   placeholder="请选择"
                   onChange={this.preTypeChange}
                   optionLabelProp="label">
@@ -543,7 +474,86 @@ class Verification extends React.Component {
 
   render() {
     const { formValues: { page: current, pageSize }, list, selectedRows, total, loading } = this.state;
+    const { preTypeAll, preStateAll } = this.props
     const data = { list, pagination: { current, pageSize, total } };
+    const columns = [
+      {
+        title: '编号/操作编号',
+        dataIndex: 'code',
+        // width: 150,
+        render (value, record) {
+          return <><div>{value}</div><div>{record.operationRecordCode}</div></>
+        },
+      },
+      {
+        title: '业务伙伴',
+        dataIndex: 'bpId',
+        // width: 150,
+        render(value, record) {
+          return <>
+            <div className={styles.partName}><Icon type="user" /> <span>{record.bpName}</span></div>
+            <div className={styles.partCode}>{record.bpCode}</div>
+          </>
+        },
+      },
+      {
+        title: '类型',
+        dataIndex: 'type',
+        filters: preTypeAll,
+        width: 150,
+        render: value => preTypeAll[value - 1].text,
+      },
+      {
+        title: '状态',
+        dataIndex: 'status',
+        filters: preStateAll,
+        width: 150,
+        render(value, record) {
+          return <>
+          <Badge status={preStateAll[value - 1].status} text={preStateAll[value - 1].text} />
+          {value === 2 ? <div>{record.operationDate}</div> : ''}
+          </>
+        },
+      },
+      {
+        title: '完成时间',
+        dataIndex: 'finishTime',
+      },
+      {
+        title: '过期时间',
+        dataIndex: 'expireDate',
+        // width: 140,
+      },
+      {
+        title: '操作人',
+        dataIndex: 'operatorName',
+        render(value, record) {
+          return <><div>{value}</div> <div>{record.operationDate}</div></>
+        },
+      },
+      {
+        fiexd: 'right',
+        title: '操作',
+        width: 150,
+        render: (text, record) => {
+          // const { preState } = record;
+          // const check = <a href="#" onClick={ e => { this.verifyPartner(record, e) }}>审核</a>;
+          // const view = <a href="#" onClick={ e => { this.checkPartner(record, e) }} >查看</a>;
+          const view = <a href="#" onClick={ e => { this.checkShow.visibleShow(record, record.type, true) }} >查看</a>;
+          // const allAction = <Fragment><a href="#"
+          // onClick={ e => { this.checkPartner(record, e) }}>查看</a><a herf="#"
+          // onClick={ e => { this.verifyPartner(record, e) }}>审核</a></Fragment>;
+          // if (preState === 2) {
+          //   return allAction;
+          // } if (preState === 1) {
+          //   return view;
+          // }
+          //   return check;
+          return view;
+        },
+      },
+    ]
+
     return (
       <PageHeaderWrapper title="验证记录">
         <Card bordered={false}>
@@ -559,7 +569,7 @@ class Verification extends React.Component {
               selectedRows={selectedRows}
               loading={loading}
               data={data}
-              columns={this.columns}
+              columns={columns}
               onSelectRow={this.handleSelectRows}
               onChange={this.handleStandardTableChange}
               className={styles.dataTable}

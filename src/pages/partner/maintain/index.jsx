@@ -17,7 +17,6 @@ import {
 import React from 'react';
 import router from 'umi/router';
 import Link from 'umi/link';
-import querystring from 'querystring';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import StandardTable from '@/components/StandardTable';
 import { connect } from 'dva';
