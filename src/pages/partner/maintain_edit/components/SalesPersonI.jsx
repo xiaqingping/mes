@@ -1,10 +1,4 @@
-import {
-  Button,
-  Table,
-  Input,
-  Divider,
-  Form,
-} from 'antd';
+import { Button, Table, Input, Divider, Form } from 'antd';
 import React from 'react';
 
 import ChooseSalesPerson from '@/components/choosse/bp/SalesPerson';
@@ -71,13 +65,13 @@ class SalesPerson extends React.Component {
 
     this.setStore(newTableData);
     this.setState({ editIndex: newTableData.length - 1, id: newId });
-  }
+  };
 
   deleteRow = index => {
     const { tableData } = this.props;
     const newTableData = tableData.filter((e, i) => i !== index);
     this.setStore(newTableData);
-  }
+  };
 
   cancel = row => {
     if (row.id < 0) {
@@ -103,16 +97,16 @@ class SalesPerson extends React.Component {
       this.setStore(newTableData);
       this.setState({ editIndex: -1 });
     });
-  }
+  };
 
   setStore = newTableData => {
     const { tableKey, valueChange } = this.props;
     valueChange(tableKey, newTableData);
-  }
+  };
 
   edit = index => {
     this.setState({ editIndex: index });
-  }
+  };
 
   selectChooseModalData = row => {
     const { editIndex } = this.state;
@@ -123,11 +117,11 @@ class SalesPerson extends React.Component {
       return e;
     });
     this.setStore(newTableData);
-  }
+  };
 
   searchSalesPerson = () => {
-    this.ChooseSalesPerson.wrappedInstance.changeVisible(true)
-  }
+    this.ChooseSalesPerson.wrappedInstance.changeVisible(true);
+  };
 
   render() {
     const { tableData } = this.props;
@@ -145,9 +139,7 @@ class SalesPerson extends React.Component {
         editable: true,
         inputType: <Search onSearch={this.searchSalesPerson} />,
         editOptions: {
-          rules: [
-            { required: true },
-          ],
+          rules: [{ required: true }],
         },
       },
       {
@@ -217,7 +209,9 @@ class SalesPerson extends React.Component {
           新增
         </Button>
         <ChooseSalesPerson
-          ref={ref => { this.ChooseSalesPerson = ref }}
+          ref={ref => {
+            this.ChooseSalesPerson = ref;
+          }}
           selectChooseModalData={this.selectChooseModalData}
         />
       </EditableContext.Provider>
