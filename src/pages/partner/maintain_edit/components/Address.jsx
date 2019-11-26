@@ -1,7 +1,7 @@
 import { Button, Table, Input, Divider, Form, Card } from 'antd';
 import React from 'react';
 import { connect } from 'dva';
-import _ from 'lodash';
+import debounce from 'lodash/debounce';
 import { validateForm, formatter } from '@/utils/utils';
 
 import { MobilePhoneInput, AddressInput } from '@/components/CustomizedFormControls';
@@ -11,7 +11,17 @@ const EditableContext = React.createContext();
 class EditableCell extends React.Component {
   renderCell = ({ getFieldDecorator }) => {
     // eslint-disable-next-line max-len
-    const { editing, dataIndex, title, inputType, record, index, children, editOptions, ...restProps } = this.props;
+    const {
+      editing,
+      dataIndex,
+      title,
+      inputType,
+      record,
+      index,
+      children,
+      editOptions,
+      ...restProps
+    } = this.props;
 
     let initialValue;
     if (editing) {
@@ -74,7 +84,7 @@ class EditableTable extends React.Component {
     };
 
     // 防抖
-    this.checkAddress = _.debounce(this.checkAddress, 500);
+    this.checkAddress = debounce(this.checkAddress, 500);
   }
 
   checkAddress = (rule, value, callback) => {

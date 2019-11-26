@@ -1,6 +1,7 @@
 import { Form, Row, Col, Select, Switch, Radio, Tabs, Card, Cascader, Icon, Empty } from 'antd';
 import React from 'react';
 import { connect } from 'dva';
+import debounce from 'lodash/debounce';
 import InvoiceParty from './InvoiceParty';
 import SoldToParty from './SoldToParty';
 import ShipToParty from './ShipToParty';
@@ -41,6 +42,21 @@ const { TabPane } = Tabs;
   };
 })
 class FormContent extends React.Component {
+  constructor(props) {
+    super(props);
+    props.getChildrenForm(props.form);
+    // 异步验证做节流处理
+    this.checkRegionOffice = debounce(this.checkRegionOffice, 500);
+  }
+
+  checkRegionOffice = (rule, value, callback) => {
+    if (!value.regionCode || !value.officeCode) {
+      callback('请选择网点归属');
+      return;
+    }
+    callback();
+  };
+
   render() {
     const {
       form: { getFieldDecorator },
@@ -61,6 +77,7 @@ class FormContent extends React.Component {
             <FormItem label="网点归属">
               {getFieldDecorator('regionOffice', {
                 initialValue: [data.regionCode, data.officeCode],
+                rules: [{ required: true, validator: this.checkRegionOffice }],
               })(
                 <Cascader
                   fieldNames={{ label: 'name', value: 'code', children: 'officeList' }}
@@ -74,6 +91,7 @@ class FormContent extends React.Component {
             <FormItem label="默认付款方式">
               {getFieldDecorator('defaultPaymentMethodCode', {
                 initialValue: data.defaultPaymentMethodCode,
+                rules: [{ required: true }],
               })(
                 <Select onChange={value => valueChange('defaultPaymentMethodCode', value)}>
                   {salesPaymentMethods.map(e => (
@@ -89,6 +107,7 @@ class FormContent extends React.Component {
             <FormItem label="币种">
               {getFieldDecorator('currencyCode', {
                 initialValue: data.currencyCode,
+                rules: [{ required: true }],
               })(
                 <Select
                   showSearch
@@ -109,6 +128,7 @@ class FormContent extends React.Component {
               <FormItem label="默认开票类型">
                 {getFieldDecorator('defaultInvoiceTypeCode', {
                   initialValue: data.defaultInvoiceTypeCode,
+                  rules: [{ required: true }],
                 })(
                   <Radio.Group
                     onChange={e => valueChange('defaultInvoiceTypeCode', e.target.value)}
@@ -128,6 +148,7 @@ class FormContent extends React.Component {
               <FormItem label="税分类">
                 {getFieldDecorator('taxClassificCode', {
                   initialValue: data.taxClassificCode,
+                  rules: [{ required: true }],
                 })(
                   <Select onChange={value => valueChange('taxClassificCode', value)}>
                     <Option value="0">免税</Option>
@@ -392,6 +413,10 @@ class SalesArea extends React.Component {
     this.setState({ tabKey: key });
   };
 
+  getChildrenForm = form => {
+    this.childrenForm = form;
+  };
+
   render() {
     const { salesAreaList: tabsData } = this.props;
     let { tabKey } = this.state;
@@ -447,7 +472,12 @@ class SalesArea extends React.Component {
             if (tabKey !== key) return null;
             return (
               <div key={key}>
-                <FormContent valueChange={this.valueChange} tabKey={tabKey} data={e} />
+                <FormContent
+                  getChildrenForm={this.getChildrenForm}
+                  valueChange={this.valueChange}
+                  tabKey={tabKey}
+                  data={e}
+                />
                 <Tabs className={styles.internalTab}>
                   <TabPane tab="收票方" key="InvoiceParty">
                     <InvoiceParty

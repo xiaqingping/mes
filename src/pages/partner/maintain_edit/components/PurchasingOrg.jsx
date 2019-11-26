@@ -20,24 +20,34 @@ const FormItem = Form.Item;
 const { Option } = Select;
 
 @Form.create()
-@connect(({ global, basicCache, partnerMaintainEdit }) => {
-  function byLangFilter(e) {
-    return e.languageCode === global.languageCode;
-  }
-  // 基础数据
-  // 币种
-  const currencies = basicCache.currencies.filter(byLangFilter);
-  // 付款条件
-  const paymentTerms = basicCache.paymentTerms.filter(byLangFilter);
-  // 采购组
-  const { purchaseGroups } = basicCache;
+@connect(
+  ({ global, basicCache, partnerMaintainEdit }) => {
+    function byLangFilter(e) {
+      return e.languageCode === global.languageCode;
+    }
+    // 基础数据
+    // 币种
+    const currencies = basicCache.currencies.filter(byLangFilter);
+    // 付款条件
+    const paymentTerms = basicCache.paymentTerms.filter(byLangFilter);
+    // 采购组
+    const { purchaseGroups } = basicCache;
 
-  // 供应商级别
-  const { VendorLevelCode } = partnerMaintainEdit;
+    // 供应商级别
+    const { VendorLevelCode } = partnerMaintainEdit;
 
-  return { currencies, paymentTerms, purchaseGroups, VendorLevelCode };
-})
+    return { currencies, paymentTerms, purchaseGroups, VendorLevelCode };
+  },
+  null,
+  null,
+  { withRef: true },
+)
 class FormContent extends React.Component {
+  constructor(props) {
+    super(props);
+    props.getChildrenForm(props.form);
+  }
+
   render() {
     const {
       form: { getFieldDecorator },
@@ -331,6 +341,10 @@ class PurchasingOrg extends React.Component {
     this.setState({ tabKey: key });
   };
 
+  getChildrenForm = form => {
+    this.childrenForm = form;
+  };
+
   render() {
     let { tabKey } = this.state;
     const { purchaseOrganizationList: tabsData, purchaseOrganizations } = this.props;
@@ -384,6 +398,7 @@ class PurchasingOrg extends React.Component {
               valueChange={this.valueChange}
               tabKey={tabKey}
               data={e}
+              getChildrenForm={this.getChildrenForm}
             />
           ))
         ) : (
