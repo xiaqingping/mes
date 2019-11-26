@@ -28,6 +28,7 @@ const { Option } = Select;
     const salesOrderBlock = customer.salesOrderBlock || 2;
     const vendor = details.vendor || {};
     const invoicePostBlock = vendor.invoicePostBlock || 2;
+    const { organizationCertification } = details;
 
     // 2. 基础数据
     // 行业类别
@@ -45,6 +46,7 @@ const { Option } = Select;
       salesOrderBlock,
       vendor,
       invoicePostBlock,
+      organizationCertification,
       industryCategories,
       countryTimeZone: basicCache.countryTimeZone,
       countryProvinceTimeZone: basicCache.countryProvinceTimeZone,
@@ -161,7 +163,7 @@ class Basic extends React.Component {
   };
 
   valueChange = (key, value) => {
-    const { details, basic, customer, vendor } = this.props;
+    const { details, basic, customer, vendor, organizationCertification } = this.props;
     let obj = {
       [key]: value,
     };
@@ -252,10 +254,11 @@ class Basic extends React.Component {
     let newDetails = { ...details, ...{ basic: newBasic } };
 
     // 电话 类型为组织时，认证资料的电话与基础信息的电话保持一致
-    if (key === 'telephone' && basic.type === 2) {
-      console.log(value);
-      // organizationCertification
-      newDetails = { ...newDetails, ...{ organizationCertification: { ...value } } };
+    if (key === 'telephone') {
+      newDetails = {
+        ...newDetails,
+        ...{ organizationCertification: { ...organizationCertification, ...value } },
+      };
     }
 
     this.props.dispatch({

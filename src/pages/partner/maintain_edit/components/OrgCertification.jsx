@@ -12,15 +12,22 @@ const FormItem = Form.Item;
 const { TextArea } = Input;
 const { Option } = Select;
 
-@connect(({ bpEdit, user }) => {
-  const details = bpEdit.details || {};
-  const organizationCertification = details.organizationCertification || { attachmentList: [] };
-  return {
-    details,
-    organizationCertification,
-    authorization: user.currentUser.authorization,
-  };
-})
+@connect(
+  ({ bpEdit, user }) => {
+    const details = bpEdit.details || {};
+    const { basic } = details;
+    const organizationCertification = details.organizationCertification || { attachmentList: [] };
+    return {
+      details,
+      basic,
+      organizationCertification,
+      authorization: user.currentUser.authorization,
+    };
+  },
+  null,
+  null,
+  { withRef: true },
+)
 class OrgCertification extends Component {
   constructor(props) {
     super(props);
@@ -50,11 +57,20 @@ class OrgCertification extends Component {
       bankFetching: false,
     };
     // 防抖
-    this.fetchBank = debounce(this.fetchBank, 800);
+    this.fetchBank = debounce(this.fetchBank, 500);
+    this.checkTelephone = debounce(this.checkTelephone, 500);
   }
 
+  checkTelephone = (rule, value, callback) => {
+    if (!value.telephone) {
+      callback('电话必须');
+      return;
+    }
+    callback();
+  };
+
   valueChange = (key, value) => {
-    const { details, organizationCertification, form } = this.props;
+    const { details, basic, organizationCertification, form } = this.props;
 
     let obj = {
       [key]: value,
@@ -90,13 +106,19 @@ class OrgCertification extends Component {
       if (!value) obj[key] = 2;
     }
 
-    const data = { ...organizationCertification, ...obj };
+    const newOrgCertification = { ...organizationCertification, ...obj };
+    let newDetails = { ...details, ...{ organizationCertification: newOrgCertification } };
+
+    // 修改电话时，同步修改基础信息的电话
+    if (key === 'telephone') {
+      newDetails = { ...newDetails, ...{ basic: { ...basic, ...obj } } };
+    }
 
     this.props.dispatch({
       type: 'bpEdit/setState',
       payload: {
         type: 'details',
-        data: { ...details, ...{ organizationCertification: data } },
+        data: newDetails,
       },
     });
   };
@@ -206,7 +228,7 @@ class OrgCertification extends Component {
                       telephone: orgData.telephone,
                       telephoneExtension: orgData.telephoneExtension,
                     },
-                    rules: [{ required: true }],
+                    rules: [{ validator: this.checkTelephone }],
                   })(<TelphoneInput onChange={value => this.valueChange('telephone', value)} />)}
                 </FormItem>
               </Col>
