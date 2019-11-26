@@ -1,12 +1,4 @@
-import {
-  Card,
-  Col,
-  Form,
-  Input,
-  Row,
-  Select,
-  Spin,
-} from 'antd';
+import { Card, Col, Form, Input, Row, Select, Spin } from 'antd';
 import React, { Component } from 'react';
 import { connect } from 'dva';
 import debounce from 'lodash/debounce';
@@ -15,21 +7,26 @@ import basicApi from '@/api/basic';
 const FormItem = Form.Item;
 const { Option } = Select;
 
-@connect(({ global, basicCache, bpEdit }) => {
-  function byLangFilter(e) {
-    return e.languageCode === global.languageCode;
-  }
-  // 业务伙伴数据
-  const details = bpEdit.details || {};
-  const basic = details.basic || {};
-  const vendor = details.vendor || { };
-  const paymentBank = vendor.paymentBank || {};
+@connect(
+  ({ global, basicCache, bpEdit }) => {
+    function byLangFilter(e) {
+      return e.languageCode === global.languageCode;
+    }
+    // 业务伙伴数据
+    const details = bpEdit.details || {};
+    const basic = details.basic || {};
+    const vendor = details.vendor || {};
+    const paymentBank = vendor.paymentBank || {};
 
-  // 基础数据
-  // 国家
-  const countrys = basicCache.countrys.filter(byLangFilter);
-  return { details, basic, vendor, paymentBank, countrys };
-}, null, null, { withRef: true })
+    // 基础数据
+    // 国家
+    const countrys = basicCache.countrys.filter(byLangFilter);
+    return { details, basic, vendor, paymentBank, countrys };
+  },
+  null,
+  null,
+  { withRef: true },
+)
 class Bank extends Component {
   constructor(props) {
     super(props);
@@ -38,7 +35,7 @@ class Bank extends Component {
       bankFetching: false,
     };
     // 防抖
-    this.fetchBank = debounce(this.fetchBank, 800);
+    this.fetchBank = debounce(this.fetchBank, 500);
   }
 
   valueChange = (key, value) => {
@@ -46,12 +43,8 @@ class Bank extends Component {
 
     const newPaymentBank = { ...paymentBank, ...{ [key]: value } };
     const newVendor = { ...vendor, ...{ paymentBank: newPaymentBank } };
-    const newDetails = { ...details, ...{ vendor: newVendor } }
+    const newDetails = { ...details, ...{ vendor: newVendor } };
 
-    // this.props.dispatch({
-    //   type: 'bpEdit/setDetails',
-    //   payload: newDetails,
-    // });
     this.props.dispatch({
       type: 'bpEdit/setState',
       payload: {
@@ -59,15 +52,17 @@ class Bank extends Component {
         data: newDetails,
       },
     });
-  }
+  };
 
   fetchBank = value => {
-    basicApi.getBanks({
-      codeOrFullName: value,
-    }).then(bank => {
-      this.setState({ bank });
-    });
-  }
+    basicApi
+      .getBanks({
+        codeOrFullName: value,
+      })
+      .then(bank => {
+        this.setState({ bank });
+      });
+  };
 
   render() {
     const {
@@ -80,11 +75,7 @@ class Bank extends Component {
     const { bank, bankFetching } = this.state;
 
     return (
-      <Card
-        title="付款银行"
-        bordered={false}
-        style={{ marginBottom: type === 2 ? '24px' : null }}
-      >
+      <Card title="付款银行" bordered={false} style={{ marginBottom: type === 2 ? '24px' : null }}>
         <Form layout="vertical">
           <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
             <Col md={6}>
@@ -96,12 +87,13 @@ class Bank extends Component {
                   <Select
                     showSearch
                     filterOption={(input, option) => option.props.children.indexOf(input) >= 0}
-                    onChange={value => this.valueChange('countryCode', value)}>
-                    {
-                      countrys.map(e =>
-                        <Option key={e.code} value={e.code}>{e.name}</Option>,
-                      )
-                    }
+                    onChange={value => this.valueChange('countryCode', value)}
+                  >
+                    {countrys.map(e => (
+                      <Option key={e.code} value={e.code}>
+                        {e.name}
+                      </Option>
+                    ))}
                   </Select>,
                 )}
               </FormItem>
@@ -120,7 +112,9 @@ class Bank extends Component {
                     onChange={value => this.valueChange('bankCode', value)}
                   >
                     {bank.map(d => (
-                      <Option key={d.code} value={d.code}>{d.fullName}</Option>
+                      <Option key={d.code} value={d.code}>
+                        {d.fullName}
+                      </Option>
                     ))}
                   </Select>,
                 )}

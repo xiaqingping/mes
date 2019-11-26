@@ -132,7 +132,7 @@ class FormContent extends React.Component {
               {getFieldDecorator('invoicePostInReceive', {
                 rules: [{ required: true }],
                 valuePropName: 'checked',
-                initialValue: data.invoicePostInReceive,
+                initialValue: data.invoicePostInReceive === 1,
               })(<Switch onChange={value => valueChange('invoicePostInReceive', value)} />)}
             </FormItem>
           </Col>
@@ -178,12 +178,12 @@ class FormContent extends React.Component {
     // BP数据
     const details = bpEdit.details || {};
     const vendor = details.vendor || {};
-    const purchasingOrganizationList = vendor.purchasingOrganizationList || [];
+    const purchaseOrganizationList = vendor.purchaseOrganizationList || [];
 
     // 基础数据
     // 采购组织
     const { purchaseOrganizations } = basicCache;
-    return { details, vendor, purchasingOrganizationList, purchaseOrganizations };
+    return { details, vendor, purchaseOrganizationList, purchaseOrganizations };
   },
   null,
   null,
@@ -192,7 +192,7 @@ class FormContent extends React.Component {
 class PurchasingOrg extends React.Component {
   constructor(props) {
     super(props);
-    const { purchasingOrganizationList: tabsData } = this.props;
+    const { purchaseOrganizationList: tabsData } = this.props;
     this.state = {
       tabKey: (tabsData && tabsData[0] && tabsData[0].purchasingOrganizationCode) || '',
     };
@@ -200,22 +200,24 @@ class PurchasingOrg extends React.Component {
 
   valueChange = (key, value) => {
     const { tabKey } = this.state;
-    const { details, vendor, purchasingOrganizationList } = this.props;
+    const { details, vendor, purchaseOrganizationList } = this.props;
 
-    const newPurchasingOrganizationList = purchasingOrganizationList.map(e => {
+    const newPurchaseOrganizationList = purchaseOrganizationList.map(e => {
       if (e.purchasingOrganizationCode === tabKey) {
+        e[key] = value;
         if (key === 'salerTelephone') {
           e.salerTelephone = value.mobilePhone;
           e.salerTelephoneCountryCode = value.mobilePhoneCountryCode;
-        } else {
-          e[key] = value;
+        }
+        if (key === 'invoicePostInReceive') {
+          e[key] = value ? 1 : 2;
         }
       }
       return e;
     });
     const newVendor = {
       ...vendor,
-      ...{ purchasingOrganizationList: newPurchasingOrganizationList },
+      ...{ purchaseOrganizationList: newPurchaseOrganizationList },
     };
     const newDetails = { ...details, ...{ vendor: newVendor } };
 
@@ -235,16 +237,17 @@ class PurchasingOrg extends React.Component {
 
   // 级联选泽采购组织时
   onCascaderChange = obj => {
-    const { details, vendor, purchasingOrganizationList: tabsData } = this.props;
+    const { details, vendor, purchaseOrganizationList: tabsData } = this.props;
     const index = obj.length - 1;
 
-    const newPurchasingOrganizationList = [].concat(tabsData, {
+    const newPurchaseOrganizationList = [].concat(tabsData, {
       purchasingOrganizationCode: obj[index],
+      invoicePostInReceive: 2,
     });
 
     const newVendor = {
       ...vendor,
-      ...{ purchasingOrganizationList: newPurchasingOrganizationList },
+      ...{ purchaseOrganizationList: newPurchaseOrganizationList },
     };
     const newDetails = { ...details, ...{ vendor: newVendor } };
 
@@ -262,7 +265,7 @@ class PurchasingOrg extends React.Component {
   };
 
   renderCascader = () => {
-    const { purchasingOrganizationList: tabsData, purchaseOrganizations } = this.props;
+    const { purchaseOrganizationList: tabsData, purchaseOrganizations } = this.props;
     const codeList = tabsData.map(e => e.purchasingOrganizationCode);
 
     const options = purchaseOrganizations.map(e => {
@@ -288,7 +291,7 @@ class PurchasingOrg extends React.Component {
   closeTab = tabKey => {
     let index = -1;
     let key = '';
-    const { details, vendor, purchasingOrganizationList: tabsData } = this.props;
+    const { details, vendor, purchaseOrganizationList: tabsData } = this.props;
 
     // 过滤掉关闭的采购组织
     const newTabsData = tabsData.filter((e, i) => {
@@ -315,7 +318,7 @@ class PurchasingOrg extends React.Component {
       key = '';
     }
 
-    const newVendor = { ...vendor, ...{ purchasingOrganizationList: newTabsData } };
+    const newVendor = { ...vendor, ...{ purchaseOrganizationList: newTabsData } };
     const newDetails = { ...details, ...{ vendor: newVendor } };
 
     this.props.dispatch({
@@ -330,7 +333,7 @@ class PurchasingOrg extends React.Component {
 
   render() {
     let { tabKey } = this.state;
-    const { purchasingOrganizationList: tabsData, purchaseOrganizations } = this.props;
+    const { purchaseOrganizationList: tabsData, purchaseOrganizations } = this.props;
 
     // 如有有数据，但没有选中，则默认选中第一条
     if (!tabKey && tabsData.length > 0) {

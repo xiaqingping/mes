@@ -121,7 +121,7 @@ export const readDetails = {
     // 采购冻结
     invoicePostBlock: false,
     // 采购组织列表
-    purchasingOrganizationList: [
+    purchaseOrganizationList: [
       {
         purchasingOrganizationCode: 'BBI',
         salerName: '张三',
@@ -130,7 +130,7 @@ export const readDetails = {
         paymentTermsCode: '1',
         currencyCode: '1',
         levelCode: '1',
-        invoicePostInReceive: true,
+        invoicePostInReceive: 1,
         purchasingGroupCode: '1',
         deliveryPlanDays: '1',
       },
@@ -272,7 +272,7 @@ export const addDetails = {
     // 采购冻结
     invoicePostBlock: false,
     // 采购组织列表
-    purchasingOrganizationList: [
+    purchaseOrganizationList: [
       {
         purchasingOrganizationCode: 'BBI',
         salerName: '张三',
@@ -281,7 +281,7 @@ export const addDetails = {
         paymentTermsCode: '1',
         currencyCode: '1',
         levelCode: '1',
-        invoicePostInReceive: true,
+        invoicePostInReceive: 1,
         purchasingGroupCode: '1',
         deliveryPlanDays: '1',
       },
@@ -378,7 +378,7 @@ export const updateDetails = {
     // 采购冻结
     invoicePostBlock: false,
     // 采购组织列表
-    purchasingOrganizationList: [
+    purchaseOrganizationList: [
       {
         purchasingOrganizationCode: 'BBI',
         salerName: '张三',
@@ -387,7 +387,7 @@ export const updateDetails = {
         paymentTermsCode: '1',
         currencyCode: '1',
         levelCode: '1',
-        invoicePostInReceive: true,
+        invoicePostInReceive: 1,
         purchasingGroupCode: '1',
         deliveryPlanDays: '1',
       },
