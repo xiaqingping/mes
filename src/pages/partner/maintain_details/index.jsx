@@ -213,7 +213,11 @@ class CustomerDetails extends Component {
     //       telephoneExtension: '2136',
     //     },
     //     attachmentList: [
-    //       { code: 'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1571310110031&di=c5c3557d5172db919d831cca34586e4c&imgtype=0&src=http%3A%2F%2F5b0988e595225.cdn.sohucs.com%2Fimages%2F20170718%2Fdc7a88ed8b5146368b068fc71c8c8533.jpeg', name: '照片', type: 'image' },
+    //       { code: 'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&
+    // sec=1571310110031&di=c5c3557d5172db919d831cca34586e4c&imgtype=0
+    // &src=http%3A%2F%2F5b0988e595225.cdn.sohucs.com%2Fimages%2F20170718
+    // %2Fdc7a88ed8b5146368b068fc71c8c8533.jpeg', name: '照片',
+    // type: 'image' },
     //     ],
     //   },
     //   // 负责人认证
@@ -226,7 +230,10 @@ class CustomerDetails extends Component {
     //       status: 1,
     //       notes: '这是一段认证说明',
     //       attachmentList: [
-    //         { code: 'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1571310110031&di=c5c3557d5172db919d831cca34586e4c&imgtype=0&src=http%3A%2F%2F5b0988e595225.cdn.sohucs.com%2Fimages%2F20170718%2Fdc7a88ed8b5146368b068fc71c8c8533.jpeg', name: '照片', type: 'image' },
+    //         { code: 'https://timgsa.baidu.com/timg?image&quality=80&
+    // size=b9999_10000&sec=1571310110031&di=c5c3557d5172db919d831cca34586e4c&
+    // imgtype=0&src=http%3A%2F%2F5b0988e595225.cdn.sohucs.com%2Fimages%2F20170718
+    // %2Fdc7a88ed8b5146368b068fc71c8c8533.jpeg', name: '照片', type: 'image' },
     //       ],
     //     },
     //   ],
@@ -351,7 +358,10 @@ class CustomerDetails extends Component {
     //     address: '上海市松江区*****注册',
     //     notes: '这是一段认证说明123',
     //     attachmentList: [
-    //       { code: 'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1571461183194&di=988ae3492cd61dcd8acd8381a14996ed&imgtype=0&src=http%3A%2F%2Fimg.51ztzj.com%2Fupload%2Fimage%2F20150213%2Fdn201502034005_670x419.jpg', name: '照片', type: 'image' },
+    //       { code: 'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&
+    // sec=1571461183194&di=988ae3492cd61dcd8acd8381a14996ed&imgtype=0&
+    // src=http%3A%2F%2Fimg.51ztzj.com%2Fupload%2Fimage%2F20150213%2
+    // Fdn201502034005_670x419.jpg', name: '照片', type: 'image' },
     //     ],
     //   },
     // };

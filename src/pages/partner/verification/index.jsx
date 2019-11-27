@@ -11,13 +11,15 @@ import {
   Select,
   AutoComplete,
 } from 'antd';
-import React, { Fragment } from 'react';
+import React from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import StandardTable from '@/components/StandardTable';
-import CheckModel from './components/CheckModel';
 import { connect } from 'dva';
+import CheckModel from './components/CheckModel';
+import _ from 'lodash';
 import styles from './index.less';
 import api from '@/api';
+
 
 const FormItem = Form.Item;
 const { RangePicker } = DatePicker;
@@ -99,12 +101,7 @@ class Verification extends React.Component {
       total: 0,
       record: [],
       type: null,
-      allPartner: this.allPartner,
-      inputPartner: undefined,
-      showModal: false,
       loading: false,
-      recordMsg: undefined,
-      clickType: '',
       formValues: {
         page: 1,
         pageSize: 10,
@@ -121,7 +118,8 @@ class Verification extends React.Component {
 
   // 业务伙伴查询
   callParter = value => {
-    api.bp.getPartnerName({ code_or_name: value }).then(res => { this.setState({ partnerVal: res }) })
+    api.bp.getPartnerName({ code_or_name: value })
+    .then(res => { this.setState({ partnerVal: res }) })
   }
 
   /** table数据源 */
@@ -139,6 +137,7 @@ class Verification extends React.Component {
         beginFinishDate: options.wanchengshijian[0].format('YYYY-MM-DD'),
         endFinishDate: options.wanchengshijian[1].format('YYYY-MM-DD'),
       }
+      // eslint-disable-next-line no-param-reassign
       delete options.wanchengshijian
     }
 
@@ -148,6 +147,7 @@ class Verification extends React.Component {
         beginExpireDate: options.overTime[0].format('YYYY-MM-DD'),
         endExpireDate: options.overTime[1].format('YYYY-MM-DD'),
       }
+      // eslint-disable-next-line no-param-reassign
       delete options.overTime
     }
     const query = Object.assign({}, { page: 1, pageSize }, options, newData);
@@ -166,26 +166,6 @@ class Verification extends React.Component {
       this.setState({
         loading: false,
       })
-    });
-  }
-
-  /** 审核Table */
-  verifyPartner = (record, event) => {
-    event.preventDefault();
-    this.setState({
-      showModal: true,
-      recordMsg: record,
-      clickType: '02',
-    });
-  }
-
-  /** 查看Table */
-  checkPartner = (record, event) => {
-    event.preventDefault();
-    this.setState({
-      showModal: true,
-      recordMsg: record,
-      clickType: '01',
     });
   }
 
@@ -219,7 +199,7 @@ class Verification extends React.Component {
     const { expandForm } = this.state;
     this.setState({
       expandForm: !expandForm,
-      recordMsg: undefined,
+      // recordMsg: undefined,
     })
   }
 
@@ -433,7 +413,8 @@ class Verification extends React.Component {
   }
 
   render() {
-    const { formValues: { page: current, pageSize }, list, selectedRows, total, loading, record, type } = this.state;
+    const { formValues: { page: current, pageSize },
+    list, selectedRows, total, loading, record, type } = this.state;
     const { preTypeAll, preStateAll } = this.props
     const data = { list, pagination: { current, pageSize, total } };
     const columns = [
@@ -441,6 +422,7 @@ class Verification extends React.Component {
         title: '编号/操作编号',
         dataIndex: 'code',
         // width: 150,
+        // eslint-disable-next-line no-shadow
         render (value, record) {
           return <><div>{value}</div><div>{record.operationRecordCode}</div></>
         },
@@ -449,6 +431,7 @@ class Verification extends React.Component {
         title: '业务伙伴',
         dataIndex: 'bpId',
         // width: 150,
+        // eslint-disable-next-line no-shadow
         render(value, record) {
           return <>
             <div className={styles.partName}><Icon type="user" /> <span>{record.bpName}</span></div>
@@ -461,6 +444,7 @@ class Verification extends React.Component {
         dataIndex: 'type',
         filters: preTypeAll,
         width: 150,
+        // eslint-disable-next-line no-shadow
         onFilter: (value, record) => record.type.toString().indexOf(value.toString()) === 0,
         render: value => preTypeAll[value - 1].text,
       },
@@ -469,7 +453,9 @@ class Verification extends React.Component {
         dataIndex: 'status',
         filters: preStateAll,
         width: 150,
+        // eslint-disable-next-line no-shadow
         onFilter: (value, record) => record.status.toString().indexOf(value.toString()) === 0,
+        // eslint-disable-next-line no-shadow
         render(value, record) {
           return <>
           <Badge status={preStateAll[value - 1].status} text={preStateAll[value - 1].text} />
@@ -489,6 +475,7 @@ class Verification extends React.Component {
       {
         title: '操作人',
         dataIndex: 'operatorName',
+        // eslint-disable-next-line no-shadow
         render(value, record) {
           return <><div>{value}</div> <div>{record.operationDate}</div></>
         },
@@ -497,11 +484,15 @@ class Verification extends React.Component {
         fiexd: 'right',
         title: '操作',
         width: 150,
+        // eslint-disable-next-line no-shadow
         render: (text, record) => {
           // const { preState } = record;
           // const check = <a href="#" onClick={ e => { this.verifyPartner(record, e) }}>审核</a>;
           // const view = <a href="#" onClick={ e => { this.checkPartner(record, e) }} >查看</a>;
-          const view = <a href="#" onClick={ e => { this.checkShow.visibleShow(record, record.type, true, this.detailsValue(record, record.type)) }} >查看</a>;
+          const view = <a href="#" onClick={ () => {
+            this.checkShow.visibleShow(record, record.type, true,
+              this.detailsValue(record, record.type))
+          }} >查看</a>;
           // const allAction = <Fragment><a href="#"
           // onClick={ e => { this.checkPartner(record, e) }}>查看</a><a herf="#"
           // onClick={ e => { this.verifyPartner(record, e) }}>审核</a></Fragment>;

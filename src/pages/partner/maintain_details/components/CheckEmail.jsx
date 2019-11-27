@@ -189,10 +189,15 @@ class CheckEmail extends Component {
           <Form layout="inline" onSubmit={this.handleSend}>
             <div style={{ height: '200px', textAlign: 'center', paddingTop: '68px' }}>
               <FormItem label="联系方式" >
-                {getFieldDecorator('phone')(<Input style={{ width: '300px' }} placeholder="输入移动电话或邮箱"/>)}
+                {getFieldDecorator('phone')(
+                <Input style={{ width: '300px' }} placeholder="输入移动电话或邮箱"/>,
+                )}
               </FormItem>
             </div>
-            <div style={{ textAlign: 'right', padding: '10px 20px', borderTop: '1px solid #E8E8E8' }}>
+            <div style={{
+            textAlign: 'right',
+            padding: '10px 20px',
+            borderTop: '1px solid #E8E8E8' }}>
               <FormItem>
                 <Button type="primary" htmlType="submit">
                   发送
@@ -211,9 +216,19 @@ class CheckEmail extends Component {
     const { status, oneQuestion, twoQuestion, threeQuestion, proceed } = this.state;
     if (status === 4) {
       return (
-        <Form layout="inline" style={{ textAlign: 'center', paddingTop: '20px' }} onSubmit={this.handleQuestion}>
+        <Form layout="inline" style={{
+          textAlign: 'center',
+          paddingTop: '20px' }} onSubmit={this.handleQuestion}>
           <FormItem label="问题一" className="tools" hasFeedback validateStatus={oneQuestion}>
-            <div style={{ width: '300px', border: '1px solid #D6D6D6', textAlign: 'left', paddingLeft: '10px', height: '30px', lineHeight: '30px', marginTop: '5px', borderRadius: '3px' }}>
+            <div style={{
+              width: '300px',
+              border: '1px solid #D6D6D6',
+              textAlign: 'left',
+              paddingLeft: '10px',
+              height: '30px',
+              lineHeight: '30px',
+              marginTop: '5px',
+              borderRadius: '3px' }}>
               <span>1+1=？</span>
             </div>
             {getFieldDecorator('qone', {
@@ -239,7 +254,15 @@ class CheckEmail extends Component {
             )}
           </FormItem>
           <FormItem label="问题二" className="tools" hasFeedback validateStatus={twoQuestion}>
-          <div style={{ width: '300px', border: '1px solid #D6D6D6', textAlign: 'left', paddingLeft: '10px', height: '30px', lineHeight: '30px', marginTop: '5px', borderRadius: '3px' }}>
+          <div style={{
+            width: '300px',
+            border: '1px solid #D6D6D6',
+            textAlign: 'left',
+            paddingLeft: '10px',
+            height: '30px',
+            lineHeight: '30px',
+            marginTop: '5px',
+            borderRadius: '3px' }}>
               <span>2*2=？</span>
             </div>
             {getFieldDecorator('qtwo', {
@@ -264,8 +287,17 @@ class CheckEmail extends Component {
               <Input style={{ width: '300px' }} placeholder="请输入"/>,
             )}
           </FormItem>
-          <FormItem label="问题三" style={{ paddingBottom: '30px' }} hasFeedback validateStatus={threeQuestion} className="tools">
-          <div style={{ width: '300px', border: '1px solid #D6D6D6', textAlign: 'left', paddingLeft: '10px', height: '30px', lineHeight: '30px', marginTop: '5px', borderRadius: '3px' }}>
+          <FormItem label="问题三" style={{ paddingBottom: '30px' }}
+          hasFeedback validateStatus={threeQuestion} className="tools">
+          <div style={{
+            width: '300px',
+            border: '1px solid #D6D6D6',
+            textAlign: 'left',
+            paddingLeft: '10px',
+            height: '30px',
+            lineHeight: '30px',
+            marginTop: '5px',
+            borderRadius: '3px' }}>
               <span>10-1=？</span>
             </div>
             {getFieldDecorator('qthree', {
@@ -312,12 +344,16 @@ class CheckEmail extends Component {
       return (
         <div style={{ textAlign: 'center', paddingTop: '20px' }}>
           <Icon type="check-circle" style={{ fontSize: '20px', color: '#54C31F' }}/>
-          <span style={{ fontSize: '20px', fontWeight: '600' }}>&nbsp;&nbsp;&nbsp;{proceed ? '继续完成新邮箱验证' : '问题验证成功，请输入新的邮箱'}</span>
+          <span style={{ fontSize: '20px', fontWeight: '600' }}>
+            &nbsp;&nbsp;&nbsp;{proceed ? '继续完成新邮箱验证' : '问题验证成功，请输入新的邮箱'}</span>
           <Form layout="inline" onSubmit={this.handleCode} style={{ marginTop: '45px' }}>
             <div>
               {this.pageRetrun()}
             </div>
-            <div style={{ textAlign: 'right', padding: '10px 20px', borderTop: '1px solid #E8E8E8' }}>
+            <div style={{
+              textAlign: 'right',
+              padding: '10px 20px',
+              borderTop: '1px solid #E8E8E8' }}>
               <FormItem>
                 <Button type="primary" htmlType="submit">
                   完成
@@ -370,7 +406,8 @@ class CheckEmail extends Component {
         <FormItem label="验证码" style={{ margin: '20px 16px 60px 0' }}>
           {getFieldDecorator('code')(<Input style={{ width: '180px' }} placeholder="请输入短信验证码"/>)}
           &nbsp;&nbsp;&nbsp;&nbsp;
-          <Button type="primary" disabled={btnText === 3} ghost onClick={() => { this.getCode() }} style={{ width: '100px' }}>
+          <Button type="primary" disabled={btnText === 3}
+          ghost onClick={() => { this.getCode() }} style={{ width: '100px' }}>
             {(btnText === 1 ? '获取验证码' : (btnText === 2 ? '重新发送' : `${time}秒`))}
           </Button>
         </FormItem>
@@ -385,7 +422,8 @@ class CheckEmail extends Component {
         <FormItem label="验证码" style={{ margin: '20px 16px 60px 0' }}>
           {getFieldDecorator('code')(<Input style={{ width: '180px' }} placeholder="请输入短信验证码"/>)}
           &nbsp;&nbsp;&nbsp;&nbsp;
-          <Button type="primary" disabled={btnText === 3} ghost onClick={() => { this.getCode() }} style={{ width: '100px' }}>
+          <Button type="primary" disabled={btnText === 3}
+          ghost onClick={() => { this.getCode() }} style={{ width: '100px' }}>
             {(btnText === 1 ? '获取验证码' : (btnText === 2 ? '重新发送' : `${time}秒`))}
           </Button>
         </FormItem>

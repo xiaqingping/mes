@@ -88,6 +88,7 @@ class Details extends React.Component {
           )
         }
         return <span className="addEllipsis"
+         // eslint-disable-next-line react/no-danger
          style={{ width: '80px' }} dangerouslySetInnerHTML={{ __html: data }} />
       },
     },

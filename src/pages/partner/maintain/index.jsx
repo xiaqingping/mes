@@ -1,3 +1,4 @@
+/* eslint-disable no-param-reassign */
 import {
   Badge,
   Button,
@@ -381,10 +382,12 @@ constructor(props) {
             <FormItem label="名称">{getFieldDecorator('name')(<Input placeholder="请输入" />)}</FormItem>
           </Col>
           <Col xxl={6} lg={8}>
-            <FormItem label="移动电话">{getFieldDecorator('mobilePhone')(<Input placeholder="请输入" />)}</FormItem>
+            <FormItem label="移动电话">{getFieldDecorator('mobilePhone')(
+            <Input placeholder="请输入" />)}</FormItem>
           </Col>
           <Col xxl={6} lg={8}>
-            <FormItem label="Email">{getFieldDecorator('email')(<Input placeholder="请输入" />)}</FormItem>
+            <FormItem label="Email">{getFieldDecorator('email')(
+            <Input placeholder="请输入" />)}</FormItem>
           </Col>
           <Col xxl={6} lg={8}>
             <FormItem label="认证状态">
@@ -431,7 +434,8 @@ constructor(props) {
           <Col xxl={6} lg={8}>
             <FormItem label="区域归属">
               {getFieldDecorator('regionalAttr')(
-                <Cascader options={regionOffice} placeholder="请选择" fieldNames={{ label: 'name', value: 'code', children: 'officeList' }}/>,
+                <Cascader options={regionOffice} placeholder="请选择"
+                fieldNames={{ label: 'name', value: 'code', children: 'officeList' }}/>,
               )}
             </FormItem>
           </Col>
@@ -491,7 +495,8 @@ constructor(props) {
             <FormItem label="名称">{getFieldDecorator('name')(<Input placeholder="请输入" />)}</FormItem>
           </Col>
           <Col xxl={6} lg={0}>
-            <FormItem label="移动电话">{getFieldDecorator('mobilePhone')(<Input placeholder="请输入" />)}</FormItem>
+            <FormItem label="移动电话">{getFieldDecorator('mobilePhone')(
+            <Input placeholder="请输入" />)}</FormItem>
           </Col>
           <Col xxl={6} lg={8}>
             <span className="submitButtons">
@@ -581,6 +586,7 @@ constructor(props) {
         filterMultiple: false,
         onFilter: (value, record) =>
         record.salesOrderBlock.toString().indexOf(value.toString()) === 0,
+        // eslint-disable-next-line consistent-return
         render: val => {
           if (val) {
             return <Badge status={dongjieMap[val].value} text={dongjieMap[val].text} />
@@ -638,12 +644,14 @@ constructor(props) {
                    <div>
                       {val}
                       &nbsp;&nbsp;
-                      {records.mobilePhoneVerifyStatus === 1 ? <Badge status={mobileIden[records.mobilePhoneVerifyStatus].value} /> : ''}
+                      {records.mobilePhoneVerifyStatus === 1 ? <
+                        Badge status={mobileIden[records.mobilePhoneVerifyStatus].value} /> : ''}
                     </div>
                     <div>
                       {records.email}
                       &nbsp;&nbsp;
-                      {records.emailVerifyStatus === 1 ? <Badge status={emailIden[records.emailVerifyStatus].value} /> : ''}
+                      {records.emailVerifyStatus === 1 ?
+                      <Badge status={emailIden[records.emailVerifyStatus].value} /> : ''}
                     </div>
                   </>
         },
@@ -664,7 +672,11 @@ constructor(props) {
           const { id } = record;
           const menu = (
             <Menu style={{ padding: 0 }}>
-              {record.salesOrderBlock === 1 ? <Menu.Item><a href="#" onClick={e => { this.cancelFreeze(e, record) }}>取消冻结</a></Menu.Item> : <Menu.Item><a href="#" onClick={ e => { this.freezePartner(e, record) }}>冻结</a></Menu.Item>}
+              {record.salesOrderBlock === 1 ? <Menu.Item>
+                  <a href="#" onClick={e => { this.cancelFreeze(e, record) }}>取消冻结</a>
+                </Menu.Item> : <Menu.Item>
+                  <a href="#" onClick={ e => { this.freezePartner(e, record) }}>冻结</a>
+                </Menu.Item>}
               {record.certificationStatus === 4 ?
                 <Menu.Item>
                   <a href="#" onClick={e => { this.cancelIdent(e, record) }}>取消认证</a>
@@ -678,14 +690,17 @@ constructor(props) {
               : ''
               }
               {record.certificationStatus === 1 ?
-                <Menu.Item><a href="#" onClick={ () => { this.showChange.visibleShow(true, record) }}>认证</a></Menu.Item>
+                <Menu.Item><a href="#"
+                onClick={ () => { this.showChange.visibleShow(true, record) }}>认证</a></Menu.Item>
               : ''
               }
             </Menu>
           );
           return (
             <>
-              <Link to={`/partner/maintain/edit/${id}?type=${record.type}`}>修改</Link>
+              <Link to={`/partner/maintain/edit/${id}?type=${record.type}
+              &customerDataStatus=${record.customerDataStatus}
+              &vendorDataStatus=${record.vendorDataStatus}`}>修改</Link>
               <Divider type="vertical" />
               <Dropdown overlay={menu}>
                 <a className="ant-dropdown-link">
