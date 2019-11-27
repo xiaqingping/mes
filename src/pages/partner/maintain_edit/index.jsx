@@ -437,8 +437,8 @@ class CustomerEdit extends Component {
     // 个人 PI认证
     if (data.basic.type === 1) {
       const piCertificationList = data.piCertificationList.map(item => {
-        const { uuid, ...other } = item;
-        return { ...other, ...{ attachmentList: uuid } };
+        const { uuid, attachmentList, ...other } = item;
+        return { ...other, ...{ attachmentCode: uuid } };
       });
       newData = {
         ...newData,
@@ -448,8 +448,8 @@ class CustomerEdit extends Component {
 
     // 组织 组织认证
     if (data.basic.type === 2) {
-      const { uuid, ...other } = data.organizationCertification;
-      const organizationCertification = { ...other, ...{ attachmentList: uuid } };
+      const { uuid, attachmentList, ...other } = data.organizationCertification;
+      const organizationCertification = { ...other, ...{ attachmentCode: uuid } };
       newData = {
         ...newData,
         ...{ organizationCertification },
@@ -458,8 +458,7 @@ class CustomerEdit extends Component {
 
     console.log(newData);
     // return;
-    bp.addBP(newData).then(res => {
-      console.log(res);
+    bp.addBP(newData).then(() => {
       message.success('新增业务伙伴成功');
       router.push('/partner/maintain');
     });

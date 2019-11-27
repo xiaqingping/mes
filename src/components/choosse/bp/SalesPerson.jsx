@@ -199,7 +199,7 @@ class ChooseSalesPerson extends React.Component {
         footer={null}
       >
         <Table
-          rowKey="id"
+          rowKey="code"
           dataSource={list}
           columns={columns}
           loading={loading}

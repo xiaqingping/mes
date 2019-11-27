@@ -1,4 +1,4 @@
-import { Button, Table, Input, Divider, Form } from 'antd';
+import { Button, Table, Input, Divider, Form, message } from 'antd';
 import React from 'react';
 
 import ChooseBillToParty from '@/components/choosse/bp/BillToParty';
@@ -111,6 +111,12 @@ class BillToParty extends React.Component {
   selectChooseModalData = row => {
     const { editIndex } = this.state;
     const { tableData } = this.props;
+    const has = tableData.some(e => e.id === row.id);
+
+    if (has) {
+      message.warning('销售员重复');
+      return;
+    }
 
     const newTableData = tableData.map((e, i) => {
       if (i === editIndex) return { ...e, ...row };
