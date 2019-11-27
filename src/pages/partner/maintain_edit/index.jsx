@@ -598,8 +598,7 @@ class CustomerEdit extends Component {
     console.log(newDetails);
     // return;
 
-    bp.updateBP(newDetails).then(res => {
-      console.log(res);
+    bp.updateBP(newDetails).then(() => {
       message.success('修改业务伙伴成功');
       router.push('/partner/maintain');
     });
