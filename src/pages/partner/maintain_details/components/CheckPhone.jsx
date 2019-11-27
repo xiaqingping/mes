@@ -178,10 +178,13 @@ class CheckPhone extends Component {
           <Form layout="inline" onSubmit={this.handleSend}>
             <div style={{ height: '200px', textAlign: 'center', paddingTop: '68px' }}>
               <FormItem label="联系方式">
-                {getFieldDecorator('phone')(<Input style={{ width: '300px' }} placeholder="输入移动电话或邮箱"/>)}
+                {getFieldDecorator('phone')(
+                <Input style={{ width: '300px' }} placeholder="输入移动电话或邮箱"/>)}
               </FormItem>
             </div>
-            <div style={{ textAlign: 'right', padding: '10px 20px', borderTop: '1px solid #E8E8E8' }}>
+            <div style={{ textAlign: 'right',
+                          padding: '10px 20px',
+                          borderTop: '1px solid #E8E8E8' }}>
               <FormItem>
                 <Button type="primary" htmlType="submit">
                   发送
@@ -209,9 +212,17 @@ class CheckPhone extends Component {
 
     if (status === 4) {
       return (
-        <Form layout="inline" style={{ textAlign: 'center', paddingTop: '20px' }} onSubmit={this.handleQuestion}>
+        <Form layout="inline" style={{ textAlign: 'center', paddingTop: '20px' }}
+        onSubmit={this.handleQuestion}>
           <FormItem label="问题一" className="tools" hasFeedback validateStatus={oneQuestion}>
-            <div style={{ width: '300px', border: '1px solid #D6D6D6', textAlign: 'left', paddingLeft: '10px', height: '30px', lineHeight: '30px', marginTop: '5px', borderRadius: '3px' }}>
+            <div style={{ width: '300px',
+            border: '1px solid #D6D6D6',
+            textAlign: 'left',
+            paddingLeft: '10px',
+            height: '30px',
+            lineHeight: '30px',
+            marginTop: '5px',
+            borderRadius: '3px' }}>
               <span>1+1=？</span>
             </div>
             {getFieldDecorator('qone', {
@@ -237,7 +248,14 @@ class CheckPhone extends Component {
             )}
           </FormItem>
           <FormItem label="问题二" className="tools" hasFeedback validateStatus={twoQuestion}>
-          <div style={{ width: '300px', border: '1px solid #D6D6D6', textAlign: 'left', paddingLeft: '10px', height: '30px', lineHeight: '30px', marginTop: '5px', borderRadius: '3px' }}>
+          <div style={{ width: '300px',
+                        border: '1px solid #D6D6D6',
+                        textAlign: 'left',
+                        paddingLeft: '10px',
+                        height: '30px',
+                        lineHeight: '30px',
+                        marginTop: '5px',
+                        borderRadius: '3px' }}>
               <span>2*2=？</span>
             </div>
             {getFieldDecorator('qtwo', {
@@ -262,8 +280,16 @@ class CheckPhone extends Component {
               <Input style={{ width: '300px' }} placeholder="请输入"/>,
             )}
           </FormItem>
-          <FormItem label="问题三" style={{ paddingBottom: '30px' }} hasFeedback validateStatus={threeQuestion} className="tools">
-          <div style={{ width: '300px', border: '1px solid #D6D6D6', textAlign: 'left', paddingLeft: '10px', height: '30px', lineHeight: '30px', marginTop: '5px', borderRadius: '3px' }}>
+          <FormItem label="问题三" style={{ paddingBottom: '30px' }}
+          hasFeedback validateStatus={threeQuestion} className="tools">
+          <div style={{ width: '300px',
+                        border: '1px solid #D6D6D6',
+                        textAlign: 'left',
+                        paddingLeft: '10px',
+                        height: '30px',
+                        lineHeight: '30px',
+                        marginTop: '5px',
+                        borderRadius: '3px' }}>
               <span>10-1=？</span>
             </div>
             {getFieldDecorator('qthree', {
@@ -310,21 +336,27 @@ class CheckPhone extends Component {
       return (
         <div style={{ textAlign: 'center', paddingTop: '20px' }}>
           <Icon type="check-circle" style={{ fontSize: '20px', color: '#54C31F' }}/>
-          <span style={{ fontSize: '20px', fontWeight: '600' }}>&nbsp;&nbsp;&nbsp;问题验证成功，请输入新的手机号</span>
+          <span style={{ fontSize: '20px', fontWeight: '600' }}
+          >&nbsp;&nbsp;&nbsp;问题验证成功，请输入新的手机号</span>
           <Form layout="inline" onSubmit={this.handleCode} style={{ marginTop: '45px' }}>
             <div>
               <FormItem label="手机号">
-                {getFieldDecorator('userPhone')(<Input addonBefore={prefixSelector} style={{ width: '300px' }} placeholder="请输入"/>)}
+                {getFieldDecorator('userPhone')(
+                <Input addonBefore={prefixSelector} style={{ width: '300px' }} placeholder="请输入"/>)}
               </FormItem>
               <FormItem label="验证码" style={{ margin: '20px 16px 60px 0' }}>
-                {getFieldDecorator('code')(<Input style={{ width: '180px' }} placeholder="请输入短信验证码"/>)}
+                {getFieldDecorator('code')(
+                <Input style={{ width: '180px' }} placeholder="请输入短信验证码"/>)}
                 &nbsp;&nbsp;&nbsp;&nbsp;
-                <Button type="primary" disabled={btnText === 3} ghost onClick={() => { this.getCode() }} style={{ width: '100px' }}>
+                <Button type="primary" disabled={btnText === 3} ghost
+                onClick={() => { this.getCode() }} style={{ width: '100px' }}>
                   {(btnText === 1 ? '获取验证码' : (btnText === 2 ? '重新发送' : `${time}秒`))}
                 </Button>
               </FormItem>
             </div>
-            <div style={{ textAlign: 'right', padding: '10px 20px', borderTop: '1px solid #E8E8E8' }}>
+            <div style={{ textAlign: 'right',
+                          padding: '10px 20px',
+                          borderTop: '1px solid #E8E8E8' }}>
               <FormItem>
                 <Button type="primary" htmlType="submit">
                   完成
@@ -379,7 +411,9 @@ class CheckPhone extends Component {
           className="check-tabs"
           footer={ null}
         >
-            <Tabs defaultActiveKey="1" onChange={key => { this.tabsChange(key) }} tabBarStyle={{ height: '50px', fontSize: '30px' }}>
+            <Tabs defaultActiveKey="1"
+            onChange={key => { this.tabsChange(key) }}
+            tabBarStyle={{ height: '50px', fontSize: '30px' }}>
               <TabPane tab="用户自行变更" key="1">
               {this.userChange()}
               </TabPane>

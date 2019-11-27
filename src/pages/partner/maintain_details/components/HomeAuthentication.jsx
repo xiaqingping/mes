@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 import {
   Row,
   Col,
@@ -35,28 +36,12 @@ const renzhengMap = {
 };
 
 @connect(({ partnerMaintainEdit }) => ({
-  details: partnerMaintainEdit.type === 'supplier' ? partnerMaintainEdit.supplier : partnerMaintainEdit.details,
+  details: partnerMaintainEdit.type === 'supplier' ?
+  partnerMaintainEdit.supplier : partnerMaintainEdit.details,
 }))
 class BasicInfo extends Component {
   render() {
     const { details } = this.props;
-    // details.organizationCertification = {
-    //     specialInvoice: true,
-    //     taxNo: 123,
-    //     bankCode: 12345,
-    //     bankAccount: '60045612378',
-    //     address: '上海市松江区*****注册',
-    //     notes: '这是一段认证说明',
-    //     telephone: {
-    //       telephoneCountryCode: '+86',
-    //       telephoneAreaCode: '1234',
-    //       telephone: '57072136',
-    //       telephoneExtension: '2136',
-    //     },
-    //     attachmentList: [
-    //       { code: 'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1571310110031&di=c5c3557d5172db919d831cca34586e4c&imgtype=0&src=http%3A%2F%2F5b0988e595225.cdn.sohucs.com%2Fimages%2F20170718%2Fdc7a88ed8b5146368b068fc71c8c8533.jpeg', name: '照片', type: 'image' },
-    //     ],
-    //   }
 
     return (
       <Card title="认证资料" bordered={false} style={{ marginBottom: '24px' }} className="check-tabs">
@@ -68,22 +53,32 @@ class BasicInfo extends Component {
               column={3}
             >
               <DescriptionsItem label="认证状态">
-                <Badge status={renzhengMap[details.basic.certificationStatus].value} text={renzhengMap[details.basic.certificationStatus].text} />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{parseInt(details.basic.certificationStatus, 10) === 4 ? <><a>变更</a>&nbsp;&nbsp;<a>取消认证</a></> : ''}
+                <Badge status={renzhengMap[details.basic.certificationStatus].value}
+                text={renzhengMap[details.basic.certificationStatus].text} />
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                {parseInt(details.basic.certificationStatus, 10) === 4 ? <>
+                <a>变更</a>&nbsp;&nbsp;<a>取消认证</a></> : ''}
               </DescriptionsItem>
               <DescriptionsItem label="增值税专用发票资质">
-                {details.organizationCertification ? (details.organizationCertification.specialInvoice === 1 ? '是' : '') : ''}
+                {details.organizationCertification ?
+                (details.organizationCertification.specialInvoice === 1 ?
+                '是' : '') : ''}
               </DescriptionsItem>
               <DescriptionsItem label="统一社会信用代码">
                 {details.organizationCertification ? details.organizationCertification.taxNo : ''}
               </DescriptionsItem>
               <DescriptionsItem label="基本户开户银行">
-                {details.organizationCertification ? details.organizationCertification.bankCode : ''}
+                {details.organizationCertification ?
+                details.organizationCertification.bankCode : ''}
               </DescriptionsItem>
               <DescriptionsItem label="基本户开户账号">
-                {details.organizationCertification ? details.organizationCertification.bankAccount : ''}
+                {details.organizationCertification ?
+                details.organizationCertification.bankAccount : ''}
               </DescriptionsItem>
               <DescriptionsItem label="电话号码">
-                {details.basic.telephoneCountryCode}{details.basic.telephoneAreaCode}{details.basic.telephone ? `-${details.basic.telephone}` : ''}{details.basic.telephoneExtension ? `-${details.basic.telephoneExtension}` : ''}
+                {details.basic.telephoneCountryCode}{details.basic.telephoneAreaCode}
+                {details.basic.telephone ? `-${details.basic.telephone}` : ''}
+                {details.basic.telephoneExtension ? `-${details.basic.telephoneExtension}` : ''}
               </DescriptionsItem>
               <DescriptionsItem span={3} label="注册地址">
                 {details.organizationCertification ? details.organizationCertification.address : ''}
@@ -93,7 +88,16 @@ class BasicInfo extends Component {
                   {details.organizationCertification ? <>
                     {details.organizationCertification.attachmentList.map((item, index) => (
                       // eslint-disable-next-line react/no-array-index-key
-                      <li key={index} style={{ width: '100px', height: '100px', border: '1px solid #D9D9D9', textAlign: 'center', lineHeight: '94px', borderRadius: '5px', float: 'left', marginRight: '10px' }}>{item.type === 'image' ? <img src={item.code} alt="" width="90" height="90"/> : ''}</li>
+                      <li key={index} style={{
+                        width: '100px',
+                        height: '100px',
+                        border: '1px solid #D9D9D9',
+                        textAlign: 'center',
+                        lineHeight: '94px',
+                        borderRadius: '5px',
+                        float: 'left',
+                        marginRight: '10px' }}>{item.type === 'image' ?
+                        <img src={item.code} alt="" width="90" height="90"/> : ''}</li>
                     ))}
                   </> : ''
                   }

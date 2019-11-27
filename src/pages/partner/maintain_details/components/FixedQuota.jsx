@@ -48,7 +48,10 @@ class FixedQuota extends Component {
   // 固定额度页面
   hangelPage = () => (
       <div style={{ textAlign: 'center' }}>
-        <Icon type="check-circle" style={{ fontSize: '30px', color: '#54C31F', marginBottom: '20px' }}/>
+        <Icon type="check-circle" style={{
+          fontSize: '30px',
+          color: '#54C31F',
+          marginBottom: '20px' }}/>
         <p>
           您的固定额度已调整为&nbsp;&nbsp;<span style={{ color: '#4EA7E9' }}>20000</span>&nbsp;&nbsp;CNY <br/>
           请注意查收！

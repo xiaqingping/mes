@@ -260,24 +260,31 @@ class BasicInfo extends Component {
                     {regions.map(v => { if (item.regionCode === v.code) return v.name })}/
                     {offices.map(v => { if (item.officeCode === v.code) return v.name })}
                   </DescriptionsItem>
-                  <DescriptionsItem label="默认付款方式">{item.defaultPaymentMethodCode}</DescriptionsItem>
+                  <DescriptionsItem label="默认付款方式">
+                    {item.defaultPaymentMethodCode}</DescriptionsItem>
                   <DescriptionsItem label="币种">{item.currencyCode}</DescriptionsItem>
                   <DescriptionsItem label="默认开票类型">{item.defaultnvoiceTypeCode}</DescriptionsItem>
-                  <DescriptionsItem label="销售冻结">{item.salesOrderBlock === 1 ? <span><Badge status="error"/>冻结</span> : <span><Badge status="success"/>活跃</span>} </DescriptionsItem>
+                  <DescriptionsItem label="销售冻结">
+                    {item.salesOrderBlock === 1 ? <span><Badge status="error"/>冻结</span> :
+                    <span><Badge status="success"/>活跃</span>} </DescriptionsItem>
                 </Descriptions>
                 <div style={{ border: '1px solid #E6E6E6', width: '100%', height: '100%' }}>
                   <Tabs defaultActiveKey="1" className="tabs">
                     <TabPane tab="收票方" key="1">
-                      <Table dataSource={item.billToPartyList} columns={this.columns1} size="small" pagination={false} rowKey={(r, i) => (i)}/>
+                      <Table dataSource={item.billToPartyList} columns={this.columns1}
+                      size="small" pagination={false} rowKey={(r, i) => (i)}/>
                     </TabPane>
                     <TabPane tab="售达方" key="2">
-                    <Table dataSource={item.soldToPartyList} columns={this.columns2} size="small" pagination={false} rowKey={(r, i) => (i)}/>
+                    <Table dataSource={item.soldToPartyList} columns={this.columns2}
+                    size="small" pagination={false} rowKey={(r, i) => (i)}/>
                     </TabPane>
                     <TabPane tab="送达方" key="3">
-                    <Table dataSource={item.shipToPartyList} columns={this.columns3} size="small" pagination={false} rowKey={(r, i) => (i)}/>
+                    <Table dataSource={item.shipToPartyList} columns={this.columns3}
+                    size="small" pagination={false} rowKey={(r, i) => (i)}/>
                     </TabPane>
                     <TabPane tab="销售员" key="4">
-                    <Table dataSource={item.salerList} columns={this.columns4} size="small" pagination={false} rowKey={(r, i) => (i)}/>
+                    <Table dataSource={item.salerList} columns={this.columns4}
+                    size="small" pagination={false} rowKey={(r, i) => (i)}/>
                     </TabPane>
                   </Tabs>
                 </div>

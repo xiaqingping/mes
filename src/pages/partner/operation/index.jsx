@@ -64,7 +64,8 @@ class Operation extends React.Component {
 
     // 业务伙伴查询
     callParter = value => {
-      api.bp.getPartnerName({ code_or_name: value }).then(res => { this.setState({ partnerVal: res }) })
+      api.bp.getPartnerName({ code_or_name: value })
+      .then(res => { this.setState({ partnerVal: res }) })
     }
 
   // 弹窗显示和详情数据保存
@@ -110,6 +111,7 @@ class Operation extends React.Component {
         beginFinishDate: options.wanchengshijian[0].format('YYYY-MM-DD'),
         endFinishDate: options.wanchengshijian[1].format('YYYY-MM-DD'),
       }
+      // eslint-disable-next-line no-param-reassign
       delete options.wanchengshijian
     }
     if (options.statusList) {
@@ -267,7 +269,8 @@ class Operation extends React.Component {
         title: '业务伙伴',
         dataIndex: 'bpCode',
         render(text, record) {
-            return <span style={{ color: '#222222' }}><Icon type="user" />{record.bpName} <br/><span style={{ color: '#999999' }}>{text}</span></span>
+            return <span style={{ color: '#222222' }}><Icon type="user" />
+            {record.bpName} <br/><span style={{ color: '#999999' }}>{text}</span></span>
         },
       },
       {
@@ -309,7 +312,8 @@ class Operation extends React.Component {
         ],
         onFilter: (value, record) => record.status.toString().indexOf(value.toString()) === 0,
         render(val, record) {
-          return <span><Badge status={status[val].value} text={status[val].text}/><br/><span style={{ marginLeft: 85 }}>{val === 3 ? record.finishDate : ''}</span></span>;
+          return <span><Badge status={status[val].value} text={status[val].text}/><br/>
+          <span style={{ marginLeft: 85 }}>{val === 3 ? record.finishDate : ''}</span></span>;
         },
       },
       {
@@ -318,7 +322,8 @@ class Operation extends React.Component {
         width: 300,
         className: 'marginLeft',
         render(val, record) {
-          return <span style={{ color: '#222222' }}>{val}<br/><span style={{ color: '#666666' }}>{record.operatorDate}</span></span>;
+          return <span style={{ color: '#222222' }}>{val}<br/><span style={{ color: '#666666' }}>
+            {record.operatorDate}</span></span>;
         },
       },
       {
