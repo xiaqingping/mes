@@ -1,10 +1,4 @@
-import {
-  Button,
-  Table,
-  Input,
-  Divider,
-  Form,
-} from 'antd';
+import { Button, Table, Input, Divider, Form, message } from 'antd';
 import React from 'react';
 
 import ChooseSoldToParty from '@/components/choosse/bp/SoldToParty';
@@ -71,13 +65,13 @@ class SoldToParty extends React.Component {
 
     this.setStore(newTableData);
     this.setState({ editIndex: newTableData.length - 1, id: newId });
-  }
+  };
 
   deleteRow = index => {
     const { tableData } = this.props;
     const newTableData = tableData.filter((e, i) => i !== index);
     this.setStore(newTableData);
-  }
+  };
 
   cancel = row => {
     if (row.id < 0) {
@@ -103,31 +97,37 @@ class SoldToParty extends React.Component {
       this.setStore(newTableData);
       this.setState({ editIndex: -1 });
     });
-  }
+  };
 
   setStore = newTableData => {
     const { tableKey, valueChange } = this.props;
     valueChange(tableKey, newTableData);
-  }
+  };
 
   edit = index => {
     this.setState({ editIndex: index });
-  }
+  };
 
   selectChooseModalData = row => {
     const { editIndex } = this.state;
     const { tableData } = this.props;
+    const has = tableData.some(e => e.id === row.id);
+
+    if (has) {
+      message.warning('销售员重复');
+      return;
+    }
 
     const newTableData = tableData.map((e, i) => {
       if (i === editIndex) return { ...e, ...row };
       return e;
     });
     this.setStore(newTableData);
-  }
+  };
 
   searchSoldToParty = () => {
-    this.ChooseSoldToParty.wrappedInstance.changeVisible(true)
-  }
+    this.ChooseSoldToParty.wrappedInstance.changeVisible(true);
+  };
 
   render() {
     const { tableData } = this.props;
@@ -145,9 +145,7 @@ class SoldToParty extends React.Component {
         editable: true,
         inputType: <Search onSearch={this.searchSoldToParty} />,
         editOptions: {
-          rules: [
-            { required: true },
-          ],
+          rules: [{ required: true }],
         },
       },
       {
@@ -222,7 +220,9 @@ class SoldToParty extends React.Component {
           新增
         </Button>
         <ChooseSoldToParty
-          ref={ref => { this.ChooseSoldToParty = ref }}
+          ref={ref => {
+            this.ChooseSoldToParty = ref;
+          }}
           selectChooseModalData={this.selectChooseModalData}
         />
       </EditableContext.Provider>

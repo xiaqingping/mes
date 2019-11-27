@@ -1,25 +1,21 @@
 /**
  * 选择销售员
  */
-import {
-  Modal,
-  Table,
-  Button,
-  AutoComplete,
-  Input,
-  Icon,
-  Cascader,
-} from 'antd';
+import { Modal, Table, Button, AutoComplete, Input, Icon, Cascader } from 'antd';
 import React from 'react';
 import { connect } from 'dva';
 import employees from '@/api/employees';
-import { formatter } from '@/utils/utils'
 
-@connect(({ partnerMaintainEdit }) => ({
-  BpCertificationStatus: partnerMaintainEdit.BpCertificationStatus,
-  SalesOrderBlock: partnerMaintainEdit.SalesOrderBlock,
-  CustomerDataStatus: partnerMaintainEdit.CustomerDataStatus,
-}), null, null, { withRef: true })
+@connect(
+  ({ partnerMaintainEdit }) => ({
+    BpCertificationStatus: partnerMaintainEdit.BpCertificationStatus,
+    SalesOrderBlock: partnerMaintainEdit.SalesOrderBlock,
+    CustomerDataStatus: partnerMaintainEdit.CustomerDataStatus,
+  }),
+  null,
+  null,
+  { withRef: true },
+)
 class ChooseSalesPerson extends React.Component {
   constructor(props) {
     super(props);
@@ -38,38 +34,45 @@ class ChooseSalesPerson extends React.Component {
   changeVisible = visible => {
     this.setState({ visible });
     if (visible) this.getTableData({ page: 1 });
-  }
+  };
 
   getTableData = (options = {}) => {
     const { pagination } = this.state;
-    const query = Object.assign({}, {
-      page: pagination.current,
-      pageSize: pagination.pageSize,
-    }, options);
+    const query = Object.assign(
+      {},
+      {
+        page: pagination.current,
+        pageSize: pagination.pageSize,
+      },
+      options,
+    );
 
     this.setState({ loading: true });
-    employees.getSaler(query).then(res => {
-      this.setState({
-        list: res.result,
-        pagination: {
-          current: query.page,
-          pageSize: query.pageSize,
-          total: res.total,
-        },
+    employees
+      .getSaler(query)
+      .then(res => {
+        this.setState({
+          list: res.results,
+          pagination: {
+            current: query.page,
+            pageSize: query.pageSize,
+            total: res.total,
+          },
+        });
+      })
+      .finally(() => {
+        this.setState({ loading: false });
       });
-    }).finally(() => {
-      this.setState({ loading: false });
-    });
-  }
+  };
 
   handleReset = data => {
     console.log(data);
-  }
+  };
 
   selectRow = row => {
     this.props.selectChooseModalData(row);
     this.setState({ visible: false });
-  }
+  };
 
   getColumns = () => {
     const columns = [
@@ -143,16 +146,16 @@ class ChooseSalesPerson extends React.Component {
         ),
         filterDropdown: ({ selectedKeys, confirm, clearFilters }) => (
           <div style={{ width: 210, padding: 8 }}>
-            <Input
-              style={{ width: 188, marginBottom: 8, display: 'block' }}
-            />
+            <Input style={{ width: 188, marginBottom: 8, display: 'block' }} />
             <Button
               type="primary"
               onClick={() => this.getTableData(selectedKeys, confirm)}
               icon="search"
               size="small"
               style={{ width: 90, marginRight: 8 }}
-            >搜索</Button>
+            >
+              搜索
+            </Button>
             <Button
               onClick={() => this.handleReset(clearFilters)}
               size="small"
@@ -162,35 +165,26 @@ class ChooseSalesPerson extends React.Component {
             </Button>
           </div>
         ),
-        render: (text, row) => {
-          const mobilePhoneArr = [];
-          if (row.mobilePhoneCountryCode) mobilePhoneArr.push(row.mobilePhoneCountryCode);
-          if (row.mobilePhone) mobilePhoneArr.push(row.mobilePhone);
-          return (
-            <>
-              {
-                mobilePhoneArr.length > 0 ? (
-                  <>
-                    <span>{mobilePhoneArr.join('-')}</span>
-                    <br/>
-                  </>
-                ) : null
-              }
-              <span>{row.email}</span>
-            </>
-          );
-        },
+        render: (text, row) => (
+          <>
+            {row.workEmail ? (
+              <>
+                <span>{row.workEmail}</span>
+                <br />
+              </>
+            ) : null}
+            <span>{row.workTelephone}</span>
+          </>
+        ),
       },
       {
         title: '操作',
         dataIndex: 'actions',
-        render: (text, record) => (
-          <a onClick={() => this.selectRow(record)}>选择</a>
-        ),
+        render: (text, record) => <a onClick={() => this.selectRow(record)}>选择</a>,
       },
     ];
     return columns;
-  }
+  };
 
   render() {
     const { list, loading, pagination, visible } = this.state;
@@ -205,7 +199,7 @@ class ChooseSalesPerson extends React.Component {
         footer={null}
       >
         <Table
-          rowKey="id"
+          rowKey="code"
           dataSource={list}
           columns={columns}
           loading={loading}
