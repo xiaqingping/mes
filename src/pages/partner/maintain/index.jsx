@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 /* eslint-disable no-param-reassign */
 import {
   Badge,
@@ -698,9 +699,7 @@ constructor(props) {
           );
           return (
             <>
-              <Link to={`/partner/maintain/edit/${id}?type=${record.type}
-              &customerDataStatus=${record.customerDataStatus}
-              &vendorDataStatus=${record.vendorDataStatus}`}>修改</Link>
+              <Link to={`/partner/maintain/edit/${id}?type=${record.type}&customerDataStatus=${record.customerDataStatus}&vendorDataStatus=${record.vendorDataStatus}`}>修改</Link>
               <Divider type="vertical" />
               <Dropdown overlay={menu}>
                 <a className="ant-dropdown-link">
