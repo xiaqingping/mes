@@ -1,7 +1,7 @@
 import { Button, Table, Input, Divider, Form } from 'antd';
 import React from 'react';
 
-import ChooseSalesPerson from '@/components/choosse/bp/Salesperson1';
+import ChooseSalesPerson from '@/components/choosse/bp/SalesPerson';
 
 const { Search } = Input;
 const EditableContext = React.createContext();
