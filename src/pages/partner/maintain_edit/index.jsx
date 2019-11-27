@@ -289,6 +289,7 @@ class CustomerEdit extends Component {
   validateVendor = async () => {
     const { details } = this.props;
     const { vendor } = details;
+    console.log(vendor);
     const { purchaseOrganizationList } = vendor;
 
     // 默认验证结果为：通过

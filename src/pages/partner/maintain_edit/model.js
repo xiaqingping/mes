@@ -1,5 +1,24 @@
 import bp from '@/api/bp';
 
+const initDetails = {
+  basic: {},
+  customer: {
+    taxesCityCode: null,
+    taxesCountyCode: null,
+    salesOrderBlock: 2,
+    salesAreaList: [],
+    addressList: [],
+  },
+  vendor: {
+    invoicePostBlock: 2,
+    purchaseOrganizationList: [],
+    paymentBank: {},
+  },
+  organizationCertification: {},
+  piCertificationList: [],
+  creditList: [],
+};
+
 const SeqModel = {
   namespace: 'bpEdit',
   state: {
@@ -20,7 +39,8 @@ const SeqModel = {
         // 供应商数据
         const vendor = yield call(bp.getBPVendor, id);
 
-        const details = { ...customer, ...vendor };
+        const details = { ...{ details: initDetails }, ...customer, ...vendor };
+        console.log(details);
 
         yield put({
           type: 'setState',
@@ -44,25 +64,7 @@ const SeqModel = {
     },
     // 新增BP时初始化数据结构
     addInitDetails(state) {
-      const details = {
-        basic: {},
-        customer: {
-          // taxesCityCode: null,
-          // taxesCountyCode: null,
-          salesOrderBlock: 2,
-          salesAreaList: [],
-          addressList: [],
-        },
-        vendor: {
-          invoicePostBlock: 2,
-          purchaseOrganizationList: [],
-          paymentBank: {},
-        },
-        organizationCertification: {},
-        piCertificationList: [],
-        creditList: [],
-      };
-      return { ...state, details };
+      return { ...state, details: initDetails };
     },
   },
 };
