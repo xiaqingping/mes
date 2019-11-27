@@ -27,7 +27,8 @@ class BasicInfo extends Component {
         render(text) {
           return (
             // eslint-disable-next-line jsx-a11y/alt-text
-            <><img src={Flag} width="10" height="10" style={{ borderRadius: '50%', marginBottom: '3px' }}/>&nbsp;&nbsp;{text}</>
+            <><img src={Flag} width="10" height="10"
+            style={{ borderRadius: '50%', marginBottom: '3px' }}/>&nbsp;&nbsp;{text}</>
           );
         },
       },

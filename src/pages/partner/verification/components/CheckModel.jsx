@@ -5,7 +5,7 @@ import {
   Form,
   Row,
   Col,
-  Button,
+  Empty,
 } from 'antd';
 import React from 'react';
 import { connect } from 'dva';
@@ -105,11 +105,19 @@ const RecordListForm = Form.create()(
       }
     }
 
+    closeListForm = () => {
+      this.props.closeListForm();
+      this.setState({
+        showList: false,
+      })
+    }
+
     render () {
       const { showList, historyRecord } = this.state;
-      const { closeListForm, recordMsg: { type } } = this.props;
+      const { recordMsg: { type } } = this.props;
       const typeName = parseInt(type, 10) === 1 ? 'organizationCertification' : 'piCertification';
-      if (historyRecord.length === 0) return null
+      // console.log(historyRecord, showList)
+      // if (historyRecord.length === 0) return null
       return (
         <Modal
           destroyOnClose
@@ -118,8 +126,8 @@ const RecordListForm = Form.create()(
           className={styles.xxx}
           title="认证历史"
           visible = {showList}
-          onCancel={closeListForm}>
-          <ul className={styles.contenList}>
+          onCancel={this.closeListForm}>
+            {historyRecord.length === 0 ? <Empty /> : <ul className={styles.contenList}>
             <li>
               <Row>
                 <Col span={4} className={styles.labelName}>状态：</Col>
@@ -143,7 +151,8 @@ const RecordListForm = Form.create()(
               <li>
                 <Row>
                   <Col span={4} className={styles.labelName}>名称：</Col>
-                  <Col span={20} className={styles.labelVal}>{historyRecord.piCertification.name}</Col>
+                  <Col span={20} className={styles.labelVal}>
+                    {historyRecord.piCertification.name}</Col>
                 </Row>
               </li>
               <li>
@@ -176,7 +185,9 @@ const RecordListForm = Form.create()(
                   <Col
                     span={14}
                     className={styles.labelVal}>
-                      {historyRecord.organizationCertification.telephoneAreaCode ? `+${historyRecord.organizationCertification.telephoneAreaCode} ` : ''}{historyRecord.organizationCertification.telephone}
+                      {historyRecord.organizationCertification
+                      .telephoneAreaCode ? `+${historyRecord.organizationCertification
+                      .telephoneAreaCode} ` : ''}{historyRecord.organizationCertification.telephone}
                   </Col>
                 </Row>
               </li>
@@ -197,7 +208,10 @@ const RecordListForm = Form.create()(
                     span={14}
                     className={styles.labelVal}>
                       {/* {detailsValue.specialInvoice} */}
-                      {historyRecord.organizationCertification.specialInvoice ? historyRecord.organizationCertification.filter(item => item.id === historyRecord.organizationCertification.specialInvoice)[0].name : ''}
+                      {historyRecord.organizationCertification.specialInvoice ?
+                      historyRecord.organizationCertification.filter(item =>
+                      item.id === historyRecord.organizationCertification
+                      .specialInvoice)[0].name : ''}
                   </Col>
                 </Row>
               </li>
@@ -245,7 +259,9 @@ const RecordListForm = Form.create()(
             :
             <li>
               <Row>
-                <Col span={10} className={styles.labelName}>{historyRecord.organizationCertification.countryCode === 'US' ? '免税认证号' : '增值税登记号'}：</Col>
+                <Col span={10} className={styles.labelName}>
+                  {historyRecord.organizationCertification.countryCode === 'US' ?
+                  '免税认证号' : '增值税登记号'} ：</Col>
                 <Col
                   span={14}
                   className={styles.labelVal}>
@@ -258,7 +274,9 @@ const RecordListForm = Form.create()(
             <li>
               <Row>
                 <Col span={4} className={styles.labelName}>认证说明：</Col>
-                <Col span={20} className={styles.labelVal}>{historyRecord.piCertification.notes}</Col>
+                <Col span={20} className={styles.labelVal}>
+                  {historyRecord.piCertification.notes}
+                  </Col>
               </Row>
             </li>
             <li>
@@ -268,13 +286,23 @@ const RecordListForm = Form.create()(
                   <ul style={{ padding: '0' }}>
                     {historyRecord[typeName].attachmentList.map((item, index) => (
                         // eslint-disable-next-line react/no-array-index-key
-                        <li key={index} style={{ width: '100px', height: '100px', border: '1px solid #D9D9D9', textAlign: 'center', lineHeight: '94px', borderRadius: '5px', float: 'left', marginRight: '30px' }}>{item.type === 'image' ? <img src={item.name} alt="" width="90" height="90"/> : ''}</li>
+                        <li key={index} style={{
+                          width: '100px',
+                          height: '100px',
+                          border: '1px solid #D9D9D9',
+                          textAlign: 'center',
+                          lineHeight: '94px',
+                          borderRadius: '5px',
+                          float: 'left',
+                          marginRight: '30px' }}>{item.type === 'image' ?
+                          <img src={item.name} alt="" width="90" height="90"/> : ''}</li>
                       ))}
                   </ul>
                 </Col>
               </Row>
             </li>
-          </ul>
+          </ul>}
+
         </Modal>
       )
     }
@@ -306,7 +334,6 @@ class CheckModel extends React.Component {
     // 组织认证
     if (clickType === 1) {
       api.bp.getOrgCertificationVerifyRecords(recordMsg.id).then(res => {
-        console.log(res)
         this.setState({
           detailsValue: res,
         })
@@ -352,7 +379,7 @@ class CheckModel extends React.Component {
 
   /** 控制模态框状态 */
   setModal1Visible = modal1Visible => {
-    this.setState({ modal1Visible });
+    this.setState({ modal1Visible, detailsValue: undefined });
   }
 
 
@@ -392,7 +419,6 @@ class CheckModel extends React.Component {
     if (recordMsg === undefined) {
       return false;
     }
-
     if (clickType === 6 || clickType === 7) {
       modalTitle = '变更已验证手机和邮箱'
       modelContent = <>
@@ -400,19 +426,25 @@ class CheckModel extends React.Component {
           <li>
             <Row>
               <Col span={8} className={styles.labelName}>变更类型：</Col>
-              <Col span={16} className={styles.labelVal}>{verifyChangeType[detailsValue.type].text}</Col>
+              <Col span={16} className={styles.labelVal}>
+                {detailsValue.type ? verifyChangeType[detailsValue.type].text : ''}
+              </Col>
             </Row>
           </li>
           <li>
             <Row>
               <Col span={8} className={styles.labelName}>变更渠道：</Col>
-              <Col span={16} className={styles.labelVal}>{verifyChannel[detailsValue.channel].text}</Col>
+              <Col span={16} className={styles.labelVal}>
+                {detailsValue.channel ? verifyChannel[detailsValue.channel].text : ''}
+              </Col>
             </Row>
           </li>
           <li>
             <Row>
               <Col span={8} className={styles.labelName}>验证方式：</Col>
-              <Col span={16} className={styles.labelVal}>{verifyTest[detailsValue.verifyType].text}</Col>
+              <Col span={16} className={styles.labelVal}>
+                {detailsValue.verifyType ? verifyTest[detailsValue.verifyType].text : ''}
+              </Col>
             </Row>
           </li>
           {
@@ -422,7 +454,10 @@ class CheckModel extends React.Component {
               parseInt(detailsValue.verifyType, 10) === 1 ?
                 <Row>
                   <Col span={8} className={styles.labelName}>原手机：</Col>
-                  <Col span={16} className={styles.labelVal}>{detailsValue.oldMobilePhoneCountryCode ? `+${detailsValue.oldMobilePhoneCountryCode} ` : ''}{detailsValue.oldMobilePhone}</Col>
+                  <Col span={16} className={styles.labelVal}>
+                    {detailsValue.oldMobilePhoneCountryCode ?
+                    `+${detailsValue.oldMobilePhoneCountryCode} `
+                    : ''}{detailsValue.oldMobilePhone}</Col>
                 </Row>
                 :
                 <Row>
@@ -436,9 +471,10 @@ class CheckModel extends React.Component {
                 <Col span={8} className={styles.labelName}>验证码：</Col>
                 <Col span={16} className={styles.labelVal}>
                   {detailsValue.oldContactInfoVerifyCode}&nbsp;&nbsp;&nbsp;&nbsp;
-                  <Badge
+                  {detailsValue.oldContactInfoVerifyStatus ? <Badge
                     status={verifyData[detailsValue.oldContactInfoVerifyStatus].value}
-                    text={verifyData[detailsValue.oldContactInfoVerifyStatus].text} />
+                    text={verifyData[detailsValue.oldContactInfoVerifyStatus].text} /> : ''}
+
                 </Col>
               </Row>
             </li>
@@ -467,7 +503,10 @@ class CheckModel extends React.Component {
           <li>
             <Row>
               <Col span={8} className={styles.labelName}>新手机：</Col>
-              <Col span={16} className={styles.labelVal}>{detailsValue.newMobilePhoneCountryCode ? `+${detailsValue.newMobilePhoneCountryCode} ` : ''}{detailsValue.newMobilePhone}</Col>
+              <Col span={16} className={styles.labelVal}>
+                {detailsValue.newMobilePhoneCountryCode ?
+                `+${detailsValue.newMobilePhoneCountryCode} ` : ''}
+                {detailsValue.newMobilePhone}</Col>
             </Row>
           </li>
           <li>
@@ -481,11 +520,10 @@ class CheckModel extends React.Component {
                   <a onClick={e => { this.reSent(e) }}>完成验证</a>
                 </>
                 :
-                <>
-                  <Badge
-                    status={verifyData[detailsValue.newContactInfoVerifyStatus].value}
-                    text={verifyData[detailsValue.newContactInfoVerifyStatus].text} />
-                </>
+                (detailsValue.newContactInfoVerifyStatus ? <Badge
+                  status={verifyData[detailsValue.newContactInfoVerifyStatus].value}
+                  text={verifyData[detailsValue.newContactInfoVerifyStatus].text} />
+               : '')
                 }
               </Col>
             </Row>
@@ -551,7 +589,16 @@ class CheckModel extends React.Component {
                 <ul style={{ padding: '0' }}>
                   {detailsValue.attachmentList ? detailsValue.attachmentList.map((item, index) => (
                       // eslint-disable-next-line react/no-array-index-key
-                      <li key={index} style={{ width: '100px', height: '100px', border: '1px solid #D9D9D9', textAlign: 'center', lineHeight: '94px', borderRadius: '5px', float: 'left', marginRight: '30px' }}>{item.type === 'image' ? <img src={item.name} alt="" width="90" height="90"/> : ''}</li>
+                      <li key={index} style={{
+                        width: '100px',
+                        height: '100px',
+                        border: '1px solid #D9D9D9',
+                        textAlign: 'center',
+                        lineHeight: '94px',
+                        borderRadius: '5px',
+                        float: 'left',
+                        marginRight: '30px' }}>{item.type === 'image' ?
+                        <img src={item.name} alt="" width="90" height="90"/> : ''}</li>
                     )) : ''}
                 </ul>
               </Col>
@@ -602,9 +649,10 @@ class CheckModel extends React.Component {
               <Col span={8} className={styles.labelName}>验证码：</Col>
               <Col span={16} className={styles.labelVal}>
                 {detailsValue.verifyCode}&nbsp;&nbsp;&nbsp;&nbsp;
-                <Badge
+                {detailsValue.status ? <Badge
                   status={verifyData[detailsValue.status].value}
-                  text={verifyData[detailsValue.status].text} />
+                  text={verifyData[detailsValue.status].text} /> : ''}
+
               </Col>
             </Row>
           </li>
@@ -629,13 +677,17 @@ class CheckModel extends React.Component {
           <li>
             <Row>
               <Col span={8} className={styles.labelName}>验证类型：</Col>
-              <Col span={16} className={styles.labelVal}>{verifyType[detailsValue.type].text}</Col>
+              <Col span={16} className={styles.labelVal}>
+                {detailsValue.type ? verifyType[detailsValue.type].text : ''}
+              </Col>
             </Row>
           </li>
           <li>
             <Row>
               <Col span={8} className={styles.labelName}>验证渠道：</Col>
-              <Col span={16} className={styles.labelVal}>{verifyChannel[detailsValue.channel].text}</Col>
+              <Col span={16} className={styles.labelVal}>
+                {detailsValue.channel ? verifyChannel[detailsValue.channel].text : ''}
+              </Col>
             </Row>
           </li>
           <li>
@@ -657,9 +709,10 @@ class CheckModel extends React.Component {
               <Col span={8} className={styles.labelName}>验证码：</Col>
               <Col span={16} className={styles.labelVal}>
                 {detailsValue.verifyCode}&nbsp;&nbsp;&nbsp;&nbsp;
-                <Badge
+                {detailsValue.status ? <Badge
                   status={verifyData[detailsValue.status].value}
-                  text={verifyData[detailsValue.status].text} />
+                  text={verifyData[detailsValue.status].text} /> : ''}
+
               </Col>
             </Row>
           </li>
@@ -709,7 +762,8 @@ class CheckModel extends React.Component {
                 <Col
                   span={14}
                   className={styles.labelVal}>
-                    {detailsValue.telephoneAreaCode ? `+${detailsValue.telephoneAreaCode} ` : ''}{detailsValue.telephone}
+                    {detailsValue.telephoneAreaCode ? `+${detailsValue.telephoneAreaCode} ` : ''}
+                    {detailsValue.telephone}
                 </Col>
               </Row>
             </li>
@@ -730,7 +784,8 @@ class CheckModel extends React.Component {
                   span={14}
                   className={styles.labelVal}>
                     {/* {detailsValue.specialInvoice} */}
-                    {detailsValue.specialInvoice ? SpecialInvoice.filter(item => item.id === detailsValue.specialInvoice)[0].name : ''}
+                    {detailsValue.specialInvoice ? SpecialInvoice.filter(item =>
+                      item.id === detailsValue.specialInvoice)[0].name : ''}
                 </Col>
               </Row>
             </li>
@@ -778,7 +833,8 @@ class CheckModel extends React.Component {
           :
           <li>
             <Row>
-              <Col span={10} className={styles.labelName}>{detailsValue.countryCode === 'US' ? '免税认证号' : '增值税登记号'}：</Col>
+              <Col span={10} className={styles.labelName}>{detailsValue.countryCode === 'US' ?
+              '免税认证号' : '增值税登记号'}：</Col>
               <Col
                 span={14}
                 className={styles.labelVal}>
@@ -802,7 +858,16 @@ class CheckModel extends React.Component {
                 <ul style={{ padding: '0' }}>
                   {detailsValue.attachmentList ? detailsValue.attachmentList.map((item, index) => (
                       // eslint-disable-next-line react/no-array-index-key
-                      <li key={index} style={{ width: '100px', height: '100px', border: '1px solid #D9D9D9', textAlign: 'center', lineHeight: '94px', borderRadius: '5px', float: 'left', marginRight: '30px' }}>{item.type === 'image' ? <img src={item.name} alt="" width="90" height="90"/> : ''}</li>
+                      <li key={index} style={{
+                        width: '100px',
+                        height: '100px',
+                        border: '1px solid #D9D9D9',
+                        textAlign: 'center',
+                        lineHeight: '94px',
+                        borderRadius: '5px',
+                        float: 'left',
+                        marginRight: '30px' }}>{item.type === 'image' ?
+                        <img src={item.name} alt="" width="90" height="90"/> : ''}</li>
                     )) : ''}
                 </ul>
               </Col>
@@ -832,7 +897,8 @@ class CheckModel extends React.Component {
         >
         { modelContent }
         </Modal>
-        <RecordListForm showList = {showList} recordMsg={recordMsg} closeListForm= {this.closeListForm}/>
+        <RecordListForm showList = {showList} recordMsg={recordMsg}
+        closeListForm= {this.closeListForm}/>
       </div>
     )
   }

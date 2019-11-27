@@ -138,7 +138,8 @@ class NameGroup extends Component {
     const { type, name } = this.state;
     return (
       <InputGroup compact>
-        <Select value={type} placeholder="请选择类型" style={{ width: '20%' }} onChange={val => this.valueChange({ type: val })}>
+        <Select value={type} placeholder="请选择类型"
+        style={{ width: '20%' }} onChange={val => this.valueChange({ type: val })}>
           <Option value="personal"><Icon type="user" /> 人员</Option>
           <Option value="group"><Icon type="home" /> 组织</Option>
         </Select>
@@ -168,6 +169,7 @@ class AddressGroup extends Component {
   }
 
   // 选择地区
+  // eslint-disable-next-line consistent-return
   selectArea = (v, o) => {
     if (o.length === 0) return false;
     const { countryCode } = this.state;
@@ -180,6 +182,7 @@ class AddressGroup extends Component {
     }
     if (parseInt(o[0].isHaveLow, 10) === 1) {
       api.area.byParentIdGetArea(o[o.length - 1].id).then(res => {
+        // eslint-disable-next-line array-callback-return
         countryCode.map((item1, key1) => {
           if (item1.code === v[0]) {
             // countryCode[key].push({ children: res })
@@ -187,22 +190,27 @@ class AddressGroup extends Component {
               countryCode[key1].children = res;
             }
             if (parseInt(res[0].level, 10) > 2) {
+              // eslint-disable-next-line array-callback-return
               item1.children.map((item2, key2) => {
                 if (item2.code === v[1]) {
                   if (parseInt(item2.level, 10) === 2 && parseInt(res[0].level, 10) === 3) {
                     countryCode[key1].children[key2].children = res;
                   }
                   if (parseInt(res[0].level, 10) > 3) {
+                    // eslint-disable-next-line array-callback-return
                     item2.children.map((item3, key3) => {
                       if (item3.code === v[2]) {
                         if (parseInt(item3.level, 10) === 3 && parseInt(res[0].level, 10) === 4) {
                           countryCode[key1].children[key2].children[key3].children = res;
                         }
                         if (parseInt(res[0].level, 10) > 4) {
+                          // eslint-disable-next-line array-callback-return
                           item3.children.map((item4, key4) => {
                             if (item4.code === v[3]) {
-                              if (parseInt(item4.level, 10) === 4 && parseInt(res[0].level, 10) === 5) {
-                                countryCode[key1].children[key2].children[key3].children[key4].children = res;
+                              if (parseInt(item4.level, 10) === 4
+                              && parseInt(res[0].level, 10) === 5) {
+                                countryCode[key1].children[key2].children[key3]
+                                .children[key4].children = res;
                               }
                             }
                           })
@@ -231,8 +239,16 @@ class AddressGroup extends Component {
     const { countryCode, popupVisible } = this.state;
     return (
       <InputGroup compact>
-        <Cascader style={{ width: '40%' }} onChange={(value, selectedOptions) => this.selectArea(value, selectedOptions)} options={countryCode} placeholder="请选择" fieldNames={{ label: 'name', value: 'code' }} popupVisible={popupVisible} onClick={() => { this.setState({ popupVisible: !popupVisible }) }}/>
-        <Input style={{ width: '60%' }} placeholder="详细地址" onChange={e => this.passVal(e.target.value, 2)} />
+        <Cascader style={{ width: '40%' }}
+        onChange={(value, selectedOptions) => this.selectArea(value, selectedOptions)}
+        options={countryCode} placeholder="请选择" fieldNames={{ label: 'name', value: 'code' }}
+        popupVisible={popupVisible}
+        onClick={() => { this.setState({ popupVisible: !popupVisible }) }}
+        />
+        <Input style={{ width: '60%' }}
+        placeholder="详细地址"
+        onChange={e => this.passVal(e.target.value, 2)}
+        />
       </InputGroup>
     )
   }
@@ -293,7 +309,9 @@ class ChangeModal extends Component {
           api.bp.getBPOrgCertification(recordMsg.id).then(res => {
             this.setState({
               userData: res,
-              specialInvoice: res.organizationCertification ? parseInt(res.organizationCertification.specialInvoice) === 1 : false,
+              specialInvoice: res.organizationCertification
+              ? parseInt(res.organizationCertification.specialInvoice)
+              === 1 : false,
             })
           })
         }
@@ -422,7 +440,9 @@ class ChangeModal extends Component {
     personalShow = name => (
       <div style={{ marginLeft: '30%' }}>
         <Form.Item label="名称">
-          &nbsp;&nbsp;&nbsp;&nbsp;<Icon type="user" /> &nbsp;<span>{name}</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="#" onClick = {event => this.updetaPersonal(event)}>修改</a>
+          &nbsp;&nbsp;&nbsp;&nbsp;<Icon type="user" /> &nbsp;<span>
+            {name}</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <a href="#" onClick = {event => this.updetaPersonal(event)}>修改</a>
         </Form.Item>
       </div>
     )
@@ -457,13 +477,15 @@ class ChangeModal extends Component {
       return groupNameShow ? this.groupNameShow() : this.groupNameInput();
     }
 
+    // eslint-disable-next-line consistent-return
     groupNameShow = () => {
       const { recordMsg } = this.state;
       if (recordMsg) {
         return (
           <Col lg={24} md={12} sm={12}>
             <FormItem label="名称" labelCol={{ span: 4 }} wrapperCol={{ span: 20 }}>
-              <Icon type="home" /> <span>{recordMsg.name}</span> <a href="#" onClick = {event => this.updetaNameGroup(event, recordMsg)}>修改</a>
+              <Icon type="home" /> <span>{recordMsg.name}</span>
+              <a href="#" onClick = {event => this.updetaNameGroup(event, recordMsg)}>修改</a>
             </FormItem>
           </Col>
         )
@@ -504,13 +526,15 @@ class ChangeModal extends Component {
       return groupAdressShow ? this.groupAdressShow() : this.groupAdressInput();
     }
 
+    // eslint-disable-next-line consistent-return
     groupAdressShow = () => {
       const { recordMsg } = this.state;
       if (recordMsg) {
         return (
           <Col lg={24} md={12} sm={12}>
             <FormItem label="联系地址" labelCol={{ span: 4 }} wrapperCol={{ span: 20 }}>
-              <span>{recordMsg.address}</span> <a href="#" onClick = {event => this.updateAdressGroup(event)}>修改</a>
+              <span>{recordMsg.address}</span> <a href="#"
+              onClick = {event => this.updateAdressGroup(event)}>修改</a>
             </FormItem>
           </Col>
         )
@@ -554,12 +578,14 @@ class ChangeModal extends Component {
         <Col lg={12} md={12} sm={12}>
           <FormItem label="行业类别">
         <span>{
+          // eslint-disable-next-line consistent-return
           industryCategories.forEach(item => {
             if (item.code === basic.industryCode) {
               return item.name
             }
           })
-        }</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#" onClick = {event => this.updateIndustryGroup(event)}>修改</a>
+        }</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#"
+        onClick = {event => this.updateIndustryGroup(event)}>修改</a>
           </FormItem>
         </Col>
       )
@@ -590,7 +616,8 @@ class ChangeModal extends Component {
 
     groupUsaShow = () => (
       <FormItem label="名称">
-        <Icon type="home" /> <span>Willian Jafferson Clinton</span> <a href="#" onClick = {event => this.updetaUsaGroup(event)}>修改</a>
+        <Icon type="home" /> <span>Willian Jafferson Clinton</span>
+        <a href="#" onClick = {event => this.updetaUsaGroup(event)}>修改</a>
       </FormItem>
     )
 
@@ -611,7 +638,7 @@ class ChangeModal extends Component {
     }
 
     removeItem = id => {
-      const { details, piCertification } = this.props;
+      // const { details, piCertification } = this.props;
 
       console.log(id)
       // const data = piCertification.filter(e => e.id !== id);
@@ -648,7 +675,13 @@ class ChangeModal extends Component {
               </Paragraph>
               <div>
                 {item.attachmentList.map(v =>
-                  <img style={{ width: 90, height: 90, margin: '0 20px 20px 0', border: '1px #ECECEC solid', padding: '5px', borderRadius: '5px' }} src={v.code} alt=""/>,
+                  <img
+                  style={{ width: 90,
+                    height: 90,
+                    margin: '0 20px 20px 0',
+                    border: '1px #ECECEC solid',
+                    padding: '5px',
+                    borderRadius: '5px' }} src={v.code} alt=""/>,
                 )}
               </div>
             </Card>
@@ -675,33 +708,34 @@ class ChangeModal extends Component {
       });
     };
 
-    handleAdd = data => {
-      const { details, piCertification } = this.props;
-      const attachmentList = data.attachmentList.map(e => ({
-        code: e.thumbUrl,
-        name: e.name,
-        type: e.type,
-      }));
-      this.handleModalVisible();
-      const obj = {
-        id: Math.random(),
-        invoicePartyId: 123,
-        invoicePartyCode: 12345,
-        invoicePartyName: data.invoicePartyName,
-        status: 1,
-        notes: data.notes,
-        attachmentList,
-      };
+    // handleAdd = data => {
+    //   // const { details, piCertification } = this.props;
+    //   const attachmentList = data.attachmentList.map(e => ({
+    //     code: e.thumbUrl,
+    //     name: e.name,
+    //     type: e.type,
+    //   }));
+    //   this.handleModalVisible();
+    //   // const obj = {
+    //   //   id: Math.random(),
+    //   //   invoicePartyId: 123,
+    //   //   invoicePartyCode: 12345,
+    //   //   invoicePartyName: data.invoicePartyName,
+    //   //   status: 1,
+    //   //   notes: data.notes,
+    //   //   attachmentList,
+    //   // };
 
-      // const newdata = [...piCertification, obj];
-      // this.props.dispatch({
-      //   type: 'partnerMaintain/setDetails',
-      //   payload: { ...details, piCertificationList: newdata },
-      // });
-    };
+    //   // const newdata = [...piCertification, obj];
+    //   // this.props.dispatch({
+    //   //   type: 'partnerMaintain/setDetails',
+    //   //   payload: { ...details, piCertificationList: newdata },
+    //   // });
+    // };
 
     render () {
-      const { changeModal, recordMsg, userData, submitNext, specialInvoice, addModalVisible } = this.state;
+      const { changeModal, recordMsg, userData,
+        submitNext, specialInvoice, addModalVisible } = this.state;
       const { piCertificationList } = userData;
       const { basic } = userData;
       const nullData = {};
@@ -735,7 +769,10 @@ class ChangeModal extends Component {
         >
           {imageUrl ? <img src={imageUrl} alt="avatar" width="80" height="80" /> : uploadButton}
         </Upload>
-        <div style={{ color: '#ADADAD', marginTop: '-30px', marginBottom: '20px' }}>只支持 .jpg 格式</div>
+        <div style={{
+          color: '#ADADAD',
+          marginTop: '-30px',
+          marginBottom: '20px' }}>只支持 .jpg 格式</div>
       </>
       // if (recordMsg.code === userData.basic.code) {}
       // 个人变更
@@ -764,7 +801,8 @@ class ChangeModal extends Component {
             />
             <PersonCertificationAddModal {...parentMethods} modalVisible={addModalVisible}/>
             <Divider style={{ margin: 0 }}/>
-            <Button htmlType="submit" type="primary" style={{ float: 'right', margin: '10px 20px' }}>
+            <Button htmlType="submit" type="primary"
+            style={{ float: 'right', margin: '10px 20px' }}>
                 提交
             </Button>
             </Row>
@@ -772,7 +810,8 @@ class ChangeModal extends Component {
         </>
       }
       // 组织变更
-      if (recordMsg && recordMsg.type === 2 && (recordMsg.countyCode === 'CN' || !recordMsg.countyCode)) {
+      if (recordMsg && recordMsg.type === 2 &&
+        (recordMsg.countyCode === 'CN' || !recordMsg.countyCode)) {
         modelWidth = 1130;
         modelContent = <>
           <Form {...formItemLayoutGroup} labelAlign="left" onSubmit={this.handleOk}>
@@ -796,7 +835,8 @@ class ChangeModal extends Component {
               { this.renderIndustryForm() }
               <Col lg={12} md={12} sm={12}>
                 <FormItem label="增值税专用发票资质">
-                  {getFieldDecorator('specialInvoice')(<Switch checkedChildren="开" unCheckedChildren="关" onChange={() => {
+                  {getFieldDecorator('specialInvoice')(
+                  <Switch checkedChildren="开" unCheckedChildren="关" onChange={() => {
                     this.setState({
                       specialInvoice: !specialInvoice,
                     })
@@ -808,7 +848,10 @@ class ChangeModal extends Component {
                 <FormItem label="统一社会信用代码">
                   {getFieldDecorator('taxNo', {
                     // eslint-disable-next-line no-nested-ternary
-                    initialValue: userData.organizationCertification ? (userData.organizationCertification.taxNo ? userData.organizationCertification.taxNo : '') : '',
+                    initialValue: userData.organizationCertification ?
+                    (userData.organizationCertification.taxNo ?
+                      userData.organizationCertification.taxNo : '')
+                     : '',
                     rules: [
                       {
                         required: true,
@@ -822,7 +865,9 @@ class ChangeModal extends Component {
                 <FormItem label="基本户开户银行">
                   {getFieldDecorator('bankCode', {
                     // eslint-disable-next-line no-nested-ternary
-                    initialValue: userData.organizationCertification ? (userData.organizationCertification.bankCode ? userData.organizationCertification.bankCode : '') : '',
+                    initialValue: userData.organizationCertification ?
+                    (userData.organizationCertification.bankCode ?
+                      userData.organizationCertification.bankCode : '') : '',
                     rules: [
                       {
                         required: true,
@@ -836,7 +881,9 @@ class ChangeModal extends Component {
                 <FormItem label="基本户开户账号">
                   {getFieldDecorator('bankAccount', {
                     // eslint-disable-next-line no-nested-ternary
-                    initialValue: userData.organizationCertification ? (userData.organizationCertification.bankAccount ? userData.organizationCertification.bankAccount : '') : '',
+                    initialValue: userData.organizationCertification ?
+                    (userData.organizationCertification.bankAccount ?
+                      userData.organizationCertification.bankAccount : '') : '',
                     rules: [
                       {
                         required: true,
@@ -855,7 +902,9 @@ class ChangeModal extends Component {
                   <FormItem label="注册地址" labelCol={{ span: 4 }} wrapperCol={{ span: 20 }}>
                     {getFieldDecorator('regisAddress', {
                     // eslint-disable-next-line no-nested-ternary
-                    initialValue: userData.organizationCertification ? (userData.organizationCertification.address ? userData.organizationCertification.address : '') : '',
+                    initialValue: userData.organizationCertification ?
+                    (userData.organizationCertification.address ?
+                      userData.organizationCertification.address : '') : '',
                     rules: [
                       {
                         required: true,
@@ -869,7 +918,9 @@ class ChangeModal extends Component {
                 <Form.Item label="认证说明" labelCol={{ span: 4 }} wrapperCol={{ span: 20 }}>
                   {getFieldDecorator('notes', {
                     // eslint-disable-next-line no-nested-ternary
-                    initialValue: userData.organizationCertification ? (userData.organizationCertification.notes ? userData.organizationCertification.notes : '') : '',
+                    initialValue: userData.organizationCertification ?
+                    (userData.organizationCertification.notes ?
+                      userData.organizationCertification.notes : '') : '',
                     rules: [
                       {
                         required: true,
@@ -885,7 +936,8 @@ class ChangeModal extends Component {
                </Form.Item>
               </Col>
               <Divider style={{ margin: 0 }}/>
-              <Button htmlType="submit" type="primary" style={{ float: 'right', margin: '10px 20px' }}>
+              <Button htmlType="submit" type="primary"
+              style={{ float: 'right', margin: '10px 20px' }}>
                   提交
               </Button>
             </Row>
@@ -923,7 +975,8 @@ class ChangeModal extends Component {
               {getFieldDecorator('idenImg')(uploadModal)}
             </Form.Item>
             <Divider style={{ margin: 0 }}/>
-            <Button htmlType="submit" type="primary" style={{ float: 'right', margin: '10px 20px 0 0' }}>
+            <Button htmlType="submit" type="primary"
+            style={{ float: 'right', margin: '10px 20px 0 0' }}>
                 提交
             </Button>
           </Form>
@@ -953,7 +1006,8 @@ class ChangeModal extends Component {
               {getFieldDecorator('idenImg')(uploadModal)}
             </Form.Item>
             <Divider style={{ margin: 0 }}/>
-            <Button htmlType="submit" type="primary" style={{ float: 'right', margin: '10px 20px 0 0' }}>
+            <Button htmlType="submit" type="primary"
+            style={{ float: 'right', margin: '10px 20px 0 0' }}>
                 提交
             </Button>
           </Form>

@@ -47,7 +47,8 @@ class PurchasingOrg extends React.Component {
               <DescriptionsItem span={2} label="销售人员">{item.salerName}</DescriptionsItem>
               <DescriptionsItem span={2} label="销售人员电话">{item.salerTelephone}</DescriptionsItem>
               <DescriptionsItem span={2} label="供应商级别">{item.levelCode}</DescriptionsItem>
-              <DescriptionsItem span={2} label="收货时发票过账">{item.invoicePostInReceive}</DescriptionsItem>
+              <DescriptionsItem span={2} label="收货时发票过账">
+                {item.invoicePostInReceive}</DescriptionsItem>
               <DescriptionsItem span={2} label="采购组">{item.purchasingGroupCode}</DescriptionsItem>
               <DescriptionsItem span={2} label="计划交货时间">{item.deliveryPlanDays}</DescriptionsItem>
             </Descriptions>
@@ -114,7 +115,8 @@ class PurchasingOrg extends React.Component {
     });
     return (
       <Cascader options={options} onChange={this.onCascaderChange}>
-        <a style={{ fontSize: 14, marginLeft: -16 }} href="#">采购组织 <Icon type="down" style={{ fontSize: 12 }} /></a>
+        <a style={{ fontSize: 14, marginLeft: -16 }} href="#">
+          采购组织 <Icon type="down" style={{ fontSize: 12 }} /></a>
       </Cascader>
     );
   }
@@ -177,7 +179,8 @@ class PurchasingOrg extends React.Component {
       tabList.forEach(e => {
         if (e.key === tabKey) {
           e.tab = (
-            <>{e.tab} <Icon type="close" style={{ fontSize: 12 }} onClick={() => this.closeTab(e.key)} /></>
+            <>{e.tab} <Icon type="close" style={{ fontSize: 12 }}
+            onClick={() => this.closeTab(e.key)} /></>
           );
         } else {
           e.tab = (
