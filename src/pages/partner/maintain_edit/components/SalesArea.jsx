@@ -2,7 +2,7 @@ import { Form, Row, Col, Select, Switch, Radio, Tabs, Card, Cascader, Icon, Empt
 import React from 'react';
 import { connect } from 'dva';
 import debounce from 'lodash/debounce';
-import InvoiceParty from './InvoiceParty';
+import BillToParty from './BillToParty';
 import SoldToParty from './SoldToParty';
 import ShipToParty from './ShipToParty';
 import SalesPerson from './SalesPerson';
@@ -479,8 +479,8 @@ class SalesArea extends React.Component {
                   data={e}
                 />
                 <Tabs className={styles.internalTab}>
-                  <TabPane tab="收票方" key="InvoiceParty">
-                    <InvoiceParty
+                  <TabPane tab="收票方" key="BillToParty">
+                    <BillToParty
                       tableData={e.billToPartyList || []}
                       tableKey="billToPartyList"
                       valueChange={this.valueChange}

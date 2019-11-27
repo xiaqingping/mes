@@ -117,11 +117,11 @@ class PersonCertification extends React.Component {
   okHandle = () => {
     const content = this.PICertificationAddModal.wrappedInstance;
     const { form } = content.props;
-    const { invoiceParty, uuid } = content.state;
+    const { billToParty, uuid } = content.state;
     form.validateFields((err, fieldsValue) => {
       if (err) return;
       form.resetFields();
-      this.handleAdd({ ...fieldsValue, ...invoiceParty, uuid });
+      this.handleAdd({ ...fieldsValue, ...billToParty, uuid });
     });
   };
 
