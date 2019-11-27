@@ -1,4 +1,4 @@
-import { Form, Button, Spin, Badge, Modal, message } from 'antd';
+import { Form, Button, Spin, Badge, Modal, message, Empty } from 'antd';
 import React, { Component } from 'react';
 
 import router from 'umi/router';
@@ -87,12 +87,15 @@ class CustomerEdit extends Component {
     const {
       params: { id },
     } = match;
-    const {
-      query: { type },
-    } = location;
+    const { query } = location;
+    const { customerDataStatus, vendorDataStatus } = query;
+    this.setState({
+      customerRequired: customerDataStatus,
+      vendorRequired: vendorDataStatus,
+    });
     dispatch({
       type: 'bpEdit/readBPDetails',
-      payload: { id, type },
+      payload: { id, ...query },
     });
   };
 
@@ -148,6 +151,9 @@ class CustomerEdit extends Component {
   onTabChange = async tabActiveKey => {
     const self = this;
     let result;
+
+    const { pageLoading } = this.props;
+    if (pageLoading) return;
 
     if (tabActiveKey === 'customer') {
       result = await this.validateVendor();
@@ -289,6 +295,7 @@ class CustomerEdit extends Component {
   validateVendor = async () => {
     const { details } = this.props;
     const { vendor } = details;
+    console.log(vendor);
     const { purchaseOrganizationList } = vendor;
 
     // 默认验证结果为：通过
@@ -435,8 +442,8 @@ class CustomerEdit extends Component {
     // 个人 PI认证
     if (data.basic.type === 1) {
       const piCertificationList = data.piCertificationList.map(item => {
-        const { uuid, ...other } = item;
-        return { ...other, ...{ attachmentList: uuid } };
+        const { uuid, attachmentList, ...other } = item;
+        return { ...other, ...{ attachmentCode: uuid } };
       });
       newData = {
         ...newData,
@@ -446,8 +453,8 @@ class CustomerEdit extends Component {
 
     // 组织 组织认证
     if (data.basic.type === 2) {
-      const { uuid, ...other } = data.organizationCertification;
-      const organizationCertification = { ...other, ...{ attachmentList: uuid } };
+      const { uuid, attachmentList, ...other } = data.organizationCertification;
+      const organizationCertification = { ...other, ...{ attachmentCode: uuid } };
       newData = {
         ...newData,
         ...{ organizationCertification },
@@ -456,8 +463,7 @@ class CustomerEdit extends Component {
 
     console.log(newData);
     // return;
-    bp.addBP(newData).then(res => {
-      console.log(res);
+    bp.addBP(newData).then(() => {
       message.success('新增业务伙伴成功');
       router.push('/partner/maintain');
     });
@@ -638,7 +644,7 @@ class CustomerEdit extends Component {
   };
 
   render() {
-    const { width, tabActiveKey } = this.state;
+    const { width, tabActiveKey, editType } = this.state;
     const { pageLoading } = this.props;
     const customerTab = this.renderCustomerTab();
     const vendorTab = this.renderVendorTab();
@@ -661,13 +667,19 @@ class CustomerEdit extends Component {
         ]}
       >
         <Spin spinning={pageLoading}>
-          <div style={{ paddingBottom: 50 }}>{this.renderContent()}</div>
-          <FooterToolbar style={{ width }}>
-            <Button>取消</Button>
-            <Button type="primary" onClick={this.validate}>
-              提交
-            </Button>
-          </FooterToolbar>
+          {editType === 'update' && pageLoading ? (
+            <Empty style={{ padding: 300, background: '#fff' }} description="loading..."></Empty>
+          ) : (
+            <>
+              <div style={{ paddingBottom: 50 }}>{this.renderContent()}</div>
+              <FooterToolbar style={{ width }}>
+                <Button>取消</Button>
+                <Button type="primary" onClick={this.validate}>
+                  提交
+                </Button>
+              </FooterToolbar>
+            </>
+          )}
         </Spin>
       </PageHeaderWrapper>
     );

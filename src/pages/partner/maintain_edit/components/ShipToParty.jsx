@@ -1,10 +1,4 @@
-import {
-  Button,
-  Table,
-  Input,
-  Divider,
-  Form,
-} from 'antd';
+import { Button, Table, Input, Divider, Form, message } from 'antd';
 import React from 'react';
 
 import ChooseShipToParty from '@/components/choosse/bp/ShipToParty';
@@ -71,13 +65,13 @@ class ShipToParty extends React.Component {
 
     this.setStore(newTableData);
     this.setState({ editIndex: newTableData.length - 1, id: newId });
-  }
+  };
 
   deleteRow = index => {
     const { tableData } = this.props;
     const newTableData = tableData.filter((e, i) => i !== index);
     this.setStore(newTableData);
-  }
+  };
 
   cancel = row => {
     if (row.id < 0) {
@@ -103,31 +97,37 @@ class ShipToParty extends React.Component {
       this.setStore(newTableData);
       this.setState({ editIndex: -1 });
     });
-  }
+  };
 
   setStore = newTableData => {
     const { tableKey, valueChange } = this.props;
     valueChange(tableKey, newTableData);
-  }
+  };
 
   edit = index => {
     this.setState({ editIndex: index });
-  }
+  };
 
   selectChooseModalData = row => {
     const { editIndex } = this.state;
     const { tableData } = this.props;
+    const has = tableData.some(e => e.id === row.id);
+
+    if (has) {
+      message.warning('送达方重复');
+      return;
+    }
 
     const newTableData = tableData.map((e, i) => {
       if (i === editIndex) return { ...e, ...row };
       return e;
     });
     this.setStore(newTableData);
-  }
+  };
 
   searchShipToParty = () => {
-    this.ChooseShipToParty.wrappedInstance.changeVisible(true)
-  }
+    this.ChooseShipToParty.wrappedInstance.changeVisible(true);
+  };
 
   render() {
     const { tableData } = this.props;
@@ -142,11 +142,9 @@ class ShipToParty extends React.Component {
         dataIndex: 'name',
         width: '40%',
         editable: true,
-        inputType: <Search onSearch={this.searchShipToParty} />,
+        inputType: <Search readOnly onSearch={this.searchShipToParty} />,
         editOptions: {
-          rules: [
-            { required: true },
-          ],
+          rules: [{ required: true }],
         },
       },
       {
@@ -221,7 +219,9 @@ class ShipToParty extends React.Component {
           新增
         </Button>
         <ChooseShipToParty
-          ref={ref => { this.ChooseShipToParty = ref }}
+          ref={ref => {
+            this.ChooseShipToParty = ref;
+          }}
           selectChooseModalData={this.selectChooseModalData}
         />
       </EditableContext.Provider>

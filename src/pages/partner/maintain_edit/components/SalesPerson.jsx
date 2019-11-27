@@ -1,4 +1,4 @@
-import { Button, Table, Input, Divider, Form } from 'antd';
+import { Button, Table, Input, Divider, Form, message } from 'antd';
 import React from 'react';
 
 import ChooseSalesPerson from '@/components/choosse/bp/SalesPerson';
@@ -111,6 +111,12 @@ class SalesPerson extends React.Component {
   selectChooseModalData = row => {
     const { editIndex } = this.state;
     const { tableData } = this.props;
+    const has = tableData.some(e => e.code === row.code);
+
+    if (has) {
+      message.warning('销售员重复');
+      return;
+    }
 
     const newTableData = tableData.map((e, i) => {
       if (i === editIndex) return { ...e, ...row };
@@ -137,7 +143,7 @@ class SalesPerson extends React.Component {
         dataIndex: 'name',
         width: '80%',
         editable: true,
-        inputType: <Search onSearch={this.searchSalesPerson} />,
+        inputType: <Search readOnly onSearch={this.searchSalesPerson} />,
         editOptions: {
           rules: [{ required: true }],
         },
