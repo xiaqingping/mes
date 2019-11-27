@@ -473,13 +473,13 @@ class CustomerEdit extends Component {
 
     // TODO:
     // 新增收票方
-    salesAreaList.newInvoicePartyList = [];
-    salesAreaList.invoicePartyList.forEach(e => {
+    salesAreaList.newBillToPartyList = [];
+    salesAreaList.billToPartyList.forEach(e => {
       if (e.id > 0) return;
-      salesAreaList.newInvoicePartyList.push({ id: e.id, soldToPartyId: e.soldToPartyId });
+      salesAreaList.newBillToPartyList.push({ id: e.id, soldToPartyId: e.soldToPartyId });
     });
     // 删除收票方
-    salesAreaList.deleteInvoicePartyList = [];
+    salesAreaList.deleteBillToPartyList = [];
 
     // 新增售达方
     salesAreaList.newSoldToPartyIdList = [];

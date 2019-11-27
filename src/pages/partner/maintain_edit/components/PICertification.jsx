@@ -31,7 +31,7 @@ class PersonCertification extends React.Component {
         <List.Item key={item.id}>
           <Card
             hoverable
-            title={item.invoicePartyName}
+            title={item.billToPartyName}
             extra={
               <>
                 <a onClick={() => this.updateItem(item)}>变更</a>
@@ -137,9 +137,9 @@ class PersonCertification extends React.Component {
     const obj = {
       id: newId,
       uuid: data.uuid,
-      invoicePartyId: data.invoicePartyId,
-      invoicePartyCode: data.invoicePartyCode,
-      invoicePartyName: data.invoicePartyName,
+      billToPartyId: data.billToPartyId,
+      billToPartyCode: data.billToPartyCode,
+      billToPartyName: data.billToPartyName,
       status: 1,
       notes: data.notes,
       attachmentList: data.attachmentList,

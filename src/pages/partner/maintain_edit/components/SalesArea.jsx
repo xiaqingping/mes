@@ -481,8 +481,8 @@ class SalesArea extends React.Component {
                 <Tabs className={styles.internalTab}>
                   <TabPane tab="收票方" key="InvoiceParty">
                     <InvoiceParty
-                      tableData={e.invoicePartyList || []}
-                      tableKey="invoicePartyList"
+                      tableData={e.billToPartyList || []}
+                      tableKey="billToPartyList"
                       valueChange={this.valueChange}
                     />
                   </TabPane>

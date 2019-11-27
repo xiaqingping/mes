@@ -44,13 +44,13 @@ class PICertificationAddModal extends React.Component {
 
   selectChooseModalData = data => {
     this.props.form.setFieldsValue({
-      invoicePartyName: data.name,
+      billToPartyName: data.name,
     });
     this.setState({
       invoiceParty: {
-        invoicePartyName: data.name,
-        invoicePartyCode: data.code,
-        invoicePartyId: data.id,
+        billToPartyName: data.name,
+        billToPartyCode: data.code,
+        billToPartyId: data.id,
       },
     });
   };
@@ -112,8 +112,8 @@ class PICertificationAddModal extends React.Component {
       <>
         <Form>
           <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="收票方">
-            {form.getFieldDecorator('invoicePartyName', {
-              initialValue: invoiceParty.invoicePartyName,
+            {form.getFieldDecorator('billToPartyName', {
+              initialValue: invoiceParty.billToPartyName,
               rules: [{ required: true }],
             })(<Search readOnly onSearch={this.searchInvoiceParty} />)}
           </FormItem>
