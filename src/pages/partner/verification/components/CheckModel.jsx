@@ -6,6 +6,7 @@ import {
   Row,
   Col,
   Empty,
+  Button,
 } from 'antd';
 import React from 'react';
 import { connect } from 'dva';
@@ -833,8 +834,9 @@ class CheckModel extends React.Component {
           :
           <li>
             <Row>
-              <Col span={10} className={styles.labelName}>{detailsValue.countryCode === 'US' ?
-              '免税认证号' : '增值税登记号'}：</Col>
+              <Col span={10} className={styles.labelName}>
+                {detailsValue.countryCode === 'US' ? '免税认证号' : '增值税登记号'}：
+              </Col>
               <Col
                 span={14}
                 className={styles.labelVal}>
@@ -894,6 +896,14 @@ class CheckModel extends React.Component {
           onOk={() => this.setModal1Visible(false)}
           onCancel={() => this.setModal1Visible(false)}
           destroyOnClose
+          footer={clickType === 1 || clickType === 2 || clickType === 3 ? [
+            <Button key="back" onClick={() => this.setModal1Visible(false)}>
+              拒绝
+            </Button>,
+            <Button key="submit" type="primary" onClick={() => this.setModal1Visible(false)}>
+              审核
+            </Button>,
+          ] : null}
         >
         { modelContent }
         </Modal>
