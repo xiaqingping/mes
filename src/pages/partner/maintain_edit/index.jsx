@@ -88,6 +88,11 @@ class CustomerEdit extends Component {
       params: { id },
     } = match;
     const { query } = location;
+    const { customerDataStatus, vendorDataStatus } = query;
+    this.setState({
+      customerRequired: customerDataStatus,
+      vendorRequired: vendorDataStatus,
+    });
     dispatch({
       type: 'bpEdit/readBPDetails',
       payload: { id, ...query },

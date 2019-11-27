@@ -114,7 +114,7 @@ class SoldToParty extends React.Component {
     const has = tableData.some(e => e.id === row.id);
 
     if (has) {
-      message.warning('销售员重复');
+      message.warning('售达方重复');
       return;
     }
 
@@ -143,7 +143,7 @@ class SoldToParty extends React.Component {
         dataIndex: 'name',
         width: '40%',
         editable: true,
-        inputType: <Search onSearch={this.searchSoldToParty} />,
+        inputType: <Search readOnly onSearch={this.searchSoldToParty} />,
         editOptions: {
           rules: [{ required: true }],
         },

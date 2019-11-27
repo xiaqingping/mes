@@ -143,7 +143,7 @@ class SalesPerson extends React.Component {
         dataIndex: 'name',
         width: '80%',
         editable: true,
-        inputType: <Search onSearch={this.searchSalesPerson} />,
+        inputType: <Search readOnly onSearch={this.searchSalesPerson} />,
         editOptions: {
           rules: [{ required: true }],
         },

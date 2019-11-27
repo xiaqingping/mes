@@ -114,7 +114,7 @@ class ShipToParty extends React.Component {
     const has = tableData.some(e => e.id === row.id);
 
     if (has) {
-      message.warning('销售员重复');
+      message.warning('送达方重复');
       return;
     }
 
@@ -142,7 +142,7 @@ class ShipToParty extends React.Component {
         dataIndex: 'name',
         width: '40%',
         editable: true,
-        inputType: <Search onSearch={this.searchShipToParty} />,
+        inputType: <Search readOnly onSearch={this.searchShipToParty} />,
         editOptions: {
           rules: [{ required: true }],
         },

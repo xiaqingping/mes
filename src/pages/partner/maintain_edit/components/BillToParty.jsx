@@ -114,7 +114,7 @@ class BillToParty extends React.Component {
     const has = tableData.some(e => e.id === row.id);
 
     if (has) {
-      message.warning('销售员重复');
+      message.warning('收票方重复');
       return;
     }
 
@@ -143,7 +143,7 @@ class BillToParty extends React.Component {
         dataIndex: 'name',
         width: '40%',
         editable: true,
-        inputType: <Search onSearch={this.searchBillToParty} />,
+        inputType: <Search readOnly onSearch={this.searchBillToParty} />,
         editOptions: {
           rules: [{ required: true }],
         },
@@ -152,11 +152,6 @@ class BillToParty extends React.Component {
         title: '售达方',
         dataIndex: 'soldToPartyName',
         width: '40%',
-        editable: true,
-        inputType: <Input />,
-        editOptions: {
-          rules: [{ required: true }],
-        },
       },
       {
         title: '操作',

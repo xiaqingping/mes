@@ -49,8 +49,6 @@ const SeqModel = {
           details = { ...details, ...vendor };
         }
 
-        console.log(details);
-
         yield put({
           type: 'setState',
           payload: { type: 'details', data: JSON.parse(JSON.stringify(details)) },
