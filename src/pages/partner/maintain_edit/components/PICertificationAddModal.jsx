@@ -2,7 +2,7 @@ import { Form, Input, Upload, Icon } from 'antd';
 import React from 'react';
 import { connect } from 'dva';
 import disk from '@/api/disk';
-import ChooseInvoiceParty from '@/components/choosse/bp/InvoiceParty';
+import ChooseBillToParty from '@/components/choosse/bp/BillToParty';
 import { requestErr } from '@/utils/request';
 import { guid } from '@/utils/utils';
 
@@ -23,7 +23,7 @@ class PICertificationAddModal extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      invoiceParty: props.data || {},
+      billToParty: props.data || {},
       uuid: props.uuid || guid(),
     };
   }
@@ -44,19 +44,19 @@ class PICertificationAddModal extends React.Component {
 
   selectChooseModalData = data => {
     this.props.form.setFieldsValue({
-      invoicePartyName: data.name,
+      billToPartyName: data.name,
     });
     this.setState({
-      invoiceParty: {
-        invoicePartyName: data.name,
-        invoicePartyCode: data.code,
-        invoicePartyId: data.id,
+      billToParty: {
+        billToPartyName: data.name,
+        billToPartyCode: data.code,
+        billToPartyId: data.id,
       },
     });
   };
 
   valueChange = (key, value) => {
-    const { invoiceParty } = this.state;
+    const { billToParty } = this.state;
     if (key === 'attachmentList') {
       const attachmentList = [];
       if (value.file.response) {
@@ -78,25 +78,25 @@ class PICertificationAddModal extends React.Component {
         });
       }
       this.setState({
-        invoiceParty: {
-          ...invoiceParty,
+        billToParty: {
+          ...billToParty,
           attachmentList,
         },
       });
     }
   };
 
-  searchInvoiceParty = () => {
-    this.ChooseInvoiceParty.wrappedInstance.changeVisible(true);
+  searchBillToParty = () => {
+    this.ChooseBillToParty.wrappedInstance.changeVisible(true);
   };
 
   render() {
     const { form, authorization } = this.props;
-    const { uuid, invoiceParty } = this.state;
+    const { uuid, billToParty } = this.state;
     const uploadUrl = disk.uploadMoreFiles('bp_organization_certification', uuid);
 
-    if (!invoiceParty.attachmentList) invoiceParty.attachmentList = [];
-    const fileList = invoiceParty.attachmentList.map(e => {
+    if (!billToParty.attachmentList) billToParty.attachmentList = [];
+    const fileList = billToParty.attachmentList.map(e => {
       const url = disk.downloadFiles(e.code, { view: true });
       return {
         old: true,
@@ -112,14 +112,14 @@ class PICertificationAddModal extends React.Component {
       <>
         <Form>
           <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="收票方">
-            {form.getFieldDecorator('invoicePartyName', {
-              initialValue: invoiceParty.invoicePartyName,
+            {form.getFieldDecorator('billToPartyName', {
+              initialValue: billToParty.billToPartyName,
               rules: [{ required: true }],
-            })(<Search readOnly onSearch={this.searchInvoiceParty} />)}
+            })(<Search readOnly onSearch={this.searchBillToParty} />)}
           </FormItem>
           <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="认证说明">
             {form.getFieldDecorator('notes', {
-              initialValue: invoiceParty.notes,
+              initialValue: billToParty.notes,
               rules: [{ required: true }],
             })(<Input.TextArea />)}
           </FormItem>
@@ -145,9 +145,9 @@ class PICertificationAddModal extends React.Component {
             )}
           </FormItem>
         </Form>
-        <ChooseInvoiceParty
+        <ChooseBillToParty
           ref={ref => {
-            this.ChooseInvoiceParty = ref;
+            this.ChooseBillToParty = ref;
           }}
           selectChooseModalData={this.selectChooseModalData}
         />

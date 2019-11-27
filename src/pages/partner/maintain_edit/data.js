@@ -60,7 +60,7 @@ export const readDetails = {
         salesOrderBlock: false,
         defaultInvoiceTypeCode: '',
         taxClassificCode: '',
-        invoicePartyList: [
+        billToPartyList: [
           {
             id: '',
             type: '',
@@ -163,9 +163,9 @@ export const readDetails = {
       id: -1,
       status: 1,
       effectiveDate: '2019-10-10',
-      invoicePartyId: 123,
-      invoicePartyCode: 12345,
-      invoicePartyName: '上海交通大学',
+      billToPartyId: 123,
+      billToPartyCode: 12345,
+      billToPartyName: '上海交通大学',
       notes: '这是一段认证说明',
       attachmentList: [
         { code: 'https://blog.maxmeng.top/images/avatar.jpg', name: '照片', type: 'image' },
@@ -175,9 +175,9 @@ export const readDetails = {
   // 信贷数据（查询接口返回此数据，新增和修改接口无法直接修改）
   creditList: [
     {
-      invoicePartyId: 123,
-      invoicePartyCode: 12345,
-      invoicePartyName: '上海交通大学',
+      billToPartyId: 123,
+      billToPartyCode: 12345,
+      billToPartyName: '上海交通大学',
       currencyCode: 'CNY',
       credit: '40000',
       creditPeriod: '30',
@@ -233,7 +233,7 @@ export const addDetails = {
         currencyCode: '',
         defaultInvoiceTypeCode: '',
         taxClassificCode: '',
-        invoicePartyList: [
+        billToPartyList: [
           {
             id: '',
             // type: '',
@@ -308,7 +308,7 @@ export const addDetails = {
   piCertificationList: [
     {
       id: -1,
-      invoicePartyId: 123,
+      billToPartyId: 123,
       notes: '这是一段认证说明',
       attachmentList: 'uuid',
     },
@@ -355,8 +355,8 @@ export const updateDetails = {
         defaultInvoiceTypeCode: '',
         taxClassificCode: '',
         // 收票方
-        newInvoicePartyList: [{ id: '', soldToPartyId: '' }],
-        deleteInvoicePartyList: [{ id: '', soldToPartyId: '' }],
+        newBillToPartyList: [{ id: '', soldToPartyId: '' }],
+        deleteBillToPartyList: [{ id: '', soldToPartyId: '' }],
         // 售达方
         newSoldToPartyIdList: [123],
         deleteSoldToPartyIdList: [123],

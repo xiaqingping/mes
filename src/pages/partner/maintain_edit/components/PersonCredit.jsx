@@ -1,8 +1,4 @@
-import {
-  Card,
-  Divider,
-  List,
-} from 'antd';
+import { Card, Divider, List } from 'antd';
 import React from 'react';
 import { connect } from 'dva';
 
@@ -17,10 +13,10 @@ class PersonCredit extends React.Component {
   }
 
   renderListItem = item => (
-    <List.Item key={item.invoicePartyId}>
+    <List.Item key={item.billToPartyId}>
       <Card
         hoverable
-        title={item.invoicePartyName}
+        title={item.billToPartyName}
         extra={
           <>
             <a>额度调整</a>
@@ -29,23 +25,26 @@ class PersonCredit extends React.Component {
           </>
         }
       >
-        <span>{item.credit} {item.currencyCode} 1天后调整</span><br/>
-        <span>{item.tempCreditLimit} {item.currencyCode} 25天后到期</span><br/>
-        <span>开票后{item.billingCycle}天到期</span><br/>
+        <span>
+          {item.credit} {item.currencyCode} 1天后调整
+        </span>
+        <br />
+        <span>
+          {item.tempCreditLimit} {item.currencyCode} 25天后到期
+        </span>
+        <br />
+        <span>开票后{item.billingCycle}天到期</span>
+        <br />
         <span>每月{item.billingDay}日开票</span>
       </Card>
     </List.Item>
-  )
+  );
 
   render() {
     const { creditList } = this.props;
 
     return (
-      <Card
-        title="信贷数据"
-        bordered={false}
-        style={{ marginBottom: '24px' }}
-      >
+      <Card title="信贷数据" bordered={false} style={{ marginBottom: '24px' }}>
         <List
           rowKey="id"
           grid={{

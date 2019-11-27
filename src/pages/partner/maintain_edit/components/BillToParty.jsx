@@ -1,13 +1,7 @@
-import {
-  Button,
-  Table,
-  Input,
-  Divider,
-  Form,
-} from 'antd';
+import { Button, Table, Input, Divider, Form } from 'antd';
 import React from 'react';
 
-import ChooseInvoiceParty from '@/components/choosse/bp/InvoiceParty';
+import ChooseBillToParty from '@/components/choosse/bp/BillToParty';
 
 const { Search } = Input;
 const EditableContext = React.createContext();
@@ -53,7 +47,7 @@ class EditableCell extends React.Component {
 }
 
 @Form.create()
-class InvoiceParty extends React.Component {
+class BillToParty extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -71,13 +65,13 @@ class InvoiceParty extends React.Component {
 
     this.setStore(newTableData);
     this.setState({ editIndex: newTableData.length - 1, id: newId });
-  }
+  };
 
   deleteRow = index => {
     const { tableData } = this.props;
     const newTableData = tableData.filter((e, i) => i !== index);
     this.setStore(newTableData);
-  }
+  };
 
   cancel = row => {
     if (row.id < 0) {
@@ -103,16 +97,16 @@ class InvoiceParty extends React.Component {
       this.setStore(newTableData);
       this.setState({ editIndex: -1 });
     });
-  }
+  };
 
   setStore = newTableData => {
     const { tableKey, valueChange } = this.props;
     valueChange(tableKey, newTableData);
-  }
+  };
 
   edit = index => {
     this.setState({ editIndex: index });
-  }
+  };
 
   selectChooseModalData = row => {
     const { editIndex } = this.state;
@@ -123,11 +117,11 @@ class InvoiceParty extends React.Component {
       return e;
     });
     this.setStore(newTableData);
-  }
+  };
 
-  searchInvoiceParty = () => {
-    this.ChooseInvoiceParty.wrappedInstance.changeVisible(true)
-  }
+  searchBillToParty = () => {
+    this.ChooseBillToParty.wrappedInstance.changeVisible(true);
+  };
 
   render() {
     const { tableData } = this.props;
@@ -143,11 +137,9 @@ class InvoiceParty extends React.Component {
         dataIndex: 'name',
         width: '40%',
         editable: true,
-        inputType: <Search onSearch={this.searchInvoiceParty} />,
+        inputType: <Search onSearch={this.searchBillToParty} />,
         editOptions: {
-          rules: [
-            { required: true },
-          ],
+          rules: [{ required: true }],
         },
       },
       {
@@ -157,9 +149,7 @@ class InvoiceParty extends React.Component {
         editable: true,
         inputType: <Input />,
         editOptions: {
-          rules: [
-            { required: true },
-          ],
+          rules: [{ required: true }],
         },
       },
       {
@@ -228,8 +218,10 @@ class InvoiceParty extends React.Component {
         >
           新增
         </Button>
-        <ChooseInvoiceParty
-          ref={ref => { this.ChooseInvoiceParty = ref }}
+        <ChooseBillToParty
+          ref={ref => {
+            this.ChooseBillToParty = ref;
+          }}
           selectChooseModalData={this.selectChooseModalData}
         />
       </EditableContext.Provider>
@@ -237,4 +229,4 @@ class InvoiceParty extends React.Component {
   }
 }
 
-export default InvoiceParty;
+export default BillToParty;
