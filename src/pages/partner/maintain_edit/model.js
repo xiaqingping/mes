@@ -34,6 +34,7 @@ const SeqModel = {
     *readBPDetails({ payload }, { call, put }) {
       try {
         const { id } = payload;
+        console.log(payload);
         // 客户数据
         const customer = yield call(bp.getBPCustomer, id);
         // 供应商数据
