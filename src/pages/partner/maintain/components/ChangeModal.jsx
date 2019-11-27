@@ -254,10 +254,11 @@ class AddressGroup extends Component {
   }
 }
 
-@connect(({ global, basicCache, user, partnerMaintain }) => {
-  const industryCategories = basicCache.industryCategories.filter(
-    e => e.languageCode === global.languageCode,
-  );
+@connect(({ basicCache, user, partnerMaintain, partnerMaintainEdit }) => {
+  // const industryCategories = basicCache.industryCategories.filter(
+  //   e => e.languageCode === global.languageCode,
+  // );
+  const industryCategories = partnerMaintainEdit.Industry;
   return {
     industryCategories,
     countryDiallingCodes: basicCache.countryDiallingCodes,
@@ -391,6 +392,7 @@ class ChangeModal extends Component {
     /** 上传图片 */
     handleChange = info => {
       // const data = [];
+      console.log(info)
       if (info.file.status === 'uploading') {
         this.setState({ loading: true });
         return;
@@ -601,7 +603,7 @@ class ChangeModal extends Component {
           {getFieldDecorator('industry')(
             <Select placeholder="请选择">
               {industryCategories.map(item =>
-                <Option key={item.code} value={item.code}>{item.name}</Option>,
+                <Option key={item.id} value={item.id}>{item.name}</Option>,
               )}
             </Select>)}
         </FormItem>
@@ -740,6 +742,7 @@ class ChangeModal extends Component {
       const { basic } = userData;
       const nullData = {};
       const uploadUrl = disk.uploadFiles('bp_organization_certification', guid());
+      console.log(uploadUrl)
       let modelWidth = 970;
       if (!basic) return null;
       // const { form, getValues, closeModal } = this.props;
@@ -757,10 +760,11 @@ class ChangeModal extends Component {
       );
       const uploadModal = <>
         <Upload
+          multiple
           name="file"
           listType="picture-card"
           className="avatar-uploader"
-          showUploadList={false}
+          showUploadList
           action={uploadUrl}
           beforeUpload={beforeUpload}
           onChange={this.handleChange}
