@@ -1,4 +1,4 @@
-import { Form, Button, Spin, Badge, Modal, message } from 'antd';
+import { Form, Button, Spin, Badge, Modal, message, Empty } from 'antd';
 import React, { Component } from 'react';
 
 import router from 'umi/router';
@@ -87,12 +87,10 @@ class CustomerEdit extends Component {
     const {
       params: { id },
     } = match;
-    const {
-      query: { type },
-    } = location;
+    const { query } = location;
     dispatch({
       type: 'bpEdit/readBPDetails',
-      payload: { id, type },
+      payload: { id, ...query },
     });
   };
 
@@ -148,6 +146,9 @@ class CustomerEdit extends Component {
   onTabChange = async tabActiveKey => {
     const self = this;
     let result;
+
+    const { pageLoading } = this.props;
+    if (pageLoading) return;
 
     if (tabActiveKey === 'customer') {
       result = await this.validateVendor();
@@ -639,7 +640,7 @@ class CustomerEdit extends Component {
   };
 
   render() {
-    const { width, tabActiveKey } = this.state;
+    const { width, tabActiveKey, editType } = this.state;
     const { pageLoading } = this.props;
     const customerTab = this.renderCustomerTab();
     const vendorTab = this.renderVendorTab();
@@ -662,13 +663,19 @@ class CustomerEdit extends Component {
         ]}
       >
         <Spin spinning={pageLoading}>
-          <div style={{ paddingBottom: 50 }}>{this.renderContent()}</div>
-          <FooterToolbar style={{ width }}>
-            <Button>取消</Button>
-            <Button type="primary" onClick={this.validate}>
-              提交
-            </Button>
-          </FooterToolbar>
+          {editType === 'update' && pageLoading ? (
+            <Empty style={{ padding: 300, background: '#fff' }} description="loading..."></Empty>
+          ) : (
+            <>
+              <div style={{ paddingBottom: 50 }}>{this.renderContent()}</div>
+              <FooterToolbar style={{ width }}>
+                <Button>取消</Button>
+                <Button type="primary" onClick={this.validate}>
+                  提交
+                </Button>
+              </FooterToolbar>
+            </>
+          )}
         </Spin>
       </PageHeaderWrapper>
     );

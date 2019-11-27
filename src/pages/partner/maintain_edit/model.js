@@ -33,14 +33,22 @@ const SeqModel = {
     // 根据参数，获取BP详细数据
     *readBPDetails({ payload }, { call, put }) {
       try {
-        const { id } = payload;
-        console.log(payload);
-        // 客户数据
-        const customer = yield call(bp.getBPCustomer, id);
-        // 供应商数据
-        const vendor = yield call(bp.getBPVendor, id);
+        const { id, ...query } = payload;
+        const { customerDataStatus, vendorDataStatus } = query;
+        let details = JSON.parse(JSON.stringify(initDetails));
 
-        const details = { ...{ details: initDetails }, ...customer, ...vendor };
+        // 客户
+        if (customerDataStatus === '1') {
+          const customer = yield call(bp.getBPCustomer, id);
+          details = { ...details, ...customer };
+        }
+
+        // 供应商
+        if (vendorDataStatus === '1') {
+          const vendor = yield call(bp.getBPVendor, id);
+          details = { ...details, ...vendor };
+        }
+
         console.log(details);
 
         yield put({
@@ -65,7 +73,8 @@ const SeqModel = {
     },
     // 新增BP时初始化数据结构
     addInitDetails(state) {
-      return { ...state, details: initDetails };
+      const details = JSON.parse(JSON.stringify(initDetails));
+      return { ...state, details };
     },
   },
 };
