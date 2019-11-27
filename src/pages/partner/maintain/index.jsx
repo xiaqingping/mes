@@ -364,7 +364,6 @@ constructor(props) {
     });
   };
 
-
   /** 完整筛选条件 */
   renderAdvancedForm() {
     const {
@@ -372,8 +371,6 @@ constructor(props) {
       regionOffice,
     } = this.props;
     const { xiaoshuoguishu } = this.state;
-
-
     return (
       <Form onSubmit={this.handleSearch} layout="inline">
         <Row gutter={{ xxl: 100, lg: 80 }}>

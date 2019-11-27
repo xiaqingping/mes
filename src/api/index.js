@@ -28,6 +28,7 @@ import system from './system';
 import serial from './serial';
 import bp from './bp';
 import employees from './employees'
+import disk from './disk'
 
 export default {
   area,
@@ -60,6 +61,7 @@ export default {
   serial,
   bp,
   employees,
+  disk,
 };
 
 export {
@@ -93,4 +95,5 @@ export {
   serial,
   bp,
   employees,
+  disk,
 };

@@ -23,7 +23,6 @@ import { connect } from 'dva';
 import { TelphoneInput } from '@/components/CustomizedFormControls';
 import api from '@/api';
 import './index.less';
-import disk from '@/api/disk';
 import { guid } from '@/utils/utils';
 import PersonCertificationAddModal from
 '@/pages/partner/maintain_details/components/PersonCertificationAddModal';
@@ -269,6 +268,9 @@ class AddressGroup extends Component {
 class ChangeModal extends Component {
     constructor (props) {
       super(props);
+      // 生成guid和上传地址
+      const newGuid = guid()
+      const uploadUrl = api.disk.uploadMoreFiles('bp_organization_certification', newGuid);
       this.state = {
         changeModal: false,
         recordMsg: undefined,
@@ -286,6 +288,8 @@ class ChangeModal extends Component {
         addModalVisible: false,
         area: [],
         address: '',
+        newGuid,
+        uploadUrl,
       }
     }
 
@@ -310,9 +314,8 @@ class ChangeModal extends Component {
           api.bp.getBPOrgCertification(recordMsg.id).then(res => {
             this.setState({
               userData: res,
-              specialInvoice: res.organizationCertification
-              ? parseInt(res.organizationCertification.specialInvoice)
-              === 1 : false,
+              specialInvoice: res.organizationCertification ?
+              parseInt(res.organizationCertification.specialInvoice) === 1 : false,
             })
           })
         }
@@ -333,7 +336,7 @@ class ChangeModal extends Component {
         data = {
           basic: {
             id: recordMsg.id,
-            name: row.msg.name,
+            name: row.msg ? row.msg.name : '',
             countryCode: area[0] ? area[0].code : '',
             provinceCode: area[1] ? area[1].code : '',
             cityCode: area[2] ? area[2].code : '',
@@ -353,7 +356,7 @@ class ChangeModal extends Component {
             bankAccount: row.bankAccount,
             address: row.regisAddress,
             notes: row.notes,
-            attachmentList: row.idenImg,
+            attachmentCode: row.attachmentCode,
           },
         }
         api.bp.updateBPOrgCertification(data).then(res => {
@@ -392,16 +395,15 @@ class ChangeModal extends Component {
     /** 上传图片 */
     handleChange = info => {
       // const data = [];
-      console.log(info)
+      const { newGuid } = this.state;
       if (info.file.status === 'uploading') {
         this.setState({ loading: true });
         return;
       }
       if (info.file.status === 'done') {
         // Get this url from response in real world.
-        getBase64(info.file.originFileObj, imageUrl =>
+        getBase64(info.file.originFileObj, () =>
           this.setState({
-            imageUrl,
             loading: false,
           }),
         );
@@ -415,11 +417,7 @@ class ChangeModal extends Component {
           // });
           // eslint-disable-next-line consistent-return
           this.props.form.setFieldsValue({
-            idenImg: {
-              code: (info.file.response && info.file.response[0]) || '',
-              name: info.file.name,
-              type: info.file.type,
-            },
+            attachmentCode: newGuid,
           })
         }
       }
@@ -710,6 +708,13 @@ class ChangeModal extends Component {
       });
     };
 
+    // 删除图片
+    removePic = e => {
+      if (e.response.length !== 0) {
+        api.disk.deleteFiles(e.response[0]).then()
+      }
+    }
+
     // handleAdd = data => {
     //   // const { details, piCertification } = this.props;
     //   const attachmentList = data.attachmentList.map(e => ({
@@ -736,13 +741,18 @@ class ChangeModal extends Component {
     // };
 
     render () {
-      const { changeModal, recordMsg, userData,
-        submitNext, specialInvoice, addModalVisible } = this.state;
+      const {
+        changeModal,
+        recordMsg,
+        userData,
+        submitNext,
+        specialInvoice,
+        addModalVisible,
+        uploadUrl,
+      } = this.state;
       const { piCertificationList } = userData;
       const { basic } = userData;
       const nullData = {};
-      const uploadUrl = disk.uploadFiles('bp_organization_certification', guid());
-      console.log(uploadUrl)
       let modelWidth = 970;
       if (!basic) return null;
       // const { form, getValues, closeModal } = this.props;
@@ -751,7 +761,6 @@ class ChangeModal extends Component {
       const { getFieldDecorator } = form;
       const { TextArea } = Input;
       let modelContent;
-      const { imageUrl } = this.state;
       const uploadButton = (
         <div>
           <Icon type={this.state.loading ? 'loading' : 'plus'} />
@@ -770,8 +779,9 @@ class ChangeModal extends Component {
           onChange={this.handleChange}
           headers={{ Authorization: this.props.authorization }}
           accept=".jpg"
+          onRemove={e => { this.removePic(e) }}
         >
-          {imageUrl ? <img src={imageUrl} alt="avatar" width="80" height="80" /> : uploadButton}
+          {uploadButton}
         </Upload>
         <div style={{
           color: '#ADADAD',
@@ -936,7 +946,7 @@ class ChangeModal extends Component {
               </Col>
               <Col lg={24} md={12} sm={12}>
               <Form.Item label="认证图片" labelCol={{ span: 4 }} wrapperCol={{ span: 20 }}>
-                {getFieldDecorator('idenImg')(uploadModal)}
+                {getFieldDecorator('attachmentCode')(uploadModal)}
                </Form.Item>
               </Col>
               <Divider style={{ margin: 0 }}/>
