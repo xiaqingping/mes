@@ -153,9 +153,10 @@ export const readDetails = {
     bankAccount: '60045612378',
     address: '注册地址',
     notes: '这是一段认证说明',
-    attachmentList: [
-      { code: 'https://blog.maxmeng.top/images/avatar.jpg', name: '照片', type: 'image' },
-    ],
+    attachmentCode: '',
+    // attachmentList: [
+    //   { code: 'https://blog.maxmeng.top/images/avatar.jpg', name: '照片', type: 'image' },
+    // ],
   },
   // 负责人认证
   piCertificationList: [
@@ -167,9 +168,10 @@ export const readDetails = {
       billToPartyCode: 12345,
       billToPartyName: '上海交通大学',
       notes: '这是一段认证说明',
-      attachmentList: [
-        { code: 'https://blog.maxmeng.top/images/avatar.jpg', name: '照片', type: 'image' },
-      ],
+      attachmentCode: '',
+      // attachmentList: [
+      //   { code: 'https://blog.maxmeng.top/images/avatar.jpg', name: '照片', type: 'image' },
+      // ],
     },
   ],
   // 信贷数据（查询接口返回此数据，新增和修改接口无法直接修改）
@@ -302,7 +304,7 @@ export const addDetails = {
     bankAccount: '60045612378',
     address: '注册地址',
     notes: '这是一段认证说明',
-    attachmentList: 'uuid',
+    attachmentCode: 'uuid',
   },
   // 负责人认证
   piCertificationList: [
@@ -310,7 +312,7 @@ export const addDetails = {
       id: -1,
       billToPartyId: 123,
       notes: '这是一段认证说明',
-      attachmentList: 'uuid',
+      attachmentCode: 'uuid',
     },
   ],
 };
@@ -364,8 +366,8 @@ export const updateDetails = {
         newShipToPartyIdList: [123],
         deleteShipToPartyIdList: [123],
         // 销售员
-        newsalerCodeList: ['123'],
-        deletesalerCodeList: ['123'],
+        newSalerCodeList: ['123'],
+        deleteSalerCodeList: ['123'],
       },
     ],
     // 地址

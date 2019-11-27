@@ -1,3 +1,6 @@
+/**
+ * 供应商 采购组织
+ */
 import {
   Card,
   Col,
@@ -10,10 +13,11 @@ import {
   Empty,
   Icon,
   Cascader,
+  message,
 } from 'antd';
-
 import { connect } from 'dva';
 import React from 'react';
+import { validateForm } from '@/utils/utils';
 import { MobilePhoneInput } from '@/components/CustomizedFormControls';
 
 const FormItem = Form.Item;
@@ -240,15 +244,36 @@ class PurchasingOrg extends React.Component {
     });
   };
 
-  onTabChange = tabKey => {
+  onTabChange = async tabKey => {
     if (tabKey === 'select') return;
+
+    // 检查当前正在编辑的数据是否验证通过
+    const viewform = this.childrenForm;
+    if (viewform) {
+      const result = await validateForm(viewform);
+      if (!result[0]) {
+        message.error('销售范围数据不完整');
+        return;
+      }
+    }
+
     this.setState({ tabKey });
   };
 
   // 级联选泽采购组织时
-  onCascaderChange = obj => {
+  onCascaderChange = async obj => {
     const { details, vendor, purchaseOrganizationList: tabsData } = this.props;
     const index = obj.length - 1;
+
+    // 检查当前正在编辑的数据是否验证通过
+    const viewform = this.childrenForm;
+    if (viewform) {
+      const result = await validateForm(viewform);
+      if (!result[0]) {
+        message.error('销售范围数据不完整');
+        return;
+      }
+    }
 
     const newPurchaseOrganizationList = [].concat(tabsData, {
       purchasingOrganizationCode: obj[index],

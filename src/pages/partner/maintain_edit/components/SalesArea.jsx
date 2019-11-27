@@ -1,7 +1,24 @@
-import { Form, Row, Col, Select, Switch, Radio, Tabs, Card, Cascader, Icon, Empty } from 'antd';
+/**
+ * 客户 销售范围
+ */
+import {
+  Form,
+  Row,
+  Col,
+  Select,
+  Switch,
+  Radio,
+  Tabs,
+  Card,
+  Cascader,
+  Icon,
+  Empty,
+  message,
+} from 'antd';
 import React from 'react';
 import { connect } from 'dva';
 import debounce from 'lodash/debounce';
+import { validateForm } from '@/utils/utils';
 import BillToParty from './BillToParty';
 import SoldToParty from './SoldToParty';
 import ShipToParty from './ShipToParty';
@@ -179,6 +196,7 @@ class FormContent extends React.Component {
     }
 
     // BP数据
+    const { editType } = bpEdit;
     const details = bpEdit.details || {};
     const basicInfo = details.basic || {};
     const customer = details.customer || {};
@@ -193,6 +211,7 @@ class FormContent extends React.Component {
     const distributionChannels = basicCache.distributionChannels.filter(byLangFilter);
 
     return {
+      editType,
       details,
       basicInfo,
       customer,
@@ -211,12 +230,16 @@ class SalesArea extends React.Component {
     super(props);
     const { salesAreaList: tabsData } = this.props;
 
+    let tabKey = '';
+    if (tabsData && tabsData[0]) {
+      tabKey = `${tabsData[0].salesOrganizationCode}-${tabsData[0].distributionChannelCode}`;
+    }
+
     this.state = {
-      tabKey:
-        (tabsData &&
-          tabsData[0] &&
-          `${tabsData[0].salesOrganizationCode}-${tabsData[0].distributionChannelCode}`) ||
-        '',
+      // 销售范围TabKey
+      tabKey,
+      // 销售范围下面表格TabKey
+      tableTabKey: 'BillToParty',
     };
   }
 
@@ -258,17 +281,44 @@ class SalesArea extends React.Component {
     });
   };
 
-  onTabChange = tabKey => {
+  onTabChange = async tabKey => {
     if (tabKey === 'select') return;
+
+    // 检查当前正在编辑的数据是否验证通过
+    const viewform = this.childrenForm;
+    if (viewform) {
+      const result = await validateForm(viewform);
+      if (!result[0]) {
+        message.error('销售范围数据不完整');
+        return;
+      }
+    }
+
     this.setState({ tabKey });
   };
 
+  onTabelTabChange = activeKey => {
+    // TODO: 这里要验证表格数据
+    this.setState({ tableTabKey: activeKey });
+  };
+
   // 级联选泽销售范围时
-  onCascaderChange = arr => {
+  onCascaderChange = async arr => {
+    console.log(arr);
     const { salesArea } = this.formatSalesArea();
     const [salesOrganizationCode, distributionChannelCode] = arr;
     const { details, customer, salesAreaList: tabsData } = this.props;
     const tabKey = `${salesOrganizationCode}-${distributionChannelCode}`;
+
+    // 检查当前正在编辑的数据是否验证通过
+    const viewform = this.childrenForm;
+    if (viewform) {
+      const result = await validateForm(viewform);
+      if (!result[0]) {
+        message.error('销售范围数据不完整');
+        return;
+      }
+    }
 
     // 新增的数据，最多可以一次新增两条，当同一个销售组织下，同时存在直销[10]和电商[20]两个销售渠道时
     // 新增一个时，会把另一个也新增进去
@@ -279,6 +329,8 @@ class SalesArea extends React.Component {
           e1.children.forEach(e2 => {
             if (e2.value === '10' || e2.value === '20') {
               addArr.push({
+                // theNew 存在代表是新增数据
+                theNew: true,
                 salesOrganizationCode: e1.value,
                 distributionChannelCode: e2.value,
               });
@@ -287,7 +339,14 @@ class SalesArea extends React.Component {
         }
       });
     }
-    if (addArr.length !== 2) addArr.push({ salesOrganizationCode, distributionChannelCode });
+    if (addArr.length !== 2) {
+      addArr.push({
+        // theNew 存在代表是新增数据
+        theNew: true,
+        salesOrganizationCode,
+        distributionChannelCode,
+      });
+    }
 
     const newSalesAreaList = [].concat(tabsData, ...addArr);
     const newCustomer = { ...customer, ...{ salesAreaList: newSalesAreaList } };
@@ -375,9 +434,19 @@ class SalesArea extends React.Component {
     let key = '';
     const { details, customer, salesAreaList: tabsData } = this.props;
 
+    // 如果本次修改的是直销[10]或电商[20]，则生成另一个对应的key，两个tab应该一起删除
+    let matchKey;
+    const arr = ['10', '20'];
+    const codeIndex = arr.indexOf(tabKey.split('-')[1]);
+    if (codeIndex !== -1) {
+      arr.splice(codeIndex, 1);
+      matchKey = `${tabKey.split('-')[0]}-${arr[0]}`;
+    }
+
     // 过滤掉关闭的采购组织
     const newTabsData = tabsData.filter((e, i) => {
-      if (`${e.salesOrganizationCode}-${e.distributionChannelCode}` !== tabKey) return true;
+      const thisTabKey = `${e.salesOrganizationCode}-${e.distributionChannelCode}`;
+      if (thisTabKey !== tabKey && thisTabKey !== matchKey) return true;
       index = i;
       return false;
     });
@@ -418,8 +487,9 @@ class SalesArea extends React.Component {
   };
 
   render() {
-    const { salesAreaList: tabsData } = this.props;
+    const { salesAreaList: tabsData, editType } = this.props;
     let { tabKey } = this.state;
+    const { tableTabKey } = this.state;
     const { salesArea, salesOrganizationsMap, distributionChannelsMap } = this.formatSalesArea();
 
     // 如有有数据，但没有选中，则默认选中第一条
@@ -439,6 +509,11 @@ class SalesArea extends React.Component {
       tab: this.renderCascader(salesArea),
     });
     tabList.forEach(e => {
+      // TODO: 修改时无法删除已有的销售范围
+      if (editType === 'update') {
+        // return;
+      }
+
       if (e.key === tabKey) {
         e.tab = (
           <>
@@ -478,7 +553,11 @@ class SalesArea extends React.Component {
                   tabKey={tabKey}
                   data={e}
                 />
-                <Tabs className={styles.internalTab}>
+                <Tabs
+                  className={styles.internalTab}
+                  onChange={this.onTabelTabChange}
+                  activeKey={tableTabKey}
+                >
                   <TabPane tab="收票方" key="BillToParty">
                     <BillToParty
                       tableData={e.billToPartyList || []}

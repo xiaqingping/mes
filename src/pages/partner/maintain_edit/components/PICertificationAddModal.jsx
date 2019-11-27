@@ -1,3 +1,6 @@
+/**
+ * PI认证 新增模态框
+ */
 import { Form, Input, Upload, Icon } from 'antd';
 import React from 'react';
 import { connect } from 'dva';

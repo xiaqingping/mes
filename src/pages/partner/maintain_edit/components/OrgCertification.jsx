@@ -1,3 +1,6 @@
+/**
+ * 组织认证编辑
+ */
 import { Card, Row, Col, Form, Input, Switch, Upload, Icon, Badge, Select, Spin } from 'antd';
 import React, { Component } from 'react';
 import { connect } from 'dva';

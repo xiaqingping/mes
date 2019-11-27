@@ -1,3 +1,6 @@
+/**
+ * 供应商 付款银行
+ */
 import { Card, Col, Form, Input, Row, Select, Spin } from 'antd';
 import React, { Component } from 'react';
 import { connect } from 'dva';
