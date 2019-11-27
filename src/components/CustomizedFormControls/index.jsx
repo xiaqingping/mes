@@ -1,10 +1,4 @@
-import {
-  Icon,
-  Input,
-  Select,
-  Cascader,
-  AutoComplete,
-} from 'antd';
+import { Icon, Input, Select, Cascader, AutoComplete } from 'antd';
 import React from 'react';
 import { connect } from 'dva';
 
@@ -35,11 +29,7 @@ export class EmailInput extends React.Component {
   valueChange = changedValue => {
     const { onChange } = this.props;
     let dataSource = [];
-    const suffix = [
-      'qq.com',
-      'gmail.com',
-      '163.com',
-    ];
+    const suffix = ['qq.com', 'gmail.com', '163.com'];
 
     if (!changedValue.email || changedValue.email.indexOf('@') >= 0) {
       dataSource = [];
@@ -105,11 +95,23 @@ export class NameInput extends React.Component {
     const { type, name } = this.state;
     return (
       <InputGroup compact>
-        <Select value={type} style={{ width: '40%' }} onChange={val => this.valueChange({ type: val })}>
-          <Option value={1}><Icon type="user" /> 个人</Option>
-          <Option value={2}><Icon type="home" /> 组织</Option>
+        <Select
+          value={type}
+          style={{ width: '40%' }}
+          onChange={val => this.valueChange({ type: val })}
+        >
+          <Option value={1}>
+            <Icon type="user" /> 个人
+          </Option>
+          <Option value={2}>
+            <Icon type="home" /> 组织
+          </Option>
         </Select>
-        <Input value={name} style={{ width: '60%' }} onChange={e => this.valueChange({ name: e.target.value })} />
+        <Input
+          value={name}
+          style={{ width: '60%' }}
+          onChange={e => this.valueChange({ name: e.target.value })}
+        />
       </InputGroup>
     );
   }
@@ -161,19 +163,23 @@ export class MobilePhoneInput extends React.Component {
           showSearch
           filterOption={(input, option) => option.props.children[1].indexOf(input) >= 0}
         >
-          {
-            countryDiallingCodes.map(e => (
-              <Option
-                key={e.countryCode}
-                value={e.countryCode}
+          {countryDiallingCodes.map(e => (
+            <Option key={e.countryCode} value={e.countryCode}>
+              <div
+                className="select-countryPic-box"
+                style={{ backgroundImage: `url(/images/country/${e.countryCode}.png)` }}
               >
-                <div className="select-countryPic-box" style={{ backgroundImage: `url(/images/country/${e.countryCode}.png)` }}>&nbsp;</div>
-                {`+${e.diallingCode}`}
-              </Option>
-            ))
-          }
+                &nbsp;
+              </div>
+              {`+${e.diallingCode}`}
+            </Option>
+          ))}
         </Select>
-        <Input value={mobilePhone} style={{ width: '60%' }} onChange={e => this.valueChange({ mobilePhone: e.target.value })} />
+        <Input
+          value={mobilePhone}
+          style={{ width: '60%' }}
+          onChange={e => this.valueChange({ mobilePhone: e.target.value })}
+        />
       </InputGroup>
     );
   }
@@ -226,21 +232,33 @@ export class TelphoneInput extends React.Component {
           showSearch
           filterOption={(input, option) => option.props.children[1].indexOf(input) >= 0}
         >
-          {
-            countryDiallingCodes.map(e => (
-              <Option
-                key={e.countryCode}
-                value={e.countryCode}
+          {countryDiallingCodes.map(e => (
+            <Option key={e.countryCode} value={e.countryCode}>
+              <div
+                className="select-countryPic-box"
+                style={{ backgroundImage: `url(/images/country/${e.countryCode}.png)` }}
               >
-                <div className="select-countryPic-box" style={{ backgroundImage: `url(/images/country/${e.countryCode}.png)` }}>&nbsp;</div>
-                {`+${e.diallingCode}`}
-              </Option>
-            ))
-          }
+                &nbsp;
+              </div>
+              {`+${e.diallingCode}`}
+            </Option>
+          ))}
         </Select>
-        <Input value={telephoneAreaCode} style={{ width: '20%' }} onChange={e => this.valueChange({ telephoneAreaCode: e.target.value })}/>
-        <Input value={telephone} style={{ width: '30%' }} onChange={e => this.valueChange({ telephone: e.target.value })}/>
-        <Input value={telephoneExtension} style={{ width: '20%' }} onChange={e => this.valueChange({ telephoneExtension: e.target.value })}/>
+        <Input
+          value={telephoneAreaCode}
+          style={{ width: '20%' }}
+          onChange={e => this.valueChange({ telephoneAreaCode: e.target.value })}
+        />
+        <Input
+          value={telephone}
+          style={{ width: '30%' }}
+          onChange={e => this.valueChange({ telephone: e.target.value })}
+        />
+        <Input
+          value={telephoneExtension}
+          style={{ width: '20%' }}
+          onChange={e => this.valueChange({ telephoneExtension: e.target.value })}
+        />
       </InputGroup>
     );
   }
@@ -293,21 +311,33 @@ export class FaxInput extends React.Component {
           showSearch
           filterOption={(input, option) => option.props.children[1].indexOf(input) >= 0}
         >
-          {
-            countryDiallingCodes.map(e => (
-              <Option
-                key={e.countryCode}
-                value={e.countryCode}
+          {countryDiallingCodes.map(e => (
+            <Option key={e.countryCode} value={e.countryCode}>
+              <div
+                className="select-countryPic-box"
+                style={{ backgroundImage: `url(/images/country/${e.countryCode}.png)` }}
               >
-                <div className="select-countryPic-box" style={{ backgroundImage: `url(/images/country/${e.countryCode}.png)` }}>&nbsp;</div>
-                {`+${e.diallingCode}`}
-              </Option>
-            ))
-          }
+                &nbsp;
+              </div>
+              {`+${e.diallingCode}`}
+            </Option>
+          ))}
         </Select>
-        <Input value={faxAreaCode} style={{ width: '20%' }} onChange={e => this.valueChange({ faxAreaCode: e.target.value })}/>
-        <Input value={fax} style={{ width: '30%' }} onChange={e => this.valueChange({ fax: e.target.value })}/>
-        <Input value={faxExtension} style={{ width: '20%' }} onChange={e => this.valueChange({ faxExtension: e.target.value })}/>
+        <Input
+          value={faxAreaCode}
+          style={{ width: '20%' }}
+          onChange={e => this.valueChange({ faxAreaCode: e.target.value })}
+        />
+        <Input
+          value={fax}
+          style={{ width: '30%' }}
+          onChange={e => this.valueChange({ fax: e.target.value })}
+        />
+        <Input
+          value={faxExtension}
+          style={{ width: '20%' }}
+          onChange={e => this.valueChange({ faxExtension: e.target.value })}
+        />
       </InputGroup>
     );
   }
@@ -320,9 +350,9 @@ export class FaxInput extends React.Component {
 })
 export class AddressInput extends React.Component {
   static getDerivedStateFromProps(nextProps, preState) {
-    const countrys = (
-      (preState.countrys && preState.countrys.length > 0 && preState.countrys)
-      || nextProps.countrys);
+    const countrys =
+      (preState.countrys && preState.countrys.length > 0 && preState.countrys) ||
+      nextProps.countrys;
     const { changedValue } = preState;
 
     if ('value' in nextProps) {
@@ -370,7 +400,7 @@ export class AddressInput extends React.Component {
     if (onChange) {
       onChange({
         ...otherState,
-        changedValue,
+        // changedValue,
         ...obj,
       });
     }
@@ -389,17 +419,10 @@ export class AddressInput extends React.Component {
         countrys: [...this.state.countrys],
       });
     });
-  }
+  };
 
   render() {
-    const {
-      address,
-      countryCode,
-      provinceCode,
-      cityCode,
-      countyCode,
-      streetCode,
-    } = this.state;
+    const { address, countryCode, provinceCode, cityCode, countyCode, streetCode } = this.state;
     const cascader = [countryCode, provinceCode, cityCode, countyCode, streetCode];
     return (
       <InputGroup compact>
@@ -412,7 +435,11 @@ export class AddressInput extends React.Component {
           onChange={(value, option) => this.valueChange({ cascader: value, option })}
           changeOnSelect
         />
-        <Input value={address} style={{ width: '60%' }} onChange={e => this.valueChange({ address: e.target.value })} />
+        <Input
+          value={address}
+          style={{ width: '60%' }}
+          onChange={e => this.valueChange({ address: e.target.value })}
+        />
       </InputGroup>
     );
   }

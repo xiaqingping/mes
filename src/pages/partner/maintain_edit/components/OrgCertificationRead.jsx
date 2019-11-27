@@ -2,10 +2,10 @@
  * 组织认证查看
  */
 import React from 'react';
-import { Card, Descriptions } from 'antd';
+import { Form, Card, Row, Col, Badge } from 'antd';
 import { connect } from 'dva';
 
-const { DescriptionsItem } = Descriptions;
+const FormItem = Form.Item;
 
 @connect(({ bpEdit }) => {
   const details = bpEdit.details || {};
@@ -18,26 +18,92 @@ const { DescriptionsItem } = Descriptions;
 class OrgCertificationRead extends React.Component {
   renderChina = () => {
     const { organizationCertification: data } = this.props;
+    console.log(data);
     return (
-      <Descriptions className="s-descriptions" layout="vertical" column={4}>
-        <DescriptionsItem label="额度">{data.credit}</DescriptionsItem>
-        <DescriptionsItem label="临时额度">{data.tempCreditLimit}</DescriptionsItem>
-        <DescriptionsItem label="付款周期">{data.billingCycle}</DescriptionsItem>
-        <DescriptionsItem label="账单间隔">{data.billingDay}</DescriptionsItem>
-      </Descriptions>
+      <>
+        <Row gutter={32}>
+          <Col xxl={15} lg={24}>
+            <Row gutter={32}>
+              <Col span={8}>
+                <FormItem label="认证状态">
+                  <Badge status="default" />
+                  未认证
+                </FormItem>
+              </Col>
+              <Col span={8}>
+                <FormItem label="增值税专用发票资质"></FormItem>
+              </Col>
+              <Col span={8}>
+                <FormItem label="统一社会信用代码"></FormItem>
+              </Col>
+              <Col span={8}>
+                <FormItem label="基本户开户银行"></FormItem>
+              </Col>
+              <Col span={8}>
+                <FormItem label="基本户开户账号"></FormItem>
+              </Col>
+              <Col span={8}>
+                <FormItem label="电话"></FormItem>
+              </Col>
+              <Col span={24}>
+                <FormItem label="注册地址"></FormItem>
+              </Col>
+            </Row>
+          </Col>
+          <Col xxl={9} lg={24}>
+            <FormItem label="认证说明"></FormItem>
+          </Col>
+        </Row>
+        <Row>
+          <Col>认证图片</Col>
+        </Row>
+      </>
     );
   };
 
   renderOther = countryCode => {
     console.log(countryCode);
     const { organizationCertification: data } = this.props;
+    console.log(data);
     return (
-      <Descriptions className="s-descriptions" layout="vertical" column={4}>
-        <DescriptionsItem label="额度">{data.credit}</DescriptionsItem>
-        <DescriptionsItem label="临时额度">{data.tempCreditLimit}</DescriptionsItem>
-        <DescriptionsItem label="付款周期">{data.billingCycle}</DescriptionsItem>
-        <DescriptionsItem label="账单间隔">{data.billingDay}</DescriptionsItem>
-      </Descriptions>
+      <>
+        <Row gutter={32}>
+          <Col xxl={15} lg={24}>
+            <Row gutter={32}>
+              <Col span={8}>
+                <FormItem label="认证状态">
+                  <Badge status="default" />
+                  未认证
+                </FormItem>
+              </Col>
+              <Col span={8}>
+                <FormItem label="增值税专用发票资质"></FormItem>
+              </Col>
+              <Col span={8}>
+                <FormItem label="统一社会信用代码"></FormItem>
+              </Col>
+              <Col span={8}>
+                <FormItem label="基本户开户银行"></FormItem>
+              </Col>
+              <Col span={8}>
+                <FormItem label="基本户开户账号"></FormItem>
+              </Col>
+              <Col span={8}>
+                <FormItem label="电话"></FormItem>
+              </Col>
+              <Col span={24}>
+                <FormItem label="注册地址"></FormItem>
+              </Col>
+            </Row>
+          </Col>
+          <Col xxl={9} lg={24}>
+            <FormItem label="认证说明"></FormItem>
+          </Col>
+        </Row>
+        <Row>
+          <Col>认证图片</Col>
+        </Row>
+      </>
     );
   };
 

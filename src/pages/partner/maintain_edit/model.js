@@ -49,6 +49,9 @@ const SeqModel = {
           details = { ...details, ...vendor };
         }
 
+        // TODO: 默认类型为组织
+        // details.basic.type = 2;
+
         yield put({
           type: 'setState',
           payload: { type: 'details', data: JSON.parse(JSON.stringify(details)) },
