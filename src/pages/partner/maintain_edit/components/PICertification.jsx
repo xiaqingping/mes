@@ -1,3 +1,6 @@
+/**
+ * PI认证
+ */
 import { Button, Card, Icon, List, Typography, Divider, Badge, Modal } from 'antd';
 import React from 'react';
 import { connect } from 'dva';

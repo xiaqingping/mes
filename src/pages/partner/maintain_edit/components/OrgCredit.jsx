@@ -1,13 +1,11 @@
-import {
-  Card,
-  Descriptions,
-  Divider,
-} from 'antd';
+/**
+ * 组织信贷数据
+ */
+import { Card, Descriptions, Divider } from 'antd';
 import React, { Component } from 'react';
 import { connect } from 'dva';
 
 const DescriptionsItem = Descriptions.Item;
-
 
 @connect(({ bpEdit }) => ({
   details: bpEdit.details || {},
@@ -31,13 +29,13 @@ class OrgCredit extends Component {
           </>
         }
       >
-        <Descriptions
-          className="s-descriptions"
-          layout="vertical"
-          column={4}
-        >
-          <DescriptionsItem label="额度">{data.credit} {data.currencyCode} 1天后调整</DescriptionsItem>
-          <DescriptionsItem label="临时额度">{data.tempCreditLimit} {data.currencyCode} 25天后到期</DescriptionsItem>
+        <Descriptions className="s-descriptions" layout="vertical" column={4}>
+          <DescriptionsItem label="额度">
+            {data.credit} {data.currencyCode} 1天后调整
+          </DescriptionsItem>
+          <DescriptionsItem label="临时额度">
+            {data.tempCreditLimit} {data.currencyCode} 25天后到期
+          </DescriptionsItem>
           <DescriptionsItem label="付款周期">开票后{data.billingCycle}天到期</DescriptionsItem>
           <DescriptionsItem label="账单间隔">每月{data.billingDay}日开票</DescriptionsItem>
         </Descriptions>

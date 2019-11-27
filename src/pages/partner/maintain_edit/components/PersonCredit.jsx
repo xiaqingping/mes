@@ -1,3 +1,6 @@
+/**
+ * 个人信贷数据
+ */
 import { Card, Divider, List } from 'antd';
 import React from 'react';
 import { connect } from 'dva';

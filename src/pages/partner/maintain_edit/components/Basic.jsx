@@ -1,3 +1,6 @@
+/**
+ * 基础信息
+ */
 import { Icon, Col, Form, Input, Row, Select, Switch, Card } from 'antd';
 import React from 'react';
 import { connect } from 'dva';

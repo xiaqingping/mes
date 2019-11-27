@@ -65,13 +65,10 @@ export const guid = () => {
  * @param {String} key 新旧数据有相同的key，说明是同一条数据，需要深度对比，字段有无变更
  */
 export const diff = (pre, next, key = 'id') => {
-  // next中，key 为负值，则是新增数据
-  const add = [];
-  next.forEach(e => {
-    if (e[key] && e[key] < 0) {
-      add.push(e);
-    }
-  });
+  // 新增add 修改update 删除del 相同equal
+
+  // next 有，pre 没有的数据，则为新增数据
+  const add = _.differenceWith(next, pre, (n, p) => p[key] === n[key]);
 
   // 在next中，过滤掉add数据 = 已有数据未修改 + 已有数据修改
   const nextOther = _.differenceWith(next, add, _.isEqual);

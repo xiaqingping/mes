@@ -10,6 +10,7 @@ import Basic from './components/Basic';
 import SalesArea from './components/SalesArea';
 import OrgCredit from './components/OrgCredit';
 import OrgCertification from './components/OrgCertification';
+import OrgCertificationRead from './components/OrgCertificationRead';
 import PersonCredit from './components/PersonCredit';
 import PICertification from './components/PICertification';
 import Address from './components/Address';
@@ -89,10 +90,17 @@ class CustomerEdit extends Component {
     } = match;
     const { query } = location;
     const { customerDataStatus, vendorDataStatus } = query;
+
+    // 根据数据完整性，确定打开哪个Tab
+    let tabActiveKey = 'customer';
+    if (customerDataStatus === '2' && vendorDataStatus === '1') tabActiveKey = 'vendor';
+
     this.setState({
-      customerRequired: customerDataStatus,
-      vendorRequired: vendorDataStatus,
+      customerRequired: customerDataStatus === '1' ? 1 : 0,
+      vendorRequired: vendorDataStatus === '1' ? 1 : 0,
+      tabActiveKey,
     });
+
     dispatch({
       type: 'bpEdit/readBPDetails',
       payload: { id, ...query },
@@ -188,6 +196,9 @@ class CustomerEdit extends Component {
         });
         return;
       }
+      this.setState({
+        vendorRequired: 1,
+      });
     }
 
     if (tabActiveKey === 'vendor') {
@@ -223,6 +234,9 @@ class CustomerEdit extends Component {
         });
         return;
       }
+      this.setState({
+        customerRequired: 1,
+      });
     }
 
     this.setState({
@@ -266,7 +280,7 @@ class CustomerEdit extends Component {
       }
     }
 
-    // 收获地址
+    // 收获地址 TODO: 暂时注释掉
     if (!(validateResult === 2)) {
       if (addressList.length === 0) {
         message.error('缺少收获地址');
@@ -295,7 +309,6 @@ class CustomerEdit extends Component {
   validateVendor = async () => {
     const { details } = this.props;
     const { vendor } = details;
-    console.log(vendor);
     const { purchaseOrganizationList } = vendor;
 
     // 默认验证结果为：通过
@@ -461,8 +474,6 @@ class CustomerEdit extends Component {
       };
     }
 
-    console.log(newData);
-    // return;
     bp.addBP(newData).then(() => {
       message.success('新增业务伙伴成功');
       router.push('/partner/maintain');
@@ -472,48 +483,122 @@ class CustomerEdit extends Component {
   // 修改
   update = () => {
     const { oldDetails } = this.props;
-    // const { tabActiveKey, customerRequired, vendorRequired } = this.state;
-    const data = JSON.parse(JSON.stringify(this.props.details)) || {};
-    const customer = data.customer || {};
-    const salesAreaList = customer.salesAreaList || [];
+    const { tabActiveKey, customerRequired, vendorRequired } = this.state;
+    const details = JSON.parse(JSON.stringify(this.props.details));
+    const { basic, customer, vendor } = details;
+    const { salesAreaList, addressList, ...customerOther } = customer;
 
-    // TODO:
-    // 新增收票方
-    salesAreaList.newBillToPartyList = [];
-    salesAreaList.billToPartyList.forEach(e => {
-      if (e.id > 0) return;
-      salesAreaList.newBillToPartyList.push({ id: e.id, soldToPartyId: e.soldToPartyId });
+    console.log('旧数据');
+    console.log(oldDetails);
+
+    // 遍历销售范围 格式化数据
+    const oldSalesAreaList = oldDetails.customer.salesAreaList || [];
+    const newSalesAreaList = salesAreaList.map(item => {
+      const {
+        billToPartyList,
+        soldToPartyList,
+        shipToPartyList,
+        salerList,
+        theNew,
+        ...other
+      } = item;
+      const key = `${item.salesOrganizationCode}-${item.distributionChannelCode}`;
+
+      let oldBillToPartyList = [];
+      let oldSoldToPartyList = [];
+      let oldShipToPartyList = [];
+      let oldSalerList = [];
+      // rowkey 存在说明是新增销售范围
+      if (!theNew) {
+        const oldItem = oldSalesAreaList.filter(oldE => {
+          const oldKey = `${oldE.salesOrganizationCode}-${oldE.distributionChannelCode}`;
+          return oldKey === key;
+        })[0];
+        oldBillToPartyList = oldItem.billToPartyList;
+        oldSoldToPartyList = oldItem.soldToPartyList;
+        oldShipToPartyList = oldItem.shipToPartyList;
+        oldSalerList = oldItem.salerList;
+      }
+
+      // 收票方
+      const billToPartyDiff = diff(oldBillToPartyList, billToPartyList);
+      const newBillToPartyList = billToPartyDiff.add.map(e => ({
+        id: e.id,
+        soldToPartyId: e.soldToPartyId,
+      }));
+      const deleteBillToPartyList = billToPartyDiff.del.map(e => ({
+        id: e.id,
+        soldToPartyId: e.soldToPartyId,
+      }));
+
+      // 售达方
+      const soldToPartyDiff = diff(oldSoldToPartyList, soldToPartyList);
+      const newSoldToPartyIdList = soldToPartyDiff.add.map(e => e.id);
+      const deleteSoldToPartyIdList = soldToPartyDiff.del.map(e => e.id);
+
+      // 送达方
+      const shipToPartyDiff = diff(oldShipToPartyList, shipToPartyList);
+      const newShipToPartyIdList = shipToPartyDiff.add.map(e => e.id);
+      const deleteShipToPartyIdList = shipToPartyDiff.del.map(e => e.id);
+
+      // 销售员
+      const salerListDiff = diff(oldSalerList, salerList);
+      const newSalerCodeList = salerListDiff.add.map(e => e.code);
+      const deleteSalerCodeList = salerListDiff.del.map(e => e.code);
+
+      return {
+        ...other,
+        newBillToPartyList,
+        deleteBillToPartyList,
+        newSoldToPartyIdList,
+        deleteSoldToPartyIdList,
+        newShipToPartyIdList,
+        deleteShipToPartyIdList,
+        newSalerCodeList,
+        deleteSalerCodeList,
+      };
     });
-    // 删除收票方
-    salesAreaList.deleteBillToPartyList = [];
-
-    // 新增售达方
-    salesAreaList.newSoldToPartyIdList = [];
-    // 删除售达方
-    salesAreaList.deleteSoldToPartyIdList = [];
-
-    // 新增送达方
-    salesAreaList.newShipToPartyIdList = [];
-    // 删除送达方
-    salesAreaList.deleteShipToPartyIdList = [];
-
-    // 新增销售员
-    salesAreaList.newsalerCodeList = [];
-    // 删除销售员
-    salesAreaList.deletesalerCodeList = [];
 
     const preAddressList = oldDetails.customer.addressList;
     const nextAddressList = customer.addressList;
     const addressDiff = diff(preAddressList, nextAddressList);
     // 新增地址
-    customer.newAddressList = addressDiff.add;
+    const newAddressList = addressDiff.add;
     // 修改地址
-    customer.modifyAddressList = addressDiff.update;
+    const modifyAddressList = addressDiff.update;
     // 删除地址
-    customer.deleteAddressIdList = addressDiff.del;
+    const deleteAddressIdList = addressDiff.del.map(e => e.id);
 
+    // 新客户数据
+    const newCustomer = {
+      ...customerOther,
+      salesAreaList: newSalesAreaList,
+      newAddressList,
+      modifyAddressList,
+      deleteAddressIdList,
+    };
+
+    // 新供应商数据
+    const newVendor = {
+      ...vendor,
+    };
+
+    let newDetails = { basic };
+
+    // 客户数据必须 或者 客户数据必须没有设置并且当前Tab处于客户页
+    if (customerRequired === 1 || (customerRequired === 0 && tabActiveKey === 'customer')) {
+      newDetails = { ...newDetails, customer: newCustomer };
+    }
+    // 供应商数据必须 或者 供应商数据必须没有设置并且当前Tab处于供应商页
+    if (vendorRequired || (vendorRequired === 0 && tabActiveKey === 'vendor')) {
+      newDetails = { ...newDetails, vendor: newVendor };
+    }
+
+    console.log('发送数据');
+    console.log(newDetails);
     // return;
-    bp.updateBP(data).then(res => {
+
+    bp.updateBP(newDetails).then(res => {
       console.log(res);
       message.success('修改业务伙伴成功');
       router.push('/partner/maintain');
@@ -540,10 +625,14 @@ class CustomerEdit extends Component {
         {type === 2 ? (
           <>
             {editType === 'update' ? <OrgCredit /> : null}
-            <OrgCertification
-              // eslint-disable-next-line no-return-assign
-              wrappedComponentRef={ref => (this.orgCertificationView = ref)}
-            />
+            {editType === 'update' ? (
+              <OrgCertificationRead></OrgCertificationRead>
+            ) : (
+              <OrgCertification
+                // eslint-disable-next-line no-return-assign
+                wrappedComponentRef={ref => (this.orgCertificationView = ref)}
+              />
+            )}
           </>
         ) : null}
         {type === 1 ? (
@@ -580,10 +669,14 @@ class CustomerEdit extends Component {
         {type === 2 ? (
           <>
             {editType === 'update' ? <OrgCredit /> : null}
-            <OrgCertification
-              // eslint-disable-next-line no-return-assign
-              wrappedComponentRef={ref => (this.orgCertificationView = ref)}
-            />
+            {editType === 'update' ? (
+              <OrgCertificationRead></OrgCertificationRead>
+            ) : (
+              <OrgCertification
+                // eslint-disable-next-line no-return-assign
+                wrappedComponentRef={ref => (this.orgCertificationView = ref)}
+              />
+            )}
           </>
         ) : null}
       </>
@@ -618,9 +711,9 @@ class CustomerEdit extends Component {
   };
 
   renderCustomerTab = () => {
-    const { customerRequired } = this.state;
-    let color = 'default';
-    if (customerRequired === 1) color = 'error';
+    // const { customerRequired } = this.state;
+    const color = 'default';
+    // if (customerRequired === 1) color = 'error';
 
     return (
       <>
@@ -631,9 +724,9 @@ class CustomerEdit extends Component {
   };
 
   renderVendorTab = () => {
-    const { vendorRequired } = this.state;
-    let color = 'default';
-    if (vendorRequired === 1) color = 'error';
+    // const { vendorRequired } = this.state;
+    const color = 'default';
+    // if (vendorRequired === 1) color = 'error';
 
     return (
       <>
@@ -673,7 +766,7 @@ class CustomerEdit extends Component {
             <>
               <div style={{ paddingBottom: 50 }}>{this.renderContent()}</div>
               <FooterToolbar style={{ width }}>
-                <Button>取消</Button>
+                <Button onClick={() => router.push('/partner/maintain')}>取消</Button>
                 <Button type="primary" onClick={this.validate}>
                   提交
                 </Button>
