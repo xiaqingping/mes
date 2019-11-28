@@ -10,12 +10,19 @@ import {
   Select,
 } from 'antd';
 import React, { Component, Fragment } from 'react';
+import { connect } from 'dva';
 import './style.less'
+import api from '@/api';
 
 const { Option } = Select;
 const FormItem = Form.Item;
 const { TabPane } = Tabs;
 
+@connect(({ basicCache, partnerMaintainEdit }) => ({
+  countryDiallingCodes: basicCache.countryDiallingCodes,
+  details: partnerMaintainEdit.type === 'supplier' ?
+  partnerMaintainEdit.supplier : partnerMaintainEdit.details,
+}))
 class CheckEmail extends Component {
   state = {
     EmailVisible: false,
@@ -26,6 +33,7 @@ class CheckEmail extends Component {
     proceed: false,
     time: 60,
     btnText: 1,
+    verifyRecordId: null,
   };
 
   componentWillReceiveProps (nextProps) {
@@ -107,8 +115,20 @@ class CheckEmail extends Component {
         })
       }
       if (!err) {
-        this.setState({
-          status: 5,
+        const { details: { basic: { id } } } = this.props;
+        // 问题提交
+        api.bp.changeContactInfoAnswerVerify(
+          id,
+          {
+            type: 2,
+            answerList: [{ questionId: 1, answer: '2' },
+            { questionId: 2, answer: '4' },
+            { questionId: 3, answer: '9',
+          }] }).then(res => {
+          this.setState({
+            status: 5,
+            verifyRecordId: res.verifyRecordId,
+          })
         })
       }
     });
@@ -117,11 +137,16 @@ class CheckEmail extends Component {
   handleCode = e => {
     e.preventDefault();
     if (this.props.form.getFieldValue('code')) {
-      clearInterval(this.timer)
-      this.setState({
-        time: 60,
-        btnText: 1,
-        status: 6,
+      const { verifyRecordId } = this.state;
+      // 提交验证码
+      // eslint-disable-next-line max-len
+      api.bp.changeContactInfoNewEmailVerifyCodeVerificationVerify(verifyRecordId, this.props.form.getFieldValue('code')).then(() => {
+        clearInterval(this.timer)
+        this.setState({
+          time: 60,
+          btnText: 1,
+          status: 6,
+        })
       })
     }
   }
@@ -140,6 +165,11 @@ class CheckEmail extends Component {
       btnText: 3,
       time: 60,
     })
+    const { verifyRecordId } = this.state;
+
+    // 发送验证码
+    // eslint-disable-next-line max-len
+    api.bp.changeContactInfoNewEmailVerifyCodeSendingVerify(verifyRecordId, this.props.form.getFieldValue('userEmail'))
   }
 
   // 倒计时

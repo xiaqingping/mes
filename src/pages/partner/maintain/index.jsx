@@ -676,7 +676,7 @@ constructor(props) {
                 </Menu.Item> : <Menu.Item>
                   <a href="#" onClick={ e => { this.freezePartner(e, record) }}>冻结</a>
                 </Menu.Item>}
-              {record.certificationStatus === 4 ?
+              {record.certificationStatus === 4 || record.certificationStatus === 3 ?
                 <Menu.Item>
                   <a href="#" onClick={e => { this.cancelIdent(e, record) }}>取消认证</a>
                 </Menu.Item>
@@ -739,6 +739,7 @@ constructor(props) {
           onRef={ref => {
             this.showChange = ref;
           }}
+          getData={this.getTableData}
           getValues={this.getValues}
         />
       </PageHeaderWrapper>

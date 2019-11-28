@@ -7,6 +7,7 @@ import {
   Col,
   Empty,
   Button,
+  Icon,
 } from 'antd';
 import React from 'react';
 import { connect } from 'dva';
@@ -322,6 +323,7 @@ class CheckModel extends React.Component {
       clickType: '',
       showList: false,
       detailsValue: undefined,
+      pageVisble: false,
     }
   }
 
@@ -335,6 +337,12 @@ class CheckModel extends React.Component {
     // 组织认证
     if (clickType === 1) {
       api.bp.getOrgCertificationVerifyRecords(recordMsg.id).then(res => {
+        console.log(res)
+        if (res.attachmentCode) {
+          api.disk.getFiles({ sourceCode: res.attachmentCode }).then(v => {
+            console.log(v)
+          })
+        }
         this.setState({
           detailsValue: res,
         })
@@ -379,8 +387,12 @@ class CheckModel extends React.Component {
   }
 
   /** 控制模态框状态 */
-  setModal1Visible = modal1Visible => {
-    this.setState({ modal1Visible, detailsValue: undefined });
+  setModal1Visible = (modal1Visible, type = false) => {
+    if (type) {
+      this.setState({ pageVisble: false });
+    } else {
+      this.setState({ modal1Visible, detailsValue: undefined });
+    }
   }
 
 
@@ -408,12 +420,30 @@ class CheckModel extends React.Component {
     })
   }
 
+  openPage = (id, pageVisble) => {
+    if (pageVisble === 1) {
+      api.bp.approvalVerifyRecords(id).then(() => {
+        this.setState({
+          pageVisble,
+        })
+      })
+    }
+    if (pageVisble === 2) {
+      api.bp.refuseVerifyRecords(id).then(() => {
+        this.setState({
+          pageVisble,
+        })
+      })
+    }
+  }
+
   render () {
-    const { recordMsg, showList, detailsValue, clickType } = this.state;
+    const { recordMsg, showList, detailsValue, clickType, pageVisble } = this.state;
     const { SpecialInvoice } = this.props;
     if (!detailsValue) return null
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     let modalTitle;
-    // const changeData = [];
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     let modelContent;
     // const actionResent = <a onClick={e => { this.reSent(e) }}>重发</a>
     // const actionFinesh = <Badge status="success" text="已完成" />
@@ -557,9 +587,9 @@ class CheckModel extends React.Component {
         <ul className={styles.contenList}>
           <li>
             <Row>
-              <Col span={4} className={styles.labelName}>名称：</Col>
+              <Col span={8} className={styles.labelName}>名称：</Col>
               <Col
-                span={20}
+                span={16}
                 className={styles.labelVal}>
                   {detailsValue.bpName}
               </Col>
@@ -567,26 +597,26 @@ class CheckModel extends React.Component {
           </li>
           <li>
             <Row>
-              <Col span={4} className={styles.labelName}>收票方：</Col>
+              <Col span={8} className={styles.labelName}>收票方：</Col>
               <Col
-                span={20}
+                span={16}
                 className={styles.labelVal}>
-                  {detailsValue.invoicePartyName}
+                  {detailsValue.billToPartyName}
               </Col>
             </Row>
           </li>
           <li>
             <Row>
-              <Col span={4} className={styles.labelName}>认证说明：</Col>
-              <Col span={20} className={styles.labelVal}>{detailsValue.notes}</Col>
+              <Col span={8} className={styles.labelName}>认证说明：</Col>
+              <Col span={16} className={styles.labelVal}>{detailsValue.notes}</Col>
             </Row>
           </li>
           <li>
             <Row>
-              <Col span={4} className={styles.labelName}>附件：</Col>
+              <Col span={8} className={styles.labelName}>附件：</Col>
               {/* <Col span={20} className={styles.labelVal}>
               {piData.attachmentList[0].name}</Col> */}
-              <Col span={20} className={styles.labelVal}>
+              <Col span={16} className={styles.labelVal}>
                 <ul style={{ padding: '0' }}>
                   {detailsValue.attachmentList ? detailsValue.attachmentList.map((item, index) => (
                       // eslint-disable-next-line react/no-array-index-key
@@ -607,7 +637,7 @@ class CheckModel extends React.Component {
           </li>
           <li>
             <Row>
-              <Col span={6}>
+              <Col span={8}>
                 <a href="#" className={styles.recoedHis} onClick={this.recordList}>认证历史</a>
               </Col>
             </Row>
@@ -886,8 +916,43 @@ class CheckModel extends React.Component {
         </>
     }
 
+    // 审核通过页面
+    const passPage = <>
+      <Modal
+        width="500px"
+        centered
+        visible={pageVisble === 1}
+        footer={null}
+        onCancel={() => this.setModal1Visible(false, true)}
+      >
+        <div style={{ height: '180px', textAlign: 'center', paddingTop: '40px' }}>
+          <Icon type="check-circle" style={{ fontSize: '40px', color: '#54C31F' }}/>
+          <h4 style={{ fontWeight: '600', margin: '30px 0 20px' }}>您的验证记录已通过审核</h4>
+        </div>
+      </Modal>
+    </>
+
+    // 拒绝页面
+    const refusePage = <>
+    <Modal
+      width="500px"
+      centered
+      visible={pageVisble === 2}
+      footer={null}
+      onCancel={() => this.setModal1Visible(false, true)}
+    >
+      <div style={{ height: '180px', textAlign: 'center', paddingTop: '40px' }}>
+        <Icon type="close-circle" style={{ fontSize: '40px', color: 'red' }}/>
+        <h4 style={{ fontWeight: '600', margin: '30px 0 20px' }}>您的验证记录已被拒绝</h4>
+      </div>
+    </Modal>
+    </>
+
+    console.log(recordMsg)
     return (
       <div style={{ position: 'absolute', right: 0 }} >
+        {passPage}
+        {refusePage}
         <Modal
           className={styles.xxx}
           width="410px"
@@ -897,10 +962,10 @@ class CheckModel extends React.Component {
           onCancel={() => this.setModal1Visible(false)}
           destroyOnClose
           footer={clickType === 1 || clickType === 2 || clickType === 3 ? [
-            <Button key="back" onClick={() => this.setModal1Visible(false)}>
+            <Button key="back" onClick={() => this.openPage(recordMsg.id, 2)}>
               拒绝
             </Button>,
-            <Button key="submit" type="primary" onClick={() => this.setModal1Visible(false)}>
+            <Button key="submit" type="primary" onClick={() => this.openPage(recordMsg.id, 1)}>
               审核
             </Button>,
           ] : null}

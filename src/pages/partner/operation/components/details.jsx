@@ -6,26 +6,26 @@ import {
 } from 'antd';
 import * as React from 'react';
 import api from '@/api'
-import { formatMessage } from 'umi-plugin-react/locale';
+import { formatMessage } from 'umi/locale';
 import './style.less'
 
 // 状态
 const status = {
   1: {
     value: 'default',
-    text: '未完成',
+    text: formatMessage({ id: 'bp.operation.unfinished' }),
   },
   2: {
     value: 'success',
-    text: '已完成',
+    text: formatMessage({ id: 'bp.operation.finished' }),
   },
   3: {
     value: 'warning',
-    text: '待验证',
+    text: formatMessage({ id: 'bp.operation.needVerified' }),
   },
   4: {
     value: 'error',
-    text: '已拒绝',
+    text: formatMessage({ id: 'bp.operation.rejected' }),
   },
 };
 
@@ -37,32 +37,31 @@ class Details extends React.Component {
 
   columns = [
     {
-      title: '字段',
+      title: formatMessage({ id: 'bp.operation.field' }),
       dataIndex: 'fieldName',
       render: text => <div className="addEllipsis"
       style={{ width: '100px' }} title={text}>{text}</div>,
     },
     {
-      title: '新值',
-
+      title: formatMessage({ id: 'bp.operation.newValue' }),
       dataIndex: 'newValue',
       render: text => <div className="addEllipsis"
       style={{ width: '50px' }} title={text}>{text}</div>,
     },
     {
-      title: '旧值',
+      title: formatMessage({ id: 'bp.operation.oldValue' }),
       dataIndex: 'oldValue',
       render: text => <div className="addEllipsis"
       style={{ width: '50px' }} title={text}>{text}</div>,
     },
     {
-      title: '关键字',
+      title: formatMessage({ id: 'bp.operation.keyword' }),
       dataIndex: 'keyword',
       render: text => <div className="addEllipsis"
       style={{ width: '50px' }} title={text}>{text}</div>,
     },
     {
-      title: '状态',
+      title: formatMessage({ id: 'bp.operation.state' }),
       dataIndex: 'status',
       render(val) {
         return <Badge className="addEllipsis"
@@ -70,7 +69,7 @@ class Details extends React.Component {
       },
     },
     {
-      title: '验证记录编号',
+      title: formatMessage({ id: 'bp.operation.verificationRecordNo' }),
       dataIndex: 'verifyRecordList',
       render(val) {
         let data = '';

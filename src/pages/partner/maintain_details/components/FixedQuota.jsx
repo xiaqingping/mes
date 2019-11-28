@@ -3,8 +3,12 @@ import {
   Button,
   Icon,
 } from 'antd';
+import { connect } from 'dva';
 import React, { Component } from 'react';
 
+@connect(({ partnerMaintainEdit }) => ({
+  details: partnerMaintainEdit.details,
+}))
 class FixedQuota extends Component {
   state = {
     visible: false,
@@ -33,7 +37,10 @@ class FixedQuota extends Component {
   }
 
   // 固定额度页面
-  detailPage = () => (
+  detailPage = () => {
+    const { details } = this.props;
+    console.log(details)
+    return (
       <div style={{ marginLeft: '80px' }}>
         <p>上海交通大学</p>
         <p>
@@ -44,8 +51,8 @@ class FixedQuota extends Component {
         <p>开票后65天到期</p>
       </div>
     )
+}
 
-  // 固定额度页面
   hangelPage = () => (
       <div style={{ textAlign: 'center' }}>
         <Icon type="check-circle" style={{
