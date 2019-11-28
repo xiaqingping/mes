@@ -281,7 +281,7 @@ class CustomerEdit extends Component {
       }
     }
 
-    // 收获地址 TODO: 暂时注释掉
+    // 收获地址
     if (!(validateResult === 2)) {
       if (addressList.length === 0) {
         message.error('缺少收获地址');
