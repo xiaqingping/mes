@@ -479,7 +479,11 @@ class Basic extends React.Component {
             ) : null}
             {tabActiveKey === 'vendor' ? (
               <Col md={6} sm={6}>
-                <FormItem label="采购冻结">
+                <FormItem
+                  label={formatMessage({
+                    id: 'bp.maintain_details.purchase_org.procurement_block',
+                  })}
+                >
                   {getFieldDecorator('invoicePostBlock', {
                     initialValue: invoicePostBlock === 1,
                     valuePropName: 'checked',
