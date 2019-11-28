@@ -39,6 +39,7 @@ const Model = {
           let { redirect } = params;
 
           if (redirect) {
+            redirect = decodeURIComponent(redirect);
             const redirectUrlParams = new URL(redirect);
 
             if (redirectUrlParams.origin === urlParams.origin) {
