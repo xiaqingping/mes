@@ -2,6 +2,7 @@ import { Form, Button, Spin, Badge, Modal, message, Empty } from 'antd';
 import React, { Component } from 'react';
 
 import router from 'umi/router';
+import { FormattedMessage } from 'umi/locale';
 import { connect } from 'dva';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import FooterToolbar from '@/components/FooterToolbar';
@@ -717,7 +718,7 @@ class CustomerEdit extends Component {
     return (
       <>
         <Badge color={this.getColor(color)} />
-        客户
+        <FormattedMessage id="bp.maintain_ed.customer" />
       </>
     );
   };
@@ -730,7 +731,7 @@ class CustomerEdit extends Component {
     return (
       <>
         <Badge color={this.getColor(color)} />
-        供应商
+        <FormattedMessage id="bp.maintain_ed.vendor" />
       </>
     );
   };

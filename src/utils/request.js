@@ -34,7 +34,7 @@ const requestErr = data => {
       localStorage.removeItem('token');
       const URL = window.location.href;
       if (URL.indexOf('/user/login') === -1) {
-        router.push(`/user/login?redirect=${window.location.href}`);
+        router.push(`/user/login?redirect=${encodeURIComponent(window.location.href)}`);
       }
     }
   } else {
@@ -45,7 +45,7 @@ const requestErr = data => {
     message: (data && data.desc) || '错误提示',
     description: errMsg.join('，') || '请求错误！',
   });
-}
+};
 
 const err = error => {
   const { response = {} } = error;
