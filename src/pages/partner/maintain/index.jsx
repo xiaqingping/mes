@@ -110,34 +110,34 @@ function renderOption(item) {
 }
 
 @connect(({ basicCache, global }) => {
-  const regionOffice = basicCache.regionOffice.filter(e => e.languageCode === global.languageCode)
-  return ({
+  const regionOffice = basicCache.regionOffice.filter(e => e.languageCode === global.languageCode);
+  return {
     regionOffice,
-  })
+  };
 })
 class Maintain extends React.Component {
-constructor(props) {
-  super(props);
-  this.state = {
-    formValues: {
-      page: 1,
-      pageSize: 10,
-    },
-    selectedRows: [],
-    expandForm: false,
-    list: [],
-    total: 0,
-    // formValues: {},
-    xiaoshuoguishu: [],
-    // kaipiaofang: [],
-    changeModal: false,
-    recordMesg: undefined,
-    loading: false,
-    searchVal: {},
-  };
-  this.callSaler = _.debounce(this.callSaler, 1000);
-  this.callCustomer = _.debounce(this.callCustomer, 1000);
-}
+  constructor(props) {
+    super(props);
+    this.state = {
+      formValues: {
+        page: 1,
+        pageSize: 10,
+      },
+      selectedRows: [],
+      expandForm: false,
+      list: [],
+      total: 0,
+      // formValues: {},
+      xiaoshuoguishu: [],
+      // kaipiaofang: [],
+      changeModal: false,
+      recordMesg: undefined,
+      loading: false,
+      searchVal: {},
+    };
+    this.callSaler = _.debounce(this.callSaler, 1000);
+    this.callCustomer = _.debounce(this.callCustomer, 1000);
+  }
 
   componentDidMount() {
     this.props.dispatch({
@@ -158,16 +158,16 @@ constructor(props) {
   // 销售归属查询
   callSaler = value => {
     api.employees.getSaler({ code_or_name: value }).then(res => {
-      console.log(res)
-    })
-  }
+      console.log(res);
+    });
+  };
 
   // 收票方查询
   callCustomer = value => {
     api.bp.getOrgCustomerByCodeOrName({ code_or_name: value }).then(res => {
-      console.log(res)
-    })
-  }
+      console.log(res);
+    });
+  };
 
   /** 激活 */
   cancelFreeze = (e, record) => {
@@ -231,7 +231,7 @@ constructor(props) {
           // eslint-disable-next-line prefer-destructuring
           fieldsValue.officeCode = fieldsValue.regionalAttr[1];
         }
-        delete fieldsValue.regionalAttr
+        delete fieldsValue.regionalAttr;
       }
       // const values = {
       //   ...fieldsValue,
@@ -243,7 +243,7 @@ constructor(props) {
       // });
       this.setState({
         searchVal: fieldsValue,
-      })
+      });
       this.getTableData(fieldsValue);
     });
   };
@@ -258,21 +258,24 @@ constructor(props) {
       formValues: query,
       loading: true,
     });
-    api.bp.getBPList(query).then(res => {
-      this.setState({
-        list: res.results,
-        total: res.total,
-        loading: false,
+    api.bp
+      .getBPList(query)
+      .then(res => {
+        this.setState({
+          list: res.results,
+          total: res.total,
+          loading: false,
+        });
+      })
+      .catch(() => {
+        this.setState({
+          loading: false,
+        });
       });
-    }).catch(() => {
-      this.setState({
-        loading: false,
-      });
-    });
   };
 
   handleModalVisible = () => {
-    router.push('/partner/maintain/add');
+    router.push('/bp/maintain/add');
   };
 
   handleSelectRows = rows => {
@@ -284,14 +287,14 @@ constructor(props) {
   // 分页
   handleStandardTableChange = pagination => {
     if (JSON.stringify(pagination) !== '{}') {
-      const { searchVal } = this.state
+      const { searchVal } = this.state;
       this.getTableData({
         ...searchVal,
         page: pagination.current,
         pageSize: pagination.pageSize,
       });
     }
-  }
+  };
 
   handleFormReset = () => {
     this.props.form.resetFields();
@@ -314,16 +317,16 @@ constructor(props) {
     //   ],
     // });
     if (value) {
-      this.callSaler(value)
+      this.callSaler(value);
     }
-  }
+  };
 
   /** 查询收票方 */
   searchCustomer = value => {
     if (value) {
-      this.callCustomer(value)
+      this.callCustomer(value);
     }
-  }
+  };
 
   toggleForm = () => {
     const { expandForm } = this.state;
@@ -375,18 +378,24 @@ constructor(props) {
       <Form onSubmit={this.handleSearch} layout="inline">
         <Row gutter={{ xxl: 100, lg: 80 }}>
           <Col xxl={6} lg={8}>
-            <FormItem label="编号">{getFieldDecorator('code')(<Input placeholder="请输入" />)}</FormItem>
+            <FormItem label="编号">
+              {getFieldDecorator('code')(<Input placeholder="请输入" />)}
+            </FormItem>
           </Col>
           <Col xxl={6} lg={8}>
-            <FormItem label="名称">{getFieldDecorator('name')(<Input placeholder="请输入" />)}</FormItem>
+            <FormItem label="名称">
+              {getFieldDecorator('name')(<Input placeholder="请输入" />)}
+            </FormItem>
           </Col>
           <Col xxl={6} lg={8}>
-            <FormItem label="移动电话">{getFieldDecorator('mobilePhone')(
-            <Input placeholder="请输入" />)}</FormItem>
+            <FormItem label="移动电话">
+              {getFieldDecorator('mobilePhone')(<Input placeholder="请输入" />)}
+            </FormItem>
           </Col>
           <Col xxl={6} lg={8}>
-            <FormItem label="Email">{getFieldDecorator('email')(
-            <Input placeholder="请输入" />)}</FormItem>
+            <FormItem label="Email">
+              {getFieldDecorator('email')(<Input placeholder="请输入" />)}
+            </FormItem>
           </Col>
           <Col xxl={6} lg={8}>
             <FormItem label="认证状态">
@@ -433,8 +442,11 @@ constructor(props) {
           <Col xxl={6} lg={8}>
             <FormItem label="区域归属">
               {getFieldDecorator('regionalAttr')(
-                <Cascader options={regionOffice} placeholder="请选择"
-                fieldNames={{ label: 'name', value: 'code', children: 'officeList' }}/>,
+                <Cascader
+                  options={regionOffice}
+                  placeholder="请选择"
+                  fieldNames={{ label: 'name', value: 'code', children: 'officeList' }}
+                />,
               )}
             </FormItem>
           </Col>
@@ -488,14 +500,19 @@ constructor(props) {
       <Form onSubmit={this.handleSearch} layout="inline">
         <Row gutter={{ xxl: 100, lg: 80 }}>
           <Col xxl={6} lg={8}>
-            <FormItem label="编号">{getFieldDecorator('code')(<Input placeholder="请输入" />)}</FormItem>
+            <FormItem label="编号">
+              {getFieldDecorator('code')(<Input placeholder="请输入" />)}
+            </FormItem>
           </Col>
           <Col xxl={6} lg={8}>
-            <FormItem label="名称">{getFieldDecorator('name')(<Input placeholder="请输入" />)}</FormItem>
+            <FormItem label="名称">
+              {getFieldDecorator('name')(<Input placeholder="请输入" />)}
+            </FormItem>
           </Col>
           <Col xxl={6} lg={0}>
-            <FormItem label="移动电话">{getFieldDecorator('mobilePhone')(
-            <Input placeholder="请输入" />)}</FormItem>
+            <FormItem label="移动电话">
+              {getFieldDecorator('mobilePhone')(<Input placeholder="请输入" />)}
+            </FormItem>
           </Col>
           <Col xxl={6} lg={8}>
             <span className="submitButtons">
@@ -533,9 +550,9 @@ constructor(props) {
         width: 250,
         render(val, record) {
           return (
-            <Link className={styles.partNer} to={`/partner/maintain/details/${record.id}`}>
+            <Link className={styles.partNer} to={`/bp/maintain/details/${record.id}`}>
               <Icon type={record.type === 1 ? 'user' : 'home'} /> &nbsp;{record.name}
-                <div className={styles.partCode}>{val}</div>
+              <div className={styles.partCode}>{val}</div>
             </Link>
           );
         },
@@ -563,7 +580,7 @@ constructor(props) {
           },
         ],
         onFilter: (value, record) =>
-        record.certificationStatus.toString().indexOf(value.toString()) === 0,
+          record.certificationStatus.toString().indexOf(value.toString()) === 0,
         render(val) {
           return <Badge status={renzhengMap[val].value} text={renzhengMap[val].text} />;
         },
@@ -584,11 +601,11 @@ constructor(props) {
         ],
         filterMultiple: false,
         onFilter: (value, record) =>
-        record.salesOrderBlock.toString().indexOf(value.toString()) === 0,
+          record.salesOrderBlock.toString().indexOf(value.toString()) === 0,
         // eslint-disable-next-line consistent-return
         render: val => {
           if (val) {
-            return <Badge status={dongjieMap[val].value} text={dongjieMap[val].text} />
+            return <Badge status={dongjieMap[val].value} text={dongjieMap[val].text} />;
           }
         },
       },
@@ -608,7 +625,7 @@ constructor(props) {
         ],
         filterMultiple: false,
         onFilter: (value, record) =>
-        record.customerDataStatus.toString().indexOf(value.toString()) === 0,
+          record.customerDataStatus.toString().indexOf(value.toString()) === 0,
         render(val) {
           return <Badge status={wanzhengMap[val].value} text={wanzhengMap[val].text} />;
         },
@@ -629,7 +646,7 @@ constructor(props) {
         ],
         filterMultiple: false,
         onFilter: (value, record) =>
-        record.vendorDataStatus.toString().indexOf(value.toString()) === 0,
+          record.vendorDataStatus.toString().indexOf(value.toString()) === 0,
         render(val) {
           return <Badge status={wanzhengMap[val].value} text={wanzhengMap[val].text} />;
         },
@@ -639,20 +656,28 @@ constructor(props) {
         dataIndex: 'mobilePhone',
         // width: 100,
         render(val, records) {
-          return <>
-                   <div>
-                      {val}
-                      &nbsp;&nbsp;
-                      {records.mobilePhoneVerifyStatus === 1 ? <
-                        Badge status={mobileIden[records.mobilePhoneVerifyStatus].value} /> : ''}
-                    </div>
-                    <div>
-                      {records.email}
-                      &nbsp;&nbsp;
-                      {records.emailVerifyStatus === 1 ?
-                      <Badge status={emailIden[records.emailVerifyStatus].value} /> : ''}
-                    </div>
-                  </>
+          return (
+            <>
+              <div>
+                {val}
+                &nbsp;&nbsp;
+                {records.mobilePhoneVerifyStatus === 1 ? (
+                  <Badge status={mobileIden[records.mobilePhoneVerifyStatus].value} />
+                ) : (
+                  ''
+                )}
+              </div>
+              <div>
+                {records.email}
+                &nbsp;&nbsp;
+                {records.emailVerifyStatus === 1 ? (
+                  <Badge status={emailIden[records.emailVerifyStatus].value} />
+                ) : (
+                  ''
+                )}
+              </div>
+            </>
+          );
         },
       },
       {
@@ -660,7 +685,7 @@ constructor(props) {
         dataIndex: 'address',
         // width: 200,
         render(val) {
-          return <div className={styles.hideAdress}>{val}</div>
+          return <div className={styles.hideAdress}>{val}</div>;
         },
       },
       {
@@ -671,33 +696,80 @@ constructor(props) {
           const { id } = record;
           const menu = (
             <Menu style={{ padding: 0 }}>
-              {record.salesOrderBlock === 1 ? <Menu.Item>
-                  <a href="#" onClick={e => { this.cancelFreeze(e, record) }}>取消冻结</a>
-                </Menu.Item> : <Menu.Item>
-                  <a href="#" onClick={ e => { this.freezePartner(e, record) }}>冻结</a>
-                </Menu.Item>}
-              {record.certificationStatus === 4 ?
+              {record.salesOrderBlock === 1 ? (
                 <Menu.Item>
-                  <a href="#" onClick={e => { this.cancelIdent(e, record) }}>取消认证</a>
+                  <a
+                    href="#"
+                    onClick={e => {
+                      this.cancelFreeze(e, record);
+                    }}
+                  >
+                    取消冻结
+                  </a>
                 </Menu.Item>
-              : ''
-              }
-              {record.certificationStatus === 4 ?
+              ) : (
                 <Menu.Item>
-                  <a href="#" onClick={ e => { this.changeIdent(e, record) }}>变更认证</a>
+                  <a
+                    href="#"
+                    onClick={e => {
+                      this.freezePartner(e, record);
+                    }}
+                  >
+                    冻结
+                  </a>
                 </Menu.Item>
-              : ''
-              }
-              {record.certificationStatus === 1 ?
-                <Menu.Item><a href="#"
-                onClick={ () => { this.showChange.visibleShow(true, record) }}>认证</a></Menu.Item>
-              : ''
-              }
+              )}
+              {record.certificationStatus === 4 ? (
+                <Menu.Item>
+                  <a
+                    href="#"
+                    onClick={e => {
+                      this.cancelIdent(e, record);
+                    }}
+                  >
+                    取消认证
+                  </a>
+                </Menu.Item>
+              ) : (
+                ''
+              )}
+              {record.certificationStatus === 4 ? (
+                <Menu.Item>
+                  <a
+                    href="#"
+                    onClick={e => {
+                      this.changeIdent(e, record);
+                    }}
+                  >
+                    变更认证
+                  </a>
+                </Menu.Item>
+              ) : (
+                ''
+              )}
+              {record.certificationStatus === 1 ? (
+                <Menu.Item>
+                  <a
+                    href="#"
+                    onClick={() => {
+                      this.showChange.visibleShow(true, record);
+                    }}
+                  >
+                    认证
+                  </a>
+                </Menu.Item>
+              ) : (
+                ''
+              )}
             </Menu>
           );
           return (
             <>
-              <Link to={`/partner/maintain/edit/${id}?type=${record.type}&customerDataStatus=${record.customerDataStatus}&vendorDataStatus=${record.vendorDataStatus}`}>修改</Link>
+              <Link
+                to={`/bp/maintain/edit/${id}?type=${record.type}&customerDataStatus=${record.customerDataStatus}&vendorDataStatus=${record.vendorDataStatus}`}
+              >
+                修改
+              </Link>
               <Divider type="vertical" />
               <Dropdown overlay={menu}>
                 <a className="ant-dropdown-link">
