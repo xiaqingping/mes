@@ -3,6 +3,7 @@
  */
 import { Button, Table, Input, Divider, Form, message } from 'antd';
 import React from 'react';
+import { formatMessage, FormattedMessage } from 'umi-plugin-react/locale';
 
 import ChooseSalesPerson from '@/components/choosse/bp/SalesPerson';
 
@@ -142,7 +143,7 @@ class SalesPerson extends React.Component {
 
     let columns = [
       {
-        title: '名称',
+        title: formatMessage({ id: 'bp.maintain_details.name' }),
         dataIndex: 'name',
         width: '80%',
         editable: true,
@@ -152,7 +153,7 @@ class SalesPerson extends React.Component {
         },
       },
       {
-        title: '操作',
+        title: formatMessage({ id: 'bp.maintain_details.operation' }),
         dataIndex: 'actions',
         render: (text, record, index) => {
           const { editIndex } = this.state;
@@ -215,7 +216,7 @@ class SalesPerson extends React.Component {
           onClick={this.addRow}
           icon="plus"
         >
-          新增
+          <FormattedMessage id="bp.maintain_details.add" />
         </Button>
         <ChooseSalesPerson
           ref={ref => {

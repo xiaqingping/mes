@@ -17,6 +17,7 @@ import {
 } from 'antd';
 import React from 'react';
 import { connect } from 'dva';
+import { formatMessage, FormattedMessage } from 'umi-plugin-react/locale';
 import debounce from 'lodash/debounce';
 import { validateForm } from '@/utils/utils';
 import BillToParty from './BillToParty';
@@ -91,7 +92,9 @@ class FormContent extends React.Component {
       <Form>
         <Row gutter={32}>
           <Col span={5}>
-            <FormItem label="网点归属">
+            <FormItem
+              label={formatMessage({ id: 'bp.maintain_details.sales_distribution.sales_area' })}
+            >
               {getFieldDecorator('regionOffice', {
                 initialValue: [data.regionCode, data.officeCode],
                 rules: [{ required: true, validator: this.checkRegionOffice }],
@@ -105,7 +108,11 @@ class FormContent extends React.Component {
             </FormItem>
           </Col>
           <Col span={5}>
-            <FormItem label="默认付款方式">
+            <FormItem
+              label={formatMessage({
+                id: 'bp.maintain_details.sales_distribution.default_payment_menthod',
+              })}
+            >
               {getFieldDecorator('defaultPaymentMethodCode', {
                 initialValue: data.defaultPaymentMethodCode,
                 rules: [{ required: true }],
@@ -121,7 +128,9 @@ class FormContent extends React.Component {
             </FormItem>
           </Col>
           <Col span={4}>
-            <FormItem label="币种">
+            <FormItem
+              label={formatMessage({ id: 'bp.maintain_details.sales_distribution.currency' })}
+            >
               {getFieldDecorator('currencyCode', {
                 initialValue: data.currencyCode,
                 rules: [{ required: true }],
@@ -142,7 +151,9 @@ class FormContent extends React.Component {
           </Col>
           {countryCode === 'CN' || !countryCode ? (
             <Col span={7}>
-              <FormItem label="默认开票类型">
+              <FormItem
+                label={formatMessage({ id: 'bp.maintain_details.sales_distribution.invoice_type' })}
+              >
                 {getFieldDecorator('defaultInvoiceTypeCode', {
                   initialValue: data.defaultInvoiceTypeCode,
                   rules: [{ required: true }],
@@ -176,7 +187,9 @@ class FormContent extends React.Component {
             </Col>
           ) : null}
           <Col span={3}>
-            <FormItem label="销售冻结">
+            <FormItem
+              label={formatMessage({ id: 'bp.maintain_details.sales_distribution.sales_block' })}
+            >
               {getFieldDecorator('salesOrderBlock', {
                 initialValue: data.salesOrderBlock === 1,
                 valuePropName: 'checked',
@@ -304,7 +317,6 @@ class SalesArea extends React.Component {
 
   // 级联选泽销售范围时
   onCascaderChange = async arr => {
-    console.log(arr);
     const { salesArea } = this.formatSalesArea();
     const [salesOrganizationCode, distributionChannelCode] = arr;
     const { details, customer, salesAreaList: tabsData } = this.props;
@@ -387,7 +399,8 @@ class SalesArea extends React.Component {
     return (
       <Cascader options={options} onChange={this.onCascaderChange}>
         <a style={{ fontSize: 14, marginLeft: -16 }} href="#">
-          销售范围 <Icon type="down" style={{ fontSize: 12 }} />
+          <FormattedMessage id="bp.maintain_details.sales_distribution.sales_org" />
+          <Icon type="down" style={{ fontSize: 12 }} />
         </a>
       </Cascader>
     );
@@ -532,7 +545,7 @@ class SalesArea extends React.Component {
 
     return (
       <Card
-        title="销售范围"
+        title={formatMessage({ id: 'bp.maintain_details.sales_distribution' })}
         bordered={false}
         style={{ marginBottom: '24px' }}
         tabList={tabList}
@@ -558,28 +571,46 @@ class SalesArea extends React.Component {
                   onChange={this.onTabelTabChange}
                   activeKey={tableTabKey}
                 >
-                  <TabPane tab="收票方" key="BillToParty">
+                  <TabPane
+                    tab={formatMessage({
+                      id: 'bp.maintain_details.sales_distribution.bill_to_party',
+                    })}
+                    key="BillToParty"
+                  >
                     <BillToParty
                       tableData={e.billToPartyList || []}
                       tableKey="billToPartyList"
                       valueChange={this.valueChange}
                     />
                   </TabPane>
-                  <TabPane tab="售达方" key="SoldToParty">
+                  <TabPane
+                    tab={formatMessage({
+                      id: 'bp.maintain_details.sales_distribution.sold_to_party',
+                    })}
+                    key="SoldToParty"
+                  >
                     <SoldToParty
                       tableData={e.soldToPartyList || []}
                       tableKey="soldToPartyList"
                       valueChange={this.valueChange}
                     />
                   </TabPane>
-                  <TabPane tab="送达方" key="ShipToParty">
+                  <TabPane
+                    tab={formatMessage({
+                      id: 'bp.maintain_details.sales_distribution.ship_to_party',
+                    })}
+                    key="ShipToParty"
+                  >
                     <ShipToParty
                       tableData={e.shipToPartyList || []}
                       tableKey="shipToPartyList"
                       valueChange={this.valueChange}
                     />
                   </TabPane>
-                  <TabPane tab="销售员" key="SalesPerson">
+                  <TabPane
+                    tab={formatMessage({ id: 'bp.maintain_details.sales_distribution.sales_rep' })}
+                    key="SalesPerson"
+                  >
                     <SalesPerson
                       tableData={e.salerList || []}
                       tableKey="salerList"
@@ -591,7 +622,9 @@ class SalesArea extends React.Component {
             );
           })
         ) : (
-          <Empty description="暂无销售范围" />
+          <Empty
+            description={formatMessage({ id: 'bp.maintain_details.sales_distribution.empty' })}
+          />
         )}
       </Card>
     );

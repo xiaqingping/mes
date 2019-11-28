@@ -17,6 +17,7 @@ import {
 } from 'antd';
 import { connect } from 'dva';
 import React from 'react';
+import { formatMessage, FormattedMessage } from 'umi-plugin-react/locale';
 import { validateForm } from '@/utils/utils';
 import { MobilePhoneInput } from '@/components/CustomizedFormControls';
 
@@ -69,7 +70,9 @@ class FormContent extends React.Component {
       <Form layout="vertical">
         <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
           <Col md={6}>
-            <FormItem label="订单货币">
+            <FormItem
+              label={formatMessage({ id: 'bp.maintain_details.purchase_org.order_currency' })}
+            >
               {getFieldDecorator('currencyCode', {
                 rules: [{ required: true }],
                 initialValue: data.currencyCode,
@@ -89,7 +92,9 @@ class FormContent extends React.Component {
             </FormItem>
           </Col>
           <Col md={6}>
-            <FormItem label="付款条件">
+            <FormItem
+              label={formatMessage({ id: 'bp.maintain_details.purchase_org.payment_condition' })}
+            >
               {getFieldDecorator('paymentTermsCode', {
                 rules: [{ required: true }],
                 initialValue: data.paymentTermsCode,
@@ -105,7 +110,7 @@ class FormContent extends React.Component {
             </FormItem>
           </Col>
           <Col md={6}>
-            <FormItem label="销售人员">
+            <FormItem label={formatMessage({ id: 'bp.maintain_details.purchase_org.sales_rep' })}>
               {getFieldDecorator('salerName', {
                 rules: [{ required: true }],
                 initialValue: data.salerName,
@@ -113,7 +118,9 @@ class FormContent extends React.Component {
             </FormItem>
           </Col>
           <Col md={6}>
-            <FormItem label="销售人员电话">
+            <FormItem
+              label={formatMessage({ id: 'bp.maintain_details.purchase_org.sales_rep_phone' })}
+            >
               {getFieldDecorator('salerTelephone', {
                 rules: [{ required: true }],
                 initialValue: {
@@ -126,7 +133,9 @@ class FormContent extends React.Component {
         </Row>
         <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
           <Col md={6}>
-            <FormItem label="供应商级别">
+            <FormItem
+              label={formatMessage({ id: 'bp.maintain_details.purchase_org.supplier_level' })}
+            >
               {getFieldDecorator('levelCode', {
                 rules: [{ required: true }],
                 initialValue: data.levelCode,
@@ -142,7 +151,11 @@ class FormContent extends React.Component {
             </FormItem>
           </Col>
           <Col md={6}>
-            <FormItem label="收货时发票过账">
+            <FormItem
+              label={formatMessage({
+                id: 'bp.maintain_details.purchase_org.invoice_when_good_receipt',
+              })}
+            >
               {getFieldDecorator('invoicePostInReceive', {
                 rules: [{ required: true }],
                 valuePropName: 'checked',
@@ -151,7 +164,11 @@ class FormContent extends React.Component {
             </FormItem>
           </Col>
           <Col md={6}>
-            <FormItem label="采购组">
+            <FormItem
+              label={formatMessage({
+                id: 'bp.maintain_details.purchase_org.purchase_organization',
+              })}
+            >
               {getFieldDecorator('purchasingGroupCode', {
                 rules: [{ required: true }],
                 initialValue: data.purchasingGroupCode,
@@ -167,7 +184,9 @@ class FormContent extends React.Component {
             </FormItem>
           </Col>
           <Col md={6}>
-            <FormItem label="计划交货时间">
+            <FormItem
+              label={formatMessage({ id: 'bp.maintain_details.purchase_org.delivery_time_plan' })}
+            >
               {getFieldDecorator('deliveryPlanDays', {
                 rules: [{ required: true }],
                 initialValue: data.deliveryPlanDays,
@@ -317,7 +336,8 @@ class PurchasingOrg extends React.Component {
         fieldNames={{ label: 'name', value: 'code' }}
       >
         <a style={{ fontSize: 14, marginLeft: -16 }} href="#">
-          采购组织 <Icon type="down" style={{ fontSize: 12 }} />
+          <FormattedMessage id="bp.maintain_details.purchase_org.purchase_org" />
+          <Icon type="down" style={{ fontSize: 12 }} />
         </a>
       </Cascader>
     );
@@ -407,7 +427,7 @@ class PurchasingOrg extends React.Component {
 
     return (
       <Card
-        title="采购组织"
+        title={formatMessage({ id: 'bp.maintain_details.purchase_org' })}
         bordered={false}
         style={{ marginBottom: '24px' }}
         tabList={tabList}
@@ -427,7 +447,7 @@ class PurchasingOrg extends React.Component {
             />
           ))
         ) : (
-          <Empty description="暂无采购组织" />
+          <Empty description={formatMessage({ id: 'bp.maintain_details.purchase_org.empty' })} />
         )}
       </Card>
     );

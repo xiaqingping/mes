@@ -5,6 +5,7 @@ import { Button, Table, Input, Divider, Form, Card } from 'antd';
 import React from 'react';
 import { connect } from 'dva';
 import debounce from 'lodash/debounce';
+import { formatMessage, FormattedMessage } from 'umi-plugin-react/locale';
 import { validateForm, formatter } from '@/utils/utils';
 
 import { MobilePhoneInput, AddressInput } from '@/components/CustomizedFormControls';
@@ -189,7 +190,7 @@ class EditableTable extends React.Component {
     const { countryDiallingCodes } = this.props;
     const columns = [
       {
-        title: '姓名',
+        title: formatMessage({ id: 'bp.maintain_details.name' }),
         dataIndex: 'name',
         width: '15%',
         editable: true,
@@ -199,7 +200,7 @@ class EditableTable extends React.Component {
         },
       },
       {
-        title: '移动电话',
+        title: formatMessage({ id: 'bp.maintain_details.mobile_phone' }),
         dataIndex: 'mobilePhone',
         width: '20%',
         editable: true,
@@ -219,7 +220,7 @@ class EditableTable extends React.Component {
         },
       },
       {
-        title: '邮编',
+        title: formatMessage({ id: 'bp.maintain_details.postal_code' }),
         dataIndex: 'postCode',
         width: '10%',
         editable: true,
@@ -229,7 +230,7 @@ class EditableTable extends React.Component {
         },
       },
       {
-        title: '地址',
+        title: formatMessage({ id: 'bp.maintain_details.shipping_address.address' }),
         dataIndex: 'address',
         width: '35%',
         editable: true,
@@ -250,7 +251,7 @@ class EditableTable extends React.Component {
         },
       },
       {
-        title: '操作',
+        title: formatMessage({ id: 'bp.maintain_details.operation' }),
         dataIndex: 'actions',
         width: '12%',
         render: (text, record, index) => {
@@ -305,7 +306,7 @@ class EditableTable extends React.Component {
     });
 
     return (
-      <Card title="收货地址" bordered={false}>
+      <Card title={formatMessage({ id: 'bp.maintain_details.shipping_address' })} bordered={false}>
         <EditableContext.Provider value={this.props.form}>
           <Table
             rowKey="id"
@@ -325,7 +326,7 @@ class EditableTable extends React.Component {
             onClick={this.addRow}
             icon="plus"
           >
-            新增
+            <FormattedMessage id="bp.maintain_details.add" />
           </Button>
         </EditableContext.Provider>
       </Card>

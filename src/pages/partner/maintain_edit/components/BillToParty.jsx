@@ -3,6 +3,7 @@
  */
 import { Button, Table, Input, Divider, Form, message } from 'antd';
 import React from 'react';
+import { formatMessage, FormattedMessage } from 'umi-plugin-react/locale';
 
 import ChooseBillToParty from '@/components/choosse/bp/BillToParty';
 
@@ -142,7 +143,7 @@ class BillToParty extends React.Component {
 
     let columns = [
       {
-        title: '名称',
+        title: formatMessage({ id: 'bp.maintain_details.name' }),
         dataIndex: 'name',
         width: '40%',
         editable: true,
@@ -152,12 +153,12 @@ class BillToParty extends React.Component {
         },
       },
       {
-        title: '售达方',
+        title: formatMessage({ id: 'bp.maintain_details.sales_distribution.sold_to_party' }),
         dataIndex: 'soldToPartyName',
         width: '40%',
       },
       {
-        title: '操作',
+        title: formatMessage({ id: 'bp.maintain_details.operation' }),
         dataIndex: 'actions',
         render: (text, record, index) => {
           const { editIndex } = this.state;
@@ -220,7 +221,7 @@ class BillToParty extends React.Component {
           onClick={this.addRow}
           icon="plus"
         >
-          新增
+          <FormattedMessage id="bp.maintain_details.add" />
         </Button>
         <ChooseBillToParty
           ref={ref => {

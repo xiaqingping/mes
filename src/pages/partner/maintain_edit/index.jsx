@@ -1,3 +1,6 @@
+/**
+ * 业务伙伴编辑
+ */
 import { Form, Button, Spin, Badge, Modal, message, Empty } from 'antd';
 import React, { Component } from 'react';
 
@@ -718,7 +721,7 @@ class CustomerEdit extends Component {
     return (
       <>
         <Badge color={this.getColor(color)} />
-        <FormattedMessage id="bp.maintain_ed.customer" />
+        <FormattedMessage id="bp.maintain_details.customer" />
       </>
     );
   };
@@ -731,7 +734,7 @@ class CustomerEdit extends Component {
     return (
       <>
         <Badge color={this.getColor(color)} />
-        <FormattedMessage id="bp.maintain_ed.vendor" />
+        <FormattedMessage id="bp.maintain_details.vendor" />
       </>
     );
   };
