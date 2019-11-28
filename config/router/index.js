@@ -1,7 +1,7 @@
 const seq = require('./seq');
 const personel = require('./personel');
-const bp = require('./bp');
-const peptide = require('./peptide');
+const partner = require('./partner');
+const peptide = require('./peptide')
 const system = require('./system');
 const purchase = require('./purchase');
 const hts = require('./hts');
@@ -38,7 +38,7 @@ module.exports = [
             component: './Welcome',
           },
           seq,
-          bp,
+          partner,
           peptide,
           system,
           personel,
