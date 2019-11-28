@@ -4,6 +4,7 @@
 import { Card, Row, Col, Form, Input, Switch, Upload, Icon, Badge, Select, Spin } from 'antd';
 import React, { Component } from 'react';
 import { connect } from 'dva';
+import { formatMessage } from 'umi-plugin-react/locale';
 import debounce from 'lodash/debounce';
 import { TelphoneInput } from '@/components/CustomizedFormControls';
 import disk from '@/api/disk';
@@ -171,13 +172,19 @@ class OrgCertification extends Component {
           <Col xxl={15} lg={24}>
             <Row gutter={32}>
               <Col span={8}>
-                <FormItem label="认证状态">
+                <FormItem
+                  label={formatMessage({ id: 'bp.maintain_details.verification_data.status' })}
+                >
                   <Badge status="default" />
                   未认证
                 </FormItem>
               </Col>
               <Col span={8}>
-                <FormItem label="增值税专用发票资质">
+                <FormItem
+                  label={formatMessage({
+                    id: 'bp.maintain_details.verification_data.special_invoice',
+                  })}
+                >
                   {getFieldDecorator('specialInvoice', {
                     valuePropName: 'checked',
                     initialValue: orgData.specialInvoice === 1,
@@ -185,7 +192,11 @@ class OrgCertification extends Component {
                 </FormItem>
               </Col>
               <Col span={8}>
-                <FormItem label="统一社会信用代码">
+                <FormItem
+                  label={formatMessage({
+                    id: 'bp.maintain_details.verification_data.VAT_Business',
+                  })}
+                >
                   {getFieldDecorator('taxNo', {
                     initialValue: orgData.taxNo,
                     rules: [{ required: true }],
@@ -193,7 +204,9 @@ class OrgCertification extends Component {
                 </FormItem>
               </Col>
               <Col span={8}>
-                <FormItem label="基本户开户银行">
+                <FormItem
+                  label={formatMessage({ id: 'bp.maintain_details.verification_data.bank_name' })}
+                >
                   {getFieldDecorator('bankCode', {
                     initialValue: orgData.bankCode,
                     rules: [{ required: true }],
@@ -215,7 +228,11 @@ class OrgCertification extends Component {
                 </FormItem>
               </Col>
               <Col span={8}>
-                <FormItem label="基本户开户账号">
+                <FormItem
+                  label={formatMessage({
+                    id: 'bp.maintain_details.verification_data.account_number',
+                  })}
+                >
                   {getFieldDecorator('bankAccount', {
                     initialValue: orgData.bankAccount,
                     rules: [{ required: true }],
@@ -223,7 +240,7 @@ class OrgCertification extends Component {
                 </FormItem>
               </Col>
               <Col span={8}>
-                <FormItem label="电话">
+                <FormItem label={formatMessage({ id: 'bp.maintain_details.phone' })}>
                   {getFieldDecorator('telephone', {
                     initialValue: {
                       telephoneCountryCode: orgData.telephoneCountryCode,
@@ -236,7 +253,9 @@ class OrgCertification extends Component {
                 </FormItem>
               </Col>
               <Col span={24}>
-                <FormItem label="注册地址">
+                <FormItem
+                  label={formatMessage({ id: 'bp.maintain_details.verification_data.address' })}
+                >
                   {getFieldDecorator('address', {
                     initialValue: orgData.address,
                     rules: [{ required: true }],
@@ -246,7 +265,7 @@ class OrgCertification extends Component {
             </Row>
           </Col>
           <Col xxl={9} lg={24}>
-            <FormItem label="认证说明">
+            <FormItem label={formatMessage({ id: 'bp.maintain_details.verification_data.memo' })}>
               {getFieldDecorator('notes', {
                 initialValue: orgData.notes,
                 rules: [{ required: true }],
@@ -256,7 +275,11 @@ class OrgCertification extends Component {
         </Row>
         <Row>
           <Col>
-            <FormItem label="认证图片">
+            <FormItem
+              label={formatMessage({
+                id: 'bp.maintain_details.verification_data.verification_documents',
+              })}
+            >
               {getFieldDecorator('attachmentList', {
                 rules: [{ required: true }],
                 valuePropName: 'fileList',
@@ -296,7 +319,9 @@ class OrgCertification extends Component {
           <Col span={6}>
             <Row>
               <Col span={24}>
-                <FormItem label="认证状态">
+                <FormItem
+                  label={formatMessage({ id: 'bp.maintain_details.verification_data.status' })}
+                >
                   <Badge status="default" />
                   未认证
                 </FormItem>
@@ -311,7 +336,11 @@ class OrgCertification extends Component {
             </Row>
           </Col>
           <Col span={6}>
-            <FormItem label="认证图片">
+            <FormItem
+              label={formatMessage({
+                id: 'bp.maintain_details.verification_data.verification_documents',
+              })}
+            >
               {getFieldDecorator('attachmentList', {
                 rules: [{ required: true }],
                 valuePropName: 'fileList',
@@ -333,7 +362,7 @@ class OrgCertification extends Component {
             </FormItem>
           </Col>
           <Col span={10}>
-            <FormItem label="认证说明">
+            <FormItem label={formatMessage({ id: 'bp.maintain_details.verification_data.memo' })}>
               {getFieldDecorator('notes', {
                 initialValue: orgData.notes,
               })(<TextArea rows={6} onChange={e => this.valueChange('notes', e.target.value)} />)}

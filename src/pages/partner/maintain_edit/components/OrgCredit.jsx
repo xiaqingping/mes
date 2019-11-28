@@ -4,6 +4,7 @@
 import { Card, Descriptions, Divider } from 'antd';
 import React, { Component } from 'react';
 import { connect } from 'dva';
+import { formatMessage, FormattedMessage } from 'umi-plugin-react/locale';
 
 const DescriptionsItem = Descriptions.Item;
 
@@ -18,26 +19,42 @@ class OrgCredit extends Component {
 
     return (
       <Card
-        title="信贷数据"
+        title={formatMessage({ id: 'bp.maintain_details.credit_management' })}
         bordered={false}
         style={{ marginBottom: '24px' }}
         extra={
           <>
-            <a>额度调整</a>
+            <a>
+              <FormattedMessage id="bp.maintain_details.credit_management.credit_adjustment" />
+            </a>
             <Divider type="vertical" />
-            <a>临时额度</a>
+            <a>
+              <FormattedMessage id="bp.maintain_details.credit_management.temporary_credit" />
+            </a>
           </>
         }
       >
         <Descriptions className="s-descriptions" layout="vertical" column={4}>
-          <DescriptionsItem label="额度">
+          <DescriptionsItem
+            label={formatMessage({ id: 'bp.maintain_details.credit_management.credit' })}
+          >
             {data.credit} {data.currencyCode} 1天后调整
           </DescriptionsItem>
-          <DescriptionsItem label="临时额度">
+          <DescriptionsItem
+            label={formatMessage({ id: 'bp.maintain_details.credit_management.temporary_credit' })}
+          >
             {data.tempCreditLimit} {data.currencyCode} 25天后到期
           </DescriptionsItem>
-          <DescriptionsItem label="付款周期">开票后{data.billingCycle}天到期</DescriptionsItem>
-          <DescriptionsItem label="账单间隔">每月{data.billingDay}日开票</DescriptionsItem>
+          <DescriptionsItem
+            label={formatMessage({ id: 'bp.maintain_details.credit_management.payment_period' })}
+          >
+            开票后{data.billingCycle}天到期
+          </DescriptionsItem>
+          <DescriptionsItem
+            label={formatMessage({ id: 'bp.maintain_details.credit_management.invoiced_period' })}
+          >
+            每月{data.billingDay}日开票
+          </DescriptionsItem>
         </Descriptions>
       </Card>
     );
