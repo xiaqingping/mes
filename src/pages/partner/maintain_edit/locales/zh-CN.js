@@ -43,6 +43,7 @@ export default {
   'bp.maintain_details.purchase_org.invoice_when_good_receipt': '收货时发票过账',
   'bp.maintain_details.purchase_org.purchase_organization': '采购组',
   'bp.maintain_details.purchase_org.delivery_time_plan': '计划交货时间',
+  'bp.maintain_details.purchase_org.procurement_block': '采购冻结',
   // 信贷数据
   'bp.maintain_details.credit_management': '信贷数据',
   'bp.maintain_details.credit_management.credit_adjustment': '额度调整',

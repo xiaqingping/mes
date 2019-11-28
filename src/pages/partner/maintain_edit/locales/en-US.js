@@ -43,6 +43,7 @@ export default {
   'bp.maintain_details.purchase_org.invoice_when_good_receipt': 'Invoice When Good Receipt',
   'bp.maintain_details.purchase_org.purchase_organization': 'Purchase Organization',
   'bp.maintain_details.purchase_org.delivery_time_plan': 'Delivery Time(Plan)',
+  'bp.maintain_details.purchase_org.procurement_block': 'Procurement Block',
   // 信贷数据
   'bp.maintain_details.credit_management': 'Credit Management',
   'bp.maintain_details.credit_management.credit_adjustment': 'Credit Adjustment',
