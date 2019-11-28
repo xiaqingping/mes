@@ -477,7 +477,7 @@ class CustomerEdit extends Component {
 
     bp.addBP(newData).then(() => {
       message.success('新增业务伙伴成功');
-      router.push('/partner/maintain');
+      router.push('/bp/maintain');
     });
   };
 
@@ -601,7 +601,7 @@ class CustomerEdit extends Component {
 
     bp.updateBP(newDetails).then(() => {
       message.success('修改业务伙伴成功');
-      router.push('/partner/maintain');
+      router.push('/bp/maintain');
     });
   };
 
@@ -766,7 +766,7 @@ class CustomerEdit extends Component {
             <>
               <div style={{ paddingBottom: 50 }}>{this.renderContent()}</div>
               <FooterToolbar style={{ width }}>
-                <Button onClick={() => router.push('/partner/maintain')}>取消</Button>
+                <Button onClick={() => router.push('/bp/maintain')}>取消</Button>
                 <Button type="primary" onClick={this.validate}>
                   提交
                 </Button>

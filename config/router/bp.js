@@ -1,43 +1,43 @@
 // 客户关系
 module.exports = {
-  path: '/partner',
-  name: 'partner',
+  path: '/bp',
+  name: 'bp',
   icon: 'user',
   routes: [
     {
       name: 'maintain',
-      path: '/partner/maintain',
+      path: '/bp/maintain',
       hideChildrenInMenu: true,
       routes: [
         {
-          path: '/partner/maintain',
+          path: '/bp/maintain',
           component: './partner/maintain',
         },
         {
           name: 'add',
-          path: '/partner/maintain/add',
+          path: '/bp/maintain/add',
           component: './partner/maintain_edit',
         },
         {
           name: 'edit',
-          path: '/partner/maintain/edit/:id',
+          path: '/bp/maintain/edit/:id',
           component: './partner/maintain_edit',
         },
         {
           name: 'details',
-          path: '/partner/maintain/details/:id',
+          path: '/bp/maintain/details/:id',
           component: './partner/maintain_details',
         },
       ],
     },
     {
       name: 'operation',
-      path: '/partner/operation',
+      path: '/bp/operation',
       component: './partner/operation',
     },
     {
       name: 'verification',
-      path: '/partner/verification',
+      path: '/bp/verification',
       component: './partner/verification',
     },
   ],
