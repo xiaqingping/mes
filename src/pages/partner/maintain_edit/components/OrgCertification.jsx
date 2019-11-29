@@ -95,9 +95,8 @@ class OrgCertification extends Component {
         obj[key] = value.fileList.map(e => {
           if (e.status === 'error') requestErr(e.response);
           return {
-            code: (e.response && e.response[0]) || '',
+            id: (e.response && e.response[0]) || '',
             name: e.name,
-            type: e.type,
           };
         });
       }

@@ -1,7 +1,7 @@
 /**
  * PI认证
  */
-import { Button, Card, Icon, List, Typography, Divider, Badge, Modal } from 'antd';
+import { Button, Card, Icon, List, Typography, Divider, Badge, Modal, Upload } from 'antd';
 import React from 'react';
 import { connect } from 'dva';
 
@@ -29,6 +29,16 @@ class PersonCertification extends React.Component {
   }
 
   renderListItem = item => {
+    let fileList = [];
+    if (item && item.attachmentList) {
+      fileList = item.attachmentList.map(e => ({
+        uid: e.id,
+        name: e.name,
+        status: 'done',
+        url: disk.downloadFiles(e.id, { view: true }),
+      }));
+    }
+
     if (item && item.id) {
       return (
         <List.Item key={item.id}>
@@ -55,17 +65,7 @@ class PersonCertification extends React.Component {
               {item.notes}
             </Paragraph>
             <div>
-              {item.attachmentList.map(pic => {
-                const url = disk.downloadFiles(pic.code, { view: true });
-                return (
-                  <img
-                    key={pic.code}
-                    style={{ width: 80, height: 80, marginRight: 5 }}
-                    src={url}
-                    alt={pic.name}
-                  />
-                );
-              })}
+              <Upload listType="picture-card" fileList={fileList} />
             </div>
           </Card>
         </List.Item>

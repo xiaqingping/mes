@@ -35,45 +35,49 @@ const SeqModel = {
     *readBPDetails(action, effects) {
       const { payload } = action;
       const { call, put, all } = effects;
+
       try {
         const { id, ...query } = payload;
-        const { type, customerDataStatus, vendorDataStatus } = query;
+        const { customerDataStatus, vendorDataStatus } = query;
         let details = JSON.parse(JSON.stringify(initDetails));
 
         const task = [null, null];
+
         // 客户
-        if (customerDataStatus === '1') task[0] = call(bp.getBPCustomer, id);
+        if (customerDataStatus !== '2') task[0] = call(bp.getBPCustomer, id);
         // 供应商
-        if (vendorDataStatus === '1') task[1] = call(bp.getBPVendor, id);
+        if (vendorDataStatus !== '2') task[1] = call(bp.getBPVendor, id);
         const [customer, vendor] = yield all(task);
 
         details = { ...details, ...customer, ...vendor };
 
+        const { type } = details.basic;
         // PI认证
-        if (type === '1' && details.piCertificationList.length > 0) {
+        if (type === 1 && details.piCertificationList.length > 0) {
           const options = {
             sourceKey: 'bp_pi_certification',
             sourceCode: details.piCertificationList.map(e => e.attachmentCode).join(','),
           };
           if (options.sourceCode) {
             const img = yield call(disk.getFiles, options);
-            console.log(img);
-            const piCertificationList = details.piCertificationList.map(e => ({
-              ...e,
-              attachmentList: [],
-            }));
+            const piCertificationList = details.piCertificationList.map(e => {
+              const attachmentList = img.filter(e1 => e1.sourceCode === e.attachmentCode);
+              return {
+                ...e,
+                attachmentList,
+              };
+            });
             details = { ...details, piCertificationList };
           }
         }
         // 组织认证
-        if (type === '2' && details.organizationCertification) {
+        if (type === 2 && details.organizationCertification) {
           const options = {
             sourceKey: 'bp_organization_certification',
             sourceCode: details.organizationCertification.attachmentCode,
           };
           if (options.sourceCode) {
-            const img = yield call(disk.getFiles, options);
-            const attachmentList = img.map(e => ({ code: e.id, name: e.name, type: e.mediaType }));
+            const attachmentList = yield call(disk.getFiles, options);
             const organizationCertification = {
               ...details.organizationCertification,
               attachmentList,

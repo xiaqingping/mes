@@ -2,9 +2,10 @@
  * 组织认证查看
  */
 import React from 'react';
-import { Form, Card, Row, Col, Badge } from 'antd';
+import { Form, Card, Row, Col, Badge, Upload } from 'antd';
 import { connect } from 'dva';
 import { formatMessage } from 'umi-plugin-react/locale';
+import disk from '@/api/disk';
 
 const FormItem = Form.Item;
 
@@ -21,7 +22,14 @@ const FormItem = Form.Item;
 class OrgCertificationRead extends React.Component {
   renderChina = () => {
     const { organizationCertification: data, basic } = this.props;
+    const fileList = data.attachmentList.map(e => ({
+      uid: e.id,
+      name: e.name,
+      status: 'done',
+      url: disk.downloadFiles(e.id, { view: true }),
+    }));
     console.log(basic);
+
     return (
       <>
         <Row gutter={32}>
@@ -94,7 +102,7 @@ class OrgCertificationRead extends React.Component {
                 id: 'bp.maintain_details.verification_data.verification_documents',
               })}
             >
-              {data.attachmentCode}
+              <Upload listType="picture-card" fileList={fileList} />
             </FormItem>
           </Col>
         </Row>
@@ -104,6 +112,7 @@ class OrgCertificationRead extends React.Component {
 
   renderOther = countryCode => {
     const { organizationCertification: data } = this.props;
+    const fileList = [];
     return (
       <Row gutter={64}>
         <Col span={6}>
@@ -128,7 +137,9 @@ class OrgCertificationRead extends React.Component {
             label={formatMessage({
               id: 'bp.maintain_details.verification_data.verification_documents',
             })}
-          ></FormItem>
+          >
+            <Upload listType="picture-card" fileList={fileList} />
+          </FormItem>
         </Col>
         <Col span={10}>
           <FormItem

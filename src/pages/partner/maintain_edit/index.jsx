@@ -492,9 +492,6 @@ class CustomerEdit extends Component {
     const { basic, customer, vendor } = details;
     const { salesAreaList, addressList, ...customerOther } = customer;
 
-    console.log('旧数据');
-    console.log(oldDetails);
-
     // 遍历销售范围 格式化数据
     const oldSalesAreaList = oldDetails.customer.salesAreaList || [];
     const newSalesAreaList = salesAreaList.map(item => {
@@ -597,10 +594,6 @@ class CustomerEdit extends Component {
     if (vendorRequired || (vendorRequired === 0 && tabActiveKey === 'vendor')) {
       newDetails = { ...newDetails, vendor: newVendor };
     }
-
-    console.log('发送数据');
-    console.log(newDetails);
-    // return;
 
     bp.updateBP(newDetails).then(() => {
       message.success('修改业务伙伴成功');
