@@ -27,8 +27,8 @@ function verifySourceKey(sourceKey) {
 
 export default {
   // 查询文件
-  getFiles() {
-    return request('/zuul/api/disk/v1/files');
+  getFiles(params) {
+    return request('/zuul/api/disk/v1/files', { params });
   },
   // 删除文件
   deleteFiles(id) {

@@ -13,11 +13,13 @@ import {
 } from 'antd';
 import * as React from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
+import { formatMessage } from 'umi/locale';
 import StandardTable from '@/components/StandardTable';
 import { connect } from 'dva';
 import _ from 'lodash';
 import DetailsList from './components/details';
 import api from '@/api';
+import './style.less'
 
 const FormItem = Form.Item;
 const { Option } = Select;
@@ -192,45 +194,47 @@ class Operation extends React.Component {
       <Form onSubmit={this.handleSearch} layout="inline">
         <Row gutter={{ lg: 24, md: 12, sm: 6 }}>
           <Col lg={6} md={8} sm={12}>
-            <FormItem label="编号">
-              {getFieldDecorator('code')(<Input />)}
+            <FormItem label={formatMessage({ id: 'bp.operation.code' })}>
+              {getFieldDecorator('code')(<Input/>)}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
-          <FormItem label="业务伙伴">
+          <FormItem label={formatMessage({ id: 'bp.operation.businessPartners' })}>
               {getFieldDecorator('bpId')(
               <AutoComplete
                 onSearch={this.inputValue}
                 dataSource={partnerVal.map(renderOption)}
-                placeholder="请输入"
+                // placeholder="请输入"
                 optionLabelProp="text"
                 />)}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
-            <FormItem label="类型">
+            <FormItem label={formatMessage({ id: 'bp.operation.type' })}>
               {getFieldDecorator('type', typeValue ? { initialValue: typeValue } : 'type')(
                 <Select>
                 {/* <Select mode="multiple" showArrow> */}
-                  <Option value="1">新建</Option>
-                  <Option value="2">修改</Option>
+                  <Option value="1">{formatMessage({ id: 'bp.operation.newlyBuild' })}</Option>
+                  <Option value="2">{formatMessage({ id: 'bp.operation.modify' })}</Option>
                 </Select>,
               )}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
-            <FormItem label="状态">
+            <FormItem label={formatMessage({ id: 'bp.operation.state' })}>
               {getFieldDecorator('statusList')(
                 <Select mode="multiple" showArrow>
-                  <Option value="1">未完成</Option>
-                  <Option value="2">部分完成</Option>
-                  <Option value="3">已完成</Option>
+                  <Option value="1">{formatMessage({ id: 'bp.operation.unfinished' })}</Option>
+                  <Option value="2">
+                    {formatMessage({ id: 'bp.operation.partiallyCompleted' })}
+                  </Option>
+                  <Option value="3">{formatMessage({ id: 'bp.operation.finished' })}</Option>
                 </Select>,
               )}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
-            <FormItem label="完成时间">
+            <FormItem label={formatMessage({ id: 'bp.operation.completionTime' })}>
               {getFieldDecorator('wanchengshijian')(
                 <RangePicker />,
               )}
@@ -240,14 +244,11 @@ class Operation extends React.Component {
         <div style={{ overflow: 'hidden' }}>
           <div style={{ float: 'right', marginBottom: 24 }}>
             <Button type="primary" htmlType="submit">
-              查询
+            {formatMessage({ id: 'bp.operation.query' })}
             </Button>
             <Button style={{ marginLeft: 8 }} onClick={this.handleFormReset}>
-              重置
+            {formatMessage({ id: 'bp.operation.reset' })}
             </Button>
-            <a style={{ marginLeft: 8 }} onClick={this.toggleForm}>
-              收起 <Icon type="up" />
-            </a>
           </div>
         </div>
       </Form>
@@ -261,12 +262,12 @@ class Operation extends React.Component {
     const dataList = { list, pagination: { current, pageSize, total } };
     const columns = [
       {
-        title: '编号',
+        title: formatMessage({ id: 'bp.operation.code' }),
         dataIndex: 'code',
         width: 140,
       },
       {
-        title: '业务伙伴',
+        title: formatMessage({ id: 'bp.operation.businessPartners' }),
         dataIndex: 'bpCode',
         render(text, record) {
             return <span style={{ color: '#222222' }}><Icon type="user" />
@@ -274,40 +275,41 @@ class Operation extends React.Component {
         },
       },
       {
-        title: '类型',
+        title: formatMessage({ id: 'bp.operation.type' }),
         dataIndex: 'type',
         width: 120,
         filters: [
           {
             value: '1',
-            text: '新建',
+            text: formatMessage({ id: 'bp.operation.newlyBuild' }),
           },
           {
             value: '2',
-            text: '修改',
+            text: formatMessage({ id: 'bp.operation.modify' }),
           },
         ],
         onFilter: (value, record) => record.type.toString().indexOf(value.toString()) === 0,
         render(text) {
-          return text === 1 ? '新建' : '修改'
+          // eslint-disable-next-line max-len
+          return text === 1 ? formatMessage({ id: 'bp.operation.newlyBuild' }) : formatMessage({ id: 'bp.operation.modify' })
         },
       },
       {
-        title: '状态',
+        title: formatMessage({ id: 'bp.operation.state' }),
         dataIndex: 'status',
         width: 200,
         filters: [
           {
             value: '1',
-            text: '未完成',
+            text: formatMessage({ id: 'bp.operation.unfinished' }),
           },
           {
             value: '2',
-            text: '部分完成',
+            text: formatMessage({ id: 'bp.operation.partiallyCompleted' }),
           },
           {
             value: '3',
-            text: '已完成',
+            text: formatMessage({ id: 'bp.operation.finished' }),
           },
         ],
         onFilter: (value, record) => record.status.toString().indexOf(value.toString()) === 0,
@@ -317,7 +319,7 @@ class Operation extends React.Component {
         },
       },
       {
-        title: '操作人',
+        title: formatMessage({ id: 'bp.operation.operator' }),
         dataIndex: 'operatorName',
         width: 300,
         className: 'marginLeft',
@@ -328,17 +330,19 @@ class Operation extends React.Component {
       },
       {
         fixed: 'right',
-        title: '操作',
+        title: formatMessage({ id: 'bp.operation.operation' }),
         width: 150,
         render: (text, record) => (
-            <a onClick={ e => this.showDrawer(record, e)}>查看</a>
+        <a onClick={ e => this.showDrawer(record, e)}>
+          {formatMessage({ id: 'bp.operation.view' })}
+        </a>
           ),
       },
     ];
 
     return (
       <PageHeaderWrapper>
-        <Card bordered={false}>
+        <Card bordered={false} className="mySet">
           <div className="tableList">
             <div className="tableListForm">{this.renderAdvancedForm()}</div>
             <div className="tableListOperator">

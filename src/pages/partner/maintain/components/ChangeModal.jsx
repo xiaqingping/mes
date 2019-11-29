@@ -336,14 +336,14 @@ class ChangeModal extends Component {
         data = {
           basic: {
             id: recordMsg.id,
-            name: row.msg ? row.msg.name : '',
+            name: row.msg ? row.msg.name : recordMsg.name,
             countryCode: area[0] ? area[0].code : '',
             provinceCode: area[1] ? area[1].code : '',
             cityCode: area[2] ? area[2].code : '',
             countyCode: area[3] ? area[3].code : '',
             streetCode: area[4] ? area[4].code : '',
-            address,
-            industryCode: row.industryCode,
+            address: address || recordMsg.address,
+            industryCode: row.industry,
             telephoneCountryCode: row.phoneNum.telephoneCountryCode,
             telephoneAreaCode: row.phoneNum.telephoneAreaCode,
             telephone: row.phoneNum.telephone,
@@ -354,14 +354,16 @@ class ChangeModal extends Component {
             taxNo: row.taxNo,
             bankCode: row.bankCode,
             bankAccount: row.bankAccount,
-            address: row.regisAddress,
+            registeredAddress: row.regisAddress,
             notes: row.notes,
             attachmentCode: row.attachmentCode,
           },
         }
-        api.bp.updateBPOrgCertification(data).then(res => {
-          console.log(res)
-        })
+        console.log(data)
+        // api.bp.updateBPOrgCertification(data).then(() => {
+        //   this.setState({ submitNext: 2 })
+        //   this.props.getData()
+        // })
       });
     }
 
@@ -389,6 +391,7 @@ class ChangeModal extends Component {
         groupUsaShow: true,
         submitNext: 1,
         userData: [],
+        address: '',
       })
     }
 
@@ -471,7 +474,6 @@ class ChangeModal extends Component {
     }
 
     /** Group */
-
     renderGroupNameForm = () => {
       const { groupNameShow } = this.state;
       return groupNameShow ? this.groupNameShow() : this.groupNameInput();
@@ -484,7 +486,7 @@ class ChangeModal extends Component {
         return (
           <Col lg={24} md={12} sm={12}>
             <FormItem label="名称" labelCol={{ span: 4 }} wrapperCol={{ span: 20 }}>
-              <Icon type="home" /> <span>{recordMsg.name}</span>
+              <Icon type="home" />&nbsp;&nbsp;<span>{recordMsg.name}</span>&nbsp;&nbsp;&nbsp;&nbsp;
               <a href="#" onClick = {event => this.updetaNameGroup(event, recordMsg)}>修改</a>
             </FormItem>
           </Col>
@@ -495,13 +497,6 @@ class ChangeModal extends Component {
     groupNameInput = () => {
       const { form, name } = this.state;
       const { getFieldDecorator } = form;
-      // let isNameFinish = false;
-      // if (form.getFieldsValue().msg && form.getFieldsValue().msg.name === '') {
-      //   console.log('进来le')
-      //   isNameFinish = true;
-      // } else {
-      //   isNameFinish = false;
-      // }
       return (
       <Col lg={24} md={12} sm={12}>
         <FormItem label="名称" labelCol={{ span: 4 }} wrapperCol={{ span: 20 }}>
@@ -533,8 +528,8 @@ class ChangeModal extends Component {
         return (
           <Col lg={24} md={12} sm={12}>
             <FormItem label="联系地址" labelCol={{ span: 4 }} wrapperCol={{ span: 20 }}>
-              <span>{recordMsg.address}</span> <a href="#"
-              onClick = {event => this.updateAdressGroup(event)}>修改</a>
+              <span>{recordMsg.address}</span>&nbsp;&nbsp;&nbsp;&nbsp;
+              <a href="#" onClick = {event => this.updateAdressGroup(event)}>修改</a>
             </FormItem>
           </Col>
         )
@@ -577,6 +572,7 @@ class ChangeModal extends Component {
         return (
         <Col lg={12} md={12} sm={12}>
           <FormItem label="行业类别">
+          &nbsp;&nbsp;&nbsp;&nbsp;
         <span>{
           // eslint-disable-next-line consistent-return
           industryCategories.forEach(item => {
@@ -584,8 +580,8 @@ class ChangeModal extends Component {
               return item.name
             }
           })
-        }</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#"
-        onClick = {event => this.updateIndustryGroup(event)}>修改</a>
+        }</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <a href="#" onClick = {event => this.updateIndustryGroup(event)}>修改</a>
           </FormItem>
         </Col>
       )
@@ -850,102 +846,107 @@ class ChangeModal extends Component {
               <Col lg={12} md={12} sm={12}>
                 <FormItem label="增值税专用发票资质">
                   {getFieldDecorator('specialInvoice')(
-                  <Switch checkedChildren="开" unCheckedChildren="关" onChange={() => {
-                    this.setState({
-                      specialInvoice: !specialInvoice,
-                    })
-                  }} checked={specialInvoice} />)}
+                  <Switch
+                    style={{ marginLeft: '7px' }}
+                    checkedChildren="开"
+                    unCheckedChildren="关"
+                    onChange={() => {
+                      this.setState({
+                        specialInvoice: !specialInvoice,
+                      })
+                    }}
+                    checked={specialInvoice}
+                  />)}
                 </FormItem>
               </Col>
 
               <Col lg={12} md={12} sm={12}>
-                <FormItem label="统一社会信用代码">
+                <FormItem
+                  label="统一社会信用代码"
+                  hasFeedback
+                  validateStatus={form.getFieldValue('taxNo') ? 'success' : 'error'}
+                  help={form.getFieldValue('taxNo') ? '' : '请输入信息'}
+                >
                   {getFieldDecorator('taxNo', {
                     // eslint-disable-next-line no-nested-ternary
                     initialValue: userData.organizationCertification ?
                     (userData.organizationCertification.taxNo ?
                       userData.organizationCertification.taxNo : '')
                      : '',
-                    rules: [
-                      {
-                        required: true,
-                        message: '请输入统一社会信用代码！',
-                      },
-                    ],
                   })(<Input placeholder="请输入"/>)}
                 </FormItem>
               </Col>
               <Col lg={12} md={12} sm={12}>
-                <FormItem label="基本户开户银行">
+                <FormItem
+                  label="基本户开户银行"
+                  className="marginLeft7"
+                  hasFeedback
+                  validateStatus={form.getFieldValue('bankCode') ? 'success' : 'error'}
+                  help={form.getFieldValue('bankCode') ? '' : '请输入信息'}
+                >
                   {getFieldDecorator('bankCode', {
                     // eslint-disable-next-line no-nested-ternary
                     initialValue: userData.organizationCertification ?
                     (userData.organizationCertification.bankCode ?
                       userData.organizationCertification.bankCode : '') : '',
-                    rules: [
-                      {
-                        required: true,
-                        message: '请输入开户行',
-                      },
-                    ],
-                  })(<Input placeholder="请输入"/>)}
+                  })(<Input placeholder="请输入" style={{ marginLeft: '7px' }}/>)}
                 </FormItem>
               </Col>
               <Col lg={12} md={12} sm={12}>
-                <FormItem label="基本户开户账号">
+                <FormItem
+                  label="基本户开户账号"
+                  hasFeedback
+                  validateStatus={form.getFieldValue('bankAccount') ? 'success' : 'error'}
+                  help={form.getFieldValue('bankAccount') ? '' : '请输入信息'}
+                >
                   {getFieldDecorator('bankAccount', {
                     // eslint-disable-next-line no-nested-ternary
                     initialValue: userData.organizationCertification ?
                     (userData.organizationCertification.bankAccount ?
                       userData.organizationCertification.bankAccount : '') : '',
-                    rules: [
-                      {
-                        required: true,
-                        message: '请输入开户行账号',
-                      },
-                    ],
                   })(<Input placeholder="请输入"/>)}
                 </FormItem>
               </Col>
-              {/* <Col lg={12} md={12} sm={12}>
-                <FormItem label="基本户开户名">
-                  {getFieldDecorator('acountName')(<Input placeholder="请输入"/>)}
-                </FormItem>
-              </Col> */}
               <Col lg={24} md={12} sm={12}>
-                  <FormItem label="注册地址" labelCol={{ span: 4 }} wrapperCol={{ span: 20 }}>
+                  <FormItem
+                    label="注册地址"
+                    labelCol={{ span: 4 }}
+                    wrapperCol={{ span: 20 }}
+                    hasFeedback
+                    validateStatus={form.getFieldValue('regisAddress') ? 'success' : 'error'}
+                    help={form.getFieldValue('regisAddress') ? '' : '请输入信息'}
+                  >
                     {getFieldDecorator('regisAddress', {
                     // eslint-disable-next-line no-nested-ternary
                     initialValue: userData.organizationCertification ?
                     (userData.organizationCertification.address ?
                       userData.organizationCertification.address : '') : '',
-                    rules: [
-                      {
-                        required: true,
-                        message: '请输入注册地址',
-                      },
-                    ],
                   })(<Input placeholder="请输入"/>)}
                   </FormItem>
               </Col>
               <Col lg={24} md={12} sm={12}>
-                <Form.Item label="认证说明" labelCol={{ span: 4 }} wrapperCol={{ span: 20 }}>
+                <Form.Item
+                  label="认证说明"
+                  hasFeedback
+                  labelCol={{ span: 4 }}
+                  wrapperCol={{ span: 20 }}
+                  validateStatus={form.getFieldValue('notes') ? 'success' : 'error'}
+                  help={form.getFieldValue('notes') ? '' : '请输入信息'}
+                >
                   {getFieldDecorator('notes', {
                     // eslint-disable-next-line no-nested-ternary
                     initialValue: userData.organizationCertification ?
                     (userData.organizationCertification.notes ?
                       userData.organizationCertification.notes : '') : '',
-                    rules: [
-                      {
-                        required: true,
-                        message: '请输入认证说明',
-                      },
-                    ],
                   })(<TextArea rows={2} />)}
                 </Form.Item>
               </Col>
               <Col lg={24} md={12} sm={12}>
-              <Form.Item label="认证图片" labelCol={{ span: 4 }} wrapperCol={{ span: 20 }}>
+              <Form.Item
+                label="认证图片"
+                labelCol={{ span: 4 }}
+                wrapperCol={{ span: 20 }}
+              >
                 {getFieldDecorator('attachmentCode')(uploadModal)}
                </Form.Item>
               </Col>
@@ -986,7 +987,7 @@ class ChangeModal extends Component {
               })(<TextArea rows={2} />)}
             </Form.Item>
             <Form.Item label="认证图片">
-              {getFieldDecorator('idenImg')(uploadModal)}
+              {getFieldDecorator('attachmentCode')(uploadModal)}
             </Form.Item>
             <Divider style={{ margin: 0 }}/>
             <Button htmlType="submit" type="primary"
@@ -1017,7 +1018,7 @@ class ChangeModal extends Component {
               {getFieldDecorator('idenText')(<TextArea rows={2} />)}
             </Form.Item>
             <Form.Item label="认证图片">
-              {getFieldDecorator('idenImg')(uploadModal)}
+              {getFieldDecorator('attachmentCode')(uploadModal)}
             </Form.Item>
             <Divider style={{ margin: 0 }}/>
             <Button htmlType="submit" type="primary"
