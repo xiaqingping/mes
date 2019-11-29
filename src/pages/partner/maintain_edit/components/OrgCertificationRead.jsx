@@ -103,9 +103,7 @@ class OrgCertificationRead extends React.Component {
   };
 
   renderOther = countryCode => {
-    console.log(countryCode);
     const { organizationCertification: data } = this.props;
-    console.log(data);
     return (
       <Row gutter={64}>
         <Col span={6}>
