@@ -10,16 +10,18 @@ const FormItem = Form.Item;
 
 @connect(({ bpEdit }) => {
   const details = bpEdit.details || {};
+  const { basic } = details;
   const organizationCertification = details.organizationCertification || { attachmentList: [] };
   return {
     details,
+    basic,
     organizationCertification,
   };
 })
 class OrgCertificationRead extends React.Component {
   renderChina = () => {
-    const { organizationCertification: data } = this.props;
-    console.log(data);
+    const { organizationCertification: data, basic } = this.props;
+    console.log(basic);
     return (
       <>
         <Row gutter={32}>
@@ -39,7 +41,7 @@ class OrgCertificationRead extends React.Component {
                     id: 'bp.maintain_details.verification_data.special_invoice',
                   })}
                 >
-                  &nbsp;
+                  {data.specialInvoice}
                 </FormItem>
               </Col>
               <Col span={8}>
@@ -48,14 +50,14 @@ class OrgCertificationRead extends React.Component {
                     id: 'bp.maintain_details.verification_data.VAT_Business',
                   })}
                 >
-                  &nbsp;
+                  {data.taxNo}
                 </FormItem>
               </Col>
               <Col span={8}>
                 <FormItem
                   label={formatMessage({ id: 'bp.maintain_details.verification_data.bank_name' })}
                 >
-                  &nbsp;
+                  {data.bankName}
                 </FormItem>
               </Col>
               <Col span={8}>
@@ -64,26 +66,24 @@ class OrgCertificationRead extends React.Component {
                     id: 'bp.maintain_details.verification_data.account_number',
                   })}
                 >
-                  &nbsp;
+                  {data.bankAccount}
                 </FormItem>
               </Col>
               <Col span={8}>
-                <FormItem label={formatMessage({ id: 'bp.maintain_details.phone' })}>
-                  &nbsp;
-                </FormItem>
+                <FormItem label={formatMessage({ id: 'bp.maintain_details.phone' })}>电话</FormItem>
               </Col>
               <Col span={24}>
                 <FormItem
                   label={formatMessage({ id: 'bp.maintain_details.verification_data.address' })}
                 >
-                  &nbsp;
+                  {data.address}
                 </FormItem>
               </Col>
             </Row>
           </Col>
           <Col xxl={9} lg={24}>
             <FormItem label={formatMessage({ id: 'bp.maintain_details.verification_data.memo' })}>
-              &nbsp;
+              {data.notes}
             </FormItem>
           </Col>
         </Row>
@@ -94,7 +94,7 @@ class OrgCertificationRead extends React.Component {
                 id: 'bp.maintain_details.verification_data.verification_documents',
               })}
             >
-              &nbsp;
+              {data.attachmentCode}
             </FormItem>
           </Col>
         </Row>
@@ -119,7 +119,9 @@ class OrgCertificationRead extends React.Component {
               </FormItem>
             </Col>
             <Col span={24}>
-              <FormItem label={countryCode === 'US' ? '免税认证号' : '增值税登记号'}></FormItem>
+              <FormItem label={countryCode === 'US' ? '免税认证号' : '增值税登记号'}>
+                {data.taxNo}
+              </FormItem>
             </Col>
           </Row>
         </Col>
