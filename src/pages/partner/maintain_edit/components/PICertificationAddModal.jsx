@@ -77,6 +77,9 @@ class PICertificationAddModal extends React.Component {
     const { billToParty } = this.state;
     if (key === 'attachmentList') {
       const attachmentList = [];
+      if (value.file.status === 'removed') {
+        disk.deleteFiles(value.file.response[0]);
+      }
       if (value.file.response) {
         value.fileList.forEach(e => {
           if (e.status === 'error') requestErr(e.response);

@@ -91,6 +91,9 @@ class OrgCertification extends Component {
     }
 
     if (key === 'attachmentList') {
+      if (value.file.status === 'removed') {
+        disk.deleteFiles(value.file.response[0]);
+      }
       if (value.file.response) {
         obj[key] = value.fileList.map(e => {
           if (e.status === 'error') requestErr(e.response);
