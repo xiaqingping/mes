@@ -115,7 +115,7 @@ export default {
   },
   // 固定信用额度调整接口
   creditLimitAdjustment(id, params) {
-    return request(`/businessPartners/v1/${id}/creditLimitAdjustment`, { params });
+    return request(`/businessPartners/v1/${id}/creditLimitAdjustment`, { method: 'POST', params });
   },
   // 临时信用额度评估接口
   tempCreditLimitAssessment(id, params) {
@@ -123,7 +123,7 @@ export default {
   },
   // 临时信用额度调整接口
   tempCreditlimitAdjustment(id, params) {
-    return request(`/businessPartners/v1/${id}/tempCreditlimitAdjustment`, { params });
+    return request(`/businessPartners/v1/${id}/tempCreditlimitAdjustment`, { method: 'POST', params });
   },
 
   // 根据业务伙伴ID查询最新的PI认证或组织认证类型的验证记录 { invoicePartyId }

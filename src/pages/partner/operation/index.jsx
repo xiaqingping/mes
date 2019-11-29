@@ -59,16 +59,15 @@ class Operation extends React.Component {
     this.callParter = _.debounce(this.callParter, 500);
   }
 
-
   componentDidMount() {
     this.getTableData();
   }
 
-    // 业务伙伴查询
-    callParter = value => {
-      api.bp.getPartnerName({ code_or_name: value })
-      .then(res => { this.setState({ partnerVal: res }) })
-    }
+  // 业务伙伴查询
+  callParter = value => {
+    api.bp.getPartnerName({ code_or_name: value })
+    .then(res => { this.setState({ partnerVal: res }) })
+  }
 
   // 弹窗显示和详情数据保存
   showDrawer = (record, e) => {
@@ -314,8 +313,11 @@ class Operation extends React.Component {
         ],
         onFilter: (value, record) => record.status.toString().indexOf(value.toString()) === 0,
         render(val, record) {
-          return <span><Badge status={status[val].value} text={status[val].text}/><br/>
+          if (val) {
+            return <span><Badge status={status[val].value} text={status[val].text}/><br/>
           <span style={{ marginLeft: 85 }}>{val === 3 ? record.finishDate : ''}</span></span>;
+          }
+            return val
         },
       },
       {

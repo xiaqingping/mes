@@ -100,10 +100,10 @@ const emailIden = {
 
 function renderOption(item) {
   return (
-    <Option key={item.value} text={item.value}>
+    <Option key={item.id} text={item.name}>
       <div style={{ display: 'flex' }}>
-        <span style={{ flexGrow: 1 }}>{item.code}</span>
-        <span style={{ flexGrow: 1 }}>{item.value}</span>
+        <span>{item.code}</span>&nbsp;&nbsp;
+        <span>{item.name}</span>
       </div>
     </Option>
   );
@@ -130,13 +130,14 @@ constructor(props) {
     // formValues: {},
     xiaoshuoguishu: [],
     // kaipiaofang: [],
+    receivingParty: [], // 收票方
     changeModal: false,
     recordMesg: undefined,
     loading: false,
     searchVal: {},
   };
-  this.callSaler = _.debounce(this.callSaler, 1000);
-  this.callCustomer = _.debounce(this.callCustomer, 1000);
+  this.callSaler = _.debounce(this.callSaler, 500);
+  this.callCustomer = _.debounce(this.callCustomer, 500);
 }
 
   componentDidMount() {
@@ -165,7 +166,9 @@ constructor(props) {
   // 收票方查询
   callCustomer = value => {
     api.bp.getOrgCustomerByCodeOrName({ code_or_name: value }).then(res => {
-      console.log(res)
+      this.setState({
+        receivingParty: res,
+      })
     })
   }
 
@@ -188,7 +191,13 @@ constructor(props) {
   /** 取消认证 */
   cancelIdent = (e, record) => {
     e.preventDefault();
-    console.log(record);
+    if (record.type === 2) {
+      api.bp.cancelBPOrgCertification(record.id).then(
+        () => {
+          this.getTableData()
+        },
+      )
+    }
   };
 
   /** 变更认证 */
@@ -370,7 +379,8 @@ constructor(props) {
       form: { getFieldDecorator },
       regionOffice,
     } = this.props;
-    const { xiaoshuoguishu } = this.state;
+    const { xiaoshuoguishu, receivingParty } = this.state;
+    console.log(receivingParty)
     return (
       <Form onSubmit={this.handleSearch} layout="inline">
         <Row gutter={{ xxl: 100, lg: 80 }}>
@@ -454,10 +464,10 @@ constructor(props) {
             <FormItem label="收票方">
               {getFieldDecorator('invoicePartyId')(
                 <AutoComplete
-                  dataSource={xiaoshuoguishu.map(renderOption)}
+                  dataSource={receivingParty.map(renderOption)}
                   onSearch={this.searchCustomer}
                   optionLabelProp="text"
-                  placeholder="请输入"
+                  // placeholder="请输入"
                 />,
               )}
             </FormItem>
@@ -684,7 +694,7 @@ constructor(props) {
               }
               {record.certificationStatus === 4 ?
                 <Menu.Item>
-                  <a href="#" onClick={ e => { this.changeIdent(e, record) }}>变更认证</a>
+                  <a href="#" onClick={ () => { this.showChange.visibleShow(true, record) }}>变更认证</a>
                 </Menu.Item>
               : ''
               }

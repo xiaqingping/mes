@@ -101,7 +101,6 @@ class BasicInfo extends Component {
                     ))}
                   </> : ''
                   }
-
                 </ul>
               </DescriptionsItem>
             </Descriptions>
