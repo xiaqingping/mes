@@ -272,7 +272,7 @@ constructor(props) {
   };
 
   handleModalVisible = () => {
-    router.push('/partner/maintain/add');
+    router.push('/bp/maintain/add');
   };
 
   handleSelectRows = rows => {
@@ -533,7 +533,7 @@ constructor(props) {
         width: 250,
         render(val, record) {
           return (
-            <Link className={styles.partNer} to={`/partner/maintain/details/${record.id}`}>
+            <Link className={styles.partNer} to={`/bp/maintain/details/${record.id}`}>
               <Icon type={record.type === 1 ? 'user' : 'home'} /> &nbsp;{record.name}
                 <div className={styles.partCode}>{val}</div>
             </Link>
@@ -697,7 +697,7 @@ constructor(props) {
           );
           return (
             <>
-              <Link to={`/partner/maintain/edit/${id}?type=${record.type}&customerDataStatus=${record.customerDataStatus}&vendorDataStatus=${record.vendorDataStatus}`}>修改</Link>
+              <Link to={`/bp/maintain/edit/${id}?type=${record.type}&customerDataStatus=${record.customerDataStatus}&vendorDataStatus=${record.vendorDataStatus}`}>修改</Link>
               <Divider type="vertical" />
               <Dropdown overlay={menu}>
                 <a className="ant-dropdown-link">
