@@ -107,7 +107,7 @@ class PICertificationAddModal extends React.Component {
   render() {
     const { form, authorization, billToPartyList } = this.props;
     const { uuid, billToParty } = this.state;
-    const uploadUrl = disk.uploadMoreFiles('bp_organization_certification', uuid);
+    const uploadUrl = disk.uploadMoreFiles('bp_pi_certification', uuid);
 
     if (!billToParty.attachmentList) billToParty.attachmentList = [];
     const fileList = billToParty.attachmentList.map(e => {
