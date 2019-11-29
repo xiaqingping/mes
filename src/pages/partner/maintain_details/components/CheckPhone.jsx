@@ -8,15 +8,21 @@ import {
   Input,
   Icon,
   Select,
-  Badge,
 } from 'antd';
 import React, { Component } from 'react';
-import './style.less'
+import { connect } from 'dva';
+import './style.less';
+import api from '@/api';
 
 const { Option } = Select;
 const FormItem = Form.Item;
 const { TabPane } = Tabs;
 
+@connect(({ basicCache, partnerMaintainEdit }) => ({
+  countryDiallingCodes: basicCache.countryDiallingCodes,
+  details: partnerMaintainEdit.type === 'supplier' ?
+  partnerMaintainEdit.supplier : partnerMaintainEdit.details,
+}))
 class CheckPhone extends Component {
   state = {
     phoneVisible: false,
@@ -26,6 +32,8 @@ class CheckPhone extends Component {
     threeQuestion: null,
     time: 60,
     btnText: 1,
+    mobilePhoneCountryCode: null,
+    verifyRecordId: null,
   };
 
   componentWillReceiveProps (nextProps) {
@@ -33,6 +41,10 @@ class CheckPhone extends Component {
     this.setState({
       phoneVisible: phoneShow,
     })
+    this.props.dispatch({
+      type: 'basicCache/getCache',
+      payload: { type: 'countryDiallingCodes' },
+    });
   }
 
 
@@ -99,8 +111,20 @@ class CheckPhone extends Component {
         })
       }
       if (!err) {
-        this.setState({
-          status: 5,
+        const { details: { basic: { id } } } = this.props;
+        // 问题提交
+        api.bp.changeContactInfoAnswerVerify(
+          id,
+          {
+            type: 1,
+            answerList: [{ questionId: 1, answer: '2' },
+            { questionId: 2, answer: '4' },
+            { questionId: 3, answer: '9',
+          }] }).then(res => {
+          this.setState({
+            status: 5,
+            verifyRecordId: res.verifyRecordId,
+          })
         })
       }
     });
@@ -109,11 +133,16 @@ class CheckPhone extends Component {
   handleCode = e => {
     e.preventDefault();
     if (this.props.form.getFieldValue('code')) {
-      clearInterval(this.timer)
-      this.setState({
-        time: 60,
-        btnText: 1,
-        status: 6,
+      const { verifyRecordId } = this.state;
+      // 提交验证码
+      // eslint-disable-next-line max-len
+      api.bp.changeContactInfoNewMobileVerifyCodeVerificationVerify(verifyRecordId, { verifyCode: this.props.form.getFieldValue('code') }).then(() => {
+        clearInterval(this.timer)
+        this.setState({
+          time: 60,
+          btnText: 1,
+          status: 6,
+        })
       })
     }
   }
@@ -127,6 +156,11 @@ class CheckPhone extends Component {
         btnText: 3,
         time: 60,
       })
+      const { mobilePhoneCountryCode, verifyRecordId } = this.state;
+
+      // 发送验证码
+      // eslint-disable-next-line max-len
+      api.bp.changeContactInfoNewMobileVerifyCodeSendingVerify(verifyRecordId, { mobilePhoneCountryCode: mobilePhoneCountryCode || 'CN', mobilePhone: this.props.form.getFieldValue('userPhone') })
     }
   }
 
@@ -195,19 +229,46 @@ class CheckPhone extends Component {
         )
       }
 
+  valueChange = v => {
+    this.setState({
+      mobilePhoneCountryCode: v,
+    })
+  }
+
   // 人工辅助变更
   manChange = () => {
     const {
       form: { getFieldDecorator },
+      countryDiallingCodes,
     } = this.props;
-    const { status, oneQuestion, twoQuestion, threeQuestion, btnText, time } = this.state;
+    const {
+      status,
+      oneQuestion,
+      twoQuestion,
+      threeQuestion,
+      btnText,
+      time } = this.state;
     const prefixSelector = getFieldDecorator('prefix', {
-      initialValue: '86',
+      initialValue: 'CN',
     })(
-      <Select style={{ width: 100 }}>
-        <Option value="86"><Badge status="error" /> +886</Option>
-        <Option value="87"><Badge status="error" /> +887</Option>
-      </Select>,
+      <Select
+      style={{ width: '100px' }}
+      onChange={val => this.valueChange({ mobilePhoneCountryCode: val })}
+      showSearch
+      filterOption={(input, option) => option.props.children[1].indexOf(input) >= 0}
+    >
+      {countryDiallingCodes.map(e => (
+        <Option key={e.countryCode} value={e.countryCode}>
+          <div
+            className="select-countryPic-box"
+            style={{ backgroundImage: `url(/images/country/${e.countryCode}.png)` }}
+          >
+            &nbsp;
+          </div>
+          {`+${e.diallingCode}`}
+        </Option>
+      ))}
+    </Select>,
     );
 
     if (status === 4) {

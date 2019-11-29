@@ -1,3 +1,5 @@
+import { formatMessage } from 'umi/locale';
+
 const SeqModel = {
   namespace: 'partnerMaintainEdit',
   state: {
@@ -143,15 +145,15 @@ const SeqModel = {
     operationStatus: {
       1: {
         value: 'default',
-        text: '未完成',
+        text: formatMessage({ id: 'bp.operation.unfinished' }),
       },
       2: {
         value: 'warning',
-        text: '部分完成',
+        text: formatMessage({ id: 'bp.operation.partiallyCompleted' }),
       },
       3: {
         value: 'success',
-        text: '已完成',
+        text: formatMessage({ id: 'bp.operation.finished' }),
       },
     },
   },

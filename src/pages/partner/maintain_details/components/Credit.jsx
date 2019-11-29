@@ -50,7 +50,6 @@ class BasicInfo extends Component {
   render() {
     const { fixedVisible, temporaryVisible } = this.state
     const { details: { creditList } } = this.props;
-
     return (
       <Card
         title={this.titleContent()}
@@ -68,14 +67,15 @@ class BasicInfo extends Component {
             <DescriptionsItem label="付款周期">{creditList[0].creditPeriod}</DescriptionsItem>
             <DescriptionsItem label="账单间隔">{creditList[0].billingDay}</DescriptionsItem>
           </Descriptions>
+        </>
+        : <Empty />
+        }
           <FixedQuota visible={fixedVisible}
           fixedQuota={v => { this.fixedQuota(v) }}
           />
           <TemporaryQuota visible={temporaryVisible}
           temporaryQuota={v => { this.temporaryQuota(v) }}
-          /></>
-        : <Empty />
-        }
+          />
       </Card>
     );
   }
