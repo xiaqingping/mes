@@ -7,6 +7,7 @@ import { connect } from 'dva';
 import { formatMessage } from 'umi-plugin-react/locale';
 import debounce from 'lodash/debounce';
 import { TelphoneInput } from '@/components/CustomizedFormControls';
+import bp from '@/api/bp';
 import disk from '@/api/disk';
 import basicAPI from '@/api/basic';
 import { requestErr } from '@/utils/request';
@@ -63,7 +64,22 @@ class OrgCertification extends Component {
     // 防抖
     this.fetchBank = debounce(this.fetchBank, 500);
     this.checkTelephone = debounce(this.checkTelephone, 500);
+    this.checkTaxNo = debounce(this.checkTaxNo, 500);
   }
+
+  fetchBank = value => {
+    if (!value) {
+      this.setState({ bank: [] });
+      return;
+    }
+    basicAPI
+      .getBanks({
+        codeOrFullName: value,
+      })
+      .then(bank => {
+        this.setState({ bank });
+      });
+  };
 
   checkTelephone = (rule, value, callback) => {
     if (!value.telephone) {
@@ -71,6 +87,23 @@ class OrgCertification extends Component {
       return;
     }
     callback();
+  };
+
+  checkTaxNo = (rule, value, callback) => {
+    if (!value) {
+      callback('税号必须');
+      return;
+    }
+
+    bp.checkBPFields({ taxNo: value })
+      .then(res => {
+        if (!res) {
+          callback();
+        } else {
+          callback('税号重复');
+        }
+      })
+      .catch(() => callback('接口验证失败'));
   };
 
   valueChange = (key, value) => {
@@ -146,20 +179,6 @@ class OrgCertification extends Component {
     return e && e.fileList;
   };
 
-  fetchBank = value => {
-    if (!value) {
-      this.setState({ bank: [] });
-      return;
-    }
-    basicAPI
-      .getBanks({
-        codeOrFullName: value,
-      })
-      .then(bank => {
-        this.setState({ bank });
-      });
-  };
-
   renderChina = () => {
     const {
       form: { getFieldDecorator },
@@ -201,7 +220,7 @@ class OrgCertification extends Component {
                 >
                   {getFieldDecorator('taxNo', {
                     initialValue: orgData.taxNo,
-                    rules: [{ required: true }],
+                    rules: [{ validator: this.checkTaxNo }],
                   })(<Input onChange={e => this.valueChange('taxNo', e.target.value)} />)}
                 </FormItem>
               </Col>

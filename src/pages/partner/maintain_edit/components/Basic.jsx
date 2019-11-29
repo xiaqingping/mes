@@ -70,6 +70,7 @@ class Basic extends React.Component {
     this.checkEmail = debounce(this.checkEmail, 500);
     this.checkMobilePhone = debounce(this.checkMobilePhone, 500);
     this.checkAddress = debounce(this.checkAddress, 500);
+    this.checkTelePhone = debounce(this.checkTelePhone, 500);
   }
 
   checkNameInput = (rule, value, callback) => {
@@ -88,8 +89,16 @@ class Basic extends React.Component {
   };
 
   checkEmail = (rule, value, callback) => {
+    const { basic } = this.props;
+    // 没有邮箱
+    // 1）个人 必须
+    // 2）组织 无所谓
     if (!value.email) {
-      callback('邮箱必填');
+      if (basic.type === 1) {
+        callback('邮箱必填');
+        return;
+      }
+      callback();
       return;
     }
 
@@ -113,8 +122,16 @@ class Basic extends React.Component {
   };
 
   checkMobilePhone = (rule, value, callback) => {
+    const { basic } = this.props;
+    // 没有移动电话
+    // 1）个人 必须
+    // 2）组织 无所谓
     if (!value.mobilePhone) {
-      callback('移动电话必填');
+      if (basic.type === 1) {
+        callback('移动电话必填');
+        return;
+      }
+      callback();
       return;
     }
 
@@ -136,6 +153,20 @@ class Basic extends React.Component {
         }
       })
       .catch(() => callback('验证失败'));
+  };
+
+  checkTelePhone = (rule, value, callback) => {
+    const { basic } = this.props;
+    // 没有电话
+    // 1）组织 必须
+    // 2）个人 无所谓
+    if (!value.telephone) {
+      if (basic.type === 2) {
+        callback('电话必填');
+        return;
+      }
+      callback();
+    }
   };
 
   checkAddress = (rule, value, callback) => {
@@ -263,6 +294,41 @@ class Basic extends React.Component {
     });
   };
 
+  renderTelephone = () => {
+    const { form, editType, basic } = this.props;
+    const { getFieldDecorator } = form;
+
+    const edit = getFieldDecorator('telephone', {
+      initialValue: {
+        telephoneCountryCode: basic.telephoneCountryCode,
+        telephoneAreaCode: basic.telephoneAreaCode,
+        telephone: basic.telephone,
+        telephoneExtension: basic.telephoneExtension,
+      },
+      rules: [{ validator: this.checkTelePhone }],
+    })(<TelphoneInput onChange={value => this.valueChange('telephone', value)} />);
+
+    const show = (
+      <p style={{ lineHeight: '32px' }}>
+        <span>{basic.telephoneCountryCode} </span>
+        {`${basic.telephoneAreaCode}-${basic.telephone}-${basic.telephoneExtension}`}
+        <a href="#"> 变更</a>
+      </p>
+    );
+
+    // 编辑状态
+    // 1）页面状态为：新增
+    // 2）页面状态为：修改 并且 BP类型为人员
+    if (editType === 'add' || (editType === 'update' && basic.type === 1)) {
+      return edit;
+    }
+    // 非编辑状态
+    if (editType === 'update') {
+      return show;
+    }
+    return null;
+  };
+
   render() {
     const {
       form: { getFieldDecorator },
@@ -337,23 +403,7 @@ class Basic extends React.Component {
             </Col>
             <Col md={6} sm={12}>
               <FormItem label={formatMessage({ id: 'bp.maintain_details.phone' })}>
-                {editType === 'add'
-                  ? getFieldDecorator('telephone', {
-                      initialValue: {
-                        telephoneCountryCode: basic.telephoneCountryCode,
-                        telephoneAreaCode: basic.telephoneAreaCode,
-                        telephone: basic.telephone,
-                        telephoneExtension: basic.telephoneExtension,
-                      },
-                    })(<TelphoneInput onChange={value => this.valueChange('telephone', value)} />)
-                  : null}
-                {editType === 'update' ? (
-                  <p style={{ lineHeight: '32px' }}>
-                    <span>{basic.telephoneCountryCode} </span>
-                    {`${basic.telephoneAreaCode}-${basic.telephone}-${basic.telephoneExtension}`}
-                    <a href="#"> 变更</a>
-                  </p>
-                ) : null}
+                {this.renderTelephone(basic)}
               </FormItem>
             </Col>
             <Col md={6} sm={12}>
