@@ -16,12 +16,14 @@ import {
   Divider,
   Badge,
   Button,
+  Spin,
   Typography,
 } from 'antd';
 import React, { Component } from 'react';
 import { connect } from 'dva';
 import { TelphoneInput } from '@/components/CustomizedFormControls';
 import api from '@/api';
+import debounce from 'lodash/debounce';
 import './index.less';
 import { guid } from '@/utils/utils';
 import PersonCertificationAddModal from
@@ -258,12 +260,13 @@ class AddressGroup extends Component {
   //   e => e.languageCode === global.languageCode,
   // );
   const industryCategories = partnerMaintainEdit.Industry;
-  return {
+   return ({
     industryCategories,
+    // industryCategories: basicCache.industryCategories,
     countryDiallingCodes: basicCache.countryDiallingCodes,
     authorization: user.currentUser.authorization,
     details: partnerMaintain.details,
-  };
+  })
 })
 class ChangeModal extends Component {
     constructor (props) {
@@ -290,7 +293,10 @@ class ChangeModal extends Component {
         address: '',
         newGuid,
         uploadUrl,
+        bankFetching: false,
+        bank: [],
       }
+      this.fetchBank = debounce(this.fetchBank, 500);
     }
 
     componentDidMount() {
@@ -299,6 +305,10 @@ class ChangeModal extends Component {
         type: 'basicCache/setState',
         payload: { type: 'countryDiallingCodes' },
       })
+      // this.props.dispatch({
+      //   type: 'basicCache/setState',
+      //   payload: { type: 'industryCategories' },
+      // })
     }
 
     /** props更新时调用 */
@@ -312,6 +322,13 @@ class ChangeModal extends Component {
           })
         } else {
           api.bp.getBPOrgCertification(recordMsg.id).then(res => {
+            // console.log(res)
+            // api.disk.getFiles({
+            //   sourceKey: 'bp_organization_certification',
+            //   sourceCode: [res.organizationCertification.attachmentCode].join(',') }).then(
+            //     v => {
+            //       console.log(v)
+            //     })
             this.setState({
               userData: res,
               specialInvoice: res.organizationCertification ?
@@ -319,6 +336,7 @@ class ChangeModal extends Component {
             })
           })
         }
+
         this.setState({
           changeModal,
           recordMsg,
@@ -327,27 +345,40 @@ class ChangeModal extends Component {
       }
     }
 
+    fetchBank = value => {
+      if (!value) {
+        this.setState({ bank: [] });
+        return;
+      }
+      api.basic.getBanks({
+          codeOrFullName: value,
+        })
+        .then(bank => {
+          this.setState({ bank });
+        });
+    };
+
     handleOk = e => {
       if (e) e.preventDefault();
-      const { address, area, recordMsg } = this.state;
+      const { address, area, userData: { basic }, recordMsg } = this.state;
       this.props.form.validateFields((error, row) => {
         if (error) return;
         let data = {};
         data = {
           basic: {
             id: recordMsg.id,
-            name: row.msg ? row.msg.name : recordMsg.name,
-            countryCode: area[0] ? area[0].code : '',
-            provinceCode: area[1] ? area[1].code : '',
-            cityCode: area[2] ? area[2].code : '',
-            countyCode: area[3] ? area[3].code : '',
-            streetCode: area[4] ? area[4].code : '',
-            address: address || recordMsg.address,
-            industryCode: row.industry,
-            telephoneCountryCode: row.phoneNum.telephoneCountryCode,
-            telephoneAreaCode: row.phoneNum.telephoneAreaCode,
-            telephone: row.phoneNum.telephone,
-            telephoneExtension: row.phoneNum.telephoneExtension,
+            name: row.msg ? row.msg.name : basic.name,
+            countryCode: area[0] ? area[0].code : basic.countryCode,
+            provinceCode: area[1] ? area[1].code : basic.provinceCode,
+            cityCode: area[2] ? area[2].code : basic.cityCode,
+            countyCode: area[3] ? area[3].code : basic.countyCode,
+            streetCode: area[4] ? area[4].code : basic.streetCode,
+            address: address || basic.address,
+            industryCode: row.industry || basic.industryCode,
+            telephoneCountryCode: row.phoneNum.telephoneCountryCode || basic.telephoneCountryCode,
+            telephoneAreaCode: row.phoneNum.telephoneAreaCode || basic.telephoneAreaCode,
+            telephone: row.phoneNum.telephone || basic.telephone,
+            telephoneExtension: row.phoneNum.telephoneExtension || basic.telephoneExtension,
           },
           organizationCertification: {
             specialInvoice: row.specialInvoice ? 1 : 2,
@@ -359,11 +390,10 @@ class ChangeModal extends Component {
             attachmentCode: row.attachmentCode,
           },
         }
-        console.log(data)
-        // api.bp.updateBPOrgCertification(data).then(() => {
-        //   this.setState({ submitNext: 2 })
-        //   this.props.getData()
-        // })
+        api.bp.updateBPOrgCertification(data).then(() => {
+          this.setState({ submitNext: 2 })
+          this.props.getData()
+        })
       });
     }
 
@@ -499,7 +529,14 @@ class ChangeModal extends Component {
       const { getFieldDecorator } = form;
       return (
       <Col lg={24} md={12} sm={12}>
-        <FormItem label="名称" labelCol={{ span: 4 }} wrapperCol={{ span: 20 }}>
+        <FormItem
+        label="名称"
+        labelCol={{ span: 4 }}
+        wrapperCol={{ span: 20 }}
+        hasFeedback
+        validateStatus={form.getFieldValue('msg') ? 'success' : 'error'}
+        help={form.getFieldValue('msg') ? '' : '请输入信息'}
+        >
           {getFieldDecorator('msg')(<NameGroup name={name} type="group"/>)}
         </FormItem>
       </Col>
@@ -537,11 +574,18 @@ class ChangeModal extends Component {
     }
 
     groupAdressInput = () => {
-      const { form } = this.state;
+      const { form, area } = this.state;
       const { getFieldDecorator } = form;
       return (
       <Col lg={24} md={12} sm={12}>
-        <FormItem label="联系地址" labelCol={{ span: 4 }} wrapperCol={{ span: 20 }}>
+        <FormItem
+         label="联系地址"
+         labelCol={{ span: 4 }}
+          wrapperCol={{ span: 20 }}
+          hasFeedback
+          validateStatus={area[0] && area[1] && area[2] && area[3] && area[4] ? 'success' : 'error'}
+          help={form.getFieldValue('msg') ? '' : '请输入信息'}
+        >
           {getFieldDecorator('address')(<AddressGroup addressVal={this.addressVal}/>)}
         </FormItem>
       </Col>
@@ -576,7 +620,7 @@ class ChangeModal extends Component {
         <span>{
           // eslint-disable-next-line consistent-return
           industryCategories.forEach(item => {
-            if (item.code === basic.industryCode) {
+            if (item.id === basic.industryCode) {
               return item.name
             }
           })
@@ -745,6 +789,8 @@ class ChangeModal extends Component {
         specialInvoice,
         addModalVisible,
         uploadUrl,
+        bankFetching,
+        bank,
       } = this.state;
       const { piCertificationList } = userData;
       const { basic } = userData;
@@ -864,7 +910,10 @@ class ChangeModal extends Component {
                 <FormItem
                   label="统一社会信用代码"
                   hasFeedback
-                  validateStatus={form.getFieldValue('taxNo') ? 'success' : 'error'}
+                  // eslint-disable-next-line max-len
+                  validateStatus={form.getFieldValue('taxNo') || (userData.organizationCertification ?
+                    (!!userData.organizationCertification.taxNo)
+                     : '') ? 'success' : 'error'}
                   help={form.getFieldValue('taxNo') ? '' : '请输入信息'}
                 >
                   {getFieldDecorator('taxNo', {
@@ -881,7 +930,10 @@ class ChangeModal extends Component {
                   label="基本户开户银行"
                   className="marginLeft7"
                   hasFeedback
-                  validateStatus={form.getFieldValue('bankCode') ? 'success' : 'error'}
+                  // eslint-disable-next-line max-len
+                  validateStatus={form.getFieldValue('bankCode') || (userData.organizationCertification ?
+                    (!!userData.organizationCertification.bankCode)
+                     : '') ? 'success' : 'error'}
                   help={form.getFieldValue('bankCode') ? '' : '请输入信息'}
                 >
                   {getFieldDecorator('bankCode', {
@@ -889,14 +941,29 @@ class ChangeModal extends Component {
                     initialValue: userData.organizationCertification ?
                     (userData.organizationCertification.bankCode ?
                       userData.organizationCertification.bankCode : '') : '',
-                  })(<Input placeholder="请输入" style={{ marginLeft: '7px' }}/>)}
+                  })(<Select
+                    showSearch
+                    notFoundContent={bankFetching ? <Spin size="small" /> : null}
+                    filterOption={false}
+                    onSearch={this.fetchBank}
+                    style={{ marginLeft: '7px' }}
+                  >
+                    {bank.map(d => (
+                      <Option key={d.code} value={d.code}>
+                        {d.fullName}
+                      </Option>
+                    ))}
+                  </Select>)}
                 </FormItem>
               </Col>
               <Col lg={12} md={12} sm={12}>
                 <FormItem
                   label="基本户开户账号"
                   hasFeedback
-                  validateStatus={form.getFieldValue('bankAccount') ? 'success' : 'error'}
+                  // eslint-disable-next-line max-len
+                  validateStatus={form.getFieldValue('bankAccount') || (userData.organizationCertification ?
+                    (!!userData.organizationCertification.bankAccount)
+                     : '') ? 'success' : 'error'}
                   help={form.getFieldValue('bankAccount') ? '' : '请输入信息'}
                 >
                   {getFieldDecorator('bankAccount', {
@@ -913,7 +980,10 @@ class ChangeModal extends Component {
                     labelCol={{ span: 4 }}
                     wrapperCol={{ span: 20 }}
                     hasFeedback
-                    validateStatus={form.getFieldValue('regisAddress') ? 'success' : 'error'}
+                    // eslint-disable-next-line max-len
+                    validateStatus={form.getFieldValue('regisAddress') || (userData.organizationCertification ?
+                      (!!userData.organizationCertification.address)
+                       : '') ? 'success' : 'error'}
                     help={form.getFieldValue('regisAddress') ? '' : '请输入信息'}
                   >
                     {getFieldDecorator('regisAddress', {
@@ -930,7 +1000,10 @@ class ChangeModal extends Component {
                   hasFeedback
                   labelCol={{ span: 4 }}
                   wrapperCol={{ span: 20 }}
-                  validateStatus={form.getFieldValue('notes') ? 'success' : 'error'}
+                  // eslint-disable-next-line max-len
+                  validateStatus={form.getFieldValue('notes') || (userData.organizationCertification ?
+                    (!!userData.organizationCertification.notes)
+                     : '') ? 'success' : 'error'}
                   help={form.getFieldValue('notes') ? '' : '请输入信息'}
                 >
                   {getFieldDecorator('notes', {

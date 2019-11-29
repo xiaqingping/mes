@@ -484,6 +484,7 @@ class Verification extends React.Component {
         fiexd: 'right',
         title: '操作',
         width: 150,
+        fixed: 'right',
         // eslint-disable-next-line no-shadow
         render: (text, record) => {
           // const { preState } = record;

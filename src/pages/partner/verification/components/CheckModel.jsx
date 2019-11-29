@@ -331,15 +331,25 @@ class CheckModel extends React.Component {
     this.props.onRef(this)
   }
 
-  componentWillReceiveProps(props) {
-    const clickType = props.type;
-    const recordMsg = props.record;
+  /** 控制模态框状态 */
+  setModal1Visible = (modal1Visible, type = false) => {
+    if (type) {
+      this.setState({ pageVisble: false });
+    } else {
+      this.setState({ modal1Visible, detailsValue: undefined, pageVisble: false });
+    }
+  }
+
+
+  visibleShow = (recordMsg, clickType, visible) => {
     // 组织认证
     if (clickType === 1) {
       api.bp.getOrgCertificationVerifyRecords(recordMsg.id).then(res => {
         console.log(res)
         if (res.attachmentCode) {
-          api.disk.getFiles({ sourceCode: res.attachmentCode }).then(v => {
+          api.disk.getFiles({
+            sourceKey: 'bp_organization_certification',
+            sourceCode: [res.attachmentCode].join(',') }).then(v => {
             console.log(v)
           })
         }
@@ -384,19 +394,6 @@ class CheckModel extends React.Component {
       recordMsg,
       clickType,
     })
-  }
-
-  /** 控制模态框状态 */
-  setModal1Visible = (modal1Visible, type = false) => {
-    if (type) {
-      this.setState({ pageVisble: false });
-    } else {
-      this.setState({ modal1Visible, detailsValue: undefined });
-    }
-  }
-
-
-  visibleShow = (recordMsg, clickType, visible) => {
     this.setState({
       modal1Visible: recordMsg ? visible : false,
     });
@@ -420,6 +417,7 @@ class CheckModel extends React.Component {
     })
   }
 
+  // pageVisble 1 审核 ，2 拒绝
   openPage = (id, pageVisble) => {
     if (pageVisble === 1) {
       api.bp.approvalVerifyRecords(id).then(() => {
@@ -947,7 +945,6 @@ class CheckModel extends React.Component {
       </div>
     </Modal>
     </>
-
     console.log(recordMsg)
     return (
       <div style={{ position: 'absolute', right: 0 }} >
@@ -961,7 +958,8 @@ class CheckModel extends React.Component {
           onOk={() => this.setModal1Visible(false)}
           onCancel={() => this.setModal1Visible(false)}
           destroyOnClose
-          footer={clickType === 1 || clickType === 2 || clickType === 3 ? [
+          footer={
+            (clickType === 1 || clickType === 2 || clickType === 3) && recordMsg.status === 1 ? [
             <Button key="back" onClick={() => this.openPage(recordMsg.id, 2)}>
               拒绝
             </Button>,

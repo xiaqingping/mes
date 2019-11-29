@@ -5,6 +5,7 @@ import {
 } from 'antd';
 import { connect } from 'dva';
 import React, { Component } from 'react';
+import api from '@/api';
 
 @connect(({ partnerMaintainEdit }) => ({
   details: partnerMaintainEdit.details,
@@ -13,6 +14,7 @@ class FixedQuota extends Component {
   state = {
     visible: false,
     status: 1,
+    quotaData: [],
   }
 
   componentWillReceiveProps(nextProps) {
@@ -20,6 +22,16 @@ class FixedQuota extends Component {
     this.setState({
       visible,
     })
+    const { details } = this.props;
+    // console.log(details)
+    if (visible) {
+      if (details.basic.type === 2) { // 判断是否为非个人
+        api.bp.creditLimitAssessment(
+          details.basic.id,
+          { currencyCode: details.customer.salesAreaList[0].currencyCode },
+          ).then(res => { this.setState({ quotaData: res }) })
+      }
+    }
   }
 
   handleCancel = () => {
@@ -30,25 +42,36 @@ class FixedQuota extends Component {
     this.props.fixedQuota(false)
   };
 
+  // 提交页面
   handleOk = () => {
-    this.setState({
-      status: 2,
-    });
+    const { details } = this.props;
+    if (details.basic.type === 2) { // 判断是否为非个人
+      api.bp.creditLimitAdjustment(
+        details.basic.id,
+        { currencyCode: details.customer.salesAreaList[0].currencyCode },
+        ).then(res => {
+          // this.setState({
+          //   quotaData: res,
+          //   status: 2,
+          // })
+          console.log(res)
+        })
+    }
   }
 
   // 固定额度页面
   detailPage = () => {
+    const { quotaData } = this.state;
     const { details } = this.props;
-    console.log(details)
     return (
       <div style={{ marginLeft: '80px' }}>
-        <p>上海交通大学</p>
+        <p>{ details.basic.name }</p>
         <p>
-          <span style={{ color: '#4EA7E9' }}>2000</span>&nbsp;&nbsp;&nbsp;&nbsp;
-          CNY
+        <span style={{ color: '#4EA7E9' }}>{ quotaData.creditLimit}</span>&nbsp;&nbsp;&nbsp;&nbsp;
+        { quotaData.currencyCode}
         </p>
-        <p>每月5日开票</p>
-        <p>开票后65天到期</p>
+        <p>每月{quotaData.billingDay}日开票</p>
+        <p>开票后{quotaData.creditPeriod}天到期</p>
       </div>
     )
 }

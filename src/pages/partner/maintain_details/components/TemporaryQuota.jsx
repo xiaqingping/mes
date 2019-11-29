@@ -4,11 +4,17 @@ import {
   Icon,
 } from 'antd';
 import React, { Component } from 'react';
+import { connect } from 'dva';
+import api from '@/api';
 
+@connect(({ partnerMaintainEdit }) => ({
+  details: partnerMaintainEdit.details,
+}))
 class TemporaryQuota extends Component {
   state = {
     visible: false,
     status: 1,
+    quotaData: [],
   }
 
   componentWillReceiveProps(nextProps) {
@@ -16,6 +22,16 @@ class TemporaryQuota extends Component {
     this.setState({
       visible,
     })
+    const { details } = this.props;
+    // console.log(details)
+    if (visible) {
+      if (details.basic.type === 2) { // 判断是否为非个人
+        api.bp.tempCreditLimitAssessment(
+          details.basic.id,
+          { currencyCode: details.customer.salesAreaList[0].currencyCode },
+          ).then(res => { this.setState({ quotaData: res }) })
+      }
+    }
   }
 
   handleCancel = () => {
@@ -27,21 +43,38 @@ class TemporaryQuota extends Component {
   };
 
   handleOk = () => {
-    this.setState({
-      status: 2,
-    });
+    const { details } = this.props;
+    if (details.basic.type === 2) { // 判断是否为非个人
+      api.bp.creditLimitAdjustment(
+        details.basic.id,
+        { currencyCode: details.customer.salesAreaList[0].currencyCode },
+        ).then(res => {
+          // this.setState({
+          //   quotaData: res,
+          //   status: 2,
+          // })
+          console.log(res)
+        })
+    }
   }
 
   // 固定额度页面
-  detailPage = () => (
+  detailPage = () => {
+    const { quotaData } = this.state;
+    const { details } = this.props;
+
+    return (
       <div style={{ marginLeft: '80px' }}>
-        <p>上海交通大学</p>
+        <p>{ details.basic.name }</p>
         <p>
-          <span style={{ color: '#4EA7E9' }}>2000</span>&nbsp;&nbsp;&nbsp;&nbsp;
-          CNY
+          <span style={{ color: '#4EA7E9' }}>
+            { quotaData.tempCreditLimit }
+          </span>&nbsp;&nbsp;&nbsp;&nbsp;
+          { quotaData.currencyCode }
         </p>
       </div>
     )
+}
 
   // 固定额度页面
   hangelPage = () => (
