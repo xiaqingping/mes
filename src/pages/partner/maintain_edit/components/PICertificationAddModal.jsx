@@ -82,15 +82,13 @@ class PICertificationAddModal extends React.Component {
           if (e.status === 'error') requestErr(e.response);
           if (e.old) {
             attachmentList.push({
-              code: e.uid,
+              id: e.uid,
               name: e.name,
-              type: e.type,
             });
           } else {
             attachmentList.push({
-              code: (e.response && e.response[0]) || '',
+              id: (e.response && e.response[0]) || '',
               name: e.name,
-              type: e.type,
             });
           }
         });
@@ -111,10 +109,10 @@ class PICertificationAddModal extends React.Component {
 
     if (!billToParty.attachmentList) billToParty.attachmentList = [];
     const fileList = billToParty.attachmentList.map(e => {
-      const url = disk.downloadFiles(e.code, { view: true });
+      const url = disk.downloadFiles(e.id, { view: true });
       return {
         old: true,
-        uid: e.code,
+        uid: e.id,
         name: e.name,
         type: e.type,
         status: 'done',
