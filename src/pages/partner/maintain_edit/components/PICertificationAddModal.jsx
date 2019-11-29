@@ -1,23 +1,38 @@
 /**
  * PI认证 新增模态框
  */
-import { Form, Input, Upload, Icon } from 'antd';
+import { Form, Input, Upload, Icon, Select } from 'antd';
 import React from 'react';
 import { connect } from 'dva';
+import uniqBy from 'lodash/uniqBy';
 import disk from '@/api/disk';
-import ChooseBillToParty from '@/components/choosse/bp/BillToParty';
 import { requestErr } from '@/utils/request';
 import { guid } from '@/utils/utils';
 
 const FormItem = Form.Item;
-const { Search } = Input;
+const { Option } = Select;
 
 @Form.create()
 @connect(
-  ({ bpEdit, user }) => ({
-    details: bpEdit.details || {},
-    authorization: user.currentUser.authorization,
-  }),
+  ({ bpEdit, user }) => {
+    const details = bpEdit.details || {};
+    const basic = details.basic || {};
+    const customer = details.customer || {};
+    const salesAreaList = customer.salesAreaList || [];
+
+    // 所有收票方合并去重，并过滤掉自己
+    let billToPartyList = salesAreaList.map(e => e.billToPartyList);
+    // eslint-disable-next-line prefer-spread
+    billToPartyList = uniqBy([].concat.apply([], billToPartyList), 'id');
+    billToPartyList = billToPartyList.filter(e => e.id !== basic.id);
+
+    return {
+      details,
+      salesAreaList,
+      billToPartyList,
+      authorization: user.currentUser.authorization,
+    };
+  },
   null,
   null,
   { withRef: true },
@@ -45,15 +60,15 @@ class PICertificationAddModal extends React.Component {
     return e && e.fileList;
   };
 
-  selectChooseModalData = data => {
-    this.props.form.setFieldsValue({
-      billToPartyName: data.name,
-    });
+  billToPartyChange = data => {
+    const { billToPartyList } = this.props;
+    const billToParty = billToPartyList.filter(e => e.id === data)[0];
+
     this.setState({
       billToParty: {
-        billToPartyName: data.name,
-        billToPartyCode: data.code,
-        billToPartyId: data.id,
+        billToPartyName: billToParty.name,
+        billToPartyCode: billToParty.code,
+        billToPartyId: billToParty.id,
       },
     });
   };
@@ -89,12 +104,8 @@ class PICertificationAddModal extends React.Component {
     }
   };
 
-  searchBillToParty = () => {
-    this.ChooseBillToParty.wrappedInstance.changeVisible(true);
-  };
-
   render() {
-    const { form, authorization } = this.props;
+    const { form, authorization, billToPartyList } = this.props;
     const { uuid, billToParty } = this.state;
     const uploadUrl = disk.uploadMoreFiles('bp_organization_certification', uuid);
 
@@ -115,10 +126,18 @@ class PICertificationAddModal extends React.Component {
       <>
         <Form>
           <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="收票方">
-            {form.getFieldDecorator('billToPartyName', {
-              initialValue: billToParty.billToPartyName,
+            {form.getFieldDecorator('billToPartyId', {
+              initialValue: billToParty.billToPartyId,
               rules: [{ required: true }],
-            })(<Search readOnly onSearch={this.searchBillToParty} />)}
+            })(
+              <Select onChange={this.billToPartyChange}>
+                {billToPartyList.map(e => (
+                  <Option value={e.id} key={e.id}>
+                    {`${e.code} - ${e.name}`}
+                  </Option>
+                ))}
+              </Select>,
+            )}
           </FormItem>
           <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="认证说明">
             {form.getFieldDecorator('notes', {
@@ -148,12 +167,6 @@ class PICertificationAddModal extends React.Component {
             )}
           </FormItem>
         </Form>
-        <ChooseBillToParty
-          ref={ref => {
-            this.ChooseBillToParty = ref;
-          }}
-          selectChooseModalData={this.selectChooseModalData}
-        />
       </>
     );
   }
