@@ -204,7 +204,10 @@ export default {
   },
   // 人工辅助变更已验证手机邮箱流程中发送新邮箱验证邮件接口（根据验证编号+邮箱产生验证码并发送）
   changeContactInfoNewEmailVerifyCodeSendingVerify(verifyRecordId, data) {
-    return request(`/businessPartners/v1/verifyRecords/${verifyRecordId}/changeContactInfo/newEmailVerifyCodeSending?email=${data}`, { method: 'POST' });
+    return request(
+      `/businessPartners/v1/verifyRecords/${verifyRecordId}/changeContactInfo/newEmailVerifyCodeSending?email=${data}`,
+      { method: 'POST' },
+    );
   },
   // 人工辅助变更已验证手机邮箱流程中新手机邮箱验证码验证接口（根据验证编号验证验证码是否正确）
   changeContactInfoNewMobileVerifyCodeVerificationVerify(verifyRecordId, data) {
@@ -215,6 +218,9 @@ export default {
   },
   // 人工辅助变更已验证手机邮箱流程中新手机邮箱验证码提交接口（根据验证编号验证验证码是否正确并更新状态）
   changeContactInfoNewEmailVerifyCodeVerificationVerify(verifyRecordId, data) {
-    return request(`/businessPartners/v1/verifyRecords/${verifyRecordId}/changeContactInfo/newEmailVerifyCodeVerification?verifyCode=${data}`, { method: 'POST' });
+    return request(
+      `/businessPartners/v1/verifyRecords/${verifyRecordId}/changeContactInfo/newEmailVerifyCodeVerification?verifyCode=${data}`,
+      { method: 'POST' },
+    );
   },
 };
