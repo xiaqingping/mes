@@ -74,7 +74,7 @@ class Basic extends React.Component {
 
   checkNameInput = (rule, value, callback) => {
     if (!value.name) {
-      callback(formatMessage({ id: 'partner.maintain.requireName' }));
+      callback('名称必须');
       return;
     }
 
@@ -278,11 +278,15 @@ class Basic extends React.Component {
     if (!industrySelectOpen) industryOption.open = industrySelectOpen;
 
     return (
-      <Card title="基础信息" bordered={false} style={{ marginBottom: '24px' }}>
+      <Card
+        title={formatMessage({ id: 'bp.maintain_details.basic' })}
+        bordered={false}
+        style={{ marginBottom: '24px' }}
+      >
         <Form layout="vertical" className={styles.sangonForm}>
           <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
             <Col md={6} sm={12}>
-              <FormItem label="名称">
+              <FormItem label={formatMessage({ id: 'bp.maintain_details.name' })}>
                 {editType === 'add'
                   ? getFieldDecorator('name', {
                       initialValue: {
@@ -313,7 +317,7 @@ class Basic extends React.Component {
               </FormItem>
             </Col>
             <Col md={6} sm={12}>
-              <FormItem label="移动电话">
+              <FormItem label={formatMessage({ id: 'bp.maintain_details.mobile_phone' })}>
                 {getFieldDecorator('mobilePhone', {
                   initialValue: {
                     mobilePhoneCountryCode: basic.mobilePhoneCountryCode,
@@ -324,7 +328,7 @@ class Basic extends React.Component {
               </FormItem>
             </Col>
             <Col md={6} sm={12}>
-              <FormItem label="邮箱">
+              <FormItem label={formatMessage({ id: 'bp.maintain_details.basic.email' })}>
                 {getFieldDecorator('email', {
                   initialValue: { email: basic.email },
                   rules: [{ validator: this.checkEmail }],
@@ -332,7 +336,7 @@ class Basic extends React.Component {
               </FormItem>
             </Col>
             <Col md={6} sm={12}>
-              <FormItem label="电话">
+              <FormItem label={formatMessage({ id: 'bp.maintain_details.phone' })}>
                 {editType === 'add'
                   ? getFieldDecorator('telephone', {
                       initialValue: {
@@ -353,7 +357,7 @@ class Basic extends React.Component {
               </FormItem>
             </Col>
             <Col md={6} sm={12}>
-              <FormItem label="传真">
+              <FormItem label={formatMessage({ id: 'bp.maintain_details.basic.fax' })}>
                 {getFieldDecorator('fax', {
                   initialValue: {
                     faxCountryCode: basic.faxCountryCode,
@@ -365,7 +369,7 @@ class Basic extends React.Component {
               </FormItem>
             </Col>
             <Col md={3} sm={6}>
-              <FormItem label="邮政编码">
+              <FormItem label={formatMessage({ id: 'bp.maintain_details.postal_code' })}>
                 {getFieldDecorator('postCode', {
                   initialValue: basic.postCode,
                   rules: [{ pattern: /^\d+$/, message: '必须数字' }],
@@ -373,7 +377,7 @@ class Basic extends React.Component {
               </FormItem>
             </Col>
             <Col md={3} sm={6}>
-              <FormItem label="时区">
+              <FormItem label={formatMessage({ id: 'bp.maintain_details.basic.time_zone' })}>
                 {getFieldDecorator('timeZoneCode', {
                   initialValue: basic.timeZoneCode,
                 })(
@@ -385,7 +389,7 @@ class Basic extends React.Component {
               </FormItem>
             </Col>
             <Col md={6} sm={12}>
-              <FormItem label="语言">
+              <FormItem label={formatMessage({ id: 'bp.maintain_details.basic.language' })}>
                 {getFieldDecorator('languageCode', {
                   initialValue: basic.languageCode,
                 })(
@@ -397,7 +401,7 @@ class Basic extends React.Component {
               </FormItem>
             </Col>
             <Col md={6} sm={12}>
-              <FormItem label="特殊行业类别">
+              <FormItem label={formatMessage({ id: 'bp.maintain_details.basic.business_type' })}>
                 {getFieldDecorator('industryCode', {
                   initialValue: basic.industryCode,
                 })(
@@ -445,7 +449,7 @@ class Basic extends React.Component {
               </FormItem>
             </Col>
             <Col md={18} sm={24}>
-              <FormItem label="通讯地址">
+              <FormItem label={formatMessage({ id: 'bp.maintain_details.basic.address' })}>
                 {getFieldDecorator('address', {
                   rules: [{ validator: this.checkAddress }],
                   initialValue: {
@@ -461,7 +465,11 @@ class Basic extends React.Component {
             </Col>
             {tabActiveKey === 'customer' ? (
               <Col md={6} sm={6}>
-                <FormItem label="销售冻结">
+                <FormItem
+                  label={formatMessage({
+                    id: 'bp.maintain_details.sales_distribution.sales_block',
+                  })}
+                >
                   {getFieldDecorator('salesOrderBlock', {
                     initialValue: salesOrderBlock === 1,
                     valuePropName: 'checked',
@@ -471,7 +479,11 @@ class Basic extends React.Component {
             ) : null}
             {tabActiveKey === 'vendor' ? (
               <Col md={6} sm={6}>
-                <FormItem label="采购冻结">
+                <FormItem
+                  label={formatMessage({
+                    id: 'bp.maintain_details.purchase_org.procurement_block',
+                  })}
+                >
                   {getFieldDecorator('invoicePostBlock', {
                     initialValue: invoicePostBlock === 1,
                     valuePropName: 'checked',

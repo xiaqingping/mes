@@ -4,6 +4,7 @@
 import React from 'react';
 import { Form, Card, Row, Col, Badge } from 'antd';
 import { connect } from 'dva';
+import { formatMessage } from 'umi-plugin-react/locale';
 
 const FormItem = Form.Item;
 
@@ -25,37 +26,77 @@ class OrgCertificationRead extends React.Component {
           <Col xxl={15} lg={24}>
             <Row gutter={32}>
               <Col span={8}>
-                <FormItem label="认证状态">
+                <FormItem
+                  label={formatMessage({ id: 'bp.maintain_details.verification_data.status' })}
+                >
                   <Badge status="default" />
                   未认证
                 </FormItem>
               </Col>
               <Col span={8}>
-                <FormItem label="增值税专用发票资质"></FormItem>
+                <FormItem
+                  label={formatMessage({
+                    id: 'bp.maintain_details.verification_data.special_invoice',
+                  })}
+                >
+                  &nbsp;
+                </FormItem>
               </Col>
               <Col span={8}>
-                <FormItem label="统一社会信用代码"></FormItem>
+                <FormItem
+                  label={formatMessage({
+                    id: 'bp.maintain_details.verification_data.VAT_Business',
+                  })}
+                >
+                  &nbsp;
+                </FormItem>
               </Col>
               <Col span={8}>
-                <FormItem label="基本户开户银行"></FormItem>
+                <FormItem
+                  label={formatMessage({ id: 'bp.maintain_details.verification_data.bank_name' })}
+                >
+                  &nbsp;
+                </FormItem>
               </Col>
               <Col span={8}>
-                <FormItem label="基本户开户账号"></FormItem>
+                <FormItem
+                  label={formatMessage({
+                    id: 'bp.maintain_details.verification_data.account_number',
+                  })}
+                >
+                  &nbsp;
+                </FormItem>
               </Col>
               <Col span={8}>
-                <FormItem label="电话"></FormItem>
+                <FormItem label={formatMessage({ id: 'bp.maintain_details.phone' })}>
+                  &nbsp;
+                </FormItem>
               </Col>
               <Col span={24}>
-                <FormItem label="注册地址"></FormItem>
+                <FormItem
+                  label={formatMessage({ id: 'bp.maintain_details.verification_data.address' })}
+                >
+                  &nbsp;
+                </FormItem>
               </Col>
             </Row>
           </Col>
           <Col xxl={9} lg={24}>
-            <FormItem label="认证说明"></FormItem>
+            <FormItem label={formatMessage({ id: 'bp.maintain_details.verification_data.memo' })}>
+              &nbsp;
+            </FormItem>
           </Col>
         </Row>
         <Row>
-          <Col>认证图片</Col>
+          <Col>
+            <FormItem
+              label={formatMessage({
+                id: 'bp.maintain_details.verification_data.verification_documents',
+              })}
+            >
+              &nbsp;
+            </FormItem>
+          </Col>
         </Row>
       </>
     );
@@ -66,44 +107,35 @@ class OrgCertificationRead extends React.Component {
     const { organizationCertification: data } = this.props;
     console.log(data);
     return (
-      <>
-        <Row gutter={32}>
-          <Col xxl={15} lg={24}>
-            <Row gutter={32}>
-              <Col span={8}>
-                <FormItem label="认证状态">
-                  <Badge status="default" />
-                  未认证
-                </FormItem>
-              </Col>
-              <Col span={8}>
-                <FormItem label="增值税专用发票资质"></FormItem>
-              </Col>
-              <Col span={8}>
-                <FormItem label="统一社会信用代码"></FormItem>
-              </Col>
-              <Col span={8}>
-                <FormItem label="基本户开户银行"></FormItem>
-              </Col>
-              <Col span={8}>
-                <FormItem label="基本户开户账号"></FormItem>
-              </Col>
-              <Col span={8}>
-                <FormItem label="电话"></FormItem>
-              </Col>
-              <Col span={24}>
-                <FormItem label="注册地址"></FormItem>
-              </Col>
-            </Row>
-          </Col>
-          <Col xxl={9} lg={24}>
-            <FormItem label="认证说明"></FormItem>
-          </Col>
-        </Row>
-        <Row>
-          <Col>认证图片</Col>
-        </Row>
-      </>
+      <Row gutter={64}>
+        <Col span={6}>
+          <Row>
+            <Col span={24}>
+              <FormItem
+                label={formatMessage({ id: 'bp.maintain_details.verification_data.status' })}
+              >
+                <Badge status="default" />
+                未认证
+              </FormItem>
+            </Col>
+            <Col span={24}>
+              <FormItem label={countryCode === 'US' ? '免税认证号' : '增值税登记号'}></FormItem>
+            </Col>
+          </Row>
+        </Col>
+        <Col span={6}>
+          <FormItem
+            label={formatMessage({
+              id: 'bp.maintain_details.verification_data.verification_documents',
+            })}
+          ></FormItem>
+        </Col>
+        <Col span={10}>
+          <FormItem
+            label={formatMessage({ id: 'bp.maintain_details.verification_data.memo' })}
+          ></FormItem>
+        </Col>
+      </Row>
     );
   };
 
@@ -124,7 +156,11 @@ class OrgCertificationRead extends React.Component {
 
   render() {
     return (
-      <Card title="认证资料" bordered={false} style={{ marginBottom: '24px' }}>
+      <Card
+        title={formatMessage({ id: 'bp.maintain_details.verification_data' })}
+        bordered={false}
+        style={{ marginBottom: '24px' }}
+      >
         {this.renderContent()}
       </Card>
     );

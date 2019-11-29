@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 /*
  * 合作伙伴
  * https://devapi.sangon.com:8443/api/businesspartner/swagger-ui.html
@@ -38,11 +39,16 @@ export default {
   },
   // 根据业务伙伴ID变更组织认证资料
   updateBPOrgCertification(data) {
-    return request(`/businessPartners/v1/${data.basic.id}/organizationCertification`, { method: 'PUT', data });
+    return request(`/businessPartners/v1/${data.basic.id}/organizationCertification`, {
+      method: 'PUT',
+      data,
+    });
   },
   // 根据业务伙伴ID取消组织认证接口
   cancelBPOrgCertification(id) {
-    return request(`/businessPartners/v1/${id}/organizationCertification/cancel`, { method: 'POST' });
+    return request(`/businessPartners/v1/${id}/organizationCertification/cancel`, {
+      method: 'POST',
+    });
   },
 
   // 负责人认证
@@ -60,11 +66,17 @@ export default {
   },
   // 根据业务伙伴ID变更负责人认证资料接口
   updateBPPiCertification(id, invoicePartyId, data) {
-    return request(`/businessPartners/v1/${id}/piCertification/${invoicePartyId}`, { method: 'PUT', data });
+    return request(`/businessPartners/v1/${id}/piCertification/${invoicePartyId}`, {
+      method: 'PUT',
+      data,
+    });
   },
   // 根据业务伙伴ID和开票方ID取消负责人认证接口
   cancelBPPiCertification(data) {
-    return request(`/businessPartners/v1/${data.id}/piCertification/${data.invoicePartyId}/cancel`, { method: 'PUT' });
+    return request(
+      `/businessPartners/v1/${data.id}/piCertification/${data.invoicePartyId}/cancel`,
+      { method: 'PUT' },
+    );
   },
 
   // 根据业务伙伴ID禁止客户销售接口
@@ -134,7 +146,7 @@ export default {
   },
   // 获取业务伙伴名称和code接口
   getPartnerName(params) {
-    return request('/businessPartners/v1/code/name', { params })
+    return request('/businessPartners/v1/code/name', { params });
   },
 
   // 验证记录
@@ -144,7 +156,9 @@ export default {
   },
   // 根据验证记录ID查询验证记录明细-组织认证
   getOrgCertificationVerifyRecords(verifyRecordId) {
-    return request(`/businessPartners/v1/verifyRecords/${verifyRecordId}/organizationCertification`);
+    return request(
+      `/businessPartners/v1/verifyRecords/${verifyRecordId}/organizationCertification`,
+    );
   },
   // 根据验证记录ID查询验证记录明细-PI认证
   getPiCertificationVerifyRecords(verifyRecordId) {
@@ -164,30 +178,57 @@ export default {
   },
   // 根据验证记录ID审核验证记录
   approvalVerifyRecords(verifyRecordId) {
-    return request(`/businessPartners/v1/verifyRecords/${verifyRecordId}/approval`, { method: 'POST' });
+    return request(`/businessPartners/v1/verifyRecords/${verifyRecordId}/approval`, {
+      method: 'POST',
+    });
   },
   // 根据验证记录ID拒绝验证记录
   refuseVerifyRecords(verifyRecordId) {
-    return request(`/businessPartners/v1/verifyRecords/${verifyRecordId}/refuse`, { method: 'POST' });
+    return request(`/businessPartners/v1/verifyRecords/${verifyRecordId}/refuse`, {
+      method: 'POST',
+    });
   },
   // 人工辅助变更已验证手机邮箱验证问题答案提交接口（验证通过产生验证记录）
   changeContactInfoAnswerVerify(id, data) {
-    return request(`/businessPartners/v1/${id}/verifyRecords/changeContactInfo/answerSubmission`, { method: 'POST', data });
+    return request(`/businessPartners/v1/${id}/verifyRecords/changeContactInfo/answerSubmission`, {
+      method: 'POST',
+      data,
+    });
   },
   // 人工辅助变更已验证手机邮箱流程中发送新手机验证短信接口（根据验证编号+手机产生验证码并发送）
   changeContactInfoNewMobileVerifyCodeSendingVerify(verifyRecordId, data) {
-    return request(`/businessPartners/v1/verifyRecords/${verifyRecordId}/changeContactInfo/newMobileVerifyCodeSending`, { method: 'POST', data });
+    return request(
+      `/businessPartners/v1/verifyRecords/${verifyRecordId}/changeContactInfo/newMobileVerifyCodeSending`,
+      { method: 'POST', data },
+    );
   },
   // 人工辅助变更已验证手机邮箱流程中发送新邮箱验证邮件接口（根据验证编号+邮箱产生验证码并发送）
   changeContactInfoNewEmailVerifyCodeSendingVerify(verifyRecordId, data) {
+<<<<<<< HEAD
     return request(`/businessPartners/v1/verifyRecords/${verifyRecordId}/changeContactInfo/newEmailVerifyCodeSending?email=${data}`, { method: 'POST' });
+=======
+    return request(
+      `/businessPartners/v1/verifyRecords/${verifyRecordId}/changeContactInfo/newEmailVerifyCodeSending`,
+      { method: 'POST', data },
+    );
+>>>>>>> 6f267b11a92d39206ba1603d9da6ea8d57d0758a
   },
   // 人工辅助变更已验证手机邮箱流程中新手机邮箱验证码验证接口（根据验证编号验证验证码是否正确）
   changeContactInfoNewMobileVerifyCodeVerificationVerify(verifyRecordId, data) {
-    return request(`/businessPartners/v1/verifyRecords/${verifyRecordId}/changeContactInfo/newMobileVerifyCodeVerification`, { method: 'POST', data });
+    return request(
+      `/businessPartners/v1/verifyRecords/${verifyRecordId}/changeContactInfo/newMobileVerifyCodeVerification`,
+      { method: 'POST', data },
+    );
   },
   // 人工辅助变更已验证手机邮箱流程中新手机邮箱验证码提交接口（根据验证编号验证验证码是否正确并更新状态）
   changeContactInfoNewEmailVerifyCodeVerificationVerify(verifyRecordId, data) {
+<<<<<<< HEAD
     return request(`/businessPartners/v1/verifyRecords/${verifyRecordId}/changeContactInfo/newEmailVerifyCodeVerification?verifyCode=${data}`, { method: 'POST' });
+=======
+    return request(
+      `/businessPartners/v1/verifyRecords/${verifyRecordId}/changeContactInfo/newEmailVerifyCodeVerification`,
+      { method: 'POST', data },
+    );
+>>>>>>> 6f267b11a92d39206ba1603d9da6ea8d57d0758a
   },
 };

@@ -17,7 +17,6 @@ import Bank from './components/Bank';
 import PurchasingOrg from './components/PurchasingOrg';
 import api from '@/api';
 
-
 @connect(({ partnerMaintainEdit }) => ({
   customer: partnerMaintainEdit.details,
   type: partnerMaintainEdit.type,
@@ -370,13 +369,13 @@ class CustomerDetails extends Component {
         type: 'partnerMaintainEdit/setDetails',
         payload: res,
       });
-    })
+    });
     api.bp.getBPVendor(this.props.match.params.id).then(res => {
       this.props.dispatch({
         type: 'partnerMaintainEdit/setSupplier',
         payload: res,
       });
-    })
+    });
     // this.props.dispatch({
     //   type: 'partnerMaintainEdit/setDetails',
     //   payload: details,
@@ -408,7 +407,7 @@ class CustomerDetails extends Component {
         verifyStatus: Math.ceil((Math.random() + 0.0001) * 2),
       });
     }
-    return data
+    return data;
   };
 
   // 售达方数据
@@ -423,8 +422,8 @@ class CustomerDetails extends Component {
         linkVerifyStatus: Math.ceil((Math.random() + 0.0001) * 2),
       });
     }
-    return data
-  }
+    return data;
+  };
 
   // 送达方数据
   getShip = () => {
@@ -438,20 +437,20 @@ class CustomerDetails extends Component {
         verifyStatus: Math.ceil((Math.random() + 0.0001) * 2),
       });
     }
-    return data
-  }
+    return data;
+  };
 
-    // 销售员数据
-    getSaler = () => {
-      const data = [];
-      for (let i = 0; i < 5; i++) {
-        data.push({
-          name: `${Math.ceil((Math.random() + 0.0001) * 100000000)} 上海复旦大学`,
-          code: Math.ceil((Math.random() + 0.0001) * 100000000),
-        });
-      }
-      return data
+  // 销售员数据
+  getSaler = () => {
+    const data = [];
+    for (let i = 0; i < 5; i++) {
+      data.push({
+        name: `${Math.ceil((Math.random() + 0.0001) * 100000000)} 上海复旦大学`,
+        code: Math.ceil((Math.random() + 0.0001) * 100000000),
+      });
     }
+    return data;
+  };
 
   resizeFooterToolbar = () => {
     requestAnimationFrame(() => {
@@ -477,27 +476,36 @@ class CustomerDetails extends Component {
   };
 
   title = v => {
-    const { match: { params: { id } } } = this.props;
+    const {
+      match: {
+        params: { id },
+      },
+    } = this.props;
     return (
       <div>
-  <span>查看 {v}</span>&nbsp;&nbsp;&nbsp;&nbsp;
-        <Link to={`/partner/maintain/edit/${id}`} onClick={() => {
-          this.props.dispatch({
-            type: 'partnerMaintainEdit/setDetails',
-            payload: null,
-          })
-          this.props.dispatch({
-            type: 'partnerMaintainEdit/setType',
-            payload: null,
-          })
-          this.props.dispatch({
-            type: 'partnerMaintainEdit/setSupplier',
-            payload: null,
-          })
-        }}><Icon type="edit" style={{ color: 'black' }} /></Link>
+        <span>查看 {v}</span>&nbsp;&nbsp;&nbsp;&nbsp;
+        <Link
+          to={`/bp/maintain/edit/${id}`}
+          onClick={() => {
+            this.props.dispatch({
+              type: 'partnerMaintainEdit/setDetails',
+              payload: null,
+            });
+            this.props.dispatch({
+              type: 'partnerMaintainEdit/setType',
+              payload: null,
+            });
+            this.props.dispatch({
+              type: 'partnerMaintainEdit/setSupplier',
+              payload: null,
+            });
+          }}
+        >
+          <Icon type="edit" style={{ color: 'black' }} />
+        </Link>
       </div>
-    )
-}
+    );
+  };
 
   render() {
     const { tabActiveKey } = this.state;
@@ -509,42 +517,43 @@ class CustomerDetails extends Component {
     const contentList = {
       customer: (
         <>
-        <BasicInfo/>
-        <Type/>
-        {
-          customer.basic.type === 1 ?
-          (
+          <BasicInfo />
+          <Type />
+          {customer.basic.type === 1 ? (
             <>
-              <PersonCredit/>
-              <PersonCertification/>
+              <PersonCredit />
+              <PersonCertification />
             </>
           ) : (
             <>
-              <Credit/>
-              {customer.basic.countryCode === 'CN' ?
-              <HomeAuthentication/> : <AbroadAuthentication/>}
+              <Credit />
+              {customer.basic.countryCode === 'CN' ? (
+                <HomeAuthentication />
+              ) : (
+                <AbroadAuthentication />
+              )}
             </>
-          )
-        }
-        <Address/>
-      </>
+          )}
+          <Address />
+        </>
       ),
       supplier: (
         <>
-        <BasicInfo/>
-        <PurchasingOrg/>
-        <Bank/>
-        {
-          customer.basic.type === 2 ?
-          (
+          <BasicInfo />
+          <PurchasingOrg />
+          <Bank />
+          {customer.basic.type === 2 ? (
             <>
-              {customer.basic.countryCode === 'CN' ?
-              <HomeAuthentication/> : <AbroadAuthentication
-              abroadType={customer.basic.telephoneCountryCode}/>}
+              {customer.basic.countryCode === 'CN' ? (
+                <HomeAuthentication />
+              ) : (
+                <AbroadAuthentication abroadType={customer.basic.telephoneCountryCode} />
+              )}
             </>
-          ) : ''
-        }
-      </>
+          ) : (
+            ''
+          )}
+        </>
       ),
     };
     return (

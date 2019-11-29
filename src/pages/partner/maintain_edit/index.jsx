@@ -1,3 +1,6 @@
+/**
+ * 业务伙伴编辑
+ */
 import { Form, Button, Spin, Badge, Modal, message, Empty } from 'antd';
 import React, { Component } from 'react';
 
@@ -281,7 +284,7 @@ class CustomerEdit extends Component {
       }
     }
 
-    // 收获地址 TODO: 暂时注释掉
+    // 收获地址
     if (!(validateResult === 2)) {
       if (addressList.length === 0) {
         message.error('缺少收获地址');
@@ -477,7 +480,7 @@ class CustomerEdit extends Component {
 
     bp.addBP(newData).then(() => {
       message.success('新增业务伙伴成功');
-      router.push('/partner/maintain');
+      router.push('/bp/maintain');
     });
   };
 
@@ -601,7 +604,7 @@ class CustomerEdit extends Component {
 
     bp.updateBP(newDetails).then(() => {
       message.success('修改业务伙伴成功');
-      router.push('/partner/maintain');
+      router.push('/bp/maintain');
     });
   };
 
@@ -718,7 +721,7 @@ class CustomerEdit extends Component {
     return (
       <>
         <Badge color={this.getColor(color)} />
-        <FormattedMessage id="bp.maintain_ed.customer" />
+        <FormattedMessage id="bp.maintain_details.customer" />
       </>
     );
   };
@@ -731,7 +734,7 @@ class CustomerEdit extends Component {
     return (
       <>
         <Badge color={this.getColor(color)} />
-        <FormattedMessage id="bp.maintain_ed.vendor" />
+        <FormattedMessage id="bp.maintain_details.vendor" />
       </>
     );
   };
@@ -766,7 +769,7 @@ class CustomerEdit extends Component {
             <>
               <div style={{ paddingBottom: 50 }}>{this.renderContent()}</div>
               <FooterToolbar style={{ width }}>
-                <Button onClick={() => router.push('/partner/maintain')}>取消</Button>
+                <Button onClick={() => router.push('/bp/maintain')}>取消</Button>
                 <Button type="primary" onClick={this.validate}>
                   提交
                 </Button>

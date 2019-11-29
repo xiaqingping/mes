@@ -3,6 +3,7 @@
  */
 import { Button, Table, Input, Divider, Form, message } from 'antd';
 import React from 'react';
+import { formatMessage, FormattedMessage } from 'umi-plugin-react/locale';
 
 import ChooseShipToParty from '@/components/choosse/bp/ShipToParty';
 
@@ -141,7 +142,7 @@ class ShipToParty extends React.Component {
     };
     let columns = [
       {
-        title: '名称',
+        title: formatMessage({ id: 'bp.maintain_details.name' }),
         dataIndex: 'name',
         width: '40%',
         editable: true,
@@ -156,7 +157,7 @@ class ShipToParty extends React.Component {
         width: '40%',
       },
       {
-        title: '操作',
+        title: formatMessage({ id: 'bp.maintain_details.operation' }),
         dataIndex: 'actions',
         render: (text, record, index) => {
           const { editIndex } = this.state;
@@ -219,7 +220,7 @@ class ShipToParty extends React.Component {
           onClick={this.addRow}
           icon="plus"
         >
-          新增
+          <FormattedMessage id="bp.maintain_details.add" />
         </Button>
         <ChooseShipToParty
           ref={ref => {
