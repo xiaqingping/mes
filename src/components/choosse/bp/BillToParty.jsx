@@ -4,6 +4,7 @@
 import { Modal, Button, AutoComplete, Input, Icon, Table } from 'antd';
 import React from 'react';
 import { connect } from 'dva';
+import { formatMessage, FormattedMessage } from 'umi-plugin-react/locale';
 import bp from '@/api/bp';
 import { formatter } from '@/utils/utils';
 
@@ -92,7 +93,7 @@ class ChooseInvoiceParty extends React.Component {
     const { BpCertificationStatus, SalesOrderBlock, CustomerDataStatus } = this.props;
     const columns = [
       {
-        title: '收票方',
+        title: formatMessage({ id: 'bp.maintain_details.sales_distribution.bill_to_party' }),
         dataIndex: 'name',
         filterIcon: filtered => (
           <Icon type="search" style={{ color: filtered ? '#1890ff' : undefined }} />
@@ -107,14 +108,14 @@ class ChooseInvoiceParty extends React.Component {
               size="small"
               style={{ width: 90, marginRight: 8 }}
             >
-              搜索
+              <FormattedMessage id="action.search" />
             </Button>
             <Button
               onClick={() => this.handleReset(clearFilters)}
               size="small"
               style={{ width: 90 }}
             >
-              重置
+              <FormattedMessage id="action.reset" />
             </Button>
           </div>
         ),
@@ -129,7 +130,7 @@ class ChooseInvoiceParty extends React.Component {
         ),
       },
       {
-        title: '认证',
+        title: formatMessage({ id: 'bp.maintain_details.verification_status' }),
         dataIndex: 'certificationStatus',
         filters: BpCertificationStatus.map(e => ({
           value: e.id,
@@ -138,7 +139,7 @@ class ChooseInvoiceParty extends React.Component {
         render: text => formatter(BpCertificationStatus, text),
       },
       {
-        title: '冻结',
+        title: formatMessage({ id: 'bp.maintain_details.block' }),
         dataIndex: 'salesOrderBlock',
         filters: SalesOrderBlock.map(e => ({
           value: e.id,
@@ -147,7 +148,7 @@ class ChooseInvoiceParty extends React.Component {
         render: text => formatter(SalesOrderBlock, text),
       },
       {
-        title: '完整',
+        title: formatMessage({ id: 'bp.maintain_details.complete' }),
         dataIndex: 'customerDataStatus',
         filters: CustomerDataStatus.map(e => ({
           value: e.id,
@@ -156,7 +157,7 @@ class ChooseInvoiceParty extends React.Component {
         render: text => formatter(CustomerDataStatus, text),
       },
       {
-        title: '联系方式',
+        title: formatMessage({ id: 'bp.maintain_details.contact_information' }),
         dataIndex: 'contactInfo',
         filterIcon: filtered => (
           <Icon type="search" style={{ color: filtered ? '#1890ff' : undefined }} />
@@ -171,14 +172,14 @@ class ChooseInvoiceParty extends React.Component {
               size="small"
               style={{ width: 90, marginRight: 8 }}
             >
-              搜索
+              <FormattedMessage id="action.search" />
             </Button>
             <Button
               onClick={() => this.handleReset(clearFilters)}
               size="small"
               style={{ width: 90 }}
             >
-              重置
+              <FormattedMessage id="action.reset" />
             </Button>
           </div>
         ),
@@ -202,9 +203,13 @@ class ChooseInvoiceParty extends React.Component {
         },
       },
       {
-        title: '操作',
-        dataIndex: 'actions',
-        render: (text, record) => <a onClick={() => this.selectRow(record)}>选择</a>,
+        title: formatMessage({ id: 'action.operation' }),
+        dataIndex: 'operation',
+        render: (text, record) => (
+          <a onClick={() => this.selectRow(record)}>
+            <FormattedMessage id="action.choose" />
+          </a>
+        ),
       },
     ];
     return columns;
@@ -216,7 +221,7 @@ class ChooseInvoiceParty extends React.Component {
 
     return (
       <Modal
-        title="收票方"
+        title={formatMessage({ id: 'bp.maintain_details.sales_distribution.bill_to_party' })}
         visible={visible}
         width="1200px"
         onCancel={() => this.changeVisible(false)}

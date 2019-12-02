@@ -762,9 +762,11 @@ class CustomerEdit extends Component {
             <>
               <div style={{ paddingBottom: 50 }}>{this.renderContent()}</div>
               <FooterToolbar style={{ width }}>
-                <Button onClick={() => router.push('/bp/maintain')}>取消</Button>
+                <Button onClick={() => router.push('/bp/maintain')}>
+                  <FormattedMessage id="action.cancel" />
+                </Button>
                 <Button type="primary" onClick={this.validate}>
-                  提交
+                  <FormattedMessage id="action.submit" />
                 </Button>
               </FooterToolbar>
             </>

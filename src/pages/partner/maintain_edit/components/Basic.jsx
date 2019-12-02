@@ -4,7 +4,7 @@
 import { Icon, Col, Form, Input, Row, Select, Switch, Card } from 'antd';
 import React from 'react';
 import { connect } from 'dva';
-import { formatMessage } from 'umi-plugin-react/locale';
+import { formatMessage, FormattedMessage } from 'umi-plugin-react/locale';
 import {
   EmailInput,
   NameInput,
@@ -312,7 +312,10 @@ class Basic extends React.Component {
       <p style={{ lineHeight: '32px' }}>
         <span>{basic.telephoneCountryCode} </span>
         {`${basic.telephoneAreaCode}-${basic.telephone}-${basic.telephoneExtension}`}
-        <a href="#"> 变更</a>
+        <a href="#">
+          {' '}
+          <FormattedMessage id="bp.maintain_details.change" />
+        </a>
       </p>
     );
 
@@ -377,7 +380,9 @@ class Basic extends React.Component {
                       </span>
                     ) : null}
                     <span> {basic.name} </span>
-                    <a href="#">变更</a>
+                    <a href="#">
+                      <FormattedMessage id="bp.maintain_details.change" />
+                    </a>
                   </p>
                 ) : null}
               </FormItem>
