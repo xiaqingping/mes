@@ -12,6 +12,7 @@ export default {
     return request('/businessPartners/v1', { params });
   },
   // 按照编号或名称模糊查询组织类客户
+  // 模糊搜索开票方
   getOrgCustomerByCodeOrName(params) {
     return request('/businessPartners/v1/org/customer', { params });
   },
@@ -123,7 +124,10 @@ export default {
   },
   // 临时信用额度调整接口
   tempCreditlimitAdjustment(id, params) {
-    return request(`/businessPartners/v1/${id}/tempCreditlimitAdjustment`, { method: 'POST', params });
+    return request(`/businessPartners/v1/${id}/tempCreditlimitAdjustment`, {
+      method: 'POST',
+      params,
+    });
   },
 
   // 根据业务伙伴ID查询最新的PI认证或组织认证类型的验证记录 { invoicePartyId }
@@ -145,7 +149,7 @@ export default {
     return request(`/businessPartners/v1/operationRecords/${operationRecordId}/operationItems`);
   },
   // 获取业务伙伴名称和code接口
-  getPartnerName(params) {
+  getBPByCodeOrName(params) {
     return request('/businessPartners/v1/code/name', { params });
   },
 

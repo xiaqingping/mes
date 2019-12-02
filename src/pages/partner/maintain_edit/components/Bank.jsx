@@ -38,7 +38,7 @@ class Bank extends Component {
       bankFetching: false,
     };
     // 防抖
-    this.fetchBank = debounce(this.fetchBank, 500);
+    this.fetchBank = debounce(this.fetchBank, 800);
   }
 
   valueChange = (key, value) => {

@@ -66,11 +66,11 @@ class Basic extends React.Component {
       industrySelectOpen: true,
     };
     // 异步验证做节流处理
-    this.checkNameInput = debounce(this.checkNameInput, 500);
-    this.checkEmail = debounce(this.checkEmail, 500);
-    this.checkMobilePhone = debounce(this.checkMobilePhone, 500);
-    this.checkAddress = debounce(this.checkAddress, 500);
-    this.checkTelePhone = debounce(this.checkTelePhone, 500);
+    this.checkNameInput = debounce(this.checkNameInput, 800);
+    this.checkEmail = debounce(this.checkEmail, 800);
+    this.checkMobilePhone = debounce(this.checkMobilePhone, 800);
+    this.checkAddress = debounce(this.checkAddress, 800);
+    this.checkTelePhone = debounce(this.checkTelePhone, 800);
   }
 
   checkNameInput = (rule, value, callback) => {

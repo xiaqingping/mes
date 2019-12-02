@@ -62,9 +62,9 @@ class OrgCertification extends Component {
       bankFetching: false,
     };
     // 防抖
-    this.fetchBank = debounce(this.fetchBank, 500);
-    this.checkTelephone = debounce(this.checkTelephone, 500);
-    this.checkTaxNo = debounce(this.checkTaxNo, 500);
+    this.fetchBank = debounce(this.fetchBank, 800);
+    this.checkTelephone = debounce(this.checkTelephone, 800);
+    this.checkTaxNo = debounce(this.checkTaxNo, 800);
   }
 
   fetchBank = value => {

@@ -64,7 +64,7 @@ class FormContent extends React.Component {
     super(props);
     props.getChildrenForm(props.form);
     // 异步验证做节流处理
-    this.checkRegionOffice = debounce(this.checkRegionOffice, 500);
+    this.checkRegionOffice = debounce(this.checkRegionOffice, 800);
   }
 
   checkRegionOffice = (rule, value, callback) => {

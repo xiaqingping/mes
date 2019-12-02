@@ -5,6 +5,7 @@ import { Modal, Table, Button, AutoComplete, Input, Icon } from 'antd';
 import React from 'react';
 import { connect } from 'dva';
 import { formatMessage, FormattedMessage } from 'umi-plugin-react/locale';
+import debounce from 'lodash/debounce';
 import bp from '@/api/bp';
 import { formatter } from '@/utils/utils';
 
@@ -30,7 +31,11 @@ class ChooseSoldToParty extends React.Component {
         pageSize: 10,
         total: 0,
       },
+      filterData: {},
+      BP: [],
     };
+    // 异步验证做节流处理
+    this.searchBP = debounce(this.searchBP, 800);
   }
 
   changeVisible = visible => {
@@ -39,15 +44,15 @@ class ChooseSoldToParty extends React.Component {
   };
 
   getTableData = (options = {}) => {
-    const { pagination } = this.state;
-    const query = Object.assign(
-      {},
-      {
+    const { pagination, filterData } = this.state;
+    const query = {
+      ...{
         page: pagination.current,
         pageSize: pagination.pageSize,
       },
-      options,
-    );
+      ...filterData,
+      ...options,
+    };
 
     this.setState({ loading: true });
     bp.getSoldToParty(query)
@@ -66,24 +71,63 @@ class ChooseSoldToParty extends React.Component {
       });
   };
 
-  handleReset = data => {
-    console.log(data);
-  };
-
   selectRow = row => {
     this.props.selectChooseModalData(row);
     this.setState({ visible: false });
   };
 
-  tableChange = ({ current, pageSize, total }) => {
+  tableChange = ({ current, pageSize, total }, filters) => {
     const pagination = { current, pageSize, total };
-    this.setState({ pagination }, () => {
+    const filterData = {};
+
+    if (filters.certificationStatus && filters.certificationStatus[0]) {
+      filterData.certificationStatusList = filters.certificationStatus.join(',');
+    }
+    if (filters.customerDataStatus && filters.customerDataStatus[0]) {
+      filterData.customerDataStatus = filters.customerDataStatus.join(',');
+    }
+    if (filters.salesOrderBlock && filters.salesOrderBlock[0]) {
+      filterData.salesOrderBlock = filters.salesOrderBlock.join(',');
+    }
+    if (filters.contactInfo) {
+      const { contactInfo } = filters;
+      if (contactInfo.indexOf('@') > -1) {
+        filterData.email = contactInfo;
+      } else {
+        filterData.mobilePhone = contactInfo;
+      }
+    }
+    if (filters.name) {
+      filterData.id = filters.name;
+    }
+
+    this.setState({ pagination, filterData }, () => {
       this.getTableData();
     });
   };
 
+  searchBP = value => {
+    if (!value) {
+      this.setState({ BP: [] });
+      return;
+    }
+    bp.getBPByCodeOrName({ code_or_name: value }).then(res => {
+      this.setState({ BP: res });
+    });
+  };
+
+  renderBP = item => (
+    <AutoComplete.Option key={item.id} text={item.name}>
+      <div style={{ display: 'flex' }}>
+        <span>{item.code}</span>&nbsp;&nbsp;
+        <span>{item.name}</span>
+      </div>
+    </AutoComplete.Option>
+  );
+
   getColumns = () => {
     const { BpCertificationStatus, SalesOrderBlock, CustomerDataStatus } = this.props;
+    const { BP } = this.state;
     const columns = [
       {
         title: formatMessage({ id: 'bp.maintain_details.sales_distribution.sold_to_party' }),
@@ -91,23 +135,26 @@ class ChooseSoldToParty extends React.Component {
         filterIcon: filtered => (
           <Icon type="search" style={{ color: filtered ? '#1890ff' : undefined }} />
         ),
-        filterDropdown: ({ selectedKeys, confirm, clearFilters }) => (
+        filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
           <div style={{ width: 210, padding: 8 }}>
-            <AutoComplete style={{ width: 188, marginBottom: 8, display: 'block' }} />
+            <AutoComplete
+              style={{ width: 188, marginBottom: 8, display: 'block' }}
+              dataSource={BP.map(this.renderBP)}
+              onSearch={this.searchBP}
+              optionLabelProp="text"
+              value={selectedKeys}
+              onChange={value => setSelectedKeys(value)}
+            />
             <Button
               type="primary"
-              onClick={() => this.getTableData(selectedKeys, confirm)}
+              onClick={confirm}
               icon="search"
               size="small"
               style={{ width: 90, marginRight: 8 }}
             >
               <FormattedMessage id="action.search" />
             </Button>
-            <Button
-              onClick={() => this.handleReset(clearFilters)}
-              size="small"
-              style={{ width: 90 }}
-            >
+            <Button onClick={clearFilters} size="small" style={{ width: 90 }}>
               <FormattedMessage id="action.reset" />
             </Button>
           </div>
@@ -155,23 +202,23 @@ class ChooseSoldToParty extends React.Component {
         filterIcon: filtered => (
           <Icon type="search" style={{ color: filtered ? '#1890ff' : undefined }} />
         ),
-        filterDropdown: ({ selectedKeys, confirm, clearFilters }) => (
+        filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
           <div style={{ width: 210, padding: 8 }}>
-            <Input style={{ width: 188, marginBottom: 8, display: 'block' }} />
+            <Input
+              style={{ width: 188, marginBottom: 8, display: 'block' }}
+              value={selectedKeys}
+              onChange={e => setSelectedKeys(e.target.value)}
+            />
             <Button
               type="primary"
-              onClick={() => this.getTableData(selectedKeys, confirm)}
+              onClick={confirm}
               icon="search"
               size="small"
               style={{ width: 90, marginRight: 8 }}
             >
               <FormattedMessage id="action.search" />
             </Button>
-            <Button
-              onClick={() => this.handleReset(clearFilters)}
-              size="small"
-              style={{ width: 90 }}
-            >
+            <Button onClick={clearFilters} size="small" style={{ width: 90 }}>
               <FormattedMessage id="action.reset" />
             </Button>
           </div>
@@ -195,7 +242,43 @@ class ChooseSoldToParty extends React.Component {
       },
       {
         title: formatMessage({ id: 'bp.maintain_details.sales_distribution.bill_to_party' }),
-        dataIndex: 'invoiceParty',
+        dataIndex: 'BPList',
+        filterIcon: filtered => (
+          <Icon type="search" style={{ color: filtered ? '#1890ff' : undefined }} />
+        ),
+        filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
+          <div style={{ width: 210, padding: 8 }}>
+            <AutoComplete
+              style={{ width: 188, marginBottom: 8, display: 'block' }}
+              dataSource={BP.map(this.renderBP)}
+              onSearch={this.searchBP}
+              optionLabelProp="text"
+              value={selectedKeys}
+              onChange={value => setSelectedKeys(value)}
+            />
+            <Button
+              type="primary"
+              onClick={confirm}
+              icon="search"
+              size="small"
+              style={{ width: 90, marginRight: 8 }}
+            >
+              <FormattedMessage id="action.search" />
+            </Button>
+            <Button onClick={clearFilters} size="small" style={{ width: 90 }}>
+              <FormattedMessage id="action.reset" />
+            </Button>
+          </div>
+        ),
+        render: (text, row) => (
+          <>
+            <span style={{ color: '#222' }}>
+              <Icon type={row.type === 1 ? 'user' : 'home'} /> {row.name}
+            </span>
+            <br />
+            <span style={{ color: '#999' }}>{row.code}</span>
+          </>
+        ),
       },
       {
         title: formatMessage({ id: 'action.operation' }),
