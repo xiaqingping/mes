@@ -251,27 +251,35 @@ class EditableTable extends React.Component {
         },
       },
       {
-        title: formatMessage({ id: 'bp.maintain_details.operation' }),
+        title: formatMessage({ id: 'action.operation' }),
         dataIndex: 'actions',
-        width: '12%',
+        width: '15%',
         render: (text, record, index) => {
           const { editIndex } = this.state;
           const editable = editIndex === index;
           if (editable) {
             return (
               <>
-                <a onClick={() => this.save(index)}>保存</a>
+                <a onClick={() => this.save(index)}>
+                  <FormattedMessage id="action.save" />
+                </a>
                 <Divider type="vertical" />
-                <a onClick={() => this.cancel(record)}>取消</a>
+                <a onClick={() => this.cancel(record)}>
+                  <FormattedMessage id="action.cancel" />
+                </a>
               </>
             );
           }
 
           return (
             <>
-              <a onClick={() => this.deleteRow(index)}>删除</a>
+              <a onClick={() => this.deleteRow(index)}>
+                <FormattedMessage id="action.delete" />
+              </a>
               <Divider type="vertical" />
-              <a onClick={() => this.edit(index)}>修改</a>
+              <a onClick={() => this.edit(index)}>
+                <FormattedMessage id="action.change" />
+              </a>
             </>
           );
         },
@@ -326,7 +334,7 @@ class EditableTable extends React.Component {
             onClick={this.addRow}
             icon="plus"
           >
-            <FormattedMessage id="bp.maintain_details.add" />
+            <FormattedMessage id="action.add" />
           </Button>
         </EditableContext.Provider>
       </Card>

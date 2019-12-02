@@ -4,6 +4,7 @@
 import { Button, Card, Icon, List, Typography, Divider, Badge, Modal, Upload } from 'antd';
 import React from 'react';
 import { connect } from 'dva';
+import { FormattedMessage, formatMessage } from 'umi-plugin-react/locale';
 
 import AddPICertification from './PICertificationAddModal';
 import disk from '@/api/disk';
@@ -47,9 +48,13 @@ class PersonCertification extends React.Component {
             title={item.billToPartyName}
             extra={
               <>
-                <a onClick={() => this.updateItem(item)}>变更</a>
+                <a onClick={() => this.updateItem(item)}>
+                  <FormattedMessage id="bp.maintain_details.change" />
+                </a>
                 <Divider type="vertical" />
-                <a onClick={() => this.removeItem(item.id)}>删除</a>
+                <a onClick={() => this.removeItem(item.id)}>
+                  <FormattedMessage id="action.delete" />
+                </a>
               </>
             }
           >
@@ -75,7 +80,8 @@ class PersonCertification extends React.Component {
     return (
       <List.Item>
         <Button type="dashed" style={{ width: '100%', height: 274 }} onClick={this.addNewItem}>
-          <Icon type="plus" /> 提交认证
+          <Icon type="plus" />
+          <FormattedMessage id="bp.maintain_details.PI_verification.submit_certification" />
         </Button>
       </List.Item>
     );
@@ -177,7 +183,11 @@ class PersonCertification extends React.Component {
     };
 
     return (
-      <Card title="PI认证" bordered={false} style={{ marginBottom: '24px' }}>
+      <Card
+        title={formatMessage({ id: 'bp.maintain_details.PI_verification' })}
+        bordered={false}
+        style={{ marginBottom: '24px' }}
+      >
         <List
           rowKey="id"
           grid={{
@@ -192,7 +202,7 @@ class PersonCertification extends React.Component {
         />
         <Modal
           destroyOnClose
-          title="PI认证"
+          title={formatMessage({ id: 'bp.maintain_details.PI_verification' })}
           visible={addModalVisible}
           onOk={this.okHandle}
           onCancel={() => this.handleModalVisible(false)}

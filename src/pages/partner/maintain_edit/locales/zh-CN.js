@@ -4,12 +4,16 @@ export default {
   'bp.maintain_details.vendor': '供应商',
   'bp.maintain_details.person': '个人',
   'bp.maintain_details.organization': '组织',
+  'bp.maintain_details.status': '状态',
+  'bp.maintain_details.change': '变更',
   'bp.maintain_details.name': '名称',
   'bp.maintain_details.mobile_phone': '移动电话',
   'bp.maintain_details.postal_code': '邮政编码',
   'bp.maintain_details.phone': '电话',
-  'bp.maintain_details.operation': '操作',
-  'bp.maintain_details.add': '新增',
+  'bp.maintain_details.verification_status': '认证',
+  'bp.maintain_details.block': '冻结',
+  'bp.maintain_details.complete': '完整',
+  'bp.maintain_details.contact_information': '联系方式',
   // 基础信息
   'bp.maintain_details.basic': '基础信息',
   'bp.maintain_details.basic.email': '邮箱',
@@ -65,8 +69,7 @@ export default {
   'bp.maintain_details.verification_data.tax_exempt_ID': 'Tax Exempt ID',
   // PI认证
   'bp.maintain_details.PI_verification': 'PI认证',
-  'bp.maintain_details.PI_verification.change': '变更',
-  'bp.maintain_details.PI_verification.delete': '删除',
+  'bp.maintain_details.PI_verification.submit_certification': '提交认证',
 
   // 收货地址
   'bp.maintain_details.shipping_address': '收货地址',

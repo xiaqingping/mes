@@ -23,7 +23,7 @@ const SelectLang = props => {
     document.documentElement.setAttribute('lang', key);
     // TODO: 切换语言时某些组件语言无法切换 https://pro.ant.design/docs/faq-cn
     // 可以将 setLocale 的第二个参数设置为 true，即可强制刷新
-    setLocale(key, false);
+    setLocale(key, true);
     setLanguageCode(key);
   };
 

@@ -4,12 +4,16 @@ export default {
   'bp.maintain_details.vendor': 'Vendor',
   'bp.maintain_details.person': 'Person',
   'bp.maintain_details.organization': 'Organization',
+  'bp.maintain_details.status': 'Status',
+  'bp.maintain_details.change': 'Change',
   'bp.maintain_details.name': 'Name',
   'bp.maintain_details.mobile_phone': 'Mobile Phone',
   'bp.maintain_details.postal_code': 'Postal Code',
   'bp.maintain_details.phone': 'Phone',
-  'bp.maintain_details.operation': 'Operation',
-  'bp.maintain_details.add': 'Add',
+  'bp.maintain_details.verification_status': 'Verification Status',
+  'bp.maintain_details.block': 'Block',
+  'bp.maintain_details.complete': 'Complete',
+  'bp.maintain_details.contact_information': 'Contact information',
   // 基础信息
   'bp.maintain_details.basic': 'Basic information',
   'bp.maintain_details.basic.email': 'E-Mail',
@@ -65,8 +69,7 @@ export default {
   'bp.maintain_details.verification_data.tax_exempt_ID': 'Tax Exempt ID',
   // PI认证
   'bp.maintain_details.PI_verification': 'PI Verification',
-  'bp.maintain_details.PI_verification.change': 'Change',
-  'bp.maintain_details.PI_verification.delete': 'Delete',
+  'bp.maintain_details.PI_verification.submit_certification': 'Submit certification',
 
   // 收货地址
   'bp.maintain_details.shipping_address': 'Shipping Address',

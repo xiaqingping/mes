@@ -4,6 +4,7 @@
 import { Modal, Table, Button, AutoComplete, Input, Icon, Cascader } from 'antd';
 import React from 'react';
 import { connect } from 'dva';
+import { formatMessage, FormattedMessage } from 'umi-plugin-react/locale';
 import employees from '@/api/employees';
 
 @connect(
@@ -77,7 +78,7 @@ class ChooseSalesPerson extends React.Component {
   getColumns = () => {
     const columns = [
       {
-        title: '销售员',
+        title: formatMessage({ id: 'bp.maintain_details.sales_distribution.sales_rep' }),
         dataIndex: 'name',
         filterIcon: filtered => (
           <Icon type="search" style={{ color: filtered ? '#1890ff' : undefined }} />
@@ -92,20 +93,20 @@ class ChooseSalesPerson extends React.Component {
               size="small"
               style={{ width: 90, marginRight: 8 }}
             >
-              搜索
+              <FormattedMessage id="action.search" />
             </Button>
             <Button
               onClick={() => this.handleReset(clearFilters)}
               size="small"
               style={{ width: 90 }}
             >
-              重置
+              <FormattedMessage id="action.reset" />
             </Button>
           </div>
         ),
       },
       {
-        title: '区域归属',
+        title: formatMessage({ id: 'bp.maintain_details.sales_distribution.sales_area' }),
         dataIndex: 'area',
         filterIcon: filtered => (
           <Icon type="search" style={{ color: filtered ? '#1890ff' : undefined }} />
@@ -120,14 +121,14 @@ class ChooseSalesPerson extends React.Component {
               size="small"
               style={{ width: 90, marginRight: 8 }}
             >
-              搜索
+              <FormattedMessage id="action.search" />
             </Button>
             <Button
               onClick={() => this.handleReset(clearFilters)}
               size="small"
               style={{ width: 90 }}
             >
-              重置
+              <FormattedMessage id="action.reset" />
             </Button>
           </div>
         ),
@@ -139,7 +140,7 @@ class ChooseSalesPerson extends React.Component {
         },
       },
       {
-        title: '联系方式',
+        title: formatMessage({ id: 'bp.maintain_details.contact_information' }),
         dataIndex: 'contactInfo',
         filterIcon: filtered => (
           <Icon type="search" style={{ color: filtered ? '#1890ff' : undefined }} />
@@ -154,14 +155,14 @@ class ChooseSalesPerson extends React.Component {
               size="small"
               style={{ width: 90, marginRight: 8 }}
             >
-              搜索
+              <FormattedMessage id="action.search" />
             </Button>
             <Button
               onClick={() => this.handleReset(clearFilters)}
               size="small"
               style={{ width: 90 }}
             >
-              重置
+              <FormattedMessage id="action.reset" />
             </Button>
           </div>
         ),
@@ -178,9 +179,13 @@ class ChooseSalesPerson extends React.Component {
         ),
       },
       {
-        title: '操作',
-        dataIndex: 'actions',
-        render: (text, record) => <a onClick={() => this.selectRow(record)}>选择</a>,
+        title: formatMessage({ id: 'action.operation' }),
+        dataIndex: 'operation',
+        render: (text, record) => (
+          <a onClick={() => this.selectRow(record)}>
+            <FormattedMessage id="action.choose" />
+          </a>
+        ),
       },
     ];
     return columns;
@@ -192,7 +197,7 @@ class ChooseSalesPerson extends React.Component {
 
     return (
       <Modal
-        title="销售员"
+        title={formatMessage({ id: 'bp.maintain_details.sales_distribution.sales_rep' })}
         visible={visible}
         width="1200px"
         onCancel={() => this.changeVisible(false)}

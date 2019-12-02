@@ -4,6 +4,7 @@
 import { Card, Divider, List } from 'antd';
 import React from 'react';
 import { connect } from 'dva';
+import { FormattedMessage, formatMessage } from 'umi-plugin-react/locale';
 
 @connect(({ bpEdit }) => ({
   details: bpEdit.details || {},
@@ -22,9 +23,13 @@ class PersonCredit extends React.Component {
         title={item.billToPartyName}
         extra={
           <>
-            <a>额度调整</a>
+            <a>
+              <FormattedMessage id="bp.maintain_details.credit_management.credit_adjustment" />
+            </a>
             <Divider type="vertical" />
-            <a>临时额度</a>
+            <a>
+              <FormattedMessage id="bp.maintain_details.credit_management.temporary_credit" />
+            </a>
           </>
         }
       >
@@ -47,7 +52,11 @@ class PersonCredit extends React.Component {
     const { creditList } = this.props;
 
     return (
-      <Card title="信贷数据" bordered={false} style={{ marginBottom: '24px' }}>
+      <Card
+        title={formatMessage({ id: 'bp.maintain_details.credit_management' })}
+        bordered={false}
+        style={{ marginBottom: '24px' }}
+      >
         <List
           rowKey="id"
           grid={{
