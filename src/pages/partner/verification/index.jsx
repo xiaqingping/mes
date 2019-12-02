@@ -424,7 +424,7 @@ class Verification extends React.Component {
         // width: 150,
         // eslint-disable-next-line no-shadow
         render (value, record) {
-          return <><div>{value}</div><div>{record.operationRecordCode}</div></>
+          return <><div>{value}</div><div>{record.bpOperationRecordCode}</div></>
         },
       },
       {

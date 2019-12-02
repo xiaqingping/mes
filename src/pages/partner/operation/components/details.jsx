@@ -11,19 +11,15 @@ import './style.less'
 
 // 状态
 const status = {
-  1: {
-    value: 'default',
-    text: formatMessage({ id: 'bp.operation.unfinished' }),
-  },
   2: {
     value: 'success',
     text: formatMessage({ id: 'bp.operation.finished' }),
   },
-  3: {
+  1: {
     value: 'warning',
     text: formatMessage({ id: 'bp.operation.needVerified' }),
   },
-  4: {
+  3: {
     value: 'error',
     text: formatMessage({ id: 'bp.operation.rejected' }),
   },

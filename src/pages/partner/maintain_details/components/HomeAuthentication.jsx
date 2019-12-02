@@ -85,7 +85,7 @@ class BasicInfo extends Component {
               </DescriptionsItem>
               <DescriptionsItem label="认证图片">
                 <ul style={{ padding: '0' }}>
-                  {details.organizationCertification ? <>
+                  {/* {details.organizationCertification ? <>
                     {details.organizationCertification.attachmentList.map((item, index) => (
                       // eslint-disable-next-line react/no-array-index-key
                       <li key={index} style={{
@@ -100,7 +100,8 @@ class BasicInfo extends Component {
                         <img src={item.code} alt="" width="90" height="90"/> : ''}</li>
                     ))}
                   </> : ''
-                  }
+                  } */}
+
                 </ul>
               </DescriptionsItem>
             </Descriptions>
