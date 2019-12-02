@@ -4,6 +4,7 @@
 import { Modal, Table, Button, AutoComplete, Input, Icon } from 'antd';
 import React from 'react';
 import { connect } from 'dva';
+import debounce from 'lodash/debounce';
 import { formatMessage, FormattedMessage } from 'umi-plugin-react/locale';
 import bp from '@/api/bp';
 
@@ -29,7 +30,11 @@ class ChooseShipToParty extends React.Component {
         pageSize: 10,
         total: 0,
       },
+      filterData: {},
+      BP: [],
     };
+    // 异步验证做节流处理
+    this.searchBP = debounce(this.searchBP, 800);
   }
 
   changeVisible = visible => {
@@ -38,15 +43,15 @@ class ChooseShipToParty extends React.Component {
   };
 
   getTableData = (options = {}) => {
-    const { pagination } = this.state;
-    const query = Object.assign(
-      {},
-      {
+    const { pagination, filterData } = this.state;
+    const query = {
+      ...{
         page: pagination.current,
         pageSize: pagination.pageSize,
       },
-      options,
-    );
+      ...filterData,
+      ...options,
+    };
 
     this.setState({ loading: true });
     bp.getShipToParty(query)
@@ -65,16 +70,53 @@ class ChooseShipToParty extends React.Component {
       });
   };
 
-  handleReset = data => {
-    console.log(data);
-  };
-
   selectRow = row => {
     this.props.selectChooseModalData(row);
     this.setState({ visible: false });
   };
 
+  tableChange = ({ current, pageSize, total }, filters) => {
+    const pagination = { current, pageSize, total };
+    const filterData = {};
+
+    if (filters.contactInfo) {
+      const { contactInfo } = filters;
+      if (contactInfo.indexOf('@') > -1) {
+        filterData.email = contactInfo;
+      } else {
+        filterData.mobilePhone = contactInfo;
+      }
+    }
+    if (filters.name) {
+      filterData.id = filters.name;
+    }
+
+    this.setState({ pagination, filterData }, () => {
+      this.getTableData();
+    });
+  };
+
+  searchBP = value => {
+    if (!value) {
+      this.setState({ BP: [] });
+      return;
+    }
+    bp.getBPByCodeOrName({ code_or_name: value }).then(res => {
+      this.setState({ BP: res });
+    });
+  };
+
+  renderBP = item => (
+    <AutoComplete.Option key={item.id} text={item.name}>
+      <div style={{ display: 'flex' }}>
+        <span>{item.code}</span>&nbsp;&nbsp;
+        <span>{item.name}</span>
+      </div>
+    </AutoComplete.Option>
+  );
+
   getColumns = () => {
+    const { BP } = this.state;
     const columns = [
       {
         title: formatMessage({ id: 'bp.maintain_details.sales_distribution.ship_to_party' }),
@@ -82,23 +124,26 @@ class ChooseShipToParty extends React.Component {
         filterIcon: filtered => (
           <Icon type="search" style={{ color: filtered ? '#1890ff' : undefined }} />
         ),
-        filterDropdown: ({ selectedKeys, confirm, clearFilters }) => (
+        filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
           <div style={{ width: 210, padding: 8 }}>
-            <AutoComplete style={{ width: 188, marginBottom: 8, display: 'block' }} />
+            <AutoComplete
+              style={{ width: 188, marginBottom: 8, display: 'block' }}
+              dataSource={BP.map(this.renderBP)}
+              onSearch={this.searchBP}
+              optionLabelProp="text"
+              value={selectedKeys}
+              onChange={value => setSelectedKeys(value)}
+            />
             <Button
               type="primary"
-              onClick={() => this.getTableData(selectedKeys, confirm)}
+              onClick={confirm}
               icon="search"
               size="small"
               style={{ width: 90, marginRight: 8 }}
             >
               <FormattedMessage id="action.search" />
             </Button>
-            <Button
-              onClick={() => this.handleReset(clearFilters)}
-              size="small"
-              style={{ width: 90 }}
-            >
+            <Button onClick={clearFilters} size="small" style={{ width: 90 }}>
               <FormattedMessage id="action.reset" />
             </Button>
           </div>
@@ -119,23 +164,23 @@ class ChooseShipToParty extends React.Component {
         filterIcon: filtered => (
           <Icon type="search" style={{ color: filtered ? '#1890ff' : undefined }} />
         ),
-        filterDropdown: ({ selectedKeys, confirm, clearFilters }) => (
+        filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
           <div style={{ width: 210, padding: 8 }}>
-            <Input style={{ width: 188, marginBottom: 8, display: 'block' }} />
+            <Input
+              style={{ width: 188, marginBottom: 8, display: 'block' }}
+              value={selectedKeys}
+              onChange={e => setSelectedKeys(e.target.value)}
+            />
             <Button
               type="primary"
-              onClick={() => this.getTableData(selectedKeys, confirm)}
+              onClick={confirm}
               icon="search"
               size="small"
               style={{ width: 90, marginRight: 8 }}
             >
               <FormattedMessage id="action.search" />
             </Button>
-            <Button
-              onClick={() => this.handleReset(clearFilters)}
-              size="small"
-              style={{ width: 90 }}
-            >
+            <Button onClick={clearFilters} size="small" style={{ width: 90 }}>
               <FormattedMessage id="action.reset" />
             </Button>
           </div>

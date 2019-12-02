@@ -88,7 +88,7 @@ class EditableTable extends React.Component {
     };
 
     // 防抖
-    this.checkAddress = debounce(this.checkAddress, 500);
+    this.checkAddress = debounce(this.checkAddress, 800);
   }
 
   checkAddress = (rule, value, callback) => {
