@@ -4,16 +4,30 @@ import {
 } from 'antd';
 import React, { Component } from 'react';
 import { connect } from 'dva';
-import Flag from '@/assets/imgs/flag.jpg'
 import './style.less'
+import api from '@/api';
 
-@connect(({ partnerMaintainEdit }) => ({
+@connect(({ partnerMaintainEdit, basicCache }) => ({
   details: partnerMaintainEdit.details,
+  countryDiallingCodes: basicCache.countryDiallingCodes,
 }))
 // eslint-disable-next-line react/prefer-stateless-function
 class BasicInfo extends Component {
+  state = {
+    phoneData: [],
+  };
+
+  componentDidMount() {
+    api.basic.getCountryDiallingCodes().then(res => {
+      this.setState({
+        phoneData: res,
+      })
+    })
+  }
+
   render() {
     const { details: { customer: { addressList } } } = this.props
+    const { phoneData } = this.state
     const columns = [
       {
         title: '姓名',
@@ -24,11 +38,21 @@ class BasicInfo extends Component {
         title: '移动电话',
         dataIndex: 'mobilePhone',
         width: 300,
-        render(text) {
+        render(text, record) {
+          let newData = [];
+          // eslint-disable-next-line array-callback-return
+          phoneData.map(item => {
+            if (item.countryCode === record.mobilePhoneCountryCode) {
+              newData = item;
+            }
+          })
           return (
             // eslint-disable-next-line jsx-a11y/alt-text
-            <><img src={Flag} width="10" height="10"
-            style={{ borderRadius: '50%', marginBottom: '3px' }}/>&nbsp;&nbsp;{text}</>
+            <><img src={`/images/country/${newData.countryCode}.png`} width="10" height="10"
+          style={{
+            borderRadius: '50%',
+            marginBottom: '3px',
+          }}/>&nbsp;&nbsp;+{newData.diallingCode}&nbsp;&nbsp;{text}</>
           );
         },
       },
@@ -41,7 +65,14 @@ class BasicInfo extends Component {
         title: '地址',
         dataIndex: 'address',
         width: 500,
-        render: text => <div className="addEllipsis" style={{ width: '300px' }}>{text}</div>,
+      render: (text, record) => <div className="addEllipsis" style={{ width: '300px' }}>
+        {record.countryName}
+         {record.provinceName}
+         {record.cityName}
+         {record.countyName}
+         {record.streetName}
+        {text}
+        </div>,
       },
       {
         title: '操作',
@@ -52,7 +83,7 @@ class BasicInfo extends Component {
     return (
       <Card title="收货地址" bordered={false} style={{ marginBottom: '24px' }}>
         <Table
-          rowKey="id"
+          rowKey={(record, index) => index}
           dataSource={addressList}
           columns={columns}
           pagination={false}

@@ -742,6 +742,13 @@ class ChangeModal extends Component {
       );
     }
 
+  normFile = e => {
+    if (Array.isArray(e)) {
+      return e;
+    }
+    return e && e.fileList;
+  };
+
     handleModalVisible = flag => {
       this.setState({
         addModalVisible: !!flag,
@@ -792,6 +799,7 @@ class ChangeModal extends Component {
         bankFetching,
         bank,
       } = this.state;
+
       const { piCertificationList } = userData;
       const { basic } = userData;
       const nullData = {};
@@ -811,8 +819,8 @@ class ChangeModal extends Component {
       );
       const uploadModal = <>
         <Upload
+          name="files"
           multiple
-          name="file"
           listType="picture-card"
           className="avatar-uploader"
           showUploadList
@@ -1020,7 +1028,11 @@ class ChangeModal extends Component {
                 labelCol={{ span: 4 }}
                 wrapperCol={{ span: 20 }}
               >
-                {getFieldDecorator('attachmentCode')(uploadModal)}
+                {getFieldDecorator('attachmentCode', {
+                rules: [{ required: true }],
+                valuePropName: 'fileList',
+                getValueFromEvent: this.normFile,
+              })(uploadModal)}
                </Form.Item>
               </Col>
               <Divider style={{ margin: 0 }}/>

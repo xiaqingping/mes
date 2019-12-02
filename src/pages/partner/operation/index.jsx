@@ -232,7 +232,7 @@ class Operation extends React.Component {
               )}
             </FormItem>
           </Col>
-          <Col lg={6} md={8} sm={12}>
+          <Col xxl={6} xl={10} lg={12} md={12} sm={12}>
             <FormItem label={formatMessage({ id: 'bp.operation.completionTime' })}>
               {getFieldDecorator('wanchengshijian')(
                 <RangePicker />,
