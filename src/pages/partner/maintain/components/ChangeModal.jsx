@@ -1,3 +1,5 @@
+/* eslint-disable array-callback-return */
+/* eslint-disable consistent-return */
 /* eslint-disable radix */
 import {
   Modal,
@@ -295,6 +297,9 @@ class ChangeModal extends Component {
         uploadUrl,
         bankFetching: false,
         bank: [],
+        pic: [],
+        picHas: false,
+        newDataList: [],
       }
       this.fetchBank = debounce(this.fetchBank, 500);
     }
@@ -316,19 +321,34 @@ class ChangeModal extends Component {
       if (recordMsg) {
         if (recordMsg.type === 1) {
           api.bp.getBPPiCertification(recordMsg.id).then(res => {
+            if (res.piCertificationList.length !== 0) {
+              res.piCertificationList.map(
+                (item, index) => {
+                  api.disk.getFiles({
+                    sourceKey: 'bp_organization_certification',
+                    sourceCode: [item.attachmentCode].join(',') }).then(
+                      v => {
+                        // eslint-disable-next-line no-unused-expressions
+                        [...res.piCertificationList[index], { pic: v }]
+                        this.setState({ picHas: true })
+                  })
+                },
+              )
+            }
             this.setState({
               userData: res,
             })
           })
         } else {
           api.bp.getBPOrgCertification(recordMsg.id).then(res => {
-            // console.log(res)
-            // api.disk.getFiles({
-            //   sourceKey: 'bp_organization_certification',
-            //   sourceCode: [res.organizationCertification.attachmentCode].join(',') }).then(
-            //     v => {
-            //       console.log(v)
-            //     })
+            if (res.organizationCertification) {
+              api.disk.getFiles({
+                sourceKey: 'bp_organization_certification',
+                sourceCode: [res.organizationCertification.attachmentCode].join(',') }).then(
+                  v => {
+                    this.setState({ pic: v, picHas: true })
+              })
+            }
             this.setState({
               userData: res,
               specialInvoice: res.organizationCertification ?
@@ -358,7 +378,34 @@ class ChangeModal extends Component {
         });
     };
 
-    handleOk = e => {
+    // 个人提交
+    handlePersonOk = e => {
+      if (e) e.preventDefault();
+      const { newDataList, userData, recordMsg } = this.state;
+      const newPiCertificationList = [];
+      newDataList.map(item => {
+        newPiCertificationList.push({
+          invoicePartyId: item.invoicePartyId,
+          notes: item.notes,
+          attachmentCode: item.attachmentCode,
+        })
+      })
+      const data = {
+        basic: {
+          // eslint-disable-next-line max-len
+          name: this.props.form.getFieldValue('pname') ? this.props.form.getFieldValue('pname').name : userData.basic.name,
+        },
+        newPiCertificationList,
+      }
+      api.bp.updateBPPiCertificationList(recordMsg.id, data).then(() => {
+        this.setState({
+          changeModal: false,
+        })
+      })
+    }
+
+    // 组织提交
+    handleOrganizationOk = e => {
       if (e) e.preventDefault();
       const { address, area, userData: { basic }, recordMsg } = this.state;
       this.props.form.validateFields((error, row) => {
@@ -410,6 +457,7 @@ class ChangeModal extends Component {
       }
     }
 
+    // 关闭弹框
     handleCancel = () => {
       this.setState({
         changeModal: false,
@@ -422,6 +470,9 @@ class ChangeModal extends Component {
         submitNext: 1,
         userData: [],
         address: '',
+        pic: [],
+        picHas: false,
+        newDataList: [],
       })
     }
 
@@ -491,7 +542,7 @@ class ChangeModal extends Component {
       }
       return (
         <Form.Item label="名称">
-          {getFieldDecorator('msg', {
+          {getFieldDecorator('pname', {
             rules: [
               {
                 required: isNameFinish,
@@ -617,14 +668,12 @@ class ChangeModal extends Component {
         <Col lg={12} md={12} sm={12}>
           <FormItem label="行业类别">
           &nbsp;&nbsp;&nbsp;&nbsp;
-        <span>{
-          // eslint-disable-next-line consistent-return
-          industryCategories.forEach(item => {
-            if (item.id === basic.industryCode) {
-              return item.name
-            }
-          })
-        }</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <span>
+          {industryCategories.map(v => {
+            if (basic.industryCode === v.id) return v.name
+            })
+          }
+        </span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         <a href="#" onClick = {event => this.updateIndustryGroup(event)}>修改</a>
           </FormItem>
         </Col>
@@ -702,8 +751,8 @@ class ChangeModal extends Component {
               }
             >
               <div style={{ marginBottom: '.8em' }}>
-                <Badge status={renzhengMap[item.invoicePartyCode].value}
-                text={renzhengMap[item.invoicePartyCode].text}/>
+                <Badge status={renzhengMap[item.status].value}
+                text={renzhengMap[item.status].text}/>
               </div>
               <Paragraph
                 style={{ minHeight: 42 }}
@@ -714,15 +763,20 @@ class ChangeModal extends Component {
                 {item.notes}
               </Paragraph>
               <div>
-                {item.attachmentList.map(v =>
+                {item.pic.map((v, index) =>
                   <img
-                  style={{ width: 90,
+                    // eslint-disable-next-line react/no-array-index-key
+                    key={index}
+                    style={{ width: 90,
                     height: 90,
                     margin: '0 20px 20px 0',
                     border: '1px #ECECEC solid',
                     padding: '5px',
-                    borderRadius: '5px' }} src={v.code} alt=""/>,
-                )}
+                    borderRadius: '5px' }}
+                    src={v}
+                    alt=""
+                  />,
+                 )}
               </div>
             </Card>
           </List.Item>
@@ -749,9 +803,10 @@ class ChangeModal extends Component {
     return e && e.fileList;
   };
 
+  // 个人添加数据的弹框关闭
     handleModalVisible = flag => {
       this.setState({
-        addModalVisible: !!flag,
+        addModalVisible: flag,
       });
     };
 
@@ -762,30 +817,30 @@ class ChangeModal extends Component {
       }
     }
 
-    // handleAdd = data => {
-    //   // const { details, piCertification } = this.props;
-    //   const attachmentList = data.attachmentList.map(e => ({
-    //     code: e.thumbUrl,
-    //     name: e.name,
-    //     type: e.type,
-    //   }));
-    //   this.handleModalVisible();
-    //   // const obj = {
-    //   //   id: Math.random(),
-    //   //   invoicePartyId: 123,
-    //   //   invoicePartyCode: 12345,
-    //   //   invoicePartyName: data.invoicePartyName,
-    //   //   status: 1,
-    //   //   notes: data.notes,
-    //   //   attachmentList,
-    //   // };
+    handleAdd = (data, uid) => {
+      const { newDataList } = this.state;
+      const picArr = [];
+      if (data.attachmentList !== 0) {
+        data.attachmentList.map(item => {
+          picArr.push(item.thumbUrl)
+        })
+      }
 
-    //   // const newdata = [...piCertification, obj];
-    //   // this.props.dispatch({
-    //   //   type: 'partnerMaintain/setDetails',
-    //   //   payload: { ...details, piCertificationList: newdata },
-    //   // });
-    // };
+      const obj = {
+        id: Math.random(),
+        type: 1,
+        invoicePartyId: data.invoicePartyId.split(',')[0],
+        invoicePartyName: data.invoicePartyId.split(',')[1],
+        status: 1,
+        notes: data.notes,
+        attachmentCode: uid,
+        pic: picArr,
+      };
+
+      this.setState({
+        newDataList: [...newDataList, obj],
+      })
+    };
 
     render () {
       const {
@@ -798,9 +853,19 @@ class ChangeModal extends Component {
         uploadUrl,
         bankFetching,
         bank,
+        pic,
+        picHas,
+        newDataList,
       } = this.state;
+      if (picHas && pic.length === 0) return null
+      const fileList = pic.map(e => ({
+        uid: e.id,
+        name: e.name,
+        status: 'done',
+        url: api.disk.downloadFiles(e.id, { view: true }),
+      }));
 
-      const { piCertificationList } = userData;
+      // const { piCertificationList } = userData;
       const { basic } = userData;
       const nullData = {};
       let modelWidth = 970;
@@ -824,6 +889,7 @@ class ChangeModal extends Component {
           listType="picture-card"
           className="avatar-uploader"
           showUploadList
+          fileList={ fileList }
           action={uploadUrl}
           beforeUpload={beforeUpload}
           onChange={this.handleChange}
@@ -848,7 +914,7 @@ class ChangeModal extends Component {
           handleModalVisible: this.handleModalVisible,
         };
         modelContent = <>
-          <Form {...formItemLayout}>
+          <Form {...formItemLayout} onSubmit={this.handlePersonOk}>
             {this.renderPerform(userData.basic.name)}
             <Row gutter={32}>
             <List
@@ -860,10 +926,21 @@ class ChangeModal extends Component {
                 sm: 1,
                 xs: 1,
               }}
-              dataSource={[...piCertificationList, nullData]}
+              dataSource={[...newDataList, nullData]}
               renderItem={this.renderListItem}
             />
-            <PersonCertificationAddModal {...parentMethods} modalVisible={addModalVisible}/>
+            <PersonCertificationAddModal
+              {...parentMethods}
+              modalVisible={addModalVisible}
+              details={recordMsg}
+              handleModalVisible={v => this.handleModalVisible(v)}
+              authorization={this.props.authorization}
+              handleAdd={(data, uid) => this.handleAdd(data, uid)}
+              // eslint-disable-next-line no-nested-ternary
+              attachmentCode={userData.piCertificationList ?
+                (userData.piCertificationList.attachmentCode ?
+                  userData.piCertificationList.attachmentCode : '') : ''}
+            />
             <Divider style={{ margin: 0 }}/>
             <Button htmlType="submit" type="primary"
             style={{ float: 'right', margin: '10px 20px' }}>
@@ -878,7 +955,7 @@ class ChangeModal extends Component {
         (recordMsg.countyCode === 'CN' || !recordMsg.countyCode)) {
         modelWidth = 1130;
         modelContent = <>
-          <Form {...formItemLayoutGroup} labelAlign="left" onSubmit={this.handleOk}>
+          <Form {...formItemLayoutGroup} labelAlign="left" onSubmit={this.handleOrganizationOk}>
             <Row gutter={32}>
               <>
                 { this.renderGroupNameForm() }
@@ -940,15 +1017,15 @@ class ChangeModal extends Component {
                   hasFeedback
                   // eslint-disable-next-line max-len
                   validateStatus={form.getFieldValue('bankCode') || (userData.organizationCertification ?
-                    (!!userData.organizationCertification.bankCode)
+                    (!!userData.organizationCertification.bankName)
                      : '') ? 'success' : 'error'}
                   help={form.getFieldValue('bankCode') ? '' : '请输入信息'}
                 >
                   {getFieldDecorator('bankCode', {
                     // eslint-disable-next-line no-nested-ternary
                     initialValue: userData.organizationCertification ?
-                    (userData.organizationCertification.bankCode ?
-                      userData.organizationCertification.bankCode : '') : '',
+                    (userData.organizationCertification.bankName ?
+                      userData.organizationCertification.bankName : '') : '',
                   })(<Select
                     showSearch
                     notFoundContent={bankFetching ? <Spin size="small" /> : null}

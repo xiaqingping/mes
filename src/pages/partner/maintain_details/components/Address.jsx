@@ -66,11 +66,11 @@ class BasicInfo extends Component {
         dataIndex: 'address',
         width: 500,
       render: (text, record) => <div className="addEllipsis" style={{ width: '300px' }}>
-        {record.countryName}
-         {record.provinceName}
-         {record.cityName}
-         {record.countyName}
-         {record.streetName}
+        {record.countryName}&nbsp;
+        {record.provinceName}&nbsp;
+        {record.cityName}&nbsp;
+        {record.countyName}&nbsp;
+        {record.streetName}&nbsp;
         {text}
         </div>,
       },

@@ -308,20 +308,6 @@ constructor(props) {
 
   /** 查询销售归属 */
   searchSaler = value => {
-    // this.setState({
-    //   xiaoshuoguishu: [
-    //     {
-    //       id: 1,
-    //       code: 11111,
-    //       value: `第一个${value}`,
-    //     },
-    //     {
-    //       id: 2,
-    //       code: 22222,
-    //       value: `第二个${value}`,
-    //     },
-    //   ],
-    // });
     if (value) {
       this.callSaler(value)
     }
