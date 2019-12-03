@@ -50,7 +50,6 @@ class BasicInfo extends Component {
   render() {
     const { fixedVisible, temporaryVisible } = this.state
     const { details: { creditList } } = this.props;
-    console.log(creditList)
     return (
       <Card
         title={this.titleContent()}
