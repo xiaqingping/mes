@@ -10,21 +10,37 @@ import React, { Component } from 'react';
 import { connect } from 'dva';
 import CheckPhone from './CheckPhone'
 import CheckEmail from './CheckEmail'
-import Flag from '@/assets/imgs/flag.jpg'
 import './style.less'
 
 const DescriptionsItem = Descriptions.Item;
 
 // eslint-disable-next-line react/prefer-stateless-function
-@connect(({ partnerMaintainEdit }) => ({
+@connect(({ partnerMaintainEdit, basicCache }) => ({
   details: partnerMaintainEdit.type === 'supplier' ?
   partnerMaintainEdit.supplier : partnerMaintainEdit.details,
   type: partnerMaintainEdit.type,
+  countryDiallingCodes: basicCache.countryDiallingCodes,
+  salesPaymentMethods: basicCache.salesPaymentMethods,
 }))
 class BasicInfo extends Component {
   state = {
     phoneShow: false,
     emailShow: false,
+  }
+
+  componentDidMount() {
+    if (!this.props.countryDiallingCodes) {
+      this.props.dispatch({
+        type: 'basicCache/getCache',
+        payload: { type: 'countryDiallingCodes' },
+      });
+    }
+    if (!this.props.salesPaymentMethods) {
+      this.props.dispatch({
+        type: 'basicCache/getCache',
+        payload: { type: 'salesPaymentMethods' },
+      });
+    }
   }
 
   checkPhone = v => {
@@ -43,7 +59,15 @@ class BasicInfo extends Component {
 
   render() {
     const { phoneShow, emailShow } = this.state;
-    const { details: { basic }, type } = this.props;
+    const { details: { basic }, type, countryDiallingCodes, salesPaymentMethods } = this.props;
+    if (!countryDiallingCodes && !salesPaymentMethods) return null;
+    let newData = []
+    // eslint-disable-next-line array-callback-return
+    countryDiallingCodes.map(item => {
+      if (item.countryCode === basic.telephoneCountryCode) {
+        newData = item;
+      }
+    })
     return (
       <Card
         title="基础信息"
@@ -62,12 +86,12 @@ class BasicInfo extends Component {
           </DescriptionsItem>
           <DescriptionsItem span={2} label="移动电话">
             <img
-              src={Flag}
+              src={`/images/country/${newData.countryCode}.png`}
               width="10"
               height="10"
               style={{ borderRadius: '50%', marginBottom: '3px' }}
             />&nbsp;&nbsp;
-            {basic.mobilePhoneCountryCode}&nbsp;&nbsp;
+            {newData.length !== 0 ? `+${newData.diallingCode}` : ''}&nbsp;&nbsp;
             {basic.mobilePhone}&nbsp;&nbsp;&nbsp;
             <a onClick={() => { this.checkPhone(true) }}>变更</a>
           </DescriptionsItem>
@@ -77,20 +101,20 @@ class BasicInfo extends Component {
           </DescriptionsItem>
           <DescriptionsItem span={2} label="电话">
             <img
-              src={Flag}
+              src={`/images/country/${newData.countryCode}.png`}
               width="10"
               height="10"
               style={{ borderRadius: '50%', marginBottom: '3px' }}
             />&nbsp;&nbsp;
-            {basic.telephoneCountryCode}&nbsp;&nbsp;
+            {newData.length !== 0 ? `+${newData.diallingCode}` : ''}&nbsp;&nbsp;
             {basic.telephoneAreaCode}
             {basic.telephone ? `-${basic.telephone}` : ''}
-            {basic.telephoneExtension ? `-${basic.telephoneExtension}--` : ''}&nbsp;&nbsp;&nbsp;
+            {basic.telephoneExtension ? `-${basic.telephoneExtension}` : ''}&nbsp;&nbsp;&nbsp;
             <a>变更</a>
           </DescriptionsItem>
           <DescriptionsItem span={2} label="传真">
             {basic.fax ? <img
-              src={Flag}
+              src={`/images/country/${newData.countryCode}.png`}
               width="10"
               height="10"
               style={{ borderRadius: '50%', marginBottom: '3px' }}
@@ -108,6 +132,11 @@ class BasicInfo extends Component {
             <a>变更</a>
           </DescriptionsItem>
           <DescriptionsItem span={6} label="通讯地址">
+            {basic.countryName}&nbsp;
+            {basic.provinceName}&nbsp;
+            {basic.cityName}&nbsp;
+            {basic.countyName}&nbsp;
+            {basic.streetName}&nbsp;
             {basic.address}
           </DescriptionsItem>
           <DescriptionsItem span={2} label={type === 'supplier' ? '采购冻结' : '销售冻结'}>

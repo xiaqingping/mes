@@ -11,7 +11,8 @@ import {
 } from 'antd';
 import React, { Component } from 'react';
 import { connect } from 'dva';
-import './style.less'
+import './style.less';
+import api from '@/api'
 
 const DescriptionsItem = Descriptions.Item;
 
@@ -40,9 +41,39 @@ const renzhengMap = {
   partnerMaintainEdit.supplier : partnerMaintainEdit.details,
 }))
 class BasicInfo extends Component {
+  state = {
+    pic: [],
+    picHas: false,
+  }
+
+  componentDidMount() {
+    const { details } = this.props;
+    const newData = []
+    if (details.organizationCertification.attachmentCode) {
+      api.disk.getFiles({
+        sourceKey: 'bp_organization_certification',
+        sourceCode: [details.organizationCertification.attachmentCode].join(',') }).then(v => {
+        // eslint-disable-next-line array-callback-return
+        v.map(item => {
+          if (item.id) {
+            newData.push(api.disk.downloadFiles(item.id, { view: true }))
+            this.setState({
+              picHas: true,
+            })
+          }
+        })
+      })
+      this.setState({
+        pic: newData,
+      })
+    }
+  }
+
+
   render() {
     const { details } = this.props;
-
+    const { pic, picHas } = this.state;
+    if (picHas && pic.length === 0) return null
     return (
       <Card title="认证资料" bordered={false} style={{ marginBottom: '24px' }} className="check-tabs">
         <Row gutter={16}>
@@ -69,15 +100,15 @@ class BasicInfo extends Component {
               </DescriptionsItem>
               <DescriptionsItem label="基本户开户银行">
                 {details.organizationCertification ?
-                details.organizationCertification.bankCode : ''}
+                details.organizationCertification.bankName : ''}
               </DescriptionsItem>
               <DescriptionsItem label="基本户开户账号">
                 {details.organizationCertification ?
                 details.organizationCertification.bankAccount : ''}
               </DescriptionsItem>
               <DescriptionsItem label="电话号码">
-                {details.basic.telephoneCountryCode}{details.basic.telephoneAreaCode}
-                {details.basic.telephone ? `-${details.basic.telephone}` : ''}
+                {details.basic.telephoneAreaCode ? `+${details.basic.telephoneAreaCode} ` : ''}
+                {details.basic.telephone ? `${details.basic.telephone}` : ''}
                 {details.basic.telephoneExtension ? `-${details.basic.telephoneExtension}` : ''}
               </DescriptionsItem>
               <DescriptionsItem span={3} label="注册地址">
@@ -85,8 +116,8 @@ class BasicInfo extends Component {
               </DescriptionsItem>
               <DescriptionsItem label="认证图片">
                 <ul style={{ padding: '0' }}>
-                  {/* {details.organizationCertification ? <>
-                    {details.organizationCertification.attachmentList.map((item, index) => (
+                  {pic.length !== 0 ? <>
+                    {pic.map((item, index) => (
                       // eslint-disable-next-line react/no-array-index-key
                       <li key={index} style={{
                         width: '100px',
@@ -96,11 +127,11 @@ class BasicInfo extends Component {
                         lineHeight: '94px',
                         borderRadius: '5px',
                         float: 'left',
-                        marginRight: '10px' }}>{item.type === 'image' ?
-                        <img src={item.code} alt="" width="90" height="90"/> : ''}</li>
+                        marginRight: '10px' }}>
+                        <img src={item} alt="" width="90" height="90"/></li>
                     ))}
                   </> : ''
-                  } */}
+                  }
 
                 </ul>
               </DescriptionsItem>

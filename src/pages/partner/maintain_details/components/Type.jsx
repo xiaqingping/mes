@@ -36,6 +36,12 @@ const status = {
   },
 };
 
+// 默认开票类型
+const defaultInvoiceType = [
+      { id: '10', name: '增值税专用发票' },
+      { id: '20', name: '增值税普通发票' },
+];
+
 @connect(({ partnerMaintainEdit, global, basicCache }) => {
   const salesOrganizations = basicCache.salesOrganizations.filter(
     e => e.languageCode === global.languageCode,
@@ -49,11 +55,15 @@ const status = {
   const offices = basicCache.offices.filter(
     e => e.languageCode === global.languageCode,
   );
+    const salesPaymentMethods = basicCache.salesPaymentMethods.filter(
+    e => e.languageCode === global.languageCode,
+  );
   return {
     distributionChannels,
     salesOrganizations,
     regions,
     offices,
+    salesPaymentMethods,
     details: partnerMaintainEdit.details,
   };
 })
@@ -183,6 +193,10 @@ class BasicInfo extends Component {
       type: 'basicCache/getCache',
       payload: { type: 'offices' },
     });
+    dispatch({
+      type: 'basicCache/getCache',
+      payload: { type: 'salesPaymentMethods' },
+    });
     if (details.customer.salesAreaList.length !== 0) {
       this.setState({
         noTitleKey: details.customer.salesAreaList[0].salesOrganizationCode
@@ -230,8 +244,9 @@ class BasicInfo extends Component {
   render() {
     const { noTitleKey } = this.state;
     // const { details: { customer: { salesAreaList } } } = this.props;
-    const { details: { customer }, regions, offices } = this.props;
+    const { details: { customer }, regions, offices, salesPaymentMethods } = this.props;
     const salesAreaList = customer ? customer.salesAreaList : '';
+    // if (!DefaultInvoiceType) return null
     return (
       <Card
         title="销售范围"
@@ -261,9 +276,15 @@ class BasicInfo extends Component {
                     {offices.map(v => { if (item.officeCode === v.code) return v.name })}
                   </DescriptionsItem>
                   <DescriptionsItem label="默认付款方式">
-                    {item.defaultPaymentMethodCode}</DescriptionsItem>
+                    {salesPaymentMethods.map(v => {
+                      if (item.defaultPaymentMethodCode === v.code) return v.name
+                      })
+                    }
+                  </DescriptionsItem>
                   <DescriptionsItem label="币种">{item.currencyCode}</DescriptionsItem>
-                  <DescriptionsItem label="默认开票类型">{item.defaultnvoiceTypeCode}</DescriptionsItem>
+                  <DescriptionsItem label="默认开票类型">
+                    {defaultInvoiceType.map(v => { if (item.defaultInvoiceTypeCode === v.code) return v.name })}
+                    </DescriptionsItem>
                   <DescriptionsItem label="销售冻结">
                     {item.salesOrderBlock === 1 ? <span><Badge status="error"/>冻结</span> :
                     <span><Badge status="success"/>活跃</span>} </DescriptionsItem>
