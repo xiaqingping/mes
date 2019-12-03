@@ -57,6 +57,11 @@ const SeqModel = {
       { id: 'N', name: '未验证' },
       { id: 'Y', name: '已验证' },
     ],
+    // 手机验证状态
+    MobilePhoneVerifyStatus: [
+      { id: 'N', name: '未验证' },
+      { id: 'Y', name: '已验证' },
+    ],
     // 行业类别
     Industry: [
       { id: '01', name: '军队' },
@@ -71,11 +76,6 @@ const SeqModel = {
     InvoiceWithGood: [
       { id: 1, name: '是' },
       { id: 2, name: '否' },
-    ],
-    // 手机验证状态
-    MobilePhoneVerifyStatus: [
-      { id: 'N', name: '未验证' },
-      { id: 'Y', name: '已验证' },
     ],
     // 付款条件
     PaymentTerms: [

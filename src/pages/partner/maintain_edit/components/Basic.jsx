@@ -166,7 +166,9 @@ class Basic extends React.Component {
         return;
       }
       callback();
+      return;
     }
+    callback();
   };
 
   checkAddress = (rule, value, callback) => {
