@@ -88,9 +88,9 @@ class ChooseSalesPerson extends React.Component {
         filterData.mobilePhone = contactInfo;
       }
     }
-    // if (filters.name) {
-    //   filterData.salesPersonId = filters.name;
-    // }
+    if (filters.name) {
+      filterData.code = filters.name;
+    }
 
     this.setState({ pagination, filterData }, () => {
       this.getTableData();
@@ -108,7 +108,7 @@ class ChooseSalesPerson extends React.Component {
   };
 
   renderSalesPerson = item => (
-    <AutoComplete.Option key={item.id} text={item.name}>
+    <AutoComplete.Option key={item.code} text={item.name}>
       <div style={{ display: 'flex' }}>
         <span>{item.code}</span>&nbsp;&nbsp;
         <span>{item.name}</span>
