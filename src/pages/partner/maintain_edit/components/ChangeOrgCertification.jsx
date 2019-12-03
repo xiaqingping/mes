@@ -2,11 +2,24 @@
  * 变更组织认证
  */
 import React from 'react';
+import { Form, Row, Col } from 'antd';
 
 class ChangeOrgCertification extends React.Component {
+  renderChina = () => {
+    const { form } = this.props;
+    console.log(form);
+    return (
+      <Row>
+        <Col></Col>
+      </Row>
+    );
+  };
+
+  renderOther = () => {};
+
   render() {
-    return <div>组织认证</div>;
+    return <Form>{this.renderChina()}</Form>;
   }
 }
 
-export default ChangeOrgCertification;
+export default Form.create()(ChangeOrgCertification);

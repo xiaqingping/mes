@@ -65,7 +65,7 @@ class FormContent extends React.Component {
       VendorLevelCode,
     } = this.props;
 
-    if (tabKey !== data.purchasingOrganizationCode) return null;
+    if (tabKey !== data.purchaseOrganizationCode) return null;
     return (
       <Form layout="vertical">
         <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
@@ -169,11 +169,11 @@ class FormContent extends React.Component {
                 id: 'bp.maintain_details.purchase_org.purchase_organization',
               })}
             >
-              {getFieldDecorator('purchasingGroupCode', {
+              {getFieldDecorator('purchaseGroupCode', {
                 rules: [{ required: true }],
-                initialValue: data.purchasingGroupCode,
+                initialValue: data.purchaseGroupCode,
               })(
-                <Select onChange={value => valueChange('purchasingGroupCode', value)}>
+                <Select onChange={value => valueChange('purchaseGroupCode', value)}>
                   {purchaseGroups.map(e => (
                     <Option key={e.code} value={e.code}>
                       {e.name}
@@ -209,6 +209,7 @@ class FormContent extends React.Component {
 @connect(
   ({ bpEdit, basicCache }) => {
     // BP数据
+    const { editType } = bpEdit;
     const details = bpEdit.details || {};
     const vendor = details.vendor || {};
     const purchaseOrganizationList = vendor.purchaseOrganizationList || [];
@@ -216,7 +217,7 @@ class FormContent extends React.Component {
     // 基础数据
     // 采购组织
     const { purchaseOrganizations } = basicCache;
-    return { details, vendor, purchaseOrganizationList, purchaseOrganizations };
+    return { editType, details, vendor, purchaseOrganizationList, purchaseOrganizations };
   },
   null,
   null,
@@ -227,7 +228,7 @@ class PurchasingOrg extends React.Component {
     super(props);
     const { purchaseOrganizationList: tabsData } = this.props;
     this.state = {
-      tabKey: (tabsData && tabsData[0] && tabsData[0].purchasingOrganizationCode) || '',
+      tabKey: (tabsData && tabsData[0] && tabsData[0].purchaseOrganizationCode) || '',
     };
   }
 
@@ -236,7 +237,7 @@ class PurchasingOrg extends React.Component {
     const { details, vendor, purchaseOrganizationList } = this.props;
 
     const newPurchaseOrganizationList = purchaseOrganizationList.map(e => {
-      if (e.purchasingOrganizationCode === tabKey) {
+      if (e.purchaseOrganizationCode === tabKey) {
         e[key] = value;
         if (key === 'salerTelephone') {
           e.salerTelephone = value.mobilePhone;
@@ -295,8 +296,10 @@ class PurchasingOrg extends React.Component {
     }
 
     const newPurchaseOrganizationList = [].concat(tabsData, {
-      purchasingOrganizationCode: obj[index],
+      purchaseOrganizationCode: obj[index],
       invoicePostInReceive: 2,
+      // theNew代表新增加的数据
+      theNew: true,
     });
 
     const newVendor = {
@@ -320,7 +323,7 @@ class PurchasingOrg extends React.Component {
 
   renderCascader = () => {
     const { purchaseOrganizationList: tabsData, purchaseOrganizations } = this.props;
-    const codeList = tabsData.map(e => e.purchasingOrganizationCode);
+    const codeList = tabsData.map(e => e.purchaseOrganizationCode);
 
     const options = purchaseOrganizations.map(e => {
       let disabled = false;
@@ -350,7 +353,7 @@ class PurchasingOrg extends React.Component {
 
     // 过滤掉关闭的采购组织
     const newTabsData = tabsData.filter((e, i) => {
-      if (e.purchasingOrganizationCode !== tabKey) return true;
+      if (e.purchaseOrganizationCode !== tabKey) return true;
       index = i;
       return false;
     });
@@ -359,15 +362,15 @@ class PurchasingOrg extends React.Component {
     if (newTabsData.length > 0) {
       // 关闭第一个
       if (index === 0) {
-        key = newTabsData[0].purchasingOrganizationCode;
+        key = newTabsData[0].purchaseOrganizationCode;
       }
       // 关闭最后一个
       if (index === tabsData.length - 1) {
-        key = newTabsData[index - 1].purchasingOrganizationCode;
+        key = newTabsData[index - 1].purchaseOrganizationCode;
       }
       // 关闭中间的Tab
       if (index > 0 && index < tabsData.length - 1) {
-        key = newTabsData[index].purchasingOrganizationCode;
+        key = newTabsData[index].purchaseOrganizationCode;
       }
     } else {
       key = '';
@@ -392,16 +395,17 @@ class PurchasingOrg extends React.Component {
 
   render() {
     let { tabKey } = this.state;
-    const { purchaseOrganizationList: tabsData, purchaseOrganizations } = this.props;
+    const { editType, purchaseOrganizationList: tabsData, purchaseOrganizations } = this.props;
 
     // 如有有数据，但没有选中，则默认选中第一条
     if (!tabKey && tabsData.length > 0) {
-      tabKey = tabsData[0].purchasingOrganizationCode;
+      tabKey = tabsData[0].purchaseOrganizationCode;
     }
 
     let tabList = tabsData.map(e => ({
-      key: e.purchasingOrganizationCode,
-      tab: purchaseOrganizations.filter(e1 => e1.code === e.purchasingOrganizationCode)[0].name,
+      key: e.purchaseOrganizationCode,
+      tab: purchaseOrganizations.filter(e1 => e1.code === e.purchaseOrganizationCode)[0].name,
+      theNew: e.theNew,
     }));
 
     tabList = tabList.concat({
@@ -409,6 +413,10 @@ class PurchasingOrg extends React.Component {
       tab: this.renderCascader(),
     });
     tabList.forEach(e => {
+      // 修改时无法删除已有的采购组织
+      if (editType === 'update' && !e.theNew) {
+        return;
+      }
       if (e.key === tabKey) {
         e.tab = (
           <>
@@ -439,7 +447,7 @@ class PurchasingOrg extends React.Component {
         {tabKey ? (
           tabsData.map(e => (
             <FormContent
-              key={e.purchasingOrganizationCode}
+              key={e.purchaseOrganizationCode}
               valueChange={this.valueChange}
               tabKey={tabKey}
               data={e}

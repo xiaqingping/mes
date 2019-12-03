@@ -13,6 +13,11 @@ const SeqModel = {
       { id: 3, name: '部分认证' },
       { id: 4, name: '已认证' },
     ],
+    // PI认证状态
+    BpPiCertificationStatus: [
+      { id: 1, name: '审核中' },
+      { id: 2, name: '已认证' },
+    ],
     // 操作项状态
     BpOperationItemStatus: [
       { id: 1, name: '待验证' },
