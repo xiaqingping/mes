@@ -1,7 +1,7 @@
 /**
  * 基础信息
  */
-import { Icon, Col, Form, Input, Row, Select, Switch, Card } from 'antd';
+import { Icon, Col, Form, Input, Row, Select, Switch, Card, Badge } from 'antd';
 import React from 'react';
 import { connect } from 'dva';
 import { formatMessage, FormattedMessage } from 'umi-plugin-react/locale';
@@ -15,6 +15,7 @@ import {
 } from '@/components/CustomizedFormControls';
 import debounce from 'lodash/debounce';
 import bp from '@/api/bp';
+import { formatter } from '@/utils/utils';
 import styles from '../style.less';
 
 const FormItem = Form.Item;
@@ -296,6 +297,7 @@ class Basic extends React.Component {
     });
   };
 
+  // 电话
   renderTelephone = () => {
     const { form, editType, basic } = this.props;
     const { getFieldDecorator } = form;
@@ -334,19 +336,140 @@ class Basic extends React.Component {
     return null;
   };
 
+  // 名称
+  renderName = () => {
+    const { form, editType, basic } = this.props;
+    const { getFieldDecorator } = form;
+
+    const edit = getFieldDecorator('name', {
+      initialValue: {
+        type: basic.type,
+        name: basic.name,
+      },
+      rules: [{ validator: this.checkNameInput }],
+    })(<NameInput onChange={value => this.valueChange('name', value)} />);
+
+    const type1 = (
+      <span>
+        <Icon type="user" />
+        &nbsp;个人
+      </span>
+    );
+    const type2 = (
+      <span>
+        <Icon type="home" />
+        &nbsp;组织
+      </span>
+    );
+    const certificationStatus2 = <Badge status="warning" text="审核中" />;
+    const show = (
+      <p style={{ lineHeight: '32px' }}>
+        {basic.type === 1 ? type1 : null}
+        {basic.type === 2 ? type2 : null}
+        <span>&nbsp;{basic.name}&nbsp;</span>
+        {basic.certificationStatus === 2 ? (
+          <certificationStatus2 />
+        ) : (
+          <a href="#">
+            <FormattedMessage id="bp.maintain_details.change" />
+          </a>
+        )}
+      </p>
+    );
+
+    // 编辑状态
+    // 页面状态为：新增
+    if (editType === 'add') {
+      return edit;
+    }
+    // 非编辑状态
+    if (editType === 'update') {
+      return show;
+    }
+    return null;
+  };
+
+  // 行业类别
+  renderIndustry = () => {
+    const { form, editType, basic, industryCategories } = this.props;
+    const { getFieldDecorator } = form;
+    const { industrySelectOpen } = this.state;
+    const industryOption = {};
+    if (!industrySelectOpen) industryOption.open = industrySelectOpen;
+
+    const edit = getFieldDecorator('industryCode', {
+      initialValue: basic.industryCode,
+    })(
+      <Select {...industryOption} onChange={value => this.valueChange('industryCode', value)}>
+        {industryCategories.map(e => {
+          if (basic.type === 1) {
+            if (e.id !== '06') {
+              return (
+                <Option disabled key={e.id} value={e.id}>
+                  {e.name}
+                </Option>
+              );
+            }
+            return (
+              <Option key={e.id} value={e.id}>
+                {e.name}
+              </Option>
+            );
+          }
+          if (basic.type === 2) {
+            if (e.id === '06') {
+              return (
+                <Option disabled key={e.id} value={e.id}>
+                  {e.name}
+                </Option>
+              );
+            }
+            return (
+              <Option key={e.id} value={e.id}>
+                {e.name}
+              </Option>
+            );
+          }
+          return (
+            <Option key={e.id} value={e.id}>
+              {e.name}
+            </Option>
+          );
+        })}
+      </Select>,
+    );
+    const show = (
+      <>
+        {formatter(industryCategories, basic.industryCode)}
+        {basic.type === 2 ? (
+          <a href="#">
+            &nbsp;
+            <FormattedMessage id="bp.maintain_details.change" />
+          </a>
+        ) : null}
+      </>
+    );
+
+    // 编辑状态
+    // 页面状态为：新增
+    if (editType === 'add') {
+      return edit;
+    }
+    // 非编辑状态
+    if (editType === 'update') {
+      return show;
+    }
+    return null;
+  };
+
   render() {
     const {
       form: { getFieldDecorator },
-      editType,
       basic,
       tabActiveKey,
       salesOrderBlock,
       invoicePostBlock,
-      industryCategories,
     } = this.props;
-    const { industrySelectOpen } = this.state;
-    const industryOption = {};
-    if (!industrySelectOpen) industryOption.open = industrySelectOpen;
 
     return (
       <Card
@@ -358,35 +481,7 @@ class Basic extends React.Component {
           <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
             <Col md={6} sm={12}>
               <FormItem label={formatMessage({ id: 'bp.maintain_details.name' })}>
-                {editType === 'add'
-                  ? getFieldDecorator('name', {
-                      initialValue: {
-                        type: basic.type,
-                        name: basic.name,
-                      },
-                      rules: [{ validator: this.checkNameInput }],
-                    })(<NameInput onChange={value => this.valueChange('name', value)} />)
-                  : null}
-                {editType === 'update' ? (
-                  <p style={{ lineHeight: '32px' }}>
-                    {basic.type === 1 ? (
-                      <span>
-                        <Icon type="user" />
-                        &nbsp;个人
-                      </span>
-                    ) : null}
-                    {basic.type === 2 ? (
-                      <span>
-                        <Icon type="home" />
-                        组织
-                      </span>
-                    ) : null}
-                    <span> {basic.name} </span>
-                    <a href="#">
-                      <FormattedMessage id="bp.maintain_details.change" />
-                    </a>
-                  </p>
-                ) : null}
+                {this.renderName()}
               </FormItem>
             </Col>
             <Col md={6} sm={12}>
@@ -459,50 +554,7 @@ class Basic extends React.Component {
             </Col>
             <Col md={6} sm={12}>
               <FormItem label={formatMessage({ id: 'bp.maintain_details.basic.business_type' })}>
-                {getFieldDecorator('industryCode', {
-                  initialValue: basic.industryCode,
-                })(
-                  <Select
-                    {...industryOption}
-                    onChange={value => this.valueChange('industryCode', value)}
-                  >
-                    {industryCategories.map(e => {
-                      if (basic.type === 1) {
-                        if (e.id !== '06') {
-                          return (
-                            <Option disabled key={e.id} value={e.id}>
-                              {e.name}
-                            </Option>
-                          );
-                        }
-                        return (
-                          <Option key={e.id} value={e.id}>
-                            {e.name}
-                          </Option>
-                        );
-                      }
-                      if (basic.type === 2) {
-                        if (e.id === '06') {
-                          return (
-                            <Option disabled key={e.id} value={e.id}>
-                              {e.name}
-                            </Option>
-                          );
-                        }
-                        return (
-                          <Option key={e.id} value={e.id}>
-                            {e.name}
-                          </Option>
-                        );
-                      }
-                      return (
-                        <Option key={e.id} value={e.id}>
-                          {e.name}
-                        </Option>
-                      );
-                    })}
-                  </Select>,
-                )}
+                {this.renderIndustry()}
               </FormItem>
             </Col>
             <Col md={18} sm={24}>

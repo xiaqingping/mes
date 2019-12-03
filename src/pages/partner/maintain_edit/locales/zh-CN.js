@@ -36,7 +36,7 @@ export default {
   'bp.maintain_details.sales_distribution.ship_to_party': '送达方',
   'bp.maintain_details.sales_distribution.sales_rep': '销售员',
   // 采购组织
-  'bp.maintain_details.purchase_organization': '采购组织',
+  'bp.maintain_details.purchase_org': '采购组织',
   'bp.maintain_details.purchase_org.empty': '暂无采购组织',
   'bp.maintain_details.purchase_org.purchase_org': '采购组织',
   'bp.maintain_details.purchase_org.order_currency': '订单货币',

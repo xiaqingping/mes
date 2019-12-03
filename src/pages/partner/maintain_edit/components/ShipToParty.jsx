@@ -153,7 +153,7 @@ class ShipToParty extends React.Component {
       },
       {
         title: formatMessage({ id: 'bp.maintain_details.status' }),
-        dataIndex: 'linkVerifyStatus',
+        dataIndex: 'verifyStatus',
         width: '40%',
       },
       {

@@ -123,7 +123,7 @@ export const readDetails = {
     // 采购组织列表
     purchaseOrganizationList: [
       {
-        purchasingOrganizationCode: 'BBI',
+        purchaseOrganizationCode: 'BBI',
         salerName: '张三',
         salerTelephoneCountryCode: '+86',
         salerTelephone: '18735818888',
@@ -131,7 +131,7 @@ export const readDetails = {
         currencyCode: '1',
         levelCode: '1',
         invoicePostInReceive: 1,
-        purchasingGroupCode: '1',
+        purchaseGroupCode: '1',
         deliveryPlanDays: '1',
       },
     ],
@@ -276,7 +276,7 @@ export const addDetails = {
     // 采购组织列表
     purchaseOrganizationList: [
       {
-        purchasingOrganizationCode: 'BBI',
+        purchaseOrganizationCode: 'BBI',
         salerName: '张三',
         salerTelephoneCountryCode: '+86',
         salerTelephone: '18735818888',
@@ -284,7 +284,7 @@ export const addDetails = {
         currencyCode: '1',
         levelCode: '1',
         invoicePostInReceive: 1,
-        purchasingGroupCode: '1',
+        purchaseGroupCode: '1',
         deliveryPlanDays: '1',
       },
     ],
@@ -382,7 +382,7 @@ export const updateDetails = {
     // 采购组织列表
     purchaseOrganizationList: [
       {
-        purchasingOrganizationCode: 'BBI',
+        purchaseOrganizationCode: 'BBI',
         salerName: '张三',
         salerTelephoneCountryCode: '+86',
         salerTelephone: '18735818888',
@@ -390,7 +390,7 @@ export const updateDetails = {
         currencyCode: '1',
         levelCode: '1',
         invoicePostInReceive: 1,
-        purchasingGroupCode: '1',
+        purchaseGroupCode: '1',
         deliveryPlanDays: '1',
       },
     ],

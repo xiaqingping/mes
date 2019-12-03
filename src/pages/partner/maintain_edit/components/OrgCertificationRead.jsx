@@ -2,10 +2,11 @@
  * 组织认证查看
  */
 import React from 'react';
-import { Form, Card, Row, Col, Badge, Upload } from 'antd';
+import { Form, Card, Row, Col, Badge, Upload, Modal } from 'antd';
 import { connect } from 'dva';
 import { formatMessage } from 'umi-plugin-react/locale';
 import disk from '@/api/disk';
+import ChangeCertification from './ChangeCertification';
 
 const FormItem = Form.Item;
 
@@ -20,15 +21,88 @@ const FormItem = Form.Item;
   };
 })
 class OrgCertificationRead extends React.Component {
+  state = {
+    modalVisible: false,
+  };
+
+  handleOk = () => {
+    this.setState({ modalVisible: false });
+  };
+
+  handleCancel = () => {
+    this.setState({ modalVisible: false });
+  };
+
+  showModal = () => {
+    this.setState({ modalVisible: true });
+  };
+
+  // 取消认证
+  cancelCertification = () => {
+    console.log('取消认证');
+  };
+
+  // 认证状态
+  renderStatus = () => {
+    const { details, basic } = this.props;
+    let status = null;
+    switch (basic.certificationStatus) {
+      case 1:
+        status = (
+          <>
+            <Badge status="default" text="未认证" />
+            &nbsp;&nbsp;
+            <a href="#">认证</a>
+            <ChangeCertification details={details} />
+          </>
+        );
+        break;
+      case 2:
+        status = (
+          <>
+            <Badge status="warning" text="审核中" />
+            &nbsp;&nbsp;
+            <a href="#">查看</a>
+          </>
+        );
+        break;
+      case 4:
+        status = (
+          <>
+            <Badge status="success" text="已认证" />
+            &nbsp;&nbsp;
+            <a href="#" onClick={this.showModal}>
+              变更
+            </a>
+            &nbsp;&nbsp;
+            <a href="#" onClick={this.cancelCertification}>
+              取消认证
+            </a>
+            <Modal
+              title="变更认证资料"
+              visible={this.state.modalVisible}
+              okText="提交"
+              onOk={this.handleOk}
+              onCancel={this.handleCancel}
+            >
+              <ChangeCertification details={details} />
+            </Modal>
+          </>
+        );
+        break;
+      default:
+    }
+    return status;
+  };
+
   renderChina = () => {
-    const { organizationCertification: data, basic } = this.props;
+    const { organizationCertification: data } = this.props;
     const fileList = data.attachmentList.map(e => ({
       uid: e.id,
       name: e.name,
       status: 'done',
       url: disk.downloadFiles(e.id, { view: true }),
     }));
-    console.log(basic);
 
     return (
       <>
@@ -39,8 +113,7 @@ class OrgCertificationRead extends React.Component {
                 <FormItem
                   label={formatMessage({ id: 'bp.maintain_details.verification_data.status' })}
                 >
-                  <Badge status="default" />
-                  未认证
+                  {this.renderStatus()}
                 </FormItem>
               </Col>
               <Col span={8}>
@@ -113,6 +186,7 @@ class OrgCertificationRead extends React.Component {
   renderOther = countryCode => {
     const { organizationCertification: data } = this.props;
     const fileList = [];
+
     return (
       <Row gutter={64}>
         <Col span={6}>
@@ -121,8 +195,7 @@ class OrgCertificationRead extends React.Component {
               <FormItem
                 label={formatMessage({ id: 'bp.maintain_details.verification_data.status' })}
               >
-                <Badge status="default" />
-                未认证
+                {this.renderStatus()}
               </FormItem>
             </Col>
             <Col span={24}>
