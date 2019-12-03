@@ -515,6 +515,7 @@ class SalesArea extends React.Component {
       tab:
         salesOrganizationsMap[e.salesOrganizationCode] +
         distributionChannelsMap[e.distributionChannelCode],
+      theNew: e.theNew,
     }));
 
     tabList = tabList.concat({
@@ -522,9 +523,9 @@ class SalesArea extends React.Component {
       tab: this.renderCascader(salesArea),
     });
     tabList.forEach(e => {
-      // TODO: 修改时无法删除已有的销售范围
-      if (editType === 'update') {
-        // return;
+      // 修改时无法删除已有的销售范围
+      if (editType === 'update' && !e.theNew) {
+        return;
       }
 
       if (e.key === tabKey) {
