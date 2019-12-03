@@ -398,6 +398,7 @@ class CustomerEdit extends Component {
         return;
       }
     }
+
     // 当前处于供应商Tab
     if (tabActiveKey === 'vendor') {
       const result = await this.validateVendor();
