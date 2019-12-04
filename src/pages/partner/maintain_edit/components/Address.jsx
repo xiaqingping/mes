@@ -88,10 +88,11 @@ class EditableTable extends React.Component {
 
     // 防抖
     this.checkAddress = debounce(this.checkAddress, 800);
+    this.checkMobilePhone = debounce(this.checkMobilePhone, 800);
   }
 
   checkAddress = (rule, value, callback) => {
-    const { address, changedValue = {} } = value;
+    const { address, countyCode, changedValue = {} } = value;
     const { option = [] } = changedValue;
     if (option.length > 0) {
       const last = option[option.length - 1];
@@ -102,6 +103,22 @@ class EditableTable extends React.Component {
     }
     if (!address) {
       callback('详细地址必填');
+      return;
+    }
+    if (!countyCode) {
+      callback('国家不能为空');
+      return;
+    }
+    callback();
+  };
+
+  checkMobilePhone = (rule, value, callback) => {
+    if (!value.mobilePhone) {
+      callback('手机号码不能为空');
+      return;
+    }
+    if (!value.mobilePhoneCountryCode) {
+      callback('国家编码不能为空');
       return;
     }
     callback();
@@ -157,7 +174,7 @@ class EditableTable extends React.Component {
     const row = validateResult[1];
     // address中排除掉changedValue，不要把此数据赋值给地址
     const { address } = row;
-    const { changedValue, ...otherAddress } = address;
+    const { changedValue, countrySapCode, provinceSapCode, ...otherAddress } = address;
     const { addressList } = this.props;
 
     const newAddressList = addressList.map((e, i) => {
@@ -211,7 +228,7 @@ class EditableTable extends React.Component {
         editable: true,
         inputType: <MobilePhoneInput />,
         editOptions: {
-          rules: [{ required: true }],
+          rules: [{ validator: this.checkMobilePhone }],
         },
         render(text, record) {
           const diallingCode = formatter(
