@@ -100,7 +100,7 @@ const emailIden = {
 
 function renderOption(item) {
   return (
-    <Option key={item.id} text={item.name}>
+    <Option key={item.code} text={item.name}>
       <div style={{ display: 'flex' }}>
         <span>{item.code}</span>&nbsp;&nbsp;
         <span>{item.name}</span>
@@ -159,7 +159,9 @@ constructor(props) {
   // 销售归属查询
   callSaler = value => {
     api.employees.getSaler({ code_or_name: value }).then(res => {
-      console.log(res)
+      this.setState({
+        xiaoshuoguishu: res,
+      })
     })
   }
 
@@ -448,7 +450,7 @@ constructor(props) {
           </Col>
           <Col xxl={6} lg={8}>
             <FormItem label="收票方">
-              {getFieldDecorator('invoicePartyId')(
+              {getFieldDecorator('billToPartyId')(
                 <AutoComplete
                   dataSource={receivingParty.map(renderOption)}
                   onSearch={this.searchCustomer}

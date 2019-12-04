@@ -315,7 +315,7 @@ class Operation extends React.Component {
         render(val, record) {
           if (val) {
             return <span><Badge status={status[val].value} text={status[val].text}/><br/>
-          <span style={{ marginLeft: 85 }}>{val === 3 ? record.finishDate : ''}</span></span>;
+          <span>{val === 3 ? record.finishDate : ''}</span></span>;
           }
             return val
         },
