@@ -66,8 +66,8 @@ export default {
     return request(`/businessPartners/v1/${id}/piCertification`, { method: 'POST', data });
   },
   // 根据业务伙伴ID变更负责人认证资料接口
-  updateBPPiCertification(id, invoicePartyId, data) {
-    return request(`/businessPartners/v1/${id}/piCertification/${invoicePartyId}`, {
+  updateBPPiCertification(id, billToPartyId, data) {
+    return request(`/businessPartners/v1/${id}/piCertification/${billToPartyId}`, {
       method: 'PUT',
       data,
     });
@@ -75,8 +75,8 @@ export default {
   // 根据业务伙伴ID和开票方ID取消负责人认证接口
   cancelBPPiCertification(data) {
     return request(
-      `/businessPartners/v1/${data.id}/piCertification/${data.invoicePartyId}/cancel`,
-      { method: 'PUT' },
+      `/businessPartners/v1/${data.id}/piCertification/${data.billToPartyId}/cancel`,
+      { method: 'POST' },
     );
   },
 
@@ -130,7 +130,7 @@ export default {
     });
   },
 
-  // 根据业务伙伴ID查询最新的PI认证或组织认证类型的验证记录 { invoicePartyId }
+  // 根据业务伙伴ID查询最新的PI认证或组织认证类型的验证记录 { billToPartyId }
   getLastVerifyRecords(id, params) {
     return request(`/businessPartners/v1/${id}/verifyRecords/last`, { params });
   },

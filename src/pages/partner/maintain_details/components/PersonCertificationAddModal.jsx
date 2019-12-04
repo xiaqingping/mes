@@ -43,22 +43,25 @@ class PersonCertificationAddModal extends Component {
     this.callCustomer = _.debounce(this.callCustomer, 500);
   }
 
-  componentWillReceiveProps(props) {
-    const { details } = props;
-    const { receivingData } = this.state;
+  componentDidMount() {
+    const { details } = this.props;
+    const newData = [];
 
     if (details) {
       api.bp.getBPCustomer(details.id).then(res => {
         // receivingData.push({ id: res.basic.id, code: res.basic.code, name: res.basic.name })
-        console.log(res)
-        // eslint-disable-next-line array-callback-return
-        res.customer.salesAreaList.map(item => {
-          if (item.soldToPartyId === res.basic.id && item.id !== res.basic.id) {
-            item.billToPartyList.map(v => receivingData.push(v))
-          }
+        res.customer.salesAreaList.forEach(item => {
+          item.billToPartyList.forEach(v => {
+            if (v.soldToPartyId === res.basic.id && v.id !== res.basic.id) {
+              newData.push(v)
+            }
+          })
         })
       });
     }
+    this.setState({
+      receivingData: newData,
+    })
   }
 
 
@@ -79,13 +82,12 @@ class PersonCertificationAddModal extends Component {
     // 收票方查询
   callCustomer = value => {
     const data = [];
-    // eslint-disable-next-line array-callback-return
-    this.uniq(this.state.receivingData).map(item => {
+    const { receivingData } = this.state;
+    this.uniq(receivingData).forEach(item => {
       if (item.code.indexOf(value) !== -1 || item.name.indexOf(value) !== -1) {
         data.push(item)
       }
     })
-    // console.log(data)
     this.setState({
       receivingParty: data,
     })
@@ -152,7 +154,7 @@ class PersonCertificationAddModal extends Component {
           }}
           label="收票方"
         >
-          {form.getFieldDecorator('invoicePartyId', {
+          {form.getFieldDecorator('billToPartyId', {
             rules: [{ required: true }],
           })(
             <AutoComplete

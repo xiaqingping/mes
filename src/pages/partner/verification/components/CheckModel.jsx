@@ -112,15 +112,15 @@ class RecordListForm extends React.Component {
           // newData = type === 1 ? { ...newData, organizationCertification: { pic: [] } } : { ...newData, piCertification: { pic: [] } };
           if (!res) return null
           if (res[typeName].attachmentCode) {
-            this.setState({ picHas: true })
             api.disk.getFiles({
               sourceKey: 'bp_organization_certification',
               sourceCode: [res[typeName].attachmentCode].join(',') }).then(v => {
-              // sourceCode: '753966edfcb7823241813b1590d8310c' }).then(v => {
+              // sourceCode: '85c951942daa05a83a55655efdd557eb' }).then(v => {
               // eslint-disable-next-line array-callback-return
               v.map(item => {
                 if (item.id) {
                   newData.push(api.disk.downloadFiles(item.id, { view: true }))
+                  this.setState({ picHas: true })
                 }
               })
             })
@@ -148,8 +148,7 @@ class RecordListForm extends React.Component {
     const { showList, historyRecord, picHas, pic } = this.state;
     const { recordMsg: { type }, SpecialInvoice, VerifyRecordStatus } = this.props;
     const typeName = parseInt(type, 10) === 1 ? 'organizationCertification' : 'piCertification';
-    if (!historyRecord) return null
-    console.log(historyRecord)
+    if (!historyRecord && !picHas) return null
     return (
       <Modal
         destroyOnClose
@@ -164,7 +163,7 @@ class RecordListForm extends React.Component {
             <Row>
               <Col span={8} className={styles.labelName}>状态：</Col>
               <Col span={16} className={styles.labelVal}>
-                <Badge status={VerifyRecordStatus.filter(item => item.value === historyRecord.status)[0].status}
+                <Badge style={{ color: '#999' }} status={VerifyRecordStatus.filter(item => item.value === historyRecord.status)[0].status}
                 text={VerifyRecordStatus.filter(item => item.value === historyRecord.status)[0].text}/>
                  {typeName === 'piCertification' ? `(${historyRecord.piCertification.billToPartyName})` : ''}
                  <br/>

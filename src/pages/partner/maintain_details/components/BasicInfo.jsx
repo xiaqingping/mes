@@ -119,10 +119,13 @@ class BasicInfo extends Component {
               height="10"
               style={{ borderRadius: '50%', marginBottom: '3px' }}
               /> : ''}&nbsp;&nbsp;
-            {basic.faxCountryCode}&nbsp;&nbsp;
-            {basic.faxAreaCode}
+            {/* {basic.faxCountryCode}&nbsp;&nbsp; */}
+            {
+              newData.length !== 0 && basic.faxCountryCode ? `+${newData.diallingCode}` : ''
+            }&nbsp;&nbsp;
+            {basic.faxAreaCode ? `${basic.faxAreaCode}-` : ''}
             {basic.fax ? `${basic.fax}-` : ''}
-            {basic.faxExtension ? `${basic.faxExtension}-` : ''}
+            {basic.faxExtension ? `${basic.faxExtension}` : ''}
           </DescriptionsItem>
           <DescriptionsItem span={1} label="邮政编码">{basic.postCode}</DescriptionsItem>
           <DescriptionsItem span={1} label="时区">{basic.timeZoneCode}</DescriptionsItem>

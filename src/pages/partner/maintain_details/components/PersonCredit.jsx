@@ -18,10 +18,10 @@ class PersonCredit extends React.Component {
   }
 
   renderListItem = item => (
-    <List.Item key={item.invoicePartyId}>
+    <List.Item key={item.billToPartyId}>
       <Card
         hoverable
-        title={item.invoicePartyName}
+        title={item.billToPartyName}
         extra={
           <>
             <a>额度调整</a>

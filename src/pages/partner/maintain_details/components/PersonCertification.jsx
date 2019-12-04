@@ -25,7 +25,7 @@ class PersonCertification extends React.Component {
         <List.Item key={item.id}>
           <Card
             hoverable
-            title={item.invoicePartyName}
+            title={item.billToPartyName}
             extra={
               <>
                 <a>变更</a>
@@ -93,9 +93,9 @@ class PersonCertification extends React.Component {
     this.handleModalVisible();
     const obj = {
       id: Math.random(),
-      invoicePartyId: 123,
-      invoicePartyCode: 12345,
-      invoicePartyName: data.invoicePartyName,
+      billToPartyId: 123,
+      billToPartyCode: 12345,
+      billToPartyName: data.billToPartyName,
       status: 1,
       notes: data.notes,
       attachmentList,
