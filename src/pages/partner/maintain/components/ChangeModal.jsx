@@ -1,6 +1,3 @@
-/* eslint-disable array-callback-return */
-/* eslint-disable consistent-return */
-/* eslint-disable radix */
 import {
   Modal,
   Form,
@@ -57,24 +54,17 @@ const formItemLayoutGroup = {
   },
 };
 
-const renzhengMap = {
+// 审核状态
+const verifyStatus = {
   1: {
-    value: 'default',
-    text: '未认证',
-  },
- 2: {
     value: 'processing',
     text: '审核中',
   },
-  4: {
+ 2: {
     value: 'success',
     text: '已认证',
   },
-  3: {
-    value: 'warning',
-    text: '部分认证',
-  },
-};
+}
 
 const formItemLayoutEng = {
   labelCol: {
@@ -298,8 +288,8 @@ class ChangeModal extends Component {
         bankFetching: false,
         bank: [],
         pic: [],
-        picHas: false,
         newDataList: [],
+        userPersonData: [],
       }
       this.fetchBank = debounce(this.fetchBank, 500);
     }
@@ -321,23 +311,39 @@ class ChangeModal extends Component {
       if (recordMsg) {
         if (recordMsg.type === 1) {
           api.bp.getBPPiCertification(recordMsg.id).then(res => {
-            if (res.piCertificationList.length !== 0) {
-              res.piCertificationList.map(
-                (item, index) => {
-                  api.disk.getFiles({
-                    sourceKey: 'bp_organization_certification',
-                    sourceCode: [item.attachmentCode].join(',') }).then(
-                      v => {
-                        // eslint-disable-next-line no-unused-expressions
-                        [...res.piCertificationList[index], { pic: v }]
-                        this.setState({ picHas: true })
-                  })
-                },
-              )
-            }
             this.setState({
               userData: res,
             })
+            if (res.piCertificationList.length !== 0) {
+                const codeList = [];
+                const newData = []
+                res.piCertificationList.forEach(item => {
+                  codeList.push(item.attachmentCode)
+                  newData.push({
+                  id: item.billToPartyId,
+                  status: item.status,
+                  billToPartyName: item.billToPartyName,
+                  notes: item.notes,
+                  pic: [],
+                  attachmentCode: item.attachmentCode,
+                  })
+                })
+                api.disk.getFiles({
+                  sourceKey: 'bp_organization_certification',
+                  sourceCode: codeList.join(',') }).then(
+                    v => {
+                      newData.forEach((item, index) => {
+                        v.forEach(i => {
+                          if (i.sourceCode === item.attachmentCode) {
+                            newData[index].pic.push(api.disk.downloadFiles(i.id, { view: true }))
+                          }
+                        })
+                      })
+                      this.setState({
+                        userPersonData: newData,
+                      })
+                })
+            }
           })
         } else {
           api.bp.getBPOrgCertification(recordMsg.id).then(res => {
@@ -346,13 +352,13 @@ class ChangeModal extends Component {
                 sourceKey: 'bp_organization_certification',
                 sourceCode: [res.organizationCertification.attachmentCode].join(',') }).then(
                   v => {
-                    this.setState({ pic: v, picHas: true })
+                    this.setState({ pic: v })
               })
             }
             this.setState({
               userData: res,
               specialInvoice: res.organizationCertification ?
-              parseInt(res.organizationCertification.specialInvoice) === 1 : false,
+              parseInt(res.organizationCertification.specialInvoice, 10) === 1 : false,
             })
           })
         }
@@ -383,9 +389,9 @@ class ChangeModal extends Component {
       if (e) e.preventDefault();
       const { newDataList, userData, recordMsg } = this.state;
       const newPiCertificationList = [];
-      newDataList.map(item => {
+      newDataList.forEach(item => {
         newPiCertificationList.push({
-          invoicePartyId: item.invoicePartyId,
+          billToPartyId: item.billToPartyId,
           notes: item.notes,
           attachmentCode: item.attachmentCode,
         })
@@ -471,8 +477,8 @@ class ChangeModal extends Component {
         userData: [],
         address: '',
         pic: [],
-        picHas: false,
         newDataList: [],
+        userPersonData: [],
       })
     }
 
@@ -492,14 +498,6 @@ class ChangeModal extends Component {
           }),
         );
         if (info.file.response) {
-          // info.fileList.map(e => {
-          //   data.push({
-          //     code: (e.response && e.response[0]) || '',
-          //     name: e.name,
-          //     type: e.type,
-          //   });
-          // });
-          // eslint-disable-next-line consistent-return
           this.props.form.setFieldsValue({
             attachmentCode: newGuid,
           })
@@ -671,6 +669,7 @@ class ChangeModal extends Component {
         <span>
           {industryCategories.map(v => {
             if (basic.industryCode === v.id) return v.name
+            return ''
             })
           }
         </span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -726,15 +725,26 @@ class ChangeModal extends Component {
       )
     }
 
+    // 删除
     removeItem = id => {
-      // const { details, piCertification } = this.props;
-
-      console.log(id)
-      // const data = piCertification.filter(e => e.id !== id);
-      // this.props.dispatch({
-      //   type: 'partnerMaintainEdit/setDetails',
-      //   payload: { ...details, piCertification: data },
-      // });
+      const { newDataList, userPersonData, recordMsg } = this.state;
+      let newData = newDataList;
+      newDataList.forEach((item, index) => {
+        if (item.id === id) {
+          // this.setState({
+          //   newDataList: newDataList.splice(index, 1),
+          // })
+        }
+      })
+      userPersonData.forEach(item => {
+        if (item.id === id) {
+          api.bp.cancelBPPiCertification({ id: recordMsg.id, billToPartyId: item.id })
+          this.props.getData()
+          this.setState({
+            changeModal: false
+          })
+        }
+      })
     }
 
     renderListItem = item => {
@@ -743,16 +753,16 @@ class ChangeModal extends Component {
           <List.Item key={item.id}>
             <Card
               hoverable
-              title={item.invoicePartyName}
+              title={item.billToPartyName}
               extra={
                 <>
-                  <a onClick={() => this.removeItem(item.id)}>删除</a>
+                  <a onClick={() => this.removeItem(item.id, item)}>删除</a>
                 </>
               }
             >
               <div style={{ marginBottom: '.8em' }}>
-                <Badge status={renzhengMap[item.status].value}
-                text={renzhengMap[item.status].text}/>
+                <Badge status={verifyStatus[item.status].value}
+                text={verifyStatus[item.status].text}/>
               </div>
               <Paragraph
                 style={{ minHeight: 42 }}
@@ -821,7 +831,7 @@ class ChangeModal extends Component {
       const { newDataList } = this.state;
       const picArr = [];
       if (data.attachmentList !== 0) {
-        data.attachmentList.map(item => {
+        data.attachmentList.forEach(item => {
           picArr.push(item.thumbUrl)
         })
       }
@@ -829,8 +839,8 @@ class ChangeModal extends Component {
       const obj = {
         id: Math.random(),
         type: 1,
-        invoicePartyId: data.invoicePartyId.split(',')[0],
-        invoicePartyName: data.invoicePartyId.split(',')[1],
+        billToPartyId: data.billToPartyId.split(',')[0],
+        billToPartyName: data.billToPartyId.split(',')[1],
         status: 1,
         notes: data.notes,
         attachmentCode: uid,
@@ -854,10 +864,10 @@ class ChangeModal extends Component {
         bankFetching,
         bank,
         pic,
-        picHas,
         newDataList,
+        userPersonData,
       } = this.state;
-      if (picHas && pic.length === 0) return null
+
       const fileList = pic.map(e => ({
         uid: e.id,
         name: e.name,
@@ -865,17 +875,17 @@ class ChangeModal extends Component {
         url: api.disk.downloadFiles(e.id, { view: true }),
       }));
 
-      // const { piCertificationList } = userData;
+
       const { basic } = userData;
       const nullData = {};
       let modelWidth = 970;
       if (!basic) return null;
-      // const { form, getValues, closeModal } = this.props;
-      // console.log(getValues)
       const { form } = this.state;
       const { getFieldDecorator } = form;
       const { TextArea } = Input;
       let modelContent;
+      const userPersonList = userPersonData.length !== 0 ?
+            userPersonData.concat(newDataList) : newDataList;
       const uploadButton = (
         <div>
           <Icon type={this.state.loading ? 'loading' : 'plus'} />
@@ -926,7 +936,7 @@ class ChangeModal extends Component {
                 sm: 1,
                 xs: 1,
               }}
-              dataSource={[...newDataList, nullData]}
+              dataSource={[...userPersonList, nullData]}
               renderItem={this.renderListItem}
             />
             <PersonCertificationAddModal
