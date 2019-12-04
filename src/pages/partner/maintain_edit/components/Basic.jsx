@@ -221,11 +221,12 @@ class Basic extends React.Component {
 
     // 地址 决定了语言和时区
     if (key === 'address') {
+      console.log(value);
       obj.timeZoneCode = '';
       // 根据国家编号确定时区
-      if (value.countrySapCode) {
+      if (value.sapCountryCode) {
         this.props.countryTimeZone.forEach(e => {
-          if (e.countryCode === value.countrySapCode) {
+          if (e.countryCode === value.sapCountryCode) {
             obj.timeZoneCode = e.timeZone;
           }
         });
@@ -233,16 +234,16 @@ class Basic extends React.Component {
       // 根据省编号确定时区
       if (value.provinceCode) {
         this.props.countryProvinceTimeZone.forEach(e => {
-          if (e.countryCode === value.countrySapCode && e.provinceCode === value.provinceSapCode) {
+          if (e.countryCode === value.sapCountryCode && e.provinceCode === value.provinceSapCode) {
             obj.timeZoneCode = e.timeZone;
           }
         });
       }
 
       // 确定语言
-      if (value.countrySapCode === 'CN') {
+      if (value.sapCountryCode === 'CN') {
         obj.languageCode = 'ZH';
-      } else if (value.countrySapCode && value.countrySapCode !== 'CN') {
+      } else if (value.sapCountryCode && value.sapCountryCode !== 'CN') {
         obj.languageCode = 'EN';
       } else {
         obj.languageCode = '';
@@ -284,7 +285,7 @@ class Basic extends React.Component {
     const keyList = ['name', 'mobilePhone', 'telephone', 'fax', 'email', 'address'];
     if (keyList.indexOf(key) > -1) {
       if (key === 'address') {
-        const { changedValue, countrySapCode, provinceSapCode, ...excludeChangeValue } = value;
+        const { changedValue, sapCountryCode, provinceSapCode, ...excludeChangeValue } = value;
         obj = {
           ...excludeChangeValue,
           languageCode: obj.languageCode,

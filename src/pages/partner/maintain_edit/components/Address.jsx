@@ -174,7 +174,7 @@ class EditableTable extends React.Component {
     const row = validateResult[1];
     // address中排除掉changedValue，不要把此数据赋值给地址
     const { address } = row;
-    const { changedValue, countrySapCode, provinceSapCode, ...otherAddress } = address;
+    const { changedValue, sapCountryCode, provinceSapCode, ...otherAddress } = address;
     const { addressList } = this.props;
 
     const newAddressList = addressList.map((e, i) => {

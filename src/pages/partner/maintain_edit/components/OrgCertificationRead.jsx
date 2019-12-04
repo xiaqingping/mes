@@ -183,7 +183,7 @@ class OrgCertificationRead extends React.Component {
     );
   };
 
-  renderOther = countryCode => {
+  renderOther = sapCountryCode => {
     const { organizationCertification: data } = this.props;
     const fileList = [];
 
@@ -199,7 +199,7 @@ class OrgCertificationRead extends React.Component {
               </FormItem>
             </Col>
             <Col span={24}>
-              <FormItem label={countryCode === 'US' ? '免税认证号' : '增值税登记号'}>
+              <FormItem label={sapCountryCode === 'US' ? '免税认证号' : '增值税登记号'}>
                 {data.taxNo}
               </FormItem>
             </Col>
@@ -227,14 +227,14 @@ class OrgCertificationRead extends React.Component {
     const {
       details: { basic },
     } = this.props;
-    const { countryCode } = basic;
+    const { sapCountryCode } = basic;
     let form;
 
-    if (!countryCode) form = this.renderChina();
-    if (countryCode) form = this.renderOther(countryCode); // 非中国，默认显示英国
-    if (countryCode === 'CN') form = this.renderChina();
-    if (countryCode === 'US') form = this.renderOther(countryCode);
-    if (countryCode === 'GB') form = this.renderChina(countryCode);
+    if (!sapCountryCode) form = this.renderChina();
+    if (sapCountryCode) form = this.renderOther(sapCountryCode); // 非中国，默认显示英国
+    if (sapCountryCode === 'CN') form = this.renderChina();
+    if (sapCountryCode === 'US') form = this.renderOther(sapCountryCode);
+    if (sapCountryCode === 'GB') form = this.renderChina(sapCountryCode);
     return form;
   };
 

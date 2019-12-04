@@ -2,6 +2,7 @@ export default {
   'action.operation': 'Operation',
   'action.search': 'Search',
   'action.reset': 'Reset',
+  'action.expand': 'Expand',
   'action.choose': 'Choose',
   'action.add': 'Add',
   'action.change': 'Change',
@@ -10,4 +11,5 @@ export default {
   'action.submit': 'Submit',
   'action.save': 'Save',
   'action.cancel': 'Cancel',
+  'action.more_option': 'More option',
 };
