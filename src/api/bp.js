@@ -111,20 +111,23 @@ export default {
   },
 
   // 固定信用额度评估接口
-  creditLimitAssessment(id, params) {
-    return request(`/businessPartners/v1/${id}/creditLimitAssessment`, { params });
+  creditLimitAssessment(params) {
+    return request(`/businessPartners/v1/${params.id}/creditLimitAssessment`, { params });
   },
   // 固定信用额度调整接口
-  creditLimitAdjustment(id, params) {
-    return request(`/businessPartners/v1/${id}/creditLimitAdjustment`, { method: 'POST', params });
+  creditLimitAdjustment(params) {
+    return request(`/businessPartners/v1/${params.id}/creditLimitAdjustment`, {
+      method: 'POST',
+      params,
+    });
   },
   // 临时信用额度评估接口
-  tempCreditLimitAssessment(id, params) {
-    return request(`/businessPartners/v1/${id}/tempCreditLimitAssessment`, { params });
+  tempCreditLimitAssessment(params) {
+    return request(`/businessPartners/v1/${params.id}/tempCreditLimitAssessment`, { params });
   },
   // 临时信用额度调整接口
-  tempCreditlimitAdjustment(id, params) {
-    return request(`/businessPartners/v1/${id}/tempCreditlimitAdjustment`, {
+  tempCreditlimitAdjustment(params) {
+    return request(`/businessPartners/v1/${params.id}/tempCreditlimitAdjustment`, {
       method: 'POST',
       params,
     });

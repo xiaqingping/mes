@@ -221,7 +221,6 @@ class Basic extends React.Component {
 
     // 地址 决定了语言和时区
     if (key === 'address') {
-      console.log(value);
       obj.timeZoneCode = '';
       // 根据国家编号确定时区
       if (value.sapCountryCode) {
