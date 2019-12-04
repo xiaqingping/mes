@@ -80,6 +80,15 @@ class Basic extends React.Component {
       return;
     }
 
+    // 修改时业务伙伴时，并且电话号码===旧电话号码（没有修改），则不进行后台验证
+    if (this.props.editType === 'update') {
+      const oldName = this.props.oldDetails.basic.name;
+      if (value.name === oldName) {
+        callback();
+        return;
+      }
+    }
+
     bp.checkBPFields({ name: value.name }).then(res => {
       if (!res) {
         callback();
@@ -173,7 +182,7 @@ class Basic extends React.Component {
   };
 
   checkAddress = (rule, value, callback) => {
-    const { address, changedValue = {} } = value;
+    const { address, countyCode, changedValue = {} } = value;
     const { option = [] } = changedValue;
     if (option.length > 0) {
       const last = option[option.length - 1];
@@ -184,6 +193,10 @@ class Basic extends React.Component {
     }
     if (!address) {
       callback('详细地址必填');
+      return;
+    }
+    if (!countyCode) {
+      callback('国家不能为空');
       return;
     }
     callback();
@@ -271,7 +284,7 @@ class Basic extends React.Component {
     const keyList = ['name', 'mobilePhone', 'telephone', 'fax', 'email', 'address'];
     if (keyList.indexOf(key) > -1) {
       if (key === 'address') {
-        const { changedValue, ...excludeChangeValue } = value;
+        const { changedValue, countrySapCode, provinceSapCode, ...excludeChangeValue } = value;
         obj = {
           ...excludeChangeValue,
           languageCode: obj.languageCode,
@@ -307,16 +320,6 @@ class Basic extends React.Component {
     const { form, editType, basic } = this.props;
     const { getFieldDecorator } = form;
 
-    const edit = getFieldDecorator('telephone', {
-      initialValue: {
-        telephoneCountryCode: basic.telephoneCountryCode,
-        telephoneAreaCode: basic.telephoneAreaCode,
-        telephone: basic.telephone,
-        telephoneExtension: basic.telephoneExtension,
-      },
-      rules: [{ validator: this.checkTelePhone }],
-    })(<TelphoneInput onChange={value => this.valueChange('telephone', value)} />);
-
     const show = (
       <p style={{ lineHeight: '32px' }}>
         <span>{basic.telephoneCountryCode} </span>
@@ -332,6 +335,16 @@ class Basic extends React.Component {
     // 1）页面状态为：新增
     // 2）页面状态为：修改 并且 BP类型为人员
     if (editType === 'add' || (editType === 'update' && basic.type === 1)) {
+      const edit = getFieldDecorator('telephone', {
+        initialValue: {
+          telephoneCountryCode: basic.telephoneCountryCode,
+          telephoneAreaCode: basic.telephoneAreaCode,
+          telephone: basic.telephone,
+          telephoneExtension: basic.telephoneExtension,
+        },
+        rules: [{ validator: this.checkTelePhone }],
+      })(<TelphoneInput onChange={value => this.valueChange('telephone', value)} />);
+
       return edit;
     }
     // 非编辑状态
@@ -345,14 +358,6 @@ class Basic extends React.Component {
   renderName = () => {
     const { form, editType, basic } = this.props;
     const { getFieldDecorator } = form;
-
-    const edit = getFieldDecorator('name', {
-      initialValue: {
-        type: basic.type,
-        name: basic.name,
-      },
-      rules: [{ validator: this.checkNameInput }],
-    })(<NameInput onChange={value => this.valueChange('name', value)} />);
 
     const type1 = (
       <span>
@@ -385,6 +390,14 @@ class Basic extends React.Component {
     // 编辑状态
     // 页面状态为：新增
     if (editType === 'add') {
+      const edit = getFieldDecorator('name', {
+        initialValue: {
+          type: basic.type,
+          name: basic.name,
+        },
+        rules: [{ validator: this.checkNameInput }],
+      })(<NameInput onChange={value => this.valueChange('name', value)} />);
+
       return edit;
     }
     // 非编辑状态
@@ -402,66 +415,67 @@ class Basic extends React.Component {
     const industryOption = {};
     if (!industrySelectOpen) industryOption.open = industrySelectOpen;
 
-    const edit = getFieldDecorator('industryCode', {
-      initialValue: basic.industryCode,
-    })(
-      <Select {...industryOption} onChange={value => this.valueChange('industryCode', value)}>
-        {industryCategories.map(e => {
-          if (basic.type === 1) {
-            if (e.id !== '06') {
-              return (
-                <Option disabled key={e.id} value={e.id}>
-                  {e.name}
-                </Option>
-              );
-            }
-            return (
-              <Option key={e.id} value={e.id}>
-                {e.name}
-              </Option>
-            );
-          }
-          if (basic.type === 2) {
-            if (e.id === '06') {
-              return (
-                <Option disabled key={e.id} value={e.id}>
-                  {e.name}
-                </Option>
-              );
-            }
-            return (
-              <Option key={e.id} value={e.id}>
-                {e.name}
-              </Option>
-            );
-          }
-          return (
-            <Option key={e.id} value={e.id}>
-              {e.name}
-            </Option>
-          );
-        })}
-      </Select>,
-    );
-    const show = (
-      <>
-        {formatter(industryCategories, basic.industryCode)}
-        {basic.type === 2 ? (
-          <a href="#">
-            &nbsp;
-            <FormattedMessage id="bp.maintain_details.change" />
-          </a>
-        ) : null}
-      </>
-    );
-
     // 编辑状态
     // 页面状态为：新增
     if (editType === 'add') {
+      const edit = getFieldDecorator('industryCode', {
+        initialValue: basic.industryCode,
+      })(
+        <Select {...industryOption} onChange={value => this.valueChange('industryCode', value)}>
+          {industryCategories.map(e => {
+            if (basic.type === 1) {
+              if (e.id !== '06') {
+                return (
+                  <Option disabled key={e.id} value={e.id}>
+                    {e.name}
+                  </Option>
+                );
+              }
+              return (
+                <Option key={e.id} value={e.id}>
+                  {e.name}
+                </Option>
+              );
+            }
+            if (basic.type === 2) {
+              if (e.id === '06') {
+                return (
+                  <Option disabled key={e.id} value={e.id}>
+                    {e.name}
+                  </Option>
+                );
+              }
+              return (
+                <Option key={e.id} value={e.id}>
+                  {e.name}
+                </Option>
+              );
+            }
+            return (
+              <Option key={e.id} value={e.id}>
+                {e.name}
+              </Option>
+            );
+          })}
+        </Select>,
+      );
+
       return edit;
     }
     // 非编辑状态
     if (editType === 'update') {
+      const show = (
+        <>
+          {formatter(industryCategories, basic.industryCode)}
+          {basic.type === 2 ? (
+            <a href="#">
+              &nbsp;
+              <FormattedMessage id="bp.maintain_details.change" />
+            </a>
+          ) : null}
+        </>
+      );
+
       return show;
     }
     return null;

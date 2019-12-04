@@ -3,7 +3,9 @@
  */
 import { Button, Table, Input, Divider, Form, message } from 'antd';
 import React from 'react';
+import { connect } from 'dva';
 import { formatMessage, FormattedMessage } from 'umi-plugin-react/locale';
+import { formatter } from '@/utils/utils';
 
 import ChooseShipToParty from '@/components/choosse/bp/ShipToParty';
 
@@ -51,6 +53,9 @@ class EditableCell extends React.Component {
 }
 
 @Form.create()
+@connect(({ partnerMaintainEdit }) => ({
+  VerifyRecordStatus: partnerMaintainEdit.VerifyRecordStatus,
+}))
 class ShipToParty extends React.Component {
   constructor(props) {
     super(props);
@@ -134,7 +139,7 @@ class ShipToParty extends React.Component {
   };
 
   render() {
-    const { tableData } = this.props;
+    const { tableData, VerifyRecordStatus } = this.props;
     const components = {
       body: {
         cell: EditableCell,
@@ -155,6 +160,7 @@ class ShipToParty extends React.Component {
         title: formatMessage({ id: 'bp.maintain_details.status' }),
         dataIndex: 'verifyStatus',
         width: '40%',
+        render: text => formatter(VerifyRecordStatus, text, 'value', 'text'),
       },
       {
         title: formatMessage({ id: 'action.operation' }),
