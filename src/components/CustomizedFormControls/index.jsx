@@ -383,8 +383,10 @@ export class AddressInput extends React.Component {
       obj = {
         countryCode: (option[0] && option[0].code) || '',
         countryName: (option[0] && option[0].name) || '',
+        countrySapCode: (option[0] && option[0].sapCode) || '',
         provinceCode: (option[1] && option[1].code) || '',
         provinceName: (option[1] && option[1].name) || '',
+        provinceSapCode: (option[1] && option[1].sapCode) || '',
         cityCode: (option[2] && option[2].code) || '',
         cityName: (option[2] && option[2].name) || '',
         countyCode: (option[3] && option[3].code) || '',
@@ -400,7 +402,7 @@ export class AddressInput extends React.Component {
     if (onChange) {
       onChange({
         ...otherState,
-        // changedValue,
+        changedValue,
         ...obj,
       });
     }

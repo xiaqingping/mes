@@ -60,7 +60,8 @@ class OrgCredit extends Component {
         title={formatMessage({ id: 'bp.maintain_details.credit_management' })}
         bordered={false}
         style={{ marginBottom: '24px' }}
-        extra={hasCredit ? extra : null}
+        // extra={hasCredit ? extra : null}
+        extra={extra}
       >
         {hasCredit ? <renderCredit /> : <Empty />}
       </Card>

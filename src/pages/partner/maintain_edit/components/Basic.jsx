@@ -210,9 +210,9 @@ class Basic extends React.Component {
     if (key === 'address') {
       obj.timeZoneCode = '';
       // 根据国家编号确定时区
-      if (value.countryCode) {
+      if (value.countrySapCode) {
         this.props.countryTimeZone.forEach(e => {
-          if (e.countryCode === value.countryCode) {
+          if (e.countryCode === value.countrySapCode) {
             obj.timeZoneCode = e.timeZone;
           }
         });
@@ -220,16 +220,16 @@ class Basic extends React.Component {
       // 根据省编号确定时区
       if (value.provinceCode) {
         this.props.countryProvinceTimeZone.forEach(e => {
-          if (e.countryCode === value.countryCode && e.provinceCode === value.provinceCode) {
+          if (e.countryCode === value.countrySapCode && e.provinceCode === value.provinceSapCode) {
             obj.timeZoneCode = e.timeZone;
           }
         });
       }
 
       // 确定语言
-      if (value.countryName === '中国') {
+      if (value.countrySapCode === 'CN') {
         obj.languageCode = 'ZH';
-      } else if (value.countryName && value.countryName !== '中国') {
+      } else if (value.countrySapCode && value.countrySapCode !== 'CN') {
         obj.languageCode = 'EN';
       } else {
         obj.languageCode = '';
@@ -271,7 +271,12 @@ class Basic extends React.Component {
     const keyList = ['name', 'mobilePhone', 'telephone', 'fax', 'email', 'address'];
     if (keyList.indexOf(key) > -1) {
       if (key === 'address') {
-        obj = { ...value, languageCode: obj.languageCode, timeZoneCode: obj.timeZoneCode };
+        const { changedValue, ...excludeChangeValue } = value;
+        obj = {
+          ...excludeChangeValue,
+          languageCode: obj.languageCode,
+          timeZoneCode: obj.timeZoneCode,
+        };
       } else {
         obj = value;
       }

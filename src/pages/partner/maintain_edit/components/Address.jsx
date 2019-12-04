@@ -14,7 +14,6 @@ const EditableContext = React.createContext();
 
 class EditableCell extends React.Component {
   renderCell = ({ getFieldDecorator }) => {
-    // eslint-disable-next-line max-len
     const {
       editing,
       dataIndex,
@@ -110,8 +109,9 @@ class EditableTable extends React.Component {
 
   valueChange = (key, value) => {
     if (key === 'address') {
+      const { changedValue, ...excludeChangeValue } = value;
       this.props.form.setFieldsValue({
-        address: value,
+        address: excludeChangeValue,
       });
     }
   };
@@ -155,10 +155,15 @@ class EditableTable extends React.Component {
     if (!validateResult[0]) return false;
 
     const row = validateResult[1];
+    // address中排除掉changedValue，不要把此数据赋值给地址
+    const { address } = row;
+    const { changedValue, ...otherAddress } = address;
     const { addressList } = this.props;
 
     const newAddressList = addressList.map((e, i) => {
-      if (i === index) return { ...e, ...row, ...row.mobilePhone, ...row.address };
+      if (i === index) {
+        return { ...e, ...row, ...row.mobilePhone, ...otherAddress };
+      }
       return e;
     });
 
