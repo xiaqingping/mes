@@ -3,8 +3,9 @@
  */
 import { Button, Table, Input, Divider, Form, message } from 'antd';
 import React from 'react';
+import { connect } from 'dva';
 import { formatMessage, FormattedMessage } from 'umi-plugin-react/locale';
-
+import { formatter } from '@/utils/utils';
 import ChooseBillToParty from '@/components/choosse/bp/BillToParty';
 
 const { Search } = Input;
@@ -51,6 +52,9 @@ class EditableCell extends React.Component {
 }
 
 @Form.create()
+@connect(({ partnerMaintainEdit }) => ({
+  VerifyRecordStatus: partnerMaintainEdit.VerifyRecordStatus,
+}))
 class BillToParty extends React.Component {
   constructor(props) {
     super(props);
@@ -134,7 +138,7 @@ class BillToParty extends React.Component {
   };
 
   render() {
-    const { tableData } = this.props;
+    const { tableData, VerifyRecordStatus } = this.props;
     const components = {
       body: {
         cell: EditableCell,
@@ -155,7 +159,13 @@ class BillToParty extends React.Component {
       {
         title: formatMessage({ id: 'bp.maintain_details.sales_distribution.sold_to_party' }),
         dataIndex: 'soldToPartyName',
-        width: '40%',
+        width: '30%',
+      },
+      {
+        title: formatMessage({ id: 'bp.maintain_details.status' }),
+        dataIndex: 'verifyStatus',
+        width: '10%',
+        render: text => formatter(VerifyRecordStatus, text, 'value', 'text'),
       },
       {
         title: formatMessage({ id: 'action.operation' }),
