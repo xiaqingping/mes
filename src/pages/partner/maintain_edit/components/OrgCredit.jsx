@@ -73,6 +73,14 @@ class OrgCredit extends Component {
 
   // 关闭调整额度界面
   handleCancel = () => {
+    // TODO:调整完额度，重新获取BP数据
+    if (this.CreditAdjustView.state.status === 2) {
+      // const { id } = this.props.details.basic;
+      // this.props.dispatch({
+      //   type: 'bpEdit/readBPDetails',
+      //   payload: { id },
+      // });
+    }
     this.setState({
       creditAdjustVisible: false,
       creditAdjustItem: {},
