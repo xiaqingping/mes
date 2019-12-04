@@ -86,7 +86,8 @@ class FormContent extends React.Component {
       currencies,
       DefaultInvoiceType,
     } = this.props;
-    const countryCode = basicInfo.countryCode || 'CN';
+    // TODO:
+    const sapCountryCode = basicInfo.sapCountryCode || 'CN';
 
     return (
       <Form>
@@ -149,7 +150,7 @@ class FormContent extends React.Component {
               )}
             </FormItem>
           </Col>
-          {countryCode === 'CN' || !countryCode ? (
+          {sapCountryCode === 'CN' || !sapCountryCode ? (
             <Col span={7}>
               <FormItem
                 label={formatMessage({ id: 'bp.maintain_details.sales_distribution.invoice_type' })}
@@ -171,7 +172,7 @@ class FormContent extends React.Component {
               </FormItem>
             </Col>
           ) : null}
-          {countryCode !== 'CN' && countryCode ? (
+          {sapCountryCode !== 'CN' && sapCountryCode ? (
             <Col span={6}>
               <FormItem label="税分类">
                 {getFieldDecorator('taxClassificCode', {
