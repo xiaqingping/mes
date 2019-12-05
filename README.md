@@ -2,7 +2,7 @@
 
 使用 React + Umijs + Ant Design of React 构建的后台管理系统
 
-## 使用
+## 1. 使用
 
 ```bash
 # 安装依赖
@@ -15,23 +15,23 @@ npm start
 npm run build
 ```
 
-## 技术栈
+## 2. 技术栈
 
 [React](https://zh-hans.reactjs.org/) + [UmiJS](https://umijs.org/zh/) + [DvaJS](https://dvajs.com/)  
 [Ant Design of React](https://ant.design/docs/react/introduce-cn)
 
-## 命名规范
+## 3. 命名规范
 
 - `/src/models` 全局数据文件夹下文件命名，比如我负责测序模块（seq），那么你的全局数据文件必须命名为 `seq.js`，每一个大模块为一个文件。
 - `/src/api` 接口文件夹下的文件命名，根据后台接口微服务命名，一个微服务为一个文件，多个不同的服务不要放到同一个文件内。比如 `basic` 服务，就是 `basic.js`。
 
-## 接口设置
+## 4. 接口设置
 
 > 开发默认接口是 `dev`。
 
 修改默认的接口环境：在项目根目录新建 `.env` 文件，输入 `BASE_API=dev`，其中 `dev` 可以改为以下说明中的其他环境。
 
-### 说明
+### 4.1 说明
 
 接口环境现有四种，分别是：
 
@@ -42,7 +42,7 @@ npm run build
 
 一般只有在正式生产服务器才会使用 `prod` 环境（或者有时候需要使用生产数据 debug），开发时一般用其他三种就可以。
 
-### 使用
+### 4.2 使用
 
 - 加载全部接口 `import api from '@/api'`  
   使用：`api.bp.xxx()`
@@ -50,13 +50,13 @@ npm run build
 - 加载单个接口 `import bpAPI from '@/api/bp'`(加载单个接口，要在接口名后加大写的 API)  
   使用：`bpAPI.xxx()`
 
-### 开发环境
+### 4.3 开发环境
 
-### 生产环境
+### 4.4 生产环境
 
-## [全局数据](/docs/全局数据.md)
+## 5. [全局数据](/docs/全局数据.md)
 
-## 负责人
+## 6. 负责人
 
 <details>
 <summary>展开查看</summary>
@@ -74,7 +74,7 @@ RNA合成：王星名 -> 吴贺珍
 </code></pre>
 </details>
 
-## 项目结构
+## 7. 项目结构
 
 <details>
 <summary>展开查看</summary>

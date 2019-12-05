@@ -6,14 +6,14 @@ import React from 'react';
 import { connect } from 'dva';
 import { formatMessage, FormattedMessage } from 'umi-plugin-react/locale';
 import debounce from 'lodash/debounce';
-import bp from '@/api/bp';
+import bpAPI from '@/api/bp';
 import { formatter } from '@/utils/utils';
 
 @connect(
-  ({ partnerMaintainEdit }) => ({
-    BpCertificationStatus: partnerMaintainEdit.BpCertificationStatus,
-    SalesOrderBlock: partnerMaintainEdit.SalesOrderBlock,
-    CustomerDataStatus: partnerMaintainEdit.CustomerDataStatus,
+  ({ bp }) => ({
+    BpCertificationStatus: bp.BpCertificationStatus,
+    SalesOrderBlock: bp.SalesOrderBlock,
+    CustomerDataStatus: bp.CustomerDataStatus,
   }),
   null,
   null,
@@ -61,7 +61,8 @@ class ChooseInvoiceParty extends React.Component {
     };
 
     this.setState({ loading: true });
-    bp.getInvoiceParty(query)
+    bpAPI
+      .getInvoiceParty(query)
       .then(res => {
         this.setState({
           list: res.results,
@@ -117,7 +118,7 @@ class ChooseInvoiceParty extends React.Component {
       this.setState({ billToParty: [] });
       return;
     }
-    bp.getOrgCustomerByCodeOrName({ code_or_name: value }).then(res => {
+    bpAPI.getOrgCustomerByCodeOrName({ code_or_name: value }).then(res => {
       this.setState({ billToParty: res });
     });
   };
