@@ -6,13 +6,13 @@ import React from 'react';
 import { connect } from 'dva';
 import debounce from 'lodash/debounce';
 import { formatMessage, FormattedMessage } from 'umi-plugin-react/locale';
-import bp from '@/api/bp';
+import bpAPI from '@/api/bp';
 
 @connect(
-  ({ partnerMaintainEdit }) => ({
-    BpCertificationStatus: partnerMaintainEdit.BpCertificationStatus,
-    SalesOrderBlock: partnerMaintainEdit.SalesOrderBlock,
-    CustomerDataStatus: partnerMaintainEdit.CustomerDataStatus,
+  ({ bp }) => ({
+    BpCertificationStatus: bp.BpCertificationStatus,
+    SalesOrderBlock: bp.SalesOrderBlock,
+    CustomerDataStatus: bp.CustomerDataStatus,
   }),
   null,
   null,
@@ -54,7 +54,8 @@ class ChooseShipToParty extends React.Component {
     };
 
     this.setState({ loading: true });
-    bp.getShipToParty(query)
+    bpAPI
+      .getShipToParty(query)
       .then(res => {
         this.setState({
           list: res.results,
@@ -101,7 +102,7 @@ class ChooseShipToParty extends React.Component {
       this.setState({ BP: [] });
       return;
     }
-    bp.getBPByCodeOrName({ code_or_name: value }).then(res => {
+    bpAPI.getBPByCodeOrName({ code_or_name: value }).then(res => {
       this.setState({ BP: res });
     });
   };

@@ -7,7 +7,7 @@ import { connect } from 'dva';
 import { FormattedMessage, formatMessage } from 'umi-plugin-react/locale';
 
 import AddPICertification from './PICertificationAddModal';
-import disk from '@/api/disk';
+import diskAPI from '@/api/disk';
 
 const { Paragraph } = Typography;
 
@@ -36,7 +36,7 @@ class PersonCertification extends React.Component {
         uid: e.id,
         name: e.name,
         status: 'done',
-        url: disk.downloadFiles(e.id, { view: true }),
+        url: diskAPI.downloadFiles(e.id, { view: true }),
       }));
     }
 

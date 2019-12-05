@@ -1,5 +1,5 @@
-import bp from '@/api/bp';
-import disk from '@/api/disk';
+import bpAPI from '@/api/bp';
+import diskAPI from '@/api/disk';
 
 const initDetails = {
   basic: {},
@@ -44,9 +44,9 @@ const SeqModel = {
         const task = [null, null];
 
         // 客户
-        if (customerDataStatus !== '2') task[0] = call(bp.getBPCustomer, id);
+        if (customerDataStatus !== '2') task[0] = call(bpAPI.getBPCustomer, id);
         // 供应商
-        if (vendorDataStatus !== '2') task[1] = call(bp.getBPVendor, id);
+        if (vendorDataStatus !== '2') task[1] = call(bpAPI.getBPVendor, id);
         const [customer, vendor] = yield all(task);
 
         details = { ...details, ...customer, ...vendor };
@@ -59,7 +59,7 @@ const SeqModel = {
             sourceCode: details.piCertificationList.map(e => e.attachmentCode).join(','),
           };
           if (options.sourceCode) {
-            const img = yield call(disk.getFiles, options);
+            const img = yield call(diskAPI.getFiles, options);
             const piCertificationList = details.piCertificationList.map(e => {
               const attachmentList = img.filter(e1 => e1.sourceCode === e.attachmentCode);
               return {
@@ -77,7 +77,7 @@ const SeqModel = {
             sourceCode: details.organizationCertification.attachmentCode,
           };
           if (options.sourceCode) {
-            const attachmentList = yield call(disk.getFiles, options);
+            const attachmentList = yield call(diskAPI.getFiles, options);
             const organizationCertification = {
               ...details.organizationCertification,
               attachmentList,
