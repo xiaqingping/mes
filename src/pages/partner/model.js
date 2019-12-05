@@ -135,6 +135,7 @@ const SeqModel = {
       { value: 1, text: '验证中', status: 'warning' },
       { value: 2, text: '已验证', status: 'success' },
       { value: 3, text: '已拒绝', status: 'error' },
+      { value: 4, text: '已过期', status: 'error' },
     ],
     // 验证类型
     VerifyRecordType: [

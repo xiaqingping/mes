@@ -25,73 +25,11 @@ const FormItem = Form.Item;
 const { RangePicker } = DatePicker;
 const { Option } = Select;
 
-@connect(({ partnerMaintainEdit }) => ({
-  preTypeAll: partnerMaintainEdit.VerifyRecordType,
-  preStateAll: partnerMaintainEdit.VerifyRecordStatus,
+@connect(({ bp }) => ({
+  preTypeAll: bp.VerifyRecordType,
+  preStateAll: bp.VerifyRecordStatus,
 }))
 class Verification extends React.Component {
-  /** 业务伙伴数据 */
-  allPartner = [
-    {
-      value: 96806578,
-      text: '王二狗',
-    },
-    {
-      value: 54056143,
-      text: '李大郎',
-    },
-  ]
-
-  /** 类型数据 */
-  // preType = [
-  //   {
-  //     value: 1,
-  //     text: '变更验证邮箱',
-  //   },
-  //   {
-  //     value: 2,
-  //     text: '变更验证手机',
-  //   },
-  //   {
-  //     value: 3,
-  //     text: '认证',
-  //   },
-  //   {
-  //     value: 4,
-  //     text: '绑定售达方',
-  //   },
-  //   {
-  //     value: 5,
-  //     text: '验证手机',
-  //   },
-  //   {
-  //     value: 6,
-  //     text: '验证邮箱',
-  //   },
-  // ]
-
-  /** 状态数据 */
-  // preState = [
-  //   {
-  //     value: 1,
-  //     text: '已完成',
-  //     status: 'success',
-  //   },
-  //   {
-  //     value: 2,
-  //     text: '验证中',
-  //     status: 'warning',
-  //   },
-  //   {
-  //     value: 3,
-  //     text: '审核中',
-  //     status: 'warning',
-  //   },
-  // ]
-
-  /** 状态 */
-
-
   constructor(props) {
     super(props);
     this.state = {
@@ -534,6 +472,7 @@ class Verification extends React.Component {
           onRef = { ref => { this.checkShow = ref }}
           record = {record}
           type = {type}
+          getData={this.getData}
           wrappedComponentRef={this.saveFormRef}/>
       </PageHeaderWrapper>
     );
