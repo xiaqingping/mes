@@ -86,8 +86,8 @@ const verifyTest = {
 
 
 @Form.create()
-@connect(({ partnerMaintainEdit }) => ({
-  VerifyRecordStatus: partnerMaintainEdit.VerifyRecordStatus,
+@connect(({ bp }) => ({
+  VerifyRecordStatus: bp.VerifyRecordStatus,
 }))
 class RecordListForm extends React.Component {
   constructor(props) {
@@ -345,8 +345,8 @@ class RecordListForm extends React.Component {
 }
 
 
-@connect(({ partnerMaintainEdit }) => ({
-  SpecialInvoice: partnerMaintainEdit.SpecialInvoice,
+@connect(({ bp }) => ({
+  SpecialInvoice: bp.SpecialInvoice,
 }))
 class CheckModel extends React.Component {
   constructor (props) {
@@ -466,14 +466,18 @@ class CheckModel extends React.Component {
       api.bp.approvalVerifyRecords(id).then(() => {
         this.setState({
           pageVisble,
+          modal1Visible: false,
         })
+        this.props.getData()
       })
     }
     if (pageVisble === 2) {
       api.bp.refuseVerifyRecords(id).then(() => {
         this.setState({
           pageVisble,
+          modal1Visible: false,
         })
+        this.props.getData()
       })
     }
   }

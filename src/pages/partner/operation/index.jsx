@@ -37,7 +37,7 @@ function renderOption(item) {
   );
 }
 
-@connect(({ partnerMaintainEdit }) => ({ status: partnerMaintainEdit.operationStatus }))
+@connect(({ bp }) => ({ status: bp.operationStatus }))
 class Operation extends React.Component {
   constructor(props) {
     super(props)
