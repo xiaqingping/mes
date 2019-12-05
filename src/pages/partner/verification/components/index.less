@@ -16,13 +16,15 @@
   height:calc(100% - 110px);
 }
 
-@media screen and (max-height: 800px) {
+@media screen and (max-height: 600px) {
   .xxx {
     position: absolute !important;
     top:0;
     right:0;
-    height:800px;
+    z-index: 100;
+    height:600px;
     padding-bottom: 0;
+
   }
 
   .xxx :global(.ant-modal-content){

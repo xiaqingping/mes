@@ -14,13 +14,13 @@ import './style.less'
 
 const DescriptionsItem = Descriptions.Item;
 
-// eslint-disable-next-line react/prefer-stateless-function
 @connect(({ partnerMaintainEdit, basicCache }) => ({
   details: partnerMaintainEdit.type === 'supplier' ?
   partnerMaintainEdit.supplier : partnerMaintainEdit.details,
   type: partnerMaintainEdit.type,
   countryDiallingCodes: basicCache.countryDiallingCodes,
   salesPaymentMethods: basicCache.salesPaymentMethods,
+  industry: basicCache.industryCategories,
 }))
 class BasicInfo extends Component {
   state = {
@@ -29,18 +29,18 @@ class BasicInfo extends Component {
   }
 
   componentDidMount() {
-    if (!this.props.countryDiallingCodes) {
-      this.props.dispatch({
-        type: 'basicCache/getCache',
-        payload: { type: 'countryDiallingCodes' },
-      });
-    }
-    if (!this.props.salesPaymentMethods) {
-      this.props.dispatch({
-        type: 'basicCache/getCache',
-        payload: { type: 'salesPaymentMethods' },
-      });
-    }
+    this.props.dispatch({
+      type: 'basicCache/getCache',
+      payload: { type: 'countryDiallingCodes' },
+    });
+    this.props.dispatch({
+      type: 'basicCache/getCache',
+      payload: { type: 'salesPaymentMethods' },
+    });
+    this.props.dispatch({
+      type: 'basicCache/getCache',
+      payload: { type: 'industryCategories' },
+    });
   }
 
   checkPhone = v => {
@@ -59,8 +59,15 @@ class BasicInfo extends Component {
 
   render() {
     const { phoneShow, emailShow } = this.state;
-    const { details: { basic }, type, countryDiallingCodes, salesPaymentMethods } = this.props;
+    const {
+      details: { basic },
+      type,
+      countryDiallingCodes,
+      salesPaymentMethods,
+      industry,
+     } = this.props;
     if (!countryDiallingCodes && !salesPaymentMethods) return null;
+    if (industry.length === 0) return null;
     let newData = []
     // eslint-disable-next-line array-callback-return
     countryDiallingCodes.map(item => {
@@ -129,9 +136,12 @@ class BasicInfo extends Component {
           </DescriptionsItem>
           <DescriptionsItem span={1} label="邮政编码">{basic.postCode}</DescriptionsItem>
           <DescriptionsItem span={1} label="时区">{basic.timeZoneCode}</DescriptionsItem>
-          <DescriptionsItem span={2} label="语言">{basic.languageCode}</DescriptionsItem>
+          <DescriptionsItem span={2} label="语言">
+            {basic.languageCode === 'ZH' ? '中文' : '英文'}
+          </DescriptionsItem>
           <DescriptionsItem span={2} label="特性行业类别">
-            {basic.industryCode}&nbsp;&nbsp;&nbsp;
+            {/* {basic.industryCode}&nbsp;&nbsp;&nbsp; */}
+            {industry.filter(item => item.code === basic.industryCode)[0].name}&nbsp;&nbsp;
             <a>变更</a>
           </DescriptionsItem>
           <DescriptionsItem span={6} label="通讯地址">

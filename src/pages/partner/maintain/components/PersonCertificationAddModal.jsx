@@ -27,9 +27,9 @@ const { Option } = Select;
 class PersonCertificationAddModal extends Component {
   constructor(props) {
     super(props);
-    const newGuid = this.props.attachmentCode || guid()
+    const newGuid = guid()
     const uploadUrl = api.disk.uploadMoreFiles(
-      'bp_organization_certification',
+      'bp_pi_certification',
       newGuid,
       );
     this.state = {
@@ -79,6 +79,14 @@ class PersonCertificationAddModal extends Component {
       this.props.form.resetFields();
       this.props.handleModalVisible(false)
       this.props.handleAdd(fieldsValue, this.state.newGuid);
+      const newGuid = guid()
+      this.setState({
+        uploadUrl: api.disk.uploadMoreFiles(
+          'bp_pi_certification',
+          newGuid,
+          ),
+        newGuid,
+      })
     });
   };
 
@@ -109,7 +117,6 @@ class PersonCertificationAddModal extends Component {
           api.disk.deleteFiles(e.response[0]).then()
         }
       }
-
     return (
       <Modal
         destroyOnClose
