@@ -674,13 +674,14 @@ constructor(props) {
                 </Menu.Item> : <Menu.Item>
                   <a href="#" onClick={ e => { this.freezePartner(e, record) }}>冻结</a>
                 </Menu.Item>}
-              {record.certificationStatus === 4 || record.certificationStatus === 3 ?
+              {(record.certificationStatus === 4 || record.certificationStatus === 3) && record.type === 2 ?
                 <Menu.Item>
                   <a href="#" onClick={e => { this.cancelIdent(e, record) }}>取消认证</a>
                 </Menu.Item>
               : ''
               }
-              {record.certificationStatus === 4 ?
+              {/* 变更认证：PI除了未认证其他都要显示；组织只显示已认证状态；组织没有部分认证 */}
+              {record.certificationStatus === 4 || record.certificationStatus === 3 ?
                 <Menu.Item>
                   <a href="#" onClick={ () => { this.showChange.visibleShow(true, record) }}>变更认证</a>
                 </Menu.Item>
@@ -722,7 +723,7 @@ constructor(props) {
               scroll={{ x: 1600 }}
               selectedRows={selectedRows}
               loading={loading}
-              rowKey={record => record.code}
+              rowKey={record => record.id}
               data={data}
               columns={columns}
               onSelectRow={this.handleSelectRows}

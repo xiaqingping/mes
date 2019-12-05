@@ -1,3 +1,4 @@
+// 组织是1，PI是2
 import {
   Modal,
   Form,
@@ -24,7 +25,6 @@ import { TelphoneInput } from '@/components/CustomizedFormControls';
 import api from '@/api';
 import debounce from 'lodash/debounce';
 import './index.less';
-import { guid } from '@/utils/utils';
 import PersonCertificationAddModal from './PersonCertificationAddModal';
 
 const { Paragraph } = Typography;
@@ -128,6 +128,7 @@ class NameGroup extends Component {
         ...changedValue,
       });
     }
+    this.props.changGType(changedValue)
   }
 
   render () {
@@ -250,11 +251,11 @@ class AddressGroup extends Component {
   }
 }
 
-@connect(({ basicCache, user, partnerMaintain, bp }) => {
-  // const industryCategories = basicCache.industryCategories.filter(
-  //   e => e.languageCode === global.languageCode,
-  // );
-  const industryCategories = bp.Industry;
+@connect(({ basicCache, user, partnerMaintain, global }) => {
+  const industryCategories = basicCache.industryCategories.filter(
+    e => e.languageCode === global.languageCode,
+  );
+  // const industryCategories = bp.Industry;
    return ({
     industryCategories,
     // industryCategories: basicCache.industryCategories,
@@ -266,9 +267,6 @@ class AddressGroup extends Component {
 class ChangeModal extends Component {
     constructor (props) {
       super(props);
-      // 生成guid和上传地址
-      const newGuid = guid()
-      const uploadUrl = api.disk.uploadMoreFiles('bp_organization_certification', newGuid);
       this.state = {
         changeModal: false,
         recordMsg: undefined,
@@ -286,13 +284,13 @@ class ChangeModal extends Component {
         addModalVisible: false,
         area: [],
         address: '',
-        newGuid,
-        uploadUrl,
         bankFetching: false,
         bank: [],
         pic: [],
         newDataList: [],
         userPersonData: [],
+        deletePiCertificationIdList: [],
+        gtype: 0,
       }
       this.fetchBank = debounce(this.fetchBank, 500);
     }
@@ -311,8 +309,9 @@ class ChangeModal extends Component {
 
     /** props更新时调用 */
     visibleShow = (changeModal, recordMsg) => {
+      const { gtype } = this.state;
       if (recordMsg) {
-        if (recordMsg.type === 1) {
+        if (recordMsg.type === 1 || gtype === 1) {
           api.bp.getBPPiCertification(recordMsg.id).then(res => {
             this.setState({
               userData: res,
@@ -332,7 +331,7 @@ class ChangeModal extends Component {
                   })
                 })
                 api.disk.getFiles({
-                  sourceKey: 'bp_organization_certification',
+                  sourceKey: 'bp_pi_certification',
                   sourceCode: codeList.join(',') }).then(
                     v => {
                       newData.forEach((item, index) => {
@@ -390,7 +389,7 @@ class ChangeModal extends Component {
     // 个人提交
     handlePersonOk = e => {
       if (e) e.preventDefault();
-      const { newDataList, userData, recordMsg } = this.state;
+      const { newDataList, userData, recordMsg, deletePiCertificationIdList } = this.state;
       const newPiCertificationList = [];
       newDataList.forEach(item => {
         newPiCertificationList.push({
@@ -401,15 +400,16 @@ class ChangeModal extends Component {
       })
       const data = {
         basic: {
-          // eslint-disable-next-line max-len
-          name: this.props.form.getFieldValue('pname') ? this.props.form.getFieldValue('pname').name : userData.basic.name,
+          name: this.props.form.getFieldValue('pname') ?
+                this.props.form.getFieldValue('pname').name : userData.basic.name,
         },
         newPiCertificationList,
+        deletePiCertificationIdList,
       }
+      this.setState({ deletePiCertificationIdList: [] })
       api.bp.updateBPPiCertificationList(recordMsg.id, data).then(() => {
-        this.setState({
-          changeModal: false,
-        })
+        this.handleCancel()
+        this.props.getData()
       })
     }
 
@@ -482,6 +482,7 @@ class ChangeModal extends Component {
         pic: [],
         newDataList: [],
         userPersonData: [],
+        deletePiCertificationIdList: [],
       })
     }
 
@@ -513,7 +514,7 @@ class ChangeModal extends Component {
       e.preventDefault();
       this.setState({
         personalShow: false,
-        name: 'leo wang',
+        // name: 'leo wang',
       })
     }
 
@@ -531,6 +532,19 @@ class ChangeModal extends Component {
         </Form.Item>
       </div>
     )
+
+    changGType = v => {
+      if (v.type === 'group') {
+        this.setState({
+          gtype: 1,
+        })
+      }
+      if (v.type === 'personal') {
+        this.setState({
+          gtype: 2,
+        })
+      }
+    }
 
     persnalInput = name => {
       const { form } = this.props;
@@ -550,7 +564,7 @@ class ChangeModal extends Component {
                 message: '请填写名称！',
               },
             ],
-          })(<NameGroup name={name} type="personal"/>)}
+          })(<NameGroup name={name} changGType={v => this.changGType(v)} type="personal"/>)}
         </Form.Item>
       )
     }
@@ -589,7 +603,9 @@ class ChangeModal extends Component {
         validateStatus={form.getFieldValue('msg') ? 'success' : 'error'}
         help={form.getFieldValue('msg') ? '' : '请输入信息'}
         >
-          {getFieldDecorator('msg')(<NameGroup name={name} type="group"/>)}
+          {getFieldDecorator('msg')(
+          <NameGroup changGType={v => this.changGType(v)} name={name} type="group"/>,
+          )}
         </FormItem>
       </Col>
       )
@@ -671,7 +687,7 @@ class ChangeModal extends Component {
           &nbsp;&nbsp;&nbsp;&nbsp;
         <span>
           {industryCategories.map(v => {
-            if (basic.industryCode === v.id) return v.name
+            if (basic.industryCode === v.code) return v.name
             return ''
             })
           }
@@ -692,7 +708,9 @@ class ChangeModal extends Component {
           {getFieldDecorator('industry')(
             <Select placeholder="请选择">
               {industryCategories.map(item =>
-                <Option key={item.id} value={item.id}>{item.name}</Option>,
+                <Option key={item.code} value={item.name} disabled={item.code === '07'}>
+                  {item.name}
+                </Option>,
               )}
             </Select>)}
         </FormItem>
@@ -730,17 +748,23 @@ class ChangeModal extends Component {
 
     // 删除
     removeItem = id => {
-      const { newDataList, userPersonData, recordMsg } = this.state;
+      const { newDataList, userPersonData, deletePiCertificationIdList } = this.state;
       // 删除新增数据
       const newData = newDataList.filter(item => item.id !== id);
       this.setState({
         newDataList: newData,
       })
-      // 删除原来数据
+      const deletePiCertificationId = deletePiCertificationIdList;
       userPersonData.forEach(item => {
         if (item.id === id) {
-          api.bp.cancelBPPiCertification({ id: recordMsg.id, billToPartyId: item.id })
+          console.log(id)
+          deletePiCertificationId.push(id)
         }
+      })
+      const oldData = userPersonData.filter(item => item.id !== id);
+      this.setState({
+        deletePiCertificationIdList,
+        userPersonData: oldData,
       })
     }
 
@@ -863,6 +887,7 @@ class ChangeModal extends Component {
         pic,
         newDataList,
         userPersonData,
+        gtype,
       } = this.state;
 
       const fileList = pic.map(e => ({
@@ -871,7 +896,6 @@ class ChangeModal extends Component {
         status: 'done',
         url: api.disk.downloadFiles(e.id, { view: true }),
       }));
-
 
       const { basic } = userData;
       const nullData = {};
@@ -913,290 +937,296 @@ class ChangeModal extends Component {
       </>
       // if (recordMsg.code === userData.basic.code) {}
       // 个人变更
-      if (recordMsg && recordMsg.type === 1) {
-        modelWidth = 830;
+      if (gtype !== 1) {
+        if ((recordMsg && recordMsg.type === 1) || gtype === 2) {
+          modelWidth = 830;
 
-        const parentMethods = {
-          handleAdd: this.handleAdd,
-          handleModalVisible: this.handleModalVisible,
-        };
-        modelContent = <>
-          <Form {...formItemLayout} onSubmit={this.handlePersonOk}>
-            {this.renderPerform(userData.basic.name)}
-            <Row gutter={32}>
-            <List
-              rowKey="id"
-              grid={{
-                gutter: 24,
-                lg: 2,
-                md: 2,
-                sm: 1,
-                xs: 1,
-              }}
-              dataSource={[...userPersonList, nullData]}
-              renderItem={this.renderListItem}
-            />
-            <PersonCertificationAddModal
-              {...parentMethods}
-              modalVisible={addModalVisible}
-              details={recordMsg}
-              handleModalVisible={v => this.handleModalVisible(v)}
-              authorization={this.props.authorization}
-              handleAdd={(data, uid) => this.handleAdd(data, uid)}
-              // eslint-disable-next-line no-nested-ternary
-              attachmentCode={userData.piCertificationList ?
-                (userData.piCertificationList.attachmentCode ?
-                  userData.piCertificationList.attachmentCode : '') : ''}
-            />
-            <Divider style={{ margin: 0 }}/>
-            <Button htmlType="submit" type="primary"
-            style={{ float: 'right', margin: '10px 20px' }}>
-                提交
-            </Button>
-            </Row>
-          </Form>
-        </>
-      }
-      // 组织变更
-      if (recordMsg && recordMsg.type === 2 &&
-        (recordMsg.countyCode === 'CN' || !recordMsg.countyCode)) {
-        modelWidth = 1130;
-        modelContent = <>
-          <Form {...formItemLayoutGroup} labelAlign="left" onSubmit={this.handleOrganizationOk}>
-            <Row gutter={32}>
-              <>
-                { this.renderGroupNameForm() }
-                { this.renderAdressForm() }
-              </>
-              <Col lg={12} md={12} sm={12}>
-                <FormItem label="电话">
-                  {getFieldDecorator('phoneNum', {
-                    initialValue: {
-                      telephoneCountryCode: basic.telephoneCountryCode,
-                      telephoneAreaCode: basic.telephoneAreaCode,
-                      telephone: basic.telephone,
-                      telephoneExtension: basic.telephoneExtension,
-                    },
-                  })(<TelphoneInput/>)}
-                </FormItem>
-              </Col>
-              { this.renderIndustryForm() }
-              <Col lg={12} md={12} sm={12}>
-                <FormItem label="增值税专用发票资质">
-                  {getFieldDecorator('specialInvoice')(
-                  <Switch
-                    style={{ marginLeft: '7px' }}
-                    checkedChildren="开"
-                    unCheckedChildren="关"
-                    onChange={() => {
-                      this.setState({
-                        specialInvoice: !specialInvoice,
-                      })
-                    }}
-                    checked={specialInvoice}
-                  />)}
-                </FormItem>
-              </Col>
-
-              <Col lg={12} md={12} sm={12}>
-                <FormItem
-                  label="统一社会信用代码"
-                  hasFeedback
-                  // eslint-disable-next-line max-len
-                  validateStatus={form.getFieldValue('taxNo') || (userData.organizationCertification ?
-                    (!!userData.organizationCertification.taxNo)
-                     : '') ? 'success' : 'error'}
-                  help={form.getFieldValue('taxNo') ? '' : '请输入信息'}
-                >
-                  {getFieldDecorator('taxNo', {
-                    // eslint-disable-next-line no-nested-ternary
-                    initialValue: userData.organizationCertification ?
-                    (userData.organizationCertification.taxNo ?
-                      userData.organizationCertification.taxNo : '')
-                     : '',
-                  })(<Input placeholder="请输入"/>)}
-                </FormItem>
-              </Col>
-              <Col lg={12} md={12} sm={12}>
-                <FormItem
-                  label="基本户开户银行"
-                  className="marginLeft7"
-                  hasFeedback
-                  // eslint-disable-next-line max-len
-                  validateStatus={form.getFieldValue('bankCode') || (userData.organizationCertification ?
-                    (!!userData.organizationCertification.bankName)
-                     : '') ? 'success' : 'error'}
-                  help={form.getFieldValue('bankCode') ? '' : '请输入信息'}
-                >
-                  {getFieldDecorator('bankCode', {
-                    // eslint-disable-next-line no-nested-ternary
-                    initialValue: userData.organizationCertification ?
-                    (userData.organizationCertification.bankName ?
-                      userData.organizationCertification.bankName : '') : '',
-                  })(<Select
-                    showSearch
-                    notFoundContent={bankFetching ? <Spin size="small" /> : null}
-                    filterOption={false}
-                    onSearch={this.fetchBank}
-                    style={{ marginLeft: '7px' }}
-                  >
-                    {bank.map(d => (
-                      <Option key={d.code} value={d.code}>
-                        {d.fullName}
-                      </Option>
-                    ))}
-                  </Select>)}
-                </FormItem>
-              </Col>
-              <Col lg={12} md={12} sm={12}>
-                <FormItem
-                  label="基本户开户账号"
-                  hasFeedback
-                  // eslint-disable-next-line max-len
-                  validateStatus={form.getFieldValue('bankAccount') || (userData.organizationCertification ?
-                    (!!userData.organizationCertification.bankAccount)
-                     : '') ? 'success' : 'error'}
-                  help={form.getFieldValue('bankAccount') ? '' : '请输入信息'}
-                >
-                  {getFieldDecorator('bankAccount', {
-                    // eslint-disable-next-line no-nested-ternary
-                    initialValue: userData.organizationCertification ?
-                    (userData.organizationCertification.bankAccount ?
-                      userData.organizationCertification.bankAccount : '') : '',
-                  })(<Input placeholder="请输入"/>)}
-                </FormItem>
-              </Col>
-              <Col lg={24} md={12} sm={12}>
-                  <FormItem
-                    label="注册地址"
-                    labelCol={{ span: 4 }}
-                    wrapperCol={{ span: 20 }}
-                    hasFeedback
-                    // eslint-disable-next-line max-len
-                    validateStatus={form.getFieldValue('regisAddress') || (userData.organizationCertification ?
-                      (!!userData.organizationCertification.address)
-                       : '') ? 'success' : 'error'}
-                    help={form.getFieldValue('regisAddress') ? '' : '请输入信息'}
-                  >
-                    {getFieldDecorator('regisAddress', {
-                    // eslint-disable-next-line no-nested-ternary
-                    initialValue: userData.organizationCertification ?
-                    (userData.organizationCertification.address ?
-                      userData.organizationCertification.address : '') : '',
-                  })(<Input placeholder="请输入"/>)}
-                  </FormItem>
-              </Col>
-              <Col lg={24} md={12} sm={12}>
-                <Form.Item
-                  label="认证说明"
-                  hasFeedback
-                  labelCol={{ span: 4 }}
-                  wrapperCol={{ span: 20 }}
-                  // eslint-disable-next-line max-len
-                  validateStatus={form.getFieldValue('notes') || (userData.organizationCertification ?
-                    (!!userData.organizationCertification.notes)
-                     : '') ? 'success' : 'error'}
-                  help={form.getFieldValue('notes') ? '' : '请输入信息'}
-                >
-                  {getFieldDecorator('notes', {
-                    // eslint-disable-next-line no-nested-ternary
-                    initialValue: userData.organizationCertification ?
-                    (userData.organizationCertification.notes ?
-                      userData.organizationCertification.notes : '') : '',
-                  })(<TextArea rows={2} />)}
-                </Form.Item>
-              </Col>
-              <Col lg={24} md={12} sm={12}>
-              <Form.Item
-                label="认证图片"
-                labelCol={{ span: 4 }}
-                wrapperCol={{ span: 20 }}
-              >
-                {getFieldDecorator('attachmentCode', {
-                rules: [{ required: true }],
-                valuePropName: 'fileList',
-                getValueFromEvent: this.normFile,
-              })(uploadModal)}
-               </Form.Item>
-              </Col>
+          const parentMethods = {
+            handleAdd: this.handleAdd,
+            handleModalVisible: this.handleModalVisible,
+          };
+          modelContent = <>
+            <Form {...formItemLayout} onSubmit={this.handlePersonOk}>
+              {this.renderPerform(userData.basic.name)}
+              <Row gutter={32}>
+              <List
+                rowKey="id"
+                grid={{
+                  gutter: 24,
+                  lg: 2,
+                  md: 2,
+                  sm: 1,
+                  xs: 1,
+                }}
+                dataSource={[...userPersonList, nullData]}
+                renderItem={this.renderListItem}
+              />
+              <PersonCertificationAddModal
+                {...parentMethods}
+                modalVisible={addModalVisible}
+                details={recordMsg}
+                handleModalVisible={v => this.handleModalVisible(v)}
+                authorization={this.props.authorization}
+                handleAdd={(data, uid) => this.handleAdd(data, uid)}
+                // eslint-disable-next-line no-nested-ternary
+                attachmentCode={userData.piCertificationList ?
+                  (userData.piCertificationList.attachmentCode ?
+                    userData.piCertificationList.attachmentCode : '') : ''}
+              />
               <Divider style={{ margin: 0 }}/>
               <Button htmlType="submit" type="primary"
               style={{ float: 'right', margin: '10px 20px' }}>
                   提交
               </Button>
-            </Row>
-          </Form>
+              </Row>
+            </Form>
           </>
+        }
       }
 
-      // 美国变更
-      if (recordMsg && recordMsg.type === 2 && recordMsg.countyCode === 'US') {
-        modelWidth = 800;
-        modelContent = <>
-          <Form {...formItemLayout}>
-             { this.renderUsaForm() }
-            <FormItem label="免税认证号">
-              {getFieldDecorator('taxNo', {
-                rules: [
-                  {
-                    required: true,
-                    message: '请输入免税认证号！',
-                  },
-                ],
-              })(<Input placeholder="请输入"/>)}
-            </FormItem>
-            <Form.Item label="认证说明">
-              {getFieldDecorator('idenText', {
-                rules: [
-                  {
-                    required: true,
-                    message: '请输入认证说明！',
-                  },
-                ],
-              })(<TextArea rows={2} />)}
-            </Form.Item>
-            <Form.Item label="认证图片">
-              {getFieldDecorator('attachmentCode')(uploadModal)}
-            </Form.Item>
-            <Divider style={{ margin: 0 }}/>
-            <Button htmlType="submit" type="primary"
-            style={{ float: 'right', margin: '10px 20px 0 0' }}>
-                提交
-            </Button>
-          </Form>
-        </>
+      if (gtype !== 2) {
+        // 组织变更
+        if ((recordMsg && recordMsg.type === 2 &&
+          (recordMsg.countyCode === 'CN' || !recordMsg.countyCode)) || gtype === 1) {
+          modelWidth = 1130;
+          modelContent = <>
+            <Form {...formItemLayoutGroup} labelAlign="left" onSubmit={this.handleOrganizationOk}>
+              <Row gutter={32}>
+                <>
+                  { this.renderGroupNameForm() }
+                  { this.renderAdressForm() }
+                </>
+                <Col lg={12} md={12} sm={12}>
+                  <FormItem label="电话">
+                    {getFieldDecorator('phoneNum', {
+                      initialValue: {
+                        telephoneCountryCode: basic.telephoneCountryCode,
+                        telephoneAreaCode: basic.telephoneAreaCode,
+                        telephone: basic.telephone,
+                        telephoneExtension: basic.telephoneExtension,
+                      },
+                    })(<TelphoneInput/>)}
+                  </FormItem>
+                </Col>
+                { this.renderIndustryForm() }
+                <Col lg={12} md={12} sm={12}>
+                  <FormItem label="增值税专用发票资质">
+                    {getFieldDecorator('specialInvoice')(
+                    <Switch
+                      style={{ marginLeft: '7px' }}
+                      checkedChildren="开"
+                      unCheckedChildren="关"
+                      onChange={() => {
+                        this.setState({
+                          specialInvoice: !specialInvoice,
+                        })
+                      }}
+                      checked={specialInvoice}
+                    />)}
+                  </FormItem>
+                </Col>
+
+                <Col lg={12} md={12} sm={12}>
+                  <FormItem
+                    label="统一社会信用代码"
+                    hasFeedback
+                    // eslint-disable-next-line max-len
+                    validateStatus={form.getFieldValue('taxNo') || (userData.organizationCertification ?
+                      (!!userData.organizationCertification.taxNo)
+                        : '') ? 'success' : 'error'}
+                    help={form.getFieldValue('taxNo') ? '' : '请输入信息'}
+                  >
+                    {getFieldDecorator('taxNo', {
+                      // eslint-disable-next-line no-nested-ternary
+                      initialValue: userData.organizationCertification ?
+                      (userData.organizationCertification.taxNo ?
+                        userData.organizationCertification.taxNo : '')
+                        : '',
+                    })(<Input placeholder="请输入"/>)}
+                  </FormItem>
+                </Col>
+                <Col lg={12} md={12} sm={12}>
+                  <FormItem
+                    label="基本户开户银行"
+                    className="marginLeft7"
+                    hasFeedback
+                    // eslint-disable-next-line max-len
+                    validateStatus={form.getFieldValue('bankCode') || (userData.organizationCertification ?
+                      (!!userData.organizationCertification.bankName)
+                        : '') ? 'success' : 'error'}
+                    help={form.getFieldValue('bankCode') ? '' : '请输入信息'}
+                  >
+                    {getFieldDecorator('bankCode', {
+                      // eslint-disable-next-line no-nested-ternary
+                      initialValue: userData.organizationCertification ?
+                      (userData.organizationCertification.bankName ?
+                        userData.organizationCertification.bankName : '') : '',
+                    })(<Select
+                      showSearch
+                      notFoundContent={bankFetching ? <Spin size="small" /> : null}
+                      filterOption={false}
+                      onSearch={this.fetchBank}
+                      style={{ marginLeft: '7px' }}
+                    >
+                      {bank.map(d => (
+                        <Option key={d.code} value={d.code}>
+                          {d.fullName}
+                        </Option>
+                      ))}
+                    </Select>)}
+                  </FormItem>
+                </Col>
+                <Col lg={12} md={12} sm={12}>
+                  <FormItem
+                    label="基本户开户账号"
+                    hasFeedback
+                    // eslint-disable-next-line max-len
+                    validateStatus={form.getFieldValue('bankAccount') || (userData.organizationCertification ?
+                      (!!userData.organizationCertification.bankAccount)
+                        : '') ? 'success' : 'error'}
+                    help={form.getFieldValue('bankAccount') ? '' : '请输入信息'}
+                  >
+                    {getFieldDecorator('bankAccount', {
+                      // eslint-disable-next-line no-nested-ternary
+                      initialValue: userData.organizationCertification ?
+                      (userData.organizationCertification.bankAccount ?
+                        userData.organizationCertification.bankAccount : '') : '',
+                    })(<Input placeholder="请输入"/>)}
+                  </FormItem>
+                </Col>
+                <Col lg={24} md={12} sm={12}>
+                    <FormItem
+                      label="注册地址"
+                      labelCol={{ span: 4 }}
+                      wrapperCol={{ span: 20 }}
+                      hasFeedback
+                      // eslint-disable-next-line max-len
+                      validateStatus={form.getFieldValue('regisAddress') || (userData.organizationCertification ?
+                        (!!userData.organizationCertification.address)
+                          : '') ? 'success' : 'error'}
+                      help={form.getFieldValue('regisAddress') ? '' : '请输入信息'}
+                    >
+                      {getFieldDecorator('regisAddress', {
+                      // eslint-disable-next-line no-nested-ternary
+                      initialValue: userData.organizationCertification ?
+                      (userData.organizationCertification.address ?
+                        userData.organizationCertification.address : '') : '',
+                    })(<Input placeholder="请输入"/>)}
+                    </FormItem>
+                </Col>
+                <Col lg={24} md={12} sm={12}>
+                  <Form.Item
+                    label="认证说明"
+                    hasFeedback
+                    labelCol={{ span: 4 }}
+                    wrapperCol={{ span: 20 }}
+                    // eslint-disable-next-line max-len
+                    validateStatus={form.getFieldValue('notes') || (userData.organizationCertification ?
+                      (!!userData.organizationCertification.notes)
+                        : '') ? 'success' : 'error'}
+                    help={form.getFieldValue('notes') ? '' : '请输入信息'}
+                  >
+                    {getFieldDecorator('notes', {
+                      // eslint-disable-next-line no-nested-ternary
+                      initialValue: userData.organizationCertification ?
+                      (userData.organizationCertification.notes ?
+                        userData.organizationCertification.notes : '') : '',
+                    })(<TextArea rows={2} />)}
+                  </Form.Item>
+                </Col>
+                <Col lg={24} md={12} sm={12}>
+                <Form.Item
+                  label="认证图片"
+                  labelCol={{ span: 4 }}
+                  wrapperCol={{ span: 20 }}
+                >
+                  {getFieldDecorator('attachmentCode', {
+                  rules: [{ required: true }],
+                  valuePropName: 'fileList',
+                  getValueFromEvent: this.normFile,
+                })(uploadModal)}
+                  </Form.Item>
+                </Col>
+                <Divider style={{ margin: 0 }}/>
+                <Button htmlType="submit" type="primary"
+                style={{ float: 'right', margin: '10px 20px' }}>
+                    提交
+                </Button>
+              </Row>
+            </Form>
+            </>
+        }
+
+        // 美国变更
+        if (recordMsg && recordMsg.type === 2 && recordMsg.countyCode === 'US') {
+          modelWidth = 800;
+          modelContent = <>
+            <Form {...formItemLayout}>
+                { this.renderUsaForm() }
+              <FormItem label="免税认证号">
+                {getFieldDecorator('taxNo', {
+                  rules: [
+                    {
+                      required: true,
+                      message: '请输入免税认证号！',
+                    },
+                  ],
+                })(<Input placeholder="请输入"/>)}
+              </FormItem>
+              <Form.Item label="认证说明">
+                {getFieldDecorator('idenText', {
+                  rules: [
+                    {
+                      required: true,
+                      message: '请输入认证说明！',
+                    },
+                  ],
+                })(<TextArea rows={2} />)}
+              </Form.Item>
+              <Form.Item label="认证图片">
+                {getFieldDecorator('attachmentCode')(uploadModal)}
+              </Form.Item>
+              <Divider style={{ margin: 0 }}/>
+              <Button htmlType="submit" type="primary"
+              style={{ float: 'right', margin: '10px 20px 0 0' }}>
+                  提交
+              </Button>
+            </Form>
+          </>
+        }
+
+        // 英国变更
+        if (recordMsg && recordMsg.id === 2 && recordMsg.countyCode === 'GB') {
+          modelWidth = 800;
+          modelContent = <>
+            <Form {...formItemLayoutEng} labelAlign="left">
+                { this.renderUsaForm() }
+              <FormItem label="增值税登记号">
+                {getFieldDecorator('taxNo', {
+                  rules: [
+                    {
+                      required: true,
+                    message: '请输入增值税登记号！',
+                    },
+                  ],
+                })(<Input placeholder="请输入"/>)}
+              </FormItem>
+              <Form.Item label="认证说明">
+                {getFieldDecorator('idenText')(<TextArea rows={2} />)}
+              </Form.Item>
+              <Form.Item label="认证图片">
+                {getFieldDecorator('attachmentCode')(uploadModal)}
+              </Form.Item>
+              <Divider style={{ margin: 0 }}/>
+              <Button htmlType="submit" type="primary"
+              style={{ float: 'right', margin: '10px 20px 0 0' }}>
+                  提交
+              </Button>
+            </Form>
+          </>
+        }
       }
 
-      // 英国变更
-      if (recordMsg && recordMsg.id === 2 && recordMsg.countyCode === 'GB') {
-        modelWidth = 800;
-        modelContent = <>
-          <Form {...formItemLayoutEng} labelAlign="left">
-             { this.renderUsaForm() }
-            <FormItem label="增值税登记号">
-              {getFieldDecorator('taxNo', {
-                rules: [
-                  {
-                    required: true,
-                  message: '请输入增值税登记号！',
-                  },
-                ],
-              })(<Input placeholder="请输入"/>)}
-            </FormItem>
-            <Form.Item label="认证说明">
-              {getFieldDecorator('idenText')(<TextArea rows={2} />)}
-            </Form.Item>
-            <Form.Item label="认证图片">
-              {getFieldDecorator('attachmentCode')(uploadModal)}
-            </Form.Item>
-            <Divider style={{ margin: 0 }}/>
-            <Button htmlType="submit" type="primary"
-            style={{ float: 'right', margin: '10px 20px 0 0' }}>
-                提交
-            </Button>
-          </Form>
-        </>
-      }
 
       // 提交通过页面
       const passPage = <>

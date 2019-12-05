@@ -113,7 +113,7 @@ class RecordListForm extends React.Component {
           if (!res) return null
           if (res[typeName].attachmentCode) {
             api.disk.getFiles({
-              sourceKey: 'bp_organization_certification',
+              sourceKey: parseInt(type, 10) === 1 ? 'bp_organization_certification' : 'bp_pi_certification',
               sourceCode: [res[typeName].attachmentCode].join(',') }).then(v => {
               // sourceCode: '85c951942daa05a83a55655efdd557eb' }).then(v => {
               // eslint-disable-next-line array-callback-return
@@ -404,8 +404,24 @@ class CheckModel extends React.Component {
     // 人员认证
     if (clickType === 2) {
       api.bp.getPiCertificationVerifyRecords(recordMsg.id).then(res => {
+        let newData = res;
+        newData = { ...newData, pic: [] };
+        if (res.attachmentCode) {
+          api.disk.getFiles({
+            sourceKey: 'bp_pi_certification',
+            sourceCode: [res.attachmentCode].join(',') }).then(v => {
+            // sourceCode: res.attachmentCode }).then(v => {
+            // eslint-disable-next-line array-callback-return
+            v.map(item => {
+              if (item.id) {
+                newData.pic.push(api.disk.downloadFiles(item.id, { view: true }))
+                this.setState({ picHas: true })
+              }
+            })
+          })
+        }
         this.setState({
-          detailsValue: res,
+          detailsValue: newData,
         })
       })
     }
@@ -664,18 +680,19 @@ class CheckModel extends React.Component {
               {piData.attachmentList[0].name}</Col> */}
               <Col span={16} className={styles.labelVal}>
                 <ul style={{ padding: '0' }}>
-                  {detailsValue.attachmentList ? detailsValue.attachmentList.map((item, index) => (
+                {detailsValue.pic.length !== 0 ? detailsValue.pic.map((item, index) => (
                       // eslint-disable-next-line react/no-array-index-key
                       <li key={index} style={{
-                        width: '100px',
-                        height: '100px',
+                        width: '90px',
+                        height: '90px',
                         border: '1px solid #D9D9D9',
                         textAlign: 'center',
-                        lineHeight: '94px',
+                        lineHeight: '84px',
                         borderRadius: '5px',
                         float: 'left',
-                        marginRight: '30px' }}>{item.type === 'image' ?
-                        <img src={item.name} alt="" width="90" height="90"/> : ''}</li>
+                        marginRight: '30px' }}>
+                        <img src={item} alt="" width="80" height="80"/>
+                      </li>
                     )) : ''}
                 </ul>
               </Col>
