@@ -335,7 +335,7 @@ class SalesArea extends React.Component {
 
     // 新增的数据，最多可以一次新增两条，当同一个销售组织下，同时存在直销[10]和电商[20]两个销售渠道时
     // 新增一个时，会把另一个也新增进去
-    const addArr = [];
+    let addArr = [];
     if (distributionChannelCode === '10' || distributionChannelCode === '20') {
       salesArea.forEach(e1 => {
         if (e1.value === salesOrganizationCode) {
@@ -352,13 +352,16 @@ class SalesArea extends React.Component {
         }
       });
     }
+
     if (addArr.length !== 2) {
-      addArr.push({
-        // theNew 存在代表是新增数据
-        theNew: true,
-        salesOrganizationCode,
-        distributionChannelCode,
-      });
+      addArr = [
+        {
+          // theNew 存在代表是新增数据
+          theNew: true,
+          salesOrganizationCode,
+          distributionChannelCode,
+        },
+      ];
     }
 
     const newSalesAreaList = [].concat(tabsData, ...addArr);
@@ -446,6 +449,7 @@ class SalesArea extends React.Component {
   closeTab = tabKey => {
     let index = -1;
     let key = '';
+    let length = 0;
     const { details, customer, salesAreaList: tabsData } = this.props;
 
     // 如果本次修改的是直销[10]或电商[20]，则生成另一个对应的key，两个tab应该一起删除
@@ -462,6 +466,7 @@ class SalesArea extends React.Component {
       const thisTabKey = `${e.salesOrganizationCode}-${e.distributionChannelCode}`;
       if (thisTabKey !== tabKey && thisTabKey !== matchKey) return true;
       index = i;
+      length++;
       return false;
     });
 
@@ -472,11 +477,11 @@ class SalesArea extends React.Component {
         key = newTabsData[0].title;
       }
       // 关闭最后一个
-      if (index === tabsData.length - 1) {
-        key = newTabsData[index - 1].title;
+      if (index === tabsData.length - length) {
+        key = newTabsData[index - length].title;
       }
       // 关闭中间的Tab
-      if (index > 0 && index < tabsData.length - 1) {
+      if (index > 0 && index < tabsData.length - length) {
         key = newTabsData[index].title;
       }
     } else {
