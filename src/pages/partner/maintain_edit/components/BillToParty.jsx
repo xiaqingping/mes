@@ -52,8 +52,8 @@ class EditableCell extends React.Component {
 }
 
 @Form.create()
-@connect(({ partnerMaintainEdit }) => ({
-  VerifyRecordStatus: partnerMaintainEdit.VerifyRecordStatus,
+@connect(({ bp }) => ({
+  VerifyRecordStatus: bp.VerifyRecordStatus,
 }))
 class BillToParty extends React.Component {
   constructor(props) {

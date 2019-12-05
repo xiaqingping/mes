@@ -1,9 +1,10 @@
 # MES
+
 使用 React + Umijs + Ant Design of React 构建的后台管理系统
 
 ## 使用
 
-``` bash
+```bash
 # 安装依赖
 npm install
 
@@ -15,26 +16,31 @@ npm run build
 ```
 
 ## 技术栈
+
 [React](https://zh-hans.reactjs.org/) + [UmiJS](https://umijs.org/zh/) + [DvaJS](https://dvajs.com/)  
-[Ant Design of React](https://ant.design/docs/react/introduce-cn)  
+[Ant Design of React](https://ant.design/docs/react/introduce-cn)
 
 ## 命名规范
-* `/src/models` 全局数据文件夹下文件命名，比如我负责测序模块（seq），那么你的全局数据文件必须命名为 `seq.js`，每一个大模块为一个文件。
-* `/src/api` 接口文件夹下的文件命名，根据后台接口微服务命名，一个微服务为一个文件，多个不同的服务不要放到同一个文件内。比如 `basic` 服务，就是 `basic.js`。
+
+- `/src/models` 全局数据文件夹下文件命名，比如我负责测序模块（seq），那么你的全局数据文件必须命名为 `seq.js`，每一个大模块为一个文件。
+- `/src/api` 接口文件夹下的文件命名，根据后台接口微服务命名，一个微服务为一个文件，多个不同的服务不要放到同一个文件内。比如 `basic` 服务，就是 `basic.js`。
 
 ## 接口设置
-> 开发默认接口是 `pre`。
 
-修改默认的接口环境：在项目根目录新建 `.env` 文件，输入 `BASE_API=pre`，其中 `pre` 可以改为以下说明中的其他环境。
+> 开发默认接口是 `dev`。
+
+修改默认的接口环境：在项目根目录新建 `.env` 文件，输入 `BASE_API=dev`，其中 `dev` 可以改为以下说明中的其他环境。
 
 ### 说明
-接口环境现有四种，分别是：
-* dev (开发)
-* test (测试)
-* pre (预生产)
-* prod (生产)
 
-一般只有在正式生产服务器才会使用 `prod` 环境（或者有时候需要使用生产数据debug），开发时一般用其他三种就可以。
+接口环境现有四种，分别是：
+
+- dev (开发)
+- test (测试)
+- pre (预生产)
+- prod (生产)
+
+一般只有在正式生产服务器才会使用 `prod` 环境（或者有时候需要使用生产数据 debug），开发时一般用其他三种就可以。
 
 ### 开发环境
 
@@ -43,6 +49,7 @@ npm run build
 ## [全局数据](/docs/全局数据.md)
 
 ## 负责人
+
 <details>
 <summary>展开查看</summary>
 <pre><code>
@@ -60,6 +67,7 @@ RNA合成：王星名 -> 吴贺珍
 </details>
 
 ## 项目结构
+
 <details>
 <summary>展开查看</summary>
 <pre>

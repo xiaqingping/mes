@@ -14,9 +14,10 @@ const SeqModel = {
       { id: 4, name: '已认证' },
     ],
     // PI认证状态
-    BpPiCertificationStatus: [
-      { id: 1, name: '审核中' },
-      { id: 2, name: '已认证' },
+    PiCertificationStatus: [
+      { id: 1, name: '审核中', badge: 'warning' },
+      { id: 2, name: '已认证', badge: 'success' },
+      { id: 3, name: '未认证', badge: 'default' },
     ],
     // 操作项状态
     BpOperationItemStatus: [
