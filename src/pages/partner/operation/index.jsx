@@ -192,13 +192,13 @@ class Operation extends React.Component {
     return (
       <Form onSubmit={this.handleSearch} layout="inline">
         <Row gutter={{ lg: 24, md: 12, sm: 6 }}>
-          <Col lg={6} md={8} sm={12}>
+          <Col xxl={6} xl={10} lg={12} md={12} sm={12}>
             <FormItem label={formatMessage({ id: 'bp.operation.code' })}>
               {getFieldDecorator('code')(<Input/>)}
             </FormItem>
           </Col>
-          <Col lg={6} md={8} sm={12}>
-          <FormItem label={formatMessage({ id: 'bp.operation.businessPartners' })}>
+          <Col xxl={6} xl={10} lg={12} md={12} sm={12}>
+            <FormItem label={formatMessage({ id: 'bp.operation.businessPartners' })}>
               {getFieldDecorator('bpId')(
               <AutoComplete
                 onSearch={this.inputValue}
@@ -208,7 +208,7 @@ class Operation extends React.Component {
                 />)}
             </FormItem>
           </Col>
-          <Col lg={6} md={8} sm={12}>
+          <Col xxl={6} xl={10} lg={12} md={12} sm={12}>
             <FormItem label={formatMessage({ id: 'bp.operation.type' })}>
               {getFieldDecorator('type', typeValue ? { initialValue: typeValue } : 'type')(
                 <Select>
@@ -219,7 +219,7 @@ class Operation extends React.Component {
               )}
             </FormItem>
           </Col>
-          <Col lg={6} md={8} sm={12}>
+          <Col xxl={6} xl={10} lg={12} md={12} sm={12}>
             <FormItem label={formatMessage({ id: 'bp.operation.state' })}>
               {getFieldDecorator('statusList')(
                 <Select mode="multiple" showArrow>

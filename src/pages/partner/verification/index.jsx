@@ -197,17 +197,17 @@ class Verification extends React.Component {
     return (
       <Form onSubmit={this.handleSearch} layout="inline">
         <Row gutter={{ lg: 24, md: 12, sm: 6 }}>
-          <Col lg={6} md={8} sm={12}>
+          <Col xl={6} sm={12}>
             <FormItem label="编号">
               {getFieldDecorator('code')(<Input placeholder="请输入"/>)}
             </FormItem>
           </Col>
-          <Col lg={6} md={8} sm={12}>
+          <Col xl={6} sm={12}>
             <FormItem label="操作编号">
               {getFieldDecorator('bpOperationRecordCode')(<Input placeholder="请输入"/>)}
             </FormItem>
           </Col>
-          <Col lg={6} md={8} sm={12}>
+          <Col xl={6} sm={12}>
           <FormItem label="业务伙伴">
               {getFieldDecorator('bpId')(
               <AutoComplete
@@ -218,7 +218,7 @@ class Verification extends React.Component {
                 />)}
             </FormItem>
           </Col>
-          <Col lg={6} md={8} sm={12}>
+          <Col xl={6} sm={12}>
             <span className="submitButtons">
               <Button type="primary" htmlType="submit">
                 查询
@@ -246,17 +246,17 @@ class Verification extends React.Component {
     return (
       <Form onSubmit={this.handleSearch} layout="inline">
         <Row gutter={{ lg: 24, md: 12, sm: 6 }}>
-          <Col lg={6} md={8} sm={12}>
+          <Col xl={6} lg={8} sm={12}>
             <FormItem label="编号">
               {getFieldDecorator('code')(<Input placeholder="请输入"/>)}
             </FormItem>
           </Col>
-          <Col lg={6} md={8} sm={12}>
+          <Col xl={6} lg={8} sm={12}>
             <FormItem label="操作编号">
               {getFieldDecorator('bpCode')(<Input placeholder="请输入"/>)}
             </FormItem>
           </Col>
-          <Col lg={6} md={8} sm={12}>
+          <Col xl={6} lg={8} sm={12}>
           <FormItem label="业务伙伴">
               {getFieldDecorator('bpId')(
               <AutoComplete
@@ -267,7 +267,7 @@ class Verification extends React.Component {
                 />)}
             </FormItem>
           </Col>
-          <Col lg={6} md={8} sm={12}>
+          <Col xl={6} lg={8} sm={12}>
             <FormItem label="类型">
               {getFieldDecorator('type')(
                 <Select
@@ -284,7 +284,7 @@ class Verification extends React.Component {
               )}
             </FormItem>
           </Col>
-          <Col lg={6} md={8} sm={12}>
+          <Col xl={6} lg={8} sm={12}>
             <FormItem label="状态">
               {getFieldDecorator('statusList')(
                 <Select
@@ -304,21 +304,21 @@ class Verification extends React.Component {
               )}
             </FormItem>
           </Col>
-          <Col lg={6} md={8} sm={12}>
+          <Col xl={6} lg={8} sm={12}>
             <FormItem label="完成时间">
               {getFieldDecorator('finishTime')(
                 <RangePicker />,
               )}
             </FormItem>
           </Col>
-          <Col lg={6} md={8} sm={12}>
+          <Col xl={6} lg={8} sm={12}>
             <FormItem label="过期时间">
               {getFieldDecorator('overTime')(
-                <DatePicker placeholder="请选择" style={{ width: '100%' }}/>,
+                <DatePicker style={{ width: '100%' }}/>,
               )}
             </FormItem>
           </Col>
-          <Col lg={6} md={8} sm={12}>
+          <Col xl={6} lg={8} sm={12}>
             <FormItem label="审核人">
               {getFieldDecorator('approverCode')(
                 <Input placeholder="请输入"/>,
