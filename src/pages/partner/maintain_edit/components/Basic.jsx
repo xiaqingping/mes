@@ -22,7 +22,7 @@ const FormItem = Form.Item;
 const { Option } = Select;
 
 @connect(
-  ({ bp, basicCache, bpEdit }) => {
+  ({ basicCache, bpEdit, global }) => {
     // 1. 业务伙伴数据
     const { editType } = bpEdit;
     const oldDetails = bpEdit.oldDetails || {};
@@ -36,10 +36,10 @@ const { Option } = Select;
 
     // 2. 基础数据
     // 行业类别
-    // const industryCategories = basicCache.industryCategories.filter(
-    //   e => e.languageCode === global.languageCode,
-    // );
-    const industryCategories = bp.Industry;
+    const industryCategories = basicCache.industryCategories.filter(
+      e => e.languageCode === global.languageCode,
+    );
+    // const industryCategories = bp.Industry;
 
     return {
       oldDetails,
@@ -213,10 +213,10 @@ class Basic extends React.Component {
     // 名字-类型为个人时，行业类别为个人，且不可更改
     if (key === 'name') {
       if (value.type === 1) {
-        obj.name.industryCode = '06';
+        obj.name.industryCode = '07';
         this.setState({ industrySelectOpen: true });
       } else {
-        if (basic.industryCode === '06') obj.name.industryCode = '';
+        if (basic.industryCode === '07') obj.name.industryCode = '';
         this.setState({ industrySelectOpen: true });
       }
     }
@@ -426,35 +426,35 @@ class Basic extends React.Component {
         <Select {...industryOption} onChange={value => this.valueChange('industryCode', value)}>
           {industryCategories.map(e => {
             if (basic.type === 1) {
-              if (e.id !== '06') {
+              if (e.code !== '07') {
                 return (
-                  <Option disabled key={e.id} value={e.id}>
+                  <Option disabled key={e.code} value={e.code}>
                     {e.name}
                   </Option>
                 );
               }
               return (
-                <Option key={e.id} value={e.id}>
+                <Option key={e.code} value={e.code}>
                   {e.name}
                 </Option>
               );
             }
             if (basic.type === 2) {
-              if (e.id === '06') {
+              if (e.code === '07') {
                 return (
-                  <Option disabled key={e.id} value={e.id}>
+                  <Option disabled key={e.code} value={e.code}>
                     {e.name}
                   </Option>
                 );
               }
               return (
-                <Option key={e.id} value={e.id}>
+                <Option key={e.code} value={e.code}>
                   {e.name}
                 </Option>
               );
             }
             return (
-              <Option key={e.id} value={e.id}>
+              <Option key={e.code} value={e.code}>
                 {e.name}
               </Option>
             );
