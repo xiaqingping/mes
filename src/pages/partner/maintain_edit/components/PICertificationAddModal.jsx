@@ -5,7 +5,7 @@ import { Form, Input, Upload, Icon, Select } from 'antd';
 import React from 'react';
 import { connect } from 'dva';
 import uniqBy from 'lodash/uniqBy';
-import disk from '@/api/disk';
+import diskAPI from '@/api/disk';
 import { requestErr } from '@/utils/request';
 import { guid } from '@/utils/utils';
 
@@ -78,7 +78,7 @@ class PICertificationAddModal extends React.Component {
     if (key === 'attachmentList') {
       const attachmentList = [];
       if (value.file.status === 'removed') {
-        disk.deleteFiles(value.file.response[0]);
+        diskAPI.deleteFiles(value.file.response[0]);
       }
       if (value.file.response) {
         value.fileList.forEach(e => {
@@ -108,11 +108,11 @@ class PICertificationAddModal extends React.Component {
   render() {
     const { form, authorization, billToPartyList } = this.props;
     const { uuid, billToParty } = this.state;
-    const uploadUrl = disk.uploadMoreFiles('bp_pi_certification', uuid);
+    const uploadUrl = diskAPI.uploadMoreFiles('bp_pi_certification', uuid);
 
     if (!billToParty.attachmentList) billToParty.attachmentList = [];
     const fileList = billToParty.attachmentList.map(e => {
-      const url = disk.downloadFiles(e.id, { view: true });
+      const url = diskAPI.downloadFiles(e.id, { view: true });
       return {
         old: true,
         uid: e.id,

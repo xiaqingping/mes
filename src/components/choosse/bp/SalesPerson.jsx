@@ -9,10 +9,10 @@ import debounce from 'lodash/debounce';
 import employees from '@/api/employees';
 
 @connect(
-  ({ partnerMaintainEdit }) => ({
-    BpCertificationStatus: partnerMaintainEdit.BpCertificationStatus,
-    SalesOrderBlock: partnerMaintainEdit.SalesOrderBlock,
-    CustomerDataStatus: partnerMaintainEdit.CustomerDataStatus,
+  ({ bp }) => ({
+    BpCertificationStatus: bp.BpCertificationStatus,
+    SalesOrderBlock: bp.SalesOrderBlock,
+    CustomerDataStatus: bp.CustomerDataStatus,
   }),
   null,
   null,

@@ -5,7 +5,7 @@ import React from 'react';
 import { Form, Card, Row, Col, Badge, Upload, Modal } from 'antd';
 import { connect } from 'dva';
 import { formatMessage } from 'umi-plugin-react/locale';
-import disk from '@/api/disk';
+import diskAPI from '@/api/disk';
 import ChangeCertification from './ChangeCertification';
 
 const FormItem = Form.Item;
@@ -101,7 +101,7 @@ class OrgCertificationRead extends React.Component {
       uid: e.id,
       name: e.name,
       status: 'done',
-      url: disk.downloadFiles(e.id, { view: true }),
+      url: diskAPI.downloadFiles(e.id, { view: true }),
     }));
 
     return (

@@ -7,8 +7,8 @@ import { connect } from 'dva';
 import { formatMessage } from 'umi-plugin-react/locale';
 import debounce from 'lodash/debounce';
 import { TelphoneInput } from '@/components/CustomizedFormControls';
-import bp from '@/api/bp';
-import disk from '@/api/disk';
+import bpAPI from '@/api/bp';
+import diskAPI from '@/api/disk';
 import basicAPI from '@/api/basic';
 import { requestErr } from '@/utils/request';
 import { guid } from '@/utils/utils';
@@ -54,7 +54,7 @@ class OrgCertification extends Component {
       });
     }
 
-    const uploadUrl = disk.uploadMoreFiles('bp_organization_certification', uuid);
+    const uploadUrl = diskAPI.uploadMoreFiles('bp_organization_certification', uuid);
 
     this.state = {
       uploadUrl,
@@ -95,7 +95,8 @@ class OrgCertification extends Component {
       return;
     }
 
-    bp.checkBPFields({ taxNo: value })
+    bpAPI
+      .checkBPFields({ taxNo: value })
       .then(res => {
         if (!res) {
           callback();
@@ -125,7 +126,7 @@ class OrgCertification extends Component {
 
     if (key === 'attachmentList') {
       if (value.file.status === 'removed') {
-        disk.deleteFiles(value.file.response[0]);
+        diskAPI.deleteFiles(value.file.response[0]);
       }
       if (value.file.response) {
         obj[key] = value.fileList.map(e => {

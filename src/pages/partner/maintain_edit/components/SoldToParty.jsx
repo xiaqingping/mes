@@ -126,6 +126,10 @@ class SoldToParty extends React.Component {
       message.warning('售达方重复');
       return;
     }
+    if (row.certificationStatus !== 4) {
+      message.warning('只能选择已认证的数据');
+      return;
+    }
 
     const newTableData = tableData.map((e, i) => {
       if (i === editIndex) return { ...e, ...row };
