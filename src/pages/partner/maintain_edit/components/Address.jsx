@@ -92,7 +92,7 @@ class EditableTable extends React.Component {
   }
 
   checkAddress = (rule, value, callback) => {
-    const { address, countyCode, changedValue = {} } = value;
+    const { address, countryCode, changedValue = {} } = value;
     const { option = [] } = changedValue;
     if (option.length > 0) {
       const last = option[option.length - 1];
@@ -105,7 +105,7 @@ class EditableTable extends React.Component {
       callback('详细地址必填');
       return;
     }
-    if (!countyCode) {
+    if (!countryCode) {
       callback('国家不能为空');
       return;
     }

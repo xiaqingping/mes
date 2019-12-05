@@ -14,7 +14,7 @@ import {
   AddressInput,
 } from '@/components/CustomizedFormControls';
 import debounce from 'lodash/debounce';
-import bp from '@/api/bp';
+import bpAPI from '@/api/bp';
 import { formatter } from '@/utils/utils';
 import styles from '../style.less';
 
@@ -22,7 +22,7 @@ const FormItem = Form.Item;
 const { Option } = Select;
 
 @connect(
-  ({ partnerMaintainEdit, basicCache, bpEdit }) => {
+  ({ bp, basicCache, bpEdit }) => {
     // 1. 业务伙伴数据
     const { editType } = bpEdit;
     const oldDetails = bpEdit.oldDetails || {};
@@ -39,7 +39,7 @@ const { Option } = Select;
     // const industryCategories = basicCache.industryCategories.filter(
     //   e => e.languageCode === global.languageCode,
     // );
-    const industryCategories = partnerMaintainEdit.Industry;
+    const industryCategories = bp.Industry;
 
     return {
       oldDetails,
@@ -89,7 +89,7 @@ class Basic extends React.Component {
       }
     }
 
-    bp.checkBPFields({ name: value.name }).then(res => {
+    bpAPI.checkBPFields({ name: value.name }).then(res => {
       if (!res) {
         callback();
       } else {
@@ -120,7 +120,8 @@ class Basic extends React.Component {
       }
     }
 
-    bp.checkBPFields({ email: value.email })
+    bpAPI
+      .checkBPFields({ email: value.email })
       .then(res => {
         if (!res) {
           callback();
@@ -154,7 +155,8 @@ class Basic extends React.Component {
       }
     }
 
-    bp.checkBPFields({ mobilePhone: value.mobilePhone })
+    bpAPI
+      .checkBPFields({ mobilePhone: value.mobilePhone })
       .then(res => {
         if (!res) {
           callback();
@@ -182,7 +184,7 @@ class Basic extends React.Component {
   };
 
   checkAddress = (rule, value, callback) => {
-    const { address, countyCode, changedValue = {} } = value;
+    const { address, countryCode, changedValue = {} } = value;
     const { option = [] } = changedValue;
     if (option.length > 0) {
       const last = option[option.length - 1];
@@ -195,7 +197,7 @@ class Basic extends React.Component {
       callback('详细地址必填');
       return;
     }
-    if (!countyCode) {
+    if (!countryCode) {
       callback('国家不能为空');
       return;
     }
@@ -284,7 +286,7 @@ class Basic extends React.Component {
     const keyList = ['name', 'mobilePhone', 'telephone', 'fax', 'email', 'address'];
     if (keyList.indexOf(key) > -1) {
       if (key === 'address') {
-        const { changedValue, sapCountryCode, provinceSapCode, ...excludeChangeValue } = value;
+        const { changedValue, ...excludeChangeValue } = value;
         obj = {
           ...excludeChangeValue,
           languageCode: obj.languageCode,

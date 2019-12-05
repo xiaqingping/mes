@@ -32,7 +32,7 @@ const { Option } = Select;
 const { TabPane } = Tabs;
 
 @Form.create()
-@connect(({ global, basicCache, bpEdit, partnerMaintainEdit }) => {
+@connect(({ global, basicCache, bpEdit, bp }) => {
   function byLangFilter(e) {
     return e.languageCode === global.languageCode;
   }
@@ -49,7 +49,7 @@ const { TabPane } = Tabs;
   const basicInfo = details.basic || {};
 
   // 默认开票类型
-  const { DefaultInvoiceType } = partnerMaintainEdit;
+  const { DefaultInvoiceType } = bp;
 
   return {
     salesPaymentMethods,

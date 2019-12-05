@@ -26,7 +26,7 @@ const { Option } = Select;
 
 @Form.create()
 @connect(
-  ({ global, basicCache, partnerMaintainEdit }) => {
+  ({ global, basicCache, bp }) => {
     function byLangFilter(e) {
       return e.languageCode === global.languageCode;
     }
@@ -39,7 +39,7 @@ const { Option } = Select;
     const { purchaseGroups } = basicCache;
 
     // 供应商级别
-    const { VendorLevelCode } = partnerMaintainEdit;
+    const { VendorLevelCode } = bp;
 
     return { currencies, paymentTerms, purchaseGroups, VendorLevelCode };
   },
