@@ -1,7 +1,7 @@
 /**
  * 组织信贷数据
  */
-import { Card, Descriptions, Divider, Empty, Modal, Button } from 'antd';
+import { Card, Descriptions, Divider, Empty, Modal, Button, message } from 'antd';
 import React, { Component } from 'react';
 import { connect } from 'dva';
 import { formatMessage, FormattedMessage } from 'umi-plugin-react/locale';
@@ -65,6 +65,12 @@ class OrgCredit extends Component {
 
   // 提交额度申请
   handleOk = () => {
+    const { details } = this.props;
+    const { basic } = details;
+    if (basic.certificationStatus !== 4) {
+      message.warning('该业务伙伴未认证，无法调整额度');
+      return;
+    }
     this.setState({
       creditAdjustFooter: false,
     });
@@ -73,13 +79,51 @@ class OrgCredit extends Component {
 
   // 关闭调整额度界面
   handleCancel = () => {
-    // TODO:调整完额度，重新获取BP数据
+    const { details } = this.props;
+
     if (this.CreditAdjustView.state.status === 2) {
-      // const { id } = this.props.details.basic;
-      // this.props.dispatch({
-      //   type: 'bpEdit/readBPDetails',
-      //   payload: { id },
-      // });
+      const { creditData } = this.CreditAdjustView.state;
+      let oldCredit = {
+        billingCycle: 0,
+        billingDay: 0,
+        credit: 0,
+        creditPeriod: 0,
+        currencyCode: 'CNY',
+        tempCreditLimit: 0,
+      };
+      if (details.creditList && details.creditList.length > 0) {
+        [oldCredit] = details.creditList;
+      }
+
+      // billToPartyCode: null
+      // billToPartyId: null
+      // billToPartyName: null
+      // billingCycle: 30
+      // billingDay: 10
+      // credit: 21000
+      // creditPeriod: 1
+      // currencyCode: "CNY"
+      // lastEvaluationDate: "2019-12-05T14:32:35"
+      // tempCreditLimit: 21000
+      // tempCreditLimitExpirationDate: null
+
+      const newCredit = {
+        ...oldCredit,
+        credit: creditData.creditLimit,
+        creditPeriod: creditData.creditPeriod,
+        currencyCode: creditData.currencyCode,
+        billingCycle: creditData.billingCycle,
+        billingDay: creditData.billingDay,
+      };
+
+      const newDetails = { ...details, creditList: [newCredit] };
+      this.props.dispatch({
+        type: 'bpEdit/setState',
+        payload: {
+          type: 'details',
+          data: newDetails,
+        },
+      });
     }
     this.setState({
       creditAdjustVisible: false,
