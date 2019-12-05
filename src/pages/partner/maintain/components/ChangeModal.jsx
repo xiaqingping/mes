@@ -25,8 +25,7 @@ import api from '@/api';
 import debounce from 'lodash/debounce';
 import './index.less';
 import { guid } from '@/utils/utils';
-import PersonCertificationAddModal from
-'@/pages/partner/maintain_details/components/PersonCertificationAddModal';
+import PersonCertificationAddModal from './PersonCertificationAddModal';
 
 const { Paragraph } = Typography;
 const FormItem = Form.Item;
@@ -57,12 +56,16 @@ const formItemLayoutGroup = {
 // 审核状态
 const verifyStatus = {
   1: {
-    value: 'processing',
+    value: 'warning',
     text: '审核中',
   },
  2: {
     value: 'success',
     text: '已认证',
+  },
+  3: {
+    value: 'default',
+    text: '未认证',
   },
 }
 
@@ -247,11 +250,11 @@ class AddressGroup extends Component {
   }
 }
 
-@connect(({ basicCache, user, partnerMaintain, partnerMaintainEdit }) => {
+@connect(({ basicCache, user, partnerMaintain, bp }) => {
   // const industryCategories = basicCache.industryCategories.filter(
   //   e => e.languageCode === global.languageCode,
   // );
-  const industryCategories = partnerMaintainEdit.Industry;
+  const industryCategories = bp.Industry;
    return ({
     industryCategories,
     // industryCategories: basicCache.industryCategories,
@@ -728,21 +731,15 @@ class ChangeModal extends Component {
     // 删除
     removeItem = id => {
       const { newDataList, userPersonData, recordMsg } = this.state;
-      let newData = newDataList;
-      newDataList.forEach((item, index) => {
-        if (item.id === id) {
-          // this.setState({
-          //   newDataList: newDataList.splice(index, 1),
-          // })
-        }
+      // 删除新增数据
+      const newData = newDataList.filter(item => item.id !== id);
+      this.setState({
+        newDataList: newData,
       })
+      // 删除原来数据
       userPersonData.forEach(item => {
         if (item.id === id) {
           api.bp.cancelBPPiCertification({ id: recordMsg.id, billToPartyId: item.id })
-          this.props.getData()
-          this.setState({
-            changeModal: false
-          })
         }
       })
     }
@@ -754,7 +751,7 @@ class ChangeModal extends Component {
             <Card
               hoverable
               title={item.billToPartyName}
-              extra={
+              extra={ item.status === 1 ? '' :
                 <>
                   <a onClick={() => this.removeItem(item.id, item)}>删除</a>
                 </>
@@ -841,7 +838,7 @@ class ChangeModal extends Component {
         type: 1,
         billToPartyId: data.billToPartyId.split(',')[0],
         billToPartyName: data.billToPartyId.split(',')[1],
-        status: 1,
+        status: 3,
         notes: data.notes,
         attachmentCode: uid,
         pic: picArr,
