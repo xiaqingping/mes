@@ -58,6 +58,10 @@ class Bank extends Component {
   };
 
   fetchBank = value => {
+    if (!value) {
+      this.setState({ bank: [] });
+      return;
+    }
     basicApi
       .getBanks({
         codeOrFullName: value,
