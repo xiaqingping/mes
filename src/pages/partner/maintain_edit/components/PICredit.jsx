@@ -16,7 +16,7 @@ import CreditAdjust from './CreditAdjust';
     piCertificationList,
   };
 })
-class PersonCredit extends React.Component {
+class PICredit extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -163,4 +163,4 @@ class PersonCredit extends React.Component {
   }
 }
 
-export default PersonCredit;
+export default PICredit;

@@ -6,7 +6,7 @@ import React from 'react';
 // import { FormattedMessage, formatMessage } from 'umi-plugin-react/locale';
 import bpAPI from '@/api/bp';
 
-class PersonCredit extends React.Component {
+class CreditAdjust extends React.Component {
   constructor(props) {
     super(props);
     const { data = {} } = props;
@@ -182,4 +182,4 @@ class PersonCredit extends React.Component {
   }
 }
 
-export default PersonCredit;
+export default CreditAdjust;

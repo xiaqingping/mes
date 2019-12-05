@@ -352,6 +352,7 @@ class OrgCertification extends Component {
                 <FormItem label={sapCountryCode === 'US' ? '免税认证号' : '增值税登记号'}>
                   {getFieldDecorator('taxNo', {
                     initialValue: orgData.taxNo,
+                    rules: [{ validator: this.checkTaxNo }],
                   })(<Input onChange={e => this.valueChange('taxNo', e.target.value)} />)}
                 </FormItem>
               </Col>

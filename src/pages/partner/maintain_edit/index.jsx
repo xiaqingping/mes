@@ -15,7 +15,7 @@ import SalesArea from './components/SalesArea';
 import OrgCredit from './components/OrgCredit';
 import OrgCertification from './components/OrgCertification';
 import OrgCertificationRead from './components/OrgCertificationRead';
-import PersonCredit from './components/PersonCredit';
+import PICredit from './components/PICredit';
 import PICertification from './components/PICertification';
 import Address from './components/Address';
 import PurchasingOrg from './components/PurchasingOrg';
@@ -634,7 +634,7 @@ class CustomerEdit extends Component {
         ) : null}
         {type === 1 ? (
           <>
-            {editType === 'update' ? <PersonCredit /> : null}
+            {editType === 'update' ? <PICredit /> : null}
             <PICertification />
           </>
         ) : null}
