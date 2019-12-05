@@ -42,6 +42,14 @@ npm run build
 
 一般只有在正式生产服务器才会使用 `prod` 环境（或者有时候需要使用生产数据 debug），开发时一般用其他三种就可以。
 
+### 使用
+
+- 加载全部接口 `import api from '@/api'`  
+  使用：`api.bp.xxx()`
+
+- 加载单个接口 `import bpAPI from '@/api/bp'`(加载单个接口，要在接口名后加大写的 API)  
+  使用：`bpAPI.xxx()`
+
 ### 开发环境
 
 ### 生产环境
