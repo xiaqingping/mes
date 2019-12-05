@@ -85,7 +85,7 @@ export default {
     'primary-color': primaryColor,
   },
   define: {
-    BASE_API: BASE_API || 'pre',
+    BASE_API: BASE_API || 'dev',
   },
   ignoreMomentLocale: true,
   lessLoaderOptions: {
