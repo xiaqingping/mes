@@ -428,15 +428,17 @@ class ChangeModal extends Component {
     handleOrganizationOk = e => {
       if (e) e.preventDefault();
       const { address, area, userData: { basic }, recordMsg, userData, deleteId, pic, guid  } = this.state;
-      const newGuid = deleteId.length !== 0 ? guid : userData.organizationCertification.attachmentCode;
+      const newGuid = userData.organizationCertification ? (deleteId.length !== 0 ? guid : userData.organizationCertification.attachmentCode) : guid;
       // console.log(userData)
       let diskFileIdList = []
+      console.log(deleteId)
       // console.log(userData)
       if (deleteId.length !== 0) {
         api.disk.getFiles({
           sourceKey: 'bp_organization_certification',
           sourceCode: userData.organizationCertification ? userData.organizationCertification.attachmentCode : guid}).then(
             v => {
+              console.log(v)
               v.forEach(item => {
                 deleteId.forEach( i => {
                   if (i !== item.id) {
@@ -445,9 +447,12 @@ class ChangeModal extends Component {
                 })
               })
               console.log(unique(diskFileIdList))
-              const newData = { diskFileIdList:unique(diskFileIdList), sourceCode: newGuid,
-                sourceKey: "bp_organization_certification"};
-              api.disk.copyFiles(newData).catch(err=> {
+              const newData = { 
+                diskFileIdList:unique(diskFileIdList), 
+                sourceCode: newGuid,
+                sourceKey: "bp_organization_certification"
+              };
+                api.disk.copyFiles(newData).catch(err=> {
                   if (err) return
                 })
         })
@@ -481,6 +486,7 @@ class ChangeModal extends Component {
             attachmentCode: newGuid,
           },
         }
+        console.log(data)
         api.bp.updateBPOrgCertification(data).then(() => {
           this.setState({ submitNext: 2 })
           this.props.getData()
@@ -930,6 +936,7 @@ class ChangeModal extends Component {
         userPersonData,
         gtype,
         guid,
+        deleteId,
       } = this.state;
       const fileList = pic.map(e => ({
         old: true,
@@ -955,11 +962,11 @@ class ChangeModal extends Component {
           <div className="ant-upload-text">点击上传</div>
         </div>
       );
-        // const newGuid = userData.organizationCertification ?
-        // userData.organizationCertification.attachmentCode : guid
+        const newGuid = deleteId.length === 0 ?  (userData.organizationCertification ?
+        userData.organizationCertification.attachmentCode : guid) : guid;
         const uploadUrl = api.disk.uploadMoreFiles(
           'bp_organization_certification',
-          guid,
+          newGuid
           );
       const uploadModal =
         <Upload
