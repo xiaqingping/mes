@@ -1,7 +1,7 @@
 /**
  * 个人信贷数据
  */
-import { Card, Divider, List, Empty, Modal, Button } from 'antd';
+import { Card, Divider, List, Empty } from 'antd';
 import React from 'react';
 import { connect } from 'dva';
 import moment from 'moment';
@@ -96,16 +96,7 @@ class PICredit extends React.Component {
       creditAdjustType: type,
       creditAdjustItem: item,
       bpId: basic.id,
-      creditAdjustFooter: true,
     });
-  };
-
-  // 提交额度申请
-  handleOk = () => {
-    this.setState({
-      creditAdjustFooter: false,
-    });
-    this.CreditAdjustView.submit();
   };
 
   // 关闭调整额度界面
@@ -150,24 +141,10 @@ class PICredit extends React.Component {
 
   render() {
     const { piCertificationList } = this.props;
-    const {
-      creditAdjustItem,
-      creditAdjustType,
-      bpId,
-      creditAdjustFooter,
-      creditAdjustVisible,
-    } = this.state;
+    const { creditAdjustVisible, creditAdjustItem, creditAdjustType, bpId } = this.state;
 
     // 未认证的开票方，不可以申请信用额度
     const list = piCertificationList.filter(e => e.status === 2);
-    let footer = null;
-    if (creditAdjustFooter) {
-      footer = (
-        <Button type="primary" onClick={this.handleOk}>
-          提交
-        </Button>
-      );
-    }
 
     return (
       <Card
@@ -187,25 +164,17 @@ class PICredit extends React.Component {
           dataSource={list}
           renderItem={this.renderListItem}
         />
-        <Modal
-          title={creditAdjustType === 1 ? '固定额度调整' : '临时额度调整'}
-          width={300}
-          visible={creditAdjustVisible}
-          onOk={this.handleOk}
-          onCancel={this.handleCancel}
-          footer={footer}
-        >
-          {creditAdjustVisible ? (
-            <CreditAdjust
-              destroyOnClose
-              data={creditAdjustItem}
-              type={creditAdjustType}
-              bpId={bpId}
-              // eslint-disable-next-line no-return-assign
-              ref={ref => (this.CreditAdjustView = ref)}
-            />
-          ) : null}
-        </Modal>
+        {creditAdjustVisible ? (
+          <CreditAdjust
+            visible={creditAdjustVisible}
+            onCancel={this.handleCancel}
+            data={creditAdjustItem}
+            type={creditAdjustType}
+            bpId={bpId}
+            // eslint-disable-next-line no-return-assign
+            ref={ref => (this.CreditAdjustView = ref)}
+          />
+        ) : null}
       </Card>
     );
   }

@@ -197,8 +197,7 @@ class OrgCertification extends Component {
                 <FormItem
                   label={formatMessage({ id: 'bp.maintain_details.verification_data.status' })}
                 >
-                  <Badge status="default" />
-                  未认证
+                  <Badge status="default" text="未认证" />
                 </FormItem>
               </Col>
               <Col span={8}>

@@ -1,12 +1,12 @@
 /**
  * PI认证
  */
-import { Button, Card, Icon, List, Typography, Divider, Badge, Modal, Upload } from 'antd';
+import { Button, Card, Icon, List, Typography, Divider, Badge, Upload } from 'antd';
 import React from 'react';
 import { connect } from 'dva';
 import { FormattedMessage, formatMessage } from 'umi-plugin-react/locale';
 
-import AddPICertification from './PICertificationAddModal';
+import PICertificationAddModal from './PICertificationAddModal';
 import api from '@/api';
 import diskAPI from '@/api/disk';
 
@@ -215,12 +215,6 @@ class PersonCertification extends React.Component {
     const { addModalVisible, updateItemData } = this.state;
     const nullData = {};
 
-    const parentMethods = {
-      handleAdd: this.handleAdd,
-      handleModalVisible: this.handleModalVisible,
-      data: updateItemData,
-    };
-
     return (
       <Card
         title={formatMessage({ id: 'bp.maintain_details.PI_verification' })}
@@ -239,20 +233,17 @@ class PersonCertification extends React.Component {
           dataSource={[...piCertificationList, nullData]}
           renderItem={this.renderListItem}
         />
-        <Modal
-          destroyOnClose
-          title={formatMessage({ id: 'bp.maintain_details.PI_verification' })}
-          visible={addModalVisible}
-          onOk={this.okHandle}
-          onCancel={() => this.handleModalVisible(false)}
-        >
-          <AddPICertification
-            {...parentMethods}
+        {addModalVisible ? (
+          <PICertificationAddModal
+            visible={addModalVisible}
+            onOk={this.okHandle}
+            onCancel={() => this.handleModalVisible(false)}
+            data={updateItemData}
             wrappedComponentRef={ref => {
               this.PICertificationAddModal = ref;
             }}
           />
-        </Modal>
+        ) : null}
       </Card>
     );
   }
