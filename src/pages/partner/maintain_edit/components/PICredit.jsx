@@ -4,6 +4,7 @@
 import { Card, Divider, List, Empty, Modal, Button } from 'antd';
 import React from 'react';
 import { connect } from 'dva';
+import moment from 'moment';
 import { FormattedMessage, formatMessage } from 'umi-plugin-react/locale';
 import CreditAdjust from './CreditAdjust';
 
@@ -33,6 +34,17 @@ class PICredit extends React.Component {
     let data = null;
     if (credit.length > 0) [data] = credit;
 
+    // 临时额度到期日期
+    let tempCreditLimitExpirationDate;
+    if (data.tempCreditLimitExpirationDate) {
+      tempCreditLimitExpirationDate = moment(data.tempCreditLimitExpirationDate).fromNow();
+    }
+    // 固定额度调整日期
+    let lastEvaluationDate;
+    if (data.lastEvaluationDate) {
+      lastEvaluationDate = moment(data.lastEvaluationDate).fromNow();
+    }
+
     return (
       <List.Item key={item.billToPartyId}>
         <Card
@@ -53,16 +65,18 @@ class PICredit extends React.Component {
           {data ? (
             <>
               <span>
-                {data.credit} {data.currencyCode} 1天后调整
+                {data.creditLimit ? `${data.creditLimit} ${data.currencyCode} ` : null}
+                {lastEvaluationDate ? `${lastEvaluationDate}调整` : null}
               </span>
               <br />
               <span>
-                {data.tempCreditLimit} {data.currencyCode} 25天后到期
+                {data.tempCreditLimit ? `${data.tempCreditLimit} ${data.currencyCode} ` : null}
+                {tempCreditLimitExpirationDate ? `${tempCreditLimitExpirationDate}到期` : null}
               </span>
               <br />
-              <span>开票后{data.billingCycle}天到期</span>
+              <span>{data.creditPeriod ? `开票后${data.creditPeriod}天到期` : null}</span>
               <br />
-              <span>每月{data.billingDay}日开票</span>
+              <span>{data.billingDay ? `每月${data.billingDay}日开票` : null}</span>
             </>
           ) : (
             <Empty />
@@ -96,6 +110,38 @@ class PICredit extends React.Component {
 
   // 关闭调整额度界面
   handleCancel = () => {
+    const { details } = this.props;
+    const { creditList } = details;
+
+    if (this.CreditAdjustView.state.status === 2) {
+      const { creditData } = this.CreditAdjustView.state;
+      const target = this.CreditAdjustView.props.data.billToPartyId;
+
+      const newCreditList = creditList.map(e => {
+        if (e.billToPartyId === target) {
+          const newCredit = {
+            ...e,
+            ...creditData,
+          };
+
+          // 固定额度设置最后调整时间
+          if (this.CreditAdjustView.props.type === 1) {
+            newCredit.lastEvaluationDate = new Date();
+          }
+          return newCredit;
+        }
+        return e;
+      });
+
+      const newDetails = { ...details, creditList: newCreditList };
+      this.props.dispatch({
+        type: 'bpEdit/setState',
+        payload: {
+          type: 'details',
+          data: newDetails,
+        },
+      });
+    }
     this.setState({
       creditAdjustVisible: false,
       creditAdjustItem: {},
@@ -111,6 +157,8 @@ class PICredit extends React.Component {
       creditAdjustFooter,
       creditAdjustVisible,
     } = this.state;
+
+    // 未认证的开票方，不可以申请信用额度
     const list = piCertificationList.filter(e => e.status === 2);
     let footer = null;
     if (creditAdjustFooter) {
@@ -140,7 +188,7 @@ class PICredit extends React.Component {
           renderItem={this.renderListItem}
         />
         <Modal
-          title="固定额度调整"
+          title={creditAdjustType === 1 ? '固定额度调整' : '临时额度调整'}
           width={300}
           visible={creditAdjustVisible}
           onOk={this.handleOk}
