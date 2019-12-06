@@ -72,7 +72,7 @@ class BasicInfo extends Component {
                 {details.organizationCertification ?
                 <>
                   <ul style={{ padding: '0' }}>
-                    {details.organizationCertification.attachmentList.map((item, index) => (
+                    {/* {details.organizationCertification.attachmentList.map((item, index) => (
                         // eslint-disable-next-line react/no-array-index-key
                         <li key={index} style={{
                           width: '100px',
@@ -84,7 +84,7 @@ class BasicInfo extends Component {
                           float: 'left',
                           marginRight: '10px' }}>{item.type === 'image' ?
                           <img src={item.code} alt="" width="90" height="90"/> : ''}</li>
-                      ))}
+                      ))} */}
                   </ul>
                 </>
                 : ''

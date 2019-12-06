@@ -141,6 +141,7 @@ class BasicInfo extends Component {
           </DescriptionsItem>
           <DescriptionsItem span={2} label="特性行业类别">
             {/* {basic.industryCode}&nbsp;&nbsp;&nbsp; */}
+            {/* {console.log(industry)} */}
             {industry.filter(item => item.code === basic.industryCode)[0].name}&nbsp;&nbsp;
             <a>变更</a>
           </DescriptionsItem>
