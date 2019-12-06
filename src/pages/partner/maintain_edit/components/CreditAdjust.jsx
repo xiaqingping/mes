@@ -97,9 +97,11 @@ class CreditAdjust extends React.Component {
   submit = () => {
     const { type, data } = this.props;
     this.setState({ status: 2, loading: true });
+    // 固定额度
     if (type === 1) {
       this.creditLimitAdjustment(data);
     }
+    // 临时额度
     if (type === 2) {
       this.tempCreditlimitAdjustment(data);
     }

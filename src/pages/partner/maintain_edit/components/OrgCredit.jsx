@@ -4,6 +4,7 @@
 import { Card, Descriptions, Divider, Empty, Modal, Button, message } from 'antd';
 import React, { Component } from 'react';
 import { connect } from 'dva';
+import moment from 'moment';
 import { formatMessage, FormattedMessage } from 'umi-plugin-react/locale';
 import CreditAdjust from './CreditAdjust';
 
@@ -24,30 +25,44 @@ class OrgCredit extends Component {
     };
   }
 
-  renderCredit = data => (
-    <Descriptions className="s-descriptions" layout="vertical" column={4}>
-      <DescriptionsItem
-        label={formatMessage({ id: 'bp.maintain_details.credit_management.credit' })}
-      >
-        {data.credit} {data.currencyCode} 1天后调整
-      </DescriptionsItem>
-      <DescriptionsItem
-        label={formatMessage({ id: 'bp.maintain_details.credit_management.temporary_credit' })}
-      >
-        {data.tempCreditLimit} {data.currencyCode} 25天后到期
-      </DescriptionsItem>
-      <DescriptionsItem
-        label={formatMessage({ id: 'bp.maintain_details.credit_management.payment_period' })}
-      >
-        开票后{data.billingCycle}天到期
-      </DescriptionsItem>
-      <DescriptionsItem
-        label={formatMessage({ id: 'bp.maintain_details.credit_management.invoiced_period' })}
-      >
-        每月{data.billingDay}日开票
-      </DescriptionsItem>
-    </Descriptions>
-  );
+  renderCredit = data => {
+    // 临时额度到期日期
+    let tempCreditLimitExpirationDate;
+    if (data.tempCreditLimitExpirationDate) {
+      tempCreditLimitExpirationDate = moment(data.tempCreditLimitExpirationDate).fromNow();
+    }
+    // 固定额度调整日期
+    let lastEvaluationDate;
+    if (data.lastEvaluationDate) {
+      lastEvaluationDate = moment(data.lastEvaluationDate).fromNow();
+    }
+    return (
+      <Descriptions className="s-descriptions" layout="vertical" column={4}>
+        <DescriptionsItem
+          label={formatMessage({ id: 'bp.maintain_details.credit_management.credit' })}
+        >
+          {data.creditLimit ? `${data.creditLimit} ${data.currencyCode} ` : null}
+          {lastEvaluationDate ? `${lastEvaluationDate}调整` : null}
+        </DescriptionsItem>
+        <DescriptionsItem
+          label={formatMessage({ id: 'bp.maintain_details.credit_management.temporary_credit' })}
+        >
+          {data.tempCreditLimit ? `${data.tempCreditLimit} ${data.currencyCode} ` : null}
+          {tempCreditLimitExpirationDate ? `${tempCreditLimitExpirationDate}到期` : null}
+        </DescriptionsItem>
+        <DescriptionsItem
+          label={formatMessage({ id: 'bp.maintain_details.credit_management.payment_period' })}
+        >
+          {data.creditPeriod ? `开票后${data.creditPeriod}天到期` : null}
+        </DescriptionsItem>
+        <DescriptionsItem
+          label={formatMessage({ id: 'bp.maintain_details.credit_management.invoiced_period' })}
+        >
+          {data.billingDay ? `每月${data.billingDay}日开票` : null}
+        </DescriptionsItem>
+      </Descriptions>
+    );
+  };
 
   // 显示调整额度界面
   showCreditAdjustModal = (item, type) => {
@@ -83,38 +98,20 @@ class OrgCredit extends Component {
 
     if (this.CreditAdjustView.state.status === 2) {
       const { creditData } = this.CreditAdjustView.state;
-      let oldCredit = {
-        billingCycle: 0,
-        billingDay: 0,
-        credit: 0,
-        creditPeriod: 0,
-        currencyCode: 'CNY',
-        tempCreditLimit: 0,
-      };
+      let oldCredit = {};
       if (details.creditList && details.creditList.length > 0) {
         [oldCredit] = details.creditList;
       }
 
-      // billToPartyCode: null
-      // billToPartyId: null
-      // billToPartyName: null
-      // billingCycle: 30
-      // billingDay: 10
-      // credit: 21000
-      // creditPeriod: 1
-      // currencyCode: "CNY"
-      // lastEvaluationDate: "2019-12-05T14:32:35"
-      // tempCreditLimit: 21000
-      // tempCreditLimitExpirationDate: null
-
       const newCredit = {
         ...oldCredit,
-        credit: creditData.creditLimit,
-        creditPeriod: creditData.creditPeriod,
-        currencyCode: creditData.currencyCode,
-        billingCycle: creditData.billingCycle,
-        billingDay: creditData.billingDay,
+        ...creditData,
       };
+
+      // 固定额度设置最后调整时间
+      if (this.CreditAdjustView.props.type === 1) {
+        newCredit.lastEvaluationDate = new Date();
+      }
 
       const newDetails = { ...details, creditList: [newCredit] };
       this.props.dispatch({
@@ -172,7 +169,7 @@ class OrgCredit extends Component {
       >
         {hasCredit ? this.renderCredit(data) : <Empty />}
         <Modal
-          title="固定额度调整"
+          title={creditAdjustType === 1 ? '固定额度调整' : '临时额度调整'}
           width={300}
           visible={creditAdjustVisible}
           onOk={this.handleOk}
