@@ -148,7 +148,7 @@ class PICertificationAddModal extends React.Component {
           </FormItem>
           <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="认证图片">
             {form.getFieldDecorator('attachmentList', {
-              // initialValue: fileList,
+              initialValue: fileList,
               rules: [{ required: true }],
               valuePropName: 'fileList',
               getValueFromEvent: this.normFile,
