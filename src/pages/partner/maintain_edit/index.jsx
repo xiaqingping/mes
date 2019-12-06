@@ -1,10 +1,11 @@
 /**
  * 业务伙伴编辑
  */
-import { Form, Button, Spin, Badge, Modal, message, Empty } from 'antd';
+import { Form, Button, Spin, Badge, Modal, message, Empty, Icon } from 'antd';
 import React, { Component } from 'react';
 
 import router from 'umi/router';
+import Link from 'umi/link';
 import { FormattedMessage } from 'umi/locale';
 import { connect } from 'dva';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
@@ -15,7 +16,7 @@ import SalesArea from './components/SalesArea';
 import OrgCredit from './components/OrgCredit';
 import OrgCertification from './components/OrgCertification';
 import OrgCertificationRead from './components/OrgCertificationRead';
-import PersonCredit from './components/PersonCredit';
+import PICredit from './components/PICredit';
 import PICertification from './components/PICertification';
 import Address from './components/Address';
 import PurchasingOrg from './components/PurchasingOrg';
@@ -634,7 +635,7 @@ class CustomerEdit extends Component {
         ) : null}
         {type === 1 ? (
           <>
-            {editType === 'update' ? <PersonCredit /> : null}
+            {editType === 'update' ? <PICredit /> : null}
             <PICertification />
           </>
         ) : null}
@@ -735,13 +736,29 @@ class CustomerEdit extends Component {
 
   render() {
     const { width, tabActiveKey, editType } = this.state;
-    const { pageLoading } = this.props;
+    const { pageLoading, details } = this.props;
     const customerTab = this.renderCustomerTab();
     const vendorTab = this.renderVendorTab();
 
+    let title = '新增';
+    if (editType === 'update') {
+      title = '修改';
+      const { basic } = details;
+      if (basic && basic.id && basic.code) {
+        title = (
+          <>
+            修改 {basic.code}
+            <Link to={`/bp/maintain/details/${basic.id}`}>
+              <Icon style={{ marginLeft: 15, color: '#666' }} type="file-search" />
+            </Link>
+          </>
+        );
+      }
+    }
+
     return (
       <PageHeaderWrapper
-        title="新增业务伙伴"
+        title={title}
         tabActiveKey={tabActiveKey}
         onTabChange={this.onTabChange}
         style={{ paddingBottom: 0 }}

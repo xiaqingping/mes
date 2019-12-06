@@ -1,18 +1,20 @@
 /**
  * PI认证
  */
-import { Button, Card, Icon, List, Typography, Divider, Badge, Modal, Upload } from 'antd';
+import { Button, Card, Icon, List, Typography, Divider, Badge, Upload } from 'antd';
 import React from 'react';
 import { connect } from 'dva';
 import { FormattedMessage, formatMessage } from 'umi-plugin-react/locale';
 
-import AddPICertification from './PICertificationAddModal';
+import PICertificationAddModal from './PICertificationAddModal';
+import api from '@/api';
 import diskAPI from '@/api/disk';
 
 const { Paragraph } = Typography;
 
 @connect(({ bpEdit, user }) => ({
   details: bpEdit.details || {},
+  editType: bpEdit.editType,
   piCertificationList: (bpEdit.details && bpEdit.details.piCertificationList) || [],
   authorization: user.currentUser.authorization,
 }))
@@ -23,13 +25,14 @@ class PersonCertification extends React.Component {
       // 新增PI认证模态框显示状态
       addModalVisible: false,
       // 自增ID
-      id: 0,
+      // id: 0,
       // 修改PI认证时传的数据
       updateItemData: {},
     };
   }
 
   renderListItem = item => {
+    const { editType, details } = this.props;
     let fileList = [];
     if (item && item.attachmentList) {
       fileList = item.attachmentList.map(e => ({
@@ -40,21 +43,27 @@ class PersonCertification extends React.Component {
       }));
     }
 
-    if (item && item.id) {
+    if (item && item.billToPartyId) {
       return (
-        <List.Item key={item.id}>
+        <List.Item key={item.billToPartyId}>
           <Card
             hoverable
             title={item.billToPartyName}
             extra={
               <>
-                <a onClick={() => this.updateItem(item)}>
-                  <FormattedMessage id="bp.maintain_details.change" />
-                </a>
-                <Divider type="vertical" />
-                <a onClick={() => this.removeItem(item.id)}>
-                  <FormattedMessage id="action.delete" />
-                </a>
+                {editType === 'add' ? (
+                  <>
+                    <a onClick={() => this.updateItem(item)}>
+                      <FormattedMessage id="bp.maintain_details.change" />
+                    </a>
+                    <Divider type="vertical" />
+                  </>
+                ) : null}
+                {item.status !== 1 ? (
+                  <a onClick={() => this.removeItem(item)}>
+                    <FormattedMessage id="action.delete" />
+                  </a>
+                ) : null}
               </>
             }
           >
@@ -79,6 +88,9 @@ class PersonCertification extends React.Component {
       );
     }
 
+    // BP审核中，editType=update时，不可提交新认证
+    if (editType === 'update' && details.basic.certificationStatus === 2) return <></>;
+
     return (
       <List.Item>
         <Button type="dashed" style={{ width: '100%', height: 274 }} onClick={this.addNewItem}>
@@ -96,8 +108,22 @@ class PersonCertification extends React.Component {
   };
 
   // 删除项
-  removeItem = id => {
-    const { details, piCertificationList } = this.props;
+  // editType=add 直接删除
+  // editType=update 接口单个删除
+  removeItem = async item => {
+    const { id, billToPartyId } = item;
+    const { details, piCertificationList, editType } = this.props;
+    let flag = true;
+
+    if (editType === 'update') {
+      try {
+        await api.bp.cancelBPPiCertification({ id: details.basic.id, billToPartyId });
+      } catch (error) {
+        flag = false;
+      }
+    }
+
+    if (!flag) return;
 
     const data = piCertificationList.filter(e => e.id !== id);
 
@@ -136,30 +162,41 @@ class PersonCertification extends React.Component {
     });
   };
 
-  handleAdd = data => {
-    const { details, piCertificationList } = this.props;
-    const { id } = this.state;
-
+  handleAdd = async data => {
     this.handleModalVisible();
-    const newId = id - 1;
-
-    this.setState({ id: newId });
+    const { details, piCertificationList, editType } = this.props;
 
     const obj = {
-      id: newId,
       uuid: data.uuid,
       billToPartyId: data.billToPartyId,
       billToPartyCode: data.billToPartyCode,
       billToPartyName: data.billToPartyName,
-      status: 1,
+      status: 3,
       notes: data.notes,
       attachmentList: data.attachmentList,
     };
+    if (editType === 'update') {
+      try {
+        await api.bp.addBPPiCertification(details.basic.id, {
+          attachmentCode: data.uuid,
+          billToPartyId: data.billToPartyId,
+          name: details.basic.name,
+          notes: data.notes,
+        });
+        obj.status = 1;
+      } catch (error) {
+        return;
+      }
+    }
 
-    let newdata = [...piCertificationList, obj];
-    if (data.id) {
+    const has = piCertificationList.some(e => e.billToPartyId === obj.billToPartyId);
+    let newdata = [];
+
+    if (!has) {
+      newdata = [...piCertificationList, obj];
+    } else {
       newdata = piCertificationList.map(e => {
-        if (e.id === data.id) return data;
+        if (e.billToPartyId === data.billToPartyId) return data;
         return e;
       });
     }
@@ -177,12 +214,6 @@ class PersonCertification extends React.Component {
     const { piCertificationList } = this.props;
     const { addModalVisible, updateItemData } = this.state;
     const nullData = {};
-
-    const parentMethods = {
-      handleAdd: this.handleAdd,
-      handleModalVisible: this.handleModalVisible,
-      data: updateItemData,
-    };
 
     return (
       <Card
@@ -202,20 +233,17 @@ class PersonCertification extends React.Component {
           dataSource={[...piCertificationList, nullData]}
           renderItem={this.renderListItem}
         />
-        <Modal
-          destroyOnClose
-          title={formatMessage({ id: 'bp.maintain_details.PI_verification' })}
-          visible={addModalVisible}
-          onOk={this.okHandle}
-          onCancel={() => this.handleModalVisible(false)}
-        >
-          <AddPICertification
-            {...parentMethods}
+        {addModalVisible ? (
+          <PICertificationAddModal
+            visible={addModalVisible}
+            onOk={this.okHandle}
+            onCancel={() => this.handleModalVisible(false)}
+            data={updateItemData}
             wrappedComponentRef={ref => {
               this.PICertificationAddModal = ref;
             }}
           />
-        </Modal>
+        ) : null}
       </Card>
     );
   }

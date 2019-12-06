@@ -197,8 +197,7 @@ class OrgCertification extends Component {
                 <FormItem
                   label={formatMessage({ id: 'bp.maintain_details.verification_data.status' })}
                 >
-                  <Badge status="default" />
-                  未认证
+                  <Badge status="default" text="未认证" />
                 </FormItem>
               </Col>
               <Col span={8}>
@@ -352,6 +351,7 @@ class OrgCertification extends Component {
                 <FormItem label={sapCountryCode === 'US' ? '免税认证号' : '增值税登记号'}>
                   {getFieldDecorator('taxNo', {
                     initialValue: orgData.taxNo,
+                    rules: [{ validator: this.checkTaxNo }],
                   })(<Input onChange={e => this.valueChange('taxNo', e.target.value)} />)}
                 </FormItem>
               </Col>

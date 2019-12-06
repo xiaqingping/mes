@@ -1,22 +1,24 @@
 /**
  * 信用额度调整
  */
-import { Spin } from 'antd';
+import { Spin, Modal, Button } from 'antd';
 import React from 'react';
 // import { FormattedMessage, formatMessage } from 'umi-plugin-react/locale';
 import bpAPI from '@/api/bp';
 
-class PersonCredit extends React.Component {
+class CreditAdjust extends React.Component {
   constructor(props) {
     super(props);
     const { data = {} } = props;
-    // 1 人员 2 组织
     const piType = data.billToPartyId ? 1 : 2;
 
     this.state = {
       loading: false,
+      // 1 人员 2 组织
       piType,
-      status: 1, // 1 评估界面 2 申请界面
+      // 1 评估界面 2 申请界面
+      status: 1,
+      // 申请后的信贷数据
       creditData: {},
     };
   }
@@ -94,12 +96,18 @@ class PersonCredit extends React.Component {
     });
   };
 
+  // 提交额度申请
   submit = () => {
     const { type, data } = this.props;
-    this.setState({ status: 2, loading: true });
+    this.setState({
+      status: 2,
+      loading: true,
+    });
+    // 固定额度
     if (type === 1) {
       this.creditLimitAdjustment(data);
     }
+    // 临时额度
     if (type === 2) {
       this.tempCreditlimitAdjustment(data);
     }
@@ -121,7 +129,7 @@ class PersonCredit extends React.Component {
             {creditData.currencyCode}
           </p>
           <p>每月{creditData.billingDay}日开票</p>
-          <p>开票后{creditData.billingCycle}天到期</p>
+          <p>开票后{creditData.creditPeriod}天到期</p>
         </div>
       );
     }
@@ -173,13 +181,39 @@ class PersonCredit extends React.Component {
     return null;
   };
 
-  render() {
+  renderContent = () => {
     const { status, loading } = this.state;
     if (loading) return <Spin />;
     if (status === 1) return this.renderAssessment();
     if (status === 2) return this.renderAdjustment();
     return null;
+  };
+
+  render() {
+    const { creditAdjustType, visible, onCancel } = this.props;
+    const { status } = this.state;
+    let footer = null;
+    if (status === 1) {
+      footer = (
+        <Button type="primary" onClick={this.submit}>
+          提交
+        </Button>
+      );
+    }
+
+    return (
+      <Modal
+        title={creditAdjustType === 1 ? '固定额度调整' : '临时额度调整'}
+        width={300}
+        visible={visible}
+        onOk={this.handleOk}
+        onCancel={onCancel}
+        footer={footer}
+      >
+        {this.renderContent()}
+      </Modal>
+    );
   }
 }
 
-export default PersonCredit;
+export default CreditAdjust;

@@ -28,7 +28,6 @@ const plugins = [
         webpackChunkName: true,
         level: 3,
       },
-      // dynamicImport: true,
       pwa: pwa
         ? {
             workboxPluginMode: 'InjectManifest',
@@ -68,11 +67,6 @@ const plugins = [
 
 export default {
   plugins,
-  block: {
-    // 国内用户可以使用码云
-    // defaultGitUrl: 'https://gitee.com/ant-design/pro-blocks',
-    defaultGitUrl: 'https://github.com/ant-design/pro-blocks',
-  },
   hash: true,
   targets: {
     ie: 11,
@@ -121,11 +115,11 @@ export default {
     basePath: '/',
   },
   chainWebpack: webpackPlugin,
-  proxy: {
-    '/basic/api/': {
-      target: 'http://180.167.32.168:8001/',
-      changeOrigin: true,
-      pathRewrite: { '^/basic/api/': '' },
-    },
-  },
+  // proxy: {
+  //   '/basic/api/': {
+  //     target: 'http://180.167.32.168:8001/',
+  //     changeOrigin: true,
+  //     pathRewrite: { '^/basic/api/': '' },
+  //   },
+  // },
 };

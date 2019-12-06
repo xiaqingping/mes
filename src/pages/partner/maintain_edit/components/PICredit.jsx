@@ -1,9 +1,10 @@
 /**
  * 个人信贷数据
  */
-import { Card, Divider, List, Empty, Modal, Button } from 'antd';
+import { Card, Divider, List, Empty } from 'antd';
 import React from 'react';
 import { connect } from 'dva';
+import moment from 'moment';
 import { FormattedMessage, formatMessage } from 'umi-plugin-react/locale';
 import CreditAdjust from './CreditAdjust';
 
@@ -16,7 +17,7 @@ import CreditAdjust from './CreditAdjust';
     piCertificationList,
   };
 })
-class PersonCredit extends React.Component {
+class PICredit extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -32,6 +33,17 @@ class PersonCredit extends React.Component {
     const credit = creditList.filter(e => e.billToPartyId === item.billToPartyId);
     let data = null;
     if (credit.length > 0) [data] = credit;
+
+    // 临时额度到期日期
+    let tempCreditLimitExpirationDate;
+    if (data.tempCreditLimitExpirationDate) {
+      tempCreditLimitExpirationDate = moment(data.tempCreditLimitExpirationDate).fromNow();
+    }
+    // 固定额度调整日期
+    let lastEvaluationDate;
+    if (data.lastEvaluationDate) {
+      lastEvaluationDate = moment(data.lastEvaluationDate).fromNow();
+    }
 
     return (
       <List.Item key={item.billToPartyId}>
@@ -53,16 +65,18 @@ class PersonCredit extends React.Component {
           {data ? (
             <>
               <span>
-                {data.credit} {data.currencyCode} 1天后调整
+                {data.creditLimit ? `${data.creditLimit} ${data.currencyCode} ` : null}
+                {lastEvaluationDate ? `${lastEvaluationDate}调整` : null}
               </span>
               <br />
               <span>
-                {data.tempCreditLimit} {data.currencyCode} 25天后到期
+                {data.tempCreditLimit ? `${data.tempCreditLimit} ${data.currencyCode} ` : null}
+                {tempCreditLimitExpirationDate ? `${tempCreditLimitExpirationDate}到期` : null}
               </span>
               <br />
-              <span>开票后{data.billingCycle}天到期</span>
+              <span>{data.creditPeriod ? `开票后${data.creditPeriod}天到期` : null}</span>
               <br />
-              <span>每月{data.billingDay}日开票</span>
+              <span>{data.billingDay ? `每月${data.billingDay}日开票` : null}</span>
             </>
           ) : (
             <Empty />
@@ -82,20 +96,43 @@ class PersonCredit extends React.Component {
       creditAdjustType: type,
       creditAdjustItem: item,
       bpId: basic.id,
-      creditAdjustFooter: true,
     });
-  };
-
-  // 提交额度申请
-  handleOk = () => {
-    this.setState({
-      creditAdjustFooter: false,
-    });
-    this.CreditAdjustView.submit();
   };
 
   // 关闭调整额度界面
   handleCancel = () => {
+    const { details } = this.props;
+    const { creditList } = details;
+
+    if (this.CreditAdjustView.state.status === 2) {
+      const { creditData } = this.CreditAdjustView.state;
+      const target = this.CreditAdjustView.props.data.billToPartyId;
+
+      const newCreditList = creditList.map(e => {
+        if (e.billToPartyId === target) {
+          const newCredit = {
+            ...e,
+            ...creditData,
+          };
+
+          // 固定额度设置最后调整时间
+          if (this.CreditAdjustView.props.type === 1) {
+            newCredit.lastEvaluationDate = new Date();
+          }
+          return newCredit;
+        }
+        return e;
+      });
+
+      const newDetails = { ...details, creditList: newCreditList };
+      this.props.dispatch({
+        type: 'bpEdit/setState',
+        payload: {
+          type: 'details',
+          data: newDetails,
+        },
+      });
+    }
     this.setState({
       creditAdjustVisible: false,
       creditAdjustItem: {},
@@ -104,22 +141,10 @@ class PersonCredit extends React.Component {
 
   render() {
     const { piCertificationList } = this.props;
-    const {
-      creditAdjustItem,
-      creditAdjustType,
-      bpId,
-      creditAdjustFooter,
-      creditAdjustVisible,
-    } = this.state;
+    const { creditAdjustVisible, creditAdjustItem, creditAdjustType, bpId } = this.state;
+
+    // 未认证的开票方，不可以申请信用额度
     const list = piCertificationList.filter(e => e.status === 2);
-    let footer = null;
-    if (creditAdjustFooter) {
-      footer = (
-        <Button type="primary" onClick={this.handleOk}>
-          提交
-        </Button>
-      );
-    }
 
     return (
       <Card
@@ -139,28 +164,20 @@ class PersonCredit extends React.Component {
           dataSource={list}
           renderItem={this.renderListItem}
         />
-        <Modal
-          title="固定额度调整"
-          width={300}
-          visible={creditAdjustVisible}
-          onOk={this.handleOk}
-          onCancel={this.handleCancel}
-          footer={footer}
-        >
-          {creditAdjustVisible ? (
-            <CreditAdjust
-              destroyOnClose
-              data={creditAdjustItem}
-              type={creditAdjustType}
-              bpId={bpId}
-              // eslint-disable-next-line no-return-assign
-              ref={ref => (this.CreditAdjustView = ref)}
-            />
-          ) : null}
-        </Modal>
+        {creditAdjustVisible ? (
+          <CreditAdjust
+            visible={creditAdjustVisible}
+            onCancel={this.handleCancel}
+            data={creditAdjustItem}
+            type={creditAdjustType}
+            bpId={bpId}
+            // eslint-disable-next-line no-return-assign
+            ref={ref => (this.CreditAdjustView = ref)}
+          />
+        ) : null}
       </Card>
     );
   }
 }
 
-export default PersonCredit;
+export default PICredit;

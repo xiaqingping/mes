@@ -1,9 +1,10 @@
 /**
  * PI认证 新增模态框
  */
-import { Form, Input, Upload, Icon, Select } from 'antd';
+import { Form, Input, Upload, Icon, Select, Modal } from 'antd';
 import React from 'react';
 import { connect } from 'dva';
+import { formatMessage } from 'umi-plugin-react/locale';
 import uniqBy from 'lodash/uniqBy';
 import diskAPI from '@/api/disk';
 import { requestErr } from '@/utils/request';
@@ -19,12 +20,24 @@ const { Option } = Select;
     const basic = details.basic || {};
     const customer = details.customer || {};
     const salesAreaList = customer.salesAreaList || [];
+    const piCertificationList = details.piCertificationList || [];
 
-    // 所有收票方合并去重，并过滤掉自己
+    // 所有收票方合并去重
     let billToPartyList = salesAreaList.map(e => e.billToPartyList);
     // eslint-disable-next-line prefer-spread
     billToPartyList = uniqBy([].concat.apply([], billToPartyList), 'id');
-    billToPartyList = billToPartyList.filter(e => e.id !== basic.id);
+    billToPartyList = billToPartyList.filter(e => {
+      // 过滤空数据
+      if (!e) return false;
+      // 过滤掉收票方是自己
+      if (e.id === basic.id) return false;
+      // 过滤掉售达方不是自己
+      if (e.soldToPartyId !== basic.id) return false;
+      // 新增认证时：过滤掉认证中已经存在的收票方
+      // 变更刚刚新增的数据时：不能过滤掉此数据的开票方（这里已经过滤掉了，需要在渲染列表时重新添加进去）
+      if (piCertificationList.some(e1 => e1.billToPartyId === e.id)) return false;
+      return true;
+    });
 
     return {
       details,
@@ -40,9 +53,17 @@ const { Option } = Select;
 class PICertificationAddModal extends React.Component {
   constructor(props) {
     super(props);
+    const { data: billToParty } = props;
+    const type = billToParty.billToPartyId ? 2 : 1;
+    const uuid = billToParty.uuid || guid();
     this.state = {
-      billToParty: props.data || {},
-      uuid: props.uuid || guid(),
+      // 1 新增 2 变更刚新增的数据
+      type,
+      // 回填的数据
+      billToParty,
+      uuid,
+      // 变更时删除的文件
+      deleteFileIdList: [],
     };
   }
 
@@ -78,7 +99,14 @@ class PICertificationAddModal extends React.Component {
     if (key === 'attachmentList') {
       const attachmentList = [];
       if (value.file.status === 'removed') {
-        diskAPI.deleteFiles(value.file.response[0]);
+        if (value.file.response) {
+          diskAPI.deleteFiles(value.file.response[0]);
+        } else {
+          const { deleteFileIdList } = this.state;
+          this.setState({
+            deleteFileIdList: [...deleteFileIdList, value.file.uid],
+          });
+        }
       }
       if (value.file.response) {
         value.fileList.forEach(e => {
@@ -105,10 +133,28 @@ class PICertificationAddModal extends React.Component {
     }
   };
 
+  // TODO: 批量删除 使用 async
+  onOk = () => {
+    const { onOk } = this.props;
+    const { deleteFileIdList } = this.state;
+    if (deleteFileIdList.length > 0) {
+      deleteFileIdList.forEach(e => diskAPI.deleteFiles(e));
+    }
+    onOk();
+  };
+
   render() {
-    const { form, authorization, billToPartyList } = this.props;
-    const { uuid, billToParty } = this.state;
+    const { visible, onCancel, form, authorization, billToPartyList } = this.props;
+    const { uuid, billToParty, type } = this.state;
     const uploadUrl = diskAPI.uploadMoreFiles('bp_pi_certification', uuid);
+
+    if (type === 2) {
+      billToPartyList.push({
+        id: billToParty.billToPartyId,
+        name: billToParty.billToPartyName,
+        code: billToParty.billToPartyCode,
+      });
+    }
 
     if (!billToParty.attachmentList) billToParty.attachmentList = [];
     const fileList = billToParty.attachmentList.map(e => {
@@ -124,7 +170,12 @@ class PICertificationAddModal extends React.Component {
     });
 
     return (
-      <>
+      <Modal
+        title={formatMessage({ id: 'bp.maintain_details.PI_verification' })}
+        visible={visible}
+        onOk={this.onOk}
+        onCancel={onCancel}
+      >
         <Form>
           <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="收票方">
             {form.getFieldDecorator('billToPartyId', {
@@ -168,7 +219,7 @@ class PICertificationAddModal extends React.Component {
             )}
           </FormItem>
         </Form>
-      </>
+      </Modal>
     );
   }
 }
