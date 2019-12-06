@@ -26,6 +26,7 @@ import api from '@/api';
 import debounce from 'lodash/debounce';
 import './index.less';
 import PersonCertificationAddModal from './PersonCertificationAddModal';
+import { guid } from '@/utils/utils';
 
 const { Paragraph } = Typography;
 const FormItem = Form.Item;
@@ -80,10 +81,13 @@ const formItemLayoutEng = {
   },
 };
 
-function getBase64(img, callback) {
-  const reader = new FileReader();
-  reader.addEventListener('load', () => callback(reader.result));
-  reader.readAsDataURL(img);
+function getBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = error => reject(error);
+  });
 }
 
 function beforeUpload(file) {
@@ -291,6 +295,7 @@ class ChangeModal extends Component {
         userPersonData: [],
         deletePiCertificationIdList: [],
         gtype: 0,
+        guid: guid()
       }
       this.fetchBank = debounce(this.fetchBank, 500);
     }
@@ -354,6 +359,7 @@ class ChangeModal extends Component {
                 sourceKey: 'bp_organization_certification',
                 sourceCode: [res.organizationCertification.attachmentCode].join(',') }).then(
                   v => {
+                    console.log(v)
                     this.setState({ pic: v })
               })
             }
@@ -416,7 +422,8 @@ class ChangeModal extends Component {
     // 组织提交
     handleOrganizationOk = e => {
       if (e) e.preventDefault();
-      const { address, area, userData: { basic }, recordMsg } = this.state;
+      const { address, area, userData: { basic }, recordMsg, userData } = this.state;
+      console.log(userData)
       this.props.form.validateFields((error, row) => {
         if (error) return;
         let data = {};
@@ -443,7 +450,7 @@ class ChangeModal extends Component {
             bankAccount: row.bankAccount,
             registeredAddress: row.regisAddress,
             notes: row.notes,
-            attachmentCode: row.attachmentCode,
+            attachmentCode: row.attachmentCode || userData.organizationCertification.attachmentCode,
           },
         }
         api.bp.updateBPOrgCertification(data).then(() => {
@@ -486,27 +493,39 @@ class ChangeModal extends Component {
       })
     }
 
-    /** 上传图片 */
+    /** 上传和删除图片 */
     handleChange = info => {
-      // const data = [];
-      const { newGuid } = this.state;
-      if (info.file.status === 'uploading') {
-        this.setState({ loading: true });
-        return;
-      }
-      if (info.file.status === 'done') {
-        // Get this url from response in real world.
-        getBase64(info.file.originFileObj, () =>
+      const { guid, userData, pic } = this.state;
+      let data = pic;
+      const newGuid = userData.organizationCertification ?
+      userData.organizationCertification.attachmentCode : guid
+      if (info.file.status === 'removed' && info.file.status !== 'error') {
+        api.disk.deleteFiles(info.file.uid).then(() => {
+          data = pic.filter( item => item.id !== info.file.uid)
           this.setState({
-            loading: false,
-          }),
-        );
-        if (info.file.response) {
+            pic: data
+          })
+        })
+        return
+      }
+      if (info.file.status !== 'error') {
+        console.log(info)
+          // Get this url from response in real world.
+          getBase64(info.file.originFileObj).then(res => {
+            data.push({
+              id: Math.random(),
+              name: Math.random(),
+              status: 'done',
+              url: res,
+            })
+            this.setState({
+              pic: data
+            })
+          });
           this.props.form.setFieldsValue({
             attachmentCode: newGuid,
           })
         }
-      }
     }
 
     /** person */
@@ -575,7 +594,6 @@ class ChangeModal extends Component {
       return groupNameShow ? this.groupNameShow() : this.groupNameInput();
     }
 
-    // eslint-disable-next-line consistent-return
     groupNameShow = () => {
       const { recordMsg } = this.state;
       if (recordMsg) {
@@ -626,7 +644,6 @@ class ChangeModal extends Component {
       return groupAdressShow ? this.groupAdressShow() : this.groupAdressInput();
     }
 
-    // eslint-disable-next-line consistent-return
     groupAdressShow = () => {
       const { recordMsg } = this.state;
       if (recordMsg) {
@@ -796,7 +813,6 @@ class ChangeModal extends Component {
               <div>
                 {item.pic.map((v, index) =>
                   <img
-                    // eslint-disable-next-line react/no-array-index-key
                     key={index}
                     style={{ width: 90,
                     height: 90,
@@ -841,13 +857,6 @@ class ChangeModal extends Component {
       });
     };
 
-    // 删除图片
-    removePic = e => {
-      if (e.response.length !== 0) {
-        api.disk.deleteFiles(e.response[0]).then()
-      }
-    }
-
     handleAdd = (data, uid) => {
       const { newDataList } = this.state;
       const picArr = [];
@@ -881,20 +890,20 @@ class ChangeModal extends Component {
         submitNext,
         specialInvoice,
         addModalVisible,
-        uploadUrl,
         bankFetching,
         bank,
         pic,
         newDataList,
         userPersonData,
         gtype,
+        guid,
       } = this.state;
-
+      console.log(pic)
       const fileList = pic.map(e => ({
         uid: e.id,
         name: e.name,
         status: 'done',
-        url: api.disk.downloadFiles(e.id, { view: true }),
+        url: e.sourceCode ?  api.disk.downloadFiles(e.id, { view: true }) : e.url,
       }));
 
       const { basic } = userData;
@@ -913,20 +922,25 @@ class ChangeModal extends Component {
           <div className="ant-upload-text">点击上传</div>
         </div>
       );
+        const newGuid = userData.organizationCertification ?
+        userData.organizationCertification.attachmentCode : guid
+        const uploadUrl = api.disk.uploadMoreFiles(
+          'bp_organization_certification',
+          newGuid,
+          );
       const uploadModal = <>
         <Upload
           name="files"
           multiple
           listType="picture-card"
           className="avatar-uploader"
-          showUploadList
           fileList={ fileList }
           action={uploadUrl}
           beforeUpload={beforeUpload}
           onChange={this.handleChange}
           headers={{ Authorization: this.props.authorization }}
           accept=".jpg"
-          onRemove={e => { this.removePic(e) }}
+          // onRemove={e => { this.removePic(e) }}
         >
           {uploadButton}
         </Upload>
@@ -1141,7 +1155,6 @@ class ChangeModal extends Component {
                   wrapperCol={{ span: 20 }}
                 >
                   {getFieldDecorator('attachmentCode', {
-                  rules: [{ required: true }],
                   valuePropName: 'fileList',
                   getValueFromEvent: this.normFile,
                 })(uploadModal)}
