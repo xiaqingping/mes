@@ -27,6 +27,8 @@ const { Option } = Select;
     // eslint-disable-next-line prefer-spread
     billToPartyList = uniqBy([].concat.apply([], billToPartyList), 'id');
     billToPartyList = billToPartyList.filter(e => {
+      // 过滤空数据
+      if (!e) return false;
       // 过滤掉收票方是自己
       if (e.id === basic.id) return false;
       // 过滤掉售达方不是自己
@@ -60,6 +62,8 @@ class PICertificationAddModal extends React.Component {
       // 回填的数据
       billToParty,
       uuid,
+      // 变更时删除的文件
+      deleteFileIdList: [],
     };
   }
 
@@ -94,15 +98,15 @@ class PICertificationAddModal extends React.Component {
     const { billToParty } = this.state;
     if (key === 'attachmentList') {
       const attachmentList = [];
-      // TODO: 变更刚刚新增的数据时，删除图片，没有提交怎么办？图片已经被删掉
       if (value.file.status === 'removed') {
-        let fileId;
         if (value.file.response) {
-          [fileId] = value.file.response;
+          diskAPI.deleteFiles(value.file.response[0]);
         } else {
-          fileId = value.file.uid;
+          const { deleteFileIdList } = this.state;
+          this.setState({
+            deleteFileIdList: [...deleteFileIdList, value.file.uid],
+          });
         }
-        diskAPI.deleteFiles(fileId);
       }
       if (value.file.response) {
         value.fileList.forEach(e => {
@@ -129,8 +133,18 @@ class PICertificationAddModal extends React.Component {
     }
   };
 
+  // TODO: 批量删除 使用 async
+  onOk = () => {
+    const { onOk } = this.props;
+    const { deleteFileIdList } = this.state;
+    if (deleteFileIdList.length > 0) {
+      deleteFileIdList.forEach(e => diskAPI.deleteFiles(e));
+    }
+    onOk();
+  };
+
   render() {
-    const { visible, onCancel, onOk, form, authorization, billToPartyList } = this.props;
+    const { visible, onCancel, form, authorization, billToPartyList } = this.props;
     const { uuid, billToParty, type } = this.state;
     const uploadUrl = diskAPI.uploadMoreFiles('bp_pi_certification', uuid);
 
@@ -159,7 +173,7 @@ class PICertificationAddModal extends React.Component {
       <Modal
         title={formatMessage({ id: 'bp.maintain_details.PI_verification' })}
         visible={visible}
-        onOk={onOk}
+        onOk={this.onOk}
         onCancel={onCancel}
       >
         <Form>
