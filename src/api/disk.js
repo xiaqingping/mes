@@ -35,8 +35,8 @@ export default {
     return request(`/zuul/api/disk/v1/files/${id}`, { method: 'DELETE' });
   },
   // 复制文件
-  copyFiles() {
-    return request('/zuul/api/disk/v1/files/copy', { method: 'POST' });
+  copyFiles(data) {
+    return request('/zuul/api/disk/v1/files/copy', { method: 'POST', data });
   },
   // 单个下载文件
   downloadFiles(id, params) {

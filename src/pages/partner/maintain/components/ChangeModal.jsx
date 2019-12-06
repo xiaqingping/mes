@@ -90,6 +90,11 @@ function getBase64(file) {
   });
 }
 
+// 数组去重
+function unique(arr){
+  return [...new Set(arr)];
+}
+
 function beforeUpload(file) {
   const isJpgOrPng = file.type === 'image/jpeg';
   if (!isJpgOrPng) {
@@ -295,7 +300,8 @@ class ChangeModal extends Component {
         userPersonData: [],
         deletePiCertificationIdList: [],
         gtype: 0,
-        guid: guid()
+        guid: guid(),
+        deleteId: []
       }
       this.fetchBank = debounce(this.fetchBank, 500);
     }
@@ -359,7 +365,6 @@ class ChangeModal extends Component {
                 sourceKey: 'bp_organization_certification',
                 sourceCode: [res.organizationCertification.attachmentCode].join(',') }).then(
                   v => {
-                    console.log(v)
                     this.setState({ pic: v })
               })
             }
@@ -422,8 +427,31 @@ class ChangeModal extends Component {
     // 组织提交
     handleOrganizationOk = e => {
       if (e) e.preventDefault();
-      const { address, area, userData: { basic }, recordMsg, userData } = this.state;
-      console.log(userData)
+      const { address, area, userData: { basic }, recordMsg, userData, deleteId, pic, guid  } = this.state;
+      const newGuid = deleteId.length !== 0 ? guid : userData.organizationCertification.attachmentCode;
+      // console.log(userData)
+      let diskFileIdList = []
+      // console.log(userData)
+      if (deleteId.length !== 0) {
+        api.disk.getFiles({
+          sourceKey: 'bp_organization_certification',
+          sourceCode: userData.organizationCertification ? userData.organizationCertification.attachmentCode : guid}).then(
+            v => {
+              v.forEach(item => {
+                deleteId.forEach( i => {
+                  if (i !== item.id) {
+                    diskFileIdList.push(item.diskFileId)
+                  }
+                })
+              })
+              console.log(unique(diskFileIdList))
+              const newData = { diskFileIdList:unique(diskFileIdList), sourceCode: newGuid,
+                sourceKey: "bp_organization_certification"};
+              api.disk.copyFiles(newData).catch(err=> {
+                  if (err) return
+                })
+        })
+      }
       this.props.form.validateFields((error, row) => {
         if (error) return;
         let data = {};
@@ -450,7 +478,7 @@ class ChangeModal extends Component {
             bankAccount: row.bankAccount,
             registeredAddress: row.regisAddress,
             notes: row.notes,
-            attachmentCode: row.attachmentCode || userData.organizationCertification.attachmentCode,
+            attachmentCode: newGuid,
           },
         }
         api.bp.updateBPOrgCertification(data).then(() => {
@@ -495,36 +523,35 @@ class ChangeModal extends Component {
 
     /** 上传和删除图片 */
     handleChange = info => {
-      const { guid, userData, pic } = this.state;
+
+      const { guid, userData, pic, deleteId } = this.state;
       let data = pic;
+      let id = deleteId;
       const newGuid = userData.organizationCertification ?
       userData.organizationCertification.attachmentCode : guid
-      if (info.file.status === 'removed' && info.file.status !== 'error') {
-        api.disk.deleteFiles(info.file.uid).then(() => {
+      if (info.file.status === 'removed') {
+        // api.disk.deleteFiles(info.file.uid).then(() => {
           data = pic.filter( item => item.id !== info.file.uid)
+          id.push(info.file.uid)
           this.setState({
             pic: data
           })
-        })
+
+        // })
         return
       }
-      if (info.file.status !== 'error') {
-        console.log(info)
+      if (info.file.status === 'done') {
           // Get this url from response in real world.
-          getBase64(info.file.originFileObj).then(res => {
+          // getBase64(info.file.originFileObj).then(res => {
             data.push({
-              id: Math.random(),
+              id: info.file.response[0],
               name: Math.random(),
               status: 'done',
-              url: res,
             })
             this.setState({
               pic: data
             })
-          });
-          this.props.form.setFieldsValue({
-            attachmentCode: newGuid,
-          })
+          // });
         }
     }
 
@@ -650,7 +677,13 @@ class ChangeModal extends Component {
         return (
           <Col lg={24} md={12} sm={12}>
             <FormItem label="联系地址" labelCol={{ span: 4 }} wrapperCol={{ span: 20 }}>
-              <span>{recordMsg.address}</span>&nbsp;&nbsp;&nbsp;&nbsp;
+              <span>
+                {recordMsg.countryName}&nbsp;
+                {recordMsg.provinceName}&nbsp;
+                {recordMsg.cityName}&nbsp;
+                {recordMsg.countyName}&nbsp;
+                {recordMsg.streetName}&nbsp;{recordMsg.address}
+              </span>&nbsp;&nbsp;&nbsp;&nbsp;
               <a href="#" onClick = {event => this.updateAdressGroup(event)}>修改</a>
             </FormItem>
           </Col>
@@ -898,14 +931,14 @@ class ChangeModal extends Component {
         gtype,
         guid,
       } = this.state;
-      console.log(pic)
       const fileList = pic.map(e => ({
+        old: true,
         uid: e.id,
-        name: e.name,
+        name: e.name.toString(),
         status: 'done',
-        url: e.sourceCode ?  api.disk.downloadFiles(e.id, { view: true }) : e.url,
+        url: api.disk.downloadFiles(e.id, { view: true }),
+        type: e.type,
       }));
-
       const { basic } = userData;
       const nullData = {};
       let modelWidth = 970;
@@ -922,21 +955,22 @@ class ChangeModal extends Component {
           <div className="ant-upload-text">点击上传</div>
         </div>
       );
-        const newGuid = userData.organizationCertification ?
-        userData.organizationCertification.attachmentCode : guid
+        // const newGuid = userData.organizationCertification ?
+        // userData.organizationCertification.attachmentCode : guid
         const uploadUrl = api.disk.uploadMoreFiles(
           'bp_organization_certification',
-          newGuid,
+          guid,
           );
-      const uploadModal = <>
+      const uploadModal =
         <Upload
           name="files"
           multiple
           listType="picture-card"
-          className="avatar-uploader"
-          fileList={ fileList }
+          // className="avatar-uploader"
+          showUploadList
+          // fileList={ fileList }
           action={uploadUrl}
-          beforeUpload={beforeUpload}
+          // beforeUpload={beforeUpload}
           onChange={this.handleChange}
           headers={{ Authorization: this.props.authorization }}
           accept=".jpg"
@@ -944,11 +978,10 @@ class ChangeModal extends Component {
         >
           {uploadButton}
         </Upload>
-        <div style={{
-          color: '#ADADAD',
-          marginTop: '-30px',
-          marginBottom: '20px' }}>只支持 .jpg 格式</div>
-      </>
+        // <div style={{
+        //   color: '#ADADAD',
+        //   marginTop: '-30px',
+        //   marginBottom: '20px' }}>只支持 .jpg 格式</div>
       // if (recordMsg.code === userData.basic.code) {}
       // 个人变更
       if (gtype !== 1) {
@@ -1073,8 +1106,8 @@ class ChangeModal extends Component {
                     {getFieldDecorator('bankCode', {
                       // eslint-disable-next-line no-nested-ternary
                       initialValue: userData.organizationCertification ?
-                      (userData.organizationCertification.bankName ?
-                        userData.organizationCertification.bankName : '') : '',
+                      (userData.organizationCertification.bankCode ?
+                        userData.organizationCertification.bankCode : '') : '',
                     })(<Select
                       showSearch
                       notFoundContent={bankFetching ? <Spin size="small" /> : null}
@@ -1154,9 +1187,10 @@ class ChangeModal extends Component {
                   labelCol={{ span: 4 }}
                   wrapperCol={{ span: 20 }}
                 >
-                  {getFieldDecorator('attachmentCode', {
-                  valuePropName: 'fileList',
-                  getValueFromEvent: this.normFile,
+                  {getFieldDecorator('attachmentList', {
+                    initialValue: fileList,
+                    valuePropName: 'fileList',
+                    getValueFromEvent: this.normFile,
                 })(uploadModal)}
                   </Form.Item>
                 </Col>
