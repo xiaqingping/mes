@@ -1,9 +1,10 @@
 /**
  * PI认证 新增模态框
  */
-import { Form, Input, Upload, Icon, Select } from 'antd';
+import { Form, Input, Upload, Icon, Select, Modal } from 'antd';
 import React from 'react';
 import { connect } from 'dva';
+import { formatMessage } from 'umi-plugin-react/locale';
 import uniqBy from 'lodash/uniqBy';
 import diskAPI from '@/api/disk';
 import { requestErr } from '@/utils/request';
@@ -30,7 +31,8 @@ const { Option } = Select;
       if (e.id === basic.id) return false;
       // 过滤掉售达方不是自己
       if (e.soldToPartyId !== basic.id) return false;
-      // 过滤掉认证中已经存在的收票方
+      // 新增认证时：过滤掉认证中已经存在的收票方
+      // 变更刚刚新增的数据时：不能过滤掉此数据的开票方（这里已经过滤掉了，需要在渲染列表时重新添加进去）
       if (piCertificationList.some(e1 => e1.billToPartyId === e.id)) return false;
       return true;
     });
@@ -49,9 +51,15 @@ const { Option } = Select;
 class PICertificationAddModal extends React.Component {
   constructor(props) {
     super(props);
+    const { data: billToParty } = props;
+    const type = billToParty.billToPartyId ? 2 : 1;
+    const uuid = billToParty.uuid || guid();
     this.state = {
-      billToParty: props.data || {},
-      uuid: props.uuid || guid(),
+      // 1 新增 2 变更刚新增的数据
+      type,
+      // 回填的数据
+      billToParty,
+      uuid,
     };
   }
 
@@ -86,8 +94,15 @@ class PICertificationAddModal extends React.Component {
     const { billToParty } = this.state;
     if (key === 'attachmentList') {
       const attachmentList = [];
+      // TODO: 变更刚刚新增的数据时，删除图片，没有提交怎么办？图片已经被删掉
       if (value.file.status === 'removed') {
-        diskAPI.deleteFiles(value.file.response[0]);
+        let fileId;
+        if (value.file.response) {
+          [fileId] = value.file.response;
+        } else {
+          fileId = value.file.uid;
+        }
+        diskAPI.deleteFiles(fileId);
       }
       if (value.file.response) {
         value.fileList.forEach(e => {
@@ -115,9 +130,17 @@ class PICertificationAddModal extends React.Component {
   };
 
   render() {
-    const { form, authorization, billToPartyList } = this.props;
-    const { uuid, billToParty } = this.state;
+    const { visible, onCancel, onOk, form, authorization, billToPartyList } = this.props;
+    const { uuid, billToParty, type } = this.state;
     const uploadUrl = diskAPI.uploadMoreFiles('bp_pi_certification', uuid);
+
+    if (type === 2) {
+      billToPartyList.push({
+        id: billToParty.billToPartyId,
+        name: billToParty.billToPartyName,
+        code: billToParty.billToPartyCode,
+      });
+    }
 
     if (!billToParty.attachmentList) billToParty.attachmentList = [];
     const fileList = billToParty.attachmentList.map(e => {
@@ -133,7 +156,12 @@ class PICertificationAddModal extends React.Component {
     });
 
     return (
-      <>
+      <Modal
+        title={formatMessage({ id: 'bp.maintain_details.PI_verification' })}
+        visible={visible}
+        onOk={onOk}
+        onCancel={onCancel}
+      >
         <Form>
           <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="收票方">
             {form.getFieldDecorator('billToPartyId', {
@@ -177,7 +205,7 @@ class PICertificationAddModal extends React.Component {
             )}
           </FormItem>
         </Form>
-      </>
+      </Modal>
     );
   }
 }
