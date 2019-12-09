@@ -18,10 +18,8 @@ const { Option } = Select;
 const FormItem = Form.Item;
 const { TabPane } = Tabs;
 
-@connect(({ basicCache, partnerMaintainEdit }) => ({
+@connect(({ basicCache }) => ({
   countryDiallingCodes: basicCache.countryDiallingCodes,
-  details: partnerMaintainEdit.type === 'supplier' ?
-  partnerMaintainEdit.supplier : partnerMaintainEdit.details,
 }))
 class CheckPhone extends Component {
   state = {

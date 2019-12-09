@@ -90,6 +90,7 @@ class Operation extends React.Component {
       this.getTableData({
         page: pagination.current,
         rows: pagination.pageSize,
+        ...this.props.form.getFieldsValue(),
         ...filtersArg,
       });
     }

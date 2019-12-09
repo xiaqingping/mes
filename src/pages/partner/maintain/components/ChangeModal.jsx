@@ -5,7 +5,6 @@ import {
   Input,
   Upload,
   Icon,
-  message,
   Row,
   Col,
   List,
@@ -70,42 +69,22 @@ const verifyStatus = {
   },
 }
 
-const formItemLayoutEng = {
-  labelCol: {
-    xs: { span: 10 },
-    sm: { span: 3 },
-  },
-  wrapperCol: {
-    xs: { span: 10 },
-    sm: { span: 20 },
-  },
-};
-
-function getBase64(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = () => resolve(reader.result);
-    reader.onerror = error => reject(error);
-  });
-}
-
 // 数组去重
-function unique(arr){
+function unique(arr) {
   return [...new Set(arr)];
 }
 
-function beforeUpload(file) {
-  const isJpgOrPng = file.type === 'image/jpeg';
-  if (!isJpgOrPng) {
-    message.error('You can only upload JPG/PNG file!');
-  }
-  const isLt2M = file.size / 1024 / 1024 < 2;
-  if (!isLt2M) {
-    message.error('Image must smaller than 2MB!');
-  }
-  return isJpgOrPng && isLt2M;
-}
+// function beforeUpload(file) {
+//   const isJpgOrPng = file.type === 'image/jpeg';
+//   if (!isJpgOrPng) {
+//     message.error('You can only upload JPG/PNG file!');
+//   }
+//   const isLt2M = file.size / 1024 / 1024 < 2;
+//   if (!isLt2M) {
+//     message.error('Image must smaller than 2MB!');
+//   }
+//   return isJpgOrPng && isLt2M;
+// }
 
 class NameGroup extends Component {
   static getDerivedStateFromProps(nextProps) {
@@ -260,7 +239,7 @@ class AddressGroup extends Component {
   }
 }
 
-@connect(({ basicCache, user, partnerMaintain, global }) => {
+@connect(({ basicCache, user, partnerMaintain, global, partnerMaintainEdit }) => {
   const industryCategories = basicCache.industryCategories.filter(
     e => e.languageCode === global.languageCode,
   );
@@ -270,7 +249,7 @@ class AddressGroup extends Component {
     // industryCategories: basicCache.industryCategories,
     countryDiallingCodes: basicCache.countryDiallingCodes,
     authorization: user.currentUser.authorization,
-    details: partnerMaintain.details,
+    details: partnerMaintain ? partnerMaintain.details : partnerMaintainEdit.details,
   })
 })
 class ChangeModal extends Component {
@@ -285,7 +264,6 @@ class ChangeModal extends Component {
         groupNameShow: true,
         groupAdressShow: true,
         groupIndustryShow: true,
-        groupUsaShow: true,
         name: '',
         userData: [],
         submitNext: 1,
@@ -300,8 +278,8 @@ class ChangeModal extends Component {
         userPersonData: [],
         deletePiCertificationIdList: [],
         gtype: 0,
-        guid: guid(),
-        deleteId: []
+        guuid: guid(),
+        deleteId: [],
       }
       this.fetchBank = debounce(this.fetchBank, 500);
     }
@@ -427,65 +405,90 @@ class ChangeModal extends Component {
     // 组织提交
     handleOrganizationOk = e => {
       if (e) e.preventDefault();
-      const { address, area, userData: { basic }, recordMsg, userData, deleteId, pic, guid  } = this.state;
-      const newGuid = userData.organizationCertification ? (deleteId.length !== 0 ? guid : userData.organizationCertification.attachmentCode) : guid;
+      // eslint-disable-next-line no-shadow
+      const {
+        address,
+         area,
+         userData: { basic },
+         recordMsg,
+         userData,
+         deleteId,
+         guuid } = this.state;
+      // eslint-disable-next-line no-nested-ternary
+      const newGuid = userData.organizationCertification ?
+      (deleteId.length !== 0 ? guuid : userData.organizationCertification.attachmentCode) : guuid;
       // console.log(userData)
-      let diskFileIdList = []
-      console.log(deleteId)
+      const diskFileIdList = []
       // console.log(userData)
       if (deleteId.length !== 0) {
         api.disk.getFiles({
           sourceKey: 'bp_organization_certification',
-          sourceCode: userData.organizationCertification ? userData.organizationCertification.attachmentCode : guid}).then(
+          sourceCode: userData.organizationCertification ?
+          userData.organizationCertification.attachmentCode : newGuid,
+        }).then(
             v => {
-              console.log(v)
-              v.forEach(item => {
-                deleteId.forEach( i => {
-                  if (i !== item.id) {
-                    diskFileIdList.push(item.diskFileId)
-                  }
-                })
+              v.filter(item => deleteId.indexOf(item.id) < 0).forEach(item => {
+                diskFileIdList.push(item.diskFileId)
               })
-              console.log(unique(diskFileIdList))
-              const newData = { 
-                diskFileIdList:unique(diskFileIdList), 
+              // console.log(unique(diskFileIdList))
+              const newData = {
+                diskFileIdList: unique(diskFileIdList),
                 sourceCode: newGuid,
-                sourceKey: "bp_organization_certification"
+                sourceKey: 'bp_organization_certification',
               };
-                api.disk.copyFiles(newData).catch(err=> {
-                  if (err) return
-                })
+              api.disk.copyFiles(newData)
         })
       }
       this.props.form.validateFields((error, row) => {
         if (error) return;
         let data = {};
-        data = {
-          basic: {
-            id: recordMsg.id,
-            name: row.msg ? row.msg.name : basic.name,
-            countryCode: area[0] ? area[0].code : basic.countryCode,
-            provinceCode: area[1] ? area[1].code : basic.provinceCode,
-            cityCode: area[2] ? area[2].code : basic.cityCode,
-            countyCode: area[3] ? area[3].code : basic.countyCode,
-            streetCode: area[4] ? area[4].code : basic.streetCode,
-            address: address || basic.address,
-            industryCode: row.industry || basic.industryCode,
-            telephoneCountryCode: row.phoneNum.telephoneCountryCode || basic.telephoneCountryCode,
-            telephoneAreaCode: row.phoneNum.telephoneAreaCode || basic.telephoneAreaCode,
-            telephone: row.phoneNum.telephone || basic.telephone,
-            telephoneExtension: row.phoneNum.telephoneExtension || basic.telephoneExtension,
-          },
-          organizationCertification: {
-            specialInvoice: row.specialInvoice ? 1 : 2,
-            taxNo: row.taxNo,
-            bankCode: row.bankCode,
-            bankAccount: row.bankAccount,
-            registeredAddress: row.regisAddress,
-            notes: row.notes,
-            attachmentCode: newGuid,
-          },
+        if (userData.basic.sapCountryCode === 'CN') {
+          data = {
+            basic: {
+              id: recordMsg.id,
+              name: row.msg ? row.msg.name : basic.name,
+              countryCode: area[0] ? area[0].code : basic.countryCode,
+              provinceCode: area[1] ? area[1].code : basic.provinceCode,
+              cityCode: area[2] ? area[2].code : basic.cityCode,
+              countyCode: area[3] ? area[3].code : basic.countyCode,
+              streetCode: area[4] ? area[4].code : basic.streetCode,
+              address: address || basic.address,
+              industryCode: row.industry || basic.industryCode,
+              telephoneCountryCode: row.phoneNum.telephoneCountryCode || basic.telephoneCountryCode,
+              telephoneAreaCode: row.phoneNum.telephoneAreaCode || basic.telephoneAreaCode,
+              telephone: row.phoneNum.telephone || basic.telephone,
+              telephoneExtension: row.phoneNum.telephoneExtension || basic.telephoneExtension,
+            },
+            organizationCertification: {
+              specialInvoice: row.specialInvoice ? 1 : 2,
+              taxNo: row.taxNo,
+              bankCode: row.bankCode,
+              bankAccount: row.bankAccount,
+              registeredAddress: row.regisAddress,
+              notes: row.notes,
+              attachmentCode: newGuid,
+            },
+          }
+        } else if (userData.basic.sapCountryCode === 'US') {
+          data = {
+            basic: {
+              id: recordMsg.id,
+              name: row.msg ? row.msg.name : basic.name,
+              countryCode: area[0] ? area[0].code : basic.countryCode,
+              provinceCode: area[1] ? area[1].code : basic.provinceCode,
+              cityCode: area[2] ? area[2].code : basic.cityCode,
+              countyCode: area[3] ? area[3].code : basic.countyCode,
+              streetCode: area[4] ? area[4].code : basic.streetCode,
+              address: address || basic.address,
+            },
+            organizationCertification: {
+              taxNo: row.taxNo,
+              notes: row.notes,
+              attachmentCode: newGuid,
+            },
+          }
         }
+
         console.log(data)
         api.bp.updateBPOrgCertification(data).then(() => {
           this.setState({ submitNext: 2 })
@@ -516,7 +519,6 @@ class ChangeModal extends Component {
         groupNameShow: true,
         groupAdressShow: true,
         groupIndustryShow: true,
-        groupUsaShow: true,
         submitNext: 1,
         userData: [],
         address: '',
@@ -529,33 +531,27 @@ class ChangeModal extends Component {
 
     /** 上传和删除图片 */
     handleChange = info => {
-
-      const { guid, userData, pic, deleteId } = this.state;
+      const { pic, deleteId } = this.state;
       let data = pic;
-      let id = deleteId;
-      const newGuid = userData.organizationCertification ?
-      userData.organizationCertification.attachmentCode : guid
+      const id = deleteId;
       if (info.file.status === 'removed') {
-        // api.disk.deleteFiles(info.file.uid).then(() => {
-          data = pic.filter( item => item.id !== info.file.uid)
-          id.push(info.file.uid)
+          data = pic.filter(item =>
+            item.id !== (info.file.response ? info.file.response[0] : info.file.uid),
+          )
+          id.push(info.file.response ? info.file.response[0] : info.file.uid)
           this.setState({
-            pic: data
+            pic: data,
           })
-
-        // })
         return
       }
       if (info.file.status === 'done') {
-          // Get this url from response in real world.
-          // getBase64(info.file.originFileObj).then(res => {
             data.push({
               id: info.file.response[0],
               name: Math.random(),
               status: 'done',
             })
             this.setState({
-              pic: data
+              pic: data,
             })
           // });
         }
@@ -627,6 +623,7 @@ class ChangeModal extends Component {
       return groupNameShow ? this.groupNameShow() : this.groupNameInput();
     }
 
+    // eslint-disable-next-line consistent-return
     groupNameShow = () => {
       const { recordMsg } = this.state;
       if (recordMsg) {
@@ -677,6 +674,7 @@ class ChangeModal extends Component {
       return groupAdressShow ? this.groupAdressShow() : this.groupAdressInput();
     }
 
+    // eslint-disable-next-line consistent-return
     groupAdressShow = () => {
       const { recordMsg } = this.state;
       if (recordMsg) {
@@ -698,22 +696,40 @@ class ChangeModal extends Component {
     }
 
     groupAdressInput = () => {
-      const { form, area } = this.state;
+      const { form, area, userData } = this.state;
       const { getFieldDecorator } = form;
-      return (
-      <Col lg={24} md={12} sm={12}>
-        <FormItem
-         label="联系地址"
-         labelCol={{ span: 4 }}
-          wrapperCol={{ span: 20 }}
-          hasFeedback
-          validateStatus={area[0] && area[1] && area[2] && area[3] && area[4] ? 'success' : 'error'}
-          help={form.getFieldValue('msg') ? '' : '请输入信息'}
-        >
-          {getFieldDecorator('address')(<AddressGroup addressVal={this.addressVal}/>)}
-        </FormItem>
-      </Col>
-      )
+      if (userData.basic.sapCountryCode === 'CN') {
+        return (
+          <Col lg={24} md={12} sm={12}>
+            <FormItem
+             label="联系地址"
+             labelCol={{ span: 4 }}
+              wrapperCol={{ span: 20 }}
+              hasFeedback
+              validateStatus={
+                area[0] && area[1] && area[2] && area[3] && area[4] ? 'success' : 'error'
+              }
+              help={form.getFieldValue('msg') ? '' : '请输入信息'}
+            >
+              {getFieldDecorator('address')(<AddressGroup addressVal={this.addressVal}/>)}
+            </FormItem>
+          </Col>
+        )
+      }
+        return (
+          <Col lg={24} md={12} sm={12}>
+            <FormItem
+             label="联系地址"
+             labelCol={{ span: 4 }}
+              wrapperCol={{ span: 20 }}
+              hasFeedback
+              validateStatus={area[0] ? 'success' : 'error'}
+              help={form.getFieldValue('msg') ? '' : '请输入信息'}
+            >
+              {getFieldDecorator('address')(<AddressGroup addressVal={this.addressVal}/>)}
+            </FormItem>
+          </Col>
+        )
     }
 
     updateAdressGroup = e => {
@@ -774,33 +790,34 @@ class ChangeModal extends Component {
       )
     }
 
-    renderUsaForm = () => {
-      const { groupUsaShow } = this.state;
-      return groupUsaShow ? this.groupUsaShow() : this.groupUsaInput();
-    }
+    // 美国名称
+    // renderUsaForm = () => {
+    //   const { groupUsaShow } = this.state;
+    //   return groupUsaShow ? this.groupUsaShow() : this.groupUsaInput();
+    // }
 
-    groupUsaShow = () => (
-      <FormItem label="名称">
-        <Icon type="home" /> <span>Willian Jafferson Clinton</span>
-        <a href="#" onClick = {event => this.updetaUsaGroup(event)}>修改</a>
-      </FormItem>
-    )
+    // groupUsaShow = () => (
+    //   <FormItem label="名称"  labelCol={{ span: 4 }} wrapperCol={{ span: 20 }}>
+    //     <Icon type="home" /> <span>Willian Jafferson Clinton</span>
+    //     <a href="#" onClick = {event => this.updetaUsaGroup(event)}>修改</a>
+    //   </FormItem>
+    // )
 
-    updetaUsaGroup = () => {
-      this.setState({
-        groupUsaShow: false,
-      })
-    }
+    // updetaUsaGroup = () => {
+    //   this.setState({
+    //     groupUsaShow: false,
+    //   })
+    // }
 
-    groupUsaInput = () => {
-      const { form } = this.state;
-      const { getFieldDecorator } = form;
-      return (
-        <FormItem label="名称">
-          {getFieldDecorator('name')(<AddressGroup/>)}
-        </FormItem>
-      )
-    }
+    // groupUsaInput = () => {
+    //   const { form } = this.state;
+    //   const { getFieldDecorator } = form;
+    //   return (
+    //     <FormItem label="名称">
+    //       {getFieldDecorator('name')(<AddressGroup/>)}
+    //     </FormItem>
+    //   )
+    // }
 
     // 删除
     removeItem = id => {
@@ -852,6 +869,7 @@ class ChangeModal extends Component {
               <div>
                 {item.pic.map((v, index) =>
                   <img
+                    // eslint-disable-next-line react/no-array-index-key
                     key={index}
                     style={{ width: 90,
                     height: 90,
@@ -935,7 +953,7 @@ class ChangeModal extends Component {
         newDataList,
         userPersonData,
         gtype,
-        guid,
+        guuid,
         deleteId,
       } = this.state;
       const fileList = pic.map(e => ({
@@ -962,11 +980,12 @@ class ChangeModal extends Component {
           <div className="ant-upload-text">点击上传</div>
         </div>
       );
-        const newGuid = deleteId.length === 0 ?  (userData.organizationCertification ?
-        userData.organizationCertification.attachmentCode : guid) : guid;
+        // eslint-disable-next-line no-nested-ternary
+        const newGuid = deleteId.length === 0 ? (userData.organizationCertification ?
+        userData.organizationCertification.attachmentCode : guuid) : guuid;
         const uploadUrl = api.disk.uploadMoreFiles(
           'bp_organization_certification',
-          newGuid
+          newGuid,
           );
       const uploadModal =
         <Upload
@@ -1041,7 +1060,7 @@ class ChangeModal extends Component {
       if (gtype !== 2) {
         // 组织变更
         if ((recordMsg && recordMsg.type === 2 &&
-          (recordMsg.countyCode === 'CN' || !recordMsg.countyCode)) || gtype === 1) {
+          userData.basic.sapCountryCode === 'CN') || gtype === 1) {
           modelWidth = 1130;
           modelContent = <>
             <Form {...formItemLayoutGroup} labelAlign="left" onSubmit={this.handleOrganizationOk}>
@@ -1189,16 +1208,16 @@ class ChangeModal extends Component {
                   </Form.Item>
                 </Col>
                 <Col lg={24} md={12} sm={12}>
-                <Form.Item
-                  label="认证图片"
-                  labelCol={{ span: 4 }}
-                  wrapperCol={{ span: 20 }}
-                >
-                  {getFieldDecorator('attachmentList', {
-                    initialValue: fileList,
-                    valuePropName: 'fileList',
-                    getValueFromEvent: this.normFile,
-                })(uploadModal)}
+                  <Form.Item
+                    label="认证图片"
+                    labelCol={{ span: 4 }}
+                    wrapperCol={{ span: 20 }}
+                  >
+                    {getFieldDecorator('attachmentList', {
+                      initialValue: fileList,
+                      valuePropName: 'fileList',
+                      getValueFromEvent: this.normFile,
+                    })(uploadModal)}
                   </Form.Item>
                 </Col>
                 <Divider style={{ margin: 0 }}/>
@@ -1212,70 +1231,143 @@ class ChangeModal extends Component {
         }
 
         // 美国变更
-        if (recordMsg && recordMsg.type === 2 && recordMsg.countyCode === 'US') {
+        if (recordMsg && recordMsg.type === 2 && userData.basic.sapCountryCode === 'US') {
           modelWidth = 800;
           modelContent = <>
-            <Form {...formItemLayout}>
-                { this.renderUsaForm() }
-              <FormItem label="免税认证号">
-                {getFieldDecorator('taxNo', {
-                  rules: [
-                    {
-                      required: true,
-                      message: '请输入免税认证号！',
-                    },
-                  ],
-                })(<Input placeholder="请输入"/>)}
-              </FormItem>
-              <Form.Item label="认证说明">
-                {getFieldDecorator('idenText', {
-                  rules: [
-                    {
-                      required: true,
-                      message: '请输入认证说明！',
-                    },
-                  ],
-                })(<TextArea rows={2} />)}
-              </Form.Item>
-              <Form.Item label="认证图片">
-                {getFieldDecorator('attachmentCode')(uploadModal)}
-              </Form.Item>
-              <Divider style={{ margin: 0 }}/>
-              <Button htmlType="submit" type="primary"
-              style={{ float: 'right', margin: '10px 20px 0 0' }}>
-                  提交
-              </Button>
+            <Form {...formItemLayout} onSubmit={this.handleOrganizationOk}>
+              <Row gutter={32}>
+                { this.renderGroupNameForm() }
+                { this.renderAdressForm() }
+                <Col lg={24} md={12} sm={12}>
+                  <FormItem
+                  label="免税认证号"
+                  labelCol={{ span: 4 }}
+                  wrapperCol={{ span: 20 }}
+                  validateStatus={
+                    form.getFieldValue('taxNo') || (userData.organizationCertification ?
+                    (!!userData.organizationCertification.taxNo)
+                      : '') ? 'success' : 'error'}
+                  help={form.getFieldValue('taxNo') ? '' : '请输入信息'}
+                  >
+                  {getFieldDecorator('taxNo', {
+                    // eslint-disable-next-line no-nested-ternary
+                    initialValue: userData.organizationCertification ?
+                    (userData.organizationCertification.taxNo ?
+                      userData.organizationCertification.taxNo : '')
+                      : '',
+                  })(<Input placeholder="请输入"/>)}
+                </FormItem>
+                </Col>
+                <Col lg={24} md={12} sm={12}>
+                  <Form.Item
+                  label="认证说明"
+                  labelCol={{ span: 4 }}
+                  wrapperCol={{ span: 20 }}
+                  validateStatus={
+                    form.getFieldValue('notes') || (userData.organizationCertification ?
+                    (!!userData.organizationCertification.notes)
+                      : '') ? 'success' : 'error'}
+                  help={form.getFieldValue('notes') ? '' : '请输入信息'}
+                  >
+                    {getFieldDecorator('notes', {
+                    // eslint-disable-next-line no-nested-ternary
+                    initialValue: userData.organizationCertification ?
+                    (userData.organizationCertification.notes ?
+                      userData.organizationCertification.notes : '')
+                      : '',
+                  })(<TextArea rows={2} />)}
+                  </Form.Item>
+                </Col>
+                <Col lg={24} md={12} sm={12}>
+                  <Form.Item
+                      label="认证图片"
+                      labelCol={{ span: 4 }}
+                      wrapperCol={{ span: 20 }}
+                    >
+                      {getFieldDecorator('attachmentList', {
+                        initialValue: fileList,
+                        valuePropName: 'fileList',
+                        getValueFromEvent: this.normFile,
+                      })(uploadModal)}
+                </Form.Item>
+                </Col>
+                <Divider style={{ margin: 0 }}/>
+                <Button htmlType="submit" type="primary"
+                style={{ float: 'right', margin: '10px 20px' }}>
+                    提交
+                </Button>
+              </Row>
             </Form>
           </>
         }
 
         // 英国变更
-        if (recordMsg && recordMsg.id === 2 && recordMsg.countyCode === 'GB') {
+        if (recordMsg && recordMsg.type === 2 && userData.basic.sapCountryCode === 'GB') {
           modelWidth = 800;
           modelContent = <>
-            <Form {...formItemLayoutEng} labelAlign="left">
-                { this.renderUsaForm() }
-              <FormItem label="增值税登记号">
-                {getFieldDecorator('taxNo', {
-                  rules: [
-                    {
-                      required: true,
-                    message: '请输入增值税登记号！',
-                    },
-                  ],
-                })(<Input placeholder="请输入"/>)}
-              </FormItem>
-              <Form.Item label="认证说明">
-                {getFieldDecorator('idenText')(<TextArea rows={2} />)}
-              </Form.Item>
-              <Form.Item label="认证图片">
-                {getFieldDecorator('attachmentCode')(uploadModal)}
-              </Form.Item>
-              <Divider style={{ margin: 0 }}/>
-              <Button htmlType="submit" type="primary"
-              style={{ float: 'right', margin: '10px 20px 0 0' }}>
-                  提交
-              </Button>
+            <Form {...formItemLayout} onSubmit={this.handleOrganizationOk}>
+              <Row gutter={32}>
+                { this.renderGroupNameForm() }
+                { this.renderAdressForm() }
+                <Col lg={24} md={12} sm={12}>
+                  <FormItem
+                  label="增值税登记号"
+                  labelCol={{ span: 4 }}
+                  wrapperCol={{ span: 20 }}
+                  validateStatus={
+                    form.getFieldValue('taxNo') || (userData.organizationCertification ?
+                    (!!userData.organizationCertification.taxNo)
+                      : '') ? 'success' : 'error'}
+                  help={form.getFieldValue('taxNo') ? '' : '请输入信息'}
+                  >
+                  {getFieldDecorator('taxNo', {
+                    // eslint-disable-next-line no-nested-ternary
+                    initialValue: userData.organizationCertification ?
+                    (userData.organizationCertification.taxNo ?
+                      userData.organizationCertification.taxNo : '')
+                      : '',
+                  })(<Input placeholder="请输入"/>)}
+                </FormItem>
+                </Col>
+                <Col lg={24} md={12} sm={12}>
+                  <Form.Item
+                  label="认证说明"
+                  labelCol={{ span: 4 }}
+                  wrapperCol={{ span: 20 }}
+                  validateStatus={
+                    form.getFieldValue('notes') || (userData.organizationCertification ?
+                    (!!userData.organizationCertification.notes)
+                      : '') ? 'success' : 'error'}
+                  help={form.getFieldValue('notes') ? '' : '请输入信息'}
+                  >
+                    {getFieldDecorator('notes', {
+                    // eslint-disable-next-line no-nested-ternary
+                    initialValue: userData.organizationCertification ?
+                    (userData.organizationCertification.notes ?
+                      userData.organizationCertification.notes : '')
+                      : '',
+                  })(<TextArea rows={2} />)}
+                  </Form.Item>
+                </Col>
+                <Col lg={24} md={12} sm={12}>
+                  <Form.Item
+                      label="认证图片"
+                      labelCol={{ span: 4 }}
+                      wrapperCol={{ span: 20 }}
+                    >
+                      {getFieldDecorator('attachmentList', {
+                        initialValue: fileList,
+                        valuePropName: 'fileList',
+                        getValueFromEvent: this.normFile,
+                      })(uploadModal)}
+                </Form.Item>
+                </Col>
+                <Divider style={{ margin: 0 }}/>
+                <Button htmlType="submit" type="primary"
+                style={{ float: 'right', margin: '10px 20px' }}>
+                    提交
+                </Button>
+              </Row>
             </Form>
           </>
         }

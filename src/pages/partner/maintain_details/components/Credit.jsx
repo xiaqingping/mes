@@ -7,6 +7,7 @@ import {
 import React, { Component } from 'react';
 import './style.less'
 import { connect } from 'dva';
+import moment from 'moment';
 import FixedQuota from './FixedQuota'
 import TemporaryQuota from './TemporaryQuota'
 
@@ -62,10 +63,16 @@ class BasicInfo extends Component {
           layout="vertical"
           column={4}
           >
-            <DescriptionsItem label="额度">{creditList[0].credit}</DescriptionsItem>
-            <DescriptionsItem label="临时额度">{creditList[0].tempCreditLimit}</DescriptionsItem>
-            <DescriptionsItem label="付款周期">{creditList[0].creditPeriod}</DescriptionsItem>
-            <DescriptionsItem label="账单间隔">{creditList[0].billingDay}</DescriptionsItem>
+            <DescriptionsItem label="额度">
+            {creditList[0].creditLimit} {creditList[0].currencyCode}&nbsp;&nbsp;
+            {moment(creditList[0].lastEvaluationDate).fromNow()}调整
+            </DescriptionsItem>
+            <DescriptionsItem label="临时额度">
+            {creditList[0].tempCreditLimit} {creditList[0].currencyCode}&nbsp;&nbsp;
+            {moment(creditList[0].tempCreditLimitExpirationDate).fromNow()}调整
+            </DescriptionsItem>
+            <DescriptionsItem label="付款周期">开票后{creditList[0].creditPeriod}天到期</DescriptionsItem>
+            <DescriptionsItem label="账单间隔">每月{creditList[0].billingDay}日开票</DescriptionsItem>
           </Descriptions>
         </>
         : <Empty />

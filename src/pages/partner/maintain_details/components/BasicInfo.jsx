@@ -8,8 +8,9 @@ import {
 } from 'antd';
 import React, { Component } from 'react';
 import { connect } from 'dva';
-import CheckPhone from './CheckPhone'
-import CheckEmail from './CheckEmail'
+import CheckPhone from './CheckPhone';
+import CheckEmail from './CheckEmail';
+import ChangeModal from '@/pages/partner/maintain/components/ChangeModal';
 import './style.less'
 
 const DescriptionsItem = Descriptions.Item;
@@ -61,6 +62,7 @@ class BasicInfo extends Component {
     const { phoneShow, emailShow } = this.state;
     const {
       details: { basic },
+      details,
       type,
       countryDiallingCodes,
       salesPaymentMethods,
@@ -75,6 +77,7 @@ class BasicInfo extends Component {
         newData = item;
       }
     })
+
     return (
       <Card
         title="基础信息"
@@ -89,7 +92,13 @@ class BasicInfo extends Component {
           <DescriptionsItem span={2} label="名称">
             <Icon type={basic.type === 1 ? 'user' : 'home'} />&nbsp;&nbsp;
             {basic.name}&nbsp;&nbsp;&nbsp;
-            <a>变更</a>
+            <a
+              onClick={
+                () => { this.showChange.visibleShow(true, this.props.details.basic) }
+              }
+            >
+              变更
+            </a>
           </DescriptionsItem>
           <DescriptionsItem span={2} label="移动电话">
             <img
@@ -142,7 +151,10 @@ class BasicInfo extends Component {
           <DescriptionsItem span={2} label="特性行业类别">
             {/* {basic.industryCode}&nbsp;&nbsp;&nbsp; */}
             {/* {console.log(industry)} */}
-            {industry.filter(item => item.code === basic.industryCode)[0].name}&nbsp;&nbsp;
+            {
+              basic.industryCode ?
+              industry.filter(item => item.code === basic.industryCode)[0].name : ''
+            }&nbsp;&nbsp;
             <a>变更</a>
           </DescriptionsItem>
           <DescriptionsItem span={6} label="通讯地址">
@@ -156,10 +168,28 @@ class BasicInfo extends Component {
           <DescriptionsItem span={2} label={type === 'supplier' ? '采购冻结' : '销售冻结'}>
             <Badge status="error"/>&nbsp;冻结</DescriptionsItem>
         </Descriptions>
-        <CheckPhone phoneShow={phoneShow} checkPhone={v => { this.checkPhone(v) }}/>
-        <CheckEmail emailShow={emailShow} checkEmail={v => { this.checkEmail(v) }}/>
+        <CheckPhone
+          phoneShow={phoneShow}
+          details={details}
+          checkPhone={v => { this.checkPhone(v) }}
+        />
+        <CheckEmail
+          emailShow={emailShow}
+          details={details}
+          checkEmail={v => { this.checkEmail(v) }}
+        />
         {/* <CheckEmail emailShow={emailShow} proceed="true" emailAccount="123456@qq.com" />
             checkEmail={v => { this.checkEmail(v) }} */}
+        <ChangeModal
+          // wrappedComponentRef={this.perSaveFormRef}
+          // changeModal={changeModal}
+          recordMsg={this.props.details}
+          onRef={ref => {
+            this.showChange = ref;
+          }}
+          getData={() => {}}
+          // getValues={this.getValues}
+        />
       </Card>
     );
   }
