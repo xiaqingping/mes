@@ -69,7 +69,7 @@ export default {
   plugins,
   hash: true,
   targets: {
-    ie: 11,
+    ie: 9,
   },
   // devtool: isAntDesignProPreview ? 'source-map' : false,
   // umi routes: https://umijs.org/zh/guide/router.html
