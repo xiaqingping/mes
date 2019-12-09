@@ -29,6 +29,7 @@ class PICredit extends React.Component {
   }
 
   renderListItem = item => {
+    if (!item) return null;
     const { creditList } = this.props;
     const credit = creditList.filter(e => e.billToPartyId === item.billToPartyId);
     let data = null;
@@ -36,12 +37,12 @@ class PICredit extends React.Component {
 
     // 临时额度到期日期
     let tempCreditLimitExpirationDate;
-    if (data.tempCreditLimitExpirationDate) {
+    if (data && data.tempCreditLimitExpirationDate) {
       tempCreditLimitExpirationDate = moment(data.tempCreditLimitExpirationDate).fromNow();
     }
     // 固定额度调整日期
     let lastEvaluationDate;
-    if (data.lastEvaluationDate) {
+    if (data && data.lastEvaluationDate) {
       lastEvaluationDate = moment(data.lastEvaluationDate).fromNow();
     }
 
