@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { notification } from 'antd';
 import { router } from 'umi';
+import { formatMessage } from 'umi/locale';
 
 const baseURLMap = {
   dev: 'https://devapi.sangon.com:8443/api',
@@ -41,9 +42,18 @@ const requestErr = data => {
     errMsg = [errMsg];
   }
 
+  let message = (data && data.desc) || '错误提示';
+  let description = errMsg.join('，') || '请求错误！';
+  try {
+    message = formatMessage({ id: message });
+    description = formatMessage({ id: description });
+  } catch (error) {
+    console.log(`缺少错误消息国际化\nmessage:${message}\ndescription${description}`);
+  }
+
   notification.error({
-    message: (data && data.desc) || '错误提示',
-    description: errMsg.join('，') || '请求错误！',
+    message,
+    description,
   });
 };
 
@@ -57,6 +67,20 @@ const err = error => {
 // 请求拦截
 service.interceptors.request.use(config => {
   const token = localStorage.getItem('token');
+  // GET请求处理请求参数
+  // 去掉首尾空格
+  if (config.method === 'get') {
+    const { params } = config;
+    // eslint-disable-next-line no-restricted-syntax
+    for (const key in params) {
+      if (params.hasOwnProperty(key)) {
+        const element = params[key];
+        if (typeof element === 'string') {
+          config.params[key] = element.trim();
+        }
+      }
+    }
+  }
   if (token) {
     config.headers.Authorization = token;
     // if (config.url.indexOf('http://180.167.32.168:8001/') === -1) {
