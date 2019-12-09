@@ -11,31 +11,34 @@ import React from 'react';
 
 const DescriptionsItem = Descriptions.Item;
 
-@connect(({ partnerMaintainEdit }) => ({
+@connect(({ partnerMaintainEdit, basicCache }) => ({
   details: partnerMaintainEdit.supplier,
+  purchaseOrganizations: basicCache.purchaseOrganizations,
 }))
 class PurchasingOrg extends React.Component {
   constructor(props) {
     super(props);
-    const { details: { vendor } } = this.props;
-    if (vendor) {
-      const { purchasingOrganizationList: tabsData } = vendor;
-      this.state = {
-        tabKey: tabsData && tabsData[0] && tabsData[0].purchasingOrganizationCode,
-      }
-    } else {
-      this.state = {
-        tabKey: '',
-      }
-    }
+    const { details: { vendor: { purchaseOrganizationList } } } = this.props;
+    this.state = {
+      tabKey: (
+        purchaseOrganizationList && purchaseOrganizationList[0] &&
+        purchaseOrganizationList[0].purchaseOrganizationCode) || '',
+    };
+  }
+
+  componentDidMount() {
+    this.props.dispatch({
+      type: 'basicCache/getCache',
+      payload: { type: 'purchaseOrganizations' },
+    })
   }
 
   renderTabPane = () => {
     const { tabKey } = this.state;
-    const { details: { vendor: { purchasingOrganizationList } } } = this.props;
+    const { details: { vendor: { purchaseOrganizationList } } } = this.props;
     let data = null;
-    purchasingOrganizationList.map(item => {
-      if (item.purchasingOrganizationCode === tabKey) {
+    purchaseOrganizationList.map(item => {
+      if (item.purchaseOrganizationCode === tabKey) {
         data = (
           <Descriptions
               className="s-descriptions"
@@ -89,32 +92,24 @@ class PurchasingOrg extends React.Component {
   }
 
   renderCascader = () => {
-    const { details } = this.props;
-    const { vendor: { purchasingOrganizationList: tabsData } } = details;
-    const cascaderTitle = tabsData.map(e => e.purchasingOrganizationCode);
-    const options = [
-      {
-        value: '生工',
-        label: '生工',
-      },
-      {
-        value: 'BBI',
-        label: 'BBI',
-      },
-      {
-        value: 'NBS',
-        label: 'NBS',
-      },
-    ];
-    options.forEach(e => {
-      if (cascaderTitle.indexOf(e.value) > -1) {
-        e.disabled = true;
-      } else {
-        e.disabled = false;
+    const { details: { vendor: { purchaseOrganizationList } }, purchaseOrganizations } = this.props;
+    const codeList = purchaseOrganizationList.map(e => e.purchaseOrganizationCode);
+    // const cascaderTitle = purchaseOrganizationList.map(e => e.purchaseOrganizationCode);
+    // console.log(purchaseOrganizations, cascaderTitle)
+    const options = purchaseOrganizations.map(e => {
+      let disabled = false;
+      if (codeList.indexOf(e.code) > -1) {
+        disabled = true;
       }
+      return { ...e, disabled };
     });
+
     return (
-      <Cascader options={options} onChange={this.onCascaderChange}>
+      <Cascader
+      options={options}
+      onChange={this.onCascaderChange}
+      fieldNames={{ label: 'name', value: 'code' }}
+      >
         <a style={{ fontSize: 14, marginLeft: -16 }} href="#">
           采购组织 <Icon type="down" style={{ fontSize: 12 }} /></a>
       </Cascader>
@@ -125,10 +120,10 @@ class PurchasingOrg extends React.Component {
     let index = -1;
     let key = '';
     const { details } = this.props;
-    const { vendor: { purchasingOrganizationList: tabsData } } = details;
+    const { vendor: { purchaseOrganizationList } } = details;
     let { vendor } = details;
     // 过滤掉关闭的采购组织
-    const newTabsData = tabsData.filter((e, i) => {
+    const newTabsData = purchaseOrganizationList.filter((e, i) => {
       if (e.purchasingOrganizationCode !== tabKey) return true;
       index = i;
       return false;
@@ -141,11 +136,11 @@ class PurchasingOrg extends React.Component {
         key = newTabsData[0].purchasingOrganizationCode;
       }
       // 关闭最后一个
-      if (index === tabsData.length - 1) {
+      if (index === purchaseOrganizationList.length - 1) {
         key = newTabsData[index - 1].purchasingOrganizationCode;
       }
       // 关闭中间的Tab
-      if (index > 0 && index < tabsData.length - 1) {
+      if (index > 0 && index < purchaseOrganizationList.length - 1) {
         key = newTabsData[index].purchasingOrganizationCode;
       }
     } else {
@@ -163,14 +158,15 @@ class PurchasingOrg extends React.Component {
   }
 
   render() {
-    const { details } = this.props;
+    const { details, purchaseOrganizations } = this.props;
     const { tabKey } = this.state;
+     if (purchaseOrganizations.length === 0) return null
     let tabList = ''
     if (tabKey) {
-      const { vendor: { purchasingOrganizationList: tabsData } } = details;
-      tabList = tabsData.map(e => ({
-        key: e.purchasingOrganizationCode,
-        tab: e.purchasingOrganizationCode,
+      const { vendor: { purchaseOrganizationList } } = details;
+      tabList = purchaseOrganizationList.map(e => ({
+        key: e.purchaseOrganizationCode,
+        tab: purchaseOrganizations.filter(e1 => e1.code === e.purchaseOrganizationCode)[0].name,
       }));
       tabList = tabList.concat({
         key: 'select',
@@ -189,7 +185,6 @@ class PurchasingOrg extends React.Component {
         }
       });
     }
-
     return (
       <Card
         title="采购组织"

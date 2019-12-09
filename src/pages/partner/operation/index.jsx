@@ -65,7 +65,7 @@ class Operation extends React.Component {
 
   // 业务伙伴查询
   callParter = value => {
-    api.bp.getPartnerName({ code_or_name: value })
+    api.bp.getBPByCodeOrName({ code_or_name: value })
     .then(res => { this.setState({ partnerVal: res }) })
   }
 
@@ -90,6 +90,7 @@ class Operation extends React.Component {
       this.getTableData({
         page: pagination.current,
         rows: pagination.pageSize,
+        ...this.props.form.getFieldsValue(),
         ...filtersArg,
       });
     }

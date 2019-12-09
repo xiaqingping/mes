@@ -62,66 +62,6 @@ class CustomerDetails extends Component {
     window.removeEventListener('resize', this.resizeFooterToolbar);
   }
 
-  // 收票方数据
-  getInvoice = () => {
-    const data = [];
-    for (let i = 0; i < 5; i++) {
-      data.push({
-        id: i,
-        name: `${Math.ceil((Math.random() + 0.0001) * 100000000)} 上海复旦大学`,
-        code: Math.ceil((Math.random() + 0.0001) * 100000000),
-        type: Math.ceil((Math.random() + 0.0001) * 2),
-        soldToPartyId: i,
-        soldTopartyCode: Math.ceil((Math.random() + 0.0001) * 100000000),
-        soldToPartyName: `${Math.ceil((Math.random() + 0.0001) * 100000000)} 上海同济大学`,
-        verifyStatus: Math.ceil((Math.random() + 0.0001) * 2),
-      });
-    }
-    return data;
-  };
-
-  // 售达方数据
-  getSold = () => {
-    const data = [];
-    for (let i = 0; i < 5; i++) {
-      data.push({
-        id: i,
-        name: `${Math.ceil((Math.random() + 0.0001) * 100000000)} 上海复旦大学`,
-        code: Math.ceil((Math.random() + 0.0001) * 100000000),
-        type: Math.ceil((Math.random() + 0.0001) * 2),
-        linkVerifyStatus: Math.ceil((Math.random() + 0.0001) * 2),
-      });
-    }
-    return data;
-  };
-
-  // 送达方数据
-  getShip = () => {
-    const data = [];
-    for (let i = 0; i < 5; i++) {
-      data.push({
-        id: i,
-        name: `${Math.ceil((Math.random() + 0.0001) * 100000000)} 上海复旦大学`,
-        code: Math.ceil((Math.random() + 0.0001) * 100000000),
-        type: Math.ceil((Math.random() + 0.0001) * 2),
-        verifyStatus: Math.ceil((Math.random() + 0.0001) * 2),
-      });
-    }
-    return data;
-  };
-
-  // 销售员数据
-  getSaler = () => {
-    const data = [];
-    for (let i = 0; i < 5; i++) {
-      data.push({
-        name: `${Math.ceil((Math.random() + 0.0001) * 100000000)} 上海复旦大学`,
-        code: Math.ceil((Math.random() + 0.0001) * 100000000),
-      });
-    }
-    return data;
-  };
-
   resizeFooterToolbar = () => {
     requestAnimationFrame(() => {
       const sider = document.querySelectorAll('.ant-layout-sider')[0];
@@ -197,7 +137,7 @@ class CustomerDetails extends Component {
           ) : (
             <>
               <Credit />
-              {customer.basic.countryCode === 'CN' ? (
+              {customer.basic.sapCountryCode === 'CN' ? (
                 <HomeAuthentication />
               ) : (
                 <AbroadAuthentication />

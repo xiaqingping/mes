@@ -1,4 +1,5 @@
-/* eslint-disable max-len */
+/* eslint-disable consistent-return */
+/* eslint-disable array-callback-return */
 /* eslint-disable no-nested-ternary */
 import {
   Modal,
@@ -109,11 +110,11 @@ class RecordListForm extends React.Component {
         // eslint-disable-next-line consistent-return
         api.bp.getLastFinishVerifyRecords(props.recordMsg.bpId).then(res => {
           const newData = [];
-          // newData = type === 1 ? { ...newData, organizationCertification: { pic: [] } } : { ...newData, piCertification: { pic: [] } };
           if (!res) return null
           if (res[typeName].attachmentCode) {
             api.disk.getFiles({
-              sourceKey: parseInt(type, 10) === 1 ? 'bp_organization_certification' : 'bp_pi_certification',
+              sourceKey: parseInt(type, 10) === 1 ?
+                        'bp_organization_certification' : 'bp_pi_certification',
               sourceCode: [res[typeName].attachmentCode].join(',') }).then(v => {
               // sourceCode: '85c951942daa05a83a55655efdd557eb' }).then(v => {
               // eslint-disable-next-line array-callback-return
@@ -163,9 +164,14 @@ class RecordListForm extends React.Component {
             <Row>
               <Col span={8} className={styles.labelName}>状态：</Col>
               <Col span={16} className={styles.labelVal}>
-                <Badge style={{ color: '#999' }} status={VerifyRecordStatus.filter(item => item.value === historyRecord.status)[0].status}
-                text={VerifyRecordStatus.filter(item => item.value === historyRecord.status)[0].text}/>
-                 {typeName === 'piCertification' ? `(${historyRecord.piCertification.billToPartyName})` : ''}
+                <Badge
+                style={{ color: '#999' }}
+                status={VerifyRecordStatus.filter(
+                          item => item.value === historyRecord.status)[0].status}
+                text={
+                  VerifyRecordStatus.filter(item => item.value === historyRecord.status)[0].text}/>
+                 {typeName === 'piCertification' ?
+                 `(${historyRecord.piCertification.billToPartyName})` : ''}
                  <br/>
                 {/* {historyRecord.status}<br/> */}
                 {historyRecord.finishDate}
@@ -319,20 +325,24 @@ class RecordListForm extends React.Component {
               <Col span={8} className={styles.labelName}>附件：</Col>
               <Col span={16} className={styles.labelVal}>
                 { picHas ? <ul style={{ padding: '0' }}>
-                {pic.length !== 0 ? pic.map((item, index) => (
-                    // eslint-disable-next-line react/no-array-index-key
-                    <li key={index} style={{
-                      width: '90px',
-                      height: '90px',
-                      border: '1px solid #D9D9D9',
-                      textAlign: 'center',
-                      lineHeight: '84px',
-                      borderRadius: '5px',
-                      float: 'left',
-                      marginRight: '30px' }}>
-                      <img src={item} alt="" width="80" height="80"/>
-                    </li>
-                    )) : ''}
+                {pic.length !== 0 ? pic.map((item, index) => {
+                  if (index < 12) {
+                    return (
+                      // eslint-disable-next-line react/no-array-index-key
+                      <li key={index} style={{
+                        width: '90px',
+                        height: '90px',
+                        border: '1px solid #D9D9D9',
+                        textAlign: 'center',
+                        lineHeight: '84px',
+                        borderRadius: '5px',
+                        float: 'left',
+                        marginRight: '30px' }}>
+                        <img src={item} alt="" width="80" height="80"/>
+                      </li>
+                      )
+                  }
+                }) : ''}
                   </ul> : ''}
               </Col>
             </Row>
@@ -501,7 +511,6 @@ class CheckModel extends React.Component {
   render () {
     const { recordMsg, showList, detailsValue, clickType, pageVisble, picHas } = this.state;
     const { SpecialInvoice } = this.props;
-
     if (!detailsValue && !picHas) return null
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     let modalTitle;
@@ -838,7 +847,7 @@ class CheckModel extends React.Component {
               </Col>
             </Row>
           </li>
-          {detailsValue.countryCode === 'CN' ?
+          {detailsValue.countryCode.toString() === '1000000000' ?
           <>
             <li>
               <Row>
@@ -951,20 +960,24 @@ class CheckModel extends React.Component {
               {piData.attachmentList[0].name}</Col> */}
               <Col span={16} className={styles.labelVal}>
                 <ul style={{ padding: '0' }}>
-                  {detailsValue.pic.length !== 0 ? detailsValue.pic.map((item, index) => (
-                      // eslint-disable-next-line react/no-array-index-key
-                      <li key={index} style={{
-                        width: '90px',
-                        height: '90px',
-                        border: '1px solid #D9D9D9',
-                        textAlign: 'center',
-                        lineHeight: '84px',
-                        borderRadius: '5px',
-                        float: 'left',
-                        marginRight: '30px' }}>
-                        <img src={item} alt="" width="80" height="80"/>
-                      </li>
-                    )) : ''}
+                  {detailsValue.pic.length !== 0 ? detailsValue.pic.map((item, index) => {
+                    if (index < 12) {
+                      return (
+                        // eslint-disable-next-line react/no-array-index-key
+                        <li key={index} style={{
+                          width: '90px',
+                          height: '90px',
+                          border: '1px solid #D9D9D9',
+                          textAlign: 'center',
+                          lineHeight: '84px',
+                          borderRadius: '5px',
+                          float: 'left',
+                          marginRight: '30px' }}>
+                          <img src={item} alt="" width="80" height="80"/>
+                        </li>
+                      )
+                    }
+                  }) : ''}
                 </ul>
               </Col>
             </Row>

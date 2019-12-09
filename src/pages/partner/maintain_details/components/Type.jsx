@@ -243,10 +243,8 @@ class BasicInfo extends Component {
 
   render() {
     const { noTitleKey } = this.state;
-    // const { details: { customer: { salesAreaList } } } = this.props;
     const { details: { customer }, regions, offices, salesPaymentMethods } = this.props;
     const salesAreaList = customer ? customer.salesAreaList : '';
-    // if (!DefaultInvoiceType) return null
     return (
       <Card
         title="销售范围"
@@ -283,7 +281,9 @@ class BasicInfo extends Component {
                   </DescriptionsItem>
                   <DescriptionsItem label="币种">{item.currencyCode}</DescriptionsItem>
                   <DescriptionsItem label="默认开票类型">
-                    {defaultInvoiceType.map(v => { if (item.defaultInvoiceTypeCode === v.code) return v.name })}
+                    {defaultInvoiceType.map(v => {
+                      if (item.defaultInvoiceTypeCode === v.code) return v.name
+                      })}
                     </DescriptionsItem>
                   <DescriptionsItem label="销售冻结">
                     {item.salesOrderBlock === 1 ? <span><Badge status="error"/>冻结</span> :

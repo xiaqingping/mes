@@ -23,12 +23,10 @@ class FixedQuota extends Component {
       visible,
     })
     const { details } = this.props;
-    // console.log(details)
     if (visible) {
       if (details.basic.type === 2) { // 判断是否为非个人
         api.bp.creditLimitAssessment(
-          details.basic.id,
-          { currencyCode: details.customer.salesAreaList[0].currencyCode },
+          { id: details.basic.id, currencyCode: details.customer.salesAreaList[0].currencyCode },
           ).then(res => { this.setState({ quotaData: res }) })
       }
     }
@@ -47,14 +45,13 @@ class FixedQuota extends Component {
     const { details } = this.props;
     if (details.basic.type === 2) { // 判断是否为非个人
       api.bp.creditLimitAdjustment(
-        details.basic.id,
-        { currencyCode: details.customer.salesAreaList[0].currencyCode },
+        { id: details.basic.id, currencyCode: details.customer.salesAreaList[0].currencyCode },
         ).then(res => {
-          // this.setState({
-          //   quotaData: res,
-          //   status: 2,
-          // })
-          console.log(res)
+          this.setState({
+            quotaData: res,
+            status: 2,
+          })
+          // console.log(res)
         })
     }
   }
@@ -76,18 +73,23 @@ class FixedQuota extends Component {
     )
 }
 
-  hangelPage = () => (
+  hangelPage = () => {
+    const { quotaData } = this.state;
+    return (
       <div style={{ textAlign: 'center' }}>
         <Icon type="check-circle" style={{
           fontSize: '30px',
           color: '#54C31F',
           marginBottom: '20px' }}/>
         <p>
-          您的固定额度已调整为&nbsp;&nbsp;<span style={{ color: '#4EA7E9' }}>20000</span>&nbsp;&nbsp;CNY <br/>
+        您的固定额度已调整为&nbsp;&nbsp;
+        <span style={{ color: '#4EA7E9' }}>{quotaData.creditLimit}</span>&nbsp;&nbsp;
+        {quotaData.currencyCode} <br/>
           请注意查收！
         </p>
       </div>
     )
+  }
 
   render() {
     const { status, visible } = this.state
