@@ -5,9 +5,6 @@ import {
   Card,
   Descriptions,
   Badge,
-  // Upload,
-  // Icon,
-  // Modal,
 } from 'antd';
 import React, { Component } from 'react';
 import { connect } from 'dva';
@@ -43,7 +40,6 @@ const renzhengMap = {
 class BasicInfo extends Component {
   state = {
     pic: [],
-    picHas: false,
   }
 
   componentDidMount() {
@@ -52,19 +48,15 @@ class BasicInfo extends Component {
     if (details.organizationCertification.attachmentCode) {
       api.disk.getFiles({
         sourceKey: 'bp_organization_certification',
-        sourceCode: [details.organizationCertification.attachmentCode].join(',') }).then(v => {
-        // eslint-disable-next-line array-callback-return
-        v.map(item => {
+        sourceCode: details.organizationCertification.attachmentCode }).then(v => {
+        v.forEach(item => {
           if (item.id) {
             newData.push(api.disk.downloadFiles(item.id, { view: true }))
-            this.setState({
-              picHas: true,
-            })
           }
         })
-      })
-      this.setState({
-        pic: newData,
+        this.setState({
+          pic: newData,
+        })
       })
     }
   }
@@ -132,7 +124,6 @@ class BasicInfo extends Component {
                     ))}
                   </> : ''
                   }
-
                 </ul>
               </DescriptionsItem>
             </Descriptions>

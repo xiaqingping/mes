@@ -127,6 +127,7 @@ class Verification extends React.Component {
       this.getData({
         page: pagination.current,
         rows: pagination.pageSize,
+        ...this.props.form.getFieldsValue(),
         ...filtersArg,
       });
     }

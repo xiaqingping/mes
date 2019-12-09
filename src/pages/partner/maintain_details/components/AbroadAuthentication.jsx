@@ -10,7 +10,8 @@ import {
 } from 'antd';
 import React, { Component } from 'react';
 import { connect } from 'dva';
-import './style.less'
+import './style.less';
+import api from '@/api'
 
 const DescriptionsItem = Descriptions.Item;
 // 认证
@@ -38,8 +39,32 @@ const renzhengMap = {
   partnerMaintainEdit.supplier : partnerMaintainEdit.details,
 }))
 class BasicInfo extends Component {
+  state = {
+    pic: [],
+  }
+
+  componentDidMount() {
+    const { details } = this.props;
+    const newData = []
+    if (details.organizationCertification.attachmentCode) {
+      api.disk.getFiles({
+        sourceKey: 'bp_organization_certification',
+        sourceCode: details.organizationCertification.attachmentCode }).then(v => {
+        v.forEach(item => {
+          if (item.id) {
+            newData.push(api.disk.downloadFiles(item.id, { view: true }))
+          }
+        })
+        this.setState({
+          pic: newData,
+        })
+      })
+    }
+  }
+
   render() {
     const { details } = this.props;
+    const { pic } = this.state;
     return (
       <Card title="认证资料" bordered={false} style={{ marginBottom: '24px' }} className="check-tabs">
         <Row gutter={16}>
@@ -69,26 +94,25 @@ class BasicInfo extends Component {
               column={1}
             >
               <DescriptionsItem label="认证图片">
-                {details.organizationCertification ?
-                <>
-                  <ul style={{ padding: '0' }}>
-                    {/* {details.organizationCertification.attachmentList.map((item, index) => (
-                        // eslint-disable-next-line react/no-array-index-key
-                        <li key={index} style={{
-                          width: '100px',
-                          height: '100px',
-                          border: '1px solid #D9D9D9',
-                          textAlign: 'center',
-                          lineHeight: '94px',
-                          borderRadius: '5px',
-                          float: 'left',
-                          marginRight: '10px' }}>{item.type === 'image' ?
-                          <img src={item.code} alt="" width="90" height="90"/> : ''}</li>
-                      ))} */}
-                  </ul>
-                </>
-                : ''
-                }
+              <ul style={{ padding: '0' }}>
+                  {pic.length !== 0 ? <>
+                    {pic.map((item, index) => (
+                      // eslint-disable-next-line react/no-array-index-key
+                      <li key={index} style={{
+                        width: '100px',
+                        height: '100px',
+                        border: '1px solid #D9D9D9',
+                        textAlign: 'center',
+                        lineHeight: '94px',
+                        borderRadius: '5px',
+                        float: 'left',
+                        marginRight: '10px' }}>
+                        <img src={item} alt="" width="90" height="90"/></li>
+                    ))}
+                  </> : ''
+                  }
+
+                </ul>
               </DescriptionsItem>
             </Descriptions>
           </Col>

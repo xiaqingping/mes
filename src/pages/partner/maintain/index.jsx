@@ -299,6 +299,7 @@ constructor(props) {
       this.getTableData({
         ...searchVal,
         page: pagination.current,
+        ...this.props.form.getFieldsValue(),
         pageSize: pagination.pageSize,
       });
     }
