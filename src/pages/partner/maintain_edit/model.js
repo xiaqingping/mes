@@ -1,8 +1,9 @@
-import bpAPI from '@/api/bp';
-import diskAPI from '@/api/disk';
+import api from '@/api';
 
 const initDetails = {
-  basic: {},
+  basic: {
+    certificationStatus: 1,
+  },
   customer: {
     taxesCityCode: null,
     taxesCountyCode: null,
@@ -44,9 +45,9 @@ const SeqModel = {
         const task = [null, null];
 
         // 客户
-        if (customerDataStatus !== '2') task[0] = call(bpAPI.getBPCustomer, id);
+        if (customerDataStatus !== '2') task[0] = call(api.bp.getBPCustomer, id);
         // 供应商
-        if (vendorDataStatus !== '2') task[1] = call(bpAPI.getBPVendor, id);
+        if (vendorDataStatus !== '2') task[1] = call(api.bp.getBPVendor, id);
         const [customer, vendor] = yield all(task);
 
         details = { ...details, ...customer, ...vendor };
@@ -59,7 +60,7 @@ const SeqModel = {
             sourceCode: details.piCertificationList.map(e => e.attachmentCode).join(','),
           };
           if (options.sourceCode) {
-            const img = yield call(diskAPI.getFiles, options);
+            const img = yield call(api.disk.getFiles, options);
             const piCertificationList = details.piCertificationList.map(e => {
               const attachmentList = img.filter(e1 => e1.sourceCode === e.attachmentCode);
               return {
@@ -77,7 +78,7 @@ const SeqModel = {
             sourceCode: details.organizationCertification.attachmentCode,
           };
           if (options.sourceCode) {
-            const attachmentList = yield call(diskAPI.getFiles, options);
+            const attachmentList = yield call(api.disk.getFiles, options);
             const organizationCertification = {
               ...details.organizationCertification,
               attachmentList,

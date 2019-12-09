@@ -4,12 +4,10 @@
 import { Card, Row, Col, Form, Input, Switch, Upload, Icon, Badge, Select, Spin } from 'antd';
 import React, { Component } from 'react';
 import { connect } from 'dva';
-import { formatMessage } from 'umi-plugin-react/locale';
+import { formatMessage } from 'umi/locale';
 import debounce from 'lodash/debounce';
 import { TelphoneInput } from '@/components/CustomizedFormControls';
-import bpAPI from '@/api/bp';
-import diskAPI from '@/api/disk';
-import basicAPI from '@/api/basic';
+import api from '@/api';
 import { requestErr } from '@/utils/request';
 import { guid } from '@/utils/utils';
 
@@ -54,7 +52,7 @@ class OrgCertification extends Component {
       });
     }
 
-    const uploadUrl = diskAPI.uploadMoreFiles('bp_organization_certification', uuid);
+    const uploadUrl = api.disk.uploadMoreFiles('bp_organization_certification', uuid);
 
     this.state = {
       uploadUrl,
@@ -72,7 +70,7 @@ class OrgCertification extends Component {
       this.setState({ bank: [] });
       return;
     }
-    basicAPI
+    api.basic
       .getBanks({
         codeOrFullName: value,
       })
@@ -95,7 +93,7 @@ class OrgCertification extends Component {
       return;
     }
 
-    bpAPI
+    api.bp
       .checkBPFields({ taxNo: value })
       .then(res => {
         if (!res) {
@@ -126,15 +124,11 @@ class OrgCertification extends Component {
 
     if (key === 'attachmentList') {
       if (value.file.status === 'removed') {
-        diskAPI.deleteFiles(value.file.response[0]);
+        api.disk.deleteFiles(value.file.response[0]);
       }
       if (value.file.response) {
-        obj[key] = value.fileList.map(e => {
+        value.fileList.forEach(e => {
           if (e.status === 'error') requestErr(e.response);
-          return {
-            id: (e.response && e.response[0]) || '',
-            name: e.name,
-          };
         });
       }
     }
@@ -187,6 +181,12 @@ class OrgCertification extends Component {
       authorization,
     } = this.props;
     const { uploadUrl, bank, bankFetching } = this.state;
+
+    if (!orgData.attachmentList) {
+      orgData.attachmentList = [];
+    } else if (orgData.attachmentList.fileList) {
+      orgData.attachmentList = orgData.attachmentList.fileList;
+    }
 
     return (
       <Form>
@@ -302,6 +302,7 @@ class OrgCertification extends Component {
               })}
             >
               {getFieldDecorator('attachmentList', {
+                initialValue: orgData.attachmentList,
                 rules: [{ required: true }],
                 valuePropName: 'fileList',
                 getValueFromEvent: this.normFile,
@@ -334,6 +335,12 @@ class OrgCertification extends Component {
     } = this.props;
     const { uploadUrl } = this.state;
 
+    if (!orgData.attachmentList) {
+      orgData.attachmentList = [];
+    } else if (orgData.attachmentList.fileList) {
+      orgData.attachmentList = orgData.attachmentList.fileList;
+    }
+
     return (
       <Form>
         <Row gutter={64}>
@@ -364,6 +371,7 @@ class OrgCertification extends Component {
               })}
             >
               {getFieldDecorator('attachmentList', {
+                initialValue: orgData.attachmentList,
                 rules: [{ required: true }],
                 valuePropName: 'fileList',
                 getValueFromEvent: this.normFile,
