@@ -38,10 +38,15 @@ class EditableCell extends React.Component {
       if (dataIndex === 'address') {
         initialValue = {
           countryCode: record.countryCode,
+          countryName: record.countryName,
           provinceCode: record.provinceCode,
+          provinceName: record.provinceName,
           cityCode: record.cityCode,
+          cityName: record.cityName,
           countyCode: record.countyCode,
+          countyName: record.countyName,
           streetCode: record.streetCode,
+          streetName: record.streetName,
           address: record.address,
         };
       }

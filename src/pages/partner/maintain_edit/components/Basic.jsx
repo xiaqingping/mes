@@ -589,10 +589,15 @@ class Basic extends React.Component {
                   rules: [{ validator: this.checkAddress }],
                   initialValue: {
                     countryCode: basic.countryCode,
+                    countryName: basic.countryName,
                     provinceCode: basic.provinceCode,
+                    provinceName: basic.provinceName,
                     cityCode: basic.cityCode,
+                    cityName: basic.cityName,
                     countyCode: basic.countyCode,
+                    countyName: basic.countyName,
                     streetCode: basic.streetCode,
+                    streetName: basic.streetName,
                     address: basic.address,
                   },
                 })(<AddressInput onChange={value => this.valueChange('address', value)} />)}
