@@ -29,7 +29,6 @@ class PICredit extends React.Component {
   }
 
   renderListItem = item => {
-    if (!item) return null;
     const { creditList } = this.props;
     const credit = creditList.filter(e => e.billToPartyId === item.billToPartyId);
     let data = null;
