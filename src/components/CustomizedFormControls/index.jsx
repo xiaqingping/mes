@@ -350,16 +350,17 @@ export class FaxInput extends React.Component {
 })
 export class AddressInput extends React.Component {
   static getDerivedStateFromProps(nextProps, preState) {
-    const countrys =
-      (preState.countrys && preState.countrys.length > 0 && preState.countrys) ||
-      nextProps.countrys;
+    // const countrys =
+    //   (preState.countrys && preState.countrys.length > 0 && preState.countrys) ||
+    //   nextProps.countrys;
     const { changedValue } = preState;
 
     if ('value' in nextProps) {
       return {
         ...(nextProps.value || {}),
-        countrys,
+        countrys: nextProps.countrys,
         changedValue,
+        flag: preState.flag || false,
       };
     }
     return null;
@@ -372,6 +373,7 @@ export class AddressInput extends React.Component {
       ...value,
       countrys: [],
       changedValue: {},
+      flag: false,
     };
   }
 
@@ -397,7 +399,7 @@ export class AddressInput extends React.Component {
     }
 
     const { onChange } = this.props;
-    const { countrys, ...otherState } = this.state;
+    const { countrys, flag, ...otherState } = this.state;
 
     if (onChange) {
       onChange({
@@ -410,32 +412,78 @@ export class AddressInput extends React.Component {
 
   loadData = selectedOptions => {
     const targetOption = selectedOptions[selectedOptions.length - 1];
-    if (targetOption.children) return;
+    if (targetOption.children && targetOption.children[0].id) return;
     targetOption.loading = true;
 
     area.byParentIdGetArea(targetOption.id).then(res => {
       targetOption.loading = false;
       targetOption.children = res;
-      this.setState({
-        // eslint-disable-next-line react/no-access-state-in-setstate
-        countrys: [...this.state.countrys],
+      // eslint-disable-next-line react/no-access-state-in-setstate
+      const countrys = [...this.state.countrys];
+      this.props.dispatch({
+        type: 'areaCache/setCache',
+        payload: { type: 'countrys', targetState: countrys },
       });
     });
+  };
+
+  changeCountry = () => {
+    const {
+      countryCode,
+      countryName,
+      provinceCode,
+      provinceName,
+      cityCode,
+      cityName,
+      countyCode,
+      countyName,
+      streetCode,
+      streetName,
+    } = this.state;
+    const arr = [
+      { code: countryCode, name: countryName },
+      { code: provinceCode, name: provinceName },
+      { code: cityCode, name: cityName },
+      { code: countyCode, name: countyName },
+      { code: streetCode, name: streetName },
+    ];
+
+    for (let i = arr.length - 1; i > -1; i--) {
+      if (arr[i].code && i > 0) {
+        arr[i - 1].children = [arr[i]];
+      }
+    }
+
+    return [arr[0]];
+  };
+
+  onPopupVisibleChange = value => {
+    this.setState({ flag: value });
   };
 
   render() {
     const { address, countryCode, provinceCode, cityCode, countyCode, streetCode } = this.state;
     const cascader = [countryCode, provinceCode, cityCode, countyCode, streetCode];
+
+    let countrys = [];
+    if (!this.state.flag) {
+      countrys = this.changeCountry();
+    } else {
+      // eslint-disable-next-line prefer-destructuring
+      countrys = this.state.countrys;
+    }
+
     return (
       <InputGroup compact>
         <Cascader
           value={cascader}
           fieldNames={{ label: 'name', value: 'code', children: 'children' }}
-          options={this.state.countrys}
+          options={countrys}
           loadData={this.loadData}
           style={{ width: '40%' }}
           onChange={(value, option) => this.valueChange({ cascader: value, option })}
           changeOnSelect
+          onPopupVisibleChange={this.onPopupVisibleChange}
         />
         <Input
           value={address}
