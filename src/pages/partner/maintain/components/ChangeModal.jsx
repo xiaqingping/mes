@@ -69,10 +69,10 @@ const verifyStatus = {
   },
 }
 
-// 数组去重
-function unique(arr) {
-  return [...new Set(arr)];
-}
+// // 数组去重
+// function unique(arr) {
+//   return [...new Set(arr)];
+// }
 
 // function beforeUpload(file) {
 //   const isJpgOrPng = file.type === 'image/jpeg';
@@ -239,7 +239,7 @@ class AddressGroup extends Component {
   }
 }
 
-@connect(({ basicCache, user, partnerMaintain, global, partnerMaintainEdit }) => {
+@connect(({ basicCache, user, global }) => {
   const industryCategories = basicCache.industryCategories.filter(
     e => e.languageCode === global.languageCode,
   );
@@ -249,14 +249,13 @@ class AddressGroup extends Component {
     // industryCategories: basicCache.industryCategories,
     countryDiallingCodes: basicCache.countryDiallingCodes,
     authorization: user.currentUser.authorization,
-    details: partnerMaintain ? partnerMaintain.details : partnerMaintainEdit.details,
+    // details: partnerMaintain ? partnerMaintain.details : partnerMaintainEdit.details,
   })
 })
 class ChangeModal extends Component {
     constructor (props) {
       super(props);
       this.state = {
-        changeModal: false,
         recordMsg: undefined,
         form: this.props.form,
         loading: false,
@@ -279,7 +278,7 @@ class ChangeModal extends Component {
         deletePiCertificationIdList: [],
         gtype: 0,
         guuid: guid(),
-        deleteId: [],
+        changeModal: false,
       }
       this.fetchBank = debounce(this.fetchBank, 500);
     }
@@ -298,7 +297,9 @@ class ChangeModal extends Component {
 
     /** props更新时调用 */
     visibleShow = (changeModal, recordMsg) => {
-      const { gtype } = this.state;
+      const { gtype, guuid } = this.state;
+      this.setState({ changeModal })
+      const diskFileIdList = []
       if (recordMsg) {
         if (recordMsg.type === 1 || gtype === 1) {
           api.bp.getBPPiCertification(recordMsg.id).then(res => {
@@ -341,9 +342,28 @@ class ChangeModal extends Component {
             if (res.organizationCertification) {
               api.disk.getFiles({
                 sourceKey: 'bp_organization_certification',
-                sourceCode: [res.organizationCertification.attachmentCode].join(',') }).then(
+                sourceCode: res.organizationCertification.attachmentCode }).then(
                   v => {
-                    this.setState({ pic: v })
+                    v.forEach(item => {
+                      diskFileIdList.push(item.diskFileId)
+                    })
+                    const newData = {
+                      diskFileIdList,
+                      sourceCode: guuid,
+                      sourceKey: 'bp_organization_certification',
+                    };
+                    api.disk.copyFiles(newData).then(() => {
+                      // 找出copy出来的图片，copy的id不同
+                      api.disk.getFiles({
+                        sourceKey: 'bp_organization_certification',
+                        sourceCode: guuid }).then(
+                          v1 => {
+                            this.setState({ pic: v1 })
+                            v1.forEach(item => {
+                              diskFileIdList.push(item.diskFileId)
+                            })
+                      })
+                    })
               })
             }
             this.setState({
@@ -355,7 +375,6 @@ class ChangeModal extends Component {
         }
 
         this.setState({
-          changeModal,
           recordMsg,
           loading: false,
         });
@@ -412,33 +431,7 @@ class ChangeModal extends Component {
          userData: { basic },
          recordMsg,
          userData,
-         deleteId,
          guuid } = this.state;
-      // eslint-disable-next-line no-nested-ternary
-      const newGuid = userData.organizationCertification ?
-      (deleteId.length !== 0 ? guuid : userData.organizationCertification.attachmentCode) : guuid;
-      // console.log(userData)
-      const diskFileIdList = []
-      // console.log(userData)
-      if (deleteId.length !== 0) {
-        api.disk.getFiles({
-          sourceKey: 'bp_organization_certification',
-          sourceCode: userData.organizationCertification ?
-          userData.organizationCertification.attachmentCode : newGuid,
-        }).then(
-            v => {
-              v.filter(item => deleteId.indexOf(item.id) < 0).forEach(item => {
-                diskFileIdList.push(item.diskFileId)
-              })
-              // console.log(unique(diskFileIdList))
-              const newData = {
-                diskFileIdList: unique(diskFileIdList),
-                sourceCode: newGuid,
-                sourceKey: 'bp_organization_certification',
-              };
-              api.disk.copyFiles(newData)
-        })
-      }
       this.props.form.validateFields((error, row) => {
         if (error) return;
         let data = {};
@@ -466,7 +459,7 @@ class ChangeModal extends Component {
               bankAccount: row.bankAccount,
               registeredAddress: row.regisAddress,
               notes: row.notes,
-              attachmentCode: newGuid,
+              attachmentCode: guuid,
             },
           }
         } else if (userData.basic.sapCountryCode === 'US') {
@@ -484,12 +477,11 @@ class ChangeModal extends Component {
             organizationCertification: {
               taxNo: row.taxNo,
               notes: row.notes,
-              attachmentCode: newGuid,
+              attachmentCode: guuid,
             },
           }
         }
 
-        console.log(data)
         api.bp.updateBPOrgCertification(data).then(() => {
           this.setState({ submitNext: 2 })
           this.props.getData()
@@ -513,7 +505,6 @@ class ChangeModal extends Component {
     // 关闭弹框
     handleCancel = () => {
       this.setState({
-        changeModal: false,
         recordMsg: null,
         personalShow: true,
         groupNameShow: true,
@@ -531,17 +522,13 @@ class ChangeModal extends Component {
 
     /** 上传和删除图片 */
     handleChange = info => {
-      const { pic, deleteId } = this.state;
+      const { pic } = this.state;
       let data = pic;
-      const id = deleteId;
       if (info.file.status === 'removed') {
           data = pic.filter(item =>
             item.id !== (info.file.response ? info.file.response[0] : info.file.uid),
           )
-          id.push(info.file.response ? info.file.response[0] : info.file.uid)
-          this.setState({
-            pic: data,
-          })
+          api.disk.deleteFiles(info.file.response ? info.file.response[0] : info.file.uid)
         return
       }
       if (info.file.status === 'done') {
@@ -830,13 +817,12 @@ class ChangeModal extends Component {
       const deletePiCertificationId = deletePiCertificationIdList;
       userPersonData.forEach(item => {
         if (item.id === id) {
-          console.log(id)
           deletePiCertificationId.push(id)
         }
       })
       const oldData = userPersonData.filter(item => item.id !== id);
       this.setState({
-        deletePiCertificationIdList,
+        deletePiCertificationIdList: deletePiCertificationId,
         userPersonData: oldData,
       })
     }
@@ -941,7 +927,6 @@ class ChangeModal extends Component {
 
     render () {
       const {
-        changeModal,
         recordMsg,
         userData,
         submitNext,
@@ -954,8 +939,9 @@ class ChangeModal extends Component {
         userPersonData,
         gtype,
         guuid,
-        deleteId,
+        changeModal,
       } = this.state;
+
       const fileList = pic.map(e => ({
         old: true,
         uid: e.id,
@@ -964,6 +950,7 @@ class ChangeModal extends Component {
         url: api.disk.downloadFiles(e.id, { view: true }),
         type: e.type,
       }));
+
       const { basic } = userData;
       const nullData = {};
       let modelWidth = 970;
@@ -981,11 +968,11 @@ class ChangeModal extends Component {
         </div>
       );
         // eslint-disable-next-line no-nested-ternary
-        const newGuid = deleteId.length === 0 ? (userData.organizationCertification ?
-        userData.organizationCertification.attachmentCode : guuid) : guuid;
+        // const newGuid = deleteId.length === 0 ? (userData.organizationCertification ?
+        // userData.organizationCertification.attachmentCode : guuid) : guuid;
         const uploadUrl = api.disk.uploadMoreFiles(
           'bp_organization_certification',
-          newGuid,
+          guuid,
           );
       const uploadModal =
         <Upload
@@ -1004,12 +991,6 @@ class ChangeModal extends Component {
         >
           {uploadButton}
         </Upload>
-        // <div style={{
-        //   color: '#ADADAD',
-        //   marginTop: '-30px',
-        //   marginBottom: '20px' }}>只支持 .jpg 格式</div>
-      // if (recordMsg.code === userData.basic.code) {}
-      // 个人变更
       if (gtype !== 1) {
         if ((recordMsg && recordMsg.type === 1) || gtype === 2) {
           modelWidth = 830;

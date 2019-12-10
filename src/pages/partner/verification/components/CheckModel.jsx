@@ -1,5 +1,3 @@
-/* eslint-disable consistent-return */
-/* eslint-disable array-callback-return */
 /* eslint-disable no-nested-ternary */
 import {
   Modal,
@@ -342,6 +340,7 @@ class RecordListForm extends React.Component {
                       </li>
                       )
                   }
+                  return ''
                 }) : ''}
                   </ul> : ''}
               </Col>
@@ -355,8 +354,9 @@ class RecordListForm extends React.Component {
 }
 
 
-@connect(({ bp }) => ({
+@connect(({ bp, basicCache }) => ({
   SpecialInvoice: bp.SpecialInvoice,
+  countryDiallingCodes: basicCache.countryDiallingCodes,
 }))
 class CheckModel extends React.Component {
   constructor (props) {
@@ -374,6 +374,10 @@ class CheckModel extends React.Component {
 
   componentDidMount() {
     this.props.onRef(this)
+    this.props.dispatch({
+      type: 'basicCache/getCache',
+      payload: { type: 'countryDiallingCodes' },
+    });
   }
 
   /** 控制模态框状态 */
@@ -510,7 +514,7 @@ class CheckModel extends React.Component {
 
   render () {
     const { recordMsg, showList, detailsValue, clickType, pageVisble, picHas } = this.state;
-    const { SpecialInvoice } = this.props;
+    const { SpecialInvoice, countryDiallingCodes } = this.props;
     if (!detailsValue && !picHas) return null
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     let modalTitle;
@@ -557,8 +561,12 @@ class CheckModel extends React.Component {
                 <Row>
                   <Col span={8} className={styles.labelName}>原手机：</Col>
                   <Col span={16} className={styles.labelVal}>
-                    {detailsValue.oldMobilePhoneCountryCode ?
-                    `+${detailsValue.oldMobilePhoneCountryCode} `
+                    {
+                    detailsValue.oldMobilePhoneCountryCode &&
+                    detailsValue.oldMobilePhoneCountryCode !== 'NULL' ?
+                    `+${countryDiallingCodes.filter(
+                      v => v.countryCode === detailsValue.oldMobilePhoneCountryCode,
+                      )[0].diallingCode} `
                     : ''}{detailsValue.oldMobilePhone}</Col>
                 </Row>
                 :
@@ -606,8 +614,11 @@ class CheckModel extends React.Component {
             <Row>
               <Col span={8} className={styles.labelName}>新手机：</Col>
               <Col span={16} className={styles.labelVal}>
-                {detailsValue.newMobilePhoneCountryCode ?
-                `+${detailsValue.newMobilePhoneCountryCode} ` : ''}
+                {detailsValue.newMobilePhoneCountryCode &&
+                detailsValue.newMobilePhoneCountryCode !== 'NULL' ?
+                `+${countryDiallingCodes.filter(
+                  v => v.countryCode === detailsValue.newMobilePhoneCountryCode,
+                  )[0].diallingCode} ` : ''}
                 {detailsValue.newMobilePhone}</Col>
             </Row>
           </li>
@@ -977,6 +988,7 @@ class CheckModel extends React.Component {
                         </li>
                       )
                     }
+                    return ''
                   }) : ''}
                 </ul>
               </Col>

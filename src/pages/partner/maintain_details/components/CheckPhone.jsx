@@ -279,13 +279,13 @@ class CheckPhone extends Component {
             </div>
             {getFieldDecorator('qone', {
               rules: [
-                { required: true, message: '请输入内容' },
+                // { required: true, message: '请输入内容' },
                 { validator: (rule, value, callback) => {
                     if (parseInt(value, 10) !== 2 && value) {
                       this.setState({
                         oneQuestion: 'error',
                       })
-                      callback('您输入的答案有误！');
+                      // callback('您输入的答案有误！');
                     } else {
                       this.setState({
                         oneQuestion: 'success',
@@ -312,13 +312,13 @@ class CheckPhone extends Component {
             </div>
             {getFieldDecorator('qtwo', {
               rules: [
-                { required: true, message: '请输入内容' },
+                // { required: true, message: '请输入内容' },
                 { validator: (rule, value, callback) => {
                     if (parseInt(value, 10) !== 4 && value) {
                       this.setState({
                         twoQuestion: 'error',
                       })
-                      callback('您输入的答案有误！');
+                      // callback('您输入的答案有误！');
                     } else {
                       this.setState({
                         twoQuestion: 'success',
@@ -346,13 +346,13 @@ class CheckPhone extends Component {
             </div>
             {getFieldDecorator('qthree', {
               rules: [
-                { required: true, message: '请输入内容' },
+                // { required: true, message: '请输入内容' },
                 { validator: (rule, value, callback) => {
                     if (parseInt(value, 10) !== 9 && value) {
                       this.setState({
                         threeQuestion: 'error',
                       })
-                      callback('您输入的答案有误！');
+                      // callback('您输入的答案有误！');
                     } else {
                       this.setState({
                         threeQuestion: 'success',
