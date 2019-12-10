@@ -21,6 +21,25 @@ const initDetails = {
   creditList: [],
 };
 
+// const validateResult = {
+//   basic: {
+//     type: 0,
+//     name: 0,
+//   },
+//   customer: {
+//     salesOrderBlock: 2,
+//     salesAreaList: [],
+//     addressList: [],
+//   },
+//   vendor: {
+//     invoicePostBlock: 2,
+//     purchaseOrganizationList: [],
+//     paymentBank: {},
+//   },
+//   organizationCertification: {},
+//   piCertificationList: [],
+// };
+
 const SeqModel = {
   namespace: 'bpEdit',
   state: {

@@ -86,7 +86,7 @@ class FormContent extends React.Component {
       currencies,
       DefaultInvoiceType,
     } = this.props;
-    // TODO:
+
     const sapCountryCode = basicInfo.sapCountryCode || 'CN';
 
     return (
@@ -258,6 +258,8 @@ class SalesArea extends React.Component {
   }
 
   valueChange = (key, value) => {
+    console.log(key);
+    console.log(value);
     const { tabKey } = this.state;
     const { details, customer, salesAreaList } = this.props;
 
@@ -313,6 +315,8 @@ class SalesArea extends React.Component {
 
   onTabelTabChange = activeKey => {
     // TODO: 这里要验证表格数据
+    console.log(this.state.tableTabKey);
+    console.log(activeKey);
     this.setState({ tableTabKey: activeKey });
   };
 
