@@ -350,7 +350,7 @@ class Basic extends React.Component {
         {basic.certificationStatus === 2 ? (
           <Badge status="warning" text="审核中" />
         ) : (
-          <a>
+          <a className={styles.changeButton}>
             <FormattedMessage id="bp.maintain_details.change" />
           </a>
         )}
@@ -402,8 +402,10 @@ class Basic extends React.Component {
     if (editType === 'update' && basic.mobilePhoneVerifyStatus === 'Y') {
       const show = (
         <>
-          18735812924
+          {basic.mobilePhoneCountryCode}
+          {basic.mobilePhone}
           <a
+            className={styles.changeButton}
             onClick={() => {
               this.changePhoneCallback(true);
             }}
@@ -448,8 +450,9 @@ class Basic extends React.Component {
     if (editType === 'update' && basic.emailVerifyStatus === 'Y') {
       const show = (
         <>
-          123456789@qq.com
+          {basic.email}
           <a
+            className={styles.changeButton}
             onClick={() => {
               this.changeEmailCallback(true);
             }}
@@ -481,8 +484,7 @@ class Basic extends React.Component {
       <p style={{ lineHeight: '32px' }}>
         <span>{basic.telephoneCountryCode} </span>
         {`${basic.telephoneAreaCode}-${basic.telephone}-${basic.telephoneExtension}`}
-        <a>
-          {' '}
+        <a className={styles.changeButton}>
           <FormattedMessage id="bp.maintain_details.change" />
         </a>
       </p>
@@ -573,8 +575,7 @@ class Basic extends React.Component {
         <>
           {formatter(industryCategories, basic.industryCode, 'code')}
           {basic.type === 2 ? (
-            <a>
-              &nbsp;
+            <a className={styles.changeButton}>
               <FormattedMessage id="bp.maintain_details.change" />
             </a>
           ) : null}
