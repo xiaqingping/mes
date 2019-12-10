@@ -90,7 +90,7 @@ class FormContent extends React.Component {
     const sapCountryCode = basicInfo.sapCountryCode || 'CN';
 
     return (
-      <Form>
+      <Form hideRequiredMark>
         <Row gutter={32}>
           <Col span={5}>
             <FormItem
@@ -402,7 +402,7 @@ class SalesArea extends React.Component {
 
     return (
       <Cascader options={options} onChange={this.onCascaderChange}>
-        <a style={{ fontSize: 14, marginLeft: -16 }} href="#">
+        <a style={{ fontSize: 14, marginLeft: -16 }}>
           <FormattedMessage id="bp.maintain_details.sales_distribution.sales_org" />
           <Icon type="down" style={{ fontSize: 12 }} />
         </a>

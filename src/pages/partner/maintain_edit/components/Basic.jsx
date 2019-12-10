@@ -16,6 +16,8 @@ import {
 import debounce from 'lodash/debounce';
 import bpAPI from '@/api/bp';
 import { formatter } from '@/utils/utils';
+import CheckPhone from '@/pages/partner/maintain_details/components/CheckPhone';
+// import CheckEmail from '@/pages/partner/maintain_details/components/CheckEmail';
 import styles from '../style.less';
 
 const FormItem = Form.Item;
@@ -39,7 +41,6 @@ const { Option } = Select;
     const industryCategories = basicCache.industryCategories.filter(
       e => e.languageCode === global.languageCode,
     );
-    // const industryCategories = bp.Industry;
 
     return {
       oldDetails,
@@ -65,6 +66,10 @@ class Basic extends React.Component {
     super(props);
     this.state = {
       industrySelectOpen: true,
+      // 变更移动电话模态框显示状态
+      changeMobileModalVisible: false,
+      // 变更邮箱模态框显示状态
+      // changeEmaileModalVisible: true,
     };
     // 异步验证做节流处理
     this.checkNameInput = debounce(this.checkNameInput, 800);
@@ -317,6 +322,141 @@ class Basic extends React.Component {
     });
   };
 
+  // 名称
+  renderName = () => {
+    const { form, editType, basic } = this.props;
+    const { getFieldDecorator } = form;
+
+    const type1 = (
+      <span>
+        <Icon type="user" />
+        &nbsp;个人
+      </span>
+    );
+    const type2 = (
+      <span>
+        <Icon type="home" />
+        &nbsp;组织
+      </span>
+    );
+
+    const show = (
+      <p style={{ lineHeight: '32px' }}>
+        {basic.type === 1 ? type1 : null}
+        {basic.type === 2 ? type2 : null}
+        <span>&nbsp;{basic.name}&nbsp;</span>
+        {basic.certificationStatus === 2 ? (
+          <Badge status="warning" text="审核中" />
+        ) : (
+          <a>
+            <FormattedMessage id="bp.maintain_details.change" />
+          </a>
+        )}
+      </p>
+    );
+
+    // 编辑状态
+    // 页面状态为：新增
+    if (editType === 'add') {
+      const edit = getFieldDecorator('name', {
+        initialValue: {
+          type: basic.type,
+          name: basic.name,
+        },
+        rules: [{ validator: this.checkNameInput }],
+      })(<NameInput onChange={value => this.valueChange('name', value)} />);
+
+      return edit;
+    }
+    // 非编辑状态
+    if (editType === 'update') {
+      return show;
+    }
+    return null;
+  };
+
+  // 移动电话
+  renderMobilePhone = () => {
+    const { form, editType, basic } = this.props;
+    const { getFieldDecorator } = form;
+
+    // 编辑状态
+    // 1）页面状态为：新增
+    // 2）页面状态为：修改 并且 BP类型为人员
+    if (editType === 'add' || (editType === 'update' && basic.mobilePhoneVerifyStatus === 'N')) {
+      const edit = getFieldDecorator('mobilePhone', {
+        initialValue: {
+          mobilePhoneCountryCode: basic.mobilePhoneCountryCode,
+          mobilePhone: basic.mobilePhone,
+        },
+        rules: [{ validator: this.checkMobilePhone }],
+      })(<MobilePhoneInput onChange={value => this.valueChange('mobilePhone', value)} />);
+
+      return edit;
+    }
+
+    // 显示状态
+    // 页面状态为：修改 并且 移动电话验证状态为：Y
+    if (editType === 'update' && basic.mobilePhoneVerifyStatus === 'Y') {
+      const show = (
+        <>
+          18735812924
+          <a
+            onClick={() => {
+              this.checkPhone(true);
+            }}
+          >
+            <FormattedMessage id="bp.maintain_details.change" />
+          </a>
+          <CheckPhone
+            details={this.props.details}
+            phoneShow={this.state.changeMobileModalVisible}
+          />
+        </>
+      );
+
+      return show;
+    }
+
+    return null;
+  };
+
+  // 邮箱
+  renderEmail = () => {
+    const { form, editType, basic } = this.props;
+    const { getFieldDecorator } = form;
+
+    // 编辑状态
+    // 1）页面状态为：新增
+    // 2）页面状态为：修改 并且 BP类型为人员
+    if (editType === 'add' || (editType === 'update' && basic.mobilePhoneVerifyStatus === 'N')) {
+      const edit = getFieldDecorator('email', {
+        initialValue: { email: basic.email },
+        rules: [{ validator: this.checkEmail }],
+      })(<EmailInput onChange={value => this.valueChange('email', value)} />);
+
+      return edit;
+    }
+
+    // 显示状态
+    // 页面状态为：修改 并且 移动电话验证状态为：Y
+    if (editType === 'update' && basic.emailVerifyStatus === 'Y') {
+      const show = (
+        <>
+          123456789@qq.com
+          <a>
+            <FormattedMessage id="bp.maintain_details.change" />
+          </a>
+          {/* <CheckEmail emailShow={this.state.changeEmaileModalVisible} /> */}
+        </>
+      );
+
+      return show;
+    }
+
+    return null;
+  };
+
   // 电话
   renderTelephone = () => {
     const { form, editType, basic } = this.props;
@@ -326,7 +466,7 @@ class Basic extends React.Component {
       <p style={{ lineHeight: '32px' }}>
         <span>{basic.telephoneCountryCode} </span>
         {`${basic.telephoneAreaCode}-${basic.telephone}-${basic.telephoneExtension}`}
-        <a href="#">
+        <a>
           {' '}
           <FormattedMessage id="bp.maintain_details.change" />
         </a>
@@ -346,59 +486,6 @@ class Basic extends React.Component {
         },
         rules: [{ validator: this.checkTelePhone }],
       })(<TelphoneInput onChange={value => this.valueChange('telephone', value)} />);
-
-      return edit;
-    }
-    // 非编辑状态
-    if (editType === 'update') {
-      return show;
-    }
-    return null;
-  };
-
-  // 名称
-  renderName = () => {
-    const { form, editType, basic } = this.props;
-    const { getFieldDecorator } = form;
-
-    const type1 = (
-      <span>
-        <Icon type="user" />
-        &nbsp;个人
-      </span>
-    );
-    const type2 = (
-      <span>
-        <Icon type="home" />
-        &nbsp;组织
-      </span>
-    );
-    // const certificationStatus2 = <Badge status="warning" text="审核中" />;
-    const show = (
-      <p style={{ lineHeight: '32px' }}>
-        {basic.type === 1 ? type1 : null}
-        {basic.type === 2 ? type2 : null}
-        <span>&nbsp;{basic.name}&nbsp;</span>
-        {basic.certificationStatus === 2 ? (
-          <Badge status="warning" text="审核中" />
-        ) : (
-          <a href="#">
-            <FormattedMessage id="bp.maintain_details.change" />
-          </a>
-        )}
-      </p>
-    );
-
-    // 编辑状态
-    // 页面状态为：新增
-    if (editType === 'add') {
-      const edit = getFieldDecorator('name', {
-        initialValue: {
-          type: basic.type,
-          name: basic.name,
-        },
-        rules: [{ validator: this.checkNameInput }],
-      })(<NameInput onChange={value => this.valueChange('name', value)} />);
 
       return edit;
     }
@@ -471,7 +558,7 @@ class Basic extends React.Component {
         <>
           {formatter(industryCategories, basic.industryCode, 'code')}
           {basic.type === 2 ? (
-            <a href="#">
+            <a>
               &nbsp;
               <FormattedMessage id="bp.maintain_details.change" />
             </a>
@@ -484,7 +571,20 @@ class Basic extends React.Component {
     return null;
   };
 
+  checkPhone = v => {
+    this.setState({
+      changeMobileModalVisible: v,
+    });
+  };
+
+  // checkEmail = v => {
+  //   this.setState({
+  //     changeEmaileModalVisible: v,
+  //   })
+  // }
+
   render() {
+    console.log('**********************render');
     const {
       form: { getFieldDecorator },
       basic,
@@ -499,7 +599,7 @@ class Basic extends React.Component {
         bordered={false}
         style={{ marginBottom: '24px' }}
       >
-        <Form layout="vertical" className={styles.sangonForm}>
+        <Form layout="vertical" className={styles.sangonForm} hideRequiredMark>
           <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
             <Col md={6} sm={12}>
               <FormItem label={formatMessage({ id: 'bp.maintain_details.name' })}>
@@ -508,21 +608,12 @@ class Basic extends React.Component {
             </Col>
             <Col md={6} sm={12}>
               <FormItem label={formatMessage({ id: 'bp.maintain_details.mobile_phone' })}>
-                {getFieldDecorator('mobilePhone', {
-                  initialValue: {
-                    mobilePhoneCountryCode: basic.mobilePhoneCountryCode,
-                    mobilePhone: basic.mobilePhone,
-                  },
-                  rules: [{ validator: this.checkMobilePhone }],
-                })(<MobilePhoneInput onChange={value => this.valueChange('mobilePhone', value)} />)}
+                {this.renderMobilePhone()}
               </FormItem>
             </Col>
             <Col md={6} sm={12}>
               <FormItem label={formatMessage({ id: 'bp.maintain_details.basic.email' })}>
-                {getFieldDecorator('email', {
-                  initialValue: { email: basic.email },
-                  rules: [{ validator: this.checkEmail }],
-                })(<EmailInput onChange={value => this.valueChange('email', value)} />)}
+                {this.renderEmail()}
               </FormItem>
             </Col>
             <Col md={6} sm={12}>
