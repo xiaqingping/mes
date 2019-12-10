@@ -176,7 +176,7 @@ class PICertificationAddModal extends React.Component {
         onOk={this.onOk}
         onCancel={onCancel}
       >
-        <Form>
+        <Form hideRequiredMark>
           <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="收票方">
             {form.getFieldDecorator('billToPartyId', {
               initialValue: billToParty.billToPartyId,

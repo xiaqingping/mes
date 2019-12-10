@@ -189,7 +189,7 @@ class OrgCertification extends Component {
     }
 
     return (
-      <Form>
+      <>
         <Row gutter={32}>
           <Col xxl={15} lg={24}>
             <Row gutter={32}>
@@ -323,7 +323,7 @@ class OrgCertification extends Component {
             </FormItem>
           </Col>
         </Row>
-      </Form>
+      </>
     );
   };
 
@@ -342,64 +342,62 @@ class OrgCertification extends Component {
     }
 
     return (
-      <Form>
-        <Row gutter={64}>
-          <Col span={6}>
-            <Row>
-              <Col span={24}>
-                <FormItem
-                  label={formatMessage({ id: 'bp.maintain_details.verification_data.status' })}
-                >
-                  <Badge status="default" />
-                  未认证
-                </FormItem>
-              </Col>
-              <Col span={24}>
-                <FormItem label={sapCountryCode === 'US' ? '免税认证号' : '增值税登记号'}>
-                  {getFieldDecorator('taxNo', {
-                    initialValue: orgData.taxNo,
-                    rules: [{ validator: this.checkTaxNo }],
-                  })(<Input onChange={e => this.valueChange('taxNo', e.target.value)} />)}
-                </FormItem>
-              </Col>
-            </Row>
-          </Col>
-          <Col span={6}>
-            <FormItem
-              label={formatMessage({
-                id: 'bp.maintain_details.verification_data.verification_documents',
-              })}
-            >
-              {getFieldDecorator('attachmentList', {
-                initialValue: orgData.attachmentList,
-                rules: [{ required: true }],
-                valuePropName: 'fileList',
-                getValueFromEvent: this.normFile,
-              })(
-                <Upload
-                  name="files"
-                  multiple
-                  listType="picture-card"
-                  showUploadList
-                  action={uploadUrl}
-                  accept=".jpg,.png"
-                  headers={{ Authorization: authorization }}
-                  onChange={value => this.valueChange('attachmentList', value)}
-                >
-                  {this.uploadButton()}
-                </Upload>,
-              )}
-            </FormItem>
-          </Col>
-          <Col span={10}>
-            <FormItem label={formatMessage({ id: 'bp.maintain_details.verification_data.memo' })}>
-              {getFieldDecorator('notes', {
-                initialValue: orgData.notes,
-              })(<TextArea rows={6} onChange={e => this.valueChange('notes', e.target.value)} />)}
-            </FormItem>
-          </Col>
-        </Row>
-      </Form>
+      <Row gutter={64}>
+        <Col span={6}>
+          <Row>
+            <Col span={24}>
+              <FormItem
+                label={formatMessage({ id: 'bp.maintain_details.verification_data.status' })}
+              >
+                <Badge status="default" />
+                未认证
+              </FormItem>
+            </Col>
+            <Col span={24}>
+              <FormItem label={sapCountryCode === 'US' ? '免税认证号' : '增值税登记号'}>
+                {getFieldDecorator('taxNo', {
+                  initialValue: orgData.taxNo,
+                  rules: [{ validator: this.checkTaxNo }],
+                })(<Input onChange={e => this.valueChange('taxNo', e.target.value)} />)}
+              </FormItem>
+            </Col>
+          </Row>
+        </Col>
+        <Col span={6}>
+          <FormItem
+            label={formatMessage({
+              id: 'bp.maintain_details.verification_data.verification_documents',
+            })}
+          >
+            {getFieldDecorator('attachmentList', {
+              initialValue: orgData.attachmentList,
+              rules: [{ required: true }],
+              valuePropName: 'fileList',
+              getValueFromEvent: this.normFile,
+            })(
+              <Upload
+                name="files"
+                multiple
+                listType="picture-card"
+                showUploadList
+                action={uploadUrl}
+                accept=".jpg,.png"
+                headers={{ Authorization: authorization }}
+                onChange={value => this.valueChange('attachmentList', value)}
+              >
+                {this.uploadButton()}
+              </Upload>,
+            )}
+          </FormItem>
+        </Col>
+        <Col span={10}>
+          <FormItem label={formatMessage({ id: 'bp.maintain_details.verification_data.memo' })}>
+            {getFieldDecorator('notes', {
+              initialValue: orgData.notes,
+            })(<TextArea rows={6} onChange={e => this.valueChange('notes', e.target.value)} />)}
+          </FormItem>
+        </Col>
+      </Row>
     );
   };
 
@@ -421,7 +419,7 @@ class OrgCertification extends Component {
   render() {
     return (
       <Card title="认证资料" bordered={false} style={{ marginBottom: '24px' }}>
-        {this.renderForm()}
+        <Form hideRequiredMark>{this.renderForm()}</Form>
       </Card>
     );
   }

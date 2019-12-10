@@ -67,7 +67,7 @@ class FormContent extends React.Component {
 
     if (tabKey !== data.purchaseOrganizationCode) return null;
     return (
-      <Form layout="vertical">
+      <Form layout="vertical" hideRequiredMark>
         <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
           <Col md={6}>
             <FormItem

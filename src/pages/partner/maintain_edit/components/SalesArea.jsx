@@ -90,7 +90,7 @@ class FormContent extends React.Component {
     const sapCountryCode = basicInfo.sapCountryCode || 'CN';
 
     return (
-      <Form>
+      <Form hideRequiredMark>
         <Row gutter={32}>
           <Col span={5}>
             <FormItem

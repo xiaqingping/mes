@@ -67,9 +67,9 @@ class Basic extends React.Component {
     this.state = {
       industrySelectOpen: true,
       // 变更移动电话模态框显示状态
-      // changeMobileModalVisible: false,
+      // changeMobileModalVisible: true,
       // 变更邮箱模态框显示状态
-      // changeEmaileModalVisible: false,
+      // changeEmaileModalVisible: true,
     };
     // 异步验证做节流处理
     this.checkNameInput = debounce(this.checkNameInput, 800);
@@ -579,7 +579,7 @@ class Basic extends React.Component {
         bordered={false}
         style={{ marginBottom: '24px' }}
       >
-        <Form layout="vertical" className={styles.sangonForm}>
+        <Form layout="vertical" className={styles.sangonForm} hideRequiredMark>
           <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
             <Col md={6} sm={12}>
               <FormItem label={formatMessage({ id: 'bp.maintain_details.name' })}>
