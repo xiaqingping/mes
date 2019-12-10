@@ -23,7 +23,7 @@ const { TabPane } = Tabs;
 }))
 class CheckEmail extends Component {
   state = {
-    EmailVisible: false,
+    emailVisible: false,
     status: 1,
     oneQuestion: null,
     twoQuestion: null,
@@ -34,31 +34,34 @@ class CheckEmail extends Component {
     verifyRecordId: null,
   };
 
+  componentDidMount() {
+    this.props.onRef(this)
+  }
+
   componentWillReceiveProps (nextProps) {
-    const { emailShow } = nextProps;
     const { proceed } = nextProps; // 继续验证的状态区别
     if (proceed) {
       this.setState({
-        EmailVisible: emailShow,
         proceed: !!proceed,
         status: 5,
-      })
-    } else {
-      this.setState({
-        EmailVisible: emailShow,
       })
     }
   }
 
+  visibleShow = emailVisible => {
+    this.setState({
+      emailVisible,
+    });
+  }
 
-  setModalVisible(EmailVisible) {
-    this.setState({ EmailVisible,
+  setModalVisible= emailVisible => {
+    this.setState({
+      emailVisible,
       status: 1,
       oneQuestion: null,
       twoQuestion: null,
       threeQuestion: null,
       proceed: false });
-      this.props.checkEmail(EmailVisible)
   }
 
   // 用户自行变更验证input的数据
@@ -468,11 +471,11 @@ class CheckEmail extends Component {
   }
 
   render() {
-    const { proceed } = this.state;
+    const { proceed, emailVisible } = this.state;
     return (
       <div>
         <Modal
-          visible={this.state.EmailVisible}
+          visible={emailVisible}
           destroyOnClose
           maskClosable={false}
           onOk={() => this.setModalVisible(false)}
