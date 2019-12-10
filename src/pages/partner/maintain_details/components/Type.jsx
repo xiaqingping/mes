@@ -245,6 +245,7 @@ class BasicInfo extends Component {
     const { noTitleKey } = this.state;
     const { details: { customer }, regions, offices, salesPaymentMethods } = this.props;
     const salesAreaList = customer ? customer.salesAreaList : '';
+
     return (
       <Card
         title="销售范围"
@@ -282,7 +283,7 @@ class BasicInfo extends Component {
                   <DescriptionsItem label="币种">{item.currencyCode}</DescriptionsItem>
                   <DescriptionsItem label="默认开票类型">
                     {defaultInvoiceType.map(v => {
-                      if (item.defaultInvoiceTypeCode === v.code) return v.name
+                      if (item.defaultInvoiceTypeCode === v.id) return v.name
                       })}
                     </DescriptionsItem>
                   <DescriptionsItem label="销售冻结">

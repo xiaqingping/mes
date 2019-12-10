@@ -131,8 +131,6 @@ constructor(props) {
     xiaoshuoguishu: [],
     // kaipiaofang: [],
     receivingParty: [], // 收票方
-    changeModal: false,
-    recordMesg: undefined,
     loading: false,
     searchVal: {},
   };
@@ -201,26 +199,6 @@ constructor(props) {
       )
     }
   };
-
-  /** 变更认证 */
-  changeIdent = (e, record) => {
-    e.preventDefault();
-    this.setState({
-      changeModal: true,
-      recordMesg: record,
-    });
-  };
-
-  /** 认证 */
-  // identificate = (e, record) => {
-  //   e.preventDefault();
-  //   this.setState(
-  //     {
-  //       changeModal: true,
-  //       recordMesg: record,
-  //     },
-  //   )
-  // }
 
   handleSearch = e => {
     e.preventDefault();
@@ -335,32 +313,9 @@ constructor(props) {
     return expandForm ? this.renderAdvancedForm() : this.renderSimpleForm();
   };
 
-  // form in modal
-  perSaveFormRef = formRef => {
-    this.performRef = formRef;
-  };
-
-  // get values of form in modal
-  getValues = () => {
-    const { form } = this.performRef.props;
-    form.validateFields((err, values) => {
-      if (err) {
-        return;
-      }
-      console.log(values);
-    });
-
-    const allValues = form.getFieldsValue();
-    console.log(allValues);
-  };
-
-  // close the modal
-  closeModal = () => {
-    this.setState({
-      changeModal: false,
-      recordMesg: undefined,
-    });
-  };
+  changeShow= (v, data) => {
+    this.ChangeModal.visibleShow(v, data)
+  }
 
   /** 完整筛选条件 */
   renderAdvancedForm() {
@@ -519,8 +474,6 @@ constructor(props) {
       formValues: { page: current, pageSize },
       list,
       selectedRows,
-      changeModal,
-      recordMesg,
       loading,
       total,
     } = this.state;
@@ -684,13 +637,13 @@ constructor(props) {
               {/* 变更认证：PI除了未认证其他都要显示；组织只显示已认证状态；组织没有部分认证 */}
               {record.certificationStatus === 4 || record.certificationStatus === 3 ?
                 <Menu.Item>
-                  <a href="#" onClick={ () => { this.showChange.visibleShow(true, record) }}>变更认证</a>
+                  <a href="#" onClick={ () => { this.changeShow(true, record) }}>变更认证</a>
                 </Menu.Item>
               : ''
               }
               {record.certificationStatus === 1 ?
                 <Menu.Item><a href="#"
-                onClick={ () => { this.showChange.visibleShow(true, record) }}>认证</a></Menu.Item>
+                onClick={ () => { this.changeShow(true, record) }}>认证</a></Menu.Item>
               : ''
               }
             </Menu>
@@ -733,12 +686,13 @@ constructor(props) {
           </div>
         </Card>
         <ChangeModal
-          wrappedComponentRef={this.perSaveFormRef}
-          changeModal={changeModal}
-          recordMsg={recordMesg}
+          // wrappedComponentRef={this.perSaveFormRef}
+          // changeModal={changeModal}
+          // recordMsg={recordMesg}
           onRef={ref => {
-            this.showChange = ref;
+            this.ChangeModal = ref;
           }}
+          changeShow={v => this.changeShow(v)}
           getData={this.getTableData}
           getValues={this.getValues}
         />
