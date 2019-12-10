@@ -1,5 +1,3 @@
-// eslint-disable-next-line eslint-comments/disable-enable-pair
-/* eslint-disable jsx-a11y/alt-text */
 import {
   Card,
   Descriptions,
@@ -69,8 +67,7 @@ class BasicInfo extends Component {
     if (!countryDiallingCodes && !salesPaymentMethods) return null;
     if (industry.length === 0) return null;
     let newData = []
-    // eslint-disable-next-line array-callback-return
-    countryDiallingCodes.map(item => {
+    countryDiallingCodes.forEach(item => {
       if (item.countryCode === basic.telephoneCountryCode) {
         newData = item;
       }
@@ -104,14 +101,17 @@ class BasicInfo extends Component {
               width="10"
               height="10"
               style={{ borderRadius: '50%', marginBottom: '3px' }}
+              alt=""
             />&nbsp;&nbsp;
             {newData.length !== 0 ? `+${newData.diallingCode}` : ''}&nbsp;&nbsp;
             {basic.mobilePhone}&nbsp;&nbsp;&nbsp;
-            <a onClick={() => { this.checkPhone(true) }}>变更</a>
+            {basic.emailVerifyStatus === 'Y' ?
+            <a onClick={() => { this.checkPhone(true) }}>变更</a> : ''}
           </DescriptionsItem>
           <DescriptionsItem span={2} label="邮箱">
             {basic.email}&nbsp;&nbsp;&nbsp;
-            <a onClick={() => { this.checkEmail(true) }}>变更</a>
+            {basic.mobilePhoneVerifyStatus === 'Y' ?
+            <a onClick={() => { this.checkEmail(true) }}>变更</a> : ''}
           </DescriptionsItem>
           <DescriptionsItem span={2} label="电话">
             <img
@@ -119,6 +119,7 @@ class BasicInfo extends Component {
               width="10"
               height="10"
               style={{ borderRadius: '50%', marginBottom: '3px' }}
+              alt=""
             />&nbsp;&nbsp;
             {newData.length !== 0 ? `+${newData.diallingCode}` : ''}&nbsp;&nbsp;
             {basic.telephoneAreaCode}
@@ -132,6 +133,7 @@ class BasicInfo extends Component {
               width="10"
               height="10"
               style={{ borderRadius: '50%', marginBottom: '3px' }}
+              alt=""
               /> : ''}&nbsp;&nbsp;
             {/* {basic.faxCountryCode}&nbsp;&nbsp; */}
             {
@@ -179,14 +181,8 @@ class BasicInfo extends Component {
         {/* <CheckEmail emailShow={emailShow} proceed="true" emailAccount="123456@qq.com" />
             checkEmail={v => { this.checkEmail(v) }} */}
         <ChangeModal
-          // wrappedComponentRef={this.perSaveFormRef}
-          // changeModal={changeModal}
-          recordMsg={this.props.details}
-          onRef={ref => {
-            this.showChange = ref;
-          }}
+          onRef={ ref => { this.showChange = ref }}
           getData={() => {}}
-          // getValues={this.getValues}
         />
       </Card>
     );
