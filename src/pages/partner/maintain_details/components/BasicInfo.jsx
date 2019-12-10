@@ -24,6 +24,11 @@ const DescriptionsItem = Descriptions.Item;
   industry: basicCache.industryCategories,
 }))
 class BasicInfo extends Component {
+  state = {
+    phoneShow: false,
+    emailShow: false,
+  }
+
   componentDidMount() {
     this.props.dispatch({
       type: 'basicCache/getCache',
@@ -39,7 +44,20 @@ class BasicInfo extends Component {
     });
   }
 
+  checkPhone = v => {
+    this.setState({
+      phoneShow: v,
+    })
+  }
+
+  checkEmail = v => {
+    this.setState({
+      emailShow: v,
+    })
+  }
+
   render() {
+    const { phoneShow, emailShow } = this.state;
     const {
       details: { basic },
       details,
@@ -89,11 +107,11 @@ class BasicInfo extends Component {
             />&nbsp;&nbsp;
             {newData.length !== 0 ? `+${newData.diallingCode}` : ''}&nbsp;&nbsp;
             {basic.mobilePhone}&nbsp;&nbsp;&nbsp;
-            <a onClick={() => this.phoneShow.visibleShow(true)}>变更</a>
+            <a onClick={() => { this.checkPhone(true) }}>变更</a>
           </DescriptionsItem>
           <DescriptionsItem span={2} label="邮箱">
             {basic.email}&nbsp;&nbsp;&nbsp;
-            <a onClick={() => this.emailShow.visibleShow(true)}>变更</a>
+            <a onClick={() => { this.checkEmail(true) }}>变更</a>
           </DescriptionsItem>
           <DescriptionsItem span={2} label="电话">
             <img
@@ -149,12 +167,14 @@ class BasicInfo extends Component {
             <Badge status="error"/>&nbsp;冻结</DescriptionsItem>
         </Descriptions>
         <CheckPhone
+          phoneShow={phoneShow}
           details={details}
-          onRef={ ref => { this.phoneShow = ref }}
+          checkPhone={v => { this.checkPhone(v) }}
         />
         <CheckEmail
+          emailShow={emailShow}
           details={details}
-          onRef={ ref => { this.emailShow = ref }}
+          checkEmail={v => { this.checkEmail(v) }}
         />
         {/* <CheckEmail emailShow={emailShow} proceed="true" emailAccount="123456@qq.com" />
             checkEmail={v => { this.checkEmail(v) }} */}

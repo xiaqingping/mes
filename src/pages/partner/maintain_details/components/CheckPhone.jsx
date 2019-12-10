@@ -34,29 +34,25 @@ class CheckPhone extends Component {
     verifyRecordId: null,
   };
 
-  componentDidMount() {
-    this.props.onRef(this)
+  componentWillReceiveProps (nextProps) {
+    const { phoneShow } = nextProps;
+    this.setState({
+      phoneVisible: phoneShow,
+    })
     this.props.dispatch({
       type: 'basicCache/getCache',
       payload: { type: 'countryDiallingCodes' },
     });
   }
 
-  visibleShow = phoneVisible => {
+  setModalVisible = v => {
     this.setState({
-      phoneVisible,
-    });
-  }
-
-  setModalVisible = phoneVisible => {
-    this.setState({
-      phoneVisible,
       status: 1,
       oneQuestion: null,
       twoQuestion: null,
       threeQuestion: null,
     });
-    // this.props.checkPhone(phoneVisible)
+    this.props.checkPhone(v)
   }
 
   // 用户自行变更验证input的数据
@@ -461,13 +457,12 @@ class CheckPhone extends Component {
   }
 
   render() {
-    const { phoneVisible } = this.state;
     return (
       <div>
         <Modal
           destroyOnClose
           maskClosable={false}
-          visible={phoneVisible}
+          visible={this.state.phoneVisible}
           onOk={() => this.setModalVisible(false)}
           onCancel={() => this.setModalVisible(false)}
           className="check-tabs"
