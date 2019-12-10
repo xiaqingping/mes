@@ -34,34 +34,31 @@ class CheckEmail extends Component {
     verifyRecordId: null,
   };
 
-  componentDidMount() {
-    this.props.onRef(this)
-  }
-
   componentWillReceiveProps (nextProps) {
+    const { emailShow } = nextProps;
     const { proceed } = nextProps; // 继续验证的状态区别
     if (proceed) {
       this.setState({
+        emailVisible: emailShow,
         proceed: !!proceed,
         status: 5,
+      })
+    } else {
+      this.setState({
+        emailVisible: emailShow,
       })
     }
   }
 
-  visibleShow = emailVisible => {
-    this.setState({
-      emailVisible,
-    });
-  }
 
-  setModalVisible= emailVisible => {
+  setModalVisible = v => {
     this.setState({
-      emailVisible,
       status: 1,
       oneQuestion: null,
       twoQuestion: null,
       threeQuestion: null,
       proceed: false });
+      this.props.checkEmail(v)
   }
 
   // 用户自行变更验证input的数据
@@ -471,11 +468,11 @@ class CheckEmail extends Component {
   }
 
   render() {
-    const { proceed, emailVisible } = this.state;
+    const { proceed } = this.state;
     return (
       <div>
         <Modal
-          visible={emailVisible}
+          visible={this.state.emailVisible}
           destroyOnClose
           maskClosable={false}
           onOk={() => this.setModalVisible(false)}
