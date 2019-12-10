@@ -339,7 +339,7 @@ class Basic extends React.Component {
         &nbsp;组织
       </span>
     );
-    // const certificationStatus2 = <Badge status="warning" text="审核中" />;
+
     const show = (
       <p style={{ lineHeight: '32px' }}>
         {basic.type === 1 ? type1 : null}
@@ -404,7 +404,10 @@ class Basic extends React.Component {
           <a href="#">
             <FormattedMessage id="bp.maintain_details.change" />
           </a>
-          {/* <CheckPhone phoneShow={this.state.changeMobileModalVisible} /> */}
+          {/* <CheckPhone
+            details={this.props.details}
+            // phoneShow={this.state.changeMobileModalVisible}
+            onRef={ ref => { this.phoneShow = ref }} /> */}
         </>
       );
 
