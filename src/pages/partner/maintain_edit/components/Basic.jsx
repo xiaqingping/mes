@@ -215,13 +215,29 @@ class Basic extends React.Component {
       [key]: value,
     };
 
+    const keyList = ['name', 'mobilePhone', 'telephone', 'fax', 'email', 'address'];
+    if (keyList.indexOf(key) > -1) {
+      if (key === 'address') {
+        const { changedValue, ...excludeChangeValue } = value;
+        obj = {
+          ...excludeChangeValue,
+          languageCode: obj.languageCode,
+          timeZoneCode: obj.timeZoneCode,
+        };
+      } else {
+        obj = { ...value };
+      }
+    }
+
     // 名字-类型为个人时，行业类别为个人，且不可更改
     if (key === 'name') {
       if (value.type === 1) {
-        obj.name.industryCode = '07';
+        obj.industryCode = '07';
         this.setState({ industrySelectOpen: true });
       } else {
-        if (basic.industryCode === '07') obj.name.industryCode = '';
+        if (basic.industryCode === '07') {
+          obj.industryCode = '';
+        }
         this.setState({ industrySelectOpen: true });
       }
     }
@@ -286,20 +302,6 @@ class Basic extends React.Component {
         },
       });
       return;
-    }
-
-    const keyList = ['name', 'mobilePhone', 'telephone', 'fax', 'email', 'address'];
-    if (keyList.indexOf(key) > -1) {
-      if (key === 'address') {
-        const { changedValue, ...excludeChangeValue } = value;
-        obj = {
-          ...excludeChangeValue,
-          languageCode: obj.languageCode,
-          timeZoneCode: obj.timeZoneCode,
-        };
-      } else {
-        obj = value;
-      }
     }
 
     const newBasic = { ...basic, ...obj };
@@ -403,7 +405,7 @@ class Basic extends React.Component {
           18735812924
           <a
             onClick={() => {
-              this.checkPhone(true);
+              this.changePhoneCallback(true);
             }}
           >
             <FormattedMessage id="bp.maintain_details.change" />
@@ -412,7 +414,7 @@ class Basic extends React.Component {
             details={this.props.details}
             phoneShow={this.state.changeMobileModalVisible}
             checkPhone={v => {
-              this.checkPhone(v);
+              this.changePhoneCallback(v);
             }}
           />
         </>
@@ -447,14 +449,18 @@ class Basic extends React.Component {
       const show = (
         <>
           123456789@qq.com
-          <a>
+          <a
+            onClick={() => {
+              this.changeEmailCallback(true);
+            }}
+          >
             <FormattedMessage id="bp.maintain_details.change" />
           </a>
           <CheckEmail
             emailShow={this.state.changeEmaileModalVisible}
             details={this.props.details}
             checkEmail={v => {
-              this.checkEmail(v);
+              this.changeEmailCallback(v);
             }}
           />
         </>
@@ -580,20 +586,19 @@ class Basic extends React.Component {
     return null;
   };
 
-  checkPhone = v => {
+  changePhoneCallback = v => {
     this.setState({
       changeMobileModalVisible: v,
     });
   };
 
-  checkEmail = v => {
+  changeEmailCallback = v => {
     this.setState({
       changeEmaileModalVisible: v,
     });
   };
 
   render() {
-    console.log('**********************render');
     const {
       form: { getFieldDecorator },
       basic,
@@ -738,4 +743,10 @@ class Basic extends React.Component {
   }
 }
 
-export default Form.create()(Basic);
+export default Form.create({
+  // onFieldsChange: (props, changed, all) => {
+  //   console.log(props);
+  //   console.log(changed);
+  //   console.log(all);
+  // },
+})(Basic);
