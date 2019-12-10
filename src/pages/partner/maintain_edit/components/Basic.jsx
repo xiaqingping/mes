@@ -17,7 +17,7 @@ import debounce from 'lodash/debounce';
 import bpAPI from '@/api/bp';
 import { formatter } from '@/utils/utils';
 import CheckPhone from '@/pages/partner/maintain_details/components/CheckPhone';
-// import CheckEmail from '@/pages/partner/maintain_details/components/CheckEmail';
+import CheckEmail from '@/pages/partner/maintain_details/components/CheckEmail';
 import styles from '../style.less';
 
 const FormItem = Form.Item;
@@ -69,7 +69,7 @@ class Basic extends React.Component {
       // 变更移动电话模态框显示状态
       changeMobileModalVisible: false,
       // 变更邮箱模态框显示状态
-      // changeEmaileModalVisible: true,
+      changeEmaileModalVisible: false,
     };
     // 异步验证做节流处理
     this.checkNameInput = debounce(this.checkNameInput, 800);
@@ -411,6 +411,9 @@ class Basic extends React.Component {
           <CheckPhone
             details={this.props.details}
             phoneShow={this.state.changeMobileModalVisible}
+            checkPhone={v => {
+              this.checkPhone(v);
+            }}
           />
         </>
       );
@@ -447,7 +450,13 @@ class Basic extends React.Component {
           <a>
             <FormattedMessage id="bp.maintain_details.change" />
           </a>
-          {/* <CheckEmail emailShow={this.state.changeEmaileModalVisible} /> */}
+          <CheckEmail
+            emailShow={this.state.changeEmaileModalVisible}
+            details={this.props.details}
+            checkEmail={v => {
+              this.checkEmail(v);
+            }}
+          />
         </>
       );
 
@@ -577,11 +586,11 @@ class Basic extends React.Component {
     });
   };
 
-  // checkEmail = v => {
-  //   this.setState({
-  //     changeEmaileModalVisible: v,
-  //   })
-  // }
+  checkEmail = v => {
+    this.setState({
+      changeEmaileModalVisible: v,
+    });
+  };
 
   render() {
     console.log('**********************render');
