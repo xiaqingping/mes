@@ -107,11 +107,13 @@ class BasicInfo extends Component {
             />&nbsp;&nbsp;
             {newData.length !== 0 ? `+${newData.diallingCode}` : ''}&nbsp;&nbsp;
             {basic.mobilePhone}&nbsp;&nbsp;&nbsp;
-            <a onClick={() => { this.checkPhone(true) }}>变更</a>
+            {basic.emailVerifyStatus === 'Y' ?
+            <a onClick={() => { this.checkPhone(true) }}>变更</a> : ''}
           </DescriptionsItem>
           <DescriptionsItem span={2} label="邮箱">
             {basic.email}&nbsp;&nbsp;&nbsp;
-            <a onClick={() => { this.checkEmail(true) }}>变更</a>
+            {basic.mobilePhoneVerifyStatus === 'Y' ?
+            <a onClick={() => { this.checkEmail(true) }}>变更</a> : ''}
           </DescriptionsItem>
           <DescriptionsItem span={2} label="电话">
             <img
