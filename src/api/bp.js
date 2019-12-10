@@ -219,8 +219,8 @@ export default {
   // 人工辅助变更已验证手机邮箱流程中新手机邮箱验证码验证接口（根据验证编号验证验证码是否正确）
   changeContactInfoNewMobileVerifyCodeVerificationVerify(verifyRecordId, data) {
     return request(
-      `/businessPartners/v1/verifyRecords/${verifyRecordId}/changeContactInfo/newMobileVerifyCodeVerification`,
-      { method: 'POST', data },
+      `/businessPartners/v1/verifyRecords/${verifyRecordId}/changeContactInfo/newMobileVerifyCodeVerification?verifyCode=${data}`,
+      { method: 'POST' },
     );
   },
   // 人工辅助变更已验证手机邮箱流程中新手机邮箱验证码提交接口（根据验证编号验证验证码是否正确并更新状态）

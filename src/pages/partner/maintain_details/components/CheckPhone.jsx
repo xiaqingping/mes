@@ -23,7 +23,6 @@ const { TabPane } = Tabs;
 }))
 class CheckPhone extends Component {
   state = {
-    phoneVisible: false,
     status: 1,
     oneQuestion: null,
     twoQuestion: null,
@@ -34,11 +33,7 @@ class CheckPhone extends Component {
     verifyRecordId: null,
   };
 
-  componentWillReceiveProps (nextProps) {
-    const { phoneShow } = nextProps;
-    this.setState({
-      phoneVisible: phoneShow,
-    })
+  componentDidMount() {
     this.props.dispatch({
       type: 'basicCache/getCache',
       payload: { type: 'countryDiallingCodes' },
@@ -132,7 +127,7 @@ class CheckPhone extends Component {
       const { verifyRecordId } = this.state;
       // 提交验证码
       // eslint-disable-next-line max-len
-      api.bp.changeContactInfoNewMobileVerifyCodeVerificationVerify(verifyRecordId, { verifyCode: this.props.form.getFieldValue('code') }).then(() => {
+      api.bp.changeContactInfoNewMobileVerifyCodeVerificationVerify(verifyRecordId, this.props.form.getFieldValue('code')).then(() => {
         clearInterval(this.timer)
         this.setState({
           time: 60,
@@ -457,12 +452,13 @@ class CheckPhone extends Component {
   }
 
   render() {
+    const { phoneShow } = this.props;
     return (
       <div>
         <Modal
           destroyOnClose
           maskClosable={false}
-          visible={this.state.phoneVisible}
+          visible={phoneShow}
           onOk={() => this.setModalVisible(false)}
           onCancel={() => this.setModalVisible(false)}
           className="check-tabs"

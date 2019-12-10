@@ -23,7 +23,6 @@ const { TabPane } = Tabs;
 }))
 class CheckEmail extends Component {
   state = {
-    emailVisible: false,
     status: 1,
     oneQuestion: null,
     twoQuestion: null,
@@ -34,22 +33,15 @@ class CheckEmail extends Component {
     verifyRecordId: null,
   };
 
-  componentWillReceiveProps (nextProps) {
-    const { emailShow } = nextProps;
-    const { proceed } = nextProps; // 继续验证的状态区别
+  componentDidMount () {
+    const { proceed } = this.props; // 继续验证的状态区别
     if (proceed) {
       this.setState({
-        emailVisible: emailShow,
         proceed: !!proceed,
         status: 5,
       })
-    } else {
-      this.setState({
-        emailVisible: emailShow,
-      })
     }
   }
-
 
   setModalVisible = v => {
     this.setState({
@@ -469,10 +461,11 @@ class CheckEmail extends Component {
 
   render() {
     const { proceed } = this.state;
+    const { emailShow } = this.props;
     return (
       <div>
         <Modal
-          visible={this.state.emailVisible}
+          visible={emailShow}
           destroyOnClose
           maskClosable={false}
           onOk={() => this.setModalVisible(false)}
