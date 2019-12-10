@@ -52,7 +52,7 @@ class OrgCertificationRead extends React.Component {
           <>
             <Badge status="default" text="未认证" />
             &nbsp;&nbsp;
-            <a href="#">认证</a>
+            <a>认证</a>
             <ChangeCertification details={details} />
           </>
         );
@@ -62,7 +62,7 @@ class OrgCertificationRead extends React.Component {
           <>
             <Badge status="warning" text="审核中" />
             &nbsp;&nbsp;
-            <a href="#">查看</a>
+            <a>查看</a>
           </>
         );
         break;
@@ -71,13 +71,9 @@ class OrgCertificationRead extends React.Component {
           <>
             <Badge status="success" text="已认证" />
             &nbsp;&nbsp;
-            <a href="#" onClick={this.showModal}>
-              变更
-            </a>
+            <a onClick={this.showModal}>变更</a>
             &nbsp;&nbsp;
-            <a href="#" onClick={this.cancelCertification}>
-              取消认证
-            </a>
+            <a onClick={this.cancelCertification}>取消认证</a>
             <Modal
               title="变更认证资料"
               visible={this.state.modalVisible}

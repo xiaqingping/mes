@@ -338,7 +338,7 @@ class PurchasingOrg extends React.Component {
         onChange={this.onCascaderChange}
         fieldNames={{ label: 'name', value: 'code' }}
       >
-        <a style={{ fontSize: 14, marginLeft: -16 }} href="#">
+        <a style={{ fontSize: 14, marginLeft: -16 }}>
           <FormattedMessage id="bp.maintain_details.purchase_org.purchase_org" />
           <Icon type="down" style={{ fontSize: 12 }} />
         </a>

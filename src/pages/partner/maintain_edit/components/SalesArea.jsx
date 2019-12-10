@@ -402,7 +402,7 @@ class SalesArea extends React.Component {
 
     return (
       <Cascader options={options} onChange={this.onCascaderChange}>
-        <a style={{ fontSize: 14, marginLeft: -16 }} href="#">
+        <a style={{ fontSize: 14, marginLeft: -16 }}>
           <FormattedMessage id="bp.maintain_details.sales_distribution.sales_org" />
           <Icon type="down" style={{ fontSize: 12 }} />
         </a>

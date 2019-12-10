@@ -16,7 +16,7 @@ import {
 import debounce from 'lodash/debounce';
 import bpAPI from '@/api/bp';
 import { formatter } from '@/utils/utils';
-// import CheckPhone from '@/pages/partner/maintain_details/components/CheckPhone';
+import CheckPhone from '@/pages/partner/maintain_details/components/CheckPhone';
 // import CheckEmail from '@/pages/partner/maintain_details/components/CheckEmail';
 import styles from '../style.less';
 
@@ -67,7 +67,7 @@ class Basic extends React.Component {
     this.state = {
       industrySelectOpen: true,
       // 变更移动电话模态框显示状态
-      // changeMobileModalVisible: true,
+      changeMobileModalVisible: false,
       // 变更邮箱模态框显示状态
       // changeEmaileModalVisible: true,
     };
@@ -348,7 +348,7 @@ class Basic extends React.Component {
         {basic.certificationStatus === 2 ? (
           <Badge status="warning" text="审核中" />
         ) : (
-          <a href="#">
+          <a>
             <FormattedMessage id="bp.maintain_details.change" />
           </a>
         )}
@@ -401,13 +401,17 @@ class Basic extends React.Component {
       const show = (
         <>
           18735812924
-          <a href="#">
+          <a
+            onClick={() => {
+              this.checkPhone(true);
+            }}
+          >
             <FormattedMessage id="bp.maintain_details.change" />
           </a>
-          {/* <CheckPhone
+          <CheckPhone
             details={this.props.details}
-            // phoneShow={this.state.changeMobileModalVisible}
-            onRef={ ref => { this.phoneShow = ref }} /> */}
+            phoneShow={this.state.changeMobileModalVisible}
+          />
         </>
       );
 
@@ -440,7 +444,7 @@ class Basic extends React.Component {
       const show = (
         <>
           123456789@qq.com
-          <a href="#">
+          <a>
             <FormattedMessage id="bp.maintain_details.change" />
           </a>
           {/* <CheckEmail emailShow={this.state.changeEmaileModalVisible} /> */}
@@ -462,7 +466,7 @@ class Basic extends React.Component {
       <p style={{ lineHeight: '32px' }}>
         <span>{basic.telephoneCountryCode} </span>
         {`${basic.telephoneAreaCode}-${basic.telephone}-${basic.telephoneExtension}`}
-        <a href="#">
+        <a>
           {' '}
           <FormattedMessage id="bp.maintain_details.change" />
         </a>
@@ -554,7 +558,7 @@ class Basic extends React.Component {
         <>
           {formatter(industryCategories, basic.industryCode, 'code')}
           {basic.type === 2 ? (
-            <a href="#">
+            <a>
               &nbsp;
               <FormattedMessage id="bp.maintain_details.change" />
             </a>
@@ -567,7 +571,20 @@ class Basic extends React.Component {
     return null;
   };
 
+  checkPhone = v => {
+    this.setState({
+      changeMobileModalVisible: v,
+    });
+  };
+
+  // checkEmail = v => {
+  //   this.setState({
+  //     changeEmaileModalVisible: v,
+  //   })
+  // }
+
   render() {
+    console.log('**********************render');
     const {
       form: { getFieldDecorator },
       basic,
