@@ -13,6 +13,7 @@ import {
 } from 'antd';
 import React from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
+import { formatMessage } from 'umi/locale';
 import StandardTable from '@/components/StandardTable';
 import { connect } from 'dva';
 import CheckModel from './components/CheckModel';
@@ -198,37 +199,41 @@ class Verification extends React.Component {
     return (
       <Form onSubmit={this.handleSearch} layout="inline">
         <Row gutter={{ lg: 24, md: 12, sm: 6 }}>
-          <Col xl={6} sm={12}>
-            <FormItem label="编号">
-              {getFieldDecorator('code')(<Input placeholder="请输入"/>)}
+          <Col xxl={6} xl={10} lg={12} md={12} sm={12}>
+            <FormItem label={formatMessage({ id: 'bp.verification.customerID' })}>
+              {getFieldDecorator('code')(
+                <Input placeholder={formatMessage({ id: 'bp.verification.inputHere' })}/>,
+              )}
             </FormItem>
           </Col>
-          <Col xl={6} sm={12}>
-            <FormItem label="操作编号">
-              {getFieldDecorator('bpOperationRecordCode')(<Input placeholder="请输入"/>)}
+          <Col xxl={6} xl={10} lg={12} md={12} sm={12}>
+            <FormItem label={formatMessage({ id: 'bp.verification.operationCode' })}>
+              {getFieldDecorator('bpOperationRecordCode')(
+                <Input placeholder={formatMessage({ id: 'bp.verification.inputHere' })}/>,
+              )}
             </FormItem>
           </Col>
-          <Col xl={6} sm={12}>
-          <FormItem label="业务伙伴">
+          <Col xxl={6} xl={10} lg={12} md={12} sm={12}>
+          <FormItem label={formatMessage({ id: 'bp.verification.businessPartner' })}>
               {getFieldDecorator('bpId')(
               <AutoComplete
                 onSearch={this.inputValue}
                 dataSource={partnerVal.map(this.renderOption)}
-                placeholder="请输入"
+                placeholder={formatMessage({ id: 'bp.verification.inputHere' })}
                 optionLabelProp="text"
                 />)}
             </FormItem>
           </Col>
-          <Col xl={6} sm={12}>
+          <Col xxl={6} xl={10} lg={12} md={12} sm={12}>
             <span className="submitButtons">
               <Button type="primary" htmlType="submit">
-                查询
+                {formatMessage({ id: 'bp.verification.search' })}
               </Button>
               <Button style={{ marginLeft: 8 }} onClick={this.handleFormReset}>
-                重置
+                {formatMessage({ id: 'bp.verification.reset' })}
               </Button>
               <a style={{ marginLeft: 8 }} onClick={this.toggleForm}>
-                展开 <Icon type="down" />
+              {formatMessage({ id: 'bp.verification.open' })} <Icon type="down" />
               </a>
             </span>
           </Col>
@@ -248,31 +253,35 @@ class Verification extends React.Component {
       <Form onSubmit={this.handleSearch} layout="inline">
         <Row gutter={{ lg: 24, md: 12, sm: 6 }}>
           <Col xl={6} lg={8} sm={12}>
-            <FormItem label="编号">
-              {getFieldDecorator('code')(<Input placeholder="请输入"/>)}
+            <FormItem label={formatMessage({ id: 'bp.verification.customerID' })}>
+              {getFieldDecorator('code')(
+                <Input placeholder={formatMessage({ id: 'bp.verification.inputHere' })}/>,
+              )}
             </FormItem>
           </Col>
           <Col xl={6} lg={8} sm={12}>
-            <FormItem label="操作编号">
-              {getFieldDecorator('bpCode')(<Input placeholder="请输入"/>)}
+            <FormItem label={formatMessage({ id: 'bp.verification.operationCode' })}>
+              {getFieldDecorator('bpCode')(
+                <Input placeholder={formatMessage({ id: 'bp.verification.inputHere' })}/>,
+              )}
             </FormItem>
           </Col>
           <Col xl={6} lg={8} sm={12}>
-          <FormItem label="业务伙伴">
+          <FormItem label={formatMessage({ id: 'bp.verification.businessPartner' })}>
               {getFieldDecorator('bpId')(
               <AutoComplete
                 onSearch={this.inputValue}
                 dataSource={partnerVal.map(this.renderOption)}
-                placeholder="请输入"
+                placeholder={formatMessage({ id: 'bp.verification.inputHere' })}
                 optionLabelProp="text"
                 />)}
             </FormItem>
           </Col>
           <Col xl={6} lg={8} sm={12}>
-            <FormItem label="类型">
+            <FormItem label={formatMessage({ id: 'bp.verification.type' })}>
               {getFieldDecorator('type')(
                 <Select
-                  placeholder="请选择"
+                  placeholder={formatMessage({ id: 'bp.verification.inputHere' })}
                   optionLabelProp="label">
                   {
                     preTypeAll.map(state => <Option
@@ -286,11 +295,11 @@ class Verification extends React.Component {
             </FormItem>
           </Col>
           <Col xl={6} lg={8} sm={12}>
-            <FormItem label="状态">
+            <FormItem label={formatMessage({ id: 'bp.verification.status' })}>
               {getFieldDecorator('statusList')(
                 <Select
                   mode="multiple"
-                  placeholder="请选择"
+                  placeholder={formatMessage({ id: 'bp.verification.inputHere' })}
                   optionLabelProp="label">
                   {
                     preStateAll.map(state =>
@@ -306,23 +315,23 @@ class Verification extends React.Component {
             </FormItem>
           </Col>
           <Col xl={6} lg={8} sm={12}>
-            <FormItem label="完成时间">
+            <FormItem label={formatMessage({ id: 'bp.verification.completeTime' })}>
               {getFieldDecorator('finishTime')(
                 <RangePicker />,
               )}
             </FormItem>
           </Col>
           <Col xl={6} lg={8} sm={12}>
-            <FormItem label="过期时间">
+            <FormItem label={formatMessage({ id: 'bp.verification.expiryDate' })}>
               {getFieldDecorator('overTime')(
                 <DatePicker style={{ width: '100%' }}/>,
               )}
             </FormItem>
           </Col>
           <Col xl={6} lg={8} sm={12}>
-            <FormItem label="审核人">
+            <FormItem label={formatMessage({ id: 'bp.verification.apprpvalBy' })}>
               {getFieldDecorator('approverCode')(
-                <Input placeholder="请输入"/>,
+                <Input placeholder={formatMessage({ id: 'bp.verification.inputHere' })}/>,
               )}
             </FormItem>
           </Col>
@@ -330,13 +339,13 @@ class Verification extends React.Component {
         <div style={{ overflow: 'hidden' }}>
           <div style={{ float: 'right', marginBottom: 24 }}>
             <Button type="primary" htmlType="submit">
-              查询
+              {formatMessage({ id: 'bp.verification.search' })}
             </Button>
             <Button style={{ marginLeft: 8 }} onClick={this.handleFormReset}>
-              重置
+              {formatMessage({ id: 'bp.verification.reset' })}
             </Button>
             <a style={{ marginLeft: 8 }} onClick={this.toggleForm}>
-              收起 <Icon type="up" />
+              {formatMessage({ id: 'bp.verification.retract' })} <Icon type="up" />
             </a>
           </div>
         </div>
@@ -358,7 +367,8 @@ class Verification extends React.Component {
     const data = { list, pagination: { current, pageSize, total } };
     const columns = [
       {
-        title: '编号/操作编号',
+        title: `${formatMessage({ id: 'bp.verification.customerID' })}
+               /${formatMessage({ id: 'bp.verification.operationCode' })}`,
         dataIndex: 'code',
         // width: 150,
         // eslint-disable-next-line no-shadow
@@ -367,95 +377,76 @@ class Verification extends React.Component {
         },
       },
       {
-        title: '业务伙伴',
+        title: formatMessage({ id: 'bp.verification.businessPartner' }),
         dataIndex: 'bpId',
         // width: 150,
-        // eslint-disable-next-line no-shadow
-        render(value, record) {
+        render(value, records) {
           return <>
-            <div className={styles.partName}><Icon type="user" /> <span>{record.bpName}</span></div>
-            <div className={styles.partCode}>{record.bpCode}</div>
+            <div className={styles.partName}>
+              <Icon type="user" /> <span>{records.bpName}</span>
+            </div>
+            <div className={styles.partCode}>{records.bpCode}</div>
           </>
         },
       },
       {
-        title: '类型',
+        title: formatMessage({ id: 'bp.verification.type' }),
         dataIndex: 'type',
         filters: preTypeAll,
         width: 150,
-        // eslint-disable-next-line no-shadow
-        onFilter: (value, record) => record.type.toString().indexOf(value.toString()) === 0,
+        onFilter: (value, records) => records.type.toString().indexOf(value.toString()) === 0,
         render: value => preTypeAll[value - 1].text,
       },
       {
-        title: '状态',
+        title: formatMessage({ id: 'bp.verification.status' }),
         dataIndex: 'status',
         filters: preStateAll,
         width: 150,
-        // eslint-disable-next-line no-shadow
-        onFilter: (value, record) => record.status.toString().indexOf(value.toString()) === 0,
-        // eslint-disable-next-line no-shadow
-        render(value, record) {
+        onFilter: (value, records) => records.status.toString().indexOf(value.toString()) === 0,
+        render(value, records) {
           return <>
           <Badge status={preStateAll[value - 1].status} text={preStateAll[value - 1].text} />
-          {value === 2 ? <div>{record.operationDate}</div> : ''}
+          {value === 2 ? <div>{records.operationDate}</div> : ''}
           </>
         },
       },
       {
-        title: '完成时间',
+        title: formatMessage({ id: 'bp.verification.completeTime' }),
         dataIndex: 'finishTime',
       },
       {
-        title: '过期时间',
+        title: formatMessage({ id: 'bp.verification.expiryDate' }),
         dataIndex: 'expireDate',
         // width: 140,
       },
       {
-        title: '操作人',
+        title: formatMessage({ id: 'bp.verification.operator' }),
         dataIndex: 'operatorName',
-        // eslint-disable-next-line no-shadow
-        render(value, record) {
-          return <><div>{value}</div> <div>{record.operationDate}</div></>
+        render(value, records) {
+          return <><div>{value}</div> <div>{records.operationDate}</div></>
         },
       },
       {
         fiexd: 'right',
-        title: '操作',
+        title: formatMessage({ id: 'bp.verification.operation' }),
         width: 150,
         fixed: 'right',
-        // eslint-disable-next-line no-shadow
-        render: (text, record) => {
-          // const { preState } = record;
-          // const check = <a href="#" onClick={ e => { this.verifyPartner(record, e) }}>审核</a>;
-          // const view = <a href="#" onClick={ e => { this.checkPartner(record, e) }} >查看</a>;
+        render: (text, records) => {
           const view = <a href="#" onClick={ () => {
-            this.checkShow.visibleShow(record, record.type, true,
-              this.detailsValue(record, record.type))
-          }} >查看</a>;
-          // const allAction = <Fragment><a href="#"
-          // onClick={ e => { this.checkPartner(record, e) }}>查看</a><a herf="#"
-          // onClick={ e => { this.verifyPartner(record, e) }}>审核</a></Fragment>;
-          // if (preState === 2) {
-          //   return allAction;
-          // } if (preState === 1) {
-          //   return view;
-          // }
-          //   return check;
+            this.checkShow.visibleShow(records, records.type, true,
+              this.detailsValue(records, records.type))
+            }} >{formatMessage({ id: 'bp.verification.view' })}</a>;
           return view;
         },
       },
     ]
 
     return (
-      <PageHeaderWrapper title="验证记录">
-        <Card bordered={false}>
+      <PageHeaderWrapper>
+        <Card bordered={false} className="mySet">
           <div className="tableList">
             <div className="tableListForm">{this.renderForm()}</div>
             <div className="tableListOperator">
-              {/* <Button icon="plus" type="primary" onClick={() => this.handleModalVisible()}>
-                新建
-              </Button> */}
             </div>
             <StandardTable
               scroll={{ x: 1300 }}
@@ -465,7 +456,6 @@ class Verification extends React.Component {
               columns={columns}
               onSelectRow={this.handleSelectRows}
               onChange={this.handleStandardTableChange}
-              className={styles.dataTable}
             />
           </div>
         </Card>

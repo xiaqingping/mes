@@ -11,8 +11,11 @@ import {
 } from 'antd';
 import React from 'react';
 import { connect } from 'dva';
+import { formatMessage } from 'umi/locale';
 import styles from './index.less';
 import api from '@/api';
+import CheckEmail from '@/pages/partner/maintain_details/components/CheckEmail';
+import CheckPhone from '@/pages/partner/maintain_details/components/CheckPhone';
 
 // const FormItem = Form.Item;
 /** verify state */
@@ -369,6 +372,10 @@ class CheckModel extends React.Component {
       detailsValue: undefined,
       pageVisble: false,
       picHas: false,
+      emailShow: false,
+      phoneShow: false,
+      emailAccount: '',
+      phoneAccount: '',
     }
   }
 
@@ -479,14 +486,37 @@ class CheckModel extends React.Component {
   }
 
   /** 重发验证码 */
-  reSent = event => {
+  reSent = (event, detailsValue) => {
     event.preventDefault();
+    if (parseInt(detailsValue.type, 10) === 1) {
+      this.checkPhone(true);
+      this.setState({
+        phoneAccount: detailsValue,
+      })
+    } else if (parseInt(detailsValue.type, 10) === 2) {
+      this.checkEmail(true);
+      this.setState({
+        emailAccount: detailsValue.newEmail,
+      })
+    }
   }
 
   recordList = e => {
     e.preventDefault();
     this.setState({
       showList: true,
+    })
+  }
+
+  checkPhone = v => {
+    this.setState({
+      phoneShow: v,
+    })
+  }
+
+  checkEmail = v => {
+    this.setState({
+      emailShow: v,
     })
   }
 
@@ -513,25 +543,35 @@ class CheckModel extends React.Component {
   }
 
   render () {
-    const { recordMsg, showList, detailsValue, clickType, pageVisble, picHas } = this.state;
+    const {
+      recordMsg,
+      showList,
+      detailsValue,
+      clickType,
+      pageVisble,
+      picHas,
+      phoneShow,
+      phoneAccount,
+      emailShow,
+      emailAccount } = this.state;
     const { SpecialInvoice, countryDiallingCodes } = this.props;
     if (!detailsValue && !picHas) return null
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     let modalTitle;
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     let modelContent;
-    // const actionResent = <a onClick={e => { this.reSent(e) }}>重发</a>
-    // const actionFinesh = <Badge status="success" text="已完成" />
     if (recordMsg === undefined) {
       return false;
     }
     if (clickType === 6 || clickType === 7) {
-      modalTitle = '变更已验证手机和邮箱'
+      modalTitle = formatMessage({ id: 'bp.verification.changeVerifiedPhoneAndEmail' })
       modelContent = <>
         <ul className={styles.contenList}>
           <li>
             <Row>
-              <Col span={8} className={styles.labelName}>变更类型：</Col>
+              <Col span={8} className={styles.labelName}>
+                {formatMessage({ id: 'bp.verification.changeVerifiedPhoneAndEmail.changeType' })}
+                </Col>
               <Col span={16} className={styles.labelVal}>
                 {detailsValue.type ? verifyChangeType[detailsValue.type].text : ''}
               </Col>
@@ -539,7 +579,9 @@ class CheckModel extends React.Component {
           </li>
           <li>
             <Row>
-              <Col span={8} className={styles.labelName}>变更渠道：</Col>
+              <Col span={8} className={styles.labelName}>
+              {formatMessage({ id: 'bp.verification.changeVerifiedPhoneAndEmail.changeMethod' })}
+              </Col>
               <Col span={16} className={styles.labelVal}>
                 {detailsValue.channel ? verifyChannel[detailsValue.channel].text : ''}
               </Col>
@@ -547,7 +589,13 @@ class CheckModel extends React.Component {
           </li>
           <li>
             <Row>
-              <Col span={8} className={styles.labelName}>验证方式：</Col>
+              <Col span={8} className={styles.labelName}>
+                {
+                  formatMessage({
+                    id: 'bp.verification.changeVerifiedPhoneAndEmail.verificationMethod',
+                  })
+                }
+              </Col>
               <Col span={16} className={styles.labelVal}>
                 {detailsValue.verifyType ? verifyTest[detailsValue.verifyType].text : ''}
               </Col>
@@ -559,7 +607,13 @@ class CheckModel extends React.Component {
               {
               parseInt(detailsValue.verifyType, 10) === 1 ?
                 <Row>
-                  <Col span={8} className={styles.labelName}>原手机：</Col>
+                  <Col span={8} className={styles.labelName}>
+                    {
+                      formatMessage({
+                        id: 'bp.verification.changeVerifiedPhoneAndEmail.previousMobilePhone',
+                      })
+                    }
+                  </Col>
                   <Col span={16} className={styles.labelVal}>
                     {
                     detailsValue.oldMobilePhoneCountryCode &&
@@ -571,14 +625,26 @@ class CheckModel extends React.Component {
                 </Row>
                 :
                 <Row>
-                  <Col span={8} className={styles.labelName}>原邮箱：</Col>
+                  <Col span={8} className={styles.labelName}>
+                    {
+                      formatMessage({
+                        id: 'bp.verification.changeVerifiedPhoneAndEmail.previousEmail',
+                      })
+                    }
+                  </Col>
                   <Col span={16} className={styles.labelVal}>{detailsValue.oldEmail}</Col>
                 </Row>
               }
             </li>
             <li>
               <Row>
-                <Col span={8} className={styles.labelName}>验证码：</Col>
+                <Col span={8} className={styles.labelName}>
+                  {
+                    formatMessage({
+                      id: 'bp.verification.changeVerifiedPhoneAndEmail.verificationCode',
+                    })
+                  }
+                </Col>
                 <Col span={16} className={styles.labelVal}>
                   {detailsValue.oldContactInfoVerifyCode}&nbsp;&nbsp;&nbsp;&nbsp;
                   {detailsValue.oldContactInfoVerifyStatus ? <Badge
@@ -590,7 +656,13 @@ class CheckModel extends React.Component {
             </li>
             <li>
               <Row>
-                <Col span={8} className={styles.labelName}>验证码过期时间：</Col>
+                <Col span={8} className={styles.labelName}>
+                  {
+                    formatMessage({
+                      id: 'bp.verification.changeVerifiedPhoneAndEmail.verificationCodeExpiryDate',
+                    })
+                  }
+                </Col>
                 <Col
                   span={16}
                   className={styles.labelVal}>
@@ -600,7 +672,13 @@ class CheckModel extends React.Component {
             </li>
             <li>
               <Row>
-                <Col span={8} className={styles.labelName}>最后发送时间：</Col>
+                <Col span={8} className={styles.labelName}>
+                  {
+                    formatMessage({
+                      id: 'bp.verification.changeVerifiedPhoneAndEmail.lastSentDate',
+                    })
+                  }
+                </Col>
                 <Col
                   span={16}
                   className={styles.labelVal}>
@@ -612,38 +690,78 @@ class CheckModel extends React.Component {
           }
           <li>
             <Row>
-              <Col span={8} className={styles.labelName}>新手机：</Col>
+              <Col span={8} className={styles.labelName}>
+                {
+                  parseInt(detailsValue.verifyType, 10) === 1
+                  ?
+                  formatMessage({
+                    id: 'bp.verification.changeVerifiedPhoneAndEmail.newMobilePhone',
+                    })
+                  :
+                  formatMessage({
+                    id: 'bp.verification.changeVerifiedPhoneAndEmail.newEmail',
+                    })
+                  }
+              </Col>
               <Col span={16} className={styles.labelVal}>
-                {detailsValue.newMobilePhoneCountryCode &&
-                detailsValue.newMobilePhoneCountryCode !== 'NULL' ?
-                `+${countryDiallingCodes.filter(
-                  v => v.countryCode === detailsValue.newMobilePhoneCountryCode,
-                  )[0].diallingCode} ` : ''}
-                {detailsValue.newMobilePhone}</Col>
+                {
+                  parseInt(detailsValue.verifyType, 10) === 1
+                  ?
+                  (
+                    detailsValue.newMobilePhoneCountryCode &&
+                    detailsValue.newMobilePhoneCountryCode !== 'NULL'
+                    ?
+                    `+${countryDiallingCodes.filter(
+                      v => v.countryCode === detailsValue.newMobilePhoneCountryCode,
+                    )[0].diallingCode} `
+                    :
+                    ''
+                  )
+                  :
+                  (detailsValue.newEmail ? detailsValue.newEmail : '')
+                }
+                {detailsValue.newMobilePhone}
+              </Col>
             </Row>
           </li>
           <li>
             <Row>
-              <Col span={8} className={styles.labelName}>验证码：</Col>
+              <Col span={8} className={styles.labelName}>
+                {
+                  formatMessage({
+                    id: 'bp.verification.changeVerifiedPhoneAndEmail.verificationCode',
+                  })
+                }
+              </Col>
               <Col span={16} className={styles.labelVal}>
                 {detailsValue.newContactInfoVerifyCode}&nbsp;&nbsp;
-                {parseInt(detailsValue.verifyType, 10) === 1 ?
+                {parseInt(recordMsg.status, 10) === 1 ?
                 <>
-                  <a onClick={e => { this.reSent(e) }}>重发</a>&nbsp;&nbsp;&nbsp;&nbsp;
-                  <a onClick={e => { this.reSent(e) }}>完成验证</a>
+                  <a onClick={e => { this.reSent(e, detailsValue) }} >
+                    {formatMessage({ id: 'bp.verification.changeVerifiedPhoneAndEmail.reSend' })}
+                  </a>&nbsp;&nbsp;&nbsp;&nbsp;
+                  <a>
+                    {formatMessage({ id: 'bp.verification.changeVerifiedPhoneAndEmail.completed' })}
+                  </a>
                 </>
                 :
                 (detailsValue.newContactInfoVerifyStatus ? <Badge
                   status={verifyData[detailsValue.newContactInfoVerifyStatus].value}
                   text={verifyData[detailsValue.newContactInfoVerifyStatus].text} />
-               : '')
+                : '')
                 }
               </Col>
             </Row>
           </li>
           <li>
             <Row>
-              <Col span={8} className={styles.labelName}>验证码过期时间：</Col>
+              <Col span={8} className={styles.labelName}>
+                {
+                  formatMessage({
+                   id: 'bp.verification.changeVerifiedPhoneAndEmail.verificationCodeExpiryDate',
+                  })
+                }
+              </Col>
               <Col
                 span={16}
                 className={styles.labelVal}>
@@ -653,7 +771,9 @@ class CheckModel extends React.Component {
           </li>
           <li>
             <Row>
-              <Col span={8} className={styles.labelName}>最后发送时间：</Col>
+              <Col span={8} className={styles.labelName}>
+                {formatMessage({ id: 'bp.verification.changeVerifiedPhoneAndEmail.lastSentDate' })}
+              </Col>
               <Col
                 span={16}
                 className={styles.labelVal}>
@@ -1051,10 +1171,10 @@ class CheckModel extends React.Component {
           footer={
             (clickType === 1 || clickType === 2 || clickType === 3) && recordMsg.status === 1 ? [
             <Button key="back" onClick={() => this.openPage(recordMsg.id, 2)}>
-              拒绝
+              {formatMessage({ id: 'bp.verification.reject' })}
             </Button>,
             <Button key="submit" type="primary" onClick={() => this.openPage(recordMsg.id, 1)}>
-              审核
+              {formatMessage({ id: 'bp.verification.approved' })}
             </Button>,
           ] : null}
         >
@@ -1065,6 +1185,18 @@ class CheckModel extends React.Component {
         recordMsg={recordMsg}
         closeListForm= {this.closeListForm}
         SpecialInvoice= {SpecialInvoice}
+        />
+        <CheckPhone
+          phoneShow={phoneShow}
+          proceed="true"
+          phoneAccount={phoneAccount}
+          checkPhone={v => { this.checkPhone(v) }}
+        />
+        <CheckEmail
+          emailShow={emailShow}
+          proceed="true"
+          emailAccount={emailAccount}
+          checkEmail={v => { this.checkEmail(v) }}
         />
       </div>
     )

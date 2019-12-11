@@ -26,7 +26,15 @@ class BasicInfo extends Component {
   }
 
   render() {
-    const { details: { customer: { addressList } } } = this.props
+    // const { details: { customer: { addressList } } } = this.props
+    const { details: { customer } } = this.props
+    console.log(customer)
+    // if (customer) {
+    //   const { addressList } = customer
+    // } else {
+    //   const addressList = []
+    // }
+
     const { phoneData } = this.state
     const columns = [
       {
@@ -84,7 +92,7 @@ class BasicInfo extends Component {
       <Card title="收货地址" bordered={false} style={{ marginBottom: '24px' }}>
         <Table
           rowKey={(record, index) => index}
-          dataSource={addressList}
+          dataSource={customer ? customer.addressList : []}
           columns={columns}
           pagination={false}
         ></Table>
