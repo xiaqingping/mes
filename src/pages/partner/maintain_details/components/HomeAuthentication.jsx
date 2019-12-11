@@ -9,6 +9,7 @@ import {
 import React, { Component } from 'react';
 import { connect } from 'dva';
 import './style.less';
+import ChangeModal from '@/pages/partner/maintain/components/ChangeModal';
 import api from '@/api'
 
 const DescriptionsItem = Descriptions.Item;
@@ -45,7 +46,11 @@ class BasicInfo extends Component {
   componentDidMount() {
     const { details } = this.props;
     const newData = []
-    if (details.organizationCertification.attachmentCode) {
+    if (!details.organizationCertification) {
+      this.setState({
+        pic: [],
+      })
+    } else if (details.organizationCertification.attachmentCode) {
       api.disk.getFiles({
         sourceKey: 'bp_organization_certification',
         sourceCode: details.organizationCertification.attachmentCode }).then(v => {
@@ -61,11 +66,20 @@ class BasicInfo extends Component {
     }
   }
 
+    /** 取消认证 */
+    cancelIdent = (e, record) => {
+      e.preventDefault();
+      if (record.basic.type === 2) {
+        api.bp.cancelBPOrgCertification(record.basic.id).then(() => {
+          // eslint-disable-next-line no-restricted-globals
+          location.reload(true);
+        })
+      }
+    };
 
   render() {
     const { details } = this.props;
-    const { pic, picHas } = this.state;
-    if (picHas && pic.length === 0) return null
+    const { pic } = this.state;
     return (
       <Card title="认证资料" bordered={false} style={{ marginBottom: '24px' }} className="check-tabs">
         <Row gutter={16}>
@@ -80,7 +94,14 @@ class BasicInfo extends Component {
                 text={renzhengMap[details.basic.certificationStatus].text} />
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                 {parseInt(details.basic.certificationStatus, 10) === 4 ? <>
-                <a>变更</a>&nbsp;&nbsp;<a>取消认证</a></> : ''}
+                <a
+                  onClick={
+                    () => { this.showChange.visibleShow(true, this.props.details.basic) }
+                  }
+                >
+                  变更
+                </a>&nbsp;&nbsp;
+                <a href="#" onClick={e => { this.cancelIdent(e, details) }}>取消认证</a></> : ''}
               </DescriptionsItem>
               <DescriptionsItem label="增值税专用发票资质">
                 {details.organizationCertification ?
@@ -140,6 +161,10 @@ class BasicInfo extends Component {
             </Descriptions>
           </Col>
         </Row>
+        <ChangeModal
+          onRef={ ref => { this.showChange = ref }}
+          getData={() => {}}
+        />
       </Card>
     );
   }

@@ -1,4 +1,4 @@
-import { Icon } from 'antd';
+import { Icon, Spin, Empty } from 'antd';
 import React, { Component } from 'react';
 import { connect } from 'dva';
 
@@ -27,6 +27,7 @@ class CustomerDetails extends Component {
   state = {
     width: '100%',
     tabActiveKey: 'customer',
+    pageLoading: true,
   };
 
   componentDidMount() {
@@ -41,6 +42,9 @@ class CustomerDetails extends Component {
         type: 'partnerMaintainEdit/setSupplier',
         payload: res,
       });
+      this.setState({
+        pageLoading: false,
+      })
     });
     this.props.dispatch({
       type: 'basicCache/setState',
@@ -118,7 +122,7 @@ class CustomerDetails extends Component {
   };
 
   render() {
-    const { tabActiveKey } = this.state;
+    const { tabActiveKey, pageLoading } = this.state;
     const { customer } = this.props;
     if (!customer) {
       return null;
@@ -183,7 +187,12 @@ class CustomerDetails extends Component {
           },
         ]}
       >
-        {contentList[tabActiveKey]}
+        <Spin spinning={pageLoading}>
+          {pageLoading ? (
+            <Empty style={{ padding: 300, background: '#fff' }} description="loading..."></Empty>
+          ) : contentList[tabActiveKey]}
+        </Spin>
+
       </PageHeaderWrapper>
     );
   }

@@ -9,7 +9,7 @@ import {
   Icon,
   Select,
 } from 'antd';
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import { connect } from 'dva';
 import './style.less';
 import api from '@/api';
@@ -231,14 +231,13 @@ class CheckPhone extends Component {
     const {
       form: { getFieldDecorator },
       countryDiallingCodes,
+      proceed,
     } = this.props;
     const {
       status,
       oneQuestion,
       twoQuestion,
-      threeQuestion,
-      btnText,
-      time } = this.state;
+      threeQuestion } = this.state;
     const prefixSelector = getFieldDecorator('prefix', {
       initialValue: 'CN',
     })(
@@ -384,27 +383,15 @@ class CheckPhone extends Component {
         </div>
       )
     }
-    if (status === 5) {
+    if (status === 5 || proceed) {
       return (
         <div style={{ textAlign: 'center', paddingTop: '20px' }}>
           <Icon type="check-circle" style={{ fontSize: '20px', color: '#54C31F' }}/>
           <span style={{ fontSize: '20px', fontWeight: '600' }}
-          >&nbsp;&nbsp;&nbsp;问题验证成功，请输入新的手机号</span>
+          >&nbsp;&nbsp;&nbsp;{proceed ? '继续完成新手机验证' : '问题验证成功，请输入新的手机号'}</span>
           <Form layout="inline" onSubmit={this.handleCode} style={{ marginTop: '45px' }}>
             <div>
-              <FormItem label="手机号">
-                {getFieldDecorator('userPhone')(
-                <Input addonBefore={prefixSelector} style={{ width: '300px' }} placeholder="请输入"/>)}
-              </FormItem>
-              <FormItem label="验证码" style={{ margin: '20px 16px 60px 0' }}>
-                {getFieldDecorator('code')(
-                <Input style={{ width: '180px' }} placeholder="请输入短信验证码"/>)}
-                &nbsp;&nbsp;&nbsp;&nbsp;
-                <Button type="primary" disabled={btnText === 3} ghost
-                onClick={() => { this.getCode() }} style={{ width: '100px' }}>
-                  {(btnText === 1 ? '获取验证码' : (btnText === 2 ? '重新发送' : `${time}秒`))}
-                </Button>
-              </FormItem>
+              {this.pageRetrun(prefixSelector)}
             </div>
             <div style={{ textAlign: 'right',
                           padding: '10px 20px',
@@ -443,16 +430,91 @@ class CheckPhone extends Component {
       )
   }
 
+  // 继续验证和问题验证后的页面
+  pageRetrun = prefixSelector => {
+    const {
+      form: { getFieldDecorator },
+      phoneAccount,
+      proceed,
+      countryDiallingCodes,
+    } = this.props;
+
+    const { btnText, time } = this.state;
+    console.log(phoneAccount)
+    if (proceed) {
+      return (
+      <Fragment>
+        <div className="divStyle">
+          <span>手机号</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          <span>
+            {
+              countryDiallingCodes.filter(
+                item => item.countryCode === phoneAccount.newMobilePhoneCountryCode,
+              ).length !== 0 ?
+              `+${countryDiallingCodes.filter(
+                item => item.countryCode === phoneAccount.newMobilePhoneCountryCode,
+              )[0].diallingCode}` : ''
+            }&nbsp;
+            {phoneAccount.newMobilePhone}
+          </span>
+        </div>
+
+
+        <FormItem label="验证码" style={{ margin: '20px 16px 60px 0' }}>
+          {
+            getFieldDecorator('code')(
+            <Input style={{ width: '180px' }} placeholder="请输入短信验证码"/>)
+          }
+          &nbsp;&nbsp;&nbsp;&nbsp;
+          <Button
+            type="primary"
+            disabled={btnText === 3}
+            ghost
+            onClick={() => { this.getCode() }}
+            style={{ width: '100px' }}
+          >
+            {(btnText === 1 ? '获取验证码' : (btnText === 2 ? '重新发送' : `${time}秒`))}
+          </Button>
+        </FormItem>
+      </Fragment>
+      )
+    }
+     return (
+      <Fragment>
+        <FormItem label="手机号">
+          {getFieldDecorator('userPhone')(
+          <Input addonBefore={prefixSelector} style={{ width: '300px' }} placeholder="请输入"/>)}
+        </FormItem>
+        <FormItem label="验证码" style={{ margin: '20px 16px 60px 0' }}>
+          {getFieldDecorator('code')(
+            <Input style={{ width: '180px' }} placeholder="请输入短信验证码"/>)
+          }
+          &nbsp;&nbsp;&nbsp;&nbsp;
+          <Button
+            type="primary"
+            disabled={btnText === 3}
+            ghost
+            onClick={() => { this.getCode() }} style={{ width: '100px' }}
+          >
+            {(btnText === 1 ? '获取验证码' : (btnText === 2 ? '重新发送' : `${time}秒`))}
+          </Button>
+        </FormItem>
+      </Fragment>
+    )
+  }
+
   // tab切换
   tabsChange = key => {
+    const { proceed } = this.props;
+    if (!proceed) {
       this.setState({
-        // eslint-disable-next-line radix
-        status: parseInt(key) === 2 ? 3 : 1,
+        status: parseInt(key, 10) === 2 ? 3 : 1,
       })
+    }
   }
 
   render() {
-    const { phoneShow } = this.props;
+    const { phoneShow, proceed } = this.props;
     return (
       <div>
         <Modal
@@ -464,9 +526,7 @@ class CheckPhone extends Component {
           className="check-tabs"
           footer={ null}
         >
-            <Tabs defaultActiveKey="1"
-            onChange={key => { this.tabsChange(key) }}
-            tabBarStyle={{ height: '50px', fontSize: '30px' }}>
+            <Tabs defaultActiveKey={proceed ? '2' : '1'} onChange={key => { this.tabsChange(key) }}>
               <TabPane tab="用户自行变更" key="1">
               {this.userChange()}
               </TabPane>

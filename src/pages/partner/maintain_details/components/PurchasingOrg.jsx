@@ -18,12 +18,18 @@ const DescriptionsItem = Descriptions.Item;
 class PurchasingOrg extends React.Component {
   constructor(props) {
     super(props);
-    const { details: { vendor: { purchaseOrganizationList } } } = this.props;
-    this.state = {
-      tabKey: (
-        purchaseOrganizationList && purchaseOrganizationList[0] &&
-        purchaseOrganizationList[0].purchaseOrganizationCode) || '',
-    };
+    const { details: { vendor } } = this.props;
+    if (vendor) {
+      this.state = {
+        tabKey: (
+          vendor.purchaseOrganizationList && vendor.purchaseOrganizationList[0] &&
+          vendor.purchaseOrganizationList[0].purchaseOrganizationCode) || '',
+      };
+    } else {
+      this.state = {
+        tabKey: '',
+      }
+    }
   }
 
   componentDidMount() {
