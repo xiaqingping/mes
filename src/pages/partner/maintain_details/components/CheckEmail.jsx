@@ -49,8 +49,9 @@ class CheckEmail extends Component {
       oneQuestion: null,
       twoQuestion: null,
       threeQuestion: null,
-      proceed: false });
-      this.props.checkEmail(v)
+      proceed: false,
+    });
+    this.props.checkEmail(v)
   }
 
   // 用户自行变更验证input的数据
@@ -253,13 +254,13 @@ class CheckEmail extends Component {
             </div>
             {getFieldDecorator('qone', {
               rules: [
-                { required: true, message: '请输入内容' },
+                // { required: true, message: '请输入内容' },
                 { validator: (rule, value, callback) => {
                     if (parseInt(value, 10) !== 2 && value) {
                       this.setState({
                         oneQuestion: 'error',
                       })
-                      callback('您输入的答案有误！');
+                      // callback('您输入的答案有误！');
                     } else {
                       this.setState({
                         oneQuestion: 'success',
@@ -287,13 +288,13 @@ class CheckEmail extends Component {
             </div>
             {getFieldDecorator('qtwo', {
               rules: [
-                { required: true, message: '请输入内容' },
+                // { required: true, message: '请输入内容' },
                 { validator: (rule, value, callback) => {
                     if (parseInt(value, 10) !== 4 && value) {
                       this.setState({
                         twoQuestion: 'error',
                       })
-                      callback('您输入的答案有误！');
+                      // callback('您输入的答案有误！');
                     } else {
                       this.setState({
                         twoQuestion: 'success',
@@ -322,13 +323,13 @@ class CheckEmail extends Component {
             </div>
             {getFieldDecorator('qthree', {
               rules: [
-                { required: true, message: '请输入内容' },
+                // { required: true, message: '请输入内容' },
                 { validator: (rule, value, callback) => {
                     if (parseInt(value, 10) !== 9 && value) {
                       this.setState({
                         threeQuestion: 'error',
                       })
-                      callback('您输入的答案有误！');
+                      // callback('您输入的答案有误！');
                     } else {
                       this.setState({
                         threeQuestion: 'success',
@@ -453,10 +454,12 @@ class CheckEmail extends Component {
 
   // tab切换
   tabsChange = key => {
+    const { proceed } = this.state;
+    if (!proceed) {
       this.setState({
-        // eslint-disable-next-line radix
-        status: parseInt(key) === 2 ? 3 : 1,
+        status: parseInt(key, 10) === 2 ? 3 : 1,
       })
+    }
   }
 
   render() {

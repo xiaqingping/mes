@@ -46,7 +46,11 @@ class BasicInfo extends Component {
   componentDidMount() {
     const { details } = this.props;
     const newData = []
-    if (details.organizationCertification.attachmentCode) {
+    if (!details.organizationCertification) {
+      this.setState({
+        pic: [],
+      })
+    } else if (details.organizationCertification.attachmentCode) {
       api.disk.getFiles({
         sourceKey: 'bp_organization_certification',
         sourceCode: details.organizationCertification.attachmentCode }).then(v => {

@@ -517,6 +517,7 @@ class ChangeModal extends Component {
         newDataList: [],
         userPersonData: [],
         deletePiCertificationIdList: [],
+        gtype: 0,
       })
     }
 
@@ -758,16 +759,23 @@ class ChangeModal extends Component {
     }
 
     groupInstruInput = () => {
-      const { form } = this.state;
+      const { form, userData: { basic } } = this.state;
       const { getFieldDecorator } = form;
       const { industryCategories } = this.props;
+      console.log(basic.industryCode)
       return (
       <Col lg={12} md={12} sm={12}>
         <FormItem label="行业类别">
-          {getFieldDecorator('industry')(
+          {getFieldDecorator('industry', {
+            initialValue: basic.industryCode,
+          })(
             <Select placeholder="请选择">
               {industryCategories.map(item =>
-                <Option key={item.code} value={item.name} disabled={item.code === '07'}>
+                <Option
+                  key={item.code}
+                  value={item.code}
+                  disabled={item.code === '07'}
+                >
                   {item.name}
                 </Option>,
               )}
@@ -776,35 +784,6 @@ class ChangeModal extends Component {
       </Col>
       )
     }
-
-    // 美国名称
-    // renderUsaForm = () => {
-    //   const { groupUsaShow } = this.state;
-    //   return groupUsaShow ? this.groupUsaShow() : this.groupUsaInput();
-    // }
-
-    // groupUsaShow = () => (
-    //   <FormItem label="名称"  labelCol={{ span: 4 }} wrapperCol={{ span: 20 }}>
-    //     <Icon type="home" /> <span>Willian Jafferson Clinton</span>
-    //     <a href="#" onClick = {event => this.updetaUsaGroup(event)}>修改</a>
-    //   </FormItem>
-    // )
-
-    // updetaUsaGroup = () => {
-    //   this.setState({
-    //     groupUsaShow: false,
-    //   })
-    // }
-
-    // groupUsaInput = () => {
-    //   const { form } = this.state;
-    //   const { getFieldDecorator } = form;
-    //   return (
-    //     <FormItem label="名称">
-    //       {getFieldDecorator('name')(<AddressGroup/>)}
-    //     </FormItem>
-    //   )
-    // }
 
     // 删除
     removeItem = id => {

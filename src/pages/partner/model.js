@@ -132,20 +132,35 @@ const SeqModel = {
     ],
     // 验证记录状态
     VerifyRecordStatus: [
-      { value: 1, text: '验证中', status: 'warning' },
-      { value: 2, text: '已验证', status: 'success' },
-      { value: 3, text: '已拒绝', status: 'error' },
-      { value: 4, text: '已过期', status: 'error' },
+      {
+        value: 1,
+        text: formatMessage({ id: 'bp.verification.verfication' }),
+        status: 'warning',
+      },
+      {
+        value: 2,
+        text: formatMessage({ id: 'bp.verification.completed' }),
+        status: 'success',
+      },
+      {
+        value: 3,
+        text: formatMessage({ id: 'bp.verification.rejected' }),
+        status: 'error',
+      },
+      { value: 4,
+        text: formatMessage({ id: 'bp.verification.expired' }),
+        status: 'error',
+      },
     ],
     // 验证类型
     VerifyRecordType: [
-      { value: 1, text: '组织认证' },
-      { value: 2, text: '人员认证' },
-      { value: 3, text: '绑定售达方' },
-      { value: 4, text: '验证手机' },
-      { value: 5, text: '验证邮箱' },
-      { value: 6, text: '变更验证手机' },
-      { value: 7, text: '变更验证邮箱' },
+      { value: 1, text: formatMessage({ id: 'bp.verification.organizationVerification' }) },
+      { value: 2, text: formatMessage({ id: 'bp.verification.PIVerfication' }) },
+      { value: 3, text: formatMessage({ id: 'bp.verification.soldToPartyBundle' }) },
+      { value: 4, text: formatMessage({ id: 'bp.verification.verificationMobilePhone' }) },
+      { value: 5, text: formatMessage({ id: 'bp.verification.verificationEmail' }) },
+      { value: 6, text: formatMessage({ id: 'bp.verification.changeMobilePhone' }) },
+      { value: 7, text: formatMessage({ id: 'bp.verification.changeEmail' }) },
     ],
 
     // 操作记录状态

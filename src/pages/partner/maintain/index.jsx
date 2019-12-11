@@ -673,7 +673,7 @@ constructor(props) {
               </Button>
             </div>
             <StandardTable
-              className={styles.dataTable}
+              // className={styles.dataTable}
               scroll={{ x: 1600 }}
               selectedRows={selectedRows}
               loading={loading}
