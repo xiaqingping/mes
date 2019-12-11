@@ -752,7 +752,6 @@ class CustomerEdit extends Component {
     const { pageLoading, details } = this.props;
     const customerTab = this.renderCustomerTab();
     const vendorTab = this.renderVendorTab();
-
     let title = '新增';
     if (editType === 'update') {
       title = '修改';

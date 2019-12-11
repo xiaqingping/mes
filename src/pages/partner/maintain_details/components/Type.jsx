@@ -197,11 +197,13 @@ class BasicInfo extends Component {
       type: 'basicCache/getCache',
       payload: { type: 'salesPaymentMethods' },
     });
-    if (details.customer.salesAreaList.length !== 0) {
-      this.setState({
-        noTitleKey: details.customer.salesAreaList[0].salesOrganizationCode
-        + details.customer.salesAreaList[0].distributionChannelCode,
-      })
+    if (details.customer) {
+      if (details.customer.salesAreaList.length !== 0) {
+        this.setState({
+          noTitleKey: details.customer.salesAreaList[0].salesOrganizationCode
+          + details.customer.salesAreaList[0].distributionChannelCode,
+        })
+      }
     }
   }
 

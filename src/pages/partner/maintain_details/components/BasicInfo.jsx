@@ -125,7 +125,12 @@ class BasicInfo extends Component {
             {basic.telephoneAreaCode}
             {basic.telephone ? `-${basic.telephone}` : ''}
             {basic.telephoneExtension ? `-${basic.telephoneExtension}` : ''}&nbsp;&nbsp;&nbsp;
-            <a>变更</a>
+            <a onClick={
+                () => { this.showChange.visibleShow(true, this.props.details.basic) }
+              }
+            >
+              变更
+            </a>
           </DescriptionsItem>
           <DescriptionsItem span={2} label="传真">
             {basic.fax ? <img
@@ -155,7 +160,12 @@ class BasicInfo extends Component {
               basic.industryCode ?
               industry.filter(item => item.code === basic.industryCode)[0].name : ''
             }&nbsp;&nbsp;
-            <a>变更</a>
+            <a onClick={
+                () => { this.showChange.visibleShow(true, this.props.details.basic) }
+              }
+            >
+              变更
+            </a>
           </DescriptionsItem>
           <DescriptionsItem span={6} label="通讯地址">
             {basic.countryName}&nbsp;
