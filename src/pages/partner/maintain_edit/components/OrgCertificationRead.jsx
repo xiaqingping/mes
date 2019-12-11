@@ -209,7 +209,14 @@ class OrgCertificationRead extends React.Component {
                 id: 'bp.maintain_details.verification_data.verification_documents',
               })}
             >
-              <Upload listType="picture-card" fileList={fileList} />
+              <Upload
+                listType="picture-card"
+                fileList={fileList}
+                showUploadList={{
+                  showRemoveIcon: false,
+                  showDownloadIcon: false,
+                }}
+              />
             </FormItem>
           </Col>
         </Row>
@@ -251,7 +258,14 @@ class OrgCertificationRead extends React.Component {
               id: 'bp.maintain_details.verification_data.verification_documents',
             })}
           >
-            <Upload listType="picture-card" fileList={fileList} />
+            <Upload
+              listType="picture-card"
+              fileList={fileList}
+              showUploadList={{
+                showRemoveIcon: false,
+                showDownloadIcon: false,
+              }}
+            />
           </FormItem>
         </Col>
         <Col span={10}>

@@ -5,7 +5,7 @@ import { Card, Col, Form, Input, Row, Select, Spin } from 'antd';
 import React, { Component } from 'react';
 import { connect } from 'dva';
 import debounce from 'lodash/debounce';
-import basicAPI from '@/api/basic';
+import api from '@/api';
 
 const FormItem = Form.Item;
 const { Option } = Select;
@@ -62,7 +62,7 @@ class Bank extends Component {
       this.setState({ bank: [] });
       return;
     }
-    basicAPI
+    api.basic
       .getBanks({
         codeOrFullName: value,
       })

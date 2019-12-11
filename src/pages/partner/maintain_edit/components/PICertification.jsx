@@ -8,7 +8,6 @@ import { FormattedMessage, formatMessage } from 'umi-plugin-react/locale';
 
 import PICertificationAddModal from './PICertificationAddModal';
 import api from '@/api';
-import diskAPI from '@/api/disk';
 
 const { Paragraph } = Typography;
 
@@ -39,7 +38,7 @@ class PersonCertification extends React.Component {
         uid: e.id,
         name: e.name,
         status: 'done',
-        url: diskAPI.downloadFiles(e.id, { view: true }),
+        url: api.disk.downloadFiles(e.id, { view: true }),
       }));
     }
 
@@ -81,7 +80,14 @@ class PersonCertification extends React.Component {
               {item.notes}
             </Paragraph>
             <div>
-              <Upload listType="picture-card" fileList={fileList} />
+              <Upload
+                listType="picture-card"
+                fileList={fileList}
+                showUploadList={{
+                  showRemoveIcon: false,
+                  showDownloadIcon: false,
+                }}
+              />
             </div>
           </Card>
         </List.Item>
