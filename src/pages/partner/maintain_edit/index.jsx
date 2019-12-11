@@ -22,14 +22,14 @@ import Address from './components/Address';
 import PurchasingOrg from './components/PurchasingOrg';
 import Bank from './components/Bank';
 
-// import { bp } from '@/api';
+import api from '@/api';
 import { validateForm, diff } from '@/utils/utils';
 
 @connect(({ loading, bpEdit }) => ({
   oldDetails: bpEdit.oldDetails || {},
   details: bpEdit.details || {},
   pageLoading: loading.effects['bpEdit/readBPDetails'] || false,
-  submitButtonLoading: loading.effects['bpEdit/addBP'] || loading.effects['bpEdit/updateBP'],
+  // submitButtonLoading: loading.effects['bpEdit/addBP'] || loading.effects['bpEdit/updateBP'],
 }))
 class CustomerEdit extends Component {
   constructor(props) {
@@ -48,6 +48,7 @@ class CustomerEdit extends Component {
       // result: [0：没有数据，1：通过，2：没通过]
       // message: 验证消息
       vendorValidate: null,
+      submitButtonLoading: false,
     };
     this.props.dispatch({
       type: 'bpEdit/setState',
@@ -324,90 +325,99 @@ class CustomerEdit extends Component {
 
   // 提交
   validate = async () => {
-    const { tabActiveKey, customerValidate, vendorValidate, editType } = this.state;
-    const { details } = this.props;
+    this.setState({
+      submitButtonLoading: true,
+    });
 
-    // 基础数据验证
-    if (this.basicView) {
-      const viewform = this.basicView.wrappedInstance.props.form;
-      const result = await validateForm(viewform);
-      if (!result[0]) {
-        message.error('基础数据验证不通过');
-        return;
-      }
-    }
-
-    // 新增组织BP时，必须验证组织认证
-    if (editType === 'add' && details.basic.type === 2) {
-      // 组织验证
-      if (this.orgCertificationView) {
-        const viewform = this.orgCertificationView.wrappedInstance.props.form;
+    try {
+      const { tabActiveKey, customerValidate, vendorValidate, editType } = this.state;
+      const { details } = this.props;
+      // 基础数据验证
+      if (this.basicView) {
+        const viewform = this.basicView.wrappedInstance.props.form;
         const result = await validateForm(viewform);
         if (!result[0]) {
-          message.error('组织认证验证不通过');
-          return;
+          message.error('基础数据验证不通过');
+          throw new Error('基础数据验证不通过');
         }
       }
-    }
 
-    // 验证逻辑
-    // 1)先验证当前页数据（因为当前页可能修改过，因此不能使用历史验证结果）
-    // 2)再检查另一页的历史验证结果
+      // 新增组织BP时，必须验证组织认证
+      if (editType === 'add' && details.basic.type === 2) {
+        // 组织验证
+        if (this.orgCertificationView) {
+          const viewform = this.orgCertificationView.wrappedInstance.props.form;
+          const result = await validateForm(viewform);
+          if (!result[0]) {
+            message.error('组织认证验证不通过');
+            throw new Error('组织认证验证不通过');
+          }
+        }
+      }
 
-    // 当前处于客户Tab
-    if (tabActiveKey === 'customer') {
-      const result = await this.validateCustomer();
-      if (result.result !== 1) {
-        message.warning(result.message.join('，'));
-        return;
-      }
-      if (vendorValidate && vendorValidate.result === 2) {
-        message.warning(vendorValidate.message.join('，'));
-        return;
-      }
-    }
+      // 验证逻辑
+      // 1)先验证当前页数据（因为当前页可能修改过，因此不能使用历史验证结果）
+      // 2)再检查另一页的历史验证结果
 
-    // 当前处于供应商Tab
-    if (tabActiveKey === 'vendor') {
-      const result = await this.validateVendor();
-      if (result.result !== 1) {
-        message.warning(result.message.join('，'));
-        return;
-      }
-      if (customerValidate && customerValidate.result === 2) {
-        message.warning(customerValidate.message.join('，'));
-        return;
-      }
-    }
-
-    // 修改BP时，如果某个tab(客户、供应商)的数据没有修改并且没有验证过，并且有数据，则默认验证通过
-    if (editType === 'update') {
+      // 当前处于客户Tab
       if (tabActiveKey === 'customer') {
-        if (!vendorValidate) {
-          this.setState({
-            vendorValidate: {
-              result: 1,
-              message: [],
-            },
-          });
+        const result = await this.validateCustomer();
+        if (result.result !== 1) {
+          message.warning(result.message.join('，'));
+          throw new Error(result.message.join('，'));
+        }
+        if (vendorValidate && vendorValidate.result === 2) {
+          message.warning(vendorValidate.message.join('，'));
+          throw new Error(vendorValidate.message.join('，'));
         }
       }
-      if (tabActiveKey === 'vendor') {
-        if (!customerValidate) {
-          this.setState({
-            customerValidate: {
-              result: 1,
-              message: [],
-            },
-          });
-        }
-      }
-    }
 
-    if (editType === 'add') {
-      this.add();
-    } else {
-      this.update();
+      // 当前处于供应商Tab
+      if (tabActiveKey === 'vendor') {
+        const result = await this.validateVendor();
+        if (result.result !== 1) {
+          message.warning(result.message.join('，'));
+          throw new Error(result.message.join('，'));
+        }
+        if (customerValidate && customerValidate.result === 2) {
+          message.warning(customerValidate.message.join('，'));
+          throw new Error(customerValidate.message.join('，'));
+        }
+      }
+
+      // 修改BP时，如果某个tab(客户、供应商)的数据没有修改并且没有验证过，并且有数据，则默认验证通过
+      if (editType === 'update') {
+        if (tabActiveKey === 'customer') {
+          if (!vendorValidate) {
+            this.setState({
+              vendorValidate: {
+                result: 1,
+                message: [],
+              },
+            });
+          }
+        }
+        if (tabActiveKey === 'vendor') {
+          if (!customerValidate) {
+            this.setState({
+              customerValidate: {
+                result: 1,
+                message: [],
+              },
+            });
+          }
+        }
+      }
+
+      if (editType === 'add') {
+        this.add();
+      } else {
+        this.update();
+      }
+    } catch (error) {
+      this.setState({
+        submitButtonLoading: false,
+      });
     }
   };
 
@@ -470,14 +480,17 @@ class CustomerEdit extends Component {
       };
     }
 
-    // bp.addBP(newData).then(() => {
-    //   message.success('新增业务伙伴成功');
-    //   router.push('/bp/maintain');
-    // });
-    this.props.dispatch({
-      type: 'bpEdit/addBP',
-      payload: newData,
-    });
+    api.bp
+      .addBP(newData)
+      .then(() => {
+        message.success('新增业务伙伴成功');
+        router.push('/bp/maintain');
+      })
+      .catch(() => {
+        this.setState({
+          submitButtonLoading: false,
+        });
+      });
   };
 
   // 修改
@@ -591,14 +604,17 @@ class CustomerEdit extends Component {
       newDetails = { ...newDetails, vendor: newVendor };
     }
 
-    this.props.dispatch({
-      type: 'bpEdit/updateBP',
-      payload: newDetails,
-    });
-    // bp.updateBP(newDetails).then(() => {
-    //   message.success('修改业务伙伴成功');
-    //   router.push('/bp/maintain');
-    // });
+    api.bp
+      .updateBP(newDetails)
+      .then(() => {
+        message.success('修改业务伙伴成功');
+        router.push('/bp/maintain');
+      })
+      .catch(() => {
+        this.setState({
+          submitButtonLoading: false,
+        });
+      });
   };
 
   // 客户
@@ -783,7 +799,7 @@ class CustomerEdit extends Component {
                 <Button
                   type="primary"
                   onClick={this.validate}
-                  loading={this.props.submitButtonLoading}
+                  loading={this.state.submitButtonLoading}
                 >
                   <FormattedMessage id="action.submit" />
                 </Button>
