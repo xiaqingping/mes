@@ -73,16 +73,21 @@ class EditableCell extends React.Component {
   }
 }
 
-@connect(({ basicCache, bpEdit }) => {
-  const details = bpEdit.details || {};
-  const customer = details.customer || {};
-  const addressList = customer.addressList || [];
+@connect(
+  ({ basicCache, bpEdit }) => {
+    const details = bpEdit.details || {};
+    const customer = details.customer || {};
+    const addressList = customer.addressList || [];
 
-  // 基础数据
-  // 国家拨号代码
-  const { countryDiallingCodes } = basicCache;
-  return { countryDiallingCodes, details, customer, addressList };
-})
+    // 基础数据
+    // 国家拨号代码
+    const { countryDiallingCodes } = basicCache;
+    return { countryDiallingCodes, details, customer, addressList };
+  },
+  null,
+  null,
+  { withRef: true },
+)
 class EditableTable extends React.Component {
   constructor(props) {
     super(props);

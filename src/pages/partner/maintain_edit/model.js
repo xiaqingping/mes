@@ -1,4 +1,6 @@
+import { message } from 'antd';
 import api from '@/api';
+import router from 'umi/router';
 
 const initDetails = {
   basic: {
@@ -20,25 +22,6 @@ const initDetails = {
   piCertificationList: [],
   creditList: [],
 };
-
-// const validateResult = {
-//   basic: {
-//     type: 0,
-//     name: 0,
-//   },
-//   customer: {
-//     salesOrderBlock: 2,
-//     salesAreaList: [],
-//     addressList: [],
-//   },
-//   vendor: {
-//     invoicePostBlock: 2,
-//     purchaseOrganizationList: [],
-//     paymentBank: {},
-//   },
-//   organizationCertification: {},
-//   piCertificationList: [],
-// };
 
 const SeqModel = {
   namespace: 'bpEdit',
@@ -114,6 +97,32 @@ const SeqModel = {
           type: 'setState',
           payload: { type: 'oldDetails', data: JSON.parse(JSON.stringify(details)) },
         });
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    // 新增BP
+    *addBP(action, effects) {
+      const { payload } = action;
+      const { call } = effects;
+
+      try {
+        yield call(api.bp.addBP, payload);
+        message.success('新增业务伙伴成功');
+        router.push('/bp/maintain');
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    // 修改BP
+    *updateBP(action, effects) {
+      const { payload } = action;
+      const { call } = effects;
+
+      try {
+        yield call(api.bp.updateBP, payload);
+        message.success('修改业务伙伴成功');
+        router.push('/bp/maintain');
       } catch (error) {
         console.log(error);
       }
