@@ -6,8 +6,9 @@ import React from 'react';
 import { connect } from 'dva';
 import debounce from 'lodash/debounce';
 import { formatMessage, FormattedMessage } from 'umi-plugin-react/locale';
-import { validateForm, formatter } from '@/utils/utils';
+import { validateForm } from '@/utils/utils';
 
+import ContactInformation from './ContactInformation';
 import { MobilePhoneInput, AddressInput } from '@/components/CustomizedFormControls';
 
 const EditableContext = React.createContext();
@@ -74,15 +75,12 @@ class EditableCell extends React.Component {
 }
 
 @connect(
-  ({ basicCache, bpEdit }) => {
+  ({ bpEdit }) => {
     const details = bpEdit.details || {};
     const customer = details.customer || {};
     const addressList = customer.addressList || [];
 
-    // 基础数据
-    // 国家拨号代码
-    const { countryDiallingCodes } = basicCache;
-    return { countryDiallingCodes, details, customer, addressList };
+    return { details, customer, addressList };
   },
   null,
   null,
@@ -219,7 +217,6 @@ class EditableTable extends React.Component {
   };
 
   getColumns = () => {
-    const { countryDiallingCodes } = this.props;
     const columns = [
       {
         title: formatMessage({ id: 'bp.maintain_details.name' }),
@@ -241,14 +238,12 @@ class EditableTable extends React.Component {
           rules: [{ validator: this.checkMobilePhone }],
         },
         render(text, record) {
-          const diallingCode = formatter(
-            countryDiallingCodes,
-            record.mobilePhoneCountryCode,
-            'countryCode',
-            'diallingCode',
-          );
-          if (diallingCode) return `+${diallingCode} ${record.mobilePhone}`;
-          return record.mobilePhone;
+          const data = {
+            countryCode: record.mobilePhoneCountryCode,
+            code: record.mobilePhone,
+          };
+
+          return <ContactInformation data={data} />;
         },
       },
       {

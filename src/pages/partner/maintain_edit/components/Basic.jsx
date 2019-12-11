@@ -15,9 +15,10 @@ import {
 } from '@/components/CustomizedFormControls';
 import debounce from 'lodash/debounce';
 import bpAPI from '@/api/bp';
-import { formatter } from '@/utils/utils';
+import ContactInformation from './ContactInformation';
 import CheckPhone from '@/pages/partner/maintain_details/components/CheckPhone';
 import CheckEmail from '@/pages/partner/maintain_details/components/CheckEmail';
+import { formatter } from '@/utils/utils';
 import styles from '../style.less';
 
 const FormItem = Form.Item;
@@ -480,14 +481,19 @@ class Basic extends React.Component {
     const { form, editType, basic } = this.props;
     const { getFieldDecorator } = form;
 
+    const data = {
+      countryCode: basic.telephoneCountryCode,
+      areaCode: basic.telephoneAreaCode,
+      code: basic.telephone,
+      extension: basic.telephoneExtension,
+    };
     const show = (
-      <p style={{ lineHeight: '32px' }}>
-        <span>{basic.telephoneCountryCode} </span>
-        {`${basic.telephoneAreaCode}-${basic.telephone}-${basic.telephoneExtension}`}
+      <>
+        <ContactInformation data={data} />
         <a className={styles.changeButton}>
           <FormattedMessage id="bp.maintain_details.change" />
         </a>
-      </p>
+      </>
     );
 
     // 编辑状态
