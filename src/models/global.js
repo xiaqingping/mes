@@ -2,16 +2,15 @@ const GlobalModel = {
   namespace: 'global',
   state: {
     languageCode: 'ZH',
-    collapsed: false,
+    collapsed: true,
+    clientWidth: '1960',
     notices: [],
     commonStatus: [
       { id: 1, name: '正常' },
       { id: 2, name: '已删除' },
     ],
   },
-  effects: {
-
-  },
+  effects: {},
   reducers: {
     changeLayoutCollapsed(
       state = {
@@ -25,7 +24,11 @@ const GlobalModel = {
 
     changeLanguageCode(state, { payload }) {
       const languageCode = payload.split('-')[0].toUpperCase();
-      return { ...state, languageCode }
+      return { ...state, languageCode };
+    },
+
+    setClientWidth(state, { payload }) {
+      return { ...state, clientWidth: payload };
     },
   },
   subscriptions: {

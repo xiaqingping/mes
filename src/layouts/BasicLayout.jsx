@@ -21,15 +21,38 @@ const menuDataRender = menuList =>
     return Authorized.check(item.authority, localItem, null);
   });
 
-const footerRender = (_, defaultDom) => null;
+const footerRender = () => null;
 
 const BasicLayout = props => {
   const { dispatch, children, settings } = props;
+
+  const resizeBasicLayout = () => {
+    const { clientWidth } = document.documentElement;
+    if (dispatch) {
+      dispatch({
+        type: 'global/setClientWidth',
+        payload: clientWidth,
+      });
+
+      let collapsed;
+      const collapsedCache = sessionStorage.getItem('global/collapsed');
+      if (clientWidth < 1400) collapsed = true;
+      if (clientWidth >= 1400) collapsed = false;
+      if (typeof collapsedCache === 'string') collapsed = JSON.parse(collapsedCache);
+      dispatch({
+        type: 'global/changeLayoutCollapsed',
+        payload: collapsed,
+      });
+    }
+  };
+
   /**
    * constructor
    */
 
   useEffect(() => {
+    resizeBasicLayout();
+
     if (dispatch) {
       dispatch({
         type: 'user/fetchCurrent',
@@ -44,6 +67,8 @@ const BasicLayout = props => {
    */
 
   const handleMenuCollapse = payload => {
+    sessionStorage.setItem('global/collapsed', payload);
+
     if (dispatch) {
       dispatch({
         type: 'global/changeLayoutCollapsed',
@@ -55,6 +80,7 @@ const BasicLayout = props => {
   return (
     <ProLayout
       logo={logo}
+      breakpoint={false}
       onCollapse={handleMenuCollapse}
       menuItemRender={(menuItemProps, defaultDom) => {
         if (menuItemProps.isUrl || menuItemProps.children) {
