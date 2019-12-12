@@ -1,7 +1,7 @@
 /**
  * PI认证
  */
-import { Button, Card, Icon, List, Typography, Divider, Badge, Upload } from 'antd';
+import { Button, Card, Icon, List, Typography, Divider, Badge, Upload, Empty } from 'antd';
 import React from 'react';
 import { connect } from 'dva';
 import { FormattedMessage, formatMessage } from 'umi-plugin-react/locale';
@@ -227,18 +227,22 @@ class PersonCertification extends React.Component {
         bordered={false}
         style={{ marginBottom: '24px' }}
       >
-        <List
-          rowKey="id"
-          grid={{
-            gutter: 24,
-            lg: 3,
-            md: 2,
-            sm: 1,
-            xs: 1,
-          }}
-          dataSource={[...piCertificationList, nullData]}
-          renderItem={this.renderListItem}
-        />
+        {piCertificationList.length === 0 && true ? (
+          <Empty />
+        ) : (
+          <List
+            rowKey="id"
+            grid={{
+              gutter: 24,
+              lg: 3,
+              md: 2,
+              sm: 1,
+              xs: 1,
+            }}
+            dataSource={[...piCertificationList, nullData]}
+            renderItem={this.renderListItem}
+          />
+        )}
         {addModalVisible ? (
           <PICertificationAddModal
             visible={addModalVisible}
