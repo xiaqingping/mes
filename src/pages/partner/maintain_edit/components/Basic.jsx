@@ -510,7 +510,11 @@ class Basic extends React.Component {
     // 编辑状态
     // 1）页面状态为：新增
     // 2）页面状态为：修改 并且 BP类型为人员
-    if (editType === 'add' || (editType === 'update' && basic.type === 1)) {
+    if (
+      editType === 'add' ||
+      (editType === 'update' && basic.type === 1) ||
+      (editType === 'update' && basic.sapCountryCode !== 'CN')
+    ) {
       const edit = getFieldDecorator('telephone', {
         initialValue: {
           telephoneCountryCode: basic.telephoneCountryCode,
@@ -540,7 +544,7 @@ class Basic extends React.Component {
 
     // 编辑状态
     // 页面状态为：新增
-    if (editType === 'add') {
+    if (editType === 'add' || (editType === 'update' && basic.sapCountryCode !== 'CN')) {
       const edit = getFieldDecorator('industryCode', {
         initialValue: basic.industryCode,
         rules: [{ required: true }],
