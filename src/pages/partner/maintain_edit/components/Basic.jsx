@@ -18,6 +18,7 @@ import api from '@/api';
 import ContactInformation from './ContactInformation';
 import CheckPhone from '@/pages/partner/maintain_details/components/CheckPhone';
 import CheckEmail from '@/pages/partner/maintain_details/components/CheckEmail';
+import ChangeModal from '@/pages/partner/maintain/components/ChangeModal';
 import { formatter } from '@/utils/utils';
 import styles from '../style.less';
 
@@ -351,7 +352,12 @@ class Basic extends React.Component {
         {basic.certificationStatus === 2 ? (
           <Badge status="warning" text="审核中" />
         ) : (
-          <a className={styles.changeButton}>
+          <a
+            className={styles.changeButton}
+            onClick={() => {
+              this.showChange.visibleShow(true, this.props.details.basic);
+            }}
+          >
             <FormattedMessage id="bp.maintain_details.change" />
           </a>
         )}
@@ -490,7 +496,12 @@ class Basic extends React.Component {
     const show = (
       <>
         <ContactInformation data={data} />
-        <a className={styles.changeButton}>
+        <a
+          className={styles.changeButton}
+          onClick={() => {
+            this.showChange.visibleShow(true, this.props.details.basic);
+          }}
+        >
           <FormattedMessage id="bp.maintain_details.change" />
         </a>
       </>
@@ -581,7 +592,12 @@ class Basic extends React.Component {
         <>
           {formatter(industryCategories, basic.industryCode, 'code')}
           {basic.type === 2 ? (
-            <a className={styles.changeButton}>
+            <a
+              className={styles.changeButton}
+              onClick={() => {
+                this.showChange.visibleShow(true, this.props.details.basic);
+              }}
+            >
               <FormattedMessage id="bp.maintain_details.change" />
             </a>
           ) : null}
@@ -609,6 +625,7 @@ class Basic extends React.Component {
     const {
       form: { getFieldDecorator },
       basic,
+      editType,
       tabActiveKey,
       salesOrderBlock,
       invoicePostBlock,
@@ -620,6 +637,14 @@ class Basic extends React.Component {
         bordered={false}
         style={{ marginBottom: '24px' }}
       >
+        {editType === 'update' ? (
+          <ChangeModal
+            onRef={ref => {
+              this.showChange = ref;
+            }}
+            getData={() => {}}
+          />
+        ) : null}
         <Form layout="vertical" className={styles.sangonForm} hideRequiredMark>
           <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
             <Col md={6} sm={12}>
