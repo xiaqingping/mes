@@ -184,7 +184,7 @@ class CustomerEdit extends Component {
   validateCustomer = async () => {
     const { details } = this.props;
     const { customer } = details;
-    const { salesAreaList, addressList } = customer;
+    const { salesAreaList = [], addressList = [] } = customer;
 
     const resultList = [];
     const messageList = [];
