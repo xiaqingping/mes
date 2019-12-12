@@ -4,7 +4,7 @@
 import { Spin, Modal, Button } from 'antd';
 import React from 'react';
 // import { FormattedMessage, formatMessage } from 'umi-plugin-react/locale';
-import bpAPI from '@/api/bp';
+import api from '@/api';
 
 class CreditAdjust extends React.Component {
   constructor(props) {
@@ -42,7 +42,7 @@ class CreditAdjust extends React.Component {
     };
     if (data.billToPartyId) options.billToPartyId = data.billToPartyId;
 
-    bpAPI.creditLimitAssessment(options).then(res => {
+    api.bp.creditLimitAssessment(options).then(res => {
       this.setState({
         creditData: res,
         loading: false,
@@ -58,7 +58,7 @@ class CreditAdjust extends React.Component {
     };
 
     if (data.billToPartyId) options.billToPartyId = data.billToPartyId;
-    bpAPI.creditLimitAdjustment(options).then(res => {
+    api.bp.creditLimitAdjustment(options).then(res => {
       this.setState({
         creditData: res,
         loading: false,
@@ -73,7 +73,7 @@ class CreditAdjust extends React.Component {
       id: this.props.bpId,
     };
     if (data.billToPartyId) options.billToPartyId = data.billToPartyId;
-    bpAPI.tempCreditLimitAssessment(options).then(res => {
+    api.bp.tempCreditLimitAssessment(options).then(res => {
       this.setState({
         creditData: res,
         loading: false,
@@ -88,7 +88,7 @@ class CreditAdjust extends React.Component {
       id: this.props.bpId,
     };
     if (data.billToPartyId) options.billToPartyId = data.billToPartyId;
-    bpAPI.tempCreditlimitAdjustment(options).then(res => {
+    api.bp.tempCreditlimitAdjustment(options).then(res => {
       this.setState({
         creditData: res,
         loading: false,

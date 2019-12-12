@@ -14,7 +14,7 @@ import {
   AddressInput,
 } from '@/components/CustomizedFormControls';
 import debounce from 'lodash/debounce';
-import bpAPI from '@/api/bp';
+import api from '@/api';
 import ContactInformation from './ContactInformation';
 import CheckPhone from '@/pages/partner/maintain_details/components/CheckPhone';
 import CheckEmail from '@/pages/partner/maintain_details/components/CheckEmail';
@@ -95,7 +95,7 @@ class Basic extends React.Component {
       }
     }
 
-    bpAPI.checkBPFields({ name: value.name }).then(res => {
+    api.bp.checkBPFields({ name: value.name }).then(res => {
       if (!res) {
         callback();
       } else {
@@ -126,7 +126,7 @@ class Basic extends React.Component {
       }
     }
 
-    bpAPI
+    api.bp
       .checkBPFields({ email: value.email })
       .then(res => {
         if (!res) {
@@ -161,7 +161,7 @@ class Basic extends React.Component {
       }
     }
 
-    bpAPI
+    api.bp
       .checkBPFields({ mobilePhone: value.mobilePhone })
       .then(res => {
         if (!res) {
