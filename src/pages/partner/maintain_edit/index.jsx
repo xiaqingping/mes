@@ -389,9 +389,10 @@ class CustomerEdit extends Component {
       if (editType === 'update') {
         if (tabActiveKey === 'customer') {
           if (!vendorValidate) {
+            const result = details.vendor.purchaseOrganizationList.length === 0 ? 0 : 1;
             this.setState({
               vendorValidate: {
-                result: 1,
+                result,
                 message: [],
               },
             });
@@ -399,9 +400,10 @@ class CustomerEdit extends Component {
         }
         if (tabActiveKey === 'vendor') {
           if (!customerValidate) {
+            const result = details.customer.salesAreaList.length === 0 ? 0 : 1;
             this.setState({
               customerValidate: {
-                result: 1,
+                result,
                 message: [],
               },
             });
@@ -497,6 +499,8 @@ class CustomerEdit extends Component {
   update = () => {
     const { oldDetails } = this.props;
     const { customerValidate, vendorValidate } = this.state;
+    console.log(customerValidate);
+    console.log(vendorValidate);
     const details = JSON.parse(JSON.stringify(this.props.details));
     const { basic, customer, vendor } = details;
     const { salesAreaList, addressList, ...customerOther } = customer;
