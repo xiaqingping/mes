@@ -21,6 +21,26 @@ const UserLayout = props => {
       pathname: '',
     },
   } = props;
+  const links = [
+    {
+      key: '帮助',
+      title: '帮助',
+      href: '/',
+      blankTarget: false,
+    },
+    {
+      key: '隐私',
+      title: '隐私',
+      href: '/',
+      blankTarget: false,
+    },
+    {
+      key: '条款',
+      title: '条款',
+      href: '/',
+      blankTarget: false,
+    },
+  ];
   const { breadcrumb } = getMenuData(routes);
   return (
     <DocumentTitle
@@ -40,14 +60,14 @@ const UserLayout = props => {
             <div className={styles.header}>
               <Link to="/">
                 <img alt="logo" className={styles.logo} src={logo} />
-                <span className={styles.title}>业务支撑平台</span>
+                <span className={styles.title}>魔方</span>
               </Link>
             </div>
-            <div className={styles.desc}>业务支撑平台 是东半球最具影响力的 Web 设计规范</div>
+            <div className={styles.desc}>魔方是集团化一站式业务支撑平台</div>
           </div>
           {children}
         </div>
-        <DefaultFooter />
+        <DefaultFooter links={links} copyright="BBI Lifesciences Corporation" />
       </div>
     </DocumentTitle>
   );

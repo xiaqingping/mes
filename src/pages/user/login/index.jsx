@@ -201,12 +201,7 @@ class Login extends Component {
             <Checkbox checked={autoLogin} onChange={this.changeAutoLogin}>
               <FormattedMessage id="user-login.login.remember-me" />
             </Checkbox>
-            <a
-              style={{
-                float: 'right',
-              }}
-              href=""
-            >
+            <a style={{ float: 'right' }} href="">
               <FormattedMessage id="user-login.login.forgot-password" />
             </a>
           </div>

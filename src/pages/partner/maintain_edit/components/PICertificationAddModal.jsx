@@ -15,8 +15,19 @@ const { Option } = Select;
 
 @Form.create()
 @connect(
-  ({ bpEdit, user }) => {
-    const details = bpEdit.details || {};
+  ({ user }) => ({
+    authorization: user.currentUser.authorization,
+  }),
+  null,
+  null,
+  { withRef: true },
+)
+class PICertificationAddModal extends React.Component {
+  constructor(props) {
+    super(props);
+    const { details, data: billToParty } = props;
+    const type = billToParty.billToPartyId ? 2 : 1;
+
     const basic = details.basic || {};
     const customer = details.customer || {};
     const salesAreaList = customer.salesAreaList || [];
@@ -39,22 +50,6 @@ const { Option } = Select;
       return true;
     });
 
-    return {
-      details,
-      salesAreaList,
-      billToPartyList,
-      authorization: user.currentUser.authorization,
-    };
-  },
-  null,
-  null,
-  { withRef: true },
-)
-class PICertificationAddModal extends React.Component {
-  constructor(props) {
-    super(props);
-    const { data: billToParty } = props;
-    const type = billToParty.billToPartyId ? 2 : 1;
     // 每次都新生成一个uuid
     // 1. 新增PI认证按流程走
     // 2. 变更未提交到后台的PI认证时，使用此uuid上传图片，删除旧uuid关联的图片时，不直接请求接口删除，
@@ -63,6 +58,7 @@ class PICertificationAddModal extends React.Component {
     // const uuid = billToParty.uuid || guid();
     const uuid = guid();
     this.state = {
+      billToPartyList,
       // 1 新增 2 变更刚新增的数据
       type,
       // 回填的数据
@@ -90,7 +86,7 @@ class PICertificationAddModal extends React.Component {
   };
 
   billToPartyChange = data => {
-    const { billToPartyList } = this.props;
+    const { billToPartyList } = this.state;
     const billToParty = billToPartyList.filter(e => e.id === data)[0];
 
     this.setState({
@@ -161,8 +157,8 @@ class PICertificationAddModal extends React.Component {
   };
 
   render() {
-    const { visible, onCancel, form, authorization, billToPartyList } = this.props;
-    const { uuid, billToParty, type } = this.state;
+    const { visible, onCancel, form, authorization } = this.props;
+    const { uuid, billToParty, type, billToPartyList } = this.state;
     const uploadUrl = api.disk.uploadMoreFiles('bp_pi_certification', uuid);
 
     if (type === 2) {

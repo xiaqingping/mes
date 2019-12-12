@@ -217,9 +217,10 @@ class PersonCertification extends React.Component {
   };
 
   render() {
-    const { piCertificationList } = this.props;
+    const { piCertificationList, details } = this.props;
     const { addModalVisible, updateItemData } = this.state;
     const nullData = {};
+    const { basic } = details;
 
     return (
       <Card
@@ -227,7 +228,7 @@ class PersonCertification extends React.Component {
         bordered={false}
         style={{ marginBottom: '24px' }}
       >
-        {piCertificationList.length === 0 && true ? (
+        {basic.id && piCertificationList.length === 0 && true ? (
           <Empty />
         ) : (
           <List
@@ -245,6 +246,7 @@ class PersonCertification extends React.Component {
         )}
         {addModalVisible ? (
           <PICertificationAddModal
+            details={details}
             visible={addModalVisible}
             onOk={this.okHandle}
             onCancel={() => this.handleModalVisible(false)}
