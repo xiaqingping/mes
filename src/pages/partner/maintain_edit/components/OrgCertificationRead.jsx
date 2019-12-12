@@ -2,12 +2,12 @@
  * 组织认证查看
  */
 import React from 'react';
-import { Form, Card, Row, Col, Badge, Upload, Modal, Popconfirm } from 'antd';
+import { Form, Card, Row, Col, Badge, Upload, Popconfirm } from 'antd';
 import { connect } from 'dva';
 import { formatMessage } from 'umi-plugin-react/locale';
-import api from '@/api';
-import ChangeCertification from './ChangeCertification';
+import ChangeModal from '@/pages/partner/maintain/components/ChangeModal';
 // import ContactInformation from './ContactInformation';
+import api from '@/api';
 import styles from '../style.less';
 
 const FormItem = Form.Item;
@@ -23,22 +23,6 @@ const FormItem = Form.Item;
   };
 })
 class OrgCertificationRead extends React.Component {
-  state = {
-    modalVisible: false,
-  };
-
-  handleOk = () => {
-    this.setState({ modalVisible: false });
-  };
-
-  handleCancel = () => {
-    this.setState({ modalVisible: false });
-  };
-
-  showModal = () => {
-    this.setState({ modalVisible: true });
-  };
-
   // 取消认证
   cancelCertification = () => {
     const { details, basic } = this.props;
@@ -60,7 +44,7 @@ class OrgCertificationRead extends React.Component {
 
   // 认证状态
   renderStatus = () => {
-    const { details, basic } = this.props;
+    const { basic } = this.props;
     let status = null;
     switch (basic.certificationStatus) {
       case 1:
@@ -68,7 +52,6 @@ class OrgCertificationRead extends React.Component {
           <>
             <Badge status="default" text="未认证" />
             <a className={styles.changeButton}>认证</a>
-            <ChangeCertification details={details} />
           </>
         );
         break;
@@ -84,7 +67,12 @@ class OrgCertificationRead extends React.Component {
         status = (
           <>
             <Badge status="success" text="已认证" />
-            <a className={styles.changeButton} onClick={this.showModal}>
+            <a
+              className={styles.changeButton}
+              onClick={() => {
+                this.showChange.visibleShow(true, this.props.details.basic);
+              }}
+            >
               变更
             </a>
             <Popconfirm
@@ -95,15 +83,6 @@ class OrgCertificationRead extends React.Component {
             >
               <a className={styles.changeButton}>取消认证</a>
             </Popconfirm>
-            <Modal
-              title="变更认证资料"
-              visible={this.state.modalVisible}
-              okText="提交"
-              onOk={this.handleOk}
-              onCancel={this.handleCancel}
-            >
-              <ChangeCertification details={details} />
-            </Modal>
           </>
         );
         break;
@@ -299,6 +278,12 @@ class OrgCertificationRead extends React.Component {
         bordered={false}
         style={{ marginBottom: '24px' }}
       >
+        <ChangeModal
+          onRef={ref => {
+            this.showChange = ref;
+          }}
+          getData={() => {}}
+        />
         {this.renderContent()}
       </Card>
     );

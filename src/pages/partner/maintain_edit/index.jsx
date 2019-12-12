@@ -499,8 +499,6 @@ class CustomerEdit extends Component {
   update = () => {
     const { oldDetails } = this.props;
     const { customerValidate, vendorValidate } = this.state;
-    console.log(customerValidate);
-    console.log(vendorValidate);
     const details = JSON.parse(JSON.stringify(this.props.details));
     const { basic, customer, vendor } = details;
     const { salesAreaList, addressList, ...customerOther } = customer;
