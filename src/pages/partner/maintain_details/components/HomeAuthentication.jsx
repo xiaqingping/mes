@@ -106,7 +106,7 @@ class BasicInfo extends Component {
               <DescriptionsItem label="增值税专用发票资质">
                 {details.organizationCertification ?
                 (details.organizationCertification.specialInvoice === 1 ?
-                '是' : '') : ''}
+                '是' : '否') : ''}
               </DescriptionsItem>
               <DescriptionsItem label="统一社会信用代码">
                 {details.organizationCertification ? details.organizationCertification.taxNo : ''}

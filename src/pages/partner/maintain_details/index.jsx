@@ -127,7 +127,6 @@ class CustomerDetails extends Component {
     if (!customer) {
       return null;
     }
-
     const contentList = {
       customer: (
         <>

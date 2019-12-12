@@ -74,11 +74,11 @@ class BasicInfo extends Component {
         {text}
         </div>,
       },
-      {
-        title: '操作',
-        dataIndex: 'action',
-        width: 150,
-      },
+      // {
+      //   title: '操作',
+      //   dataIndex: 'action',
+      //   width: 150,
+      // },
     ];
     return (
       <Card title="收货地址" bordered={false} style={{ marginBottom: '24px' }}>
