@@ -1,6 +1,6 @@
 {
-  "name": "业务支撑平台",
-  "short_name": "业务支撑平台",
+  "name": "魔方",
+  "short_name": "魔方",
   "display": "standalone",
   "start_url": "./?utm_source=homescreen",
   "theme_color": "#002140",

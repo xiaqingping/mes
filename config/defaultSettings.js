@@ -10,7 +10,7 @@ export default {
   menu: {
     locale: true,
   },
-  title: '业务支撑平台',
+  title: '魔方',
   pwa: false,
   iconfontUrl: '',
 };
