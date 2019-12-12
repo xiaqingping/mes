@@ -36,8 +36,8 @@ const BasicLayout = props => {
 
       let collapsed;
       const collapsedCache = sessionStorage.getItem('global/collapsed');
-      if (clientWidth < 1400) collapsed = true;
-      if (clientWidth >= 1400) collapsed = false;
+      if (clientWidth <= 1440) collapsed = true;
+      if (clientWidth > 1440) collapsed = false;
       if (typeof collapsedCache === 'string') collapsed = JSON.parse(collapsedCache);
       dispatch({
         type: 'global/changeLayoutCollapsed',
