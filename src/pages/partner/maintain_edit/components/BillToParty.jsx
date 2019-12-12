@@ -52,9 +52,13 @@ class EditableCell extends React.Component {
 }
 
 @Form.create()
-@connect(({ bp }) => ({
-  VerifyRecordStatus: bp.VerifyRecordStatus,
-}))
+@connect(({ bp, bpEdit }) => {
+  const { details = {} } = bpEdit;
+  return {
+    basic: details.basic,
+    VerifyRecordStatus: bp.VerifyRecordStatus,
+  };
+})
 class BillToParty extends React.Component {
   constructor(props) {
     super(props);
@@ -142,7 +146,7 @@ class BillToParty extends React.Component {
   };
 
   render() {
-    const { tableData, VerifyRecordStatus } = this.props;
+    const { tableData, VerifyRecordStatus, basic } = this.props;
     const components = {
       body: {
         cell: EditableCell,
@@ -177,6 +181,10 @@ class BillToParty extends React.Component {
         render: (text, record, index) => {
           const { editIndex } = this.state;
           const editable = editIndex === index;
+
+          // 不能删除和修改自己
+          if (basic.id && basic.id === record.id) return null;
+
           if (editable) {
             return (
               <>
