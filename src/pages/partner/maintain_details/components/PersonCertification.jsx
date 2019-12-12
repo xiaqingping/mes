@@ -1,22 +1,85 @@
-import { Button, Card, Icon, List, Typography, Divider, Badge } from 'antd';
+import { Button, Card, Icon, List, Typography, Badge } from 'antd';
 import React from 'react';
 import { connect } from 'dva';
+import api from '@/api';
+import { formatMessage } from 'umi-plugin-react/locale';
 
 import PersonCertificationAddModal from './PersonCertificationAddModal';
 
 const { Paragraph } = Typography;
+// 审核状态
+const verifyStatus = {
+  1: {
+    value: 'warning',
+    text: '审核中',
+  },
+ 2: {
+    value: 'success',
+    text: '已认证',
+  },
+  3: {
+    value: 'default',
+    text: '未认证',
+  },
+}
 
-@connect(({ partnerMaintainEdit }) => ({
+@connect(({ partnerMaintainEdit, user }) => ({
   details: partnerMaintainEdit.details || {},
-  piCertification:
-    (partnerMaintainEdit.details && partnerMaintainEdit.details.piCertification) || [],
+  authorization: user.currentUser.authorization,
 }))
 class PersonCertification extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      // 新增PI认证模态框显示状态
       addModalVisible: false,
+      editType: 'update',
+      updateItemData: {},
+      attachmentList: [],
     };
+  }
+
+  componentDidMount() {
+    const { details } = this.props;
+    if (details.piCertificationList.length !== 0) {
+      const codeList = [];
+      const attachmentList = []
+      details.piCertificationList.forEach(item => {
+        codeList.push(item.attachmentCode)
+        attachmentList.push({
+        id: item.billToPartyId,
+        status: item.status,
+        billToPartyName: item.billToPartyName,
+        notes: item.notes,
+        pic: [],
+        attachmentCode: item.attachmentCode,
+        })
+      })
+      api.disk.getFiles({
+        sourceKey: 'bp_pi_certification',
+        sourceCode: codeList.join(',') }).then(
+          v => {
+            attachmentList.forEach((item, index) => {
+              v.forEach(i => {
+                if (i.sourceCode === item.attachmentCode) {
+                  attachmentList[index].pic.push(api.disk.downloadFiles(i.id, { view: true }))
+                }
+              })
+            })
+            this.setState({
+              attachmentList,
+            })
+            this.props.dispatch({
+              type: 'partnerMaintainEdit/setDetails',
+              payload: { ...details, attachmentList },
+            });
+      })
+    } else {
+      this.props.dispatch({
+        type: 'partnerMaintainEdit/setDetails',
+        payload: { ...details, attachmentList: [] },
+      });
+    }
   }
 
   renderListItem = item => {
@@ -26,16 +89,15 @@ class PersonCertification extends React.Component {
           <Card
             hoverable
             title={item.billToPartyName}
-            extra={
+            extra={ item.status === 1 ? '' :
               <>
-                <a>变更</a>
-                <Divider type="vertical" />
-                <a onClick={() => this.removeItem(item.id)}>删除</a>
+                <a onClick={() => this.removeItem(item)}>删除</a>
               </>
             }
           >
             <div style={{ marginBottom: '.8em' }}>
-              <Badge status="default" text="未认证" />
+              <Badge status={verifyStatus[item.status].value}
+              text={verifyStatus[item.status].text}/>
             </div>
             <Paragraph
               style={{ minHeight: 42 }}
@@ -46,7 +108,20 @@ class PersonCertification extends React.Component {
               {item.notes}
             </Paragraph>
             <div>
-              <img style={{ width: 80, height: 80 }} src={item.attachmentList[0].code} alt="" />
+              {item.pic.map((v, index) =>
+                <img
+                  // eslint-disable-next-line react/no-array-index-key
+                  key={index}
+                  style={{ width: 90,
+                  height: 90,
+                  margin: '0 20px 20px 0',
+                  border: '1px #ECECEC solid',
+                  padding: '5px',
+                  borderRadius: '5px' }}
+                  src={v}
+                  alt=""
+                />,
+               )}
             </div>
           </Card>
         </List.Item>
@@ -57,14 +132,14 @@ class PersonCertification extends React.Component {
       <List.Item>
         <Button
           type="dashed"
-          style={{ width: '100%', height: 274 }}
+          style={{ width: '100%', height: 304 }}
           onClick={() => this.handleModalVisible(true)}
         >
-          <Icon type="plus" /> 提交认证
+          <Icon type="plus" /> 新增认证
         </Button>
       </List.Item>
     );
-  };
+  }
 
   handleModalVisible = flag => {
     this.setState({
@@ -72,53 +147,108 @@ class PersonCertification extends React.Component {
     });
   };
 
-  removeItem = id => {
-    const { details, piCertification } = this.props;
+  // 删除项
+  // editType=add 直接删除
+  // editType=update 接口单个删除
+  removeItem = item => {
+    const { details } = this.props;
 
-    const data = piCertification.filter(e => e.id !== id);
-    this.props.dispatch({
-      type: 'partnerMaintainEdit/setDetails',
-      payload: { ...details, piCertification: data },
+    api.bp.cancelBPPiCertification({ id: details.basic.id, billToPartyId: item.id }).then(() => {
+      const attachmentList = details.attachmentList.filter(e => e.id !== item.id);
+      this.props.dispatch({
+        type: 'partnerMaintainEdit/setDetails',
+        payload: { ...details, attachmentList },
+      });
+      this.setState({
+        attachmentList,
+      })
     });
   };
 
-  handleAdd = data => {
-    const { details, piCertification } = this.props;
+  addNewItem = () => {
+    this.setState({
+      updateItemData: {},
+    });
+    this.handleModalVisible(true);
+  };
 
-    const attachmentList = data.attachmentList.map(e => ({
-      code: e.thumbUrl,
-      name: e.name,
-      type: e.type,
-    }));
+  // 变更项
+  updateItem = data => {
+    this.setState({
+      updateItemData: data,
+    });
+    this.handleModalVisible(true);
+  };
+
+  okHandle = () => {
+    const content = this.PICertificationAddModal.wrappedInstance;
+    const { form } = content.props;
+    const { billToParty, uuid } = content.state;
+    form.validateFields((err, fieldsValue) => {
+      if (err) return;
+      form.resetFields();
+      this.handleAdd({ ...fieldsValue, ...billToParty, uuid });
+    });
+  };
+
+  handleAdd = async data => {
     this.handleModalVisible();
-    const obj = {
-      id: Math.random(),
-      billToPartyId: 123,
-      billToPartyCode: 12345,
-      billToPartyName: data.billToPartyName,
-      status: 1,
-      notes: data.notes,
-      attachmentList,
-    };
+    const { details } = this.props;
+    const { editType } = this.state;
 
-    const newdata = [...piCertification, obj];
+    // const has = details.attachmentList.filter(e => e.billToPartyId === data.billToPartyId);
+    let newdata = [];
+
+    // if (has.length === 0) {
+      const obj = {
+        uuid: data.uuid,
+        billToPartyId: data.billToPartyId,
+        billToPartyCode: data.billToPartyCode,
+        billToPartyName: data.billToPartyName,
+        status: 3,
+        notes: data.notes,
+        attachmentList: data.attachmentList,
+      };
+      if (editType === 'update') {
+        try {
+          await api.bp.addBPPiCertification(details.basic.id, {
+            attachmentCode: data.uuid,
+            billToPartyId: data.billToPartyId,
+            name: details.basic.name,
+            notes: data.notes,
+          });
+          obj.status = 1;
+        } catch (error) {
+          return;
+        }
+      }
+      newdata = [...details.attachmentList, obj];
+    // } else {
+    //   newdata = details.attachmentList.map(e => {
+    //     if (e.billToPartyId === data.billToPartyId) return data;
+    //     return e;
+    //   });
+    // }
+
     this.props.dispatch({
       type: 'partnerMaintainEdit/setDetails',
-      payload: { ...details, piCertification: newdata },
+      payload: { ...details, attachmentList: newdata },
     });
+
+    this.setState({
+      attachmentList: newdata,
+    })
   };
 
   render() {
-    const { piCertification } = this.props;
-    const { addModalVisible } = this.state;
+    const { addModalVisible, updateItemData, attachmentList } = this.state;
     const nullData = {};
-    const parentMethods = {
-      handleAdd: this.handleAdd,
-      handleModalVisible: this.handleModalVisible,
-    };
-
     return (
-      <Card title="PI认证" bordered={false} style={{ marginBottom: '24px' }}>
+      <Card
+        title={formatMessage({ id: 'bp.maintain_details.PI_verification' })}
+        bordered={false}
+        style={{ marginBottom: '24px' }}
+      >
         <List
           rowKey="id"
           grid={{
@@ -128,10 +258,20 @@ class PersonCertification extends React.Component {
             sm: 1,
             xs: 1,
           }}
-          dataSource={[...piCertification, nullData]}
+          dataSource={[...attachmentList, nullData]}
           renderItem={this.renderListItem}
         />
-        <PersonCertificationAddModal {...parentMethods} modalVisible={addModalVisible} />
+        {addModalVisible ? (
+          <PersonCertificationAddModal
+            visible={addModalVisible}
+            onOk={this.okHandle}
+            onCancel={() => this.handleModalVisible(false)}
+            data={updateItemData}
+            wrappedComponentRef={ref => {
+              this.PICertificationAddModal = ref;
+            }}
+          />
+        ) : null}
       </Card>
     );
   }
