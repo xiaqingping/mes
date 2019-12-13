@@ -132,9 +132,7 @@ class NameGroup extends Component {
           value={name}
           style={{ width: '80%' }}
           placeholder="请输入名称"
-          onChange={e => this.valueChange({ name: e.target.value })}
-          validatestatus="error"
-          help="Should be combination of numbers & alphabets"/>
+          onChange={e => this.valueChange({ name: e.target.value })}/>
       </InputGroup>
     )
   }
@@ -156,7 +154,9 @@ class AddressGroup extends Component {
   // 选择地区
   // eslint-disable-next-line consistent-return
   selectArea = (v, o) => {
-    this.props.gTypeName(o[0].sapCode)
+    if (o.length !== 0) {
+      this.props.gTypeName(o[0].sapCode)
+    }
     if (o.length === 0) return false;
     const { countryCode } = this.state;
     if (o[o.length - 1].isHaveLow === 2) {
@@ -220,6 +220,7 @@ class AddressGroup extends Component {
 
   render () {
     const { countryCode, popupVisible } = this.state;
+    const { userData } = this.props;
     return (
       <InputGroup compact>
         <Cascader
@@ -231,8 +232,9 @@ class AddressGroup extends Component {
           onClick={() => { this.setState({ popupVisible: !popupVisible }) }}
         />
         <Input style={{ width: '60%' }}
-        placeholder="详细地址"
-        onChange={e => this.passVal(e.target.value, 2)}
+          placeholder="详细地址"
+          defaultValue={userData.basic.address}
+          onChange={e => this.passVal(e.target.value, 2)}
         />
       </InputGroup>
     )
@@ -430,56 +432,42 @@ class ChangeModal extends Component {
          area,
          userData: { basic },
          recordMsg,
-         userData,
+         gtype,
          guuid } = this.state;
       this.props.form.validateFields((error, row) => {
         if (error) return;
         let data = {};
-        if (userData.basic.sapCountryCode === 'CN') {
-          data = {
-            basic: {
-              id: recordMsg.id,
-              name: row.msg ? row.msg.name : basic.name,
-              countryCode: area[0] ? area[0].code : basic.countryCode,
-              provinceCode: area[1] ? area[1].code : basic.provinceCode,
-              cityCode: area[2] ? area[2].code : basic.cityCode,
-              countyCode: area[3] ? area[3].code : basic.countyCode,
-              streetCode: area[4] ? area[4].code : basic.streetCode,
-              address: address || basic.address,
-              industryCode: row.industry || basic.industryCode,
-              telephoneCountryCode: row.phoneNum.telephoneCountryCode || basic.telephoneCountryCode,
-              telephoneAreaCode: row.phoneNum.telephoneAreaCode || basic.telephoneAreaCode,
-              telephone: row.phoneNum.telephone || basic.telephone,
-              telephoneExtension: row.phoneNum.telephoneExtension || basic.telephoneExtension,
-            },
-            organizationCertification: {
-              specialInvoice: row.specialInvoice ? 1 : 2,
-              taxNo: row.taxNo,
-              bankCode: row.bankCode,
-              bankAccount: row.bankAccount,
-              registeredAddress: row.regisAddress,
-              notes: row.notes,
-              attachmentCode: guuid,
-            },
-          }
-        } else {
-          data = {
-            basic: {
-              id: recordMsg.id,
-              name: row.msg ? row.msg.name : basic.name,
-              countryCode: area[0] ? area[0].code : basic.countryCode,
-              provinceCode: area[1] ? area[1].code : basic.provinceCode,
-              cityCode: area[2] ? area[2].code : basic.cityCode,
-              countyCode: area[3] ? area[3].code : basic.countyCode,
-              streetCode: area[4] ? area[4].code : basic.streetCode,
-              address: address || basic.address,
-            },
-            organizationCertification: {
-              taxNo: row.taxNo,
-              notes: row.notes,
-              attachmentCode: guuid,
-            },
-          }
+        data = {
+          basic: {
+            id: recordMsg.id,
+            name: row.msg ? row.msg.name : basic.name,
+            countryCode: area[0] ? area[0].code : basic.countryCode,
+            provinceCode: area[1] ? area[1].code : basic.provinceCode,
+            cityCode: area[2] ? area[2].code : basic.cityCode,
+            countyCode: area[3] ? area[3].code : basic.countyCode,
+            streetCode: area[4] ? area[4].code : basic.streetCode,
+            address: address || basic.address,
+          },
+          organizationCertification: {
+            taxNo: row.taxNo,
+            notes: row.notes,
+            attachmentCode: guuid,
+          },
+        }
+        if (gtype === 1 || (!gtype && basic.sapCountryCode === 'CN')) {
+          Object.assign(data.basic, {
+            industryCode: row.industry || basic.industryCode,
+            telephoneCountryCode: row.phoneNum.telephoneCountryCode || basic.telephoneCountryCode,
+            telephoneAreaCode: row.phoneNum.telephoneAreaCode || basic.telephoneAreaCode,
+            telephone: row.phoneNum.telephone || basic.telephone,
+            telephoneExtension: row.phoneNum.telephoneExtension || basic.telephoneExtension,
+          })
+          Object.assign(data.organizationCertification, {
+            specialInvoice: row.specialInvoice ? 1 : 2,
+            bankCode: row.bankCode || '',
+            bankAccount: row.bankAccount || '',
+            registeredAddress: row.regisAddress || '',
+          })
         }
         console.log(data)
         api.bp.updateBPOrgCertification(data).then(() => {
@@ -570,7 +558,6 @@ class ChangeModal extends Component {
     )
 
     changGType = v => {
-      console.log(v)
       if (v.type) {
         if (v.type === 'group') {
           this.setState({
@@ -651,7 +638,9 @@ class ChangeModal extends Component {
         labelCol={{ span: 4 }}
         wrapperCol={{ span: 20 }}
         hasFeedback
-        validateStatus={form.getFieldValue('msg') ? 'success' : 'error'}
+        // eslint-disable-next-line no-nested-ternary
+        validateStatus={form.getFieldValue('msg') ?
+                        (form.getFieldValue('msg').name ? 'success' : 'error') : 'error'}
         // help={form.getFieldValue('msg') ? '' : '请输入信息'}
         >
           {getFieldDecorator('msg')(
@@ -701,6 +690,7 @@ class ChangeModal extends Component {
     groupAdressInput = () => {
       const { form, area, userData, gtype } = this.state;
       const { getFieldDecorator } = form;
+      // console.log(form.getFieldValue('address'))
       if (gtype === 1) {
         return (
           <Col lg={24} md={12} sm={12}>
@@ -715,7 +705,7 @@ class ChangeModal extends Component {
               // help={form.getFieldValue('msg') ? '' : '请输入信息'}
             >
               {getFieldDecorator('address')(
-              <AddressGroup addressVal={this.addressVal} gTypeName={v => this.changGType(v)}/>,
+              <AddressGroup addressVal={this.addressVal} gTypeName={v => this.changGType(v)} userData={userData}/>,
               )}
             </FormItem>
           </Col>
@@ -733,7 +723,7 @@ class ChangeModal extends Component {
               // help={form.getFieldValue('msg') ? '' : '请输入信息'}
             >
               {getFieldDecorator('address')(
-                <AddressGroup addressVal={this.addressVal} gTypeName={v => this.changGType(v)}/>,
+                <AddressGroup addressVal={this.addressVal} gTypeName={v => this.changGType(v)} userData={userData}/>,
               )}
             </FormItem>
           </Col>
@@ -753,7 +743,7 @@ class ChangeModal extends Component {
               // help={form.getFieldValue('msg') ? '' : '请输入信息'}
             >
               {getFieldDecorator('address')(
-              <AddressGroup addressVal={this.addressVal} gTypeName={v => this.changGType(v)}/>,
+              <AddressGroup addressVal={this.addressVal} gTypeName={v => this.changGType(v)} userData={userData}/>,
               )}
             </FormItem>
           </Col>
@@ -770,7 +760,7 @@ class ChangeModal extends Component {
               // help={form.getFieldValue('msg') ? '' : '请输入信息'}
             >
               {getFieldDecorator('address')(
-                <AddressGroup addressVal={this.addressVal} gTypeName={v => this.changGType(v)}/>,
+                <AddressGroup addressVal={this.addressVal} gTypeName={v => this.changGType(v)} userData={userData}/>,
               )}
             </FormItem>
           </Col>
@@ -819,7 +809,6 @@ class ChangeModal extends Component {
       const { form, userData: { basic } } = this.state;
       const { getFieldDecorator } = form;
       const { industryCategories } = this.props;
-      console.log(basic.industryCode)
       return (
       <Col lg={12} md={12} sm={12}>
         <FormItem label="行业类别">
@@ -1732,6 +1721,7 @@ class ChangeModal extends Component {
           <h4 style={{ fontWeight: '600', margin: '30px 0 20px' }}>您的资料已提交，请耐心等待审核</h4>
         </div>
       </>
+
       return (
           <div>
             <Modal
