@@ -149,7 +149,7 @@ class AddressGroup extends Component {
     };
   }
 
-  componentWillMount () {
+  componentDidMount () {
     api.area.byParentIdGetArea(0).then(res => { this.setState({ countryCode: res }) })
   }
 

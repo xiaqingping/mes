@@ -69,16 +69,11 @@ class PersonCertification extends React.Component {
             this.setState({
               attachmentList,
             })
-            this.props.dispatch({
-              type: 'partnerMaintainEdit/setDetails',
-              payload: { ...details, attachmentList },
-            });
+            // this.props.dispatch({
+            //   type: 'partnerMaintainEdit/setDetails',
+            //   payload: { ...details, attachmentList },
+            // });
       })
-    } else {
-      this.props.dispatch({
-        type: 'partnerMaintainEdit/setDetails',
-        payload: { ...details, attachmentList: [] },
-      });
     }
   }
 
@@ -152,15 +147,19 @@ class PersonCertification extends React.Component {
   // editType=update 接口单个删除
   removeItem = item => {
     const { details } = this.props;
+    const { attachmentList } = this.state;
 
     api.bp.cancelBPPiCertification({ id: details.basic.id, billToPartyId: item.id }).then(() => {
-      const attachmentList = details.attachmentList.filter(e => e.id !== item.id);
-      this.props.dispatch({
-        type: 'partnerMaintainEdit/setDetails',
-        payload: { ...details, attachmentList },
-      });
+      const attachmentListData = attachmentList.filter(e => e.id !== item.id);
+      // const piCertificationList = details.piCertificationList.filter(
+      //   e => e.billToPartyId !== item.id,
+      // )
+      // this.props.dispatch({
+      //   type: 'partnerMaintainEdit/setDetails',
+      //   payload: { ...details, attachmentList, piCertificationList },
+      // });
       this.setState({
-        attachmentList,
+        attachmentList: attachmentListData,
       })
     });
   };
@@ -194,20 +193,25 @@ class PersonCertification extends React.Component {
   handleAdd = async data => {
     this.handleModalVisible();
     const { details } = this.props;
-    const { editType } = this.state;
+    const { editType, attachmentList } = this.state;
 
     // const has = details.attachmentList.filter(e => e.billToPartyId === data.billToPartyId);
     let newdata = [];
-
+    const picList = []
+    if (data.attachmentList.length !== 0) {
+      data.attachmentList.forEach(item => {
+        picList.push(api.disk.downloadFiles(item.id, { view: true }))
+      })
+    }
     // if (has.length === 0) {
       const obj = {
-        uuid: data.uuid,
+        id: data.uuid,
         billToPartyId: data.billToPartyId,
         billToPartyCode: data.billToPartyCode,
         billToPartyName: data.billToPartyName,
         status: 3,
         notes: data.notes,
-        attachmentList: data.attachmentList,
+        pic: picList,
       };
       if (editType === 'update') {
         try {
@@ -222,18 +226,23 @@ class PersonCertification extends React.Component {
           return;
         }
       }
-      newdata = [...details.attachmentList, obj];
+      newdata = [...attachmentList, obj];
     // } else {
     //   newdata = details.attachmentList.map(e => {
     //     if (e.billToPartyId === data.billToPartyId) return data;
     //     return e;
     //   });
     // }
-
-    this.props.dispatch({
-      type: 'partnerMaintainEdit/setDetails',
-      payload: { ...details, attachmentList: newdata },
-    });
+    // const piCertificationListData = details.piCertificationList;
+    // piCertificationListData.push({ id: 'new' })
+    // this.props.dispatch({
+    //   type: 'partnerMaintainEdit/setDetails',
+    //   payload: {
+    //     ...details,
+    //     attachmentList: newdata,
+    //     piCertificationList: piCertificationListData,
+    //   },
+    // });
 
     this.setState({
       attachmentList: newdata,

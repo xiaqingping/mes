@@ -1,5 +1,7 @@
 export default {
-  'menu.welcome': 'Welcome',
+  'menu.welcome': 'welcome',
+  'menu.dashboard': 'Dashboard',
+  'menu.dashboard.sale': 'Sales Analysis',
   'menu.more-blocks': 'More Blocks',
   'menu.home': 'Home',
   'menu.login': 'Login',

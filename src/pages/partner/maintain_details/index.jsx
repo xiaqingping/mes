@@ -31,6 +31,7 @@ class CustomerDetails extends Component {
   };
 
   componentDidMount() {
+    console.log(this.props.match.params.id)
     api.bp.getBPCustomer(this.props.match.params.id).then(res => {
       this.props.dispatch({
         type: 'partnerMaintainEdit/setDetails',
