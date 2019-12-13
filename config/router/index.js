@@ -5,6 +5,7 @@ const peptide = require('./peptide');
 const system = require('./system');
 const purchase = require('./purchase');
 const hts = require('./hts');
+const dashboard = require('./dashboard');
 
 module.exports = [
   {
@@ -29,14 +30,9 @@ module.exports = [
         routes: [
           {
             path: '/',
-            redirect: '/welcome',
+            redirect: '/dashboard',
           },
-          {
-            path: '/welcome',
-            name: 'welcome',
-            icon: 'smile',
-            component: './Welcome',
-          },
+          dashboard,
           seq,
           bp,
           peptide,

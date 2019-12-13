@@ -411,10 +411,6 @@ class Verification extends React.Component {
         },
       },
       {
-        title: formatMessage({ id: 'bp.verification.completeTime' }),
-        dataIndex: 'finishTime',
-      },
-      {
         title: formatMessage({ id: 'bp.verification.expiryDate' }),
         dataIndex: 'expireDate',
         // width: 140,

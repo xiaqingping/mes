@@ -46,4 +46,11 @@ export default {
   'bp.verification.changeVerifiedPhoneAndEmail.newEmail': '新邮箱：',
   'bp.verification.changeVerifiedPhoneAndEmail.reSend': '重发',
   'bp.verification.changeVerifiedPhoneAndEmail.completed': '完成验证',
+  // PI 认证
+  'bp.verification.PIVerification': 'PI 认证',
+  'bp.verification.PIVerification.name': '名称：',
+  'bp.verification.PIVerification.billToParty': '收票方：',
+  'bp.verification.PIVerification.memo': '认证说明：',
+  'bp.verification.PIVerification.attachment': '附件：',
+  'bp.verification.PIVerification.verificationHistory': '认证历史',
 };
