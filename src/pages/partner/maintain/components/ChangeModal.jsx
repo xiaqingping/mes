@@ -469,7 +469,6 @@ class ChangeModal extends Component {
             registeredAddress: row.regisAddress || '',
           })
         }
-        console.log(data)
         api.bp.updateBPOrgCertification(data).then(() => {
           this.setState({ submitNext: 2 })
           this.props.getData()
@@ -690,6 +689,7 @@ class ChangeModal extends Component {
     groupAdressInput = () => {
       const { form, area, userData, gtype } = this.state;
       const { getFieldDecorator } = form;
+      console.log(area)
       // console.log(form.getFieldValue('address'))
       if (gtype === 1) {
         return (
