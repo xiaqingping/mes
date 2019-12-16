@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 // 组织是1，PI是2
 import {
   Modal,
@@ -17,6 +18,7 @@ import {
   Button,
   Spin,
   Typography,
+  Empty,
 } from 'antd';
 import React, { Component } from 'react';
 import { connect } from 'dva';
@@ -67,6 +69,14 @@ const verifyStatus = {
     value: 'default',
     text: '未认证',
   },
+}
+
+function isNumber (obj) {
+  const t1 = /^\d+(\.\d+)?$/;// 非负浮点数
+  if (t1.test(obj)) {
+    return true;
+  }
+    return false;
 }
 
 // // 数组去重
@@ -148,6 +158,7 @@ class AddressGroup extends Component {
   }
 
   componentDidMount () {
+    console.log(this.props.defaultAddress)
     api.area.byParentIdGetArea(0).then(res => { this.setState({ countryCode: res }) })
   }
 
@@ -156,6 +167,9 @@ class AddressGroup extends Component {
   selectArea = (v, o) => {
     if (o.length !== 0) {
       this.props.gTypeName(o[0].sapCode)
+      if (o[0].level === 1) {
+        this.props.defaultAddressCode(o[0].code)
+      }
     }
     if (o.length === 0) return false;
     const { countryCode } = this.state;
@@ -220,7 +234,7 @@ class AddressGroup extends Component {
 
   render () {
     const { countryCode, popupVisible } = this.state;
-    const { userData } = this.props;
+    const { userData, defaultAddress } = this.props;
     return (
       <InputGroup compact>
         <Cascader
@@ -230,6 +244,7 @@ class AddressGroup extends Component {
           fieldNames={{ label: 'name', value: 'code' }}
           popupVisible={popupVisible}
           onClick={() => { this.setState({ popupVisible: !popupVisible }) }}
+          defaultValue={[defaultAddress]}
         />
         <Input style={{ width: '60%' }}
           placeholder="详细地址"
@@ -280,6 +295,8 @@ class ChangeModal extends Component {
         gtype: 0,
         guuid: guid(),
         changeModal: false,
+        defaultAddress: '',
+        pageLoading: true,
       }
       this.fetchBank = debounce(this.fetchBank, 500);
     }
@@ -335,6 +352,7 @@ class ChangeModal extends Component {
                       })
                       this.setState({
                         userPersonData: newData,
+                        pageLoading: false,
                       })
                 })
             }
@@ -369,7 +387,9 @@ class ChangeModal extends Component {
               })
             }
             this.setState({
+              pageLoading: false,
               userData: res,
+              address: res.basic.address ? res.basic.address : '',
               specialInvoice: res.organizationCertification ?
               parseInt(res.organizationCertification.specialInvoice, 10) === 1 : false,
             })
@@ -429,11 +449,12 @@ class ChangeModal extends Component {
       // eslint-disable-next-line no-shadow
       const {
         address,
-         area,
-         userData: { basic },
-         recordMsg,
-         gtype,
-         guuid } = this.state;
+        area,
+        userData: { basic },
+        userData,
+        recordMsg,
+        gtype,
+        guuid } = this.state;
       this.props.form.validateFields((error, row) => {
         if (error) return;
         let data = {};
@@ -464,7 +485,13 @@ class ChangeModal extends Component {
           })
           Object.assign(data.organizationCertification, {
             specialInvoice: row.specialInvoice ? 1 : 2,
-            bankCode: row.bankCode || '',
+            // eslint-disable-next-line no-nested-ternary
+            bankCode: row.bankCode ?
+                      (
+                        isNumber(row.bankCode) ? row.bankCode :
+                        userData.organizationCertification.bankCode
+                      )
+                      : '',
             bankAccount: row.bankAccount || '',
             registeredAddress: row.regisAddress || '',
           })
@@ -505,6 +532,7 @@ class ChangeModal extends Component {
         userPersonData: [],
         deletePiCertificationIdList: [],
         gtype: 0,
+        pageLoading: true,
       })
     }
 
@@ -627,6 +655,10 @@ class ChangeModal extends Component {
       }
     }
 
+    defaultAddressCode = v => {
+      this.setState({ defaultAddress: v })
+    }
+
     groupNameInput = () => {
       const { form, name } = this.state;
       const { getFieldDecorator } = form;
@@ -687,10 +719,11 @@ class ChangeModal extends Component {
     }
 
     groupAdressInput = () => {
-      const { form, area, userData, gtype } = this.state;
+      const { form, area, userData, gtype, address, defaultAddress } = this.state;
       const { getFieldDecorator } = form;
-      console.log(area)
+      // console.log(area)
       // console.log(form.getFieldValue('address'))
+      console.log(address)
       if (gtype === 1) {
         return (
           <Col lg={24} md={12} sm={12}>
@@ -700,12 +733,18 @@ class ChangeModal extends Component {
               wrapperCol={{ span: 20 }}
               hasFeedback
               validateStatus={
-                area[0] && area[1] && area[2] && area[3] && area[4] ? 'success' : 'error'
+                area[0] && area[1] && area[2] && area[3] && area[4] && address ? 'success' : 'error'
               }
               // help={form.getFieldValue('msg') ? '' : '请输入信息'}
             >
               {getFieldDecorator('address')(
-              <AddressGroup addressVal={this.addressVal} gTypeName={v => this.changGType(v)} userData={userData}/>,
+              <AddressGroup
+                addressVal={this.addressVal}
+                gTypeName={v => this.changGType(v)}
+                userData={userData}
+                defaultAddressCode={v => this.defaultAddressCode(v)}
+                defaultAddress={defaultAddress}
+              />,
               )}
             </FormItem>
           </Col>
@@ -719,11 +758,17 @@ class ChangeModal extends Component {
              labelCol={{ span: 4 }}
               wrapperCol={{ span: 20 }}
               hasFeedback
-              validateStatus={area[0] ? 'success' : 'error'}
+              validateStatus={area[0] && address ? 'success' : 'error'}
               // help={form.getFieldValue('msg') ? '' : '请输入信息'}
             >
               {getFieldDecorator('address')(
-                <AddressGroup addressVal={this.addressVal} gTypeName={v => this.changGType(v)} userData={userData}/>,
+                <AddressGroup
+                  addressVal={this.addressVal}
+                  gTypeName={v => this.changGType(v)}
+                  userData={userData}
+                  defaultAddressCode={v => this.defaultAddressCode(v)}
+                  defaultAddress={defaultAddress}
+                />,
               )}
             </FormItem>
           </Col>
@@ -738,12 +783,18 @@ class ChangeModal extends Component {
               wrapperCol={{ span: 20 }}
               hasFeedback
               validateStatus={
-                area[0] && area[1] && area[2] && area[3] && area[4] ? 'success' : 'error'
+                area[0] && area[1] && area[2] && area[3] && area[4] && address ? 'success' : 'error'
               }
               // help={form.getFieldValue('msg') ? '' : '请输入信息'}
             >
               {getFieldDecorator('address')(
-              <AddressGroup addressVal={this.addressVal} gTypeName={v => this.changGType(v)} userData={userData}/>,
+              <AddressGroup
+                addressVal={this.addressVal}
+                gTypeName={v => this.changGType(v)}
+                userData={userData}
+                defaultAddressCode={v => this.defaultAddressCode(v)}
+                defaultAddress={defaultAddress}
+              />,
               )}
             </FormItem>
           </Col>
@@ -756,11 +807,17 @@ class ChangeModal extends Component {
              labelCol={{ span: 4 }}
               wrapperCol={{ span: 20 }}
               hasFeedback
-              validateStatus={area[0] ? 'success' : 'error'}
+              validateStatus={area[0] && address ? 'success' : 'error'}
               // help={form.getFieldValue('msg') ? '' : '请输入信息'}
             >
               {getFieldDecorator('address')(
-                <AddressGroup addressVal={this.addressVal} gTypeName={v => this.changGType(v)} userData={userData}/>,
+                <AddressGroup
+                  addressVal={this.addressVal}
+                  gTypeName={v => this.changGType(v)}
+                  userData={userData}
+                  defaultAddressCode={v => this.defaultAddressCode(v)}
+                  defaultAddress={defaultAddress}
+                />,
               )}
             </FormItem>
           </Col>
@@ -793,10 +850,9 @@ class ChangeModal extends Component {
           <FormItem label="行业类别">
           &nbsp;&nbsp;&nbsp;&nbsp;
         <span>
-          {industryCategories.map(v => {
-            if (basic.industryCode === v.code) return v.name
-            return ''
-            })
+          {
+            industryCategories.filter(v => basic.industryCode === v.code) !== 0 ?
+            industryCategories.filter(v => basic.industryCode === v.code)[0].name : ''
           }
         </span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         <a href="#" onClick = {event => this.updateIndustryGroup(event)}>修改</a>
@@ -965,6 +1021,7 @@ class ChangeModal extends Component {
         gtype,
         guuid,
         changeModal,
+        pageLoading,
       } = this.state;
 
       const fileList = pic.map(e => ({
@@ -1125,15 +1182,15 @@ class ChangeModal extends Component {
                     hasFeedback
                     // eslint-disable-next-line max-len
                     validateStatus={form.getFieldValue('bankCode') || (userData.organizationCertification ?
-                      (!!userData.organizationCertification.bankName)
+                      (!!userData.organizationCertification.bankCode)
                         : '') ? 'success' : 'error'}
                     // help={form.getFieldValue('bankCode') ? '' : '请输入信息'}
                   >
                     {getFieldDecorator('bankCode', {
                       // eslint-disable-next-line no-nested-ternary
                       initialValue: userData.organizationCertification ?
-                      (userData.organizationCertification.bankCode ?
-                        userData.organizationCertification.bankCode : '') : '',
+                      (userData.organizationCertification.bankName ?
+                        userData.organizationCertification.bankName : '') : '',
                     })(<Select
                       showSearch
                       notFoundContent={bankFetching ? <Spin size="small" /> : null}
@@ -1142,7 +1199,7 @@ class ChangeModal extends Component {
                       style={{ marginLeft: '7px' }}
                     >
                       {bank.map(d => (
-                        <Option key={d.code} value={d.code}>
+                        <Option key={d.code} value={d.code} >
                           {d.fullName}
                         </Option>
                       ))}
@@ -1480,8 +1537,8 @@ class ChangeModal extends Component {
                   {getFieldDecorator('bankCode', {
                     // eslint-disable-next-line no-nested-ternary
                     initialValue: userData.organizationCertification ?
-                    (userData.organizationCertification.bankCode ?
-                      userData.organizationCertification.bankCode : '') : '',
+                    (userData.organizationCertification.bankName ?
+                      userData.organizationCertification.bankName : '') : '',
                   })(<Select
                     showSearch
                     notFoundContent={bankFetching ? <Spin size="small" /> : null}
@@ -1735,7 +1792,11 @@ class ChangeModal extends Component {
               footer={null}
               className="myModel"
             >
-             { submitNext === 1 ? modelContent : passPage }
+              <Spin spinning={pageLoading}>
+                { pageLoading ? (
+                    <Empty style={{ padding: 300, background: '#fff' }} description="loading..."/>
+                  ) : (submitNext === 1 ? modelContent : passPage) }
+              </Spin>
             </Modal>
           </div>
       )

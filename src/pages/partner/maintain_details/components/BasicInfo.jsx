@@ -9,6 +9,7 @@ import { connect } from 'dva';
 import CheckPhone from './CheckPhone';
 import CheckEmail from './CheckEmail';
 import ChangeModal from '@/pages/partner/maintain/components/ChangeModal';
+import ContactInformation from '@/pages/partner/maintain_edit/components/ContactInformation';
 import './style.less'
 
 const DescriptionsItem = Descriptions.Item;
@@ -17,7 +18,7 @@ const DescriptionsItem = Descriptions.Item;
   details: partnerMaintainEdit.type === 'supplier' ?
   partnerMaintainEdit.supplier : partnerMaintainEdit.details,
   type: partnerMaintainEdit.type,
-  countryDiallingCodes: basicCache.countryDiallingCodes,
+  // countryDiallingCodes: basicCache.countryDiallingCodes,
   salesPaymentMethods: basicCache.salesPaymentMethods,
   industry: basicCache.industryCategories,
 }))
@@ -66,12 +67,12 @@ class BasicInfo extends Component {
      } = this.props;
     if (!countryDiallingCodes && !salesPaymentMethods) return null;
     if (industry.length === 0) return null;
-    let newData = []
-    countryDiallingCodes.forEach(item => {
-      if (item.countryCode === basic.telephoneCountryCode) {
-        newData = item;
-      }
-    })
+    // let newData = []
+    // countryDiallingCodes.forEach(item => {
+    //   if (item.countryCode === basic.telephoneCountryCode) {
+    //     newData = item;
+    //   }
+    // })
 
     return (
       <Card
@@ -97,15 +98,11 @@ class BasicInfo extends Component {
 
           </DescriptionsItem>
           <DescriptionsItem span={2} label="移动电话">
-            <img
-              src={`/images/country/${newData.countryCode}.png`}
-              width="10"
-              height="10"
-              style={{ borderRadius: '50%', marginBottom: '3px' }}
-              alt=""
-            />&nbsp;&nbsp;
-            {newData.length !== 0 ? `+${newData.diallingCode}` : ''}&nbsp;&nbsp;
-            {basic.mobilePhone}&nbsp;&nbsp;&nbsp;
+          <ContactInformation data={{
+                countryCode: basic.mobilePhoneCountryCode,
+                code: basic.mobilePhone,
+              }}
+            />
             {basic.emailVerifyStatus === 'Y' ?
             <a onClick={() => { this.checkPhone(true) }}>变更</a> : ''}
           </DescriptionsItem>
@@ -115,17 +112,13 @@ class BasicInfo extends Component {
             <a onClick={() => { this.checkEmail(true) }}>变更</a> : ''}
           </DescriptionsItem>
           <DescriptionsItem span={2} label="电话">
-            <img
-              src={`/images/country/${newData.countryCode}.png`}
-              width="10"
-              height="10"
-              style={{ borderRadius: '50%', marginBottom: '3px' }}
-              alt=""
-            />&nbsp;&nbsp;
-            {newData.length !== 0 ? `+${newData.diallingCode}` : ''}&nbsp;&nbsp;
-            {basic.telephoneAreaCode}
-            {basic.telephone ? `-${basic.telephone}` : ''}
-            {basic.telephoneExtension ? `-${basic.telephoneExtension}` : ''}&nbsp;&nbsp;&nbsp;
+            <ContactInformation data={{
+                countryCode: basic.telephoneCountryCode,
+                areaCode: basic.telephoneAreaCode,
+                code: basic.telephone,
+                extension: basic.telephoneExtension,
+              }}
+            />
             {
               details.basic.sapCountryCode === 'CN' &&
               details.basic.type === 2 &&
@@ -140,20 +133,13 @@ class BasicInfo extends Component {
             }
           </DescriptionsItem>
           <DescriptionsItem span={2} label="传真">
-            {basic.fax ? <img
-              src={`/images/country/${newData.countryCode}.png`}
-              width="10"
-              height="10"
-              style={{ borderRadius: '50%', marginBottom: '3px' }}
-              alt=""
-              /> : ''}&nbsp;&nbsp;
-            {/* {basic.faxCountryCode}&nbsp;&nbsp; */}
-            {
-              newData.length !== 0 && basic.faxCountryCode ? `+${newData.diallingCode}` : ''
-            }&nbsp;&nbsp;
-            {basic.faxAreaCode ? `${basic.faxAreaCode}-` : ''}
-            {basic.fax ? `${basic.fax}-` : ''}
-            {basic.faxExtension ? `${basic.faxExtension}` : ''}
+            <ContactInformation data={{
+                  countryCode: basic.faxCountryCode,
+                  areaCode: basic.faxAreaCode,
+                  code: basic.fax,
+                  extension: basic.faxExtension,
+              }}
+            />
           </DescriptionsItem>
           <DescriptionsItem span={1} label="邮政编码">{basic.postCode}</DescriptionsItem>
           <DescriptionsItem span={1} label="时区">{basic.timeZoneCode}</DescriptionsItem>

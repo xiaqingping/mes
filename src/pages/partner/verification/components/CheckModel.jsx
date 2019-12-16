@@ -88,9 +88,15 @@ const verifyTest = {
 
 
 @Form.create()
-@connect(({ bp }) => ({
+@connect(({ bp, basicCache, global }) => {
+  const industryCategories = basicCache.industryCategories.filter(
+    e => e.languageCode === global.languageCode,
+  );
+  return ({
   VerifyRecordStatus: bp.VerifyRecordStatus,
-}))
+  industryCategories: industryCategories.length !== 0 ? industryCategories : [],
+})
+})
 class RecordListForm extends React.Component {
   constructor(props) {
     super(props);
@@ -148,7 +154,11 @@ class RecordListForm extends React.Component {
 
   render () {
     const { showList, historyRecord, picHas, pic } = this.state;
-    const { recordMsg: { type }, SpecialInvoice, VerifyRecordStatus } = this.props;
+    const {
+      recordMsg: { type },
+      SpecialInvoice,
+      VerifyRecordStatus,
+      industryCategories } = this.props;
     const typeName = parseInt(type, 10) === 1 ? 'organizationCertification' : 'piCertification';
     if (!historyRecord && !picHas) return null
     return (
@@ -157,13 +167,23 @@ class RecordListForm extends React.Component {
         footer={null}
         width="410px"
         className={styles.xxx}
-        title="认证历史"
+        title= {
+          formatMessage({
+           id: 'bp.verification.organizationVerification.verificationHistory',
+          })
+        }
         visible = {showList}
         onCancel={this.closeListForm}>
           {historyRecord.length === 0 ? <Empty /> : <ul className={styles.contenList}>
           <li>
             <Row>
-              <Col span={8} className={styles.labelName}>状态：</Col>
+              <Col span={8} className={styles.labelName}>
+                {
+                  formatMessage({
+                  id: 'bp.verification.organizationVerification.status',
+                  })
+                }
+              </Col>
               <Col span={16} className={styles.labelVal}>
                 <Badge
                 style={{ color: '#999' }}
@@ -181,7 +201,13 @@ class RecordListForm extends React.Component {
           </li>
           <li>
             <Row>
-              <Col span={8} className={styles.labelName}>操作人：</Col>
+              <Col span={8} className={styles.labelName}>
+                {
+                  formatMessage({
+                  id: 'bp.verification.organizationVerification.operator',
+                  })
+                }
+              </Col>
               <Col span={16} className={styles.labelVal}>
                 {historyRecord.operatorName}<br/>
                 {historyRecord.operationDate}
@@ -192,14 +218,26 @@ class RecordListForm extends React.Component {
           <>
             <li>
               <Row>
-                <Col span={8} className={styles.labelName}>名称：</Col>
+                <Col span={8} className={styles.labelName}>
+                  {
+                    formatMessage({
+                    id: 'bp.verification.organizationVerification.name',
+                    })
+                  }
+                </Col>
                 <Col span={16} className={styles.labelVal}>
                   {historyRecord.piCertification.name}</Col>
               </Row>
             </li>
             <li>
               <Row>
-                <Col span={8} className={styles.labelName}>收票方：</Col>
+                <Col span={8} className={styles.labelName}>
+                  {
+                    formatMessage({
+                    id: 'bp.verification.PIVerification.billToParty',
+                    })
+                  }
+                </Col>
                 <Col
                   span={16}
                   className={styles.labelVal}>
@@ -209,11 +247,17 @@ class RecordListForm extends React.Component {
             </li>
           </>
           :
-          (historyRecord.organizationCertification.countryCode === 'CN' ?
+          (historyRecord.organizationCertification.countryCode === '1000000000' ?
           <>
             <li>
               <Row>
-                <Col span={8} className={styles.labelName}>国家：</Col>
+                <Col span={8} className={styles.labelName}>
+                  {
+                    formatMessage({
+                    id: 'bp.verification.organizationVerification.country',
+                    })
+                  }
+                </Col>
                 <Col
                   span={16}
                   className={styles.labelVal}>
@@ -223,7 +267,13 @@ class RecordListForm extends React.Component {
             </li>
             <li>
               <Row>
-                <Col span={8} className={styles.labelName}>联系电话：</Col>
+                <Col span={8} className={styles.labelName}>
+                  {
+                    formatMessage({
+                    id: 'bp.verification.organizationVerification.contactPhone',
+                    })
+                  }
+                </Col>
                 <Col
                   span={16}
                   className={styles.labelVal}>
@@ -235,17 +285,35 @@ class RecordListForm extends React.Component {
             </li>
             <li>
               <Row>
-                <Col span={8} className={styles.labelName}>行业类别：</Col>
+                <Col span={10} className={styles.labelName}>
+                  {
+                    formatMessage({
+                      id: 'bp.verification.organizationVerification.businessType',
+                    })
+                  }
+                </Col>
                 <Col
-                  span={16}
+                  span={14}
                   className={styles.labelVal}>
-                    {historyRecord.organizationCertification.industryCode}
+                    {
+                      industryCategories.filter(
+                        item => historyRecord.industryCode === item.code,
+                      ).length !== 0 && industryCategories.length !== 0 ? industryCategories.filter(
+                        item => historyRecord.industryCode === item.code,
+                      )[0].name : ''
+                    }
                 </Col>
               </Row>
             </li>
             <li>
               <Row>
-                <Col span={8} className={styles.labelName}>增值税专用发票资质：</Col>
+                <Col span={8} className={styles.labelName}>
+                  {
+                    formatMessage({
+                      id: 'bp.verification.organizationVerification.taxInvoice',
+                    })
+                  }
+                </Col>
                 <Col
                   span={16}
                   className={styles.labelVal}>
@@ -259,7 +327,13 @@ class RecordListForm extends React.Component {
             </li>
             <li>
               <Row>
-                <Col span={8} className={styles.labelName}>统一社会信用代码：</Col>
+                <Col span={8} className={styles.labelName}>
+                  {
+                    formatMessage({
+                      id: 'bp.verification.organizationVerification.vatBusiness',
+                    })
+                  }
+                </Col>
                 <Col
                   span={16}
                   className={styles.labelVal}>
@@ -269,7 +343,13 @@ class RecordListForm extends React.Component {
             </li>
             <li>
               <Row>
-                <Col span={8} className={styles.labelName}>基本户开户银行：</Col>
+                <Col span={8} className={styles.labelName}>
+                  {
+                    formatMessage({
+                      id: 'bp.verification.organizationVerification.bankName',
+                    })
+                  }
+                </Col>
                 <Col
                   span={16}
                   className={styles.labelVal}>
@@ -279,7 +359,13 @@ class RecordListForm extends React.Component {
             </li>
             <li>
               <Row>
-                <Col span={8} className={styles.labelName}>基本户开户账号：</Col>
+                <Col span={8} className={styles.labelName}>
+                  {
+                    formatMessage({
+                      id: 'bp.verification.organizationVerification.bankAccount',
+                    })
+                  }
+                </Col>
                 <Col
                   span={16}
                   className={styles.labelVal}>
@@ -289,7 +375,13 @@ class RecordListForm extends React.Component {
             </li>
             <li>
               <Row>
-                <Col span={8} className={styles.labelName}>注册地址：</Col>
+                <Col span={8} className={styles.labelName}>
+                  {
+                    formatMessage({
+                      id: 'bp.verification.organizationVerification.address',
+                    })
+                  }
+                </Col>
                 <Col
                   span={16}
                   className={styles.labelVal}>
@@ -303,7 +395,12 @@ class RecordListForm extends React.Component {
             <Row>
               <Col span={8} className={styles.labelName}>
                 {historyRecord.organizationCertification.countryCode === 'US' ?
-                '免税认证号' : '增值税登记号'} ：</Col>
+                formatMessage({
+                  id: 'bp.verification.organizationVerification.taxExemptID',
+                }) : formatMessage({
+                  id: 'bp.verification.organizationVerification.vat',
+                })}
+              </Col>
               <Col
                 span={16}
                 className={styles.labelVal}>
@@ -315,7 +412,13 @@ class RecordListForm extends React.Component {
 
           <li>
             <Row>
-              <Col span={8} className={styles.labelName}>认证说明：</Col>
+              <Col span={8} className={styles.labelName}>
+                {
+                  formatMessage({
+                    id: 'bp.verification.organizationVerification.memo',
+                  })
+                }
+              </Col>
               <Col span={16} className={styles.labelVal}>
                 {historyRecord[typeName].notes}
                 </Col>
@@ -323,11 +426,18 @@ class RecordListForm extends React.Component {
           </li>
           <li>
             <Row>
-              <Col span={8} className={styles.labelName}>附件：</Col>
+              <Col span={8} className={styles.labelName}>
+                {
+                  formatMessage({
+                    id: 'bp.verification.organizationVerification.attachment',
+                  })
+                }
+              </Col>
               <Col span={16} className={styles.labelVal}>
                 { picHas ? <ul style={{ padding: '0' }}>
                 {pic.length !== 0 ? pic.map((item, index) => {
                   if (index < 12) {
+                    console.log(index)
                     return (
                       // eslint-disable-next-line react/no-array-index-key
                       <li key={index} style={{
@@ -357,10 +467,16 @@ class RecordListForm extends React.Component {
 }
 
 
-@connect(({ bp, basicCache }) => ({
+@connect(({ bp, basicCache, global }) => {
+  const industryCategories = basicCache.industryCategories.filter(
+    e => e.languageCode === global.languageCode,
+  );
+  return ({
   SpecialInvoice: bp.SpecialInvoice,
   countryDiallingCodes: basicCache.countryDiallingCodes,
-}))
+  industryCategories: industryCategories.length !== 0 ? industryCategories : [],
+  })
+})
 class CheckModel extends React.Component {
   constructor (props) {
     super(props);
@@ -385,6 +501,10 @@ class CheckModel extends React.Component {
     this.props.dispatch({
       type: 'basicCache/getCache',
       payload: { type: 'countryDiallingCodes' },
+    });
+    this.props.dispatch({
+      type: 'basicCache/getCache',
+      payload: { type: 'industryCategories' },
     });
   }
 
@@ -560,11 +680,9 @@ class CheckModel extends React.Component {
       emailShow,
       approvedLoading,
       emailAccount } = this.state;
-    const { SpecialInvoice, countryDiallingCodes } = this.props;
+    const { SpecialInvoice, countryDiallingCodes, industryCategories } = this.props;
     if (!detailsValue && !picHas) return null
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     let modalTitle;
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     let modelContent;
     if (recordMsg === undefined) {
       return false;
@@ -864,12 +982,16 @@ class CheckModel extends React.Component {
         </ul>
         </>
     } else if (clickType === 3) {
-      modalTitle = '绑定售达方';
+      modalTitle = formatMessage({ id: 'bp.verification.defaultShipToParty' });
       modelContent = <>
         <ul className={styles.contenList}>
           <li>
             <Row>
-              <Col span={8} className={styles.labelName}>送达方：</Col>
+              <Col span={8} className={styles.labelName}>
+                {
+                  formatMessage({ id: 'bp.verification.defaultShipToParty.shipToParty' })
+                }
+              </Col>
               <Col
                 span={16}
                 className={styles.labelVal}>
@@ -879,7 +1001,11 @@ class CheckModel extends React.Component {
           </li>
           <li>
             <Row>
-              <Col span={8} className={styles.labelName}>售达方：</Col>
+              <Col span={8} className={styles.labelName}>
+                {
+                  formatMessage({ id: 'bp.verification.defaultShipToParty.soldToParty' })
+                }
+              </Col>
               <Col
                 span={16}
                 className={styles.labelVal}>
@@ -890,13 +1016,31 @@ class CheckModel extends React.Component {
           </li>
           <li>
             <Row>
-              <Col span={8} className={styles.labelName}>验证类型：</Col>
+              <Col span={8} className={styles.labelName}>
+                {
+                  formatMessage({ id: 'bp.verification.defaultShipToParty.verificationType' })
+                }
+              </Col>
               <Col span={16} className={styles.labelVal}>{detailsValue.type}</Col>
             </Row>
           </li>
           <li>
             <Row>
-              <Col span={8} className={styles.labelName}>验证码：</Col>
+              <Col span={8} className={styles.labelName}>
+                {
+                  formatMessage({ id: 'bp.verification.defaultShipToParty.mobilePhone' })
+                }
+              </Col>
+              <Col span={16} className={styles.labelVal}>{detailsValue.mobilePhone}</Col>
+            </Row>
+          </li>
+          <li>
+            <Row>
+              <Col span={8} className={styles.labelName}>
+                {
+                  formatMessage({ id: 'bp.verification.defaultShipToParty.verificationCode' })
+                }
+              </Col>
               <Col span={16} className={styles.labelVal}>
                 {detailsValue.verifyCode}&nbsp;&nbsp;&nbsp;&nbsp;
                 {detailsValue.status ? <Badge
@@ -908,25 +1052,41 @@ class CheckModel extends React.Component {
           </li>
           <li>
             <Row>
-              <Col span={8} className={styles.labelName}>验证码过期时间：</Col>
+              <Col span={8} className={styles.labelName}>
+                {
+                  formatMessage({
+                    id: 'bp.verification.defaultShipToParty.verificationCodeExpiryDate',
+                  })
+                }
+              </Col>
               <Col span={16} className={styles.labelVal}>{detailsValue.expireDate}</Col>
             </Row>
           </li>
           <li>
             <Row>
-              <Col span={8} className={styles.labelName}>最后发送时间：</Col>
+              <Col span={8} className={styles.labelName}>
+                {
+                  formatMessage({
+                    id: 'bp.verification.defaultShipToParty.lastSentDate',
+                  })
+                }
+              </Col>
               <Col span={16} className={styles.labelVal}>{detailsValue.lastSendDate}</Col>
             </Row>
           </li>
         </ul>
         </>
     } else if (clickType === 4 || clickType === 5) {
-      modalTitle = '验证手机和邮箱';
+      modalTitle = formatMessage({ id: 'bp.verification.verification' });
       modelContent = <>
         <ul className={styles.contenList}>
           <li>
             <Row>
-              <Col span={8} className={styles.labelName}>验证类型：</Col>
+              <Col span={8} className={styles.labelName}>
+                {
+                  formatMessage({ id: 'bp.verification.verification.verificationType' })
+                }
+              </Col>
               <Col span={16} className={styles.labelVal}>
                 {detailsValue.type ? verifyType[detailsValue.type].text : ''}
               </Col>
@@ -934,7 +1094,11 @@ class CheckModel extends React.Component {
           </li>
           <li>
             <Row>
-              <Col span={8} className={styles.labelName}>验证渠道：</Col>
+              <Col span={8} className={styles.labelName}>
+                {
+                  formatMessage({ id: 'bp.verification.verification.verificationMethod' })
+                }
+              </Col>
               <Col span={16} className={styles.labelVal}>
                 {detailsValue.channel ? verifyChannel[detailsValue.channel].text : ''}
               </Col>
@@ -942,13 +1106,21 @@ class CheckModel extends React.Component {
           </li>
           <li>
             <Row>
-              <Col span={8} className={styles.labelName}>手机：</Col>
+              <Col span={8} className={styles.labelName}>
+                {
+                  formatMessage({ id: 'bp.verification.verification.mobilePhone' })
+                }
+              </Col>
               <Col span={16} className={styles.labelVal}>{detailsValue.mobilePhone}</Col>
             </Row>
           </li>
           <li>
             <Row>
-              <Col span={8} className={styles.labelName}>邮箱：</Col>
+              <Col span={8} className={styles.labelName}>
+                {
+                  formatMessage({ id: 'bp.verification.verification.email' })
+                }
+              </Col>
               <Col span={16} className={styles.labelVal}>
                 {detailsValue.email}
               </Col>
@@ -956,7 +1128,11 @@ class CheckModel extends React.Component {
           </li>
           <li>
             <Row>
-              <Col span={8} className={styles.labelName}>验证码：</Col>
+              <Col span={8} className={styles.labelName}>
+                {
+                  formatMessage({ id: 'bp.verification.verification.verificationCode' })
+                }
+              </Col>
               <Col span={16} className={styles.labelVal}>
                 {detailsValue.verifyCode}&nbsp;&nbsp;&nbsp;&nbsp;
                 {detailsValue.status ? <Badge
@@ -968,25 +1144,41 @@ class CheckModel extends React.Component {
           </li>
           <li>
             <Row>
-              <Col span={8} className={styles.labelName}>验证码过期时间：</Col>
+              <Col span={8} className={styles.labelName}>
+                {
+                  formatMessage({ id: 'bp.verification.verification.verificationCodeExpiryDate' })
+                }
+              </Col>
               <Col span={16} className={styles.labelVal}>{detailsValue.expireDate}</Col>
             </Row>
           </li>
           <li>
             <Row>
-              <Col span={8} className={styles.labelName}>最后发送时间：</Col>
+              <Col span={8} className={styles.labelName}>
+                {
+                  formatMessage({ id: 'bp.verification.verification.lastSentDate' })
+                }
+              </Col>
               <Col span={16} className={styles.labelVal}>{detailsValue.lastSendDate}</Col>
             </Row>
           </li>
         </ul>
         </>
     } else if (clickType === 1) {
-      modalTitle = '组织认证';
+      modalTitle = formatMessage({
+        id: 'bp.verification.organizationVerification',
+      });
       modelContent = <>
         <ul className={styles.contenList}>
           <li>
             <Row>
-              <Col span={10} className={styles.labelName}>名称：</Col>
+          <Col span={10} className={styles.labelName}>
+            {
+              formatMessage({
+                id: 'bp.verification.organizationVerification.name',
+              })
+            }
+          </Col>
               <Col
                 span={14}
                 className={styles.labelVal}>
@@ -998,7 +1190,13 @@ class CheckModel extends React.Component {
           <>
             <li>
               <Row>
-                <Col span={10} className={styles.labelName}>国家：</Col>
+                <Col span={10} className={styles.labelName}>
+                  {
+                    formatMessage({
+                      id: 'bp.verification.organizationVerification.country',
+                    })
+                  }
+                </Col>
                 <Col
                   span={14}
                   className={styles.labelVal}>
@@ -1008,7 +1206,13 @@ class CheckModel extends React.Component {
             </li>
             <li>
               <Row>
-                <Col span={10} className={styles.labelName}>联系电话：</Col>
+                <Col span={10} className={styles.labelName}>
+                  {
+                    formatMessage({
+                      id: 'bp.verification.organizationVerification.contactPhone',
+                    })
+                  }
+                </Col>
                 <Col
                   span={14}
                   className={styles.labelVal}>
@@ -1019,17 +1223,35 @@ class CheckModel extends React.Component {
             </li>
             <li>
               <Row>
-                <Col span={10} className={styles.labelName}>行业类别：</Col>
+                <Col span={10} className={styles.labelName}>
+                  {
+                    formatMessage({
+                      id: 'bp.verification.organizationVerification.businessType',
+                    })
+                  }
+                </Col>
                 <Col
                   span={14}
                   className={styles.labelVal}>
-                    {detailsValue.industryCode}
+                    {
+                      industryCategories.filter(
+                        item => detailsValue.industryCode === item.code,
+                      ).length !== 0 && industryCategories.length !== 0 ? industryCategories.filter(
+                        item => detailsValue.industryCode === item.code,
+                      )[0].name : ''
+                    }
                 </Col>
               </Row>
             </li>
             <li>
               <Row>
-                <Col span={10} className={styles.labelName}>增值税专用发票资质：</Col>
+                <Col span={10} className={styles.labelName}>
+                  {
+                    formatMessage({
+                      id: 'bp.verification.organizationVerification.taxInvoice',
+                    })
+                  }
+                </Col>
                 <Col
                   span={14}
                   className={styles.labelVal}>
@@ -1041,7 +1263,13 @@ class CheckModel extends React.Component {
             </li>
             <li>
               <Row>
-                <Col span={10} className={styles.labelName}>统一社会信用代码：</Col>
+                <Col span={10} className={styles.labelName}>
+                  {
+                    formatMessage({
+                      id: 'bp.verification.organizationVerification.vatBusiness',
+                    })
+                  }
+                </Col>
                 <Col
                   span={14}
                   className={styles.labelVal}>
@@ -1051,7 +1279,13 @@ class CheckModel extends React.Component {
             </li>
             <li>
               <Row>
-                <Col span={10} className={styles.labelName}>基本户开户银行：</Col>
+                <Col span={10} className={styles.labelName}>
+                  {
+                    formatMessage({
+                      id: 'bp.verification.organizationVerification.bankName',
+                    })
+                  }
+                </Col>
                 <Col
                   span={14}
                   className={styles.labelVal}>
@@ -1061,7 +1295,13 @@ class CheckModel extends React.Component {
             </li>
             <li>
               <Row>
-                <Col span={10} className={styles.labelName}>基本户开户账号：</Col>
+                <Col span={10} className={styles.labelName}>
+                  {
+                    formatMessage({
+                      id: 'bp.verification.organizationVerification.bankAccount',
+                    })
+                  }
+                </Col>
                 <Col
                   span={14}
                   className={styles.labelVal}>
@@ -1071,7 +1311,13 @@ class CheckModel extends React.Component {
             </li>
             <li>
               <Row>
-                <Col span={10} className={styles.labelName}>注册地址：</Col>
+                <Col span={10} className={styles.labelName}>
+                  {
+                    formatMessage({
+                      id: 'bp.verification.organizationVerification.address',
+                    })
+                  }
+                </Col>
                 <Col
                   span={14}
                   className={styles.labelVal}>
@@ -1084,7 +1330,11 @@ class CheckModel extends React.Component {
           <li>
             <Row>
               <Col span={10} className={styles.labelName}>
-                {detailsValue.countryCode === 'US' ? '免税认证号' : '增值税登记号'}：
+                {detailsValue.countryCode === 'US' ? formatMessage({
+                      id: 'bp.verification.organizationVerification.taxExemptID',
+                    }) : formatMessage({
+                      id: 'bp.verification.organizationVerification.vat',
+                    })}：
               </Col>
               <Col
                 span={14}
@@ -1096,13 +1346,25 @@ class CheckModel extends React.Component {
           }
           <li>
             <Row>
-              <Col span={10} className={styles.labelName}>认证说明：</Col>
+              <Col span={10} className={styles.labelName}>
+                {
+                  formatMessage({
+                    id: 'bp.verification.organizationVerification.memo',
+                  })
+                }
+              </Col>
               <Col span={14} className={styles.labelVal}>{detailsValue.notes}</Col>
             </Row>
           </li>
           <li>
             <Row>
-              <Col span={8} className={styles.labelName}>附件：</Col>
+              <Col span={8} className={styles.labelName}>
+                {
+                  formatMessage({
+                    id: 'bp.verification.organizationVerification.attachment',
+                  })
+                }
+              </Col>
               {/* <Col span={20} className={styles.labelVal}>
               {piData.attachmentList[0].name}</Col> */}
               <Col span={16} className={styles.labelVal}>
@@ -1132,8 +1394,14 @@ class CheckModel extends React.Component {
           </li>
           <li>
             <Row>
-              <Col span={6}>
-                <a href="#" className={styles.recoedHis} onClick={this.recordList}>认证历史</a>
+              <Col span={12}>
+                <a href="#" className={styles.recoedHis} onClick={this.recordList}>
+                  {
+                    formatMessage({
+                      id: 'bp.verification.organizationVerification.verificationHistory',
+                    })
+                  }
+                </a>
               </Col>
             </Row>
           </li>
@@ -1152,7 +1420,13 @@ class CheckModel extends React.Component {
       >
         <div style={{ height: '180px', textAlign: 'center', paddingTop: '40px' }}>
           <Icon type="check-circle" style={{ fontSize: '40px', color: '#54C31F' }}/>
-          <h4 style={{ fontWeight: '600', margin: '30px 0 20px' }}>您的验证记录已通过审核</h4>
+          <h4 style={{ fontWeight: '600', margin: '30px 0 20px' }}>
+            {
+              formatMessage({
+                id: 'bp.verification.approvedPage',
+              })
+            }
+          </h4>
         </div>
       </Modal>
     </>
@@ -1168,7 +1442,13 @@ class CheckModel extends React.Component {
     >
       <div style={{ height: '180px', textAlign: 'center', paddingTop: '40px' }}>
         <Icon type="close-circle" style={{ fontSize: '40px', color: 'red' }}/>
-        <h4 style={{ fontWeight: '600', margin: '30px 0 20px' }}>您的验证记录已被拒绝</h4>
+        <h4 style={{ fontWeight: '600', margin: '30px 0 20px' }}>
+          {
+            formatMessage({
+              id: 'bp.verification.rejectPage',
+            })
+          }
+        </h4>
       </div>
     </Modal>
     </>

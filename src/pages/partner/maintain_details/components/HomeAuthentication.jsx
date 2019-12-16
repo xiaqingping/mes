@@ -10,6 +10,7 @@ import React, { Component } from 'react';
 import { connect } from 'dva';
 import './style.less';
 import ChangeModal from '@/pages/partner/maintain/components/ChangeModal';
+import ContactInformation from '@/pages/partner/maintain_edit/components/ContactInformation';
 import api from '@/api'
 
 const DescriptionsItem = Descriptions.Item;
@@ -119,10 +120,13 @@ class BasicInfo extends Component {
                 {details.organizationCertification ?
                 details.organizationCertification.bankAccount : ''}
               </DescriptionsItem>
-              <DescriptionsItem label="电话号码">
-                {details.basic.telephoneAreaCode ? `+${details.basic.telephoneAreaCode} ` : ''}
-                {details.basic.telephone ? `${details.basic.telephone}` : ''}
-                {details.basic.telephoneExtension ? `-${details.basic.telephoneExtension}` : ''}
+              <DescriptionsItem label="电话">
+                <ContactInformation data={{
+                    areaCode: details.basic.telephoneAreaCode,
+                    code: details.basic.telephone,
+                    extension: details.basic.telephoneExtension,
+                  }}
+                />
               </DescriptionsItem>
               <DescriptionsItem span={3} label="注册地址">
                 {details.organizationCertification ? details.organizationCertification.address : ''}
