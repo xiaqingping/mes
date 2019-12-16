@@ -34,7 +34,7 @@ class CertificationPopover extends React.Component {
         <div>
           <strong style={{ color: '#444' }}>{data.organizationCertification.name}</strong>
         </div>
-        <div style={{ marginTop: 10 }}>{data.code}</div>
+        <div style={{ marginTop: 10 }}>{data.bpCode}</div>
         <div style={{ marginTop: 10 }}>
           {/* <span>{lastVerifyRecords.operatorName}</span>&nbsp; */}
           <Badge status="success" text="已验证" />
