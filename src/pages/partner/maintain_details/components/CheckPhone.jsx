@@ -127,7 +127,7 @@ class CheckPhone extends Component {
       const { verifyRecordId } = this.state;
       // 提交验证码
       // eslint-disable-next-line max-len
-      api.bp.changeContactInfoNewMobileVerifyCodeVerificationVerify(verifyRecordId, this.props.form.getFieldValue('code')).then(() => {
+      api.bp.changeContactInfoNewEmailVerifyCodeVerificationVerify(verifyRecordId, this.props.form.getFieldValue('code')).then(() => {
         clearInterval(this.timer)
         this.setState({
           time: 60,
@@ -440,7 +440,6 @@ class CheckPhone extends Component {
     } = this.props;
 
     const { btnText, time } = this.state;
-    console.log(phoneAccount)
     if (proceed) {
       return (
       <Fragment>

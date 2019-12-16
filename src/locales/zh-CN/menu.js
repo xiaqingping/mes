@@ -1,5 +1,7 @@
 export default {
-  'menu.welcome': '欢迎',
+  'menu.welcome': 'welcome',
+  'menu.dashboard': 'Dashboard',
+  'menu.dashboard.sale': '销售分析',
   'menu.more-blocks': '更多区块',
   'menu.home': '首页',
   'menu.login': '登录',

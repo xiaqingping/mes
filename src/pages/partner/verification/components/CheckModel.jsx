@@ -376,6 +376,7 @@ class CheckModel extends React.Component {
       phoneShow: false,
       emailAccount: '',
       phoneAccount: '',
+      approvedLoading: false,
     }
   }
 
@@ -523,10 +524,14 @@ class CheckModel extends React.Component {
   // pageVisble 1 审核 ，2 拒绝
   openPage = (id, pageVisble) => {
     if (pageVisble === 1) {
+      this.setState({
+        approvedLoading: true,
+      })
       api.bp.approvalVerifyRecords(id).then(() => {
         this.setState({
           pageVisble,
           modal1Visible: false,
+          approvedLoading: false,
         })
         this.props.getData()
       })
@@ -553,6 +558,7 @@ class CheckModel extends React.Component {
       phoneShow,
       phoneAccount,
       emailShow,
+      approvedLoading,
       emailAccount } = this.state;
     const { SpecialInvoice, countryDiallingCodes } = this.props;
     if (!detailsValue && !picHas) return null
@@ -784,12 +790,14 @@ class CheckModel extends React.Component {
         </ul>
       </>
     } else if (clickType === 2) {
-      modalTitle = '认证';
+      modalTitle = formatMessage({ id: 'bp.verification.PIVerification' });
       modelContent = <>
         <ul className={styles.contenList}>
           <li>
             <Row>
-              <Col span={8} className={styles.labelName}>名称：</Col>
+              <Col span={8} className={styles.labelName}>
+                {formatMessage({ id: 'bp.verification.PIVerification.name' })}
+              </Col>
               <Col
                 span={16}
                 className={styles.labelVal}>
@@ -799,7 +807,9 @@ class CheckModel extends React.Component {
           </li>
           <li>
             <Row>
-              <Col span={8} className={styles.labelName}>收票方：</Col>
+              <Col span={8} className={styles.labelName}>
+                {formatMessage({ id: 'bp.verification.PIVerification.billToParty' })}
+              </Col>
               <Col
                 span={16}
                 className={styles.labelVal}>
@@ -809,13 +819,17 @@ class CheckModel extends React.Component {
           </li>
           <li>
             <Row>
-              <Col span={8} className={styles.labelName}>认证说明：</Col>
+              <Col span={8} className={styles.labelName}>
+                {formatMessage({ id: 'bp.verification.PIVerification.memo' })}
+              </Col>
               <Col span={16} className={styles.labelVal}>{detailsValue.notes}</Col>
             </Row>
           </li>
           <li>
             <Row>
-              <Col span={8} className={styles.labelName}>附件：</Col>
+              <Col span={8} className={styles.labelName}>
+                {formatMessage({ id: 'bp.verification.PIVerification.attachment' })}
+              </Col>
               {/* <Col span={20} className={styles.labelVal}>
               {piData.attachmentList[0].name}</Col> */}
               <Col span={16} className={styles.labelVal}>
@@ -840,8 +854,10 @@ class CheckModel extends React.Component {
           </li>
           <li>
             <Row>
-              <Col span={8}>
-                <a href="#" className={styles.recoedHis} onClick={this.recordList}>认证历史</a>
+              <Col span={16}>
+                <a href="#" className={styles.recoedHis} onClick={this.recordList}>
+                  {formatMessage({ id: 'bp.verification.PIVerification.verificationHistory' })}
+                </a>
               </Col>
             </Row>
           </li>
@@ -1173,7 +1189,12 @@ class CheckModel extends React.Component {
             <Button key="back" onClick={() => this.openPage(recordMsg.id, 2)}>
               {formatMessage({ id: 'bp.verification.reject' })}
             </Button>,
-            <Button key="submit" type="primary" onClick={() => this.openPage(recordMsg.id, 1)}>
+            <Button
+              key="submit"
+              type="primary"
+              onClick={() => this.openPage(recordMsg.id, 1)}
+              loading={approvedLoading}
+            >
               {formatMessage({ id: 'bp.verification.approved' })}
             </Button>,
           ] : null}

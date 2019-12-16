@@ -87,13 +87,14 @@ class BasicInfo extends Component {
           <DescriptionsItem span={2} label="名称">
             <Icon type={basic.type === 1 ? 'user' : 'home'} />&nbsp;&nbsp;
             {basic.name}&nbsp;&nbsp;&nbsp;
-            <a
+            {basic.certificationStatus === 2 ? <Badge status="warning" text="审核中"/> : <a
               onClick={
                 () => { this.showChange.visibleShow(true, this.props.details.basic) }
               }
             >
               变更
-            </a>
+            </a>}
+
           </DescriptionsItem>
           <DescriptionsItem span={2} label="移动电话">
             <img
@@ -125,13 +126,16 @@ class BasicInfo extends Component {
             {basic.telephoneAreaCode}
             {basic.telephone ? `-${basic.telephone}` : ''}
             {basic.telephoneExtension ? `-${basic.telephoneExtension}` : ''}&nbsp;&nbsp;&nbsp;
-            {details.basic.sapCountryCode === 'CN' && details.basic.type === 2 ?
-                         <a onClick={
-                () => { this.showChange.visibleShow(true, this.props.details.basic) }
-              }
-            >
-              变更
-            </a>
+            {
+              details.basic.sapCountryCode === 'CN' &&
+              details.basic.type === 2 &&
+              basic.certificationStatus !== 2 ?
+              <a onClick={
+                  () => { this.showChange.visibleShow(true, this.props.details.basic) }
+                }
+              >
+                变更
+              </a>
             : ''
             }
           </DescriptionsItem>
@@ -163,14 +167,17 @@ class BasicInfo extends Component {
               basic.industryCode ?
               industry.filter(item => item.code === basic.industryCode)[0].name : ''
             }&nbsp;&nbsp;
-            {details.basic.sapCountryCode === 'CN' && details.basic.type === 2 ?
-                         <a onClick={
-                () => { this.showChange.visibleShow(true, this.props.details.basic) }
-              }
-            >
+            {
+              details.basic.sapCountryCode === 'CN' &&
+              details.basic.type === 2 &&
+              basic.certificationStatus !== 2 ?
+              <a onClick={
+                  () => { this.showChange.visibleShow(true, this.props.details.basic) }
+                }
+              >
               变更
-            </a>
-            : ''
+              </a>
+              : ''
             }
           </DescriptionsItem>
           <DescriptionsItem span={6} label="通讯地址">
