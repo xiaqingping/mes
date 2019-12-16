@@ -40,6 +40,10 @@ class CheckPhone extends Component {
     });
   }
 
+  componentWillUnmount() {
+    clearInterval(this.time)
+  }
+
   setModalVisible = v => {
     this.setState({
       status: 1,
