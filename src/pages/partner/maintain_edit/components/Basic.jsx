@@ -496,14 +496,16 @@ class Basic extends React.Component {
     const show = (
       <>
         <ContactInformation data={data} />
-        <a
-          className={styles.changeButton}
-          onClick={() => {
-            this.showChange.visibleShow(true, this.props.details.basic);
-          }}
-        >
-          <FormattedMessage id="bp.maintain_details.change" />
-        </a>
+        {basic.certificationStatus !== 2 ? (
+          <a
+            className={styles.changeButton}
+            onClick={() => {
+              this.showChange.visibleShow(true, this.props.details.basic);
+            }}
+          >
+            <FormattedMessage id="bp.maintain_details.change" />
+          </a>
+        ) : null}
       </>
     );
 
@@ -595,7 +597,7 @@ class Basic extends React.Component {
       const show = (
         <>
           {formatter(industryCategories, basic.industryCode, 'code')}
-          {basic.type === 2 ? (
+          {basic.type === 2 && basic.certificationStatus !== 2 ? (
             <a
               className={styles.changeButton}
               onClick={() => {
