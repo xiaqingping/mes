@@ -1,4 +1,4 @@
-// 高通量测序
+// 数据分析
 module.exports = {
   path: '/dashboard',
   name: 'dashboard',

@@ -40,20 +40,20 @@ class CustomerDetails extends Component {
         type: 'partnerMaintainEdit/setDetails',
         payload: res,
       });
+      this.setState({
+        pageLoading: false,
+      });
     });
     api.bp.getBPVendor(this.props.match.params.id).then(res => {
       this.props.dispatch({
         type: 'partnerMaintainEdit/setSupplier',
         payload: res,
       });
-      this.setState({
-        pageLoading: false,
-      })
     });
     this.props.dispatch({
       type: 'basicCache/setState',
       payload: { type: 'countryDiallingCodes' },
-    })
+    });
     // this.props.dispatch({
     //   type: 'partnerMaintainEdit/setDetails',
     //   payload: details,
@@ -128,56 +128,12 @@ class CustomerDetails extends Component {
   render() {
     const { tabActiveKey, pageLoading } = this.state;
     const { customer } = this.props;
-    if (!customer) {
-      return null;
-    }
-    const contentList = {
-      customer: (
-        <>
-          <BasicInfo />
-          <Type />
-          {customer.basic.type === 1 ? (
-            <>
-              <PersonCredit />
-              <PersonCertification />
-            </>
-          ) : (
-            <>
-              <Credit />
-              {customer.basic.sapCountryCode === 'CN' ? (
-                <HomeAuthentication />
-              ) : (
-                <AbroadAuthentication />
-              )}
-            </>
-          )}
-          <Address />
-        </>
-      ),
-      supplier: (
-        <>
-          <BasicInfo />
-          <PurchasingOrg />
-          <Bank />
-          {customer.basic.type === 2 ? (
-            <>
-              {customer.basic.countryCode === 'CN' ? (
-                <HomeAuthentication />
-              ) : (
-                <AbroadAuthentication abroadType={customer.basic.telephoneCountryCode} />
-              )}
-            </>
-          ) : (
-            ''
-          )}
-        </>
-      ),
-    };
+
     return (
       <PageHeaderWrapper
         tabActiveKey={tabActiveKey}
         onTabChange={this.onTabChange}
-        title={this.title(customer.basic.code)}
+        title={this.title(customer ? customer.basic.code : '')}
         style={{ paddingBottom: 0 }}
         tabList={[
           {
@@ -193,9 +149,51 @@ class CustomerDetails extends Component {
         <Spin spinning={pageLoading}>
           {pageLoading ? (
             <Empty style={{ padding: 300, background: '#fff' }} description="loading..."></Empty>
-          ) : contentList[tabActiveKey]}
+          ) : (
+            {
+              customer: (
+                <>
+                  <BasicInfo />
+                  <Type />
+                  {customer.basic.type === 1 ? (
+                    <>
+                      <PersonCredit />
+                      <PersonCertification />
+                    </>
+                  ) : (
+                    <>
+                      <Credit />
+                      {customer.basic.sapCountryCode === 'CN' ? (
+                        <HomeAuthentication />
+                      ) : (
+                        <AbroadAuthentication />
+                      )}
+                    </>
+                  )}
+                  <Address />
+                </>
+              ),
+              supplier: (
+                <>
+                  <BasicInfo />
+                  <PurchasingOrg />
+                  <Bank />
+                  {customer.basic.type === 2 ? (
+                    <>
+                      {customer.basic.countryCode === 'CN' ? (
+                        <HomeAuthentication />
+                      ) : (
+                        <AbroadAuthentication abroadType={customer.basic.telephoneCountryCode} />
+                      )}
+                    </>
+                  ) : (
+                    ''
+                  )}
+                </>
+              ),
+            }[tabActiveKey]
+          )}
         </Spin>
-
       </PageHeaderWrapper>
     );
   }

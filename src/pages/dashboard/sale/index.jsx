@@ -1,40 +1,134 @@
 import React from 'react';
-import { PageHeaderWrapper } from '@ant-design/pro-layout';
-// import g2plot from '@antv/g2plot';
-
-// const data = [
-//   { year: '1991', value: 3 },
-//   { year: '1992', value: 4 },
-//   { year: '1993', value: 3.5 },
-//   { year: '1994', value: 5 },
-//   { year: '1995', value: 4.9 },
-//   { year: '1996', value: 6 },
-//   { year: '1997', value: 7 },
-//   { year: '1998', value: 9 },
-//   { year: '1999', value: 13 },
-// ];
-
-// const linePlot = new Line('canvas', {
-//   data,
-//   xField: 'year',
-//   yField: 'value',
-// });
-
-// linePlot.render();
+import { GroupColumn } from '@antv/g2plot';
 
 class Sale extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {
-    };
+    this.state = {};
+  }
+
+  componentDidMount() {
+    const data = [
+      {
+        name: 'London',
+        月份: 'Jan.',
+        月均降雨量: 18.9,
+      },
+      {
+        name: 'London',
+        月份: 'Feb.',
+        月均降雨量: 28.8,
+      },
+      {
+        name: 'London',
+        月份: 'Mar.',
+        月均降雨量: 39.3,
+      },
+      {
+        name: 'London',
+        月份: 'Apr.',
+        月均降雨量: 81.4,
+      },
+      {
+        name: 'London',
+        月份: 'May',
+        月均降雨量: 47,
+      },
+      {
+        name: 'London',
+        月份: 'Jun.',
+        月均降雨量: 20.3,
+      },
+      {
+        name: 'London',
+        月份: 'Jul.',
+        月均降雨量: 24,
+      },
+      {
+        name: 'London',
+        月份: 'Aug.',
+        月均降雨量: 35.6,
+      },
+      {
+        name: 'Berlin',
+        月份: 'Jan.',
+        月均降雨量: 12.4,
+      },
+      {
+        name: 'Berlin',
+        月份: 'Feb.',
+        月均降雨量: 23.2,
+      },
+      {
+        name: 'Berlin',
+        月份: 'Mar.',
+        月均降雨量: 34.5,
+      },
+      {
+        name: 'Berlin',
+        月份: 'Apr.',
+        月均降雨量: 99.7,
+      },
+      {
+        name: 'Berlin',
+        月份: 'May',
+        月均降雨量: 52.6,
+      },
+      {
+        name: 'Berlin',
+        月份: 'Jun.',
+        月均降雨量: 35.5,
+      },
+      {
+        name: 'Berlin',
+        月份: 'Jul.',
+        月均降雨量: 37.4,
+      },
+      {
+        name: 'Berlin',
+        月份: 'Aug.',
+        月均降雨量: 42.4,
+      },
+    ];
+
+    const columnPlot = new GroupColumn(document.getElementById('container'), {
+      title: {
+        visible: true,
+        text: '销售额趋势',
+      },
+      forceFit: false,
+      data,
+      width: 800,
+      xField: '月份',
+      yField: '月均降雨量',
+      xAxis: {
+        line: {
+          visible: true,
+        },
+      },
+      yAxis: {
+        line: {
+          visible: true,
+        },
+      },
+      // label: {
+      //   visible: true,
+      // },
+      legend: {
+        visible: true,
+        position: 'right-center',
+      },
+      // grid: {
+      //   visible: false,
+      // },
+      groupField: 'name',
+    });
+
+    columnPlot.render();
   }
 
   render() {
-    return (
-      <PageHeaderWrapper>
-        <div id="canvas"></div>
-      </PageHeaderWrapper>
-    );
+    return <div id="container"></div>;
   }
 }
 export default Sale;
