@@ -24,6 +24,7 @@ import StandardTable from '@/components/StandardTable';
 import { connect } from 'dva';
 import _ from 'lodash';
 import ChangeModal from './components/ChangeModal';
+import { formatMessage } from 'umi/locale';
 import styles from './index.less';
 import api from '@/api';
 
@@ -34,19 +35,19 @@ const { Option } = Select;
 const renzhengMap = {
   1: {
     value: 'default',
-    text: '未认证',
+    text: formatMessage({ id: 'bp.maintain.unapproved' }),
   },
   2: {
     value: 'processing',
-    text: '审核中',
+    text: formatMessage({ id: 'bp.maintain.processing' }),
   },
   4: {
     value: 'success',
-    text: '已认证',
+    text: formatMessage({ id: 'bp.maintain.approveds' }),
   },
   3: {
     value: 'warning',
-    text: '部分认证',
+    text: formatMessage({ id: 'bp.maintain.partialApproved' }),
   },
 };
 
@@ -54,11 +55,11 @@ const renzhengMap = {
 const dongjieMap = {
   1: {
     value: 'error',
-    text: '冻结',
+    text: formatMessage({ id: 'bp.maintain.blocked' }),
   },
   2: {
     value: 'success',
-    text: '活跃',
+    text: formatMessage({ id: 'bp.maintain.actived' }),
   },
 };
 
@@ -66,11 +67,11 @@ const dongjieMap = {
 const wanzhengMap = {
   2: {
     value: 'default',
-    text: '不完整',
+    text: formatMessage({ id: 'bp.maintain.incomplete' }),
   },
   1: {
     value: 'success',
-    text: '完整',
+    text: formatMessage({ id: 'bp.maintain.completed' }),
   },
 };
 
@@ -78,11 +79,11 @@ const wanzhengMap = {
 const mobileIden = {
   0: {
     value: 'default',
-    text: '未认证',
+    text: formatMessage({ id: 'bp.maintain.unapproved' }),
   },
   1: {
     value: 'success',
-    text: '已认证',
+    text: formatMessage({ id: 'bp.maintain.approveds' }),
   },
 };
 
@@ -90,11 +91,11 @@ const mobileIden = {
 const emailIden = {
   0: {
     value: 'default',
-    text: '未认证',
+    text: formatMessage({ id: 'bp.maintain.unapproved' }),
   },
   1: {
     value: 'success',
-    text: '已认证',
+    text: formatMessage({ id: 'bp.maintain.approveds' }),
   },
 };
 
@@ -109,10 +110,13 @@ function renderOption(item) {
   );
 }
 
-@connect(({ basicCache, global }) => {
+@connect(({ basicCache, global, bp }) => {
   const regionOffice = basicCache.regionOffice.filter(e => e.languageCode === global.languageCode)
   return ({
     regionOffice,
+    BpCertificationStatus: bp.BpCertificationStatus,
+    salesOrderBlock: bp.salesOrderBlock,
+    CustomerDataStatus: bp.CustomerDataStatus,
   })
 })
 class Maintain extends React.Component {
@@ -222,14 +226,6 @@ constructor(props) {
         }
         delete fieldsValue.regionalAttr
       }
-      // const values = {
-      //   ...fieldsValue,
-      //   // updatedAt: fieldsValue.updatedAt && fieldsValue.updatedAt.valueOf(),
-      // };
-      // console.log(values)
-      // this.setState({
-      //   formValues: values,
-      // });
       this.setState({
         searchVal: fieldsValue,
       })
@@ -322,6 +318,9 @@ constructor(props) {
     const {
       form: { getFieldDecorator },
       regionOffice,
+      BpCertificationStatus,
+      salesOrderBlock,
+      CustomerDataStatus,
     } = this.props;
     const { xiaoshuoguishu, receivingParty } = this.state;
     console.log(receivingParty)
@@ -329,89 +328,91 @@ constructor(props) {
       <Form onSubmit={this.handleSearch} layout="inline">
         <Row gutter={{ xxl: 100, lg: 80 }}>
           <Col xxl={6} lg={8}>
-            <FormItem label="编号">{getFieldDecorator('code')(<Input placeholder="请输入" />)}</FormItem>
+            <FormItem label={formatMessage({ id: 'bp.maintain.customerID' })}>{getFieldDecorator('code')(<Input placeholder={formatMessage({ id: 'bp.maintain.inputHere' })} />)}</FormItem>
           </Col>
           <Col xxl={6} lg={8}>
-            <FormItem label="名称">{getFieldDecorator('name')(<Input placeholder="请输入" />)}</FormItem>
+            <FormItem label={formatMessage({ id: 'bp.maintain.customerName' })}>{getFieldDecorator('name')(<Input placeholder={formatMessage({ id: 'bp.maintain.inputHere' })} />)}</FormItem>
           </Col>
           <Col xxl={6} lg={8}>
-            <FormItem label="移动电话">{getFieldDecorator('mobilePhone')(
-            <Input placeholder="请输入" />)}</FormItem>
+            <FormItem label={formatMessage({ id: 'bp.maintain.mobilePhone' })}>{getFieldDecorator('mobilePhone')(
+            <Input placeholder={formatMessage({ id: 'bp.maintain.inputHere' })} />)}</FormItem>
           </Col>
           <Col xxl={6} lg={8}>
-            <FormItem label="Email">{getFieldDecorator('email')(
-            <Input placeholder="请输入" />)}</FormItem>
+            <FormItem label={formatMessage({ id: 'bp.maintain.email' })}>{getFieldDecorator('email')(
+            <Input placeholder={formatMessage({ id: 'bp.maintain.inputHere' })} />)}</FormItem>
           </Col>
           <Col xxl={6} lg={8}>
-            <FormItem label="认证状态">
+            <FormItem label={formatMessage({ id: 'bp.maintain.verificationStatus' })}>
               {getFieldDecorator('certificationStatusList')(
-                <Select placeholder="请选择" maxTagCount={1} mode="multiple">
-                  <Option value="1">未认证</Option>
-                  <Option value="2">审核中</Option>
-                  <Option value="3">部分认证</Option>
-                  <Option value="4">已认证</Option>
+                <Select placeholder={formatMessage({ id: 'bp.maintain.pleaseSelect' })} maxTagCount={1} mode="multiple">
+                  {BpCertificationStatus.map(item =>
+                    <Option value={item.id}>{item.name}</Option>,
+                  )}
                 </Select>,
               )}
             </FormItem>
           </Col>
           <Col xxl={6} lg={8}>
-            <FormItem label="销售冻结">
+            <FormItem label={formatMessage({ id: 'bp.maintain.salesBlocked' })}>
               {getFieldDecorator('salesOrderBlock')(
-                <Select placeholder="请选择">
-                  <Option value="2">冻结</Option>
-                  <Option value="1">活跃</Option>
+                <Select placeholder={formatMessage({ id: 'bp.maintain.pleaseSelect' })}>
+                  {salesOrderBlock.map(item =>
+                    <Option value={item.id}>{item.name}</Option>,
+                  )}
                 </Select>,
               )}
             </FormItem>
           </Col>
           <Col xxl={6} lg={8}>
-            <FormItem label="客户数据">
+            <FormItem label={formatMessage({ id: 'bp.maintain.customerData' })}>
               {getFieldDecorator('customerDataStatus')(
-                <Select placeholder="请选择">
-                  <Option value="1">完整</Option>
-                  <Option value="2">不完整</Option>
+                <Select placeholder={formatMessage({ id: 'bp.maintain.pleaseSelect' })}>
+                  {CustomerDataStatus.map(item =>
+                    <Option value={item.id}>{item.name}</Option>,
+                  )}
                 </Select>,
               )}
             </FormItem>
           </Col>
           <Col xxl={6} lg={8}>
-            <FormItem label="供应商数据">
+            <FormItem label={formatMessage({ id: 'bp.maintain.vendorData' })}>
               {getFieldDecorator('vendorDataStatus')(
-                <Select placeholder="请选择">
-                  <Option value="1">完整</Option>
-                  <Option value="2">不完整</Option>
+                <Select placeholder={formatMessage({ id: 'bp.maintain.pleaseSelect' })}>
+                  {CustomerDataStatus.map(item =>
+                    <Option value={item.id}>{item.name}</Option>,
+                  )}
                 </Select>,
               )}
             </FormItem>
           </Col>
           <Col xxl={6} lg={8}>
-            <FormItem label="区域归属">
+            <FormItem label={formatMessage({ id: 'bp.maintain.salesArea' })}>
               {getFieldDecorator('regionalAttr')(
-                <Cascader options={regionOffice} placeholder="请选择"
+                <Cascader options={regionOffice} placeholder={formatMessage({ id: 'bp.maintain.pleaseSelect' })}
                 fieldNames={{ label: 'name', value: 'code', children: 'officeList' }}/>,
               )}
             </FormItem>
           </Col>
           <Col xxl={6} lg={8}>
-            <FormItem label="销售归属">
+            <FormItem label={formatMessage({ id: 'bp.maintain.salesRep' })}>
               {getFieldDecorator('salerCode')(
                 <AutoComplete
                   dataSource={xiaoshuoguishu.map(renderOption)}
                   onSearch={this.searchSaler}
                   optionLabelProp="text"
-                  placeholder="请输入"
+                  placeholder={formatMessage({ id: 'bp.maintain.inputHere' })}
                 />,
               )}
             </FormItem>
           </Col>
           <Col xxl={6} lg={8}>
-            <FormItem label="收票方">
+            <FormItem label={formatMessage({ id: 'bp.maintain.billToParty' })}>
               {getFieldDecorator('billToPartyId')(
                 <AutoComplete
                   dataSource={receivingParty.map(renderOption)}
                   onSearch={this.searchCustomer}
                   optionLabelProp="text"
-                  // placeholder="请输入"
+                  // placeholder={formatMessage({ id: 'bp.maintain.inputHere' })}
                 />,
               )}
             </FormItem>
@@ -420,13 +421,13 @@ constructor(props) {
         <div style={{ overflow: 'hidden' }}>
           <div style={{ float: 'right', marginBottom: 24 }}>
             <Button type="primary" htmlType="submit">
-              查询
+              {formatMessage({ id: 'bp.maintain.search' })}
             </Button>
             <Button style={{ marginLeft: 8 }} onClick={this.handleFormReset}>
-              重置
+              {formatMessage({ id: 'bp.maintain.reset' })}
             </Button>
             <a style={{ marginLeft: 8 }} onClick={this.toggleForm}>
-              收起 <Icon type="up" />
+              {formatMessage({ id: 'bp.maintain.putAway' })} <Icon type="up" />
             </a>
           </div>
         </div>
@@ -442,25 +443,25 @@ constructor(props) {
       <Form onSubmit={this.handleSearch} layout="inline">
         <Row gutter={{ xxl: 100, lg: 80 }}>
           <Col xxl={6} lg={8}>
-            <FormItem label="编号">{getFieldDecorator('code')(<Input placeholder="请输入" />)}</FormItem>
+            <FormItem label={formatMessage({ id: 'bp.maintain.customerID' })}>{getFieldDecorator('code')(<Input placeholder={formatMessage({ id: 'bp.maintain.inputHere' })} />)}</FormItem>
           </Col>
           <Col xxl={6} lg={8}>
-            <FormItem label="名称">{getFieldDecorator('name')(<Input placeholder="请输入" />)}</FormItem>
-          </Col>
-          <Col xxl={6} lg={0}>
-            <FormItem label="移动电话">{getFieldDecorator('mobilePhone')(
-            <Input placeholder="请输入" />)}</FormItem>
+            <FormItem label={formatMessage({ id: 'bp.maintain.customerName' })}>{getFieldDecorator('name')(<Input placeholder={formatMessage({ id: 'bp.maintain.inputHere' })} />)}</FormItem>
           </Col>
           <Col xxl={6} lg={8}>
-            <span className="submitButtons">
+            <FormItem label={formatMessage({ id: 'bp.maintain.mobilePhone' })}>{getFieldDecorator('mobilePhone')(
+            <Input placeholder={formatMessage({ id: 'bp.maintain.inputHere' })} />)}</FormItem>
+          </Col>
+          <Col xxl={6} lg={8}>
+              <span className="submitButtons">
               <Button type="primary" htmlType="submit">
-                查询
+                {formatMessage({ id: 'bp.maintain.search' })}
               </Button>
               <Button style={{ marginLeft: 8 }} onClick={this.handleFormReset}>
-                重置
+                {formatMessage({ id: 'bp.maintain.reset' })}
               </Button>
               <a style={{ marginLeft: 8 }} onClick={this.toggleForm}>
-                展开 <Icon type="down" />
+                {formatMessage({ id: 'bp.maintain.putAway' })} <Icon type="up" />
               </a>
             </span>
           </Col>
@@ -477,10 +478,20 @@ constructor(props) {
       loading,
       total,
     } = this.state;
+    const { BpCertificationStatus, salesOrderBlock, CustomerDataStatus } = this.props;
     const data = { list, pagination: { current, pageSize, total } };
+
+    const CertificationStatus = []; // 认证状态
+    const salesBlock = []; // 销售冻结
+    const CustomerStatus = []; // 客户数据状态
+
+    BpCertificationStatus.forEach(item => { CertificationStatus.push({ value: item.id, text: item.name }) })
+    salesOrderBlock.forEach(item => { salesBlock.push({ value: item.id, text: item.name }) })
+    CustomerDataStatus.forEach(item => { CustomerStatus.push({ value: item.id, text: item.name }) })
+
     const columns = [
       {
-        title: '业务伙伴',
+        title: formatMessage({ id: 'bp.maintain.businessPartner' }),
         dataIndex: 'code',
         width: 250,
         render(val, record) {
@@ -493,27 +504,10 @@ constructor(props) {
         },
       },
       {
-        title: '认证',
+        title: formatMessage({ id: 'bp.maintain.approved' }),
         dataIndex: 'certificationStatus',
         // width: 100,
-        filters: [
-          {
-            value: '1',
-            text: '未认证',
-          },
-          {
-            value: '2',
-            text: '审核中',
-          },
-          {
-            value: '3',
-            text: '部分认证',
-          },
-          {
-            value: '4',
-            text: '已认证',
-          },
-        ],
+        filters: CertificationStatus,
         onFilter: (value, record) =>
         record.certificationStatus.toString().indexOf(value.toString()) === 0,
         render(val) {
@@ -521,19 +515,9 @@ constructor(props) {
         },
       },
       {
-        title: '冻结',
+        title: formatMessage({ id: 'bp.maintain.block' }),
         dataIndex: 'salesOrderBlock',
-        // width: 100,
-        filters: [
-          {
-            value: '1',
-            text: '冻结',
-          },
-          {
-            value: '2',
-            text: '活跃',
-          },
-        ],
+        filters: salesBlock,
         filterMultiple: false,
         onFilter: (value, record) =>
         record.salesOrderBlock.toString().indexOf(value.toString()) === 0,
@@ -545,19 +529,10 @@ constructor(props) {
         },
       },
       {
-        title: '客户',
+        title: formatMessage({ id: 'bp.maintain.customer' }),
         dataIndex: 'customerDataStatus',
         // width: 100,
-        filters: [
-          {
-            value: '2',
-            text: '不完整',
-          },
-          {
-            value: '1',
-            text: '完整',
-          },
-        ],
+        filters: CustomerStatus,
         filterMultiple: false,
         onFilter: (value, record) =>
         record.customerDataStatus.toString().indexOf(value.toString()) === 0,
@@ -566,19 +541,10 @@ constructor(props) {
         },
       },
       {
-        title: '供应商',
+        title: formatMessage({ id: 'bp.maintain.vendor' }),
         dataIndex: 'vendorDataStatus',
         // width: 100,
-        filters: [
-          {
-            value: '2',
-            text: '不完整',
-          },
-          {
-            value: '1',
-            text: '完整',
-          },
-        ],
+        filters: CustomerStatus,
         filterMultiple: false,
         onFilter: (value, record) =>
         record.vendorDataStatus.toString().indexOf(value.toString()) === 0,
@@ -587,7 +553,7 @@ constructor(props) {
         },
       },
       {
-        title: '联系方式',
+        title: formatMessage({ id: 'bp.maintain.contactInformation' }),
         dataIndex: 'mobilePhone',
         // width: 100,
         render(val, records) {
@@ -608,7 +574,7 @@ constructor(props) {
         },
       },
       {
-        title: '地址',
+        title: formatMessage({ id: 'bp.maintain.address' }),
         dataIndex: 'address',
         // width: 200,
         render(val) {
@@ -617,44 +583,44 @@ constructor(props) {
       },
       {
         fixed: 'right',
-        title: '操作',
-        width: 170,
+        title: formatMessage({ id: 'bp.maintain.operation' }),
+        width: 180,
         render: (text, record) => {
           const { id } = record;
           const menu = (
             <Menu style={{ padding: 0 }}>
               {record.salesOrderBlock === 1 ? <Menu.Item>
-                  <a href="#" onClick={e => { this.cancelFreeze(e, record) }}>取消冻结</a>
+              <a href="#" onClick={e => { this.cancelFreeze(e, record) }}>{formatMessage({ id: 'bp.maintain.cancelBlock' })}</a>
                 </Menu.Item> : <Menu.Item>
-                  <a href="#" onClick={ e => { this.freezePartner(e, record) }}>冻结</a>
+                  <a href="#" onClick={ e => { this.freezePartner(e, record) }}>{formatMessage({ id: 'bp.maintain.block' })}</a>
                 </Menu.Item>}
               {(record.certificationStatus === 4 || record.certificationStatus === 3) && record.type === 2 ?
                 <Menu.Item>
-                  <a href="#" onClick={e => { this.cancelIdent(e, record) }}>取消认证</a>
+                  <a href="#" onClick={e => { this.cancelIdent(e, record) }}>{formatMessage({ id: 'bp.maintain.cancelBlock' })}</a>
                 </Menu.Item>
               : ''
               }
               {/* 变更认证：PI除了未认证其他都要显示；组织只显示已认证状态；组织没有部分认证 */}
               {record.certificationStatus === 4 || record.certificationStatus === 3 ?
                 <Menu.Item>
-                  <a href="#" onClick={ () => { this.changeShow(true, record) }}>变更认证</a>
+                  <a href="#" onClick={ () => { this.changeShow(true, record) }}>{formatMessage({ id: 'bp.maintain.changeApproval' })}</a>
                 </Menu.Item>
               : ''
               }
               {record.certificationStatus === 1 ?
                 <Menu.Item><a href="#"
-                onClick={ () => { this.changeShow(true, record) }}>认证</a></Menu.Item>
+                onClick={ () => { this.changeShow(true, record) }}>{formatMessage({ id: 'bp.maintain.approval' })}</a></Menu.Item>
               : ''
               }
             </Menu>
           );
           return (
             <>
-              <Link to={`/bp/maintain/edit/${id}?type=${record.type}&customerDataStatus=${record.customerDataStatus}&vendorDataStatus=${record.vendorDataStatus}`}>修改</Link>
+              <Link to={`/bp/maintain/edit/${id}?type=${record.type}&customerDataStatus=${record.customerDataStatus}&vendorDataStatus=${record.vendorDataStatus}`}>{formatMessage({ id: 'bp.maintain.change' })}</Link>
               <Divider type="vertical" />
               <Dropdown overlay={menu}>
                 <a className="ant-dropdown-link">
-                  更多操作 <Icon type="down" />
+                  {formatMessage({ id: 'bp.maintain.moreOption' })} <Icon type="down" />
                 </a>
               </Dropdown>
             </>
@@ -664,12 +630,12 @@ constructor(props) {
     ];
     return (
       <PageHeaderWrapper>
-        <Card bordered={false}>
+        <Card bordered={false} className="mySet">
           <div className="tableList">
             <div className="tableListForm">{this.renderForm()}</div>
             <div className="tableListOperator">
               <Button icon="plus" type="primary" onClick={() => this.handleModalVisible(true)}>
-                新建
+                {formatMessage({ id: 'bp.maintain.new' })}
               </Button>
             </div>
             <StandardTable

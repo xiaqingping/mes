@@ -891,19 +891,17 @@ class ChangeModal extends Component {
       <Col lg={12} md={12} sm={12}>
         <FormItem label="行业类别">
           &nbsp;&nbsp;&nbsp;&nbsp;
-          <span>
-            {industryCategories.filter(v => basic.industryCode === v.code) !== 0
-              ? industryCategories.filter(v => basic.industryCode === v.code)[0].name
-              : ''}
-          </span>{' '}
-          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-          <a href="#" onClick={event => this.updateIndustryGroup(event)}>
-            修改
-          </a>
-        </FormItem>
-      </Col>
-    );
-  };
+        <span>
+          {
+            industryCategories.filter(v => basic.industryCode === v.code).length !== 0 ?
+            industryCategories.filter(v => basic.industryCode === v.code)[0].name : ''
+          }
+        </span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <a href="#" onClick = {event => this.updateIndustryGroup(event)}>修改</a>
+          </FormItem>
+        </Col>
+      )
+    }
 
   groupInstruInput = () => {
     const {

@@ -13,8 +13,8 @@ export default {
   'bp.verification.operator': 'Operator',
   'bp.verification.operation': 'Operation',
   // 按钮
-  'bp.verification.open': 'Open',
-  'bp.verification.retract': 'Retract',
+  'bp.verification.open': 'Expand',
+  'bp.verification.retract': 'Put away',
   'bp.verification.search': 'Search',
   'bp.verification.reset': 'Reset',
   'bp.verification.view': 'Details',

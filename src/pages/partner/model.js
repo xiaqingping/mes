@@ -8,10 +8,15 @@ const SeqModel = {
     supplier: null,
     // 业务伙伴认证状态
     BpCertificationStatus: [
-      { id: 1, name: '未认证' },
-      { id: 2, name: '审核中' },
-      { id: 3, name: '部分认证' },
-      { id: 4, name: '已认证' },
+      { id: 1, name: formatMessage({ id: 'bp.maintain.unapproved' }) },
+      { id: 2, name: formatMessage({ id: 'bp.maintain.processing' }) },
+      { id: 3, name: formatMessage({ id: 'bp.maintain.partialApproved' }) },
+      { id: 4, name: formatMessage({ id: 'bp.maintain.approveds' }) },
+    ],
+    // 销售冻结
+    salesOrderBlock: [
+      { id: 1, name: formatMessage({ id: 'bp.maintain.blocked' }) },
+      { id: 2, name: formatMessage({ id: 'bp.maintain.actived' }) },
     ],
     // PI认证状态
     PiCertificationStatus: [
@@ -50,8 +55,8 @@ const SeqModel = {
     ],
     // 客户数据状态
     CustomerDataStatus: [
-      { id: 1, name: '完整' },
-      { id: 2, name: '不完整' },
+      { id: 1, name: formatMessage({ id: 'bp.maintain.completed' }) },
+      { id: 2, name: formatMessage({ id: 'bp.maintain.incomplete' }) },
     ],
     // 默认开票类型
     DefaultInvoiceType: [
