@@ -1,7 +1,4 @@
-import {
-  Card,
-  Table,
-} from 'antd';
+import { Card, Table } from 'antd';
 import React, { Component } from 'react';
 import { connect } from 'dva';
 import './style.less';
@@ -14,7 +11,9 @@ import api from '@/api';
 // eslint-disable-next-line react/prefer-stateless-function
 class BasicInfo extends Component {
   render() {
-    const { details: { customer } } = this.props
+    const {
+      details: { customer },
+    } = this.props;
     const columns = [
       {
         title: '姓名',
@@ -27,11 +26,12 @@ class BasicInfo extends Component {
         width: 300,
         render(text, record) {
           return (
-            <ContactInformation data={{
-              countryCode: record.mobilePhoneCountryCode,
-              code: record.mobilePhone,
-            }}
-          />
+            <ContactInformation
+              data={{
+                countryCode: record.mobilePhoneCountryCode,
+                code: record.mobilePhone,
+              }}
+            />
           );
         },
       },
@@ -44,14 +44,16 @@ class BasicInfo extends Component {
         title: '地址',
         dataIndex: 'address',
         width: 500,
-      render: (text, record) => <div className="addEllipsis" style={{ width: '300px' }}>
-        {record.countryName}&nbsp;
-        {record.provinceName}&nbsp;
-        {record.cityName}&nbsp;
-        {record.countyName}&nbsp;
-        {record.streetName}&nbsp;
-        {text}
-        </div>,
+        render: (text, record) => (
+          <div className="addEllipsis" style={{ width: '300px' }}>
+            {record.countryName}&nbsp;
+            {record.provinceName}&nbsp;
+            {record.cityName}&nbsp;
+            {record.countyName}&nbsp;
+            {record.streetName}&nbsp;
+            {text}
+          </div>
+        ),
       },
     ];
     return (

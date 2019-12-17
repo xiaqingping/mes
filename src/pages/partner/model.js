@@ -68,16 +68,6 @@ const SeqModel = {
       { id: 'N', name: '未验证' },
       { id: 'Y', name: '已验证' },
     ],
-    // 行业类别 TODO:停止使用
-    // Industry: [
-    //   { id: '01', name: '军队' },
-    //   { id: '02', name: '国外' },
-    //   { id: '03', name: '政府机关' },
-    //   { id: '04', name: '事业单位' },
-    //   { id: '05', name: '社会团体' },
-    //   { id: '06', name: '个人' },
-    //   { id: '07', name: '企业' },
-    // ],
     // 随货开票
     InvoiceWithGood: [
       { id: 1, name: '是' },
@@ -147,10 +137,7 @@ const SeqModel = {
         text: formatMessage({ id: 'bp.verification.rejected' }),
         status: 'error',
       },
-      { value: 4,
-        text: formatMessage({ id: 'bp.verification.expired' }),
-        status: 'error',
-      },
+      { value: 4, text: formatMessage({ id: 'bp.verification.expired' }), status: 'error' },
     ],
     // 验证类型
     VerifyRecordType: [

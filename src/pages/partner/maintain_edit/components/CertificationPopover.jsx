@@ -2,7 +2,7 @@
  * 认证气泡框
  */
 import React from 'react';
-import { Badge, Spin } from 'antd';
+import { Badge, Spin, Empty } from 'antd';
 import api from '@/api';
 
 class CertificationPopover extends React.Component {
@@ -10,22 +10,30 @@ class CertificationPopover extends React.Component {
     super(props);
     this.state = {
       data: null,
+      loading: true,
     };
   }
 
   componentDidMount() {
     const { id } = this.props;
     api.bp.getLastVerifyRecords(id).then(data => {
-      this.setState({ data });
+      this.setState({ data, loading: false });
     });
   }
 
   render() {
-    const { data } = this.state;
-    if (!data) {
+    const { data, loading } = this.state;
+    if (loading) {
       return (
         <div style={{ width: 280, height: 145 }}>
           <Spin />
+        </div>
+      );
+    }
+    if (!data) {
+      return (
+        <div style={{ width: 280, height: 145 }}>
+          <Empty description="暂无认证记录" />
         </div>
       );
     }
