@@ -49,8 +49,17 @@ const SeqModel = {
         // 供应商
         if (vendorDataStatus !== '2') task[1] = call(api.bp.getBPVendor, id);
         const [customer, vendor] = yield all(task);
-        if (customer && customer.customer) details = { ...details, ...customer };
-        if (vendor && vendor.vendor) details = { ...details, ...vendor };
+        if (customer && customer.customer) {
+          if (!customer.customer.salesAreaList) customer.customer.salesAreaList = [];
+          if (!customer.customer.addressList) customer.customer.addressList = [];
+          details = { ...details, ...customer };
+        }
+        if (vendor && vendor.vendor) {
+          const data = {};
+          if (!vendor.vendor.purchaseOrganizationList) vendor.vendor.purchaseOrganizationList = [];
+          if (!vendor.vendor.paymentBank) vendor.vendor.paymentBank = {};
+          details = { ...details, ...vendor, ...data };
+        }
 
         const { type } = details.basic;
         // PI认证
