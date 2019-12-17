@@ -1,12 +1,10 @@
 import React from 'react';
 import { GroupColumn } from '@antv/g2plot';
 
-
 class Sale extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {
-    };
+    this.state = {};
   }
 
   componentDidMount() {
@@ -130,9 +128,7 @@ class Sale extends React.Component {
   }
 
   render() {
-    return (
-      <div id="container"></div>
-    );
+    return <div id="container"></div>;
   }
 }
 export default Sale;
