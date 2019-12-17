@@ -851,7 +851,7 @@ class ChangeModal extends Component {
           &nbsp;&nbsp;&nbsp;&nbsp;
         <span>
           {
-            industryCategories.filter(v => basic.industryCode === v.code) !== 0 ?
+            industryCategories.filter(v => basic.industryCode === v.code).length !== 0 ?
             industryCategories.filter(v => basic.industryCode === v.code)[0].name : ''
           }
         </span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;

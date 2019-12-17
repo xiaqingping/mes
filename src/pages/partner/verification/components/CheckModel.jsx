@@ -8,6 +8,7 @@ import {
   Empty,
   Button,
   Icon,
+  Spin,
 } from 'antd';
 import React from 'react';
 import { connect } from 'dva';
@@ -22,23 +23,19 @@ import CheckPhone from '@/pages/partner/maintain_details/components/CheckPhone';
 const verifyData = {
   1: {
     value: 'warning',
-    text: '验证中',
+    text: formatMessage({ id: 'bp.verification.verfication' }),
   },
   2: {
     value: 'success',
-    text: '已完成',
+    text: formatMessage({ id: 'bp.verification.completed' }),
   },
   3: {
     value: 'error',
-    text: '已拒绝',
+    text: formatMessage({ id: 'bp.verification.rejected' }),
   },
   4: {
     value: 'error',
-    text: '已取消',
-  },
-  5: {
-    value: 'error',
-    text: '已过期',
+    text: formatMessage({ id: 'bp.verification.expired' }),
   },
 }
 
@@ -493,6 +490,7 @@ class CheckModel extends React.Component {
       emailAccount: '',
       phoneAccount: '',
       approvedLoading: false,
+      pageLoading: true,
     }
   }
 
@@ -533,7 +531,7 @@ class CheckModel extends React.Component {
             v.map(item => {
               if (item.id) {
                 newData.pic.push(api.disk.downloadFiles(item.id, { view: true }))
-                this.setState({ picHas: true })
+                this.setState({ picHas: true, pageLoading: false })
               }
             })
           })
@@ -557,7 +555,7 @@ class CheckModel extends React.Component {
             v.map(item => {
               if (item.id) {
                 newData.pic.push(api.disk.downloadFiles(item.id, { view: true }))
-                this.setState({ picHas: true })
+                this.setState({ picHas: true, pageLoading: false })
               }
             })
           })
@@ -679,6 +677,7 @@ class CheckModel extends React.Component {
       phoneAccount,
       emailShow,
       approvedLoading,
+      pageLoading,
       emailAccount } = this.state;
     const { SpecialInvoice, countryDiallingCodes, industryCategories } = this.props;
     if (!detailsValue && !picHas) return null
@@ -1479,7 +1478,12 @@ class CheckModel extends React.Component {
             </Button>,
           ] : null}
         >
-        { modelContent }
+          <Spin spinning={pageLoading}>
+            {pageLoading ? (
+              <Empty />
+              ) : modelContent
+            }
+          </Spin>
         </Modal>
         <RecordListForm
         showList = {showList}
