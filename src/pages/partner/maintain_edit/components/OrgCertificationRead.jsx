@@ -54,7 +54,14 @@ class OrgCertificationRead extends React.Component {
           <>
             <Badge status="default" text="未认证" />
             <CertificationPopover id={basic.id} type={basic.type}>
-              <a className={styles.changeButton}>认证</a>
+              <a
+                className={styles.changeButton}
+                onClick={() => {
+                  this.showChange.visibleShow(true, basic);
+                }}
+              >
+                认证
+              </a>
             </CertificationPopover>
           </>
         );
