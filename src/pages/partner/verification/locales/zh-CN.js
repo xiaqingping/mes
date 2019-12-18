@@ -28,8 +28,8 @@ export default {
   'bp.verification.soldToPartyBundle': '绑定售达方',
   'bp.verification.verificationMobilePhone': '验证手机',
   'bp.verification.verificationEmail': '验证邮箱',
-  'bp.verification.completed': '已验证',
   'bp.verification.verfication': '验证中',
+  'bp.verification.completed': '已验证',
   'bp.verification.rejected': '已拒绝',
   'bp.verification.expired': '已过期',
   // 变更已验证手机和邮箱页面
