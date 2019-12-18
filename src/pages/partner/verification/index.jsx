@@ -406,7 +406,7 @@ class Verification extends React.Component {
         render(value, records) {
           return <>
           <Badge status={preStateAll[value - 1].status} text={preStateAll[value - 1].text} />
-          {value === 2 ? <div>{records.operationDate}</div> : ''}
+          {value === 1 ? '' : <div>{records.finishDate}</div>}
           </>
         },
       },
