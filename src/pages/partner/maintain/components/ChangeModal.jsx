@@ -167,7 +167,6 @@ class AddressGroup extends Component {
   }
 
   componentDidMount() {
-    console.log(this.props.defaultAddress);
     api.area.byParentIdGetArea(0).then(res => {
       this.setState({ countryCode: res });
     });
@@ -336,12 +335,12 @@ class ChangeModal extends Component {
     const { gtype, guuid } = this.state;
     this.setState({ changeModal });
     const diskFileIdList = [];
-    // console.log(this.props.details)
     if (recordMsg) {
       if (recordMsg.type === 1 || gtype === 1) {
         api.bp.getBPPiCertification(recordMsg.id).then(res => {
           this.setState({
             userData: res,
+            pageLoading: false,
           });
           if (res.piCertificationList.length !== 0) {
             const codeList = [];
@@ -372,7 +371,6 @@ class ChangeModal extends Component {
                 });
                 this.setState({
                   userPersonData: newData,
-                  pageLoading: false,
                 });
               });
           }
@@ -614,7 +612,7 @@ class ChangeModal extends Component {
   );
 
   changGType = v => {
-    if (v.type) {
+    if (v.type || v.name) {
       if (v.type === 'group') {
         this.setState({
           gtype: 1,
@@ -625,18 +623,22 @@ class ChangeModal extends Component {
           gtype: 2,
         });
       }
-    } else if (v === 'CN') {
-      this.setState({
-        gtype: 1,
-      });
-    } else if (v === 'GB') {
-      this.setState({
-        gtype: 3,
-      });
-    } else if (v) {
-      this.setState({
-        gtype: 4,
-      });
+    } else {
+      if (v === 'CN') {
+        this.setState({
+          gtype: 1,
+        });
+      }
+      if (v === 'GB') {
+        this.setState({
+          gtype: 3,
+        });
+      }
+      if (v) {
+        this.setState({
+          gtype: 4,
+        });
+      }
     }
   };
 
@@ -669,7 +671,6 @@ class ChangeModal extends Component {
     return groupNameShow ? this.groupNameShow() : this.groupNameInput();
   };
 
-  // eslint-disable-next-line consistent-return
   groupNameShow = () => {
     const { recordMsg } = this.state;
     if (recordMsg) {
@@ -685,6 +686,7 @@ class ChangeModal extends Component {
         </Col>
       );
     }
+    return null
   };
 
   defaultAddressCode = v => {
@@ -891,19 +893,17 @@ class ChangeModal extends Component {
       <Col lg={12} md={12} sm={12}>
         <FormItem label="行业类别">
           &nbsp;&nbsp;&nbsp;&nbsp;
-          <span>
-            {industryCategories.filter(v => basic.industryCode === v.code) !== 0
-              ? industryCategories.filter(v => basic.industryCode === v.code)[0].name
-              : ''}
-          </span>{' '}
-          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-          <a href="#" onClick={event => this.updateIndustryGroup(event)}>
-            修改
-          </a>
-        </FormItem>
-      </Col>
-    );
-  };
+        <span>
+          {
+            industryCategories.filter(v => basic.industryCode === v.code).length !== 0 ?
+            industryCategories.filter(v => basic.industryCode === v.code)[0].name : ''
+          }
+        </span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <a href="#" onClick = {event => this.updateIndustryGroup(event)}>修改</a>
+          </FormItem>
+        </Col>
+      )
+    }
 
   groupInstruInput = () => {
     const {
@@ -1123,7 +1123,7 @@ class ChangeModal extends Component {
         {uploadButton}
       </Upload>
     );
-
+    console.log(gtype)
     if (gtype === 2) {
       modelWidth = 830;
 

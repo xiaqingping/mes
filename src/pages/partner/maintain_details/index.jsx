@@ -31,10 +31,12 @@ class CustomerDetails extends Component {
   };
 
   componentDidMount() {
-    this.props.dispatch({
-      type: 'partnerMaintainEdit/setDetails',
-      payload: null,
-    });
+    const activeKey = this.props.location.query.tabActiveKey ?
+                      this.props.location.query.tabActiveKey : '';
+    // this.props.dispatch({
+    //   type: 'partnerMaintainEdit/setDetails',
+    //   payload: null,
+    // });
     api.bp.getBPCustomer(this.props.match.params.id).then(res => {
       this.props.dispatch({
         type: 'partnerMaintainEdit/setDetails',
@@ -54,14 +56,35 @@ class CustomerDetails extends Component {
       type: 'basicCache/setState',
       payload: { type: 'countryDiallingCodes' },
     });
-    // this.props.dispatch({
-    //   type: 'partnerMaintainEdit/setDetails',
-    //   payload: details,
-    // });
-    // this.props.dispatch({
-    //   type: 'partnerMaintainEdit/setSupplier',
-    //   payload: supplier,
-    // });
+
+        // 判断是客户还是供应商
+    if (activeKey) {
+      if (activeKey === 'vendor') {
+        this.props.dispatch({
+          type: 'partnerMaintainEdit/setType',
+          payload: 'supplier',
+        });
+        this.setState({
+          tabActiveKey: 'supplier',
+        })
+      }
+    } else if ((parseInt(this.props.location.query.customerDataStatus, 10) === 2 &&
+      parseInt(this.props.location.query.vendorDataStatus, 10) === 1)) {
+      this.props.dispatch({
+        type: 'partnerMaintainEdit/setType',
+        payload: 'supplier',
+      });
+      this.setState({
+        tabActiveKey: 'supplier',
+      })
+    } else {
+      this.props.dispatch({
+        type: 'partnerMaintainEdit/setType',
+        payload: 'customer',
+      });
+    }
+
+
     window.addEventListener('resize', this.resizeFooterToolbar, { passive: true });
     this.resizeFooterToolbar();
   }
@@ -94,16 +117,18 @@ class CustomerDetails extends Component {
   };
 
   title = v => {
+    const { location, match } = this.props;
     const {
-      match: {
-        params: { id },
-      },
-    } = this.props;
+      params: { id },
+    } = match;
+    const { query } = location;
+    const { customerDataStatus, vendorDataStatus, type } = query;
     return (
       <div>
         <span>查看 {v}</span>&nbsp;&nbsp;&nbsp;&nbsp;
         <Link
-          to={`/bp/maintain/edit/${id}`}
+          // eslint-disable-next-line max-len
+          to={`/bp/maintain/edit/${id}?type=${type}&customerDataStatus=${customerDataStatus}&vendorDataStatus=${vendorDataStatus}&tabActiveKey=${this.props.type === 'customer' ? 'customer' : 'vendor'}`}
           onClick={() => {
             this.props.dispatch({
               type: 'partnerMaintainEdit/setDetails',
@@ -128,7 +153,6 @@ class CustomerDetails extends Component {
   render() {
     const { tabActiveKey, pageLoading } = this.state;
     const { customer } = this.props;
-
     return (
       <PageHeaderWrapper
         tabActiveKey={tabActiveKey}
