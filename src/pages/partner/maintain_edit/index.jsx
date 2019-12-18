@@ -4,9 +4,10 @@
 import { Form, Button, Spin, Badge, message, Empty, Icon } from 'antd';
 import React, { Component } from 'react';
 
+import qs from 'querystring';
 import router from 'umi/router';
 import Link from 'umi/link';
-import { FormattedMessage } from 'umi/locale';
+import { formatMessage, FormattedMessage } from 'umi/locale';
 import { connect } from 'dva';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import FooterToolbar from '@/components/FooterToolbar';
@@ -755,15 +756,20 @@ class CustomerEdit extends Component {
     const customerTab = this.renderCustomerTab();
     const vendorTab = this.renderVendorTab();
 
-    let title = '新增';
+    let title = formatMessage({ id: 'action.add' });
     if (editType === 'update') {
-      title = '修改';
+      title = formatMessage({ id: 'action.change' });
       const { basic } = details;
       if (basic && basic.id && basic.code) {
+        const query = {
+          ...this.props.location.query,
+          tabActiveKey,
+        };
+        const url = `/bp/maintain/details/${basic.id}?${qs.stringify(query)}`;
         title = (
           <>
-            修改 {basic.code}
-            <Link to={`/bp/maintain/details/${basic.id}`}>
+            {formatMessage({ id: 'action.change' })} {basic.code}
+            <Link to={url}>
               <Icon style={{ marginLeft: 15, color: '#666' }} type="file-search" />
             </Link>
           </>

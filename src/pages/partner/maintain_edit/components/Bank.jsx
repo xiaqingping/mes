@@ -4,6 +4,7 @@
 import { Card, Col, Form, Input, Row, Select, Spin } from 'antd';
 import React, { Component } from 'react';
 import { connect } from 'dva';
+import { formatMessage } from 'umi/locale';
 import debounce from 'lodash/debounce';
 import api from '@/api';
 
@@ -82,11 +83,15 @@ class Bank extends Component {
     const { bank, bankFetching } = this.state;
 
     return (
-      <Card title="付款银行" bordered={false} style={{ marginBottom: type === 2 ? '24px' : null }}>
+      <Card
+        bordered={false}
+        title={formatMessage({ id: 'bp.maintain_details.bank' })}
+        style={{ marginBottom: type === 2 ? '24px' : null }}
+      >
         <Form layout="vertical" hideRequiredMark>
           <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
             <Col md={6}>
-              <FormItem label="国家">
+              <FormItem label={formatMessage({ id: 'bp.maintain_details.bank.country' })}>
                 {getFieldDecorator('countryCode', {
                   initialValue: paymentBank.countryCode,
                   rules: [{ required: true }],
@@ -106,7 +111,7 @@ class Bank extends Component {
               </FormItem>
             </Col>
             <Col md={6}>
-              <FormItem label="开户行">
+              <FormItem label={formatMessage({ id: 'bp.maintain_details.bank.bank_name' })}>
                 {getFieldDecorator('bankCode', {
                   initialValue: paymentBank.bankCode,
                   rules: [{ required: true }],
@@ -128,7 +133,7 @@ class Bank extends Component {
               </FormItem>
             </Col>
             <Col md={6}>
-              <FormItem label="银行账户">
+              <FormItem label={formatMessage({ id: 'bp.maintain_details.bank.bank_account' })}>
                 {getFieldDecorator('bankAccount', {
                   initialValue: paymentBank.bankAccount,
                   rules: [{ required: true }],
@@ -136,7 +141,7 @@ class Bank extends Component {
               </FormItem>
             </Col>
             <Col md={6}>
-              <FormItem label="户名">
+              <FormItem label={formatMessage({ id: 'bp.maintain_details.bank.contact_name' })}>
                 {getFieldDecorator('bankAccountName', {
                   initialValue: paymentBank.bankAccountName,
                   rules: [{ required: true }],

@@ -3,11 +3,18 @@
  */
 import React from 'react';
 import { Badge, Spin, Empty } from 'antd';
+import { connect } from 'dva';
 import api from '@/api';
 
+@connect(({ bp }) => ({
+  VerifyRecordStatus: bp.VerifyRecordStatus,
+}))
 class CertificationPopover extends React.Component {
   constructor(props) {
     super(props);
+    // props.id 业务伙伴ID
+    // props.type 业务伙伴类型
+    // props.billToPartyId 开票方ID（业务伙伴类型为人员时，需要传）
     this.state = {
       data: null,
       loading: true,
@@ -21,31 +28,41 @@ class CertificationPopover extends React.Component {
     });
   }
 
-  render() {
-    const { data, loading } = this.state;
-    if (loading) {
-      return (
-        <div style={{ width: 280, height: 145 }}>
-          <Spin />
-        </div>
-      );
-    }
-    if (!data) {
-      return (
-        <div style={{ width: 280, height: 145 }}>
-          <Empty description="暂无认证记录" />
-        </div>
-      );
-    }
+  renderOrg = () => {
+    const { VerifyRecordStatus } = this.props;
+    const { data } = this.state;
+    const status = VerifyRecordStatus.filter(e => data.status === e.value)[0];
     return (
-      <div style={{ width: 280, height: 145, color: '#999' }}>
+      <>
+        <div>
+          <strong style={{ color: '#444' }}>{data.organizationCertification.name}</strong>
+        </div>
+        <div style={{ marginTop: 10 }}>{data.bpCode}</div>
+        <div style={{ marginTop: 10 }}>
+          <Badge status={status.status} text={status.text} />
+          <span style={{ marginLeft: '1em' }}>{data.operationDate}</span>
+        </div>
+        <div style={{ marginTop: 10 }}>
+          <span>{data.approverName}</span>
+          <span>{data.finishDate}</span>
+        </div>
+      </>
+    );
+  };
+
+  renderPi = () => {
+    const { VerifyRecordStatus } = this.props;
+    const { data } = this.state;
+    const status = VerifyRecordStatus.filter(e => data.status === e.value)[0];
+    return (
+      <>
         <div>
           <strong style={{ color: '#444' }}>{data.organizationCertification.name}</strong>
         </div>
         <div style={{ marginTop: 10 }}>{data.bpCode}</div>
         <div style={{ marginTop: 10 }}>
           {/* <span>{lastVerifyRecords.operatorName}</span>&nbsp; */}
-          <Badge status="success" text="已验证" />
+          <Badge status={status.status} text={status.text} />
           &nbsp;
           <span>{data.operationDate}</span>
         </div>
@@ -53,6 +70,34 @@ class CertificationPopover extends React.Component {
           <span>{data.approverName}</span>
           <span>{data.finishDate}</span>
         </div>
+      </>
+    );
+  };
+
+  render() {
+    const { type } = this.props;
+    const { data, loading } = this.state;
+    const style = { width: 280, height: 145, color: '#999' };
+
+    if (loading) {
+      return (
+        <div style={style}>
+          <Spin />
+        </div>
+      );
+    }
+
+    if (!data) {
+      return (
+        <div style={style}>
+          <Empty description="暂无认证记录" />
+        </div>
+      );
+    }
+
+    return (
+      <div style={style}>
+        {type === 1 ? this.renderPi() : this.renderOrg()}
         <div style={{ textAlign: 'right', marginTop: 10 }}>
           <a>查看更多</a>
         </div>
