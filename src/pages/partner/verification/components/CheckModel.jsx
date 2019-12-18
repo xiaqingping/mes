@@ -531,12 +531,13 @@ class CheckModel extends React.Component {
             v.map(item => {
               if (item.id) {
                 newData.pic.push(api.disk.downloadFiles(item.id, { view: true }))
-                this.setState({ picHas: true, pageLoading: false })
+                this.setState({ picHas: true })
               }
             })
           })
         }
         this.setState({
+          pageLoading: false,
           detailsValue: newData,
         })
       })
@@ -555,12 +556,13 @@ class CheckModel extends React.Component {
             v.map(item => {
               if (item.id) {
                 newData.pic.push(api.disk.downloadFiles(item.id, { view: true }))
-                this.setState({ picHas: true, pageLoading: false })
+                this.setState({ picHas: true })
               }
             })
           })
         }
         this.setState({
+          pageLoading: false,
           detailsValue: newData,
         })
       })
@@ -569,6 +571,7 @@ class CheckModel extends React.Component {
     if (clickType === 3) {
       api.bp.getSoldToPartyVerifyRecords(recordMsg.id).then(res => {
         this.setState({
+          pageLoading: false,
           detailsValue: res,
         })
       })
@@ -577,6 +580,7 @@ class CheckModel extends React.Component {
     if (clickType === 4 || clickType === 5) {
       api.bp.getContactInfoVerifyRecords(recordMsg.id).then(res => {
         this.setState({
+          pageLoading: false,
           detailsValue: res,
         })
       })
@@ -585,6 +589,7 @@ class CheckModel extends React.Component {
     if (clickType === 6 || clickType === 7) {
       api.bp.getChangeContactInfoVerifyRecords(recordMsg.id).then(res => {
         this.setState({
+          pageLoading: false,
           detailsValue: res,
         })
       })
@@ -1451,6 +1456,7 @@ class CheckModel extends React.Component {
       </div>
     </Modal>
     </>
+
     return (
       <div style={{ position: 'absolute', right: 0 }} >
         {passPage}

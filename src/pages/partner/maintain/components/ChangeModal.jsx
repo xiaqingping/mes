@@ -167,7 +167,6 @@ class AddressGroup extends Component {
   }
 
   componentDidMount() {
-    console.log(this.props.defaultAddress);
     api.area.byParentIdGetArea(0).then(res => {
       this.setState({ countryCode: res });
     });
@@ -336,12 +335,12 @@ class ChangeModal extends Component {
     const { gtype, guuid } = this.state;
     this.setState({ changeModal });
     const diskFileIdList = [];
-    // console.log(this.props.details)
     if (recordMsg) {
       if (recordMsg.type === 1 || gtype === 1) {
         api.bp.getBPPiCertification(recordMsg.id).then(res => {
           this.setState({
             userData: res,
+            pageLoading: false,
           });
           if (res.piCertificationList.length !== 0) {
             const codeList = [];
@@ -372,7 +371,6 @@ class ChangeModal extends Component {
                 });
                 this.setState({
                   userPersonData: newData,
-                  pageLoading: false,
                 });
               });
           }
@@ -614,6 +612,7 @@ class ChangeModal extends Component {
   );
 
   changGType = v => {
+    console.log(v)
     if (v.type) {
       if (v.type === 'group') {
         this.setState({
@@ -669,7 +668,6 @@ class ChangeModal extends Component {
     return groupNameShow ? this.groupNameShow() : this.groupNameInput();
   };
 
-  // eslint-disable-next-line consistent-return
   groupNameShow = () => {
     const { recordMsg } = this.state;
     if (recordMsg) {
@@ -1121,7 +1119,7 @@ class ChangeModal extends Component {
         {uploadButton}
       </Upload>
     );
-
+    console.log(gtype)
     if (gtype === 2) {
       modelWidth = 830;
 
