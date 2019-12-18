@@ -596,7 +596,7 @@ constructor(props) {
                 </Menu.Item>}
               {(record.certificationStatus === 4 || record.certificationStatus === 3) && record.type === 2 ?
                 <Menu.Item>
-                  <a href="#" onClick={e => { this.cancelIdent(e, record) }}>{formatMessage({ id: 'bp.maintain.cancelBlock' })}</a>
+                  <a href="#" onClick={e => { this.cancelIdent(e, record) }}>{formatMessage({ id: 'bp.maintain.cancelApproval' })}</a>
                 </Menu.Item>
               : ''
               }
