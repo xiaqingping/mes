@@ -383,7 +383,7 @@ class Verification extends React.Component {
         render(value, records) {
           return <>
             <div className={styles.partName}>
-              <Icon type="user" /> <span>{records.bpName}</span>
+              <Icon type={records.bpType === 1 ? 'user' : 'home'} /> <span>{records.bpName}</span>
             </div>
             <div className={styles.partCode}>{records.bpCode}</div>
           </>

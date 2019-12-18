@@ -612,8 +612,7 @@ class ChangeModal extends Component {
   );
 
   changGType = v => {
-    console.log(v)
-    if (v.type) {
+    if (v.type || v.name) {
       if (v.type === 'group') {
         this.setState({
           gtype: 1,
@@ -624,18 +623,22 @@ class ChangeModal extends Component {
           gtype: 2,
         });
       }
-    } else if (v === 'CN') {
-      this.setState({
-        gtype: 1,
-      });
-    } else if (v === 'GB') {
-      this.setState({
-        gtype: 3,
-      });
-    } else if (v) {
-      this.setState({
-        gtype: 4,
-      });
+    } else {
+      if (v === 'CN') {
+        this.setState({
+          gtype: 1,
+        });
+      }
+      if (v === 'GB') {
+        this.setState({
+          gtype: 3,
+        });
+      }
+      if (v) {
+        this.setState({
+          gtype: 4,
+        });
+      }
     }
   };
 
@@ -683,6 +686,7 @@ class ChangeModal extends Component {
         </Col>
       );
     }
+    return null
   };
 
   defaultAddressCode = v => {

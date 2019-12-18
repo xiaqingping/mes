@@ -25,10 +25,18 @@ class Bank extends Component {
           layout="vertical"
           column={4}
         >
-          <DescriptionsItem label="国家">{vendor.paymentBank.countryCode}</DescriptionsItem>
-          <DescriptionsItem label="开户行">{vendor.paymentBank.bankName}</DescriptionsItem>
-          <DescriptionsItem label="银行账户">{vendor.paymentBank.bankAccount}</DescriptionsItem>
-          <DescriptionsItem label="户名">{vendor.paymentBank.bankAccountName}</DescriptionsItem>
+          <DescriptionsItem label="国家">
+            {vendor.paymentBank ? vendor.paymentBank.countryCode : ''}
+          </DescriptionsItem>
+          <DescriptionsItem label="开户行">
+            {vendor.paymentBank ? vendor.paymentBank.bankName : ''}
+          </DescriptionsItem>
+          <DescriptionsItem label="银行账户">
+            {vendor.paymentBank ? vendor.paymentBank.bankAccount : ''}
+          </DescriptionsItem>
+          <DescriptionsItem label="户名">
+            {vendor.paymentBank ? vendor.paymentBank.bankAccountName : ''}
+          </DescriptionsItem>
         </Descriptions>
         : <Empty />
         }
