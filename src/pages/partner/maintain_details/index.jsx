@@ -128,7 +128,7 @@ class CustomerDetails extends Component {
         <span>查看 {v}</span>&nbsp;&nbsp;&nbsp;&nbsp;
         <Link
           // eslint-disable-next-line max-len
-          to={`/bp/maintain/edit/${id}?type=${type}&customerDataStatus=${customerDataStatus}&vendorDataStatus=${vendorDataStatus}&tabActiveKey=${this.props.type}`}
+          to={`/bp/maintain/edit/${id}?type=${type}&customerDataStatus=${customerDataStatus}&vendorDataStatus=${vendorDataStatus}&tabActiveKey=${this.props.type === 'customer' ? 'customer' : 'vendor'}`}
           onClick={() => {
             this.props.dispatch({
               type: 'partnerMaintainEdit/setDetails',
