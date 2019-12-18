@@ -69,20 +69,12 @@ class PersonCertification extends React.Component {
           >
             <div style={{ marginBottom: '.8em' }}>
               {item.status === 1 ? (
-                <CertificationPopover
-                  id={basic.id}
-                  type={basic.type}
-                  billToPartyId={item.billToPartyId}
-                >
+                <CertificationPopover basic={basic} billToPartyId={item.billToPartyId}>
                   <Badge status="warning" text="审核中" />
                 </CertificationPopover>
               ) : null}
               {item.status === 2 ? (
-                <CertificationPopover
-                  id={basic.id}
-                  type={basic.type}
-                  billToPartyId={item.billToPartyId}
-                >
+                <CertificationPopover basic={basic} billToPartyId={item.billToPartyId}>
                   <Badge status="success" text="已认证" />
                 </CertificationPopover>
               ) : null}

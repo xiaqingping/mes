@@ -13,24 +13,31 @@ import api from '@/api';
 class CertificationPopover extends React.Component {
   constructor(props) {
     super(props);
-    // props.id 业务伙伴ID
-    // props.type 业务伙伴类型
+    // props.basic 业务伙伴基础信息
     // props.billToPartyId 开票方ID（业务伙伴类型为人员时，需要传）
     this.state = {
       data: null,
       loading: true,
+      more: false,
     };
   }
 
   componentDidMount() {
-    const { id, billToPartyId } = this.props;
+    const { basic, billToPartyId } = this.props;
+    const { id } = basic;
     api.bp.getLastVerifyRecords(id, { billToPartyId }).then(data => {
       this.setState({ data, loading: false });
     });
   }
 
+  showMore = () => {
+    this.setState({ more: true });
+  };
+
   renderPopover = () => {
-    const { type, VerifyRecordStatus } = this.props;
+    const { basic } = this.props;
+    const { type } = basic;
+    const { VerifyRecordStatus } = this.props;
     const { data, loading } = this.state;
     const style = { width: 280, height: 145, color: '#999' };
     if (type === 1) style.height = 115;
@@ -84,23 +91,65 @@ class CertificationPopover extends React.Component {
           <span style={{ marginLeft: '1.5em' }}>{data.operationDate}</span>
         </div>
         <div style={{ textAlign: 'right', marginTop: 10 }}>
-          <a>查看更多</a>
+          <a onClick={this.showMore}>查看更多</a>
         </div>
       </div>
     );
   };
 
+  renderMore = () => {
+    const { data } = this.state;
+    const { basic } = this.props;
+    const { type } = basic;
+    console.log(data);
+    if (type === 1) return this.renderMorePi();
+    return this.renderMoreOrg();
+  };
+
+  // 人员大气泡
+  renderMorePi = () => {
+    const { data } = this.state;
+    console.log(data);
+    return <div>人员大气泡</div>;
+  };
+
+  // 组织大气泡
+  renderMoreOrg = () => {
+    const { data } = this.state;
+    console.log(data);
+    return <div>组织大气泡</div>;
+  };
+
+  // 组织国外大气泡
+  renderMoreOrgOther = () => {
+    const { data } = this.state;
+    console.log(data);
+    return <div>组织国外大气泡</div>;
+  };
+
+  // 组织国内大气泡
+  renderMoreOrgChina = () => {
+    const { data } = this.state;
+    console.log(data);
+    return <div>组织国内大气泡</div>;
+  };
+
   render() {
-    const { data, loading } = this.state;
+    const { data, loading, more } = this.state;
 
     // 没有认证记录的不显示气泡框
     if (!loading && !data) {
       return this.props.children;
     }
 
-    const content = this.renderPopover();
+    let content;
+    content = this.renderPopover();
+    if (more) {
+      content = this.renderMore();
+    }
+
     return (
-      <Popover content={content} placement="topLeft">
+      <Popover content={content} title={more ? '认证记录' : null} placement="topLeft">
         {this.props.children}
       </Popover>
     );

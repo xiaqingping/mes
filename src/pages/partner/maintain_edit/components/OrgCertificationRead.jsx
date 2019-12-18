@@ -53,7 +53,7 @@ class OrgCertificationRead extends React.Component {
         status = (
           <>
             <Badge status="default" text="未认证" />
-            <CertificationPopover id={basic.id} type={basic.type}>
+            <CertificationPopover basic={basic}>
               <a
                 className={styles.changeButton}
                 onClick={() => {
@@ -70,7 +70,7 @@ class OrgCertificationRead extends React.Component {
         status = (
           <>
             <Badge status="warning" text="审核中" />
-            <CertificationPopover id={basic.id} type={basic.type}>
+            <CertificationPopover basic={basic}>
               <a className={styles.changeButton}>查看</a>
             </CertificationPopover>
           </>
@@ -80,7 +80,7 @@ class OrgCertificationRead extends React.Component {
         status = (
           <>
             <Badge status="success" text="已认证" />
-            <CertificationPopover id={basic.id} type={basic.type}>
+            <CertificationPopover basic={basic}>
               <a
                 className={styles.changeButton}
                 onClick={() => {
