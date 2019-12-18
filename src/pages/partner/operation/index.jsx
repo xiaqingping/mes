@@ -37,7 +37,10 @@ function renderOption(item) {
   );
 }
 
-@connect(({ bp }) => ({ status: bp.operationStatus }))
+@connect(({ bp, global }) => ({
+  status: bp.operationStatus,
+  languageCode: global.languageCode,
+}))
 class Operation extends React.Component {
   constructor(props) {
     super(props)
@@ -188,31 +191,32 @@ class Operation extends React.Component {
   renderAdvancedForm() {
     const {
       form: { getFieldDecorator },
+      languageCode,
     } = this.props;
     const { typeValue, partnerVal } = this.state;
     return (
       <Form onSubmit={this.handleSearch} layout="inline">
         <Row gutter={{ lg: 24, md: 12, sm: 6 }}>
-          <Col xxl={6} xl={10} lg={12} md={12} sm={12}>
-            <FormItem label={formatMessage({ id: 'bp.operation.code' })}>
+          <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
+            <FormItem label={formatMessage({ id: 'bp.customerID' })}>
               {getFieldDecorator('code')(<Input/>)}
             </FormItem>
           </Col>
-          <Col xxl={6} xl={10} lg={12} md={12} sm={12}>
+          <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
             <FormItem label={formatMessage({ id: 'bp.operation.businessPartners' })}>
               {getFieldDecorator('bpId')(
               <AutoComplete
                 onSearch={this.inputValue}
                 dataSource={partnerVal.map(renderOption)}
-                // placeholder="请输入"
+                placeholder={formatMessage({ id: 'bp.inputHere' })}
                 optionLabelProp="text"
                 />)}
             </FormItem>
           </Col>
-          <Col xxl={6} xl={10} lg={12} md={12} sm={12}>
+          <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
             <FormItem label={formatMessage({ id: 'bp.operation.type' })}>
               {getFieldDecorator('type', typeValue ? { initialValue: typeValue } : 'type')(
-                <Select>
+                <Select placeholder={formatMessage({ id: 'bp.pleaseSelect' })}>
                 {/* <Select mode="multiple" showArrow> */}
                   <Option value="1">{formatMessage({ id: 'bp.operation.newlyBuild' })}</Option>
                   <Option value="2">{formatMessage({ id: 'bp.operation.modify' })}</Option>
@@ -220,10 +224,14 @@ class Operation extends React.Component {
               )}
             </FormItem>
           </Col>
-          <Col xxl={6} xl={10} lg={12} md={12} sm={12}>
+          <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
             <FormItem label={formatMessage({ id: 'bp.operation.state' })}>
               {getFieldDecorator('statusList')(
-                <Select mode="multiple" showArrow>
+                <Select
+                  mode="multiple"
+                  showArrow
+                  placeholder={formatMessage({ id: 'bp.pleaseSelect' })}
+                >
                   <Option value="1">{formatMessage({ id: 'bp.operation.unfinished' })}</Option>
                   <Option value="2">
                     {formatMessage({ id: 'bp.operation.partiallyCompleted' })}
@@ -233,7 +241,7 @@ class Operation extends React.Component {
               )}
             </FormItem>
           </Col>
-          <Col xxl={6} xl={10} lg={12} md={12} sm={12}>
+          <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
             <FormItem label={formatMessage({ id: 'bp.operation.completionTime' })}>
               {getFieldDecorator('wanchengshijian')(
                 <RangePicker />,
@@ -258,11 +266,11 @@ class Operation extends React.Component {
   render() {
     const { formValues: { page: current, pageSize },
     list, total, loading, selectedRows, detailsVisible, detailsValue } = this.state;
-    const { status } = this.props;
+    const { status, languageCode } = this.props;
     const dataList = { list, pagination: { current, pageSize, total } };
     const columns = [
       {
-        title: formatMessage({ id: 'bp.operation.code' }),
+        title: formatMessage({ id: 'bp.customerID' }),
         dataIndex: 'code',
         width: 140,
       },
@@ -345,7 +353,7 @@ class Operation extends React.Component {
 
     return (
       <PageHeaderWrapper>
-        <Card bordered={false} className="mySet">
+        <Card bordered={false} className={ languageCode === 'EN' ? 'mySet' : ''}>
           <div className="tableList">
             <div className="tableListForm">{this.renderAdvancedForm()}</div>
             <div className="tableListOperator">

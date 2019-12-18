@@ -26,9 +26,10 @@ const FormItem = Form.Item;
 const { RangePicker } = DatePicker;
 const { Option } = Select;
 
-@connect(({ bp }) => ({
+@connect(({ bp, global }) => ({
   preTypeAll: bp.VerifyRecordType,
   preStateAll: bp.VerifyRecordStatus,
+  languageCode: global.languageCode,
 }))
 class Verification extends React.Component {
   constructor(props) {
@@ -193,38 +194,38 @@ class Verification extends React.Component {
 
   /** 部分筛选条件 */
   renderSimpleForm = () => {
-    const { form } = this.props;
+    const { form, languageCode } = this.props;
     const { partnerVal } = this.state;
     const { getFieldDecorator } = form;
     return (
       <Form onSubmit={this.handleSearch} layout="inline">
         <Row gutter={{ lg: 24, md: 12, sm: 6 }}>
-          <Col xxl={6} xl={10} lg={12} md={12} sm={12}>
-            <FormItem label={formatMessage({ id: 'bp.verification.customerID' })}>
+          <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
+            <FormItem label={formatMessage({ id: 'bp.customerID' })}>
               {getFieldDecorator('code')(
-                <Input placeholder={formatMessage({ id: 'bp.verification.inputHere' })}/>,
+                <Input placeholder={formatMessage({ id: 'bp.inputHere' })}/>,
               )}
             </FormItem>
           </Col>
-          <Col xxl={6} xl={10} lg={12} md={12} sm={12}>
+          <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
             <FormItem label={formatMessage({ id: 'bp.verification.operationCode' })}>
               {getFieldDecorator('bpOperationRecordCode')(
-                <Input placeholder={formatMessage({ id: 'bp.verification.inputHere' })}/>,
+                <Input placeholder={formatMessage({ id: 'bp.inputHere' })}/>,
               )}
             </FormItem>
           </Col>
-          <Col xxl={6} xl={10} lg={12} md={12} sm={12}>
+          <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
           <FormItem label={formatMessage({ id: 'bp.verification.businessPartner' })}>
               {getFieldDecorator('bpId')(
               <AutoComplete
                 onSearch={this.inputValue}
                 dataSource={partnerVal.map(this.renderOption)}
-                placeholder={formatMessage({ id: 'bp.verification.inputHere' })}
+                placeholder={formatMessage({ id: 'bp.inputHere' })}
                 optionLabelProp="text"
                 />)}
             </FormItem>
           </Col>
-          <Col xxl={6} xl={10} lg={12} md={12} sm={12}>
+          <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
             <span className="submitButtons">
               <Button type="primary" htmlType="submit">
                 {formatMessage({ id: 'bp.verification.search' })}
@@ -245,43 +246,46 @@ class Verification extends React.Component {
   /** 完整筛选条件 */
   renderAdvancedForm = () => {
     const {
-      form: { getFieldDecorator }, preTypeAll, preStateAll,
+      form: { getFieldDecorator },
+      preTypeAll,
+      preStateAll,
+      languageCode,
     } = this.props;
     const { partnerVal } = this.state;
 
     return (
       <Form onSubmit={this.handleSearch} layout="inline">
         <Row gutter={{ lg: 24, md: 12, sm: 6 }}>
-          <Col xl={6} lg={8} sm={12}>
-            <FormItem label={formatMessage({ id: 'bp.verification.customerID' })}>
+          <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
+            <FormItem label={formatMessage({ id: 'bp.customerID' })}>
               {getFieldDecorator('code')(
-                <Input placeholder={formatMessage({ id: 'bp.verification.inputHere' })}/>,
+                <Input placeholder={formatMessage({ id: 'bp.inputHere' })}/>,
               )}
             </FormItem>
           </Col>
-          <Col xl={6} lg={8} sm={12}>
+          <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
             <FormItem label={formatMessage({ id: 'bp.verification.operationCode' })}>
               {getFieldDecorator('bpCode')(
-                <Input placeholder={formatMessage({ id: 'bp.verification.inputHere' })}/>,
+                <Input placeholder={formatMessage({ id: 'bp.inputHere' })}/>,
               )}
             </FormItem>
           </Col>
-          <Col xl={6} lg={8} sm={12}>
+          <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
           <FormItem label={formatMessage({ id: 'bp.verification.businessPartner' })}>
               {getFieldDecorator('bpId')(
               <AutoComplete
                 onSearch={this.inputValue}
                 dataSource={partnerVal.map(this.renderOption)}
-                placeholder={formatMessage({ id: 'bp.verification.inputHere' })}
+                placeholder={formatMessage({ id: 'bp.inputHere' })}
                 optionLabelProp="text"
                 />)}
             </FormItem>
           </Col>
-          <Col xl={6} lg={8} sm={12}>
+          <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
             <FormItem label={formatMessage({ id: 'bp.verification.type' })}>
               {getFieldDecorator('type')(
                 <Select
-                  placeholder={formatMessage({ id: 'bp.verification.inputHere' })}
+                  placeholder={formatMessage({ id: 'bp.pleaseSelect' })}
                   optionLabelProp="label">
                   {
                     preTypeAll.map(state => <Option
@@ -294,12 +298,12 @@ class Verification extends React.Component {
               )}
             </FormItem>
           </Col>
-          <Col xl={6} lg={8} sm={12}>
+          <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
             <FormItem label={formatMessage({ id: 'bp.verification.status' })}>
               {getFieldDecorator('statusList')(
                 <Select
                   mode="multiple"
-                  placeholder={formatMessage({ id: 'bp.verification.inputHere' })}
+                  placeholder={formatMessage({ id: 'bp.pleaseSelect' })}
                   optionLabelProp="label">
                   {
                     preStateAll.map(state =>
@@ -314,24 +318,24 @@ class Verification extends React.Component {
               )}
             </FormItem>
           </Col>
-          <Col xl={6} lg={8} sm={12}>
+          <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
             <FormItem label={formatMessage({ id: 'bp.verification.completeTime' })}>
               {getFieldDecorator('finishTime')(
                 <RangePicker />,
               )}
             </FormItem>
           </Col>
-          <Col xl={6} lg={8} sm={12}>
+          <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
             <FormItem label={formatMessage({ id: 'bp.verification.expiryDate' })}>
               {getFieldDecorator('overTime')(
                 <DatePicker style={{ width: '100%' }}/>,
               )}
             </FormItem>
           </Col>
-          <Col xl={6} lg={8} sm={12}>
+          <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
             <FormItem label={formatMessage({ id: 'bp.verification.apprpvalBy' })}>
-              {getFieldDecorator('approverCode')(
-                <Input placeholder={formatMessage({ id: 'bp.verification.inputHere' })}/>,
+              {getFieldDecorator('finisherCode')(
+                <Input placeholder={formatMessage({ id: 'bp.inputHere' })}/>,
               )}
             </FormItem>
           </Col>
@@ -363,11 +367,11 @@ class Verification extends React.Component {
   render() {
     const { formValues: { page: current, pageSize },
     list, selectedRows, total, loading, record, type } = this.state;
-    const { preTypeAll, preStateAll } = this.props
+    const { preTypeAll, preStateAll, languageCode } = this.props
     const data = { list, pagination: { current, pageSize, total } };
     const columns = [
       {
-        title: `${formatMessage({ id: 'bp.verification.customerID' })}
+        title: `${formatMessage({ id: 'bp.customerID' })}
                /${formatMessage({ id: 'bp.verification.operationCode' })}`,
         dataIndex: 'code',
         // width: 150,
@@ -439,7 +443,7 @@ class Verification extends React.Component {
 
     return (
       <PageHeaderWrapper>
-        <Card bordered={false} className="mySet">
+        <Card bordered={false} className={ languageCode === 'EN' ? 'mySet' : ''}>
           <div className="tableList">
             <div className="tableListForm">{this.renderForm()}</div>
             <div className="tableListOperator">

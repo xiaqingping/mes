@@ -41,45 +41,45 @@ const verifyData = {
 
 const verifyType = {
   1: {
-    text: '手机',
+    text: formatMessage({ id: 'bp.verification.mobilePhone' }),
   },
   2: {
-    text: '邮箱',
+    text: formatMessage({ id: 'bp.verification.email' }),
   },
   3: {
-    text: '用户',
+    text: formatMessage({ id: 'bp.verification.user' }),
   },
   4: {
-    text: '人工审核',
+    text: formatMessage({ id: 'bp.verification.manualAudit' }),
   },
 }
 
 // 变更渠道
 const verifyChannel = {
-  1: { text: '登录验证' },
-  2: { text: '自助验证' },
+  1: { text: formatMessage({ id: 'bp.verification.validateLogon' }) },
+  2: { text: formatMessage({ id: 'bp.verification.selfHelpVerification' }) },
 }
 
 // 变更类型
 const verifyChangeType = {
   1: {
-    text: '验证手机',
+    text: formatMessage({ id: 'bp.verification.verifyCellPhone' }),
   },
   2: {
-    text: '验证邮箱',
+    text: formatMessage({ id: 'bp.verification.verifyMailbox' }),
   },
 }
 
 // 验证方式
 const verifyTest = {
   1: {
-    text: '手机',
+    text: formatMessage({ id: 'bp.verification.mobilePhone' }),
   },
   2: {
-    text: '邮箱',
+    text: formatMessage({ id: 'bp.verification.email' }),
   },
   3: {
-    text: '问题',
+    text: formatMessage({ id: 'bp.verification.question' }),
   },
 }
 

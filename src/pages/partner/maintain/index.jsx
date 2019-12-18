@@ -113,6 +113,7 @@ function renderOption(item) {
 @connect(({ basicCache, global, bp }) => {
   const regionOffice = basicCache.regionOffice.filter(e => e.languageCode === global.languageCode)
   return ({
+    languageCode: global.languageCode,
     regionOffice,
     BpCertificationStatus: bp.BpCertificationStatus,
     salesOrderBlock: bp.salesOrderBlock,
@@ -321,30 +322,30 @@ constructor(props) {
       BpCertificationStatus,
       salesOrderBlock,
       CustomerDataStatus,
+      languageCode,
     } = this.props;
     const { xiaoshuoguishu, receivingParty } = this.state;
-    console.log(receivingParty)
     return (
       <Form onSubmit={this.handleSearch} layout="inline">
         <Row gutter={{ xxl: 100, lg: 80 }}>
-          <Col xxl={6} lg={8}>
-            <FormItem label={formatMessage({ id: 'bp.maintain.customerID' })}>{getFieldDecorator('code')(<Input placeholder={formatMessage({ id: 'bp.maintain.inputHere' })} />)}</FormItem>
+          <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
+            <FormItem label={formatMessage({ id: 'bp.customerID' })}>{getFieldDecorator('code')(<Input placeholder={formatMessage({ id: 'bp.inputHere' })} />)}</FormItem>
           </Col>
-          <Col xxl={6} lg={8}>
-            <FormItem label={formatMessage({ id: 'bp.maintain.customerName' })}>{getFieldDecorator('name')(<Input placeholder={formatMessage({ id: 'bp.maintain.inputHere' })} />)}</FormItem>
+          <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
+            <FormItem label={formatMessage({ id: 'bp.maintain.customerName' })}>{getFieldDecorator('name')(<Input placeholder={formatMessage({ id: 'bp.inputHere' })} />)}</FormItem>
           </Col>
-          <Col xxl={6} lg={8}>
+          <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
             <FormItem label={formatMessage({ id: 'bp.maintain.mobilePhone' })}>{getFieldDecorator('mobilePhone')(
-            <Input placeholder={formatMessage({ id: 'bp.maintain.inputHere' })} />)}</FormItem>
+            <Input placeholder={formatMessage({ id: 'bp.inputHere' })} />)}</FormItem>
           </Col>
-          <Col xxl={6} lg={8}>
+          <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
             <FormItem label={formatMessage({ id: 'bp.maintain.email' })}>{getFieldDecorator('email')(
-            <Input placeholder={formatMessage({ id: 'bp.maintain.inputHere' })} />)}</FormItem>
+            <Input placeholder={formatMessage({ id: 'bp.inputHere' })} />)}</FormItem>
           </Col>
-          <Col xxl={6} lg={8}>
+          <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
             <FormItem label={formatMessage({ id: 'bp.maintain.verificationStatus' })}>
               {getFieldDecorator('certificationStatusList')(
-                <Select placeholder={formatMessage({ id: 'bp.maintain.pleaseSelect' })} maxTagCount={1} mode="multiple">
+                <Select placeholder={formatMessage({ id: 'bp.pleaseSelect' })} maxTagCount={1} mode="multiple">
                   {BpCertificationStatus.map(item =>
                     <Option value={item.id}>{item.name}</Option>,
                   )}
@@ -352,10 +353,10 @@ constructor(props) {
               )}
             </FormItem>
           </Col>
-          <Col xxl={6} lg={8}>
+          <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
             <FormItem label={formatMessage({ id: 'bp.maintain.salesBlocked' })}>
               {getFieldDecorator('salesOrderBlock')(
-                <Select placeholder={formatMessage({ id: 'bp.maintain.pleaseSelect' })}>
+                <Select placeholder={formatMessage({ id: 'bp.pleaseSelect' })}>
                   {salesOrderBlock.map(item =>
                     <Option value={item.id}>{item.name}</Option>,
                   )}
@@ -363,10 +364,10 @@ constructor(props) {
               )}
             </FormItem>
           </Col>
-          <Col xxl={6} lg={8}>
+          <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
             <FormItem label={formatMessage({ id: 'bp.maintain.customerData' })}>
               {getFieldDecorator('customerDataStatus')(
-                <Select placeholder={formatMessage({ id: 'bp.maintain.pleaseSelect' })}>
+                <Select placeholder={formatMessage({ id: 'bp.pleaseSelect' })}>
                   {CustomerDataStatus.map(item =>
                     <Option value={item.id}>{item.name}</Option>,
                   )}
@@ -374,10 +375,10 @@ constructor(props) {
               )}
             </FormItem>
           </Col>
-          <Col xxl={6} lg={8}>
+          <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
             <FormItem label={formatMessage({ id: 'bp.maintain.vendorData' })}>
               {getFieldDecorator('vendorDataStatus')(
-                <Select placeholder={formatMessage({ id: 'bp.maintain.pleaseSelect' })}>
+                <Select placeholder={formatMessage({ id: 'bp.pleaseSelect' })}>
                   {CustomerDataStatus.map(item =>
                     <Option value={item.id}>{item.name}</Option>,
                   )}
@@ -385,34 +386,33 @@ constructor(props) {
               )}
             </FormItem>
           </Col>
-          <Col xxl={6} lg={8}>
+          <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
             <FormItem label={formatMessage({ id: 'bp.maintain.salesArea' })}>
               {getFieldDecorator('regionalAttr')(
-                <Cascader options={regionOffice} placeholder={formatMessage({ id: 'bp.maintain.pleaseSelect' })}
+                <Cascader options={regionOffice} placeholder={formatMessage({ id: 'bp.pleaseSelect' })}
                 fieldNames={{ label: 'name', value: 'code', children: 'officeList' }}/>,
               )}
             </FormItem>
           </Col>
-          <Col xxl={6} lg={8}>
+          <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
             <FormItem label={formatMessage({ id: 'bp.maintain.salesRep' })}>
               {getFieldDecorator('salerCode')(
                 <AutoComplete
                   dataSource={xiaoshuoguishu.map(renderOption)}
                   onSearch={this.searchSaler}
                   optionLabelProp="text"
-                  placeholder={formatMessage({ id: 'bp.maintain.inputHere' })}
+                  placeholder={formatMessage({ id: 'bp.inputHere' })}
                 />,
               )}
             </FormItem>
           </Col>
-          <Col xxl={6} lg={8}>
+          <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
             <FormItem label={formatMessage({ id: 'bp.maintain.billToParty' })}>
               {getFieldDecorator('billToPartyId')(
                 <AutoComplete
                   dataSource={receivingParty.map(renderOption)}
                   onSearch={this.searchCustomer}
                   optionLabelProp="text"
-                  // placeholder={formatMessage({ id: 'bp.maintain.inputHere' })}
                 />,
               )}
             </FormItem>
@@ -437,22 +437,22 @@ constructor(props) {
 
   /** 部分筛选条件 */
   renderSimpleForm() {
-    const { form } = this.props;
+    const { form, languageCode } = this.props;
     const { getFieldDecorator } = form;
     return (
       <Form onSubmit={this.handleSearch} layout="inline">
         <Row gutter={{ xxl: 100, lg: 80 }}>
-          <Col xxl={6} lg={8}>
-            <FormItem label={formatMessage({ id: 'bp.maintain.customerID' })}>{getFieldDecorator('code')(<Input placeholder={formatMessage({ id: 'bp.maintain.inputHere' })} />)}</FormItem>
+        <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
+            <FormItem label={formatMessage({ id: 'bp.customerID' })}>{getFieldDecorator('code')(<Input placeholder={formatMessage({ id: 'bp.inputHere' })} />)}</FormItem>
           </Col>
-          <Col xxl={6} lg={8}>
-            <FormItem label={formatMessage({ id: 'bp.maintain.customerName' })}>{getFieldDecorator('name')(<Input placeholder={formatMessage({ id: 'bp.maintain.inputHere' })} />)}</FormItem>
+          <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
+            <FormItem label={formatMessage({ id: 'bp.customerName' })}>{getFieldDecorator('name')(<Input placeholder={formatMessage({ id: 'bp.inputHere' })} />)}</FormItem>
           </Col>
-          <Col xxl={6} lg={8}>
+          <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
             <FormItem label={formatMessage({ id: 'bp.maintain.mobilePhone' })}>{getFieldDecorator('mobilePhone')(
-            <Input placeholder={formatMessage({ id: 'bp.maintain.inputHere' })} />)}</FormItem>
+            <Input placeholder={formatMessage({ id: 'bp.inputHere' })} />)}</FormItem>
           </Col>
-          <Col xxl={6} lg={8}>
+          <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
               <span className="submitButtons">
               <Button type="primary" htmlType="submit">
                 {formatMessage({ id: 'bp.maintain.search' })}
@@ -478,9 +478,9 @@ constructor(props) {
       loading,
       total,
     } = this.state;
-    const { BpCertificationStatus, salesOrderBlock, CustomerDataStatus } = this.props;
+    const { BpCertificationStatus, salesOrderBlock, CustomerDataStatus, languageCode } = this.props;
     const data = { list, pagination: { current, pageSize, total } };
-
+    console.log(languageCode)
     const CertificationStatus = []; // 认证状态
     const salesBlock = []; // 销售冻结
     const CustomerStatus = []; // 客户数据状态
@@ -630,7 +630,7 @@ constructor(props) {
     ];
     return (
       <PageHeaderWrapper>
-        <Card bordered={false} className="mySet">
+        <Card bordered={false} className={languageCode === 'EN' ? 'mySet' : ''}>
           <div className="tableList">
             <div className="tableListForm">{this.renderForm()}</div>
             <div className="tableListOperator">
