@@ -496,7 +496,7 @@ constructor(props) {
         width: 250,
         render(val, record) {
           return (
-            <Link className={styles.partNer} to={`/bp/maintain/details/${record.id}`}>
+            <Link className={styles.partNer} to={`/bp/maintain/details/${record.id}?type=${record.type}&customerDataStatus=${record.customerDataStatus}&vendorDataStatus=${record.vendorDataStatus}`}>
               <Icon type={record.type === 1 ? 'user' : 'home'} /> &nbsp;{record.name}
                 <div className={styles.partCode}>{val}</div>
             </Link>

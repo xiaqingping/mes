@@ -8,18 +8,22 @@ import {
 } from 'antd';
 import { connect } from 'dva';
 import React from 'react';
+import { formatter } from '@/utils/utils';
 
 const DescriptionsItem = Descriptions.Item;
 
-@connect(({ partnerMaintainEdit, basicCache, global }) => {
+@connect(({ partnerMaintainEdit, basicCache, global, bp }) => {
       // 付款条件
   const paymentTerms = basicCache.paymentTerms.filter(e => e.languageCode === global.languageCode);
+  const currencies = basicCache.currencies.filter(e => e.languageCode === global.languageCode);
   return ({
     paymentTerms,
     purchaseGroups: basicCache.purchaseGroups,
     details: partnerMaintainEdit.supplier,
     purchaseOrganizations: basicCache.purchaseOrganizations,
-})
+    currencies,
+    VendorLevelCode: bp.VendorLevelCode,
+  })
 })
 class PurchasingOrg extends React.Component {
   constructor(props) {
@@ -51,6 +55,10 @@ class PurchasingOrg extends React.Component {
       type: 'basicCache/getCache',
       payload: { type: 'paymentTerms' },
     })
+    this.props.dispatch({
+      type: 'basicCache/getCache',
+      payload: { type: 'currencies' },
+    })
   }
 
   renderTabPane = () => {
@@ -59,9 +67,10 @@ class PurchasingOrg extends React.Component {
       details: { vendor: { purchaseOrganizationList } },
       paymentTerms,
       purchaseGroups,
+      currencies,
+      VendorLevelCode,
     } = this.props;
     let data = null;
-    console.log(paymentTerms, purchaseGroups)
     purchaseOrganizationList.map(item => {
       if (item.purchaseOrganizationCode === tabKey) {
         data = (
@@ -70,7 +79,9 @@ class PurchasingOrg extends React.Component {
               layout="vertical"
               column={8}
             >
-              <DescriptionsItem span={2} label="订单货币">{item.currencyCode}</DescriptionsItem>
+              <DescriptionsItem span={2} label="订单货币">
+                {formatter(currencies, item.currencyCode, 'code', 'shortText')}
+              </DescriptionsItem>
               <DescriptionsItem span={2} label="付款条件">
                 {
                 paymentTerms.filter(e => item.paymentTermsCode === e.code) ?
@@ -79,7 +90,9 @@ class PurchasingOrg extends React.Component {
               </DescriptionsItem>
               <DescriptionsItem span={2} label="销售人员">{item.salerName}</DescriptionsItem>
               <DescriptionsItem span={2} label="销售人员电话">{item.salerTelephone}</DescriptionsItem>
-              <DescriptionsItem span={2} label="供应商级别">{item.levelCode}</DescriptionsItem>
+              <DescriptionsItem span={2} label="供应商级别">
+                {formatter(VendorLevelCode, item.levelCode)}
+              </DescriptionsItem>
               <DescriptionsItem span={2} label="收货时发票过账">
                 {parseInt(item.invoicePostInReceive, 10) === 1 ? '是' : '否'}
               </DescriptionsItem>
@@ -126,75 +139,6 @@ class PurchasingOrg extends React.Component {
       tabKey: obj[index],
     });
   }
-
-  // renderCascader = () => {
-  // const {
-  //     details: { vendor: { purchaseOrganizationList } },
-  //     purchaseOrganizations
-  //   } = this.props;
-  //   const codeList = purchaseOrganizationList.map(e => e.purchaseOrganizationCode);
-  //   // const cascaderTitle = purchaseOrganizationList.map(e => e.purchaseOrganizationCode);
-  //   // console.log(purchaseOrganizations, cascaderTitle)
-  //   const options = purchaseOrganizations.map(e => {
-  //     let disabled = false;
-  //     if (codeList.indexOf(e.code) > -1) {
-  //       disabled = true;
-  //     }
-  //     return { ...e, disabled };
-  //   });
-
-    // return (
-    //   <Cascader
-    //   options={options}
-    //   onChange={this.onCascaderChange}
-    //   fieldNames={{ label: 'name', value: 'code' }}
-    //   >
-    //     <a style={{ fontSize: 14, marginLeft: -16 }} href="#">
-    //       采购组织 <Icon type="down" style={{ fontSize: 12 }} /></a>
-    //   </Cascader>
-    // );
-  // }
-
-  // closeTab = tabKey => {
-  //   let index = -1;
-  //   let key = '';
-  //   const { details } = this.props;
-  //   const { vendor: { purchaseOrganizationList } } = details;
-  //   let { vendor } = details;
-  //   // 过滤掉关闭的采购组织
-  //   const newTabsData = purchaseOrganizationList.filter((e, i) => {
-  //     if (e.purchasingOrganizationCode !== tabKey) return true;
-  //     index = i;
-  //     return false;
-  //   });
-
-  //   // 根据index决定选中哪个Tab
-  //   if (newTabsData.length > 0) {
-  //     // 关闭第一个
-  //     if (index === 0) {
-  //       key = newTabsData[0].purchasingOrganizationCode;
-  //     }
-  //     // 关闭最后一个
-  //     if (index === purchaseOrganizationList.length - 1) {
-  //       key = newTabsData[index - 1].purchasingOrganizationCode;
-  //     }
-  //     // 关闭中间的Tab
-  //     if (index > 0 && index < purchaseOrganizationList.length - 1) {
-  //       key = newTabsData[index].purchasingOrganizationCode;
-  //     }
-  //   } else {
-  //     key = '';
-  //   }
-
-  //   vendor = { ...vendor, ...{ purchasingOrganizationList: newTabsData } }
-  //   this.props.dispatch({
-  //     type: 'partnerMaintainEdit/setSupplier',
-  //     payload: { ...details, vendor },
-  //   });
-  //   this.setState({
-  //     tabKey: key,
-  //   });
-  // }
 
   render() {
     const { details, purchaseOrganizations } = this.props;

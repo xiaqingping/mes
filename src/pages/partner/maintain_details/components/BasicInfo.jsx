@@ -62,6 +62,7 @@ class BasicInfo extends Component {
       salesPaymentMethods,
       industry,
     } = this.props;
+    if (!basic) return null
     if (!countryDiallingCodes && !salesPaymentMethods) return null;
     if (industry.length === 0) return null;
     // let newData = []
@@ -82,6 +83,7 @@ class BasicInfo extends Component {
           <DescriptionsItem span={2} label="名称">
             <Icon type={basic.type === 1 ? 'user' : 'home'} />
             &nbsp;&nbsp;
+            {basic.type === 1 ? '个人' : '组织'}&nbsp;&nbsp;
             {basic.name}&nbsp;&nbsp;&nbsp;
             {basic.certificationStatus === 2 ? (
               <Badge status="warning" text="审核中" />
