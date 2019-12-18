@@ -129,22 +129,30 @@ const SeqModel = {
     ],
     // 验证记录状态
     VerifyRecordStatus: [
+      // 验证中
       {
         value: 1,
         text: formatMessage({ id: 'bp.verification.verfication' }),
         status: 'warning',
       },
+      // 已验证
       {
         value: 2,
         text: formatMessage({ id: 'bp.verification.completed' }),
         status: 'success',
       },
+      // 已拒绝
       {
         value: 3,
         text: formatMessage({ id: 'bp.verification.rejected' }),
         status: 'error',
       },
-      { value: 4, text: formatMessage({ id: 'bp.verification.expired' }), status: 'error' },
+      // 已过期
+      {
+        value: 4,
+        text: formatMessage({ id: 'bp.verification.expired' }),
+        status: 'error',
+      },
     ],
     // 验证类型
     VerifyRecordType: [
