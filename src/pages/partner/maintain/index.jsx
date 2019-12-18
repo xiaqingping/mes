@@ -480,7 +480,6 @@ constructor(props) {
     } = this.state;
     const { BpCertificationStatus, salesOrderBlock, CustomerDataStatus, languageCode } = this.props;
     const data = { list, pagination: { current, pageSize, total } };
-    console.log(languageCode)
     const CertificationStatus = []; // 认证状态
     const salesBlock = []; // 销售冻结
     const CustomerStatus = []; // 客户数据状态
