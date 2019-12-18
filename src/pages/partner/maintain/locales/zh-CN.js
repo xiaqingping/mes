@@ -1,6 +1,5 @@
 export default {
   // 搜索部分
-  'bp.maintain.customerID': '编号',
   'bp.maintain.customerName': '名称',
   'bp.maintain.mobilePhone': '移动电话',
   'bp.maintain.email': 'Email',
@@ -11,8 +10,6 @@ export default {
   'bp.maintain.salesArea': '区域归属',
   'bp.maintain.salesRep': '销售归属',
   'bp.maintain.billToParty': '收票方',
-  'bp.maintain.inputHere': '请输入',
-  'bp.maintain.pleaseSelect': '请选择',
 
   // 表格部分
   'bp.maintain.businessPartner': '业务伙伴',

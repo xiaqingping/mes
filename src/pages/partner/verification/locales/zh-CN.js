@@ -1,6 +1,5 @@
 export default {
   // 搜索和标题
-  'bp.verification.customerID': '编号',
   'bp.verification.operationCode': '操作编号',
   'bp.verification.businessPartner': '业务伙伴',
   'bp.verification.type': '类型',
@@ -8,8 +7,6 @@ export default {
   'bp.verification.completeTime': '完成时间',
   'bp.verification.expiryDate': '过期时间',
   'bp.verification.apprpvalBy': '审核人',
-  'bp.verification.inputHere': '请输入',
-  'bp.verification.pleaseSelect': '请选择',
   'bp.verification.operator': '操作人',
   'bp.verification.operation': '操作',
   // 按钮
@@ -32,6 +29,15 @@ export default {
   'bp.verification.completed': '已验证',
   'bp.verification.rejected': '已拒绝',
   'bp.verification.expired': '已过期',
+  'bp.verification.mobilePhone': '手机',
+  'bp.verification.email': '邮箱',
+  'bp.verification.user': '用户',
+  'bp.verification.manualAudit': '人工审核',
+  'bp.verification.validateLogon': '登录验证',
+  'bp.verification.selfHelpVerification': '自助验证',
+  'bp.verification.verifyCellPhone': '验证手机',
+  'bp.verification.verifyMailbox': '验证邮箱',
+  'bp.verification.question': '问题',
   // 变更已验证手机和邮箱页面
   'bp.verification.changeVerifiedPhoneAndEmail': '变更已验证手机和邮箱',
   'bp.verification.changeVerifiedPhoneAndEmail.changeType': '变更类型：',

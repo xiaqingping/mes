@@ -20,20 +20,20 @@ const SeqModel = {
     ],
     // PI认证状态
     PiCertificationStatus: [
-      { id: 1, name: '审核中', badge: 'warning' },
-      { id: 2, name: '已认证', badge: 'success' },
-      { id: 3, name: '未认证', badge: 'default' },
+      { id: 1, name: formatMessage({ id: 'bp.maintain.processing' }), badge: 'warning' },
+      { id: 2, name: formatMessage({ id: 'bp.maintain.approveds' }), badge: 'success' },
+      { id: 3, name: formatMessage({ id: 'bp.maintain.unapproved' }), badge: 'default' },
     ],
     // 操作项状态
     BpOperationItemStatus: [
-      { id: 1, name: '待验证' },
-      { id: 2, name: '已完成' },
-      { id: 3, name: '已拒绝' },
+      { id: 1, name: formatMessage({ id: 'bp.operation.needVerified' }) },
+      { id: 2, name: formatMessage({ id: 'bp.operation.finished' }) },
+      { id: 3, name: formatMessage({ id: 'bp.operation.rejected' }) },
     ],
     // 操作记录类型
     BpOperationRecordType: [
-      { id: 1, name: '新增' },
-      { id: 2, name: '修改' },
+      { id: 1, name: formatMessage({ id: 'action.add' }) },
+      { id: 2, name: formatMessage({ id: 'action.change' }) },
     ],
     // 业务伙伴类别
     BpType: [
@@ -67,18 +67,18 @@ const SeqModel = {
     ],
     // 邮箱认证状态
     EmailVerifyStatus: [
-      { id: 'N', name: '未验证' },
-      { id: 'Y', name: '已验证' },
+      { id: 'N', name: formatMessage({ id: 'bp.EmailVerifyStatus.unverified' }) },
+      { id: 'Y', name: formatMessage({ id: 'bp.EmailVerifyStatus.verified' }) },
     ],
     // 手机验证状态
     MobilePhoneVerifyStatus: [
-      { id: 'N', name: '未验证' },
-      { id: 'Y', name: '已验证' },
+      { id: 'N', name: formatMessage({ id: 'bp.EmailVerifyStatus.unverified' }) },
+      { id: 'Y', name: formatMessage({ id: 'bp.EmailVerifyStatus.verified' }) },
     ],
     // 随货开票
     InvoiceWithGood: [
-      { id: 1, name: '是' },
-      { id: 2, name: '否' },
+      { id: 1, name: formatMessage({ id: 'bp.InvoiceWithGood.yes' }) },
+      { id: 2, name: formatMessage({ id: 'bp.InvoiceWithGood.no' }) },
     ],
     // 付款条件
     PaymentTerms: [
@@ -91,8 +91,8 @@ const SeqModel = {
     ],
     // 销售范围冻结状态
     SalesOrderBlock: [
-      { id: 1, name: '冻结' },
-      { id: 2, name: '正常' },
+      { id: 1, name: formatMessage({ id: 'bp.block' }) },
+      { id: 2, name: formatMessage({ id: 'bp.normal' }) },
     ],
     // 装运条件
     ShippingCondition: [{ id: '01', name: '标准' }],

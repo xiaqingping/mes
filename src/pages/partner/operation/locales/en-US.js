@@ -1,5 +1,4 @@
 export default {
-  'bp.operation.code': 'Customer ID',
   'bp.operation.businessPartners': 'Business Part',
   'bp.operation.type': 'Type',
   'bp.operation.state': 'Status',

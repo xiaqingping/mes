@@ -1,6 +1,5 @@
 export default {
   // 搜索和标题
-  'bp.verification.customerID': 'Customer ID',
   'bp.verification.operationCode': 'Operation Code',
   'bp.verification.businessPartner': 'Business Partner',
   'bp.verification.type': 'Type',
@@ -8,8 +7,6 @@ export default {
   'bp.verification.completeTime': 'Complete Time',
   'bp.verification.expiryDate': 'Expiry Date',
   'bp.verification.apprpvalBy': 'Apprpval By',
-  'bp.verification.inputHere': 'input here',
-  'bp.verification.pleaseSelect': 'please select',
   'bp.verification.operator': 'Operator',
   'bp.verification.operation': 'Operation',
   // 按钮
@@ -32,6 +29,15 @@ export default {
   'bp.verification.completed': 'Completed',
   'bp.verification.rejected': 'Rejected',
   'bp.verification.expired': 'Expired',
+  'bp.verification.mobilePhone': 'Mobile Phone',
+  'bp.verification.email': 'E-Mail',
+  'bp.verification.user': 'User',
+  'bp.verification.manualAudit': 'Manual Audit',
+  'bp.verification.validateLogon': 'Validate Logon',
+  'bp.verification.selfHelpVerification': 'Self Help Verification',
+  'bp.verification.verifyCellPhone': 'Verify Cell Phone',
+  'bp.verification.verifyMailbox': 'Verify Mailbox',
+  'bp.verification.question': 'Question',
   // 变更已验证手机和邮箱页面
   'bp.verification.changeVerifiedPhoneAndEmail': 'change Verified Phone and Email',
   'bp.verification.changeVerifiedPhoneAndEmail.changeType': 'Change Type:',

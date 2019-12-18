@@ -1,5 +1,4 @@
 export default {
-  'bp.operation.code': '编号',
   'bp.operation.businessPartners': '业务伙伴',
   'bp.operation.type': '类型',
   'bp.operation.state': '状态',
