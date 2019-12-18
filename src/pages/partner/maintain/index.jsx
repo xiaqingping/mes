@@ -446,7 +446,7 @@ constructor(props) {
             <FormItem label={formatMessage({ id: 'bp.customerID' })}>{getFieldDecorator('code')(<Input placeholder={formatMessage({ id: 'bp.inputHere' })} />)}</FormItem>
           </Col>
           <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
-            <FormItem label={formatMessage({ id: 'bp.customerName' })}>{getFieldDecorator('name')(<Input placeholder={formatMessage({ id: 'bp.inputHere' })} />)}</FormItem>
+            <FormItem label={formatMessage({ id: 'bp.maintain.customerName' })}>{getFieldDecorator('name')(<Input placeholder={formatMessage({ id: 'bp.inputHere' })} />)}</FormItem>
           </Col>
           <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
             <FormItem label={formatMessage({ id: 'bp.maintain.mobilePhone' })}>{getFieldDecorator('mobilePhone')(
