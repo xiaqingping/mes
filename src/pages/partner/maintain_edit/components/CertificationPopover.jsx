@@ -2,8 +2,9 @@
  * 认证气泡框
  */
 import React from 'react';
-import { Badge, Spin, Empty } from 'antd';
+import { Badge, Spin, Empty, Popover } from 'antd';
 import { connect } from 'dva';
+import moment from 'moment';
 import api from '@/api';
 
 @connect(({ bp }) => ({
@@ -22,62 +23,17 @@ class CertificationPopover extends React.Component {
   }
 
   componentDidMount() {
-    const { id } = this.props;
-    api.bp.getLastVerifyRecords(id).then(data => {
+    const { id, billToPartyId } = this.props;
+    api.bp.getLastVerifyRecords(id, { billToPartyId }).then(data => {
       this.setState({ data, loading: false });
     });
   }
 
-  renderOrg = () => {
-    const { VerifyRecordStatus } = this.props;
-    const { data } = this.state;
-    const status = VerifyRecordStatus.filter(e => data.status === e.value)[0];
-    return (
-      <>
-        <div>
-          <strong style={{ color: '#444' }}>{data.organizationCertification.name}</strong>
-        </div>
-        <div style={{ marginTop: 10 }}>{data.bpCode}</div>
-        <div style={{ marginTop: 10 }}>
-          <Badge status={status.status} text={status.text} />
-          <span style={{ marginLeft: '1em' }}>{data.operationDate}</span>
-        </div>
-        <div style={{ marginTop: 10 }}>
-          <span>{data.approverName}</span>
-          <span>{data.finishDate}</span>
-        </div>
-      </>
-    );
-  };
-
-  renderPi = () => {
-    const { VerifyRecordStatus } = this.props;
-    const { data } = this.state;
-    const status = VerifyRecordStatus.filter(e => data.status === e.value)[0];
-    return (
-      <>
-        <div>
-          <strong style={{ color: '#444' }}>{data.organizationCertification.name}</strong>
-        </div>
-        <div style={{ marginTop: 10 }}>{data.bpCode}</div>
-        <div style={{ marginTop: 10 }}>
-          {/* <span>{lastVerifyRecords.operatorName}</span>&nbsp; */}
-          <Badge status={status.status} text={status.text} />
-          &nbsp;
-          <span>{data.operationDate}</span>
-        </div>
-        <div style={{ marginTop: 10 }}>
-          <span>{data.approverName}</span>
-          <span>{data.finishDate}</span>
-        </div>
-      </>
-    );
-  };
-
-  render() {
-    const { type } = this.props;
+  renderPopover = () => {
+    const { type, VerifyRecordStatus } = this.props;
     const { data, loading } = this.state;
     const style = { width: 280, height: 145, color: '#999' };
+    if (type === 1) style.height = 115;
 
     if (loading) {
       return (
@@ -95,13 +51,58 @@ class CertificationPopover extends React.Component {
       );
     }
 
+    const status = VerifyRecordStatus.filter(e => data.status === e.value)[0];
+
     return (
       <div style={style}>
-        {type === 1 ? this.renderPi() : this.renderOrg()}
+        <div>
+          <strong style={{ color: '#444' }}>
+            {type === 1 ? data.piCertification.billToPartyName : null}
+            {type === 2 ? data.organizationCertification.name : null}
+          </strong>
+        </div>
+        {type === 2 ? (
+          <div style={{ marginTop: 10 }}>{data.organizationCertification.taxNo}</div>
+        ) : null}
+        <div style={{ marginTop: 10 }}>
+          <Badge status={status.status} text={status.text} />
+          {/* 验证中 显示过期时间 */}
+          {data.status === 1 ? (
+            <span style={{ marginLeft: '1em' }}>{moment(data.expireDate).fromNow()}过期</span>
+          ) : null}
+          {/* 已验证 显示完成人和完成时间 */}
+          {/* 已拒绝 显示拒绝人和拒绝时间 */}
+          {data.status === 2 || data.status === 3 ? (
+            <>
+              <span style={{ marginLeft: '0.5em' }}>({data.finisherName})</span>
+              <span style={{ marginLeft: '2em' }}>{data.finishDate}</span>
+            </>
+          ) : null}
+        </div>
+        <div style={{ marginTop: 10 }}>
+          <span>{data.operatorName}</span>
+          <span style={{ marginLeft: '1.5em' }}>{data.operationDate}</span>
+        </div>
         <div style={{ textAlign: 'right', marginTop: 10 }}>
           <a>查看更多</a>
         </div>
       </div>
+    );
+  };
+
+  render() {
+    const { data, loading } = this.state;
+
+    // 没有认证记录的不显示气泡框
+    if (!loading && !data) {
+      return this.props.children;
+    }
+
+    const content = this.renderPopover();
+    return (
+      <Popover content={content} placement="topLeft">
+        {this.props.children}
+      </Popover>
     );
   }
 }
