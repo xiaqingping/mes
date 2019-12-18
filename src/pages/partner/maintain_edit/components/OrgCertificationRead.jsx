@@ -2,7 +2,7 @@
  * 组织认证查看
  */
 import React from 'react';
-import { Form, Card, Row, Col, Badge, Upload, Popconfirm, Popover } from 'antd';
+import { Form, Card, Row, Col, Badge, Upload, Popconfirm } from 'antd';
 import { connect } from 'dva';
 import { formatMessage } from 'umi-plugin-react/locale';
 import ChangeModal from '@/pages/partner/maintain/components/ChangeModal';
@@ -47,16 +47,15 @@ class OrgCertificationRead extends React.Component {
   renderStatus = () => {
     const { basic } = this.props;
     let status = null;
-    const content = <CertificationPopover id={basic.id} type={basic.type} />;
 
     switch (basic.certificationStatus) {
       case 1:
         status = (
           <>
             <Badge status="default" text="未认证" />
-            <Popover content={content} placement="topRight">
+            <CertificationPopover id={basic.id} type={basic.type}>
               <a className={styles.changeButton}>认证</a>
-            </Popover>
+            </CertificationPopover>
           </>
         );
         break;
@@ -64,9 +63,9 @@ class OrgCertificationRead extends React.Component {
         status = (
           <>
             <Badge status="warning" text="审核中" />
-            <Popover content={content} placement="topRight">
+            <CertificationPopover id={basic.id} type={basic.type}>
               <a className={styles.changeButton}>查看</a>
-            </Popover>
+            </CertificationPopover>
           </>
         );
         break;
@@ -74,7 +73,7 @@ class OrgCertificationRead extends React.Component {
         status = (
           <>
             <Badge status="success" text="已认证" />
-            <Popover content={content} placement="topRight">
+            <CertificationPopover id={basic.id} type={basic.type}>
               <a
                 className={styles.changeButton}
                 onClick={() => {
@@ -83,7 +82,7 @@ class OrgCertificationRead extends React.Component {
               >
                 变更
               </a>
-            </Popover>
+            </CertificationPopover>
             <Popconfirm
               title="确认取消认证？"
               onConfirm={this.cancelCertification}

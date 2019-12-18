@@ -3,8 +3,11 @@ module.exports = {
   path: '/dashboard',
   name: 'dashboard',
   icon: 'smile',
-  // redirect: '/dashboard/sale',
   routes: [
+    {
+      path: '/dashboard',
+      redirect: '/dashboard/sale',
+    },
     {
       name: 'sale',
       path: '/dashboard/sale',

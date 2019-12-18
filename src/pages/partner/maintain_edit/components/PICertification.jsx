@@ -5,7 +5,7 @@ import { Button, Card, Icon, List, Typography, Divider, Badge, Upload, Empty } f
 import React from 'react';
 import { connect } from 'dva';
 import { FormattedMessage, formatMessage } from 'umi-plugin-react/locale';
-
+import CertificationPopover from './CertificationPopover';
 import PICertificationAddModal from './PICertificationAddModal';
 import api from '@/api';
 
@@ -32,6 +32,7 @@ class PersonCertification extends React.Component {
 
   renderListItem = item => {
     const { editType, details } = this.props;
+    const { basic } = details;
     let fileList = [];
     if (item && item.attachmentList) {
       fileList = item.attachmentList.map(e => ({
@@ -67,8 +68,24 @@ class PersonCertification extends React.Component {
             }
           >
             <div style={{ marginBottom: '.8em' }}>
-              {item.status === 1 ? <Badge status="warning" text="审核中" /> : null}
-              {item.status === 2 ? <Badge status="success" text="已认证" /> : null}
+              {item.status === 1 ? (
+                <CertificationPopover
+                  id={basic.id}
+                  type={basic.type}
+                  billToPartyId={item.billToPartyId}
+                >
+                  <Badge status="warning" text="审核中" />
+                </CertificationPopover>
+              ) : null}
+              {item.status === 2 ? (
+                <CertificationPopover
+                  id={basic.id}
+                  type={basic.type}
+                  billToPartyId={item.billToPartyId}
+                >
+                  <Badge status="success" text="已认证" />
+                </CertificationPopover>
+              ) : null}
               {item.status === 3 ? <Badge status="default" text="未认证" /> : null}
             </div>
             <Paragraph
