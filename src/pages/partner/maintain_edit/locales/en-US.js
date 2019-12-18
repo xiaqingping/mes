@@ -48,6 +48,12 @@ export default {
   'bp.maintain_details.purchase_org.purchase_organization': 'Purchase Organization',
   'bp.maintain_details.purchase_org.delivery_time_plan': 'Delivery Time(Plan)',
   'bp.maintain_details.purchase_org.procurement_block': 'Procurement Block',
+  // 付款银行
+  'bp.maintain_details.bank': 'Payment Bank Information',
+  'bp.maintain_details.bank.country': 'Country',
+  'bp.maintain_details.bank.bank_name': 'Bank Name',
+  'bp.maintain_details.bank.bank_account': 'Bank Account',
+  'bp.maintain_details.bank.contact_name': 'Contact Name',
   // 信贷数据
   'bp.maintain_details.credit_management': 'Credit Management',
   'bp.maintain_details.credit_management.credit_adjustment': 'Credit Adjustment',
@@ -70,7 +76,6 @@ export default {
   // PI认证
   'bp.maintain_details.PI_verification': 'PI Verification',
   'bp.maintain_details.PI_verification.submit_certification': 'Submit certification',
-
   // 收货地址
   'bp.maintain_details.shipping_address': 'Shipping Address',
   'bp.maintain_details.shipping_address.address': 'Address',

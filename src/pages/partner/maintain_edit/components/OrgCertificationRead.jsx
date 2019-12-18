@@ -47,7 +47,7 @@ class OrgCertificationRead extends React.Component {
   renderStatus = () => {
     const { basic } = this.props;
     let status = null;
-    const content = <CertificationPopover id={basic.id} />;
+    const content = <CertificationPopover id={basic.id} type={basic.type} />;
 
     switch (basic.certificationStatus) {
       case 1:

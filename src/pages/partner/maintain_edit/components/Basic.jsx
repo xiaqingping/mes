@@ -334,13 +334,15 @@ class Basic extends React.Component {
     const type1 = (
       <span>
         <Icon type="user" />
-        &nbsp;个人
+        &nbsp;
+        <FormattedMessage id="bp.maintain_details.person" />
       </span>
     );
     const type2 = (
       <span>
         <Icon type="home" />
-        &nbsp;组织
+        &nbsp;
+        <FormattedMessage id="bp.maintain_details.organization" />
       </span>
     );
 

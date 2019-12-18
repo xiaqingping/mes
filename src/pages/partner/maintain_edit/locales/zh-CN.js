@@ -2,7 +2,7 @@ export default {
   // 本页通用数据
   'bp.maintain_details.customer': '客户',
   'bp.maintain_details.vendor': '供应商',
-  'bp.maintain_details.person': '个人',
+  'bp.maintain_details.person': '人员',
   'bp.maintain_details.organization': '组织',
   'bp.maintain_details.status': '状态',
   'bp.maintain_details.change': '变更',
@@ -48,6 +48,12 @@ export default {
   'bp.maintain_details.purchase_org.purchase_organization': '采购组',
   'bp.maintain_details.purchase_org.delivery_time_plan': '计划交货时间',
   'bp.maintain_details.purchase_org.procurement_block': '采购冻结',
+  // 付款银行
+  'bp.maintain_details.bank': '付款银行',
+  'bp.maintain_details.bank.country': '国家',
+  'bp.maintain_details.bank.bank_name': '开户行',
+  'bp.maintain_details.bank.bank_account': '银行账户',
+  'bp.maintain_details.bank.contact_name': '户名',
   // 信贷数据
   'bp.maintain_details.credit_management': '信贷数据',
   'bp.maintain_details.credit_management.credit_adjustment': '额度调整',
@@ -70,7 +76,6 @@ export default {
   // PI认证
   'bp.maintain_details.PI_verification': 'PI认证',
   'bp.maintain_details.PI_verification.submit_certification': '提交认证',
-
   // 收货地址
   'bp.maintain_details.shipping_address': '收货地址',
   'bp.maintain_details.shipping_address.address': '地址',

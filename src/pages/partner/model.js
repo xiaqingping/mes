@@ -32,8 +32,10 @@ const SeqModel = {
     ],
     // 业务伙伴类别
     BpType: [
-      { id: 1, name: '人员' },
-      { id: 2, name: '组织' },
+      // 人员
+      { id: 1, name: formatMessage({ id: 'bp.maintain_details.person' }) },
+      // 组织
+      { id: 2, name: formatMessage({ id: 'bp.maintain_details.organization' }) },
     ],
     // 国家代码
     CountryCode: [
