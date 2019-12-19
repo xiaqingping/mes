@@ -3,7 +3,7 @@ import React from 'react';
 import { connect } from 'dva';
 import api from '@/api';
 import { formatMessage } from 'umi-plugin-react/locale';
-
+import CertificationPopover from '@/pages/partner/maintain_edit/components/CertificationPopover';
 import PersonCertificationAddModal from './PersonCertificationAddModal';
 
 const { Paragraph } = Typography;
@@ -78,6 +78,7 @@ class PersonCertification extends React.Component {
   }
 
   renderListItem = item => {
+    const { details } = this.props;
     if (item && item.id) {
       return (
         <List.Item key={item.id}>
@@ -91,8 +92,16 @@ class PersonCertification extends React.Component {
             }
           >
             <div style={{ marginBottom: '.8em' }}>
-              <Badge status={verifyStatus[item.status].value}
-              text={verifyStatus[item.status].text}/>
+              <CertificationPopover
+                id={details.basic.id}
+                type={details.basic.type}
+                billToPartyId={item.billToPartyId}
+              >
+                <Badge
+                  status={verifyStatus[item.status].value}
+                  text={verifyStatus[item.status].text}
+                />
+              </CertificationPopover>
             </div>
             <Paragraph
               style={{ minHeight: 42 }}

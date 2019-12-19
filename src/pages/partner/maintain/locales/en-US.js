@@ -35,10 +35,6 @@ export default {
     'bp.maintain.approval': 'Approval',
 
     // 枚举值
-    'bp.maintain.unapproved': 'Unapproved',
-    'bp.maintain.processing': 'Processing',
-    'bp.maintain.partialApproved': 'Partial Approved',
-    'bp.maintain.approveds': 'Approved',
     'bp.maintain.blocked': 'Blocked',
     'bp.maintain.actived': 'Actived',
     'bp.maintain.completed': 'Completed',
