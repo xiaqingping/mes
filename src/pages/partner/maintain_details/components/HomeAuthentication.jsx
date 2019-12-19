@@ -83,7 +83,7 @@ class BasicInfo extends Component {
     if (parseInt(v, 10) === 4) {
       return (
         <>
-          <CertificationPopover id={details.basic.id} type={details.basic.type}>
+          <CertificationPopover basic={details.basic}>
             <a
               onClick={() => {
                 this.showChange.visibleShow(true, this.props.details.basic);
@@ -107,7 +107,7 @@ class BasicInfo extends Component {
     if (parseInt(v, 10) === 1) {
       return (
         <>
-          <CertificationPopover id={details.basic.id} type={details.basic.type}>
+          <CertificationPopover basic={details.basic}>
             <a
               onClick={() => {
                 this.showChange.visibleShow(true, this.props.details.basic);
@@ -122,7 +122,7 @@ class BasicInfo extends Component {
     if (parseInt(v, 10) === 2) {
       return (
         <>
-          <CertificationPopover id={details.basic.id} type={details.basic.type}>
+          <CertificationPopover basic={details.basic}>
             <a>
               查看
             </a>

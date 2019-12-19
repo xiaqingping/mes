@@ -93,8 +93,7 @@ class PersonCertification extends React.Component {
           >
             <div style={{ marginBottom: '.8em' }}>
               <CertificationPopover
-                id={details.basic.id}
-                type={details.basic.type}
+                basic={details.basic}
                 billToPartyId={item.billToPartyId}
               >
                 <Badge
