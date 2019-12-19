@@ -6,6 +6,7 @@ import './style.less';
 import ChangeModal from '@/pages/partner/maintain/components/ChangeModal';
 import ContactInformation from '@/pages/partner/maintain_edit/components/ContactInformation';
 import api from '@/api';
+import CertificationPopover from '@/pages/partner/maintain_edit/components/CertificationPopover';
 
 const DescriptionsItem = Descriptions.Item;
 
@@ -16,7 +17,7 @@ const renzhengMap = {
     text: '未认证',
   },
   2: {
-    value: 'processing',
+    value: 'warning',
     text: '审核中',
   },
   4: {
@@ -77,6 +78,61 @@ class BasicInfo extends Component {
     }
   };
 
+  // 根据状态来判断后面显示的内容
+  certificationStatus = (v, details) => {
+    if (parseInt(v, 10) === 4) {
+      return (
+        <>
+          <CertificationPopover id={details.basic.id} type={details.basic.type}>
+            <a
+              onClick={() => {
+                this.showChange.visibleShow(true, this.props.details.basic);
+              }}
+            >
+              变更
+            </a>
+          </CertificationPopover>
+          &nbsp;&nbsp;
+          <a
+            href="#"
+            onClick={e => {
+              this.cancelIdent(e, details);
+            }}
+          >
+            取消认证
+          </a>
+        </>
+      )
+    }
+    if (parseInt(v, 10) === 1) {
+      return (
+        <>
+          <CertificationPopover id={details.basic.id} type={details.basic.type}>
+            <a
+              onClick={() => {
+                this.showChange.visibleShow(true, this.props.details.basic);
+              }}
+            >
+              认证
+            </a>
+          </CertificationPopover>
+        </>
+      )
+    }
+    if (parseInt(v, 10) === 2) {
+      return (
+        <>
+          <CertificationPopover id={details.basic.id} type={details.basic.type}>
+            <a>
+              查看
+            </a>
+          </CertificationPopover>
+        </>
+      )
+    }
+    return ''
+  }
+
   render() {
     const { details } = this.props;
     const { pic } = this.state;
@@ -95,29 +151,8 @@ class BasicInfo extends Component {
                   status={renzhengMap[details.basic.certificationStatus].value}
                   text={renzhengMap[details.basic.certificationStatus].text}
                 />
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                {parseInt(details.basic.certificationStatus, 10) === 4 ? (
-                  <>
-                    <a
-                      onClick={() => {
-                        this.showChange.visibleShow(true, this.props.details.basic);
-                      }}
-                    >
-                      变更
-                    </a>
-                    &nbsp;&nbsp;
-                    <a
-                      href="#"
-                      onClick={e => {
-                        this.cancelIdent(e, details);
-                      }}
-                    >
-                      取消认证
-                    </a>
-                  </>
-                ) : (
-                  ''
-                )}
+                &nbsp;&nbsp;&nbsp;&nbsp;
+                { this.certificationStatus(details.basic.certificationStatus, details)}
               </DescriptionsItem>
               <DescriptionsItem label="增值税专用发票资质">
                 {details.organizationCertification
@@ -156,8 +191,8 @@ class BasicInfo extends Component {
                   {pic.length !== 0 ? (
                     <>
                       {pic.map((item, index) => (
-                        // eslint-disable-next-line react/no-array-index-key
                         <li
+                          // eslint-disable-next-line react/no-array-index-key
                           key={index}
                           style={{
                             width: '100px',

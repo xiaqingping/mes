@@ -20,6 +20,7 @@ import React from 'react';
 import router from 'umi/router';
 import Link from 'umi/link';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
+import { formatter } from '@/utils/utils';
 import StandardTable from '@/components/StandardTable';
 import { connect } from 'dva';
 import _ from 'lodash';
@@ -30,26 +31,6 @@ import api from '@/api';
 
 const FormItem = Form.Item;
 const { Option } = Select;
-
-// 认证
-const renzhengMap = {
-  1: {
-    value: 'default',
-    text: formatMessage({ id: 'bp.maintain.unapproved' }),
-  },
-  2: {
-    value: 'processing',
-    text: formatMessage({ id: 'bp.maintain.processing' }),
-  },
-  4: {
-    value: 'success',
-    text: formatMessage({ id: 'bp.maintain.approveds' }),
-  },
-  3: {
-    value: 'warning',
-    text: formatMessage({ id: 'bp.maintain.partialApproved' }),
-  },
-};
 
 // 冻结
 const dongjieMap = {
@@ -79,11 +60,11 @@ const wanzhengMap = {
 const mobileIden = {
   0: {
     value: 'default',
-    text: formatMessage({ id: 'bp.maintain.unapproved' }),
+    text: formatMessage({ id: 'bp.unapproved' }),
   },
   1: {
     value: 'success',
-    text: formatMessage({ id: 'bp.maintain.approveds' }),
+    text: formatMessage({ id: 'bp.approveds' }),
   },
 };
 
@@ -91,11 +72,11 @@ const mobileIden = {
 const emailIden = {
   0: {
     value: 'default',
-    text: formatMessage({ id: 'bp.maintain.unapproved' }),
+    text: formatMessage({ id: 'bp.unapproved' }),
   },
   1: {
     value: 'success',
-    text: formatMessage({ id: 'bp.maintain.approveds' }),
+    text: formatMessage({ id: 'bp.approveds' }),
   },
 };
 
@@ -448,7 +429,7 @@ constructor(props) {
           <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
             <FormItem label={formatMessage({ id: 'bp.maintain.customerName' })}>{getFieldDecorator('name')(<Input placeholder={formatMessage({ id: 'bp.inputHere' })} />)}</FormItem>
           </Col>
-          <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
+          <Col xxl={6} lg={languageCode === 'EN' ? 12 : 0}>
             <FormItem label={formatMessage({ id: 'bp.maintain.mobilePhone' })}>{getFieldDecorator('mobilePhone')(
             <Input placeholder={formatMessage({ id: 'bp.inputHere' })} />)}</FormItem>
           </Col>
@@ -510,7 +491,7 @@ constructor(props) {
         onFilter: (value, record) =>
         record.certificationStatus.toString().indexOf(value.toString()) === 0,
         render(val) {
-          return <Badge status={renzhengMap[val].value} text={renzhengMap[val].text} />;
+          return <Badge status={formatter(BpCertificationStatus, val, 'id', 'badge')} text={formatter(BpCertificationStatus, val, 'id', 'name')} />;
         },
       },
       {

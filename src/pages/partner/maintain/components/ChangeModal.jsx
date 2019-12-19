@@ -558,6 +558,7 @@ class ChangeModal extends Component {
       deletePiCertificationIdList: [],
       gtype: 0,
       pageLoading: true,
+      defaultAddress: '',
     });
   };
 
@@ -624,6 +625,11 @@ class ChangeModal extends Component {
         });
       }
     } else {
+      if (v) {
+        this.setState({
+          gtype: 4,
+        });
+      }
       if (v === 'CN') {
         this.setState({
           gtype: 1,
@@ -632,11 +638,6 @@ class ChangeModal extends Component {
       if (v === 'GB') {
         this.setState({
           gtype: 3,
-        });
-      }
-      if (v) {
-        this.setState({
-          gtype: 4,
         });
       }
     }
@@ -765,7 +766,6 @@ class ChangeModal extends Component {
     const { getFieldDecorator } = form;
     // console.log(area)
     // console.log(form.getFieldValue('address'))
-    console.log(address);
     if (gtype === 1) {
       return (
         <Col lg={24} md={12} sm={12}>
@@ -1110,20 +1110,16 @@ class ChangeModal extends Component {
         name="files"
         multiple
         listType="picture-card"
-        // className="avatar-uploader"
         showUploadList
-        // fileList={ fileList }
         action={uploadUrl}
-        // beforeUpload={beforeUpload}
         onChange={this.handleChange}
         headers={{ Authorization: this.props.authorization }}
         accept=".jpg"
-        // onRemove={e => { this.removePic(e) }}
       >
         {uploadButton}
       </Upload>
     );
-    console.log(gtype)
+
     if (gtype === 2) {
       modelWidth = 830;
 

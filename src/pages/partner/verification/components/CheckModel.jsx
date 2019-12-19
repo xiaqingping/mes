@@ -17,72 +17,7 @@ import styles from './index.less';
 import api from '@/api';
 import CheckEmail from '@/pages/partner/maintain_details/components/CheckEmail';
 import CheckPhone from '@/pages/partner/maintain_details/components/CheckPhone';
-
-// const FormItem = Form.Item;
-/** verify state */
-const verifyData = {
-  1: {
-    value: 'warning',
-    text: formatMessage({ id: 'bp.verification.verfication' }),
-  },
-  2: {
-    value: 'success',
-    text: formatMessage({ id: 'bp.verification.completed' }),
-  },
-  3: {
-    value: 'error',
-    text: formatMessage({ id: 'bp.verification.rejected' }),
-  },
-  4: {
-    value: 'error',
-    text: formatMessage({ id: 'bp.verification.expired' }),
-  },
-}
-
-const verifyType = {
-  1: {
-    text: formatMessage({ id: 'bp.verification.mobilePhone' }),
-  },
-  2: {
-    text: formatMessage({ id: 'bp.verification.email' }),
-  },
-  3: {
-    text: formatMessage({ id: 'bp.verification.user' }),
-  },
-  4: {
-    text: formatMessage({ id: 'bp.verification.manualAudit' }),
-  },
-}
-
-// 变更渠道
-const verifyChannel = {
-  1: { text: formatMessage({ id: 'bp.verification.validateLogon' }) },
-  2: { text: formatMessage({ id: 'bp.verification.selfHelpVerification' }) },
-}
-
-// 变更类型
-const verifyChangeType = {
-  1: {
-    text: formatMessage({ id: 'bp.verification.verifyCellPhone' }),
-  },
-  2: {
-    text: formatMessage({ id: 'bp.verification.verifyMailbox' }),
-  },
-}
-
-// 验证方式
-const verifyTest = {
-  1: {
-    text: formatMessage({ id: 'bp.verification.mobilePhone' }),
-  },
-  2: {
-    text: formatMessage({ id: 'bp.verification.email' }),
-  },
-  3: {
-    text: formatMessage({ id: 'bp.verification.question' }),
-  },
-}
-
+import { formatter } from '@/utils/utils';
 
 @Form.create()
 @connect(({ bp, basicCache, global }) => {
@@ -412,7 +347,7 @@ class RecordListForm extends React.Component {
               <Col span={8} className={styles.labelName}>
                 {
                   formatMessage({
-                    id: 'bp.verification.organizationVerification.memo',
+                    id: 'bp.verification.PIVerification.memo',
                   })
                 }
               </Col>
@@ -472,6 +407,11 @@ class RecordListForm extends React.Component {
   SpecialInvoice: bp.SpecialInvoice,
   countryDiallingCodes: basicCache.countryDiallingCodes,
   industryCategories: industryCategories.length !== 0 ? industryCategories : [],
+  VerifyLinkSoldToPartyType: bp.VerifyLinkSoldToPartyType,
+  verifyTest: bp.verifyTest,
+  verifyChannel: bp.verifyChannel,
+  verifyChangeType: bp.verifyChangeType,
+  VerifyRecordStatus: bp.VerifyRecordStatus,
   })
 })
 class CheckModel extends React.Component {
@@ -684,7 +624,15 @@ class CheckModel extends React.Component {
       approvedLoading,
       pageLoading,
       emailAccount } = this.state;
-    const { SpecialInvoice, countryDiallingCodes, industryCategories } = this.props;
+    const {
+      SpecialInvoice,
+      countryDiallingCodes,
+      industryCategories,
+      VerifyLinkSoldToPartyType,
+      verifyChannel,
+      verifyChangeType,
+      VerifyRecordStatus,
+      verifyTest } = this.props;
     if (!detailsValue && !picHas) return null
     let modalTitle;
     let modelContent;
@@ -701,7 +649,7 @@ class CheckModel extends React.Component {
                 {formatMessage({ id: 'bp.verification.changeVerifiedPhoneAndEmail.changeType' })}
                 </Col>
               <Col span={16} className={styles.labelVal}>
-                {detailsValue.type ? verifyChangeType[detailsValue.type].text : ''}
+                {detailsValue.type ? formatter(verifyChangeType, detailsValue.type) : ''}
               </Col>
             </Row>
           </li>
@@ -711,7 +659,7 @@ class CheckModel extends React.Component {
               {formatMessage({ id: 'bp.verification.changeVerifiedPhoneAndEmail.changeMethod' })}
               </Col>
               <Col span={16} className={styles.labelVal}>
-                {detailsValue.channel ? verifyChannel[detailsValue.channel].text : ''}
+                {detailsValue.channel ? formatter(verifyChannel, detailsValue.channel) : ''}
               </Col>
             </Row>
           </li>
@@ -725,7 +673,8 @@ class CheckModel extends React.Component {
                 }
               </Col>
               <Col span={16} className={styles.labelVal}>
-                {detailsValue.verifyType ? verifyTest[detailsValue.verifyType].text : ''}
+                {detailsValue.verifyType ?
+                  formatter(verifyTest, detailsValue.verifyType) : ''}
               </Col>
             </Row>
           </li>
@@ -775,9 +724,24 @@ class CheckModel extends React.Component {
                 </Col>
                 <Col span={16} className={styles.labelVal}>
                   {detailsValue.oldContactInfoVerifyCode}&nbsp;&nbsp;&nbsp;&nbsp;
-                  {detailsValue.oldContactInfoVerifyStatus ? <Badge
-                    status={verifyData[detailsValue.oldContactInfoVerifyStatus].value}
-                    text={verifyData[detailsValue.oldContactInfoVerifyStatus].text} /> : ''}
+                  {detailsValue.oldContactInfoVerifyStatus ?
+                    <Badge
+                      status={
+                        formatter(
+                          VerifyRecordStatus,
+                          detailsValue.oldContactInfoVerifyStatus,
+                          'value',
+                          'status')
+                      }
+                      text={
+                        formatter(
+                          VerifyRecordStatus,
+                          detailsValue.oldContactInfoVerifyStatus,
+                          'value',
+                          'text')
+                        }
+                    /> : ''
+                  }
 
                 </Col>
               </Row>
@@ -873,9 +837,23 @@ class CheckModel extends React.Component {
                   </a>
                 </>
                 :
-                (detailsValue.newContactInfoVerifyStatus ? <Badge
-                  status={verifyData[detailsValue.newContactInfoVerifyStatus].value}
-                  text={verifyData[detailsValue.newContactInfoVerifyStatus].text} />
+                (detailsValue.newContactInfoVerifyStatus ?
+                <Badge
+                  status={
+                    formatter(
+                      VerifyRecordStatus,
+                      detailsValue.newContactInfoVerifyStatus,
+                      'value',
+                      'status')
+                  }
+                  text={
+                    formatter(
+                      VerifyRecordStatus,
+                      detailsValue.newContactInfoVerifyStatus,
+                      'value',
+                      'text')
+                    }
+                />
                 : '')
                 }
               </Col>
@@ -1047,9 +1025,23 @@ class CheckModel extends React.Component {
               </Col>
               <Col span={16} className={styles.labelVal}>
                 {detailsValue.verifyCode}&nbsp;&nbsp;&nbsp;&nbsp;
-                {detailsValue.status ? <Badge
-                  status={verifyData[detailsValue.status].value}
-                  text={verifyData[detailsValue.status].text} /> : ''}
+                {detailsValue.status ?
+                  <Badge
+                      status={
+                        formatter(
+                          VerifyRecordStatus,
+                          detailsValue.status,
+                          'value',
+                          'status')
+                      }
+                      text={
+                        formatter(
+                          VerifyRecordStatus,
+                          detailsValue.status,
+                          'value',
+                          'text')
+                        }
+                    /> : ''}
 
               </Col>
             </Row>
@@ -1092,7 +1084,8 @@ class CheckModel extends React.Component {
                 }
               </Col>
               <Col span={16} className={styles.labelVal}>
-                {detailsValue.type ? verifyType[detailsValue.type].text : ''}
+                {detailsValue.type ?
+                formatter(VerifyLinkSoldToPartyType, detailsValue.verifyType) : ''}
               </Col>
             </Row>
           </li>
@@ -1104,7 +1097,7 @@ class CheckModel extends React.Component {
                 }
               </Col>
               <Col span={16} className={styles.labelVal}>
-                {detailsValue.channel ? verifyChannel[detailsValue.channel].text : ''}
+                {detailsValue.channel ? formatter(verifyChannel, detailsValue.channel) : ''}
               </Col>
             </Row>
           </li>
@@ -1140,8 +1133,21 @@ class CheckModel extends React.Component {
               <Col span={16} className={styles.labelVal}>
                 {detailsValue.verifyCode}&nbsp;&nbsp;&nbsp;&nbsp;
                 {detailsValue.status ? <Badge
-                  status={verifyData[detailsValue.status].value}
-                  text={verifyData[detailsValue.status].text} /> : ''}
+                      status={
+                        formatter(
+                          VerifyRecordStatus,
+                          detailsValue.status,
+                          'value',
+                          'status')
+                      }
+                      text={
+                        formatter(
+                          VerifyRecordStatus,
+                          detailsValue.status,
+                          'value',
+                          'text')
+                        }
+                    /> : ''}
 
               </Col>
             </Row>
@@ -1353,7 +1359,7 @@ class CheckModel extends React.Component {
               <Col span={10} className={styles.labelName}>
                 {
                   formatMessage({
-                    id: 'bp.verification.organizationVerification.memo',
+                    id: 'bp.verification.PIVerification.memo',
                   })
                 }
               </Col>

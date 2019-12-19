@@ -15,7 +15,6 @@ export default {
   'bp.operation.query': '查询',
   'bp.operation.reset': '重置',
   'bp.operation.retract': '收起',
-  'bp.operation.view': '查看',
   'bp.operation.newlyBuild': '新建',
   'bp.operation.modify': '修改',
   'bp.operation.unfinished': '未完成',
