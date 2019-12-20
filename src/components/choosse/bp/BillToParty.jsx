@@ -12,7 +12,7 @@ import { formatter } from '@/utils/utils';
 @connect(
   ({ bp }) => ({
     BpCertificationStatus: bp.BpCertificationStatus,
-    SalesOrderBlock: bp.SalesOrderBlock,
+    SalesOrderBlock: bp.salesOrderBlock,
     CustomerDataStatus: bp.CustomerDataStatus,
   }),
   null,
