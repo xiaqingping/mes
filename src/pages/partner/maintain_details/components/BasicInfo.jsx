@@ -1,6 +1,7 @@
 import { Card, Descriptions, Icon, Badge } from 'antd';
 import React, { Component } from 'react';
 import { connect } from 'dva';
+import { formatMessage } from 'umi/locale';
 import CheckPhone from './CheckPhone';
 import CheckEmail from './CheckEmail';
 import ChangeModal from '@/pages/partner/maintain/components/ChangeModal';
@@ -74,63 +75,68 @@ class BasicInfo extends Component {
 
     return (
       <Card
-        title="基础信息"
+        title={formatMessage({ id: 'bp.maintain_details.basic' })}
         className="check-tabs"
         bordered={false}
         style={{ marginBottom: '24px' }}
       >
         <Descriptions className="s-descriptions" layout="vertical" column={8}>
-          <DescriptionsItem span={2} label="名称">
+          <DescriptionsItem span={2} label={formatMessage({ id: 'bp.maintain_details.basic' })}>
             <Icon type={basic.type === 1 ? 'user' : 'home'} />
             &nbsp;&nbsp;
-            {basic.type === 1 ? '个人' : '组织'}&nbsp;&nbsp;
+            {basic.type === 1 ?
+            formatMessage({ id: 'bp.maintain_details.person' }) :
+            formatMessage({ id: 'bp.maintain_details.organization' })}&nbsp;&nbsp;
             {basic.name}&nbsp;&nbsp;&nbsp;
             {basic.certificationStatus === 2 ? (
-              <Badge status="warning" text="审核中" />
+              <Badge status="warning" text={formatMessage({ id: 'bp.processing' })} />
             ) : (
               <a
                 onClick={() => {
                   this.showChange.visibleShow(true, this.props.details.basic);
                 }}
               >
-                变更
+                {formatMessage({ id: 'bp.maintain_details.change' })}
               </a>
             )}
           </DescriptionsItem>
-          <DescriptionsItem span={2} label="移动电话">
+          <DescriptionsItem span={2} label={formatMessage({ id: 'bp.mobilePhone' })}>
             <ContactInformation
               data={{
                 countryCode: basic.mobilePhoneCountryCode,
                 code: basic.mobilePhone,
               }}
             />&nbsp;&nbsp;&nbsp;
-            {basic.emailVerifyStatus === 'Y' ? (
+            {basic.mobilePhoneVerifyStatus === 'Y' ? (
               <a
                 onClick={() => {
                   this.checkPhone(true);
                 }}
               >
-                变更
+                {formatMessage({ id: 'bp.maintain_details.change' })}
               </a>
             ) : (
               ''
             )}
           </DescriptionsItem>
-          <DescriptionsItem span={2} label="邮箱">
+          <DescriptionsItem
+          span={2}
+          label={formatMessage({ id: 'bp.maintain_details.basic.email' })}
+          >
             {basic.email}&nbsp;&nbsp;&nbsp;
-            {basic.mobilePhoneVerifyStatus === 'Y' ? (
+            {basic.emailVerifyStatus === 'Y' ? (
               <a
                 onClick={() => {
                   this.checkEmail(true);
                 }}
               >
-                变更
+                {formatMessage({ id: 'bp.maintain_details.change' })}
               </a>
             ) : (
               ''
             )}
           </DescriptionsItem>
-          <DescriptionsItem span={2} label="电话">
+          <DescriptionsItem span={2} label={formatMessage({ id: 'bp.maintain_details.phone' })}>
             <ContactInformation
               data={{
                 countryCode: basic.telephoneCountryCode,
@@ -147,13 +153,13 @@ class BasicInfo extends Component {
                   this.showChange.visibleShow(true, this.props.details.basic);
                 }}
               >
-                变更
+                {formatMessage({ id: 'bp.maintain_details.change' })}
               </a>
             ) : (
               ''
             )}
           </DescriptionsItem>
-          <DescriptionsItem span={2} label="传真">
+          <DescriptionsItem span={2} label={formatMessage({ id: 'bp.maintain_details.basic.fax' })}>
             <ContactInformation
               data={{
                 countryCode: basic.faxCountryCode,
@@ -163,16 +169,30 @@ class BasicInfo extends Component {
               }}
             />
           </DescriptionsItem>
-          <DescriptionsItem span={1} label="邮政编码">
+          <DescriptionsItem
+          span={1}
+          label={formatMessage({ id: 'bp.maintain_details.postal_code' })}
+          >
             {basic.postCode}
           </DescriptionsItem>
-          <DescriptionsItem span={1} label="时区">
+          <DescriptionsItem
+          span={1}
+          label={formatMessage({ id: 'bp.maintain_details.basic.time_zone' })}
+          >
             {basic.timeZoneCode}
           </DescriptionsItem>
-          <DescriptionsItem span={2} label="语言">
-            {basic.languageCode === 'ZH' ? '中文' : '英文'}
+          <DescriptionsItem
+          span={2}
+          label={formatMessage({ id: 'bp.maintain_details.basic.language' })}
+          >
+            {basic.languageCode === 'ZH' ?
+            formatMessage({ id: 'bp.chinese' }) : formatMessage({ id: 'bp.english' })
+            }
           </DescriptionsItem>
-          <DescriptionsItem span={2} label="特性行业类别">
+          <DescriptionsItem
+          span={2}
+          label={formatMessage({ id: 'bp.maintain_details.basic.business_type' })}
+          >
             {/* {basic.industryCode}&nbsp;&nbsp;&nbsp; */}
             {/* {console.log(industry)} */}
             {basic.industryCode
@@ -187,13 +207,16 @@ class BasicInfo extends Component {
                   this.showChange.visibleShow(true, this.props.details.basic);
                 }}
               >
-                变更
+                {formatMessage({ id: 'bp.maintain_details.change' })}
               </a>
             ) : (
               ''
             )}
           </DescriptionsItem>
-          <DescriptionsItem span={6} label="通讯地址">
+          <DescriptionsItem
+          span={6}
+          label={formatMessage({ id: 'bp.maintain_details.basic.address' })}
+          >
             {basic.countryName}&nbsp;
             {basic.provinceName}&nbsp;
             {basic.cityName}&nbsp;
@@ -201,9 +224,11 @@ class BasicInfo extends Component {
             {basic.streetName}&nbsp;
             {basic.address}
           </DescriptionsItem>
-          <DescriptionsItem span={2} label={type === 'supplier' ? '采购冻结' : '销售冻结'}>
+          <DescriptionsItem span={2} label={type === 'supplier' ?
+          formatMessage({ id: 'bp.maintain_details.purchase_org.procurement_block' }) :
+          formatMessage({ id: 'bp.maintain_details.sales_distribution.sales_block' })}>
             <Badge status="error" />
-            &nbsp;冻结
+            &nbsp;{formatMessage({ id: 'bp.block' })}
           </DescriptionsItem>
         </Descriptions>
         <CheckPhone
@@ -220,8 +245,6 @@ class BasicInfo extends Component {
             this.checkEmail(v);
           }}
         />
-        {/* <CheckEmail emailShow={emailShow} proceed="true" emailAccount="123456@qq.com" />
-            checkEmail={v => { this.checkEmail(v) }} */}
         <ChangeModal
           onRef={ref => {
             this.showChange = ref;

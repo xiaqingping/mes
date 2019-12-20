@@ -316,7 +316,7 @@ constructor(props) {
             <FormItem label={formatMessage({ id: 'bp.maintain.customerName' })}>{getFieldDecorator('name')(<Input placeholder={formatMessage({ id: 'bp.inputHere' })} />)}</FormItem>
           </Col>
           <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
-            <FormItem label={formatMessage({ id: 'bp.maintain.mobilePhone' })}>{getFieldDecorator('mobilePhone')(
+            <FormItem label={formatMessage({ id: 'bp.mobilePhone' })}>{getFieldDecorator('mobilePhone')(
             <Input placeholder={formatMessage({ id: 'bp.inputHere' })} />)}</FormItem>
           </Col>
           <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
@@ -430,7 +430,7 @@ constructor(props) {
             <FormItem label={formatMessage({ id: 'bp.maintain.customerName' })}>{getFieldDecorator('name')(<Input placeholder={formatMessage({ id: 'bp.inputHere' })} />)}</FormItem>
           </Col>
           <Col xxl={6} lg={languageCode === 'EN' ? 12 : 0}>
-            <FormItem label={formatMessage({ id: 'bp.maintain.mobilePhone' })}>{getFieldDecorator('mobilePhone')(
+            <FormItem label={formatMessage({ id: 'bp.mobilePhone' })}>{getFieldDecorator('mobilePhone')(
             <Input placeholder={formatMessage({ id: 'bp.inputHere' })} />)}</FormItem>
           </Col>
           <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>

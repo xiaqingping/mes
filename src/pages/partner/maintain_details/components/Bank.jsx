@@ -6,7 +6,8 @@ import {
 } from 'antd';
 import React, { Component } from 'react';
 import { connect } from 'dva';
-import './style.less'
+import './style.less';
+import { formatMessage } from 'umi/locale';
 
 const DescriptionsItem = Descriptions.Item;
 
@@ -19,22 +20,26 @@ class Bank extends Component {
   render() {
     const { details: { vendor } } = this.props;
     return (
-      <Card title="付款银行" bordered={false} style={{ marginBottom: '24px' }} className="check-tabs">
+      <Card
+      title={formatMessage({ id: 'bp.maintain_details.bank' })}
+      bordered={false}
+      style={{ marginBottom: '24px' }}
+      className="check-tabs">
         {vendor ? <Descriptions
           className="s-descriptions"
           layout="vertical"
           column={4}
         >
-          <DescriptionsItem label="国家">
+          <DescriptionsItem label={formatMessage({ id: 'bp.maintain_details.bank.country' })}>
             {vendor.paymentBank ? vendor.paymentBank.countryCode : ''}
           </DescriptionsItem>
-          <DescriptionsItem label="开户行">
+          <DescriptionsItem label={formatMessage({ id: 'bp.maintain_details.bank.bank_name' })}>
             {vendor.paymentBank ? vendor.paymentBank.bankName : ''}
           </DescriptionsItem>
-          <DescriptionsItem label="银行账户">
+          <DescriptionsItem label={formatMessage({ id: 'bp.maintain_details.bank.bank_account' })}>
             {vendor.paymentBank ? vendor.paymentBank.bankAccount : ''}
           </DescriptionsItem>
-          <DescriptionsItem label="户名">
+          <DescriptionsItem label={formatMessage({ id: 'bp.maintain_details.bank.contact_name' })}>
             {vendor.paymentBank ? vendor.paymentBank.bankAccountName : ''}
           </DescriptionsItem>
         </Descriptions>

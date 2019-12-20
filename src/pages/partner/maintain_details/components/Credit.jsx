@@ -8,13 +8,15 @@ import React, { Component } from 'react';
 import './style.less'
 import { connect } from 'dva';
 import moment from 'moment';
-import FixedQuota from './FixedQuota'
-import TemporaryQuota from './TemporaryQuota'
+import { formatMessage } from 'umi/locale';
+import FixedQuota from './FixedQuota';
+import TemporaryQuota from './TemporaryQuota';
 
 const DescriptionsItem = Descriptions.Item;
 
-@connect(({ partnerMaintainEdit }) => ({
+@connect(({ partnerMaintainEdit, global }) => ({
   details: partnerMaintainEdit.details,
+  languageCode: global.languageCode,
 }))
 // eslint-disable-next-line react/prefer-stateless-function
 class BasicInfo extends Component {
@@ -39,18 +41,23 @@ class BasicInfo extends Component {
 
   titleContent = () => (
     <div style={{ lineHeight: '24px' }}>
-      <span>信贷数据</span>
+      <span>{formatMessage({ id: 'bp.maintain_details.credit_management' })}</span>
       <span style={{ float: 'right', fontSize: '14px' }}>
-        <a onClick={ () => { this.fixedQuota(true) } }>额度调整</a>
+        <a onClick={ () => { this.fixedQuota(true) } }>
+          {formatMessage({ id: 'bp.maintain_details.credit_management.credit_adjustment' })}
+        </a>
         <Divider type="vertical"/>
-        <a onClick={ () => { this.temporaryQuota(true) } }>临时额度</a>
+        <a onClick={ () => { this.temporaryQuota(true) } }>
+          {formatMessage({ id: 'bp.maintain_details.credit_management.temporary_credit' })}
+        </a>
         </span>
     </div>
   )
 
   render() {
     const { fixedVisible, temporaryVisible } = this.state
-    const { details: { creditList } } = this.props;
+    const { details: { creditList }, languageCode } = this.props;
+    console.log(languageCode)
     return (
       <Card
         title={this.titleContent()}
@@ -63,16 +70,32 @@ class BasicInfo extends Component {
           layout="vertical"
           column={4}
           >
-            <DescriptionsItem label="额度">
+            <DescriptionsItem
+            label={formatMessage({ id: 'bp.maintain_details.credit_management.credit' })}
+            >
             {creditList[0].creditLimit} {creditList[0].currencyCode}&nbsp;&nbsp;
-            {moment(creditList[0].lastEvaluationDate).fromNow()}调整
+            {moment(creditList[0].lastEvaluationDate).fromNow()}
             </DescriptionsItem>
-            <DescriptionsItem label="临时额度">
+            <DescriptionsItem
+            label={formatMessage({ id: 'bp.maintain_details.credit_management.temporary_credit' })}
+            >
             {creditList[0].tempCreditLimit} {creditList[0].currencyCode}&nbsp;&nbsp;
-            {moment(creditList[0].tempCreditLimitExpirationDate).fromNow()}调整
+            {moment(creditList[0].tempCreditLimitExpirationDate).fromNow()}
             </DescriptionsItem>
-            <DescriptionsItem label="付款周期">开票后{creditList[0].creditPeriod}天到期</DescriptionsItem>
-            <DescriptionsItem label="账单间隔">每月{creditList[0].billingDay}日开票</DescriptionsItem>
+            <DescriptionsItem
+            label={formatMessage({ id: 'bp.maintain_details.credit_management.payment_period' })}
+            >
+              {languageCode === 'EN' ?
+              `Due date: ${creditList[0].creditPeriod} days` :
+              `开票后${creditList[0].creditPeriod}天到期`}
+            </DescriptionsItem>
+            <DescriptionsItem
+            label={formatMessage({ id: 'bp.maintain_details.credit_management.invoiced_period' })}
+            >
+            {languageCode === 'EN' ?
+              `Invoice issued in ${creditList[0].billingDay}th day of each month` :
+              `每月${creditList[0].billingDay}日开票`}
+            </DescriptionsItem>
           </Descriptions>
         </>
         : <Empty />

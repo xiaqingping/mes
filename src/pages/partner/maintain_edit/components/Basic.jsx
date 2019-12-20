@@ -661,7 +661,7 @@ class Basic extends React.Component {
               </FormItem>
             </Col>
             <Col md={6} sm={12}>
-              <FormItem label={formatMessage({ id: 'bp.maintain_details.mobile_phone' })}>
+              <FormItem label={formatMessage({ id: 'bp.mobilePhone' })}>
                 {this.renderMobilePhone()}
               </FormItem>
             </Col>

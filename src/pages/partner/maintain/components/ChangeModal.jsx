@@ -521,6 +521,7 @@ class ChangeModal extends Component {
           registeredAddress: row.regisAddress || '',
         });
       }
+      console.log(data)
       api.bp.updateBPOrgCertification(data).then(() => {
         this.setState({ submitNext: 2 });
         this.props.getData();

@@ -20,6 +20,9 @@ export default {
   'bp.processing': '审核中',
   'bp.partialApproved': '部分认证',
   'bp.approveds': '已认证',
+  'bp.mobilePhone': '移动电话',
+  'bp.chinese': '中文',
+  'bp.english': '英文',
 
   // model本地数据
   'bp.VendorLevelCode.important': '重要',
