@@ -161,6 +161,7 @@ export class MobilePhoneInput extends React.Component {
           value={mobilePhoneCountryCode}
           onChange={val => this.valueChange({ mobilePhoneCountryCode: val })}
           showSearch
+          allowClear
           filterOption={(input, option) => option.props.children[1].indexOf(input) >= 0}
         >
           {countryDiallingCodes.map(e => (
@@ -230,6 +231,7 @@ export class TelphoneInput extends React.Component {
           style={{ width: '30%' }}
           onChange={val => this.valueChange({ telephoneCountryCode: val })}
           showSearch
+          allowClear
           filterOption={(input, option) => option.props.children[1].indexOf(input) >= 0}
         >
           {countryDiallingCodes.map(e => (
@@ -309,6 +311,7 @@ export class FaxInput extends React.Component {
           style={{ width: '30%' }}
           onChange={val => this.valueChange({ faxCountryCode: val })}
           showSearch
+          allowClear
           filterOption={(input, option) => option.props.children[1].indexOf(input) >= 0}
         >
           {countryDiallingCodes.map(e => (
