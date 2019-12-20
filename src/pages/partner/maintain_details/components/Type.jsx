@@ -1,7 +1,3 @@
-// eslint-disable-next-line eslint-comments/disable-enable-pair
-/* eslint-disable consistent-return */
-// eslint-disable-next-line eslint-comments/disable-enable-pair
-/* eslint-disable array-callback-return */
 import {
   Card,
   Descriptions,
@@ -12,6 +8,7 @@ import {
   Empty,
 } from 'antd';
 import React, { Component } from 'react';
+import { formatter } from '@/utils/utils';
 import './style.less'
 import { connect } from 'dva';
 
@@ -46,7 +43,7 @@ const defaultInvoiceType = [
   const salesOrganizations = basicCache.salesOrganizations.filter(
     e => e.languageCode === global.languageCode,
   );
-   const distributionChannels = basicCache.distributionChannels.filter(
+  const distributionChannels = basicCache.distributionChannels.filter(
     e => e.languageCode === global.languageCode,
   );
   const regions = basicCache.regions.filter(
@@ -55,7 +52,10 @@ const defaultInvoiceType = [
   const offices = basicCache.offices.filter(
     e => e.languageCode === global.languageCode,
   );
-    const salesPaymentMethods = basicCache.salesPaymentMethods.filter(
+  const salesPaymentMethods = basicCache.salesPaymentMethods.filter(
+    e => e.languageCode === global.languageCode,
+  );
+  const currencies = basicCache.currencies.filter(
     e => e.languageCode === global.languageCode,
   );
   return {
@@ -63,6 +63,7 @@ const defaultInvoiceType = [
     salesOrganizations,
     regions,
     offices,
+    currencies,
     salesPaymentMethods,
     details: partnerMaintainEdit.details,
   };
@@ -197,6 +198,10 @@ class BasicInfo extends Component {
       type: 'basicCache/getCache',
       payload: { type: 'salesPaymentMethods' },
     });
+    dispatch({
+      type: 'basicCache/getCache',
+      payload: { type: 'currencies' },
+    });
     if (details.customer) {
       if (details.customer.salesAreaList.length !== 0) {
         this.setState({
@@ -211,7 +216,7 @@ class BasicInfo extends Component {
   tabListNoTitle = () => {
     const { details: { customer: { salesAreaList } } } = this.props;
     const data = [];
-    salesAreaList.map(item => {
+    salesAreaList.forEach(item => {
       data.push({
         key: item.salesOrganizationCode + item.distributionChannelCode,
         tab: this.tabName(item.salesOrganizationCode, item.distributionChannelCode),
@@ -224,12 +229,12 @@ class BasicInfo extends Component {
     const { distributionChannels, salesOrganizations } = this.props;
     let firstName = '';
     let lastName = '';
-    distributionChannels.map(item => {
+    distributionChannels.forEach(item => {
       if (item.code === distributionChannelCode) {
         lastName = item.name;
       }
     })
-    salesOrganizations.map(item => {
+    salesOrganizations.forEach(item => {
       if (item.code === salesOrganizationCode) {
         firstName = item.name;
       }
@@ -245,7 +250,7 @@ class BasicInfo extends Component {
 
   render() {
     const { noTitleKey } = this.state;
-    const { details: { customer }, regions, offices, salesPaymentMethods } = this.props;
+    const { details: { customer }, regions, offices, salesPaymentMethods, currencies } = this.props;
     const salesAreaList = customer ? customer.salesAreaList : '';
 
     return (
@@ -273,21 +278,20 @@ class BasicInfo extends Component {
                 style={{ marginBottom: '20px' }}
                 >
                   <DescriptionsItem label="网点归属">
-                    {regions.map(v => { if (item.regionCode === v.code) return v.name })}/
-                    {offices.map(v => { if (item.officeCode === v.code) return v.name })}
+                    {formatter(regions, item.regionCode, 'code', 'name')}/
+                    {formatter(offices, item.officeCode, 'code', 'name')}
                   </DescriptionsItem>
                   <DescriptionsItem label="默认付款方式">
-                    {salesPaymentMethods.map(v => {
-                      if (item.defaultPaymentMethodCode === v.code) return v.name
-                      })
+                    {
+                      formatter(salesPaymentMethods, item.defaultPaymentMethodCode, 'code', 'name')
                     }
                   </DescriptionsItem>
-                  <DescriptionsItem label="币种">{item.currencyCode}</DescriptionsItem>
+                  <DescriptionsItem label="币种">
+                    {formatter(currencies, item.currencyCode, 'code', 'shortText')}
+                  </DescriptionsItem>
                   <DescriptionsItem label="默认开票类型">
-                    {defaultInvoiceType.map(v => {
-                      if (item.defaultInvoiceTypeCode === v.id) return v.name
-                      })}
-                    </DescriptionsItem>
+                    {formatter(defaultInvoiceType, item.defaultInvoiceTypeCode)}
+                  </DescriptionsItem>
                   <DescriptionsItem label="销售冻结">
                     {item.salesOrderBlock === 1 ? <span><Badge status="error"/>冻结</span> :
                     <span><Badge status="success"/>活跃</span>} </DescriptionsItem>
@@ -315,6 +319,7 @@ class BasicInfo extends Component {
               </div>
             )
           }
+          return ''
         })
         : <Empty />
       }

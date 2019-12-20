@@ -34,7 +34,7 @@ export default {
   'bp.maintain.approval': '认证',
 
   // 枚举值
-  'bp.maintain.blocked': '冻结',
+  // 'bp.maintain.blocked': '冻结',
   'bp.maintain.actived': '活跃',
   'bp.maintain.completed': '完整',
   'bp.maintain.incomplete': '不完整',

@@ -34,7 +34,7 @@ export default {
     'bp.maintain.approval': 'Approval',
 
     // 枚举值
-    'bp.maintain.blocked': 'Blocked',
+    // 'bp.maintain.blocked': 'Blocked',
     'bp.maintain.actived': 'Actived',
     'bp.maintain.completed': 'Completed',
     'bp.maintain.incomplete': 'Incomplete',

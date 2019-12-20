@@ -27,7 +27,7 @@ import api from '@/api';
 import debounce from 'lodash/debounce';
 import './index.less';
 import PersonCertificationAddModal from './PersonCertificationAddModal';
-import { guid } from '@/utils/utils';
+import { guid, formatter } from '@/utils/utils';
 
 const { Paragraph } = Typography;
 const FormItem = Form.Item;
@@ -126,7 +126,7 @@ class NameGroup extends Component {
         ...changedValue,
       });
     }
-    this.props.changGType(changedValue);
+    this.props.nameChangGType(changedValue);
   };
 
   render() {
@@ -136,7 +136,7 @@ class NameGroup extends Component {
         <Select
           value={type}
           placeholder="请选择类型"
-          style={{ width: '20%' }}
+          style={{ width: '30%' }}
           onChange={val => this.valueChange({ type: val })}
         >
           <Option value="personal">
@@ -148,7 +148,7 @@ class NameGroup extends Component {
         </Select>
         <Input
           value={name}
-          style={{ width: '80%' }}
+          style={{ width: '70%' }}
           placeholder="请输入名称"
           onChange={e => this.valueChange({ name: e.target.value })}
         />
@@ -173,7 +173,6 @@ class AddressGroup extends Component {
   }
 
   // 选择地区
-  // eslint-disable-next-line consistent-return
   selectArea = (v, o) => {
     if (o.length !== 0) {
       this.props.gTypeName(o[0].sapCode);
@@ -204,15 +203,13 @@ class AddressGroup extends Component {
                     countryCode[key1].children[key2].children = res;
                   }
                   if (parseInt(res[0].level, 10) > 3) {
-                    // eslint-disable-next-line array-callback-return
-                    item2.children.map((item3, key3) => {
+                    item2.children.forEach((item3, key3) => {
                       if (item3.code === v[2]) {
                         if (parseInt(item3.level, 10) === 3 && parseInt(res[0].level, 10) === 4) {
                           countryCode[key1].children[key2].children[key3].children = res;
                         }
                         if (parseInt(res[0].level, 10) > 4) {
-                          // eslint-disable-next-line array-callback-return
-                          item3.children.map((item4, key4) => {
+                          item3.children.forEach((item4, key4) => {
                             if (item4.code === v[3]) {
                               if (
                                 parseInt(item4.level, 10) === 4 &&
@@ -238,6 +235,7 @@ class AddressGroup extends Component {
         });
       });
     }
+    return ''
   };
 
   // 传递省市区和详细地址的值
@@ -273,7 +271,7 @@ class AddressGroup extends Component {
   }
 }
 
-@connect(({ basicCache, user, global }) => {
+@connect(({ basicCache, user, global, bpCache }) => {
   const industryCategories = basicCache.industryCategories.filter(
     e => e.languageCode === global.languageCode,
   );
@@ -283,6 +281,7 @@ class AddressGroup extends Component {
     // industryCategories: basicCache.industryCategories,
     countryDiallingCodes: basicCache.countryDiallingCodes,
     authorization: user.currentUser.authorization,
+    industryCategoryAll: bpCache.industryCategoryAll,
   };
 })
 class ChangeModal extends Component {
@@ -310,10 +309,11 @@ class ChangeModal extends Component {
       userPersonData: [],
       deletePiCertificationIdList: [],
       gtype: 0,
-      guuid: guid(),
+      guuid: '',
       changeModal: false,
       defaultAddress: '',
       pageLoading: true,
+      industryCategory: [],
     };
     this.fetchBank = debounce(this.fetchBank, 500);
   }
@@ -324,10 +324,16 @@ class ChangeModal extends Component {
       type: 'basicCache/setState',
       payload: { type: 'countryDiallingCodes' },
     });
-    // this.props.dispatch({
-    //   type: 'basicCache/setState',
-    //   payload: { type: 'industryCategories' },
-    // })
+    this.props.dispatch({
+      type: 'bpCache/getCache',
+      payload: { type: 'industryCategoryAll' },
+    });
+  }
+
+  componentWillReceiveProps() {
+    this.setState({
+      guuid: guid(),
+    })
   }
 
   /** props更新时调用 */
@@ -401,9 +407,11 @@ class ChangeModal extends Component {
                     })
                     .then(v1 => {
                       this.setState({ pic: v1 });
-                      v1.forEach(item => {
-                        diskFileIdList.push(item.diskFileId);
-                      });
+                      if (v1 instanceof Array) {
+                        v1.forEach(item => {
+                          diskFileIdList.push(item.diskFileId);
+                        });
+                      }
                     });
                 });
               });
@@ -559,7 +567,7 @@ class ChangeModal extends Component {
       gtype: 0,
       pageLoading: true,
       defaultAddress: '',
-      guuid: '',
+      // guuid: '',
     });
   };
 
@@ -613,34 +621,53 @@ class ChangeModal extends Component {
     </div>
   );
 
-  changGType = v => {
-    if (v.type || v.name) {
-      if (v.type === 'group') {
-        this.setState({
-          gtype: 1,
-        });
-      }
-      if (v.type === 'personal') {
-        this.setState({
-          gtype: 2,
-        });
-      }
-    } else {
-      if (v) {
+  // 名称修改模式
+  nameChangeType = v => {
+    console.log(`名称:${v}`)
+    const { userData: { basic: { sapCountryCode } } } = this.state;
+    if (v.type === 'group') {
+      if (sapCountryCode) {
         this.setState({
           gtype: 4,
         });
       }
-      if (v === 'CN') {
+      if (sapCountryCode === 'CN' || !sapCountryCode) {
         this.setState({
           gtype: 1,
         });
       }
-      if (v === 'GB') {
+      if (sapCountryCode === 'GB') {
         this.setState({
           gtype: 3,
         });
       }
+    }
+    if (v.type === 'personal') {
+      this.setState({
+        gtype: 2,
+      });
+    }
+  };
+
+  // 国家修改模式
+  countryChangeType = v => {
+    console.log(`国家:${v}`)
+    if (v === 'CN') {
+      this.setState({
+        gtype: 1,
+      });
+      return
+    }
+    if (v === 'GB') {
+      this.setState({
+        gtype: 3,
+      });
+      return
+    }
+    if (v) {
+      this.setState({
+        gtype: 4,
+      });
     }
   };
 
@@ -662,7 +689,7 @@ class ChangeModal extends Component {
               message: '请填写名称！',
             },
           ],
-        })(<NameGroup name={name} changGType={v => this.changGType(v)} type="personal" />)}
+        })(<NameGroup name={name} nameChangGType={v => this.nameChangeType(v)} type="personal" />)}
       </Form.Item>
     );
   };
@@ -716,7 +743,7 @@ class ChangeModal extends Component {
           // help={form.getFieldValue('msg') ? '' : '请输入信息'}
         >
           {getFieldDecorator('msg')(
-            <NameGroup changGType={v => this.changGType(v)} name={name} type="group" />,
+            <NameGroup nameChangGType={v => this.nameChangeType(v)} name={name} type="group" />,
           )}
         </FormItem>
       </Col>
@@ -783,7 +810,7 @@ class ChangeModal extends Component {
             {getFieldDecorator('address')(
               <AddressGroup
                 addressVal={this.addressVal}
-                gTypeName={v => this.changGType(v)}
+                gTypeName={v => this.countryChangeType(v)}
                 userData={userData}
                 defaultAddressCode={v => this.defaultAddressCode(v)}
                 defaultAddress={defaultAddress}
@@ -807,7 +834,7 @@ class ChangeModal extends Component {
             {getFieldDecorator('address')(
               <AddressGroup
                 addressVal={this.addressVal}
-                gTypeName={v => this.changGType(v)}
+                gTypeName={v => this.countryChangeType(v)}
                 userData={userData}
                 defaultAddressCode={v => this.defaultAddressCode(v)}
                 defaultAddress={defaultAddress}
@@ -833,7 +860,7 @@ class ChangeModal extends Component {
             {getFieldDecorator('address')(
               <AddressGroup
                 addressVal={this.addressVal}
-                gTypeName={v => this.changGType(v)}
+                gTypeName={v => this.countryChangeType(v)}
                 userData={userData}
                 defaultAddressCode={v => this.defaultAddressCode(v)}
                 defaultAddress={defaultAddress}
@@ -856,7 +883,7 @@ class ChangeModal extends Component {
           {getFieldDecorator('address')(
             <AddressGroup
               addressVal={this.addressVal}
-              gTypeName={v => this.changGType(v)}
+              gTypeName={v => this.countryChangeType(v)}
               userData={userData}
               defaultAddressCode={v => this.defaultAddressCode(v)}
               defaultAddress={defaultAddress}
@@ -889,15 +916,14 @@ class ChangeModal extends Component {
     const {
       userData: { basic },
     } = this.state;
-    const { industryCategories } = this.props;
+    const { industryCategoryAll } = this.props;
     return (
       <Col lg={12} md={12} sm={12}>
         <FormItem label="行业类别">
           &nbsp;&nbsp;&nbsp;&nbsp;
         <span>
           {
-            industryCategories.filter(v => basic.industryCode === v.code).length !== 0 ?
-            industryCategories.filter(v => basic.industryCode === v.code)[0].name : ''
+            formatter(industryCategoryAll, basic.industryCode, 'industryCode', 'industryName')
           }
         </span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         <a href="#" onClick = {event => this.updateIndustryGroup(event)}>修改</a>
@@ -912,17 +938,21 @@ class ChangeModal extends Component {
       userData: { basic },
     } = this.state;
     const { getFieldDecorator } = form;
-    const { industryCategories } = this.props;
+    const { industryCategoryAll } = this.props;
     return (
       <Col lg={12} md={12} sm={12}>
         <FormItem label="行业类别">
           {getFieldDecorator('industry', {
             initialValue: basic.industryCode,
           })(
-            <Select placeholder="请选择">
-              {industryCategories.map(item => (
-                <Option key={item.code} value={item.code} disabled={item.code === '07'}>
-                  {item.name}
+            <Select placeholder="请选择" onChange={v => { this.industryCategoryChange(v) }}>
+              {industryCategoryAll.map(item => (
+                <Option
+                key={item.industryCode}
+                value={item.industryCode}
+                disabled={item.industryCode === '07'}
+                >
+                  {item.industryName}
                 </Option>
               ))}
             </Select>,
@@ -931,6 +961,15 @@ class ChangeModal extends Component {
       </Col>
     );
   };
+
+  // 行业类别选择
+  industryCategoryChange = v => {
+    const { industryCategoryAll } = this.props;
+    const industryData = industryCategoryAll.filter(item => item.industryCode === v);
+    this.setState({
+      industryCategory: industryData,
+    })
+  }
 
   // 删除
   removeItem = id => {
@@ -1059,6 +1098,21 @@ class ChangeModal extends Component {
     });
   };
 
+  // 统一社会信用代码默认数据显示
+  taxNoShow = (userData, industryCategory) => {
+    if (industryCategory.length !== 0) {
+      if (industryCategory[0].taxNo) {
+        return industryCategory[0].taxNo
+      }
+    }
+    if (userData.organizationCertification) {
+      if (userData.organizationCertification.taxNo) {
+        return userData.organizationCertification.taxNo
+      }
+    }
+    return ''
+  }
+
   render() {
     const {
       recordMsg,
@@ -1075,8 +1129,10 @@ class ChangeModal extends Component {
       guuid,
       changeModal,
       pageLoading,
+      form,
+      industryCategory,
     } = this.state;
-
+    if (!userData.basic || !(pic instanceof Array)) return null;
     const fileList = pic.map(e => ({
       old: true,
       uid: e.id,
@@ -1089,7 +1145,6 @@ class ChangeModal extends Component {
     const nullData = {};
     let modelWidth = 970;
     if (!basic) return null;
-    const { form } = this.state;
     const { getFieldDecorator } = form;
     const { TextArea } = Input;
     let modelContent;
@@ -1101,9 +1156,6 @@ class ChangeModal extends Component {
         <div className="ant-upload-text">点击上传</div>
       </div>
     );
-    // eslint-disable-next-line no-nested-ternary
-    // const newGuid = deleteId.length === 0 ? (userData.organizationCertification ?
-    // userData.organizationCertification.attachmentCode : guuid) : guuid;
     const uploadUrl = api.disk.uploadMoreFiles('bp_organization_certification', guuid);
 
     const uploadModal = (
@@ -1230,13 +1282,12 @@ class ChangeModal extends Component {
                   // help={form.getFieldValue('taxNo') ? '' : '请输入信息'}
                 >
                   {getFieldDecorator('taxNo', {
-                    // eslint-disable-next-line no-nested-ternary
-                    initialValue: userData.organizationCertification
-                      ? userData.organizationCertification.taxNo
-                        ? userData.organizationCertification.taxNo
-                        : ''
-                      : '',
-                  })(<Input placeholder="请输入" />)}
+                    initialValue: this.taxNoShow(userData, industryCategory),
+                  })(
+                  <Input placeholder="请输入" readOnly={
+                    industryCategory.length !== 0 ? (!!industryCategory[0].taxNo) : ''
+                    }/>,
+                  )}
                 </FormItem>
               </Col>
               <Col lg={12} md={12} sm={12}>
@@ -1636,8 +1687,7 @@ class ChangeModal extends Component {
                   hasFeedback
                   // eslint-disable-next-line max-len
                   validateStatus={
-                    form.getFieldValue('taxNo') ||
-                    (userData.organizationCertification
+                    form.getFieldValue('taxNo') || (userData.organizationCertification
                       ? !!userData.organizationCertification.taxNo
                       : '')
                       ? 'success'
@@ -1647,12 +1697,10 @@ class ChangeModal extends Component {
                 >
                   {getFieldDecorator('taxNo', {
                     // eslint-disable-next-line no-nested-ternary
-                    initialValue: userData.organizationCertification
-                      ? userData.organizationCertification.taxNo
-                        ? userData.organizationCertification.taxNo
-                        : ''
-                      : '',
-                  })(<Input placeholder="请输入" />)}
+                    initialValue: this.taxNoShow(userData, industryCategory),
+                  })(<Input placeholder="请输入" readOnly={
+                    industryCategory.length !== 0 ? (!!industryCategory[0].taxNo) : ''
+                    }/>)}
                 </FormItem>
               </Col>
               <Col lg={12} md={12} sm={12}>

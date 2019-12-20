@@ -13,11 +13,11 @@ const SeqModel = {
       { id: 3, name: formatMessage({ id: 'bp.partialApproved' }), badge: 'warning' },
       { id: 4, name: formatMessage({ id: 'bp.approveds' }), badge: 'success' },
     ],
-    // 销售冻结
-    salesOrderBlock: [
-      { id: 1, name: formatMessage({ id: 'bp.maintain.blocked' }) },
-      { id: 2, name: formatMessage({ id: 'bp.maintain.actived' }) },
-    ],
+    // // 销售冻结
+    // salesOrderBlock: [
+    //   { id: 1, name: formatMessage({ id: 'bp.maintain.blocked' }) },
+    //   { id: 2, name: formatMessage({ id: 'bp.maintain.actived' }) },
+    // ],
     // PI认证状态
     PiCertificationStatus: [
       { id: 1, name: formatMessage({ id: 'bp.processing' }), badge: 'warning' },
@@ -90,9 +90,9 @@ const SeqModel = {
       { id: 'D006', name: '45 天之内 到期净值' },
     ],
     // 销售范围冻结状态
-    SalesOrderBlock: [
-      { id: 1, name: formatMessage({ id: 'bp.block' }) },
-      { id: 2, name: formatMessage({ id: 'bp.normal' }) },
+    salesOrderBlock: [
+      { id: 1, name: formatMessage({ id: 'bp.block' }), badge: 'error' },
+      { id: 2, name: formatMessage({ id: 'bp.normal' }), badge: 'success' },
     ],
     // 装运条件
     ShippingCondition: [{ id: '01', name: '标准' }],

@@ -36,7 +36,7 @@ const { Option } = Select;
 const dongjieMap = {
   1: {
     value: 'error',
-    text: formatMessage({ id: 'bp.maintain.blocked' }),
+    text: formatMessage({ id: 'bp.block' }),
   },
   2: {
     value: 'success',
