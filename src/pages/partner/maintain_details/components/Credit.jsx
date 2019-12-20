@@ -14,9 +14,8 @@ import TemporaryQuota from './TemporaryQuota';
 
 const DescriptionsItem = Descriptions.Item;
 
-@connect(({ partnerMaintainEdit, global }) => ({
+@connect(({ partnerMaintainEdit }) => ({
   details: partnerMaintainEdit.details,
-  languageCode: global.languageCode,
 }))
 // eslint-disable-next-line react/prefer-stateless-function
 class BasicInfo extends Component {
@@ -56,8 +55,7 @@ class BasicInfo extends Component {
 
   render() {
     const { fixedVisible, temporaryVisible } = this.state
-    const { details: { creditList }, languageCode } = this.props;
-    console.log(languageCode)
+    const { details: { creditList } } = this.props;
     return (
       <Card
         title={this.titleContent()}
@@ -85,16 +83,17 @@ class BasicInfo extends Component {
             <DescriptionsItem
             label={formatMessage({ id: 'bp.maintain_details.credit_management.payment_period' })}
             >
-              {languageCode === 'EN' ?
-              `Due date: ${creditList[0].creditPeriod} days` :
-              `开票后${creditList[0].creditPeriod}天到期`}
+              {formatMessage(
+                { id: 'bp.maintain_details.credit_management.dueDate' },
+                { name: creditList[0].creditPeriod },
+                )}
             </DescriptionsItem>
             <DescriptionsItem
             label={formatMessage({ id: 'bp.maintain_details.credit_management.invoiced_period' })}
             >
-            {languageCode === 'EN' ?
-              `Invoice issued in ${creditList[0].billingDay}th day of each month` :
-              `每月${creditList[0].billingDay}日开票`}
+              {formatMessage(
+                { id: 'bp.maintain_details.credit_management.invoiceIssued' },
+                { name: creditList[0].billingDay })}
             </DescriptionsItem>
           </Descriptions>
         </>

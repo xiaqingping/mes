@@ -86,13 +86,13 @@ class CustomerDetails extends Component {
     }
 
 
-    window.addEventListener('resize', this.resizeFooterToolbar, { passive: true });
+    // window.addEventListener('resize', this.resizeFooterToolbar, { passive: true });
     this.resizeFooterToolbar();
   }
 
-  componentWillUnmount() {
-    window.removeEventListener('resize', this.resizeFooterToolbar);
-  }
+  // componentWillUnmount() {
+  //   window.removeEventListener('resize', this.resizeFooterToolbar);
+  // }
 
   resizeFooterToolbar = () => {
     requestAnimationFrame(() => {
@@ -153,7 +153,8 @@ class CustomerDetails extends Component {
 
   render() {
     const { tabActiveKey, pageLoading } = this.state;
-    const { customer } = this.props;
+    const { customer, supplier } = this.props;
+    if (!customer || !supplier) return false
     return (
       <PageHeaderWrapper
         tabActiveKey={tabActiveKey}
@@ -203,12 +204,12 @@ class CustomerDetails extends Component {
                   <BasicInfo />
                   <PurchasingOrg />
                   <Bank />
-                  {customer.basic.type === 2 ? (
+                  {supplier.basic.type === 2 ? (
                     <>
-                      {customer.basic.countryCode === 'CN' ? (
+                      {supplier.basic.sapCountryCode === 'CN' ? (
                         <HomeAuthentication />
                       ) : (
-                        <AbroadAuthentication abroadType={customer.basic.telephoneCountryCode} />
+                        <AbroadAuthentication />
                       )}
                     </>
                   ) : (

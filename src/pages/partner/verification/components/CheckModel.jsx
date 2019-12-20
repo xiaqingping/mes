@@ -991,8 +991,7 @@ class CheckModel extends React.Component {
               <Col
                 span={16}
                 className={styles.labelVal}>
-                  {detailsValue.soldToPartyCode}
-                  {detailsValue.soldToPartyName}
+                  {detailsValue.soldToPartyCode} {detailsValue.soldToPartyName}
                 </Col>
             </Row>
           </li>
@@ -1003,7 +1002,10 @@ class CheckModel extends React.Component {
                   formatMessage({ id: 'bp.verification.defaultShipToParty.verificationType' })
                 }
               </Col>
-              <Col span={16} className={styles.labelVal}>{detailsValue.type}</Col>
+              <Col span={16} className={styles.labelVal}>
+                {/* {detailsValue.type} */}
+                {formatter(VerifyLinkSoldToPartyType, detailsValue.type)}
+              </Col>
             </Row>
           </li>
           <li>
@@ -1468,8 +1470,11 @@ class CheckModel extends React.Component {
         {passPage}
         {refusePage}
         <Modal
-          className={styles.xxx}
-          width="410px"
+          className={
+            (clickType === 1 || clickType === 2 || clickType === 3) && recordMsg.status === 1 ?
+            styles.xxx : styles.xxxs
+          }
+          width="430px"
           title={ modalTitle }
           visible={this.state.modal1Visible}
           onOk={() => this.setModal1Visible(false)}

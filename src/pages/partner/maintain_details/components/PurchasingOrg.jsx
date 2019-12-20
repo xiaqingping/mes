@@ -84,8 +84,7 @@ class PurchasingOrg extends React.Component {
               </DescriptionsItem>
               <DescriptionsItem span={2} label="付款条件">
                 {
-                paymentTerms.filter(e => item.paymentTermsCode === e.code) ?
-                paymentTerms.filter(e => item.paymentTermsCode === e.code)[0].name : ''
+                  formatter(paymentTerms, item.paymentTermsCode, 'code', 'name')
                 }
               </DescriptionsItem>
               <DescriptionsItem span={2} label="销售人员">{item.salerName}</DescriptionsItem>
@@ -97,10 +96,7 @@ class PurchasingOrg extends React.Component {
                 {parseInt(item.invoicePostInReceive, 10) === 1 ? '是' : '否'}
               </DescriptionsItem>
               <DescriptionsItem span={2} label="采购组">
-              {
-                  purchaseGroups.filter(e => item.purchaseGroupCode === e.code).length !== 0 ?
-                  purchaseGroups.filter(e => item.purchaseGroupCode === e.code)[0].name : ''
-                }
+              { formatter(purchaseGroups, item.purchaseGroupCode, 'code', 'name') }
               </DescriptionsItem>
               <DescriptionsItem span={2} label="计划交货时间">{item.deliveryPlanDays}天</DescriptionsItem>
             </Descriptions>
@@ -149,7 +145,8 @@ class PurchasingOrg extends React.Component {
       const { vendor: { purchaseOrganizationList } } = details;
       tabList = purchaseOrganizationList.map(e => ({
         key: e.purchaseOrganizationCode,
-        tab: purchaseOrganizations.filter(e1 => e1.code === e.purchaseOrganizationCode)[0].name,
+        // tab: purchaseOrganizations.filter(e1 => e1.code === e.purchaseOrganizationCode)[0].name,
+        tab: formatter(purchaseOrganizations, e.purchaseOrganizationCode, 'code', 'name'),
       }));
       // tabList = tabList.concat({
       //   key: 'select',
