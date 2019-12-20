@@ -278,8 +278,9 @@ class Operation extends React.Component {
         title: formatMessage({ id: 'bp.operation.businessPartners' }),
         dataIndex: 'bpCode',
         render(text, record) {
-            return <span style={{ color: '#222222' }}><Icon type="user" />
-            {record.bpName} <br/><span style={{ color: '#999999' }}>{text}</span></span>
+            return <span style={{ color: '#222222' }}>
+              <Icon type={record.bpType === 1 ? 'user' : 'home'} /> {record.bpName} <br/>
+              <span style={{ color: '#999999' }}>{text}</span></span>
         },
       },
       {
@@ -345,7 +346,7 @@ class Operation extends React.Component {
         width: 150,
         render: (text, record) => (
         <a onClick={ e => this.showDrawer(record, e)}>
-          {formatMessage({ id: 'bp.operation.view' })}
+          {formatMessage({ id: 'menu.bp.maintain.details' })}
         </a>
           ),
       },

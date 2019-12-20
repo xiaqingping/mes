@@ -435,7 +435,7 @@ class Verification extends React.Component {
           const view = <a href="#" onClick={ () => {
             this.checkShow.visibleShow(records, records.type, true,
               this.detailsValue(records, records.type))
-            }} >{formatMessage({ id: 'bp.verification.view' })}</a>;
+            }} >{formatMessage({ id: 'menu.bp.maintain.details' })}</a>;
           return view;
         },
       },

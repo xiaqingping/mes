@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import { connect } from 'dva';
 import './style.less';
 import ContactInformation from '@/pages/partner/maintain_edit/components/ContactInformation';
-import api from '@/api';
+// import { formatMessage } from 'umi/locale';
 
 @connect(({ partnerMaintainEdit }) => ({
   details: partnerMaintainEdit.details,

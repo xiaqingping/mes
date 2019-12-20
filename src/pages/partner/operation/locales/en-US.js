@@ -15,7 +15,6 @@ export default {
   'bp.operation.query': 'Search',
   'bp.operation.reset': 'Reset',
   'bp.operation.retract': 'Retract',
-  'bp.operation.view': 'Details',
   'bp.operation.newlyBuild': 'newly build',
   'bp.operation.modify': 'modify',
   'bp.operation.unfinished': 'unfinished',

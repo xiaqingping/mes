@@ -4,39 +4,20 @@ import {
   Card,
   Descriptions,
   Badge,
-  // Upload,
-  // Icon,
-  // Modal,
 } from 'antd';
 import React, { Component } from 'react';
 import { connect } from 'dva';
 import './style.less';
+import { formatMessage } from 'umi/locale';
+import { formatter } from '@/utils/utils';
 import api from '@/api'
 
 const DescriptionsItem = Descriptions.Item;
-// 认证
-const renzhengMap = {
-  1: {
-    value: 'default',
-    text: '未认证',
-  },
- 2: {
-    value: 'processing',
-    text: '审核中',
-  },
-  4: {
-    value: 'success',
-    text: '已认证',
-  },
-  3: {
-    value: 'warning',
-    text: '部分认证',
-  },
-};
 
-@connect(({ partnerMaintainEdit }) => ({
+@connect(({ partnerMaintainEdit, bp }) => ({
   details: partnerMaintainEdit.type === 'supplier' ?
   partnerMaintainEdit.supplier : partnerMaintainEdit.details,
+  BpCertificationStatus: bp.BpCertificationStatus,
 }))
 class BasicInfo extends Component {
   state = {
@@ -67,10 +48,15 @@ class BasicInfo extends Component {
   }
 
   render() {
-    const { details } = this.props;
+    const { details, BpCertificationStatus } = this.props;
     const { pic } = this.state;
     return (
-      <Card title="认证资料" bordered={false} style={{ marginBottom: '24px' }} className="check-tabs">
+      <Card
+      title={formatMessage({ id: 'bp.maintain_details.verification_data' })}
+      bordered={false}
+      style={{ marginBottom: '24px' }}
+      className="check-tabs"
+      >
         <Row gutter={16}>
           <Col span={5}>
             <Descriptions
@@ -78,15 +64,29 @@ class BasicInfo extends Component {
               layout="vertical"
               column={1}
             >
-              <DescriptionsItem label="认证状态">
-                <Badge status={renzhengMap[details.basic.certificationStatus].value}
-                text={renzhengMap[details.basic.certificationStatus].text} />
+              <DescriptionsItem
+              label={formatMessage({ id: 'bp.maintain_details.verification_data.status' })}
+              >
+                <Badge
+                status={
+                  formatter(BpCertificationStatus, details.basic.certificationStatus, 'id', 'badge')
+                }
+                text={
+                  formatter(BpCertificationStatus, details.basic.certificationStatus, 'id', 'name')
+                }
+                />
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                 {parseInt(details.basic.certificationStatus, 10) === 4 ? <>
-                <a>变更</a>&nbsp;&nbsp;<a>取消认证</a></> : ''}
+                  <a>
+                    {formatMessage({ id: 'bp.maintain_details.change' })}
+                  </a>&nbsp;&nbsp;
+                  <a>
+                    {formatMessage({ id: 'bp.maintain.cancelApproval' })}
+                  </a></> : ''}
               </DescriptionsItem>
               <DescriptionsItem label={details.basic.countryCode === 'US' ?
-              '免税认证号' : '增值税登记号'}>
+              formatMessage({ id: 'bp.verification.organizationVerification.taxExemptID' }) :
+              formatMessage({ id: 'bp.verification.organizationVerification.vat' })}>
               {details.organizationCertification ? details.organizationCertification.taxNo : ''}
               </DescriptionsItem>
             </Descriptions>
@@ -97,7 +97,11 @@ class BasicInfo extends Component {
               layout="vertical"
               column={1}
             >
-              <DescriptionsItem label="认证图片">
+              <DescriptionsItem
+              label={formatMessage({
+                id: 'bp.maintain_details.verification_data.verification_documents',
+              })}
+              >
               <ul style={{ padding: '0' }}>
                   {pic.length !== 0 ? <>
                     {pic.map((item, index) => (
@@ -126,7 +130,9 @@ class BasicInfo extends Component {
               layout="vertical"
               column={1}
             >
-              <DescriptionsItem label="认证说明">
+              <DescriptionsItem
+              label={formatMessage({ id: 'bp.maintain_details.verification_data.memo' })}
+              >
                 {details.organizationCertification ? details.organizationCertification.notes : ''}
               </DescriptionsItem>
             </Descriptions>

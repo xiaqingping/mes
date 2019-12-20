@@ -103,7 +103,7 @@ class BasicInfo extends Component {
                 countryCode: basic.mobilePhoneCountryCode,
                 code: basic.mobilePhone,
               }}
-            />
+            />&nbsp;&nbsp;&nbsp;
             {basic.emailVerifyStatus === 'Y' ? (
               <a
                 onClick={() => {

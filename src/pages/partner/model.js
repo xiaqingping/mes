@@ -8,10 +8,10 @@ const SeqModel = {
     supplier: null,
     // 业务伙伴认证状态
     BpCertificationStatus: [
-      { id: 1, name: formatMessage({ id: 'bp.maintain.unapproved' }) },
-      { id: 2, name: formatMessage({ id: 'bp.maintain.processing' }) },
-      { id: 3, name: formatMessage({ id: 'bp.maintain.partialApproved' }) },
-      { id: 4, name: formatMessage({ id: 'bp.maintain.approveds' }) },
+      { id: 1, name: formatMessage({ id: 'bp.unapproved' }), badge: 'default' },
+      { id: 2, name: formatMessage({ id: 'bp.processing' }), badge: 'warning' },
+      { id: 3, name: formatMessage({ id: 'bp.partialApproved' }), badge: 'warning' },
+      { id: 4, name: formatMessage({ id: 'bp.approveds' }), badge: 'success' },
     ],
     // 销售冻结
     salesOrderBlock: [
@@ -20,9 +20,9 @@ const SeqModel = {
     ],
     // PI认证状态
     PiCertificationStatus: [
-      { id: 1, name: formatMessage({ id: 'bp.maintain.processing' }), badge: 'warning' },
-      { id: 2, name: formatMessage({ id: 'bp.maintain.approveds' }), badge: 'success' },
-      { id: 3, name: formatMessage({ id: 'bp.maintain.unapproved' }), badge: 'default' },
+      { id: 1, name: formatMessage({ id: 'bp.processing' }), badge: 'warning' },
+      { id: 2, name: formatMessage({ id: 'bp.approveds' }), badge: 'success' },
+      { id: 3, name: formatMessage({ id: 'bp.unapproved' }), badge: 'default' },
     ],
     // 操作项状态
     BpOperationItemStatus: [
@@ -98,59 +98,59 @@ const SeqModel = {
     ShippingCondition: [{ id: '01', name: '标准' }],
     // 增值税专用发票资质
     SpecialInvoice: [
-      { id: 1, name: '是' },
-      { id: 2, name: '否' },
+      { id: 1, name: formatMessage({ id: 'bp.InvoiceWithGood.yes' }) },
+      { id: 2, name: formatMessage({ id: 'bp.InvoiceWithGood.no' }) },
     ],
     // 供应商数据状态
     VendorDateStatus: [
-      { id: 1, name: '是' },
-      { id: 2, name: '否' },
+      { id: 1, name: formatMessage({ id: 'bp.InvoiceWithGood.yes' }) },
+      { id: 2, name: formatMessage({ id: 'bp.InvoiceWithGood.no' }) },
     ],
     // 供应商级别
     VendorLevelCode: [
-      { id: 'A', name: '重要' },
-      { id: 'B', name: '比较重要' },
-      { id: 'C', name: '一般' },
+      { id: 'A', name: formatMessage({ id: 'bp.InvoiceWithGood.important' }) },
+      { id: 'B', name: formatMessage({ id: 'bp.InvoiceWithGood.moreImportant' }) },
+      { id: 'C', name: formatMessage({ id: 'bp.InvoiceWithGood.commonly' }) },
     ],
     // 验证记录-关联售达方记录-验证结果
     VerifyLinkSoldToPartyStatus: [
-      { id: 1, name: '验证中' },
-      { id: 2, name: '已完成' },
-      { id: 3, name: '已拒绝' },
-      { id: 4, name: '已取消' },
-      { id: 5, name: '已过期' },
+      { id: 1, name: formatMessage({ id: 'bp.verfication' }) },
+      { id: 2, name: formatMessage({ id: 'bp.completed' }) },
+      { id: 3, name: formatMessage({ id: 'bp.rejected' }) },
+      { id: 4, name: formatMessage({ id: 'bp.cancelled' }) },
+      { id: 5, name: formatMessage({ id: 'bp.expired' }) },
     ],
     // 验证记录-关联售达方记录-验证类型
     VerifyLinkSoldToPartyType: [
-      { id: 1, name: '手机' },
-      { id: 2, name: '邮箱' },
-      { id: 3, name: '用户' },
-      { id: 4, name: '人工审核' },
+      { id: 1, name: formatMessage({ id: 'bp.verification.mobilePhone' }) },
+      { id: 2, name: formatMessage({ id: 'bp.verification.email' }) },
+      { id: 3, name: formatMessage({ id: 'bp.verification.user' }) },
+      { id: 4, name: formatMessage({ id: 'bp.verification.manualAudit' }) },
     ],
     // 验证记录状态
     VerifyRecordStatus: [
       // 验证中
       {
         value: 1,
-        text: formatMessage({ id: 'bp.verification.verfication' }),
+        text: formatMessage({ id: 'bp.verfication' }),
         status: 'warning',
       },
       // 已验证
       {
         value: 2,
-        text: formatMessage({ id: 'bp.verification.completed' }),
+        text: formatMessage({ id: 'bp.completed' }),
         status: 'success',
       },
       // 已拒绝
       {
         value: 3,
-        text: formatMessage({ id: 'bp.verification.rejected' }),
+        text: formatMessage({ id: 'bp.rejected' }),
         status: 'error',
       },
       // 已过期
       {
         value: 4,
-        text: formatMessage({ id: 'bp.verification.expired' }),
+        text: formatMessage({ id: 'bp.expired' }),
         status: 'error',
       },
     ],
@@ -163,6 +163,25 @@ const SeqModel = {
       { value: 5, text: formatMessage({ id: 'bp.verification.verificationEmail' }) },
       { value: 6, text: formatMessage({ id: 'bp.verification.changeMobilePhone' }) },
       { value: 7, text: formatMessage({ id: 'bp.verification.changeEmail' }) },
+    ],
+
+    // 验证方式
+    verifyTest: [
+      { id: 1, name: formatMessage({ id: 'bp.verification.mobilePhone' }) },
+      { id: 2, name: formatMessage({ id: 'bp.verification.email' }) },
+      { id: 3, name: formatMessage({ id: 'bp.verification.question' }) },
+    ],
+
+    // 变更渠道
+    verifyChannel: [
+      { id: 1, name: formatMessage({ id: 'bp.verification.validateLogon' }) },
+      { id: 2, name: formatMessage({ id: 'bp.verification.selfHelpVerification' }) },
+    ],
+
+    // 变更类型
+    verifyChangeType: [
+      { id: 1, name: formatMessage({ id: 'bp.verification.verifyCellPhone' }) },
+      { id: 2, name: formatMessage({ id: 'bp.verification.verifyMailbox' }) },
     ],
 
     // 操作记录状态

@@ -3,10 +3,11 @@ import React, { Component } from 'react';
 import { connect } from 'dva';
 
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
-import PersonCertification from './components/PersonCertification';
-import PersonCredit from './components/PersonCredit';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { Link } from 'react-router-dom';
+import { formatMessage } from 'umi/locale';
+import PersonCertification from './components/PersonCertification';
+import PersonCredit from './components/PersonCredit';
 import BasicInfo from './components/BasicInfo';
 import Type from './components/Type';
 import Credit from './components/Credit';
@@ -125,7 +126,7 @@ class CustomerDetails extends Component {
     const { customerDataStatus, vendorDataStatus, type } = query;
     return (
       <div>
-        <span>查看 {v}</span>&nbsp;&nbsp;&nbsp;&nbsp;
+        <span>{formatMessage({ id: 'menu.bp.maintain.details' })} {v}</span>&nbsp;&nbsp;&nbsp;&nbsp;
         <Link
           // eslint-disable-next-line max-len
           to={`/bp/maintain/edit/${id}?type=${type}&customerDataStatus=${customerDataStatus}&vendorDataStatus=${vendorDataStatus}&tabActiveKey=${this.props.type === 'customer' ? 'customer' : 'vendor'}`}
@@ -162,11 +163,11 @@ class CustomerDetails extends Component {
         tabList={[
           {
             key: 'customer',
-            tab: '客户',
+            tab: formatMessage({ id: 'bp.maintain_details.customer' }),
           },
           {
             key: 'supplier',
-            tab: '供应商',
+            tab: formatMessage({ id: 'bp.maintain_details.vendor' }),
           },
         ]}
       >

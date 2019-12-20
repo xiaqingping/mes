@@ -35,10 +35,6 @@ export default {
   'bp.maintain.approval': '认证',
 
   // 枚举值
-  'bp.maintain.unapproved': '未认证',
-  'bp.maintain.processing': '审核中',
-  'bp.maintain.partialApproved': '部分认证',
-  'bp.maintain.approveds': '已认证',
   'bp.maintain.blocked': '冻结',
   'bp.maintain.actived': '活跃',
   'bp.maintain.completed': '完整',
