@@ -11,7 +11,7 @@ import bpAPI from '@/api/bp';
 @connect(
   ({ bp }) => ({
     BpCertificationStatus: bp.BpCertificationStatus,
-    SalesOrderBlock: bp.SalesOrderBlock,
+    SalesOrderBlock: bp.salesOrderBlock,
     CustomerDataStatus: bp.CustomerDataStatus,
   }),
   null,
