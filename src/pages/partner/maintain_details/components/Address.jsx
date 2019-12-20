@@ -3,12 +3,11 @@ import React, { Component } from 'react';
 import { connect } from 'dva';
 import './style.less';
 import ContactInformation from '@/pages/partner/maintain_edit/components/ContactInformation';
-// import { formatMessage } from 'umi/locale';
+import { formatMessage } from 'umi/locale';
 
 @connect(({ partnerMaintainEdit }) => ({
   details: partnerMaintainEdit.details,
 }))
-// eslint-disable-next-line react/prefer-stateless-function
 class BasicInfo extends Component {
   render() {
     const {
@@ -16,12 +15,12 @@ class BasicInfo extends Component {
     } = this.props;
     const columns = [
       {
-        title: '姓名',
+        title: formatMessage({ id: 'bp.maintain_details.shipping_address.name' }),
         dataIndex: 'name',
         width: 300,
       },
       {
-        title: '移动电话',
+        title: formatMessage({ id: 'bp.mobilePhone' }),
         dataIndex: 'mobilePhone',
         width: 300,
         render(text, record) {
@@ -36,12 +35,12 @@ class BasicInfo extends Component {
         },
       },
       {
-        title: '邮编',
+        title: formatMessage({ id: 'bp.maintain_details.postal_code' }),
         dataIndex: 'postCode',
         width: 200,
       },
       {
-        title: '地址',
+        title: formatMessage({ id: 'bp.maintain_details.shipping_address.address' }),
         dataIndex: 'address',
         width: 500,
         render: (text, record) => (
@@ -57,7 +56,11 @@ class BasicInfo extends Component {
       },
     ];
     return (
-      <Card title="收货地址" bordered={false} style={{ marginBottom: '24px' }}>
+      <Card
+        title={formatMessage({ id: 'bp.maintain_details.shipping_address.address' })}
+        bordered={false}
+        style={{ marginBottom: '24px' }}
+      >
         <Table
           rowKey={(record, index) => index}
           dataSource={customer ? customer.addressList : []}

@@ -11,6 +11,7 @@ import {
 } from 'antd';
 import React, { Component, Fragment } from 'react';
 import { connect } from 'dva';
+import { formatMessage } from 'umi/locale';
 import './style.less'
 import api from '@/api';
 
@@ -201,31 +202,38 @@ class CheckEmail extends Component {
         return (
             <div style={{ height: '261px', textAlign: 'center', paddingTop: '28px' }}>
               <Icon type="check-circle" style={{ fontSize: '40px', color: '#54C31F' }}/>
-              <h2 style={{ fontWeight: '600', margin: '30px 0 20px' }}>发送成功</h2>
-              <h3 style={{ color: '#999999' }}>联系方式已输入成功，请用户进行自行变更。</h3>
+              <h2 style={{ fontWeight: '600', margin: '30px 0 20px' }}>
+                {formatMessage({ id: 'bp.maintain_details.phone.sentSuccessfully' })}
+              </h2>
+              <h3 style={{ color: '#999999' }}>
+                {formatMessage({ id: 'bp.maintain_details.phone.passMsg' })}
+              </h3>
             </div>
         )
       }
       return (
-          <Form layout="inline" onSubmit={this.handleSend}>
-            <div style={{ height: '200px', textAlign: 'center', paddingTop: '68px' }}>
-              <FormItem label="联系方式" >
-                {getFieldDecorator('phone')(
-                <Input style={{ width: '300px' }} placeholder="输入移动电话或邮箱"/>,
-                )}
-              </FormItem>
-            </div>
-            <div style={{
-            textAlign: 'right',
-            padding: '10px 20px',
-            borderTop: '1px solid #E8E8E8' }}>
-              <FormItem>
-                <Button type="primary" htmlType="submit">
-                  发送
-                </Button>
-              </FormItem>
-            </div>
-          </Form>
+        <Form layout="inline" onSubmit={this.handleSend}>
+          <div style={{ height: '200px', textAlign: 'center', paddingTop: '68px' }}>
+            <FormItem label={formatMessage({ id: 'bp.maintain_details.phone.contactInformation' })}>
+              {getFieldDecorator('phone')(
+                <Input
+                style={{ width: '300px' }}
+                placeholder={formatMessage({ id: 'bp.maintain_details.phone.phoneOrEmail' })}
+                />,
+              )}
+            </FormItem>
+          </div>
+          <div style={{
+          textAlign: 'right',
+          padding: '10px 20px',
+          borderTop: '1px solid #E8E8E8' }}>
+            <FormItem>
+              <Button type="primary" htmlType="submit">
+                发送
+              </Button>
+            </FormItem>
+          </div>
+        </Form>
         )
       }
 
@@ -240,7 +248,12 @@ class CheckEmail extends Component {
         <Form layout="inline" style={{
           textAlign: 'center',
           paddingTop: '20px' }} onSubmit={this.handleQuestion}>
-          <FormItem label="问题一" className="tools" hasFeedback validateStatus={oneQuestion}>
+          <FormItem
+          label={formatMessage({ id: 'bp.maintain_details.phone.question1' })}
+          className="tools"
+          hasFeedback
+          validateStatus={oneQuestion}
+          >
             <div style={{
               width: '300px',
               border: '1px solid #D6D6D6',
@@ -271,10 +284,18 @@ class CheckEmail extends Component {
                 },
               ],
             })(
-              <Input style={{ width: '300px' }} placeholder="请输入"/>,
+              <Input
+              style={{ width: '300px' }}
+              placeholder={formatMessage({ id: 'bp.inputHere' })}
+              />,
             )}
           </FormItem>
-          <FormItem label="问题二" className="tools" hasFeedback validateStatus={twoQuestion}>
+          <FormItem
+          label={formatMessage({ id: 'bp.maintain_details.phone.question2' })}
+          className="tools"
+          hasFeedback
+          validateStatus={twoQuestion}
+          >
           <div style={{
             width: '300px',
             border: '1px solid #D6D6D6',
@@ -305,10 +326,15 @@ class CheckEmail extends Component {
                 },
               ],
             })(
-              <Input style={{ width: '300px' }} placeholder="请输入"/>,
+              <Input
+              style={{ width: '300px' }}
+              placeholder={formatMessage({ id: 'bp.inputHere' })}
+              />,
             )}
           </FormItem>
-          <FormItem label="问题三" style={{ paddingBottom: '30px' }}
+          <FormItem
+          label={formatMessage({ id: 'bp.maintain_details.phone.question3' })}
+          style={{ paddingBottom: '30px' }}
           hasFeedback validateStatus={threeQuestion} className="tools">
           <div style={{
             width: '300px',
@@ -340,13 +366,16 @@ class CheckEmail extends Component {
                 },
               ],
             })(
-              <Input style={{ width: '300px' }} placeholder="请输入"/>,
+              <Input
+              style={{ width: '300px' }}
+              placeholder={formatMessage({ id: 'bp.inputHere' })}
+              />,
             )}
           </FormItem>
           <div style={{ textAlign: 'right', padding: '10px 20px', borderTop: '1px solid #E8E8E8' }}>
             <FormItem>
               <Button type="primary" htmlType="submit">
-                下一步
+                {formatMessage({ id: 'bp.maintain_details.phone.next' })}
               </Button>
             </FormItem>
           </div>
@@ -357,7 +386,9 @@ class CheckEmail extends Component {
       return (
         <div style={{ height: '261px', textAlign: 'center', paddingTop: '60px' }}>
           <Icon type="check-circle" style={{ fontSize: '40px', color: '#54C31F' }}/>
-          <h2 style={{ fontWeight: '600', margin: '30px 0 20px' }}>邮箱变更已完成</h2>
+          <h2 style={{ fontWeight: '600', margin: '30px 0 20px' }}>
+            {formatMessage({ id: 'bp.maintain_details.email.emailChangeFinish' })}
+          </h2>
         </div>
       )
     }
@@ -366,7 +397,11 @@ class CheckEmail extends Component {
         <div style={{ textAlign: 'center', paddingTop: '20px' }}>
           <Icon type="check-circle" style={{ fontSize: '20px', color: '#54C31F' }}/>
           <span style={{ fontSize: '20px', fontWeight: '600' }}>
-            &nbsp;&nbsp;&nbsp;{proceed ? '继续完成新邮箱验证' : '问题验证成功，请输入新的邮箱'}</span>
+            &nbsp;&nbsp;&nbsp;
+            {proceed ?
+            formatMessage({ id: 'bp.maintain_details.email.continue' }) :
+            formatMessage({ id: 'bp.maintain_details.email.finishQuestion' })
+            }</span>
           <Form layout="inline" onSubmit={this.handleCode} style={{ marginTop: '45px' }}>
             <div>
               {this.pageRetrun()}
@@ -377,7 +412,7 @@ class CheckEmail extends Component {
               borderTop: '1px solid #E8E8E8' }}>
               <FormItem>
                 <Button type="primary" htmlType="submit">
-                  完成
+                  {formatMessage({ id: 'bp.maintain_details.phone.finish' })}
                 </Button>
               </FormItem>
             </div>
@@ -390,17 +425,21 @@ class CheckEmail extends Component {
     return (
       <Form layout="inline" onSubmit={this.handleNext}>
           <div style={{ height: '200px', textAlign: 'center', paddingTop: '68px' }}>
-            <FormItem label="验证方式">
+            <FormItem label={formatMessage({ id: 'bp.maintain_details.phone.identity' })}>
             {getFieldDecorator('type', { initialValue: '1' })(
-            <Select style={{ width: '300px' }} placeholder="选择验证方式（问题）">
-              <Option value="1">问题方式</Option>
+            <Select
+            style={{ width: '300px' }}
+            >
+              <Option value="1">
+                {formatMessage({ id: 'bp.maintain_details.phone.questions' })}
+              </Option>
             </Select>)}
             </FormItem>
           </div>
           <div style={{ textAlign: 'right', padding: '10px 20px', borderTop: '1px solid #E8E8E8' }}>
             <FormItem>
               <Button type="primary" htmlType="submit">
-                下一步
+                {formatMessage({ id: 'bp.maintain_details.phone.next' })}
               </Button>
             </FormItem>
           </div>
@@ -420,16 +459,28 @@ class CheckEmail extends Component {
       return (
       <Fragment>
         <div className="divStyle">
-          <span>邮箱</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          <span>
+            {formatMessage({ id: 'bp.maintain_details.email.email' })}
+          </span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
           <span>{emailAccount}</span>
         </div>
 
-        <FormItem label="验证码" style={{ margin: '20px 16px 60px 0' }}>
-          {getFieldDecorator('code')(<Input style={{ width: '180px' }} placeholder="请输入短信验证码"/>)}
+        <FormItem
+        label={formatMessage({ id: 'bp.maintain_details.phone.verificationCode' })}
+        style={{ margin: '20px 16px 60px 0' }}
+        >
+          {getFieldDecorator('code')(
+          <Input
+          style={{ width: '180px' }}
+          placeholder={formatMessage({ id: 'bp.maintain_details.phone.pleaseEnterCode' })}
+          />,
+          )}
           &nbsp;&nbsp;&nbsp;&nbsp;
           <Button type="primary" disabled={btnText === 3}
           ghost onClick={() => { this.getCode() }} style={{ width: '100px' }}>
-            {(btnText === 1 ? '获取验证码' : (btnText === 2 ? '重新发送' : `${time}秒`))}
+            {(btnText === 1 ? formatMessage({ id: 'bp.maintain_details.phone.obtainNewCode' }) :
+            (btnText === 2 ? formatMessage({ id: 'bp.maintain_details.phone.resend' }) :
+            `${time}${formatMessage({ id: 'bp.maintain_details.phone.seconds' })}`))}
           </Button>
         </FormItem>
       </Fragment>
@@ -437,15 +488,28 @@ class CheckEmail extends Component {
     }
      return (
       <Fragment>
-        <FormItem label="邮箱">
-          {getFieldDecorator('userEmail')(<Input style={{ width: '297px' }} placeholder="请输入"/>)}
+        <FormItem label={formatMessage({ id: 'bp.maintain_details.email.email' })}>
+          {getFieldDecorator('userEmail')(
+          <Input
+          style={{ width: '297px' }}
+          placeholder={formatMessage({ id: 'bp.inputHere' })}
+          />,
+          )}
         </FormItem>
-        <FormItem label="验证码" style={{ margin: '20px 16px 60px 0' }}>
-          {getFieldDecorator('code')(<Input style={{ width: '180px' }} placeholder="请输入短信验证码"/>)}
+        <FormItem
+        label={formatMessage({ id: 'bp.maintain_details.phone.verificationCode' })}
+        style={{ margin: '20px 16px 60px 0' }}>
+          {getFieldDecorator('code')(
+          <Input
+          style={{ width: '180px' }}
+          placeholder={formatMessage({ id: 'bp.maintain_details.phone.pleaseEnterCode' })}/>,
+          )}
           &nbsp;&nbsp;&nbsp;&nbsp;
           <Button type="primary" disabled={btnText === 3}
           ghost onClick={() => { this.getCode() }} style={{ width: '100px' }}>
-            {(btnText === 1 ? '获取验证码' : (btnText === 2 ? '重新发送' : `${time}秒`))}
+            {(btnText === 1 ? formatMessage({ id: 'bp.maintain_details.phone.obtainNewCode' }) :
+            (btnText === 2 ? formatMessage({ id: 'bp.maintain_details.phone.resend' }) :
+            `${time}${formatMessage({ id: 'bp.maintain_details.phone.seconds' })}`))}
           </Button>
         </FormItem>
       </Fragment>
@@ -477,10 +541,16 @@ class CheckEmail extends Component {
           footer={ null}
         >
             <Tabs defaultActiveKey={proceed ? '2' : '1'} onChange={key => { this.tabsChange(key) }}>
-              <TabPane tab="用户自行变更" key="1">
+              <TabPane
+              tab={formatMessage({ id: 'bp.maintain_details.phone.customerSelfChange' })}
+              key="1"
+              >
               {this.userChange()}
               </TabPane>
-              <TabPane tab="人工辅助变更" key="2">
+              <TabPane
+              tab={formatMessage({ id: 'bp.maintain_details.phone.systemAssistantChange' })}
+              key="2"
+               >
               {this.manChange()}
               </TabPane>
             </Tabs>

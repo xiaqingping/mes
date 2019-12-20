@@ -1,7 +1,6 @@
 export default {
   // 搜索部分
   'bp.maintain.customerName': '名称',
-  'bp.maintain.mobilePhone': '移动电话',
   'bp.maintain.email': 'Email',
   'bp.maintain.verificationStatus': '认证状态',
   'bp.maintain.salesBlocked': '销售冻结',

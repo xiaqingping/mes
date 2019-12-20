@@ -108,9 +108,9 @@ const SeqModel = {
     ],
     // 供应商级别
     VendorLevelCode: [
-      { id: 'A', name: formatMessage({ id: 'bp.InvoiceWithGood.important' }) },
-      { id: 'B', name: formatMessage({ id: 'bp.InvoiceWithGood.moreImportant' }) },
-      { id: 'C', name: formatMessage({ id: 'bp.InvoiceWithGood.commonly' }) },
+      { id: 'A', name: formatMessage({ id: 'bp.VendorLevelCode.important' }) },
+      { id: 'B', name: formatMessage({ id: 'bp.VendorLevelCode.moreImportant' }) },
+      { id: 'C', name: formatMessage({ id: 'bp.VendorLevelCode.commonly' }) },
     ],
     // 验证记录-关联售达方记录-验证结果
     VerifyLinkSoldToPartyStatus: [

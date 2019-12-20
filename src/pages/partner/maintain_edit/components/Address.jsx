@@ -219,7 +219,7 @@ class EditableTable extends React.Component {
   getColumns = () => {
     const columns = [
       {
-        title: formatMessage({ id: 'bp.maintain_details.name' }),
+        title: formatMessage({ id: 'bp.maintain_details.shipping_address.name' }),
         dataIndex: 'name',
         width: '15%',
         editable: true,
@@ -229,7 +229,7 @@ class EditableTable extends React.Component {
         },
       },
       {
-        title: formatMessage({ id: 'bp.maintain_details.mobile_phone' }),
+        title: formatMessage({ id: 'bp.mobilePhone' }),
         dataIndex: 'mobilePhone',
         width: '20%',
         editable: true,
