@@ -6,6 +6,7 @@ import {
 } from 'antd';
 import React from 'react';
 import { connect } from 'dva';
+import moment from 'moment';
 
 @connect(({ partnerMaintainEdit }) => ({
   details: partnerMaintainEdit.details || {},
@@ -30,9 +31,19 @@ class PersonCredit extends React.Component {
           </>
         }
       >
-        <span>{item.credit} {item.currencyCode} 1天后调整</span><br/>
-        <span>{item.tempCreditLimit} {item.currencyCode} 25天后到期</span><br/>
-        <span>开票后{item.billingCycle}天到期</span><br/>
+        <span>
+          <span style={{ color: '#3C88D4' }}>
+            {item.creditLimit ? `${item.creditLimit} ` : ''}
+          </span>{item.creditLimit ? `${item.currencyCode} ` : ''}
+          {moment(item.lastEvaluationDate).fromNow()}天后调整
+        </span><br/><br/>
+        <span>
+          <span style={{ color: '#3C88D4' }}>
+            {item.tempCreditLimit ? `${item.tempCreditLimit} ` : ''}
+          </span>{item.tempCreditLimit ? `${item.currencyCode} ` : ''}
+            {moment(item.tempCreditLimitExpirationDate).fromNow()}天后到期
+        </span><br/><br/>
+        <span>开票后{item.billingCycle}天到期</span><br/><br/>
         <span>每月{item.billingDay}日开票</span>
       </Card>
     </List.Item>

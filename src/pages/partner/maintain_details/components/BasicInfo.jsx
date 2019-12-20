@@ -1,7 +1,9 @@
+/* eslint-disable no-nested-ternary */
 import { Card, Descriptions, Icon, Badge } from 'antd';
 import React, { Component } from 'react';
 import { connect } from 'dva';
 import { formatMessage } from 'umi/locale';
+import { formatter } from '@/utils/utils';
 import CheckPhone from './CheckPhone';
 import CheckEmail from './CheckEmail';
 import ChangeModal from '@/pages/partner/maintain/components/ChangeModal';
@@ -10,7 +12,7 @@ import './style.less';
 
 const DescriptionsItem = Descriptions.Item;
 
-@connect(({ partnerMaintainEdit, basicCache }) => ({
+@connect(({ partnerMaintainEdit, basicCache, bp }) => ({
   details:
     partnerMaintainEdit.type === 'supplier'
       ? partnerMaintainEdit.supplier
@@ -19,6 +21,7 @@ const DescriptionsItem = Descriptions.Item;
   // countryDiallingCodes: basicCache.countryDiallingCodes,
   salesPaymentMethods: basicCache.salesPaymentMethods,
   industry: basicCache.industryCategories,
+  salesOrderBlock: bp.salesOrderBlock,
 }))
 class BasicInfo extends Component {
   state = {
@@ -62,6 +65,7 @@ class BasicInfo extends Component {
       countryDiallingCodes,
       salesPaymentMethods,
       industry,
+      salesOrderBlock,
     } = this.props;
     if (!basic) return null
     if (!countryDiallingCodes && !salesPaymentMethods) return null;
@@ -227,8 +231,21 @@ class BasicInfo extends Component {
           <DescriptionsItem span={2} label={type === 'supplier' ?
           formatMessage({ id: 'bp.maintain_details.purchase_org.procurement_block' }) :
           formatMessage({ id: 'bp.maintain_details.sales_distribution.sales_block' })}>
-            <Badge status="error" />
-            &nbsp;{formatMessage({ id: 'bp.block' })}
+            {/* <Badge status="error" /> */}
+            {/* &nbsp;{formatMessage({ id: 'bp.block' })} */}
+            {type === 'supplier' ?
+            (details.vendor ?
+            <Badge
+            status={formatter(salesOrderBlock, details.vendor.invoicePostBlock, 'id', 'badge') }
+            text={formatter(salesOrderBlock, details.vendor.invoicePostBlock) }
+            /> : '')
+             :
+            (details.custom ?
+            <Badge
+            status={formatter(salesOrderBlock, details.custom.invoicePostBlock, 'id', 'badge') }
+            text={formatter(salesOrderBlock, details.custom.invoicePostBlock) }
+            /> : '')
+            }
           </DescriptionsItem>
         </Descriptions>
         <CheckPhone
