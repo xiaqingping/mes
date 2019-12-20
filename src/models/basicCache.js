@@ -126,7 +126,7 @@ const BasicModel = {
         // 三：数据请求接口
         const methods = {
           // countrys: basic.getCountrys,
-        }
+        };
 
         // 四：确定请求方法
         // example: type = countrys，则 methodName = getCountrys，如果你的接口命名规则与此不同，则需要将你的方法写到 methods 里
@@ -175,8 +175,7 @@ const BasicModel = {
     },
   },
   subscriptions: {
-    setup() {
-    },
+    setup() {},
   },
 };
 export default BasicModel;

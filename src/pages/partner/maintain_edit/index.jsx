@@ -30,7 +30,6 @@ import { validateForm, diff } from '@/utils/utils';
   oldDetails: bpEdit.oldDetails || {},
   details: bpEdit.details || {},
   pageLoading: loading.effects['bpEdit/readBPDetails'] || false,
-  // submitButtonLoading: loading.effects['bpEdit/addBP'] || loading.effects['bpEdit/updateBP'],
 }))
 class CustomerEdit extends Component {
   constructor(props) {
@@ -139,6 +138,14 @@ class CustomerEdit extends Component {
     areaCacheList.forEach(item => {
       this.props.dispatch({
         type: 'areaCache/getCache',
+        payload: item,
+      });
+    });
+
+    const bpCacheList = [{ type: 'industryCategoryAll' }];
+    bpCacheList.forEach(item => {
+      this.props.dispatch({
+        type: 'bpCache/getCache',
         payload: item,
       });
     });

@@ -74,10 +74,9 @@ export default {
   },
   // 根据业务伙伴ID和开票方ID取消负责人认证接口
   cancelBPPiCertification(data) {
-    return request(
-      `/businessPartners/v1/${data.id}/piCertification/${data.billToPartyId}/cancel`,
-      { method: 'POST' },
-    );
+    return request(`/businessPartners/v1/${data.id}/piCertification/${data.billToPartyId}/cancel`, {
+      method: 'POST',
+    });
   },
 
   // 根据业务伙伴ID禁止客户销售接口
@@ -229,5 +228,9 @@ export default {
       `/businessPartners/v1/verifyRecords/${verifyRecordId}/changeContactInfo/newEmailVerifyCodeVerification?verifyCode=${data}`,
       { method: 'POST' },
     );
+  },
+  // 查询所有行业类别（taxNo：默认税号 repeatTaxNo：是否可重复）
+  getIndustryCategoryAll() {
+    return request('/businessPartners/v1/industryCategory/all');
   },
 };
