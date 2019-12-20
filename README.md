@@ -18,7 +18,7 @@ npm run build
 ## 2. 技术栈
 
 [React](https://zh-hans.reactjs.org/) + [UmiJS](https://umijs.org/zh/) + [DvaJS](https://dvajs.com/)  
-[Ant Design of React](https://ant.design/docs/react/introduce-cn)
+[Ant Design of React](https://ant.design/docs/react/introduce-cn) [i18n](https://github.com/formatjs/react-intl)
 
 ## 3. 命名规范
 
