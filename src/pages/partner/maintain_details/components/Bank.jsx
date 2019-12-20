@@ -8,17 +8,29 @@ import React, { Component } from 'react';
 import { connect } from 'dva';
 import './style.less';
 import { formatMessage } from 'umi/locale';
+import { formatter } from '@/utils/utils';
 
 const DescriptionsItem = Descriptions.Item;
 
-@connect(({ partnerMaintainEdit }) => ({
+@connect(({ partnerMaintainEdit, basicCache, global }) => {
+  const countrys = basicCache.countrys.filter(item => item.languageCode === global.languageCode)
+  return ({
   details: partnerMaintainEdit.supplier,
-}))
+  countrys,
+})
+})
 class Bank extends Component {
   state = {}
 
+  componentDidMount() {
+    this.props.dispatch({
+      type: 'basicCache/getCache',
+      payload: { type: 'countrys' },
+    })
+  }
+
   render() {
-    const { details: { vendor } } = this.props;
+    const { details: { vendor }, countrys } = this.props;
     return (
       <Card
       title={formatMessage({ id: 'bp.maintain_details.bank' })}
@@ -31,7 +43,8 @@ class Bank extends Component {
           column={4}
         >
           <DescriptionsItem label={formatMessage({ id: 'bp.maintain_details.bank.country' })}>
-            {vendor.paymentBank ? vendor.paymentBank.countryCode : ''}
+            {vendor.paymentBank ?
+            formatter(countrys, vendor.paymentBank.countryCode, 'code', 'name') : ''}
           </DescriptionsItem>
           <DescriptionsItem label={formatMessage({ id: 'bp.maintain_details.bank.bank_name' })}>
             {vendor.paymentBank ? vendor.paymentBank.bankName : ''}

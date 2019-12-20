@@ -521,7 +521,6 @@ class ChangeModal extends Component {
           registeredAddress: row.regisAddress || '',
         });
       }
-      console.log(data)
       api.bp.updateBPOrgCertification(data).then(() => {
         this.setState({ submitNext: 2 });
         this.props.getData();
@@ -560,6 +559,7 @@ class ChangeModal extends Component {
       gtype: 0,
       pageLoading: true,
       defaultAddress: '',
+      guuid: '',
     });
   };
 

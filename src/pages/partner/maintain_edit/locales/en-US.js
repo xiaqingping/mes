@@ -60,6 +60,9 @@ export default {
   'bp.maintain_details.credit_management.temporary_credit': 'Temporary Credit',
   'bp.maintain_details.credit_management.payment_period': 'Payment Period',
   'bp.maintain_details.credit_management.invoiced_period': 'Invoiced Period',
+  'bp.maintain_details.credit_management.dueDate': 'Due date: {name} days',
+  'bp.maintain_details.credit_management.invoiceIssued':
+  'Invoice issued {name}th day of each month',
   // 组织认证
   'bp.maintain_details.verification_data': 'Verification Data',
   'bp.maintain_details.verification_data.status': 'Verification Status',

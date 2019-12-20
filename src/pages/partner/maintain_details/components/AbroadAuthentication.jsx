@@ -10,7 +10,9 @@ import { connect } from 'dva';
 import './style.less';
 import { formatMessage } from 'umi/locale';
 import { formatter } from '@/utils/utils';
-import api from '@/api'
+import ChangeModal from '@/pages/partner/maintain/components/ChangeModal';
+import api from '@/api';
+import CertificationPopover from '@/pages/partner/maintain_edit/components/CertificationPopover';
 
 const DescriptionsItem = Descriptions.Item;
 
@@ -47,6 +49,71 @@ class BasicInfo extends Component {
     }
   }
 
+  /** 取消认证 */
+  cancelIdent = (e, record) => {
+    e.preventDefault();
+    if (record.basic.type === 2) {
+      api.bp.cancelBPOrgCertification(record.basic.id).then(() => {
+        // eslint-disable-next-line no-restricted-globals
+        location.reload(true);
+      });
+    }
+  };
+
+  certificationStatus = (v, details) => {
+    if (parseInt(v, 10) === 4) {
+      return (
+        <>
+          <CertificationPopover basic={details.basic}>
+            <a
+              onClick={() => {
+                this.showChange.visibleShow(true, this.props.details.basic);
+              }}
+            >
+              {formatMessage({ id: 'bp.maintain_details.change' })}
+            </a>
+          </CertificationPopover>
+          &nbsp;&nbsp;
+          <a
+            href="#"
+            onClick={e => {
+              this.cancelIdent(e, details);
+            }}
+          >
+            {formatMessage({ id: 'bp.maintain.cancelApproval' })}
+          </a>
+        </>
+      )
+    }
+    if (parseInt(v, 10) === 1) {
+      return (
+        <>
+          <CertificationPopover basic={details.basic}>
+            <a
+              onClick={() => {
+                this.showChange.visibleShow(true, this.props.details.basic);
+              }}
+            >
+              {formatMessage({ id: 'bp.maintain.approval' })}
+            </a>
+          </CertificationPopover>
+        </>
+      )
+    }
+    if (parseInt(v, 10) === 2) {
+      return (
+        <>
+          <CertificationPopover basic={details.basic}>
+            <a>
+            {formatMessage({ id: 'menu.bp.maintain.details' })}
+            </a>
+          </CertificationPopover>
+        </>
+      )
+    }
+    return ''
+  }
+
   render() {
     const { details, BpCertificationStatus } = this.props;
     const { pic } = this.state;
@@ -75,14 +142,8 @@ class BasicInfo extends Component {
                   formatter(BpCertificationStatus, details.basic.certificationStatus, 'id', 'name')
                 }
                 />
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                {parseInt(details.basic.certificationStatus, 10) === 4 ? <>
-                  <a>
-                    {formatMessage({ id: 'bp.maintain_details.change' })}
-                  </a>&nbsp;&nbsp;
-                  <a>
-                    {formatMessage({ id: 'bp.maintain.cancelApproval' })}
-                  </a></> : ''}
+                &nbsp;&nbsp;&nbsp;&nbsp;
+                { this.certificationStatus(details.basic.certificationStatus, details)}
               </DescriptionsItem>
               <DescriptionsItem label={details.basic.countryCode === 'US' ?
               formatMessage({ id: 'bp.verification.organizationVerification.taxExemptID' }) :
@@ -138,6 +199,12 @@ class BasicInfo extends Component {
             </Descriptions>
           </Col>
         </Row>
+        <ChangeModal
+          onRef={ref => {
+            this.showChange = ref;
+          }}
+          getData={() => {}}
+        />
       </Card>
     );
   }

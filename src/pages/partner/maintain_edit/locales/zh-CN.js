@@ -60,6 +60,8 @@ export default {
   'bp.maintain_details.credit_management.temporary_credit': '临时额度',
   'bp.maintain_details.credit_management.payment_period': '付款周期',
   'bp.maintain_details.credit_management.invoiced_period': '账单间隔',
+  'bp.maintain_details.credit_management.dueDate': '开票后{name}天到期',
+  'bp.maintain_details.credit_management.invoiceIssued': '每月{name}日开票',
   // 组织认证
   'bp.maintain_details.verification_data': '认证资料',
   'bp.maintain_details.verification_data.status': '认证状态',
