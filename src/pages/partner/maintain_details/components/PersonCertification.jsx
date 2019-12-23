@@ -2,30 +2,17 @@ import { Button, Card, Icon, List, Typography, Badge } from 'antd';
 import React from 'react';
 import { connect } from 'dva';
 import api from '@/api';
-import { formatMessage } from 'umi-plugin-react/locale';
+import { formatter } from '@/utils/utils';
+import { formatMessage } from 'umi/locale';
 import CertificationPopover from '@/pages/partner/maintain_edit/components/CertificationPopover';
 import PersonCertificationAddModal from './PersonCertificationAddModal';
 
 const { Paragraph } = Typography;
-// 审核状态
-const verifyStatus = {
-  1: {
-    value: 'warning',
-    text: '审核中',
-  },
- 2: {
-    value: 'success',
-    text: '已认证',
-  },
-  3: {
-    value: 'default',
-    text: '未认证',
-  },
-}
 
-@connect(({ partnerMaintainEdit, user }) => ({
+@connect(({ partnerMaintainEdit, user, bp }) => ({
   details: partnerMaintainEdit.details || {},
   authorization: user.currentUser.authorization,
+  PiCertificationStatus: bp.PiCertificationStatus,
 }))
 class PersonCertification extends React.Component {
   constructor(props) {
@@ -78,7 +65,7 @@ class PersonCertification extends React.Component {
   }
 
   renderListItem = item => {
-    const { details } = this.props;
+    const { details, PiCertificationStatus } = this.props;
     if (item && item.id) {
       return (
         <List.Item key={item.id}>
@@ -87,7 +74,9 @@ class PersonCertification extends React.Component {
             title={item.billToPartyName}
             extra={ item.status === 1 ? '' :
               <>
-                <a onClick={() => this.removeItem(item)}>删除</a>
+                <a onClick={() => this.removeItem(item)}>
+                  {formatMessage({ id: 'action.delete' })}
+                </a>
               </>
             }
           >
@@ -96,10 +85,18 @@ class PersonCertification extends React.Component {
                 basic={details.basic}
                 billToPartyId={item.billToPartyId}
               >
-                <Badge
+                {/* <Badge
                   status={verifyStatus[item.status].value}
                   text={verifyStatus[item.status].text}
-                />
+                /> */}
+              <Badge
+                status={
+                  formatter(PiCertificationStatus, item.status, 'id', 'badge')
+                }
+                text={
+                  formatter(PiCertificationStatus, item.status, 'id', 'name')
+                }
+              />
               </CertificationPopover>
             </div>
             <Paragraph
@@ -138,7 +135,7 @@ class PersonCertification extends React.Component {
           style={{ width: '100%', height: 304 }}
           onClick={() => this.handleModalVisible(true)}
         >
-          <Icon type="plus" /> 新增认证
+          <Icon type="plus" /> {formatMessage({ id: 'bp.newCertifications' })}
         </Button>
       </List.Item>
     );

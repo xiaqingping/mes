@@ -127,6 +127,11 @@ const SeqModel = {
       { id: 3, name: formatMessage({ id: 'bp.verification.user' }) },
       { id: 4, name: formatMessage({ id: 'bp.verification.manualAudit' }) },
     ],
+    // 验证记录-手机验证和邮箱验证-验证类型
+    VerifyPhoneOrEmailType: [
+      { id: 1, name: formatMessage({ id: 'bp.verification.verification.mobileVerification' }) },
+      { id: 2, name: formatMessage({ id: 'bp.verification.verification.mailboxVerification' }) },
+    ],
     // 验证记录状态
     VerifyRecordStatus: [
       // 验证中

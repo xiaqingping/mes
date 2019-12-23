@@ -9,6 +9,7 @@ import {
 import { connect } from 'dva';
 import React from 'react';
 import { formatter } from '@/utils/utils';
+import { formatMessage } from 'umi/locale';
 
 const DescriptionsItem = Descriptions.Item;
 
@@ -23,6 +24,7 @@ const DescriptionsItem = Descriptions.Item;
     purchaseOrganizations: basicCache.purchaseOrganizations,
     currencies,
     VendorLevelCode: bp.VendorLevelCode,
+    InvoiceWithGood: bp.InvoiceWithGood,
   })
 })
 class PurchasingOrg extends React.Component {
@@ -69,6 +71,7 @@ class PurchasingOrg extends React.Component {
       purchaseGroups,
       currencies,
       VendorLevelCode,
+      InvoiceWithGood,
     } = this.props;
     let data = null;
     purchaseOrganizationList.map(item => {
@@ -79,26 +82,67 @@ class PurchasingOrg extends React.Component {
               layout="vertical"
               column={8}
             >
-              <DescriptionsItem span={2} label="订单货币">
+              <DescriptionsItem
+              span={2}
+              label={formatMessage({ id: 'bp.maintain_details.purchase_org.order_currency' })}
+              >
                 {formatter(currencies, item.currencyCode, 'code', 'shortText')}
               </DescriptionsItem>
-              <DescriptionsItem span={2} label="付款条件">
+              <DescriptionsItem
+              span={2}
+              label={formatMessage({ id: 'bp.maintain_details.purchase_org.payment_condition' })}
+              >
                 {
                   formatter(paymentTerms, item.paymentTermsCode, 'code', 'name')
                 }
               </DescriptionsItem>
-              <DescriptionsItem span={2} label="销售人员">{item.salerName}</DescriptionsItem>
-              <DescriptionsItem span={2} label="销售人员电话">{item.salerTelephone}</DescriptionsItem>
-              <DescriptionsItem span={2} label="供应商级别">
+              <DescriptionsItem
+              span={2}
+              label={formatMessage({ id: 'bp.maintain_details.purchase_org.sales_rep' })}
+              >
+                {item.salerName}
+              </DescriptionsItem>
+              <DescriptionsItem
+              span={2}
+              label={formatMessage({ id: 'bp.maintain_details.purchase_org.sales_rep_phone' })}
+              >
+                {item.salerTelephone}
+              </DescriptionsItem>
+              <DescriptionsItem
+              span={2}
+              label={formatMessage({ id: 'bp.maintain_details.purchase_org.supplier_level' })}
+              >
                 {formatter(VendorLevelCode, item.levelCode)}
               </DescriptionsItem>
-              <DescriptionsItem span={2} label="收货时发票过账">
-                {parseInt(item.invoicePostInReceive, 10) === 1 ? '是' : '否'}
+              <DescriptionsItem
+              span={2}
+              label={formatMessage({
+                id: 'bp.maintain_details.purchase_org.invoice_when_good_receipt',
+              })}
+              >
+                {item.invoicePostInReceive ?
+                formatter(
+                  InvoiceWithGood,
+                  item.invoicePostInReceive,
+                  ) : ''}
               </DescriptionsItem>
-              <DescriptionsItem span={2} label="采购组">
+              <DescriptionsItem
+              span={2}
+              label={formatMessage({
+                id: 'bp.maintain_details.purchase_org.purchase_organization',
+              })}
+              >
               { formatter(purchaseGroups, item.purchaseGroupCode, 'code', 'name') }
               </DescriptionsItem>
-              <DescriptionsItem span={2} label="计划交货时间">{item.deliveryPlanDays}天</DescriptionsItem>
+              <DescriptionsItem
+              span={2}
+              label={formatMessage({
+                id: 'bp.maintain_details.purchase_org.delivery_time_plan',
+              })}
+              >
+                {item.deliveryPlanDays}
+                {formatMessage({ id: 'bp.maintain_details.purchase_org.day' })}
+              </DescriptionsItem>
             </Descriptions>
         )
       }
@@ -169,7 +213,7 @@ class PurchasingOrg extends React.Component {
     }
     return (
       <Card
-        title="采购组织"
+        title={formatMessage({ id: 'bp.maintain_details.purchase_org' })}
         bordered={false}
         style={{ marginBottom: '24px' }}
         tabList={tabKey ? tabList : ''}

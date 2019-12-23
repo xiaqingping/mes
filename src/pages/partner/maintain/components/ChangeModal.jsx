@@ -175,7 +175,7 @@ class AddressGroup extends Component {
   // 选择地区
   selectArea = (v, o) => {
     if (o.length !== 0) {
-      this.props.gTypeName(o[0].sapCode);
+      this.props.gTypeName(o[0].sapCode, o[o.length - 1].isHaveLow);
       if (o[0].level === 1) {
         this.props.defaultAddressCode(o[0].code);
       }
@@ -314,6 +314,7 @@ class ChangeModal extends Component {
       defaultAddress: '',
       pageLoading: true,
       industryCategory: [],
+      noHaveLev: false,
     };
     this.fetchBank = debounce(this.fetchBank, 500);
   }
@@ -567,6 +568,7 @@ class ChangeModal extends Component {
       gtype: 0,
       pageLoading: true,
       defaultAddress: '',
+      noHaveLev: false,
       // guuid: '',
     });
   };
@@ -650,8 +652,17 @@ class ChangeModal extends Component {
   };
 
   // 国家修改模式
-  countryChangeType = v => {
+  countryChangeType = (v, noHaveLev) => {
     console.log(`国家:${v}`)
+    if (noHaveLev === 2) {
+      this.setState({
+        noHaveLev: true,
+      })
+    } else {
+      this.setState({
+        noHaveLev: false,
+      })
+    }
     if (v === 'CN') {
       this.setState({
         gtype: 1,
@@ -790,7 +801,7 @@ class ChangeModal extends Component {
   };
 
   groupAdressInput = () => {
-    const { form, area, userData, gtype, address, defaultAddress } = this.state;
+    const { form, userData, gtype, address, defaultAddress, noHaveLev } = this.state;
     const { getFieldDecorator } = form;
     // console.log(area)
     // console.log(form.getFieldValue('address'))
@@ -803,14 +814,14 @@ class ChangeModal extends Component {
             wrapperCol={{ span: 20 }}
             hasFeedback
             validateStatus={
-              area[0] && area[1] && area[2] && area[3] && area[4] && address ? 'success' : 'error'
+              noHaveLev && address ? 'success' : 'error'
             }
             // help={form.getFieldValue('msg') ? '' : '请输入信息'}
           >
             {getFieldDecorator('address')(
               <AddressGroup
                 addressVal={this.addressVal}
-                gTypeName={v => this.countryChangeType(v)}
+                gTypeName={(v, lev) => this.countryChangeType(v, lev)}
                 userData={userData}
                 defaultAddressCode={v => this.defaultAddressCode(v)}
                 defaultAddress={defaultAddress}
@@ -828,13 +839,13 @@ class ChangeModal extends Component {
             labelCol={{ span: 4 }}
             wrapperCol={{ span: 20 }}
             hasFeedback
-            validateStatus={area[0] && address ? 'success' : 'error'}
+            validateStatus={noHaveLev && address ? 'success' : 'error'}
             // help={form.getFieldValue('msg') ? '' : '请输入信息'}
           >
             {getFieldDecorator('address')(
               <AddressGroup
                 addressVal={this.addressVal}
-                gTypeName={v => this.countryChangeType(v)}
+                gTypeName={(v, lev) => this.countryChangeType(v, lev)}
                 userData={userData}
                 defaultAddressCode={v => this.defaultAddressCode(v)}
                 defaultAddress={defaultAddress}
@@ -853,14 +864,14 @@ class ChangeModal extends Component {
             wrapperCol={{ span: 20 }}
             hasFeedback
             validateStatus={
-              area[0] && area[1] && area[2] && area[3] && area[4] && address ? 'success' : 'error'
+              noHaveLev && address ? 'success' : 'error'
             }
             // help={form.getFieldValue('msg') ? '' : '请输入信息'}
           >
             {getFieldDecorator('address')(
               <AddressGroup
                 addressVal={this.addressVal}
-                gTypeName={v => this.countryChangeType(v)}
+                gTypeName={(v, lev) => this.countryChangeType(v, lev)}
                 userData={userData}
                 defaultAddressCode={v => this.defaultAddressCode(v)}
                 defaultAddress={defaultAddress}
@@ -877,13 +888,13 @@ class ChangeModal extends Component {
           labelCol={{ span: 4 }}
           wrapperCol={{ span: 20 }}
           hasFeedback
-          validateStatus={area[0] && address ? 'success' : 'error'}
+          validateStatus={noHaveLev && address ? 'success' : 'error'}
           // help={form.getFieldValue('msg') ? '' : '请输入信息'}
         >
           {getFieldDecorator('address')(
             <AddressGroup
               addressVal={this.addressVal}
-              gTypeName={v => this.countryChangeType(v)}
+              gTypeName={(v, lev) => this.countryChangeType(v, lev)}
               userData={userData}
               defaultAddressCode={v => this.defaultAddressCode(v)}
               defaultAddress={defaultAddress}

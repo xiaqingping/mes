@@ -47,6 +47,7 @@ export default {
   'bp.maintain_details.purchase_org.purchase_organization': 'Purchase Organization',
   'bp.maintain_details.purchase_org.delivery_time_plan': 'Delivery Time(Plan)',
   'bp.maintain_details.purchase_org.procurement_block': 'Procurement Block',
+  'bp.maintain_details.purchase_org.day': ' Days',
   // 付款银行
   'bp.maintain_details.bank': 'Payment Bank Information',
   'bp.maintain_details.bank.country': 'Country',
@@ -63,6 +64,11 @@ export default {
   'bp.maintain_details.credit_management.dueDate': 'Due date: {name} days',
   'bp.maintain_details.credit_management.invoiceIssued':
   'Invoice issued {name}th day of each month',
+  'bp.maintain_details.credit_management.yourCredit': 'Your credit has been adjusted to',
+  'bp.maintain_details.credit_management.pleaseCheck': ', please check!',
+  'bp.maintain_details.credit_management.creditAdjustment': 'Credit Adjustment',
+  'bp.maintain_details.credit_management.yourTemporary': 'Your temporary credit limit is',
+  'bp.maintain_details.credit_management.temporaryCreditApp': 'Temporary Credit application',
   // 组织认证
   'bp.maintain_details.verification_data': 'Verification Data',
   'bp.maintain_details.verification_data.status': 'Verification Status',

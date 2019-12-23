@@ -80,6 +80,8 @@ export default {
   'bp.verification.verification.verificationCode': 'Verification Code:',
   'bp.verification.verification.verificationCodeExpiryDate': 'Verification Code Expiry Date:',
   'bp.verification.verification.lastSentDate': 'Last Sent Date:',
+  'bp.verification.verification.mobileVerification': 'Mobile Verification',
+  'bp.verification.verification.mailboxVerification': 'Mailbox Verification',
   // 绑定售达方
   'bp.verification.defaultShipToParty': 'Default Ship-To Party',
   'bp.verification.defaultShipToParty.shipToParty': 'Ship-To Party:',
