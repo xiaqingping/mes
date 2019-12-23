@@ -261,16 +261,17 @@ class SalesArea extends React.Component {
     const { tabKey } = this.state;
     const { details, customer, salesAreaList } = this.props;
 
+    // 如果本次修改的是直销[10]或电商[20]，则生成另一个对应的key
+    let matchKey;
+    const arr = ['10', '20'];
+    const codeIndex = arr.indexOf(tabKey.split('-')[1]);
+    if (codeIndex !== -1) {
+      arr.splice(codeIndex, 1);
+      matchKey = `${tabKey.split('-')[0]}-${arr[0]}`;
+    }
+
     const newSalesAreaList = salesAreaList.map(e => {
       const itemKey = `${e.salesOrganizationCode}-${e.distributionChannelCode}`;
-      // 如果本次修改的是直销[10]或电商[20]，则生成另一个对应的key
-      let matchKey;
-      const arr = ['10', '20'];
-      const codeIndex = arr.indexOf(tabKey.split('-')[1]);
-      if (codeIndex !== -1) {
-        arr.splice(codeIndex, 1);
-        matchKey = `${e.salesOrganizationCode}-${arr[0]}`;
-      }
 
       if (itemKey === tabKey || itemKey === matchKey) {
         if (key === 'regionOffice') {
