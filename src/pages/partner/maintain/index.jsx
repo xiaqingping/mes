@@ -97,7 +97,7 @@ function renderOption(item) {
     languageCode: global.languageCode,
     regionOffice,
     BpCertificationStatus: bp.BpCertificationStatus,
-    salesOrderBlock: bp.salesOrderBlock,
+    salesOrderBlock: bp.SalesOrderBlock,
     CustomerDataStatus: bp.CustomerDataStatus,
   })
 })
