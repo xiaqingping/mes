@@ -23,6 +23,7 @@ export default {
   'bp.mobilePhone': '移动电话',
   'bp.chinese': '中文',
   'bp.english': '英文',
+  'bp.newCertifications': '新增认证',
 
   // model本地数据
   'bp.VendorLevelCode.important': '重要',

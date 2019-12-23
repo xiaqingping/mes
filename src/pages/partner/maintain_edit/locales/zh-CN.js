@@ -47,6 +47,7 @@ export default {
   'bp.maintain_details.purchase_org.purchase_organization': '采购组',
   'bp.maintain_details.purchase_org.delivery_time_plan': '计划交货时间',
   'bp.maintain_details.purchase_org.procurement_block': '采购冻结',
+  'bp.maintain_details.purchase_org.day': '天',
   // 付款银行
   'bp.maintain_details.bank': '付款银行',
   'bp.maintain_details.bank.country': '国家',
@@ -62,6 +63,11 @@ export default {
   'bp.maintain_details.credit_management.invoiced_period': '账单间隔',
   'bp.maintain_details.credit_management.dueDate': '开票后{name}天到期',
   'bp.maintain_details.credit_management.invoiceIssued': '每月{name}日开票',
+  'bp.maintain_details.credit_management.yourCredit': '您的固定额度已调整为',
+  'bp.maintain_details.credit_management.pleaseCheck': '， 请注意查收！',
+  'bp.maintain_details.credit_management.creditAdjustment': '固定额度调整',
+  'bp.maintain_details.credit_management.yourTemporary': '您申请的临时额度为',
+  'bp.maintain_details.credit_management.temporaryCreditApp': '申请临时额度',
   // 组织认证
   'bp.maintain_details.verification_data': '认证资料',
   'bp.maintain_details.verification_data.status': '认证状态',

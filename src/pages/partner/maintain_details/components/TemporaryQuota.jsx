@@ -5,6 +5,8 @@ import {
 } from 'antd';
 import React, { Component } from 'react';
 import { connect } from 'dva';
+import { formatMessage } from 'umi/locale';
+import { formatter } from '@/utils/utils';
 import api from '@/api';
 
 @connect(({ partnerMaintainEdit }) => ({
@@ -23,13 +25,19 @@ class TemporaryQuota extends Component {
       visible,
     })
     const { details } = this.props;
-    // console.log(details)
     if (visible) {
-      if (details.basic.type === 2) { // 判断是否为非个人
+      // if (details.basic.type === 2) { // 判断是否为非个人
         api.bp.tempCreditLimitAssessment(
-          { id: details.basic.id, currencyCode: details.customer.salesAreaList[0].currencyCode },
-          ).then(res => { this.setState({ quotaData: res }) })
-      }
+          {
+            id: details.basic.id,
+            currencyCode: details.basic.type === 2 ?
+            details.customer.salesAreaList[0].currencyCode : formatter(
+              details.creditList, nextProps.billToPartyId, 'billToPartyId', 'currencyCode',
+            ),
+            billToPartyId: details.basic.type === 2 ? '' : nextProps.billToPartyId,
+          },
+        ).then(res => { this.setState({ quotaData: res }) })
+      // }
     }
   }
 
@@ -43,18 +51,65 @@ class TemporaryQuota extends Component {
 
   handleOk = () => {
     const { details } = this.props;
-    if (details.basic.type === 2) { // 判断是否为非个人
-      api.bp.creditLimitAdjustment(
-
-        { id: details.basic.id, currencyCode: details.customer.salesAreaList[0].currencyCode },
+    const { creditList } = details;
+    // if (details.basic.type === 2) { // 判断是否为非个人
+      api.bp.tempCreditlimitAdjustment(
+        { id: details.basic.id,
+          currencyCode: details.customer.salesAreaList[0].currencyCode,
+          billToPartyId: details.basic.type === 2 ? '' : this.props.billToPartyId,
+        },
         ).then(res => {
           this.setState({
             quotaData: res,
             status: 2,
           })
-          // console.log(res)
+          if (details.basic.type === 2) {
+            const data = creditList[0];
+            if (creditList.length !== 0) {
+              data.tempCreditLimit = res.tempCreditLimit;
+              data.currencyCode = res.currencyCode;
+              data.tempCreditLimitExpirationDate =
+              details.creditList[0].tempCreditLimitExpirationDate;
+            }
+            this.props.dispatch({
+              type: 'partnerMaintainEdit/setDetails',
+              payload: {
+                ...details,
+                creditList: [data],
+              },
+            })
+          } else {
+            const data = details.creditList;
+            const newData = [];
+            data.forEach(item => {
+              if (item.billToPartyId === this.props.billToPartyId) {
+                newData.push({
+                  billToPartyId: item.billToPartyId,
+                  billToPartyCode: item.billToPartyCode,
+                  billToPartyName: item.billToPartyName,
+                  billingCycle: item.billingCycle,
+                  billingDay: item.billingDay,
+                  creditLimit: item.creditLimit,
+                  creditPeriod: item.creditPeriod,
+                  currencyCode: res.currencyCode,
+                  lastEvaluationDate: item.lastEvaluationDate,
+                  tempCreditLimit: res.tempCreditLimit,
+                  tempCreditLimitExpirationDate: item.tempCreditLimitExpirationDate,
+                })
+              } else {
+                newData.push(item)
+              }
+            })
+            this.props.dispatch({
+              type: 'partnerMaintainEdit/setDetails',
+              payload: {
+                ...details,
+                creditList: newData,
+              },
+            })
+          }
         })
-    }
+    // }
   }
 
   // 固定额度页面
@@ -75,7 +130,7 @@ class TemporaryQuota extends Component {
     )
 }
 
-  // 固定额度页面
+  // 临时额度页面
   hangelPage = () => {
     const { quotaData } = this.state;
     return (
@@ -85,10 +140,10 @@ class TemporaryQuota extends Component {
           color: '#54C31F',
           marginBottom: '20px' }}/>
         <p>
-        您申请的临时额度为&nbsp;&nbsp;
-        <span style={{ color: '#4EA7E9' }}>{quotaData.creditLimit}</span>&nbsp;&nbsp;
-        {quotaData.currencyCode} <br/>
-          请注意查收！
+        {formatMessage({ id: 'bp.maintain_details.credit_management.yourTemporary' })}&nbsp;&nbsp;
+        <span style={{ color: '#4EA7E9' }}> {quotaData.tempCreditLimit} </span>&nbsp;&nbsp;
+        {quotaData.currencyCode}
+        {formatMessage({ id: 'bp.maintain_details.credit_management.pleaseCheck' })}
         </p>
       </div>
     )
@@ -99,7 +154,9 @@ class TemporaryQuota extends Component {
     return (
       <div>
         <Modal
-          title={ status === 1 ? '固定额度调整' : ' '}
+          title={ status === 1 ? formatMessage({
+            id: 'bp.maintain_details.credit_management.temporaryCreditApp',
+           }) : ' '}
           visible={visible}
           className="quotaStyle"
           centered
@@ -108,7 +165,7 @@ class TemporaryQuota extends Component {
           onCancel={this.handleCancel}
           footer={ status === 1 ? [
             <Button key="submit" type="primary" onClick={this.handleOk}>
-              提交
+              {formatMessage({ id: 'action.submit' })}
             </Button>,
           ] : ''}
         >

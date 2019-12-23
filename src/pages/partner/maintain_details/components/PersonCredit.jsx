@@ -6,7 +6,10 @@ import {
 } from 'antd';
 import React from 'react';
 import { connect } from 'dva';
+import { formatMessage } from 'umi/locale';
 import moment from 'moment';
+import FixedQuota from './FixedQuota';
+import TemporaryQuota from './TemporaryQuota';
 
 @connect(({ partnerMaintainEdit }) => ({
   details: partnerMaintainEdit.details || {},
@@ -15,8 +18,28 @@ import moment from 'moment';
 class PersonCredit extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = {
+      fixedVisible: false,
+      temporaryVisible: false,
+      billToPartyId: '',
+    };
   }
+
+    // 固定额度
+    fixedQuota = (v, billToPartyId) => {
+      this.setState({
+        fixedVisible: v,
+        billToPartyId,
+      })
+    }
+
+    // 临时额度
+    temporaryQuota = (v, billToPartyId) => {
+      this.setState({
+        temporaryVisible: v,
+        billToPartyId,
+      })
+    }
 
   renderListItem = item => (
     <List.Item key={item.billToPartyId}>
@@ -25,9 +48,13 @@ class PersonCredit extends React.Component {
         title={item.billToPartyName}
         extra={
           <>
-            <a>额度调整</a>
+            <a onClick={ () => { this.fixedQuota(true, item.billToPartyId) } }>
+              {formatMessage({ id: 'bp.maintain_details.credit_management.credit_adjustment' })}
+            </a>
             <Divider type="vertical" />
-            <a>临时额度</a>
+            <a onClick={ () => { this.temporaryQuota(true, item.billToPartyId) } }>
+              {formatMessage({ id: 'bp.maintain_details.credit_management.temporary_credit' })}
+            </a>
           </>
         }
       >
@@ -35,26 +62,35 @@ class PersonCredit extends React.Component {
           <span style={{ color: '#3C88D4' }}>
             {item.creditLimit ? `${item.creditLimit} ` : ''}
           </span>{item.creditLimit ? `${item.currencyCode} ` : ''}
-          {moment(item.lastEvaluationDate).fromNow()}天后调整
+          {moment(item.lastEvaluationDate).fromNow()}
         </span><br/><br/>
         <span>
           <span style={{ color: '#3C88D4' }}>
             {item.tempCreditLimit ? `${item.tempCreditLimit} ` : ''}
           </span>{item.tempCreditLimit ? `${item.currencyCode} ` : ''}
-            {moment(item.tempCreditLimitExpirationDate).fromNow()}天后到期
+            {moment(item.tempCreditLimitExpirationDate).fromNow()}
         </span><br/><br/>
-        <span>开票后{item.billingCycle}天到期</span><br/><br/>
-        <span>每月{item.billingDay}日开票</span>
+        <span>
+          {formatMessage(
+            { id: 'bp.maintain_details.credit_management.dueDate' },
+            { name: item.creditPeriod },
+            )}
+        </span><br/><br/>
+        <span>
+          {formatMessage(
+            { id: 'bp.maintain_details.credit_management.invoiceIssued' },
+            { name: item.billingDay })}
+        </span>
       </Card>
     </List.Item>
   )
 
   render() {
     const { creditList } = this.props;
-
+    const { fixedVisible, temporaryVisible, billToPartyId } = this.state
     return (
       <Card
-        title="信贷数据"
+        title={formatMessage({ id: 'bp.maintain_details.credit_management' })}
         bordered={false}
         style={{ marginBottom: '24px' }}
       >
@@ -72,6 +108,16 @@ class PersonCredit extends React.Component {
           renderItem={this.renderListItem}
         />
         </> : <Empty />}
+        <FixedQuota
+        visible={fixedVisible}
+        fixedQuota={v => { this.fixedQuota(v) }}
+        billToPartyId={billToPartyId}
+        />
+        <TemporaryQuota
+        visible={temporaryVisible}
+        temporaryQuota={v => { this.temporaryQuota(v) }}
+        billToPartyId={billToPartyId}
+        />
       </Card>
     );
   }

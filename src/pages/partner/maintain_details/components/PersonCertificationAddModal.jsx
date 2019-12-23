@@ -4,7 +4,7 @@
 import { Form, Input, Upload, Icon, Select, Modal } from 'antd';
 import React from 'react';
 import { connect } from 'dva';
-import { formatMessage } from 'umi-plugin-react/locale';
+import { formatMessage } from 'umi/locale';
 import uniqBy from 'lodash/uniqBy';
 import api from '@/api';
 import { requestErr } from '@/utils/request';
@@ -194,7 +194,11 @@ class PICertificationAddModal extends React.Component {
         onCancel={onCancel}
       >
         <Form hideRequiredMark>
-          <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="收票方">
+          <FormItem
+          labelCol={{ span: 5 }}
+          wrapperCol={{ span: 15 }}
+          label={formatMessage({ id: 'bp.maintain_details.sales_distribution.bill_to_party' })}
+          >
             {form.getFieldDecorator('billToPartyId', {
               initialValue: billToParty.billToPartyId,
               rules: [{ required: true }],
@@ -208,13 +212,23 @@ class PICertificationAddModal extends React.Component {
               </Select>,
             )}
           </FormItem>
-          <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="认证说明">
+          <FormItem
+          labelCol={{ span: 5 }}
+          wrapperCol={{ span: 15 }}
+          label={formatMessage({ id: 'bp.maintain_details.verification_data.memo' })}
+          >
             {form.getFieldDecorator('notes', {
               initialValue: billToParty.notes,
               rules: [{ required: true }],
             })(<Input.TextArea />)}
           </FormItem>
-          <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="认证图片">
+          <FormItem
+          labelCol={{ span: 5 }}
+          wrapperCol={{ span: 15 }}
+          label={formatMessage({
+            id: 'bp.maintain_details.verification_data.verification_documents',
+          })}
+          >
             {form.getFieldDecorator('attachmentList', {
               initialValue: fileList,
               rules: [{ required: true }],

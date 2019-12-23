@@ -9,6 +9,7 @@ import {
 } from 'antd';
 import React, { Component } from 'react';
 import { formatter } from '@/utils/utils';
+import { formatMessage } from 'umi/locale';
 import './style.less'
 import { connect } from 'dva';
 
@@ -17,29 +18,8 @@ const { TabPane } = Tabs;
 
 const DescriptionsItem = Descriptions.Item;
 
-// 状态
-const status = {
-  1: {
-    value: 'warning',
-    text: '验证中',
-  },
-  2: {
-    value: 'success',
-    text: '已验证',
-  },
-  3: {
-    value: 'error',
-    text: '已拒绝',
-  },
-};
 
-// 默认开票类型
-const defaultInvoiceType = [
-      { id: '10', name: '增值税专用发票' },
-      { id: '20', name: '增值税普通发票' },
-];
-
-@connect(({ partnerMaintainEdit, global, basicCache }) => {
+@connect(({ partnerMaintainEdit, global, basicCache, bp }) => {
   const salesOrganizations = basicCache.salesOrganizations.filter(
     e => e.languageCode === global.languageCode,
   );
@@ -66,6 +46,9 @@ const defaultInvoiceType = [
     currencies,
     salesPaymentMethods,
     details: partnerMaintainEdit.details,
+    SalesOrderBlock: bp.SalesOrderBlock,
+    status: bp.VerifyRecordStatus,
+    DefaultInvoiceType: bp.DefaultInvoiceType,
   };
 })
 // eslint-disable-next-line react/prefer-stateless-function
@@ -73,108 +56,6 @@ class BasicInfo extends Component {
   state = {
     noTitleKey: 1,
   }
-
-  columns1 = [
-    {
-      title: '名称',
-      width: 500,
-      dataIndex: 'name',
-      render(text, record) {
-          return <><Icon type={record.type === 2 ? 'home' : 'user'}/> {text}</>
-      },
-    },
-    {
-      title: '售达方',
-      width: 500,
-      dataIndex: 'soldToPartyName',
-      render(text, record) {
-        return <><Icon type={record.type === 2 ? 'home' : 'user'}/> {text}</>
-      },
-    },
-    {
-      title: '状态',
-      width: 400,
-      dataIndex: 'verifyStatus',
-      render(text) {
-        return <Badge status={status[text].value} text={status[text].text}/>;
-      },
-    },
-    // {
-    //   title: '操作',
-    //   render: (text, record) => (
-    //       <a>删除</a>
-    //     ),
-    // },
-  ];
-
-  columns2 = [
-    {
-      title: '名称',
-      width: 500,
-      dataIndex: 'name',
-      render(text, record) {
-        return <><Icon type={record.type === 2 ? 'home' : 'user'}/> {text}</>
-      },
-    },
-    {
-      title: '状态',
-      width: 600,
-      dataIndex: 'linkVerifyStatus',
-      render(text) {
-        return <Badge status={status[text].value} text={status[text].text}/>;
-      },
-    },
-    // {
-    //   title: '操作',
-    //   render: (text, record) => (
-    //       <a>删除</a>
-    //     ),
-    // },
-  ];
-
-  columns3 = [
-    {
-      title: '名称',
-      width: 700,
-      dataIndex: 'name',
-      render(text, record) {
-        return <><Icon type={record.type === 2 ? 'home' : 'user'}/> {text}</>
-      },
-    },
-    {
-      title: '状态',
-      width: 400,
-      dataIndex: 'verifyStatus',
-      render(text) {
-        return <Badge status={status[text].value} text={status[text].text}/>;
-      },
-    },
-    // {
-    //   align: 'center',
-    //   title: '操作',
-    //   render: (text, record) => (
-    //       <a>删除</a>
-    //     ),
-    // },
-  ];
-
-  columns4 = [
-    {
-      title: '名称',
-      width: 1200,
-      dataIndex: 'name',
-      // render(text, record) {
-      //   return <><Icon type={record.type === 1 ? 'home' : 'user'}/> {text}</>
-      // },
-    },
-    // {
-    //   align: 'center',
-    //   title: '操作',
-    //   render: (text, record) => (
-    //       <a>变更</a>
-    //     ),
-    // },
-  ];
 
   componentDidMount () {
     const { dispatch, details } = this.props;
@@ -250,12 +131,132 @@ class BasicInfo extends Component {
 
   render() {
     const { noTitleKey } = this.state;
-    const { details: { customer }, regions, offices, salesPaymentMethods, currencies } = this.props;
+    const {
+      details: { customer },
+      regions,
+      offices,
+      salesPaymentMethods,
+      currencies,
+      status,
+      DefaultInvoiceType,
+      SalesOrderBlock } = this.props;
     const salesAreaList = customer ? customer.salesAreaList : '';
+
+    const columns1 = [
+      {
+        title: formatMessage({ id: 'bp.maintain_details.name' }),
+        width: 500,
+        dataIndex: 'name',
+        render(text, record) {
+            return <><Icon type={record.type === 2 ? 'home' : 'user'}/> {text}</>
+        },
+      },
+      {
+        title: formatMessage({ id: 'bp.maintain_details.sales_distribution.sold_to_party' }),
+        width: 500,
+        dataIndex: 'soldToPartyName',
+        render(text, record) {
+          return <><Icon type={record.type === 2 ? 'home' : 'user'}/> {text}</>
+        },
+      },
+      {
+        title: formatMessage({ id: 'bp.maintain_details.status' }),
+        width: 400,
+        dataIndex: 'verifyStatus',
+        render(text) {
+          // return <Badge status={status[text].value} text={status[text].text}/>;
+          return <Badge
+            status={formatter(status, text, 'value', 'status')}
+            text={formatter(status, text, 'value', 'text')}
+          />;
+        },
+      },
+      // {
+      //   title: '操作',
+      //   render: (text, record) => (
+      //       <a>删除</a>
+      //     ),
+      // },
+    ];
+
+    const columns2 = [
+      {
+        title: formatMessage({ id: 'bp.maintain_details.name' }),
+        width: 500,
+        dataIndex: 'name',
+        render(text, record) {
+          return <><Icon type={record.type === 2 ? 'home' : 'user'}/> {text}</>
+        },
+      },
+      {
+        title: formatMessage({ id: 'bp.maintain_details.status' }),
+        width: 600,
+        dataIndex: 'linkVerifyStatus',
+        render(text) {
+          return <Badge
+          status={formatter(status, text, 'value', 'status')}
+          text={formatter(status, text, 'value', 'text')}
+        />;
+        },
+      },
+      // {
+      //   title: '操作',
+      //   render: (text, record) => (
+      //       <a>删除</a>
+      //     ),
+      // },
+    ];
+
+    const columns3 = [
+      {
+        title: formatMessage({ id: 'bp.maintain_details.name' }),
+        width: 700,
+        dataIndex: 'name',
+        render(text, record) {
+          return <><Icon type={record.type === 2 ? 'home' : 'user'}/> {text}</>
+        },
+      },
+      {
+        title: formatMessage({ id: 'bp.maintain_details.status' }),
+        width: 400,
+        dataIndex: 'verifyStatus',
+        render(text) {
+          return <Badge
+          status={formatter(status, text, 'value', 'status')}
+          text={formatter(status, text, 'value', 'text')}
+        />;
+        },
+      },
+      // {
+      //   align: 'center',
+      //   title: '操作',
+      //   render: (text, record) => (
+      //       <a>删除</a>
+      //     ),
+      // },
+    ];
+
+    const columns4 = [
+      {
+        title: formatMessage({ id: 'bp.maintain_details.name' }),
+        width: 1200,
+        dataIndex: 'name',
+        // render(text, record) {
+        //   return <><Icon type={record.type === 1 ? 'home' : 'user'}/> {text}</>
+        // },
+      },
+      // {
+      //   align: 'center',
+      //   title: '操作',
+      //   render: (text, record) => (
+      //       <a>变更</a>
+      //     ),
+      // },
+    ];
 
     return (
       <Card
-        title="销售范围"
+        title={formatMessage({ id: 'bp.maintain_details.sales_distribution' })}
         className="check-tabs"
         bordered={false}
         style={{ width: '100%', marginBottom: '24px' }}
@@ -277,41 +278,82 @@ class BasicInfo extends Component {
                 key={item.regionCode}
                 style={{ marginBottom: '20px' }}
                 >
-                  <DescriptionsItem label="网点归属">
+                  <DescriptionsItem
+                  label={formatMessage({ id: 'bp.maintain_details.sales_distribution.sales_area' })}
+                  >
                     {formatter(regions, item.regionCode, 'code', 'name')}/
                     {formatter(offices, item.officeCode, 'code', 'name')}
                   </DescriptionsItem>
-                  <DescriptionsItem label="默认付款方式">
+                  <DescriptionsItem
+                  label={formatMessage({
+                      id: 'bp.maintain_details.sales_distribution.default_payment_menthod',
+                    })}
+                  >
                     {
                       formatter(salesPaymentMethods, item.defaultPaymentMethodCode, 'code', 'name')
                     }
                   </DescriptionsItem>
-                  <DescriptionsItem label="币种">
+                  <DescriptionsItem
+                  label={formatMessage({ id: 'bp.maintain_details.sales_distribution.currency' })}
+                  >
                     {formatter(currencies, item.currencyCode, 'code', 'shortText')}
                   </DescriptionsItem>
-                  <DescriptionsItem label="默认开票类型">
-                    {formatter(defaultInvoiceType, item.defaultInvoiceTypeCode)}
+                  <DescriptionsItem
+                  label={formatMessage({
+                    id: 'bp.maintain_details.sales_distribution.invoice_type',
+                  })}
+                  >
+                    {formatter(DefaultInvoiceType, item.defaultInvoiceTypeCode)}
                   </DescriptionsItem>
-                  <DescriptionsItem label="销售冻结">
-                    {item.salesOrderBlock === 1 ? <span><Badge status="error"/>冻结</span> :
-                    <span><Badge status="success"/>活跃</span>} </DescriptionsItem>
+                  <DescriptionsItem
+                  label={formatMessage({
+                    id: 'bp.maintain_details.sales_distribution.sales_block',
+                  })}
+                  >
+                    {/* {item.salesOrderBlock === 1 ? <span><Badge status="error"/>冻结</span> :
+                    <span><Badge status="success"/>活跃</span>} */}
+                    <span>
+                      <Badge
+                      status={formatter(SalesOrderBlock, item.salesOrderBlock, 'id', 'badge')}
+                      text={formatter(SalesOrderBlock, item.salesOrderBlock)}
+                      />
+                    </span>
+                  </DescriptionsItem>
                 </Descriptions>
                 <div style={{ border: '1px solid #E6E6E6', width: '100%', height: '100%' }}>
                   <Tabs defaultActiveKey="1" className="tabs">
-                    <TabPane tab="收票方" key="1">
-                      <Table dataSource={item.billToPartyList} columns={this.columns1}
+                    <TabPane
+                    tab={formatMessage({
+                      id: 'bp.maintain_details.sales_distribution.bill_to_party',
+                    })}
+                    key="1"
+                    >
+                      <Table dataSource={item.billToPartyList} columns={columns1}
                       size="small" pagination={false} rowKey={(r, i) => (i)}/>
                     </TabPane>
-                    <TabPane tab="售达方" key="2">
-                    <Table dataSource={item.soldToPartyList} columns={this.columns2}
+                    <TabPane
+                    tab={formatMessage({
+                      id: 'bp.maintain_details.sales_distribution.sold_to_party',
+                    })}
+                    key="2">
+                    <Table dataSource={item.soldToPartyList} columns={columns2}
                     size="small" pagination={false} rowKey={(r, i) => (i)}/>
                     </TabPane>
-                    <TabPane tab="送达方" key="3">
-                    <Table dataSource={item.shipToPartyList} columns={this.columns3}
+                    <TabPane
+                    tab={formatMessage({
+                      id: 'bp.maintain_details.sales_distribution.ship_to_party',
+                    })}
+                    key="3"
+                    >
+                    <Table dataSource={item.shipToPartyList} columns={columns3}
                     size="small" pagination={false} rowKey={(r, i) => (i)}/>
                     </TabPane>
-                    <TabPane tab="销售员" key="4">
-                    <Table dataSource={item.salerList} columns={this.columns4}
+                    <TabPane
+                    tab={formatMessage({
+                      id: 'bp.maintain_details.sales_distribution.sales_rep',
+                    })}
+                    key="4">
+                    <Table dataSource={item.salerList} columns={columns4}
                     size="small" pagination={false} rowKey={(r, i) => (i)}/>
                     </TabPane>
                   </Tabs>

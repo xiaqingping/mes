@@ -412,6 +412,7 @@ class RecordListForm extends React.Component {
   verifyChannel: bp.verifyChannel,
   verifyChangeType: bp.verifyChangeType,
   VerifyRecordStatus: bp.VerifyRecordStatus,
+  VerifyPhoneOrEmailType: bp.VerifyPhoneOrEmailType,
   })
 })
 class CheckModel extends React.Component {
@@ -632,6 +633,7 @@ class CheckModel extends React.Component {
       verifyChannel,
       verifyChangeType,
       VerifyRecordStatus,
+      VerifyPhoneOrEmailType,
       verifyTest } = this.props;
     if (!detailsValue && !picHas) return null
     let modalTitle;
@@ -1087,7 +1089,7 @@ class CheckModel extends React.Component {
               </Col>
               <Col span={16} className={styles.labelVal}>
                 {detailsValue.type ?
-                formatter(VerifyLinkSoldToPartyType, detailsValue.verifyType) : ''}
+                formatter(VerifyPhoneOrEmailType, detailsValue.type) : ''}
               </Col>
             </Row>
           </li>

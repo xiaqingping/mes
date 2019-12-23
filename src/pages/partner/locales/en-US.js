@@ -1,6 +1,8 @@
 export default {
   // 本页模块通用数据
   'bp.block': 'Block',
+  'bp.normal': 'Normal',
+  'bp.contactInformation': 'Contact information',
   'bp.customerID': 'Customer ID',
   'bp.inputHere': 'input here',
   'bp.pleaseSelect': 'please select',
@@ -16,6 +18,7 @@ export default {
   'bp.mobilePhone': 'Mobile Phone',
   'bp.chinese': 'Chinese',
   'bp.english': 'English',
+  'bp.newCertifications': 'New certifications',
 
   // model本地数据
   'bp.VendorLevelCode.important': 'Important',
