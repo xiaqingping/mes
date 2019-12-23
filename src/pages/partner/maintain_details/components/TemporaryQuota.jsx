@@ -31,7 +31,7 @@ class TemporaryQuota extends Component {
           {
             id: details.basic.id,
             currencyCode: details.basic.type === 2 ?
-            details.creditList[0].currencyCode : formatter(
+            details.customer.salesAreaList[0].currencyCode : formatter(
               details.creditList, nextProps.billToPartyId, 'billToPartyId', 'currencyCode',
             ),
             billToPartyId: details.basic.type === 2 ? '' : nextProps.billToPartyId,
@@ -55,7 +55,7 @@ class TemporaryQuota extends Component {
     // if (details.basic.type === 2) { // 判断是否为非个人
       api.bp.tempCreditlimitAdjustment(
         { id: details.basic.id,
-          currencyCode: details.creditList[0].currencyCode,
+          currencyCode: details.customer.salesAreaList[0].currencyCode,
           billToPartyId: details.basic.type === 2 ? '' : this.props.billToPartyId,
         },
         ).then(res => {

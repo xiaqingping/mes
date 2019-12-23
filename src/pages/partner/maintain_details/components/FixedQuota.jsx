@@ -34,7 +34,7 @@ class FixedQuota extends Component {
         api.bp.creditLimitAssessment(
           { id: details.basic.id,
             currencyCode: details.basic.type === 2 ?
-            details.creditList[0].currencyCode : formatter(
+            details.customer.salesAreaList[0].currencyCode : formatter(
               details.creditList, nextProps.billToPartyId, 'billToPartyId', 'currencyCode',
             ),
             billToPartyId: details.basic.type === 2 ? '' : nextProps.billToPartyId,
@@ -56,13 +56,14 @@ class FixedQuota extends Component {
   handleOk = () => {
     const { details } = this.props;
     // if (details.basic.type === 2) { // 判断是否为非个人
-    api.bp.creditLimitAdjustment(
-      {
-        id: details.basic.id,
-        currencyCode: details.creditList[0].currencyCode,
-        billToPartyId: details.basic.type === 2 ? '' : this.props.billToPartyId,
-      },
-      ).then(res => {
+    const term = {
+      id: details.basic.id,
+      currencyCode: details.customer.salesAreaList[0].currencyCode,
+    }
+    if (details.basic.type === 2) {
+      term.billToPartyId = this.props.billToPartyId
+    }
+    api.bp.creditLimitAdjustment(term).then(res => {
         this.setState({
           quotaData: res,
           status: 2,
@@ -79,8 +80,10 @@ class FixedQuota extends Component {
                 creditPeriod: res.creditPeriod,
                 currencyCode: res.currencyCode,
                 lastEvaluationDate: new Date(),
-                tempCreditLimit: details.creditList[0].tempCreditLimit,
-                tempCreditLimitExpirationDate: details.creditList[0].tempCreditLimitExpirationDate,
+                tempCreditLimit:
+                details.creditList.length !== 0 ? details.creditList[0].tempCreditLimit : '',
+                tempCreditLimitExpirationDate: details.creditList.length !== 0 ?
+                details.creditList[0].tempCreditLimitExpirationDate : '',
               }],
             },
           })
