@@ -21,7 +21,7 @@ const DescriptionsItem = Descriptions.Item;
   // countryDiallingCodes: basicCache.countryDiallingCodes,
   salesPaymentMethods: basicCache.salesPaymentMethods,
   industry: basicCache.industryCategories,
-  salesOrderBlock: bp.salesOrderBlock,
+  salesOrderBlock: bp.SalesOrderBlock,
 }))
 class BasicInfo extends Component {
   state = {
@@ -70,12 +70,6 @@ class BasicInfo extends Component {
     if (!basic) return null
     if (!countryDiallingCodes && !salesPaymentMethods) return null;
     if (industry.length === 0) return null;
-    // let newData = []
-    // countryDiallingCodes.forEach(item => {
-    //   if (item.countryCode === basic.telephoneCountryCode) {
-    //     newData = item;
-    //   }
-    // })
 
     return (
       <Card
@@ -157,7 +151,7 @@ class BasicInfo extends Component {
                   this.showChange.visibleShow(true, this.props.details.basic);
                 }}
               >
-                {formatMessage({ id: 'bp.maintain_details.change' })}
+                &nbsp;{formatMessage({ id: 'bp.maintain_details.change' })}
               </a>
             ) : (
               ''
@@ -197,8 +191,6 @@ class BasicInfo extends Component {
           span={2}
           label={formatMessage({ id: 'bp.maintain_details.basic.business_type' })}
           >
-            {/* {basic.industryCode}&nbsp;&nbsp;&nbsp; */}
-            {/* {console.log(industry)} */}
             {basic.industryCode
               ? industry.filter(item => item.code === basic.industryCode)[0].name
               : ''}
@@ -231,8 +223,6 @@ class BasicInfo extends Component {
           <DescriptionsItem span={2} label={type === 'supplier' ?
           formatMessage({ id: 'bp.maintain_details.purchase_org.procurement_block' }) :
           formatMessage({ id: 'bp.maintain_details.sales_distribution.sales_block' })}>
-            {/* <Badge status="error" /> */}
-            {/* &nbsp;{formatMessage({ id: 'bp.block' })} */}
             {type === 'supplier' ?
             (details.vendor ?
             <Badge

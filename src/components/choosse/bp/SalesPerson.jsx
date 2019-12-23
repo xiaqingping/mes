@@ -11,7 +11,7 @@ import employees from '@/api/employees';
 @connect(
   ({ bp }) => ({
     BpCertificationStatus: bp.BpCertificationStatus,
-    SalesOrderBlock: bp.salesOrderBlock,
+    SalesOrderBlock: bp.SalesOrderBlock,
     CustomerDataStatus: bp.CustomerDataStatus,
   }),
   null,

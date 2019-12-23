@@ -90,7 +90,7 @@ const SeqModel = {
       { id: 'D006', name: '45 天之内 到期净值' },
     ],
     // 销售范围冻结状态
-    salesOrderBlock: [
+    SalesOrderBlock: [
       { id: 1, name: formatMessage({ id: 'bp.block' }), badge: 'error' },
       { id: 2, name: formatMessage({ id: 'bp.normal' }), badge: 'success' },
     ],
