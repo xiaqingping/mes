@@ -30,37 +30,39 @@ class PersonCertification extends React.Component {
     const { details } = this.props;
     if (details.piCertificationList.length !== 0) {
       const codeList = [];
-      const attachmentList = []
+      const attachmentList = [];
       details.piCertificationList.forEach(item => {
-        codeList.push(item.attachmentCode)
+        codeList.push(item.attachmentCode);
         attachmentList.push({
-        id: item.billToPartyId,
-        status: item.status,
-        billToPartyName: item.billToPartyName,
-        notes: item.notes,
-        pic: [],
-        attachmentCode: item.attachmentCode,
+          id: item.billToPartyId,
+          status: item.status,
+          billToPartyName: item.billToPartyName,
+          notes: item.notes,
+          pic: [],
+          attachmentCode: item.attachmentCode,
+        });
+      });
+      api.disk
+        .getFiles({
+          sourceKey: 'bp_pi_certification',
+          sourceCode: codeList.join(','),
         })
-      })
-      api.disk.getFiles({
-        sourceKey: 'bp_pi_certification',
-        sourceCode: codeList.join(',') }).then(
-          v => {
-            attachmentList.forEach((item, index) => {
-              v.forEach(i => {
-                if (i.sourceCode === item.attachmentCode) {
-                  attachmentList[index].pic.push(api.disk.downloadFiles(i.id, { view: true }))
-                }
-              })
-            })
-            this.setState({
-              attachmentList,
-            })
-            // this.props.dispatch({
-            //   type: 'partnerMaintainEdit/setDetails',
-            //   payload: { ...details, attachmentList },
-            // });
-      })
+        .then(v => {
+          attachmentList.forEach((item, index) => {
+            v.forEach(i => {
+              if (i.sourceCode === item.attachmentCode) {
+                attachmentList[index].pic.push(api.disk.downloadFiles(i.id, { view: true }));
+              }
+            });
+          });
+          this.setState({
+            attachmentList,
+          });
+          // this.props.dispatch({
+          //   type: 'partnerMaintainEdit/setDetails',
+          //   payload: { ...details, attachmentList },
+          // });
+        });
     }
   }
 
@@ -72,31 +74,28 @@ class PersonCertification extends React.Component {
           <Card
             hoverable
             title={item.billToPartyName}
-            extra={ item.status === 1 ? '' :
-              <>
-                <a onClick={() => this.removeItem(item)}>
-                  {formatMessage({ id: 'action.delete' })}
-                </a>
-              </>
+            extra={
+              item.status === 1 ? (
+                ''
+              ) : (
+                <>
+                  <a onClick={() => this.removeItem(item)}>
+                    {formatMessage({ id: 'action.delete' })}
+                  </a>
+                </>
+              )
             }
           >
             <div style={{ marginBottom: '.8em' }}>
-              <CertificationPopover
-                basic={details.basic}
-                billToPartyId={item.billToPartyId}
-              >
+              <CertificationPopover basic={details.basic} billToPartyId={item.billToPartyId}>
                 {/* <Badge
                   status={verifyStatus[item.status].value}
                   text={verifyStatus[item.status].text}
                 /> */}
-              <Badge
-                status={
-                  formatter(PiCertificationStatus, item.status, 'id', 'badge')
-                }
-                text={
-                  formatter(PiCertificationStatus, item.status, 'id', 'name')
-                }
-              />
+                <Badge
+                  status={formatter(PiCertificationStatus, item.status, 'id', 'badge')}
+                  text={formatter(PiCertificationStatus, item.status, 'id', 'name')}
+                />
               </CertificationPopover>
             </div>
             <Paragraph
@@ -108,20 +107,22 @@ class PersonCertification extends React.Component {
               {item.notes}
             </Paragraph>
             <div>
-              {item.pic.map((v, index) =>
+              {item.pic.map((v, index) => (
                 <img
                   // eslint-disable-next-line react/no-array-index-key
                   key={index}
-                  style={{ width: 90,
-                  height: 90,
-                  margin: '0 20px 20px 0',
-                  border: '1px #ECECEC solid',
-                  padding: '5px',
-                  borderRadius: '5px' }}
+                  style={{
+                    width: 90,
+                    height: 90,
+                    margin: '0 20px 20px 0',
+                    border: '1px #ECECEC solid',
+                    padding: '5px',
+                    borderRadius: '5px',
+                  }}
                   src={v}
                   alt=""
-                />,
-               )}
+                />
+              ))}
             </div>
           </Card>
         </List.Item>
@@ -139,7 +140,7 @@ class PersonCertification extends React.Component {
         </Button>
       </List.Item>
     );
-  }
+  };
 
   handleModalVisible = flag => {
     this.setState({
@@ -165,7 +166,7 @@ class PersonCertification extends React.Component {
       // });
       this.setState({
         attachmentList: attachmentListData,
-      })
+      });
     });
   };
 
@@ -202,36 +203,36 @@ class PersonCertification extends React.Component {
 
     // const has = details.attachmentList.filter(e => e.billToPartyId === data.billToPartyId);
     let newdata = [];
-    const picList = []
+    const picList = [];
     if (data.attachmentList.length !== 0) {
       data.attachmentList.forEach(item => {
-        picList.push(api.disk.downloadFiles(item.id, { view: true }))
-      })
+        picList.push(api.disk.downloadFiles(item.id, { view: true }));
+      });
     }
     // if (has.length === 0) {
-      const obj = {
-        id: data.uuid,
-        billToPartyId: data.billToPartyId,
-        billToPartyCode: data.billToPartyCode,
-        billToPartyName: data.billToPartyName,
-        status: 3,
-        notes: data.notes,
-        pic: picList,
-      };
-      if (editType === 'update') {
-        try {
-          await api.bp.addBPPiCertification(details.basic.id, {
-            attachmentCode: data.uuid,
-            billToPartyId: data.billToPartyId,
-            name: details.basic.name,
-            notes: data.notes,
-          });
-          obj.status = 1;
-        } catch (error) {
-          return;
-        }
+    const obj = {
+      id: data.uuid,
+      billToPartyId: data.billToPartyId,
+      billToPartyCode: data.billToPartyCode,
+      billToPartyName: data.billToPartyName,
+      status: 3,
+      notes: data.notes,
+      pic: picList,
+    };
+    if (editType === 'update') {
+      try {
+        await api.bp.addBPPiCertification(details.basic.id, {
+          attachmentCode: data.uuid,
+          billToPartyId: data.billToPartyId,
+          name: details.basic.name,
+          notes: data.notes,
+        });
+        obj.status = 1;
+      } catch (error) {
+        return;
       }
-      newdata = [...attachmentList, obj];
+    }
+    newdata = [...attachmentList, obj];
     // } else {
     //   newdata = details.attachmentList.map(e => {
     //     if (e.billToPartyId === data.billToPartyId) return data;
@@ -251,7 +252,7 @@ class PersonCertification extends React.Component {
 
     this.setState({
       attachmentList: newdata,
-    })
+    });
   };
 
   render() {

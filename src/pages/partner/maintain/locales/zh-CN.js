@@ -39,4 +39,15 @@ export default {
   'bp.maintain.completed': '完整',
   'bp.maintain.incomplete': '不完整',
 
+  // 变更
+  'bp.maintain.ChangeModal.address': '联系地址',
+  'bp.maintain.ChangeModal.businessType': '行业类别',
+  'bp.maintain.ChangeModal.clickToUpload': '点击上传',
+  'bp.maintain.ChangeModal.on': '开',
+  'bp.maintain.ChangeModal.off': '关',
+  'bp.maintain.ChangeModal.vat': '增值税登记号',
+  'bp.maintain.ChangeModal.taxExemptID': '免税认证号',
+  'bp.maintain.ChangeModal.newInformation': '您的资料已提交，请耐心等待审核',
+  'bp.maintain.ChangeModal.changeApprovedData': '变更认证资料',
+
 };

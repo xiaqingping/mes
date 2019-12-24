@@ -195,9 +195,9 @@ class PICertificationAddModal extends React.Component {
       >
         <Form hideRequiredMark>
           <FormItem
-          labelCol={{ span: 5 }}
-          wrapperCol={{ span: 15 }}
-          label={formatMessage({ id: 'bp.maintain_details.sales_distribution.bill_to_party' })}
+            labelCol={{ span: 5 }}
+            wrapperCol={{ span: 15 }}
+            label={formatMessage({ id: 'bp.maintain_details.sales_distribution.bill_to_party' })}
           >
             {form.getFieldDecorator('billToPartyId', {
               initialValue: billToParty.billToPartyId,
@@ -213,9 +213,9 @@ class PICertificationAddModal extends React.Component {
             )}
           </FormItem>
           <FormItem
-          labelCol={{ span: 5 }}
-          wrapperCol={{ span: 15 }}
-          label={formatMessage({ id: 'bp.maintain_details.verification_data.memo' })}
+            labelCol={{ span: 5 }}
+            wrapperCol={{ span: 15 }}
+            label={formatMessage({ id: 'bp.maintain_details.verification_data.memo' })}
           >
             {form.getFieldDecorator('notes', {
               initialValue: billToParty.notes,
@@ -223,11 +223,11 @@ class PICertificationAddModal extends React.Component {
             })(<Input.TextArea />)}
           </FormItem>
           <FormItem
-          labelCol={{ span: 5 }}
-          wrapperCol={{ span: 15 }}
-          label={formatMessage({
-            id: 'bp.maintain_details.verification_data.verification_documents',
-          })}
+            labelCol={{ span: 5 }}
+            wrapperCol={{ span: 15 }}
+            label={formatMessage({
+              id: 'bp.maintain_details.verification_data.verification_documents',
+            })}
           >
             {form.getFieldDecorator('attachmentList', {
               initialValue: fileList,

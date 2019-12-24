@@ -1,23 +1,13 @@
-import {
-  Card,
-  Descriptions,
-  Table,
-  Tabs,
-  Badge,
-  Icon,
-  Empty,
-} from 'antd';
+import { Card, Descriptions, Table, Tabs, Badge, Icon, Empty } from 'antd';
 import React, { Component } from 'react';
 import { formatter } from '@/utils/utils';
 import { formatMessage } from 'umi/locale';
-import './style.less'
+import './style.less';
 import { connect } from 'dva';
-
 
 const { TabPane } = Tabs;
 
 const DescriptionsItem = Descriptions.Item;
-
 
 @connect(({ partnerMaintainEdit, global, basicCache, bp }) => {
   const salesOrganizations = basicCache.salesOrganizations.filter(
@@ -26,18 +16,12 @@ const DescriptionsItem = Descriptions.Item;
   const distributionChannels = basicCache.distributionChannels.filter(
     e => e.languageCode === global.languageCode,
   );
-  const regions = basicCache.regions.filter(
-    e => e.languageCode === global.languageCode,
-  );
-  const offices = basicCache.offices.filter(
-    e => e.languageCode === global.languageCode,
-  );
+  const regions = basicCache.regions.filter(e => e.languageCode === global.languageCode);
+  const offices = basicCache.offices.filter(e => e.languageCode === global.languageCode);
   const salesPaymentMethods = basicCache.salesPaymentMethods.filter(
     e => e.languageCode === global.languageCode,
   );
-  const currencies = basicCache.currencies.filter(
-    e => e.languageCode === global.languageCode,
-  );
+  const currencies = basicCache.currencies.filter(e => e.languageCode === global.languageCode);
   return {
     distributionChannels,
     salesOrganizations,
@@ -55,9 +39,9 @@ const DescriptionsItem = Descriptions.Item;
 class BasicInfo extends Component {
   state = {
     noTitleKey: 1,
-  }
+  };
 
-  componentDidMount () {
+  componentDidMount() {
     const { dispatch, details } = this.props;
     dispatch({
       type: 'basicCache/getCache',
@@ -86,25 +70,30 @@ class BasicInfo extends Component {
     if (details.customer) {
       if (details.customer.salesAreaList.length !== 0) {
         this.setState({
-          noTitleKey: details.customer.salesAreaList[0].salesOrganizationCode
-          + details.customer.salesAreaList[0].distributionChannelCode,
-        })
+          noTitleKey:
+            details.customer.salesAreaList[0].salesOrganizationCode +
+            details.customer.salesAreaList[0].distributionChannelCode,
+        });
       }
     }
   }
 
   // 销售范围TABS
   tabListNoTitle = () => {
-    const { details: { customer: { salesAreaList } } } = this.props;
+    const {
+      details: {
+        customer: { salesAreaList },
+      },
+    } = this.props;
     const data = [];
     salesAreaList.forEach(item => {
       data.push({
         key: item.salesOrganizationCode + item.distributionChannelCode,
         tab: this.tabName(item.salesOrganizationCode, item.distributionChannelCode),
-      })
-    })
-    return data
-  }
+      });
+    });
+    return data;
+  };
 
   tabName = (salesOrganizationCode, distributionChannelCode) => {
     const { distributionChannels, salesOrganizations } = this.props;
@@ -114,20 +103,20 @@ class BasicInfo extends Component {
       if (item.code === distributionChannelCode) {
         lastName = item.name;
       }
-    })
+    });
     salesOrganizations.forEach(item => {
       if (item.code === salesOrganizationCode) {
         firstName = item.name;
       }
-    })
-    return firstName + lastName
-  }
+    });
+    return firstName + lastName;
+  };
 
   onTabChange = key => {
     this.setState({
       noTitleKey: key,
     });
-  }
+  };
 
   render() {
     const { noTitleKey } = this.state;
@@ -139,7 +128,8 @@ class BasicInfo extends Component {
       currencies,
       status,
       DefaultInvoiceType,
-      SalesOrderBlock } = this.props;
+      SalesOrderBlock,
+    } = this.props;
     const salesAreaList = customer ? customer.salesAreaList : '';
 
     const columns1 = [
@@ -148,7 +138,11 @@ class BasicInfo extends Component {
         width: 500,
         dataIndex: 'name',
         render(text, record) {
-            return <><Icon type={record.type === 2 ? 'home' : 'user'}/> {text}</>
+          return (
+            <>
+              <Icon type={record.type === 2 ? 'home' : 'user'} /> {text}
+            </>
+          );
         },
       },
       {
@@ -156,7 +150,11 @@ class BasicInfo extends Component {
         width: 500,
         dataIndex: 'soldToPartyName',
         render(text, record) {
-          return <><Icon type={record.type === 2 ? 'home' : 'user'}/> {text}</>
+          return (
+            <>
+              <Icon type={record.type === 2 ? 'home' : 'user'} /> {text}
+            </>
+          );
         },
       },
       {
@@ -165,10 +163,12 @@ class BasicInfo extends Component {
         dataIndex: 'verifyStatus',
         render(text) {
           // return <Badge status={status[text].value} text={status[text].text}/>;
-          return <Badge
-            status={formatter(status, text, 'value', 'status')}
-            text={formatter(status, text, 'value', 'text')}
-          />;
+          return (
+            <Badge
+              status={formatter(status, text, 'value', 'status')}
+              text={formatter(status, text, 'value', 'text')}
+            />
+          );
         },
       },
       // {
@@ -185,7 +185,11 @@ class BasicInfo extends Component {
         width: 500,
         dataIndex: 'name',
         render(text, record) {
-          return <><Icon type={record.type === 2 ? 'home' : 'user'}/> {text}</>
+          return (
+            <>
+              <Icon type={record.type === 2 ? 'home' : 'user'} /> {text}
+            </>
+          );
         },
       },
       {
@@ -193,10 +197,12 @@ class BasicInfo extends Component {
         width: 600,
         dataIndex: 'linkVerifyStatus',
         render(text) {
-          return <Badge
-          status={formatter(status, text, 'value', 'status')}
-          text={formatter(status, text, 'value', 'text')}
-        />;
+          return (
+            <Badge
+              status={formatter(status, text, 'value', 'status')}
+              text={formatter(status, text, 'value', 'text')}
+            />
+          );
         },
       },
       // {
@@ -213,7 +219,11 @@ class BasicInfo extends Component {
         width: 700,
         dataIndex: 'name',
         render(text, record) {
-          return <><Icon type={record.type === 2 ? 'home' : 'user'}/> {text}</>
+          return (
+            <>
+              <Icon type={record.type === 2 ? 'home' : 'user'} /> {text}
+            </>
+          );
         },
       },
       {
@@ -221,10 +231,12 @@ class BasicInfo extends Component {
         width: 400,
         dataIndex: 'verifyStatus',
         render(text) {
-          return <Badge
-          status={formatter(status, text, 'value', 'status')}
-          text={formatter(status, text, 'value', 'text')}
-        />;
+          return (
+            <Badge
+              status={formatter(status, text, 'value', 'status')}
+              text={formatter(status, text, 'value', 'text')}
+            />
+          );
         },
       },
       // {
@@ -266,105 +278,138 @@ class BasicInfo extends Component {
           this.onTabChange(key);
         }}
       >
-        {salesAreaList ? salesAreaList.map(item => {
-          if (parseInt(item.salesOrganizationCode + item.distributionChannelCode, 10)
-           === parseInt(noTitleKey, 10)) {
-            return (
-              <div key={item.regionCode}>
-                <Descriptions
-                className="s-descriptions"
-                layout="vertical"
-                column={5}
-                key={item.regionCode}
-                style={{ marginBottom: '20px' }}
-                >
-                  <DescriptionsItem
-                  label={formatMessage({ id: 'bp.maintain_details.sales_distribution.sales_area' })}
+        {salesAreaList ? (
+          salesAreaList.map(item => {
+            if (
+              parseInt(item.salesOrganizationCode + item.distributionChannelCode, 10) ===
+              parseInt(noTitleKey, 10)
+            ) {
+              return (
+                <div key={item.regionCode}>
+                  <Descriptions
+                    className="s-descriptions"
+                    layout="vertical"
+                    column={5}
+                    key={item.regionCode}
+                    style={{ marginBottom: '20px' }}
                   >
-                    {formatter(regions, item.regionCode, 'code', 'name')}/
-                    {formatter(offices, item.officeCode, 'code', 'name')}
-                  </DescriptionsItem>
-                  <DescriptionsItem
-                  label={formatMessage({
-                      id: 'bp.maintain_details.sales_distribution.default_payment_menthod',
-                    })}
-                  >
-                    {
-                      formatter(salesPaymentMethods, item.defaultPaymentMethodCode, 'code', 'name')
-                    }
-                  </DescriptionsItem>
-                  <DescriptionsItem
-                  label={formatMessage({ id: 'bp.maintain_details.sales_distribution.currency' })}
-                  >
-                    {formatter(currencies, item.currencyCode, 'code', 'shortText')}
-                  </DescriptionsItem>
-                  <DescriptionsItem
-                  label={formatMessage({
-                    id: 'bp.maintain_details.sales_distribution.invoice_type',
-                  })}
-                  >
-                    {formatter(DefaultInvoiceType, item.defaultInvoiceTypeCode)}
-                  </DescriptionsItem>
-                  <DescriptionsItem
-                  label={formatMessage({
-                    id: 'bp.maintain_details.sales_distribution.sales_block',
-                  })}
-                  >
-                    {/* {item.salesOrderBlock === 1 ? <span><Badge status="error"/>冻结</span> :
+                    <DescriptionsItem
+                      label={formatMessage({
+                        id: 'bp.maintain_details.sales_distribution.sales_area',
+                      })}
+                    >
+                      {formatter(regions, item.regionCode, 'code', 'name')}/
+                      {formatter(offices, item.officeCode, 'code', 'name')}
+                    </DescriptionsItem>
+                    <DescriptionsItem
+                      label={formatMessage({
+                        id: 'bp.maintain_details.sales_distribution.default_payment_menthod',
+                      })}
+                    >
+                      {formatter(
+                        salesPaymentMethods,
+                        item.defaultPaymentMethodCode,
+                        'code',
+                        'name',
+                      )}
+                    </DescriptionsItem>
+                    <DescriptionsItem
+                      label={formatMessage({
+                        id: 'bp.maintain_details.sales_distribution.currency',
+                      })}
+                    >
+                      {formatter(currencies, item.currencyCode, 'code', 'shortText')}
+                    </DescriptionsItem>
+                    <DescriptionsItem
+                      label={formatMessage({
+                        id: 'bp.maintain_details.sales_distribution.invoice_type',
+                      })}
+                    >
+                      {formatter(DefaultInvoiceType, item.defaultInvoiceTypeCode)}
+                    </DescriptionsItem>
+                    <DescriptionsItem
+                      label={formatMessage({
+                        id: 'bp.maintain_details.sales_distribution.sales_block',
+                      })}
+                    >
+                      {/* {item.salesOrderBlock === 1 ? <span><Badge status="error"/>冻结</span> :
                     <span><Badge status="success"/>活跃</span>} */}
-                    <span>
-                      <Badge
-                      status={formatter(SalesOrderBlock, item.salesOrderBlock, 'id', 'badge')}
-                      text={formatter(SalesOrderBlock, item.salesOrderBlock)}
-                      />
-                    </span>
-                  </DescriptionsItem>
-                </Descriptions>
-                <div style={{ border: '1px solid #E6E6E6', width: '100%', height: '100%' }}>
-                  <Tabs defaultActiveKey="1" className="tabs">
-                    <TabPane
-                    tab={formatMessage({
-                      id: 'bp.maintain_details.sales_distribution.bill_to_party',
-                    })}
-                    key="1"
-                    >
-                      <Table dataSource={item.billToPartyList} columns={columns1}
-                      size="small" pagination={false} rowKey={(r, i) => (i)}/>
-                    </TabPane>
-                    <TabPane
-                    tab={formatMessage({
-                      id: 'bp.maintain_details.sales_distribution.sold_to_party',
-                    })}
-                    key="2">
-                    <Table dataSource={item.soldToPartyList} columns={columns2}
-                    size="small" pagination={false} rowKey={(r, i) => (i)}/>
-                    </TabPane>
-                    <TabPane
-                    tab={formatMessage({
-                      id: 'bp.maintain_details.sales_distribution.ship_to_party',
-                    })}
-                    key="3"
-                    >
-                    <Table dataSource={item.shipToPartyList} columns={columns3}
-                    size="small" pagination={false} rowKey={(r, i) => (i)}/>
-                    </TabPane>
-                    <TabPane
-                    tab={formatMessage({
-                      id: 'bp.maintain_details.sales_distribution.sales_rep',
-                    })}
-                    key="4">
-                    <Table dataSource={item.salerList} columns={columns4}
-                    size="small" pagination={false} rowKey={(r, i) => (i)}/>
-                    </TabPane>
-                  </Tabs>
+                      <span>
+                        <Badge
+                          status={formatter(SalesOrderBlock, item.salesOrderBlock, 'id', 'badge')}
+                          text={formatter(SalesOrderBlock, item.salesOrderBlock)}
+                        />
+                      </span>
+                    </DescriptionsItem>
+                  </Descriptions>
+                  <div style={{ border: '1px solid #E6E6E6', width: '100%', height: '100%' }}>
+                    <Tabs defaultActiveKey="1" className="tabs">
+                      <TabPane
+                        tab={formatMessage({
+                          id: 'bp.maintain_details.sales_distribution.bill_to_party',
+                        })}
+                        key="1"
+                      >
+                        <Table
+                          dataSource={item.billToPartyList}
+                          columns={columns1}
+                          size="small"
+                          pagination={false}
+                          rowKey={(r, i) => i}
+                        />
+                      </TabPane>
+                      <TabPane
+                        tab={formatMessage({
+                          id: 'bp.maintain_details.sales_distribution.sold_to_party',
+                        })}
+                        key="2"
+                      >
+                        <Table
+                          dataSource={item.soldToPartyList}
+                          columns={columns2}
+                          size="small"
+                          pagination={false}
+                          rowKey={(r, i) => i}
+                        />
+                      </TabPane>
+                      <TabPane
+                        tab={formatMessage({
+                          id: 'bp.maintain_details.sales_distribution.ship_to_party',
+                        })}
+                        key="3"
+                      >
+                        <Table
+                          dataSource={item.shipToPartyList}
+                          columns={columns3}
+                          size="small"
+                          pagination={false}
+                          rowKey={(r, i) => i}
+                        />
+                      </TabPane>
+                      <TabPane
+                        tab={formatMessage({
+                          id: 'bp.maintain_details.sales_distribution.sales_rep',
+                        })}
+                        key="4"
+                      >
+                        <Table
+                          dataSource={item.salerList}
+                          columns={columns4}
+                          size="small"
+                          pagination={false}
+                          rowKey={(r, i) => i}
+                        />
+                      </TabPane>
+                    </Tabs>
+                  </div>
                 </div>
-              </div>
-            )
-          }
-          return ''
-        })
-        : <Empty />
-      }
+              );
+            }
+            return '';
+          })
+        ) : (
+          <Empty />
+        )}
       </Card>
     );
   }

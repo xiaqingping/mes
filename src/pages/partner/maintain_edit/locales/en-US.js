@@ -117,4 +117,9 @@ export default {
   'bp.maintain_details.email.continue': 'Continue to complete E-Mail verification',
   'bp.maintain_details.phone.mobilePhone': 'Mobile Phone',
   'bp.maintain_details.email.email': 'E-Mail',
+
+  // 认证的气泡
+  'bp.maintain_details.popover.attachment': 'Attachment',
+  'bp.maintain_details.popover.certificationRecords': 'Certification records',
+  'bp.maintain_details.popover.noCertificationRecords': 'No certification records',
 };

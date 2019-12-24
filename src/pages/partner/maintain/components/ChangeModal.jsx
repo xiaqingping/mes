@@ -23,6 +23,7 @@ import {
 import React, { Component } from 'react';
 import { connect } from 'dva';
 import { TelphoneInput } from '@/components/CustomizedFormControls';
+import { formatMessage } from 'umi/locale';
 import api from '@/api';
 import debounce from 'lodash/debounce';
 import './index.less';
@@ -616,8 +617,8 @@ class ChangeModal extends Component {
       <Form.Item label="名称">
         &nbsp;&nbsp;&nbsp;&nbsp;
         <Icon type="user" /> &nbsp;<span>{name}</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        <a href="#" onClick={event => this.updetaPersonal(event)}>
-          修改
+        <a onClick={event => this.updetaPersonal(event)}>
+          {formatMessage({ id: 'action.change' })}
         </a>
       </Form.Item>
     </div>
@@ -625,7 +626,6 @@ class ChangeModal extends Component {
 
   // 名称修改模式
   nameChangeType = v => {
-    console.log(`名称:${v}`)
     const { userData: { basic: { sapCountryCode } } } = this.state;
     if (v.type === 'group') {
       if (sapCountryCode) {
@@ -653,7 +653,6 @@ class ChangeModal extends Component {
 
   // 国家修改模式
   countryChangeType = (v, noHaveLev) => {
-    console.log(`国家:${v}`)
     if (noHaveLev === 2) {
       this.setState({
         noHaveLev: true,
@@ -692,7 +691,7 @@ class ChangeModal extends Component {
       isNameFinish = false;
     }
     return (
-      <Form.Item label="名称">
+      <Form.Item label={formatMessage({ id: 'bp.maintain_details.name' })}>
         {getFieldDecorator('pname', {
           rules: [
             {
@@ -716,11 +715,15 @@ class ChangeModal extends Component {
     if (recordMsg) {
       return (
         <Col lg={24} md={12} sm={12}>
-          <FormItem label="名称" labelCol={{ span: 4 }} wrapperCol={{ span: 20 }}>
+          <FormItem
+          label={formatMessage({ id: 'bp.maintain_details.name' })}
+          labelCol={{ span: 4 }}
+          wrapperCol={{ span: 20 }}
+          >
             <Icon type="home" />
             &nbsp;&nbsp;<span>{recordMsg.name}</span>&nbsp;&nbsp;&nbsp;&nbsp;
-            <a href="#" onClick={event => this.updetaNameGroup(event, recordMsg)}>
-              修改
+            <a onClick={event => this.updetaNameGroup(event, recordMsg)}>
+              {formatMessage({ id: 'action.change' })}
             </a>
           </FormItem>
         </Col>
@@ -739,7 +742,7 @@ class ChangeModal extends Component {
     return (
       <Col lg={24} md={12} sm={12}>
         <FormItem
-          label="名称"
+          label={formatMessage({ id: 'bp.maintain_details.name' })}
           labelCol={{ span: 4 }}
           wrapperCol={{ span: 20 }}
           hasFeedback
@@ -782,7 +785,11 @@ class ChangeModal extends Component {
     if (recordMsg) {
       return (
         <Col lg={24} md={12} sm={12}>
-          <FormItem label="联系地址" labelCol={{ span: 4 }} wrapperCol={{ span: 20 }}>
+          <FormItem
+          label={formatMessage({ id: 'bp.maintain.ChangeModal.address' })}
+          labelCol={{ span: 4 }}
+          wrapperCol={{ span: 20 }}
+          >
             <span>
               {recordMsg.countryName}&nbsp;
               {recordMsg.provinceName}&nbsp;
@@ -791,8 +798,8 @@ class ChangeModal extends Component {
               {recordMsg.streetName}&nbsp;{recordMsg.address}
             </span>
             &nbsp;&nbsp;&nbsp;&nbsp;
-            <a href="#" onClick={event => this.updateAdressGroup(event)}>
-              修改
+            <a onClick={event => this.updateAdressGroup(event)}>
+              {formatMessage({ id: 'action.change' })}
             </a>
           </FormItem>
         </Col>
@@ -809,7 +816,7 @@ class ChangeModal extends Component {
       return (
         <Col lg={24} md={12} sm={12}>
           <FormItem
-            label="联系地址"
+            label={formatMessage({ id: 'bp.maintain.ChangeModal.address' })}
             labelCol={{ span: 4 }}
             wrapperCol={{ span: 20 }}
             hasFeedback
@@ -835,7 +842,7 @@ class ChangeModal extends Component {
       return (
         <Col lg={24} md={12} sm={12}>
           <FormItem
-            label="联系地址"
+            label={formatMessage({ id: 'bp.maintain.ChangeModal.address' })}
             labelCol={{ span: 4 }}
             wrapperCol={{ span: 20 }}
             hasFeedback
@@ -859,7 +866,7 @@ class ChangeModal extends Component {
       return (
         <Col lg={24} md={12} sm={12}>
           <FormItem
-            label="联系地址"
+            label={formatMessage({ id: 'bp.maintain.ChangeModal.address' })}
             labelCol={{ span: 4 }}
             wrapperCol={{ span: 20 }}
             hasFeedback
@@ -884,7 +891,7 @@ class ChangeModal extends Component {
     return (
       <Col lg={24} md={12} sm={12}>
         <FormItem
-          label="联系地址"
+          label={formatMessage({ id: 'bp.maintain.ChangeModal.address' })}
           labelCol={{ span: 4 }}
           wrapperCol={{ span: 20 }}
           hasFeedback
@@ -930,14 +937,16 @@ class ChangeModal extends Component {
     const { industryCategoryAll } = this.props;
     return (
       <Col lg={12} md={12} sm={12}>
-        <FormItem label="行业类别">
+        <FormItem label={formatMessage({ id: 'bp.maintain.ChangeModal.businessType' })}>
           &nbsp;&nbsp;&nbsp;&nbsp;
         <span>
           {
             formatter(industryCategoryAll, basic.industryCode, 'industryCode', 'industryName')
           }
         </span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        <a href="#" onClick = {event => this.updateIndustryGroup(event)}>修改</a>
+        <a onClick = {event => this.updateIndustryGroup(event)}>
+          {formatMessage({ id: 'action.change' })}
+        </a>
           </FormItem>
         </Col>
       )
@@ -952,11 +961,14 @@ class ChangeModal extends Component {
     const { industryCategoryAll } = this.props;
     return (
       <Col lg={12} md={12} sm={12}>
-        <FormItem label="行业类别">
+        <FormItem label={formatMessage({ id: 'bp.maintain.ChangeModal.businessType' })}>
           {getFieldDecorator('industry', {
             initialValue: basic.industryCode,
           })(
-            <Select placeholder="请选择" onChange={v => { this.industryCategoryChange(v) }}>
+            <Select
+            placeholder={formatMessage({ id: 'bp.pleaseSelect' })}
+            onChange={v => { this.industryCategoryChange(v) }}
+            >
               {industryCategoryAll.map(item => (
                 <Option
                 key={item.industryCode}
@@ -1015,7 +1027,9 @@ class ChangeModal extends Component {
                 ''
               ) : (
                 <>
-                  <a onClick={() => this.removeItem(item.id, item)}>删除</a>
+                  <a onClick={() => this.removeItem(item.id, item)}>
+                    {formatMessage({ id: 'action.delete' })}
+                  </a>
                 </>
               )
             }
@@ -1064,7 +1078,7 @@ class ChangeModal extends Component {
           style={{ width: '100%', height: 304 }}
           onClick={() => this.handleModalVisible(true)}
         >
-          <Icon type="plus" /> 新增认证
+          <Icon type="plus" /> {formatMessage({ id: 'bp.newCertifications' })}
         </Button>
       </List.Item>
     );
@@ -1164,7 +1178,9 @@ class ChangeModal extends Component {
     const uploadButton = (
       <div>
         <Icon type={this.state.loading ? 'loading' : 'plus'} />
-        <div className="ant-upload-text">点击上传</div>
+        <div className="ant-upload-text">
+          {formatMessage({ id: 'bp.maintain.ChangeModal.clickToUpload' })}
+        </div>
       </div>
     );
     const uploadUrl = api.disk.uploadMoreFiles('bp_organization_certification', guuid);
@@ -1230,7 +1246,7 @@ class ChangeModal extends Component {
                 type="primary"
                 style={{ float: 'right', margin: '10px 20px' }}
               >
-                提交
+                {formatMessage({ id: 'action.submit' })}
               </Button>
             </Row>
           </Form>
@@ -1247,7 +1263,7 @@ class ChangeModal extends Component {
                 {this.renderAdressForm()}
               </>
               <Col lg={12} md={12} sm={12}>
-                <FormItem label="电话">
+                <FormItem label={formatMessage({ id: 'bp.maintain_details.phone' })}>
                   {getFieldDecorator('phoneNum', {
                     initialValue: {
                       telephoneCountryCode: basic.telephoneCountryCode,
@@ -1260,12 +1276,16 @@ class ChangeModal extends Component {
               </Col>
               {this.renderIndustryForm()}
               <Col lg={12} md={12} sm={12}>
-                <FormItem label="增值税专用发票资质">
+                <FormItem
+                label={formatMessage({
+                  id: 'bp.maintain_details.verification_data.special_invoice',
+                })}
+                >
                   {getFieldDecorator('specialInvoice')(
                     <Switch
                       style={{ marginLeft: '7px' }}
-                      checkedChildren="开"
-                      unCheckedChildren="关"
+                      checkedChildren={formatMessage({ id: 'bp.maintain.ChangeModal.on' })}
+                      unCheckedChildren={formatMessage({ id: 'bp.maintain.ChangeModal.off' })}
                       onChange={() => {
                         this.setState({
                           specialInvoice: !specialInvoice,
@@ -1279,7 +1299,9 @@ class ChangeModal extends Component {
 
               <Col lg={12} md={12} sm={12}>
                 <FormItem
-                  label="统一社会信用代码"
+                  label={formatMessage({
+                    id: 'bp.maintain_details.verification_data.VAT_Business',
+                  })}
                   hasFeedback
                   // eslint-disable-next-line max-len
                   validateStatus={
@@ -1295,7 +1317,7 @@ class ChangeModal extends Component {
                   {getFieldDecorator('taxNo', {
                     initialValue: this.taxNoShow(userData, industryCategory),
                   })(
-                  <Input placeholder="请输入" readOnly={
+                  <Input placeholder={formatMessage({ id: 'bp.inputHere' })} readOnly={
                     industryCategory.length !== 0 ? (!!industryCategory[0].taxNo) : ''
                     }/>,
                   )}
@@ -1303,7 +1325,7 @@ class ChangeModal extends Component {
               </Col>
               <Col lg={12} md={12} sm={12}>
                 <FormItem
-                  label="基本户开户银行"
+                  label={formatMessage({ id: 'bp.maintain_details.verification_data.bank_name' })}
                   className="marginLeft7"
                   hasFeedback
                   // eslint-disable-next-line max-len
@@ -1343,7 +1365,9 @@ class ChangeModal extends Component {
               </Col>
               <Col lg={12} md={12} sm={12}>
                 <FormItem
-                  label="基本户开户账号"
+                  label={formatMessage({
+                    id: 'bp.maintain_details.verification_data.account_number',
+                  })}
                   hasFeedback
                   // eslint-disable-next-line max-len
                   validateStatus={
@@ -1363,12 +1387,12 @@ class ChangeModal extends Component {
                         ? userData.organizationCertification.bankAccount
                         : ''
                       : '',
-                  })(<Input placeholder="请输入" />)}
+                  })(<Input placeholder={formatMessage({ id: 'bp.inputHere' })} />)}
                 </FormItem>
               </Col>
               <Col lg={24} md={12} sm={12}>
                 <FormItem
-                  label="注册地址"
+                  label={formatMessage({ id: 'bp.maintain_details.verification_data.address' })}
                   labelCol={{ span: 4 }}
                   wrapperCol={{ span: 20 }}
                   hasFeedback
@@ -1390,12 +1414,12 @@ class ChangeModal extends Component {
                         ? userData.organizationCertification.address
                         : ''
                       : '',
-                  })(<Input placeholder="请输入" />)}
+                  })(<Input placeholder={formatMessage({ id: 'bp.inputHere' })} />)}
                 </FormItem>
               </Col>
               <Col lg={24} md={12} sm={12}>
                 <Form.Item
-                  label="认证说明"
+                  label={formatMessage({ id: 'bp.maintain_details.verification_data.memo' })}
                   hasFeedback
                   labelCol={{ span: 4 }}
                   wrapperCol={{ span: 20 }}
@@ -1421,7 +1445,13 @@ class ChangeModal extends Component {
                 </Form.Item>
               </Col>
               <Col lg={24} md={12} sm={12}>
-                <Form.Item label="认证图片" labelCol={{ span: 4 }} wrapperCol={{ span: 20 }}>
+                <Form.Item
+                label={formatMessage({
+                  id: 'bp.maintain_details.verification_data.verification_documents',
+                })}
+                labelCol={{ span: 4 }}
+                wrapperCol={{ span: 20 }}
+                >
                   {getFieldDecorator('attachmentList', {
                     initialValue: fileList,
                     valuePropName: 'fileList',
@@ -1435,7 +1465,7 @@ class ChangeModal extends Component {
                 type="primary"
                 style={{ float: 'right', margin: '10px 20px' }}
               >
-                提交
+                {formatMessage({ id: 'action.submit' })}
               </Button>
             </Row>
           </Form>
@@ -1451,7 +1481,7 @@ class ChangeModal extends Component {
               {this.renderAdressForm()}
               <Col lg={24} md={12} sm={12}>
                 <FormItem
-                  label="增值税登记号"
+                  label={formatMessage({ id: 'bp.maintain.ChangeModal.vat' })}
                   labelCol={{ span: 4 }}
                   wrapperCol={{ span: 20 }}
                   validateStatus={
@@ -1471,12 +1501,12 @@ class ChangeModal extends Component {
                         ? userData.organizationCertification.taxNo
                         : ''
                       : '',
-                  })(<Input placeholder="请输入" />)}
+                  })(<Input placeholder={formatMessage({ id: 'bp.inputHere' })} />)}
                 </FormItem>
               </Col>
               <Col lg={24} md={12} sm={12}>
                 <Form.Item
-                  label="认证说明"
+                  label={formatMessage({ id: 'bp.maintain_details.verification_data.memo' })}
                   labelCol={{ span: 4 }}
                   wrapperCol={{ span: 20 }}
                   validateStatus={
@@ -1500,7 +1530,13 @@ class ChangeModal extends Component {
                 </Form.Item>
               </Col>
               <Col lg={24} md={12} sm={12}>
-                <Form.Item label="认证图片" labelCol={{ span: 4 }} wrapperCol={{ span: 20 }}>
+                <Form.Item
+                label={formatMessage({
+                  id: 'bp.maintain_details.verification_data.verification_documents',
+                })}
+                labelCol={{ span: 4 }}
+                wrapperCol={{ span: 20 }}
+                >
                   {getFieldDecorator('attachmentList', {
                     initialValue: fileList,
                     valuePropName: 'fileList',
@@ -1514,7 +1550,7 @@ class ChangeModal extends Component {
                 type="primary"
                 style={{ float: 'right', margin: '10px 20px' }}
               >
-                提交
+                {formatMessage({ id: 'action.submit' })}
               </Button>
             </Row>
           </Form>
@@ -1530,7 +1566,7 @@ class ChangeModal extends Component {
               {this.renderAdressForm()}
               <Col lg={24} md={12} sm={12}>
                 <FormItem
-                  label="免税认证号"
+                  label={formatMessage({ id: 'bp.maintain.ChangeModal.taxExemptID' })}
                   labelCol={{ span: 4 }}
                   wrapperCol={{ span: 20 }}
                   validateStatus={
@@ -1550,12 +1586,12 @@ class ChangeModal extends Component {
                         ? userData.organizationCertification.taxNo
                         : ''
                       : '',
-                  })(<Input placeholder="请输入" />)}
+                  })(<Input placeholder={formatMessage({ id: 'bp.inputHere' })} />)}
                 </FormItem>
               </Col>
               <Col lg={24} md={12} sm={12}>
                 <Form.Item
-                  label="认证说明"
+                  label={formatMessage({ id: 'bp.maintain_details.verification_data.memo' })}
                   labelCol={{ span: 4 }}
                   wrapperCol={{ span: 20 }}
                   validateStatus={
@@ -1579,7 +1615,13 @@ class ChangeModal extends Component {
                 </Form.Item>
               </Col>
               <Col lg={24} md={12} sm={12}>
-                <Form.Item label="认证图片" labelCol={{ span: 4 }} wrapperCol={{ span: 20 }}>
+                <Form.Item
+                label={formatMessage({
+                  id: 'bp.maintain_details.verification_data.verification_documents',
+                })}
+                labelCol={{ span: 4 }}
+                wrapperCol={{ span: 20 }}
+                >
                   {getFieldDecorator('attachmentList', {
                     initialValue: fileList,
                     valuePropName: 'fileList',
@@ -1593,7 +1635,7 @@ class ChangeModal extends Component {
                 type="primary"
                 style={{ float: 'right', margin: '10px 20px' }}
               >
-                提交
+                {formatMessage({ id: 'action.submit' })}
               </Button>
             </Row>
           </Form>
@@ -1645,7 +1687,7 @@ class ChangeModal extends Component {
                 type="primary"
                 style={{ float: 'right', margin: '10px 20px' }}
               >
-                提交
+                {formatMessage({ id: 'action.submit' })}
               </Button>
             </Row>
           </Form>
@@ -1662,7 +1704,7 @@ class ChangeModal extends Component {
                 {this.renderAdressForm()}
               </>
               <Col lg={12} md={12} sm={12}>
-                <FormItem label="电话">
+                <FormItem label={formatMessage({ id: 'bp.maintain_details.phone' })}>
                   {getFieldDecorator('phoneNum', {
                     initialValue: {
                       telephoneCountryCode: basic.telephoneCountryCode,
@@ -1675,12 +1717,16 @@ class ChangeModal extends Component {
               </Col>
               {this.renderIndustryForm()}
               <Col lg={12} md={12} sm={12}>
-                <FormItem label="增值税专用发票资质">
+                <FormItem
+                label={formatMessage({
+                  id: 'bp.maintain_details.verification_data.special_invoice',
+                })}
+                >
                   {getFieldDecorator('specialInvoice')(
                     <Switch
                       style={{ marginLeft: '7px' }}
-                      checkedChildren="开"
-                      unCheckedChildren="关"
+                      checkedChildren={formatMessage({ id: 'bp.maintain.ChangeModal.on' })}
+                      unCheckedChildren={formatMessage({ id: 'bp.maintain.ChangeModal.off' })}
                       onChange={() => {
                         this.setState({
                           specialInvoice: !specialInvoice,
@@ -1694,7 +1740,9 @@ class ChangeModal extends Component {
 
               <Col lg={12} md={12} sm={12}>
                 <FormItem
-                  label="统一社会信用代码"
+                  label={formatMessage({
+                    id: 'bp.maintain_details.verification_data.VAT_Business',
+                  })}
                   hasFeedback
                   // eslint-disable-next-line max-len
                   validateStatus={
@@ -1709,14 +1757,14 @@ class ChangeModal extends Component {
                   {getFieldDecorator('taxNo', {
                     // eslint-disable-next-line no-nested-ternary
                     initialValue: this.taxNoShow(userData, industryCategory),
-                  })(<Input placeholder="请输入" readOnly={
+                  })(<Input placeholder={formatMessage({ id: 'bp.inputHere' })} readOnly={
                     industryCategory.length !== 0 ? (!!industryCategory[0].taxNo) : ''
                     }/>)}
                 </FormItem>
               </Col>
               <Col lg={12} md={12} sm={12}>
                 <FormItem
-                  label="基本户开户银行"
+                  label={formatMessage({ id: 'bp.maintain_details.verification_data.bank_name' })}
                   className="marginLeft7"
                   hasFeedback
                   // eslint-disable-next-line max-len
@@ -1756,7 +1804,9 @@ class ChangeModal extends Component {
               </Col>
               <Col lg={12} md={12} sm={12}>
                 <FormItem
-                  label="基本户开户账号"
+                  label={formatMessage({
+                    id: 'bp.maintain_details.verification_data.account_number',
+                  })}
                   hasFeedback
                   // eslint-disable-next-line max-len
                   validateStatus={
@@ -1776,12 +1826,12 @@ class ChangeModal extends Component {
                         ? userData.organizationCertification.bankAccount
                         : ''
                       : '',
-                  })(<Input placeholder="请输入" />)}
+                  })(<Input placeholder={formatMessage({ id: 'bp.inputHere' })} />)}
                 </FormItem>
               </Col>
               <Col lg={24} md={12} sm={12}>
                 <FormItem
-                  label="注册地址"
+                  label={formatMessage({ id: 'bp.maintain_details.verification_data.address' })}
                   labelCol={{ span: 4 }}
                   wrapperCol={{ span: 20 }}
                   hasFeedback
@@ -1803,12 +1853,12 @@ class ChangeModal extends Component {
                         ? userData.organizationCertification.address
                         : ''
                       : '',
-                  })(<Input placeholder="请输入" />)}
+                  })(<Input placeholder={formatMessage({ id: 'bp.inputHere' })} />)}
                 </FormItem>
               </Col>
               <Col lg={24} md={12} sm={12}>
                 <Form.Item
-                  label="认证说明"
+                  label={formatMessage({ id: 'bp.maintain_details.verification_data.memo' })}
                   hasFeedback
                   labelCol={{ span: 4 }}
                   wrapperCol={{ span: 20 }}
@@ -1834,7 +1884,13 @@ class ChangeModal extends Component {
                 </Form.Item>
               </Col>
               <Col lg={24} md={12} sm={12}>
-                <Form.Item label="认证图片" labelCol={{ span: 4 }} wrapperCol={{ span: 20 }}>
+                <Form.Item
+                label={formatMessage({
+                  id: 'bp.maintain_details.verification_data.verification_documents',
+                })}
+                labelCol={{ span: 4 }}
+                wrapperCol={{ span: 20 }}
+                >
                   {getFieldDecorator('attachmentList', {
                     initialValue: fileList,
                     valuePropName: 'fileList',
@@ -1848,7 +1904,7 @@ class ChangeModal extends Component {
                 type="primary"
                 style={{ float: 'right', margin: '10px 20px' }}
               >
-                提交
+                {formatMessage({ id: 'action.submit' })}
               </Button>
             </Row>
           </Form>
@@ -1864,7 +1920,7 @@ class ChangeModal extends Component {
               {this.renderAdressForm()}
               <Col lg={24} md={12} sm={12}>
                 <FormItem
-                  label="免税认证号"
+                  label={formatMessage({ id: 'bp.maintain.ChangeModal.taxExemptID' })}
                   labelCol={{ span: 4 }}
                   wrapperCol={{ span: 20 }}
                   validateStatus={
@@ -1884,12 +1940,12 @@ class ChangeModal extends Component {
                         ? userData.organizationCertification.taxNo
                         : ''
                       : '',
-                  })(<Input placeholder="请输入" />)}
+                  })(<Input placeholder={formatMessage({ id: 'bp.inputHere' })} />)}
                 </FormItem>
               </Col>
               <Col lg={24} md={12} sm={12}>
                 <Form.Item
-                  label="认证说明"
+                  label={formatMessage({ id: 'bp.maintain_details.verification_data.memo' })}
                   labelCol={{ span: 4 }}
                   wrapperCol={{ span: 20 }}
                   validateStatus={
@@ -1913,7 +1969,13 @@ class ChangeModal extends Component {
                 </Form.Item>
               </Col>
               <Col lg={24} md={12} sm={12}>
-                <Form.Item label="认证图片" labelCol={{ span: 4 }} wrapperCol={{ span: 20 }}>
+                <Form.Item
+                label={formatMessage({
+                  id: 'bp.maintain_details.verification_data.verification_documents',
+                })}
+                labelCol={{ span: 4 }}
+                wrapperCol={{ span: 20 }}
+                >
                   {getFieldDecorator('attachmentList', {
                     initialValue: fileList,
                     valuePropName: 'fileList',
@@ -1927,7 +1989,7 @@ class ChangeModal extends Component {
                 type="primary"
                 style={{ float: 'right', margin: '10px 20px' }}
               >
-                提交
+                {formatMessage({ id: 'action.submit' })}
               </Button>
             </Row>
           </Form>
@@ -1943,7 +2005,7 @@ class ChangeModal extends Component {
               {this.renderAdressForm()}
               <Col lg={24} md={12} sm={12}>
                 <FormItem
-                  label="增值税登记号"
+                  label={formatMessage({ id: 'bp.maintain.ChangeModal.vat' })}
                   labelCol={{ span: 4 }}
                   wrapperCol={{ span: 20 }}
                   validateStatus={
@@ -1963,12 +2025,12 @@ class ChangeModal extends Component {
                         ? userData.organizationCertification.taxNo
                         : ''
                       : '',
-                  })(<Input placeholder="请输入" />)}
+                  })(<Input placeholder={formatMessage({ id: 'bp.inputHere' })} />)}
                 </FormItem>
               </Col>
               <Col lg={24} md={12} sm={12}>
                 <Form.Item
-                  label="认证说明"
+                  label={formatMessage({ id: 'bp.maintain_details.verification_data.memo' })}
                   labelCol={{ span: 4 }}
                   wrapperCol={{ span: 20 }}
                   validateStatus={
@@ -1992,7 +2054,13 @@ class ChangeModal extends Component {
                 </Form.Item>
               </Col>
               <Col lg={24} md={12} sm={12}>
-                <Form.Item label="认证图片" labelCol={{ span: 4 }} wrapperCol={{ span: 20 }}>
+                <Form.Item
+                label={formatMessage({
+                  id: 'bp.maintain_details.verification_data.verification_documents',
+                })}
+                labelCol={{ span: 4 }}
+                wrapperCol={{ span: 20 }}
+                >
                   {getFieldDecorator('attachmentList', {
                     initialValue: fileList,
                     valuePropName: 'fileList',
@@ -2006,7 +2074,7 @@ class ChangeModal extends Component {
                 type="primary"
                 style={{ float: 'right', margin: '10px 20px' }}
               >
-                提交
+                {formatMessage({ id: 'action.submit' })}
               </Button>
             </Row>
           </Form>
@@ -2020,7 +2088,7 @@ class ChangeModal extends Component {
         <div style={{ height: '180px', textAlign: 'center', paddingTop: '40px' }}>
           <Icon type="check-circle" style={{ fontSize: '40px', color: '#54C31F' }} />
           <h4 style={{ fontWeight: '600', margin: '30px 0 20px' }}>
-            您的资料已提交，请耐心等待审核
+            {formatMessage({ id: 'bp.maintain.ChangeModal.newInformation' })}
           </h4>
         </div>
       </>
@@ -2031,7 +2099,9 @@ class ChangeModal extends Component {
         <Modal
           width={submitNext === 1 ? modelWidth : 400}
           centered
-          title={submitNext === 1 ? '变更认证资料' : ''}
+          title={submitNext === 1 ? formatMessage({
+            id: 'bp.maintain.ChangeModal.changeApprovedData',
+          }) : ''}
           visible={changeModal}
           onCancel={this.handleCancel}
           destroyOnClose
