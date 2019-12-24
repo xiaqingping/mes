@@ -212,7 +212,7 @@ class Basic extends React.Component {
   };
 
   valueChange = (key, value) => {
-    const { details, basic, customer, vendor, organizationCertification } = this.props;
+    const { editType, details, basic, customer, vendor, organizationCertification } = this.props;
     let obj = {
       [key]: value,
     };
@@ -223,8 +223,6 @@ class Basic extends React.Component {
         const { changedValue, ...excludeChangeValue } = value;
         obj = {
           ...excludeChangeValue,
-          languageCode: obj.languageCode,
-          timeZoneCode: obj.timeZoneCode,
         };
       } else {
         obj = { ...value };
@@ -246,31 +244,50 @@ class Basic extends React.Component {
 
     // 地址 决定了语言和时区
     if (key === 'address') {
-      obj.timeZoneCode = '';
+      let sapCountryCode = value.sapCountryCode || basic.sapCountryCode;
+      let sapProvinceCode = value.sapProvinceCode || basic.sapProvinceCode;
+
+      // 修改BP时，组织的通讯地址国家不能直接改，需走变更认证
+      if (editType === 'update' && obj.countryCode !== basic.countryCode) {
+        Object.keys(obj).forEach(k => {
+          obj[k] = basic[k];
+        });
+
+        // eslint-disable-next-line prefer-destructuring
+        sapCountryCode = obj.sapCountryCode;
+        // eslint-disable-next-line prefer-destructuring
+        sapProvinceCode = obj.sapProvinceCode;
+
+        this.showChange.visibleShow(true, basic);
+        setTimeout(() => {
+          this.props.form.setFieldsValue({ address: obj });
+        });
+      }
+
+      // 确定语言
+      if (sapCountryCode === 'CN') {
+        obj.languageCode = 'ZH';
+      } else if (sapCountryCode && sapCountryCode !== 'CN') {
+        obj.languageCode = 'EN';
+      } else {
+        obj.languageCode = '';
+      }
+
       // 根据国家编号确定时区
-      if (value.sapCountryCode) {
+      if (sapCountryCode) {
         this.props.countryTimeZone.forEach(e => {
-          if (e.countryCode === value.sapCountryCode) {
+          if (e.countryCode === sapCountryCode) {
             obj.timeZoneCode = e.timeZone;
           }
         });
       }
       // 根据省编号确定时区
-      if (value.provinceCode) {
+      if (sapProvinceCode) {
         this.props.countryProvinceTimeZone.forEach(e => {
-          if (e.countryCode === value.sapCountryCode && e.provinceCode === value.provinceSapCode) {
+          if (e.countryCode === sapCountryCode && e.provinceCode === sapProvinceCode) {
             obj.timeZoneCode = e.timeZone;
           }
         });
-      }
-
-      // 确定语言
-      if (value.sapCountryCode === 'CN') {
-        obj.languageCode = 'ZH';
-      } else if (value.sapCountryCode && value.sapCountryCode !== 'CN') {
-        obj.languageCode = 'EN';
-      } else {
-        obj.languageCode = '';
       }
     }
 
@@ -783,10 +800,4 @@ class Basic extends React.Component {
   }
 }
 
-export default Form.create({
-  // onFieldsChange: (props, changed, all) => {
-  //   console.log(props);
-  //   console.log(changed);
-  //   console.log(all);
-  // },
-})(Basic);
+export default Form.create()(Basic);
