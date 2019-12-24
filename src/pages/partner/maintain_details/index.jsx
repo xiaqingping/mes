@@ -3,8 +3,7 @@ import React, { Component } from 'react';
 import { connect } from 'dva';
 
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
-// eslint-disable-next-line import/no-extraneous-dependencies
-import { Link } from 'react-router-dom';
+import Link from 'umi/link';
 import { formatMessage } from 'umi/locale';
 import PersonCertification from './components/PersonCertification';
 import PersonCredit from './components/PersonCredit';
@@ -32,8 +31,9 @@ class CustomerDetails extends Component {
   };
 
   componentDidMount() {
-    const activeKey = this.props.location.query.tabActiveKey ?
-                      this.props.location.query.tabActiveKey : '';
+    const activeKey = this.props.location.query.tabActiveKey
+      ? this.props.location.query.tabActiveKey
+      : '';
     // this.props.dispatch({
     //   type: 'partnerMaintainEdit/setDetails',
     //   payload: null,
@@ -58,7 +58,7 @@ class CustomerDetails extends Component {
       payload: { type: 'countryDiallingCodes' },
     });
 
-        // 判断是客户还是供应商
+    // 判断是客户还是供应商
     if (activeKey) {
       if (activeKey === 'vendor') {
         this.props.dispatch({
@@ -67,24 +67,25 @@ class CustomerDetails extends Component {
         });
         this.setState({
           tabActiveKey: 'supplier',
-        })
+        });
       }
-    } else if ((parseInt(this.props.location.query.customerDataStatus, 10) === 2 &&
-      parseInt(this.props.location.query.vendorDataStatus, 10) === 1)) {
+    } else if (
+      parseInt(this.props.location.query.customerDataStatus, 10) === 2 &&
+      parseInt(this.props.location.query.vendorDataStatus, 10) === 1
+    ) {
       this.props.dispatch({
         type: 'partnerMaintainEdit/setType',
         payload: 'supplier',
       });
       this.setState({
         tabActiveKey: 'supplier',
-      })
+      });
     } else {
       this.props.dispatch({
         type: 'partnerMaintainEdit/setType',
         payload: 'customer',
       });
     }
-
 
     // window.addEventListener('resize', this.resizeFooterToolbar, { passive: true });
     this.resizeFooterToolbar();
@@ -126,10 +127,15 @@ class CustomerDetails extends Component {
     const { customerDataStatus, vendorDataStatus, type } = query;
     return (
       <div>
-        <span>{formatMessage({ id: 'menu.bp.maintain.details' })} {v}</span>&nbsp;&nbsp;&nbsp;&nbsp;
+        <span>
+          {formatMessage({ id: 'menu.bp.maintain.details' })} {v}
+        </span>
+        &nbsp;&nbsp;&nbsp;&nbsp;
         <Link
           // eslint-disable-next-line max-len
-          to={`/bp/maintain/edit/${id}?type=${type}&customerDataStatus=${customerDataStatus}&vendorDataStatus=${vendorDataStatus}&tabActiveKey=${this.props.type === 'customer' ? 'customer' : 'vendor'}`}
+          to={`/bp/maintain/edit/${id}?type=${type}&customerDataStatus=${customerDataStatus}&vendorDataStatus=${vendorDataStatus}&tabActiveKey=${
+            this.props.type === 'customer' ? 'customer' : 'vendor'
+          }`}
           onClick={() => {
             this.props.dispatch({
               type: 'partnerMaintainEdit/setDetails',
@@ -154,7 +160,7 @@ class CustomerDetails extends Component {
   render() {
     const { tabActiveKey, pageLoading } = this.state;
     const { customer, supplier } = this.props;
-    if (!customer || !supplier) return false
+    if (!customer || !supplier) return false;
     return (
       <PageHeaderWrapper
         tabActiveKey={tabActiveKey}

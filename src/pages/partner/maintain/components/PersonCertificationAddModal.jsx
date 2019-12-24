@@ -1,11 +1,4 @@
-import {
-  Form,
-  Input,
-  Modal,
-  Upload,
-  Icon,
-  Select,
-} from 'antd';
+import { Form, Input, Modal, Upload, Icon, Select } from 'antd';
 import React, { Component } from 'react';
 import api from '@/api';
 import { guid } from '@/utils/utils';
@@ -27,16 +20,13 @@ const { Option } = Select;
 class PersonCertificationAddModal extends Component {
   constructor(props) {
     super(props);
-    const newGuid = guid()
-    const uploadUrl = api.disk.uploadMoreFiles(
-      'bp_pi_certification',
-      newGuid,
-      );
+    const newGuid = guid();
+    const uploadUrl = api.disk.uploadMoreFiles('bp_pi_certification', newGuid);
     this.state = {
       uploadUrl,
       newGuid,
       receivingParty: [], // 收票方
-    }
+    };
   }
 
   componentDidMount() {
@@ -49,13 +39,13 @@ class PersonCertificationAddModal extends Component {
         res.customer.salesAreaList.forEach(item => {
           item.billToPartyList.forEach(v => {
             if (v.soldToPartyId === res.basic.id && v.id !== res.basic.id) {
-              newData.push(v)
+              newData.push(v);
             }
-          })
-        })
+          });
+        });
         this.setState({
           receivingParty: newData,
-        })
+        });
       });
     }
   }
@@ -65,36 +55,30 @@ class PersonCertificationAddModal extends Component {
     const result = [];
     const obj = {};
     for (let i = 0; i < arr.length; i++) {
-        if (!obj[arr[i].id]) {
-            result.push(arr[i]);
-            obj[arr[i].id] = true;
-        }
+      if (!obj[arr[i].id]) {
+        result.push(arr[i]);
+        obj[arr[i].id] = true;
+      }
     }
-    return result
-}
+    return result;
+  };
 
   okHandle = () => {
     this.props.form.validateFields((err, fieldsValue) => {
       if (err) return;
       this.props.form.resetFields();
-      this.props.handleModalVisible(false)
+      this.props.handleModalVisible(false);
       this.props.handleAdd(fieldsValue, this.state.newGuid);
-      const newGuid = guid()
+      const newGuid = guid();
       this.setState({
-        uploadUrl: api.disk.uploadMoreFiles(
-          'bp_pi_certification',
-          newGuid,
-          ),
+        uploadUrl: api.disk.uploadMoreFiles('bp_pi_certification', newGuid),
         newGuid,
-      })
+      });
     });
   };
 
-  render () {
-    const { modalVisible,
-      form,
-      handleModalVisible,
-      authorization } = this.props;
+  render() {
+    const { modalVisible, form, handleModalVisible, authorization } = this.props;
     const { uploadUrl, receivingParty } = this.state;
 
     const uploadButton = (
@@ -111,12 +95,12 @@ class PersonCertificationAddModal extends Component {
       return e && e.fileList;
     };
 
-        // 删除图片
+    // 删除图片
     const removePic = e => {
-        if (e.response.length !== 0) {
-          api.disk.deleteFiles(e.response[0]).then()
-        }
+      if (e.response.length !== 0) {
+        api.disk.deleteFiles(e.response[0]).then();
       }
+    };
     return (
       <Modal
         destroyOnClose
@@ -144,13 +128,12 @@ class PersonCertificationAddModal extends Component {
             //   style= {{ width: '100%' }}
             //   // placeholder="请输入"
             // />,
-            <Select style= {{ width: '100%' }}>
-              {this.uniq(receivingParty).map(
-                item =>
-                  (<Option key={`${item.id},${item.name}`} text={item.name}>
-                      {item.code}&nbsp;&nbsp;{item.name}
-                  </Option>),
-              )}
+            <Select style={{ width: '100%' }}>
+              {this.uniq(receivingParty).map(item => (
+                <Option key={`${item.id},${item.name}`} text={item.name}>
+                  {item.code}&nbsp;&nbsp;{item.name}
+                </Option>
+              ))}
             </Select>,
           )}
         </FormItem>
@@ -180,19 +163,23 @@ class PersonCertificationAddModal extends Component {
             rules: [{ required: true }],
             valuePropName: 'attachmentList',
             getValueFromEvent: normFile,
-          })(<Upload
-            name="files"
-            multiple
-            listType="picture-card"
-            className="avatar-uploader"
-            showUploadList
-            action={uploadUrl}
-            headers={{ Authorization: authorization }}
-            accept=".jpg"
-            onRemove={e => { removePic(e) }}
-          >
-            {uploadButton}
-          </Upload>)}
+          })(
+            <Upload
+              name="files"
+              multiple
+              listType="picture-card"
+              className="avatar-uploader"
+              showUploadList
+              action={uploadUrl}
+              headers={{ Authorization: authorization }}
+              accept=".jpg"
+              onRemove={e => {
+                removePic(e);
+              }}
+            >
+              {uploadButton}
+            </Upload>,
+          )}
         </FormItem>
       </Modal>
     );

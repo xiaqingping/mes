@@ -78,7 +78,6 @@ class BasicInfo extends Component {
           </CertificationPopover>
           &nbsp;&nbsp;
           <a
-            href="#"
             onClick={e => {
               this.cancelIdent(e, details);
             }}

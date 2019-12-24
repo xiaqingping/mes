@@ -21,7 +21,6 @@ import _ from 'lodash';
 import styles from './index.less';
 import api from '@/api';
 
-
 const FormItem = Form.Item;
 const { RangePicker } = DatePicker;
 const { Option } = Select;
@@ -58,17 +57,20 @@ class Verification extends React.Component {
 
   // 业务伙伴查询
   callParter = value => {
-    api.bp.getBPByCodeOrName({ code_or_name: value })
-    .then(res => { this.setState({ partnerVal: res }) })
-  }
+    api.bp.getBPByCodeOrName({ code_or_name: value }).then(res => {
+      this.setState({ partnerVal: res });
+    });
+  };
 
   /** table数据源 */
   getData = (options = {}) => {
-    const { formValues: { pageSize } } = this.state;
+    const {
+      formValues: { pageSize },
+    } = this.state;
     let newData = [];
 
     if (options.statusList) {
-      newData = { ...newData, statusList: options.statusList.join(',') }
+      newData = { ...newData, statusList: options.statusList.join(',') };
     }
 
     if (options.wanchengshijian) {
@@ -76,9 +78,9 @@ class Verification extends React.Component {
         ...newData,
         beginFinishDate: options.wanchengshijian[0].format('YYYY-MM-DD'),
         endFinishDate: options.wanchengshijian[1].format('YYYY-MM-DD'),
-      }
+      };
       // eslint-disable-next-line no-param-reassign
-      delete options.wanchengshijian
+      delete options.wanchengshijian;
     }
 
     if (options.overTime) {
@@ -86,9 +88,9 @@ class Verification extends React.Component {
         ...newData,
         beginExpireDate: options.overTime[0].format('YYYY-MM-DD'),
         endExpireDate: options.overTime[1].format('YYYY-MM-DD'),
-      }
+      };
       // eslint-disable-next-line no-param-reassign
-      delete options.overTime
+      delete options.overTime;
     }
     const query = Object.assign({}, { page: 1, pageSize }, options, newData);
     this.setState({
@@ -96,25 +98,28 @@ class Verification extends React.Component {
       loading: true,
     });
 
-    api.bp.getVerifyRecords(query).then(res => {
-      this.setState({
-        list: res.results,
-        total: res.total,
-        loading: false,
-      });
-    }).catch(() => {
-      this.setState({
-        loading: false,
+    api.bp
+      .getVerifyRecords(query)
+      .then(res => {
+        this.setState({
+          list: res.results,
+          total: res.total,
+          loading: false,
+        });
       })
-    });
-  }
+      .catch(() => {
+        this.setState({
+          loading: false,
+        });
+      });
+  };
 
   /** 查询 */
   handleSearch = e => {
     if (e) e.preventDefault();
     const val = this.props.form.getFieldsValue();
     this.getData({ page: 1, ...val });
-  }
+  };
 
   /** 选中table事件 */
   handleSelectRows = rows => {
@@ -133,7 +138,7 @@ class Verification extends React.Component {
         ...filtersArg,
       });
     }
-  }
+  };
 
   /** 筛选条件显示与隐藏 */
   toggleForm = () => {
@@ -141,8 +146,8 @@ class Verification extends React.Component {
     this.setState({
       expandForm: !expandForm,
       // recordMsg: undefined,
-    })
-  }
+    });
+  };
 
   // 重置
   handleFormReset = () => {
@@ -156,41 +161,46 @@ class Verification extends React.Component {
   renderForm = () => {
     const { expandForm } = this.state;
     return expandForm ? this.renderAdvancedForm() : this.renderSimpleForm();
-  }
+  };
 
   saveFormRef = formRef => {
     this.formRef = formRef;
-  }
+  };
 
   renderOption = item => (
-      <Option key={item.id} text={item.name}>
-        <div style={{ display: 'flex' }}>
-          <span><Icon type="user" /></span>&nbsp;&nbsp;
-          <span>{item.code}</span>&nbsp;&nbsp;
-          <span>{item.name}</span>
-        </div>
-      </Option>
-    )
+    <Option key={item.id} text={item.name}>
+      <div style={{ display: 'flex' }}>
+        <span>
+          <Icon type="user" />
+        </span>
+        &nbsp;&nbsp;
+        <span>{item.code}</span>&nbsp;&nbsp;
+        <span>{item.name}</span>
+      </div>
+    </Option>
+  );
 
-      // 业务伙伴筛选
+  // 业务伙伴筛选
   // eslint-disable-next-line consistent-return
   inputValue = value => {
-    const arr = []
+    const arr = [];
     if (!value) {
-      return false
+      return false;
     }
-    this.callParter(value)
+    this.callParter(value);
     this.state.partnerVal.forEach(item => {
       if (item.name.indexOf(value) !== -1) {
         arr.push(item);
       }
-      if (item.code.indexOf(value) !== -1 && arr.indexOf(item)) { arr.push(item); }
-    })
+      if (item.code.indexOf(value) !== -1 && arr.indexOf(item)) {
+        arr.push(item);
+      }
+    });
     this.setState({
       partnerVal: arr,
       // allowClear: 'ture',
     });
-  }
+  };
 
   /** 部分筛选条件 */
   renderSimpleForm = () => {
@@ -203,26 +213,27 @@ class Verification extends React.Component {
           <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
             <FormItem label={formatMessage({ id: 'bp.customerID' })}>
               {getFieldDecorator('code')(
-                <Input placeholder={formatMessage({ id: 'bp.inputHere' })}/>,
+                <Input placeholder={formatMessage({ id: 'bp.inputHere' })} />,
               )}
             </FormItem>
           </Col>
           <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
             <FormItem label={formatMessage({ id: 'bp.verification.operationCode' })}>
               {getFieldDecorator('bpOperationRecordCode')(
-                <Input placeholder={formatMessage({ id: 'bp.inputHere' })}/>,
+                <Input placeholder={formatMessage({ id: 'bp.inputHere' })} />,
               )}
             </FormItem>
           </Col>
           <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
-          <FormItem label={formatMessage({ id: 'bp.verification.businessPartner' })}>
+            <FormItem label={formatMessage({ id: 'bp.verification.businessPartner' })}>
               {getFieldDecorator('bpId')(
-              <AutoComplete
-                onSearch={this.inputValue}
-                dataSource={partnerVal.map(this.renderOption)}
-                placeholder={formatMessage({ id: 'bp.inputHere' })}
-                optionLabelProp="text"
-                />)}
+                <AutoComplete
+                  onSearch={this.inputValue}
+                  dataSource={partnerVal.map(this.renderOption)}
+                  placeholder={formatMessage({ id: 'bp.inputHere' })}
+                  optionLabelProp="text"
+                />,
+              )}
             </FormItem>
           </Col>
           <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
@@ -234,14 +245,14 @@ class Verification extends React.Component {
                 {formatMessage({ id: 'bp.verification.reset' })}
               </Button>
               <a style={{ marginLeft: 8 }} onClick={this.toggleForm}>
-              {formatMessage({ id: 'bp.verification.open' })} <Icon type="down" />
+                {formatMessage({ id: 'bp.verification.open' })} <Icon type="down" />
               </a>
             </span>
           </Col>
         </Row>
       </Form>
-    )
-  }
+    );
+  };
 
   /** 完整筛选条件 */
   renderAdvancedForm = () => {
@@ -259,26 +270,27 @@ class Verification extends React.Component {
           <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
             <FormItem label={formatMessage({ id: 'bp.customerID' })}>
               {getFieldDecorator('code')(
-                <Input placeholder={formatMessage({ id: 'bp.inputHere' })}/>,
+                <Input placeholder={formatMessage({ id: 'bp.inputHere' })} />,
               )}
             </FormItem>
           </Col>
           <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
             <FormItem label={formatMessage({ id: 'bp.verification.operationCode' })}>
               {getFieldDecorator('bpCode')(
-                <Input placeholder={formatMessage({ id: 'bp.inputHere' })}/>,
+                <Input placeholder={formatMessage({ id: 'bp.inputHere' })} />,
               )}
             </FormItem>
           </Col>
           <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
-          <FormItem label={formatMessage({ id: 'bp.verification.businessPartner' })}>
+            <FormItem label={formatMessage({ id: 'bp.verification.businessPartner' })}>
               {getFieldDecorator('bpId')(
-              <AutoComplete
-                onSearch={this.inputValue}
-                dataSource={partnerVal.map(this.renderOption)}
-                placeholder={formatMessage({ id: 'bp.inputHere' })}
-                optionLabelProp="text"
-                />)}
+                <AutoComplete
+                  onSearch={this.inputValue}
+                  dataSource={partnerVal.map(this.renderOption)}
+                  placeholder={formatMessage({ id: 'bp.inputHere' })}
+                  optionLabelProp="text"
+                />,
+              )}
             </FormItem>
           </Col>
           <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
@@ -286,14 +298,14 @@ class Verification extends React.Component {
               {getFieldDecorator('type')(
                 <Select
                   placeholder={formatMessage({ id: 'bp.pleaseSelect' })}
-                  optionLabelProp="label">
-                  {
-                    preTypeAll.map(state => <Option
-                              key={state.value}
-                              value={state.value}
-                              label={state.text}> {state.text}
-                            </Option>)
-                  }
+                  optionLabelProp="label"
+                >
+                  {preTypeAll.map(state => (
+                    <Option key={state.value} value={state.value} label={state.text}>
+                      {' '}
+                      {state.text}
+                    </Option>
+                  ))}
                 </Select>,
               )}
             </FormItem>
@@ -304,38 +316,31 @@ class Verification extends React.Component {
                 <Select
                   mode="multiple"
                   placeholder={formatMessage({ id: 'bp.pleaseSelect' })}
-                  optionLabelProp="label">
-                  {
-                    preStateAll.map(state =>
-                        <Option
-                        key={state.value}
-                        value={state.value}
-                        label={state.text}>
-                        {state.text}
-                        </Option>)
-                  }
+                  optionLabelProp="label"
+                >
+                  {preStateAll.map(state => (
+                    <Option key={state.value} value={state.value} label={state.text}>
+                      {state.text}
+                    </Option>
+                  ))}
                 </Select>,
               )}
             </FormItem>
           </Col>
           <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
             <FormItem label={formatMessage({ id: 'bp.verification.completeTime' })}>
-              {getFieldDecorator('finishTime')(
-                <RangePicker />,
-              )}
+              {getFieldDecorator('finishTime')(<RangePicker />)}
             </FormItem>
           </Col>
           <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
             <FormItem label={formatMessage({ id: 'bp.verification.expiryDate' })}>
-              {getFieldDecorator('overTime')(
-                <DatePicker style={{ width: '100%' }}/>,
-              )}
+              {getFieldDecorator('overTime')(<DatePicker style={{ width: '100%' }} />)}
             </FormItem>
           </Col>
           <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
             <FormItem label={formatMessage({ id: 'bp.verification.apprpvalBy' })}>
               {getFieldDecorator('finisherCode')(
-                <Input placeholder={formatMessage({ id: 'bp.inputHere' })}/>,
+                <Input placeholder={formatMessage({ id: 'bp.inputHere' })} />,
               )}
             </FormItem>
           </Col>
@@ -354,20 +359,27 @@ class Verification extends React.Component {
           </div>
         </div>
       </Form>
-    )
-  }
+    );
+  };
 
   detailsValue = (record, type) => {
     this.setState({
       record,
       type,
-    })
-  }
+    });
+  };
 
   render() {
-    const { formValues: { page: current, pageSize },
-    list, selectedRows, total, loading, record, type } = this.state;
-    const { preTypeAll, preStateAll, languageCode } = this.props
+    const {
+      formValues: { page: current, pageSize },
+      list,
+      selectedRows,
+      total,
+      loading,
+      record,
+      type,
+    } = this.state;
+    const { preTypeAll, preStateAll, languageCode } = this.props;
     const data = { list, pagination: { current, pageSize, total } };
     const columns = [
       {
@@ -376,8 +388,13 @@ class Verification extends React.Component {
         dataIndex: 'code',
         // width: 150,
         // eslint-disable-next-line no-shadow
-        render (value, record) {
-          return <><div>{value}</div><div>{record.bpOperationRecordCode}</div></>
+        render(value, record) {
+          return (
+            <>
+              <div>{value}</div>
+              <div>{record.bpOperationRecordCode}</div>
+            </>
+          );
         },
       },
       {
@@ -385,12 +402,14 @@ class Verification extends React.Component {
         dataIndex: 'bpId',
         // width: 150,
         render(value, records) {
-          return <>
-            <div className={styles.partName}>
-              <Icon type={records.bpType === 1 ? 'user' : 'home'} /> <span>{records.bpName}</span>
-            </div>
-            <div className={styles.partCode}>{records.bpCode}</div>
-          </>
+          return (
+            <>
+              <div className={styles.partName}>
+                <Icon type={records.bpType === 1 ? 'user' : 'home'} /> <span>{records.bpName}</span>
+              </div>
+              <div className={styles.partCode}>{records.bpCode}</div>
+            </>
+          );
         },
       },
       {
@@ -408,10 +427,12 @@ class Verification extends React.Component {
         width: 150,
         onFilter: (value, records) => records.status.toString().indexOf(value.toString()) === 0,
         render(value, records) {
-          return <>
-          <Badge status={preStateAll[value - 1].status} text={preStateAll[value - 1].text} />
-          {value === 1 ? '' : <div>{records.finishDate}</div>}
-          </>
+          return (
+            <>
+              <Badge status={preStateAll[value - 1].status} text={preStateAll[value - 1].text} />
+              {value === 1 ? '' : <div>{records.finishDate}</div>}
+            </>
+          );
         },
       },
       {
@@ -423,7 +444,11 @@ class Verification extends React.Component {
         title: formatMessage({ id: 'bp.verification.operator' }),
         dataIndex: 'operatorName',
         render(value, records) {
-          return <><div>{value}</div> <div>{records.operationDate}</div></>
+          return (
+            <>
+              <div>{value}</div> <div>{records.operationDate}</div>
+            </>
+          );
         },
       },
       {
@@ -432,22 +457,31 @@ class Verification extends React.Component {
         width: 150,
         fixed: 'right',
         render: (text, records) => {
-          const view = <a href="#" onClick={ () => {
-            this.checkShow.visibleShow(records, records.type, true,
-              this.detailsValue(records, records.type))
-            }} >{formatMessage({ id: 'menu.bp.maintain.details' })}</a>;
+          const view = (
+            <a
+              onClick={() => {
+                this.checkShow.visibleShow(
+                  records,
+                  records.type,
+                  true,
+                  this.detailsValue(records, records.type),
+                );
+              }}
+            >
+              {formatMessage({ id: 'menu.bp.maintain.details' })}
+            </a>
+          );
           return view;
         },
       },
-    ]
+    ];
 
     return (
       <PageHeaderWrapper>
-        <Card bordered={false} className={ languageCode === 'EN' ? 'mySet' : ''}>
+        <Card bordered={false} className={languageCode === 'EN' ? 'mySet' : ''}>
           <div className="tableList">
             <div className="tableListForm">{this.renderForm()}</div>
-            <div className="tableListOperator">
-            </div>
+            <div className="tableListOperator"></div>
             <StandardTable
               scroll={{ x: 1300 }}
               selectedRows={selectedRows}
@@ -460,11 +494,14 @@ class Verification extends React.Component {
           </div>
         </Card>
         <CheckModel
-          onRef = { ref => { this.checkShow = ref }}
-          record = {record}
-          type = {type}
+          onRef={ref => {
+            this.checkShow = ref;
+          }}
+          record={record}
+          type={type}
           getData={this.getData}
-          wrappedComponentRef={this.saveFormRef}/>
+          wrappedComponentRef={this.saveFormRef}
+        />
       </PageHeaderWrapper>
     );
   }

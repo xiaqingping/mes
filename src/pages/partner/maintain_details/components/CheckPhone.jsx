@@ -223,8 +223,8 @@ class CheckPhone extends Component {
           <FormItem label={formatMessage({ id: 'bp.maintain_details.phone.contactInformation' })}>
             {getFieldDecorator('phone')(
               <Input
-              style={{ width: '300px' }}
-              placeholder={formatMessage({ id: 'bp.maintain_details.phone.phoneOrEmail' })}
+                style={{ width: '300px' }}
+                placeholder={formatMessage({ id: 'bp.maintain_details.phone.phoneOrEmail' })}
               />,
             )}
           </FormItem>
@@ -285,10 +285,10 @@ class CheckPhone extends Component {
           onSubmit={this.handleQuestion}
         >
           <FormItem
-          label={formatMessage({ id: 'bp.maintain_details.phone.question1' })}
-          className="tools"
-          hasFeedback
-          validateStatus={oneQuestion}
+            label={formatMessage({ id: 'bp.maintain_details.phone.question1' })}
+            className="tools"
+            hasFeedback
+            validateStatus={oneQuestion}
           >
             <div
               style={{
@@ -324,16 +324,17 @@ class CheckPhone extends Component {
                 },
               ],
             })(
-            <Input
-            style={{ width: '300px' }}
-            placeholder={formatMessage({ id: 'bp.inputHere' })}
-            />)}
+              <Input
+                style={{ width: '300px' }}
+                placeholder={formatMessage({ id: 'bp.inputHere' })}
+              />,
+            )}
           </FormItem>
           <FormItem
-          label={formatMessage({ id: 'bp.maintain_details.phone.question2' })}
-          className="tools"
-          hasFeedback
-          validateStatus={twoQuestion}
+            label={formatMessage({ id: 'bp.maintain_details.phone.question2' })}
+            className="tools"
+            hasFeedback
+            validateStatus={twoQuestion}
           >
             <div
               style={{
@@ -369,10 +370,11 @@ class CheckPhone extends Component {
                 },
               ],
             })(
-            <Input
-            style={{ width: '300px' }}
-            placeholder={formatMessage({ id: 'bp.inputHere' })}
-            />)}
+              <Input
+                style={{ width: '300px' }}
+                placeholder={formatMessage({ id: 'bp.inputHere' })}
+              />,
+            )}
           </FormItem>
           <FormItem
             label={formatMessage({ id: 'bp.maintain_details.phone.question3' })}
@@ -415,10 +417,11 @@ class CheckPhone extends Component {
                 },
               ],
             })(
-            <Input
-            style={{ width: '300px' }}
-            placeholder={formatMessage({ id: 'bp.inputHere' })}
-            />)}
+              <Input
+                style={{ width: '300px' }}
+                placeholder={formatMessage({ id: 'bp.inputHere' })}
+              />,
+            )}
           </FormItem>
           <div style={{ textAlign: 'right', padding: '10px 20px', borderTop: '1px solid #E8E8E8' }}>
             <FormItem>
@@ -446,10 +449,9 @@ class CheckPhone extends Component {
           <Icon type="check-circle" style={{ fontSize: '20px', color: '#54C31F' }} />
           <span style={{ fontSize: '20px', fontWeight: '600' }}>
             &nbsp;&nbsp;&nbsp;
-            {proceed ?
-            formatMessage({ id: 'bp.maintain_details.phone.continue' }) :
-            formatMessage({ id: 'bp.maintain_details.phone.finishQuestion' })
-            }
+            {proceed
+              ? formatMessage({ id: 'bp.maintain_details.phone.continue' })
+              : formatMessage({ id: 'bp.maintain_details.phone.finishQuestion' })}
           </span>
           <Form layout="inline" onSubmit={this.handleCode} style={{ marginTop: '45px' }}>
             <div>{this.pageRetrun(prefixSelector)}</div>
@@ -472,8 +474,8 @@ class CheckPhone extends Component {
           <FormItem label={formatMessage({ id: 'bp.maintain_details.phone.identity' })}>
             {getFieldDecorator('type', { initialValue: '1' })(
               <Select
-              style={{ width: '300px' }}
-              // placeholder={formatMessage({ id: 'bp.maintain_details.phone.questions' })}
+                style={{ width: '300px' }}
+                // placeholder={formatMessage({ id: 'bp.maintain_details.phone.questions' })}
               >
                 <Option value="1">
                   {formatMessage({ id: 'bp.maintain_details.phone.questions' })}
@@ -507,9 +509,8 @@ class CheckPhone extends Component {
       return (
         <Fragment>
           <div className="divStyle">
-            <span>
-              {formatMessage({ id: 'bp.maintain_details.phone.mobilePhone' })}
-            </span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <span>{formatMessage({ id: 'bp.maintain_details.phone.mobilePhone' })}</span>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             <span>
               {countryDiallingCodes.filter(
                 item => item.countryCode === phoneAccount.newMobilePhoneCountryCode,
@@ -526,13 +527,13 @@ class CheckPhone extends Component {
           </div>
 
           <FormItem
-          label={formatMessage({ id: 'bp.maintain_details.phone.verificationCode' })}
-          style={{ margin: '20px 16px 60px 0' }}
+            label={formatMessage({ id: 'bp.maintain_details.phone.verificationCode' })}
+            style={{ margin: '20px 16px 60px 0' }}
           >
             {getFieldDecorator('code')(
               <Input
-              style={{ width: '180px' }}
-              placeholder={formatMessage({ id: 'bp.maintain_details.phone.pleaseEnterCode' })}
+                style={{ width: '180px' }}
+                placeholder={formatMessage({ id: 'bp.maintain_details.phone.pleaseEnterCode' })}
               />,
             )}
             &nbsp;&nbsp;&nbsp;&nbsp;
@@ -545,10 +546,11 @@ class CheckPhone extends Component {
               }}
               style={{ width: '100px' }}
             >
-              {btnText === 1 ?
-              formatMessage({ id: 'bp.maintain_details.phone.obtainNewCode' }) : btnText === 2 ?
-              formatMessage({ id: 'bp.maintain_details.phone.resend' }) :
-              `${time}${formatMessage({ id: 'bp.maintain_details.phone.seconds' })}`}
+              {btnText === 1
+                ? formatMessage({ id: 'bp.maintain_details.phone.obtainNewCode' })
+                : btnText === 2
+                ? formatMessage({ id: 'bp.maintain_details.phone.resend' })
+                : `${time}${formatMessage({ id: 'bp.maintain_details.phone.seconds' })}`}
             </Button>
           </FormItem>
         </Fragment>
@@ -559,20 +561,20 @@ class CheckPhone extends Component {
         <FormItem label={formatMessage({ id: 'bp.maintain_details.phone.mobilePhone' })}>
           {getFieldDecorator('userPhone')(
             <Input
-            addonBefore={prefixSelector}
-            style={{ width: '300px' }}
-            placeholder={formatMessage({ id: 'bp.inputHere' })}
+              addonBefore={prefixSelector}
+              style={{ width: '300px' }}
+              placeholder={formatMessage({ id: 'bp.inputHere' })}
             />,
           )}
         </FormItem>
         <FormItem
-        label={formatMessage({ id: 'bp.maintain_details.phone.verificationCode' })}
-        style={{ margin: '20px 16px 60px 0' }}
+          label={formatMessage({ id: 'bp.maintain_details.phone.verificationCode' })}
+          style={{ margin: '20px 16px 60px 0' }}
         >
           {getFieldDecorator('code')(
             <Input
-            style={{ width: '180px' }}
-            placeholder={formatMessage({ id: 'bp.maintain_details.phone.pleaseEnterCode' })}
+              style={{ width: '180px' }}
+              placeholder={formatMessage({ id: 'bp.maintain_details.phone.pleaseEnterCode' })}
             />,
           )}
           &nbsp;&nbsp;&nbsp;&nbsp;
@@ -585,9 +587,11 @@ class CheckPhone extends Component {
             }}
             style={{ width: '100px' }}
           >
-            {btnText === 1 ? formatMessage({ id: 'bp.maintain_details.phone.obtainNewCode' }) :
-            btnText === 2 ? formatMessage({ id: 'bp.maintain_details.phone.resend' }) :
-            `${time}${formatMessage({ id: 'bp.maintain_details.phone.seconds' })}`}
+            {btnText === 1
+              ? formatMessage({ id: 'bp.maintain_details.phone.obtainNewCode' })
+              : btnText === 2
+              ? formatMessage({ id: 'bp.maintain_details.phone.resend' })
+              : `${time}${formatMessage({ id: 'bp.maintain_details.phone.seconds' })}`}
           </Button>
         </FormItem>
       </Fragment>
@@ -624,14 +628,14 @@ class CheckPhone extends Component {
             }}
           >
             <TabPane
-            tab={formatMessage({ id: 'bp.maintain_details.phone.customerSelfChange' })}
-            key="1"
+              tab={formatMessage({ id: 'bp.maintain_details.phone.customerSelfChange' })}
+              key="1"
             >
               {this.userChange()}
             </TabPane>
             <TabPane
-            tab={formatMessage({ id: 'bp.maintain_details.phone.systemAssistantChange' })}
-            key="2"
+              tab={formatMessage({ id: 'bp.maintain_details.phone.systemAssistantChange' })}
+              key="2"
             >
               {this.manChange()}
             </TabPane>

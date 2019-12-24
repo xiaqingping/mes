@@ -117,5 +117,8 @@ export default {
   'bp.maintain_details.phone.mobilePhone': '手机号',
   'bp.maintain_details.email.email': '邮箱',
 
-
+  // 认证的气泡
+  'bp.maintain_details.popover.attachment': '附件',
+  'bp.maintain_details.popover.certificationRecords': '认证记录',
+  'bp.maintain_details.popover.noCertificationRecords': '暂无认证记录',
 };

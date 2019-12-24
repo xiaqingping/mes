@@ -1,27 +1,32 @@
 :global {
-  .tabs{
+  .tabs {
     .ant-tabs-nav-scroll {
       background-color: #EEE
     }
+
     .bdr {
       width: 1000px;
       height: 1000px;
       background: red;
       border: 1px solid #EEE;
     }
+
     .ant-tabs-bar {
       margin: 0
     }
+
     // .ant-pagination {
     //   display: none
     // }
-    .ant-table-small > .ant-table-content > .ant-table-body {
+    .ant-table-small>.ant-table-content>.ant-table-body {
       margin: 0
     }
-    .ant-table-tbody > tr > td:first-child {
+
+    .ant-table-tbody>tr>td:first-child {
       padding-left: 80px !important
     }
-    .ant-table-thead > tr > th:first-child .ant-table-column-title {
+
+    .ant-table-thead>tr>th:first-child .ant-table-column-title {
       padding-left: 80px !important
     }
   }
@@ -36,13 +41,17 @@
     .ant-modal-content .ant-modal-body {
       padding: 0;
     }
+
     .ant-form-inline .ant-form-item-with-help {
-        margin-bottom: 0
+      margin-bottom: 0
     }
+
     // 去掉：号
-    .ant-form-item-label > label::after, .ant-descriptions-item-colon::after  {
+    .ant-form-item-label>label::after,
+    .ant-descriptions-item-colon::after {
       content: '' !important
     }
+
     // tab的高度变大
     .ant-tabs-tab {
       height: 50px;
@@ -68,15 +77,15 @@
 
   // 额度弹框顶部样式
   .quotaStyle {
-    .ant-modal-header{
+    .ant-modal-header {
       height: 55px;
     }
   }
 
   // 地址的省略号添加
   .addEllipsis {
-    overflow:hidden;
-    white-space:nowrap;
+    overflow: hidden;
+    white-space: nowrap;
     text-overflow: ellipsis;
   }
 }

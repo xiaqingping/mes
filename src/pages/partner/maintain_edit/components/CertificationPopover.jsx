@@ -6,6 +6,12 @@ import { Badge, Spin, Empty, Popover } from 'antd';
 import { connect } from 'dva';
 import moment from 'moment';
 import api from '@/api';
+import { formatMessage } from 'umi/locale';
+import OrgChina from './OrgChina'
+import OrgUsa from './OrgUsa'
+import OrgGb from './OrgGb'
+import PersonRecord from './PersonRecord'
+
 
 @connect(({ bp }) => ({
   VerifyRecordStatus: bp.VerifyRecordStatus,
@@ -53,7 +59,9 @@ class CertificationPopover extends React.Component {
     if (!data) {
       return (
         <div style={style}>
-          <Empty description="暂无认证记录" />
+          <Empty
+          description={formatMessage({ id: 'bp.maintain_details.popover.noCertificationRecords' })}
+          />
         </div>
       );
     }
@@ -91,47 +99,46 @@ class CertificationPopover extends React.Component {
           <span style={{ marginLeft: '1.5em' }}>{data.operationDate}</span>
         </div>
         <div style={{ textAlign: 'right', marginTop: 10 }}>
-          <a onClick={this.showMore}>查看更多</a>
+          <a onClick={this.showMore}>
+            {formatMessage({ id: 'component.noticeIcon.view-more' })}
+          </a>
         </div>
       </div>
     );
   };
 
   renderMore = () => {
-    const { data } = this.state;
     const { basic } = this.props;
     const { type } = basic;
-    console.log(data);
     if (type === 1) return this.renderMorePi();
+    if (type === 2 && basic.sapCountryCode === 'CN') return this.renderMoreOrgChina();
+    if (type === 2 && basic.sapCountryCode === 'GB') return this.renderMoreOrgGB();
     return this.renderMoreOrg();
   };
 
   // 人员大气泡
   renderMorePi = () => {
     const { data } = this.state;
-    console.log(data);
-    return <div>人员大气泡</div>;
+    console.log(data)
+    return <PersonRecord data={data}/>;
   };
 
-  // 组织大气泡
+  // 组织美国和其他国家大气泡
   renderMoreOrg = () => {
     const { data } = this.state;
-    console.log(data);
-    return <div>组织大气泡</div>;
+    return <OrgUsa data={data}/>;
   };
 
   // 组织国外大气泡
-  renderMoreOrgOther = () => {
+  renderMoreOrgGB = () => {
     const { data } = this.state;
-    console.log(data);
-    return <div>组织国外大气泡</div>;
+    return <OrgGb data={data}/>;
   };
 
   // 组织国内大气泡
   renderMoreOrgChina = () => {
     const { data } = this.state;
-    console.log(data);
-    return <div>组织国内大气泡</div>;
+    return <OrgChina data={data}/>;
   };
 
   render() {
@@ -149,7 +156,13 @@ class CertificationPopover extends React.Component {
     }
 
     return (
-      <Popover content={content} title={more ? '认证记录' : null} placement="topLeft">
+      <Popover
+      content={content}
+      title={more ? formatMessage({
+        id: 'bp.maintain_details.popover.certificationRecords',
+      }) : null}
+      placement="topLeft"
+      >
         {this.props.children}
       </Popover>
     );
