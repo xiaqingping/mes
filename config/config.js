@@ -115,11 +115,11 @@ export default {
     basePath: '/',
   },
   chainWebpack: webpackPlugin,
-  // proxy: {
-  //   '/basic/api/': {
-  //     target: 'http://180.167.32.168:8001/',
-  //     changeOrigin: true,
-  //     pathRewrite: { '^/basic/api/': '' },
-  //   },
-  // },
+  proxy: {
+    '/temporary/api/': {
+      target: 'http://192.168.20.43:8550/',
+      changeOrigin: true,
+      pathRewrite: { '^/temporary/api/': '' },
+    },
+  },
 };

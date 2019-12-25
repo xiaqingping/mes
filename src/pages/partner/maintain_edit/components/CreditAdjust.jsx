@@ -190,7 +190,7 @@ class CreditAdjust extends React.Component {
   };
 
   render() {
-    const { creditAdjustType, visible, onCancel } = this.props;
+    const { type, visible, onCancel } = this.props;
     const { status } = this.state;
     let footer = null;
     if (status === 1) {
@@ -203,7 +203,7 @@ class CreditAdjust extends React.Component {
 
     return (
       <Modal
-        title={creditAdjustType === 1 ? '固定额度调整' : '临时额度调整'}
+        title={type === 1 ? '固定额度调整' : '临时额度调整'}
         width={300}
         visible={visible}
         onOk={this.handleOk}
