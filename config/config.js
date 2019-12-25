@@ -121,5 +121,10 @@ export default {
       changeOrigin: true,
       pathRewrite: { '^/192.168.20.43:8550/': '' },
     },
+    '/192.168.20.43:8001/': {
+      target: 'http://192.168.20.43:8001/',
+      changeOrigin: true,
+      pathRewrite: { '^/192.168.20.43:8001/': '' },
+    },
   },
 };

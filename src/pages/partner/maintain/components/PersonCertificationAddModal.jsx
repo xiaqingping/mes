@@ -1,5 +1,6 @@
 import { Form, Input, Modal, Upload, Icon, Select } from 'antd';
 import React, { Component } from 'react';
+import { formatMessage } from 'umi/locale';
 import api from '@/api';
 import { guid } from '@/utils/utils';
 
@@ -116,7 +117,7 @@ class PersonCertificationAddModal extends Component {
           wrapperCol={{
             span: 15,
           }}
-          label="收票方"
+          label={formatMessage({ id: 'bp.maintain_details.sales_distribution.bill_to_party' })}
         >
           {form.getFieldDecorator('billToPartyId', {
             rules: [{ required: true }],
@@ -144,7 +145,7 @@ class PersonCertificationAddModal extends Component {
           wrapperCol={{
             span: 15,
           }}
-          label="认证说明"
+          label={formatMessage({ id: 'bp.maintain_details.verification_data.memo' })}
         >
           {form.getFieldDecorator('notes', {
             rules: [{ required: true }],
@@ -157,7 +158,7 @@ class PersonCertificationAddModal extends Component {
           wrapperCol={{
             span: 15,
           }}
-          label="认证附件"
+          label={formatMessage({ id: 'bp.maintain.ChangeModal.attachment' })}
         >
           {form.getFieldDecorator('attachmentList', {
             rules: [{ required: true }],

@@ -57,20 +57,20 @@ const formItemLayoutGroup = {
 };
 
 // 审核状态
-const verifyStatus = {
-  1: {
-    value: 'warning',
-    text: '审核中',
-  },
-  2: {
-    value: 'success',
-    text: '已认证',
-  },
-  3: {
-    value: 'default',
-    text: '未认证',
-  },
-};
+// const verifyStatus = {
+//   1: {
+//     value: 'warning',
+//     text: '审核中',
+//   },
+//   2: {
+//     value: 'success',
+//     text: '已认证',
+//   },
+//   3: {
+//     value: 'default',
+//     text: '未认证',
+//   },
+// };
 
 function isNumber(obj) {
   const t1 = /^\d+(\.\d+)?$/; // 非负浮点数
@@ -150,7 +150,7 @@ class NameGroup extends Component {
         <Input
           value={name}
           style={{ width: '70%' }}
-          placeholder="请输入名称"
+          placeholder={formatMessage({ id: 'bp.inputHere' })}
           onChange={e => this.valueChange({ name: e.target.value })}
         />
       </InputGroup>
@@ -253,7 +253,7 @@ class AddressGroup extends Component {
           style={{ width: '40%' }}
           onChange={(value, selectedOptions) => this.selectArea(value, selectedOptions)}
           options={countryCode}
-          placeholder="请选择"
+          placeholder={formatMessage({ id: 'bp.inputHere' })}
           fieldNames={{ label: 'name', value: 'code' }}
           popupVisible={popupVisible}
           onClick={() => {
@@ -272,7 +272,7 @@ class AddressGroup extends Component {
   }
 }
 
-@connect(({ basicCache, user, global, bpCache }) => {
+@connect(({ basicCache, user, global, bpCache, bp }) => {
   const industryCategories = basicCache.industryCategories.filter(
     e => e.languageCode === global.languageCode,
   );
@@ -283,6 +283,7 @@ class AddressGroup extends Component {
     countryDiallingCodes: basicCache.countryDiallingCodes,
     authorization: user.currentUser.authorization,
     industryCategoryAll: bpCache.industryCategoryAll,
+    PiCertificationStatus: bp.PiCertificationStatus,
   };
 })
 class ChangeModal extends Component {
@@ -614,7 +615,7 @@ class ChangeModal extends Component {
 
   personalShow = name => (
     <div style={{ marginLeft: '30%' }}>
-      <Form.Item label="名称">
+      <Form.Item label={formatMessage({ id: 'bp.maintain_details.name' })}>
         &nbsp;&nbsp;&nbsp;&nbsp;
         <Icon type="user" /> &nbsp;<span>{name}</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         <a onClick={event => this.updetaPersonal(event)}>
@@ -1016,6 +1017,7 @@ class ChangeModal extends Component {
   };
 
   renderListItem = item => {
+    const { PiCertificationStatus } = this.props;
     if (item && item.id) {
       return (
         <List.Item key={item.id}>
@@ -1036,9 +1038,9 @@ class ChangeModal extends Component {
           >
             <div style={{ marginBottom: '.8em' }}>
               <Badge
-                status={verifyStatus[item.status].value}
-                text={verifyStatus[item.status].text}
-              />
+                  status={formatter(PiCertificationStatus, item.status, 'id', 'badge')}
+                  text={formatter(PiCertificationStatus, item.status, 'id', 'name')}
+                />
             </div>
             <Paragraph
               style={{ minHeight: 42 }}
@@ -1970,6 +1972,7 @@ class ChangeModal extends Component {
               </Col>
               <Col lg={24} md={12} sm={12}>
                 <Form.Item
+                className="customLabelStyles"
                 label={formatMessage({
                   id: 'bp.maintain_details.verification_data.verification_documents',
                 })}
