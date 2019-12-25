@@ -5,6 +5,7 @@ import { Modal, Table, Button, AutoComplete, Input, Icon } from 'antd';
 import React from 'react';
 import { connect } from 'dva';
 import { formatMessage, FormattedMessage } from 'umi-plugin-react/locale';
+import ContactInformation from '@/pages/partner/maintain_edit/components/ContactInformation';
 import debounce from 'lodash/debounce';
 import bpAPI from '@/api/bp';
 import { formatter } from '@/utils/utils';
@@ -12,7 +13,7 @@ import { formatter } from '@/utils/utils';
 @connect(
   ({ bp }) => ({
     BpCertificationStatus: bp.BpCertificationStatus,
-    SalesOrderBlock: bp.salesOrderBlock,
+    SalesOrderBlock: bp.SalesOrderBlock,
     CustomerDataStatus: bp.CustomerDataStatus,
   }),
   null,
@@ -224,22 +225,29 @@ class ChooseSoldToParty extends React.Component {
             </Button>
           </div>
         ),
-        render: (text, row) => {
-          const mobilePhoneArr = [];
-          if (row.mobilePhoneCountryCode) mobilePhoneArr.push(row.mobilePhoneCountryCode);
-          if (row.mobilePhone) mobilePhoneArr.push(row.mobilePhone);
-          return (
+        render: (text, row) =>
+          // const mobilePhoneArr = [];
+          // if (row.mobilePhoneCountryCode) mobilePhoneArr.push(row.mobilePhoneCountryCode);
+          // if (row.mobilePhone) mobilePhoneArr.push(row.mobilePhone);
+           (
             <>
-              {mobilePhoneArr.length > 0 ? (
+              {/* {mobilePhoneArr.length > 0 ? (
                 <>
                   <span>{mobilePhoneArr.join('-')}</span>
                   <br />
                 </>
-              ) : null}
-              <span>{row.email}</span>
+              ) : null} */}
+              <span>{row.email}</span><br />
+              <ContactInformation
+                data={{
+                  countryCode: row.mobilePhoneCountryCode,
+                  code: row.mobilePhone,
+                  flag: 'no_use',
+                }}
+              />
             </>
-          );
-        },
+          )
+        ,
       },
       {
         title: formatMessage({ id: 'bp.maintain_details.sales_distribution.bill_to_party' }),

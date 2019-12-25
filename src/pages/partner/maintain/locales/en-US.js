@@ -38,4 +38,16 @@ export default {
     'bp.maintain.actived': 'Actived',
     'bp.maintain.completed': 'Completed',
     'bp.maintain.incomplete': 'Incomplete',
+
+    // 变更
+    'bp.maintain.ChangeModal.address': 'Address',
+    'bp.maintain.ChangeModal.businessType': 'Business Type',
+    'bp.maintain.ChangeModal.clickToUpload': 'Click to upload',
+    'bp.maintain.ChangeModal.on': 'on',
+    'bp.maintain.ChangeModal.off': 'off',
+    'bp.maintain.ChangeModal.vat': 'vat#/Business #',
+    'bp.maintain.ChangeModal.taxExemptID': 'Tax Exempt ID',
+    'bp.maintain.ChangeModal.newInformation':
+    'New information has been submitted, please wait for approval!',
+    'bp.maintain.ChangeModal.changeApprovedData': 'Change approved data',
 };

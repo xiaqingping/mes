@@ -1,5 +1,4 @@
-/* eslint-disable max-len */
-/* eslint-disable no-param-reassign */
+/* eslint-disable prefer-destructuring */
 import {
   Badge,
   Button,
@@ -92,37 +91,37 @@ function renderOption(item) {
 }
 
 @connect(({ basicCache, global, bp }) => {
-  const regionOffice = basicCache.regionOffice.filter(e => e.languageCode === global.languageCode)
-  return ({
+  const regionOffice = basicCache.regionOffice.filter(e => e.languageCode === global.languageCode);
+  return {
     languageCode: global.languageCode,
     regionOffice,
     BpCertificationStatus: bp.BpCertificationStatus,
-    salesOrderBlock: bp.salesOrderBlock,
+    salesOrderBlock: bp.SalesOrderBlock,
     CustomerDataStatus: bp.CustomerDataStatus,
-  })
+  };
 })
 class Maintain extends React.Component {
-constructor(props) {
-  super(props);
-  this.state = {
-    formValues: {
-      page: 1,
-      pageSize: 10,
-    },
-    selectedRows: [],
-    expandForm: false,
-    list: [],
-    total: 0,
-    // formValues: {},
-    xiaoshuoguishu: [],
-    // kaipiaofang: [],
-    receivingParty: [], // 收票方
-    loading: false,
-    searchVal: {},
-  };
-  this.callSaler = _.debounce(this.callSaler, 500);
-  this.callCustomer = _.debounce(this.callCustomer, 500);
-}
+  constructor(props) {
+    super(props);
+    this.state = {
+      formValues: {
+        page: 1,
+        pageSize: 10,
+      },
+      selectedRows: [],
+      expandForm: false,
+      list: [],
+      total: 0,
+      // formValues: {},
+      xiaoshuoguishu: [],
+      // kaipiaofang: [],
+      receivingParty: [], // 收票方
+      loading: false,
+      searchVal: {},
+    };
+    this.callSaler = _.debounce(this.callSaler, 500);
+    this.callCustomer = _.debounce(this.callCustomer, 500);
+  }
 
   componentDidMount() {
     this.props.dispatch({
@@ -145,18 +144,18 @@ constructor(props) {
     api.employees.getSaler({ code_or_name: value }).then(res => {
       this.setState({
         xiaoshuoguishu: res,
-      })
-    })
-  }
+      });
+    });
+  };
 
   // 收票方查询
   callCustomer = value => {
     api.bp.getOrgCustomerByCodeOrName({ code_or_name: value }).then(res => {
       this.setState({
         receivingParty: res,
-      })
-    })
-  }
+      });
+    });
+  };
 
   /** 激活 */
   cancelFreeze = (e, record) => {
@@ -178,11 +177,9 @@ constructor(props) {
   cancelIdent = (e, record) => {
     e.preventDefault();
     if (record.type === 2) {
-      api.bp.cancelBPOrgCertification(record.id).then(
-        () => {
-          this.getTableData()
-        },
-      )
+      api.bp.cancelBPOrgCertification(record.id).then(() => {
+        this.getTableData();
+      });
     }
   };
 
@@ -199,18 +196,19 @@ constructor(props) {
       }
       if (fieldsValue.regionalAttr) {
         if (fieldsValue.regionalAttr[0]) {
-          // eslint-disable-next-line prefer-destructuring
+          // eslint-disable-next-line no-param-reassign
           fieldsValue.regionCode = fieldsValue.regionalAttr[0];
         }
         if (fieldsValue.regionalAttr[1]) {
-          // eslint-disable-next-line prefer-destructuring
+          // eslint-disable-next-line no-param-reassign
           fieldsValue.officeCode = fieldsValue.regionalAttr[1];
         }
-        delete fieldsValue.regionalAttr
+        // eslint-disable-next-line no-param-reassign
+        delete fieldsValue.regionalAttr;
       }
       this.setState({
         searchVal: fieldsValue,
-      })
+      });
       this.getTableData(fieldsValue);
     });
   };
@@ -225,17 +223,20 @@ constructor(props) {
       formValues: query,
       loading: true,
     });
-    api.bp.getBPList(query).then(res => {
-      this.setState({
-        list: res.results,
-        total: res.total,
-        loading: false,
+    api.bp
+      .getBPList(query)
+      .then(res => {
+        this.setState({
+          list: res.results,
+          total: res.total,
+          loading: false,
+        });
+      })
+      .catch(() => {
+        this.setState({
+          loading: false,
+        });
       });
-    }).catch(() => {
-      this.setState({
-        loading: false,
-      });
-    });
   };
 
   handleModalVisible = () => {
@@ -251,7 +252,7 @@ constructor(props) {
   // 分页
   handleStandardTableChange = pagination => {
     if (JSON.stringify(pagination) !== '{}') {
-      const { searchVal } = this.state
+      const { searchVal } = this.state;
       this.getTableData({
         ...searchVal,
         page: pagination.current,
@@ -259,7 +260,7 @@ constructor(props) {
         pageSize: pagination.pageSize,
       });
     }
-  }
+  };
 
   handleFormReset = () => {
     this.props.form.resetFields();
@@ -268,16 +269,16 @@ constructor(props) {
   /** 查询销售归属 */
   searchSaler = value => {
     if (value) {
-      this.callSaler(value)
+      this.callSaler(value);
     }
-  }
+  };
 
   /** 查询收票方 */
   searchCustomer = value => {
     if (value) {
-      this.callCustomer(value)
+      this.callCustomer(value);
     }
-  }
+  };
 
   toggleForm = () => {
     const { expandForm } = this.state;
@@ -291,9 +292,9 @@ constructor(props) {
     return expandForm ? this.renderAdvancedForm() : this.renderSimpleForm();
   };
 
-  changeShow= (v, data) => {
-    this.ChangeModal.visibleShow(v, data)
-  }
+  changeShow = (v, data) => {
+    this.ChangeModal.visibleShow(v, data);
+  };
 
   /** 完整筛选条件 */
   renderAdvancedForm() {
@@ -310,26 +311,44 @@ constructor(props) {
       <Form onSubmit={this.handleSearch} layout="inline">
         <Row gutter={{ xxl: 100, lg: 80 }}>
           <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
-            <FormItem label={formatMessage({ id: 'bp.customerID' })}>{getFieldDecorator('code')(<Input placeholder={formatMessage({ id: 'bp.inputHere' })} />)}</FormItem>
+            <FormItem label={formatMessage({ id: 'bp.customerID' })}>
+              {getFieldDecorator('code')(
+                <Input placeholder={formatMessage({ id: 'bp.inputHere' })} />,
+              )}
+            </FormItem>
           </Col>
           <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
-            <FormItem label={formatMessage({ id: 'bp.maintain.customerName' })}>{getFieldDecorator('name')(<Input placeholder={formatMessage({ id: 'bp.inputHere' })} />)}</FormItem>
+            <FormItem label={formatMessage({ id: 'bp.maintain.customerName' })}>
+              {getFieldDecorator('name')(
+                <Input placeholder={formatMessage({ id: 'bp.inputHere' })} />,
+              )}
+            </FormItem>
           </Col>
           <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
-            <FormItem label={formatMessage({ id: 'bp.mobilePhone' })}>{getFieldDecorator('mobilePhone')(
-            <Input placeholder={formatMessage({ id: 'bp.inputHere' })} />)}</FormItem>
+            <FormItem label={formatMessage({ id: 'bp.mobilePhone' })}>
+              {getFieldDecorator('mobilePhone')(
+                <Input placeholder={formatMessage({ id: 'bp.inputHere' })} />,
+              )}
+            </FormItem>
           </Col>
           <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
-            <FormItem label={formatMessage({ id: 'bp.maintain.email' })}>{getFieldDecorator('email')(
-            <Input placeholder={formatMessage({ id: 'bp.inputHere' })} />)}</FormItem>
+            <FormItem label={formatMessage({ id: 'bp.maintain.email' })}>
+              {getFieldDecorator('email')(
+                <Input placeholder={formatMessage({ id: 'bp.inputHere' })} />,
+              )}
+            </FormItem>
           </Col>
           <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
             <FormItem label={formatMessage({ id: 'bp.maintain.verificationStatus' })}>
               {getFieldDecorator('certificationStatusList')(
-                <Select placeholder={formatMessage({ id: 'bp.pleaseSelect' })} maxTagCount={1} mode="multiple">
-                  {BpCertificationStatus.map(item =>
-                    <Option value={item.id}>{item.name}</Option>,
-                  )}
+                <Select
+                  placeholder={formatMessage({ id: 'bp.pleaseSelect' })}
+                  maxTagCount={1}
+                  mode="multiple"
+                >
+                  {BpCertificationStatus.map(item => (
+                    <Option value={item.id}>{item.name}</Option>
+                  ))}
                 </Select>,
               )}
             </FormItem>
@@ -338,9 +357,9 @@ constructor(props) {
             <FormItem label={formatMessage({ id: 'bp.maintain.salesBlocked' })}>
               {getFieldDecorator('salesOrderBlock')(
                 <Select placeholder={formatMessage({ id: 'bp.pleaseSelect' })}>
-                  {salesOrderBlock.map(item =>
-                    <Option value={item.id}>{item.name}</Option>,
-                  )}
+                  {salesOrderBlock.map(item => (
+                    <Option value={item.id}>{item.name}</Option>
+                  ))}
                 </Select>,
               )}
             </FormItem>
@@ -349,9 +368,9 @@ constructor(props) {
             <FormItem label={formatMessage({ id: 'bp.maintain.customerData' })}>
               {getFieldDecorator('customerDataStatus')(
                 <Select placeholder={formatMessage({ id: 'bp.pleaseSelect' })}>
-                  {CustomerDataStatus.map(item =>
-                    <Option value={item.id}>{item.name}</Option>,
-                  )}
+                  {CustomerDataStatus.map(item => (
+                    <Option value={item.id}>{item.name}</Option>
+                  ))}
                 </Select>,
               )}
             </FormItem>
@@ -360,9 +379,9 @@ constructor(props) {
             <FormItem label={formatMessage({ id: 'bp.maintain.vendorData' })}>
               {getFieldDecorator('vendorDataStatus')(
                 <Select placeholder={formatMessage({ id: 'bp.pleaseSelect' })}>
-                  {CustomerDataStatus.map(item =>
-                    <Option value={item.id}>{item.name}</Option>,
-                  )}
+                  {CustomerDataStatus.map(item => (
+                    <Option value={item.id}>{item.name}</Option>
+                  ))}
                 </Select>,
               )}
             </FormItem>
@@ -370,8 +389,11 @@ constructor(props) {
           <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
             <FormItem label={formatMessage({ id: 'bp.maintain.salesArea' })}>
               {getFieldDecorator('regionalAttr')(
-                <Cascader options={regionOffice} placeholder={formatMessage({ id: 'bp.pleaseSelect' })}
-                fieldNames={{ label: 'name', value: 'code', children: 'officeList' }}/>,
+                <Cascader
+                  options={regionOffice}
+                  placeholder={formatMessage({ id: 'bp.pleaseSelect' })}
+                  fieldNames={{ label: 'name', value: 'code', children: 'officeList' }}
+                />,
               )}
             </FormItem>
           </Col>
@@ -423,18 +445,29 @@ constructor(props) {
     return (
       <Form onSubmit={this.handleSearch} layout="inline">
         <Row gutter={{ xxl: 100, lg: 80 }}>
-        <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
-            <FormItem label={formatMessage({ id: 'bp.customerID' })}>{getFieldDecorator('code')(<Input placeholder={formatMessage({ id: 'bp.inputHere' })} />)}</FormItem>
+          <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
+            <FormItem label={formatMessage({ id: 'bp.customerID' })}>
+              {getFieldDecorator('code')(
+                <Input placeholder={formatMessage({ id: 'bp.inputHere' })} />,
+              )}
+            </FormItem>
           </Col>
           <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
-            <FormItem label={formatMessage({ id: 'bp.maintain.customerName' })}>{getFieldDecorator('name')(<Input placeholder={formatMessage({ id: 'bp.inputHere' })} />)}</FormItem>
+            <FormItem label={formatMessage({ id: 'bp.maintain.customerName' })}>
+              {getFieldDecorator('name')(
+                <Input placeholder={formatMessage({ id: 'bp.inputHere' })} />,
+              )}
+            </FormItem>
           </Col>
           <Col xxl={6} lg={languageCode === 'EN' ? 12 : 0}>
-            <FormItem label={formatMessage({ id: 'bp.mobilePhone' })}>{getFieldDecorator('mobilePhone')(
-            <Input placeholder={formatMessage({ id: 'bp.inputHere' })} />)}</FormItem>
+            <FormItem label={formatMessage({ id: 'bp.mobilePhone' })}>
+              {getFieldDecorator('mobilePhone')(
+                <Input placeholder={formatMessage({ id: 'bp.inputHere' })} />,
+              )}
+            </FormItem>
           </Col>
           <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
-              <span className="submitButtons">
+            <span className="submitButtons">
               <Button type="primary" htmlType="submit">
                 {formatMessage({ id: 'bp.maintain.search' })}
               </Button>
@@ -465,9 +498,15 @@ constructor(props) {
     const salesBlock = []; // 销售冻结
     const CustomerStatus = []; // 客户数据状态
 
-    BpCertificationStatus.forEach(item => { CertificationStatus.push({ value: item.id, text: item.name }) })
-    salesOrderBlock.forEach(item => { salesBlock.push({ value: item.id, text: item.name }) })
-    CustomerDataStatus.forEach(item => { CustomerStatus.push({ value: item.id, text: item.name }) })
+    BpCertificationStatus.forEach(item => {
+      CertificationStatus.push({ value: item.id, text: item.name });
+    });
+    salesOrderBlock.forEach(item => {
+      salesBlock.push({ value: item.id, text: item.name });
+    });
+    CustomerDataStatus.forEach(item => {
+      CustomerStatus.push({ value: item.id, text: item.name });
+    });
 
     const columns = [
       {
@@ -476,9 +515,13 @@ constructor(props) {
         width: 250,
         render(val, record) {
           return (
-            <Link className={styles.partNer} to={`/bp/maintain/details/${record.id}?type=${record.type}&customerDataStatus=${record.customerDataStatus}&vendorDataStatus=${record.vendorDataStatus}`}>
+            <Link
+              className={styles.partNer}
+              // eslint-disable-next-line max-len
+              to={`/bp/maintain/details/${record.id}?type=${record.type}&customerDataStatus=${record.customerDataStatus}&vendorDataStatus=${record.vendorDataStatus}`}
+            >
               <Icon type={record.type === 1 ? 'user' : 'home'} /> &nbsp;{record.name}
-                <div className={styles.partCode}>{val}</div>
+              <div className={styles.partCode}>{val}</div>
             </Link>
           );
         },
@@ -489,9 +532,14 @@ constructor(props) {
         // width: 100,
         filters: CertificationStatus,
         onFilter: (value, record) =>
-        record.certificationStatus.toString().indexOf(value.toString()) === 0,
+          record.certificationStatus.toString().indexOf(value.toString()) === 0,
         render(val) {
-          return <Badge status={formatter(BpCertificationStatus, val, 'id', 'badge')} text={formatter(BpCertificationStatus, val, 'id', 'name')} />;
+          return (
+            <Badge
+              status={formatter(BpCertificationStatus, val, 'id', 'badge')}
+              text={formatter(BpCertificationStatus, val, 'id', 'name')}
+            />
+          );
         },
       },
       {
@@ -500,11 +548,11 @@ constructor(props) {
         filters: salesBlock,
         filterMultiple: false,
         onFilter: (value, record) =>
-        record.salesOrderBlock.toString().indexOf(value.toString()) === 0,
+          record.salesOrderBlock.toString().indexOf(value.toString()) === 0,
         // eslint-disable-next-line consistent-return
         render: val => {
           if (val) {
-            return <Badge status={dongjieMap[val].value} text={dongjieMap[val].text} />
+            return <Badge status={dongjieMap[val].value} text={dongjieMap[val].text} />;
           }
         },
       },
@@ -515,7 +563,7 @@ constructor(props) {
         filters: CustomerStatus,
         filterMultiple: false,
         onFilter: (value, record) =>
-        record.customerDataStatus.toString().indexOf(value.toString()) === 0,
+          record.customerDataStatus.toString().indexOf(value.toString()) === 0,
         render(val) {
           return <Badge status={wanzhengMap[val].value} text={wanzhengMap[val].text} />;
         },
@@ -527,7 +575,7 @@ constructor(props) {
         filters: CustomerStatus,
         filterMultiple: false,
         onFilter: (value, record) =>
-        record.vendorDataStatus.toString().indexOf(value.toString()) === 0,
+          record.vendorDataStatus.toString().indexOf(value.toString()) === 0,
         render(val) {
           return <Badge status={wanzhengMap[val].value} text={wanzhengMap[val].text} />;
         },
@@ -537,20 +585,28 @@ constructor(props) {
         dataIndex: 'mobilePhone',
         // width: 100,
         render(val, records) {
-          return <>
-                   <div>
-                      {val}
-                      &nbsp;&nbsp;
-                      {records.mobilePhoneVerifyStatus === 1 ? <
-                        Badge status={mobileIden[records.mobilePhoneVerifyStatus].value} /> : ''}
-                    </div>
-                    <div>
-                      {records.email}
-                      &nbsp;&nbsp;
-                      {records.emailVerifyStatus === 1 ?
-                      <Badge status={emailIden[records.emailVerifyStatus].value} /> : ''}
-                    </div>
-                  </>
+          return (
+            <>
+              <div>
+                {val}
+                &nbsp;&nbsp;
+                {records.mobilePhoneVerifyStatus === 1 ? (
+                  <Badge status={mobileIden[records.mobilePhoneVerifyStatus].value} />
+                ) : (
+                  ''
+                )}
+              </div>
+              <div>
+                {records.email}
+                &nbsp;&nbsp;
+                {records.emailVerifyStatus === 1 ? (
+                  <Badge status={emailIden[records.emailVerifyStatus].value} />
+                ) : (
+                  ''
+                )}
+              </div>
+            </>
+          );
         },
       },
       {
@@ -558,7 +614,7 @@ constructor(props) {
         dataIndex: 'address',
         // width: 200,
         render(val) {
-          return <div className={styles.hideAdress}>{val}</div>
+          return <div className={styles.hideAdress}>{val}</div>;
         },
       },
       {
@@ -569,34 +625,78 @@ constructor(props) {
           const { id } = record;
           const menu = (
             <Menu style={{ padding: 0 }}>
-              {record.salesOrderBlock === 1 ? <Menu.Item>
-              <a href="#" onClick={e => { this.cancelFreeze(e, record) }}>{formatMessage({ id: 'bp.maintain.cancelBlock' })}</a>
-                </Menu.Item> : <Menu.Item>
-                  <a href="#" onClick={ e => { this.freezePartner(e, record) }}>{formatMessage({ id: 'bp.maintain.block' })}</a>
-                </Menu.Item>}
-              {(record.certificationStatus === 4 || record.certificationStatus === 3) && record.type === 2 ?
+              {record.salesOrderBlock === 1 ? (
                 <Menu.Item>
-                  <a href="#" onClick={e => { this.cancelIdent(e, record) }}>{formatMessage({ id: 'bp.maintain.cancelApproval' })}</a>
+                  <a
+                    onClick={e => {
+                      this.cancelFreeze(e, record);
+                    }}
+                  >
+                    {formatMessage({ id: 'bp.maintain.cancelBlock' })}
+                  </a>
                 </Menu.Item>
-              : ''
-              }
+              ) : (
+                <Menu.Item>
+                  <a
+                    onClick={e => {
+                      this.freezePartner(e, record);
+                    }}
+                  >
+                    {formatMessage({ id: 'bp.maintain.block' })}
+                  </a>
+                </Menu.Item>
+              )}
+              {(record.certificationStatus === 4 || record.certificationStatus === 3) &&
+              record.type === 2 ? (
+                <Menu.Item>
+                  <a
+                    onClick={e => {
+                      this.cancelIdent(e, record);
+                    }}
+                  >
+                    {formatMessage({ id: 'bp.maintain.cancelApproval' })}
+                  </a>
+                </Menu.Item>
+              ) : (
+                ''
+              )}
               {/* 变更认证：PI除了未认证其他都要显示；组织只显示已认证状态；组织没有部分认证 */}
-              {record.certificationStatus === 4 || record.certificationStatus === 3 ?
+              {record.certificationStatus === 4 || record.certificationStatus === 3 ? (
                 <Menu.Item>
-                  <a href="#" onClick={ () => { this.changeShow(true, record) }}>{formatMessage({ id: 'bp.maintain.changeApproval' })}</a>
+                  <a
+                    onClick={() => {
+                      this.changeShow(true, record);
+                    }}
+                  >
+                    {formatMessage({ id: 'bp.maintain.changeApproval' })}
+                  </a>
                 </Menu.Item>
-              : ''
-              }
-              {record.certificationStatus === 1 ?
-                <Menu.Item><a href="#"
-                onClick={ () => { this.changeShow(true, record) }}>{formatMessage({ id: 'bp.maintain.approval' })}</a></Menu.Item>
-              : ''
-              }
+              ) : (
+                ''
+              )}
+              {record.certificationStatus === 1 ? (
+                <Menu.Item>
+                  <a
+                    onClick={() => {
+                      this.changeShow(true, record);
+                    }}
+                  >
+                    {formatMessage({ id: 'bp.maintain.approval' })}
+                  </a>
+                </Menu.Item>
+              ) : (
+                ''
+              )}
             </Menu>
           );
           return (
             <>
-              <Link to={`/bp/maintain/edit/${id}?type=${record.type}&customerDataStatus=${record.customerDataStatus}&vendorDataStatus=${record.vendorDataStatus}`}>{formatMessage({ id: 'bp.maintain.change' })}</Link>
+              <Link
+                // eslint-disable-next-line max-len
+                to={`/bp/maintain/edit/${id}?type=${record.type}&customerDataStatus=${record.customerDataStatus}&vendorDataStatus=${record.vendorDataStatus}`}
+              >
+                {formatMessage({ id: 'bp.maintain.change' })}
+              </Link>
               <Divider type="vertical" />
               <Dropdown overlay={menu}>
                 <a className="ant-dropdown-link">

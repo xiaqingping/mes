@@ -79,6 +79,9 @@ export default {
   'bp.verification.verification.verificationCode': '验证码：',
   'bp.verification.verification.verificationCodeExpiryDate': '验证码过期时间：',
   'bp.verification.verification.lastSentDate': '最后发送时间：',
+  'bp.verification.verification.phone': '最后发送时间：',
+  'bp.verification.verification.mobileVerification': '手机验证',
+  'bp.verification.verification.mailboxVerification': '邮箱验证',
   // 绑定售达方
   'bp.verification.defaultShipToParty': '绑定售达方',
   'bp.verification.defaultShipToParty.shipToParty': '送达方：',

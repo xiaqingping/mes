@@ -21,7 +21,7 @@ const DescriptionsItem = Descriptions.Item;
   // countryDiallingCodes: basicCache.countryDiallingCodes,
   salesPaymentMethods: basicCache.salesPaymentMethods,
   industry: basicCache.industryCategories,
-  salesOrderBlock: bp.salesOrderBlock,
+  salesOrderBlock: bp.SalesOrderBlock,
 }))
 class BasicInfo extends Component {
   state = {
@@ -67,15 +67,9 @@ class BasicInfo extends Component {
       industry,
       salesOrderBlock,
     } = this.props;
-    if (!basic) return null
+    if (!basic) return null;
     if (!countryDiallingCodes && !salesPaymentMethods) return null;
     if (industry.length === 0) return null;
-    // let newData = []
-    // countryDiallingCodes.forEach(item => {
-    //   if (item.countryCode === basic.telephoneCountryCode) {
-    //     newData = item;
-    //   }
-    // })
 
     return (
       <Card
@@ -88,9 +82,10 @@ class BasicInfo extends Component {
           <DescriptionsItem span={2} label={formatMessage({ id: 'bp.maintain_details.basic' })}>
             <Icon type={basic.type === 1 ? 'user' : 'home'} />
             &nbsp;&nbsp;
-            {basic.type === 1 ?
-            formatMessage({ id: 'bp.maintain_details.person' }) :
-            formatMessage({ id: 'bp.maintain_details.organization' })}&nbsp;&nbsp;
+            {basic.type === 1
+              ? formatMessage({ id: 'bp.maintain_details.person' })
+              : formatMessage({ id: 'bp.maintain_details.organization' })}
+            &nbsp;&nbsp;
             {basic.name}&nbsp;&nbsp;&nbsp;
             {basic.certificationStatus === 2 ? (
               <Badge status="warning" text={formatMessage({ id: 'bp.processing' })} />
@@ -110,7 +105,8 @@ class BasicInfo extends Component {
                 countryCode: basic.mobilePhoneCountryCode,
                 code: basic.mobilePhone,
               }}
-            />&nbsp;&nbsp;&nbsp;
+            />
+            &nbsp;&nbsp;&nbsp;
             {basic.mobilePhoneVerifyStatus === 'Y' ? (
               <a
                 onClick={() => {
@@ -124,8 +120,8 @@ class BasicInfo extends Component {
             )}
           </DescriptionsItem>
           <DescriptionsItem
-          span={2}
-          label={formatMessage({ id: 'bp.maintain_details.basic.email' })}
+            span={2}
+            label={formatMessage({ id: 'bp.maintain_details.basic.email' })}
           >
             {basic.email}&nbsp;&nbsp;&nbsp;
             {basic.emailVerifyStatus === 'Y' ? (
@@ -157,7 +153,7 @@ class BasicInfo extends Component {
                   this.showChange.visibleShow(true, this.props.details.basic);
                 }}
               >
-                {formatMessage({ id: 'bp.maintain_details.change' })}
+                &nbsp;{formatMessage({ id: 'bp.maintain_details.change' })}
               </a>
             ) : (
               ''
@@ -174,31 +170,29 @@ class BasicInfo extends Component {
             />
           </DescriptionsItem>
           <DescriptionsItem
-          span={1}
-          label={formatMessage({ id: 'bp.maintain_details.postal_code' })}
+            span={1}
+            label={formatMessage({ id: 'bp.maintain_details.postal_code' })}
           >
             {basic.postCode}
           </DescriptionsItem>
           <DescriptionsItem
-          span={1}
-          label={formatMessage({ id: 'bp.maintain_details.basic.time_zone' })}
+            span={1}
+            label={formatMessage({ id: 'bp.maintain_details.basic.time_zone' })}
           >
             {basic.timeZoneCode}
           </DescriptionsItem>
           <DescriptionsItem
-          span={2}
-          label={formatMessage({ id: 'bp.maintain_details.basic.language' })}
+            span={2}
+            label={formatMessage({ id: 'bp.maintain_details.basic.language' })}
           >
-            {basic.languageCode === 'ZH' ?
-            formatMessage({ id: 'bp.chinese' }) : formatMessage({ id: 'bp.english' })
-            }
+            {basic.languageCode === 'ZH'
+              ? formatMessage({ id: 'bp.chinese' })
+              : formatMessage({ id: 'bp.english' })}
           </DescriptionsItem>
           <DescriptionsItem
-          span={2}
-          label={formatMessage({ id: 'bp.maintain_details.basic.business_type' })}
+            span={2}
+            label={formatMessage({ id: 'bp.maintain_details.basic.business_type' })}
           >
-            {/* {basic.industryCode}&nbsp;&nbsp;&nbsp; */}
-            {/* {console.log(industry)} */}
             {basic.industryCode
               ? industry.filter(item => item.code === basic.industryCode)[0].name
               : ''}
@@ -218,8 +212,8 @@ class BasicInfo extends Component {
             )}
           </DescriptionsItem>
           <DescriptionsItem
-          span={6}
-          label={formatMessage({ id: 'bp.maintain_details.basic.address' })}
+            span={6}
+            label={formatMessage({ id: 'bp.maintain_details.basic.address' })}
           >
             {basic.countryName}&nbsp;
             {basic.provinceName}&nbsp;
@@ -228,24 +222,36 @@ class BasicInfo extends Component {
             {basic.streetName}&nbsp;
             {basic.address}
           </DescriptionsItem>
-          <DescriptionsItem span={2} label={type === 'supplier' ?
-          formatMessage({ id: 'bp.maintain_details.purchase_org.procurement_block' }) :
-          formatMessage({ id: 'bp.maintain_details.sales_distribution.sales_block' })}>
-            {/* <Badge status="error" /> */}
-            {/* &nbsp;{formatMessage({ id: 'bp.block' })} */}
-            {type === 'supplier' ?
-            (details.vendor ?
-            <Badge
-            status={formatter(salesOrderBlock, details.vendor.invoicePostBlock, 'id', 'badge') }
-            text={formatter(salesOrderBlock, details.vendor.invoicePostBlock) }
-            /> : '')
-             :
-            (details.custom ?
-            <Badge
-            status={formatter(salesOrderBlock, details.custom.invoicePostBlock, 'id', 'badge') }
-            text={formatter(salesOrderBlock, details.custom.invoicePostBlock) }
-            /> : '')
+          <DescriptionsItem
+            span={2}
+            label={
+              type === 'supplier'
+                ? formatMessage({ id: 'bp.maintain_details.purchase_org.procurement_block' })
+                : formatMessage({ id: 'bp.maintain_details.sales_distribution.sales_block' })
             }
+          >
+            {type === 'supplier' ? (
+              details.vendor ? (
+                <Badge
+                  status={formatter(
+                    salesOrderBlock,
+                    details.vendor.invoicePostBlock,
+                    'id',
+                    'badge',
+                  )}
+                  text={formatter(salesOrderBlock, details.vendor.invoicePostBlock)}
+                />
+              ) : (
+                ''
+              )
+            ) : details.custom ? (
+              <Badge
+                status={formatter(salesOrderBlock, details.custom.invoicePostBlock, 'id', 'badge')}
+                text={formatter(salesOrderBlock, details.custom.invoicePostBlock)}
+              />
+            ) : (
+              ''
+            )}
           </DescriptionsItem>
         </Descriptions>
         <CheckPhone

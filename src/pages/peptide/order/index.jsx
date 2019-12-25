@@ -1,15 +1,5 @@
 // 多肽订单
-import {
-  Button,
-  Card,
-  Col,
-  DatePicker,
-  Form,
-  Icon,
-  Input,
-  Row,
-  Select,
-} from 'antd';
+import { Button, Card, Col, DatePicker, Form, Icon, Input, Row, Select } from 'antd';
 import React, { Component } from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import StandardTable from '@/components/StandardTable';
@@ -28,7 +18,6 @@ const { Option } = Select;
 const { RangePicker } = DatePicker;
 const { Search } = Input;
 
-
 @Form.create()
 @connect(({ peptide, global }) => ({
   peptide,
@@ -39,7 +28,7 @@ class SearchPage extends Component {
     super(props);
     this.state = {
       expandForm: false,
-    }
+    };
   }
 
   componentDidMount() {
@@ -50,11 +39,11 @@ class SearchPage extends Component {
     if (e) e.preventDefault();
     const val = this.props.form.getFieldsValue();
     this.props.getTableData({ page: 1, ...val });
-  }
+  };
 
   handleFormReset = () => {
     this.props.form.resetFields();
-  }
+  };
 
   toggleForm = () => {
     const { expandForm } = this.state;
@@ -84,54 +73,52 @@ class SearchPage extends Component {
         salerCode: v.code,
       });
     }
-  }
+  };
 
   renderAdvancedForm() {
     const {
       form: { getFieldDecorator },
-      peptide: {
-        commonData,
-      },
+      peptide: { commonData },
       peptide,
       language,
     } = this.props;
-    const regions = peptide.regions.filter(
-      e => e.languageCode === language,
-    )
+    const regions = peptide.regions.filter(e => e.languageCode === language);
 
-    const offices = peptide.offices.filter(
-      e => e.languageCode === language,
-    )
-    const currencies = peptide.currencies.filter(
-      e => e.languageCode === language,
-    )
+    const offices = peptide.offices.filter(e => e.languageCode === language);
+    const currencies = peptide.currencies.filter(e => e.languageCode === language);
 
     return (
       <Form onSubmit={this.submit} layout="inline">
         <Row gutter={{ lg: 24, md: 12, sm: 6 }}>
-        <Col lg={6} md={8} sm={12}>
-            <FormItem label="订单编号">
-              {getFieldDecorator('code')(<Input />)}
-            </FormItem>
+          <Col lg={6} md={8} sm={12}>
+            <FormItem label="订单编号">{getFieldDecorator('code')(<Input />)}</FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="客户">
-              {getFieldDecorator('customerCode')(<Search onSearch={() => this.showCustomer.visibleShow(true)} />)}
+              {getFieldDecorator('customerCode')(
+                <Search onSearch={() => this.showCustomer.visibleShow(true)} />,
+              )}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="负责人">
-            {getFieldDecorator('subCustomerCode')(<Search onSearch={() => this.showSubCustomer.visibleShow(true)} />)}
+              {getFieldDecorator('subCustomerCode')(
+                <Search onSearch={() => this.showSubCustomer.visibleShow(true)} />,
+              )}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="订货人">
-            {getFieldDecorator('contactCode')(<Search onSearch={() => this.showContact.visibleShow(true)} />)}
+              {getFieldDecorator('contactCode')(
+                <Search onSearch={() => this.showContact.visibleShow(true)} />,
+              )}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="销售员">
-            {getFieldDecorator('salerCode')(<Search onSearch={() => this.showSaler.visibleShow(true)} />)}
+              {getFieldDecorator('salerCode')(
+                <Search onSearch={() => this.showSaler.visibleShow(true)} />,
+              )}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
@@ -139,9 +126,11 @@ class SearchPage extends Component {
               {getFieldDecorator('currency', { initialValue: '' })(
                 <Select>
                   <Option value="">全部</Option>
-                  {currencies.map(item =>
-                  <Option key={item.code} value={item.code}>{`${item.code}-${item.shortText}`}</Option>,
-                )}
+                  {currencies.map(item => (
+                    <Option key={item.code} value={item.code}>
+                      {`${item.code}-${item.shortText}`}
+                    </Option>
+                  ))}
                 </Select>,
               )}
             </FormItem>
@@ -150,11 +139,12 @@ class SearchPage extends Component {
             <FormItem label="销售网点">
               {getFieldDecorator('officeCode', { initialValue: '' })(
                 <Select>
-                <Option value="">全部</Option>
-                {offices.map(item =>
-                  <Option key={item.code} value={item.code}>{`${item.code}-${item.name}`}</Option>,
-                )}
-                </Select>)}
+                  <Option value="">全部</Option>
+                  {offices.map(item => (
+                    <Option key={item.code} value={item.code}>{`${item.code}-${item.name}`}</Option>
+                  ))}
+                </Select>,
+              )}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
@@ -162,37 +152,44 @@ class SearchPage extends Component {
               {getFieldDecorator('regionCode', { initialValue: '' })(
                 <Select>
                   <Option value="">全部</Option>
-                  {regions.map(item =>
-                    <Option key={item.code} value={item.code}>{`${item.code}-${item.name}`}</Option>,
-                  )}
-                  </Select>)}
+                  {regions.map(item => (
+                    <Option key={item.code} value={item.code}>
+                      {`${item.code}-${item.name}`}
+                    </Option>
+                  ))}
+                </Select>,
+              )}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="销售组织">
               {getFieldDecorator('rangeOrganization', { initialValue: '' })(
                 <Select>
-                  {commonData.rangeOrganization.map(item =>
-                    <Option key={item.id} value={item.id}>{item.name}</Option>,
-                  )}
-                  </Select>)}
+                  {commonData.rangeOrganization.map(item => (
+                    <Option key={item.id} value={item.id}>
+                      {item.name}
+                    </Option>
+                  ))}
+                </Select>,
+              )}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="销售渠道">
               {getFieldDecorator('rangeChannel', { initialValue: '' })(
                 <Select>
-                  {commonData.rangeChannel.map(item =>
-                    <Option key={item.id} value={item.id}>{item.name}</Option>,
-                  )}
-                  </Select>)}
+                  {commonData.rangeChannel.map(item => (
+                    <Option key={item.id} value={item.id}>
+                      {item.name}
+                    </Option>
+                  ))}
+                </Select>,
+              )}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="创建日期">
-              {getFieldDecorator('wanchengshijian')(
-                <RangePicker />,
-              )}
+              {getFieldDecorator('wanchengshijian')(<RangePicker />)}
             </FormItem>
           </Col>
         </Row>
@@ -220,28 +217,34 @@ class SearchPage extends Component {
       <Form onSubmit={this.submit} layout="inline">
         <Row gutter={{ lg: 24, md: 12, sm: 6 }}>
           <Col lg={6} md={8} sm={12}>
-            <FormItem label="订单编号">
-              {getFieldDecorator('code')(<Input />)}
-            </FormItem>
+            <FormItem label="订单编号">{getFieldDecorator('code')(<Input />)}</FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="客户">
-              {getFieldDecorator('customerCode')(<Search onSearch={() => this.showCustomer.visibleShow(true)} />)}
+              {getFieldDecorator('customerCode')(
+                <Search onSearch={() => this.showCustomer.visibleShow(true)} />,
+              )}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="负责人">
-            {getFieldDecorator('subCustomerCode')(<Search onSearch={() => this.showSubCustomer.visibleShow(true)} />)}
+              {getFieldDecorator('subCustomerCode')(
+                <Search onSearch={() => this.showSubCustomer.visibleShow(true)} />,
+              )}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="订货人">
-            {getFieldDecorator('contactCode')(<Search onSearch={() => this.showContact.visibleShow(true)} />)}
+              {getFieldDecorator('contactCode')(
+                <Search onSearch={() => this.showContact.visibleShow(true)} />,
+              )}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="销售员">
-            {getFieldDecorator('salerCode')(<Search onSearch={() => this.showSaler.visibleShow(true)} />)}
+              {getFieldDecorator('salerCode')(
+                <Search onSearch={() => this.showSaler.visibleShow(true)} />,
+              )}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
@@ -266,28 +269,36 @@ class SearchPage extends Component {
   renderForm = () => {
     const { expandForm } = this.state;
     return expandForm ? this.renderAdvancedForm() : this.renderSimpleForm();
-  }
+  };
 
   render() {
     return (
       <div className="tableListForm">
-      {this.renderForm()}
-      <CustomerMask
-        onRef={ref => { this.showCustomer = ref }}
-        getData={v => this.getMaskData(v, 'customer')}
+        {this.renderForm()}
+        <CustomerMask
+          onRef={ref => {
+            this.showCustomer = ref;
+          }}
+          getData={v => this.getMaskData(v, 'customer')}
         />
-      <SubCustomerMask
-        onRef={ref => { this.showSubCustomer = ref }}
-        getData={v => this.getMaskData(v, 'subCustomer')}
-      />
-      <ContactMask
-        onRef={ref => { this.showContact = ref }}
-        getData={v => this.getMaskData(v, 'contact')}
-      />
-      <SalerMask
-        onRef={ref => { this.showSaler = ref }}
-        getData={v => this.getMaskData(v, 'saler')}
-      />
+        <SubCustomerMask
+          onRef={ref => {
+            this.showSubCustomer = ref;
+          }}
+          getData={v => this.getMaskData(v, 'subCustomer')}
+        />
+        <ContactMask
+          onRef={ref => {
+            this.showContact = ref;
+          }}
+          getData={v => this.getMaskData(v, 'contact')}
+        />
+        <SalerMask
+          onRef={ref => {
+            this.showSaler = ref;
+          }}
+          getData={v => this.getMaskData(v, 'saler')}
+        />
       </div>
     );
   }
@@ -347,7 +358,7 @@ class Order extends Component {
       loading: false,
       selectedRows: [],
       editIndex: -1,
-    }
+    };
   }
 
   componentDidMount() {
@@ -355,31 +366,31 @@ class Order extends Component {
     dispatch({
       type: 'peptide/getCache', // 销售大区
       payload: { type: 'regions' },
-    })
+    });
     dispatch({
       type: 'peptide/getCache', // 销售网点
       payload: { type: 'offices' },
-    })
+    });
     dispatch({
       type: 'peptide/getCache', // 开票方式
       payload: { type: 'invtypes' },
-    })
+    });
     dispatch({
       type: 'peptide/getCache', // 付款方式
       payload: { type: 'payMethods' },
-    })
+    });
     dispatch({
       type: 'peptide/getCache', // 付款条件
       payload: { type: 'payTerms' },
-    })
+    });
     dispatch({
       type: 'peptide/getCache', // 货币类型
       payload: { type: 'currencies' },
-    })
+    });
     dispatch({
       type: 'peptide/getCache', // 销售范围
       payload: { type: 'SalesRanges' },
-    })
+    });
   }
 
   handleStandardTableChange = pagination => {
@@ -387,7 +398,7 @@ class Order extends Component {
       page: pagination.current,
       rows: pagination.pageSize,
     });
-  }
+  };
 
   handleSelectRows = rows => {
     this.setState({
@@ -422,7 +433,7 @@ class Order extends Component {
         editIndex: -1,
       });
     });
-  }
+  };
 
   handleFormReset = () => {
     this.props.form.resetFields();
@@ -456,18 +467,15 @@ class Order extends Component {
       loading,
     } = this.state;
 
-    const { peptide: { commonData, invtypes, payMethods, payTerms },
-     peptide, language } = this.props
+    const {
+      peptide: { commonData, invtypes, payMethods, payTerms },
+      peptide,
+      language,
+    } = this.props;
 
-    const regions = peptide.regions.filter(
-      e => e.languageCode === language,
-    )
-    const offices = peptide.offices.filter(
-      e => e.languageCode === language,
-    )
-    const currencies = peptide.currencies.filter(
-      e => e.languageCode === language,
-    )
+    const regions = peptide.regions.filter(e => e.languageCode === language);
+    const offices = peptide.offices.filter(e => e.languageCode === language);
+    const currencies = peptide.currencies.filter(e => e.languageCode === language);
     const data = { list, pagination: { current, pageSize, total } };
     let tableWidth = 0;
     let columns = [
@@ -610,7 +618,9 @@ class Order extends Component {
         title: '随货开票',
         dataIndex: 'invoiceByGoods',
         width: 100,
-        render(text) { return text ? '是' : '否' },
+        render(text) {
+          return text ? '是' : '否';
+        },
       },
       {
         title: '送货地址',
@@ -744,7 +754,13 @@ class Order extends Component {
           <div className="tableList">
             <SearchPage getTableData={this.getTableData} />
             <div className="tableListOperator">
-              <Button icon="plus" type="primary" onClick={ () => { this.showOrder.visibleShow(true) }}>
+              <Button
+                icon="plus"
+                type="primary"
+                onClick={() => {
+                  this.showOrder.visibleShow(true);
+                }}
+              >
                 新建
               </Button>
             </div>
@@ -764,7 +780,9 @@ class Order extends Component {
           </div>
         </Card>
         <OrderMask
-          onRef={ref => { this.showOrder = ref }}
+          onRef={ref => {
+            this.showOrder = ref;
+          }}
         />
       </PageHeaderWrapper>
     );

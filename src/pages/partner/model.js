@@ -90,7 +90,7 @@ const SeqModel = {
       { id: 'D006', name: '45 天之内 到期净值' },
     ],
     // 销售范围冻结状态
-    salesOrderBlock: [
+    SalesOrderBlock: [
       { id: 1, name: formatMessage({ id: 'bp.block' }), badge: 'error' },
       { id: 2, name: formatMessage({ id: 'bp.normal' }), badge: 'success' },
     ],
@@ -126,6 +126,11 @@ const SeqModel = {
       { id: 2, name: formatMessage({ id: 'bp.verification.email' }) },
       { id: 3, name: formatMessage({ id: 'bp.verification.user' }) },
       { id: 4, name: formatMessage({ id: 'bp.verification.manualAudit' }) },
+    ],
+    // 验证记录-手机验证和邮箱验证-验证类型
+    VerifyPhoneOrEmailType: [
+      { id: 1, name: formatMessage({ id: 'bp.verification.verification.mobileVerification' }) },
+      { id: 2, name: formatMessage({ id: 'bp.verification.verification.mailboxVerification' }) },
     ],
     // 验证记录状态
     VerifyRecordStatus: [

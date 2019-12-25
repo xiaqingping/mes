@@ -5,6 +5,7 @@ import { Modal, Button, AutoComplete, Input, Icon, Table } from 'antd';
 import React from 'react';
 import { connect } from 'dva';
 import { formatMessage, FormattedMessage } from 'umi-plugin-react/locale';
+import ContactInformation from '@/pages/partner/maintain_edit/components/ContactInformation';
 import debounce from 'lodash/debounce';
 import bpAPI from '@/api/bp';
 import { formatter } from '@/utils/utils';
@@ -12,7 +13,7 @@ import { formatter } from '@/utils/utils';
 @connect(
   ({ bp }) => ({
     BpCertificationStatus: bp.BpCertificationStatus,
-    SalesOrderBlock: bp.salesOrderBlock,
+    SalesOrderBlock: bp.SalesOrderBlock,
     CustomerDataStatus: bp.CustomerDataStatus,
   }),
   null,
@@ -232,24 +233,34 @@ class ChooseInvoiceParty extends React.Component {
             </Button>
           </div>
         ),
-        render: (text, row) => {
-          const telephoneArr = [];
-          if (row.telephoneCountryCode) telephoneArr.push(row.telephoneCountryCode);
-          if (row.telephoneAreaCode) telephoneArr.push(row.telephoneAreaCode);
-          if (row.telephone) telephoneArr.push(row.telephone);
-          if (row.telephoneExtension) telephoneArr.push(row.telephoneExtension);
-          return (
+        render: (text, row) =>
+          // const telephoneArr = [];
+          // if (row.telephoneCountryCode)
+          // telephoneArr.push({ countryCode: row.telephoneCountryCode });
+          // if (row.telephoneAreaCode) telephoneArr.push({ areaCode: row.telephoneAreaCode });
+          // if (row.telephone) telephoneArr.push({ code: row.telephone });
+          // if (row.telephoneExtension) telephoneArr.push({ extension: row.telephoneExtension });
+          // console.log(telephoneArr)
+           (
             <>
-              {telephoneArr.length > 0 ? (
+              {/* {telephoneArr.length > 0 ? ( */}
                 <>
-                  <span>{telephoneArr.join('-')}</span>
-                  <br />
+                  {/* <span>{telephoneArr.join('-')}</span> */}
+                  <span>{row.email}</span><br />
+                  <ContactInformation
+                    data={{
+                      countryCode: row.telephoneCountryCode,
+                      areaCode: row.telephoneAreaCode,
+                      code: row.telephone,
+                      extension: row.telephoneExtension,
+                      flag: 'no_use',
+                    }}
+                  />
                 </>
-              ) : null}
-              <span>{row.email}</span>
+              {/* ) : null} */}
             </>
-          );
-        },
+          )
+        ,
       },
       {
         title: formatMessage({ id: 'action.operation' }),

@@ -1,10 +1,8 @@
-import {
-  Modal,
-  Button,
-  Icon,
-} from 'antd';
+import { Modal, Button, Icon } from 'antd';
 import React, { Component } from 'react';
 import { connect } from 'dva';
+import { formatMessage } from 'umi/locale';
+import { formatter } from '@/utils/utils';
 import api from '@/api';
 
 @connect(({ partnerMaintainEdit }) => ({
@@ -15,21 +13,34 @@ class TemporaryQuota extends Component {
     visible: false,
     status: 1,
     quotaData: [],
-  }
+  };
 
   componentWillReceiveProps(nextProps) {
     const { visible } = nextProps;
     this.setState({
       visible,
-    })
+    });
     const { details } = this.props;
-    // console.log(details)
     if (visible) {
-      if (details.basic.type === 2) { // 判断是否为非个人
-        api.bp.tempCreditLimitAssessment(
-          { id: details.basic.id, currencyCode: details.customer.salesAreaList[0].currencyCode },
-          ).then(res => { this.setState({ quotaData: res }) })
-      }
+      // if (details.basic.type === 2) { // 判断是否为非个人
+      api.bp
+        .tempCreditLimitAssessment({
+          id: details.basic.id,
+          currencyCode:
+            details.basic.type === 2
+              ? details.customer.salesAreaList[0].currencyCode
+              : formatter(
+                  details.creditList,
+                  nextProps.billToPartyId,
+                  'billToPartyId',
+                  'currencyCode',
+                ),
+          billToPartyId: details.basic.type === 2 ? '' : nextProps.billToPartyId,
+        })
+        .then(res => {
+          this.setState({ quotaData: res });
+        });
+      // }
     }
   }
 
@@ -38,24 +49,72 @@ class TemporaryQuota extends Component {
       visible: false,
       status: 1,
     });
-    this.props.temporaryQuota(false)
+    this.props.temporaryQuota(false);
   };
 
   handleOk = () => {
     const { details } = this.props;
-    if (details.basic.type === 2) { // 判断是否为非个人
-      api.bp.creditLimitAdjustment(
-
-        { id: details.basic.id, currencyCode: details.customer.salesAreaList[0].currencyCode },
-        ).then(res => {
-          this.setState({
-            quotaData: res,
-            status: 2,
-          })
-          // console.log(res)
-        })
-    }
-  }
+    const { creditList } = details;
+    // if (details.basic.type === 2) { // 判断是否为非个人
+    api.bp
+      .tempCreditlimitAdjustment({
+        id: details.basic.id,
+        currencyCode: details.customer.salesAreaList[0].currencyCode,
+        billToPartyId: details.basic.type === 2 ? '' : this.props.billToPartyId,
+      })
+      .then(res => {
+        this.setState({
+          quotaData: res,
+          status: 2,
+        });
+        if (details.basic.type === 2) {
+          const data = creditList[0];
+          if (creditList.length !== 0) {
+            data.tempCreditLimit = res.tempCreditLimit;
+            data.currencyCode = res.currencyCode;
+            data.tempCreditLimitExpirationDate =
+              details.creditList[0].tempCreditLimitExpirationDate;
+          }
+          this.props.dispatch({
+            type: 'partnerMaintainEdit/setDetails',
+            payload: {
+              ...details,
+              creditList: [data],
+            },
+          });
+        } else {
+          const data = details.creditList;
+          const newData = [];
+          data.forEach(item => {
+            if (item.billToPartyId === this.props.billToPartyId) {
+              newData.push({
+                billToPartyId: item.billToPartyId,
+                billToPartyCode: item.billToPartyCode,
+                billToPartyName: item.billToPartyName,
+                billingCycle: item.billingCycle,
+                billingDay: item.billingDay,
+                creditLimit: item.creditLimit,
+                creditPeriod: item.creditPeriod,
+                currencyCode: res.currencyCode,
+                lastEvaluationDate: item.lastEvaluationDate,
+                tempCreditLimit: res.tempCreditLimit,
+                tempCreditLimitExpirationDate: item.tempCreditLimitExpirationDate,
+              });
+            } else {
+              newData.push(item);
+            }
+          });
+          this.props.dispatch({
+            type: 'partnerMaintainEdit/setDetails',
+            payload: {
+              ...details,
+              creditList: newData,
+            },
+          });
+        }
+      });
+    // }
+  };
 
   // 固定额度页面
   detailPage = () => {
@@ -64,55 +123,68 @@ class TemporaryQuota extends Component {
 
     return (
       <div style={{ marginLeft: '80px' }}>
-        <p>{ details.basic.name }</p>
+        <p>{details.basic.name}</p>
         <p>
-          <span style={{ color: '#4EA7E9' }}>
-            { quotaData.tempCreditLimit }
-          </span>&nbsp;&nbsp;&nbsp;&nbsp;
-          { quotaData.currencyCode }
+          <span style={{ color: '#4EA7E9' }}>{quotaData.tempCreditLimit}</span>
+          &nbsp;&nbsp;&nbsp;&nbsp;
+          {quotaData.currencyCode}
         </p>
       </div>
-    )
-}
+    );
+  };
 
-  // 固定额度页面
+  // 临时额度页面
   hangelPage = () => {
     const { quotaData } = this.state;
     return (
       <div style={{ textAlign: 'center' }}>
-        <Icon type="check-circle" style={{
-          fontSize: '30px',
-          color: '#54C31F',
-          marginBottom: '20px' }}/>
+        <Icon
+          type="check-circle"
+          style={{
+            fontSize: '30px',
+            color: '#54C31F',
+            marginBottom: '20px',
+          }}
+        />
         <p>
-        您申请的临时额度为&nbsp;&nbsp;
-        <span style={{ color: '#4EA7E9' }}>{quotaData.creditLimit}</span>&nbsp;&nbsp;
-        {quotaData.currencyCode} <br/>
-          请注意查收！
+          {formatMessage({ id: 'bp.maintain_details.credit_management.yourTemporary' })}&nbsp;&nbsp;
+          <span style={{ color: '#4EA7E9' }}> {quotaData.tempCreditLimit} </span>&nbsp;&nbsp;
+          {quotaData.currencyCode}
+          {formatMessage({ id: 'bp.maintain_details.credit_management.pleaseCheck' })}
         </p>
       </div>
-    )
-  }
+    );
+  };
 
   render() {
-    const { status, visible } = this.state
+    const { status, visible } = this.state;
     return (
       <div>
         <Modal
-          title={ status === 1 ? '固定额度调整' : ' '}
+          title={
+            status === 1
+              ? formatMessage({
+                  id: 'bp.maintain_details.credit_management.temporaryCreditApp',
+                })
+              : ' '
+          }
           visible={visible}
           className="quotaStyle"
           centered
           destroyOnClose
           width="300px"
           onCancel={this.handleCancel}
-          footer={ status === 1 ? [
-            <Button key="submit" type="primary" onClick={this.handleOk}>
-              提交
-            </Button>,
-          ] : ''}
+          footer={
+            status === 1
+              ? [
+                  <Button key="submit" type="primary" onClick={this.handleOk}>
+                    {formatMessage({ id: 'action.submit' })}
+                  </Button>,
+                ]
+              : ''
+          }
         >
-          { status === 1 ? this.detailPage() : this.hangelPage() }
+          {status === 1 ? this.detailPage() : this.hangelPage()}
         </Modal>
       </div>
     );

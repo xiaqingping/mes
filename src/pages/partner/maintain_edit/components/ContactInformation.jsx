@@ -17,17 +17,25 @@ const ContactInformation = props => {
   if (data.countryCode) {
     countryDiallingCodes.forEach(e => {
       if (e.countryCode === data.countryCode) {
-        country = (
-          <>
-            <div
-              className="select-countryPic-box"
-              style={{ backgroundImage: `url(/images/country/${e.countryCode}.png)` }}
-            >
-              &nbsp;
-            </div>
-            {`+${e.diallingCode} `}
-          </>
-        );
+        if (data.flag === 'no_use') {
+          country = (
+            <>
+              {`+${e.diallingCode} `}
+            </>
+          );
+        } else {
+          country = (
+            <>
+              <div
+                className="select-countryPic-box"
+                style={{ backgroundImage: `url(/images/country/${e.countryCode}.png)` }}
+              >
+                &nbsp;
+              </div>
+              {`+${e.diallingCode} `}
+            </>
+          );
+        }
       }
     });
   }

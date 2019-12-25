@@ -4,37 +4,21 @@ import React, { Component } from 'react';
 import { connect } from 'dva';
 import './style.less';
 import ChangeModal from '@/pages/partner/maintain/components/ChangeModal';
+import { formatMessage } from 'umi/locale';
 import ContactInformation from '@/pages/partner/maintain_edit/components/ContactInformation';
+import { formatter } from '@/utils/utils';
 import api from '@/api';
 import CertificationPopover from '@/pages/partner/maintain_edit/components/CertificationPopover';
 
 const DescriptionsItem = Descriptions.Item;
 
-// 认证
-const renzhengMap = {
-  1: {
-    value: 'default',
-    text: '未认证',
-  },
-  2: {
-    value: 'warning',
-    text: '审核中',
-  },
-  4: {
-    value: 'success',
-    text: '已认证',
-  },
-  3: {
-    value: 'warning',
-    text: '部分认证',
-  },
-};
-
-@connect(({ partnerMaintainEdit }) => ({
+@connect(({ partnerMaintainEdit, bp }) => ({
   details:
     partnerMaintainEdit.type === 'supplier'
       ? partnerMaintainEdit.supplier
       : partnerMaintainEdit.details,
+    BpCertificationStatus: bp.BpCertificationStatus,
+    SpecialInvoice: bp.SpecialInvoice,
 }))
 class BasicInfo extends Component {
   state = {
@@ -89,17 +73,16 @@ class BasicInfo extends Component {
                 this.showChange.visibleShow(true, this.props.details.basic);
               }}
             >
-              变更
+              {formatMessage({ id: 'bp.maintain_details.change' })}
             </a>
           </CertificationPopover>
           &nbsp;&nbsp;
           <a
-            href="#"
             onClick={e => {
               this.cancelIdent(e, details);
             }}
           >
-            取消认证
+            {formatMessage({ id: 'bp.maintain.cancelApproval' })}
           </a>
         </>
       )
@@ -113,7 +96,7 @@ class BasicInfo extends Component {
                 this.showChange.visibleShow(true, this.props.details.basic);
               }}
             >
-              认证
+              {formatMessage({ id: 'bp.maintain_details.verification_status' })}
             </a>
           </CertificationPopover>
         </>
@@ -124,7 +107,7 @@ class BasicInfo extends Component {
         <>
           <CertificationPopover basic={details.basic}>
             <a>
-              查看
+              {formatMessage({ id: 'menu.bp.maintain.details' })}
             </a>
           </CertificationPopover>
         </>
@@ -134,11 +117,11 @@ class BasicInfo extends Component {
   }
 
   render() {
-    const { details } = this.props;
+    const { details, BpCertificationStatus, SpecialInvoice } = this.props;
     const { pic } = this.state;
     return (
       <Card
-        title="认证资料"
+        title={formatMessage({ id: 'bp.maintain_details.verification_data' })}
         bordered={false}
         style={{ marginBottom: '24px' }}
         className="check-tabs"
@@ -146,35 +129,51 @@ class BasicInfo extends Component {
         <Row gutter={16}>
           <Col span={15}>
             <Descriptions className="s-descriptions uploads" layout="vertical" column={3}>
-              <DescriptionsItem label="认证状态">
-                <Badge
-                  status={renzhengMap[details.basic.certificationStatus].value}
-                  text={renzhengMap[details.basic.certificationStatus].text}
+              <DescriptionsItem
+              label={formatMessage({ id: 'bp.maintain_details.verification_data.status' })}
+              >
+              <Badge
+                status={
+                  formatter(BpCertificationStatus, details.basic.certificationStatus, 'id', 'badge')
+                }
+                text={
+                  formatter(BpCertificationStatus, details.basic.certificationStatus, 'id', 'name')
+                }
                 />
                 &nbsp;&nbsp;&nbsp;&nbsp;
                 { this.certificationStatus(details.basic.certificationStatus, details)}
               </DescriptionsItem>
-              <DescriptionsItem label="增值税专用发票资质">
-                {details.organizationCertification
+              <DescriptionsItem
+              label={formatMessage({ id: 'bp.maintain_details.verification_data.special_invoice' })}
+              >
+                {/* {details.organizationCertification
                   ? details.organizationCertification.specialInvoice === 1
                     ? '是'
                     : '否'
-                  : ''}
+                  : ''} */}
+                  {details.organizationCertification ?
+                  formatter(SpecialInvoice, details.organizationCertification.specialInvoice) : ''}
               </DescriptionsItem>
-              <DescriptionsItem label="统一社会信用代码">
+              <DescriptionsItem
+              label={formatMessage({ id: 'bp.maintain_details.verification_data.VAT_Business' })}
+              >
                 {details.organizationCertification ? details.organizationCertification.taxNo : ''}
               </DescriptionsItem>
-              <DescriptionsItem label="基本户开户银行">
+              <DescriptionsItem
+              label={formatMessage({ id: 'bp.maintain_details.verification_data.bank_name' })}
+              >
                 {details.organizationCertification
                   ? details.organizationCertification.bankName
                   : ''}
               </DescriptionsItem>
-              <DescriptionsItem label="基本户开户账号">
+              <DescriptionsItem
+              label={formatMessage({ id: 'bp.maintain_details.verification_data.account_number' })}
+              >
                 {details.organizationCertification
                   ? details.organizationCertification.bankAccount
                   : ''}
               </DescriptionsItem>
-              <DescriptionsItem label="电话">
+              <DescriptionsItem label={formatMessage({ id: 'bp.maintain_details.phone' })}>
                 <ContactInformation
                   data={{
                     areaCode: details.basic.telephoneAreaCode,
@@ -183,10 +182,17 @@ class BasicInfo extends Component {
                   }}
                 />
               </DescriptionsItem>
-              <DescriptionsItem span={3} label="注册地址">
+              <DescriptionsItem
+               span={3}
+               label={formatMessage({ id: 'bp.maintain_details.verification_data.address' })}
+               >
                 {details.organizationCertification ? details.organizationCertification.address : ''}
               </DescriptionsItem>
-              <DescriptionsItem label="认证图片">
+              <DescriptionsItem
+              label={formatMessage({
+                id: 'bp.maintain_details.verification_data.verification_documents',
+              })}
+              >
                 <ul style={{ padding: '0' }}>
                   {pic.length !== 0 ? (
                     <>
@@ -218,7 +224,9 @@ class BasicInfo extends Component {
           </Col>
           <Col span={9}>
             <Descriptions className="s-descriptions" layout="vertical" column={1}>
-              <DescriptionsItem label="认证说明">
+              <DescriptionsItem
+              label={formatMessage({ id: 'bp.maintain_details.verification_data.memo' })}
+              >
                 {details.organizationCertification ? details.organizationCertification.notes : ''}
               </DescriptionsItem>
             </Descriptions>
