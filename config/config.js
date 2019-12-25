@@ -116,10 +116,10 @@ export default {
   },
   chainWebpack: webpackPlugin,
   proxy: {
-    '/temporary/api/': {
+    '/192.168.20.43:8550/': {
       target: 'http://192.168.20.43:8550/',
       changeOrigin: true,
-      pathRewrite: { '^/temporary/api/': '' },
+      pathRewrite: { '^/192.168.20.43:8550/': '' },
     },
   },
 };

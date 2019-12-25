@@ -1,4 +1,4 @@
-// 临时接口
+// 临时接口 此文件只能暂时存放后台没有发布到服务的接口
 import request from '@/utils/request';
 
 export default {
