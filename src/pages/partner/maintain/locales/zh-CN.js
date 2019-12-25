@@ -49,5 +49,6 @@ export default {
   'bp.maintain.ChangeModal.taxExemptID': '免税认证号',
   'bp.maintain.ChangeModal.newInformation': '您的资料已提交，请耐心等待审核',
   'bp.maintain.ChangeModal.changeApprovedData': '变更认证资料',
+  'bp.maintain.ChangeModal.attachment': '认证附件',
 
 };

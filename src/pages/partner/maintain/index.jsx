@@ -347,7 +347,9 @@ class Maintain extends React.Component {
                   mode="multiple"
                 >
                   {BpCertificationStatus.map(item => (
-                    <Option value={item.id}>{item.name}</Option>
+                    <Option key={item.id} value={item.id}>
+                      {item.name}
+                    </Option>
                   ))}
                 </Select>,
               )}
@@ -358,7 +360,9 @@ class Maintain extends React.Component {
               {getFieldDecorator('salesOrderBlock')(
                 <Select placeholder={formatMessage({ id: 'bp.pleaseSelect' })}>
                   {salesOrderBlock.map(item => (
-                    <Option value={item.id}>{item.name}</Option>
+                    <Option key={item.id} value={item.id}>
+                      {item.name}
+                    </Option>
                   ))}
                 </Select>,
               )}
@@ -369,7 +373,9 @@ class Maintain extends React.Component {
               {getFieldDecorator('customerDataStatus')(
                 <Select placeholder={formatMessage({ id: 'bp.pleaseSelect' })}>
                   {CustomerDataStatus.map(item => (
-                    <Option value={item.id}>{item.name}</Option>
+                    <Option key={item.id} value={item.id}>
+                      {item.name}
+                    </Option>
                   ))}
                 </Select>,
               )}
@@ -380,7 +386,9 @@ class Maintain extends React.Component {
               {getFieldDecorator('vendorDataStatus')(
                 <Select placeholder={formatMessage({ id: 'bp.pleaseSelect' })}>
                   {CustomerDataStatus.map(item => (
-                    <Option value={item.id}>{item.name}</Option>
+                    <Option key={item.id} value={item.id}>
+                      {item.name}
+                    </Option>
                   ))}
                 </Select>,
               )}

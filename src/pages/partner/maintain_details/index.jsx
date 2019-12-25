@@ -38,15 +38,6 @@ class CustomerDetails extends Component {
     //   type: 'partnerMaintainEdit/setDetails',
     //   payload: null,
     // });
-    api.bp.getBPCustomer(this.props.match.params.id).then(res => {
-      this.props.dispatch({
-        type: 'partnerMaintainEdit/setDetails',
-        payload: res,
-      });
-      this.setState({
-        pageLoading: false,
-      });
-    });
     api.bp.getBPVendor(this.props.match.params.id).then(res => {
       this.props.dispatch({
         type: 'partnerMaintainEdit/setSupplier',
@@ -58,6 +49,15 @@ class CustomerDetails extends Component {
       payload: { type: 'countryDiallingCodes' },
     });
 
+    api.bp.getBPCustomer(this.props.match.params.id).then(res => {
+      this.props.dispatch({
+        type: 'partnerMaintainEdit/setDetails',
+        payload: res,
+      });
+      this.setState({
+        pageLoading: false,
+      });
+    });
     // 判断是客户还是供应商
     if (activeKey) {
       if (activeKey === 'vendor') {

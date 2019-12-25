@@ -50,4 +50,5 @@ export default {
     'bp.maintain.ChangeModal.newInformation':
     'New information has been submitted, please wait for approval!',
     'bp.maintain.ChangeModal.changeApprovedData': 'Change approved data',
+    'bp.maintain.ChangeModal.attachment': 'Attachment',
 };
