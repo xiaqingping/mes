@@ -1,5 +1,6 @@
 import React from 'react';
 // import { GroupColumn } from '@antv/g2plot';
+import api from '@/api';
 
 class Sale extends React.Component {
   constructor(props) {
@@ -8,6 +9,10 @@ class Sale extends React.Component {
   }
 
   componentDidMount() {
+    api.temporary.getXXX({
+      monthDateBegin: '201901',
+      monthDateEnd: '201912',
+    });
     // const data = [
     //   {
     //     name: 'London',

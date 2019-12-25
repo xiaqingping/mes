@@ -83,20 +83,20 @@ service.interceptors.request.use(config => {
   }
   if (token) {
     config.headers.Authorization = token;
-    // if (config.url.indexOf('http://180.167.32.168:8001/') === -1) {
-    //   // eslint-disable-next-line no-param-reassign
-    //   config.headers.Authorization = token;
-    // } else {
-    //   // basic 因为跨域问题，使用了 webpack 的代理访问，只在开发时生效
-    //   // eslint-disable-next-line no-lonely-if
-    //   if (process.env.NODE_ENV === 'development') {
-    //     config.url = config.url.replace('http://180.167.32.168:8001/', '/basic/api/');
-    //     config.baseURL = '/';
-    //   } else {
-    //     config.url = config.url.replace('http://180.167.32.168:8001/', '/');
-    //     config.headers.Authorization = token;
-    //   }
-    // }
+    if (config.url.indexOf('http://192.168.20.43:8550/') === -1) {
+      // eslint-disable-next-line no-param-reassign
+      config.headers.Authorization = token;
+    } else {
+      // basic 因为跨域问题，使用了 webpack 的代理访问，只在开发时生效
+      // eslint-disable-next-line no-lonely-if
+      if (process.env.NODE_ENV === 'development') {
+        config.url = config.url.replace('http://192.168.20.43:8550/', '/temporary/api/');
+        config.baseURL = '/';
+      } else {
+        config.url = config.url.replace('http://192.168.20.43:8550/', '/');
+        config.headers.Authorization = token;
+      }
+    }
   }
 
   if (config.url.indexOf('/zuul/api/disk/') > -1) {

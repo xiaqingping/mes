@@ -27,8 +27,9 @@ import pay from './pay';
 import system from './system';
 import serial from './serial';
 import bp from './bp';
-import employees from './employees'
-import disk from './disk'
+import employees from './employees';
+import disk from './disk';
+import temporary from './temporary';
 
 export default {
   area,
@@ -62,6 +63,7 @@ export default {
   bp,
   employees,
   disk,
+  temporary,
 };
 
 export {
@@ -96,4 +98,5 @@ export {
   bp,
   employees,
   disk,
+  temporary,
 };
