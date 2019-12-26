@@ -16,15 +16,20 @@ const { TextArea } = Input;
 const { Option } = Select;
 
 @connect(
-  ({ bpEdit, user }) => {
+  ({ user, bpCache, bpEdit }) => {
     const details = bpEdit.details || {};
     const { basic } = details;
     const organizationCertification = details.organizationCertification || { attachmentList: [] };
+
+    // 行业类别和默认税号
+    const { industryCategoryAll } = bpCache;
+
     return {
       details,
       basic,
       organizationCertification,
       authorization: user.currentUser.authorization,
+      industryCategoryAll,
     };
   },
   null,
@@ -90,6 +95,15 @@ class OrgCertification extends Component {
   checkTaxNo = (rule, value, callback) => {
     if (!value) {
       callback('税号必须');
+      return;
+    }
+
+    // 默认税号不进行后台接口检查
+    const taxNoReadonly = this.props.industryCategoryAll.some(
+      e => e.taxNo === value && e.repeatTaxNo === 1,
+    );
+    if (taxNoReadonly) {
+      callback();
       return;
     }
 
@@ -179,6 +193,7 @@ class OrgCertification extends Component {
       form: { getFieldDecorator },
       organizationCertification: orgData,
       authorization,
+      industryCategoryAll,
     } = this.props;
     const { uploadUrl, bank, bankFetching } = this.state;
 
@@ -187,6 +202,11 @@ class OrgCertification extends Component {
     } else if (orgData.attachmentList.fileList) {
       orgData.attachmentList = orgData.attachmentList.fileList;
     }
+
+    // 税号是否默认且不可修改
+    const taxNoReadonly = industryCategoryAll.some(
+      e => e.taxNo === orgData.taxNo && e.repeatTaxNo === 1,
+    );
 
     return (
       <>
@@ -221,7 +241,12 @@ class OrgCertification extends Component {
                   {getFieldDecorator('taxNo', {
                     initialValue: orgData.taxNo,
                     rules: [{ validator: this.checkTaxNo }],
-                  })(<Input onChange={e => this.valueChange('taxNo', e.target.value)} />)}
+                  })(
+                    <Input
+                      readOnly={taxNoReadonly}
+                      onChange={e => this.valueChange('taxNo', e.target.value)}
+                    />,
+                  )}
                 </FormItem>
               </Col>
               <Col span={8}>
