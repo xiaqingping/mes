@@ -47,7 +47,7 @@
   ],
   "dependencies": {
     "@ant-design/colors": "^3.2.2",
-    "@ant-design/pro-layout": "^4.10.0",
+    "@ant-design/pro-layout": "^4.10.1",
     "@antv/g2plot": "^0.11.16",
     "@tinymce/tinymce-react": "^3.3.2",
     "antd": "^3.26.4",
