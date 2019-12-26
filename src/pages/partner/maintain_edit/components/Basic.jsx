@@ -26,7 +26,7 @@ const FormItem = Form.Item;
 const { Option } = Select;
 
 @connect(
-  ({ basicCache, bpEdit, global }) => {
+  ({ global, basicCache, bpCache, bpEdit }) => {
     // 1. 业务伙伴数据
     const { editType } = bpEdit;
     const oldDetails = bpEdit.oldDetails || {};
@@ -43,6 +43,8 @@ const { Option } = Select;
     const industryCategories = basicCache.industryCategories.filter(
       e => e.languageCode === global.languageCode,
     );
+    // 行业类别和默认税号
+    const { industryCategoryAll } = bpCache;
 
     return {
       oldDetails,
@@ -55,6 +57,7 @@ const { Option } = Select;
       invoicePostBlock,
       organizationCertification,
       industryCategories,
+      industryCategoryAll,
       countryTimeZone: basicCache.countryTimeZone,
       countryProvinceTimeZone: basicCache.countryProvinceTimeZone,
     };
@@ -212,31 +215,40 @@ class Basic extends React.Component {
   };
 
   valueChange = (key, value) => {
-    const { editType, details, basic, customer, vendor, organizationCertification } = this.props;
-    let obj = {
-      [key]: value,
-    };
+    const {
+      industryCategoryAll,
+      editType,
+      details,
+      basic,
+      customer,
+      vendor,
+      organizationCertification,
+    } = this.props;
+    let newBasic = JSON.parse(JSON.stringify(basic));
+    const newCustomer = JSON.parse(JSON.stringify(customer));
+    const newVendor = JSON.parse(JSON.stringify(vendor));
+    let newOrganizationCertification = JSON.parse(JSON.stringify(organizationCertification));
 
     const keyList = ['name', 'mobilePhone', 'telephone', 'fax', 'email', 'address'];
     if (keyList.indexOf(key) > -1) {
       if (key === 'address') {
         const { changedValue, ...excludeChangeValue } = value;
-        obj = {
-          ...excludeChangeValue,
-        };
+        newBasic = { ...newBasic, ...excludeChangeValue };
       } else {
-        obj = { ...value };
+        newBasic = { ...newBasic, ...value };
       }
+    } else {
+      newBasic[key] = value;
     }
 
     // 名字-类型为个人时，行业类别为个人，且不可更改
     if (key === 'name') {
       if (value.type === 1) {
-        obj.industryCode = '07';
+        newBasic.industryCode = '07';
         this.setState({ industrySelectOpen: true });
       } else {
         if (basic.industryCode === '07') {
-          obj.industryCode = '';
+          newBasic.industryCode = '';
         }
         this.setState({ industrySelectOpen: true });
       }
@@ -247,9 +259,30 @@ class Basic extends React.Component {
       let sapCountryCode = value.sapCountryCode || basic.sapCountryCode;
       let sapProvinceCode = value.sapProvinceCode || basic.sapProvinceCode;
 
+      // 新增时，如果由中国修改为其他国家，并且组织认证税号使用的是默认税号，则清空
+      if (editType === 'add' && value.sapCountryCode !== 'CN' && basic.sapCountryCode === 'CN') {
+        const { taxNo } = newOrganizationCertification;
+        const clear = industryCategoryAll.some(e => e.taxNo === taxNo);
+        newOrganizationCertification.taxNo = clear ? '' : taxNo;
+      }
+      // 新增时，如果由其他国家修改为中国，则根据行业类别设置税号
+      if (
+        editType === 'add' &&
+        value.sapCountryCode === 'CN' &&
+        basic.sapCountryCode !== 'CN' &&
+        basic.industryCode
+      ) {
+        const select = industryCategoryAll.filter(e => e.industryCode === basic.industryCode);
+        if (select[0]) {
+          newOrganizationCertification.taxNo = select[0].taxNo;
+        }
+      }
+
       // 修改BP时，组织的通讯地址国家不能直接改，需走变更认证
-      if (editType === 'update' && obj.countryCode !== basic.countryCode) {
-        Object.keys(obj).forEach(k => {
+      if (editType === 'update' && value.countryCode !== basic.countryCode) {
+        const obj = {};
+        Object.keys(value).forEach(k => {
+          if (k === 'changedValue') return;
           obj[k] = basic[k];
         });
 
@@ -262,22 +295,23 @@ class Basic extends React.Component {
         setTimeout(() => {
           this.props.form.setFieldsValue({ address: obj });
         });
+        newBasic = { ...newBasic, ...obj };
       }
 
       // 确定语言
       if (sapCountryCode === 'CN') {
-        obj.languageCode = 'ZH';
+        newBasic.languageCode = 'ZH';
       } else if (sapCountryCode && sapCountryCode !== 'CN') {
-        obj.languageCode = 'EN';
+        newBasic.languageCode = 'EN';
       } else {
-        obj.languageCode = '';
+        newBasic.languageCode = '';
       }
 
       // 根据国家编号确定时区
       if (sapCountryCode) {
         this.props.countryTimeZone.forEach(e => {
           if (e.countryCode === sapCountryCode) {
-            obj.timeZoneCode = e.timeZone;
+            newBasic.timeZoneCode = e.timeZone;
           }
         });
       }
@@ -285,7 +319,7 @@ class Basic extends React.Component {
       if (sapProvinceCode) {
         this.props.countryProvinceTimeZone.forEach(e => {
           if (e.countryCode === sapCountryCode && e.provinceCode === sapProvinceCode) {
-            obj.timeZoneCode = e.timeZone;
+            newBasic.timeZoneCode = e.timeZone;
           }
         });
       }
@@ -293,52 +327,38 @@ class Basic extends React.Component {
 
     // 销售冻结
     if (key === 'salesOrderBlock') {
-      // eslint-disable-next-line no-unused-expressions
-      value ? (obj[key] = 1) : (obj[key] = 2);
-      const newCustomer = { ...customer, ...obj };
-
-      this.props.dispatch({
-        type: 'bpEdit/setState',
-        payload: {
-          type: 'details',
-          data: { ...details, ...{ customer: newCustomer } },
-        },
-      });
-      return;
+      newCustomer.salesOrderBlock = value ? 1 : 2;
     }
 
     // 采购冻结
     if (key === 'invoicePostBlock') {
-      // eslint-disable-next-line no-unused-expressions
-      value ? (obj[key] = 1) : (obj[key] = 2);
-      const newVendor = { ...vendor, ...obj };
-
-      this.props.dispatch({
-        type: 'bpEdit/setState',
-        payload: {
-          type: 'details',
-          data: { ...details, ...{ vendor: newVendor } },
-        },
-      });
-      return;
+      newVendor.invoicePostBlock = value ? 1 : 2;
     }
-
-    const newBasic = { ...basic, ...obj };
-    let newDetails = { ...details, ...{ basic: newBasic } };
 
     // 电话 类型为组织时，认证资料的电话与基础信息的电话保持一致
     if (key === 'telephone') {
-      newDetails = {
-        ...newDetails,
-        ...{ organizationCertification: { ...organizationCertification, ...value } },
-      };
+      newOrganizationCertification = { ...newOrganizationCertification, ...value };
+    }
+
+    // 行业类别 与 默认税号
+    if (key === 'industryCode' && basic.sapCountryCode === 'CN') {
+      const select = industryCategoryAll.filter(e => e.industryCode === value);
+      if (select[0]) {
+        newOrganizationCertification.taxNo = select[0].taxNo;
+      }
     }
 
     this.props.dispatch({
       type: 'bpEdit/setState',
       payload: {
         type: 'details',
-        data: newDetails,
+        data: {
+          ...details,
+          basic: newBasic,
+          customer: newCustomer,
+          vendor: newVendor,
+          organizationCertification: newOrganizationCertification,
+        },
       },
     });
   };
