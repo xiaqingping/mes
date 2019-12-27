@@ -26,15 +26,15 @@ class CheckEmail extends Component {
     verifyRecordId: null,
   };
 
-  componentDidMount() {
-    const { proceed } = this.props; // 继续验证的状态区别
-    if (proceed) {
-      this.setState({
-        proceed: !!proceed,
-        status: 5,
-      });
-    }
-  }
+  // componentDidMount() {
+  //   const { proceed } = this.props; // 继续验证的状态区别
+  //   if (proceed) {
+  //     this.setState({
+  //       proceed: !!proceed,
+  //       status: 5,
+  //     });
+  //   }
+  // }
 
   setModalVisible = v => {
     this.setState({
@@ -42,7 +42,7 @@ class CheckEmail extends Component {
       oneQuestion: null,
       twoQuestion: null,
       threeQuestion: null,
-      proceed: false,
+      // proceed: false,
     });
     this.props.checkEmail(v);
   };
@@ -251,8 +251,9 @@ class CheckEmail extends Component {
   manChange = () => {
     const {
       form: { getFieldDecorator },
+      proceed,
     } = this.props;
-    const { status, oneQuestion, twoQuestion, threeQuestion, proceed } = this.state;
+    const { status, oneQuestion, twoQuestion, threeQuestion } = this.state;
     if (status === 4) {
       return (
         <Form
@@ -422,7 +423,7 @@ class CheckEmail extends Component {
         </div>
       );
     }
-    if (status === 5) {
+    if (status === 5 || proceed) {
       return (
         <div style={{ textAlign: 'center', paddingTop: '20px' }}>
           <Icon type="check-circle" style={{ fontSize: '20px', color: '#54C31F' }} />
@@ -480,8 +481,9 @@ class CheckEmail extends Component {
     const {
       form: { getFieldDecorator },
       emailAccount,
+      proceed,
     } = this.props;
-    const { proceed, btnText, time } = this.state;
+    const { btnText, time } = this.state;
     if (proceed) {
       return (
         <Fragment>
@@ -573,8 +575,7 @@ class CheckEmail extends Component {
   };
 
   render() {
-    const { proceed } = this.state;
-    const { emailShow } = this.props;
+    const { emailShow, proceed } = this.props;
     return (
       <div>
         <Modal

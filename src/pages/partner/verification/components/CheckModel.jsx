@@ -790,17 +790,17 @@ class CheckModel extends React.Component {
                   {detailsValue.newContactInfoVerifyCode}&nbsp;&nbsp;
                   {parseInt(recordMsg.status, 10) === 1 ? (
                     <>
-                      <a
-                        onClick={e => {
-                          this.reSent(e, detailsValue);
-                        }}
-                      >
+                      <a>
                         {formatMessage({
                           id: 'bp.verification.changeVerifiedPhoneAndEmail.reSend',
                         })}
                       </a>
                       &nbsp;&nbsp;&nbsp;&nbsp;
-                      <a>
+                      <a
+                        onClick={e => {
+                          this.reSent(e, detailsValue);
+                        }}
+                      >
                         {formatMessage({
                           id: 'bp.verification.changeVerifiedPhoneAndEmail.completed',
                         })}
@@ -901,7 +901,7 @@ class CheckModel extends React.Component {
                     {detailsValue.pic.length !== 0
                       ? detailsValue.pic.map((item, index) => (
                           <li
-                          // eslint-disable-next-line react/no-array-index-key
+                            // eslint-disable-next-line react/no-array-index-key
                             key={index}
                             style={{
                               width: '90px',
@@ -1286,7 +1286,7 @@ class CheckModel extends React.Component {
                           if (index < 12) {
                             return (
                               <li
-                              // eslint-disable-next-line react/no-array-index-key
+                                // eslint-disable-next-line react/no-array-index-key
                                 key={index}
                                 style={{
                                   width: '90px',

@@ -1,12 +1,16 @@
-import api from '@/api';
+import api from '@/api/temporary';
 
 const namespace = 'dashboard';
 const Model = {
   namespace,
 
   state: {
+    // 利润中心+公司
+    profitCenterCompany: [],
     // 利润中心
-    profitCenter: [],
+    profitCenters: [],
+    // 图表数据
+    chartData: [],
   },
   effects: {
     /**
@@ -77,6 +81,9 @@ const Model = {
       // 将数据存到浏览器缓存中
       sessionStorage.setItem(`${namespace}/${type}`, JSON.stringify(data));
       return { ...state, [type]: data };
+    },
+    setChartData(state, action) {
+      return { ...state, chartData: action.payload };
     },
   },
 };
