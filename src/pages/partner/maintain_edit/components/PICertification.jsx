@@ -8,6 +8,7 @@ import { FormattedMessage, formatMessage } from 'umi-plugin-react/locale';
 import CertificationPopover from './CertificationPopover';
 import PICertificationAddModal from './PICertificationAddModal';
 import api from '@/api';
+import styles from '../style.less';
 
 const { Paragraph } = Typography;
 
@@ -47,6 +48,7 @@ class PersonCertification extends React.Component {
       return (
         <List.Item key={item.billToPartyId}>
           <Card
+            className={styles['piCertification-item']}
             hoverable
             title={item.billToPartyName}
             extra={
@@ -108,7 +110,7 @@ class PersonCertification extends React.Component {
 
     return (
       <List.Item>
-        <Button type="dashed" style={{ width: '100%', height: 274 }} onClick={this.addNewItem}>
+        <Button className={styles['piCertification-add']} type="dashed" onClick={this.addNewItem}>
           <Icon type="plus" />
           <FormattedMessage id="bp.maintain_details.PI_verification.submit_certification" />
         </Button>
@@ -235,7 +237,7 @@ class PersonCertification extends React.Component {
       <Card
         title={formatMessage({ id: 'bp.maintain_details.PI_verification' })}
         bordered={false}
-        style={{ marginBottom: '24px' }}
+        className={styles.piCertification}
       >
         {basic.id && piCertificationList.length === 0 && true ? (
           <Empty />
