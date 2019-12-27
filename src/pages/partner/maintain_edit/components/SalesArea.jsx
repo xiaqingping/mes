@@ -37,6 +37,8 @@ const { TabPane } = Tabs;
     return e.languageCode === global.languageCode;
   }
   // 基础数据
+  // 销售范围和大区关系
+  const { salesAreaRegion } = basicCache;
   // 大区+网点
   const regionOffice = basicCache.regionOffice.filter(byLangFilter);
   // 付款方式
@@ -52,6 +54,7 @@ const { TabPane } = Tabs;
   const { DefaultInvoiceType } = bp;
 
   return {
+    salesAreaRegion,
     salesPaymentMethods,
     regionOffice,
     currencies,
@@ -85,7 +88,21 @@ class FormContent extends React.Component {
       regionOffice,
       currencies,
       DefaultInvoiceType,
+      salesAreaRegion,
     } = this.props;
+
+    const regionCodeList = salesAreaRegion
+      .map(e => {
+        if (
+          e.salesOrganizationCode === data.salesOrganizationCode &&
+          e.distributionChannelCode === data.distributionChannelCode
+        ) {
+          return e.regionCode;
+        }
+        return '';
+      })
+      .filter(e => e);
+    const regionOfficeFilter = regionOffice.filter(e => regionCodeList.indexOf(e.code) > -1);
 
     const sapCountryCode = basicInfo.sapCountryCode || 'CN';
 
@@ -103,7 +120,7 @@ class FormContent extends React.Component {
                 <Cascader
                   fieldNames={{ label: 'name', value: 'code', children: 'officeList' }}
                   onChange={value => valueChange('regionOffice', value)}
-                  options={regionOffice}
+                  options={regionOfficeFilter}
                 />,
               )}
             </FormItem>
