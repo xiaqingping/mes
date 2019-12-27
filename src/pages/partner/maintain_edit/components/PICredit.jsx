@@ -12,9 +12,21 @@ import styles from '../style.less';
 @connect(({ bpEdit }) => {
   const { details } = bpEdit;
   const { creditList, piCertificationList } = details;
+
+  // 未认证的开票方，不可以申请信用额度
+  const list = piCertificationList
+    .filter(e => e.status === 2 && !creditList.some(e1 => e1.billToPartyId === e.billToPartyId))
+    .map(e => ({
+      billToPartyId: e.billToPartyId,
+      billToPartyCode: e.billToPartyCode,
+      billToPartyName: e.billToPartyName,
+    }));
+
+  const newCreditList = [].concat(creditList, list);
+
   return {
     details,
-    creditList,
+    creditList: newCreditList,
     piCertificationList,
   };
 })
@@ -63,7 +75,7 @@ class PICredit extends React.Component {
             </>
           }
         >
-          {data ? (
+          {data.creditLimit || data.tempCreditLimit ? (
             <>
               <div className={styles['piCredit-item-line']}>
                 {data.creditLimit ? (
@@ -111,8 +123,7 @@ class PICredit extends React.Component {
 
   // 关闭调整额度界面
   handleCancel = () => {
-    const { details } = this.props;
-    const { creditList } = details;
+    const { details, creditList } = this.props;
 
     if (this.CreditAdjustView.state.status === 2) {
       const { creditData } = this.CreditAdjustView.state;
