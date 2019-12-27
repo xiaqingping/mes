@@ -1,6 +1,6 @@
 export default {
   'menu.welcome': 'welcome',
-  'menu.dashboard': 'Dashboard',
+  'menu.dashboard': '业务分析',
   'menu.dashboard.sale': '销售分析',
   'menu.more-blocks': '更多区块',
   'menu.home': '首页',

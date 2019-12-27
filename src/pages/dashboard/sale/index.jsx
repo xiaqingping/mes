@@ -1,7 +1,9 @@
-import { Card, Tabs, Select, DatePicker, Radio } from 'antd';
+/* eslint-disable no-nested-ternary */
+import { Card, Tabs, Select, DatePicker, Radio, Form, Col, Button } from 'antd';
 import React from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import { connect } from 'dva';
+import moment from 'moment';
 import Chart from './components/Chart';
 import List from './components/List';
 import api from '@/api';
@@ -10,11 +12,19 @@ const { TabPane } = Tabs;
 const { Option } = Select;
 const { RangePicker } = DatePicker;
 
-@connect(({ global, basicCache }) => {
+@connect(({ global, basicCache, dashboard }) => {
   const companys = basicCache.companys.filter(e => e.languageCode === global.languageCode);
+  const profitCenters = dashboard.profitCenters.filter(e => e.languageCode === global.languageCode);
+  const offices = basicCache.offices.filter(e => e.languageCode === global.languageCode);
+  const regions = basicCache.regions.filter(e => e.languageCode === global.languageCode);
   return {
     companys,
     languageCode: global.languageCode,
+    profitCenters,
+    profitCenterCompany: dashboard.profitCenterCompany,
+    salers: dashboard.salers,
+    offices,
+    regions,
   };
 })
 class Sale extends React.Component {
@@ -22,10 +32,9 @@ class Sale extends React.Component {
     super(props);
     this.state = {
       dataTime: [],
-      type: '1',
+      type: '1', // 选择月，季度，半年，整年
+      selectType: '1', // 选择大区、网点、销售员
       chartData: [],
-      profitCenterName: [],
-      profitCenter: [],
       profitCenterData: [],
     };
   }
@@ -35,195 +44,36 @@ class Sale extends React.Component {
       type: 'basicCache/getCache',
       payload: { type: 'companys' },
     });
-    api.temporary.getProfitCenterCompany().then(res => {
-      this.setState({
-        profitCenterName: res,
-      });
+    this.props.dispatch({
+      type: 'dashboard/getCache',
+      payload: { type: 'profitCenterCompany' },
     });
-    api.temporary.getProfitCenter().then(res => {
-      this.setState({
-        profitCenter: res,
-      });
+    this.props.dispatch({
+      type: 'dashboard/getCache',
+      payload: { type: 'profitCenters' },
     });
+    api.employees.getSaler().then(res => {
+      this.props.dispatch({
+        type: 'dashboard/setSalers',
+        payload: res.results,
+      });
+    })
+    this.props.dispatch({
+      type: 'basicCache/getCache',
+      payload: { type: 'offices' },
+    });
+    this.props.dispatch({
+      type: 'basicCache/getCache',
+      payload: { type: 'regions' },
+    });
+    this.companyChange(['3100']);
   }
 
   // 面板选择
   handlePanelChange = data => {
-    // const { type } = this.state;
-    // this.chart.passData([
-    //   {
-    //     name: 'London',
-    //     月份: 'Jan.',
-    //     月均降雨量: 100.9,
-    //   },
-    //   {
-    //     name: 'London',
-    //     月份: 'Feb.',
-    //     月均降雨量: 200.8,
-    //   },
-    //   {
-    //     name: 'London',
-    //     月份: 'Mar.',
-    //     月均降雨量: 300.3,
-    //   },
-    //   {
-    //     name: 'London',
-    //     月份: 'Apr.',
-    //     月均降雨量: 8.4,
-    //   },
-    //   {
-    //     name: 'London',
-    //     月份: 'May',
-    //     月均降雨量: 4,
-    //   },
-    //   {
-    //     name: 'London',
-    //     月份: 'Jun.',
-    //     月均降雨量: 2.3,
-    //   },
-    //   {
-    //     name: 'London',
-    //     月份: 'Jul.',
-    //     月均降雨量: 2,
-    //   },
-    //   {
-    //     name: 'London',
-    //     月份: 'Aug.',
-    //     月均降雨量: 3.6,
-    //   },
-    //   {
-    //     name: 'Berlin',
-    //     月份: 'Jan.',
-    //     月均降雨量: 12.4,
-    //   },
-    //   {
-    //     name: 'Berlin',
-    //     月份: 'Feb.',
-    //     月均降雨量: 23.2,
-    //   },
-    //   {
-    //     name: 'Berlin',
-    //     月份: 'Mar.',
-    //     月均降雨量: 34.5,
-    //   },
-    //   {
-    //     name: 'Berlin',
-    //     月份: 'Apr.',
-    //     月均降雨量: 99.7,
-    //   },
-    //   {
-    //     name: 'Berlin',
-    //     月份: 'May',
-    //     月均降雨量: 52.6,
-    //   },
-    //   {
-    //     name: 'Berlin',
-    //     月份: 'Jun.',
-    //     月均降雨量: 35.5,
-    //   },
-    //   {
-    //     name: 'Berlin',
-    //     月份: 'Jul.',
-    //     月均降雨量: 37.4,
-    //   },
-    //   {
-    //     name: 'Berlin',
-    //     月份: 'Aug.',
-    //     月均降雨量: 42.4,
-    //   },
-    //   {
-    //     name: 'Lon',
-    //     月份: 'Jan.',
-    //     月均降雨量: 18.9,
-    //   },
-    //   {
-    //     name: 'Lon',
-    //     月份: 'Feb.',
-    //     月均降雨量: 28.8,
-    //   },
-    //   {
-    //     name: 'Lon',
-    //     月份: 'Mar.',
-    //     月均降雨量: 39.3,
-    //   },
-    //   {
-    //     name: 'Lon',
-    //     月份: 'Apr.',
-    //     月均降雨量: 81.4,
-    //   },
-    //   {
-    //     name: 'Lon',
-    //     月份: 'May',
-    //     月均降雨量: 47,
-    //   },
-    //   {
-    //     name: 'Lon',
-    //     月份: 'Jun.',
-    //     月均降雨量: 20.3,
-    //   },
-    //   {
-    //     name: 'Lon',
-    //     月份: 'Jul.',
-    //     月均降雨量: 24,
-    //   },
-    //   {
-    //     name: 'Lon',
-    //     月份: 'Aug.',
-    //     月均降雨量: 35.6,
-    //   },
-    //   {
-    //     name: 'Ber',
-    //     月份: 'Jan.',
-    //     月均降雨量: 12.4,
-    //   },
-    //   {
-    //     name: 'Ber',
-    //     月份: 'Feb.',
-    //     月均降雨量: 23.2,
-    //   },
-    //   {
-    //     name: 'Ber',
-    //     月份: 'Mar.',
-    //     月均降雨量: 34.5,
-    //   },
-    //   {
-    //     name: 'Ber',
-    //     月份: 'Apr.',
-    //     月均降雨量: 99.7,
-    //   },
-    //   {
-    //     name: 'Ber',
-    //     月份: 'May',
-    //     月均降雨量: 52.6,
-    //   },
-    //   {
-    //     name: 'Ber',
-    //     月份: 'Jun.',
-    //     月均降雨量: 35.5,
-    //   },
-    //   {
-    //     name: 'Ber',
-    //     月份: 'Jul.',
-    //     月均降雨量: 37.4,
-    //   },
-    //   {
-    //     name: 'Ber',
-    //     月份: 'Aug.',
-    //     月均降雨量: 42.4,
-    //   },
-    // ]);
     this.setState({
       dataTime: data,
     });
-    // api.chartData
-    //   .getSalesAnalysisMonth({
-    //     monthDateBegin:
-    //       parseInt(type, 10) === 1 ? data[0].format('YYYYMM') : data[0].format('YYYY'),
-    //     monthDateEnd: parseInt(type, 10) === 1 ? data[1].format('YYYYMM') : data[1].format('YYYY'),
-    //   })
-    //   .then(res => {
-    //     this.chart.passData(res);
-    //   });
   };
 
   // 选择变更模式
@@ -234,77 +84,296 @@ class Sale extends React.Component {
     });
   };
 
+  // 公司选择
   companyChange = v => {
-    const { profitCenterName, profitCenter } = this.state;
-    const data = profitCenterName.filter(e => e.companyCode === v);
+    const {
+      profitCenterCompany,
+      profitCenters,
+      form: { resetFields },
+    } = this.props;
     const newData = [];
-    data.forEach(item => {
-      profitCenter.forEach(i => {
-        console.log(123)
-        if (item.profitCenterCode === i.code) {
-          newData.push(i);
-        }
+    profitCenterCompany.forEach(item => {
+      profitCenters.forEach(i => {
+        v.forEach(vi => {
+          if (item.companyCode === vi) {
+            if (
+              item.profitCenterCode === i.code &&
+              item.controllingAreaCode === i.controllingAreaCode
+            ) {
+              newData.push(i);
+            }
+          }
+        });
       });
     });
+    resetFields(['profitCenters']);
     this.setState({
       profitCenterData: newData,
+      chartData: { companyList: v },
     });
   };
 
-  operations = () => {
-    const { dataTime, type, profitCenterData } = this.state;
-    const { companys } = this.props;
-    console.log(profitCenterData);
-    return (
-      <div style={{ marginRight: '100px' }}>
-        <Select defaultValue="3100" style={{ width: 280 }} onChange={v => this.companyChange(v)}>
-          {companys.map(item => (
-            <Option key={item.code} value={item.code}>
-              {item.name}
-            </Option>
-          ))}
-        </Select>
-        <Select defaultValue="销售员" style={{ width: 120, margin: '0 50px' }}>
-          <Option value="销售员">销售员</Option>
-          <Option value="大区">大区</Option>
-          <Option value="网点">网点</Option>
-        </Select>
+  // 利润中心选择
+  profitCenterChange = v => {
+    const { chartData } = this.state;
+    this.setState({
+      chartData: { ...chartData, profitCenterList: v },
+    });
+  };
 
-        <Radio.Group value={type} onChange={this.handleDateChange}>
-          <Radio.Button value="1">月</Radio.Button>
-          <Radio.Button value="2" style={{ margin: '0 50px' }}>
-            年
-          </Radio.Button>
-        </Radio.Group>
+  // 网点选择
+  officesChange = v => {
+    const { chartData } = this.state;
+    this.setState({
+      chartData: { ...chartData, officesList: v },
+    });
+  };
+
+  // 大区选择
+  regionsChange = v => {
+    const { chartData } = this.state;
+    this.setState({
+      chartData: { ...chartData, regionsList: v },
+    });
+  };
+
+  // 销售员选择
+  salersChange = v => {
+    const { chartData } = this.state;
+    this.setState({
+      chartData: { ...chartData, salersList: v },
+    });
+  };
+
+  // 查询按钮
+  searchButton = () => {
+    const { chartData, dataTime, selectType } = this.state;
+
+    let data = chartData;
+    if (!('companyList' in data)) {
+      data = { ...data, companyList: [] };
+    }
+    if (!('profitCenterCodeList' in data)) {
+      data = { ...data, profitCenterList: [] };
+    }
+    if (parseInt(selectType, 10) === 1) {
+      if (!('regionCodeList' in data)) {
+        data = { ...data, regionsList: [] };
+      }
+    }
+    if (parseInt(selectType, 10) === 2) {
+      if (!('officeCodeList' in data)) {
+        data = { ...data, officesList: [] };
+      }
+    }
+    this.chart.passData(data, dataTime, selectType);
+    this.list.passData(selectType);
+  };
+
+  // 选择网点还是大区
+  selectTypeChange = v => {
+    const {
+      form: { resetFields },
+    } = this.props;
+    resetFields(['typeName']);
+    this.setState({
+      selectType: v,
+    });
+  };
+
+  // 时间是否是默认还是已经选择过了
+  setTime = () => {
+    const { dataTime, type } = this.state;
+    if (dataTime.length !== 0) {
+      return (
         <RangePicker
           placeholder={
-            parseInt(type, 10) === 1 ? ['开始月份', '结束月份'] : ['开始年份', '结束年份']
+            !(parseInt(type, 10) === 4) ? ['开始月份', '结束月份'] : ['开始年份', '结束年份']
           }
-          format={parseInt(type, 10) === 1 ? 'YYYY-MM' : 'YYYY'}
+          format={!(parseInt(type, 10) === 4) ? 'YYYY-MM' : 'YYYY'}
           value={dataTime}
-          mode={parseInt(type, 10) === 1 ? ['month', 'month'] : ['year', 'year']}
-          style={{ width: '230px' }}
+          mode={!(parseInt(type, 10) === 4) ? ['month', 'month'] : ['year', 'year']}
+          style={{ width: '200px' }}
           onPanelChange={this.handlePanelChange}
         />
+      );
+    }
+    return (
+      <RangePicker
+        placeholder={
+          !(parseInt(type, 10) === 4) ? ['开始月份', '结束月份'] : ['开始年份', '结束年份']
+        }
+        defaultValue={[
+          moment(`${new Date().getFullYear()}01}`, 'YYYY-MM'),
+          moment(`${new Date().getFullYear()}12}`, 'YYYY-MM'),
+        ]}
+        defaultPickerValue={[
+          moment(`${new Date().getFullYear()}01}`, 'YYYY-MM'),
+          moment(`${new Date().getFullYear()}12}`, 'YYYY-MM'),
+        ]}
+        format={!(parseInt(type, 10) === 4) ? 'YYYY-MM' : 'YYYY'}
+        mode={!(parseInt(type, 10) === 4) ? ['month', 'month'] : ['year', 'year']}
+        style={{ width: '200px' }}
+        onPanelChange={this.handlePanelChange}
+      />
+    );
+  };
+
+  operations = () => {
+    const { type, profitCenterData, selectType } = this.state;
+    const { companys, offices, regions, salers } = this.props;
+    const { getFieldDecorator } = this.props.form;
+
+    return (
+      <div style={{ marginRight: '100px' }}>
+        <Form>
+          <Col sm={7}>
+            <Form.Item style={{ width: '400px' }}>
+              {getFieldDecorator('companys', {
+                initialValue: '3100',
+              })(
+                <Select
+                  onChange={v => this.companyChange(v)}
+                  mode="multiple"
+                  maxTagCount={2}
+                  maxTagTextLength={6}
+                  allowClear
+                  placeholder="请选择公司名称(不选择，默认全部)"
+                >
+                  {companys.map(item => (
+                    <Option key={item.code} value={item.code}>
+                      {item.name}
+                    </Option>
+                  ))}
+                </Select>,
+              )}
+            </Form.Item>
+          </Col>
+          <Col sm={7}>
+            <Form.Item style={{ width: '350px' }}>
+              {getFieldDecorator('profitCenters')(
+                <Select
+                  mode="multiple"
+                  onChange={v => this.profitCenterChange(v)}
+                  maxTagCount={2}
+                  maxTagTextLength={6}
+                  allowClear
+                  placeholder="请选择利润中心(不选择，默认全部)"
+                >
+                  {profitCenterData.map(item => (
+                    <Option key={item.code} value={item.code}>
+                      {item.name}
+                    </Option>
+                  ))}
+                </Select>,
+              )}
+            </Form.Item>
+          </Col>
+          <Col sm={3}>
+            <Form.Item>
+              {getFieldDecorator('type', {
+                initialValue: selectType,
+              })(
+                <Select
+                  // style={{ width: 110 }}
+                  onChange={v => this.selectTypeChange(v)}
+                >
+                  <Option value="1">选择大区</Option>
+                  <Option value="2">选择网点</Option>
+                  <Option value="3">选择销售员</Option>
+                </Select>,
+              )}
+            </Form.Item>
+          </Col>
+          <Col sm={7}>
+            <Form.Item>
+              {getFieldDecorator('typeName')(
+                <Select
+                  // style={{ width: '330px', marginRight: '40px' }}
+                  mode="multiple"
+                  onChange={
+                    parseInt(selectType, 10) === 1
+                      ? v => this.regionsChange(v)
+                      : parseInt(selectType, 10) === 2
+                      ? v => this.officesChange(v)
+                      : v => this.salersChange(v)
+                  }
+                  maxTagCount={2}
+                  maxTagTextLength={6}
+                  allowClear
+                  placeholder={
+                    parseInt(selectType, 10) === 1
+                      ? '请选择大区(不选择，默认全部)'
+                      : parseInt(selectType, 10) === 2
+                      ? '请选择网点(不选择，默认全部)'
+                      : '请选择销售员(不选择，默认全部)'
+                  }
+                >
+                  {parseInt(selectType, 10) === 1
+                    ? regions.map(item => (
+                        <Option key={item.code} value={item.code}>
+                          {item.name}
+                        </Option>
+                      ))
+                    : parseInt(selectType, 10) === 2
+                    ? offices.map(item => (
+                        <Option key={item.code} value={item.code}>
+                          {item.name}
+                        </Option>
+                      ))
+                    : salers.map(item => (
+                        <Option key={item.code} value={item.code}>
+                          {item.name}
+                        </Option>
+                      ))}
+                </Select>,
+              )}
+            </Form.Item>
+          </Col>
+          <Radio.Group value={type} onChange={this.handleDateChange}>
+            <Radio.Button value="1">月份</Radio.Button>
+            <Radio.Button value="2">季度</Radio.Button>
+            <Radio.Button value="3">半年</Radio.Button>
+            <Radio.Button value="4">全年</Radio.Button>
+          </Radio.Group>
+          {this.setTime()}
+
+          <Button
+            type="primary"
+            onClick={() => {
+              this.searchButton();
+            }}
+            style={{ marginLeft: '20px' }}
+          >
+            查询
+          </Button>
+        </Form>
       </div>
     );
   };
 
   render() {
-    const { chartData } = this.state;
+    const { chartData, type } = this.state;
     return (
       <PageHeaderWrapper>
         <Card bordered={false} style={{ width: '1600px' }}>
-          <Tabs tabBarExtraContent={this.operations()}>
+          <Tabs>
             <TabPane tab="销售额" key="1">
+              {this.operations()}
+
               <div style={{ position: 'relative' }}>
                 <Chart
                   chartData={chartData}
+                  type={type}
                   onRef={ref => {
                     this.chart = ref;
                   }}
                 />
-                <List />
+                <List
+                  onRef={ref => {
+                    this.list = ref;
+                  }}
+                />
               </div>
             </TabPane>
             <TabPane tab="订单量" key="2">
@@ -316,4 +385,4 @@ class Sale extends React.Component {
     );
   }
 }
-export default Sale;
+export default Form.create()(Sale);
