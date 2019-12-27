@@ -14,10 +14,6 @@ export default {
   getInvtypes() {
     return request('/basic/v1/invtypes');
   },
-  // // 查询币种列表
-  // getCurrencys() {
-  //   return request('/basic/v1/currencys');
-  // },
   // 查询仓库
   getStorages() {
     return request('/basic/v1/storages');
@@ -57,187 +53,187 @@ export default {
 
   // 国际化数据接口
   // 国家主数据
-  getCountrys () {
+  getCountrys() {
     return request('/countrys/v1');
   },
   // 地区(省)主数据
-  getProvinces () {
+  getProvinces() {
     return request('/provinces/v1');
   },
   // 税号类别主数据
-  getTaxNumberCategories () {
+  getTaxNumberCategories() {
     return request('/taxNumberCategories/v1');
   },
   // 银行主数据
-  getBanks (params) {
+  getBanks(params) {
     return request('/banks/v1', { params });
   },
   // BP角色主数据(非隐藏)
-  getBpRoles () {
+  getBpRoles() {
     return request('/bpRoles/v1');
   },
   // 客户销项税分类主数据(客户税款)(免税,必须上税...)
-  getTaxOutputClassifics () {
+  getTaxOutputClassifics() {
     return request('/taxOutputClassifics/v1');
   },
   // 定价条件类型(销项税收类别)主数据(MWST)
-  getTaxOutputCategories () {
+  getTaxOutputCategories() {
     return request('/taxOutputCategories/v1');
   },
   // 总账科目主数据
-  getGlAccounts () {
+  getGlAccounts() {
     return request('/glAccounts/v1');
   },
   // 付款条件主数据
-  getPaymentTerms () {
+  getPaymentTerms() {
     return request('/paymentTerms/v1');
   },
   // 国家拨号代码主数据
-  getCountryDiallingCodes () {
+  getCountryDiallingCodes() {
     return request('/countryDiallingCodes/v1');
   },
   // 销售区域主数据（亚洲、欧洲...）
-  getSalesDistricts () {
+  getSalesDistricts() {
     return request('/salesDistricts/v1');
   },
   // 客户组主数据（付款方式）
-  getSalesPaymentMethods () {
+  getSalesPaymentMethods() {
     return request('/salesPaymentMethods/v1');
   },
   // 销售办公室+销售组 主数据
-  getRegionOffice () {
+  getRegionOffice() {
     return request('/regionOffice/v1');
   },
   // 销售办公室主数据（大区）
-  getRegions () {
+  getRegions() {
     return request('/regions/v1');
   },
   // 销售组主数据(网点)
-  getOffices () {
+  getOffices() {
     return request('/offices/v1');
   },
   // 货币代码主数据
-  getCurrencies () {
+  getCurrencies() {
     return request('/currencies/v1');
   },
   // 销售范围主数据
-  getSalesArea () {
+  getSalesArea() {
     return request('/salesArea/v1');
   },
   // 销售组织主数据
-  getSalesOrganizations () {
+  getSalesOrganizations() {
     return request('/salesOrganizations/v1');
   },
   // 分销渠道主数据
-  getDistributionChannels () {
+  getDistributionChannels() {
     return request('/distributionChannels/v1');
   },
   // 产品组主数据
-  getSalesDivisions () {
+  getSalesDivisions() {
     return request('/salesDivisions/v1');
   },
   // 定价过程的客户分类(Cust.Pric.过程)数据
-  getCustomerPricingProcedures () {
+  getCustomerPricingProcedures() {
     return request('/customerPricingProcedures/v1');
   },
   // 客户统计组主数据
-  getCustomerStatGroups () {
+  getCustomerStatGroups() {
     return request('/customerStatGroups/v1');
   },
   // 装运条件主数据
-  getShippingConditions () {
+  getShippingConditions() {
     return request('/shippingConditions/v1');
   },
   // 客户科目分配组主数据
-  getCustomerAccountAssignmentGroups () {
+  getCustomerAccountAssignmentGroups() {
     return request('/customerAccountAssignmentGroups/v1');
   },
   // 客户组 1主数据（金税发票类型）
-  getTaxInvoiceTypes () {
+  getTaxInvoiceTypes() {
     return request('/taxInvoiceTypes/v1');
   },
   // 客户组 2主数据（新客户分类）
-  getCustomerCategories () {
+  getCustomerCategories() {
     return request('/customerCategories/v1');
   },
   // 销售订单冻结主数据
-  getSalesOrderBlocks () {
+  getSalesOrderBlocks() {
     return request('/salesOrderBlocks/v1');
   },
   // 公司代码主数据
-  getCompanys () {
+  getCompanys() {
     return request('/companys/v1');
   },
   // 供应商帐户组主数据（T077Y ）
-  getVonderAccountGroups () {
+  getVonderAccountGroups() {
     return request('/vonderAccountGroups/v1');
   },
   // 客户帐户组主数据（T077D(T077X) ）
-  getCustomerAccountGroups () {
+  getCustomerAccountGroups() {
     return request('/customerAccountGroups/v1');
   },
   // 排序码主数据
-  getSortKeys () {
+  getSortKeys() {
     return request('/sortKeys/v1');
   },
   // 支付方式主数据(供应商公司代码数据)
-  getPaymentMethods () {
+  getPaymentMethods() {
     return request('/paymentMethods/v1');
   },
   // 采购组主数据
-  getPurchaseGroups () {
+  getPurchaseGroups() {
     return request('/purchaseGroups/v1');
   },
   // 销售组织 + 公司代码数据
-  getSalesOrganizationCompany () {
+  getSalesOrganizationCompany() {
     return request('/salesOrganizationCompany/v1');
   },
   // 销售组织 + 分销渠道 + 工厂数据
-  getSalesOrganizationDistributionChannelPlant () {
+  getSalesOrganizationDistributionChannelPlant() {
     return request('/salesOrganizationDistributionChannelPlant/v1');
   },
   // 工厂主数据
-  getPlants () {
+  getPlants() {
     return request('/plants/v1');
   },
   // 销售范围+销售办事处(大区)数据
-  getSalesAreaRegion () {
+  getSalesAreaRegion() {
     return request('/salesAreaRegion/v1');
   },
   // 公司代码+工厂数据
-  getCompanyPlant () {
+  getCompanyPlant() {
     return request('/companyPlant/v1');
   },
   // 采购组织数据
-  getPurchaseOrganizations () {
+  getPurchaseOrganizations() {
     return request('/purchaseOrganizations/v1');
   },
   // 采购组织对应公司代码关系数据
-  getPurchaseOrganizationCompany () {
+  getPurchaseOrganizationCompany() {
     return request('/purchaseOrganizationCompany/v1');
   },
   // 国家+税收类别主数据
-  getCountryTaxOutputCategory () {
+  getCountryTaxOutputCategory() {
     return request('/countryTaxOutputCategory/v1');
   },
   // 税收城市代码主数据
-  getTaxesCitys () {
+  getTaxesCitys() {
     return request('/taxesCitys/v1');
   },
   // 税收县代码主数据
-  getTaxesCounties () {
+  getTaxesCounties() {
     return request('/taxesCounties/v1');
   },
   // 行业类别
-  getIndustryCategories () {
+  getIndustryCategories() {
     return request('/industryCategories/v1');
   },
   // 国家+时区
-  getCountryTimeZone () {
+  getCountryTimeZone() {
     return request('/countryTimeZone/v1');
   },
   // 国家+（省）地区+时区
-  getCountryProvinceTimeZone () {
+  getCountryProvinceTimeZone() {
     return request('/countryProvinceTimeZone/v1');
   },
 };

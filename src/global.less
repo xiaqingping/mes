@@ -123,6 +123,22 @@ ol {
 }
 
 :global {
+  // upload 上传组件样式重写
+  .ant-upload-picture-card-wrapper {
+    .ant-upload-list-picture-card-container {
+      width: 90px;
+      height: 90px;
+      .ant-upload-list-item-list-type-picture-card {
+        width: 90px;
+        height: 90px;
+      }
+    }
+    .ant-upload.ant-upload-select-picture-card {
+      width: 90px;
+      height: 90px;
+    }
+  }
+
   // 编辑表格错误提示位置
   .editable-row {
     .ant-form-item {

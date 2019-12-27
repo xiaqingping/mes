@@ -7,13 +7,26 @@ import { connect } from 'dva';
 import moment from 'moment';
 import { FormattedMessage, formatMessage } from 'umi-plugin-react/locale';
 import CreditAdjust from './CreditAdjust';
+import styles from '../style.less';
 
 @connect(({ bpEdit }) => {
   const { details } = bpEdit;
   const { creditList, piCertificationList } = details;
+
+  // 未认证的开票方，不可以申请信用额度
+  const list = piCertificationList
+    .filter(e => e.status === 2 && !creditList.some(e1 => e1.billToPartyId === e.billToPartyId))
+    .map(e => ({
+      billToPartyId: e.billToPartyId,
+      billToPartyCode: e.billToPartyCode,
+      billToPartyName: e.billToPartyName,
+    }));
+
+  const newCreditList = [].concat(creditList, list);
+
   return {
     details,
-    creditList,
+    creditList: newCreditList,
     piCertificationList,
   };
 })
@@ -62,21 +75,30 @@ class PICredit extends React.Component {
             </>
           }
         >
-          {data ? (
+          {data.creditLimit || data.tempCreditLimit ? (
             <>
-              <span>
-                {data.creditLimit ? `${data.creditLimit} ${data.currencyCode} ` : null}
+              <div className={styles['piCredit-item-line']}>
+                {data.creditLimit ? (
+                  <>
+                    <span className={styles.number}>{data.creditLimit}</span>
+                    <span className={styles.currency}>{data.currencyCode}</span>
+                  </>
+                ) : null}
                 {lastEvaluationDate ? `${lastEvaluationDate}调整` : null}
-              </span>
-              <br />
-              <span>
-                {data.tempCreditLimit ? `${data.tempCreditLimit} ${data.currencyCode} ` : null}
-                {tempCreditLimitExpirationDate ? `${tempCreditLimitExpirationDate}到期` : null}
-              </span>
-              <br />
-              <span>{data.creditPeriod ? `开票后${data.creditPeriod}天到期` : null}</span>
-              <br />
-              <span>{data.billingDay ? `每月${data.billingDay}日开票` : null}</span>
+              </div>
+              {data.tempCreditLimit ? (
+                <div className={styles['piCredit-item-line']}>
+                  <>
+                    <span className={styles.number}>{data.tempCreditLimit}</span>
+                    <span className={styles.currency}>{data.currencyCode}</span>
+                  </>
+                  {`${tempCreditLimitExpirationDate}到期`}
+                </div>
+              ) : null}
+              <div className={styles['piCredit-item-line']}>
+                {data.creditPeriod ? `开票后${data.creditPeriod}天到期` : null}
+              </div>
+              <div>{data.billingDay ? `每月${data.billingDay}日开票` : null}</div>
             </>
           ) : (
             <Empty />
@@ -101,8 +123,7 @@ class PICredit extends React.Component {
 
   // 关闭调整额度界面
   handleCancel = () => {
-    const { details } = this.props;
-    const { creditList } = details;
+    const { details, creditList } = this.props;
 
     if (this.CreditAdjustView.state.status === 2) {
       const { creditData } = this.CreditAdjustView.state;
