@@ -126,6 +126,7 @@ class CustomerEdit extends Component {
       { type: 'distributionChannels' }, // 分销渠道
       { type: 'countryTimeZone' }, // 国家+时区
       { type: 'countryProvinceTimeZone' }, // 国家+时区
+      { type: 'salesAreaRegion' }, // 销售范围和大区关系
     ];
     basicCacheList.forEach(item => {
       this.props.dispatch({

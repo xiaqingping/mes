@@ -9,15 +9,18 @@ import ChangeModal from '@/pages/partner/maintain/components/ChangeModal';
 import ContactInformation from './ContactInformation';
 import CertificationPopover from './CertificationPopover';
 import api from '@/api';
+import { formatter } from '@/utils/utils';
 import styles from '../style.less';
 
 const FormItem = Form.Item;
 
-@connect(({ bpEdit }) => {
+@connect(({ bp, bpEdit }) => {
+  const { SpecialInvoice } = bp;
   const details = bpEdit.details || {};
   const { basic } = details;
   const organizationCertification = details.organizationCertification || { attachmentList: [] };
   return {
+    SpecialInvoice,
     details,
     basic,
     organizationCertification,
@@ -107,7 +110,7 @@ class OrgCertificationRead extends React.Component {
   };
 
   renderChina = () => {
-    const { basic, organizationCertification: data } = this.props;
+    const { SpecialInvoice, basic, organizationCertification: data } = this.props;
     const attachmentList = data.attachmentList || [];
     const fileList = attachmentList.map(e => ({
       uid: e.id,
@@ -145,7 +148,7 @@ class OrgCertificationRead extends React.Component {
                     id: 'bp.maintain_details.verification_data.special_invoice',
                   })}
                 >
-                  {data.specialInvoice || <span>&nbsp;</span>}
+                  {formatter(SpecialInvoice, data.specialInvoice) || <span>&nbsp;</span>}
                 </FormItem>
               </Col>
               <Col span={8}>
