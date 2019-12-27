@@ -38,11 +38,23 @@ function compare(property) {
 class Lists extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = {
+      selectType: '',
+    };
+  }
+
+  componentDidMount () {
+    this.props.onRef(this);
+  }
+
+  passData = selectType => {
+    this.setState({
+      selectType,
+    })
   }
 
   listItem = (item, index) => {
-    const { selectType } = this.props;
+    const { selectType } = this.state;
     return (
       <List.Item>
         <Badge
@@ -68,7 +80,8 @@ class Lists extends React.Component {
   };
 
   render() {
-    const { chartData, selectType } = this.props;
+    const { chartData } = this.props;
+    const { selectType } = this.state;
     return (
       <div
         style={{

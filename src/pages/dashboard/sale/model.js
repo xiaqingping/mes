@@ -11,6 +11,8 @@ const Model = {
     profitCenters: [],
     // 图表数据
     chartData: [],
+    // 销售员
+    salers: [],
   },
   effects: {
     /**
@@ -84,6 +86,9 @@ const Model = {
     },
     setChartData(state, action) {
       return { ...state, chartData: action.payload };
+    },
+    setSalers(state, action) {
+      return { ...state, salers: action.payload };
     },
   },
 };
