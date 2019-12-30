@@ -139,6 +139,7 @@ class NameGroup extends Component {
           placeholder="请选择类型"
           style={{ width: '30%' }}
           onChange={val => this.valueChange({ type: val })}
+          disabled
         >
           <Option value="personal">
             <Icon type="user" /> 人员

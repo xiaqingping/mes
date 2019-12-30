@@ -106,6 +106,7 @@ export default {
           .map(a => a.replace(/([A-Z])/g, '-$1'))
           .map(a => a.toLowerCase());
         return `antd-pro${arr.join('-')}-${localName}`.replace(/--/g, '-');
+        // return `magic${arr.join('-')}-${localName}`.replace(/--/g, '-');
       }
 
       return localName;
@@ -121,10 +122,10 @@ export default {
       changeOrigin: true,
       pathRewrite: { '^/192.168.19.71:8550/': '' },
     },
-    '/192.168.19.71:8001/': {
-      target: 'http://192.168.19.71:8001/',
+    '/192.168.20.43:8001/': {
+      target: 'http://192.168.20.43:8001/',
       changeOrigin: true,
-      pathRewrite: { '^/192.168.19.71:8001/': '' },
+      pathRewrite: { '^/192.168.20.43:8001/': '' },
     },
   },
 };

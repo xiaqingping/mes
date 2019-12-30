@@ -2,24 +2,47 @@ import { List, Badge } from 'antd';
 import React from 'react';
 import { connect } from 'dva';
 
+// function addVal(arr, keyVal) {
+//   const newfood = [];
+//   const temp = [];
+//   for (const i in arr) {
+//     const key = arr[i][keyVal];
+//     console.log(key)
+//     if (temp[key]) {
+//       temp[key][keyVal] = temp[key][keyVal];
+//       temp[key].amount = temp[key].amount + arr[i].amount;
+//     } else {
+//       temp[key] = {};
+//       temp[key][keyVal] = arr[i][keyVal];
+//       temp[key].amount = arr[i].amount;
+//     }
+//     // temp[key].ItemType = arr[i].ItemType;
+//   }
+//   for (const k in temp) {
+//     newfood.push(temp[k]);
+//   }
+//   return newfood.sort(compare('amount'));
+// }
+
 function addVal(arr, keyVal) {
-  const newfood = [];
   const temp = {};
-  for (const i in arr) {
-    const key = arr[i][keyVal];
+  arr.forEach(item => {
+    const key = item[keyVal];
     if (temp[key]) {
       temp[key][keyVal] = temp[key][keyVal];
-      temp[key].amount = temp[key].amount + arr[i].amount;
+      temp[key].amount += item.amount;
     } else {
       temp[key] = {};
-      temp[key][keyVal] = arr[i][keyVal];
-      temp[key].amount = arr[i].amount;
+      temp[key][keyVal] = item[keyVal];
+      temp[key].amount = item.amount;
     }
-    temp[key].ItemType = arr[i].ItemType;
-  }
-  for (const k in temp) {
-    newfood.push(temp[k]);
-  }
+  })
+  // for (const k in temp) {
+  //   if (temp[k]) {
+  //     newfood.push(temp[k]);
+  //   }
+  // }
+  const newfood = Object.values(temp)
   return newfood.sort(compare('amount'));
 }
 
@@ -43,15 +66,15 @@ class Lists extends React.Component {
     };
   }
 
-  componentDidMount () {
+  componentDidMount() {
     this.props.onRef(this);
   }
 
   passData = selectType => {
     this.setState({
       selectType,
-    })
-  }
+    });
+  };
 
   listItem = (item, index) => {
     const { selectType } = this.state;
@@ -71,7 +94,7 @@ class Lists extends React.Component {
               margin: '0 40px 0 20px',
             }}
           >
-            {parseInt(selectType, 10) === 1 ? item.regionCode : item.officeCode}
+            {parseInt(selectType, 10) === 2 ? item.officeCode : item.regionCode}
           </span>
           {item.amount}
         </span>
@@ -82,6 +105,7 @@ class Lists extends React.Component {
   render() {
     const { chartData } = this.props;
     const { selectType } = this.state;
+    // console.log(chartData, selectType)
     return (
       <div
         style={{
@@ -93,12 +117,14 @@ class Lists extends React.Component {
           overflow: 'hidden',
         }}
       >
-        <h3 style={{ marginBottom: 16, fontWeight: 'bold' }}>网点销售额排名</h3>
+        <h3 style={{ marginBottom: 16, fontWeight: 'bold' }}>
+          {parseInt(selectType, 10) === 2 ? '网点' : '大区'}销售额排名
+        </h3>
         <List
           split={false}
           dataSource={addVal(
             chartData,
-            parseInt(selectType, 10) === 1 ? 'regionCode' : 'officeCode',
+            parseInt(selectType, 10) === 2 ? 'officeCode' : 'regionCode',
           )}
           renderItem={(item, index) => this.listItem(item, index)}
         />
