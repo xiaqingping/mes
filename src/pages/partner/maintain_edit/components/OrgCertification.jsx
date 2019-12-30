@@ -295,7 +295,12 @@ class OrgCertification extends Component {
                       telephoneExtension: orgData.telephoneExtension,
                     },
                     rules: [{ validator: this.checkTelephone }],
-                  })(<TelphoneInput onChange={value => this.valueChange('telephone', value)} />)}
+                  })(
+                    <TelphoneInput
+                      readOnly
+                      onChange={value => this.valueChange('telephone', value)}
+                    />,
+                  )}
                 </FormItem>
               </Col>
               <Col span={24}>
