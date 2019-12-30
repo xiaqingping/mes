@@ -6,7 +6,6 @@ import { connect } from 'dva';
 import moment from 'moment';
 import Chart from './components/Chart';
 import List from './components/List';
-import api from '@/api';
 
 const { TabPane } = Tabs;
 const { Option } = Select;
@@ -22,7 +21,7 @@ const { RangePicker } = DatePicker;
     languageCode: global.languageCode,
     profitCenters,
     profitCenterCompany: dashboard.profitCenterCompany,
-    salers: dashboard.salers,
+    salers: dashboard.salers || [],
     offices,
     regions,
   };
@@ -52,12 +51,12 @@ class Sale extends React.Component {
       type: 'dashboard/getCache',
       payload: { type: 'profitCenters' },
     });
-    api.employees.getSaler().then(res => {
-      this.props.dispatch({
-        type: 'dashboard/setSalers',
-        payload: res.results,
-      });
-    })
+    // api.employees.getSaler().then(res => {
+    //   this.props.dispatch({
+    //     type: 'dashboard/setSalers',
+    //     payload: res.results,
+    //   });
+    // })
     this.props.dispatch({
       type: 'basicCache/getCache',
       payload: { type: 'offices' },
@@ -79,7 +78,6 @@ class Sale extends React.Component {
   // 选择变更模式
   handleDateChange = e => {
     this.setState({
-      dataTime: [],
       type: e.target.value,
     });
   };
@@ -106,11 +104,11 @@ class Sale extends React.Component {
         });
       });
     });
-    resetFields(['profitCenters']);
     this.setState({
       profitCenterData: newData,
       chartData: { companyList: v },
     });
+    resetFields(['profitCenters']);
   };
 
   // 利润中心选择
@@ -120,6 +118,14 @@ class Sale extends React.Component {
       chartData: { ...chartData, profitCenterList: v },
     });
   };
+
+  // 利润中心的值添加
+  valueOfProfitCenter = () => {
+    const { profitCenterData } = this.state;
+    if (profitCenterData.length === 0) {
+      this.companyChange(['3100']);
+    }
+  }
 
   // 网点选择
   officesChange = v => {
@@ -153,16 +159,16 @@ class Sale extends React.Component {
     if (!('companyList' in data)) {
       data = { ...data, companyList: [] };
     }
-    if (!('profitCenterCodeList' in data)) {
+    if (!('profitCenterList' in data)) {
       data = { ...data, profitCenterList: [] };
     }
     if (parseInt(selectType, 10) === 1) {
-      if (!('regionCodeList' in data)) {
+      if (!('regionsList' in data)) {
         data = { ...data, regionsList: [] };
       }
     }
     if (parseInt(selectType, 10) === 2) {
-      if (!('officeCodeList' in data)) {
+      if (!('officesList' in data)) {
         data = { ...data, officesList: [] };
       }
     }
@@ -195,6 +201,7 @@ class Sale extends React.Component {
           mode={!(parseInt(type, 10) === 4) ? ['month', 'month'] : ['year', 'year']}
           style={{ width: '200px' }}
           onPanelChange={this.handlePanelChange}
+          allowClear={false}
         />
       );
     }
@@ -204,17 +211,18 @@ class Sale extends React.Component {
           !(parseInt(type, 10) === 4) ? ['开始月份', '结束月份'] : ['开始年份', '结束年份']
         }
         defaultValue={[
-          moment(`${new Date().getFullYear()}01}`, 'YYYY-MM'),
-          moment(`${new Date().getFullYear()}12}`, 'YYYY-MM'),
+          moment(`${new Date().getFullYear()}01`, 'YYYY-MM'),
+          moment(`${new Date().getFullYear()}12`, 'YYYY-MM'),
         ]}
         defaultPickerValue={[
-          moment(`${new Date().getFullYear()}01}`, 'YYYY-MM'),
-          moment(`${new Date().getFullYear()}12}`, 'YYYY-MM'),
+          moment(`${new Date().getFullYear()}01`, 'YYYY-MM'),
+          moment(`${new Date().getFullYear()}12`, 'YYYY-MM'),
         ]}
         format={!(parseInt(type, 10) === 4) ? 'YYYY-MM' : 'YYYY'}
         mode={!(parseInt(type, 10) === 4) ? ['month', 'month'] : ['year', 'year']}
         style={{ width: '200px' }}
         onPanelChange={this.handlePanelChange}
+        allowClear={false}
       />
     );
   };
@@ -258,6 +266,7 @@ class Sale extends React.Component {
                   maxTagCount={2}
                   maxTagTextLength={6}
                   allowClear
+                  onFocus={() => this.valueOfProfitCenter()}
                   placeholder="请选择利润中心(不选择，默认全部)"
                 >
                   {profitCenterData.map(item => (

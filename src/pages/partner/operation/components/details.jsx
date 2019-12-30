@@ -1,5 +1,5 @@
 import {
-  Badge,
+  // Badge,
   Form,
   Table,
   Drawer,
@@ -10,20 +10,20 @@ import { formatMessage } from 'umi/locale';
 import './style.less'
 
 // 状态
-const status = {
-  2: {
-    value: 'success',
-    text: formatMessage({ id: 'bp.operation.finished' }),
-  },
-  1: {
-    value: 'warning',
-    text: formatMessage({ id: 'bp.operation.needVerified' }),
-  },
-  3: {
-    value: 'error',
-    text: formatMessage({ id: 'bp.operation.rejected' }),
-  },
-};
+// const status = {
+//   2: {
+//     value: 'success',
+//     text: formatMessage({ id: 'bp.operation.finished' }),
+//   },
+//   1: {
+//     value: 'warning',
+//     text: formatMessage({ id: 'bp.operation.needVerified' }),
+//   },
+//   3: {
+//     value: 'error',
+//     text: formatMessage({ id: 'bp.operation.rejected' }),
+//   },
+// };
 
 class Details extends React.Component {
   state = {
@@ -56,37 +56,37 @@ class Details extends React.Component {
       render: text => <div className="addEllipsis"
       style={{ width: '50px' }} title={text}>{text}</div>,
     },
-    {
-      title: formatMessage({ id: 'bp.operation.state' }),
-      dataIndex: 'status',
-      render(val) {
-        return <Badge className="addEllipsis"
-        style={{ width: '80px' }} status={status[val].value} text={status[val].text}/>;
-      },
-    },
-    {
-      title: formatMessage({ id: 'bp.operation.verificationRecordNo' }),
-      dataIndex: 'verifyRecordList',
-      render(val) {
-        let data = '';
-        if (val) {
-          // eslint-disable-next-line array-callback-return
-          val.map((item, index) => {
-              if (item.code) {
-                if (index < 2) {
-                  data += `${item.code}<br/>`
-                } else {
-                  data += '……'
-                }
-              }
-            },
-          )
-        }
-        return <span className="addEllipsis"
-         // eslint-disable-next-line react/no-danger
-         style={{ width: '80px' }} dangerouslySetInnerHTML={{ __html: data }} />
-      },
-    },
+    // {
+    //   title: formatMessage({ id: 'bp.operation.state' }),
+    //   dataIndex: 'status',
+    //   render(val) {
+    //     return <Badge className="addEllipsis"
+    //     style={{ width: '80px' }} status={status[val].value} text={status[val].text}/>;
+    //   },
+    // },
+    // {
+    //   title: formatMessage({ id: 'bp.operation.verificationRecordNo' }),
+    //   dataIndex: 'verifyRecordList',
+    //   render(val) {
+    //     let data = '';
+    //     if (val) {
+    //       // eslint-disable-next-line array-callback-return
+    //       val.map((item, index) => {
+    //           if (item.code) {
+    //             if (index < 2) {
+    //               data += `${item.code}<br/>`
+    //             } else {
+    //               data += '……'
+    //             }
+    //           }
+    //         },
+    //       )
+    //     }
+    //     return <span className="addEllipsis"
+    //      // eslint-disable-next-line react/no-danger
+    //      style={{ width: '80px' }} dangerouslySetInnerHTML={{ __html: data }} />
+    //   },
+    // },
   ];
 
   componentWillReceiveProps (nextProps) {
