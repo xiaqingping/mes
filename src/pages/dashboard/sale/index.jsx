@@ -201,6 +201,7 @@ class Sale extends React.Component {
           mode={!(parseInt(type, 10) === 4) ? ['month', 'month'] : ['year', 'year']}
           style={{ width: '200px' }}
           onPanelChange={this.handlePanelChange}
+          allowClear={false}
         />
       );
     }
@@ -221,6 +222,7 @@ class Sale extends React.Component {
         mode={!(parseInt(type, 10) === 4) ? ['month', 'month'] : ['year', 'year']}
         style={{ width: '200px' }}
         onPanelChange={this.handlePanelChange}
+        allowClear={false}
       />
     );
   };
