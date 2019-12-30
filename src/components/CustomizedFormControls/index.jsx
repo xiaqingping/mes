@@ -223,10 +223,14 @@ export class TelphoneInput extends React.Component {
 
   render() {
     const { telephoneCountryCode, telephoneAreaCode, telephone, telephoneExtension } = this.state;
-    const { countryDiallingCodes } = this.props;
+    const { countryDiallingCodes, readOnly } = this.props;
+    const selectOpen = {};
+    if (readOnly) selectOpen.open = false;
+
     return (
       <InputGroup compact>
         <Select
+          {...selectOpen}
           value={telephoneCountryCode}
           style={{ width: '30%' }}
           onChange={val => this.valueChange({ telephoneCountryCode: val })}
@@ -247,16 +251,19 @@ export class TelphoneInput extends React.Component {
           ))}
         </Select>
         <Input
+          readOnly={readOnly}
           value={telephoneAreaCode}
           style={{ width: '20%' }}
           onChange={e => this.valueChange({ telephoneAreaCode: e.target.value })}
         />
         <Input
+          readOnly={readOnly}
           value={telephone}
           style={{ width: '30%' }}
           onChange={e => this.valueChange({ telephone: e.target.value })}
         />
         <Input
+          readOnly={readOnly}
           value={telephoneExtension}
           style={{ width: '20%' }}
           onChange={e => this.valueChange({ telephoneExtension: e.target.value })}
