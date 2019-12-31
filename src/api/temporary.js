@@ -32,6 +32,4 @@ export default {
   getProfitCenters() {
     return request('http://192.168.20.43:8001/profitCenters/v1');
   },
-
-
 };

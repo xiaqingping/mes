@@ -8,7 +8,7 @@ import _ from 'lodash';
 import Chart from './components/Chart';
 import List from './components/List';
 import api from '@/api';
-import './index.less'
+import './index.less';
 
 const { TabPane } = Tabs;
 const { Option } = Select;
@@ -85,7 +85,7 @@ class Sale extends React.Component {
   }
 
   componentWillUnmount() {
-    this.companyChange()
+    this.companyChange();
   }
 
   // 销售员查询
@@ -273,121 +273,118 @@ class Sale extends React.Component {
     return (
       <div style={{ marginRight: '100px' }}>
         <Form className="mySet">
-        <Row>
-          <Col xxl={7} lg={7} sm={24}>
-            <Form.Item>
-              {getFieldDecorator('companys', {
-                initialValue: '3100',
-              })(
-                <Select
-                  style={{ width: '400px' }}
-                  onChange={v => this.companyChange(v)}
-                  mode="multiple"
-                  maxTagCount={2}
-                  maxTagTextLength={6}
-                  allowClear
-                  placeholder="请选择公司名称(不选择，默认全部)"
-                >
-                  {companys.map(item => (
-                    <Option key={item.code} value={item.code}>
-                      {item.name}
-                    </Option>
-                  ))}
-                </Select>,
-              )}
-            </Form.Item>
-          </Col>
-          <Col xxl={7} lg={7} sm={24}>
-            <Form.Item>
-              {getFieldDecorator('profitCenters')(
-                <Select
-                  style={{ width: '400px' }}
-                  mode="multiple"
-                  onChange={v => this.profitCenterChange(v)}
-                  maxTagCount={2}
-                  maxTagTextLength={6}
-                  allowClear
-                  onFocus={() => this.valueOfProfitCenter()}
-                  placeholder="请选择利润中心(不选择，默认全部)"
-                >
-                  {profitCenterData.map(item => (
-                    <Option key={item.code} value={item.code}>
-                      {item.name}
-                    </Option>
-                  ))}
-                </Select>,
-              )}
-            </Form.Item>
-          </Col>
-          <Col xxl={10} lg={20} sm={20}>
-            <Form.Item style={{ float: 'left' }}>
-              {getFieldDecorator('type', {
-                initialValue: selectType,
-              })(
-                <Select
-                  style={{ width: '121px' }}
-                  onChange={v => this.selectTypeChange(v)}
-                >
-                  <Option value="1">选择大区</Option>
-                  <Option value="2">选择网点</Option>
-                  <Option value="3">选择销售员</Option>
-                </Select>,
-              )}
-            </Form.Item>
-            <Form.Item style={{ float: 'left' }}>
-              {getFieldDecorator('typeName')(
-                parseInt(selectType, 10) === 3 ? (
-                  <AutoComplete
-                  style={{ width: '400px' }}
-                    dataSource={salersData.map(renderOption)}
-                    onSearch={this.searchSaler}
-                    onSelect={this.salersChange}
-                    optionLabelProp="text"
-                  />
-                ) : (
+          <Row>
+            <Col xxl={7} lg={7} sm={24}>
+              <Form.Item>
+                {getFieldDecorator('companys', {
+                  initialValue: '3100',
+                })(
                   <Select
-                  style={{ width: '400px' }}
+                    style={{ width: '400px' }}
+                    onChange={v => this.companyChange(v)}
                     mode="multiple"
-                    onChange={
-                      parseInt(selectType, 10) === 1
-                        ? v => this.regionsChange(v)
-                        : parseInt(selectType, 10) === 2
-                        ? v => this.officesChange(v)
-                        : v => this.salersChange(v)
-                    }
-                    maxTagCount={3}
-                    maxTagTextLength={4}
+                    maxTagCount={2}
+                    maxTagTextLength={6}
                     allowClear
-                    placeholder={
-                      parseInt(selectType, 10) === 1
-                        ? '请选择大区(不选择，默认全部)'
-                        : parseInt(selectType, 10) === 2
-                        ? '请选择网点(不选择，默认全部)'
-                        : '请选择销售员(不选择，默认全部)'
-                    }
+                    placeholder="请选择公司名称(不选择，默认全部)"
                   >
-                    {parseInt(selectType, 10) === 1
-                      ? regions.map(item => (
-                          <Option key={item.code} value={item.code}>
-                            {item.name}
-                          </Option>
-                        ))
-                      : parseInt(selectType, 10) === 2
-                      ? offices.map(item => (
-                          <Option key={item.code} value={item.code}>
-                            {item.name}
-                          </Option>
-                        ))
-                      : salers.map(item => (
-                          <Option key={item.code} value={item.code}>
-                            {item.name}
-                          </Option>
-                        ))}
-                  </Select>
-                ),
-              )}
-            </Form.Item>
-          </Col>
+                    {companys.map(item => (
+                      <Option key={item.code} value={item.code}>
+                        {item.name}
+                      </Option>
+                    ))}
+                  </Select>,
+                )}
+              </Form.Item>
+            </Col>
+            <Col xxl={7} lg={7} sm={24}>
+              <Form.Item>
+                {getFieldDecorator('profitCenters')(
+                  <Select
+                    style={{ width: '400px' }}
+                    mode="multiple"
+                    onChange={v => this.profitCenterChange(v)}
+                    maxTagCount={2}
+                    maxTagTextLength={6}
+                    allowClear
+                    onFocus={() => this.valueOfProfitCenter()}
+                    placeholder="请选择利润中心(不选择，默认全部)"
+                  >
+                    {profitCenterData.map(item => (
+                      <Option key={item.code} value={item.code}>
+                        {item.name}
+                      </Option>
+                    ))}
+                  </Select>,
+                )}
+              </Form.Item>
+            </Col>
+            <Col xxl={10} lg={20} sm={20}>
+              <Form.Item style={{ float: 'left' }}>
+                {getFieldDecorator('type', {
+                  initialValue: selectType,
+                })(
+                  <Select style={{ width: '121px' }} onChange={v => this.selectTypeChange(v)}>
+                    <Option value="1">选择大区</Option>
+                    <Option value="2">选择网点</Option>
+                    <Option value="3">选择销售员</Option>
+                  </Select>,
+                )}
+              </Form.Item>
+              <Form.Item style={{ float: 'left' }}>
+                {getFieldDecorator('typeName')(
+                  parseInt(selectType, 10) === 3 ? (
+                    <AutoComplete
+                      style={{ width: '400px' }}
+                      dataSource={salersData.map(renderOption)}
+                      onSearch={this.searchSaler}
+                      onSelect={this.salersChange}
+                      optionLabelProp="text"
+                    />
+                  ) : (
+                    <Select
+                      style={{ width: '400px' }}
+                      mode="multiple"
+                      onChange={
+                        parseInt(selectType, 10) === 1
+                          ? v => this.regionsChange(v)
+                          : parseInt(selectType, 10) === 2
+                          ? v => this.officesChange(v)
+                          : v => this.salersChange(v)
+                      }
+                      maxTagCount={3}
+                      maxTagTextLength={4}
+                      allowClear
+                      placeholder={
+                        parseInt(selectType, 10) === 1
+                          ? '请选择大区(不选择，默认全部)'
+                          : parseInt(selectType, 10) === 2
+                          ? '请选择网点(不选择，默认全部)'
+                          : '请选择销售员(不选择，默认全部)'
+                      }
+                    >
+                      {parseInt(selectType, 10) === 1
+                        ? regions.map(item => (
+                            <Option key={item.code} value={item.code}>
+                              {item.name}
+                            </Option>
+                          ))
+                        : parseInt(selectType, 10) === 2
+                        ? offices.map(item => (
+                            <Option key={item.code} value={item.code}>
+                              {item.name}
+                            </Option>
+                          ))
+                        : salers.map(item => (
+                            <Option key={item.code} value={item.code}>
+                              {item.name}
+                            </Option>
+                          ))}
+                    </Select>
+                  ),
+                )}
+              </Form.Item>
+            </Col>
           </Row>
           <Radio.Group value={type} onChange={this.handleDateChange}>
             <Radio.Button value="1">月份</Radio.Button>
@@ -406,7 +403,6 @@ class Sale extends React.Component {
           >
             查询
           </Button>
-
         </Form>
       </div>
     );
@@ -431,13 +427,11 @@ class Sale extends React.Component {
                 {parseInt(selectType, 10) === 3 ? (
                   ''
                 ) : (
-
-                    <List
-                      onRef={ref => {
-                        this.list = ref;
-                      }}
-                    />
-
+                  <List
+                    onRef={ref => {
+                      this.list = ref;
+                    }}
+                  />
                 )}
               </div>
             </TabPane>
