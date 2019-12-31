@@ -36,13 +36,13 @@ function addVal(arr, keyVal) {
       temp[key][keyVal] = item[keyVal];
       temp[key].amount = item.amount;
     }
-  })
+  });
   // for (const k in temp) {
   //   if (temp[k]) {
   //     newfood.push(temp[k]);
   //   }
   // }
-  const newfood = Object.values(temp)
+  const newfood = Object.values(temp);
   return newfood.sort(compare('amount'));
 }
 
@@ -56,7 +56,7 @@ function compare(property) {
 }
 
 @connect(({ dashboard }) => ({
-  chartData: dashboard.chartData,
+  chartData: dashboard.chartData || [],
 }))
 class Lists extends React.Component {
   constructor(props) {
@@ -96,7 +96,7 @@ class Lists extends React.Component {
           >
             {parseInt(selectType, 10) === 2 ? item.officeCode : item.regionCode}
           </span>
-          {item.amount}
+          {item.amount.toFixed(2)}
         </span>
       </List.Item>
     );
@@ -105,17 +105,20 @@ class Lists extends React.Component {
   render() {
     const { chartData } = this.props;
     const { selectType } = this.state;
-    // console.log(chartData, selectType)
     return (
       <div
-        style={{
-          position: 'absolute',
-          top: '20px',
-          left: '1300px',
-          width: '600px',
-          height: '480px',
-          overflow: 'hidden',
-        }}
+        style={
+          document.body.clientWidth < 1600
+            ? { width: '600px', height: '480px', overflow: 'hidden' }
+            : {
+                position: 'absolute',
+                top: '20px',
+                left: '1100px',
+                width: '600px',
+                height: '480px',
+                overflow: 'hidden',
+              }
+        }
       >
         <h3 style={{ marginBottom: 16, fontWeight: 'bold' }}>
           {parseInt(selectType, 10) === 2 ? '网点' : '大区'}销售额排名
