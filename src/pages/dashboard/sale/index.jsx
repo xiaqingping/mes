@@ -1,15 +1,29 @@
 /* eslint-disable no-nested-ternary */
-import { Card, Tabs, Select, DatePicker, Radio, Form, Col, Button } from 'antd';
+import { Card, Tabs, Select, DatePicker, Radio, Form, Col, Button, AutoComplete, Row } from 'antd';
 import React from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import { connect } from 'dva';
 import moment from 'moment';
+import _ from 'lodash';
 import Chart from './components/Chart';
 import List from './components/List';
+import api from '@/api';
+import './index.less'
 
 const { TabPane } = Tabs;
 const { Option } = Select;
 const { RangePicker } = DatePicker;
+
+function renderOption(item) {
+  return (
+    <Option key={item.code} text={item.name}>
+      <div style={{ display: 'flex' }}>
+        <span>{item.code}</span>&nbsp;&nbsp;
+        <span>{item.name}</span>
+      </div>
+    </Option>
+  );
+}
 
 @connect(({ global, basicCache, dashboard }) => {
   const companys = basicCache.companys.filter(e => e.languageCode === global.languageCode);
@@ -18,12 +32,12 @@ const { RangePicker } = DatePicker;
   const regions = basicCache.regions.filter(e => e.languageCode === global.languageCode);
   return {
     companys,
-    languageCode: global.languageCode,
-    profitCenters,
-    profitCenterCompany: dashboard.profitCenterCompany,
+    languageCode: global.languageCode || [],
+    profitCenters: profitCenters || [],
+    profitCenterCompany: dashboard.profitCenterCompany || [],
     salers: dashboard.salers || [],
-    offices,
-    regions,
+    offices: offices || [],
+    regions: regions || [],
   };
 })
 class Sale extends React.Component {
@@ -35,7 +49,9 @@ class Sale extends React.Component {
       selectType: '1', // 选择大区、网点、销售员
       chartData: [],
       profitCenterData: [],
+      salersData: [],
     };
+    this.callSaler = _.debounce(this.callSaler, 500);
   }
 
   componentDidMount() {
@@ -68,6 +84,19 @@ class Sale extends React.Component {
     this.companyChange(['3100']);
   }
 
+  componentWillUnmount() {
+    this.companyChange()
+  }
+
+  // 销售员查询
+  callSaler = value => {
+    api.employees.getSaler({ code_or_name: value }).then(res => {
+      this.setState({
+        salersData: res,
+      });
+    });
+  };
+
   // 面板选择
   handlePanelChange = data => {
     this.setState({
@@ -84,6 +113,7 @@ class Sale extends React.Component {
 
   // 公司选择
   companyChange = v => {
+    const comapnyVal = v || [];
     const {
       profitCenterCompany,
       profitCenters,
@@ -92,7 +122,7 @@ class Sale extends React.Component {
     const newData = [];
     profitCenterCompany.forEach(item => {
       profitCenters.forEach(i => {
-        v.forEach(vi => {
+        comapnyVal.forEach(vi => {
           if (item.companyCode === vi) {
             if (
               item.profitCenterCode === i.code &&
@@ -106,7 +136,7 @@ class Sale extends React.Component {
     });
     this.setState({
       profitCenterData: newData,
-      chartData: { companyList: v },
+      chartData: { companyList: comapnyVal },
     });
     resetFields(['profitCenters']);
   };
@@ -125,7 +155,7 @@ class Sale extends React.Component {
     if (profitCenterData.length === 0) {
       this.companyChange(['3100']);
     }
-  }
+  };
 
   // 网点选择
   officesChange = v => {
@@ -149,6 +179,13 @@ class Sale extends React.Component {
     this.setState({
       chartData: { ...chartData, salersList: v },
     });
+  };
+
+  // 销售员查找
+  searchSaler = value => {
+    if (value) {
+      this.callSaler(value);
+    }
   };
 
   // 查询按钮
@@ -184,6 +221,7 @@ class Sale extends React.Component {
     resetFields(['typeName']);
     this.setState({
       selectType: v,
+      salersData: [],
     });
   };
 
@@ -228,19 +266,21 @@ class Sale extends React.Component {
   };
 
   operations = () => {
-    const { type, profitCenterData, selectType } = this.state;
+    const { type, profitCenterData, selectType, salersData } = this.state;
     const { companys, offices, regions, salers } = this.props;
     const { getFieldDecorator } = this.props.form;
 
     return (
       <div style={{ marginRight: '100px' }}>
-        <Form>
-          <Col sm={7}>
-            <Form.Item style={{ width: '400px' }}>
+        <Form className="mySet">
+        <Row>
+          <Col xxl={7} lg={7} sm={24}>
+            <Form.Item>
               {getFieldDecorator('companys', {
                 initialValue: '3100',
               })(
                 <Select
+                  style={{ width: '400px' }}
                   onChange={v => this.companyChange(v)}
                   mode="multiple"
                   maxTagCount={2}
@@ -257,10 +297,11 @@ class Sale extends React.Component {
               )}
             </Form.Item>
           </Col>
-          <Col sm={7}>
-            <Form.Item style={{ width: '350px' }}>
+          <Col xxl={7} lg={7} sm={24}>
+            <Form.Item>
               {getFieldDecorator('profitCenters')(
                 <Select
+                  style={{ width: '400px' }}
                   mode="multiple"
                   onChange={v => this.profitCenterChange(v)}
                   maxTagCount={2}
@@ -278,13 +319,13 @@ class Sale extends React.Component {
               )}
             </Form.Item>
           </Col>
-          <Col sm={3}>
-            <Form.Item>
+          <Col xxl={10} lg={20} sm={20}>
+            <Form.Item style={{ float: 'left' }}>
               {getFieldDecorator('type', {
                 initialValue: selectType,
               })(
                 <Select
-                  // style={{ width: 110 }}
+                  style={{ width: '121px' }}
                   onChange={v => this.selectTypeChange(v)}
                 >
                   <Option value="1">选择大区</Option>
@@ -293,52 +334,61 @@ class Sale extends React.Component {
                 </Select>,
               )}
             </Form.Item>
-          </Col>
-          <Col sm={7}>
-            <Form.Item>
+            <Form.Item style={{ float: 'left' }}>
               {getFieldDecorator('typeName')(
-                <Select
-                  // style={{ width: '330px', marginRight: '40px' }}
-                  mode="multiple"
-                  onChange={
-                    parseInt(selectType, 10) === 1
-                      ? v => this.regionsChange(v)
+                parseInt(selectType, 10) === 3 ? (
+                  <AutoComplete
+                  style={{ width: '400px' }}
+                    dataSource={salersData.map(renderOption)}
+                    onSearch={this.searchSaler}
+                    onSelect={this.salersChange}
+                    optionLabelProp="text"
+                  />
+                ) : (
+                  <Select
+                  style={{ width: '400px' }}
+                    mode="multiple"
+                    onChange={
+                      parseInt(selectType, 10) === 1
+                        ? v => this.regionsChange(v)
+                        : parseInt(selectType, 10) === 2
+                        ? v => this.officesChange(v)
+                        : v => this.salersChange(v)
+                    }
+                    maxTagCount={3}
+                    maxTagTextLength={4}
+                    allowClear
+                    placeholder={
+                      parseInt(selectType, 10) === 1
+                        ? '请选择大区(不选择，默认全部)'
+                        : parseInt(selectType, 10) === 2
+                        ? '请选择网点(不选择，默认全部)'
+                        : '请选择销售员(不选择，默认全部)'
+                    }
+                  >
+                    {parseInt(selectType, 10) === 1
+                      ? regions.map(item => (
+                          <Option key={item.code} value={item.code}>
+                            {item.name}
+                          </Option>
+                        ))
                       : parseInt(selectType, 10) === 2
-                      ? v => this.officesChange(v)
-                      : v => this.salersChange(v)
-                  }
-                  maxTagCount={2}
-                  maxTagTextLength={6}
-                  allowClear
-                  placeholder={
-                    parseInt(selectType, 10) === 1
-                      ? '请选择大区(不选择，默认全部)'
-                      : parseInt(selectType, 10) === 2
-                      ? '请选择网点(不选择，默认全部)'
-                      : '请选择销售员(不选择，默认全部)'
-                  }
-                >
-                  {parseInt(selectType, 10) === 1
-                    ? regions.map(item => (
-                        <Option key={item.code} value={item.code}>
-                          {item.name}
-                        </Option>
-                      ))
-                    : parseInt(selectType, 10) === 2
-                    ? offices.map(item => (
-                        <Option key={item.code} value={item.code}>
-                          {item.name}
-                        </Option>
-                      ))
-                    : salers.map(item => (
-                        <Option key={item.code} value={item.code}>
-                          {item.name}
-                        </Option>
-                      ))}
-                </Select>,
+                      ? offices.map(item => (
+                          <Option key={item.code} value={item.code}>
+                            {item.name}
+                          </Option>
+                        ))
+                      : salers.map(item => (
+                          <Option key={item.code} value={item.code}>
+                            {item.name}
+                          </Option>
+                        ))}
+                  </Select>
+                ),
               )}
             </Form.Item>
           </Col>
+          </Row>
           <Radio.Group value={type} onChange={this.handleDateChange}>
             <Radio.Button value="1">月份</Radio.Button>
             <Radio.Button value="2">季度</Radio.Button>
@@ -356,20 +406,20 @@ class Sale extends React.Component {
           >
             查询
           </Button>
+
         </Form>
       </div>
     );
   };
 
   render() {
-    const { chartData, type } = this.state;
+    const { chartData, type, selectType } = this.state;
     return (
       <PageHeaderWrapper>
         <Card bordered={false} style={{ width: '1600px' }}>
           <Tabs>
             <TabPane tab="销售额" key="1">
               {this.operations()}
-
               <div style={{ position: 'relative' }}>
                 <Chart
                   chartData={chartData}
@@ -378,11 +428,17 @@ class Sale extends React.Component {
                     this.chart = ref;
                   }}
                 />
-                <List
-                  onRef={ref => {
-                    this.list = ref;
-                  }}
-                />
+                {parseInt(selectType, 10) === 3 ? (
+                  ''
+                ) : (
+
+                    <List
+                      onRef={ref => {
+                        this.list = ref;
+                      }}
+                    />
+
+                )}
               </div>
             </TabPane>
             <TabPane tab="订单量" key="2">
