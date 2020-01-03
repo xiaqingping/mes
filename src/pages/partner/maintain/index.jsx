@@ -537,7 +537,7 @@ class Maintain extends React.Component {
       {
         title: formatMessage({ id: 'bp.maintain.approved' }),
         dataIndex: 'certificationStatus',
-        // width: 100,
+        width: 120,
         filters: CertificationStatus,
         onFilter: (value, record) =>
           record.certificationStatus.toString().indexOf(value.toString()) === 0,
@@ -554,6 +554,7 @@ class Maintain extends React.Component {
         title: formatMessage({ id: 'bp.maintain.block' }),
         dataIndex: 'salesOrderBlock',
         filters: salesBlock,
+        width: 120,
         filterMultiple: false,
         onFilter: (value, record) =>
           record.salesOrderBlock.toString().indexOf(value.toString()) === 0,
@@ -567,7 +568,7 @@ class Maintain extends React.Component {
       {
         title: formatMessage({ id: 'bp.maintain.customer' }),
         dataIndex: 'customerDataStatus',
-        // width: 100,
+        width: 120,
         filters: CustomerStatus,
         filterMultiple: false,
         onFilter: (value, record) =>
@@ -579,7 +580,7 @@ class Maintain extends React.Component {
       {
         title: formatMessage({ id: 'bp.maintain.vendor' }),
         dataIndex: 'vendorDataStatus',
-        // width: 100,
+        width: 120,
         filters: CustomerStatus,
         filterMultiple: false,
         onFilter: (value, record) =>
@@ -591,7 +592,7 @@ class Maintain extends React.Component {
       {
         title: formatMessage({ id: 'bp.maintain.contactInformation' }),
         dataIndex: 'mobilePhone',
-        // width: 100,
+        width: 250,
         render(val, records) {
           return (
             <>
@@ -604,11 +605,14 @@ class Maintain extends React.Component {
                   ''
                 )}
               </div>
-              <div>
+              <div title={records.email}>
                 {records.email}
                 &nbsp;&nbsp;
                 {records.emailVerifyStatus === 1 ? (
-                  <Badge status={emailIden[records.emailVerifyStatus].value} />
+                  <Badge
+                    status={emailIden[records.emailVerifyStatus].value}
+                    className={styles.hideAdress}
+                  />
                 ) : (
                   ''
                 )}
@@ -622,7 +626,11 @@ class Maintain extends React.Component {
         dataIndex: 'address',
         // width: 200,
         render(val) {
-          return <div className={styles.hideAdress}>{val}</div>;
+          return (
+            <div title={val} className={styles.hideAdress}>
+              {val}
+            </div>
+          );
         },
       },
       {
@@ -727,8 +735,8 @@ class Maintain extends React.Component {
               </Button>
             </div>
             <StandardTable
-              // className={styles.dataTable}
-              scroll={{ x: 1600 }}
+              // className="titleColor"
+              scroll={{ x: 1500 }}
               selectedRows={selectedRows}
               loading={loading}
               rowKey={record => record.id}

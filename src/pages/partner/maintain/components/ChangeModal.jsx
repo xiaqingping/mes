@@ -159,19 +159,27 @@ class NameGroup extends Component {
   }
 }
 
+@connect(({ areaCache }) => {
+  const { countrys } = areaCache;
+  return { countrys };
+})
 class AddressGroup extends Component {
   constructor(props) {
     super(props);
     this.state = {
       countryCode: [],
-      popupVisible: false,
     };
   }
 
   componentDidMount() {
-    api.area.byParentIdGetArea(0).then(res => {
-      this.setState({ countryCode: res });
-    });
+    const { countrys } = this.props;
+    if (countrys.length !== 0) {
+      this.setState({ countryCode: countrys });
+    } else {
+      api.area.byParentIdGetArea(0).then(res => {
+        this.setState({ countryCode: res });
+      });
+    }
   }
 
   // 选择地区
@@ -183,61 +191,29 @@ class AddressGroup extends Component {
       }
     }
     if (o.length === 0) return false;
-    const { countryCode } = this.state;
+    let obj = v;
+    if (Object.keys(v).indexOf('cascader') > -1) {
+      const { option } = v;
+      obj = {
+        countryCode: (option[0] && option[0].code) || '',
+        countryName: (option[0] && option[0].name) || '',
+        sapCountryCode: (option[0] && option[0].sapCode) || '',
+        provinceCode: (option[1] && option[1].code) || '',
+        provinceName: (option[1] && option[1].name) || '',
+        sapProvinceCode: (option[1] && option[1].sapCode) || '',
+        cityCode: (option[2] && option[2].code) || '',
+        cityName: (option[2] && option[2].name) || '',
+        countyCode: (option[3] && option[3].code) || '',
+        countyName: (option[3] && option[3].name) || '',
+        streetCode: (option[4] && option[4].code) || '',
+        streetName: (option[4] && option[4].name) || '',
+      };
+    }
     if (o[o.length - 1].isHaveLow === 2) {
-      this.setState({
-        popupVisible: false,
-      });
-      this.passVal(o, 1);
+      this.passVal(obj, 1);
       return false;
     }
-    if (parseInt(o[0].isHaveLow, 10) === 1) {
-      api.area.byParentIdGetArea(o[o.length - 1].id).then(res => {
-        countryCode.forEach((item1, key1) => {
-          if (item1.code === v[0]) {
-            if (parseInt(item1.level, 10) === 1 && parseInt(res[0].level, 10) === 2) {
-              countryCode[key1].children = res;
-            }
-            if (parseInt(res[0].level, 10) > 2) {
-              item1.children.forEach((item2, key2) => {
-                if (item2.code === v[1]) {
-                  if (parseInt(item2.level, 10) === 2 && parseInt(res[0].level, 10) === 3) {
-                    countryCode[key1].children[key2].children = res;
-                  }
-                  if (parseInt(res[0].level, 10) > 3) {
-                    item2.children.forEach((item3, key3) => {
-                      if (item3.code === v[2]) {
-                        if (parseInt(item3.level, 10) === 3 && parseInt(res[0].level, 10) === 4) {
-                          countryCode[key1].children[key2].children[key3].children = res;
-                        }
-                        if (parseInt(res[0].level, 10) > 4) {
-                          item3.children.forEach((item4, key4) => {
-                            if (item4.code === v[3]) {
-                              if (
-                                parseInt(item4.level, 10) === 4 &&
-                                parseInt(res[0].level, 10) === 5
-                              ) {
-                                countryCode[key1].children[key2].children[key3].children[
-                                  key4
-                                ].children = res;
-                              }
-                            }
-                          });
-                        }
-                      }
-                    });
-                  }
-                }
-              });
-            }
-          }
-        });
-        this.setState({
-          countryCode,
-        });
-      });
-    }
-    return ''
+    return null;
   };
 
   // 传递省市区和详细地址的值
@@ -245,22 +221,52 @@ class AddressGroup extends Component {
     this.props.addressVal(address, type);
   };
 
+  loadData = selectedOptions => {
+    const targetOption = selectedOptions[selectedOptions.length - 1];
+    if (targetOption.children && targetOption.children[0].id) return null;
+    targetOption.loading = true;
+
+    api.area.byParentIdGetArea(targetOption.id).then(res => {
+      targetOption.loading = false;
+      targetOption.children = res;
+      // eslint-disable-next-line react/no-access-state-in-setstate
+      const countrys = [...this.state.countryCode];
+      this.props.dispatch({
+        type: 'areaCache/setCache',
+        payload: { type: 'countrys', targetState: countrys },
+      });
+    });
+    return null;
+  };
+
+  defaultValueSetting = (oldAddress, defaultAddress) => {
+    if (defaultAddress) {
+      return [defaultAddress];
+    }
+    if (oldAddress) {
+      return [oldAddress];
+    }
+    return [];
+  };
+
   render() {
-    const { countryCode, popupVisible } = this.state;
+    const { countryCode } = this.state;
     const { userData, defaultAddress } = this.props;
+    const { basic } = userData;
+    const defaultValue = this.defaultValueSetting(
+      basic.length !== 0 ? basic.countryCode : '',
+      defaultAddress,
+    );
     return (
       <InputGroup compact>
         <Cascader
           style={{ width: '40%' }}
-          onChange={(value, selectedOptions) => this.selectArea(value, selectedOptions)}
           options={countryCode}
-          placeholder={formatMessage({ id: 'bp.inputHere' })}
+          loadData={this.loadData}
           fieldNames={{ label: 'name', value: 'code' }}
-          popupVisible={popupVisible}
-          onClick={() => {
-            this.setState({ popupVisible: !popupVisible });
-          }}
-          defaultValue={[defaultAddress]}
+          changeOnSelect
+          defaultValue={defaultValue}
+          onChange={(value, selectedOptions) => this.selectArea(value, selectedOptions)}
         />
         <Input
           style={{ width: '60%' }}
@@ -337,7 +343,7 @@ class ChangeModal extends Component {
   componentWillReceiveProps() {
     this.setState({
       guuid: guid(),
-    })
+    });
   }
 
   /** props更新时调用 */
@@ -500,11 +506,11 @@ class ChangeModal extends Component {
         basic: {
           id: recordMsg.id,
           name: row.msg ? row.msg.name : basic.name,
-          countryCode: area[0] ? area[0].code : basic.countryCode,
-          provinceCode: area[1] ? area[1].code : basic.provinceCode,
-          cityCode: area[2] ? area[2].code : basic.cityCode,
-          countyCode: area[3] ? area[3].code : basic.countyCode,
-          streetCode: area[4] ? area[4].code : basic.streetCode,
+          countryCode: area[0] ? area[0] : basic.countryCode,
+          provinceCode: area[1] ? area[1] : basic.provinceCode,
+          cityCode: area[2] ? area[2] : basic.cityCode,
+          countyCode: area[3] ? area[3] : basic.countyCode,
+          streetCode: area[4] ? area[4] : basic.streetCode,
           address: address || basic.address,
         },
         organizationCertification: {
@@ -628,7 +634,11 @@ class ChangeModal extends Component {
 
   // 名称修改模式
   nameChangeType = v => {
-    const { userData: { basic: { sapCountryCode } } } = this.state;
+    const {
+      userData: {
+        basic: { sapCountryCode },
+      },
+    } = this.state;
     if (v.type === 'group') {
       if (sapCountryCode) {
         this.setState({
@@ -658,23 +668,23 @@ class ChangeModal extends Component {
     if (noHaveLev === 2) {
       this.setState({
         noHaveLev: true,
-      })
+      });
     } else {
       this.setState({
         noHaveLev: false,
-      })
+      });
     }
     if (v === 'CN') {
       this.setState({
         gtype: 1,
       });
-      return
+      return;
     }
     if (v === 'GB') {
       this.setState({
         gtype: 3,
       });
-      return
+      return;
     }
     if (v) {
       this.setState({
@@ -718,9 +728,9 @@ class ChangeModal extends Component {
       return (
         <Col lg={24} md={12} sm={12}>
           <FormItem
-          label={formatMessage({ id: 'bp.maintain_details.name' })}
-          labelCol={{ span: 4 }}
-          wrapperCol={{ span: 20 }}
+            label={formatMessage({ id: 'bp.maintain_details.name' })}
+            labelCol={{ span: 4 }}
+            wrapperCol={{ span: 20 }}
           >
             <Icon type="home" />
             &nbsp;&nbsp;<span>{recordMsg.name}</span>&nbsp;&nbsp;&nbsp;&nbsp;
@@ -731,7 +741,7 @@ class ChangeModal extends Component {
         </Col>
       );
     }
-    return null
+    return null;
   };
 
   defaultAddressCode = v => {
@@ -788,9 +798,9 @@ class ChangeModal extends Component {
       return (
         <Col lg={24} md={12} sm={12}>
           <FormItem
-          label={formatMessage({ id: 'bp.maintain.ChangeModal.address' })}
-          labelCol={{ span: 4 }}
-          wrapperCol={{ span: 20 }}
+            label={formatMessage({ id: 'bp.maintain.ChangeModal.address' })}
+            labelCol={{ span: 4 }}
+            wrapperCol={{ span: 20 }}
           >
             <span>
               {recordMsg.countryName}&nbsp;
@@ -812,8 +822,6 @@ class ChangeModal extends Component {
   groupAdressInput = () => {
     const { form, userData, gtype, address, defaultAddress, noHaveLev } = this.state;
     const { getFieldDecorator } = form;
-    // console.log(area)
-    // console.log(form.getFieldValue('address'))
     if (gtype === 1) {
       return (
         <Col lg={24} md={12} sm={12}>
@@ -822,9 +830,7 @@ class ChangeModal extends Component {
             labelCol={{ span: 4 }}
             wrapperCol={{ span: 20 }}
             hasFeedback
-            validateStatus={
-              noHaveLev && address ? 'success' : 'error'
-            }
+            validateStatus={noHaveLev && address ? 'success' : 'error'}
             // help={form.getFieldValue('msg') ? '' : '请输入信息'}
           >
             {getFieldDecorator('address')(
@@ -872,9 +878,7 @@ class ChangeModal extends Component {
             labelCol={{ span: 4 }}
             wrapperCol={{ span: 20 }}
             hasFeedback
-            validateStatus={
-              noHaveLev && address ? 'success' : 'error'
-            }
+            validateStatus={noHaveLev && address ? 'success' : 'error'}
             // help={form.getFieldValue('msg') ? '' : '请输入信息'}
           >
             {getFieldDecorator('address')(
@@ -941,18 +945,17 @@ class ChangeModal extends Component {
       <Col lg={12} md={12} sm={12}>
         <FormItem label={formatMessage({ id: 'bp.maintain.ChangeModal.businessType' })}>
           &nbsp;&nbsp;&nbsp;&nbsp;
-        <span>
-          {
-            formatter(industryCategoryAll, basic.industryCode, 'industryCode', 'industryName')
-          }
-        </span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        <a onClick = {event => this.updateIndustryGroup(event)}>
-          {formatMessage({ id: 'action.change' })}
-        </a>
-          </FormItem>
-        </Col>
-      )
-    }
+          <span>
+            {formatter(industryCategoryAll, basic.industryCode, 'industryCode', 'industryName')}
+          </span>{' '}
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          <a onClick={event => this.updateIndustryGroup(event)}>
+            {formatMessage({ id: 'action.change' })}
+          </a>
+        </FormItem>
+      </Col>
+    );
+  };
 
   groupInstruInput = () => {
     const {
@@ -968,14 +971,16 @@ class ChangeModal extends Component {
             initialValue: basic.industryCode,
           })(
             <Select
-            placeholder={formatMessage({ id: 'bp.pleaseSelect' })}
-            onChange={v => { this.industryCategoryChange(v) }}
+              placeholder={formatMessage({ id: 'bp.pleaseSelect' })}
+              onChange={v => {
+                this.industryCategoryChange(v);
+              }}
             >
               {industryCategoryAll.map(item => (
                 <Option
-                key={item.industryCode}
-                value={item.industryCode}
-                disabled={item.industryCode === '07'}
+                  key={item.industryCode}
+                  value={item.industryCode}
+                  disabled={item.industryCode === '07'}
                 >
                   {item.industryName}
                 </Option>
@@ -993,8 +998,8 @@ class ChangeModal extends Component {
     const industryData = industryCategoryAll.filter(item => item.industryCode === v);
     this.setState({
       industryCategory: industryData,
-    })
-  }
+    });
+  };
 
   // 删除
   removeItem = id => {
@@ -1039,9 +1044,9 @@ class ChangeModal extends Component {
           >
             <div style={{ marginBottom: '.8em' }}>
               <Badge
-                  status={formatter(PiCertificationStatus, item.status, 'id', 'badge')}
-                  text={formatter(PiCertificationStatus, item.status, 'id', 'name')}
-                />
+                status={formatter(PiCertificationStatus, item.status, 'id', 'badge')}
+                text={formatter(PiCertificationStatus, item.status, 'id', 'name')}
+              />
             </div>
             <Paragraph
               style={{ minHeight: 42 }}
@@ -1130,16 +1135,16 @@ class ChangeModal extends Component {
   taxNoShow = (userData, industryCategory) => {
     if (industryCategory.length !== 0) {
       if (industryCategory[0].taxNo) {
-        return industryCategory[0].taxNo
+        return industryCategory[0].taxNo;
       }
     }
     if (userData.organizationCertification) {
       if (userData.organizationCertification.taxNo) {
-        return userData.organizationCertification.taxNo
+        return userData.organizationCertification.taxNo;
       }
     }
-    return ''
-  }
+    return '';
+  };
 
   render() {
     const {
@@ -1280,9 +1285,9 @@ class ChangeModal extends Component {
               {this.renderIndustryForm()}
               <Col lg={12} md={12} sm={12}>
                 <FormItem
-                label={formatMessage({
-                  id: 'bp.maintain_details.verification_data.special_invoice',
-                })}
+                  label={formatMessage({
+                    id: 'bp.maintain_details.verification_data.special_invoice',
+                  })}
                 >
                   {getFieldDecorator('specialInvoice')(
                     <Switch
@@ -1320,9 +1325,10 @@ class ChangeModal extends Component {
                   {getFieldDecorator('taxNo', {
                     initialValue: this.taxNoShow(userData, industryCategory),
                   })(
-                  <Input placeholder={formatMessage({ id: 'bp.inputHere' })} readOnly={
-                    industryCategory.length !== 0 ? (!!industryCategory[0].taxNo) : ''
-                    }/>,
+                    <Input
+                      placeholder={formatMessage({ id: 'bp.inputHere' })}
+                      readOnly={industryCategory.length !== 0 ? !!industryCategory[0].taxNo : ''}
+                    />,
                   )}
                 </FormItem>
               </Col>
@@ -1449,11 +1455,11 @@ class ChangeModal extends Component {
               </Col>
               <Col lg={24} md={12} sm={12}>
                 <Form.Item
-                label={formatMessage({
-                  id: 'bp.maintain_details.verification_data.verification_documents',
-                })}
-                labelCol={{ span: 4 }}
-                wrapperCol={{ span: 20 }}
+                  label={formatMessage({
+                    id: 'bp.maintain_details.verification_data.verification_documents',
+                  })}
+                  labelCol={{ span: 4 }}
+                  wrapperCol={{ span: 20 }}
                 >
                   {getFieldDecorator('attachmentList', {
                     initialValue: fileList,
@@ -1534,11 +1540,11 @@ class ChangeModal extends Component {
               </Col>
               <Col lg={24} md={12} sm={12}>
                 <Form.Item
-                label={formatMessage({
-                  id: 'bp.maintain_details.verification_data.verification_documents',
-                })}
-                labelCol={{ span: 4 }}
-                wrapperCol={{ span: 20 }}
+                  label={formatMessage({
+                    id: 'bp.maintain_details.verification_data.verification_documents',
+                  })}
+                  labelCol={{ span: 4 }}
+                  wrapperCol={{ span: 20 }}
                 >
                   {getFieldDecorator('attachmentList', {
                     initialValue: fileList,
@@ -1619,11 +1625,11 @@ class ChangeModal extends Component {
               </Col>
               <Col lg={24} md={12} sm={12}>
                 <Form.Item
-                label={formatMessage({
-                  id: 'bp.maintain_details.verification_data.verification_documents',
-                })}
-                labelCol={{ span: 4 }}
-                wrapperCol={{ span: 20 }}
+                  label={formatMessage({
+                    id: 'bp.maintain_details.verification_data.verification_documents',
+                  })}
+                  labelCol={{ span: 4 }}
+                  wrapperCol={{ span: 20 }}
                 >
                   {getFieldDecorator('attachmentList', {
                     initialValue: fileList,
@@ -1721,9 +1727,9 @@ class ChangeModal extends Component {
               {this.renderIndustryForm()}
               <Col lg={12} md={12} sm={12}>
                 <FormItem
-                label={formatMessage({
-                  id: 'bp.maintain_details.verification_data.special_invoice',
-                })}
+                  label={formatMessage({
+                    id: 'bp.maintain_details.verification_data.special_invoice',
+                  })}
                 >
                   {getFieldDecorator('specialInvoice')(
                     <Switch
@@ -1749,7 +1755,8 @@ class ChangeModal extends Component {
                   hasFeedback
                   // eslint-disable-next-line max-len
                   validateStatus={
-                    form.getFieldValue('taxNo') || (userData.organizationCertification
+                    form.getFieldValue('taxNo') ||
+                    (userData.organizationCertification
                       ? !!userData.organizationCertification.taxNo
                       : '')
                       ? 'success'
@@ -1760,9 +1767,12 @@ class ChangeModal extends Component {
                   {getFieldDecorator('taxNo', {
                     // eslint-disable-next-line no-nested-ternary
                     initialValue: this.taxNoShow(userData, industryCategory),
-                  })(<Input placeholder={formatMessage({ id: 'bp.inputHere' })} readOnly={
-                    industryCategory.length !== 0 ? (!!industryCategory[0].taxNo) : ''
-                    }/>)}
+                  })(
+                    <Input
+                      placeholder={formatMessage({ id: 'bp.inputHere' })}
+                      readOnly={industryCategory.length !== 0 ? !!industryCategory[0].taxNo : ''}
+                    />,
+                  )}
                 </FormItem>
               </Col>
               <Col lg={12} md={12} sm={12}>
@@ -1888,11 +1898,11 @@ class ChangeModal extends Component {
               </Col>
               <Col lg={24} md={12} sm={12}>
                 <Form.Item
-                label={formatMessage({
-                  id: 'bp.maintain_details.verification_data.verification_documents',
-                })}
-                labelCol={{ span: 4 }}
-                wrapperCol={{ span: 20 }}
+                  label={formatMessage({
+                    id: 'bp.maintain_details.verification_data.verification_documents',
+                  })}
+                  labelCol={{ span: 4 }}
+                  wrapperCol={{ span: 20 }}
                 >
                   {getFieldDecorator('attachmentList', {
                     initialValue: fileList,
@@ -1973,12 +1983,12 @@ class ChangeModal extends Component {
               </Col>
               <Col lg={24} md={12} sm={12}>
                 <Form.Item
-                className="customLabelStyles"
-                label={formatMessage({
-                  id: 'bp.maintain_details.verification_data.verification_documents',
-                })}
-                labelCol={{ span: 4 }}
-                wrapperCol={{ span: 20 }}
+                  className="customLabelStyles"
+                  label={formatMessage({
+                    id: 'bp.maintain_details.verification_data.verification_documents',
+                  })}
+                  labelCol={{ span: 4 }}
+                  wrapperCol={{ span: 20 }}
                 >
                   {getFieldDecorator('attachmentList', {
                     initialValue: fileList,
@@ -2059,11 +2069,11 @@ class ChangeModal extends Component {
               </Col>
               <Col lg={24} md={12} sm={12}>
                 <Form.Item
-                label={formatMessage({
-                  id: 'bp.maintain_details.verification_data.verification_documents',
-                })}
-                labelCol={{ span: 4 }}
-                wrapperCol={{ span: 20 }}
+                  label={formatMessage({
+                    id: 'bp.maintain_details.verification_data.verification_documents',
+                  })}
+                  labelCol={{ span: 4 }}
+                  wrapperCol={{ span: 20 }}
                 >
                   {getFieldDecorator('attachmentList', {
                     initialValue: fileList,
@@ -2103,9 +2113,13 @@ class ChangeModal extends Component {
         <Modal
           width={submitNext === 1 ? modelWidth : 400}
           centered
-          title={submitNext === 1 ? formatMessage({
-            id: 'bp.maintain.ChangeModal.changeApprovedData',
-          }) : ''}
+          title={
+            submitNext === 1
+              ? formatMessage({
+                  id: 'bp.maintain.ChangeModal.changeApprovedData',
+                })
+              : ''
+          }
           visible={changeModal}
           onCancel={this.handleCancel}
           destroyOnClose

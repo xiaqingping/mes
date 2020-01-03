@@ -1,4 +1,4 @@
-import { message } from 'antd';
+import { message, Empty, Spin, Icon } from 'antd';
 import React from 'react';
 import { GroupColumn } from '@antv/g2plot';
 import api from '@/api';
@@ -19,6 +19,8 @@ class Chart extends React.Component {
     this.state = {
       columnPlot: undefined,
       // selectType: '',
+      err: false,
+      loadingPage: true,
     };
   }
 
@@ -47,7 +49,7 @@ class Chart extends React.Component {
     if (parseInt(type, 10) === 1) {
       Object.assign(params, {
         monthDateBegin:
-          data.length !== 0 ? data[0].format('YYYYMM') : `${new Date().getFullYear()}01`,
+          data.length !== 0 ? data[0].format('YYYYMM') : `${new Date().getFullYear() - 1}01`,
         monthDateEnd:
           data.length !== 0 ? data[1].format('YYYYMM') : `${new Date().getFullYear()}12`,
       });
@@ -59,7 +61,7 @@ class Chart extends React.Component {
       let quarterStart = '';
       let quarterEnd = '';
       if (data.length === 0) {
-        quarterStart = `${new Date().getFullYear()}1`;
+        quarterStart = `${new Date().getFullYear() - 1}1`;
         quarterEnd = `${new Date().getFullYear()}4`;
       } else {
         quarterStart =
@@ -100,7 +102,7 @@ class Chart extends React.Component {
       let halfStart = '';
       let halfEnd = '';
       if (data.length === 0) {
-        halfStart = `${new Date().getFullYear()}1`;
+        halfStart = `${new Date().getFullYear() - 1}1`;
         halfEnd = `${new Date().getFullYear()}2`;
       } else {
         if (parseInt(data[0].format('YYYYMM').slice(-2), 10) === 1) {
@@ -141,7 +143,7 @@ class Chart extends React.Component {
       //   return false;
       // }
       Object.assign(params, {
-        yearBegin: data.length !== 0 ? data[0].format('YYYY') : new Date().getFullYear(),
+        yearBegin: data.length !== 0 ? data[0].format('YYYY') : new Date().getFullYear() - 1,
         yearEnd: data.length !== 0 ? data[1].format('YYYY') : new Date().getFullYear(),
       });
 
@@ -231,6 +233,7 @@ class Chart extends React.Component {
           type: 'dashboard/setChartData',
           payload: newData,
         });
+        this.setState({ err: false, loadingPage: false });
       });
     }
 
@@ -316,6 +319,7 @@ class Chart extends React.Component {
           type: 'dashboard/setChartData',
           payload: newData,
         });
+        this.setState({ err: false, loadingPage: false });
       });
     }
 
@@ -404,13 +408,16 @@ class Chart extends React.Component {
           type: 'dashboard/setChartData',
           payload: newData,
         });
+        this.setState({ err: false, loadingPage: false });
       });
     }
-    // return '';
   };
 
   // x轴的名称处理
   xFieldName = (val, type) => {
+    if (parseInt(type, 10) === 1) {
+      return `${val.slice(0, 4)}-${val.slice(-2)}`;
+    }
     if (parseInt(type, 10) === 2) {
       return `${val.slice(0, 4)}第${val.slice(-1)}季度`;
     }
@@ -427,10 +434,11 @@ class Chart extends React.Component {
 
   // 图表的加载
   loadChart = () => {
+    // const { regions } = this.props;
     api.temporary
       .getSalesAnalysisRegion({
-        monthDateBegin: `${new Date().getFullYear() - 1}${new Date().getMonth() + 1}`,
-        monthDateEnd: `${new Date().getFullYear()}${new Date().getMonth() + 1}`,
+        monthDateBegin: new Date().getFullYear() - 1 + `0${new Date().getMonth() + 1}`.slice(-2),
+        monthDateEnd: new Date().getFullYear() + `0${new Date().getMonth() + 1}`.slice(-2),
         companyCodeList: '3100',
       })
       .then(res => {
@@ -444,7 +452,7 @@ class Chart extends React.Component {
                 regionCode: formatter(regions, item.regionCode, 'code'),
                 amount: parseFloat(item.amount),
                 // amount: item.amount,
-                monthDate: item.monthDate,
+                monthDate: this.xFieldName(item.monthDate, 1),
               });
             });
             const columnPlot = new GroupColumn(document.getElementById('container'), {
@@ -485,9 +493,15 @@ class Chart extends React.Component {
                 visible: true,
                 position: 'right-center',
               },
-              // grid: {
-              //   visible: true,
-              // },
+              interactions: [
+                {
+                  type: 'slider',
+                  cfg: {
+                    start: 0.3,
+                    end: 0.8,
+                  },
+                },
+              ],
               groupField: 'regionCode',
             });
 
@@ -500,18 +514,50 @@ class Chart extends React.Component {
               payload: data,
             });
             columnPlot.render();
+            this.setState({ err: false, loadingPage: false });
             return '';
           })
-          .catch(() => null);
+          .catch(() => {
+            this.props.errorPage(true);
+            this.setState({ err: true });
+          });
+      })
+      .catch(() => {
+        this.props.errorPage(true);
+        this.setState({ err: true });
       });
   };
 
+  loadingPageSetting = () => {
+    const { err, loadingPage } = this.state;
+    if (loadingPage && !err) {
+      return (
+        <Spin
+          indicator={<Icon type="redo" style={{ fontSize: 24 }} spin />}
+          tip="正在加载中，请耐心等待..."
+          style={{ margin: '100px 220px' }}
+        />
+      );
+    }
+    return '';
+  };
+
   render() {
+    const { err } = this.state;
     return (
       <>
-        <div id="container"></div>
+        {this.loadingPageSetting()}
+        {err ? (
+          <>
+            <h3 style={{ paddingTop: '50px', fontWeight: 'bold' }}>销售额趋势</h3>
+            <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} style={{ paddingRight: '935px' }} />
+          </>
+        ) : (
+          <div id="container"></div>
+        )}
       </>
     );
   }
 }
+
 export default Chart;

@@ -209,7 +209,7 @@ class Verification extends React.Component {
     const { getFieldDecorator } = form;
     return (
       <Form onSubmit={this.handleSearch} layout="inline">
-        <Row gutter={{ lg: 24, md: 12, sm: 6 }}>
+        <Row gutter={{ xxl: 100, lg: 80 }}>
           <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
             <FormItem label={formatMessage({ id: 'bp.customerID' })}>
               {getFieldDecorator('code')(
@@ -224,7 +224,7 @@ class Verification extends React.Component {
               )}
             </FormItem>
           </Col>
-          <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
+          <Col xxl={6} lg={languageCode === 'EN' ? 12 : 0}>
             <FormItem label={formatMessage({ id: 'bp.verification.businessPartner' })}>
               {getFieldDecorator('bpId')(
                 <AutoComplete
@@ -266,7 +266,7 @@ class Verification extends React.Component {
 
     return (
       <Form onSubmit={this.handleSearch} layout="inline">
-        <Row gutter={{ lg: 24, md: 12, sm: 6 }}>
+        <Row gutter={{ xxl: 100, lg: 80 }}>
           <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
             <FormItem label={formatMessage({ id: 'bp.customerID' })}>
               {getFieldDecorator('code')(
