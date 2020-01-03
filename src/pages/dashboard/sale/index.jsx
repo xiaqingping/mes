@@ -1,5 +1,17 @@
 /* eslint-disable no-nested-ternary */
-import { Card, Tabs, Select, DatePicker, Radio, Form, Col, Button, AutoComplete, Row } from 'antd';
+import {
+  message,
+  Card,
+  Tabs,
+  Select,
+  DatePicker,
+  Radio,
+  Form,
+  Col,
+  Button,
+  AutoComplete,
+  Row,
+} from 'antd';
 import React from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import { connect } from 'dva';
@@ -50,6 +62,10 @@ class Sale extends React.Component {
       chartData: [],
       profitCenterData: [],
       salersData: [],
+      companyList: [],
+      profitCenterList: [],
+      regionsList: [],
+      err: false,
     };
     this.callSaler = _.debounce(this.callSaler, 500);
   }
@@ -67,12 +83,6 @@ class Sale extends React.Component {
       type: 'dashboard/getCache',
       payload: { type: 'profitCenters' },
     });
-    // api.employees.getSaler().then(res => {
-    //   this.props.dispatch({
-    //     type: 'dashboard/setSalers',
-    //     payload: res.results,
-    //   });
-    // })
     this.props.dispatch({
       type: 'basicCache/getCache',
       payload: { type: 'offices' },
@@ -136,16 +146,15 @@ class Sale extends React.Component {
     });
     this.setState({
       profitCenterData: newData,
-      chartData: { companyList: comapnyVal },
+      companyList: comapnyVal,
     });
     resetFields(['profitCenters']);
   };
 
   // 利润中心选择
   profitCenterChange = v => {
-    const { chartData } = this.state;
     this.setState({
-      chartData: { ...chartData, profitCenterList: v },
+      profitCenterList: v,
     });
   };
 
@@ -159,17 +168,15 @@ class Sale extends React.Component {
 
   // 网点选择
   officesChange = v => {
-    const { chartData } = this.state;
     this.setState({
-      chartData: { ...chartData, officesList: v },
+      officesList: v,
     });
   };
 
   // 大区选择
   regionsChange = v => {
-    const { chartData } = this.state;
     this.setState({
-      chartData: { ...chartData, regionsList: v },
+      regionsList: v,
     });
   };
 
@@ -189,24 +196,45 @@ class Sale extends React.Component {
   };
 
   // 查询按钮
+  // eslint-disable-next-line consistent-return
   searchButton = () => {
-    const { chartData, dataTime, selectType } = this.state;
-
-    let data = chartData;
-    if (!('companyList' in data)) {
-      data = { ...data, companyList: [] };
+    const {
+      chartData,
+      dataTime,
+      selectType,
+      err,
+      officesList,
+      regionsList,
+      companyList,
+      profitCenterList,
+    } = this.state;
+    if (err) {
+      message.error('没有找到相关数据');
+      return false;
     }
-    if (!('profitCenterList' in data)) {
+    let data = chartData;
+    if (companyList.length === 0) {
+      data = { ...data, companyList: [] };
+    } else {
+      data = { ...data, companyList };
+    }
+    if (profitCenterList.length === 0) {
       data = { ...data, profitCenterList: [] };
+    } else {
+      data = { ...data, profitCenterList };
     }
     if (parseInt(selectType, 10) === 1) {
-      if (!('regionsList' in data)) {
+      if (regionsList === 0) {
         data = { ...data, regionsList: [] };
+      } else {
+        data = { ...data, regionsList };
       }
     }
     if (parseInt(selectType, 10) === 2) {
-      if (!('officesList' in data)) {
+      if (officesList.length === 0) {
         data = { ...data, officesList: [] };
+      } else {
+        data = { ...data, officesList };
       }
     }
     this.chart.passData(data, dataTime, selectType);
@@ -249,11 +277,11 @@ class Sale extends React.Component {
           !(parseInt(type, 10) === 4) ? ['开始月份', '结束月份'] : ['开始年份', '结束年份']
         }
         defaultValue={[
-          moment(`${new Date().getFullYear()}01`, 'YYYY-MM'),
+          moment(`${new Date().getFullYear() - 1}01`, 'YYYY-MM'),
           moment(`${new Date().getFullYear()}12`, 'YYYY-MM'),
         ]}
         defaultPickerValue={[
-          moment(`${new Date().getFullYear()}01`, 'YYYY-MM'),
+          moment(`${new Date().getFullYear() - 1}01`, 'YYYY-MM'),
           moment(`${new Date().getFullYear()}12`, 'YYYY-MM'),
         ]}
         format={!(parseInt(type, 10) === 4) ? 'YYYY-MM' : 'YYYY'}
@@ -408,6 +436,12 @@ class Sale extends React.Component {
     );
   };
 
+  errorPage = err => {
+    this.setState({
+      err,
+    });
+  };
+
   render() {
     const { chartData, type, selectType } = this.state;
     return (
@@ -420,6 +454,7 @@ class Sale extends React.Component {
                 <Chart
                   chartData={chartData}
                   type={type}
+                  errorPage={v => this.errorPage(v)}
                   onRef={ref => {
                     this.chart = ref;
                   }}
