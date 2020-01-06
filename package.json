@@ -47,10 +47,10 @@
   ],
   "dependencies": {
     "@ant-design/colors": "^3.2.2",
-    "@ant-design/pro-layout": "^4.10.3",
+    "@ant-design/pro-layout": "^4.10.2",
     "@antv/g2plot": "^0.11.20",
     "@tinymce/tinymce-react": "^3.3.2",
-    "antd": "^3.26.5",
+    "antd": "^3.26.6",
     "axios": "^0.19.0",
     "classnames": "^2.2.6",
     "d3": "^5.15.0",
