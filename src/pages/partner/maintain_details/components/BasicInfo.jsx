@@ -62,14 +62,10 @@ class BasicInfo extends Component {
       details: { basic },
       details,
       type,
-      countryDiallingCodes,
-      salesPaymentMethods,
       industry,
       salesOrderBlock,
     } = this.props;
     if (!basic) return null;
-    if (!countryDiallingCodes && !salesPaymentMethods) return null;
-    if (industry.length === 0) return null;
 
     return (
       <Card
@@ -193,7 +189,8 @@ class BasicInfo extends Component {
             span={2}
             label={formatMessage({ id: 'bp.maintain_details.basic.business_type' })}
           >
-            {basic.industryCode
+            {basic.industryCode &&
+            industry.filter(item => item.code === basic.industryCode).length !== 0
               ? industry.filter(item => item.code === basic.industryCode)[0].name
               : ''}
             &nbsp;&nbsp;

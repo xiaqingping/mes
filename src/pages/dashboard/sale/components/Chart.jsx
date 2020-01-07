@@ -19,7 +19,7 @@ class Chart extends React.Component {
     this.state = {
       columnPlot: undefined,
       // selectType: '',
-      err: false,
+      errs: false,
       loadingPage: true,
     };
   }
@@ -34,7 +34,6 @@ class Chart extends React.Component {
   }
 
   // 接收父组件的参数
-  // eslint-disable-next-line consistent-return
   passData = (chartData, data, selectType) => {
     const { columnPlot } = this.state;
     const { regions, offices, type } = this.props;
@@ -45,6 +44,9 @@ class Chart extends React.Component {
         chartData.profitCenterList.length !== 0 ? chartData.profitCenterList.join(',') : '',
     };
 
+    let beginTime = '';
+    let endTime = '';
+
     // 月份添加到条件里
     if (parseInt(type, 10) === 1) {
       Object.assign(params, {
@@ -54,6 +56,8 @@ class Chart extends React.Component {
           data.length !== 0 ? data[1].format('YYYYMM') : `${new Date().getFullYear()}12`,
       });
       xField = 'monthDate';
+      beginTime = params.monthDateBegin;
+      endTime = params.monthDateEnd;
     }
 
     // 季度添加到条件里
@@ -95,6 +99,8 @@ class Chart extends React.Component {
         quarterDateEnd: quarterEnd,
       });
       xField = 'quarterDate';
+      beginTime = params.quarterStart;
+      endTime = params.quarterEnd;
     }
 
     // 半年添加到条件里
@@ -134,6 +140,9 @@ class Chart extends React.Component {
         halfYearEnd: halfEnd,
       });
       xField = 'halfYear';
+
+      beginTime = params.halfStart;
+      endTime = params.halfEnd;
     }
 
     // 整年添加到条件里
@@ -146,8 +155,9 @@ class Chart extends React.Component {
         yearBegin: data.length !== 0 ? data[0].format('YYYY') : new Date().getFullYear() - 1,
         yearEnd: data.length !== 0 ? data[1].format('YYYY') : new Date().getFullYear(),
       });
-
       xField = 'year';
+      beginTime = params.yearBegin;
+      endTime = params.yearEnd;
     }
 
     // 大区模式
@@ -158,7 +168,8 @@ class Chart extends React.Component {
       if (regions.length === 0) return null;
       api.temporary.getSalesAnalysisRegion(params).then(res => {
         const newData = [];
-        res.forEach(item => {
+        const resData = this.setNewData(res, regions, beginTime, endTime);
+        resData.forEach(item => {
           newData.push({
             regionCode: formatter(regions, item.regionCode, 'code'),
             amount: parseFloat(item.amount),
@@ -233,7 +244,7 @@ class Chart extends React.Component {
           type: 'dashboard/setChartData',
           payload: newData,
         });
-        this.setState({ err: false, loadingPage: false });
+        this.setState({ errs: false, loadingPage: false });
       });
     }
 
@@ -319,7 +330,7 @@ class Chart extends React.Component {
           type: 'dashboard/setChartData',
           payload: newData,
         });
-        this.setState({ err: false, loadingPage: false });
+        this.setState({ errs: false, loadingPage: false });
       });
     }
 
@@ -408,9 +419,10 @@ class Chart extends React.Component {
           type: 'dashboard/setChartData',
           payload: newData,
         });
-        this.setState({ err: false, loadingPage: false });
+        this.setState({ errs: false, loadingPage: false });
       });
     }
+    return null;
   };
 
   // x轴的名称处理
@@ -432,24 +444,149 @@ class Chart extends React.Component {
     return val;
   };
 
+  /** 设值，如果没有的值变成0
+   * @param {Array} res 接口返回的数据
+   * @param {Array} reg 接口返回的大区值
+   * @param {String} btime 开始时间
+   * @param {String} etime 结束时间
+   */
+  setNewData = (res, reg, btime, etime) => {
+    // console.log(btime.slice(0, 4), etime.slice(0, 4));
+    const yearBtime = parseInt(btime.slice(0, 4), 10);
+    const yearEtime = parseInt(etime.slice(0, 4), 10);
+    const monthBtime = parseInt(btime.slice(4), 10);
+    const monthEtime = parseInt(etime.slice(4), 10);
+    const newDate = [];
+    if (yearBtime !== yearEtime) {
+      const yearNum = yearEtime - yearBtime;
+      const num = yearNum * 12;
+      if (monthBtime) {
+        for (let i = monthBtime; i <= monthEtime + num; i++) {
+          let newTime = '';
+          if (i >= 12) {
+            newTime = `${
+              i % 12 === 0 ? yearBtime + parseInt(i / 13, 10) : yearBtime + parseInt(i / 12, 10)
+            }${i % 12 ? `${0}${i % 12}`.slice(-2) : '12'}`;
+          } else {
+            newTime = yearBtime + `0${i}`.slice(-2);
+          }
+
+          reg.forEach(item => {
+            newDate.push({
+              regionCode: item.code,
+              amount: '0',
+              monthDate: newTime,
+            });
+          });
+        }
+      }
+    }
+    res.forEach(item => {
+      newDate.forEach(it => {
+        if (item.regionCode === it.regionCode && item.monthDate === it.monthDate) {
+          it.amount = item.amount;
+        }
+      });
+    });
+    return newDate;
+  };
+
   // 图表的加载
   loadChart = () => {
-    // const { regions } = this.props;
+    const { regions } = this.props;
+    const monthDateBegin = new Date().getFullYear() - 1 + `0${new Date().getMonth() + 1}`.slice(-2);
+    const monthDateEnd = new Date().getFullYear() + `0${new Date().getMonth() + 1}`.slice(-2);
     api.temporary
       .getSalesAnalysisRegion({
-        monthDateBegin: new Date().getFullYear() - 1 + `0${new Date().getMonth() + 1}`.slice(-2),
-        monthDateEnd: new Date().getFullYear() + `0${new Date().getMonth() + 1}`.slice(-2),
+        monthDateBegin,
+        monthDateEnd,
         companyCodeList: '3100',
       })
       .then(res => {
+        //
+        if (regions.length !== 0) {
+          const data = [];
+          if (!(res instanceof Array)) return null;
+          const resData = this.setNewData(res, regions, monthDateBegin, monthDateEnd);
+          resData.forEach(item => {
+            data.push({
+              regionCode: formatter(regions, item.regionCode, 'code'),
+              amount: parseFloat(item.amount),
+              // amount: item.amount,
+              monthDate: this.xFieldName(item.monthDate, 1),
+            });
+          });
+          const columnPlot = new GroupColumn(document.getElementById('container'), {
+            title: {
+              visible: true,
+              text: '销售额趋势',
+            },
+            forceFit: false,
+            data,
+            width: document.body.clientWidth < 1300 ? 780 : 1000,
+            height: 500,
+            // meta: {
+            //   amount: {
+            //     range: [0, 1],
+            //   },
+            // },
+            xField: 'monthDate',
+            yField: 'amount',
+            xAxis: {
+              // line: {
+              //   visible: true,
+              // },
+              title: {
+                text: '年月份',
+              },
+            },
+            yAxis: {
+              // min: 0,
+              line: {
+                visible: true,
+              },
+              tickInterval: 10,
+              title: {
+                text: '销售额(CNY)',
+              },
+            },
+            legend: {
+              visible: true,
+              position: 'right-center',
+            },
+            interactions: [
+              {
+                type: 'slider',
+                // cfg: {
+                //   start: 0,
+                //   end: 1,
+                // },
+              },
+            ],
+            groupField: 'regionCode',
+          });
+
+          this.setState({
+            columnPlot,
+          });
+
+          this.props.dispatch({
+            type: 'dashboard/setChartData',
+            payload: data,
+          });
+          columnPlot.render();
+          this.setState({ errs: false, loadingPage: false });
+          return '';
+        }
         api.basic
           .getRegions()
-          .then(regions => {
+          .then(reg => {
             const data = [];
             if (!(res instanceof Array)) return null;
-            res.forEach(item => {
+            const resData = this.setNewData(res, reg, monthDateBegin, monthDateEnd);
+            resData.forEach(item => {
               data.push({
-                regionCode: formatter(regions, item.regionCode, 'code'),
+                regionCode: formatter(reg, item.regionCode, 'code'),
                 amount: parseFloat(item.amount),
                 // amount: item.amount,
                 monthDate: this.xFieldName(item.monthDate, 1),
@@ -496,10 +633,10 @@ class Chart extends React.Component {
               interactions: [
                 {
                   type: 'slider',
-                  cfg: {
-                    start: 0.3,
-                    end: 0.8,
-                  },
+                  // cfg: {
+                  //   start: 0.3,
+                  //   end: 0.7,
+                  // },
                 },
               ],
               groupField: 'regionCode',
@@ -514,23 +651,25 @@ class Chart extends React.Component {
               payload: data,
             });
             columnPlot.render();
-            this.setState({ err: false, loadingPage: false });
-            return '';
+            this.setState({ errs: false, loadingPage: false });
+            this.props.errorPage(false);
+            return null;
           })
           .catch(() => {
             this.props.errorPage(true);
-            this.setState({ err: true });
+            this.setState({ errs: true });
           });
+        return null;
       })
       .catch(() => {
         this.props.errorPage(true);
-        this.setState({ err: true });
+        this.setState({ errs: true });
       });
   };
 
   loadingPageSetting = () => {
-    const { err, loadingPage } = this.state;
-    if (loadingPage && !err) {
+    const { errs, loadingPage } = this.state;
+    if (loadingPage && !errs) {
       return (
         <Spin
           indicator={<Icon type="redo" style={{ fontSize: 24 }} spin />}
@@ -543,11 +682,11 @@ class Chart extends React.Component {
   };
 
   render() {
-    const { err } = this.state;
+    const { errs } = this.state;
     return (
       <>
         {this.loadingPageSetting()}
-        {err ? (
+        {errs ? (
           <>
             <h3 style={{ paddingTop: '50px', fontWeight: 'bold' }}>销售额趋势</h3>
             <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} style={{ paddingRight: '935px' }} />

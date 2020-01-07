@@ -55,30 +55,6 @@ const wanzhengMap = {
   },
 };
 
-// 移动电话
-const mobileIden = {
-  0: {
-    value: 'default',
-    text: formatMessage({ id: 'bp.unapproved' }),
-  },
-  1: {
-    value: 'success',
-    text: formatMessage({ id: 'bp.approveds' }),
-  },
-};
-
-// 邮箱
-const emailIden = {
-  0: {
-    value: 'default',
-    text: formatMessage({ id: 'bp.unapproved' }),
-  },
-  1: {
-    value: 'success',
-    text: formatMessage({ id: 'bp.approveds' }),
-  },
-};
-
 function renderOption(item) {
   return (
     <Option key={item.code} text={item.name}>
@@ -599,19 +575,30 @@ class Maintain extends React.Component {
               <div>
                 {val}
                 &nbsp;&nbsp;
-                {records.mobilePhoneVerifyStatus === 1 ? (
-                  <Badge status={mobileIden[records.mobilePhoneVerifyStatus].value} />
+                {records.mobilePhone ? (
+                  <Badge
+                    status={formatter(
+                      BpCertificationStatus,
+                      records.mobilePhoneVerifyStatus,
+                      'id',
+                      'badge',
+                    )}
+                  />
                 ) : (
                   ''
                 )}
               </div>
               <div title={records.email}>
-                {records.email}
+                <span className={styles.hideAdress}>{records.email}</span>
                 &nbsp;&nbsp;
-                {records.emailVerifyStatus === 1 ? (
+                {records.email ? (
                   <Badge
-                    status={emailIden[records.emailVerifyStatus].value}
-                    className={styles.hideAdress}
+                    status={formatter(
+                      BpCertificationStatus,
+                      records.emailVerifyStatus,
+                      'id',
+                      'badge',
+                    )}
                   />
                 ) : (
                   ''

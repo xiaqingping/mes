@@ -65,7 +65,8 @@ class Sale extends React.Component {
       companyList: [],
       profitCenterList: [],
       regionsList: [],
-      err: false,
+      officesList: [],
+      err: undefined,
     };
     this.callSaler = _.debounce(this.callSaler, 500);
   }
@@ -196,7 +197,6 @@ class Sale extends React.Component {
   };
 
   // 查询按钮
-  // eslint-disable-next-line consistent-return
   searchButton = () => {
     const {
       chartData,
@@ -208,8 +208,11 @@ class Sale extends React.Component {
       companyList,
       profitCenterList,
     } = this.state;
-    if (err) {
+    if (err === true) {
       message.error('没有找到相关数据');
+      return false;
+    }
+    if (err === undefined) {
       return false;
     }
     let data = chartData;
@@ -239,9 +242,10 @@ class Sale extends React.Component {
     }
     this.chart.passData(data, dataTime, selectType);
     this.list.passData(selectType);
+    return true;
   };
 
-  // 选择网点还是大区
+  // 选择网点、大区、销售员
   selectTypeChange = v => {
     const {
       form: { resetFields },
@@ -304,9 +308,7 @@ class Sale extends React.Component {
           <Row>
             <Col xxl={7} lg={7} sm={24}>
               <Form.Item>
-                {getFieldDecorator('companys', {
-                  initialValue: '3100',
-                })(
+                {getFieldDecorator('companys', { initialValue: '3100' })(
                   <Select
                     style={{ width: '400px' }}
                     onChange={v => this.companyChange(v)}
@@ -373,13 +375,17 @@ class Sale extends React.Component {
                     <Select
                       style={{ width: '400px' }}
                       mode="multiple"
-                      onChange={
-                        parseInt(selectType, 10) === 1
-                          ? v => this.regionsChange(v)
-                          : parseInt(selectType, 10) === 2
-                          ? v => this.officesChange(v)
-                          : v => this.salersChange(v)
-                      }
+                      onChange={v => {
+                        if (parseInt(selectType, 10) === 1) {
+                          this.regionsChange(v);
+                        }
+                        if (parseInt(selectType, 10) === 2) {
+                          this.officesChange(v);
+                        }
+                        if (parseInt(selectType, 10) === 3) {
+                          this.salersChange(v);
+                        }
+                      }}
                       maxTagCount={3}
                       maxTagTextLength={4}
                       allowClear
@@ -446,7 +452,7 @@ class Sale extends React.Component {
     const { chartData, type, selectType } = this.state;
     return (
       <PageHeaderWrapper>
-        <Card bordered={false} style={{ width: '1600px' }}>
+        <Card bordered={false}>
           <Tabs>
             <TabPane tab="销售额" key="1">
               {this.operations()}
