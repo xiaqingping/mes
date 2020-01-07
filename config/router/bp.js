@@ -3,13 +3,11 @@ module.exports = {
   path: '/bp',
   name: 'bp',
   icon: 'user',
-  routes: [
-    {
+  routes: [{
       name: 'maintain',
       path: '/bp/maintain',
       hideChildrenInMenu: true,
-      routes: [
-        {
+      routes: [{
           path: '/bp/maintain',
           component: './partner/maintain',
         },
