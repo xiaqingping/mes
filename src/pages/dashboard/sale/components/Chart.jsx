@@ -559,7 +559,6 @@ class Chart extends React.Component {
     const { regions } = this.props;
     const monthDateBegin = `${new Date().getFullYear() - 1}01`;
     const monthDateEnd = `${new Date().getFullYear()}12`;
-    console.log(monthDateEnd);
     api.temporary
       .getSalesAnalysisRegion({
         monthDateBegin,
