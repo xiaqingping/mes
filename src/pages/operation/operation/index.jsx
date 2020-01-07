@@ -119,47 +119,25 @@ class Operation extends React.Component {
       newData = { ...newData, statusList: op.statusList.join(',') };
     }
     const query = Object.assign({ page: 1, pageSize, languageCode }, op, newData);
-    console.log(query);
     this.setState({
       formValues: query,
       loading: true,
     });
-    // api.bp
-    //   .getOperationRecords(query)
-    //   .then(res => {
-    //     this.setState({
-    //       list: res.results,
-    //       total: res.total,
-    //       loading: false,
-    //     });
-    //   })
-    //   .catch(() => {
-    //     this.setState({
-    //       loading: false,
-    //     });
-    //   });
-    const res = {
-      total: 10,
-    };
-    const results = [];
-    for (let i = 0; i < 10; i++) {
-      results.push({
-        id: i,
-        code: i,
-        sourceCode: `${i}${i}`,
-        sourceName: 'sourceNameTest',
-        operationTypeDescribe: 'operationTypeDescribeoperationTypeDescribeoperationTypeDescribe',
-        operatorCode: 'operatorCodeoperatorCode',
-        operatorName: 'operatorName',
-        operationDate: '2020-01-07',
+    api.bp
+      .getOperationRecords(query)
+      .then(res => {
+        console.log(res);
+        this.setState({
+          list: res.results,
+          total: res.total,
+          loading: false,
+        });
+      })
+      .catch(() => {
+        this.setState({
+          loading: false,
+        });
       });
-    }
-    Object.assign(res, { results });
-    this.setState({
-      list: res.results,
-      total: res.total,
-      loading: false,
-    });
   };
 
   // 重置

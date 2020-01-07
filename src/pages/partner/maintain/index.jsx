@@ -572,10 +572,10 @@ class Maintain extends React.Component {
         render(val, records) {
           return (
             <>
-              <div>
-                {val}
-                &nbsp;&nbsp;
-                {records.mobilePhone ? (
+              {records.mobilePhone ? (
+                <div>
+                  {val}
+                  &nbsp;&nbsp;
                   <Badge
                     status={formatter(
                       BpCertificationStatus,
@@ -584,14 +584,14 @@ class Maintain extends React.Component {
                       'badge',
                     )}
                   />
-                ) : (
-                  ''
-                )}
-              </div>
-              <div title={records.email}>
-                <span className={styles.hideAdress}>{records.email}</span>
-                &nbsp;&nbsp;
-                {records.email ? (
+                </div>
+              ) : (
+                ''
+              )}
+              {records.email ? (
+                <div title={records.email}>
+                  <span className={styles.hideAdress}>{records.email}</span>
+                  &nbsp;&nbsp;
                   <Badge
                     status={formatter(
                       BpCertificationStatus,
@@ -600,10 +600,10 @@ class Maintain extends React.Component {
                       'badge',
                     )}
                   />
-                ) : (
-                  ''
-                )}
-              </div>
+                </div>
+              ) : (
+                ''
+              )}
             </>
           );
         },

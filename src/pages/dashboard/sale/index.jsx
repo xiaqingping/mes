@@ -212,9 +212,6 @@ class Sale extends React.Component {
       message.error('没有找到相关数据');
       return false;
     }
-    if (err === undefined) {
-      return false;
-    }
     let data = chartData;
     if (companyList.length === 0) {
       data = { ...data, companyList: [] };
@@ -242,7 +239,7 @@ class Sale extends React.Component {
     }
     this.chart.passData(data, dataTime, selectType);
     this.list.passData(selectType);
-    return true;
+    return null;
   };
 
   // 选择网点、大区、销售员
