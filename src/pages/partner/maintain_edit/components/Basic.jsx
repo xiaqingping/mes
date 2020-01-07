@@ -427,11 +427,12 @@ class Basic extends React.Component {
   renderMobilePhone = () => {
     const { form, editType, basic } = this.props;
     const { getFieldDecorator } = form;
+    const verifyStatus = basic.mobilePhoneVerifyStatus;
 
     // 编辑状态
     // 1）页面状态为：新增
     // 2）页面状态为：修改 并且 移动电话验证状态为：1(未验证)
-    if (editType === 'add' || (editType === 'update' && basic.mobilePhoneVerifyStatus === 1)) {
+    if (editType === 'add' || (editType === 'update' && verifyStatus === 1)) {
       const edit = getFieldDecorator('mobilePhone', {
         initialValue: {
           mobilePhoneCountryCode: basic.mobilePhoneCountryCode,
@@ -446,33 +447,42 @@ class Basic extends React.Component {
     // 显示状态
     // 页面状态为：修改 并且 移动电话验证状态为：2(验证中)/3(变更中)/4(已验证)
     // 组织类BP还要有解绑按钮
-    if (
-      editType === 'update' &&
-      (basic.mobilePhoneVerifyStatus === 2 ||
-        basic.mobilePhoneVerifyStatus === 3 ||
-        basic.mobilePhoneVerifyStatus === 4)
-    ) {
+    if (editType === 'update' && (verifyStatus === 2 || verifyStatus === 3 || verifyStatus === 4)) {
+      const data = {
+        countryCode: basic.mobilePhoneCountryCode,
+        code: basic.mobilePhone,
+      };
       const show = (
         <>
-          {basic.mobilePhoneCountryCode}
-          {basic.mobilePhone}
-          {basic.mobilePhoneVerifyStatus === 2 ? <>验证中</> : null}
-          {basic.mobilePhoneVerifyStatus === 3 ? <>变更中</> : null}
-          <a
-            className={styles.changeButton}
-            onClick={() => {
-              this.changePhoneCallback(true);
-            }}
-          >
-            <FormattedMessage id="bp.maintain_details.change" />
-          </a>
-          <CheckPhone
-            details={this.props.details}
-            phoneShow={this.state.changeMobileModalVisible}
-            checkPhone={v => {
-              this.changePhoneCallback(v);
-            }}
-          />
+          <ContactInformation data={data} />
+          {verifyStatus === 2 ? (
+            <Badge className={styles.changeButton} status="warning" text="验证中" />
+          ) : null}
+          {verifyStatus === 3 ? (
+            <Badge className={styles.changeButton} status="warning" text="变更中" />
+          ) : null}
+          {verifyStatus === 4 ? (
+            <a
+              className={styles.changeButton}
+              onClick={() => {
+                this.changePhoneCallback(true);
+              }}
+            >
+              <FormattedMessage id="bp.maintain_details.change" />
+            </a>
+          ) : null}
+          {verifyStatus === 4 && basic.type === 2 ? (
+            <a className={styles.changeButton}>解绑</a>
+          ) : null}
+          {verifyStatus === 4 ? (
+            <CheckPhone
+              details={this.props.details}
+              phoneShow={this.state.changeMobileModalVisible}
+              checkPhone={v => {
+                this.changePhoneCallback(v);
+              }}
+            />
+          ) : null}
         </>
       );
 
@@ -486,11 +496,12 @@ class Basic extends React.Component {
   renderEmail = () => {
     const { form, editType, basic } = this.props;
     const { getFieldDecorator } = form;
+    const verifyStatus = basic.emailVerifyStatus;
 
     // 编辑状态
     // 1）页面状态为：新增
     // 2）页面状态为：修改 并且 BP类型为人员
-    if (editType === 'add' || (editType === 'update' && basic.mobilePhoneVerifyStatus === 1)) {
+    if (editType === 'add' || (editType === 'update' && verifyStatus === 1)) {
       const edit = getFieldDecorator('email', {
         initialValue: { email: basic.email },
         rules: [{ validator: this.checkEmail }],
@@ -501,25 +512,38 @@ class Basic extends React.Component {
 
     // 显示状态
     // 页面状态为：修改 并且 移动电话验证状态为：Y
-    if (editType === 'update' && basic.emailVerifyStatus === 4) {
+    if (editType === 'update' && (verifyStatus === 2 || verifyStatus === 3 || verifyStatus === 4)) {
       const show = (
         <>
           {basic.email}
-          <a
-            className={styles.changeButton}
-            onClick={() => {
-              this.changeEmailCallback(true);
-            }}
-          >
-            <FormattedMessage id="bp.maintain_details.change" />
-          </a>
-          <CheckEmail
-            emailShow={this.state.changeEmaileModalVisible}
-            details={this.props.details}
-            checkEmail={v => {
-              this.changeEmailCallback(v);
-            }}
-          />
+          {verifyStatus === 2 ? (
+            <Badge className={styles.changeButton} status="warning" text="验证中" />
+          ) : null}
+          {verifyStatus === 3 ? (
+            <Badge className={styles.changeButton} status="warning" text="变更中" />
+          ) : null}
+          {verifyStatus === 4 ? (
+            <a
+              className={styles.changeButton}
+              onClick={() => {
+                this.changeEmailCallback(true);
+              }}
+            >
+              <FormattedMessage id="bp.maintain_details.change" />
+            </a>
+          ) : null}
+          {verifyStatus === 4 && basic.type === 2 ? (
+            <a className={styles.changeButton}>解绑</a>
+          ) : null}
+          {verifyStatus === 4 ? (
+            <CheckEmail
+              emailShow={this.state.changeEmaileModalVisible}
+              details={this.props.details}
+              checkEmail={v => {
+                this.changeEmailCallback(v);
+              }}
+            />
+          ) : null}
         </>
       );
 
