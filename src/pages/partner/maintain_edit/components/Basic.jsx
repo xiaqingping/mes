@@ -430,8 +430,8 @@ class Basic extends React.Component {
 
     // 编辑状态
     // 1）页面状态为：新增
-    // 2）页面状态为：修改 并且 BP类型为人员
-    if (editType === 'add' || (editType === 'update' && basic.mobilePhoneVerifyStatus === 'N')) {
+    // 2）页面状态为：修改 并且 移动电话验证状态为：1(未验证)
+    if (editType === 'add' || (editType === 'update' && basic.mobilePhoneVerifyStatus === 1)) {
       const edit = getFieldDecorator('mobilePhone', {
         initialValue: {
           mobilePhoneCountryCode: basic.mobilePhoneCountryCode,
@@ -444,12 +444,20 @@ class Basic extends React.Component {
     }
 
     // 显示状态
-    // 页面状态为：修改 并且 移动电话验证状态为：Y
-    if (editType === 'update' && basic.mobilePhoneVerifyStatus === 'Y') {
+    // 页面状态为：修改 并且 移动电话验证状态为：2(验证中)/3(变更中)/4(已验证)
+    // 组织类BP还要有解绑按钮
+    if (
+      editType === 'update' &&
+      (basic.mobilePhoneVerifyStatus === 2 ||
+        basic.mobilePhoneVerifyStatus === 3 ||
+        basic.mobilePhoneVerifyStatus === 4)
+    ) {
       const show = (
         <>
           {basic.mobilePhoneCountryCode}
           {basic.mobilePhone}
+          {basic.mobilePhoneVerifyStatus === 2 ? <>验证中</> : null}
+          {basic.mobilePhoneVerifyStatus === 3 ? <>变更中</> : null}
           <a
             className={styles.changeButton}
             onClick={() => {
@@ -482,7 +490,7 @@ class Basic extends React.Component {
     // 编辑状态
     // 1）页面状态为：新增
     // 2）页面状态为：修改 并且 BP类型为人员
-    if (editType === 'add' || (editType === 'update' && basic.mobilePhoneVerifyStatus === 'N')) {
+    if (editType === 'add' || (editType === 'update' && basic.mobilePhoneVerifyStatus === 1)) {
       const edit = getFieldDecorator('email', {
         initialValue: { email: basic.email },
         rules: [{ validator: this.checkEmail }],
@@ -493,7 +501,7 @@ class Basic extends React.Component {
 
     // 显示状态
     // 页面状态为：修改 并且 移动电话验证状态为：Y
-    if (editType === 'update' && basic.emailVerifyStatus === 'Y') {
+    if (editType === 'update' && basic.emailVerifyStatus === 4) {
       const show = (
         <>
           {basic.email}
