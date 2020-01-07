@@ -19,10 +19,19 @@ const Model = {
      * 获取此命名空间内的缓存数据
      * @param {Object} payload = {type：要请求的缓存数据, options：请求上传递的参数}
      */
-    *getCache(action, effects) {
-      const { payload } = action;
-      const { call, put, select } = effects;
-      const { type, options } = payload;
+    * getCache(action, effects) {
+      const {
+        payload,
+      } = action;
+      const {
+        call,
+        put,
+        select,
+      } = effects;
+      const {
+        type,
+        options,
+      } = payload;
 
       let targetState;
 
@@ -67,13 +76,21 @@ const Model = {
       // 六：设置数据
       yield put({
         type: 'setCache',
-        payload: { type, targetState },
+        payload: {
+          type,
+          targetState,
+        },
       });
     },
   },
   reducers: {
-    setCache(state, { payload }) {
-      const { type, targetState } = payload;
+    setCache(state, {
+      payload,
+    }) {
+      const {
+        type,
+        targetState,
+      } = payload;
 
       // 数据处理方法
       const format = {};
@@ -82,13 +99,22 @@ const Model = {
 
       // 将数据存到浏览器缓存中
       sessionStorage.setItem(`${namespace}/${type}`, JSON.stringify(data));
-      return { ...state, [type]: data };
+      return {
+        ...state,
+        [type]: data,
+      };
     },
     setChartData(state, action) {
-      return { ...state, chartData: action.payload };
+      return {
+        ...state,
+        chartData: action.payload,
+      };
     },
     setSalers(state, action) {
-      return { ...state, salers: action.payload };
+      return {
+        ...state,
+        salers: action.payload,
+      };
     },
   },
 };
