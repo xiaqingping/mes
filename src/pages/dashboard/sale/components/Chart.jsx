@@ -99,8 +99,8 @@ class Chart extends React.Component {
         quarterDateEnd: quarterEnd,
       });
       xField = 'quarterDate';
-      beginTime = params.quarterStart;
-      endTime = params.quarterEnd;
+      beginTime = params.quarterDateBegin;
+      endTime = params.quarterDateEnd;
     }
 
     // 半年添加到条件里
@@ -141,8 +141,8 @@ class Chart extends React.Component {
       });
       xField = 'halfYear';
 
-      beginTime = params.halfStart;
-      endTime = params.halfEnd;
+      beginTime = params.halfYearBegin;
+      endTime = params.halfYearEnd;
     }
 
     // 整年添加到条件里
@@ -166,9 +166,17 @@ class Chart extends React.Component {
         regionCodeList: chartData.regionsList.length !== 0 ? chartData.regionsList.join(',') : '',
       });
       if (regions.length === 0) return null;
+
       api.temporary.getSalesAnalysisRegion(params).then(res => {
         const newData = [];
-        const resData = this.setNewData(res, regions, beginTime, endTime);
+        const resData = this.setNewData(
+          res,
+          regions,
+          beginTime,
+          endTime,
+          parseInt(type, 10),
+          'regionCode',
+        );
         resData.forEach(item => {
           newData.push({
             regionCode: formatter(regions, item.regionCode, 'code'),
@@ -256,7 +264,15 @@ class Chart extends React.Component {
       if (offices.length === 0) return null;
       api.temporary.getSalesAnalysisOffice(params).then(res => {
         const newData = [];
-        res.forEach(item => {
+        const resData = this.setNewData(
+          res,
+          offices,
+          beginTime,
+          endTime,
+          parseInt(type, 10),
+          'officeCode',
+        );
+        resData.forEach(item => {
           newData.push({
             officeCode: formatter(offices, item.officeCode, 'code'),
             amount: parseFloat(item.amount),
@@ -345,7 +361,15 @@ class Chart extends React.Component {
       });
       api.temporary.getSalesAnalysisSaler(params).then(res => {
         const newData = [];
-        res.forEach((item, index) => {
+        const resData = this.setNewData(
+          res,
+          offices,
+          beginTime,
+          endTime,
+          parseInt(type, 10),
+          'salerCode',
+        );
+        resData.forEach((item, index) => {
           newData.push({
             salerCode: index,
             amount: parseFloat(item.amount),
@@ -449,41 +473,80 @@ class Chart extends React.Component {
    * @param {Array} reg 接口返回的大区值
    * @param {String} btime 开始时间
    * @param {String} etime 结束时间
+   * @param {int} type 1-月份，2-季度，3-半年，4-整年
    */
-  setNewData = (res, reg, btime, etime) => {
-    // console.log(btime.slice(0, 4), etime.slice(0, 4));
-    const yearBtime = parseInt(btime.slice(0, 4), 10);
-    const yearEtime = parseInt(etime.slice(0, 4), 10);
-    const monthBtime = parseInt(btime.slice(4), 10);
-    const monthEtime = parseInt(etime.slice(4), 10);
+  setNewData = (res, reg, btime, etime, type = 1, key = 'regionCode') => {
+    let yearBtime = 0;
+    let yearEtime = 0;
+    let monthBtime = 0;
+    let monthEtime = 0;
+    if (type === 4) {
+      yearBtime = btime;
+      yearEtime = etime;
+    } else {
+      yearBtime = parseInt(btime.slice(0, 4), 10);
+      yearEtime = parseInt(etime.slice(0, 4), 10);
+      monthBtime = parseInt(btime.slice(4), 10);
+      monthEtime = parseInt(etime.slice(4), 10);
+    }
     const newDate = [];
-    if (yearBtime !== yearEtime) {
-      const yearNum = yearEtime - yearBtime;
-      const num = yearNum * 12;
-      if (monthBtime) {
-        for (let i = monthBtime; i <= monthEtime + num; i++) {
-          let newTime = '';
-          if (i >= 12) {
-            newTime = `${
-              i % 12 === 0 ? yearBtime + parseInt(i / 13, 10) : yearBtime + parseInt(i / 12, 10)
-            }${i % 12 ? `${0}${i % 12}`.slice(-2) : '12'}`;
-          } else {
-            newTime = yearBtime + `0${i}`.slice(-2);
-          }
-
-          reg.forEach(item => {
-            newDate.push({
-              regionCode: item.code,
-              amount: '0',
-              monthDate: newTime,
-            });
-          });
+    let gapYear = 12;
+    let xField = 'monthDate';
+    if (type === 2) {
+      gapYear = 4;
+      xField = 'quarterDate';
+    }
+    if (type === 3) {
+      gapYear = 2;
+      xField = 'halfYear';
+    }
+    if (type === 4) {
+      gapYear = 1;
+      xField = 'year';
+    }
+    // if (yearBtime !== yearEtime) {
+    const yearNum = yearEtime - yearBtime;
+    // const num = type === 1 ? yearNum * 12 : yearNum;
+    const num = yearNum * gapYear;
+    if (monthBtime) {
+      for (let i = monthBtime; i <= monthEtime + num; i++) {
+        let newTime = '';
+        if (i >= gapYear) {
+          newTime = `${
+            i % gapYear === 0
+              ? yearBtime + parseInt(i / (gapYear + 1), 10)
+              : yearBtime + parseInt(i / gapYear, 10)
+          }${i % gapYear ? `${0}${i % gapYear}`.slice(-2) : gapYear}`;
+        } else {
+          newTime = yearBtime + `0${i}`.slice(-2);
         }
+        if (type !== 1) {
+          newTime = `${newTime}`.slice(0, 4) + `${newTime}`.slice(-1);
+        }
+
+        reg.forEach(item => {
+          newDate.push({
+            [key]: item.code,
+            amount: '0',
+            [xField]: newTime,
+          });
+        });
+      }
+    } else {
+      for (let i = yearBtime; i <= yearEtime; i++) {
+        reg.forEach(item => {
+          newDate.push({
+            [key]: item.code,
+            amount: '0',
+            [xField]: i.toString(),
+          });
+        });
       }
     }
     res.forEach(item => {
       newDate.forEach(it => {
-        if (item.regionCode === it.regionCode && item.monthDate === it.monthDate) {
+        if (item[key] === it[key] && item[xField] === it[xField]) {
+          // eslint-disable-next-line no-param-reassign
           it.amount = item.amount;
         }
       });
@@ -494,8 +557,9 @@ class Chart extends React.Component {
   // 图表的加载
   loadChart = () => {
     const { regions } = this.props;
-    const monthDateBegin = new Date().getFullYear() - 1 + `0${new Date().getMonth() + 1}`.slice(-2);
-    const monthDateEnd = new Date().getFullYear() + `0${new Date().getMonth() + 1}`.slice(-2);
+    const monthDateBegin = `${new Date().getFullYear() - 1}01`;
+    const monthDateEnd = `${new Date().getFullYear()}12`;
+    console.log(monthDateEnd);
     api.temporary
       .getSalesAnalysisRegion({
         monthDateBegin,
@@ -557,10 +621,10 @@ class Chart extends React.Component {
             interactions: [
               {
                 type: 'slider',
-                // cfg: {
-                //   start: 0,
-                //   end: 1,
-                // },
+                cfg: {
+                  start: 0,
+                  end: 0.5,
+                },
               },
             ],
             groupField: 'regionCode',
@@ -633,10 +697,10 @@ class Chart extends React.Component {
               interactions: [
                 {
                   type: 'slider',
-                  // cfg: {
-                  //   start: 0.3,
-                  //   end: 0.7,
-                  // },
+                  cfg: {
+                    start: 0,
+                    end: 0.5,
+                  },
                 },
               ],
               groupField: 'regionCode',
