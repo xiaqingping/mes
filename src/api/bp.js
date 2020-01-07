@@ -179,7 +179,7 @@ export default {
   // 操作记录
   // 操作记录列表查询接口（带分页）
   getOperationRecords(params) {
-    return request('/businessPartners/v1/operationRecords', {
+    return request('/businessPartners/operationRecords/v1', {
       params,
     });
   },
