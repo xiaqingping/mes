@@ -187,29 +187,19 @@ class ChooseShipToParty extends React.Component {
             </Button>
           </div>
         ),
-        render: (text, row) =>
-          // const mobilePhoneArr = [];
-          // if (row.mobilePhoneCountryCode) mobilePhoneArr.push(row.mobilePhoneCountryCode);
-          // if (row.mobilePhone) mobilePhoneArr.push(row.mobilePhone);
-           (
-            <>
-              {/* {mobilePhoneArr.length > 0 ? (
-                <>
-                  <span>{mobilePhoneArr.join('-')}</span>
-                  <br />
-                </>
-              ) : null} */}
-              <span>{row.email}</span><br/>
-              <ContactInformation
-                data={{
-                  countryCode: row.mobilePhoneCountryCode,
-                  code: row.mobilePhone,
-                  flag: 'no_use',
-                }}
-              />
-            </>
-          )
-        ,
+        render: (text, row) => (
+          <>
+            <span>{row.email}</span>
+            <br />
+            <ContactInformation
+              data={{
+                countryCode: row.mobilePhoneCountryCode,
+                code: row.mobilePhone,
+                hideFlag: true,
+              }}
+            />
+          </>
+        ),
       },
       {
         title: formatMessage({ id: 'action.operation' }),

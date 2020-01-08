@@ -1,6 +1,4 @@
-import {
-  formatMessage,
-} from 'umi/locale';
+import { formatMessage } from 'umi/locale';
 
 const SeqModel = {
   namespace: 'bp',
@@ -9,7 +7,8 @@ const SeqModel = {
     type: null,
     supplier: null,
     // 业务伙伴认证状态
-    BpCertificationStatus: [{
+    BpCertificationStatus: [
+      {
         id: 1,
         name: formatMessage({
           id: 'bp.unapproved',
@@ -44,7 +43,8 @@ const SeqModel = {
     //   { id: 2, name: formatMessage({ id: 'bp.maintain.actived' }) },
     // ],
     // PI认证状态
-    PiCertificationStatus: [{
+    PiCertificationStatus: [
+      {
         id: 1,
         name: formatMessage({
           id: 'bp.processing',
@@ -67,7 +67,8 @@ const SeqModel = {
       },
     ],
     // 操作项状态
-    BpOperationItemStatus: [{
+    BpOperationItemStatus: [
+      {
         id: 1,
         name: formatMessage({
           id: 'bp.operation.needVerified',
@@ -87,7 +88,8 @@ const SeqModel = {
       },
     ],
     // 操作记录类型
-    BpOperationRecordType: [{
+    BpOperationRecordType: [
+      {
         id: 1,
         name: formatMessage({
           id: 'action.add',
@@ -118,7 +120,8 @@ const SeqModel = {
       },
     ],
     // 国家代码
-    CountryCode: [{
+    CountryCode: [
+      {
         id: 'CN',
         name: '中国',
       },
@@ -160,7 +163,8 @@ const SeqModel = {
       },
     ],
     // 客户数据状态
-    CustomerDataStatus: [{
+    CustomerDataStatus: [
+      {
         id: 1,
         name: formatMessage({
           id: 'bp.maintain.completed',
@@ -174,7 +178,8 @@ const SeqModel = {
       },
     ],
     // 默认开票类型
-    DefaultInvoiceType: [{
+    DefaultInvoiceType: [
+      {
         id: '10',
         name: '增值税专用发票',
       },
@@ -184,7 +189,8 @@ const SeqModel = {
       },
     ],
     // 邮箱认证状态
-    EmailVerifyStatus: [{
+    EmailVerifyStatus: [
+      {
         id: 1,
         name: formatMessage({
           id: 'bp.EmailVerifyStatus.unverified',
@@ -208,7 +214,8 @@ const SeqModel = {
       },
     ],
     // 手机验证状态
-    MobilePhoneVerifyStatus: [{
+    MobilePhoneVerifyStatus: [
+      {
         id: 1,
         name: formatMessage({
           id: 'bp.EmailVerifyStatus.unverified',
@@ -232,7 +239,8 @@ const SeqModel = {
       },
     ],
     // 随货开票
-    InvoiceWithGood: [{
+    InvoiceWithGood: [
+      {
         id: 1,
         name: formatMessage({
           id: 'bp.InvoiceWithGood.yes',
@@ -246,7 +254,8 @@ const SeqModel = {
       },
     ],
     // 付款条件
-    PaymentTerms: [{
+    PaymentTerms: [
+      {
         id: 'D001',
         name: '立即应付的 到期净值',
       },
@@ -272,7 +281,8 @@ const SeqModel = {
       },
     ],
     // 销售范围冻结状态
-    SalesOrderBlock: [{
+    SalesOrderBlock: [
+      {
         id: 1,
         name: formatMessage({
           id: 'bp.block',
@@ -288,12 +298,15 @@ const SeqModel = {
       },
     ],
     // 装运条件
-    ShippingCondition: [{
-      id: '01',
-      name: '标准',
-    }],
+    ShippingCondition: [
+      {
+        id: '01',
+        name: '标准',
+      },
+    ],
     // 增值税专用发票资质
-    SpecialInvoice: [{
+    SpecialInvoice: [
+      {
         id: 1,
         name: formatMessage({
           id: 'bp.InvoiceWithGood.yes',
@@ -307,7 +320,8 @@ const SeqModel = {
       },
     ],
     // 供应商数据状态
-    VendorDateStatus: [{
+    VendorDateStatus: [
+      {
         id: 1,
         name: formatMessage({
           id: 'bp.InvoiceWithGood.yes',
@@ -321,7 +335,8 @@ const SeqModel = {
       },
     ],
     // 供应商级别
-    VendorLevelCode: [{
+    VendorLevelCode: [
+      {
         id: 'A',
         name: formatMessage({
           id: 'bp.VendorLevelCode.important',
@@ -341,7 +356,8 @@ const SeqModel = {
       },
     ],
     // 验证记录-关联售达方记录-验证结果
-    VerifyLinkSoldToPartyStatus: [{
+    VerifyLinkSoldToPartyStatus: [
+      {
         id: 1,
         name: formatMessage({
           id: 'bp.verfication',
@@ -373,7 +389,8 @@ const SeqModel = {
       },
     ],
     // 验证记录-关联售达方记录-验证类型
-    VerifyLinkSoldToPartyType: [{
+    VerifyLinkSoldToPartyType: [
+      {
         id: 1,
         name: formatMessage({
           id: 'bp.verification.mobilePhone',
@@ -399,7 +416,8 @@ const SeqModel = {
       },
     ],
     // 验证记录-手机验证和邮箱验证-验证类型
-    VerifyPhoneOrEmailType: [{
+    VerifyPhoneOrEmailType: [
+      {
         id: 1,
         name: formatMessage({
           id: 'bp.verification.verification.mobileVerification',
@@ -448,7 +466,8 @@ const SeqModel = {
       },
     ],
     // 验证类型
-    VerifyRecordType: [{
+    VerifyRecordType: [
+      {
         value: 1,
         text: formatMessage({
           id: 'bp.verification.organizationVerification',
@@ -493,7 +512,8 @@ const SeqModel = {
     ],
 
     // 验证方式
-    verifyTest: [{
+    verifyTest: [
+      {
         id: 1,
         name: formatMessage({
           id: 'bp.verification.mobilePhone',
@@ -514,7 +534,8 @@ const SeqModel = {
     ],
 
     // 变更渠道
-    verifyChannel: [{
+    verifyChannel: [
+      {
         id: 1,
         name: formatMessage({
           id: 'bp.verification.validateLogon',
@@ -529,7 +550,8 @@ const SeqModel = {
     ],
 
     // 变更类型
-    verifyChangeType: [{
+    verifyChangeType: [
+      {
         id: 1,
         name: formatMessage({
           id: 'bp.verification.verifyCellPhone',

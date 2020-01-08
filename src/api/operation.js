@@ -20,7 +20,7 @@ export default {
   },
   // 操作记录类型查询(带分页)
   getOperationTypes(params) {
-    return request('/v1/operationTypes', {
+    return request('/operationTypes/v1/', {
       params,
     });
   },

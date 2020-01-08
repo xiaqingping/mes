@@ -25,6 +25,8 @@ export default {
   'bp.VendorLevelCode.moreImportant': 'More Important',
   'bp.VendorLevelCode.commonly': 'Commonly',
   'bp.EmailVerifyStatus.unverified': 'Unverified',
+  'bp.EmailVerifyStatus.verfication': 'Verfication',
+  'bp.EmailVerifyStatus.inChange': 'In Change', // 百度翻译
   'bp.EmailVerifyStatus.verified': 'Verified',
   'bp.InvoiceWithGood.yes': 'Yes',
   'bp.InvoiceWithGood.no': 'No',

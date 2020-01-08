@@ -6,26 +6,26 @@
 import request from '@/utils/request';
 
 export default {
-  // 查询工厂列表
-  getFactorys() {
-    return request('/basic/v1/factorys');
-  },
-  // 查询开票类型
-  getInvtypes() {
-    return request('/basic/v1/invtypes');
-  },
+  // 查询工厂列表 // TODO: 废弃，新 plants/v1
+  // getFactorys() {
+  //   return request('/basic/v1/factorys');
+  // },
+  // 查询开票类型 // TODO: 废弃，新 taxInvoiceTypes/v1
+  // getInvtypes() {
+  //   return request('/basic/v1/invtypes');
+  // },
   // 查询仓库
   getStorages() {
     return request('/basic/v1/storages');
   },
-  // 查询付款方式
-  getPayMethods() {
-    return request('/basic/v1/paymethods');
-  },
-  // 查询付款条件
-  getPayTerms() {
-    return request('/basic/v1/payterms');
-  },
+  // 查询付款方式 // TODO: 废弃，新 salesPaymentMethods/v1
+  // getPayMethods() {
+  //   return request('/basic/v1/paymethods');
+  // },
+  // 查询付款条件 // TODO: 废弃，新 paymentTerms/v1
+  // getPayTerms() {
+  //   return request('/basic/v1/payterms');
+  // },
   // 查询订货人
   getContacts() {
     return request('/basic/v1/contacts');
@@ -84,7 +84,7 @@ export default {
   getGlAccounts() {
     return request('/glAccounts/v1');
   },
-  // 付款条件主数据
+  // 付款条件
   getPaymentTerms() {
     return request('/paymentTerms/v1');
   },
@@ -96,7 +96,7 @@ export default {
   getSalesDistricts() {
     return request('/salesDistricts/v1');
   },
-  // 客户组主数据（付款方式）
+  // 付款方式
   getSalesPaymentMethods() {
     return request('/salesPaymentMethods/v1');
   },
@@ -148,7 +148,7 @@ export default {
   getCustomerAccountAssignmentGroups() {
     return request('/customerAccountAssignmentGroups/v1');
   },
-  // 客户组 1主数据（金税发票类型）
+  // 开票类型
   getTaxInvoiceTypes() {
     return request('/taxInvoiceTypes/v1');
   },
@@ -192,7 +192,7 @@ export default {
   getSalesOrganizationDistributionChannelPlant() {
     return request('/salesOrganizationDistributionChannelPlant/v1');
   },
-  // 工厂主数据
+  // 工厂
   getPlants() {
     return request('/plants/v1');
   },

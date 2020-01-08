@@ -96,7 +96,6 @@ class Operation extends React.Component {
     } = this.state;
     const { languageCode } = this.props;
     const op = options;
-    // const query = Object.assign({}, { page: 1, pageSize }, options);
     let newData = [];
     if (op.operationDate) {
       newData = {

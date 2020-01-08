@@ -4,10 +4,10 @@
  */
 import React from 'react';
 import { connect } from 'dva';
-// import axios from 'axios';
 
 const ContactInformation = props => {
   const { data, countryDiallingCodes } = props;
+  // hideFlag 是否显示国旗
   // countryCode 国际编号
   // areaCode 区号
   // code 号码
@@ -18,12 +18,7 @@ const ContactInformation = props => {
   if (data.countryCode) {
     countryDiallingCodes.forEach(e => {
       if (e.countryCode === data.countryCode) {
-        // axios.get('/images/country/CN.png').then(res => {
-        //   console.log(res);
-        // }).catch(err => {
-        //   console.log(2);
-        // });
-        if (data.flag === 'no_use') {
+        if (data.hideFlag) {
           country = <>{`+${e.diallingCode} `}</>;
         } else {
           country = (

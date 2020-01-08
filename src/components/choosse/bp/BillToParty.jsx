@@ -233,34 +233,21 @@ class ChooseInvoiceParty extends React.Component {
             </Button>
           </div>
         ),
-        render: (text, row) =>
-          // const telephoneArr = [];
-          // if (row.telephoneCountryCode)
-          // telephoneArr.push({ countryCode: row.telephoneCountryCode });
-          // if (row.telephoneAreaCode) telephoneArr.push({ areaCode: row.telephoneAreaCode });
-          // if (row.telephone) telephoneArr.push({ code: row.telephone });
-          // if (row.telephoneExtension) telephoneArr.push({ extension: row.telephoneExtension });
-          // console.log(telephoneArr)
-           (
-            <>
-              {/* {telephoneArr.length > 0 ? ( */}
-                <>
-                  {/* <span>{telephoneArr.join('-')}</span> */}
-                  <span>{row.email}</span><br />
-                  <ContactInformation
-                    data={{
-                      countryCode: row.telephoneCountryCode,
-                      areaCode: row.telephoneAreaCode,
-                      code: row.telephone,
-                      extension: row.telephoneExtension,
-                      flag: 'no_use',
-                    }}
-                  />
-                </>
-              {/* ) : null} */}
-            </>
-          )
-        ,
+        render: (text, row) => (
+          <>
+            <span>{row.email}</span>
+            <br />
+            <ContactInformation
+              data={{
+                countryCode: row.telephoneCountryCode,
+                areaCode: row.telephoneAreaCode,
+                code: row.telephone,
+                extension: row.telephoneExtension,
+                hideFlag: true,
+              }}
+            />
+          </>
+        ),
       },
       {
         title: formatMessage({ id: 'action.operation' }),
