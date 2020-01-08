@@ -1,16 +1,4 @@
-import {
-  Badge,
-  Button,
-  Card,
-  Col,
-  DatePicker,
-  Form,
-  Icon,
-  Input,
-  Row,
-  Select,
-  AutoComplete,
-} from 'antd';
+import { Button, Card, Col, Form, Input, Row } from 'antd';
 import * as React from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import { formatMessage } from 'umi/locale';
@@ -22,23 +10,6 @@ import api from '@/api';
 import './style.less';
 
 const FormItem = Form.Item;
-const { Option } = Select;
-const { RangePicker } = DatePicker;
-
-function renderOption(item) {
-  return (
-    <Option key={item.id} text={item.name}>
-      <div style={{ display: 'flex' }}>
-        <span>
-          <Icon type="user" />
-        </span>
-        &nbsp;&nbsp;
-        <span>{item.code}</span>&nbsp;&nbsp;
-        <span>{item.name}</span>
-      </div>
-    </Option>
-  );
-}
 
 @connect(({ operation, global }) => ({
   status: operation.operationStatus,
@@ -60,17 +31,12 @@ class Operation extends React.Component {
       detailsVisible: false,
       detailsValue: null,
       // editIndex: -1,
-      typeValue: [],
       partnerVal: [],
     };
     this.callParter = _.debounce(this.callParter, 500);
   }
 
   componentDidMount() {
-    this.props.dispatch({
-      type: 'operation/GET_RECORD',
-      payload: { page: 1, pageSize: 10 },
-    });
     this.getTableData();
   }
 
@@ -119,26 +85,13 @@ class Operation extends React.Component {
     const {
       formValues: { pageSize },
     } = this.state;
-    // const query = Object.assign({}, { page: 1, pageSize }, options);
-    let newData = [];
-    if (options.wanchengshijian) {
-      newData = {
-        ...newData,
-        beginFinishDate: options.wanchengshijian[0].format('YYYY-MM-DD'),
-        endFinishDate: options.wanchengshijian[1].format('YYYY-MM-DD'),
-      };
-      // eslint-disable-next-line no-param-reassign
-      delete options.wanchengshijian;
-    }
-    if (options.statusList) {
-      newData = { ...newData, statusList: options.statusList.join(',') };
-    }
-    const query = Object.assign({}, { page: 1, pageSize, languageCode: 'CN' }, options, newData);
+
+    const query = Object.assign({}, { page: 1, pageSize, languageCode: 'CN' }, options);
     this.setState({
       formValues: query,
       loading: true,
     });
-    api.bp
+    api.operation
       .getOperationTypes(query)
       .then(res => {
         this.setState({
@@ -157,9 +110,6 @@ class Operation extends React.Component {
   // 重置
   handleFormReset = () => {
     this.props.form.resetFields();
-    this.setState({
-      typeValue: [],
-    });
   };
 
   renderForm = () => {
@@ -211,128 +161,22 @@ class Operation extends React.Component {
     });
   };
 
-  renderAdvancedForm() {
-    const {
-      form: { getFieldDecorator },
-      languageCode,
-    } = this.props;
-    const { typeValue, partnerVal } = this.state;
-    return (
-      <Form onSubmit={this.handleSearch} layout="inline">
-        <Row gutter={{ xxl: 100, lg: 80 }}>
-          <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
-            <FormItem label={formatMessage({ id: 'bp.customerID' })}>
-              {getFieldDecorator('code')(<Input />)}
-            </FormItem>
-          </Col>
-          <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
-            <FormItem label={formatMessage({ id: 'bp.operation.businessPartners' })}>
-              {getFieldDecorator('bpId')(
-                <AutoComplete
-                  onSearch={this.inputValue}
-                  dataSource={partnerVal.map(renderOption)}
-                  placeholder={formatMessage({ id: 'bp.inputHere' })}
-                  optionLabelProp="text"
-                />,
-              )}
-            </FormItem>
-          </Col>
-          <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
-            <FormItem label={formatMessage({ id: 'bp.operation.type' })}>
-              {getFieldDecorator(
-                'type',
-                typeValue ? { initialValue: typeValue } : 'type',
-              )(
-                <Select placeholder={formatMessage({ id: 'bp.pleaseSelect' })}>
-                  {/* <Select mode="multiple" showArrow> */}
-                  <Option value="1">{formatMessage({ id: 'bp.operation.newlyBuild' })}</Option>
-                  <Option value="2">{formatMessage({ id: 'bp.operation.modify' })}</Option>
-                </Select>,
-              )}
-            </FormItem>
-          </Col>
-          <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
-            <FormItem label={formatMessage({ id: 'bp.operation.state' })}>
-              {getFieldDecorator('statusList')(
-                <Select
-                  mode="multiple"
-                  showArrow
-                  placeholder={formatMessage({ id: 'bp.pleaseSelect' })}
-                >
-                  <Option value="1">{formatMessage({ id: 'bp.operation.unfinished' })}</Option>
-                  <Option value="2">
-                    {formatMessage({ id: 'bp.operation.partiallyCompleted' })}
-                  </Option>
-                  <Option value="3">{formatMessage({ id: 'bp.operation.finished' })}</Option>
-                </Select>,
-              )}
-            </FormItem>
-          </Col>
-          <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
-            <FormItem label={formatMessage({ id: 'bp.operation.completionTime' })}>
-              {getFieldDecorator('wanchengshijian')(<RangePicker />)}
-            </FormItem>
-          </Col>
-        </Row>
-        <div style={{ overflow: 'hidden' }}>
-          <div style={{ float: 'right', marginBottom: 24 }}>
-            <Button type="primary" htmlType="submit">
-              {formatMessage({ id: 'bp.operation.query' })}
-            </Button>
-            <Button style={{ marginLeft: 8 }} onClick={this.handleFormReset}>
-              {formatMessage({ id: 'bp.operation.reset' })}
-            </Button>
-            <a style={{ marginLeft: 8 }} onClick={this.toggleForm}>
-              {formatMessage({ id: 'bp.maintain.putAway' })} <Icon type="up" />
-            </a>
-          </div>
-        </div>
-      </Form>
-    );
-  }
-
   /** 部分筛选条件 */
   renderSimpleForm() {
     const {
       form: { getFieldDecorator },
       languageCode,
     } = this.props;
-    const { typeValue, partnerVal } = this.state;
     return (
-      <Form onSubmit={this.handleSearch} layout="inline">
+      <Form onSubmit={this.handleSearch} layout="inline" className="longLabel">
         <Row gutter={{ xxl: 100, lg: 80 }}>
-          <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
-            <FormItem label={formatMessage({ id: 'bp.customerID' })}>
-              {getFieldDecorator('code')(<Input />)}
-            </FormItem>
+          <Col xxl={8} lg={languageCode === 'EN' ? 12 : 8}>
+            <FormItem label="操作记录类型编号">{getFieldDecorator('code')(<Input />)}</FormItem>
           </Col>
-          <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
-            <FormItem label={formatMessage({ id: 'bp.operation.businessPartners' })}>
-              {getFieldDecorator('bpId')(
-                <AutoComplete
-                  onSearch={this.inputValue}
-                  dataSource={partnerVal.map(renderOption)}
-                  placeholder={formatMessage({ id: 'bp.inputHere' })}
-                  optionLabelProp="text"
-                />,
-              )}
-            </FormItem>
+          <Col xxl={8} lg={languageCode === 'EN' ? 12 : 8}>
+            <FormItem label="操作记录类型描述">{getFieldDecorator('describe')(<Input />)}</FormItem>
           </Col>
-          <Col xxl={6} lg={languageCode === 'EN' ? 12 : 0}>
-            <FormItem label={formatMessage({ id: 'bp.operation.type' })}>
-              {getFieldDecorator(
-                'type',
-                typeValue ? { initialValue: typeValue } : 'type',
-              )(
-                <Select placeholder={formatMessage({ id: 'bp.pleaseSelect' })}>
-                  {/* <Select mode="multiple" showArrow> */}
-                  <Option value="1">{formatMessage({ id: 'bp.operation.newlyBuild' })}</Option>
-                  <Option value="2">{formatMessage({ id: 'bp.operation.modify' })}</Option>
-                </Select>,
-              )}
-            </FormItem>
-          </Col>
-          <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
+          <Col xxl={8} lg={languageCode === 'EN' ? 12 : 8}>
             <span className="submitButtons">
               <Button type="primary" htmlType="submit">
                 {formatMessage({ id: 'bp.maintain.search' })}
@@ -340,9 +184,6 @@ class Operation extends React.Component {
               <Button style={{ marginLeft: 8 }} onClick={this.handleFormReset}>
                 {formatMessage({ id: 'bp.maintain.reset' })}
               </Button>
-              <a style={{ marginLeft: 8 }} onClick={this.toggleForm}>
-                {formatMessage({ id: 'bp.maintain.putAway' })} <Icon type="up" />
-              </a>
             </span>
           </Col>
         </Row>
@@ -360,94 +201,47 @@ class Operation extends React.Component {
       detailsVisible,
       detailsValue,
     } = this.state;
-    const { status, languageCode } = this.props;
+    const { languageCode } = this.props;
     const dataList = { list, pagination: { current, pageSize, total } };
     const columns = [
       {
         title: formatMessage({ id: 'bp.customerID' }),
         dataIndex: 'code',
-        width: 140,
       },
       {
-        title: formatMessage({ id: 'bp.operation.businessPartners' }),
-        dataIndex: 'bpCode',
+        title: '操作记录类型描述',
+        dataIndex: 'describe',
+        render(text) {
+          return (
+            <div
+              style={{
+                width: '200px',
+                overflow: 'hidden',
+                whiteSpace: 'nowrap',
+                textOverflow: 'ellipsis',
+              }}
+              title={text}
+            >
+              {text}
+            </div>
+          );
+        },
+      },
+      {
+        title: '操作人编号/操作人名称',
+        dataIndex: 'operatorCode',
         render(text, record) {
           return (
             <span style={{ color: '#222222' }}>
-              <Icon type={record.bpType === 1 ? 'user' : 'home'} /> {record.bpName} <br />
-              <span style={{ color: '#999999' }}>{text}</span>
+              <span>{text}</span> <br />
+              <span style={{ color: '#999999' }}>{record.operatorName}</span>
             </span>
           );
         },
       },
       {
-        title: formatMessage({ id: 'bp.operation.type' }),
-        dataIndex: 'type',
-        width: 120,
-        filters: [
-          {
-            value: '1',
-            text: formatMessage({ id: 'bp.operation.newlyBuild' }),
-          },
-          {
-            value: '2',
-            text: formatMessage({ id: 'bp.operation.modify' }),
-          },
-        ],
-        onFilter: (value, record) => record.type.toString().indexOf(value.toString()) === 0,
-        render(text) {
-          // eslint-disable-next-line max-len
-          return text === 1
-            ? formatMessage({ id: 'bp.operation.newlyBuild' })
-            : formatMessage({ id: 'bp.operation.modify' });
-        },
-      },
-      {
-        title: formatMessage({ id: 'bp.operation.state' }),
-        dataIndex: 'status',
-        width: 200,
-        filters: [
-          {
-            value: '1',
-            text: formatMessage({ id: 'bp.operation.unfinished' }),
-          },
-          {
-            value: '2',
-            text: formatMessage({ id: 'bp.operation.partiallyCompleted' }),
-          },
-          {
-            value: '3',
-            text: formatMessage({ id: 'bp.operation.finished' }),
-          },
-        ],
-        onFilter: (value, record) => record.status.toString().indexOf(value.toString()) === 0,
-        render(val, record) {
-          if (val) {
-            return (
-              <span>
-                <Badge status={status[val].value} text={status[val].text} />
-                <br />
-                <span>{val === 3 ? record.finishDate : ''}</span>
-              </span>
-            );
-          }
-          return val;
-        },
-      },
-      {
-        title: formatMessage({ id: 'bp.operation.operator' }),
-        dataIndex: 'operatorName',
-        width: 100,
-        className: 'marginLeft',
-        render(val, record) {
-          return (
-            <span style={{ color: '#222222' }}>
-              {val}
-              <br />
-              <span style={{ color: '#666666' }}>{record.operatorDate}</span>
-            </span>
-          );
-        },
+        title: '操作时间',
+        dataIndex: 'operationDate',
       },
       {
         fixed: 'right',

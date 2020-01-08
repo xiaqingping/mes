@@ -15,8 +15,10 @@ export default {
     });
   },
   // 根据操作记录ID查询操作明细接口
-  getOperationItems(operationRecordId) {
-    return request(`/operationRecords/v1/${operationRecordId}/operationItems`);
+  getOperationItems(operationRecordId, params) {
+    return request(`/operationRecords/v1/${operationRecordId}/operationItems`, {
+      params,
+    });
   },
   // 操作记录类型查询(带分页)
   getOperationTypes(params) {
