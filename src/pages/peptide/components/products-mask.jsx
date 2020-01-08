@@ -1,18 +1,9 @@
 // 产品弹框
-import {
-  Button,
-  Col,
-  Form,
-  Input,
-  Row,
-  Select,
-  Table,
-  Modal,
-} from 'antd';
+import { Button, Col, Form, Input, Row, Select, Table, Modal } from 'antd';
 import React, { Component } from 'react';
 
 import api from '@/api';
-import './style.less'
+import './style.less';
 import { connect } from 'dva';
 
 const FormItem = Form.Item;
@@ -30,39 +21,36 @@ class Search extends Component {
     super(props);
     this.state = {
       factorys: [],
-    }
+    };
   }
 
   componentDidMount() {
     this.submit();
-    api.basic.getFactorys().then(data => {
+    api.basic.getPlants().then(data => {
       this.setState({
         factorys: data,
-      })
-    })
+      });
+    });
   }
 
-  componentWillReceiveProps() {
-
-  }
+  componentWillReceiveProps() {}
 
   submit = e => {
     if (e) e.preventDefault();
     const val = this.props.form.getFieldsValue();
     this.props.getTableData({ page: 1, ...val });
-  }
+  };
 
   handleFormReset = () => {
     this.props.form.resetFields();
-  }
+  };
 
   // 渲染表单
   renderForm = () => {
     const {
       form: { getFieldDecorator },
       brands,
-      peptide:
-      { salesRanges },
+      peptide: { salesRanges },
     } = this.props;
     const { factorys } = this.state;
 
@@ -70,29 +58,19 @@ class Search extends Component {
       <Form onSubmit={this.submit} layout="inline">
         <Row gutter={{ lg: 24, md: 12, sm: 6 }}>
           <Col lg={6} md={8} sm={12}>
-            <FormItem label="编号">
-              {getFieldDecorator('code')(<Input />)}
-            </FormItem>
+            <FormItem label="编号">{getFieldDecorator('code')(<Input />)}</FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
-            <FormItem label="产品名称">
-              {getFieldDecorator('desc')(<Input />)}
-            </FormItem>
+            <FormItem label="产品名称">{getFieldDecorator('desc')(<Input />)}</FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
-            <FormItem label="英文名称">
-              {getFieldDecorator('edesc')(<Input />)}
-            </FormItem>
+            <FormItem label="英文名称">{getFieldDecorator('edesc')(<Input />)}</FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
-            <FormItem label="旧物料号">
-              {getFieldDecorator('oldCode')(<Input />)}
-            </FormItem>
+            <FormItem label="旧物料号">{getFieldDecorator('oldCode')(<Input />)}</FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
-            <FormItem label="客户编号">
-              {getFieldDecorator('customerCode')(<Input />)}
-            </FormItem>
+            <FormItem label="客户编号">{getFieldDecorator('customerCode')(<Input />)}</FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="负责人编号">
@@ -100,24 +78,26 @@ class Search extends Component {
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
-            <FormItem label="销售大区">
-              {getFieldDecorator('regionCode')(<Input />)}
-            </FormItem>
+            <FormItem label="销售大区">{getFieldDecorator('regionCode')(<Input />)}</FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
-            <FormItem label="销售网点">
-              {getFieldDecorator('officeCode')(<Input />)}
-            </FormItem>
+            <FormItem label="销售网点">{getFieldDecorator('officeCode')(<Input />)}</FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="销售范围">
               {getFieldDecorator('range_area', { initialValue: '10-3110' })(
                 <Select style={{ width: '192px' }}>
                   <Option value="">全部</Option>
-                  {salesRanges.map(item => <Option key={`${item.organization}${item.channel}`} value={`${item.channel}-${item.organization}`}>
-                  {`${item.channelName} - ${item.organizationName}`}
-                  </Option>)}
-                </Select>)}
+                  {salesRanges.map(item => (
+                    <Option
+                      key={`${item.organization}${item.channel}`}
+                      value={`${item.channel}-${item.organization}`}
+                    >
+                      {`${item.channelName} - ${item.organizationName}`}
+                    </Option>
+                  ))}
+                </Select>,
+              )}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
@@ -125,21 +105,23 @@ class Search extends Component {
               {getFieldDecorator('stock_factory', { initialValue: '' })(
                 <Select>
                   <Option value="">全部</Option>
-                    {factorys.map(item =>
-                      <Option key={item.code} value={item.code}>{`${item.code}-${item.name}`}</Option>,
-                    )}
-                </Select>)}
+                  {factorys.map(item => (
+                    <Option key={item.code} value={item.code}>{`${item.code}-${item.name}`}</Option>
+                  ))}
+                </Select>,
+              )}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="品牌">
-            {getFieldDecorator('brandCode', { initialValue: '' })(
+              {getFieldDecorator('brandCode', { initialValue: '' })(
                 <Select>
                   <Option value="">全部</Option>
-                    {brands.map(item =>
-                      <Option key={item.code} value={item.code}>{`${item.code}-${item.name}`}</Option>,
-                    )}
-                </Select>)}
+                  {brands.map(item => (
+                    <Option key={item.code} value={item.code}>{`${item.code}-${item.name}`}</Option>
+                  ))}
+                </Select>,
+              )}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
@@ -155,12 +137,10 @@ class Search extends Component {
         </Row>
       </Form>
     );
-  }
+  };
 
   render() {
-    return (
-      <div className="tableListForm">{this.renderForm()}</div>
-    );
+    return <div className="tableListForm">{this.renderForm()}</div>;
   }
 }
 
@@ -179,21 +159,21 @@ class Order extends Component {
     visible: false, // 遮罩层的判断
     dataSon: [],
     loadingSon: false,
-  }
+  };
 
   componentDidMount() {
-    this.props.onRef(this)
+    this.props.onRef(this);
   }
 
   visibleShow = visible => {
     this.setState({
       visible,
-    })
-  }
+    });
+  };
 
   handleSelect = data => {
     this.props.getData(data);
-    this.handleCancel()
+    this.handleCancel();
   };
 
   handleCancel = () => {
@@ -202,19 +182,19 @@ class Order extends Component {
     });
   };
 
-    // 设置子值
-    dataSon = v => {
-      this.setState({
-        loadingSon: true,
-      })
+  // 设置子值
+  dataSon = v => {
+    this.setState({
+      loadingSon: true,
+    });
 
-      setTimeout(() => {
-          this.setState({
-            dataSon: v.stock ? v.stock.storages : [],
-            loadingSon: false,
-          })
-        }, 500)
-    }
+    setTimeout(() => {
+      this.setState({
+        dataSon: v.stock ? v.stock.storages : [],
+        loadingSon: false,
+      });
+    }, 500);
+  };
 
   // 分页
   handleStandardTableChange = pagination => {
@@ -222,7 +202,7 @@ class Order extends Component {
       page: pagination.current,
       rows: pagination.pageSize,
     });
-  }
+  };
 
   // 获取表格数据
   getTableData = (options = {}) => {
@@ -245,7 +225,7 @@ class Order extends Component {
         loading: false,
       });
     });
-  }
+  };
 
   handleFormReset = () => {
     this.props.form.resetFields();
@@ -262,7 +242,9 @@ class Order extends Component {
       loadingSon,
     } = this.state;
     const data = { list, pagination: { current, pageSize, total } };
-    const { peptide: { commonData } } = this.props
+    const {
+      peptide: { commonData },
+    } = this.props;
     let tableWidth = 0;
 
     let columns = [
@@ -310,7 +292,8 @@ class Order extends Component {
         title: '温度条件',
         dataIndex: 'temperatureCode',
         width: 200,
-        render: (text, record) => `${record.temperatureCode ? `${record.temperatureCode}-` : ''}${record.temperature}`,
+        render: (text, record) =>
+          `${record.temperatureCode ? `${record.temperatureCode}-` : ''}${record.temperature}`,
       },
       {
         title: '危险品标识',
@@ -354,9 +337,9 @@ class Order extends Component {
                 return '现货';
               }
             }
-              return '无货';
+            return '无货';
           }
-            return `预计${Math.max(record.deliPeriod, record.prodPeriod)}天到货`;
+          return `预计${Math.max(record.deliPeriod, record.prodPeriod)}天到货`;
         },
       },
       {
@@ -364,22 +347,20 @@ class Order extends Component {
         dataIndex: 'saleStatus',
         width: 150,
         render: text => {
-          if (text === 'Z1') return '暂停销售'
-          return '状态异常(促销)'
+          if (text === 'Z1') return '暂停销售';
+          return '状态异常(促销)';
         },
       },
       {
         title: '操作',
         dataIndex: 'actions',
         fixed: 'right',
-        render: (text, record) => (
-          <a onClick={() => this.handleSelect(record)}>选择</a>
-        ),
+        render: (text, record) => <a onClick={() => this.handleSelect(record)}>选择</a>,
       },
     ];
 
     const columnSon = [
-        {
+      {
         title: '仓库',
         dataIndex: 'storageName',
         width: 100,
@@ -391,12 +372,11 @@ class Order extends Component {
       },
     ];
 
-
     columns = columns.map(col => {
       // eslint-disable-next-line no-param-reassign
       if (!col.width) col.width = 100;
       tableWidth += col.width;
-      return col
+      return col;
     });
 
     // const rowSelection = {
@@ -418,36 +398,43 @@ class Order extends Component {
           onCancel={this.handleCancel}
           footer={null}
         >
-            <Search getTableData={this.getTableData} brands={commonData.brands}
-            rangeArea={commonData.rangeArea}/>
-            <div className="tableListOperator">
-            </div>
+          <Search
+            getTableData={this.getTableData}
+            brands={commonData.brands}
+            rangeArea={commonData.rangeArea}
+          />
+          <div className="tableListOperator"></div>
 
-              <Table
-                style={{ width: '800px', height: '100%', display: 'inline-block' }}
-                bordered
-                dataSource={data.list}
-                columns={columns}
-                scroll={{ x: tableWidth, y: 350 }}
-                rowKey="code"
-                // rowSelection={rowSelection}
-                loading={loading}
-                onChange={this.handleStandardTableChange}
-                onRow={record => ({ onClick: e => this.dataSon(record, e) }) }
-                pagination={false}
-                />
+          <Table
+            style={{ width: '800px', height: '100%', display: 'inline-block' }}
+            bordered
+            dataSource={data.list}
+            columns={columns}
+            scroll={{ x: tableWidth, y: 350 }}
+            rowKey="code"
+            // rowSelection={rowSelection}
+            loading={loading}
+            onChange={this.handleStandardTableChange}
+            onRow={record => ({ onClick: e => this.dataSon(record, e) })}
+            pagination={false}
+          />
 
-              <Table
-                style={{ width: '300px', height: '100%', display: 'inline-block', marginLeft: '50px', verticalAlign: 'top' }}
-                bordered
-                dataSource={dataSon}
-                columns={columnSon}
-                scroll={{ x: 250, y: 350 }}
-                rowKey="storage"
-                loading={loadingSon}
-                pagination={false}
-                />
-
+          <Table
+            style={{
+              width: '300px',
+              height: '100%',
+              display: 'inline-block',
+              marginLeft: '50px',
+              verticalAlign: 'top',
+            }}
+            bordered
+            dataSource={dataSon}
+            columns={columnSon}
+            scroll={{ x: 250, y: 350 }}
+            rowKey="storage"
+            loading={loadingSon}
+            pagination={false}
+          />
         </Modal>
       </div>
     );

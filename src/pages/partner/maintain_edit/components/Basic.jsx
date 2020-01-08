@@ -456,10 +456,18 @@ class Basic extends React.Component {
         <>
           <ContactInformation data={data} />
           {verifyStatus === 2 ? (
-            <Badge className={styles.changeButton} status="warning" text="验证中" />
+            <Badge
+              className={styles.changeButton}
+              status="warning"
+              text={formatMessage({ id: 'bp.EmailVerifyStatus.verfication' })}
+            />
           ) : null}
           {verifyStatus === 3 ? (
-            <Badge className={styles.changeButton} status="warning" text="变更中" />
+            <Badge
+              className={styles.changeButton}
+              status="warning"
+              text={formatMessage({ id: 'bp.EmailVerifyStatus.inChange' })}
+            />
           ) : null}
           {verifyStatus === 4 ? (
             <a
