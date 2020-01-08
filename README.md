@@ -1,4 +1,4 @@
-# MES 2
+# MES 3
 
 使用 React + Umijs + Ant Design of React 构建的后台管理系统
 
