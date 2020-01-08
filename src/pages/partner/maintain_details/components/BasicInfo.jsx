@@ -1,5 +1,5 @@
 /* eslint-disable no-nested-ternary */
-import { Card, Descriptions, Icon, Badge } from 'antd';
+import { Card, Descriptions, Icon, Badge, Popconfirm } from 'antd';
 import React, { Component } from 'react';
 import { connect } from 'dva';
 import { formatMessage } from 'umi/locale';
@@ -98,13 +98,15 @@ class BasicInfo extends Component {
               {formatMessage({ id: 'bp.maintain_details.change' })}
             </a>
             &nbsp;&nbsp;
-            <a
-              onClick={() => {
-                this.unbundling(basic.id, type);
+            <Popconfirm
+              title="确定要解除绑定吗？"
+              icon={<Icon type="question-circle-o" style={{ color: 'red' }} />}
+              onConfirm={() => {
+                this.unbundling(basic.id, 1);
               }}
             >
-              {formatMessage({ id: 'bp.maintain_details.unbundling' })}
-            </a>
+              <a>{formatMessage({ id: 'bp.maintain_details.unbundling' })}</a>
+            </Popconfirm>
           </>
         );
       }
@@ -142,13 +144,15 @@ class BasicInfo extends Component {
               {formatMessage({ id: 'bp.maintain_details.change' })}
             </a>
             &nbsp;&nbsp;
-            <a
-              onClick={() => {
-                this.unbundling(basic.id, type);
+            <Popconfirm
+              title="确定要解除绑定吗？"
+              icon={<Icon type="question-circle-o" style={{ color: 'red' }} />}
+              onConfirm={() => {
+                this.unbundling(basic.id, 2);
               }}
             >
-              {formatMessage({ id: 'bp.maintain_details.unbundling' })}
-            </a>
+              <a>{formatMessage({ id: 'bp.maintain_details.unbundling' })}</a>
+            </Popconfirm>
           </>
         );
       }
@@ -284,7 +288,7 @@ class BasicInfo extends Component {
             {basic.industryCode &&
             industry.filter(item => item.code === basic.industryCode).length !== 0
               ? industry.filter(item => item.code === basic.industryCode)[0].name
-              : ''}
+              : basic.industryCode}
             &nbsp;&nbsp;
             {details.basic.sapCountryCode === 'CN' &&
             details.basic.type === 2 &&

@@ -68,7 +68,6 @@ class Verification extends React.Component {
       formValues: { pageSize },
     } = this.state;
     let newData = [];
-
     if (options.statusList) {
       newData = { ...newData, statusList: options.statusList.join(',') };
     }

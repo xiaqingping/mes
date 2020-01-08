@@ -43,21 +43,21 @@ class CustomerDetails extends Component {
         type: 'partnerMaintainEdit/setSupplier',
         payload: res,
       });
+      api.bp.getBPCustomer(this.props.match.params.id).then(r => {
+        this.props.dispatch({
+          type: 'partnerMaintainEdit/setDetails',
+          payload: r,
+        });
+        this.setState({
+          pageLoading: false,
+        });
+      });
     });
     this.props.dispatch({
       type: 'basicCache/setState',
       payload: { type: 'countryDiallingCodes' },
     });
 
-    api.bp.getBPCustomer(this.props.match.params.id).then(res => {
-      this.props.dispatch({
-        type: 'partnerMaintainEdit/setDetails',
-        payload: res,
-      });
-      this.setState({
-        pageLoading: false,
-      });
-    });
     // 判断是客户还是供应商
     if (activeKey) {
       if (activeKey === 'vendor') {
