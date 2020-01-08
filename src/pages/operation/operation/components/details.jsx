@@ -96,7 +96,7 @@ class Details extends React.Component {
 
   getData = detailsValue => {
     if (detailsValue) {
-      api.operation.getOperationItems(detailsValue.id).then(res => {
+      api.operation.getOperationItems(detailsValue.id, { languageCode: 'CN' }).then(res => {
         res.map((item, index) => {
           res[index].fieldName = formatMessage({ id: item.fieldName });
           return null;
