@@ -30,6 +30,7 @@ import bp from './bp';
 import employees from './employees';
 import disk from './disk';
 import temporary from './temporary';
+import operation from './operation';
 
 export default {
   area,
@@ -64,6 +65,7 @@ export default {
   employees,
   disk,
   temporary,
+  operation,
 };
 
 export {
@@ -99,4 +101,5 @@ export {
   employees,
   disk,
   temporary,
+  operation,
 };

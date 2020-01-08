@@ -133,7 +133,7 @@ class Operation extends React.Component {
     if (options.statusList) {
       newData = { ...newData, statusList: options.statusList.join(',') };
     }
-    const query = Object.assign({}, { page: 1, pageSize }, options, newData);
+    const query = Object.assign({}, { page: 1, pageSize, languageCode: 'CN' }, options, newData);
     this.setState({
       formValues: query,
       loading: true,

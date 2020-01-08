@@ -251,7 +251,8 @@ export default {
   // 人工辅助变更已验证手机邮箱流程中发送新手机验证短信接口（根据验证编号+手机产生验证码并发送）
   changeContactInfoNewMobileVerifyCodeSendingVerify(verifyRecordId, data) {
     return request(
-      `/businessPartners/v1/verifyRecords/${verifyRecordId}/changeContactInfo/newMobileVerifyCodeSending`, {
+      `/businessPartners/v1/verifyRecords/${verifyRecordId}/changeContactInfo/newMobileVerifyCodeSending`,
+      {
         method: 'POST',
         data,
       },
@@ -260,7 +261,8 @@ export default {
   // 人工辅助变更已验证手机邮箱流程中发送新邮箱验证邮件接口（根据验证编号+邮箱产生验证码并发送）
   changeContactInfoNewEmailVerifyCodeSendingVerify(verifyRecordId, data) {
     return request(
-      `/businessPartners/v1/verifyRecords/${verifyRecordId}/changeContactInfo/newEmailVerifyCodeSending?email=${data}`, {
+      `/businessPartners/v1/verifyRecords/${verifyRecordId}/changeContactInfo/newEmailVerifyCodeSending?email=${data}`,
+      {
         method: 'POST',
       },
     );
@@ -268,7 +270,8 @@ export default {
   // 人工辅助变更验证验证号是否正确
   changeContactInfoNewMobileVerifyCodeVerificationVerify(verifyRecordId, data) {
     return request(
-      `/businessPartners/v1/verifyRecords/${verifyRecordId}/changeContactInfo/newMobileVerifyCodeVerification?verifyCode=${data}`, {
+      `/businessPartners/v1/verifyRecords/${verifyRecordId}/changeContactInfo/newMobileVerifyCodeVerification?verifyCode=${data}`,
+      {
         method: 'POST',
       },
     );
@@ -276,13 +279,26 @@ export default {
   // 人工辅助变更已验证手机邮箱提交验证码变更手机
   changeContactInfoNewEmailVerifyCodeVerificationVerify(verifyRecordId, data) {
     return request(
-      `/businessPartners/v1/verifyRecords/${verifyRecordId}/changeContactInfo/newEmailVerifyCodeVerification?verifyCode=${data}`, {
+      `/businessPartners/v1/verifyRecords/${verifyRecordId}/changeContactInfo/newEmailVerifyCodeVerification?verifyCode=${data}`,
+      {
         method: 'POST',
       },
     );
   },
   // 查询所有行业类别（taxNo：默认税号 repeatTaxNo：是否可重复）
   getIndustryCategoryAll() {
-    return request('/businessPartners/v1/industryCategory/all');
+    return request('/businessPartners/v1/industryCategory');
+  },
+  // 组织类型合作伙伴解除手机绑定接口
+  mobilePhoneUnbind(id) {
+    return request(`/businessPartner/v1/${id}/mobilePhone/unbind`, {
+      method: 'POST',
+    });
+  },
+  // 组织类型合作伙伴解除邮箱绑定接口
+  emailUnbind(id) {
+    return request(`/businessPartner/v1/${id}/email/unbind`, {
+      method: 'POST',
+    });
   },
 };

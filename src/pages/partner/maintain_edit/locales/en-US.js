@@ -6,6 +6,7 @@ export default {
   'bp.maintain_details.organization': 'Organization',
   'bp.maintain_details.status': 'Status',
   'bp.maintain_details.change': 'Change',
+  'bp.maintain_details.unbundling': 'Unbundling',
   'bp.maintain_details.name': 'Name',
   'bp.maintain_details.postal_code': 'Postal Code',
   'bp.maintain_details.phone': 'Phone',
@@ -62,8 +63,7 @@ export default {
   'bp.maintain_details.credit_management.payment_period': 'Payment Period',
   'bp.maintain_details.credit_management.invoiced_period': 'Invoiced Period',
   'bp.maintain_details.credit_management.dueDate': 'Due date: {name} days',
-  'bp.maintain_details.credit_management.invoiceIssued':
-  'Invoice issued {name}th day of each month',
+  'bp.maintain_details.credit_management.invoiceIssued': 'Invoice issued {name}th day of each month',
   'bp.maintain_details.credit_management.yourCredit': 'Your credit has been adjusted to',
   'bp.maintain_details.credit_management.pleaseCheck': ', please check!',
   'bp.maintain_details.credit_management.creditAdjustment': 'Credit Adjustment',
