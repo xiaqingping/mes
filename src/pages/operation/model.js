@@ -1,13 +1,13 @@
-import {
-  formatMessage,
-} from 'umi/locale';
+import { formatMessage } from 'umi/locale';
 
-import api from '@/api'
+import api from '@/api';
 
 const SeqModel = {
   namespace: 'operation',
   state: {
     record: [],
+    // 所有记录的类型
+    recordType: [],
     // 操作记录状态
     operationStatus: {
       1: {
@@ -31,13 +31,8 @@ const SeqModel = {
     },
   },
   effects: {
-    * GET_RECORD({
-      payload,
-    }, {
-      call,
-      put,
-    }) {
-      const res = yield call(api.bp.getOperationRecords, payload)
+    *GET_RECORD({ payload }, { call, put }) {
+      const res = yield call(api.bp.getOperationRecords, payload);
       yield put({
         type: 'setState',
         payload: {
@@ -50,15 +45,15 @@ const SeqModel = {
   reducers: {
     setState(state, action) {
       const {
-        payload: {
-          type,
-          data,
-        },
+        payload: { type, data },
       } = action;
       return {
         ...state,
         [type]: data,
       };
+    },
+    setRecordType(state, action) {
+      return { ...state, recordType: action.payload };
     },
   },
 };

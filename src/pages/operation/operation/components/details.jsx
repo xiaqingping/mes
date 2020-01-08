@@ -96,10 +96,10 @@ class Details extends React.Component {
 
   getData = detailsValue => {
     if (detailsValue) {
-      api.bp.getOperationItems(detailsValue.id).then(res => {
-        // eslint-disable-next-line array-callback-return
+      api.operation.getOperationItems(detailsValue.id).then(res => {
         res.map((item, index) => {
           res[index].fieldName = formatMessage({ id: item.fieldName });
+          return null;
         });
         this.setState({
           list: res,

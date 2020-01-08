@@ -3,11 +3,13 @@ module.exports = {
   path: '/bp',
   name: 'bp',
   icon: 'user',
-  routes: [{
+  routes: [
+    {
       name: 'maintain',
       path: '/bp/maintain',
       hideChildrenInMenu: true,
-      routes: [{
+      routes: [
+        {
           path: '/bp/maintain',
           component: './partner/maintain',
         },
@@ -28,11 +30,11 @@ module.exports = {
         },
       ],
     },
-    {
-      name: 'operation',
-      path: '/bp/operation',
-      component: './partner/operation',
-    },
+    // {
+    //   name: 'operation',
+    //   path: '/bp/operation',
+    //   component: './partner/operation',
+    // },
     {
       name: 'verification',
       path: '/bp/verification',
