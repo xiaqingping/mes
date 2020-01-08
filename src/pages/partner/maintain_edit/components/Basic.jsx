@@ -1,7 +1,7 @@
 /**
  * 基础信息
  */
-import { Icon, Col, Form, Input, Row, Select, Switch, Card, Badge } from 'antd';
+import { Icon, Col, Form, Input, Row, Select, Switch, Card, Badge, Popconfirm } from 'antd';
 import React from 'react';
 import { connect } from 'dva';
 import { formatMessage, FormattedMessage } from 'umi-plugin-react/locale';
@@ -480,7 +480,14 @@ class Basic extends React.Component {
             </a>
           ) : null}
           {verifyStatus === 4 && basic.type === 2 ? (
-            <a className={styles.changeButton}>解绑</a>
+            <Popconfirm
+              title="确认解绑移动电话？"
+              onConfirm={this.unbindMobilePhone}
+              okText="确认"
+              cancelText="取消"
+            >
+              <a className={styles.changeButton}>解绑</a>
+            </Popconfirm>
           ) : null}
           {verifyStatus === 4 ? (
             <CheckPhone
@@ -498,6 +505,27 @@ class Basic extends React.Component {
     }
 
     return null;
+  };
+
+  // 解绑移动电话
+  unbindMobilePhone = () => {
+    const { details, basic } = this.props;
+    const { id } = basic;
+    api.bp.mobilePhoneUnbind(id).then(() => {
+      this.props.dispatch({
+        type: 'bpEdit/setState',
+        payload: {
+          type: 'details',
+          data: {
+            ...details,
+            basic: {
+              ...basic,
+              mobilePhoneVerifyStatus: 1,
+            },
+          },
+        },
+      });
+    });
   };
 
   // 邮箱
@@ -525,10 +553,18 @@ class Basic extends React.Component {
         <>
           {basic.email}
           {verifyStatus === 2 ? (
-            <Badge className={styles.changeButton} status="warning" text="验证中" />
+            <Badge
+              className={styles.changeButton}
+              status="warning"
+              text={formatMessage({ id: 'bp.EmailVerifyStatus.verfication' })}
+            />
           ) : null}
           {verifyStatus === 3 ? (
-            <Badge className={styles.changeButton} status="warning" text="变更中" />
+            <Badge
+              className={styles.changeButton}
+              status="warning"
+              text={formatMessage({ id: 'bp.EmailVerifyStatus.inChange' })}
+            />
           ) : null}
           {verifyStatus === 4 ? (
             <a
@@ -541,7 +577,14 @@ class Basic extends React.Component {
             </a>
           ) : null}
           {verifyStatus === 4 && basic.type === 2 ? (
-            <a className={styles.changeButton}>解绑</a>
+            <Popconfirm
+              title="确认解绑邮箱？"
+              onConfirm={this.unbindEmail}
+              okText="确认"
+              cancelText="取消"
+            >
+              <a className={styles.changeButton}>解绑</a>
+            </Popconfirm>
           ) : null}
           {verifyStatus === 4 ? (
             <CheckEmail
@@ -559,6 +602,27 @@ class Basic extends React.Component {
     }
 
     return null;
+  };
+
+  // 解绑邮箱
+  unbindEmail = () => {
+    const { details, basic } = this.props;
+    const { id } = basic;
+    api.bp.emailUnbind(id).then(() => {
+      this.props.dispatch({
+        type: 'bpEdit/setState',
+        payload: {
+          type: 'details',
+          data: {
+            ...details,
+            basic: {
+              ...basic,
+              emailVerifyStatus: 1,
+            },
+          },
+        },
+      });
+    });
   };
 
   // 电话
