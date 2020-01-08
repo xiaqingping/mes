@@ -1,17 +1,5 @@
 // 多肽订单新增弹框
-import {
-  Button,
-  Col,
-  Form,
-  Input,
-  Row,
-  Select,
-  Table,
-  Modal,
-  message,
-  Divider,
-  Icon,
-} from 'antd';
+import { Button, Col, Form, Input, Row, Select, Table, Modal, message, Divider, Icon } from 'antd';
 import React, { Component } from 'react';
 
 import api from '@/api';
@@ -43,15 +31,15 @@ class AddPage extends Component {
     this.state = {
       factorys: [],
       plusStatus: false,
-    }
+    };
   }
 
   componentDidMount() {
-    api.basic.getFactorys().then(data => {
+    api.basic.getPlants().then(data => {
       this.setState({
         factorys: data,
-      })
-    })
+      });
+    });
   }
 
   // 获取批量导入序列
@@ -62,16 +50,18 @@ class AddPage extends Component {
     let data = [];
     // eslint-disable-next-line array-callback-return
     val.map(item => {
-      data = [...data, item.split(',')]
-    })
-    this.props.handleAdd(data)
-  }
+      data = [...data, item.split(',')];
+    });
+    this.props.handleAdd(data);
+  };
 
-  addAddress = () => { console.log(123) }
+  addAddress = () => {
+    console.log(123);
+  };
 
   handleFormReset = () => {
     this.props.form.resetFields();
-  }
+  };
 
   getMaskData = (v, type) => {
     if (type === 'customer') {
@@ -94,20 +84,20 @@ class AddPage extends Component {
         salerName: v.name,
       });
     }
-  }
+  };
 
   // 修改加号颜色
   changePlusStatus = v => {
     this.setState({
       plusStatus: v,
-    })
-  }
+    });
+  };
 
   handleSubmit = e => {
     e.preventDefault();
     this.props.form.validateFields((err, values) => {
-      if (err) return
-      this.props.handleAdd([], values)
+      if (err) return;
+      this.props.handleAdd([], values);
     });
   };
 
@@ -115,38 +105,27 @@ class AddPage extends Component {
   renderForm = () => {
     const {
       form: { getFieldDecorator, getFieldValue },
-      peptide: {
-        commonData,
-        salesRanges,
-        invtypes,
-        payMethods,
-      },
+      peptide: { commonData, salesRanges, invtypes, payMethods },
       peptide,
       language,
     } = this.props;
     const { factorys, plusStatus } = this.state;
-    const regions = peptide.regions.filter(
-      e => e.languageCode === language,
-    )
-    const offices = peptide.offices.filter(
-      e => e.languageCode === language,
-    )
-    const currencies = peptide.currencies.filter(
-      e => e.languageCode === language,
-    )
+    const regions = peptide.regions.filter(e => e.languageCode === language);
+    const offices = peptide.offices.filter(e => e.languageCode === language);
+    const currencies = peptide.currencies.filter(e => e.languageCode === language);
     return (
       <Form layout="inline" onSubmit={this.handleSubmit} className="myForm">
         <Row gutter={{ lg: 24, md: 12, sm: 6 }}>
           <Col lg={6} md={8} sm={12}>
-            <FormItem label="订单编号">
-              {getFieldDecorator('code')(<Input />)}
-            </FormItem>
+            <FormItem label="订单编号">{getFieldDecorator('code')(<Input />)}</FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="销售类型">
-              {getFieldDecorator('salesType')(<Select>
+              {getFieldDecorator('salesType')(
+                <Select>
                   <Option value="0">全部</Option>
-                </Select>)}
+                </Select>,
+              )}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
@@ -161,10 +140,16 @@ class AddPage extends Component {
               {getFieldDecorator('rangeOrganization', { initialValue: '' })(
                 <Select>
                   <Option value="">全部</Option>
-                  {salesRanges.map(item => <Option key={`${item.organization}${item.channel}`} value={`${item.channelName} - ${item.organizationName}`}>
-                  {`${item.channelName} - ${item.organizationName}`}
-                  </Option>)}
-                </Select>)}
+                  {salesRanges.map(item => (
+                    <Option
+                      key={`${item.organization}${item.channel}`}
+                      value={`${item.channelName} - ${item.organizationName}`}
+                    >
+                      {`${item.channelName} - ${item.organizationName}`}
+                    </Option>
+                  ))}
+                </Select>,
+              )}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
@@ -176,11 +161,13 @@ class AddPage extends Component {
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="销售大区">
-              {getFieldDecorator('regionCode', { initialValue: '3100' })(<Select dropdownMenuStyle={{ display: 'none' }}>
-                {regions.map(item =>
-                      <Option key={item.code} value={item.code}>{`${item.code}-${item.name}`}</Option>,
-                    )}
-                </Select>)}
+              {getFieldDecorator('regionCode', { initialValue: '3100' })(
+                <Select dropdownMenuStyle={{ display: 'none' }}>
+                  {regions.map(item => (
+                    <Option key={item.code} value={item.code}>{`${item.code}-${item.name}`}</Option>
+                  ))}
+                </Select>,
+              )}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
@@ -192,20 +179,24 @@ class AddPage extends Component {
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="销售网点">
-              {getFieldDecorator('officeCode', { initialValue: '998' })(<Select dropdownMenuStyle={{ display: 'none' }}>
-                {offices.map(item =>
-                      <Option key={item.code} value={item.code}>{`${item.code}-${item.name}`}</Option>,
-                    )}
-                </Select>)}
+              {getFieldDecorator('officeCode', { initialValue: '998' })(
+                <Select dropdownMenuStyle={{ display: 'none' }}>
+                  {offices.map(item => (
+                    <Option key={item.code} value={item.code}>{`${item.code}-${item.name}`}</Option>
+                  ))}
+                </Select>,
+              )}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="配送网点">
               {getFieldDecorator('dofficeCode', {
                 //  rules: [{ required: true }],
-              })(<Select>
+              })(
+                <Select>
                   <Option value="0">全部</Option>
-                </Select>)}
+                </Select>,
+              )}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
@@ -217,53 +208,55 @@ class AddPage extends Component {
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="销售部门">
-              {getFieldDecorator('departmentCode')(<Select>
+              {getFieldDecorator('departmentCode')(
+                <Select>
                   <Option value="0">全部</Option>
-                </Select>)}
+                </Select>,
+              )}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
-            <FormItem label="信用额度">
-              {getFieldDecorator('credit')(<Input />)}
-            </FormItem>
+            <FormItem label="信用额度">{getFieldDecorator('credit')(<Input />)}</FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="开票方式">
-              {getFieldDecorator('invoiceType', { initialValue: '20' })(<Select>
-                {invtypes.map(item =>
-                      <Option key={item.code} value={item.code}>{`${item.code}-${item.name}`}</Option>,
-                    )}
-                </Select>)}
+              {getFieldDecorator('invoiceType', { initialValue: '20' })(
+                <Select>
+                  {invtypes.map(item => (
+                    <Option key={item.code} value={item.code}>{`${item.code}-${item.name}`}</Option>
+                  ))}
+                </Select>,
+              )}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
-            <FormItem label="信用余额">
-              {getFieldDecorator('balance')(<Input />)}
-            </FormItem>
+            <FormItem label="信用余额">{getFieldDecorator('balance')(<Input />)}</FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="付款方式">
               {getFieldDecorator('paymentMethod', {
                 //  rules: [{ required: true }],
-              })(<Select>
-                {payMethods.map(item =>
-                      <Option key={item.code} value={item.code}>{`${item.code}-${item.name}`}</Option>,
-                    )}
-                </Select>)}
+              })(
+                <Select>
+                  {payMethods.map(item => (
+                    <Option key={item.code} value={item.code}>{`${item.code}-${item.name}`}</Option>
+                  ))}
+                </Select>,
+              )}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
-            <FormItem label="专项经费">
-              {getFieldDecorator('depositBalance')(<Input />)}
-            </FormItem>
+            <FormItem label="专项经费">{getFieldDecorator('depositBalance')(<Input />)}</FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="付款条件">
               {getFieldDecorator('paymentTerm', {
                 //  rules: [{ required: true }],
-              })(<Select>
+              })(
+                <Select>
                   <Option value="0">全部</Option>
-                </Select>)}
+                </Select>,
+              )}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
@@ -273,11 +266,15 @@ class AddPage extends Component {
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="随货开票">
-              {getFieldDecorator('invoiceByGoods', { initialValue: 0 })(<Select>
-                {commonData.invoiceByGoodsStatus.map(item =>
-                      <Option key={item.id} value={item.id}>{item.name}</Option>,
-                    )}
-                </Select>)}
+              {getFieldDecorator('invoiceByGoods', { initialValue: 0 })(
+                <Select>
+                  {commonData.invoiceByGoodsStatus.map(item => (
+                    <Option key={item.id} value={item.id}>
+                      {item.name}
+                    </Option>
+                  ))}
+                </Select>,
+              )}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
@@ -291,9 +288,7 @@ class AddPage extends Component {
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
-            <FormItem label="客户订单号">
-              {getFieldDecorator('customerPoCode')(<Input />)}
-            </FormItem>
+            <FormItem label="客户订单号">{getFieldDecorator('customerPoCode')(<Input />)}</FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="客户订单日期">
@@ -302,56 +297,70 @@ class AddPage extends Component {
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="交货方式">
-              {getFieldDecorator('deliveryType', { initialValue: '01' })(<Select dropdownMenuStyle={{ display: 'none' }}>
-                {commonData.deliveryTypeStatus.map(item =>
-                      <Option key={item.id} value={item.id}>{`${item.id}-${item.name}`}</Option>,
-                    )}
-                </Select>)}
+              {getFieldDecorator('deliveryType', { initialValue: '01' })(
+                <Select dropdownMenuStyle={{ display: 'none' }}>
+                  {commonData.deliveryTypeStatus.map(item => (
+                    <Option key={item.id} value={item.id}>{`${item.id}-${item.name}`}</Option>
+                  ))}
+                </Select>,
+              )}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
-            <FormItem label="仓库">
-              {getFieldDecorator('storageCode')(<Input />)}
-            </FormItem>
+            <FormItem label="仓库">{getFieldDecorator('storageCode')(<Input />)}</FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="SAP交货单号">
-              {getFieldDecorator('sapDeliveryCode')(<Select>
+              {getFieldDecorator('sapDeliveryCode')(
+                <Select>
                   <Option value="0">全部</Option>
-                </Select>)}
+                </Select>,
+              )}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="工厂">
-              {getFieldDecorator('factory', { initialValue: '3100' })(<Select dropdownMenuStyle={{ display: 'none' }}>
-                {factorys.map(item =>
-                      <Option key={item.code} value={item.code}>{`${item.code}-${item.name}`}</Option>,
-                    )}
-                </Select>)}
+              {getFieldDecorator('factory', { initialValue: '3100' })(
+                <Select dropdownMenuStyle={{ display: 'none' }}>
+                  {factorys.map(item => (
+                    <Option key={item.code} value={item.code}>{`${item.code}-${item.name}`}</Option>
+                  ))}
+                </Select>,
+              )}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="产品金额">
-              {getFieldDecorator('productAmount', { initialValue: 9546.23.toFixed(2) })(<Input readOnly/>)}
+              {getFieldDecorator('productAmount', { initialValue: (9546.23).toFixed(2) })(
+                <Input readOnly />,
+              )}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="订单类型">
-              {getFieldDecorator('orderTypeStatus', { initialValue: 0 })(<Select>
-                {commonData.orderTypeStatus.map(item =>
-                      <Option key={item.id} value={item.id}>{item.name}</Option>,
-                    )}
-                </Select>)}
+              {getFieldDecorator('orderTypeStatus', { initialValue: 0 })(
+                <Select>
+                  {commonData.orderTypeStatus.map(item => (
+                    <Option key={item.id} value={item.id}>
+                      {item.name}
+                    </Option>
+                  ))}
+                </Select>,
+              )}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="运费">
-              {getFieldDecorator('freight', { initialValue: 0.00.toFixed(2) })(<Input />)}
+              {getFieldDecorator('freight', { initialValue: (0.0).toFixed(2) })(<Input />)}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="订单金额">
-              {getFieldDecorator('amount', { initialValue: (parseFloat(getFieldValue('productAmount')) + parseFloat(getFieldValue('freight'))).toFixed(2) })(<Input readOnly/>)}
+              {getFieldDecorator('amount', {
+                initialValue: (
+                  parseFloat(getFieldValue('productAmount')) + parseFloat(getFieldValue('freight'))
+                ).toFixed(2),
+              })(<Input readOnly />)}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
@@ -370,72 +379,73 @@ class AddPage extends Component {
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="币种">
-              {getFieldDecorator('currency', { initialValue: 'CNY' })(<Select dropdownMenuStyle={{ display: 'none' }}>
-                {currencies.map(item =>
-                      <Option key={item.code} value={item.code}>{`${item.code}-${item.shortText}`}</Option>,
-                    )}
-                </Select>)}
+              {getFieldDecorator('currency', { initialValue: 'CNY' })(
+                <Select dropdownMenuStyle={{ display: 'none' }}>
+                  {currencies.map(item => (
+                    <Option
+                      key={item.code}
+                      value={item.code}
+                    >{`${item.code}-${item.shortText}`}</Option>
+                  ))}
+                </Select>,
+              )}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
-            <FormItem label="备注">
-              {getFieldDecorator('remark')(<Input />)}
-            </FormItem>
+            <FormItem label="备注">{getFieldDecorator('remark')(<Input />)}</FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="地址">
               {getFieldDecorator('address')(
                 <Select>
                   <Option value="0">全部</Option>
-                </Select>)}
-                <div style={{ position: 'absolute', top: '-8px', right: '40px', cursor: 'pointer' }} onMouseLeave={() => { this.changePlusStatus(false) }} onMouseEnter={() => { this.changePlusStatus(true) }} onClick={() => this.showAddress.visibleShow(true)}><Icon type="plus" className={plusStatus ? 'select-plus' : ''} style={{ color: 'green', opacity: '0.4' }}/></div>
+                </Select>,
+              )}
+              <div
+                style={{ position: 'absolute', top: '-8px', right: '40px', cursor: 'pointer' }}
+                onMouseLeave={() => {
+                  this.changePlusStatus(false);
+                }}
+                onMouseEnter={() => {
+                  this.changePlusStatus(true);
+                }}
+                onClick={() => this.showAddress.visibleShow(true)}
+              >
+                <Icon
+                  type="plus"
+                  className={plusStatus ? 'select-plus' : ''}
+                  style={{ color: 'green', opacity: '0.4' }}
+                />
+              </div>
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
-            <FormItem label="创建人">
-              {getFieldDecorator('creatorName')(<Input />)}
-            </FormItem>
+            <FormItem label="创建人">{getFieldDecorator('creatorName')(<Input />)}</FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
-            <FormItem label="创建日期">
-              {getFieldDecorator('createDate')(<Input />)}
-            </FormItem>
+            <FormItem label="创建日期">{getFieldDecorator('createDate')(<Input />)}</FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
-            <FormItem label="修改人">
-              {getFieldDecorator('changerName')(<Input />)}
-            </FormItem>
+            <FormItem label="修改人">{getFieldDecorator('changerName')(<Input />)}</FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
-            <FormItem label="修改日期">
-              {getFieldDecorator('changeDate')(<Input />)}
-            </FormItem>
+            <FormItem label="修改日期">{getFieldDecorator('changeDate')(<Input />)}</FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
-            <FormItem label="审核人">
-              {getFieldDecorator('checkName')(<Input />)}
-            </FormItem>
+            <FormItem label="审核人">{getFieldDecorator('checkName')(<Input />)}</FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
-            <FormItem label="审核日期">
-              {getFieldDecorator('checkDate')(<Input />)}
-            </FormItem>
+            <FormItem label="审核日期">{getFieldDecorator('checkDate')(<Input />)}</FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
-            <FormItem label="完成人">
-              {getFieldDecorator('finishName')(<Input />)}
-            </FormItem>
+            <FormItem label="完成人">{getFieldDecorator('finishName')(<Input />)}</FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
-            <FormItem label="完成日期">
-              {getFieldDecorator('finishDate')(<Input />)}
-            </FormItem>
+            <FormItem label="完成日期">{getFieldDecorator('finishDate')(<Input />)}</FormItem>
           </Col>
           <Col lg={6} md={8} sm={12} style={{ marginTop: '20px' }}>
             <span className="submitButtons">
-              <Button onClick={ () => this.showLoad.visibleShow(true)}>
-                批量导入序列
-              </Button>
+              <Button onClick={() => this.showLoad.visibleShow(true)}>批量导入序列</Button>
               <Button style={{ marginLeft: 8 }} type="primary" htmlType="submit">
                 新增
               </Button>
@@ -447,35 +457,51 @@ class AddPage extends Component {
         </Row>
       </Form>
     );
-  }
+  };
 
   render() {
     return (
       <div className="tableListForm">
-      {this.renderForm()}
-      <CustomerMask
-        onRef={ref => { this.showCustomer = ref }}
-        getData={v => this.getMaskData(v, 'customer')}
+        {this.renderForm()}
+        <CustomerMask
+          onRef={ref => {
+            this.showCustomer = ref;
+          }}
+          getData={v => this.getMaskData(v, 'customer')}
         />
-      <SubCustomerMask
-        onRef={ref => { this.showSubCustomer = ref }}
-        getData={v => this.getMaskData(v, 'subCustomer')}
-      />
-      <ContactMask
-        onRef={ref => { this.showContact = ref }}
-        getData={v => this.getMaskData(v, 'contact')}
-      />
-      <SalerMask
-        onRef={ref => { this.showSaler = ref }}
-        getData={v => this.getMaskData(v, 'saler')}
-      />
-      <AddressMask onRef={ref => { this.showAddress = ref }}/>
-      <LoadMask onRef={ref => { this.showLoad = ref }} getData={ v => this.loadData(v)}/>
+        <SubCustomerMask
+          onRef={ref => {
+            this.showSubCustomer = ref;
+          }}
+          getData={v => this.getMaskData(v, 'subCustomer')}
+        />
+        <ContactMask
+          onRef={ref => {
+            this.showContact = ref;
+          }}
+          getData={v => this.getMaskData(v, 'contact')}
+        />
+        <SalerMask
+          onRef={ref => {
+            this.showSaler = ref;
+          }}
+          getData={v => this.getMaskData(v, 'saler')}
+        />
+        <AddressMask
+          onRef={ref => {
+            this.showAddress = ref;
+          }}
+        />
+        <LoadMask
+          onRef={ref => {
+            this.showLoad = ref;
+          }}
+          getData={v => this.loadData(v)}
+        />
       </div>
     );
   }
 }
-
 
 /**
  * 表格编辑组件
@@ -498,19 +524,18 @@ class EditableCell extends React.Component {
     if (editing) {
       return (
         <td {...restProps} style={{ padding: 0 }}>
-            <Form.Item>
-              {getFieldDecorator(dataIndex, {
-                rules,
-                valuePropName: 'checked',
-                initialValue: value,
-              })(inputType)}
-            </Form.Item>
+          <Form.Item>
+            {getFieldDecorator(dataIndex, {
+              rules,
+              valuePropName: 'checked',
+              initialValue: value,
+            })(inputType)}
+          </Form.Item>
         </td>
       );
     }
-    return (<td {...restProps}>{children}</td>);
+    return <td {...restProps}>{children}</td>;
   };
-
 
   render() {
     return <EditableContext.Consumer>{this.renderCell}</EditableContext.Consumer>;
@@ -537,28 +562,28 @@ class Order extends Component {
     editIndex: -1,
     purityValue: [],
     modificationType: [],
-  }
+  };
 
   componentDidMount() {
     this.props.onRef(this);
     api.peptideBase.getPurity().then(res => {
       this.setState({
         purityValue: res,
-      })
-    })
+      });
+    });
     api.peptideBase.getModifications({ modificationPosition: 1, status: 1 }).then(res => {
       this.setState({
         modificationType: res,
-      })
-    })
+      });
+    });
   }
 
   visibleShow = visible => {
-    this.setState({ visible })
-  }
+    this.setState({ visible });
+  };
 
   handleOk = () => {
-    this.handleCancel()
+    this.handleCancel();
   };
 
   handleCancel = () => {
@@ -571,14 +596,14 @@ class Order extends Component {
   dataSon = v => {
     this.setState({
       loadingSon: true,
-    })
+    });
     setTimeout(() => {
-        this.setState({
-          dataSon: v.stock.storages,
-          loadingSon: false,
-        })
-    }, 500)
-  }
+      this.setState({
+        dataSon: v.stock.storages,
+        loadingSon: false,
+      });
+    }, 500);
+  };
 
   // 分页
   handleStandardTableChange = pagination => {
@@ -586,7 +611,7 @@ class Order extends Component {
       page: pagination.current,
       rows: pagination.pageSize,
     });
-  }
+  };
 
   // 获取表格数据
   getTableData = (options = {}) => {
@@ -606,28 +631,28 @@ class Order extends Component {
         editIndex: -1,
       });
     });
-  }
+  };
 
   // 保存
   saveRow = (val, index) => {
-      this.props.form.validateFields((error, row) => {
-        // if (error) return;
-        const { list } = this.state;
-        // const newData = { ...list[index],
-        //                   ...row,
-        //                   isIndependentModification: row.isIndependentModification ? 1 : 2,
-        //                 };
-        // if (newData.id > 0) {
-        //   // api.peptideBase.updateSeries(newData).then(() => this.getTableData());
-        // } else {
-        //   api.peptideBase.insertModifications(newData).then(() => this.getTableData());
-        // }
-        console.log(list[index], error, row)
-        // console.log(row)
-        // console.log(index)
-        this.cancelEdit(val, index)
-      });
-  }
+    this.props.form.validateFields((error, row) => {
+      // if (error) return;
+      const { list } = this.state;
+      // const newData = { ...list[index],
+      //                   ...row,
+      //                   isIndependentModification: row.isIndependentModification ? 1 : 2,
+      //                 };
+      // if (newData.id > 0) {
+      //   // api.peptideBase.updateSeries(newData).then(() => this.getTableData());
+      // } else {
+      //   api.peptideBase.insertModifications(newData).then(() => this.getTableData());
+      // }
+      console.log(list[index], error, row);
+      // console.log(row)
+      // console.log(index)
+      this.cancelEdit(val, index);
+    });
+  };
 
   // 新增
   handleAdd = data => {
@@ -643,7 +668,7 @@ class Order extends Component {
     data.map((item, key) => {
       // console.log(item)
       if (item.length === 1 && item[0] === '') {
-        return false
+        return false;
       }
       arrData.push({
         id: id - key - 1,
@@ -653,9 +678,9 @@ class Order extends Component {
         peptidePurityId: item[3],
         sequence: item[4],
         subpackage: item[5],
-      })
-      strId = `${strId + (id - key - 1)},`
-    })
+      });
+      strId = `${strId + (id - key - 1)},`;
+    });
     if (arrData.length === 0) {
       const newId = id - 1;
       this.setState({
@@ -672,13 +697,10 @@ class Order extends Component {
       this.setState({
         id: arrData[0],
         editIndex: strId,
-        list: [
-          ...arrData,
-          ...list,
-        ],
+        list: [...arrData, ...list],
       });
     }
-  }
+  };
 
   // 删除指定的值
   removeValue = (arr, val) => {
@@ -688,7 +710,7 @@ class Order extends Component {
         break;
       }
     }
-  }
+  };
 
   // 退出编辑
   cancelEdit = (row, index) => {
@@ -707,18 +729,18 @@ class Order extends Component {
       });
       list.forEach(e => {
         if (e.id < 0) {
-          flag++
+          flag++;
         }
-      })
+      });
       if (flag === 1) {
         this.setState({
           list: list.filter(e => e.id > 0),
           editIndex: -1,
           id: 0,
-        })
+        });
       }
     }
-  }
+  };
 
   // 删除数据
   deleteRow = row => {
@@ -730,13 +752,24 @@ class Order extends Component {
   // 键盘点击回车触发
   keyDownEvent = (e, rowIndex) => {
     if (e.nativeEvent.keyCode === 13) {
-      if (this.props.form.getFieldValue(`providerTotalAmount${rowIndex}`) && this.props.form.getFieldValue(`peptidePurityId${rowIndex}`)) {
-        api.peptideBase.getAminoAcid({ shortCode: this.props.form.getFieldValue(`providerTotalAmount${rowIndex}`) }).then(data => {
-          const map = {}; const dest = [];
-          for (let i = 0; i < data.length; i++) {
-            const ai = data[i];
-            if (ai.shortCode[0] === this.props.form.getFieldValue(`sequence${rowIndex}`) || ai.shortCode[1] === this.props.form.getFieldValue(`sequence${rowIndex}`)) {
-              if (!map[ai.id]) {
+      if (
+        this.props.form.getFieldValue(`providerTotalAmount${rowIndex}`) &&
+        this.props.form.getFieldValue(`peptidePurityId${rowIndex}`)
+      ) {
+        api.peptideBase
+          .getAminoAcid({
+            shortCode: this.props.form.getFieldValue(`providerTotalAmount${rowIndex}`),
+          })
+          .then(data => {
+            const map = {};
+            const dest = [];
+            for (let i = 0; i < data.length; i++) {
+              const ai = data[i];
+              if (
+                ai.shortCode[0] === this.props.form.getFieldValue(`sequence${rowIndex}`) ||
+                ai.shortCode[1] === this.props.form.getFieldValue(`sequence${rowIndex}`)
+              ) {
+                if (!map[ai.id]) {
                   dest.push({
                     id: ai.id,
                     code: ai.code,
@@ -759,36 +792,42 @@ class Order extends Component {
                     longCode: ai.longCode,
                     shortCode: ai.shortCode,
                   });
-                map[ai.id] = ai;
-              } else {
-                for (let j = 0; j < dest.length; j++) {
-                  const dj = dest[j];
-                  if (dj.id === ai.id) {
-                    dj.cancelName = dj.cancelName || ai.cancelName ? [dj.cancelName, ai.cancelName] : '';
-                    dj.cancelDate = dj.cancelDate || ai.cancelDate ? [dj.cancelDate, ai.cancelDate] : '';
-                    dj.shortCode = dj.shortCode || ai.shortCode ? [dj.shortCode, ai.shortCode] : '';
-                    // dj.shortCode = (dj.shortCode ? dj.shortCode : '')
-                    // + (ai.shortCode ? ` | ${ai.shortCode}` : '');
-                    dj.longCode = dj.longCode || ai.longCode ? [dj.longCode, ai.longCode] : '';
-                    // dj.longCode = (dj.longCode ? dj.longCode : '')
-                    // + (ai.longCode ? ` | ${ai.longCode}` : '');
-                    dj.aminoAcidType = dj.aminoAcidType || ai.aminoAcidType ? [dj.aminoAcidType, ai.aminoAcidType] : '';
-                    // dj.aminoAcidType = (dj.aminoAcidType ? dj.aminoAcidType : '')
-                    // + (ai.aminoAcidType ? ` | ${ai.aminoAcidType}` : '');
-                    break;
+                  map[ai.id] = ai;
+                } else {
+                  for (let j = 0; j < dest.length; j++) {
+                    const dj = dest[j];
+                    if (dj.id === ai.id) {
+                      dj.cancelName =
+                        dj.cancelName || ai.cancelName ? [dj.cancelName, ai.cancelName] : '';
+                      dj.cancelDate =
+                        dj.cancelDate || ai.cancelDate ? [dj.cancelDate, ai.cancelDate] : '';
+                      dj.shortCode =
+                        dj.shortCode || ai.shortCode ? [dj.shortCode, ai.shortCode] : '';
+                      // dj.shortCode = (dj.shortCode ? dj.shortCode : '')
+                      // + (ai.shortCode ? ` | ${ai.shortCode}` : '');
+                      dj.longCode = dj.longCode || ai.longCode ? [dj.longCode, ai.longCode] : '';
+                      // dj.longCode = (dj.longCode ? dj.longCode : '')
+                      // + (ai.longCode ? ` | ${ai.longCode}` : '');
+                      dj.aminoAcidType =
+                        dj.aminoAcidType || ai.aminoAcidType
+                          ? [dj.aminoAcidType, ai.aminoAcidType]
+                          : '';
+                      // dj.aminoAcidType = (dj.aminoAcidType ? dj.aminoAcidType : '')
+                      // + (ai.aminoAcidType ? ` | ${ai.aminoAcidType}` : '');
+                      break;
+                    }
                   }
                 }
               }
             }
-          }
-          this.setState({
-            loadingSon: false,
-            dataSon: dest,
+            this.setState({
+              loadingSon: false,
+              dataSon: dest,
+            });
           });
-        });
       }
     }
-  }
+  };
 
   /**
    * 选择input
@@ -798,36 +837,48 @@ class Order extends Component {
    * @param {int} widthValue 表单宽度的值
    * @param {int} rowIndex 当前指针位置
    * @param {string} event 事件
-  */
+   */
   // eslint-disable-next-line consistent-return
   selectType = (data, type, selectList, widthValue, rowIndex, event) => {
     if (type === 'input') {
       if (event === 'onkeydown') {
-        return <Input style={{ width: `${widthValue}px` }} onKeyDown={e => this.keyDownEvent(e, rowIndex)}/>
+        return (
+          <Input
+            style={{ width: `${widthValue}px` }}
+            onKeyDown={e => this.keyDownEvent(e, rowIndex)}
+          />
+        );
       }
-      return <Input style={{ width: `${widthValue}px` }} defaultValue={data}/>
+      return <Input style={{ width: `${widthValue}px` }} defaultValue={data} />;
     }
     if (type === 'inputReadOnly') {
-      return <Input style={{ width: `${widthValue}px` }} defaultValue={data} readOnly/>
+      return <Input style={{ width: `${widthValue}px` }} defaultValue={data} readOnly />;
     }
     if (type === 'select') {
-      return (<Select style={{ width: `${widthValue}px` }} defaultValue={data === '是' || data === '否' ? data : '' }>
-              {selectList.map(item =>
-                <Option key={item.id} value={item.id}>{item.name}</Option>,
-              )}
-        </Select>)
+      return (
+        <Select
+          style={{ width: `${widthValue}px` }}
+          defaultValue={data === '是' || data === '否' ? data : ''}
+        >
+          {selectList.map(item => (
+            <Option key={item.id} value={item.id}>
+              {item.name}
+            </Option>
+          ))}
+        </Select>
+      );
     }
-  }
+  };
 
   // 格式化数据
   formatterData = (arr, id = 'id', name = 'name') => {
     const val = [];
     // eslint-disable-next-line array-callback-return
     arr.map(item => {
-      val.push({ id: item[id], name: item[name] })
-    })
+      val.push({ id: item[id], name: item[name] });
+    });
     return val;
-  }
+  };
 
   render() {
     const {
@@ -857,9 +908,7 @@ class Order extends Component {
         width: 100,
         editable: true,
         inputType: 'input',
-        rules: [
-          { required: true, message: '必填' },
-        ],
+        rules: [{ required: true, message: '必填' }],
       },
       {
         title: '提供总量(mg)',
@@ -867,9 +916,7 @@ class Order extends Component {
         width: 150,
         editable: true,
         inputType: 'input',
-        rules: [
-          { required: true, message: '必填' },
-        ],
+        rules: [{ required: true, message: '必填' }],
       },
       {
         title: '是否脱盐',
@@ -881,9 +928,7 @@ class Order extends Component {
           { id: 1, name: '是' },
           { id: 2, name: '否' },
         ],
-        rules: [
-          { required: true, message: '必填' },
-        ],
+        rules: [{ required: true, message: '必填' }],
       },
       {
         title: '纯度',
@@ -892,9 +937,7 @@ class Order extends Component {
         editable: true,
         inputType: 'select',
         selectList: this.formatterData(purityValue, 'id', 'purity'),
-        rules: [
-          { required: true, message: '必填' },
-        ],
+        rules: [{ required: true, message: '必填' }],
       },
       {
         title: '序列',
@@ -903,9 +946,7 @@ class Order extends Component {
         editable: true,
         inputType: 'input',
         event: 'onkeydown',
-        rules: [
-          { required: true, message: '必填' },
-        ],
+        rules: [{ required: true, message: '必填' }],
       },
       {
         title: '氨基酸数',
@@ -913,9 +954,7 @@ class Order extends Component {
         width: 100,
         editable: true,
         inputType: 'inputReadOnly',
-        rules: [
-          { required: true, message: '必填' },
-        ],
+        rules: [{ required: true, message: '必填' }],
       },
       {
         title: '氨基酸金额',
@@ -923,9 +962,7 @@ class Order extends Component {
         width: 120,
         editable: true,
         inputType: 'inputReadOnly',
-        rules: [
-          { required: true, message: '必填' },
-        ],
+        rules: [{ required: true, message: '必填' }],
       },
       {
         title: '氨基端修饰',
@@ -934,9 +971,7 @@ class Order extends Component {
         editable: true,
         inputType: 'select',
         selectList: this.formatterData(modificationType),
-        rules: [
-          { required: true, message: '必填' },
-        ],
+        rules: [{ required: true, message: '必填' }],
       },
       {
         title: '氨基端修饰金额',
@@ -944,9 +979,7 @@ class Order extends Component {
         width: 150,
         editable: true,
         inputType: 'input',
-        rules: [
-          { required: true, message: '必填' },
-        ],
+        rules: [{ required: true, message: '必填' }],
       },
       {
         title: '氨基端修饰SAP产品编号',
@@ -954,9 +987,7 @@ class Order extends Component {
         width: 200,
         editable: true,
         inputType: 'inputReadOnly',
-        rules: [
-          { required: true, message: '必填' },
-        ],
+        rules: [{ required: true, message: '必填' }],
       },
       {
         title: '氨基端修饰SAP产品名称',
@@ -964,9 +995,7 @@ class Order extends Component {
         width: 200,
         editable: true,
         inputType: 'inputReadOnly',
-        rules: [
-          { required: true, message: '必填' },
-        ],
+        rules: [{ required: true, message: '必填' }],
       },
       {
         title: '羧基端修饰',
@@ -975,9 +1004,7 @@ class Order extends Component {
         editable: true,
         inputType: 'select',
         selectList: [],
-        rules: [
-          { required: true, message: '必填' },
-        ],
+        rules: [{ required: true, message: '必填' }],
       },
       {
         title: '羧基端修饰金额',
@@ -985,9 +1012,7 @@ class Order extends Component {
         width: 170,
         editable: true,
         inputType: 'input',
-        rules: [
-          { required: true, message: '必填' },
-        ],
+        rules: [{ required: true, message: '必填' }],
       },
       {
         title: '羧基端修饰SAP产品编号',
@@ -995,9 +1020,7 @@ class Order extends Component {
         width: 200,
         editable: true,
         inputType: 'inputReadOnly',
-        rules: [
-          { required: true, message: '必填' },
-        ],
+        rules: [{ required: true, message: '必填' }],
       },
       {
         title: '羧基端修饰SAP产品名称',
@@ -1005,9 +1028,7 @@ class Order extends Component {
         width: 200,
         editable: true,
         inputType: 'inputReadOnly',
-        rules: [
-          { required: true, message: '必填' },
-        ],
+        rules: [{ required: true, message: '必填' }],
       },
       {
         title: '中间修饰',
@@ -1016,9 +1037,7 @@ class Order extends Component {
         editable: true,
         inputType: 'select',
         selectList: [],
-        rules: [
-          { required: true, message: '必填' },
-        ],
+        rules: [{ required: true, message: '必填' }],
       },
       {
         title: '中间修饰数量',
@@ -1026,9 +1045,7 @@ class Order extends Component {
         width: 150,
         editable: true,
         inputType: 'inputReadOnly',
-        rules: [
-          { required: true, message: '必填' },
-        ],
+        rules: [{ required: true, message: '必填' }],
       },
       {
         title: '中间修饰金额',
@@ -1036,9 +1053,7 @@ class Order extends Component {
         width: 150,
         editable: true,
         inputType: 'inputReadOnly',
-        rules: [
-          { required: true, message: '必填' },
-        ],
+        rules: [{ required: true, message: '必填' }],
       },
       {
         title: '二硫键',
@@ -1047,9 +1062,7 @@ class Order extends Component {
         editable: true,
         inputType: 'select',
         selectList: [],
-        rules: [
-          { required: true, message: '必填' },
-        ],
+        rules: [{ required: true, message: '必填' }],
       },
       {
         title: '二硫键数量',
@@ -1057,9 +1070,7 @@ class Order extends Component {
         width: 120,
         editable: true,
         inputType: 'inputReadOnly',
-        rules: [
-          { required: true, message: '必填' },
-        ],
+        rules: [{ required: true, message: '必填' }],
       },
       {
         title: '二硫键金额',
@@ -1067,9 +1078,7 @@ class Order extends Component {
         width: 120,
         editable: true,
         inputType: 'inputReadOnly',
-        rules: [
-          { required: true, message: '必填' },
-        ],
+        rules: [{ required: true, message: '必填' }],
       },
       {
         title: '分装管数',
@@ -1077,9 +1086,7 @@ class Order extends Component {
         width: 100,
         editable: true,
         inputType: 'input',
-        rules: [
-          { required: true, message: '必填' },
-        ],
+        rules: [{ required: true, message: '必填' }],
       },
       {
         title: '金额',
@@ -1087,9 +1094,7 @@ class Order extends Component {
         width: 100,
         editable: true,
         inputType: 'inputReadOnly',
-        rules: [
-          { required: true, message: '必填' },
-        ],
+        rules: [{ required: true, message: '必填' }],
       },
       {
         title: '备注',
@@ -1097,9 +1102,7 @@ class Order extends Component {
         width: 100,
         editable: true,
         inputType: 'input',
-        rules: [
-          { required: true, message: '必填' },
-        ],
+        rules: [{ required: true, message: '必填' }],
       },
       {
         title: '操作',
@@ -1111,7 +1114,9 @@ class Order extends Component {
           if (editIndex.toString().indexOf(row.id) !== -1) {
             actions = (
               <>
-                <a className="addNewData" onClick={() => this.saveRow(row, index)}>保存</a>
+                <a className="addNewData" onClick={() => this.saveRow(row, index)}>
+                  保存
+                </a>
                 <Divider type="vertical" />
                 <a onClick={() => this.cancelEdit(row, index)}>退出</a>
               </>
@@ -1123,7 +1128,7 @@ class Order extends Component {
     ];
 
     let columnSon = [
-        {
+      {
         title: '氨基酸',
         dataIndex: 'aminoAcidID',
         width: 100,
@@ -1173,7 +1178,8 @@ class Order extends Component {
       if (!col.editable) {
         return col;
       }
-      const editId = editIndex === -1 || editIndex === 0 ? editIndex : editIndex.split(',').length - 2;
+      const editId =
+        editIndex === -1 || editIndex === 0 ? editIndex : editIndex.split(',').length - 2;
       return {
         ...col,
         onCell: (record, rowIndex) => ({
@@ -1181,16 +1187,17 @@ class Order extends Component {
           rules: col.rules,
           inputType: this.selectType(
             list[rowIndex][col.dataIndex],
-            col.inputType, col.selectList,
+            col.inputType,
+            col.selectList,
             col.width ? col.width - 10 : 90,
             rowIndex,
             col.event,
-            ),
+          ),
           dataIndex: col.dataIndex + rowIndex,
           title: col.title,
           value: list[rowIndex][col.dataIndex],
           // editing: editId.toString().indexOf((-(rowIndex + 1)).toString()) !== -1,
-          editing: (rowIndex <= editId) || (rowIndex === editIndex),
+          editing: rowIndex <= editId || rowIndex === editIndex,
         }),
       };
     });
@@ -1199,50 +1206,47 @@ class Order extends Component {
       // eslint-disable-next-line no-param-reassign
       if (!col.width) col.width = 100;
       tableWidthSon += col.width;
-      return col
+      return col;
     });
     return (
-        <Modal
-          width="100%"
-          title="多肽合成订单编辑页面"
-          style={{ top: '0', padding: '0', border: 'none' }}
-          visible={visible}
-          onOk={this.handleOk}
-          onCancel={this.handleCancel}
-          keyboard={false}
-          className="orderMask"
-        >
-          <div>
-            <AddPage
-              openAddressMask={this.openAddressMask}
-              handleAdd={this.handleAdd}
-            />
-            <Col span={14}>
-              <EditableContext.Provider value={this.props.form}>
-                <Table
-                    dataSource={data.list}
-                    columns={columns}
-                    scroll={{ x: tableWidth, y: 300 }}
-                    pagination={data.pagination}
-                    rowKey="id"
-                    loading={loading}
-                    onChange={this.handleStandardTableChange}
-                    components={components}
-                    rowClassName="editable-row"
-                    />
-              </EditableContext.Provider>
-            </Col>
-            <Col span={1}></Col>
-            <Col span={9}>
+      <Modal
+        width="100%"
+        title="多肽合成订单编辑页面"
+        style={{ top: '0', padding: '0', border: 'none' }}
+        visible={visible}
+        onOk={this.handleOk}
+        onCancel={this.handleCancel}
+        keyboard={false}
+        className="orderMask"
+      >
+        <div>
+          <AddPage openAddressMask={this.openAddressMask} handleAdd={this.handleAdd} />
+          <Col span={14}>
+            <EditableContext.Provider value={this.props.form}>
               <Table
-                  dataSource={dataSon}
-                  columns={columnSon}
-                  scroll={{ x: tableWidthSon, y: 300 }}
-                  loading={loadingSon}
-                  />
-            </Col>
-          </div>
-        </Modal>
+                dataSource={data.list}
+                columns={columns}
+                scroll={{ x: tableWidth, y: 300 }}
+                pagination={data.pagination}
+                rowKey="id"
+                loading={loading}
+                onChange={this.handleStandardTableChange}
+                components={components}
+                rowClassName="editable-row"
+              />
+            </EditableContext.Provider>
+          </Col>
+          <Col span={1}></Col>
+          <Col span={9}>
+            <Table
+              dataSource={dataSon}
+              columns={columnSon}
+              scroll={{ x: tableWidthSon, y: 300 }}
+              loading={loadingSon}
+            />
+          </Col>
+        </div>
+      </Modal>
     );
   }
 }

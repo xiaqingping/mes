@@ -68,15 +68,15 @@ const SeqModel = {
     // 邮箱认证状态
     EmailVerifyStatus: [
       { id: 1, name: formatMessage({ id: 'bp.EmailVerifyStatus.unverified' }) },
-      { id: 2, name: '验证中' },
-      { id: 3, name: '变更中' },
+      { id: 2, name: formatMessage({ id: 'bp.EmailVerifyStatus.verfication' }) },
+      { id: 3, name: formatMessage({ id: 'bp.EmailVerifyStatus.inChange' }) },
       { id: 4, name: formatMessage({ id: 'bp.EmailVerifyStatus.verified' }) },
     ],
     // 手机验证状态
     MobilePhoneVerifyStatus: [
       { id: 1, name: formatMessage({ id: 'bp.EmailVerifyStatus.unverified' }) },
-      { id: 2, name: '验证中' },
-      { id: 3, name: '变更中' },
+      { id: 2, name: formatMessage({ id: 'bp.EmailVerifyStatus.verfication' }) },
+      { id: 3, name: formatMessage({ id: 'bp.EmailVerifyStatus.inChange' }) },
       { id: 4, name: formatMessage({ id: 'bp.EmailVerifyStatus.verified' }) },
     ],
     // 随货开票

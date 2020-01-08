@@ -87,7 +87,7 @@ const brands = [
   { code: '028', name: '欧西亚' },
   { code: 'BBI', name: 'BBI' },
   { code: 'MBI', name: 'MBI' },
-]
+];
 
 const applyColumns = [
   {
@@ -126,7 +126,7 @@ const applyColumns = [
     title: '仓库',
     dataIndex: 'storageCode',
   },
-]
+];
 
 const productColumns = [
   {
@@ -197,7 +197,7 @@ const productColumns = [
     title: '状态',
     dataIndex: 'saleStatus',
   },
-]
+];
 
 const proDetailColumns = [
   {
@@ -208,14 +208,14 @@ const proDetailColumns = [
     title: '数量',
     dataIndex: 'shuliang',
   },
-]
+];
 
 const ChoseApplyNameModel = Form.create()(
   class extends React.Component {
-    constructor (props) {
+    constructor(props) {
       super(props);
       // 无用状态
-      this.state = {}
+      this.state = {};
     }
 
     render() {
@@ -246,12 +246,14 @@ const ChoseApplyNameModel = Form.create()(
             <Row>
               <Col lg={6} md={8} sm={12}>
                 <FormItem label="编号" labelCol={{ span: 4 }} wrapperCol={{ span: 20 }}>
-                  {getFieldDecorator('loginCode')(<Input placeholder="请输入" size="small" style={{ width: '100%' }}/>)}
+                  {getFieldDecorator('loginCode')(
+                    <Input placeholder="请输入" size="small" style={{ width: '100%' }} />,
+                  )}
                 </FormItem>
               </Col>
               <Col lg={6} md={8} sm={12}>
                 <FormItem label="姓名" labelCol={{ span: 4 }} wrapperCol={{ span: 20 }}>
-                  {getFieldDecorator('name')(<Input placeholder="请输入" size="small"/>)}
+                  {getFieldDecorator('name')(<Input placeholder="请输入" size="small" />)}
                 </FormItem>
               </Col>
               <Col lg={6} md={8} sm={12}>
@@ -270,13 +272,12 @@ const ChoseApplyNameModel = Form.create()(
                   {getFieldDecorator('regionCode', { initialValue: '' })(
                     <Select placeholder="请选择" size="small" style={{ width: 197 }}>
                       <Option value=""> 全部 </Option>
-                      {
-                        (regions.length > 0) && regions.map(region =>
-                          <Option
-                            key={ region.code}
-                            value={region.code}>{region.code}-{region.name} </Option>,
-                        )
-                      }
+                      {regions.length > 0 &&
+                        regions.map(region => (
+                          <Option key={region.code} value={region.code}>
+                            {region.code}-{region.name}{' '}
+                          </Option>
+                        ))}
                     </Select>,
                   )}
                 </FormItem>
@@ -285,23 +286,20 @@ const ChoseApplyNameModel = Form.create()(
                 <FormItem label="网点" labelCol={{ span: 4 }} wrapperCol={{ span: 20 }}>
                   {getFieldDecorator('officeCode', { initialValue: '' })(
                     <Select placeholder="请选择" size="small" style={{ width: 197 }}>
-                    <Option value=""> 全部 </Option>
-                      {
-                        (offices.length > 0) && offices.map(office =>
-                          <Option
-                            key={ office.code}
-                            value={office.code}>{office.code}-{office.name} </Option>,
-                        )
-                      }
+                      <Option value=""> 全部 </Option>
+                      {offices.length > 0 &&
+                        offices.map(office => (
+                          <Option key={office.code} value={office.code}>
+                            {office.code}-{office.name}{' '}
+                          </Option>
+                        ))}
                     </Select>,
                   )}
                 </FormItem>
               </Col>
               <Col lg={6} md={8} sm={12}>
                 <FormItem label="员工" labelCol={{ span: 4 }} wrapperCol={{ span: 20 }}>
-                  {getFieldDecorator('employeeCode')(
-                    <Input placeholder="请输入" size="small"/>,
-                  )}
+                  {getFieldDecorator('employeeCode')(<Input placeholder="请输入" size="small" />)}
                 </FormItem>
               </Col>
             </Row>
@@ -317,25 +315,25 @@ const ChoseApplyNameModel = Form.create()(
             </div>
           </Form>
           <StandardTable
-              selectedRows= {applyRows}
-              loading={applyLoading}
-              data={applyData}
-              columns={applyColumns}
-              onSelectRow={applySelectRows}
-              onChange={applyChange}
-            />
+            selectedRows={applyRows}
+            loading={applyLoading}
+            data={applyData}
+            columns={applyColumns}
+            onSelectRow={applySelectRows}
+            onChange={applyChange}
+          />
         </Modal>
-      )
+      );
     }
   },
-)
+);
 
 const ChoseProductForm = Form.create()(
   class extends React.Component {
-    constructor (props) {
+    constructor(props) {
       // 无用状态
       super(props);
-      this.state = {}
+      this.state = {};
     }
 
     render() {
@@ -359,49 +357,59 @@ const ChoseProductForm = Form.create()(
           title="产品列表"
           footer={null}
           width={1130}
-          visible= { productModal }
-          onCancel= { closeProductModal }
+          visible={productModal}
+          onCancel={closeProductModal}
         >
           <Form onSubmit={searchProduct} layout="inline" labelAlign="left">
             <Row>
               <Col lg={6} md={8} sm={12}>
                 <FormItem label="编号" labelCol={{ span: 9 }} wrapperCol={{ span: 15 }}>
-                  {getFieldDecorator('code')(<Input placeholder="请输入" size="small" style={{ width: '100%' }}/>)}
+                  {getFieldDecorator('code')(
+                    <Input placeholder="请输入" size="small" style={{ width: '100%' }} />,
+                  )}
                 </FormItem>
               </Col>
               <Col lg={6} md={8} sm={12}>
                 <FormItem label="产品名称" labelCol={{ span: 9 }} wrapperCol={{ span: 15 }}>
-                  {getFieldDecorator('desc')(<Input placeholder="请输入" size="small"/>)}
+                  {getFieldDecorator('desc')(<Input placeholder="请输入" size="small" />)}
                 </FormItem>
               </Col>
               <Col lg={6} md={8} sm={12}>
                 <FormItem label="英文名称" labelCol={{ span: 9 }} wrapperCol={{ span: 15 }}>
-                  {getFieldDecorator('edesc')(<Input placeholder="请输入" size="small"/>)}
+                  {getFieldDecorator('edesc')(<Input placeholder="请输入" size="small" />)}
                 </FormItem>
               </Col>
               <Col lg={6} md={8} sm={12}>
                 <FormItem label="旧物料号" labelCol={{ span: 9 }} wrapperCol={{ span: 15 }}>
-                  {getFieldDecorator('oldCode')(<Input placeholder="请输入" size="small"/>)}
+                  {getFieldDecorator('oldCode')(<Input placeholder="请输入" size="small" />)}
                 </FormItem>
               </Col>
               <Col lg={6} md={8} sm={12}>
                 <FormItem label="客户编号" labelCol={{ span: 9 }} wrapperCol={{ span: 15 }}>
-                  {getFieldDecorator('customerCode')(<Input placeholder="请输入" size="small" disabled/>)}
+                  {getFieldDecorator('customerCode')(
+                    <Input placeholder="请输入" size="small" disabled />,
+                  )}
                 </FormItem>
               </Col>
               <Col lg={6} md={8} sm={12}>
                 <FormItem label="负责人编号" labelCol={{ span: 9 }} wrapperCol={{ span: 15 }}>
-                  {getFieldDecorator('subcustomerCode')(<Input placeholder="请输入" size="small" disabled/>)}
+                  {getFieldDecorator('subcustomerCode')(
+                    <Input placeholder="请输入" size="small" disabled />,
+                  )}
                 </FormItem>
               </Col>
               <Col lg={6} md={8} sm={12}>
                 <FormItem label="销售大区" labelCol={{ span: 9 }} wrapperCol={{ span: 15 }}>
-                  {getFieldDecorator('regionCode')(<Input placeholder="请输入" size="small" disabled/>)}
+                  {getFieldDecorator('regionCode')(
+                    <Input placeholder="请输入" size="small" disabled />,
+                  )}
                 </FormItem>
               </Col>
               <Col lg={6} md={8} sm={12}>
                 <FormItem label="销售网点" labelCol={{ span: 9 }} wrapperCol={{ span: 15 }}>
-                  {getFieldDecorator('officeCode')(<Input placeholder="请输入" size="small" disabled/>)}
+                  {getFieldDecorator('officeCode')(
+                    <Input placeholder="请输入" size="small" disabled />,
+                  )}
                 </FormItem>
               </Col>
               <Col lg={6} md={8} sm={12}>
@@ -409,15 +417,12 @@ const ChoseProductForm = Form.create()(
                   {getFieldDecorator('range')(
                     <Select placeholder="请选择" size="small" style={{ width: 150 }} disabled>
                       <Option value="">全部</Option>
-                      {
-                        (getSalesRange.length > 0) && getSalesRange.map(range =>
-                          <Option
-                            key={ range.channel}
-                            value={range.channel}>
+                      {getSalesRange.length > 0 &&
+                        getSalesRange.map(range => (
+                          <Option key={range.channel} value={range.channel}>
                             {range.channelName}-{range.organizationName}
-                          </Option>,
-                        )
-                      }
+                          </Option>
+                        ))}
                     </Select>,
                   )}
                 </FormItem>
@@ -427,13 +432,12 @@ const ChoseProductForm = Form.create()(
                   {getFieldDecorator('factory', { initialValue: '3100' })(
                     <Select placeholder="请选择" size="small" style={{ width: 147 }}>
                       <Option value=""> 全部 </Option>
-                      {
-                        (factorys.length > 0) && factorys.map(factory =>
-                          <Option
-                            key={ factory.code}
-                            value={factory.code}>{factory.code}-{factory.name} </Option>,
-                        )
-                      }
+                      {factorys.length > 0 &&
+                        factorys.map(factory => (
+                          <Option key={factory.code} value={factory.code}>
+                            {factory.code}-{factory.name}{' '}
+                          </Option>
+                        ))}
                     </Select>,
                   )}
                 </FormItem>
@@ -442,19 +446,17 @@ const ChoseProductForm = Form.create()(
                 <FormItem label="品牌" labelCol={{ span: 10 }} wrapperCol={{ span: 14 }}>
                   {getFieldDecorator('brandCode', { initialValue: '' })(
                     <Select placeholder="请选择" size="small" style={{ width: 147 }}>
-                    <Option value=""> 全部 </Option>
-                      {
-                        (brands.length > 0) && brands.map(bramd =>
-                          <Option
-                            key={ bramd.code}
-                            value={bramd.code}>{bramd.code}-{bramd.name} </Option>,
-                        )
-                      }
+                      <Option value=""> 全部 </Option>
+                      {brands.length > 0 &&
+                        brands.map(bramd => (
+                          <Option key={bramd.code} value={bramd.code}>
+                            {bramd.code}-{bramd.name}{' '}
+                          </Option>
+                        ))}
                     </Select>,
                   )}
                 </FormItem>
               </Col>
-
             </Row>
             <div style={{ overflow: 'hidden' }}>
               <div style={{ float: 'right', marginBottom: 24 }}>
@@ -471,7 +473,7 @@ const ChoseProductForm = Form.create()(
             <Col span={18}>
               <StandardTable
                 scroll={{ x: 2000 }}
-                selectedRows= {productRows}
+                selectedRows={productRows}
                 loading={productLoading}
                 data={procductList}
                 columns={productColumns}
@@ -480,22 +482,21 @@ const ChoseProductForm = Form.create()(
               />
             </Col>
             <Col span={6}>
-            <StandardTable
+              <StandardTable
                 columns={proDetailColumns}
                 data={procductList}
-                selectedRows= {productRows}
+                selectedRows={productRows}
                 loading={productLoading}
                 onSelectRow={productSelectRows}
                 onChange={productChange}
               />
             </Col>
           </Row>
-
         </Modal>
-      )
+      );
     }
   },
-)
+);
 class PurchaseApply extends React.Component {
   allPartner = [
     {
@@ -508,7 +509,7 @@ class PurchaseApply extends React.Component {
     },
   ];
 
-  constructor (props) {
+  constructor(props) {
     super(props);
     this.getRoles();
   }
@@ -535,7 +536,7 @@ class PurchaseApply extends React.Component {
 
   /** 第一次渲染之后调用 */
   componentDidMount(event) {
-    this.handleSearch(event)
+    this.handleSearch(event);
   }
 
   /** 自定义联动框 测试数据  */
@@ -543,19 +544,15 @@ class PurchaseApply extends React.Component {
     this.setState({
       text: selectedOptions.map(o => o.label).join(', '),
     });
-  }
+  };
 
   /** 自定义联动框 测试数据 */
   getCode = () => ({
-    filterDropdown: () => (
-      <div style={{ padding: 30, paddingLeft: 5 }}>
-        {this.state.text}
-      </div>
-    ),
+    filterDropdown: () => <div style={{ padding: 30, paddingLeft: 5 }}>{this.state.text}</div>,
     filterIcon: filtered => (
-        <Cascader options={optionsTry} onChange={this.choseAddress} placeholder="请选择">
-          <Icon type="filter" style={{ color: filtered ? '#1890ff' : undefined }} />
-        </Cascader>
+      <Cascader options={optionsTry} onChange={this.choseAddress} placeholder="请选择">
+        <Icon type="filter" style={{ color: filtered ? '#1890ff' : undefined }} />
+      </Cascader>
     ),
   });
 
@@ -571,8 +568,8 @@ class PurchaseApply extends React.Component {
           list: res.rows,
         },
       });
-    })
-  }
+    });
+  };
 
   choseApplyName = () => {
     this.getRegions();
@@ -580,7 +577,7 @@ class PurchaseApply extends React.Component {
     this.setState({
       applyNameModal: true,
     });
-  }
+  };
 
   choseProCode = () => {
     this.getSalesRange();
@@ -588,19 +585,19 @@ class PurchaseApply extends React.Component {
     this.setState({
       productModal: true,
     });
-  }
+  };
 
   closeApplyNameModal = () => {
     this.setState({
       applyNameModal: false,
     });
-  }
+  };
 
   closeProductModal = () => {
     this.setState({
       productModal: false,
     });
-  }
+  };
 
   handleSearch = e => {
     if (e) {
@@ -615,7 +612,7 @@ class PurchaseApply extends React.Component {
     //       const values = {
     //         ...fieldsValue,
     //         'range-picker': [rangeValue[0].format('YYYY-MM-DD'),
-                    // rangeValue[1].format('YYYY-MM-DD')] 把这一行敲上去
+    // rangeValue[1].format('YYYY-MM-DD')] 把这一行敲上去
     //     }
     //   }
     // })
@@ -643,13 +640,20 @@ class PurchaseApply extends React.Component {
           list: data.rows,
         },
       });
-    })
-  }
+    });
+  };
 
   searchProduct = e => {
     e.preventDefault();
     const { form } = this.procductRef.props;
-    const allValue = form.getFieldsValue(['code', 'desc', 'edesc', 'oldCode', 'factory', 'brandCode']);
+    const allValue = form.getFieldsValue([
+      'code',
+      'desc',
+      'edesc',
+      'oldCode',
+      'factory',
+      'brandCode',
+    ]);
     this.setState({
       productLoading: true,
     });
@@ -663,66 +667,62 @@ class PurchaseApply extends React.Component {
           list: data,
         },
       });
-    })
-  }
+    });
+  };
 
   handleSelectRows = rows => {
     this.setState({
       selectedRows: rows,
     });
-  }
+  };
 
   applySelectRows = rows => {
     this.setState({
       applyRows: rows,
     });
-  }
+  };
 
   productSelectRows = rows => {
     this.setState({
       productRows: rows,
     });
-  }
+  };
 
-  handleStandardTableChange = () => {
-  }
+  handleStandardTableChange = () => {};
 
-  applyChange = () => {
-  }
+  applyChange = () => {};
 
-  productChange =() => {
-  }
+  productChange = () => {};
 
   applyReset = event => {
     const { form } = this.formRef.props;
     form.resetFields();
     this.searchApplyName(event);
-  }
+  };
 
   productReset = event => {
     const { form } = this.procductRef.props;
     form.resetFields();
     this.searchProduct(event);
-  }
+  };
 
   toggleForm = () => {
     const { expandForm } = this.state;
     this.setState({
       expandForm: !expandForm,
     });
-  }
+  };
 
   renderForm = () => {
     const { expandForm } = this.state;
     return expandForm ? this.renderAdvancedForm() : this.renderSimpleForm();
-  }
+  };
 
   preStateChange = value => {
     console.log(value);
-  }
+  };
 
-  getRoles = () => {
-  }
+  getRoles = () => {};
 
   getRegions = () => {
     api.basic.getRegions().then(data => {
@@ -730,7 +730,7 @@ class PurchaseApply extends React.Component {
         regions: data,
       });
     });
-  }
+  };
 
   getOffices = () => {
     api.basic.getOffices().then(data => {
@@ -738,7 +738,7 @@ class PurchaseApply extends React.Component {
         offices: data,
       });
     });
-  }
+  };
 
   getSalesRange = () => {
     api.basic.getSalesRanges().then(data => {
@@ -746,26 +746,26 @@ class PurchaseApply extends React.Component {
         getSalesRange: data,
       });
     });
-  }
+  };
 
   getFactorys = () => {
-    api.basic.getFactorys().then(data => {
+    api.basic.getPlants().then(data => {
       this.setState({
         factorys: data,
       });
-    })
-  }
+    });
+  };
 
   saveFormRef = formRef => {
     this.formRef = formRef;
-  }
+  };
 
   saveProductRef = formRef => {
     this.procductRef = formRef;
-  }
+  };
 
   /** 部分筛选条件 */
-  renderSimpleForm () {
+  renderSimpleForm() {
     const { form } = this.props;
     const { getFieldDecorator } = form;
     return (
@@ -773,23 +773,19 @@ class PurchaseApply extends React.Component {
         <Row gutter={{ lg: 24, md: 12, sm: 6 }}>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="编号">
-              {getFieldDecorator('code')(<Input placeholder="请输入"/>)}
+              {getFieldDecorator('code')(<Input placeholder="请输入" />)}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="申请人">
               {getFieldDecorator('requestName')(
-                <Search
-                  placeholder="请输入"
-                  onSearch={value => this.choseApplyName(value)}
-                />)}
+                <Search placeholder="请输入" onSearch={value => this.choseApplyName(value)} />,
+              )}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
-          <FormItem label="申请日期">
-              {getFieldDecorator('finishTime')(
-                <RangePicker format="YYYY-MM-DD"/>,
-              )}
+            <FormItem label="申请日期">
+              {getFieldDecorator('finishTime')(<RangePicker format="YYYY-MM-DD" />)}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
@@ -807,7 +803,7 @@ class PurchaseApply extends React.Component {
           </Col>
         </Row>
       </Form>
-    )
+    );
   }
 
   /** 完整筛选条件 */
@@ -818,49 +814,36 @@ class PurchaseApply extends React.Component {
     return (
       <Form onSubmit={this.handleSearch} layout="inline">
         <Row gutter={{ lg: 24, md: 12, sm: 6 }}>
-        <Col lg={6} md={8} sm={12}>
+          <Col lg={6} md={8} sm={12}>
             <FormItem label="编号">
-              {getFieldDecorator('code')(<Input placeholder="请输入"/>)}
+              {getFieldDecorator('code')(<Input placeholder="请输入" />)}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="申请人">
               {getFieldDecorator('requestName')(
-                <Search
-                  placeholder="请输入"
-                  onSearch={value => this.choseApplyName(value)}
-                />)}
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-          <FormItem label="申请日期">
-              {getFieldDecorator('finishTime')(
-                <RangePicker />,
+                <Search placeholder="请输入" onSearch={value => this.choseApplyName(value)} />,
               )}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
+            <FormItem label="申请日期">{getFieldDecorator('finishTime')(<RangePicker />)}</FormItem>
+          </Col>
+          <Col lg={6} md={8} sm={12}>
             <FormItem label="物料号">
               {getFieldDecorator('productCode')(
-                <Search
-                  placeholder="请输入"
-                  onSearch={value => this.choseProCode(value)}
-                />,
+                <Search placeholder="请输入" onSearch={value => this.choseProCode(value)} />,
               )}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="需求跟踪号">
-              {getFieldDecorator('requirementTrackingNumber')(
-                <Input placeholder="请输入"/>,
-              )}
+              {getFieldDecorator('requirementTrackingNumber')(<Input placeholder="请输入" />)}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="工厂">
-              {getFieldDecorator('factoryCode')(
-                <Input placeholder="请输入"/>,
-              )}
+              {getFieldDecorator('factoryCode')(<Input placeholder="请输入" />)}
             </FormItem>
           </Col>
         </Row>
@@ -878,8 +861,8 @@ class PurchaseApply extends React.Component {
           </div>
         </div>
       </Form>
-    )
-  }
+    );
+  };
 
   render() {
     const {
@@ -968,15 +951,14 @@ class PurchaseApply extends React.Component {
         title: '已采购数量',
         dataIndex: 'purchaseCount',
       },
-    ]
+    ];
     return (
       /** 表格渲染 */
       <PageHeaderWrapper title="采购申请">
         <Card bordered={false}>
-        <div className="tableList">
+          <div className="tableList">
             <div className="tableListForm">{this.renderForm()}</div>
-            <div className="tableListOperator">
-            </div>
+            <div className="tableListOperator"></div>
             <StandardTable
               scroll={{ x: 2500 }}
               selectedRows={selectedRows}
@@ -988,33 +970,33 @@ class PurchaseApply extends React.Component {
             />
           </div>
           <ChoseApplyNameModel
-            wrappedComponentRef = { this.saveFormRef }
+            wrappedComponentRef={this.saveFormRef}
             applyNameModal={this.state.applyNameModal}
             closeApplyNameModal={this.closeApplyNameModal}
             searchApplyName={this.searchApplyName}
-            offices = { offices }
-            regions = { regions }
-            applyLoading = { applyLoading }
-            applyData = { applyData }
-            applySelectRows = { this.applySelectRows}
-            applyChange = { this.applyChange }
-            applyReset = { this.applyReset }
-            applyRows = { applyRows }
+            offices={offices}
+            regions={regions}
+            applyLoading={applyLoading}
+            applyData={applyData}
+            applySelectRows={this.applySelectRows}
+            applyChange={this.applyChange}
+            applyReset={this.applyReset}
+            applyRows={applyRows}
           />
           <ChoseProductForm
-            wrappedComponentRef = { this.saveProductRef }
-            productModal = { productModal }
-            closeProductModal = { this.closeProductModal }
-            searchProduct = { this.searchProduct }
-            getSalesRange = { getSalesRange }
-            factorys = { factorys }
-            productReset = { this.productReset }
-            procductList = { procductList }
-            productLoading = { productLoading }
-            productSelectRows = { this.productSelectRows}
-            productRows = { productRows }
-            productChange = { this.productChange }
-            />
+            wrappedComponentRef={this.saveProductRef}
+            productModal={productModal}
+            closeProductModal={this.closeProductModal}
+            searchProduct={this.searchProduct}
+            getSalesRange={getSalesRange}
+            factorys={factorys}
+            productReset={this.productReset}
+            procductList={procductList}
+            productLoading={productLoading}
+            productSelectRows={this.productSelectRows}
+            productRows={productRows}
+            productChange={this.productChange}
+          />
         </Card>
       </PageHeaderWrapper>
     );

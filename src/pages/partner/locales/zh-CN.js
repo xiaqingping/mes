@@ -30,6 +30,8 @@ export default {
   'bp.VendorLevelCode.moreImportant': '比较重要',
   'bp.VendorLevelCode.commonly': '一般',
   'bp.EmailVerifyStatus.unverified': '未验证',
+  'bp.EmailVerifyStatus.verfication': '验证中',
+  'bp.EmailVerifyStatus.inChange': '变更中',
   'bp.EmailVerifyStatus.verified': '已验证',
   'bp.InvoiceWithGood.yes': '是',
   'bp.InvoiceWithGood.no': '否',

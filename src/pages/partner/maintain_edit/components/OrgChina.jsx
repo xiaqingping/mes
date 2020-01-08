@@ -10,7 +10,6 @@ import api from '@/api';
 import '@/pages/partner/maintain_edit/style.less';
 import ContactInformation from './ContactInformation';
 
-
 @connect(({ basicCache, bp }) => ({
   industryCategories: basicCache.industryCategories,
   BpCertificationStatus: bp.BpCertificationStatus,
@@ -28,9 +27,9 @@ class OrgChina extends Component {
     this.props.dispatch({
       type: 'basicCache/getCache',
       payload: { type: 'industryCategories' },
-    })
+    });
     const newData = [];
-    const { data } = this.props
+    const { data } = this.props;
     if (data.organizationCertification.attachmentCode) {
       api.disk
         .getFiles({
@@ -51,43 +50,33 @@ class OrgChina extends Component {
   }
 
   render() {
-    const { data, BpCertificationStatus, SpecialInvoice, industryCategories } = this.props
-    const { pic } = this.state
-    const { organizationCertification } = data
+    const { data, BpCertificationStatus, SpecialInvoice, industryCategories } = this.props;
+    const { pic } = this.state;
+    const { organizationCertification } = data;
     return (
       <Descriptions column={2} style={{ width: '1000px' }} className="orgStyle">
-        <Descriptions.Item
-        label={formatMessage({ id: 'bp.maintain.customerName' })}
-        >
+        <Descriptions.Item label={formatMessage({ id: 'bp.maintain.customerName' })}>
           {organizationCertification.name}
         </Descriptions.Item>
         <Descriptions.Item
-        label={formatMessage({ id: 'bp.maintain_details.verification_data.VAT_Business' })}
+          label={formatMessage({ id: 'bp.maintain_details.verification_data.VAT_Business' })}
         >
           {organizationCertification.taxNo}
         </Descriptions.Item>
-        <Descriptions.Item
-        label={formatMessage({ id: 'bp.maintain_details.status' })}
-        >
+        <Descriptions.Item label={formatMessage({ id: 'bp.maintain_details.status' })}>
           <Badge
-          status={formatter(BpCertificationStatus, data.status, 'id', 'badge')}
-          text={formatter(BpCertificationStatus, data.status, 'id', 'name')}
+            status={formatter(BpCertificationStatus, data.status, 'id', 'badge')}
+            text={formatter(BpCertificationStatus, data.status, 'id', 'name')}
           />
         </Descriptions.Item>
-        <Descriptions.Item
-        label={formatMessage({ id: 'bp.operation.operator' })}
-        >
+        <Descriptions.Item label={formatMessage({ id: 'bp.operation.operator' })}>
           {data.operatorName}
         </Descriptions.Item>
-        <Descriptions.Item label="">
-          {data.finishDate}
-        </Descriptions.Item>
-        <Descriptions.Item label="">
-        {data.operatorDate}
-        </Descriptions.Item>
+        <Descriptions.Item label="">{data.finishDate}</Descriptions.Item>
+        <Descriptions.Item label="">{data.operatorDate}</Descriptions.Item>
         <Descriptions.Item
-        label={formatMessage({ id: 'bp.maintain.ChangeModal.address' })}
-        span={2}
+          label={formatMessage({ id: 'bp.maintain.ChangeModal.address' })}
+          span={2}
         >
           {organizationCertification.countryName}&nbsp;
           {organizationCertification.provinceName}&nbsp;
@@ -96,52 +85,46 @@ class OrgChina extends Component {
           {organizationCertification.streetName}&nbsp;
         </Descriptions.Item>
         <Descriptions.Item
-        label={formatMessage({ id: 'bp.maintain_details.verification_data.special_invoice' })}
+          label={formatMessage({ id: 'bp.maintain_details.verification_data.special_invoice' })}
         >
           {formatter(SpecialInvoice, organizationCertification.specialInvoice)}
         </Descriptions.Item>
-        <Descriptions.Item
-        label={formatMessage({ id: 'bp.maintain.ChangeModal.businessType' })}
-        >
+        <Descriptions.Item label={formatMessage({ id: 'bp.maintain.ChangeModal.businessType' })}>
           {formatter(industryCategories, organizationCertification.industryCode, 'code')}
         </Descriptions.Item>
         <Descriptions.Item
-        label={formatMessage({ id: 'bp.maintain_details.verification_data.account_number' })}
+          label={formatMessage({ id: 'bp.maintain_details.verification_data.account_number' })}
         >
           {organizationCertification.bankCode}
         </Descriptions.Item>
         <Descriptions.Item
-        label={formatMessage({ id: 'bp.maintain_details.verification_data.bank_name' })}
+          label={formatMessage({ id: 'bp.maintain_details.verification_data.bank_name' })}
         >
-        {organizationCertification.bankName}
+          {organizationCertification.bankName}
         </Descriptions.Item>
-        <Descriptions.Item
-        label={formatMessage({ id: 'app.settings.basic.phone' })}
-        >
+        <Descriptions.Item label={formatMessage({ id: 'app.settings.basic.phone' })}>
           <ContactInformation
             data={{
               countryCode: organizationCertification.telephoneCountryCode,
               areaCode: organizationCertification.telephoneAreaCode,
               code: organizationCertification.telephone,
               extension: organizationCertification.telephoneExtension,
-              flag: 'no_use',
+              hideFlag: true,
             }}
           />
         </Descriptions.Item>
         <Descriptions.Item
-        label={formatMessage({ id: 'bp.maintain_details.verification_data.address' })}
+          label={formatMessage({ id: 'bp.maintain_details.verification_data.address' })}
         >
           {organizationCertification.registeredAddress}
         </Descriptions.Item>
         <Descriptions.Item
-        label={formatMessage({ id: 'bp.maintain_details.verification_data.memo' })}
-        span={2}
+          label={formatMessage({ id: 'bp.maintain_details.verification_data.memo' })}
+          span={2}
         >
           {organizationCertification.notes}
         </Descriptions.Item>
-        <Descriptions.Item
-        label={formatMessage({ id: 'bp.maintain_details.popover.attachment' })}
-        >
+        <Descriptions.Item label={formatMessage({ id: 'bp.maintain_details.popover.attachment' })}>
           {pic.map((item, index) => (
             <li
               // eslint-disable-next-line react/no-array-index-key
@@ -162,7 +145,7 @@ class OrgChina extends Component {
           ))}
         </Descriptions.Item>
       </Descriptions>
-    )
+    );
   }
 }
 
