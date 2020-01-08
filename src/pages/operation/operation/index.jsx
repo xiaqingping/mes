@@ -1,4 +1,4 @@
-import { Button, Card, Col, DatePicker, Form, Icon, Input, Row, Select, AutoComplete } from 'antd';
+import { Button, Card, Col, DatePicker, Form, Icon, Input, Row, Select } from 'antd';
 import * as React from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import { formatMessage } from 'umi/locale';
@@ -13,23 +13,9 @@ const FormItem = Form.Item;
 const { Option } = Select;
 const { RangePicker } = DatePicker;
 
-function renderOption(item) {
-  return (
-    <Option key={item.id} text={item.name}>
-      <div style={{ display: 'flex' }}>
-        <span>
-          <Icon type="user" />
-        </span>
-        &nbsp;&nbsp;
-        <span>{item.code}</span>&nbsp;&nbsp;
-        <span>{item.name}</span>
-      </div>
-    </Option>
-  );
-}
-
 @connect(({ operation, global }) => ({
   status: operation.operationStatus,
+  recordType: operation.recordType,
   languageCode: global.languageCode,
 }))
 class Operation extends React.Component {
@@ -48,13 +34,18 @@ class Operation extends React.Component {
       detailsVisible: false,
       detailsValue: null,
       // editIndex: -1,
-      typeValue: [],
       partnerVal: [],
     };
     this.callParter = _.debounce(this.callParter, 500);
   }
 
   componentDidMount() {
+    api.operation.getOperationTypesAll({ languageCode: 'CN' }).then(res => {
+      this.props.dispatch({
+        type: 'operation/setRecordType',
+        payload: res,
+      });
+    });
     this.getTableData();
   }
 
@@ -105,7 +96,6 @@ class Operation extends React.Component {
     } = this.state;
     const { languageCode } = this.props;
     const op = options;
-    // const query = Object.assign({}, { page: 1, pageSize }, options);
     let newData = [];
     if (op.operationDate) {
       newData = {
@@ -118,15 +108,14 @@ class Operation extends React.Component {
     if (op.statusList) {
       newData = { ...newData, statusList: op.statusList.join(',') };
     }
-    const query = Object.assign({ page: 1, pageSize, languageCode }, op, newData);
+    const query = Object.assign({ page: 1, pageSize, languageCode: 'CN' }, op, newData);
     this.setState({
       formValues: query,
       loading: true,
     });
-    api.bp
+    api.operation
       .getOperationRecords(query)
       .then(res => {
-        console.log(res);
         this.setState({
           list: res.results,
           total: res.total,
@@ -143,9 +132,6 @@ class Operation extends React.Component {
   // 重置
   handleFormReset = () => {
     this.props.form.resetFields();
-    this.setState({
-      typeValue: [],
-    });
   };
 
   renderForm = () => {
@@ -201,61 +187,44 @@ class Operation extends React.Component {
     const {
       form: { getFieldDecorator },
       languageCode,
+      recordType,
     } = this.props;
-    const { typeValue, partnerVal } = this.state;
     return (
       <Form onSubmit={this.handleSearch} layout="inline">
         <Row gutter={{ xxl: 100, lg: 80 }}>
+          {/* 编号 */}
           <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
             <FormItem label={formatMessage({ id: 'bp.customerID' })}>
               {getFieldDecorator('code')(<Input />)}
             </FormItem>
           </Col>
+          {/* 来源编号 */}
           <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
-            <FormItem label={formatMessage({ id: 'bp.operation.businessPartners' })}>
-              {getFieldDecorator('bpId')(
-                <AutoComplete
-                  onSearch={this.inputValue}
-                  dataSource={partnerVal.map(renderOption)}
-                  placeholder={formatMessage({ id: 'bp.inputHere' })}
-                  optionLabelProp="text"
-                />,
-              )}
-            </FormItem>
+            <FormItem label="来源编号">{getFieldDecorator('sourceCode')(<Input />)}</FormItem>
           </Col>
+          {/* 来源名称 */}
           <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
-            <FormItem label={formatMessage({ id: 'bp.operation.type' })}>
-              {getFieldDecorator(
-                'type',
-                typeValue ? { initialValue: typeValue } : 'type',
-              )(
+            <FormItem label="来源名称">{getFieldDecorator('sourceName')(<Input />)}</FormItem>
+          </Col>
+          {/* 操作记录类型 */}
+          <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
+            <FormItem label="操作类型">
+              {getFieldDecorator('operationTypeId')(
                 <Select placeholder={formatMessage({ id: 'bp.pleaseSelect' })}>
                   {/* <Select mode="multiple" showArrow> */}
-                  <Option value="1">{formatMessage({ id: 'bp.operation.newlyBuild' })}</Option>
-                  <Option value="2">{formatMessage({ id: 'bp.operation.modify' })}</Option>
+                  {recordType.map(item => (
+                    <Option value={item.id}>{item.describe}</Option>
+                  ))}
                 </Select>,
               )}
             </FormItem>
           </Col>
+          {/* 操作人编号 */}
           <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
-            <FormItem label={formatMessage({ id: 'bp.operation.state' })}>
-              {getFieldDecorator('statusList')(
-                <Select
-                  mode="multiple"
-                  showArrow
-                  placeholder={formatMessage({ id: 'bp.pleaseSelect' })}
-                >
-                  <Option value="1">{formatMessage({ id: 'bp.operation.unfinished' })}</Option>
-                  <Option value="2">
-                    {formatMessage({ id: 'bp.operation.partiallyCompleted' })}
-                  </Option>
-                  <Option value="3">{formatMessage({ id: 'bp.operation.finished' })}</Option>
-                </Select>,
-              )}
-            </FormItem>
+            <FormItem label="操作人编号">{getFieldDecorator('operatorCode')(<Input />)}</FormItem>
           </Col>
           <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
-            <FormItem label={formatMessage({ id: 'bp.operation.completionTime' })}>
+            <FormItem label="操作时间">
               {getFieldDecorator('operationDate')(<RangePicker />)}
             </FormItem>
           </Col>
@@ -283,40 +252,22 @@ class Operation extends React.Component {
       form: { getFieldDecorator },
       languageCode,
     } = this.props;
-    const { typeValue, partnerVal } = this.state;
     return (
       <Form onSubmit={this.handleSearch} layout="inline">
         <Row gutter={{ xxl: 100, lg: 80 }}>
+          {/* 编号 */}
           <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
             <FormItem label={formatMessage({ id: 'bp.customerID' })}>
               {getFieldDecorator('code')(<Input />)}
             </FormItem>
           </Col>
+          {/* 来源编号 */}
           <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
-            <FormItem label={formatMessage({ id: 'bp.operation.businessPartners' })}>
-              {getFieldDecorator('bpId')(
-                <AutoComplete
-                  onSearch={this.inputValue}
-                  dataSource={partnerVal.map(renderOption)}
-                  placeholder={formatMessage({ id: 'bp.inputHere' })}
-                  optionLabelProp="text"
-                />,
-              )}
-            </FormItem>
+            <FormItem label="来源编号">{getFieldDecorator('sourceCode')(<Input />)}</FormItem>
           </Col>
+          {/* 来源名称 */}
           <Col xxl={6} lg={languageCode === 'EN' ? 12 : 0}>
-            <FormItem label={formatMessage({ id: 'bp.operation.type' })}>
-              {getFieldDecorator(
-                'type',
-                typeValue ? { initialValue: typeValue } : 'type',
-              )(
-                <Select placeholder={formatMessage({ id: 'bp.pleaseSelect' })}>
-                  {/* <Select mode="multiple" showArrow> */}
-                  <Option value="1">{formatMessage({ id: 'bp.operation.newlyBuild' })}</Option>
-                  <Option value="2">{formatMessage({ id: 'bp.operation.modify' })}</Option>
-                </Select>,
-              )}
-            </FormItem>
+            <FormItem label="来源名称">{getFieldDecorator('sourceName')(<Input />)}</FormItem>
           </Col>
           <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
             <span className="submitButtons">
@@ -373,7 +324,7 @@ class Operation extends React.Component {
           return (
             <div
               style={{
-                width: '250px',
+                width: '200px',
                 overflow: 'hidden',
                 whiteSpace: 'nowrap',
                 textOverflow: 'ellipsis',

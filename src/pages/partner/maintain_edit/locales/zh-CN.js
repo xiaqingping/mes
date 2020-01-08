@@ -6,6 +6,7 @@ export default {
   'bp.maintain_details.organization': '组织',
   'bp.maintain_details.status': '状态',
   'bp.maintain_details.change': '变更',
+  'bp.maintain_details.unbundling': '解绑',
   'bp.maintain_details.name': '名称',
   'bp.maintain_details.postal_code': '邮编',
   'bp.maintain_details.phone': '电话',
