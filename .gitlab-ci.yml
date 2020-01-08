@@ -7,3 +7,6 @@ build:
     - cd C:\sangon\project\mes
     - git pull
     - npm run build
+  only:
+    - develop
+
