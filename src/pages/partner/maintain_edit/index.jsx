@@ -450,7 +450,7 @@ class CustomerEdit extends Component {
 
       e.soldToPartyIdList = soldToPartyList.map(e1 => e1.id);
       e.shipToPartyIdList = shipToPartyList.map(e1 => e1.id);
-      e.salerCodeList = salerList.map(e1 => e1.id);
+      e.salerCodeList = salerList.map(e1 => e1.code);
     });
 
     let newData = {};
