@@ -7,3 +7,7 @@ build:
     - cd C:\sangon\project\mes
     - git pull
     - npm run build
+  environment:
+    name: mes
+  only:
+  - develop
