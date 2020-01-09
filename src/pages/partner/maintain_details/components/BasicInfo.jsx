@@ -25,11 +25,14 @@ const DescriptionsItem = Descriptions.Item;
   salesOrderBlock: bp.SalesOrderBlock,
   emailVerifyStatus: bp.EmailVerifyStatus,
   mobilePhoneVerifyStatus: bp.MobilePhoneVerifyStatus,
+  customer: partnerMaintainEdit.details,
+  supplier: partnerMaintainEdit.supplier,
 }))
 class BasicInfo extends Component {
   state = {
     phoneShow: false,
     emailShow: false,
+    details: this.props.details,
   };
 
   componentDidMount() {
@@ -61,11 +64,46 @@ class BasicInfo extends Component {
 
   // 解绑
   unbundling = (id, type) => {
+    const { customer, supplier } = this.props;
+    const { details } = this.state;
+    const customerData = customer;
+    const supplierData = supplier;
+    const detailsData = details;
     if (type === 1) {
-      api.bp.mobilePhoneUnbind(id);
+      api.bp.mobilePhoneUnbind(id).then(() => {
+        customerData.basic.mobilePhoneVerifyStatus = 1;
+        supplierData.basic.mobilePhoneVerifyStatus = 1;
+        detailsData.basic.mobilePhoneVerifyStatus = 1;
+        this.props.dispatch({
+          type: 'partnerMaintainEdit/setSupplier',
+          payload: supplierData,
+        });
+        this.props.dispatch({
+          type: 'partnerMaintainEdit/setDetails',
+          payload: customerData,
+        });
+        this.setState({
+          details: detailsData,
+        });
+      });
     }
     if (type === 2) {
-      api.bp.emailUnbind(id);
+      api.bp.emailUnbind(id).then(() => {
+        customerData.basic.emailVerifyStatus = 1;
+        supplierData.basic.emailVerifyStatus = 1;
+        detailsData.basic.emailVerifyStatus = 1;
+        this.props.dispatch({
+          type: 'partnerMaintainEdit/setSupplier',
+          payload: supplierData,
+        });
+        this.props.dispatch({
+          type: 'partnerMaintainEdit/setDetails',
+          payload: customerData,
+        });
+        this.setState({
+          details: detailsData,
+        });
+      });
     }
   };
 
@@ -99,8 +137,7 @@ class BasicInfo extends Component {
             </a>
             &nbsp;&nbsp;
             <Popconfirm
-              title="确定要解除绑定吗？"
-              icon={<Icon type="question-circle-o" style={{ color: 'red' }} />}
+              title="确认解绑移动电话？"
               onConfirm={() => {
                 this.unbundling(basic.id, 1);
               }}
@@ -145,8 +182,7 @@ class BasicInfo extends Component {
             </a>
             &nbsp;&nbsp;
             <Popconfirm
-              title="确定要解除绑定吗？"
-              icon={<Icon type="question-circle-o" style={{ color: 'red' }} />}
+              title="确认解绑邮箱？"
               onConfirm={() => {
                 this.unbundling(basic.id, 2);
               }}
@@ -174,14 +210,12 @@ class BasicInfo extends Component {
   };
 
   render() {
-    const { phoneShow, emailShow } = this.state;
     const {
       details: { basic },
-      details,
-      type,
-      industry,
-      salesOrderBlock,
-    } = this.props;
+      phoneShow,
+      emailShow,
+    } = this.state;
+    const { details, type, industry, salesOrderBlock } = this.props;
     if (!basic) return null;
     return (
       <Card
