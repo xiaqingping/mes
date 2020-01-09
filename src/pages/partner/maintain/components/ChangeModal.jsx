@@ -1160,7 +1160,6 @@ class ChangeModal extends Component {
       form,
       industryCategory,
     } = this.state;
-    console.log(guuid);
     if (!userData.basic || !(pic instanceof Array)) return null;
     const fileList = pic.map(e => ({
       old: true,
