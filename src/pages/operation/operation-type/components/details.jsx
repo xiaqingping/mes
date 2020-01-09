@@ -6,7 +6,7 @@ import {
 } from 'antd';
 import * as React from 'react';
 import api from '@/api';
-import { formatMessage } from 'umi/locale';
+// import { formatMessage } from 'umi/locale';
 import './style.less';
 
 class Details extends React.Component {
@@ -17,8 +17,8 @@ class Details extends React.Component {
 
   columns = [
     {
-      title: formatMessage({ id: 'bp.operation.field' }),
-      dataIndex: 'fieldName',
+      title: '操作类型属性编号',
+      dataIndex: 'code',
       render: text => (
         <div className="addEllipsis" style={{ width: '100px' }} title={text}>
           {text}
@@ -26,63 +26,32 @@ class Details extends React.Component {
       ),
     },
     {
-      title: formatMessage({ id: 'bp.operation.newValue' }),
-      dataIndex: 'newValue',
+      title: '操作类型属性描述',
+      dataIndex: 'describe',
       render: text => (
-        <div className="addEllipsis" style={{ width: '50px' }} title={text}>
+        <div className="addEllipsis" style={{ width: '100px' }} title={text}>
           {text}
         </div>
       ),
     },
     {
-      title: formatMessage({ id: 'bp.operation.oldValue' }),
-      dataIndex: 'oldValue',
+      title: '操作人名称',
+      dataIndex: 'operatorName',
       render: text => (
-        <div className="addEllipsis" style={{ width: '50px' }} title={text}>
+        <div className="addEllipsis" style={{ width: '100px' }} title={text}>
           {text}
         </div>
       ),
     },
     {
-      title: formatMessage({ id: 'bp.operation.keyword' }),
-      dataIndex: 'keyword',
+      title: '操作时间',
+      dataIndex: 'operationDate',
       render: text => (
-        <div className="addEllipsis" style={{ width: '50px' }} title={text}>
+        <div className="addEllipsis" style={{ width: '100px' }} title={text}>
           {text}
         </div>
       ),
     },
-    // {
-    //   title: formatMessage({ id: 'bp.operation.state' }),
-    //   dataIndex: 'status',
-    //   render(val) {
-    //     return <Badge className="addEllipsis"
-    //     style={{ width: '80px' }} status={status[val].value} text={status[val].text}/>;
-    //   },
-    // },
-    // {
-    //   title: formatMessage({ id: 'bp.operation.verificationRecordNo' }),
-    //   dataIndex: 'verifyRecordList',
-    //   render(val) {
-    //     let data = '';
-    //     if (val) {
-    //       // eslint-disable-next-line array-callback-return
-    //       val.map((item, index) => {
-    //           if (item.code) {
-    //             if (index < 2) {
-    //               data += `${item.code}<br/>`
-    //             } else {
-    //               data += '……'
-    //             }
-    //           }
-    //         },
-    //       )
-    //     }
-    //     return <span className="addEllipsis"
-    //      // eslint-disable-next-line react/no-danger
-    //      style={{ width: '80px' }} dangerouslySetInnerHTML={{ __html: data }} />
-    //   },
-    // },
   ];
 
   componentWillReceiveProps(nextProps) {
@@ -96,11 +65,10 @@ class Details extends React.Component {
 
   getData = detailsValue => {
     if (detailsValue) {
-      api.bp.getOperationItems(detailsValue.id).then(res => {
-        // eslint-disable-next-line array-callback-return
-        res.map((item, index) => {
-          res[index].fieldName = formatMessage({ id: item.fieldName });
-        });
+      api.operation.getOperationTypeProperty(detailsValue.id, { languageCode: 'CN' }).then(res => {
+        // res.map((item, index) => {
+        //   res[index].fieldName = formatMessage({ id: item.fieldName });
+        // });
         this.setState({
           list: res,
         });

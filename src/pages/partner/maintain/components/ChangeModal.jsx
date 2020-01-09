@@ -296,6 +296,7 @@ class AddressGroup extends Component {
 class ChangeModal extends Component {
   constructor(props) {
     super(props);
+    const guuid = guid();
     this.state = {
       recordMsg: undefined,
       form: this.props.form,
@@ -318,7 +319,7 @@ class ChangeModal extends Component {
       userPersonData: [],
       deletePiCertificationIdList: [],
       gtype: 0,
-      guuid: '',
+      guuid,
       changeModal: false,
       defaultAddress: '',
       pageLoading: true,
@@ -340,19 +341,13 @@ class ChangeModal extends Component {
     });
   }
 
-  componentWillReceiveProps() {
-    this.setState({
-      guuid: guid(),
-    });
-  }
-
   /** props更新时调用 */
   visibleShow = (changeModal, recordMsg) => {
     const { gtype, guuid } = this.state;
     this.setState({ changeModal });
     const diskFileIdList = [];
     if (recordMsg) {
-      if (recordMsg.type === 1 || gtype === 1) {
+      if (recordMsg.type === 1 || gtype === 2) {
         api.bp.getBPPiCertification(recordMsg.id).then(res => {
           this.setState({
             userData: res,
@@ -400,6 +395,7 @@ class ChangeModal extends Component {
                 sourceCode: res.organizationCertification.attachmentCode,
               })
               .then(v => {
+                console.log(v);
                 v.forEach(item => {
                   diskFileIdList.push(item.diskFileId);
                 });
@@ -489,7 +485,6 @@ class ChangeModal extends Component {
   // 组织提交
   handleOrganizationOk = e => {
     if (e) e.preventDefault();
-    // eslint-disable-next-line no-shadow
     const {
       address,
       area,
@@ -578,7 +573,7 @@ class ChangeModal extends Component {
       pageLoading: true,
       defaultAddress: '',
       noHaveLev: false,
-      // guuid: '',
+      guuid: guid(),
     });
   };
 
@@ -1165,6 +1160,7 @@ class ChangeModal extends Component {
       form,
       industryCategory,
     } = this.state;
+    console.log(guuid);
     if (!userData.basic || !(pic instanceof Array)) return null;
     const fileList = pic.map(e => ({
       old: true,

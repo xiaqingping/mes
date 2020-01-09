@@ -25,11 +25,11 @@ export default {
 
   // 查询利润中心+公司代码数据列表
   getProfitCenterCompany() {
-    return request('http://192.168.20.43:8001/profitCenterCompany/v1');
+    return request('http://192.168.19.71:8001/profitCenterCompany/v1');
   },
 
   // 查询利润中心主数据
   getProfitCenters() {
-    return request('http://192.168.20.43:8001/profitCenters/v1');
+    return request('http://192.168.19.71:8001/profitCenters/v1');
   },
 };
