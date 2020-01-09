@@ -17,8 +17,8 @@ class Details extends React.Component {
 
   columns = [
     {
-      title: formatMessage({ id: 'bp.operation.field' }),
-      dataIndex: 'fieldName',
+      title: '操作类型属性描述',
+      dataIndex: 'operationTypePropertyDescribe',
       render: text => (
         <div className="addEllipsis" style={{ width: '100px' }} title={text}>
           {text}
@@ -97,10 +97,11 @@ class Details extends React.Component {
   getData = detailsValue => {
     if (detailsValue) {
       api.operation.getOperationItems(detailsValue.id, { languageCode: 'CN' }).then(res => {
-        res.map((item, index) => {
-          res[index].fieldName = formatMessage({ id: item.fieldName });
-          return null;
-        });
+        console.log(res);
+        // res.map((item, index) => {
+        //   res[index].fieldName = formatMessage({ id: item.fieldName });
+        //   return null;
+        // });
         this.setState({
           list: res,
         });

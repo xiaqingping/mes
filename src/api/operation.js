@@ -26,6 +26,12 @@ export default {
       params,
     });
   },
+  // 根据操作类型ID查询全部操作类型属性记录
+  getOperationTypeProperty(operationTypeId, params) {
+    return request(`/operationTypes/v1/${operationTypeId}/operationTypeProperty`, {
+      params,
+    });
+  },
   // 查询操作全部类型
   getOperationTypesAll(params) {
     return request('/operationTypes/v1/all', {
