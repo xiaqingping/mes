@@ -20,7 +20,7 @@ class Details extends React.Component {
       title: '操作类型属性描述',
       dataIndex: 'operationTypePropertyDescribe',
       render: text => (
-        <div className="addEllipsis" style={{ width: '100px' }} title={text}>
+        <div className="addEllipsis" style={{ width: '200px' }} title={text}>
           {text}
         </div>
       ),
@@ -29,7 +29,7 @@ class Details extends React.Component {
       title: formatMessage({ id: 'bp.operation.newValue' }),
       dataIndex: 'newValue',
       render: text => (
-        <div className="addEllipsis" style={{ width: '50px' }} title={text}>
+        <div className="addEllipsis" style={{ width: '100px' }} title={text}>
           {text}
         </div>
       ),
@@ -38,7 +38,7 @@ class Details extends React.Component {
       title: formatMessage({ id: 'bp.operation.oldValue' }),
       dataIndex: 'oldValue',
       render: text => (
-        <div className="addEllipsis" style={{ width: '50px' }} title={text}>
+        <div className="addEllipsis" style={{ width: '100px' }} title={text}>
           {text}
         </div>
       ),
@@ -47,7 +47,7 @@ class Details extends React.Component {
       title: formatMessage({ id: 'bp.operation.keyword' }),
       dataIndex: 'keyword',
       render: text => (
-        <div className="addEllipsis" style={{ width: '50px' }} title={text}>
+        <div className="addEllipsis" style={{ width: '100px' }} title={text}>
           {text}
         </div>
       ),

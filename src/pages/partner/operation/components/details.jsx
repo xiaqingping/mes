@@ -5,9 +5,9 @@ import {
   Drawer,
 } from 'antd';
 import * as React from 'react';
-import api from '@/api'
+import api from '@/api';
 import { formatMessage } from 'umi/locale';
-import './style.less'
+import './style.less';
 
 // 状态
 // const status = {
@@ -35,26 +35,38 @@ class Details extends React.Component {
     {
       title: formatMessage({ id: 'bp.operation.field' }),
       dataIndex: 'fieldName',
-      render: text => <div className="addEllipsis"
-      style={{ width: '100px' }} title={text}>{text}</div>,
+      render: text => (
+        <div className="addEllipsis" style={{ width: '100px' }} title={text}>
+          {text}
+        </div>
+      ),
     },
     {
       title: formatMessage({ id: 'bp.operation.newValue' }),
       dataIndex: 'newValue',
-      render: text => <div className="addEllipsis"
-      style={{ width: '50px' }} title={text}>{text}</div>,
+      render: text => (
+        <div className="addEllipsis" style={{ width: '50px' }} title={text}>
+          {text}
+        </div>
+      ),
     },
     {
       title: formatMessage({ id: 'bp.operation.oldValue' }),
       dataIndex: 'oldValue',
-      render: text => <div className="addEllipsis"
-      style={{ width: '50px' }} title={text}>{text}</div>,
+      render: text => (
+        <div className="addEllipsis" style={{ width: '50px' }} title={text}>
+          {text}
+        </div>
+      ),
     },
     {
       title: formatMessage({ id: 'bp.operation.keyword' }),
       dataIndex: 'keyword',
-      render: text => <div className="addEllipsis"
-      style={{ width: '50px' }} title={text}>{text}</div>,
+      render: text => (
+        <div className="addEllipsis" style={{ width: '50px' }} title={text}>
+          {text}
+        </div>
+      ),
     },
     // {
     //   title: formatMessage({ id: 'bp.operation.state' }),
@@ -89,12 +101,12 @@ class Details extends React.Component {
     // },
   ];
 
-  componentWillReceiveProps (nextProps) {
+  componentWillReceiveProps(nextProps) {
     const { detailsVisible } = nextProps;
     const { detailsValue } = nextProps;
     this.setState({
       visible: detailsVisible,
-    })
+    });
     this.getData(detailsValue);
   }
 
@@ -103,12 +115,12 @@ class Details extends React.Component {
       api.bp.getOperationItems(detailsValue.id).then(res => {
         // eslint-disable-next-line array-callback-return
         res.map((item, index) => {
-          res[index].fieldName = formatMessage({ id: item.fieldName })
-        })
+          res[index].fieldName = formatMessage({ id: item.fieldName });
+        });
         this.setState({
           list: res,
-        })
-      })
+        });
+      });
     }
   };
 
@@ -119,7 +131,7 @@ class Details extends React.Component {
   };
 
   onClose = () => {
-    this.props.detailsVisibleClose(false)
+    this.props.detailsVisibleClose(false);
     this.setState({
       visible: false,
     });
@@ -134,11 +146,16 @@ class Details extends React.Component {
           closable={false}
           onClose={this.onClose}
           visible={visible}
-          width= "600"
+          width="600"
           className="myTables"
         >
-            <Table dataSource={list} rowKey={(record, index) => index}
-            columns={this.columns} size="small" pagination={false}/>
+          <Table
+            dataSource={list}
+            rowKey={(record, index) => index}
+            columns={this.columns}
+            size="small"
+            pagination={false}
+          />
         </Drawer>
       </div>
     );
