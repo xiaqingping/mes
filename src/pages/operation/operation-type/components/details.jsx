@@ -20,7 +20,7 @@ class Details extends React.Component {
       title: '操作类型属性编号',
       dataIndex: 'code',
       render: text => (
-        <div className="addEllipsis" style={{ width: '100px' }} title={text}>
+        <div className="addEllipsis" style={{ width: '150px' }} title={text}>
           {text}
         </div>
       ),
@@ -29,7 +29,7 @@ class Details extends React.Component {
       title: '操作类型属性描述',
       dataIndex: 'describe',
       render: text => (
-        <div className="addEllipsis" style={{ width: '100px' }} title={text}>
+        <div className="addEllipsis" style={{ width: '150px' }} title={text}>
           {text}
         </div>
       ),

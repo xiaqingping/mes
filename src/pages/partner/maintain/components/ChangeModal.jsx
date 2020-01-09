@@ -30,6 +30,7 @@ import './index.less';
 import PersonCertificationAddModal from './PersonCertificationAddModal';
 import { guid, formatter } from '@/utils/utils';
 
+// const { confirm } = Modal;
 const { Paragraph } = Typography;
 const FormItem = Form.Item;
 const InputGroup = Input.Group;
@@ -395,7 +396,6 @@ class ChangeModal extends Component {
                 sourceCode: res.organizationCertification.attachmentCode,
               })
               .then(v => {
-                console.log(v);
                 v.forEach(item => {
                   diskFileIdList.push(item.diskFileId);
                 });
@@ -493,9 +493,26 @@ class ChangeModal extends Component {
       recordMsg,
       gtype,
       guuid,
+      // groupNameShow,
     } = this.state;
+
     this.props.form.validateFields((error, row) => {
-      if (error) return;
+      // if (!groupNameShow) {
+      //   if (row.msg.name !== basic.name) {
+      //     confirm({
+      //       title: '确定要修改名字吗?',
+      //       content: '修改名称认证资料需重新审核，所有售达方及送达方全部清空，信用数据将全部失效',
+      //       okText: '确定',
+      //       okType: 'danger',
+      //       cancelText: '取消',
+      //       centered: true,
+      //       onOk() {},
+      //       onCancel() {},
+      //     });
+      //   }
+      // }
+      if (error) return false;
+
       let data = {};
       data = {
         basic: {
@@ -538,6 +555,7 @@ class ChangeModal extends Component {
         this.setState({ submitNext: 2 });
         this.props.getData();
       });
+      return null;
     });
   };
 
