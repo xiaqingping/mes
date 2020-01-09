@@ -291,13 +291,13 @@ export default {
   },
   // 组织类型合作伙伴解除手机绑定接口
   mobilePhoneUnbind(id) {
-    return request(`/businessPartner/v1/${id}/mobilePhone/unbind`, {
+    return request(`/businessPartners/v1/${id}/mobilePhone/unbind`, {
       method: 'POST',
     });
   },
   // 组织类型合作伙伴解除邮箱绑定接口
   emailUnbind(id) {
-    return request(`/businessPartner/v1/${id}/email/unbind`, {
+    return request(`/businessPartners/v1/${id}/email/unbind`, {
       method: 'POST',
     });
   },
