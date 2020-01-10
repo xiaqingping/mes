@@ -9,5 +9,5 @@ build:
     - npm run build
   environment:
     name: mes
-  only:
-  - develop
+  # only:
+  # - develop
