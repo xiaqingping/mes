@@ -66,6 +66,7 @@ class FixedQuota extends Component {
     const term = {
       id: details.basic.id,
       currencyCode: details.customer.salesAreaList[0].currencyCode,
+      billToPartyId: details.basic.type === 2 ? '' : this.props.billToPartyId,
     };
     if (details.basic.type === 2) {
       term.billToPartyId = this.props.billToPartyId;

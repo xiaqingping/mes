@@ -566,14 +566,21 @@ class CheckModel extends React.Component {
       this.setState({
         approvedLoading: true,
       });
-      api.bp.approvalVerifyRecords(id).then(() => {
-        this.setState({
-          pageVisble,
-          modal1Visible: false,
-          approvedLoading: false,
+      api.bp
+        .approvalVerifyRecords(id)
+        .then(() => {
+          this.setState({
+            pageVisble,
+            modal1Visible: false,
+            approvedLoading: false,
+          });
+          this.props.getData();
+        })
+        .catch(() => {
+          this.setState({
+            approvedLoading: false,
+          });
         });
-        this.props.getData();
-      });
     }
     if (pageVisble === 2) {
       api.bp.refuseVerifyRecords(id).then(() => {

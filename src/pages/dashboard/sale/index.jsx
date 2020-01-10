@@ -303,11 +303,11 @@ class Sale extends React.Component {
       <div style={{ marginRight: '100px' }}>
         <Form className="mySet">
           <Row>
-            <Col xxl={7} lg={7} sm={24}>
+            <Col xxl={7} lg={12} sm={24}>
               <Form.Item>
                 {getFieldDecorator('companys', { initialValue: '3100' })(
                   <Select
-                    style={{ width: '400px' }}
+                    style={{ width: '90%' }}
                     onChange={v => this.companyChange(v)}
                     mode="multiple"
                     maxTagCount={2}
@@ -324,11 +324,11 @@ class Sale extends React.Component {
                 )}
               </Form.Item>
             </Col>
-            <Col xxl={7} lg={7} sm={24}>
+            <Col xxl={7} lg={12} sm={24}>
               <Form.Item>
                 {getFieldDecorator('profitCenters')(
                   <Select
-                    style={{ width: '400px' }}
+                    style={{ width: '90%' }}
                     mode="multiple"
                     onChange={v => this.profitCenterChange(v)}
                     maxTagCount={2}
@@ -346,23 +346,23 @@ class Sale extends React.Component {
                 )}
               </Form.Item>
             </Col>
-            <Col xxl={10} lg={20} sm={20}>
-              <Form.Item style={{ float: 'left' }}>
+            <Col xxl={10} lg={24} sm={24}>
+              <Form.Item style={{ float: 'left', width: '20%' }}>
                 {getFieldDecorator('type', {
                   initialValue: selectType,
                 })(
-                  <Select style={{ width: '121px' }} onChange={v => this.selectTypeChange(v)}>
+                  <Select onChange={v => this.selectTypeChange(v)}>
                     <Option value="1">选择大区</Option>
                     <Option value="2">选择网点</Option>
                     <Option value="3">选择销售员</Option>
                   </Select>,
                 )}
               </Form.Item>
-              <Form.Item style={{ float: 'left' }}>
+              <Form.Item style={{ float: 'left', width: '80%' }}>
                 {getFieldDecorator('typeName')(
                   parseInt(selectType, 10) === 3 ? (
                     <AutoComplete
-                      style={{ width: '400px' }}
+                      // style={{ width: '300px' }}
                       dataSource={salersData.map(renderOption)}
                       onSearch={this.searchSaler}
                       onSelect={this.salersChange}

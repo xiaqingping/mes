@@ -94,7 +94,7 @@ class Operation extends React.Component {
     const {
       formValues: { pageSize },
     } = this.state;
-    const { languageCode } = this.props;
+    // const { languageCode } = this.props;
     const op = options;
     let newData = [];
     if (op.operationDate) {
@@ -200,15 +200,19 @@ class Operation extends React.Component {
           </Col>
           {/* 来源编号 */}
           <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
-            <FormItem label="来源编号">{getFieldDecorator('sourceCode')(<Input />)}</FormItem>
+            <FormItem label={formatMessage({ id: 'operation.operation.sourceCode' })}>
+              {getFieldDecorator('sourceCode')(<Input />)}
+            </FormItem>
           </Col>
           {/* 来源名称 */}
           <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
-            <FormItem label="来源名称">{getFieldDecorator('sourceName')(<Input />)}</FormItem>
+            <FormItem label={formatMessage({ id: 'operation.operation.sourceName' })}>
+              {getFieldDecorator('sourceName')(<Input />)}
+            </FormItem>
           </Col>
           {/* 操作记录类型 */}
           <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
-            <FormItem label="操作类型">
+            <FormItem label={formatMessage({ id: 'operation.operation.operationType' })}>
               {getFieldDecorator('operationTypeId')(
                 <Select placeholder={formatMessage({ id: 'bp.pleaseSelect' })}>
                   {/* <Select mode="multiple" showArrow> */}
@@ -221,10 +225,12 @@ class Operation extends React.Component {
           </Col>
           {/* 操作人编号 */}
           <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
-            <FormItem label="操作人编号">{getFieldDecorator('operatorCode')(<Input />)}</FormItem>
+            <FormItem label={formatMessage({ id: 'operation.operatorNumber' })}>
+              {getFieldDecorator('operatorCode')(<Input />)}
+            </FormItem>
           </Col>
           <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
-            <FormItem label="操作时间">
+            <FormItem label={formatMessage({ id: 'operation.operationTime' })}>
               {getFieldDecorator('operationDate')(<RangePicker />)}
             </FormItem>
           </Col>
@@ -263,11 +269,15 @@ class Operation extends React.Component {
           </Col>
           {/* 来源编号 */}
           <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
-            <FormItem label="来源编号">{getFieldDecorator('sourceCode')(<Input />)}</FormItem>
+            <FormItem label={formatMessage({ id: 'operation.operation.sourceCode' })}>
+              {getFieldDecorator('sourceCode')(<Input />)}
+            </FormItem>
           </Col>
           {/* 来源名称 */}
           <Col xxl={6} lg={languageCode === 'EN' ? 12 : 0}>
-            <FormItem label="来源名称">{getFieldDecorator('sourceName')(<Input />)}</FormItem>
+            <FormItem label={formatMessage({ id: 'operation.operation.sourceName' })}>
+              {getFieldDecorator('sourceName')(<Input />)}
+            </FormItem>
           </Col>
           <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
             <span className="submitButtons">
@@ -278,7 +288,7 @@ class Operation extends React.Component {
                 {formatMessage({ id: 'bp.maintain.reset' })}
               </Button>
               <a style={{ marginLeft: 8 }} onClick={this.toggleForm}>
-                {formatMessage({ id: 'bp.maintain.putAway' })} <Icon type="up" />
+                {formatMessage({ id: 'bp.verification.open' })} <Icon type="down" />
               </a>
             </span>
           </Col>
@@ -306,7 +316,9 @@ class Operation extends React.Component {
         width: 140,
       },
       {
-        title: '来源编号/来源名称',
+        title: `${formatMessage({ id: 'operation.operation.sourceCode' })}/${formatMessage({
+          id: 'operation.operation.sourceName',
+        })}`,
         dataIndex: 'sourceCode',
         render(text, record) {
           return (
@@ -318,13 +330,12 @@ class Operation extends React.Component {
         },
       },
       {
-        title: '操作类型描述',
+        title: formatMessage({ id: 'operation.actionTypePropertyDescription' }),
         dataIndex: 'operationTypeDescribe',
         render(text) {
           return (
             <div
               style={{
-                width: '200px',
                 overflow: 'hidden',
                 whiteSpace: 'nowrap',
                 textOverflow: 'ellipsis',
@@ -337,7 +348,9 @@ class Operation extends React.Component {
         },
       },
       {
-        title: '操作人编号/操作人名称',
+        title: `${formatMessage({ id: 'operation.operatorNumber' })}/${formatMessage({
+          id: 'operation.operatorName',
+        })}`,
         dataIndex: 'operatorCode',
         render(text, record) {
           return (
@@ -349,12 +362,12 @@ class Operation extends React.Component {
         },
       },
       {
-        title: '操作时间',
+        title: formatMessage({ id: 'operation.operationTime' }),
         dataIndex: 'operationDate',
       },
       {
         fixed: 'right',
-        title: formatMessage({ id: 'bp.operation.operation' }),
+        title: formatMessage({ id: 'action.operation' }),
         width: 150,
         render: (text, record) => (
           <a onClick={e => this.showDrawer(record, e)}>

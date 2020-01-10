@@ -30,7 +30,7 @@ import './index.less';
 import PersonCertificationAddModal from './PersonCertificationAddModal';
 import { guid, formatter } from '@/utils/utils';
 
-// const { confirm } = Modal;
+const { confirm } = Modal;
 const { Paragraph } = Typography;
 const FormItem = Form.Item;
 const InputGroup = Input.Group;
@@ -454,9 +454,43 @@ class ChangeModal extends Component {
       });
   };
 
-  // 个人提交
-  handlePersonOk = e => {
+  // 个人提交判断是否修改过名称
+  handlePerson = e => {
     if (e) e.preventDefault();
+    const {
+      userData: { basic },
+      personalShow,
+    } = this.state;
+    const self = this;
+    if (!personalShow) {
+      if (this.props.form.getFieldValue('pname').length === 0) return false;
+      if (!this.props.form.getFieldValue('pname').name) return false;
+      if (this.props.form.getFieldValue('pname').name !== basic.name) {
+        confirm({
+          title: '确定要修改名字吗?',
+          content: '修改名称认证资料需重新审核，所有售达方及送达方全部清空，信用数据将全部失效',
+          okText: '确定',
+          okType: 'danger',
+          cancelText: '取消',
+          centered: true,
+          onOk() {
+            self.handlePersonOk();
+          },
+          onCancel() {
+            return false;
+          },
+        });
+      } else {
+        self.handlePersonOk();
+      }
+    } else {
+      self.handlePersonOk();
+    }
+    return null;
+  };
+
+  // 个人提交
+  handlePersonOk = () => {
     const { newDataList, userData, recordMsg, deletePiCertificationIdList } = this.state;
     const newPiCertificationList = [];
     newDataList.forEach(item => {
@@ -482,9 +516,42 @@ class ChangeModal extends Component {
     });
   };
 
-  // 组织提交
-  handleOrganizationOk = e => {
+  // 组织提交判断是否修改过名称
+  handleOrganization = e => {
     if (e) e.preventDefault();
+    const {
+      userData: { basic },
+      groupNameShow,
+    } = this.state;
+    const self = this;
+    this.props.form.validateFields((error, row) => {
+      if (!groupNameShow) {
+        if (row.msg.name !== basic.name) {
+          confirm({
+            title: '确定要修改名字吗?',
+            content: '修改名称认证资料需重新审核，所有售达方及送达方全部清空，信用数据将全部失效',
+            okText: '确定',
+            okType: 'danger',
+            cancelText: '取消',
+            centered: true,
+            onOk() {
+              self.handleOrganizationOk();
+            },
+            onCancel() {
+              return false;
+            },
+          });
+        } else {
+          self.handleOrganizationOk();
+        }
+      } else {
+        self.handleOrganizationOk();
+      }
+    });
+  };
+
+  // 组织提交
+  handleOrganizationOk = () => {
     const {
       address,
       area,
@@ -493,24 +560,9 @@ class ChangeModal extends Component {
       recordMsg,
       gtype,
       guuid,
-      // groupNameShow,
     } = this.state;
 
     this.props.form.validateFields((error, row) => {
-      // if (!groupNameShow) {
-      //   if (row.msg.name !== basic.name) {
-      //     confirm({
-      //       title: '确定要修改名字吗?',
-      //       content: '修改名称认证资料需重新审核，所有售达方及送达方全部清空，信用数据将全部失效',
-      //       okText: '确定',
-      //       okType: 'danger',
-      //       cancelText: '取消',
-      //       centered: true,
-      //       onOk() {},
-      //       onCancel() {},
-      //     });
-      //   }
-      // }
       if (error) return false;
 
       let data = {};
@@ -628,6 +680,7 @@ class ChangeModal extends Component {
     });
   };
 
+  // 个人名称修改
   renderPerform = name => {
     const { personalShow } = this.state;
     return personalShow ? this.personalShow(name) : this.persnalInput(name);
@@ -1230,7 +1283,7 @@ class ChangeModal extends Component {
       };
       modelContent = (
         <>
-          <Form {...formItemLayout} onSubmit={this.handlePersonOk}>
+          <Form {...formItemLayout} onSubmit={this.handlePerson}>
             {this.renderPerform(userData.basic.name)}
             <Row gutter={32}>
               <List
@@ -1277,7 +1330,7 @@ class ChangeModal extends Component {
       modelWidth = 1130;
       modelContent = (
         <>
-          <Form {...formItemLayoutGroup} labelAlign="left" onSubmit={this.handleOrganizationOk}>
+          <Form {...formItemLayoutGroup} labelAlign="left" onSubmit={this.handleOrganization}>
             <Row gutter={32}>
               <>
                 {this.renderGroupNameForm()}
@@ -1497,7 +1550,7 @@ class ChangeModal extends Component {
       modelWidth = 800;
       modelContent = (
         <>
-          <Form {...formItemLayout} onSubmit={this.handleOrganizationOk}>
+          <Form {...formItemLayout} onSubmit={this.handleOrganization}>
             <Row gutter={32}>
               {this.renderGroupNameForm()}
               {this.renderAdressForm()}
@@ -1582,7 +1635,7 @@ class ChangeModal extends Component {
       modelWidth = 800;
       modelContent = (
         <>
-          <Form {...formItemLayout} onSubmit={this.handleOrganizationOk}>
+          <Form {...formItemLayout} onSubmit={this.handleOrganization}>
             <Row gutter={32}>
               {this.renderGroupNameForm()}
               {this.renderAdressForm()}
@@ -1672,7 +1725,7 @@ class ChangeModal extends Component {
       };
       modelContent = (
         <>
-          <Form {...formItemLayout} onSubmit={this.handlePersonOk}>
+          <Form {...formItemLayout} onSubmit={this.handlePerson}>
             {this.renderPerform(userData.basic.name)}
             <Row gutter={32}>
               <List
@@ -1719,7 +1772,7 @@ class ChangeModal extends Component {
       modelWidth = 1130;
       modelContent = (
         <>
-          <Form {...formItemLayoutGroup} labelAlign="left" onSubmit={this.handleOrganizationOk}>
+          <Form {...formItemLayoutGroup} labelAlign="left" onSubmit={this.handleOrganization}>
             <Row gutter={32}>
               <>
                 {this.renderGroupNameForm()}
@@ -1940,7 +1993,7 @@ class ChangeModal extends Component {
       modelWidth = 800;
       modelContent = (
         <>
-          <Form {...formItemLayout} onSubmit={this.handleOrganizationOk}>
+          <Form {...formItemLayout} onSubmit={this.handleOrganization}>
             <Row gutter={32}>
               {this.renderGroupNameForm()}
               {this.renderAdressForm()}
@@ -2026,7 +2079,7 @@ class ChangeModal extends Component {
       modelWidth = 800;
       modelContent = (
         <>
-          <Form {...formItemLayout} onSubmit={this.handleOrganizationOk}>
+          <Form {...formItemLayout} onSubmit={this.handleOrganization}>
             <Row gutter={32}>
               {this.renderGroupNameForm()}
               {this.renderAdressForm()}

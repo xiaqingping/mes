@@ -1,23 +1,20 @@
-import {
-  // Badge,
-  Form,
-  Table,
-  Drawer,
-} from 'antd';
+import { Empty, Form, Table, Drawer } from 'antd';
 import * as React from 'react';
 import api from '@/api';
-// import { formatMessage } from 'umi/locale';
+import { formatMessage } from 'umi/locale';
 import './style.less';
 
 class Details extends React.Component {
   state = {
     visible: false,
+    loading: true,
     list: [],
+    err: false,
   };
 
   columns = [
     {
-      title: '操作类型属性编号',
+      title: formatMessage({ id: 'operation.operationType.actionTypePropertyNumber' }),
       dataIndex: 'code',
       render: text => (
         <div className="addEllipsis" style={{ width: '150px' }} title={text}>
@@ -26,7 +23,7 @@ class Details extends React.Component {
       ),
     },
     {
-      title: '操作类型属性描述',
+      title: formatMessage({ id: 'operation.actionTypePropertyDescription' }),
       dataIndex: 'describe',
       render: text => (
         <div className="addEllipsis" style={{ width: '150px' }} title={text}>
@@ -35,16 +32,16 @@ class Details extends React.Component {
       ),
     },
     {
-      title: '操作人名称',
+      title: formatMessage({ id: 'operation.actionTypePropertyDescription' }),
       dataIndex: 'operatorName',
       render: text => (
-        <div className="addEllipsis" style={{ width: '100px' }} title={text}>
+        <div className="addEllipsis" style={{ width: '150px' }} title={text}>
           {text}
         </div>
       ),
     },
     {
-      title: '操作时间',
+      title: formatMessage({ id: 'operation.operationTime' }),
       dataIndex: 'operationDate',
       render: text => (
         <div className="addEllipsis" style={{ width: '100px' }} title={text}>
@@ -59,20 +56,30 @@ class Details extends React.Component {
     const { detailsValue } = nextProps;
     this.setState({
       visible: detailsVisible,
+      loading: true,
+      list: [],
     });
     this.getData(detailsValue);
   }
 
   getData = detailsValue => {
     if (detailsValue) {
-      api.operation.getOperationTypeProperty(detailsValue.id, { languageCode: 'CN' }).then(res => {
-        // res.map((item, index) => {
-        //   res[index].fieldName = formatMessage({ id: item.fieldName });
-        // });
-        this.setState({
-          list: res,
+      api.operation
+        .getOperationTypeProperty(detailsValue.id, { languageCode: 'CN' })
+        .then(res => {
+          // res.map((item, index) => {
+          //   res[index].fieldName = formatMessage({ id: item.fieldName });
+          // });
+          this.setState({
+            list: res,
+            loading: false,
+          });
+        })
+        .catch(() => {
+          this.setState({
+            err: true,
+          });
         });
-      });
     }
   };
 
@@ -90,7 +97,7 @@ class Details extends React.Component {
   };
 
   render() {
-    const { list, visible } = this.state;
+    const { list, visible, loading, err } = this.state;
     return (
       <div>
         <Drawer
@@ -98,16 +105,22 @@ class Details extends React.Component {
           closable={false}
           onClose={this.onClose}
           visible={visible}
-          width="600"
+          width="650"
           className="myTables"
+          destroyOnClose
         >
-          <Table
-            dataSource={list}
-            rowKey={(record, index) => index}
-            columns={this.columns}
-            size="small"
-            pagination={false}
-          />
+          {err ? (
+            <Empty />
+          ) : (
+            <Table
+              dataSource={list}
+              rowKey={(record, index) => index}
+              columns={this.columns}
+              loading={loading}
+              size="small"
+              pagination={false}
+            />
+          )}
         </Drawer>
       </div>
     );

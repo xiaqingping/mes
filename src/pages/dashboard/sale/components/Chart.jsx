@@ -752,7 +752,7 @@ class Chart extends React.Component {
         {errs ? (
           <>
             <h3 style={{ paddingTop: '50px', fontWeight: 'bold' }}>销售额趋势</h3>
-            <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} style={{ paddingRight: '935px' }} />
+            <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} style={{ width: '68%' }} />
           </>
         ) : (
           <div id="container"></div>

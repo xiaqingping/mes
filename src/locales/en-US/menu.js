@@ -35,7 +35,7 @@ export default {
   'menu.bp.operation': 'Operation Record',
   'menu.bp.verification': 'Verification record',
   'menu.operation': 'Operation Record',
-  'menu.operation.operation': 'Operation Record',
+  'menu.operation.operation': 'Operation Record List',
   'menu.operation.operation-type': 'Operation Record Type',
   'menu.peptide': 'peptide',
   'menu.peptide.order': 'order',
