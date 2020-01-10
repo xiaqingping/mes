@@ -326,6 +326,7 @@ class ChangeModal extends Component {
       pageLoading: true,
       industryCategory: [],
       noHaveLev: false,
+      switchCountryName: '',
     };
     this.fetchBank = debounce(this.fetchBank, 500);
   }
@@ -440,7 +441,9 @@ class ChangeModal extends Component {
     }
   };
 
+  // 输入银行关键字
   fetchBank = value => {
+    const { switchCountryName } = this.state;
     if (!value) {
       this.setState({ bank: [] });
       return;
@@ -448,6 +451,7 @@ class ChangeModal extends Component {
     api.basic
       .getBanks({
         codeOrFullName: value,
+        countryCode: switchCountryName,
       })
       .then(bank => {
         this.setState({ bank });
@@ -644,6 +648,7 @@ class ChangeModal extends Component {
       defaultAddress: '',
       noHaveLev: false,
       guuid: guid(),
+      switchCountryName: '',
     });
   };
 
@@ -731,6 +736,10 @@ class ChangeModal extends Component {
 
   // 国家修改模式
   countryChangeType = (v, noHaveLev) => {
+    this.setState({
+      switchCountryName: v,
+    });
+    this.props.form.resetFields('bankCode');
     if (noHaveLev === 2) {
       this.setState({
         noHaveLev: true,
