@@ -1,9 +1,4 @@
-import {
-  // Badge,
-  Form,
-  Table,
-  Drawer,
-} from 'antd';
+import { Empty, Form, Table, Drawer } from 'antd';
 import * as React from 'react';
 import api from '@/api';
 import { formatMessage } from 'umi/locale';
@@ -13,11 +8,13 @@ class Details extends React.Component {
   state = {
     visible: false,
     list: [],
+    err: false,
+    loading: true,
   };
 
   columns = [
     {
-      title: '操作类型属性描述',
+      title: formatMessage({ id: 'operation.actionTypePropertyDescription' }),
       dataIndex: 'operationTypePropertyDescribe',
       render: text => (
         <div className="addEllipsis" style={{ width: '200px' }} title={text}>
@@ -90,22 +87,31 @@ class Details extends React.Component {
     const { detailsValue } = nextProps;
     this.setState({
       visible: detailsVisible,
+      loading: true,
+      list: [],
     });
     this.getData(detailsValue);
   }
 
   getData = detailsValue => {
     if (detailsValue) {
-      api.operation.getOperationItems(detailsValue.id, { languageCode: 'CN' }).then(res => {
-        console.log(res);
-        // res.map((item, index) => {
-        //   res[index].fieldName = formatMessage({ id: item.fieldName });
-        //   return null;
-        // });
-        this.setState({
-          list: res,
+      api.operation
+        .getOperationItems(detailsValue.id, { languageCode: 'CN' })
+        .then(res => {
+          // res.map((item, index) => {
+          //   res[index].fieldName = formatMessage({ id: item.fieldName });
+          //   return null;
+          // });
+          this.setState({
+            list: res,
+            loading: false,
+          });
+        })
+        .catch(() => {
+          this.setState({
+            err: true,
+          });
         });
-      });
     }
   };
 
@@ -123,7 +129,7 @@ class Details extends React.Component {
   };
 
   render() {
-    const { list, visible } = this.state;
+    const { list, visible, loading, err } = this.state;
     return (
       <div>
         <Drawer
@@ -134,13 +140,18 @@ class Details extends React.Component {
           width="600"
           className="myTables"
         >
-          <Table
-            dataSource={list}
-            rowKey={(record, index) => index}
-            columns={this.columns}
-            size="small"
-            pagination={false}
-          />
+          {err ? (
+            <Empty />
+          ) : (
+            <Table
+              dataSource={list}
+              rowKey={(record, index) => index}
+              columns={this.columns}
+              loading={loading}
+              size="small"
+              pagination={false}
+            />
+          )}
         </Drawer>
       </div>
     );

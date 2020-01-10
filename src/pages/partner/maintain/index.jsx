@@ -459,7 +459,7 @@ class Maintain extends React.Component {
                 {formatMessage({ id: 'bp.maintain.reset' })}
               </Button>
               <a style={{ marginLeft: 8 }} onClick={this.toggleForm}>
-                {formatMessage({ id: 'bp.maintain.putAway' })} <Icon type="up" />
+                {formatMessage({ id: 'bp.verification.open' })} <Icon type="down" />
               </a>
             </span>
           </Col>

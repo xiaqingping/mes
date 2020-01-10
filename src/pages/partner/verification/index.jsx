@@ -203,7 +203,7 @@ class Verification extends React.Component {
 
   /** 部分筛选条件 */
   renderSimpleForm = () => {
-    const { form, languageCode } = this.props;
+    const { form, languageCode, preTypeAll } = this.props;
     const { partnerVal } = this.state;
     const { getFieldDecorator } = form;
     return (
@@ -216,14 +216,14 @@ class Verification extends React.Component {
               )}
             </FormItem>
           </Col>
-          <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
+          {/* <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
             <FormItem label={formatMessage({ id: 'bp.verification.operationCode' })}>
               {getFieldDecorator('bpOperationRecordCode')(
                 <Input placeholder={formatMessage({ id: 'bp.inputHere' })} />,
               )}
             </FormItem>
-          </Col>
-          <Col xxl={6} lg={languageCode === 'EN' ? 12 : 0}>
+          </Col> */}
+          <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
             <FormItem label={formatMessage({ id: 'bp.verification.businessPartner' })}>
               {getFieldDecorator('bpId')(
                 <AutoComplete
@@ -232,6 +232,23 @@ class Verification extends React.Component {
                   placeholder={formatMessage({ id: 'bp.inputHere' })}
                   optionLabelProp="text"
                 />,
+              )}
+            </FormItem>
+          </Col>
+          <Col xxl={6} lg={languageCode === 'EN' ? 12 : 0}>
+            <FormItem label={formatMessage({ id: 'bp.verification.type' })}>
+              {getFieldDecorator('type')(
+                <Select
+                  placeholder={formatMessage({ id: 'bp.pleaseSelect' })}
+                  optionLabelProp="label"
+                >
+                  {preTypeAll.map(state => (
+                    <Option key={state.value} value={state.value} label={state.text}>
+                      {' '}
+                      {state.text}
+                    </Option>
+                  ))}
+                </Select>,
               )}
             </FormItem>
           </Col>
@@ -273,13 +290,13 @@ class Verification extends React.Component {
               )}
             </FormItem>
           </Col>
-          <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
+          {/* <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
             <FormItem label={formatMessage({ id: 'bp.verification.operationCode' })}>
               {getFieldDecorator('bpCode')(
                 <Input placeholder={formatMessage({ id: 'bp.inputHere' })} />,
               )}
             </FormItem>
-          </Col>
+          </Col> */}
           <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
             <FormItem label={formatMessage({ id: 'bp.verification.businessPartner' })}>
               {getFieldDecorator('bpId')(

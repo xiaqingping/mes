@@ -61,22 +61,32 @@ class PersonCredit extends React.Component {
           </>
         }
       >
-        <span>
-          <span style={{ color: '#3C88D4' }}>{item.creditLimit ? `${item.creditLimit} ` : ''}</span>
-          {item.creditLimit ? `${item.currencyCode} ` : ''}
-          {moment(item.lastEvaluationDate).fromNow()}
-        </span>
-        <br />
-        <br />
-        <span>
-          <span style={{ color: '#3C88D4' }}>
-            {item.tempCreditLimit ? `${item.tempCreditLimit} ` : ''}
-          </span>
-          {item.tempCreditLimit ? `${item.currencyCode} ` : ''}
-          {moment(item.tempCreditLimitExpirationDate).fromNow()}
-        </span>
-        <br />
-        <br />
+        {item.creditLimit ? (
+          <>
+            <span>
+              <span style={{ color: '#1890ff', fontWeight: '600' }}>{item.creditLimit} </span>
+              {` ${item.currencyCode} `}&nbsp;&nbsp;&nbsp;&nbsp;
+              {moment(item.lastEvaluationDate).fromNow()}调整
+            </span>
+            <br />
+            <br />
+          </>
+        ) : (
+          ''
+        )}
+        {item.tempCreditLimit ? (
+          <>
+            <span>
+              <span style={{ color: '#1890ff', fontWeight: '600' }}>{item.tempCreditLimit} </span>
+              {` ${item.currencyCode} `}&nbsp;&nbsp;&nbsp;&nbsp;
+              {moment(item.tempCreditLimitExpirationDate).fromNow()}到期
+            </span>
+            <br />
+            <br />
+          </>
+        ) : (
+          ''
+        )}
         <span>
           {formatMessage(
             { id: 'bp.maintain_details.credit_management.dueDate' },

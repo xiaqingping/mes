@@ -167,14 +167,26 @@ class Operation extends React.Component {
       form: { getFieldDecorator },
       languageCode,
     } = this.props;
+    const formItemLayout = {
+      labelCol: { span: 16 },
+      wrapperCol: { span: 8, offset: 1 },
+    };
     return (
-      <Form onSubmit={this.handleSearch} layout="inline" className="longLabel">
+      <Form onSubmit={this.handleSearch} {...formItemLayout} layout="inline" className="longLabel">
         <Row gutter={{ xxl: 100, lg: 80 }}>
           <Col xxl={8} lg={languageCode === 'EN' ? 12 : 8}>
-            <FormItem label="操作记录类型编号">{getFieldDecorator('code')(<Input />)}</FormItem>
+            <FormItem
+              label={formatMessage({ id: 'operation.operationType.actionRecordTypeNumber' })}
+            >
+              {getFieldDecorator('code')(<Input />)}
+            </FormItem>
           </Col>
           <Col xxl={8} lg={languageCode === 'EN' ? 12 : 8}>
-            <FormItem label="操作记录类型描述">{getFieldDecorator('describe')(<Input />)}</FormItem>
+            <FormItem
+              label={formatMessage({ id: 'operation.operationType.descriptionOfActionRecordType' })}
+            >
+              {getFieldDecorator('describe')(<Input />)}
+            </FormItem>
           </Col>
           <Col xxl={8} lg={languageCode === 'EN' ? 12 : 8}>
             <span className="submitButtons">
@@ -209,13 +221,12 @@ class Operation extends React.Component {
         dataIndex: 'code',
       },
       {
-        title: '操作记录类型描述',
+        title: formatMessage({ id: 'operation.operationType.descriptionOfActionRecordType' }),
         dataIndex: 'describe',
         render(text) {
           return (
             <div
               style={{
-                width: '200px',
                 overflow: 'hidden',
                 whiteSpace: 'nowrap',
                 textOverflow: 'ellipsis',
@@ -228,7 +239,9 @@ class Operation extends React.Component {
         },
       },
       {
-        title: '操作人编号/操作人名称',
+        title: `${formatMessage({ id: 'operation.operation.sourceCode' })}/${formatMessage({
+          id: 'operation.operation.sourceName',
+        })}`,
         dataIndex: 'operatorCode',
         render(text, record) {
           return (
@@ -240,12 +253,12 @@ class Operation extends React.Component {
         },
       },
       {
-        title: '操作时间',
+        title: formatMessage({ id: 'operation.operationTime' }),
         dataIndex: 'operationDate',
       },
       {
         fixed: 'right',
-        title: formatMessage({ id: 'bp.operation.operation' }),
+        title: formatMessage({ id: 'action.operation' }),
         width: 150,
         render: (text, record) => (
           <a onClick={e => this.showDrawer(record, e)}>
