@@ -282,11 +282,20 @@ class ChooseSoldToParty extends React.Component {
       {
         title: formatMessage({ id: 'action.operation' }),
         dataIndex: 'operation',
-        render: (text, record) => (
-          <a onClick={() => this.selectRow(record)}>
-            <FormattedMessage id="action.choose" />
-          </a>
-        ),
+        render: (text, record) => {
+          if (this.props.disabledChoose && this.props.disabledChoose(record)) {
+            return (
+              <span style={{ color: '#A9A9A9' }}>
+                <FormattedMessage id="action.choose" />
+              </span>
+            );
+          }
+          return (
+            <a onClick={() => this.selectRow(record)}>
+              <FormattedMessage id="action.choose" />
+            </a>
+          );
+        },
       },
     ];
     return columns;

@@ -141,6 +141,9 @@ class BillToParty extends React.Component {
     this.setStore(newTableData);
   };
 
+  // 根据row判断是否禁止选择此数据
+  disabledChoose = row => row.certificationStatus !== 4;
+
   searchBillToParty = () => {
     this.ChooseBillToParty.wrappedInstance.changeVisible(true);
   };
@@ -258,6 +261,7 @@ class BillToParty extends React.Component {
             this.ChooseBillToParty = ref;
           }}
           selectChooseModalData={this.selectChooseModalData}
+          disabledChoose={this.disabledChoose}
         />
       </EditableContext.Provider>
     );
