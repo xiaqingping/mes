@@ -75,9 +75,11 @@ class OrgCertification extends Component {
       this.setState({ bank: [] });
       return;
     }
+    const { countryCode } = this.props.basic;
     api.basic
       .getBanks({
         codeOrFullName: value,
+        countryCode,
       })
       .then(bank => {
         this.setState({ bank });
@@ -191,6 +193,7 @@ class OrgCertification extends Component {
   renderChina = () => {
     const {
       form: { getFieldDecorator },
+      basic,
       organizationCertification: orgData,
       authorization,
       industryCategoryAll,
@@ -259,6 +262,7 @@ class OrgCertification extends Component {
                   })(
                     <Select
                       showSearch
+                      disabled={!basic.countryCode}
                       notFoundContent={bankFetching ? <Spin size="small" /> : null}
                       filterOption={false}
                       onSearch={this.fetchBank}

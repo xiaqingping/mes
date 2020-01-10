@@ -63,9 +63,11 @@ class Bank extends Component {
       this.setState({ bank: [] });
       return;
     }
+    const { countryCode } = this.props.paymentBank;
     api.basic
       .getBanks({
         codeOrFullName: value,
+        countryCode,
       })
       .then(bank => {
         this.setState({ bank });
@@ -118,6 +120,7 @@ class Bank extends Component {
                 })(
                   <Select
                     showSearch
+                    disabled={!paymentBank.countryCode}
                     notFoundContent={bankFetching ? <Spin size="small" /> : null}
                     filterOption={false}
                     onSearch={this.fetchBank}
