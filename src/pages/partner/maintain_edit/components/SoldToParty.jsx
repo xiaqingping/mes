@@ -142,6 +142,9 @@ class SoldToParty extends React.Component {
     this.setStore(newTableData);
   };
 
+  // 根据row判断是否禁止选择此数据
+  disabledChoose = row => row.certificationStatus !== 4;
+
   searchSoldToParty = () => {
     this.ChooseSoldToParty.wrappedInstance.changeVisible(true);
   };
@@ -254,6 +257,7 @@ class SoldToParty extends React.Component {
             this.ChooseSoldToParty = ref;
           }}
           selectChooseModalData={this.selectChooseModalData}
+          disabledChoose={this.disabledChoose}
         />
       </EditableContext.Provider>
     );
