@@ -4,7 +4,7 @@ stages:
 build:
   stage: build
   script:
-    - cd C:\sangon\project\mes
+    - cd C:/sangon/project/mes
     - git pull
     - npm run build
   environment:
