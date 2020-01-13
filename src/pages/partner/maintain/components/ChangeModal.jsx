@@ -444,7 +444,7 @@ class ChangeModal extends Component {
 
   // 输入银行关键字
   fetchBank = value => {
-    const { switchCountryName } = this.state;
+    const { switchCountryName, userData } = this.state;
     if (!value) {
       this.setState({ bank: [] });
       return;
@@ -452,7 +452,7 @@ class ChangeModal extends Component {
     api.basic
       .getBanks({
         codeOrFullName: value,
-        countryCode: switchCountryName || 'CN',
+        countryCode: switchCountryName || userData.basic.sapCountryCode,
       })
       .then(bank => {
         this.setState({ bank });
