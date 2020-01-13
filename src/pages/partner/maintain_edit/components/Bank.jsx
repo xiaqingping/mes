@@ -46,6 +46,11 @@ class Bank extends Component {
     const { details, vendor, paymentBank } = this.props;
 
     const newPaymentBank = { ...paymentBank, ...{ [key]: value } };
+    // 修改国家时清掉开户行
+    if (key === 'countryCode') {
+      newPaymentBank.bankCode = '';
+      this.props.form.setFieldsValue({ bankCode: '' });
+    }
     const newVendor = { ...vendor, ...{ paymentBank: newPaymentBank } };
     const newDetails = { ...details, ...{ vendor: newVendor } };
 
