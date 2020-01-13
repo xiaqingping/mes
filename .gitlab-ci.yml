@@ -11,6 +11,7 @@ build:
     # - npm set registry https://registry.npm.taobao.org
     - cd c:\sangon\project\mes
     - dir
+    - git pull
     # - npm install
     - npm run build
     # - cp -r dist/* c:/sangon/project/mes/dist
