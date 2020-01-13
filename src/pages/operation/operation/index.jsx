@@ -238,10 +238,10 @@ class Operation extends React.Component {
         <div style={{ overflow: 'hidden' }}>
           <div style={{ float: 'right', marginBottom: 24 }}>
             <Button type="primary" htmlType="submit">
-              {formatMessage({ id: 'bp.operation.query' })}
+              {formatMessage({ id: 'bp.maintain.search' })}
             </Button>
             <Button style={{ marginLeft: 8 }} onClick={this.handleFormReset}>
-              {formatMessage({ id: 'bp.operation.reset' })}
+              {formatMessage({ id: 'bp.maintain.reset' })}
             </Button>
             <a style={{ marginLeft: 8 }} onClick={this.toggleForm}>
               {formatMessage({ id: 'bp.maintain.putAway' })} <Icon type="up" />

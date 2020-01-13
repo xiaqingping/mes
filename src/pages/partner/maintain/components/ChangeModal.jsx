@@ -327,6 +327,7 @@ class ChangeModal extends Component {
       industryCategory: [],
       noHaveLev: false,
       switchCountryName: '',
+      buttonLoading: false,
     };
     this.fetchBank = debounce(this.fetchBank, 500);
   }
@@ -496,6 +497,9 @@ class ChangeModal extends Component {
   // 个人提交
   handlePersonOk = () => {
     const { newDataList, userData, recordMsg, deletePiCertificationIdList } = this.state;
+    this.setState({
+      buttonLoading: true,
+    });
     const newPiCertificationList = [];
     newDataList.forEach(item => {
       newPiCertificationList.push({
@@ -514,10 +518,20 @@ class ChangeModal extends Component {
       deletePiCertificationIdList,
     };
     this.setState({ deletePiCertificationIdList: [] });
-    api.bp.updateBPPiCertificationList(recordMsg.id, data).then(() => {
-      this.handleCancel();
-      this.props.getData();
-    });
+    api.bp
+      .updateBPPiCertificationList(recordMsg.id, data)
+      .then(() => {
+        this.handleCancel();
+        this.props.getData();
+        this.setState({
+          buttonLoading: false,
+        });
+      })
+      .catch(() => {
+        this.setState({
+          buttonLoading: false,
+        });
+      });
   };
 
   // 组织提交判断是否修改过名称
@@ -564,29 +578,53 @@ class ChangeModal extends Component {
       recordMsg,
       gtype,
       guuid,
+      groupAdressShow,
     } = this.state;
-
+    this.setState({
+      buttonLoading: true,
+    });
     this.props.form.validateFields((error, row) => {
       if (error) return false;
-
       let data = {};
-      data = {
-        basic: {
-          id: recordMsg.id,
-          name: row.msg ? row.msg.name : basic.name,
-          countryCode: area[0] ? area[0] : basic.countryCode,
-          provinceCode: area[1] ? area[1] : basic.provinceCode,
-          cityCode: area[2] ? area[2] : basic.cityCode,
-          countyCode: area[3] ? area[3] : basic.countyCode,
-          streetCode: area[4] ? area[4] : basic.streetCode,
-          address: address || basic.address,
-        },
-        organizationCertification: {
-          taxNo: row.taxNo,
-          notes: row.notes,
-          attachmentCode: guuid,
-        },
-      };
+      // 地址是否变更
+      if (groupAdressShow) {
+        data = {
+          basic: {
+            id: recordMsg.id,
+            name: row.msg ? row.msg.name : basic.name,
+            countryCode: basic.countryCode,
+            provinceCode: basic.provinceCode,
+            cityCode: basic.cityCode,
+            countyCode: basic.countyCode,
+            streetCode: basic.streetCode,
+            address: basic.address,
+          },
+          organizationCertification: {
+            taxNo: row.taxNo,
+            notes: row.notes,
+            attachmentCode: guuid,
+          },
+        };
+      } else {
+        data = {
+          basic: {
+            id: recordMsg.id,
+            name: row.msg ? row.msg.name : basic.name,
+            countryCode: area[0] ? area[0] : '',
+            provinceCode: area[1] ? area[1] : '',
+            cityCode: area[2] ? area[2] : '',
+            countyCode: area[3] ? area[3] : '',
+            streetCode: area[4] ? area[4] : '',
+            address,
+          },
+          organizationCertification: {
+            taxNo: row.taxNo,
+            notes: row.notes,
+            attachmentCode: guuid,
+          },
+        };
+      }
+
       if (gtype === 1 || (!gtype && basic.sapCountryCode === 'CN')) {
         Object.assign(data.basic, {
           industryCode: row.industry || basic.industryCode,
@@ -607,10 +645,17 @@ class ChangeModal extends Component {
           registeredAddress: row.regisAddress || '',
         });
       }
-      api.bp.updateBPOrgCertification(data).then(() => {
-        this.setState({ submitNext: 2 });
-        this.props.getData();
-      });
+      api.bp
+        .updateBPOrgCertification(data)
+        .then(() => {
+          this.setState({ submitNext: 2, buttonLoading: false });
+          this.props.getData();
+        })
+        .catch(() => {
+          this.setState({
+            buttonLoading: false,
+          });
+        });
       return null;
     });
   };
@@ -649,6 +694,7 @@ class ChangeModal extends Component {
       noHaveLev: false,
       guuid: guid(),
       switchCountryName: '',
+      buttonLoading: false,
     });
   };
 
@@ -1239,6 +1285,7 @@ class ChangeModal extends Component {
       pageLoading,
       form,
       industryCategory,
+      buttonLoading,
     } = this.state;
     if (!userData.basic || !(pic instanceof Array)) return null;
     const fileList = pic.map(e => ({
@@ -1328,6 +1375,7 @@ class ChangeModal extends Component {
                 htmlType="submit"
                 type="primary"
                 style={{ float: 'right', margin: '10px 20px' }}
+                loading={buttonLoading}
               >
                 {formatMessage({ id: 'action.submit' })}
               </Button>
@@ -1548,6 +1596,7 @@ class ChangeModal extends Component {
                 htmlType="submit"
                 type="primary"
                 style={{ float: 'right', margin: '10px 20px' }}
+                loading={buttonLoading}
               >
                 {formatMessage({ id: 'action.submit' })}
               </Button>
@@ -1633,6 +1682,7 @@ class ChangeModal extends Component {
                 htmlType="submit"
                 type="primary"
                 style={{ float: 'right', margin: '10px 20px' }}
+                loading={buttonLoading}
               >
                 {formatMessage({ id: 'action.submit' })}
               </Button>
@@ -1718,6 +1768,7 @@ class ChangeModal extends Component {
                 htmlType="submit"
                 type="primary"
                 style={{ float: 'right', margin: '10px 20px' }}
+                loading={buttonLoading}
               >
                 {formatMessage({ id: 'action.submit' })}
               </Button>
@@ -1770,6 +1821,7 @@ class ChangeModal extends Component {
                 htmlType="submit"
                 type="primary"
                 style={{ float: 'right', margin: '10px 20px' }}
+                loading={buttonLoading}
               >
                 {formatMessage({ id: 'action.submit' })}
               </Button>
@@ -1991,6 +2043,7 @@ class ChangeModal extends Component {
                 htmlType="submit"
                 type="primary"
                 style={{ float: 'right', margin: '10px 20px' }}
+                loading={buttonLoading}
               >
                 {formatMessage({ id: 'action.submit' })}
               </Button>
@@ -2077,6 +2130,7 @@ class ChangeModal extends Component {
                 htmlType="submit"
                 type="primary"
                 style={{ float: 'right', margin: '10px 20px' }}
+                loading={buttonLoading}
               >
                 {formatMessage({ id: 'action.submit' })}
               </Button>
@@ -2162,6 +2216,7 @@ class ChangeModal extends Component {
                 htmlType="submit"
                 type="primary"
                 style={{ float: 'right', margin: '10px 20px' }}
+                loading={buttonLoading}
               >
                 {formatMessage({ id: 'action.submit' })}
               </Button>
