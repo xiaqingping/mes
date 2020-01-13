@@ -87,13 +87,13 @@ class CustomerDetails extends Component {
       });
     }
 
-    // window.addEventListener('resize', this.resizeFooterToolbar, { passive: true });
+    window.addEventListener('resize', this.resizeFooterToolbar, { passive: true });
     this.resizeFooterToolbar();
   }
 
-  // componentWillUnmount() {
-  //   window.removeEventListener('resize', this.resizeFooterToolbar);
-  // }
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.resizeFooterToolbar);
+  }
 
   resizeFooterToolbar = () => {
     requestAnimationFrame(() => {
@@ -137,18 +137,21 @@ class CustomerDetails extends Component {
             this.props.type === 'customer' ? 'customer' : 'vendor'
           }`}
           onClick={() => {
-            this.props.dispatch({
-              type: 'partnerMaintainEdit/setDetails',
-              payload: null,
+            this.setState({
+              pageLoading: true,
             });
-            this.props.dispatch({
-              type: 'partnerMaintainEdit/setType',
-              payload: null,
-            });
-            this.props.dispatch({
-              type: 'partnerMaintainEdit/setSupplier',
-              payload: null,
-            });
+            // this.props.dispatch({
+            //   type: 'partnerMaintainEdit/setDetails',
+            //   payload: null,
+            // });
+            // this.props.dispatch({
+            //   type: 'partnerMaintainEdit/setType',
+            //   payload: null,
+            // });
+            // this.props.dispatch({
+            //   type: 'partnerMaintainEdit/setSupplier',
+            //   payload: null,
+            // });
           }}
         >
           <Icon type="edit" style={{ color: 'black' }} />
