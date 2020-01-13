@@ -360,15 +360,16 @@ export class FaxInput extends React.Component {
 })
 export class AddressInput extends React.Component {
   static getDerivedStateFromProps(nextProps, preState) {
-    // const countrys =
-    //   (preState.countrys && preState.countrys.length > 0 && preState.countrys) ||
-    //   nextProps.countrys;
     const { changedValue } = preState;
+    let countrys = nextProps.countrys || [];
+    if (nextProps.dataTreating) {
+      countrys = nextProps.dataTreating(nextProps.countrys);
+    }
 
     if ('value' in nextProps) {
       return {
         ...(nextProps.value || {}),
-        countrys: nextProps.countrys,
+        countrys,
         changedValue,
         flag: preState.flag || false,
       };
