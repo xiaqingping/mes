@@ -773,7 +773,7 @@ class Basic extends React.Component {
   // 地址输入框数据处理
   AddressInputDataTreating = countrys => {
     const { basic } = this.props;
-    if (basic.certificationStatus === 2) {
+    if (basic.certificationStatus === 2 && basic.type === 2) {
       return countrys.map(e => {
         if (e.code !== basic.countryCode) {
           return { ...e, disabled: true };
