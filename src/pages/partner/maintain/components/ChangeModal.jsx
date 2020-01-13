@@ -444,7 +444,7 @@ class ChangeModal extends Component {
 
   // 输入银行关键字
   fetchBank = value => {
-    const { switchCountryName } = this.state;
+    const { switchCountryName, userData } = this.state;
     if (!value) {
       this.setState({ bank: [] });
       return;
@@ -452,7 +452,7 @@ class ChangeModal extends Component {
     api.basic
       .getBanks({
         codeOrFullName: value,
-        countryCode: switchCountryName,
+        countryCode: switchCountryName || userData.basic.sapCountryCode,
       })
       .then(bank => {
         this.setState({ bank });
@@ -521,11 +521,11 @@ class ChangeModal extends Component {
     api.bp
       .updateBPPiCertificationList(recordMsg.id, data)
       .then(() => {
-        this.handleCancel();
-        this.props.getData();
         this.setState({
           buttonLoading: false,
+          submitNext: 2,
         });
+        this.props.getData();
       })
       .catch(() => {
         this.setState({
@@ -695,6 +695,7 @@ class ChangeModal extends Component {
       guuid: guid(),
       switchCountryName: '',
       buttonLoading: false,
+      industryCategory: [],
     });
   };
 
@@ -1122,6 +1123,26 @@ class ChangeModal extends Component {
     });
   };
 
+  // 统一社会信用代码只读状态的判断
+  readOnlyStatus = v => {
+    const { industryCategoryAll } = this.props;
+    if (typeof v === 'object' && v.constructor === Array) {
+      if (v[0].repeatTaxNo === 1) {
+        return true;
+      }
+    }
+    if (typeof v === 'string') {
+      const industryData = industryCategoryAll.filter(item => item.taxNo === v);
+      if (industryData.length !== 0) {
+        if (industryData[0].repeatTaxNo === 1) {
+          return true;
+        }
+      }
+    }
+
+    return false;
+  };
+
   // 删除
   removeItem = id => {
     const { newDataList, userPersonData, deletePiCertificationIdList } = this.state;
@@ -1287,6 +1308,7 @@ class ChangeModal extends Component {
       industryCategory,
       buttonLoading,
     } = this.state;
+    // console.log(userData.constructor === Object);
     if (!userData.basic || !(pic instanceof Array)) return null;
     const fileList = pic.map(e => ({
       old: true,
@@ -1450,7 +1472,12 @@ class ChangeModal extends Component {
                   })(
                     <Input
                       placeholder={formatMessage({ id: 'bp.inputHere' })}
-                      readOnly={industryCategory.length !== 0 ? !!industryCategory[0].taxNo : ''}
+                      // readOnly={industryCategory.length !== 0 ? !!industryCategory[0].taxNo : ''}
+                      readOnly={this.readOnlyStatus(
+                        industryCategory.length !== 0
+                          ? industryCategory
+                          : userData.organizationCertification.taxNo,
+                      )}
                     />,
                   )}
                 </FormItem>
@@ -1897,7 +1924,11 @@ class ChangeModal extends Component {
                   })(
                     <Input
                       placeholder={formatMessage({ id: 'bp.inputHere' })}
-                      readOnly={industryCategory.length !== 0 ? !!industryCategory[0].taxNo : ''}
+                      readOnly={this.readOnlyStatus(
+                        industryCategory.length !== 0
+                          ? industryCategory
+                          : userData.organizationCertification.taxNo,
+                      )}
                     />,
                   )}
                 </FormItem>
