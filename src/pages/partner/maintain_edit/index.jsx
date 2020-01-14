@@ -640,6 +640,7 @@ class CustomerEdit extends Component {
           tabActiveKey={tabActiveKey}
           // eslint-disable-next-line no-return-assign
           wrappedComponentRef={ref => (this.basicView = ref)}
+          orgCertificationView={this.orgCertificationView}
         />
         <SalesArea
           // eslint-disable-next-line no-return-assign
@@ -683,6 +684,7 @@ class CustomerEdit extends Component {
           tabActiveKey={tabActiveKey}
           // eslint-disable-next-line no-return-assign
           wrappedComponentRef={ref => (this.basicView = ref)}
+          orgCertificationView={this.orgCertificationView}
         />
         <PurchasingOrg
           // eslint-disable-next-line no-return-assign

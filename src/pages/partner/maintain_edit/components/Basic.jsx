@@ -263,7 +263,11 @@ class Basic extends React.Component {
       if (editType === 'add' && value.sapCountryCode !== 'CN' && basic.sapCountryCode === 'CN') {
         const { taxNo } = newOrganizationCertification;
         const clear = industryCategoryAll.some(e => e.taxNo === taxNo);
+
         newOrganizationCertification.taxNo = clear ? '' : taxNo;
+        if (this.props.orgCertificationView) {
+          this.props.orgCertificationView.props.form.setFieldsValue({ taxNo: clear ? '' : taxNo });
+        }
       }
       // 新增时，如果由其他国家修改为中国，则根据行业类别设置税号
       if (
@@ -275,6 +279,19 @@ class Basic extends React.Component {
         const select = industryCategoryAll.filter(e => e.industryCode === basic.industryCode);
         if (select[0]) {
           newOrganizationCertification.taxNo = select[0].taxNo;
+          if (this.props.orgCertificationView) {
+            this.props.orgCertificationView.props.form.setFieldsValue({ taxNo: select[0].taxNo });
+          }
+        }
+      }
+      // 新增时，清除/变更国家后，清除认证资料的基本户开户行
+      if (
+        editType === 'add' &&
+        (value.sapCountryCode !== basic.sapCountryCode || !value.sapCountryCode)
+      ) {
+        newOrganizationCertification.bankCode = '';
+        if (this.props.orgCertificationView) {
+          this.props.orgCertificationView.props.form.setFieldsValue({ bankCode: '' });
         }
       }
 
@@ -338,6 +355,9 @@ class Basic extends React.Component {
     // 电话 类型为组织时，认证资料的电话与基础信息的电话保持一致
     if (key === 'telephone') {
       newOrganizationCertification = { ...newOrganizationCertification, ...value };
+      // if (this.props.orgCertificationView) {
+      //   this.props.orgCertificationView.props.form.setFieldsValue(value);
+      // }
     }
 
     // 行业类别 与 默认税号
