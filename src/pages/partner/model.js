@@ -488,13 +488,13 @@ const SeqModel = {
       {
         value: 4,
         text: formatMessage({
-          id: 'bp.verification.verificationMobilePhone',
+          id: 'bp.verification.verifyCellPhone',
         }),
       },
       {
         value: 5,
         text: formatMessage({
-          id: 'bp.verification.verificationEmail',
+          id: 'bp.verification.verifyMailbox',
         }),
       },
       {

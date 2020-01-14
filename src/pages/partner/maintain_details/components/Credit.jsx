@@ -1,3 +1,4 @@
+// 信贷数据
 import { Card, Descriptions, Divider, Empty } from 'antd';
 import React, { Component } from 'react';
 import './style.less';
@@ -74,16 +75,28 @@ class BasicInfo extends Component {
               <DescriptionsItem
                 label={formatMessage({ id: 'bp.maintain_details.credit_management.credit' })}
               >
-                {creditList[0].creditLimit} {creditList[0].currencyCode}&nbsp;&nbsp;
-                {moment(creditList[0].lastEvaluationDate).fromNow()}调整
+                {creditList[0].creditLimit ? (
+                  <>
+                    {creditList[0].creditLimit} {creditList[0].currencyCode}&nbsp;&nbsp;
+                    {moment(creditList[0].lastEvaluationDate).fromNow()}调整
+                  </>
+                ) : (
+                  ''
+                )}
               </DescriptionsItem>
               <DescriptionsItem
                 label={formatMessage({
                   id: 'bp.maintain_details.credit_management.temporary_credit',
                 })}
               >
-                {creditList[0].tempCreditLimit} {creditList[0].currencyCode}&nbsp;&nbsp;
-                {moment(creditList[0].tempCreditLimitExpirationDate).fromNow()}到期
+                {creditList[0].tempCreditLimit ? (
+                  <>
+                    {creditList[0].tempCreditLimit} {creditList[0].currencyCode}&nbsp;&nbsp;
+                    {moment(creditList[0].tempCreditLimitExpirationDate).fromNow()}到期
+                  </>
+                ) : (
+                  ''
+                )}
               </DescriptionsItem>
               <DescriptionsItem
                 label={formatMessage({

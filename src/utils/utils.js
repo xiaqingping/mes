@@ -83,3 +83,16 @@ export const diff = (pre, next, key = 'id') => {
 
   return { add, del, update };
 };
+
+/**
+ * 验证非空字段
+ * @param {string} val 需要验证的值
+ * @param {string} fieldName 需要验证的字段名
+ * @returns {string} 如果验证错误返回错误信息，如果验证正确返回false
+ */
+export const validateEmpty = (val, fieldName) => {
+  if (val.trim() === '') {
+    return `${fieldName}不能为空`;
+  }
+  return false;
+};

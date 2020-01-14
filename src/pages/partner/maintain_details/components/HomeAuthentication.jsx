@@ -17,8 +17,8 @@ const DescriptionsItem = Descriptions.Item;
     partnerMaintainEdit.type === 'supplier'
       ? partnerMaintainEdit.supplier
       : partnerMaintainEdit.details,
-    BpCertificationStatus: bp.BpCertificationStatus,
-    SpecialInvoice: bp.SpecialInvoice,
+  BpCertificationStatus: bp.BpCertificationStatus,
+  SpecialInvoice: bp.SpecialInvoice,
 }))
 class BasicInfo extends Component {
   state = {
@@ -85,7 +85,7 @@ class BasicInfo extends Component {
             {formatMessage({ id: 'bp.maintain.cancelApproval' })}
           </a>
         </>
-      )
+      );
     }
     if (parseInt(v, 10) === 1) {
       return (
@@ -100,21 +100,19 @@ class BasicInfo extends Component {
             </a>
           </CertificationPopover>
         </>
-      )
+      );
     }
     if (parseInt(v, 10) === 2) {
       return (
         <>
           <CertificationPopover basic={details.basic}>
-            <a>
-              {formatMessage({ id: 'menu.bp.maintain.details' })}
-            </a>
+            <a>{formatMessage({ id: 'menu.bp.maintain.details' })}</a>
           </CertificationPopover>
         </>
-      )
+      );
     }
-    return ''
-  }
+    return '';
+  };
 
   render() {
     const { details, BpCertificationStatus, SpecialInvoice } = this.props;
@@ -130,44 +128,55 @@ class BasicInfo extends Component {
           <Col span={15}>
             <Descriptions className="s-descriptions uploads" layout="vertical" column={3}>
               <DescriptionsItem
-              label={formatMessage({ id: 'bp.maintain_details.verification_data.status' })}
+                label={formatMessage({ id: 'bp.maintain_details.verification_data.status' })}
               >
-              <Badge
-                status={
-                  formatter(BpCertificationStatus, details.basic.certificationStatus, 'id', 'badge')
-                }
-                text={
-                  formatter(BpCertificationStatus, details.basic.certificationStatus, 'id', 'name')
-                }
+                <Badge
+                  status={formatter(
+                    BpCertificationStatus,
+                    details.basic.certificationStatus,
+                    'id',
+                    'badge',
+                  )}
+                  text={formatter(
+                    BpCertificationStatus,
+                    details.basic.certificationStatus,
+                    'id',
+                    'name',
+                  )}
                 />
                 &nbsp;&nbsp;&nbsp;&nbsp;
-                { this.certificationStatus(details.basic.certificationStatus, details)}
+                {this.certificationStatus(details.basic.certificationStatus, details)}
               </DescriptionsItem>
               <DescriptionsItem
-              label={formatMessage({ id: 'bp.maintain_details.verification_data.special_invoice' })}
+                label={formatMessage({
+                  id: 'bp.maintain_details.verification_data.special_invoice',
+                })}
               >
                 {/* {details.organizationCertification
                   ? details.organizationCertification.specialInvoice === 1
                     ? '是'
                     : '否'
                   : ''} */}
-                  {details.organizationCertification ?
-                  formatter(SpecialInvoice, details.organizationCertification.specialInvoice) : ''}
+                {details.organizationCertification
+                  ? formatter(SpecialInvoice, details.organizationCertification.specialInvoice)
+                  : ''}
               </DescriptionsItem>
               <DescriptionsItem
-              label={formatMessage({ id: 'bp.maintain_details.verification_data.VAT_Business' })}
+                label={formatMessage({ id: 'bp.maintain_details.verification_data.VAT_Business' })}
               >
                 {details.organizationCertification ? details.organizationCertification.taxNo : ''}
               </DescriptionsItem>
               <DescriptionsItem
-              label={formatMessage({ id: 'bp.maintain_details.verification_data.bank_name' })}
+                label={formatMessage({ id: 'bp.maintain_details.verification_data.bank_name' })}
               >
                 {details.organizationCertification
                   ? details.organizationCertification.bankName
                   : ''}
               </DescriptionsItem>
               <DescriptionsItem
-              label={formatMessage({ id: 'bp.maintain_details.verification_data.account_number' })}
+                label={formatMessage({
+                  id: 'bp.maintain_details.verification_data.account_number',
+                })}
               >
                 {details.organizationCertification
                   ? details.organizationCertification.bankAccount
@@ -183,15 +192,15 @@ class BasicInfo extends Component {
                 />
               </DescriptionsItem>
               <DescriptionsItem
-               span={3}
-               label={formatMessage({ id: 'bp.maintain_details.verification_data.address' })}
-               >
+                span={3}
+                label={formatMessage({ id: 'bp.maintain_details.verification_data.address' })}
+              >
                 {details.organizationCertification ? details.organizationCertification.address : ''}
               </DescriptionsItem>
               <DescriptionsItem
-              label={formatMessage({
-                id: 'bp.maintain_details.verification_data.verification_documents',
-              })}
+                label={formatMessage({
+                  id: 'bp.maintain_details.verification_data.verification_documents',
+                })}
               >
                 <ul style={{ padding: '0' }}>
                   {pic.length !== 0 ? (
@@ -225,7 +234,7 @@ class BasicInfo extends Component {
           <Col span={9}>
             <Descriptions className="s-descriptions" layout="vertical" column={1}>
               <DescriptionsItem
-              label={formatMessage({ id: 'bp.maintain_details.verification_data.memo' })}
+                label={formatMessage({ id: 'bp.maintain_details.verification_data.memo' })}
               >
                 {details.organizationCertification ? details.organizationCertification.notes : ''}
               </DescriptionsItem>
