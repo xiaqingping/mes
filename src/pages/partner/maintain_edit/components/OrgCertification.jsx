@@ -75,11 +75,11 @@ class OrgCertification extends Component {
       this.setState({ bank: [] });
       return;
     }
-    const { countryCode } = this.props.basic;
+    const { sapCountryCode } = this.props.basic;
     api.basic
       .getBanks({
         codeOrFullName: value,
-        countryCode,
+        countryCode: sapCountryCode,
       })
       .then(bank => {
         this.setState({ bank });

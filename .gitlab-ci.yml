@@ -12,11 +12,11 @@ build:
     # - cd c:\sangon\project\mes
     - dir
     # - git pull
-    - npm install
+    - npm ci
     - npm run build
     # # - cp -r dist/* c:/sangon/project/mes/dist
     - cp -r dist/* c:/other
-  environment:
-    name: mes
+  # environment:
+  #   name: mes
   only:
     - develop
