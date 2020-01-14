@@ -22,8 +22,6 @@ export default {
   'bp.verification.changeMobilePhone': '变更验证手机',
   'bp.verification.PIVerfication': 'PI认证',
   'bp.verification.soldToPartyBundle': '绑定售达方',
-  'bp.verification.verificationMobilePhone': '验证手机',
-  'bp.verification.verificationEmail': '验证邮箱',
   'bp.verification.mobilePhone': '手机',
   'bp.verification.email': '邮箱',
   'bp.verification.user': '用户',

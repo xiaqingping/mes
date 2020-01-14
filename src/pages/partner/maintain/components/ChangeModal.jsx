@@ -19,6 +19,7 @@ import {
   Spin,
   Typography,
   Empty,
+  message,
 } from 'antd';
 import React, { Component } from 'react';
 import { connect } from 'dva';
@@ -28,7 +29,7 @@ import api from '@/api';
 import debounce from 'lodash/debounce';
 import './index.less';
 import PersonCertificationAddModal from './PersonCertificationAddModal';
-import { guid, formatter } from '@/utils/utils';
+import { guid, formatter, validateEmpty } from '@/utils/utils';
 
 const { confirm } = Modal;
 const { Paragraph } = Typography;
@@ -56,22 +57,6 @@ const formItemLayoutGroup = {
     sm: { span: 16 },
   },
 };
-
-// 审核状态
-// const verifyStatus = {
-//   1: {
-//     value: 'warning',
-//     text: '审核中',
-//   },
-//   2: {
-//     value: 'success',
-//     text: '已认证',
-//   },
-//   3: {
-//     value: 'default',
-//     text: '未认证',
-//   },
-// };
 
 function isNumber(obj) {
   const t1 = /^\d+(\.\d+)?$/; // 非负浮点数
@@ -328,6 +313,11 @@ class ChangeModal extends Component {
       noHaveLev: false,
       switchCountryName: '',
       buttonLoading: false,
+      readOnlyBool: false,
+      taxNoEmpty: true,
+      bankAccountEmpty: true,
+      regisAddressEmpty: true,
+      notesEmpty: true,
     };
     this.fetchBank = debounce(this.fetchBank, 500);
   }
@@ -466,6 +456,16 @@ class ChangeModal extends Component {
       userData: { basic },
       personalShow,
     } = this.state;
+    if (!personalShow) {
+      const nameErr = validateEmpty(
+        this.props.form.getFieldValue('pname').name,
+        formatMessage({ id: 'bp.maintain_details.name' }),
+      );
+      if (nameErr) {
+        message.error(nameErr);
+        return false;
+      }
+    }
     const self = this;
     if (!personalShow) {
       if (this.props.form.getFieldValue('pname').length === 0) return false;
@@ -497,6 +497,7 @@ class ChangeModal extends Component {
   // 个人提交
   handlePersonOk = () => {
     const { newDataList, userData, recordMsg, deletePiCertificationIdList } = this.state;
+    // 验证用户名
     this.setState({
       buttonLoading: true,
     });
@@ -541,6 +542,17 @@ class ChangeModal extends Component {
       userData: { basic },
       groupNameShow,
     } = this.state;
+    // 验证用户名
+    if (!groupNameShow) {
+      const nameErr = validateEmpty(
+        this.props.form.getFieldValue('msg').name,
+        formatMessage({ id: 'bp.maintain_details.name' }),
+      );
+      if (nameErr) {
+        message.error(nameErr);
+        return false;
+      }
+    }
     const self = this;
     this.props.form.validateFields((error, row) => {
       if (!groupNameShow) {
@@ -566,6 +578,7 @@ class ChangeModal extends Component {
         self.handleOrganizationOk();
       }
     });
+    return null;
   };
 
   // 组织提交
@@ -579,12 +592,107 @@ class ChangeModal extends Component {
       gtype,
       guuid,
       groupAdressShow,
+      noHaveLev,
     } = this.state;
-    this.setState({
-      buttonLoading: true,
-    });
     this.props.form.validateFields((error, row) => {
       if (error) return false;
+
+      // 验证联系地址
+      if (!groupAdressShow) {
+        if (!noHaveLev || area.length === 0) {
+          message.error('请选择完整的地址');
+          return false;
+        }
+      }
+
+      const taxNosErr = validateEmpty(row.taxNo, '税号');
+      if (taxNosErr) {
+        message.error(taxNosErr);
+        return false;
+      }
+
+      const notesErr = validateEmpty(
+        row.notes,
+        formatMessage({
+          id: 'bp.maintain_details.verification_data.memo',
+        }),
+      );
+      if (notesErr) {
+        message.error(notesErr);
+        return false;
+      }
+
+      if ((groupAdressShow && basic.sapCountryCode === 'CN') || area[0] === '1000000000') {
+        const telephoneCountryCodeErr = validateEmpty(
+          row.phoneNum.telephoneCountryCode,
+          '电话国家编号',
+        );
+        if (telephoneCountryCodeErr) {
+          message.error(telephoneCountryCodeErr);
+          return false;
+        }
+
+        const telephoneAreaCodeErr = validateEmpty(row.phoneNum.telephoneAreaCode, '电话区号');
+        if (telephoneAreaCodeErr) {
+          message.error(telephoneAreaCodeErr);
+          return false;
+        }
+
+        const telephoneErr = validateEmpty(row.phoneNum.telephone, '电话');
+        if (telephoneErr) {
+          message.error(telephoneErr);
+          return false;
+        }
+
+        const telephoneExtensionErr = validateEmpty(row.phoneNum.telephoneExtension, '电话分机号');
+        if (telephoneExtensionErr) {
+          message.error(telephoneExtensionErr);
+          return false;
+        }
+
+        const taxNoErr = validateEmpty(
+          row.taxNo,
+          formatMessage({
+            id: 'bp.maintain_details.verification_data.VAT_Business',
+          }),
+        );
+        if (taxNoErr) {
+          message.error(taxNoErr);
+          return false;
+        }
+
+        const bankCodeErr = validateEmpty(
+          row.bankCode,
+          formatMessage({ id: 'bp.maintain_details.verification_data.bank_name' }),
+        );
+        if (bankCodeErr) {
+          message.error(bankCodeErr);
+          return false;
+        }
+
+        const bankAccountErr = validateEmpty(
+          row.bankAccount,
+          formatMessage({ id: 'bp.maintain_details.verification_data.account_number' }),
+        );
+        if (bankAccountErr) {
+          message.error(bankAccountErr);
+          return false;
+        }
+
+        const regisAddressErr = validateEmpty(
+          row.regisAddress,
+          formatMessage({ id: 'bp.maintain_details.verification_data.address' }),
+        );
+        if (regisAddressErr) {
+          message.error(regisAddressErr);
+          return false;
+        }
+      }
+
+      this.setState({
+        buttonLoading: true,
+      });
+
       let data = {};
       // 地址是否变更
       if (groupAdressShow) {
@@ -696,6 +804,11 @@ class ChangeModal extends Component {
       switchCountryName: '',
       buttonLoading: false,
       industryCategory: [],
+      readOnlyBool: false,
+      taxNoEmpty: true,
+      bankAccountEmpty: true,
+      regisAddressEmpty: true,
+      notesEmpty: true,
     });
   };
 
@@ -723,7 +836,7 @@ class ChangeModal extends Component {
     }
   };
 
-  /** person */
+  /** 个人变更 */
   updetaPersonal = e => {
     e.preventDefault();
     this.setState({
@@ -783,8 +896,14 @@ class ChangeModal extends Component {
 
   // 国家修改模式
   countryChangeType = (v, noHaveLev) => {
+    const {
+      userData: { basic },
+    } = this.state;
+    const { industryCategoryAll } = this.props;
+    const industry = industryCategoryAll.filter(item => item.industryCode === basic.industryCode);
     this.setState({
       switchCountryName: v,
+      readOnlyBool: false,
     });
     this.props.form.resetFields('bankCode');
     if (noHaveLev === 2) {
@@ -797,6 +916,16 @@ class ChangeModal extends Component {
       });
     }
     if (v === 'CN') {
+      if (industry.length !== 0) {
+        if (industry[0].repeatTaxNo === 1) {
+          this.props.form.setFieldsValue({
+            taxNo: industry[0].taxNo,
+          });
+          this.setState({
+            readOnlyBool: true,
+          });
+        }
+      }
       this.setState({
         gtype: 1,
       });
@@ -818,22 +947,21 @@ class ChangeModal extends Component {
   persnalInput = name => {
     const { form } = this.props;
     const { getFieldDecorator } = form;
-    let isNameFinish = false;
-    if (form.getFieldsValue().msg && form.getFieldsValue().msg.name === '') {
-      isNameFinish = true;
-    } else {
-      isNameFinish = false;
-    }
     return (
-      <Form.Item label={formatMessage({ id: 'bp.maintain_details.name' })}>
-        {getFieldDecorator('pname', {
-          rules: [
-            {
-              required: isNameFinish,
-              message: '请填写名称！',
-            },
-          ],
-        })(<NameGroup name={name} nameChangGType={v => this.nameChangeType(v)} type="personal" />)}
+      <Form.Item
+        label={formatMessage({ id: 'bp.maintain_details.name' })}
+        hasFeedback
+        validateStatus={
+          form.getFieldValue('pname')
+            ? form.getFieldValue('pname').name
+              ? 'success'
+              : 'error'
+            : 'error'
+        }
+      >
+        {getFieldDecorator('pname')(
+          <NameGroup name={name} nameChangGType={v => this.nameChangeType(v)} type="personal" />,
+        )}
       </Form.Item>
     );
   };
@@ -880,7 +1008,6 @@ class ChangeModal extends Component {
           labelCol={{ span: 4 }}
           wrapperCol={{ span: 20 }}
           hasFeedback
-          // eslint-disable-next-line no-nested-ternary
           validateStatus={
             form.getFieldValue('msg')
               ? form.getFieldValue('msg').name
@@ -913,7 +1040,6 @@ class ChangeModal extends Component {
     return groupAdressShow ? this.groupAdressShow() : this.groupAdressInput();
   };
 
-  // eslint-disable-next-line consistent-return
   groupAdressShow = () => {
     const { recordMsg } = this.state;
     if (recordMsg) {
@@ -939,6 +1065,7 @@ class ChangeModal extends Component {
         </Col>
       );
     }
+    return null;
   };
 
   groupAdressInput = () => {
@@ -1118,8 +1245,15 @@ class ChangeModal extends Component {
   industryCategoryChange = v => {
     const { industryCategoryAll } = this.props;
     const industryData = industryCategoryAll.filter(item => item.industryCode === v);
+    if (industryData.length !== 0) {
+      if (industryData[0].repeatTaxNo === 1) {
+        this.props.form.setFieldsValue({
+          taxNo: industryData[0].taxNo,
+        });
+      }
+    }
     this.setState({
-      industryCategory: industryData,
+      readOnlyBool: false,
     });
   };
 
@@ -1307,6 +1441,11 @@ class ChangeModal extends Component {
       form,
       industryCategory,
       buttonLoading,
+      readOnlyBool,
+      taxNoEmpty,
+      bankAccountEmpty,
+      regisAddressEmpty,
+      notesEmpty,
     } = this.state;
     // console.log(userData.constructor === Object);
     if (!userData.basic || !(pic instanceof Array)) return null;
@@ -1327,6 +1466,9 @@ class ChangeModal extends Component {
     let modelContent;
     const userPersonList =
       userPersonData.length !== 0 ? userPersonData.concat(newDataList) : newDataList;
+    const userDataTaxNo = userData.organizationCertification
+      ? userData.organizationCertification.taxNo
+      : '';
     const uploadButton = (
       <div>
         <Icon type={this.state.loading ? 'loading' : 'plus'} />
@@ -1458,11 +1600,13 @@ class ChangeModal extends Component {
                   hasFeedback
                   // eslint-disable-next-line max-len
                   validateStatus={
-                    form.getFieldValue('taxNo') ||
-                    (userData.organizationCertification
-                      ? !!userData.organizationCertification.taxNo
-                      : '')
-                      ? 'success'
+                    taxNoEmpty
+                      ? form.getFieldValue('taxNo') ||
+                        (userData.organizationCertification
+                          ? !!userData.organizationCertification.taxNo
+                          : '')
+                        ? 'success'
+                        : 'error'
                       : 'error'
                   }
                   // help={form.getFieldValue('taxNo') ? '' : '请输入信息'}
@@ -1472,12 +1616,23 @@ class ChangeModal extends Component {
                   })(
                     <Input
                       placeholder={formatMessage({ id: 'bp.inputHere' })}
-                      // readOnly={industryCategory.length !== 0 ? !!industryCategory[0].taxNo : ''}
-                      readOnly={this.readOnlyStatus(
-                        industryCategory.length !== 0
-                          ? industryCategory
-                          : userData.organizationCertification.taxNo,
-                      )}
+                      onChange={e => {
+                        if (!e.target.value) {
+                          this.setState({
+                            taxNoEmpty: false,
+                          });
+                        } else {
+                          this.setState({
+                            taxNoEmpty: true,
+                          });
+                        }
+                      }}
+                      readOnly={
+                        readOnlyBool ||
+                        this.readOnlyStatus(
+                          industryCategory.length !== 0 ? industryCategory : userDataTaxNo,
+                        )
+                      }
                     />,
                   )}
                 </FormItem>
@@ -1530,11 +1685,13 @@ class ChangeModal extends Component {
                   hasFeedback
                   // eslint-disable-next-line max-len
                   validateStatus={
-                    form.getFieldValue('bankAccount') ||
-                    (userData.organizationCertification
-                      ? !!userData.organizationCertification.bankAccount
-                      : '')
-                      ? 'success'
+                    bankAccountEmpty
+                      ? form.getFieldValue('bankAccount') ||
+                        (userData.organizationCertification
+                          ? !!userData.organizationCertification.bankAccount
+                          : '')
+                        ? 'success'
+                        : 'error'
                       : 'error'
                   }
                   // help={form.getFieldValue('bankAccount') ? '' : '请输入信息'}
@@ -1546,7 +1703,22 @@ class ChangeModal extends Component {
                         ? userData.organizationCertification.bankAccount
                         : ''
                       : '',
-                  })(<Input placeholder={formatMessage({ id: 'bp.inputHere' })} />)}
+                  })(
+                    <Input
+                      placeholder={formatMessage({ id: 'bp.inputHere' })}
+                      onChange={e => {
+                        if (!e.target.value) {
+                          this.setState({
+                            bankAccountEmpty: false,
+                          });
+                        } else {
+                          this.setState({
+                            bankAccountEmpty: true,
+                          });
+                        }
+                      }}
+                    />,
+                  )}
                 </FormItem>
               </Col>
               <Col lg={24} md={12} sm={12}>
@@ -1557,23 +1729,38 @@ class ChangeModal extends Component {
                   hasFeedback
                   // eslint-disable-next-line max-len
                   validateStatus={
-                    form.getFieldValue('regisAddress') ||
-                    (userData.organizationCertification
-                      ? !!userData.organizationCertification.address
-                      : '')
-                      ? 'success'
+                    regisAddressEmpty
+                      ? form.getFieldValue('regisAddress') ||
+                        (userData.organizationCertification
+                          ? !!userData.organizationCertification.address
+                          : '')
+                        ? 'success'
+                        : 'error'
                       : 'error'
                   }
-                  // help={form.getFieldValue('regisAddress') ? '' : '请输入信息'}
                 >
                   {getFieldDecorator('regisAddress', {
-                    // eslint-disable-next-line no-nested-ternary
                     initialValue: userData.organizationCertification
                       ? userData.organizationCertification.address
                         ? userData.organizationCertification.address
                         : ''
                       : '',
-                  })(<Input placeholder={formatMessage({ id: 'bp.inputHere' })} />)}
+                  })(
+                    <Input
+                      placeholder={formatMessage({ id: 'bp.inputHere' })}
+                      onChange={e => {
+                        if (!e.target.value) {
+                          this.setState({
+                            regisAddressEmpty: false,
+                          });
+                        } else {
+                          this.setState({
+                            regisAddressEmpty: true,
+                          });
+                        }
+                      }}
+                    />,
+                  )}
                 </FormItem>
               </Col>
               <Col lg={24} md={12} sm={12}>
@@ -1584,23 +1771,38 @@ class ChangeModal extends Component {
                   wrapperCol={{ span: 20 }}
                   // eslint-disable-next-line max-len
                   validateStatus={
-                    form.getFieldValue('notes') ||
-                    (userData.organizationCertification
-                      ? !!userData.organizationCertification.notes
-                      : '')
-                      ? 'success'
+                    notesEmpty
+                      ? form.getFieldValue('notes') ||
+                        (userData.organizationCertification
+                          ? !!userData.organizationCertification.notes
+                          : '')
+                        ? 'success'
+                        : 'error'
                       : 'error'
                   }
-                  // help={form.getFieldValue('notes') ? '' : '请输入信息'}
                 >
                   {getFieldDecorator('notes', {
-                    // eslint-disable-next-line no-nested-ternary
                     initialValue: userData.organizationCertification
                       ? userData.organizationCertification.notes
                         ? userData.organizationCertification.notes
                         : ''
                       : '',
-                  })(<TextArea rows={2} />)}
+                  })(
+                    <TextArea
+                      rows={2}
+                      onChange={e => {
+                        if (!e.target.value) {
+                          this.setState({
+                            notesEmpty: false,
+                          });
+                        } else {
+                          this.setState({
+                            notesEmpty: true,
+                          });
+                        }
+                      }}
+                    />,
+                  )}
                 </Form.Item>
               </Col>
               <Col lg={24} md={12} sm={12}>
@@ -1645,11 +1847,13 @@ class ChangeModal extends Component {
                   labelCol={{ span: 4 }}
                   wrapperCol={{ span: 20 }}
                   validateStatus={
-                    form.getFieldValue('taxNo') ||
-                    (userData.organizationCertification
-                      ? !!userData.organizationCertification.taxNo
-                      : '')
-                      ? 'success'
+                    taxNoEmpty
+                      ? form.getFieldValue('taxNo') ||
+                        (userData.organizationCertification
+                          ? !!userData.organizationCertification.taxNo
+                          : '')
+                        ? 'success'
+                        : 'error'
                       : 'error'
                   }
                   // help={form.getFieldValue('taxNo') ? '' : '请输入信息'}
@@ -1661,7 +1865,22 @@ class ChangeModal extends Component {
                         ? userData.organizationCertification.taxNo
                         : ''
                       : '',
-                  })(<Input placeholder={formatMessage({ id: 'bp.inputHere' })} />)}
+                  })(
+                    <Input
+                      placeholder={formatMessage({ id: 'bp.inputHere' })}
+                      onChange={e => {
+                        if (!e.target.value) {
+                          this.setState({
+                            taxNoEmpty: false,
+                          });
+                        } else {
+                          this.setState({
+                            taxNoEmpty: true,
+                          });
+                        }
+                      }}
+                    />,
+                  )}
                 </FormItem>
               </Col>
               <Col lg={24} md={12} sm={12}>
@@ -1670,11 +1889,13 @@ class ChangeModal extends Component {
                   labelCol={{ span: 4 }}
                   wrapperCol={{ span: 20 }}
                   validateStatus={
-                    form.getFieldValue('notes') ||
-                    (userData.organizationCertification
-                      ? !!userData.organizationCertification.notes
-                      : '')
-                      ? 'success'
+                    notesEmpty
+                      ? form.getFieldValue('notes') ||
+                        (userData.organizationCertification
+                          ? !!userData.organizationCertification.notes
+                          : '')
+                        ? 'success'
+                        : 'error'
                       : 'error'
                   }
                   // help={form.getFieldValue('notes') ? '' : '请输入信息'}
@@ -1686,7 +1907,22 @@ class ChangeModal extends Component {
                         ? userData.organizationCertification.notes
                         : ''
                       : '',
-                  })(<TextArea rows={2} />)}
+                  })(
+                    <TextArea
+                      rows={2}
+                      onChange={e => {
+                        if (!e.target.value) {
+                          this.setState({
+                            notesEmpty: false,
+                          });
+                        } else {
+                          this.setState({
+                            notesEmpty: true,
+                          });
+                        }
+                      }}
+                    />,
+                  )}
                 </Form.Item>
               </Col>
               <Col lg={24} md={12} sm={12}>
@@ -1731,11 +1967,13 @@ class ChangeModal extends Component {
                   labelCol={{ span: 4 }}
                   wrapperCol={{ span: 20 }}
                   validateStatus={
-                    form.getFieldValue('taxNo') ||
-                    (userData.organizationCertification
-                      ? !!userData.organizationCertification.taxNo
-                      : '')
-                      ? 'success'
+                    taxNoEmpty
+                      ? form.getFieldValue('taxNo') ||
+                        (userData.organizationCertification
+                          ? !!userData.organizationCertification.taxNo
+                          : '')
+                        ? 'success'
+                        : 'error'
                       : 'error'
                   }
                   // help={form.getFieldValue('taxNo') ? '' : '请输入信息'}
@@ -1747,7 +1985,22 @@ class ChangeModal extends Component {
                         ? userData.organizationCertification.taxNo
                         : ''
                       : '',
-                  })(<Input placeholder={formatMessage({ id: 'bp.inputHere' })} />)}
+                  })(
+                    <Input
+                      placeholder={formatMessage({ id: 'bp.inputHere' })}
+                      onChange={e => {
+                        if (!e.target.value) {
+                          this.setState({
+                            taxNoEmpty: false,
+                          });
+                        } else {
+                          this.setState({
+                            taxNoEmpty: true,
+                          });
+                        }
+                      }}
+                    />,
+                  )}
                 </FormItem>
               </Col>
               <Col lg={24} md={12} sm={12}>
@@ -1756,11 +2009,13 @@ class ChangeModal extends Component {
                   labelCol={{ span: 4 }}
                   wrapperCol={{ span: 20 }}
                   validateStatus={
-                    form.getFieldValue('notes') ||
-                    (userData.organizationCertification
-                      ? !!userData.organizationCertification.notes
-                      : '')
-                      ? 'success'
+                    notesEmpty
+                      ? form.getFieldValue('notes') ||
+                        (userData.organizationCertification
+                          ? !!userData.organizationCertification.notes
+                          : '')
+                        ? 'success'
+                        : 'error'
                       : 'error'
                   }
                   // help={form.getFieldValue('notes') ? '' : '请输入信息'}
@@ -1772,7 +2027,22 @@ class ChangeModal extends Component {
                         ? userData.organizationCertification.notes
                         : ''
                       : '',
-                  })(<TextArea rows={2} />)}
+                  })(
+                    <TextArea
+                      rows={2}
+                      onChange={e => {
+                        if (!e.target.value) {
+                          this.setState({
+                            notesEmpty: false,
+                          });
+                        } else {
+                          this.setState({
+                            notesEmpty: true,
+                          });
+                        }
+                      }}
+                    />,
+                  )}
                 </Form.Item>
               </Col>
               <Col lg={24} md={12} sm={12}>
@@ -1907,13 +2177,14 @@ class ChangeModal extends Component {
                     id: 'bp.maintain_details.verification_data.VAT_Business',
                   })}
                   hasFeedback
-                  // eslint-disable-next-line max-len
                   validateStatus={
-                    form.getFieldValue('taxNo') ||
-                    (userData.organizationCertification
-                      ? !!userData.organizationCertification.taxNo
-                      : '')
-                      ? 'success'
+                    taxNoEmpty
+                      ? form.getFieldValue('taxNo') ||
+                        (userData.organizationCertification
+                          ? !!userData.organizationCertification.taxNo
+                          : '')
+                        ? 'success'
+                        : 'error'
                       : 'error'
                   }
                   // help={form.getFieldValue('taxNo') ? '' : '请输入信息'}
@@ -1924,11 +2195,23 @@ class ChangeModal extends Component {
                   })(
                     <Input
                       placeholder={formatMessage({ id: 'bp.inputHere' })}
-                      readOnly={this.readOnlyStatus(
-                        industryCategory.length !== 0
-                          ? industryCategory
-                          : userData.organizationCertification.taxNo,
-                      )}
+                      onChange={e => {
+                        if (!e.target.value) {
+                          this.setState({
+                            taxNoEmpty: false,
+                          });
+                        } else {
+                          this.setState({
+                            taxNoEmpty: true,
+                          });
+                        }
+                      }}
+                      readOnly={
+                        readOnlyBool ||
+                        this.readOnlyStatus(
+                          industryCategory.length !== 0 ? industryCategory : userDataTaxNo,
+                        )
+                      }
                     />,
                   )}
                 </FormItem>
@@ -1981,11 +2264,13 @@ class ChangeModal extends Component {
                   hasFeedback
                   // eslint-disable-next-line max-len
                   validateStatus={
-                    form.getFieldValue('bankAccount') ||
-                    (userData.organizationCertification
-                      ? !!userData.organizationCertification.bankAccount
-                      : '')
-                      ? 'success'
+                    bankAccountEmpty
+                      ? form.getFieldValue('bankAccount') ||
+                        (userData.organizationCertification
+                          ? !!userData.organizationCertification.bankAccount
+                          : '')
+                        ? 'success'
+                        : 'error'
                       : 'error'
                   }
                   // help={form.getFieldValue('bankAccount') ? '' : '请输入信息'}
@@ -1997,7 +2282,22 @@ class ChangeModal extends Component {
                         ? userData.organizationCertification.bankAccount
                         : ''
                       : '',
-                  })(<Input placeholder={formatMessage({ id: 'bp.inputHere' })} />)}
+                  })(
+                    <Input
+                      placeholder={formatMessage({ id: 'bp.inputHere' })}
+                      onChange={e => {
+                        if (!e.target.value) {
+                          this.setState({
+                            bankAccountEmpty: false,
+                          });
+                        } else {
+                          this.setState({
+                            bankAccountEmpty: true,
+                          });
+                        }
+                      }}
+                    />,
+                  )}
                 </FormItem>
               </Col>
               <Col lg={24} md={12} sm={12}>
@@ -2008,11 +2308,13 @@ class ChangeModal extends Component {
                   hasFeedback
                   // eslint-disable-next-line max-len
                   validateStatus={
-                    form.getFieldValue('regisAddress') ||
-                    (userData.organizationCertification
-                      ? !!userData.organizationCertification.address
-                      : '')
-                      ? 'success'
+                    regisAddressEmpty
+                      ? form.getFieldValue('regisAddress') ||
+                        (userData.organizationCertification
+                          ? !!userData.organizationCertification.address
+                          : '')
+                        ? 'success'
+                        : 'error'
                       : 'error'
                   }
                   // help={form.getFieldValue('regisAddress') ? '' : '请输入信息'}
@@ -2024,7 +2326,22 @@ class ChangeModal extends Component {
                         ? userData.organizationCertification.address
                         : ''
                       : '',
-                  })(<Input placeholder={formatMessage({ id: 'bp.inputHere' })} />)}
+                  })(
+                    <Input
+                      placeholder={formatMessage({ id: 'bp.inputHere' })}
+                      onChange={e => {
+                        if (!e.target.value) {
+                          this.setState({
+                            regisAddressEmpty: false,
+                          });
+                        } else {
+                          this.setState({
+                            regisAddressEmpty: true,
+                          });
+                        }
+                      }}
+                    />,
+                  )}
                 </FormItem>
               </Col>
               <Col lg={24} md={12} sm={12}>
@@ -2035,11 +2352,13 @@ class ChangeModal extends Component {
                   wrapperCol={{ span: 20 }}
                   // eslint-disable-next-line max-len
                   validateStatus={
-                    form.getFieldValue('notes') ||
-                    (userData.organizationCertification
-                      ? !!userData.organizationCertification.notes
-                      : '')
-                      ? 'success'
+                    notesEmpty
+                      ? form.getFieldValue('notes') ||
+                        (userData.organizationCertification
+                          ? !!userData.organizationCertification.notes
+                          : '')
+                        ? 'success'
+                        : 'error'
                       : 'error'
                   }
                   // help={form.getFieldValue('notes') ? '' : '请输入信息'}
@@ -2051,7 +2370,22 @@ class ChangeModal extends Component {
                         ? userData.organizationCertification.notes
                         : ''
                       : '',
-                  })(<TextArea rows={2} />)}
+                  })(
+                    <TextArea
+                      rows={2}
+                      onChange={e => {
+                        if (!e.target.value) {
+                          this.setState({
+                            notesEmpty: false,
+                          });
+                        } else {
+                          this.setState({
+                            notesEmpty: true,
+                          });
+                        }
+                      }}
+                    />,
+                  )}
                 </Form.Item>
               </Col>
               <Col lg={24} md={12} sm={12}>
@@ -2095,12 +2429,15 @@ class ChangeModal extends Component {
                   label={formatMessage({ id: 'bp.maintain.ChangeModal.taxExemptID' })}
                   labelCol={{ span: 4 }}
                   wrapperCol={{ span: 20 }}
+                  required
                   validateStatus={
-                    form.getFieldValue('taxNo') ||
-                    (userData.organizationCertification
-                      ? !!userData.organizationCertification.taxNo
-                      : '')
-                      ? 'success'
+                    taxNoEmpty
+                      ? form.getFieldValue('taxNo') ||
+                        (userData.organizationCertification
+                          ? !!userData.organizationCertification.taxNo
+                          : '')
+                        ? 'success'
+                        : 'error'
                       : 'error'
                   }
                   // help={form.getFieldValue('taxNo') ? '' : '请输入信息'}
@@ -2112,7 +2449,22 @@ class ChangeModal extends Component {
                         ? userData.organizationCertification.taxNo
                         : ''
                       : '',
-                  })(<Input placeholder={formatMessage({ id: 'bp.inputHere' })} />)}
+                  })(
+                    <Input
+                      placeholder={formatMessage({ id: 'bp.inputHere' })}
+                      onChange={e => {
+                        if (!e.target.value) {
+                          this.setState({
+                            taxNoEmpty: false,
+                          });
+                        } else {
+                          this.setState({
+                            taxNoEmpty: true,
+                          });
+                        }
+                      }}
+                    />,
+                  )}
                 </FormItem>
               </Col>
               <Col lg={24} md={12} sm={12}>
@@ -2121,11 +2473,13 @@ class ChangeModal extends Component {
                   labelCol={{ span: 4 }}
                   wrapperCol={{ span: 20 }}
                   validateStatus={
-                    form.getFieldValue('notes') ||
-                    (userData.organizationCertification
-                      ? !!userData.organizationCertification.notes
-                      : '')
-                      ? 'success'
+                    notesEmpty
+                      ? form.getFieldValue('notes') ||
+                        (userData.organizationCertification
+                          ? !!userData.organizationCertification.notes
+                          : '')
+                        ? 'success'
+                        : 'error'
                       : 'error'
                   }
                   // help={form.getFieldValue('notes') ? '' : '请输入信息'}
@@ -2137,7 +2491,22 @@ class ChangeModal extends Component {
                         ? userData.organizationCertification.notes
                         : ''
                       : '',
-                  })(<TextArea rows={2} />)}
+                  })(
+                    <TextArea
+                      rows={2}
+                      onChange={e => {
+                        if (!e.target.value) {
+                          this.setState({
+                            notesEmpty: false,
+                          });
+                        } else {
+                          this.setState({
+                            notesEmpty: true,
+                          });
+                        }
+                      }}
+                    />,
+                  )}
                 </Form.Item>
               </Col>
               <Col lg={24} md={12} sm={12}>
@@ -2183,23 +2552,39 @@ class ChangeModal extends Component {
                   labelCol={{ span: 4 }}
                   wrapperCol={{ span: 20 }}
                   validateStatus={
-                    form.getFieldValue('taxNo') ||
-                    (userData.organizationCertification
-                      ? !!userData.organizationCertification.taxNo
-                      : '')
-                      ? 'success'
+                    taxNoEmpty
+                      ? form.getFieldValue('taxNo') ||
+                        (userData.organizationCertification
+                          ? !!userData.organizationCertification.taxNo
+                          : '')
+                        ? 'success'
+                        : 'error'
                       : 'error'
                   }
                   // help={form.getFieldValue('taxNo') ? '' : '请输入信息'}
                 >
                   {getFieldDecorator('taxNo', {
-                    // eslint-disable-next-line no-nested-ternary
                     initialValue: userData.organizationCertification
                       ? userData.organizationCertification.taxNo
                         ? userData.organizationCertification.taxNo
                         : ''
                       : '',
-                  })(<Input placeholder={formatMessage({ id: 'bp.inputHere' })} />)}
+                  })(
+                    <Input
+                      placeholder={formatMessage({ id: 'bp.inputHere' })}
+                      onChange={e => {
+                        if (!e.target.value) {
+                          this.setState({
+                            taxNoEmpty: false,
+                          });
+                        } else {
+                          this.setState({
+                            taxNoEmpty: true,
+                          });
+                        }
+                      }}
+                    />,
+                  )}
                 </FormItem>
               </Col>
               <Col lg={24} md={12} sm={12}>
@@ -2208,11 +2593,13 @@ class ChangeModal extends Component {
                   labelCol={{ span: 4 }}
                   wrapperCol={{ span: 20 }}
                   validateStatus={
-                    form.getFieldValue('notes') ||
-                    (userData.organizationCertification
-                      ? !!userData.organizationCertification.notes
-                      : '')
-                      ? 'success'
+                    notesEmpty
+                      ? form.getFieldValue('notes') ||
+                        (userData.organizationCertification
+                          ? !!userData.organizationCertification.notes
+                          : '')
+                        ? 'success'
+                        : 'error'
                       : 'error'
                   }
                   // help={form.getFieldValue('notes') ? '' : '请输入信息'}
@@ -2224,7 +2611,22 @@ class ChangeModal extends Component {
                         ? userData.organizationCertification.notes
                         : ''
                       : '',
-                  })(<TextArea rows={2} />)}
+                  })(
+                    <TextArea
+                      rows={2}
+                      onChange={e => {
+                        if (!e.target.value) {
+                          this.setState({
+                            notesEmpty: false,
+                          });
+                        } else {
+                          this.setState({
+                            notesEmpty: true,
+                          });
+                        }
+                      }}
+                    />,
+                  )}
                 </Form.Item>
               </Col>
               <Col lg={24} md={12} sm={12}>

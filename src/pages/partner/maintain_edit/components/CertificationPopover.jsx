@@ -7,11 +7,10 @@ import { connect } from 'dva';
 import moment from 'moment';
 import api from '@/api';
 import { formatMessage } from 'umi/locale';
-import OrgChina from './OrgChina'
-import OrgUsa from './OrgUsa'
-import OrgGb from './OrgGb'
-import PersonRecord from './PersonRecord'
-
+import OrgChina from './OrgChina';
+import OrgUsa from './OrgUsa';
+import OrgGb from './OrgGb';
+import PersonRecord from './PersonRecord';
 
 @connect(({ bp }) => ({
   VerifyRecordStatus: bp.VerifyRecordStatus,
@@ -60,7 +59,9 @@ class CertificationPopover extends React.Component {
       return (
         <div style={style}>
           <Empty
-          description={formatMessage({ id: 'bp.maintain_details.popover.noCertificationRecords' })}
+            description={formatMessage({
+              id: 'bp.maintain_details.popover.noCertificationRecords',
+            })}
           />
         </div>
       );
@@ -99,46 +100,43 @@ class CertificationPopover extends React.Component {
           <span style={{ marginLeft: '1.5em' }}>{data.operationDate}</span>
         </div>
         <div style={{ textAlign: 'right', marginTop: 10 }}>
-          <a onClick={this.showMore}>
-            {formatMessage({ id: 'component.noticeIcon.view-more' })}
-          </a>
+          <a onClick={this.showMore}>{formatMessage({ id: 'component.noticeIcon.view-more' })}</a>
         </div>
       </div>
     );
   };
 
   renderMore = () => {
-    const { basic } = this.props;
-    const { type } = basic;
-    if (type === 1) return this.renderMorePi();
-    if (type === 2 && basic.sapCountryCode === 'CN') return this.renderMoreOrgChina();
-    if (type === 2 && basic.sapCountryCode === 'GB') return this.renderMoreOrgGB();
+    const { data } = this.state;
+    if (!data.piCertification && !data.organizationCertification) return false;
+    if (data.piCertification) return this.renderMorePi();
+    if (data.organizationCertification.sapCountryCode === 'CN') return this.renderMoreOrgChina();
+    if (data.organizationCertification.sapCountryCode === 'GB') return this.renderMoreOrgGB();
     return this.renderMoreOrg();
   };
 
   // 人员大气泡
   renderMorePi = () => {
     const { data } = this.state;
-    console.log(data)
-    return <PersonRecord data={data}/>;
+    return <PersonRecord data={data} />;
   };
 
   // 组织美国和其他国家大气泡
   renderMoreOrg = () => {
     const { data } = this.state;
-    return <OrgUsa data={data}/>;
+    return <OrgUsa data={data} />;
   };
 
   // 组织国外大气泡
   renderMoreOrgGB = () => {
     const { data } = this.state;
-    return <OrgGb data={data}/>;
+    return <OrgGb data={data} />;
   };
 
   // 组织国内大气泡
   renderMoreOrgChina = () => {
     const { data } = this.state;
-    return <OrgChina data={data}/>;
+    return <OrgChina data={data} />;
   };
 
   render() {
@@ -157,11 +155,15 @@ class CertificationPopover extends React.Component {
 
     return (
       <Popover
-      content={content}
-      title={more ? formatMessage({
-        id: 'bp.maintain_details.popover.certificationRecords',
-      }) : null}
-      placement="topLeft"
+        content={content}
+        title={
+          more
+            ? formatMessage({
+                id: 'bp.maintain_details.popover.certificationRecords',
+              })
+            : null
+        }
+        placement="topLeft"
       >
         {this.props.children}
       </Popover>
