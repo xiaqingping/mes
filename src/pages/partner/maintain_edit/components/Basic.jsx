@@ -279,7 +279,7 @@ class Basic extends React.Component {
       }
 
       // 修改BP时，组织的通讯地址国家不能直接改，需走变更认证
-      if (editType === 'update' && value.countryCode !== basic.countryCode) {
+      if (editType === 'update' && value.countryCode !== basic.countryCode && basic.type === 2) {
         const obj = {};
         Object.keys(value).forEach(k => {
           if (k === 'changedValue') return;
