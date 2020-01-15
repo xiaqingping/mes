@@ -42,31 +42,31 @@ class BasicInfo extends Component {
   };
 
   componentDidMount() {
-    const { dispatch, details } = this.props;
-    dispatch({
-      type: 'basicCache/getCache',
-      payload: { type: 'distributionChannels' },
-    });
-    dispatch({
-      type: 'basicCache/getCache',
-      payload: { type: 'salesOrganizations' },
-    });
-    dispatch({
-      type: 'basicCache/getCache',
-      payload: { type: 'regions' },
-    });
-    dispatch({
-      type: 'basicCache/getCache',
-      payload: { type: 'offices' },
-    });
-    dispatch({
-      type: 'basicCache/getCache',
-      payload: { type: 'salesPaymentMethods' },
-    });
-    dispatch({
-      type: 'basicCache/getCache',
-      payload: { type: 'currencies' },
-    });
+    const { details } = this.props;
+    // dispatch({
+    //   type: 'basicCache/getCache',
+    //   payload: { type: 'distributionChannels' },
+    // });
+    // dispatch({
+    //   type: 'basicCache/getCache',
+    //   payload: { type: 'salesOrganizations' },
+    // });
+    // dispatch({
+    //   type: 'basicCache/getCache',
+    //   payload: { type: 'regions' },
+    // });
+    // dispatch({
+    //   type: 'basicCache/getCache',
+    //   payload: { type: 'offices' },
+    // });
+    // dispatch({
+    //   type: 'basicCache/getCache',
+    //   payload: { type: 'salesPaymentMethods' },
+    // });
+    // dispatch({
+    //   type: 'basicCache/getCache',
+    //   payload: { type: 'currencies' },
+    // });
     if (details.customer) {
       if (details.customer.salesAreaList.length !== 0) {
         this.setState({

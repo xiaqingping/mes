@@ -49,22 +49,22 @@ class PurchasingOrg extends React.Component {
   }
 
   componentDidMount() {
-    this.props.dispatch({
-      type: 'basicCache/getCache',
-      payload: { type: 'purchaseOrganizations' },
-    });
-    this.props.dispatch({
-      type: 'basicCache/getCache',
-      payload: { type: 'purchaseGroups' },
-    });
-    this.props.dispatch({
-      type: 'basicCache/getCache',
-      payload: { type: 'paymentTerms' },
-    });
-    this.props.dispatch({
-      type: 'basicCache/getCache',
-      payload: { type: 'currencies' },
-    });
+    // this.props.dispatch({
+    //   type: 'basicCache/getCache',
+    //   payload: { type: 'purchaseOrganizations' },
+    // });
+    // this.props.dispatch({
+    //   type: 'basicCache/getCache',
+    //   payload: { type: 'purchaseGroups' },
+    // });
+    // this.props.dispatch({
+    //   type: 'basicCache/getCache',
+    //   payload: { type: 'paymentTerms' },
+    // });
+    // this.props.dispatch({
+    //   type: 'basicCache/getCache',
+    //   payload: { type: 'currencies' },
+    // });
   }
 
   renderTabPane = () => {

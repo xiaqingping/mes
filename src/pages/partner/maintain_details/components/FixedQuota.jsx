@@ -13,39 +13,11 @@ class FixedQuota extends Component {
     visible: false,
     status: 1,
     quotaData: [],
+    billToPartyId: '',
   };
 
-  componentWillReceiveProps(nextProps) {
-    const { visible } = nextProps;
-    this.setState({
-      visible,
-    });
-    const { details } = this.props;
-    if (visible) {
-      // if (details.basic.type === 2) { // 判断是否为非个人
-      //   api.bp.creditLimitAssessment(
-      //     { id: details.basic.id, currencyCode: details.customer.salesAreaList[0].currencyCode },
-      //     ).then(res => { this.setState({ quotaData: res }) })
-      // } else {
-      api.bp
-        .creditLimitAssessment({
-          id: details.basic.id,
-          currencyCode:
-            details.basic.type === 2
-              ? details.customer.salesAreaList[0].currencyCode
-              : formatter(
-                  details.creditList,
-                  nextProps.billToPartyId,
-                  'billToPartyId',
-                  'currencyCode',
-                ),
-          billToPartyId: details.basic.type === 2 ? '' : nextProps.billToPartyId,
-        })
-        .then(res => {
-          this.setState({ quotaData: res });
-        });
-      // }
-    }
+  componentDidMount() {
+    this.props.onRef(this);
   }
 
   handleCancel = () => {
@@ -56,20 +28,20 @@ class FixedQuota extends Component {
       }),
       '1000',
     );
-    this.props.fixedQuota(false);
   };
 
   // 提交页面
   handleOk = () => {
     const { details } = this.props;
+    const { billToPartyId } = this.state;
     // if (details.basic.type === 2) { // 判断是否为非个人
     const term = {
       id: details.basic.id,
       currencyCode: details.customer.salesAreaList[0].currencyCode,
-      billToPartyId: details.basic.type === 2 ? '' : this.props.billToPartyId,
+      billToPartyId: details.basic.type === 2 ? '' : billToPartyId,
     };
     if (details.basic.type === 2) {
-      term.billToPartyId = this.props.billToPartyId;
+      term.billToPartyId = billToPartyId;
     }
     api.bp.creditLimitAdjustment(term).then(res => {
       this.setState({
@@ -183,6 +155,34 @@ class FixedQuota extends Component {
       </div>
     );
   };
+
+  passData(visible, billToPartyId = '') {
+    this.setState({
+      visible,
+      billToPartyId,
+    });
+    const { details } = this.props;
+    if (visible) {
+      // if (details.basic.type === 2) { // 判断是否为非个人
+      //   api.bp.creditLimitAssessment(
+      //     { id: details.basic.id, currencyCode: details.customer.salesAreaList[0].currencyCode },
+      //     ).then(res => { this.setState({ quotaData: res }) })
+      // } else {
+      api.bp
+        .creditLimitAssessment({
+          id: details.basic.id,
+          currencyCode:
+            details.basic.type === 2
+              ? details.customer.salesAreaList[0].currencyCode
+              : formatter(details.creditList, billToPartyId, 'billToPartyId', 'currencyCode'),
+          billToPartyId: details.basic.type === 2 ? '' : billToPartyId,
+        })
+        .then(res => {
+          this.setState({ quotaData: res });
+        });
+      // }
+    }
+  }
 
   render() {
     const { status, visible } = this.state;

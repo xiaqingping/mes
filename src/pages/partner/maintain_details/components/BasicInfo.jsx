@@ -36,18 +36,18 @@ class BasicInfo extends Component {
   };
 
   componentDidMount() {
-    this.props.dispatch({
-      type: 'basicCache/getCache',
-      payload: { type: 'countryDiallingCodes' },
-    });
-    this.props.dispatch({
-      type: 'basicCache/getCache',
-      payload: { type: 'salesPaymentMethods' },
-    });
-    this.props.dispatch({
-      type: 'basicCache/getCache',
-      payload: { type: 'industryCategories' },
-    });
+    // this.props.dispatch({
+    //   type: 'basicCache/getCache',
+    //   payload: { type: 'countryDiallingCodes' },
+    // });
+    // this.props.dispatch({
+    //   type: 'basicCache/getCache',
+    //   payload: { type: 'salesPaymentMethods' },
+    // });
+    // this.props.dispatch({
+    //   type: 'basicCache/getCache',
+    //   payload: { type: 'industryCategories' },
+    // });
   }
 
   checkPhone = v => {

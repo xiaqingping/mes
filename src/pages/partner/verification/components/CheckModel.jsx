@@ -30,8 +30,17 @@ class RecordListForm extends React.Component {
     };
   }
 
+  closeListForm = () => {
+    this.props.closeListForm();
+    this.setState({
+      showList: false,
+      picHas: false,
+      pic: [],
+    });
+  };
+
   // props更新时调用
-  componentWillReceiveProps(props) {
+  UNSAFE_componentWillReceiveProps(props) {
     const {
       recordMsg: { type },
     } = this.props;
@@ -71,15 +80,6 @@ class RecordListForm extends React.Component {
       }
     }
   }
-
-  closeListForm = () => {
-    this.props.closeListForm();
-    this.setState({
-      showList: false,
-      picHas: false,
-      pic: [],
-    });
-  };
 
   render() {
     const { showList, historyRecord, picHas, pic } = this.state;
