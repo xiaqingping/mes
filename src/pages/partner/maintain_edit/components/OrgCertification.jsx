@@ -88,7 +88,7 @@ class OrgCertification extends Component {
 
   checkTelephone = (rule, value, callback) => {
     if (!value.telephone) {
-      callback('电话必须');
+      callback('电话必填');
       return;
     }
     callback();
@@ -96,7 +96,7 @@ class OrgCertification extends Component {
 
   checkTaxNo = (rule, value, callback) => {
     if (!value) {
-      callback('税号必须');
+      callback('税号必填');
       return;
     }
 

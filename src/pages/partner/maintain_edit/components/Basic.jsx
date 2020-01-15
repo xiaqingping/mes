@@ -174,7 +174,7 @@ class Basic extends React.Component {
           callback('移动电话重复');
         }
       })
-      .catch(() => callback('验证失败'));
+      .catch(() => callback('接口验证失败'));
   };
 
   checkTelePhone = (rule, value, callback) => {

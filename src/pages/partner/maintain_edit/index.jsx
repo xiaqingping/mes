@@ -346,8 +346,8 @@ class CustomerEdit extends Component {
         const viewform = this.basicView.wrappedInstance.props.form;
         const result = await validateForm(viewform);
         if (!result[0]) {
-          message.error('基础数据验证不通过');
-          throw new Error('基础数据验证不通过');
+          message.error('基础数据验证未通过');
+          throw new Error('基础数据验证未通过');
         }
       }
 
@@ -358,8 +358,8 @@ class CustomerEdit extends Component {
           const viewform = this.orgCertificationView.wrappedInstance.props.form;
           const result = await validateForm(viewform);
           if (!result[0]) {
-            message.error('组织认证验证不通过');
-            throw new Error('组织认证验证不通过');
+            message.error('组织认证验证未通过');
+            throw new Error('组织认证验证未通过');
           }
         }
       }
