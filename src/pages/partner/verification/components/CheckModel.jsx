@@ -332,7 +332,6 @@ class RecordListForm extends React.Component {
                       {pic.length !== 0
                         ? pic.map((item, index) => {
                             if (index < 12) {
-                              console.log(index);
                               return (
                                 <li
                                   // eslint-disable-next-line react/no-array-index-key
@@ -393,7 +392,7 @@ class CheckModel extends React.Component {
       recordMsg: undefined,
       clickType: '',
       showList: false,
-      detailsValue: undefined,
+      detailsValue: {},
       pageVisble: false,
       picHas: false,
       emailShow: false,
@@ -422,7 +421,7 @@ class CheckModel extends React.Component {
     if (type) {
       this.setState({ pageVisble: false });
     } else {
-      this.setState({ modal1Visible, detailsValue: undefined, pageVisble: false, picHas: false });
+      this.setState({ modal1Visible, detailsValue: {}, pageVisble: false, picHas: false });
     }
   };
 
@@ -620,6 +619,7 @@ class CheckModel extends React.Component {
       verifyTest,
     } = this.props;
     if (!detailsValue && !picHas) return null;
+    if (Object.keys(detailsValue).length === 0) return null;
     let modalTitle;
     let modelContent;
     if (recordMsg === undefined) {
