@@ -11,31 +11,6 @@ import TemporaryQuota from './TemporaryQuota';
   creditList: (partnerMaintainEdit.details && partnerMaintainEdit.details.creditList) || [],
 }))
 class PersonCredit extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      fixedVisible: false,
-      temporaryVisible: false,
-      billToPartyId: '',
-    };
-  }
-
-  // 固定额度
-  fixedQuota = (v, billToPartyId) => {
-    this.setState({
-      fixedVisible: v,
-      billToPartyId,
-    });
-  };
-
-  // 临时额度
-  temporaryQuota = (v, billToPartyId) => {
-    this.setState({
-      temporaryVisible: v,
-      billToPartyId,
-    });
-  };
-
   renderListItem = item => (
     <List.Item key={item.billToPartyId}>
       <Card
@@ -45,7 +20,7 @@ class PersonCredit extends React.Component {
           <>
             <a
               onClick={() => {
-                this.fixedQuota(true, item.billToPartyId);
+                this.FixedQuota.passData(true, item.billToPartyId);
               }}
             >
               {formatMessage({ id: 'bp.maintain_details.credit_management.credit_adjustment' })}
@@ -53,7 +28,7 @@ class PersonCredit extends React.Component {
             <Divider type="vertical" />
             <a
               onClick={() => {
-                this.temporaryQuota(true, item.billToPartyId);
+                this.TemporaryQuota.passData(true, item.billToPartyId);
               }}
             >
               {formatMessage({ id: 'bp.maintain_details.credit_management.temporary_credit' })}
@@ -107,7 +82,6 @@ class PersonCredit extends React.Component {
 
   render() {
     const { creditList } = this.props;
-    const { fixedVisible, temporaryVisible, billToPartyId } = this.state;
     return (
       <Card
         title={formatMessage({ id: 'bp.maintain_details.credit_management' })}
@@ -133,18 +107,14 @@ class PersonCredit extends React.Component {
           <Empty />
         )}
         <FixedQuota
-          visible={fixedVisible}
-          fixedQuota={v => {
-            this.fixedQuota(v);
+          onRef={ref => {
+            this.FixedQuota = ref;
           }}
-          billToPartyId={billToPartyId}
         />
         <TemporaryQuota
-          visible={temporaryVisible}
-          temporaryQuota={v => {
-            this.temporaryQuota(v);
+          onRef={ref => {
+            this.TemporaryQuota = ref;
           }}
-          billToPartyId={billToPartyId}
         />
       </Card>
     );

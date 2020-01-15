@@ -44,7 +44,7 @@ class CertificationPopover extends React.Component {
     const { type } = basic;
     const { VerifyRecordStatus } = this.props;
     const { data, loading } = this.state;
-    const style = { width: 280, height: 145, color: '#999' };
+    const style = { width: 300, height: 145, color: '#999' };
     if (type === 1) style.height = 115;
 
     if (loading) {

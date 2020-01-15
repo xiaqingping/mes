@@ -15,32 +15,13 @@ const DescriptionsItem = Descriptions.Item;
 }))
 // eslint-disable-next-line react/prefer-stateless-function
 class BasicInfo extends Component {
-  state = {
-    fixedVisible: false,
-    temporaryVisible: false,
-  };
-
-  // 固定额度
-  fixedQuota = v => {
-    this.setState({
-      fixedVisible: v,
-    });
-  };
-
-  // 临时额度
-  temporaryQuota = v => {
-    this.setState({
-      temporaryVisible: v,
-    });
-  };
-
   titleContent = () => (
     <div style={{ lineHeight: '24px' }}>
       <span>{formatMessage({ id: 'bp.maintain_details.credit_management' })}</span>
       <span style={{ float: 'right', fontSize: '14px' }}>
         <a
           onClick={() => {
-            this.fixedQuota(true);
+            this.FixedQuota.passData(true);
           }}
         >
           {formatMessage({ id: 'bp.maintain_details.credit_management.credit_adjustment' })}
@@ -48,7 +29,7 @@ class BasicInfo extends Component {
         <Divider type="vertical" />
         <a
           onClick={() => {
-            this.temporaryQuota(true);
+            this.TemporaryQuota.passData(true);
           }}
         >
           {formatMessage({ id: 'bp.maintain_details.credit_management.temporary_credit' })}
@@ -58,7 +39,6 @@ class BasicInfo extends Component {
   );
 
   render() {
-    const { fixedVisible, temporaryVisible } = this.state;
     const {
       details: { creditList },
     } = this.props;
@@ -124,15 +104,13 @@ class BasicInfo extends Component {
           <Empty />
         )}
         <FixedQuota
-          visible={fixedVisible}
-          fixedQuota={v => {
-            this.fixedQuota(v);
+          onRef={ref => {
+            this.FixedQuota = ref;
           }}
         />
         <TemporaryQuota
-          visible={temporaryVisible}
-          temporaryQuota={v => {
-            this.temporaryQuota(v);
+          onRef={ref => {
+            this.TemporaryQuota = ref;
           }}
         />
       </Card>

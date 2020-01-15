@@ -239,7 +239,7 @@ class CheckEmail extends Component {
         >
           <FormItem>
             <Button type="primary" htmlType="submit">
-              发送
+              {formatMessage({ id: 'bp.maintain_details.phone.send' })}
             </Button>
           </FormItem>
         </div>
