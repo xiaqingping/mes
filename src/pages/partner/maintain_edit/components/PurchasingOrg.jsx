@@ -272,7 +272,7 @@ class PurchasingOrg extends React.Component {
     if (viewform) {
       const result = await validateForm(viewform);
       if (!result[0]) {
-        message.error('销售范围数据不完整');
+        message.error('采购组织验证未通过');
         return;
       }
     }
@@ -290,7 +290,7 @@ class PurchasingOrg extends React.Component {
     if (viewform) {
       const result = await validateForm(viewform);
       if (!result[0]) {
-        message.error('销售范围数据不完整');
+        message.error('采购组织验证未通过');
         return;
       }
     }
