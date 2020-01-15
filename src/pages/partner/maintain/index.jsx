@@ -100,17 +100,26 @@ class Maintain extends React.Component {
   }
 
   componentDidMount() {
-    this.props.dispatch({
-      type: 'basicCache/getCache',
-      payload: { type: 'industryCategories' },
-    });
-    this.props.dispatch({
-      type: 'basicCache/getCache',
-      payload: { type: 'countryDiallingCodes' },
-    });
-    this.props.dispatch({
-      type: 'basicCache/getCache',
-      payload: { type: 'regionOffice' },
+    const basicCacheList = [
+      { type: 'countrys' }, // 国家
+      { type: 'countryDiallingCodes' }, // 国家拨号代码
+      { type: 'industryCategories' }, // 行业类别
+      { type: 'salesPaymentMethods' }, // 付款方式
+      { type: 'currencies' }, // 货币
+      { type: 'paymentTerms' }, // 付款条件
+      { type: 'purchaseGroups' }, // 采购组
+      { type: 'purchaseOrganizations' }, // 采购组织
+      { type: 'salesOrganizations' }, // 销售组织
+      { type: 'distributionChannels' }, // 分销渠道
+      { type: 'regions' },
+      { type: 'offices' },
+      { type: 'regionOffice' },
+    ];
+    basicCacheList.forEach(item => {
+      this.props.dispatch({
+        type: 'basicCache/getCache',
+        payload: item,
+      });
     });
     this.getTableData();
   }

@@ -18,10 +18,10 @@ class Bank extends Component {
   state = {};
 
   componentDidMount() {
-    this.props.dispatch({
-      type: 'basicCache/getCache',
-      payload: { type: 'countrys' },
-    });
+    // this.props.dispatch({
+    //   type: 'basicCache/getCache',
+    //   payload: { type: 'countrys' },
+    // });
   }
 
   render() {

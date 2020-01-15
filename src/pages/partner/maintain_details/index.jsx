@@ -24,39 +24,72 @@ import api from '@/api';
   countryDiallingCodes: basicCache.countryDiallingCodes,
 }))
 class CustomerDetails extends Component {
-  state = {
-    width: '100%',
-    tabActiveKey: 'customer',
-    pageLoading: true,
-  };
+  constructor(props) {
+    super(props);
+    this.state = {
+      width: '100%',
+      tabActiveKey: 'customer',
+      pageLoading: true,
+      errPage: false,
+    };
+  }
 
   componentDidMount() {
     const activeKey = this.props.location.query.tabActiveKey
       ? this.props.location.query.tabActiveKey
       : '';
-    // this.props.dispatch({
-    //   type: 'partnerMaintainEdit/setDetails',
-    //   payload: null,
-    // });
-    api.bp.getBPVendor(this.props.match.params.id).then(res => {
+    const basicCacheList = [
+      { type: 'countrys' }, // 国家
+      { type: 'countryDiallingCodes' }, // 国家拨号代码
+      { type: 'industryCategories' }, // 行业类别
+      { type: 'salesPaymentMethods' }, // 付款方式
+      { type: 'currencies' }, // 货币
+      { type: 'paymentTerms' }, // 付款条件
+      { type: 'purchaseGroups' }, // 采购组
+      { type: 'purchaseOrganizations' }, // 采购组织
+      { type: 'salesOrganizations' }, // 销售组织
+      { type: 'distributionChannels' }, // 分销渠道
+      { type: 'regions' },
+      { type: 'offices' },
+    ];
+    basicCacheList.forEach(item => {
       this.props.dispatch({
-        type: 'partnerMaintainEdit/setSupplier',
-        payload: res,
+        type: 'basicCache/getCache',
+        payload: item,
       });
-      api.bp.getBPCustomer(this.props.match.params.id).then(r => {
+    });
+
+    api.bp
+      .getBPVendor(this.props.match.params.id)
+      .then(res => {
         this.props.dispatch({
-          type: 'partnerMaintainEdit/setDetails',
-          payload: r,
+          type: 'partnerMaintainEdit/setSupplier',
+          payload: res,
         });
+        api.bp
+          .getBPCustomer(this.props.match.params.id)
+          .then(r => {
+            this.props.dispatch({
+              type: 'partnerMaintainEdit/setDetails',
+              payload: r,
+            });
+            this.setState({
+              pageLoading: false,
+            });
+          })
+          .catch(() => {
+            this.setState({
+              pageLoading: false,
+              errPage: true,
+            });
+          });
+      })
+      .catch(() => {
         this.setState({
           pageLoading: false,
+          errPage: true,
         });
       });
-    });
-    this.props.dispatch({
-      type: 'basicCache/setState',
-      payload: { type: 'countryDiallingCodes' },
-    });
 
     // 判断是客户还是供应商
     if (activeKey) {
@@ -161,9 +194,9 @@ class CustomerDetails extends Component {
   };
 
   render() {
-    const { tabActiveKey, pageLoading } = this.state;
+    const { tabActiveKey, pageLoading, errPage } = this.state;
     const { customer, supplier } = this.props;
-    if (!customer || !supplier) return false;
+    // if (!customer || !supplier) return false;
     return (
       <PageHeaderWrapper
         tabActiveKey={tabActiveKey}
@@ -182,8 +215,11 @@ class CustomerDetails extends Component {
         ]}
       >
         <Spin spinning={pageLoading}>
-          {pageLoading ? (
-            <Empty style={{ padding: 300, background: '#fff' }} description="loading..."></Empty>
+          {pageLoading || errPage ? (
+            <Empty
+              style={{ padding: 300, background: '#fff' }}
+              description={errPage ? '' : 'loading...'}
+            ></Empty>
           ) : (
             {
               customer: (
