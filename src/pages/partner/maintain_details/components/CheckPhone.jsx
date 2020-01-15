@@ -27,10 +27,10 @@ class CheckPhone extends Component {
   };
 
   componentDidMount() {
-    this.props.dispatch({
-      type: 'basicCache/getCache',
-      payload: { type: 'countryDiallingCodes' },
-    });
+    // this.props.dispatch({
+    //   type: 'basicCache/getCache',
+    //   payload: { type: 'countryDiallingCodes' },
+    // });
   }
 
   // componentWillUnmount() {

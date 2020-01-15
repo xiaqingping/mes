@@ -623,32 +623,32 @@ class ChangeModal extends Component {
       }
 
       if ((groupAdressShow && basic.sapCountryCode === 'CN') || area[0] === '1000000000') {
-        const telephoneCountryCodeErr = validateEmpty(
-          row.phoneNum.telephoneCountryCode,
-          '电话国家编号',
-        );
-        if (telephoneCountryCodeErr) {
-          message.error(telephoneCountryCodeErr);
-          return false;
-        }
+        // const telephoneCountryCodeErr = validateEmpty(
+        //   row.phoneNum.telephoneCountryCode,
+        //   '电话国家编号',
+        // );
+        // if (telephoneCountryCodeErr) {
+        //   message.error(telephoneCountryCodeErr);
+        //   return false;
+        // }
 
-        const telephoneAreaCodeErr = validateEmpty(row.phoneNum.telephoneAreaCode, '电话区号');
-        if (telephoneAreaCodeErr) {
-          message.error(telephoneAreaCodeErr);
-          return false;
-        }
+        // const telephoneAreaCodeErr = validateEmpty(row.phoneNum.telephoneAreaCode, '电话区号');
+        // if (telephoneAreaCodeErr) {
+        //   message.error(telephoneAreaCodeErr);
+        //   return false;
+        // }
 
-        const telephoneErr = validateEmpty(row.phoneNum.telephone, '电话');
-        if (telephoneErr) {
-          message.error(telephoneErr);
-          return false;
-        }
+        // const telephoneErr = validateEmpty(row.phoneNum.telephone, '电话');
+        // if (telephoneErr) {
+        //   message.error(telephoneErr);
+        //   return false;
+        // }
 
-        const telephoneExtensionErr = validateEmpty(row.phoneNum.telephoneExtension, '电话分机号');
-        if (telephoneExtensionErr) {
-          message.error(telephoneExtensionErr);
-          return false;
-        }
+        // const telephoneExtensionErr = validateEmpty(row.phoneNum.telephoneExtension, '电话分机号');
+        // if (telephoneExtensionErr) {
+        //   message.error(telephoneExtensionErr);
+        //   return false;
+        // }
 
         const taxNoErr = validateEmpty(
           row.taxNo,

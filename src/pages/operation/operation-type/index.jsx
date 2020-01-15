@@ -28,8 +28,6 @@ class Operation extends React.Component {
       loading: false,
       selectedRows: [],
       expandForm: false,
-      detailsVisible: false,
-      detailsValue: null,
       // editIndex: -1,
       partnerVal: [],
     };
@@ -44,15 +42,6 @@ class Operation extends React.Component {
   callParter = value => {
     api.bp.getBPByCodeOrName({ code_or_name: value }).then(res => {
       this.setState({ partnerVal: res });
-    });
-  };
-
-  // 弹窗显示和详情数据保存
-  showDrawer = (record, e) => {
-    e.preventDefault();
-    this.setState({
-      detailsVisible: true,
-      detailsValue: record,
     });
   };
 
@@ -122,13 +111,6 @@ class Operation extends React.Component {
     const { expandForm } = this.state;
     this.setState({
       expandForm: !expandForm,
-    });
-  };
-
-  // 弹框关闭
-  detailsVisibleClose = v => {
-    this.setState({
-      detailsVisible: v,
     });
   };
 
@@ -210,8 +192,6 @@ class Operation extends React.Component {
       total,
       loading,
       selectedRows,
-      detailsVisible,
-      detailsValue,
     } = this.state;
     const { languageCode } = this.props;
     const dataList = { list, pagination: { current, pageSize, total } };
@@ -239,8 +219,8 @@ class Operation extends React.Component {
         },
       },
       {
-        title: `${formatMessage({ id: 'operation.operation.sourceCode' })}/${formatMessage({
-          id: 'operation.operation.sourceName',
+        title: `${formatMessage({ id: 'operation.operatorNumber' })}/${formatMessage({
+          id: 'operation.operatorName',
         })}`,
         dataIndex: 'operatorCode',
         render(text, record) {
@@ -261,7 +241,11 @@ class Operation extends React.Component {
         title: formatMessage({ id: 'action.operation' }),
         width: 150,
         render: (text, record) => (
-          <a onClick={e => this.showDrawer(record, e)}>
+          <a
+            onClick={() => {
+              this.DetailsList.passData(true, record);
+            }}
+          >
             {formatMessage({ id: 'menu.bp.maintain.details' })}
           </a>
         ),
@@ -290,11 +274,9 @@ class Operation extends React.Component {
           </div>
         </Card>
         <DetailsList
-          detailsVisible={detailsVisible}
-          detailsVisibleClose={v => {
-            this.detailsVisibleClose(v);
+          onRef={ref => {
+            this.DetailsList = ref;
           }}
-          detailsValue={detailsValue}
         />
       </PageHeaderWrapper>
     );

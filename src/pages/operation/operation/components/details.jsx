@@ -82,15 +82,8 @@ class Details extends React.Component {
     // },
   ];
 
-  componentWillReceiveProps(nextProps) {
-    const { detailsVisible } = nextProps;
-    const { detailsValue } = nextProps;
-    this.setState({
-      visible: detailsVisible,
-      loading: true,
-      list: [],
-    });
-    this.getData(detailsValue);
+  componentDidMount() {
+    this.props.onRef(this);
   }
 
   getData = detailsValue => {
@@ -115,18 +108,20 @@ class Details extends React.Component {
     }
   };
 
-  showDrawer = () => {
-    this.setState({
-      visible: true,
-    });
-  };
-
   onClose = () => {
-    this.props.detailsVisibleClose(false);
     this.setState({
       visible: false,
     });
   };
+
+  passData(visible, detailsValue) {
+    this.setState({
+      visible,
+      loading: true,
+      list: [],
+    });
+    this.getData(detailsValue);
+  }
 
   render() {
     const { list, visible, loading, err } = this.state;
