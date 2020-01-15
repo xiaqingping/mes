@@ -44,10 +44,14 @@ class CustomerEdit extends Component {
       // result: [0：没有数据，1：通过，2：没通过]
       // message: 验证消息
       customerValidate: null,
+      // 客户数据是否完整
+      customerDataStatus: 2,
       // 供应商数据验证结果 { result: 'number', message: ['string'] }
       // result: [0：没有数据，1：通过，2：没通过]
       // message: 验证消息
       vendorValidate: null,
+      // 供应商数据是否完整
+      vendorDataStatus: 2,
       submitButtonLoading: false,
     };
     this.props.dispatch({
@@ -100,6 +104,8 @@ class CustomerEdit extends Component {
 
     this.setState({
       tabActiveKey,
+      customerDataStatus: +customerDataStatus,
+      vendorDataStatus: +vendorDataStatus,
     });
 
     dispatch({
@@ -732,29 +738,29 @@ class CustomerEdit extends Component {
 
   getColor = type => {
     const colors = {
-      default: '#d9d9d9',
-      error: 'red',
+      1: 'success',
+      2: 'default',
     };
     return colors[type];
   };
 
   renderCustomerTab = () => {
-    const color = 'default';
+    const { customerDataStatus } = this.state;
 
     return (
       <>
-        <Badge color={this.getColor(color)} />
+        <Badge status={this.getColor(customerDataStatus)} />
         <FormattedMessage id="bp.maintain_details.customer" />
       </>
     );
   };
 
   renderVendorTab = () => {
-    const color = 'default';
+    const { vendorDataStatus } = this.state;
 
     return (
       <>
-        <Badge color={this.getColor(color)} />
+        <Badge status={this.getColor(vendorDataStatus)} />
         <FormattedMessage id="bp.maintain_details.vendor" />
       </>
     );
