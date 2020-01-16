@@ -97,10 +97,15 @@ class CustomerEdit extends Component {
     } = match;
     const { query } = location;
     const { customerDataStatus, vendorDataStatus } = query;
+    let { tabActiveKey } = query;
 
     // 根据数据完整性，确定打开哪个Tab
-    let tabActiveKey = 'customer';
-    if (customerDataStatus === '2' && vendorDataStatus === '1') tabActiveKey = 'vendor';
+    if (!tabActiveKey) {
+      tabActiveKey = 'customer';
+      if (customerDataStatus === '2' && vendorDataStatus === '1') {
+        tabActiveKey = 'vendor';
+      }
+    }
 
     this.setState({
       tabActiveKey,
