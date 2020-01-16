@@ -215,8 +215,8 @@ class BasicInfo extends Component {
       phoneShow,
       emailShow,
     } = this.state;
+    if (!basic) return false;
     const { details, type, industry, salesOrderBlock } = this.props;
-    if (!basic) return null;
     return (
       <Card
         title={formatMessage({ id: 'bp.maintain_details.basic' })}
@@ -371,10 +371,10 @@ class BasicInfo extends Component {
               ) : (
                 ''
               )
-            ) : details.custom ? (
+            ) : details.customer ? (
               <Badge
-                status={formatter(salesOrderBlock, details.custom.invoicePostBlock, 'id', 'badge')}
-                text={formatter(salesOrderBlock, details.custom.invoicePostBlock)}
+                status={formatter(salesOrderBlock, details.customer.salesOrderBlock, 'id', 'badge')}
+                text={formatter(salesOrderBlock, details.customer.salesOrderBlock)}
               />
             ) : (
               ''

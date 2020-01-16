@@ -126,6 +126,7 @@ class CustomerDetails extends Component {
 
   componentWillUnmount() {
     window.removeEventListener('resize', this.resizeFooterToolbar);
+    this.resizeFooterToolbar();
   }
 
   resizeFooterToolbar = () => {
