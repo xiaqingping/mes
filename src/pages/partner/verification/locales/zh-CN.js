@@ -51,7 +51,6 @@ export default {
   'bp.verification.PIVerification.billToParty': '收票方：',
   'bp.verification.PIVerification.memo': '认证说明：',
   'bp.verification.PIVerification.attachment': '附件：',
-  'bp.verification.PIVerification.verificationHistory': '认证历史',
   // 组织认证
   'bp.verification.organizationVerification.name': '名称：',
   'bp.verification.organizationVerification.country': '国家：',

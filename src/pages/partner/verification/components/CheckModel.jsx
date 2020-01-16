@@ -33,6 +33,7 @@ class RecordListForm extends React.Component {
   closeListForm = () => {
     this.props.closeListForm();
     this.setState({
+      historyRecord: [],
       showList: false,
       picHas: false,
       pic: [],
@@ -84,13 +85,14 @@ class RecordListForm extends React.Component {
   render() {
     const { showList, historyRecord, picHas, pic } = this.state;
     const {
-      recordMsg: { type },
+      recordMsg: { bpType },
       SpecialInvoice,
       VerifyRecordStatus,
       industryCategories,
     } = this.props;
-    const typeName = parseInt(type, 10) === 1 ? 'organizationCertification' : 'piCertification';
-    if (!historyRecord && !picHas) return null;
+    const typeName = parseInt(bpType, 10) === 2 ? 'organizationCertification' : 'piCertification';
+    if (!historyRecord && !picHas) return false;
+    if (!bpType) return false;
     return (
       <Modal
         destroyOnClose
@@ -148,7 +150,7 @@ class RecordListForm extends React.Component {
                 </Col>
               </Row>
             </li>
-            {parseInt(type, 10) === 2 ? (
+            {parseInt(bpType, 10) === 1 ? (
               <>
                 <li>
                   <Row>
@@ -332,7 +334,6 @@ class RecordListForm extends React.Component {
                       {pic.length !== 0
                         ? pic.map((item, index) => {
                             if (index < 12) {
-                              console.log(index);
                               return (
                                 <li
                                   // eslint-disable-next-line react/no-array-index-key
@@ -393,7 +394,7 @@ class CheckModel extends React.Component {
       recordMsg: undefined,
       clickType: '',
       showList: false,
-      detailsValue: undefined,
+      detailsValue: {},
       pageVisble: false,
       picHas: false,
       emailShow: false,
@@ -422,7 +423,13 @@ class CheckModel extends React.Component {
     if (type) {
       this.setState({ pageVisble: false });
     } else {
-      this.setState({ modal1Visible, detailsValue: undefined, pageVisble: false, picHas: false });
+      this.setState({
+        modal1Visible,
+        detailsValue: {},
+        pageVisble: false,
+        picHas: false,
+        pageLoading: true,
+      });
     }
   };
 
@@ -593,21 +600,53 @@ class CheckModel extends React.Component {
     }
   };
 
-  render() {
-    const {
-      recordMsg,
-      showList,
-      detailsValue,
-      clickType,
-      pageVisble,
-      picHas,
-      phoneShow,
-      phoneAccount,
-      emailShow,
-      approvedLoading,
-      pageLoading,
-      emailAccount,
-    } = this.state;
+  // 审核通过页面
+  passPage = pageVisble => (
+    <>
+      <Modal
+        width="500px"
+        centered
+        visible={pageVisble === 1}
+        footer={null}
+        onCancel={() => this.setModal1Visible(false, true)}
+      >
+        <div style={{ height: '180px', textAlign: 'center', paddingTop: '40px' }}>
+          <Icon type="check-circle" style={{ fontSize: '40px', color: '#54C31F' }} />
+          <h4 style={{ fontWeight: '600', margin: '30px 0 20px' }}>
+            {formatMessage({
+              id: 'bp.verification.approvedPage',
+            })}
+          </h4>
+        </div>
+      </Modal>
+    </>
+  );
+
+  // 拒绝页面
+  refusePage = pageVisble => (
+    <>
+      <Modal
+        width="500px"
+        centered
+        visible={pageVisble === 2}
+        footer={null}
+        onCancel={() => this.setModal1Visible(false, true)}
+      >
+        <div style={{ height: '180px', textAlign: 'center', paddingTop: '40px' }}>
+          <Icon type="close-circle" style={{ fontSize: '40px', color: 'red' }} />
+          <h4 style={{ fontWeight: '600', margin: '30px 0 20px' }}>
+            {formatMessage({
+              id: 'bp.verification.rejectPage',
+            })}
+          </h4>
+        </div>
+      </Modal>
+    </>
+  );
+
+  // 详情页面
+  detailsPage = () => {
+    const { recordMsg, detailsValue, clickType, picHas } = this.state;
     const {
       SpecialInvoice,
       countryDiallingCodes,
@@ -619,12 +658,10 @@ class CheckModel extends React.Component {
       VerifyPhoneOrEmailType,
       verifyTest,
     } = this.props;
-    if (!detailsValue && !picHas) return null;
+    if (!detailsValue && !picHas) return false;
+    if (Object.keys(detailsValue).length === 0) return false;
     let modalTitle;
     let modelContent;
-    if (recordMsg === undefined) {
-      return false;
-    }
     if (clickType === 6 || clickType === 7) {
       modalTitle = formatMessage({ id: 'bp.verification.changeVerifiedPhoneAndEmail' });
       modelContent = (
@@ -933,7 +970,9 @@ class CheckModel extends React.Component {
               <Row>
                 <Col span={16}>
                   <a className={styles.recoedHis} onClick={this.recordList}>
-                    {formatMessage({ id: 'bp.verification.PIVerification.verificationHistory' })}
+                    {formatMessage({
+                      id: 'bp.verification.organizationVerification.verificationHistory',
+                    })}
                   </a>
                 </Col>
               </Row>
@@ -1333,54 +1372,34 @@ class CheckModel extends React.Component {
       );
     }
 
-    // 审核通过页面
-    const passPage = (
-      <>
-        <Modal
-          width="500px"
-          centered
-          visible={pageVisble === 1}
-          footer={null}
-          onCancel={() => this.setModal1Visible(false, true)}
-        >
-          <div style={{ height: '180px', textAlign: 'center', paddingTop: '40px' }}>
-            <Icon type="check-circle" style={{ fontSize: '40px', color: '#54C31F' }} />
-            <h4 style={{ fontWeight: '600', margin: '30px 0 20px' }}>
-              {formatMessage({
-                id: 'bp.verification.approvedPage',
-              })}
-            </h4>
-          </div>
-        </Modal>
-      </>
-    );
+    if (modalTitle && modelContent) {
+      return [modalTitle, modelContent];
+    }
+    return false;
+  };
 
-    // 拒绝页面
-    const refusePage = (
-      <>
-        <Modal
-          width="500px"
-          centered
-          visible={pageVisble === 2}
-          footer={null}
-          onCancel={() => this.setModal1Visible(false, true)}
-        >
-          <div style={{ height: '180px', textAlign: 'center', paddingTop: '40px' }}>
-            <Icon type="close-circle" style={{ fontSize: '40px', color: 'red' }} />
-            <h4 style={{ fontWeight: '600', margin: '30px 0 20px' }}>
-              {formatMessage({
-                id: 'bp.verification.rejectPage',
-              })}
-            </h4>
-          </div>
-        </Modal>
-      </>
-    );
-
+  render() {
+    const {
+      recordMsg,
+      showList,
+      clickType,
+      pageVisble,
+      phoneShow,
+      phoneAccount,
+      emailShow,
+      approvedLoading,
+      pageLoading,
+      emailAccount,
+    } = this.state;
+    const { SpecialInvoice } = this.props;
+    if (recordMsg === undefined) {
+      return false;
+    }
+    const detailsPage = this.detailsPage();
     return (
       <div style={{ position: 'absolute', right: 0 }}>
-        {passPage}
-        {refusePage}
+        {this.passPage(pageVisble)}
+        {this.refusePage(pageVisble)}
         <Modal
           className={
             (clickType === 1 || clickType === 2 || clickType === 3) && recordMsg.status === 1
@@ -1388,13 +1407,15 @@ class CheckModel extends React.Component {
               : styles.xxxs
           }
           width="430px"
-          title={modalTitle}
+          title={detailsPage[0]}
           visible={this.state.modal1Visible}
           onOk={() => this.setModal1Visible(false)}
           onCancel={() => this.setModal1Visible(false)}
           destroyOnClose
           footer={
-            (clickType === 1 || clickType === 2 || clickType === 3) && recordMsg.status === 1
+            pageLoading
+              ? null
+              : (clickType === 1 || clickType === 2 || clickType === 3) && recordMsg.status === 1
               ? [
                   <Button key="back" onClick={() => this.openPage(recordMsg.id, 2)}>
                     {formatMessage({ id: 'bp.verification.reject' })}
@@ -1411,7 +1432,7 @@ class CheckModel extends React.Component {
               : null
           }
         >
-          <Spin spinning={pageLoading}>{pageLoading ? <Empty /> : modelContent}</Spin>
+          <Spin spinning={pageLoading}>{pageLoading ? <Empty /> : detailsPage[1]}</Spin>
         </Modal>
         <RecordListForm
           showList={showList}
