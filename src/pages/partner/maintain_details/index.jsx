@@ -1,4 +1,4 @@
-import { Icon, Spin, Empty } from 'antd';
+import { Icon, Spin, Empty, Badge } from 'antd';
 import React, { Component } from 'react';
 import { connect } from 'dva';
 
@@ -207,11 +207,33 @@ class CustomerDetails extends Component {
         tabList={[
           {
             key: 'customer',
-            tab: formatMessage({ id: 'bp.maintain_details.customer' }),
+            tab: (
+              <>
+                <Badge
+                  status={
+                    parseInt(this.props.location.query.customerDataStatus, 10) === 1
+                      ? 'success'
+                      : 'default'
+                  }
+                />
+                {formatMessage({ id: 'bp.maintain_details.customer' })}
+              </>
+            ),
           },
           {
             key: 'supplier',
-            tab: formatMessage({ id: 'bp.maintain_details.vendor' }),
+            tab: (
+              <>
+                <Badge
+                  status={
+                    parseInt(this.props.location.query.vendorDataStatus, 10) === 1
+                      ? 'success'
+                      : 'default'
+                  }
+                />
+                {formatMessage({ id: 'bp.maintain_details.vendor' })}
+              </>
+            ),
           },
         ]}
       >
