@@ -37,11 +37,6 @@ const SeqModel = {
         badge: 'success',
       },
     ],
-    // // 销售冻结
-    // salesOrderBlock: [
-    //   { id: 1, name: formatMessage({ id: 'bp.maintain.blocked' }) },
-    //   { id: 2, name: formatMessage({ id: 'bp.maintain.actived' }) },
-    // ],
     // PI认证状态
     PiCertificationStatus: [
       {
