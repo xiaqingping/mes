@@ -52,7 +52,6 @@ export default {
   'bp.verification.PIVerification.billToParty': 'Bill-To Party:',
   'bp.verification.PIVerification.memo': 'Memo:',
   'bp.verification.PIVerification.attachment': 'Attachment:',
-  'bp.verification.PIVerification.verificationHistory': 'Verification History',
   // 组织认证
   'bp.verification.organizationVerification.name': 'Name:',
   'bp.verification.organizationVerification.country': 'Country:',
