@@ -78,6 +78,7 @@ const err = error => {
   return Promise.reject(data);
 };
 
+/* eslint-disable no-param-reassign */
 // 请求拦截
 service.interceptors.request.use(config => {
   const token = localStorage.getItem('token');
@@ -118,6 +119,7 @@ service.interceptors.request.use(config => {
 
   return config;
 }, err);
+/* eslint-enable no-param-reassign */
 
 // 响应拦截
 service.interceptors.response.use(response => response.data, err);
