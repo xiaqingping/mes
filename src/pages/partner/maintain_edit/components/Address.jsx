@@ -282,6 +282,9 @@ class EditableTable extends React.Component {
         dataIndex: 'actions',
         width: '15%',
         render: (text, record, index) => {
+          // 线上地址不可修改、删除
+          if (record.source === 1) return null;
+
           const { editIndex } = this.state;
           const editable = editIndex === index;
           if (editable) {

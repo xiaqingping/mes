@@ -192,8 +192,8 @@ export default {
     '人工辅助变更已验证手机邮箱验证问题答案提交参数答案列表不能为空',
   BP_CHANGE_MOBILE_EMAIL_QUESTION_ANSWER_TYPE_IS_NULL:
     '人工辅助变更已验证手机邮箱验证问题答案参数type不正确',
-  BP_VERIFY_RECORD_MOBILE_STATUS_NOT_UNVERIFY: '业务伙伴(#key)对应的手机验证状态不是未验证状态',
-  BP_VERIFY_RECORD_EMAIL_STATUS_NOT_UNVERIFY: '业务伙伴(#key)对应的邮箱验证状态不是未验证状态',
+  BP_VERIFY_RECORD_MOBILE_STATUS_NOT_VERIFIED: '业务伙伴(#key)对应的手机验证状态不是已验证状态',
+  BP_VERIFY_RECORD_EMAIL_STATUS_NOT_VERIFIED: '业务伙伴(#key)对应的邮箱验证状态不是已验证状态',
   BP_VERIFY_RECORD_NOT_EXIST: '验证记录ID(#key)对应的记录不存在',
   BP_VERIFY_RECORD_NOT_VERIFING: '验证记录(#key)不是验证中状态',
   BP_VERIFY_RECORD_IS_EXPIRE: '验证记录(#key)已失效',
