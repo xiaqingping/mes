@@ -1250,11 +1250,15 @@ class ChangeModal extends Component {
         this.props.form.setFieldsValue({
           taxNo: industryData[0].taxNo,
         });
+        this.setState({
+          readOnlyBool: true,
+        });
+      } else {
+        this.setState({
+          readOnlyBool: false,
+        });
       }
     }
-    this.setState({
-      readOnlyBool: false,
-    });
   };
 
   // 统一社会信用代码只读状态的判断
@@ -1447,7 +1451,6 @@ class ChangeModal extends Component {
       regisAddressEmpty,
       notesEmpty,
     } = this.state;
-    // console.log(userData.constructor === Object);
     if (!userData.basic || !(pic instanceof Array)) return null;
     const fileList = pic.map(e => ({
       old: true,
