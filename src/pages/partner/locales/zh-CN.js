@@ -1,4 +1,7 @@
+import ErrorMsg from './zh-CN/error-msg';
+
 export default {
+  ...ErrorMsg,
   // 本页模块通用数据
   'bp.bp': '业务伙伴',
   'bp.customer': '客户',

@@ -20,6 +20,20 @@ const service = axios.create({
   timeout: 60000,
 });
 
+// 错误消息结构
+// let err = {
+//   type: Number,
+//   name: String,
+//   desc: String,
+//   code: Number,
+//   message: String|Array,
+// }
+
+// 国际化错误消息结构
+// let errI18n = {
+//
+// }
+
 const requestErr = data => {
   let errMsg = ['系统异常,请与系统管理员联系!'];
 
@@ -64,6 +78,7 @@ const err = error => {
   return Promise.reject(data);
 };
 
+/* eslint-disable no-param-reassign */
 // 请求拦截
 service.interceptors.request.use(config => {
   const token = localStorage.getItem('token');
@@ -104,6 +119,7 @@ service.interceptors.request.use(config => {
 
   return config;
 }, err);
+/* eslint-enable no-param-reassign */
 
 // 响应拦截
 service.interceptors.response.use(response => response.data, err);
