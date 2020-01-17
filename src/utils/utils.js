@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import { parse } from 'querystring';
+import { formatMessage } from 'umi/locale';
 /* eslint no-useless-escape:0 import/prefer-default-export:0 */
 
 // eslint-disable-next-line max-len
@@ -96,3 +97,9 @@ export const validateEmpty = (val, fieldName) => {
   }
   return false;
 };
+
+/**
+ * 简化 formatMessage 使用
+ * @param {String} id
+ */
+export const format = id => formatMessage({ id });
