@@ -27,36 +27,41 @@ class RecordListForm extends React.Component {
       historyRecord: [],
       pic: [],
       picHas: false,
+      SpecialInvoice: [],
+      recordMsg: [],
     };
   }
 
+  componentDidMount() {
+    this.props.onRef(this);
+  }
+
   closeListForm = () => {
-    this.props.closeListForm();
     this.setState({
-      historyRecord: [],
       showList: false,
-      picHas: false,
+      historyRecord: [],
       pic: [],
+      picHas: false,
+      SpecialInvoice: [],
+      recordMsg: [],
     });
   };
 
   // props更新时调用
-  UNSAFE_componentWillReceiveProps(props) {
-    const {
-      recordMsg: { type },
-    } = this.props;
-    const typeName = parseInt(type, 10) === 1 ? 'organizationCertification' : 'piCertification';
-    if (props.showList) {
-      if (props.recordMsg) {
+  passData(showList, recordMsg, SpecialInvoice) {
+    const typeName =
+      parseInt(recordMsg.type, 10) === 1 ? 'organizationCertification' : 'piCertification';
+    if (showList) {
+      if (recordMsg) {
         // eslint-disable-next-line consistent-return
-        api.bp.getLastFinishVerifyRecords(props.recordMsg.bpId).then(res => {
+        api.bp.getLastFinishVerifyRecords(recordMsg.bpId).then(res => {
           const newData = [];
           if (!res) return null;
           if (res[typeName].attachmentCode) {
             api.disk
               .getFiles({
                 sourceKey:
-                  parseInt(type, 10) === 1
+                  parseInt(recordMsg.type, 10) === 1
                     ? 'bp_organization_certification'
                     : 'bp_pi_certification',
                 sourceCode: [res[typeName].attachmentCode].join(','),
@@ -73,9 +78,11 @@ class RecordListForm extends React.Component {
               });
           }
           this.setState({
-            showList: props.showList,
+            showList,
             historyRecord: res,
             pic: newData,
+            SpecialInvoice,
+            recordMsg,
           });
         });
       }
@@ -83,13 +90,16 @@ class RecordListForm extends React.Component {
   }
 
   render() {
-    const { showList, historyRecord, picHas, pic } = this.state;
     const {
       recordMsg: { bpType },
+      showList,
+      historyRecord,
+      picHas,
+      pic,
       SpecialInvoice,
-      VerifyRecordStatus,
-      industryCategories,
-    } = this.props;
+    } = this.state;
+
+    const { VerifyRecordStatus, industryCategories } = this.props;
     const typeName = parseInt(bpType, 10) === 2 ? 'organizationCertification' : 'piCertification';
     if (!historyRecord && !picHas) return false;
     if (!bpType) return false;
@@ -97,8 +107,8 @@ class RecordListForm extends React.Component {
       <Modal
         destroyOnClose
         footer={null}
-        width="410px"
-        className={styles.xxx}
+        width="430px"
+        className={styles.xxxs}
         title={formatMessage({
           id: 'bp.verification.organizationVerification.verificationHistory',
         })}
@@ -393,7 +403,6 @@ class CheckModel extends React.Component {
       modal1Visible: false,
       recordMsg: undefined,
       clickType: '',
-      showList: false,
       detailsValue: {},
       pageVisble: false,
       picHas: false,
@@ -526,12 +535,6 @@ class CheckModel extends React.Component {
     });
   };
 
-  closeListForm = () => {
-    this.setState({
-      showList: false,
-    });
-  };
-
   /** 重发验证码 */
   reSent = (event, detailsValue) => {
     event.preventDefault();
@@ -546,13 +549,6 @@ class CheckModel extends React.Component {
         emailAccount: detailsValue.newEmail,
       });
     }
-  };
-
-  recordList = e => {
-    e.preventDefault();
-    this.setState({
-      showList: true,
-    });
   };
 
   checkPhone = v => {
@@ -969,7 +965,10 @@ class CheckModel extends React.Component {
             <li>
               <Row>
                 <Col span={16}>
-                  <a className={styles.recoedHis} onClick={this.recordList}>
+                  <a
+                    className={styles.recoedHis}
+                    onClick={() => this.recordListForm.passData(true, recordMsg, SpecialInvoice)}
+                  >
                     {formatMessage({
                       id: 'bp.verification.organizationVerification.verificationHistory',
                     })}
@@ -1359,7 +1358,10 @@ class CheckModel extends React.Component {
             <li>
               <Row>
                 <Col span={12}>
-                  <a className={styles.recoedHis} onClick={this.recordList}>
+                  <a
+                    className={styles.recoedHis}
+                    onClick={() => this.recordListForm.passData(true, recordMsg, SpecialInvoice)}
+                  >
                     {formatMessage({
                       id: 'bp.verification.organizationVerification.verificationHistory',
                     })}
@@ -1381,7 +1383,6 @@ class CheckModel extends React.Component {
   render() {
     const {
       recordMsg,
-      showList,
       clickType,
       pageVisble,
       phoneShow,
@@ -1391,7 +1392,6 @@ class CheckModel extends React.Component {
       pageLoading,
       emailAccount,
     } = this.state;
-    const { SpecialInvoice } = this.props;
     if (recordMsg === undefined) {
       return false;
     }
@@ -1435,10 +1435,13 @@ class CheckModel extends React.Component {
           <Spin spinning={pageLoading}>{pageLoading ? <Empty /> : detailsPage[1]}</Spin>
         </Modal>
         <RecordListForm
-          showList={showList}
-          recordMsg={recordMsg}
-          closeListForm={this.closeListForm}
-          SpecialInvoice={SpecialInvoice}
+          // showList={showList}
+          // recordMsg={recordMsg}
+          // closeListForm={this.closeListForm}
+          // SpecialInvoice={SpecialInvoice}
+          onRef={ref => {
+            this.recordListForm = ref;
+          }}
         />
         <CheckPhone
           phoneShow={phoneShow}

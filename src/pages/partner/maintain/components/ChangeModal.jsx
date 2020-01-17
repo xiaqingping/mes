@@ -1256,6 +1256,7 @@ class ChangeModal extends Component {
       } else {
         this.setState({
           readOnlyBool: false,
+          industryCategory: industryData,
         });
       }
     }
