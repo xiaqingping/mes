@@ -85,18 +85,27 @@ class Basic extends React.Component {
   }
 
   checkNameInput = (rule, value, callback) => {
+    const { basic } = this.props;
+
     if (!value.name) {
       callback('名称必须');
       return;
     }
 
+    // TODO: 修改BP时，名称不能直接修改，只能通过变更认证修改，所以这里的代码注释掉
     // 修改时业务伙伴时，并且电话号码===旧电话号码（没有修改），则不进行后台验证
-    if (this.props.editType === 'update') {
-      const oldName = this.props.oldDetails.basic.name;
-      if (value.name === oldName) {
-        callback();
-        return;
-      }
+    // if (this.props.editType === 'update') {
+    //   const oldName = this.props.oldDetails.basic.name;
+    //   if (value.name === oldName) {
+    //     callback();
+    //     return;
+    //   }
+    // }
+
+    // 人员类BP，不验证名称
+    if (basic.type === 1) {
+      callback();
+      return;
     }
 
     api.bp.checkBPFields({ name: value.name }).then(res => {
