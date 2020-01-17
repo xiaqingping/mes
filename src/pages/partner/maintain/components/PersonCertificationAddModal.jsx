@@ -27,16 +27,21 @@ class PersonCertificationAddModal extends Component {
       uploadUrl,
       newGuid,
       receivingParty: [], // 收票方
+      newBillToPartyId: [],
     };
   }
 
   componentDidMount() {
     const { details } = this.props;
     const newData = [];
-
     if (details) {
+      // eslint-disable-next-line consistent-return
       api.bp.getBPCustomer(details.id).then(res => {
-        // receivingData.push({ id: res.basic.id, code: res.basic.code, name: res.basic.name })
+        let newBillToPartyIds = [];
+        res.piCertificationList.forEach(item => {
+          newBillToPartyIds = [...newBillToPartyIds, item.billToPartyId];
+        });
+        if (!res.customer) return false;
         res.customer.salesAreaList.forEach(item => {
           item.billToPartyList.forEach(v => {
             if (v.soldToPartyId === res.basic.id && v.id !== res.basic.id) {
@@ -46,6 +51,7 @@ class PersonCertificationAddModal extends Component {
         });
         this.setState({
           receivingParty: newData,
+          newBillToPartyId: newBillToPartyIds,
         });
       });
     }
@@ -65,6 +71,7 @@ class PersonCertificationAddModal extends Component {
   };
 
   okHandle = () => {
+    const { newBillToPartyId } = this.state;
     this.props.form.validateFields((err, fieldsValue) => {
       if (err) return;
       this.props.form.resetFields();
@@ -74,13 +81,20 @@ class PersonCertificationAddModal extends Component {
       this.setState({
         uploadUrl: api.disk.uploadMoreFiles('bp_pi_certification', newGuid),
         newGuid,
+        newBillToPartyId: [...newBillToPartyId, fieldsValue.billToPartyId.split(',')[0]],
       });
     });
   };
 
   render() {
     const { modalVisible, form, handleModalVisible, authorization } = this.props;
-    const { uploadUrl, receivingParty } = this.state;
+    const { uploadUrl, receivingParty, newBillToPartyId } = this.state;
+    const newReceivingParty = [];
+    this.uniq(receivingParty).forEach(item => {
+      if (!newBillToPartyId.includes(item.id)) {
+        newReceivingParty.push(item);
+      }
+    });
 
     const uploadButton = (
       <div>
@@ -130,7 +144,7 @@ class PersonCertificationAddModal extends Component {
             //   // placeholder="请输入"
             // />,
             <Select style={{ width: '100%' }}>
-              {this.uniq(receivingParty).map(item => (
+              {newReceivingParty.map(item => (
                 <Option key={`${item.id},${item.name}`} text={item.name}>
                   {item.code}&nbsp;&nbsp;{item.name}
                 </Option>
