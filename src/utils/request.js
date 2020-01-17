@@ -20,6 +20,20 @@ const service = axios.create({
   timeout: 60000,
 });
 
+// 错误消息结构
+// let err = {
+//   type: Number,
+//   name: String,
+//   desc: String,
+//   code: Number,
+//   message: String|Array,
+// }
+
+// 国际化错误消息结构
+// let errI18n = {
+//
+// }
+
 const requestErr = data => {
   let errMsg = ['系统异常,请与系统管理员联系!'];
 

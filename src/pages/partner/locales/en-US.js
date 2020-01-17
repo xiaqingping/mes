@@ -1,4 +1,7 @@
+import ErrorMsg from './en-US/error-msg';
+
 export default {
+  ...ErrorMsg,
   // 本页模块通用数据
   'bp.block': 'Block',
   'bp.normal': 'Normal',
