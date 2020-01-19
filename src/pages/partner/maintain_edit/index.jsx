@@ -77,6 +77,7 @@ class CustomerEdit extends Component {
 
   componentWillUnmount() {
     window.removeEventListener('resize', this.resizeFooterToolbar);
+    // TODO: 这里不应该设置state或者store的数据
     this.props.dispatch({
       type: 'bpEdit/setState',
       payload: {
