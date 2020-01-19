@@ -1,5 +1,5 @@
 /* eslint-disable no-nested-ternary */
-// 组织是1，PI是2
+// 组织是1，PI是2, 英国3，其他4 gtype
 import {
   Modal,
   Form,
@@ -344,7 +344,6 @@ class ChangeModal extends Component {
         api.bp.getBPPiCertification(recordMsg.id).then(res => {
           this.setState({
             userData: res,
-            pageLoading: false,
           });
           if (res.piCertificationList.length !== 0) {
             const codeList = [];
@@ -415,7 +414,6 @@ class ChangeModal extends Component {
               });
           }
           this.setState({
-            pageLoading: false,
             userData: res,
             address: res.basic.address ? res.basic.address : '',
             specialInvoice: res.organizationCertification
@@ -428,6 +426,7 @@ class ChangeModal extends Component {
       this.setState({
         recordMsg,
         loading: false,
+        pageLoading: false,
       });
     }
   };
@@ -1427,52 +1426,8 @@ class ChangeModal extends Component {
     return '';
   };
 
-  render() {
-    const {
-      recordMsg,
-      userData,
-      submitNext,
-      specialInvoice,
-      addModalVisible,
-      bankFetching,
-      bank,
-      pic,
-      newDataList,
-      userPersonData,
-      gtype,
-      guuid,
-      changeModal,
-      pageLoading,
-      form,
-      industryCategory,
-      buttonLoading,
-      readOnlyBool,
-      taxNoEmpty,
-      bankAccountEmpty,
-      regisAddressEmpty,
-      notesEmpty,
-    } = this.state;
-    if (!userData.basic || !(pic instanceof Array)) return null;
-    const fileList = pic.map(e => ({
-      old: true,
-      uid: e.id,
-      name: e.name.toString(),
-      status: 'done',
-      url: api.disk.downloadFiles(e.id, { view: true }),
-      type: e.type,
-    }));
-    const { basic } = userData;
-    const nullData = {};
-    let modelWidth = 970;
-    if (!basic) return null;
-    const { getFieldDecorator } = form;
-    const { TextArea } = Input;
-    let modelContent;
-    const userPersonList =
-      userPersonData.length !== 0 ? userPersonData.concat(newDataList) : newDataList;
-    const userDataTaxNo = userData.organizationCertification
-      ? userData.organizationCertification.taxNo
-      : '';
+  uploadModal = () => {
+    const { guuid } = this.state;
     const uploadButton = (
       <div>
         <Icon type={this.state.loading ? 'loading' : 'plus'} />
@@ -1483,7 +1438,7 @@ class ChangeModal extends Component {
     );
     const uploadUrl = api.disk.uploadMoreFiles('bp_organization_certification', guuid);
 
-    const uploadModal = (
+    return (
       <Upload
         name="files"
         multiple
@@ -1497,1170 +1452,699 @@ class ChangeModal extends Component {
         {uploadButton}
       </Upload>
     );
+  };
+
+  // 个人认证页面
+  PIcontent = () => {
+    const {
+      recordMsg,
+      userData,
+      addModalVisible,
+      buttonLoading,
+      userPersonData,
+      newDataList,
+      deletePiCertificationIdList,
+    } = this.state;
+    const nullData = {};
+    const userPersonList =
+      userPersonData.length !== 0 ? userPersonData.concat(newDataList) : newDataList;
+    const parentMethods = {
+      handleAdd: this.handleAdd,
+      handleModalVisible: this.handleModalVisible,
+    };
+    return (
+      <>
+        <Form {...formItemLayout} onSubmit={this.handlePerson}>
+          {this.renderPerform(userData.basic.name)}
+          <Row gutter={32}>
+            <List
+              rowKey="id"
+              grid={{
+                gutter: 24,
+                lg: 2,
+                md: 2,
+                sm: 1,
+                xs: 1,
+              }}
+              dataSource={[...userPersonList, nullData]}
+              renderItem={this.renderListItem}
+            />
+            <PersonCertificationAddModal
+              {...parentMethods}
+              newDataList={newDataList}
+              userPersonData={userPersonData}
+              deletePiCertificationIdList={deletePiCertificationIdList}
+              modalVisible={addModalVisible}
+              details={recordMsg}
+              handleModalVisible={v => this.handleModalVisible(v)}
+              authorization={this.props.authorization}
+              handleAdd={(data, uid) => this.handleAdd(data, uid)}
+              // eslint-disable-next-line no-nested-ternary
+              attachmentCode={
+                userData.piCertificationList
+                  ? userData.piCertificationList.attachmentCode
+                    ? userData.piCertificationList.attachmentCode
+                    : ''
+                  : ''
+              }
+            />
+            <Divider style={{ margin: 0 }} />
+            <Button
+              htmlType="submit"
+              type="primary"
+              style={{ float: 'right', margin: '10px 20px' }}
+              loading={buttonLoading}
+            >
+              {formatMessage({ id: 'action.submit' })}
+            </Button>
+          </Row>
+        </Form>
+      </>
+    );
+  };
+
+  // 组织认证页面
+  orgcontent = () => {
+    const {
+      userData,
+      specialInvoice,
+      bankFetching,
+      bank,
+      pic,
+      form,
+      industryCategory,
+      buttonLoading,
+      readOnlyBool,
+      taxNoEmpty,
+      bankAccountEmpty,
+      regisAddressEmpty,
+      notesEmpty,
+    } = this.state;
+    if (!userData.basic || !(pic instanceof Array)) return false;
+    const fileList = pic.map(e => ({
+      old: true,
+      uid: e.id,
+      name: e.name.toString(),
+      status: 'done',
+      url: api.disk.downloadFiles(e.id, { view: true }),
+      type: e.type,
+    }));
+    const { basic } = userData;
+    if (!basic) return null;
+    const { getFieldDecorator } = form;
+    const { TextArea } = Input;
+    const userDataTaxNo = userData.organizationCertification
+      ? userData.organizationCertification.taxNo
+      : '';
+    return (
+      <>
+        <Form {...formItemLayoutGroup} labelAlign="left" onSubmit={this.handleOrganization}>
+          <Row gutter={32}>
+            <>
+              {this.renderGroupNameForm()}
+              {this.renderAdressForm()}
+            </>
+            <Col lg={12} md={12} sm={12}>
+              <FormItem label={formatMessage({ id: 'bp.maintain_details.phone' })}>
+                {getFieldDecorator('phoneNum', {
+                  initialValue: {
+                    telephoneCountryCode: basic.telephoneCountryCode,
+                    telephoneAreaCode: basic.telephoneAreaCode,
+                    telephone: basic.telephone,
+                    telephoneExtension: basic.telephoneExtension,
+                  },
+                })(<TelphoneInput />)}
+              </FormItem>
+            </Col>
+            {this.renderIndustryForm()}
+            <Col lg={12} md={12} sm={12}>
+              <FormItem
+                label={formatMessage({
+                  id: 'bp.maintain_details.verification_data.special_invoice',
+                })}
+              >
+                {getFieldDecorator('specialInvoice')(
+                  <Switch
+                    style={{ marginLeft: '7px' }}
+                    checkedChildren={formatMessage({ id: 'bp.maintain.ChangeModal.on' })}
+                    unCheckedChildren={formatMessage({ id: 'bp.maintain.ChangeModal.off' })}
+                    onChange={() => {
+                      this.setState({
+                        specialInvoice: !specialInvoice,
+                      });
+                    }}
+                    checked={specialInvoice}
+                  />,
+                )}
+              </FormItem>
+            </Col>
+
+            <Col lg={12} md={12} sm={12}>
+              <FormItem
+                label={formatMessage({
+                  id: 'bp.maintain_details.verification_data.VAT_Business',
+                })}
+                hasFeedback
+                // eslint-disable-next-line max-len
+                validateStatus={
+                  taxNoEmpty
+                    ? form.getFieldValue('taxNo') ||
+                      (userData.organizationCertification
+                        ? !!userData.organizationCertification.taxNo
+                        : '')
+                      ? 'success'
+                      : 'error'
+                    : 'error'
+                }
+                // help={form.getFieldValue('taxNo') ? '' : '请输入信息'}
+              >
+                {getFieldDecorator('taxNo', {
+                  initialValue: this.taxNoShow(userData, industryCategory),
+                })(
+                  <Input
+                    placeholder={formatMessage({ id: 'bp.inputHere' })}
+                    onChange={e => {
+                      if (!e.target.value) {
+                        this.setState({
+                          taxNoEmpty: false,
+                        });
+                      } else {
+                        this.setState({
+                          taxNoEmpty: true,
+                        });
+                      }
+                    }}
+                    readOnly={
+                      readOnlyBool ||
+                      this.readOnlyStatus(
+                        industryCategory.length !== 0 ? industryCategory : userDataTaxNo,
+                      )
+                    }
+                  />,
+                )}
+              </FormItem>
+            </Col>
+            <Col lg={12} md={12} sm={12}>
+              <FormItem
+                label={formatMessage({ id: 'bp.maintain_details.verification_data.bank_name' })}
+                className="marginLeft7"
+                hasFeedback
+                // eslint-disable-next-line max-len
+                validateStatus={
+                  form.getFieldValue('bankCode') ||
+                  (userData.organizationCertification
+                    ? !!userData.organizationCertification.bankCode
+                    : '')
+                    ? 'success'
+                    : 'error'
+                }
+                // help={form.getFieldValue('bankCode') ? '' : '请输入信息'}
+              >
+                {getFieldDecorator('bankCode', {
+                  // eslint-disable-next-line no-nested-ternary
+                  initialValue: userData.organizationCertification
+                    ? userData.organizationCertification.bankName
+                      ? userData.organizationCertification.bankName
+                      : ''
+                    : '',
+                })(
+                  <Select
+                    showSearch
+                    notFoundContent={bankFetching ? <Spin size="small" /> : null}
+                    filterOption={false}
+                    onSearch={this.fetchBank}
+                    style={{ marginLeft: '7px' }}
+                  >
+                    {bank.map(d => (
+                      <Option key={d.code} value={d.code}>
+                        {d.fullName}
+                      </Option>
+                    ))}
+                  </Select>,
+                )}
+              </FormItem>
+            </Col>
+            <Col lg={12} md={12} sm={12}>
+              <FormItem
+                label={formatMessage({
+                  id: 'bp.maintain_details.verification_data.account_number',
+                })}
+                hasFeedback
+                // eslint-disable-next-line max-len
+                validateStatus={
+                  bankAccountEmpty
+                    ? form.getFieldValue('bankAccount') ||
+                      (userData.organizationCertification
+                        ? !!userData.organizationCertification.bankAccount
+                        : '')
+                      ? 'success'
+                      : 'error'
+                    : 'error'
+                }
+                // help={form.getFieldValue('bankAccount') ? '' : '请输入信息'}
+              >
+                {getFieldDecorator('bankAccount', {
+                  // eslint-disable-next-line no-nested-ternary
+                  initialValue: userData.organizationCertification
+                    ? userData.organizationCertification.bankAccount
+                      ? userData.organizationCertification.bankAccount
+                      : ''
+                    : '',
+                })(
+                  <Input
+                    placeholder={formatMessage({ id: 'bp.inputHere' })}
+                    onChange={e => {
+                      if (!e.target.value) {
+                        this.setState({
+                          bankAccountEmpty: false,
+                        });
+                      } else {
+                        this.setState({
+                          bankAccountEmpty: true,
+                        });
+                      }
+                    }}
+                  />,
+                )}
+              </FormItem>
+            </Col>
+            <Col lg={24} md={12} sm={12}>
+              <FormItem
+                label={formatMessage({ id: 'bp.maintain_details.verification_data.address' })}
+                labelCol={{ span: 4 }}
+                wrapperCol={{ span: 20 }}
+                hasFeedback
+                // eslint-disable-next-line max-len
+                validateStatus={
+                  regisAddressEmpty
+                    ? form.getFieldValue('regisAddress') ||
+                      (userData.organizationCertification
+                        ? !!userData.organizationCertification.address
+                        : '')
+                      ? 'success'
+                      : 'error'
+                    : 'error'
+                }
+              >
+                {getFieldDecorator('regisAddress', {
+                  initialValue: userData.organizationCertification
+                    ? userData.organizationCertification.address
+                      ? userData.organizationCertification.address
+                      : ''
+                    : '',
+                })(
+                  <Input
+                    placeholder={formatMessage({ id: 'bp.inputHere' })}
+                    onChange={e => {
+                      if (!e.target.value) {
+                        this.setState({
+                          regisAddressEmpty: false,
+                        });
+                      } else {
+                        this.setState({
+                          regisAddressEmpty: true,
+                        });
+                      }
+                    }}
+                  />,
+                )}
+              </FormItem>
+            </Col>
+            <Col lg={24} md={12} sm={12}>
+              <Form.Item
+                label={formatMessage({ id: 'bp.maintain_details.verification_data.memo' })}
+                hasFeedback
+                labelCol={{ span: 4 }}
+                wrapperCol={{ span: 20 }}
+                // eslint-disable-next-line max-len
+                validateStatus={
+                  notesEmpty
+                    ? form.getFieldValue('notes') ||
+                      (userData.organizationCertification
+                        ? !!userData.organizationCertification.notes
+                        : '')
+                      ? 'success'
+                      : 'error'
+                    : 'error'
+                }
+              >
+                {getFieldDecorator('notes', {
+                  initialValue: userData.organizationCertification
+                    ? userData.organizationCertification.notes
+                      ? userData.organizationCertification.notes
+                      : ''
+                    : '',
+                })(
+                  <TextArea
+                    rows={2}
+                    onChange={e => {
+                      if (!e.target.value) {
+                        this.setState({
+                          notesEmpty: false,
+                        });
+                      } else {
+                        this.setState({
+                          notesEmpty: true,
+                        });
+                      }
+                    }}
+                  />,
+                )}
+              </Form.Item>
+            </Col>
+            <Col lg={24} md={12} sm={12}>
+              <Form.Item
+                label={formatMessage({
+                  id: 'bp.maintain_details.verification_data.verification_documents',
+                })}
+                labelCol={{ span: 4 }}
+                wrapperCol={{ span: 20 }}
+              >
+                {getFieldDecorator('attachmentList', {
+                  initialValue: fileList,
+                  valuePropName: 'fileList',
+                  getValueFromEvent: this.normFile,
+                })(this.uploadModal())}
+              </Form.Item>
+            </Col>
+            <Divider style={{ margin: 0 }} />
+            <Button
+              htmlType="submit"
+              type="primary"
+              style={{ float: 'right', margin: '10px 20px' }}
+              loading={buttonLoading}
+            >
+              {formatMessage({ id: 'action.submit' })}
+            </Button>
+          </Row>
+        </Form>
+      </>
+    );
+  };
+
+  // 英国认证页面
+  GBcontent = () => {
+    const { userData, form, buttonLoading, taxNoEmpty, notesEmpty, pic } = this.state;
+    if (!userData.basic || !(pic instanceof Array)) return false;
+    const fileList = pic.map(e => ({
+      old: true,
+      uid: e.id,
+      name: e.name.toString(),
+      status: 'done',
+      url: api.disk.downloadFiles(e.id, { view: true }),
+      type: e.type,
+    }));
+    const { basic } = userData;
+    if (!basic) return null;
+    const { getFieldDecorator } = form;
+    const { TextArea } = Input;
+    return (
+      <>
+        <Form {...formItemLayout} onSubmit={this.handleOrganization}>
+          <Row gutter={32}>
+            {this.renderGroupNameForm()}
+            {this.renderAdressForm()}
+            <Col lg={24} md={12} sm={12}>
+              <FormItem
+                label={formatMessage({ id: 'bp.maintain.ChangeModal.vat' })}
+                labelCol={{ span: 4 }}
+                wrapperCol={{ span: 20 }}
+                validateStatus={
+                  taxNoEmpty
+                    ? form.getFieldValue('taxNo') ||
+                      (userData.organizationCertification
+                        ? !!userData.organizationCertification.taxNo
+                        : '')
+                      ? 'success'
+                      : 'error'
+                    : 'error'
+                }
+                // help={form.getFieldValue('taxNo') ? '' : '请输入信息'}
+              >
+                {getFieldDecorator('taxNo', {
+                  // eslint-disable-next-line no-nested-ternary
+                  initialValue: userData.organizationCertification
+                    ? userData.organizationCertification.taxNo
+                      ? userData.organizationCertification.taxNo
+                      : ''
+                    : '',
+                })(
+                  <Input
+                    placeholder={formatMessage({ id: 'bp.inputHere' })}
+                    onChange={e => {
+                      if (!e.target.value) {
+                        this.setState({
+                          taxNoEmpty: false,
+                        });
+                      } else {
+                        this.setState({
+                          taxNoEmpty: true,
+                        });
+                      }
+                    }}
+                  />,
+                )}
+              </FormItem>
+            </Col>
+            <Col lg={24} md={12} sm={12}>
+              <Form.Item
+                label={formatMessage({ id: 'bp.maintain_details.verification_data.memo' })}
+                labelCol={{ span: 4 }}
+                wrapperCol={{ span: 20 }}
+                validateStatus={
+                  notesEmpty
+                    ? form.getFieldValue('notes') ||
+                      (userData.organizationCertification
+                        ? !!userData.organizationCertification.notes
+                        : '')
+                      ? 'success'
+                      : 'error'
+                    : 'error'
+                }
+                // help={form.getFieldValue('notes') ? '' : '请输入信息'}
+              >
+                {getFieldDecorator('notes', {
+                  // eslint-disable-next-line no-nested-ternary
+                  initialValue: userData.organizationCertification
+                    ? userData.organizationCertification.notes
+                      ? userData.organizationCertification.notes
+                      : ''
+                    : '',
+                })(
+                  <TextArea
+                    rows={2}
+                    onChange={e => {
+                      if (!e.target.value) {
+                        this.setState({
+                          notesEmpty: false,
+                        });
+                      } else {
+                        this.setState({
+                          notesEmpty: true,
+                        });
+                      }
+                    }}
+                  />,
+                )}
+              </Form.Item>
+            </Col>
+            <Col lg={24} md={12} sm={12}>
+              <Form.Item
+                label={formatMessage({
+                  id: 'bp.maintain_details.verification_data.verification_documents',
+                })}
+                labelCol={{ span: 4 }}
+                wrapperCol={{ span: 20 }}
+              >
+                {getFieldDecorator('attachmentList', {
+                  initialValue: fileList,
+                  valuePropName: 'fileList',
+                  getValueFromEvent: this.normFile,
+                })(this.uploadModal())}
+              </Form.Item>
+            </Col>
+            <Divider style={{ margin: 0 }} />
+            <Button
+              htmlType="submit"
+              type="primary"
+              style={{ float: 'right', margin: '10px 20px' }}
+              loading={buttonLoading}
+            >
+              {formatMessage({ id: 'action.submit' })}
+            </Button>
+          </Row>
+        </Form>
+      </>
+    );
+  };
+
+  // 其他组织认证页面
+  otherContent = () => {
+    const { userData, pic, form, buttonLoading, taxNoEmpty, notesEmpty } = this.state;
+    if (!userData.basic || !(pic instanceof Array)) return false;
+    const fileList = pic.map(e => ({
+      old: true,
+      uid: e.id,
+      name: e.name.toString(),
+      status: 'done',
+      url: api.disk.downloadFiles(e.id, { view: true }),
+      type: e.type,
+    }));
+    const { basic } = userData;
+    if (!basic) return null;
+    const { getFieldDecorator } = form;
+    const { TextArea } = Input;
+    return (
+      <>
+        <Form {...formItemLayout} onSubmit={this.handleOrganization}>
+          <Row gutter={32}>
+            {this.renderGroupNameForm()}
+            {this.renderAdressForm()}
+            <Col lg={24} md={12} sm={12}>
+              <FormItem
+                label={formatMessage({ id: 'bp.maintain.ChangeModal.taxExemptID' })}
+                labelCol={{ span: 4 }}
+                wrapperCol={{ span: 20 }}
+                validateStatus={
+                  taxNoEmpty
+                    ? form.getFieldValue('taxNo') ||
+                      (userData.organizationCertification
+                        ? !!userData.organizationCertification.taxNo
+                        : '')
+                      ? 'success'
+                      : 'error'
+                    : 'error'
+                }
+                // help={form.getFieldValue('taxNo') ? '' : '请输入信息'}
+              >
+                {getFieldDecorator('taxNo', {
+                  // eslint-disable-next-line no-nested-ternary
+                  initialValue: userData.organizationCertification
+                    ? userData.organizationCertification.taxNo
+                      ? userData.organizationCertification.taxNo
+                      : ''
+                    : '',
+                })(
+                  <Input
+                    placeholder={formatMessage({ id: 'bp.inputHere' })}
+                    onChange={e => {
+                      if (!e.target.value) {
+                        this.setState({
+                          taxNoEmpty: false,
+                        });
+                      } else {
+                        this.setState({
+                          taxNoEmpty: true,
+                        });
+                      }
+                    }}
+                  />,
+                )}
+              </FormItem>
+            </Col>
+            <Col lg={24} md={12} sm={12}>
+              <Form.Item
+                label={formatMessage({ id: 'bp.maintain_details.verification_data.memo' })}
+                labelCol={{ span: 4 }}
+                wrapperCol={{ span: 20 }}
+                validateStatus={
+                  notesEmpty
+                    ? form.getFieldValue('notes') ||
+                      (userData.organizationCertification
+                        ? !!userData.organizationCertification.notes
+                        : '')
+                      ? 'success'
+                      : 'error'
+                    : 'error'
+                }
+                // help={form.getFieldValue('notes') ? '' : '请输入信息'}
+              >
+                {getFieldDecorator('notes', {
+                  // eslint-disable-next-line no-nested-ternary
+                  initialValue: userData.organizationCertification
+                    ? userData.organizationCertification.notes
+                      ? userData.organizationCertification.notes
+                      : ''
+                    : '',
+                })(
+                  <TextArea
+                    rows={2}
+                    onChange={e => {
+                      if (!e.target.value) {
+                        this.setState({
+                          notesEmpty: false,
+                        });
+                      } else {
+                        this.setState({
+                          notesEmpty: true,
+                        });
+                      }
+                    }}
+                  />,
+                )}
+              </Form.Item>
+            </Col>
+            <Col lg={24} md={12} sm={12}>
+              <Form.Item
+                label={formatMessage({
+                  id: 'bp.maintain_details.verification_data.verification_documents',
+                })}
+                labelCol={{ span: 4 }}
+                wrapperCol={{ span: 20 }}
+              >
+                {getFieldDecorator('attachmentList', {
+                  initialValue: fileList,
+                  valuePropName: 'fileList',
+                  getValueFromEvent: this.normFile,
+                })(this.uploadModal())}
+              </Form.Item>
+            </Col>
+            <Divider style={{ margin: 0 }} />
+            <Button
+              htmlType="submit"
+              type="primary"
+              style={{ float: 'right', margin: '10px 20px' }}
+              loading={buttonLoading}
+            >
+              {formatMessage({ id: 'action.submit' })}
+            </Button>
+          </Row>
+        </Form>
+      </>
+    );
+  };
+
+  render() {
+    const { recordMsg, userData, submitNext, gtype, changeModal, pageLoading } = this.state;
+    const { basic } = userData;
+    let modelWidth = 970;
+    if (!basic) return false;
+    let modelContent;
 
     if (gtype === 2) {
       modelWidth = 830;
-
-      const parentMethods = {
-        handleAdd: this.handleAdd,
-        handleModalVisible: this.handleModalVisible,
-      };
-      modelContent = (
-        <>
-          <Form {...formItemLayout} onSubmit={this.handlePerson}>
-            {this.renderPerform(userData.basic.name)}
-            <Row gutter={32}>
-              <List
-                rowKey="id"
-                grid={{
-                  gutter: 24,
-                  lg: 2,
-                  md: 2,
-                  sm: 1,
-                  xs: 1,
-                }}
-                dataSource={[...userPersonList, nullData]}
-                renderItem={this.renderListItem}
-              />
-              <PersonCertificationAddModal
-                {...parentMethods}
-                modalVisible={addModalVisible}
-                details={recordMsg}
-                handleModalVisible={v => this.handleModalVisible(v)}
-                authorization={this.props.authorization}
-                handleAdd={(data, uid) => this.handleAdd(data, uid)}
-                // eslint-disable-next-line no-nested-ternary
-                attachmentCode={
-                  userData.piCertificationList
-                    ? userData.piCertificationList.attachmentCode
-                      ? userData.piCertificationList.attachmentCode
-                      : ''
-                    : ''
-                }
-              />
-              <Divider style={{ margin: 0 }} />
-              <Button
-                htmlType="submit"
-                type="primary"
-                style={{ float: 'right', margin: '10px 20px' }}
-                loading={buttonLoading}
-              >
-                {formatMessage({ id: 'action.submit' })}
-              </Button>
-            </Row>
-          </Form>
-        </>
-      );
+      modelContent = this.PIcontent();
     } else if (gtype === 1) {
       modelWidth = 1130;
-      modelContent = (
-        <>
-          <Form {...formItemLayoutGroup} labelAlign="left" onSubmit={this.handleOrganization}>
-            <Row gutter={32}>
-              <>
-                {this.renderGroupNameForm()}
-                {this.renderAdressForm()}
-              </>
-              <Col lg={12} md={12} sm={12}>
-                <FormItem label={formatMessage({ id: 'bp.maintain_details.phone' })}>
-                  {getFieldDecorator('phoneNum', {
-                    initialValue: {
-                      telephoneCountryCode: basic.telephoneCountryCode,
-                      telephoneAreaCode: basic.telephoneAreaCode,
-                      telephone: basic.telephone,
-                      telephoneExtension: basic.telephoneExtension,
-                    },
-                  })(<TelphoneInput />)}
-                </FormItem>
-              </Col>
-              {this.renderIndustryForm()}
-              <Col lg={12} md={12} sm={12}>
-                <FormItem
-                  label={formatMessage({
-                    id: 'bp.maintain_details.verification_data.special_invoice',
-                  })}
-                >
-                  {getFieldDecorator('specialInvoice')(
-                    <Switch
-                      style={{ marginLeft: '7px' }}
-                      checkedChildren={formatMessage({ id: 'bp.maintain.ChangeModal.on' })}
-                      unCheckedChildren={formatMessage({ id: 'bp.maintain.ChangeModal.off' })}
-                      onChange={() => {
-                        this.setState({
-                          specialInvoice: !specialInvoice,
-                        });
-                      }}
-                      checked={specialInvoice}
-                    />,
-                  )}
-                </FormItem>
-              </Col>
-
-              <Col lg={12} md={12} sm={12}>
-                <FormItem
-                  label={formatMessage({
-                    id: 'bp.maintain_details.verification_data.VAT_Business',
-                  })}
-                  hasFeedback
-                  // eslint-disable-next-line max-len
-                  validateStatus={
-                    taxNoEmpty
-                      ? form.getFieldValue('taxNo') ||
-                        (userData.organizationCertification
-                          ? !!userData.organizationCertification.taxNo
-                          : '')
-                        ? 'success'
-                        : 'error'
-                      : 'error'
-                  }
-                  // help={form.getFieldValue('taxNo') ? '' : '请输入信息'}
-                >
-                  {getFieldDecorator('taxNo', {
-                    initialValue: this.taxNoShow(userData, industryCategory),
-                  })(
-                    <Input
-                      placeholder={formatMessage({ id: 'bp.inputHere' })}
-                      onChange={e => {
-                        if (!e.target.value) {
-                          this.setState({
-                            taxNoEmpty: false,
-                          });
-                        } else {
-                          this.setState({
-                            taxNoEmpty: true,
-                          });
-                        }
-                      }}
-                      readOnly={
-                        readOnlyBool ||
-                        this.readOnlyStatus(
-                          industryCategory.length !== 0 ? industryCategory : userDataTaxNo,
-                        )
-                      }
-                    />,
-                  )}
-                </FormItem>
-              </Col>
-              <Col lg={12} md={12} sm={12}>
-                <FormItem
-                  label={formatMessage({ id: 'bp.maintain_details.verification_data.bank_name' })}
-                  className="marginLeft7"
-                  hasFeedback
-                  // eslint-disable-next-line max-len
-                  validateStatus={
-                    form.getFieldValue('bankCode') ||
-                    (userData.organizationCertification
-                      ? !!userData.organizationCertification.bankCode
-                      : '')
-                      ? 'success'
-                      : 'error'
-                  }
-                  // help={form.getFieldValue('bankCode') ? '' : '请输入信息'}
-                >
-                  {getFieldDecorator('bankCode', {
-                    // eslint-disable-next-line no-nested-ternary
-                    initialValue: userData.organizationCertification
-                      ? userData.organizationCertification.bankName
-                        ? userData.organizationCertification.bankName
-                        : ''
-                      : '',
-                  })(
-                    <Select
-                      showSearch
-                      notFoundContent={bankFetching ? <Spin size="small" /> : null}
-                      filterOption={false}
-                      onSearch={this.fetchBank}
-                      style={{ marginLeft: '7px' }}
-                    >
-                      {bank.map(d => (
-                        <Option key={d.code} value={d.code}>
-                          {d.fullName}
-                        </Option>
-                      ))}
-                    </Select>,
-                  )}
-                </FormItem>
-              </Col>
-              <Col lg={12} md={12} sm={12}>
-                <FormItem
-                  label={formatMessage({
-                    id: 'bp.maintain_details.verification_data.account_number',
-                  })}
-                  hasFeedback
-                  // eslint-disable-next-line max-len
-                  validateStatus={
-                    bankAccountEmpty
-                      ? form.getFieldValue('bankAccount') ||
-                        (userData.organizationCertification
-                          ? !!userData.organizationCertification.bankAccount
-                          : '')
-                        ? 'success'
-                        : 'error'
-                      : 'error'
-                  }
-                  // help={form.getFieldValue('bankAccount') ? '' : '请输入信息'}
-                >
-                  {getFieldDecorator('bankAccount', {
-                    // eslint-disable-next-line no-nested-ternary
-                    initialValue: userData.organizationCertification
-                      ? userData.organizationCertification.bankAccount
-                        ? userData.organizationCertification.bankAccount
-                        : ''
-                      : '',
-                  })(
-                    <Input
-                      placeholder={formatMessage({ id: 'bp.inputHere' })}
-                      onChange={e => {
-                        if (!e.target.value) {
-                          this.setState({
-                            bankAccountEmpty: false,
-                          });
-                        } else {
-                          this.setState({
-                            bankAccountEmpty: true,
-                          });
-                        }
-                      }}
-                    />,
-                  )}
-                </FormItem>
-              </Col>
-              <Col lg={24} md={12} sm={12}>
-                <FormItem
-                  label={formatMessage({ id: 'bp.maintain_details.verification_data.address' })}
-                  labelCol={{ span: 4 }}
-                  wrapperCol={{ span: 20 }}
-                  hasFeedback
-                  // eslint-disable-next-line max-len
-                  validateStatus={
-                    regisAddressEmpty
-                      ? form.getFieldValue('regisAddress') ||
-                        (userData.organizationCertification
-                          ? !!userData.organizationCertification.address
-                          : '')
-                        ? 'success'
-                        : 'error'
-                      : 'error'
-                  }
-                >
-                  {getFieldDecorator('regisAddress', {
-                    initialValue: userData.organizationCertification
-                      ? userData.organizationCertification.address
-                        ? userData.organizationCertification.address
-                        : ''
-                      : '',
-                  })(
-                    <Input
-                      placeholder={formatMessage({ id: 'bp.inputHere' })}
-                      onChange={e => {
-                        if (!e.target.value) {
-                          this.setState({
-                            regisAddressEmpty: false,
-                          });
-                        } else {
-                          this.setState({
-                            regisAddressEmpty: true,
-                          });
-                        }
-                      }}
-                    />,
-                  )}
-                </FormItem>
-              </Col>
-              <Col lg={24} md={12} sm={12}>
-                <Form.Item
-                  label={formatMessage({ id: 'bp.maintain_details.verification_data.memo' })}
-                  hasFeedback
-                  labelCol={{ span: 4 }}
-                  wrapperCol={{ span: 20 }}
-                  // eslint-disable-next-line max-len
-                  validateStatus={
-                    notesEmpty
-                      ? form.getFieldValue('notes') ||
-                        (userData.organizationCertification
-                          ? !!userData.organizationCertification.notes
-                          : '')
-                        ? 'success'
-                        : 'error'
-                      : 'error'
-                  }
-                >
-                  {getFieldDecorator('notes', {
-                    initialValue: userData.organizationCertification
-                      ? userData.organizationCertification.notes
-                        ? userData.organizationCertification.notes
-                        : ''
-                      : '',
-                  })(
-                    <TextArea
-                      rows={2}
-                      onChange={e => {
-                        if (!e.target.value) {
-                          this.setState({
-                            notesEmpty: false,
-                          });
-                        } else {
-                          this.setState({
-                            notesEmpty: true,
-                          });
-                        }
-                      }}
-                    />,
-                  )}
-                </Form.Item>
-              </Col>
-              <Col lg={24} md={12} sm={12}>
-                <Form.Item
-                  label={formatMessage({
-                    id: 'bp.maintain_details.verification_data.verification_documents',
-                  })}
-                  labelCol={{ span: 4 }}
-                  wrapperCol={{ span: 20 }}
-                >
-                  {getFieldDecorator('attachmentList', {
-                    initialValue: fileList,
-                    valuePropName: 'fileList',
-                    getValueFromEvent: this.normFile,
-                  })(uploadModal)}
-                </Form.Item>
-              </Col>
-              <Divider style={{ margin: 0 }} />
-              <Button
-                htmlType="submit"
-                type="primary"
-                style={{ float: 'right', margin: '10px 20px' }}
-                loading={buttonLoading}
-              >
-                {formatMessage({ id: 'action.submit' })}
-              </Button>
-            </Row>
-          </Form>
-        </>
-      );
+      modelContent = this.orgcontent();
     } else if (gtype === 3) {
       modelWidth = 800;
-      modelContent = (
-        <>
-          <Form {...formItemLayout} onSubmit={this.handleOrganization}>
-            <Row gutter={32}>
-              {this.renderGroupNameForm()}
-              {this.renderAdressForm()}
-              <Col lg={24} md={12} sm={12}>
-                <FormItem
-                  label={formatMessage({ id: 'bp.maintain.ChangeModal.vat' })}
-                  labelCol={{ span: 4 }}
-                  wrapperCol={{ span: 20 }}
-                  validateStatus={
-                    taxNoEmpty
-                      ? form.getFieldValue('taxNo') ||
-                        (userData.organizationCertification
-                          ? !!userData.organizationCertification.taxNo
-                          : '')
-                        ? 'success'
-                        : 'error'
-                      : 'error'
-                  }
-                  // help={form.getFieldValue('taxNo') ? '' : '请输入信息'}
-                >
-                  {getFieldDecorator('taxNo', {
-                    // eslint-disable-next-line no-nested-ternary
-                    initialValue: userData.organizationCertification
-                      ? userData.organizationCertification.taxNo
-                        ? userData.organizationCertification.taxNo
-                        : ''
-                      : '',
-                  })(
-                    <Input
-                      placeholder={formatMessage({ id: 'bp.inputHere' })}
-                      onChange={e => {
-                        if (!e.target.value) {
-                          this.setState({
-                            taxNoEmpty: false,
-                          });
-                        } else {
-                          this.setState({
-                            taxNoEmpty: true,
-                          });
-                        }
-                      }}
-                    />,
-                  )}
-                </FormItem>
-              </Col>
-              <Col lg={24} md={12} sm={12}>
-                <Form.Item
-                  label={formatMessage({ id: 'bp.maintain_details.verification_data.memo' })}
-                  labelCol={{ span: 4 }}
-                  wrapperCol={{ span: 20 }}
-                  validateStatus={
-                    notesEmpty
-                      ? form.getFieldValue('notes') ||
-                        (userData.organizationCertification
-                          ? !!userData.organizationCertification.notes
-                          : '')
-                        ? 'success'
-                        : 'error'
-                      : 'error'
-                  }
-                  // help={form.getFieldValue('notes') ? '' : '请输入信息'}
-                >
-                  {getFieldDecorator('notes', {
-                    // eslint-disable-next-line no-nested-ternary
-                    initialValue: userData.organizationCertification
-                      ? userData.organizationCertification.notes
-                        ? userData.organizationCertification.notes
-                        : ''
-                      : '',
-                  })(
-                    <TextArea
-                      rows={2}
-                      onChange={e => {
-                        if (!e.target.value) {
-                          this.setState({
-                            notesEmpty: false,
-                          });
-                        } else {
-                          this.setState({
-                            notesEmpty: true,
-                          });
-                        }
-                      }}
-                    />,
-                  )}
-                </Form.Item>
-              </Col>
-              <Col lg={24} md={12} sm={12}>
-                <Form.Item
-                  label={formatMessage({
-                    id: 'bp.maintain_details.verification_data.verification_documents',
-                  })}
-                  labelCol={{ span: 4 }}
-                  wrapperCol={{ span: 20 }}
-                >
-                  {getFieldDecorator('attachmentList', {
-                    initialValue: fileList,
-                    valuePropName: 'fileList',
-                    getValueFromEvent: this.normFile,
-                  })(uploadModal)}
-                </Form.Item>
-              </Col>
-              <Divider style={{ margin: 0 }} />
-              <Button
-                htmlType="submit"
-                type="primary"
-                style={{ float: 'right', margin: '10px 20px' }}
-                loading={buttonLoading}
-              >
-                {formatMessage({ id: 'action.submit' })}
-              </Button>
-            </Row>
-          </Form>
-        </>
-      );
+      modelContent = this.GBcontent();
     } else if (gtype === 4) {
       modelWidth = 800;
-      modelContent = (
-        <>
-          <Form {...formItemLayout} onSubmit={this.handleOrganization}>
-            <Row gutter={32}>
-              {this.renderGroupNameForm()}
-              {this.renderAdressForm()}
-              <Col lg={24} md={12} sm={12}>
-                <FormItem
-                  label={formatMessage({ id: 'bp.maintain.ChangeModal.taxExemptID' })}
-                  labelCol={{ span: 4 }}
-                  wrapperCol={{ span: 20 }}
-                  validateStatus={
-                    taxNoEmpty
-                      ? form.getFieldValue('taxNo') ||
-                        (userData.organizationCertification
-                          ? !!userData.organizationCertification.taxNo
-                          : '')
-                        ? 'success'
-                        : 'error'
-                      : 'error'
-                  }
-                  // help={form.getFieldValue('taxNo') ? '' : '请输入信息'}
-                >
-                  {getFieldDecorator('taxNo', {
-                    // eslint-disable-next-line no-nested-ternary
-                    initialValue: userData.organizationCertification
-                      ? userData.organizationCertification.taxNo
-                        ? userData.organizationCertification.taxNo
-                        : ''
-                      : '',
-                  })(
-                    <Input
-                      placeholder={formatMessage({ id: 'bp.inputHere' })}
-                      onChange={e => {
-                        if (!e.target.value) {
-                          this.setState({
-                            taxNoEmpty: false,
-                          });
-                        } else {
-                          this.setState({
-                            taxNoEmpty: true,
-                          });
-                        }
-                      }}
-                    />,
-                  )}
-                </FormItem>
-              </Col>
-              <Col lg={24} md={12} sm={12}>
-                <Form.Item
-                  label={formatMessage({ id: 'bp.maintain_details.verification_data.memo' })}
-                  labelCol={{ span: 4 }}
-                  wrapperCol={{ span: 20 }}
-                  validateStatus={
-                    notesEmpty
-                      ? form.getFieldValue('notes') ||
-                        (userData.organizationCertification
-                          ? !!userData.organizationCertification.notes
-                          : '')
-                        ? 'success'
-                        : 'error'
-                      : 'error'
-                  }
-                  // help={form.getFieldValue('notes') ? '' : '请输入信息'}
-                >
-                  {getFieldDecorator('notes', {
-                    // eslint-disable-next-line no-nested-ternary
-                    initialValue: userData.organizationCertification
-                      ? userData.organizationCertification.notes
-                        ? userData.organizationCertification.notes
-                        : ''
-                      : '',
-                  })(
-                    <TextArea
-                      rows={2}
-                      onChange={e => {
-                        if (!e.target.value) {
-                          this.setState({
-                            notesEmpty: false,
-                          });
-                        } else {
-                          this.setState({
-                            notesEmpty: true,
-                          });
-                        }
-                      }}
-                    />,
-                  )}
-                </Form.Item>
-              </Col>
-              <Col lg={24} md={12} sm={12}>
-                <Form.Item
-                  label={formatMessage({
-                    id: 'bp.maintain_details.verification_data.verification_documents',
-                  })}
-                  labelCol={{ span: 4 }}
-                  wrapperCol={{ span: 20 }}
-                >
-                  {getFieldDecorator('attachmentList', {
-                    initialValue: fileList,
-                    valuePropName: 'fileList',
-                    getValueFromEvent: this.normFile,
-                  })(uploadModal)}
-                </Form.Item>
-              </Col>
-              <Divider style={{ margin: 0 }} />
-              <Button
-                htmlType="submit"
-                type="primary"
-                style={{ float: 'right', margin: '10px 20px' }}
-                loading={buttonLoading}
-              >
-                {formatMessage({ id: 'action.submit' })}
-              </Button>
-            </Row>
-          </Form>
-        </>
-      );
+      modelContent = this.otherContent();
     } else if (recordMsg && recordMsg.type === 1) {
       modelWidth = 830;
-
-      const parentMethods = {
-        handleAdd: this.handleAdd,
-        handleModalVisible: this.handleModalVisible,
-      };
-      modelContent = (
-        <>
-          <Form {...formItemLayout} onSubmit={this.handlePerson}>
-            {this.renderPerform(userData.basic.name)}
-            <Row gutter={32}>
-              <List
-                rowKey="id"
-                grid={{
-                  gutter: 24,
-                  lg: 2,
-                  md: 2,
-                  sm: 1,
-                  xs: 1,
-                }}
-                dataSource={[...userPersonList, nullData]}
-                renderItem={this.renderListItem}
-              />
-              <PersonCertificationAddModal
-                {...parentMethods}
-                modalVisible={addModalVisible}
-                details={recordMsg}
-                handleModalVisible={v => this.handleModalVisible(v)}
-                authorization={this.props.authorization}
-                handleAdd={(data, uid) => this.handleAdd(data, uid)}
-                // eslint-disable-next-line no-nested-ternary
-                attachmentCode={
-                  userData.piCertificationList
-                    ? userData.piCertificationList.attachmentCode
-                      ? userData.piCertificationList.attachmentCode
-                      : ''
-                    : ''
-                }
-              />
-              <Divider style={{ margin: 0 }} />
-              <Button
-                htmlType="submit"
-                type="primary"
-                style={{ float: 'right', margin: '10px 20px' }}
-                loading={buttonLoading}
-              >
-                {formatMessage({ id: 'action.submit' })}
-              </Button>
-            </Row>
-          </Form>
-        </>
-      );
+      modelContent = this.PIcontent();
     } else if (recordMsg && recordMsg.type === 2 && userData.basic.sapCountryCode === 'CN') {
       modelWidth = 1130;
-      modelContent = (
-        <>
-          <Form {...formItemLayoutGroup} labelAlign="left" onSubmit={this.handleOrganization}>
-            <Row gutter={32}>
-              <>
-                {this.renderGroupNameForm()}
-                {this.renderAdressForm()}
-              </>
-              <Col lg={12} md={12} sm={12}>
-                <FormItem label={formatMessage({ id: 'bp.maintain_details.phone' })}>
-                  {getFieldDecorator('phoneNum', {
-                    initialValue: {
-                      telephoneCountryCode: basic.telephoneCountryCode,
-                      telephoneAreaCode: basic.telephoneAreaCode,
-                      telephone: basic.telephone,
-                      telephoneExtension: basic.telephoneExtension,
-                    },
-                  })(<TelphoneInput />)}
-                </FormItem>
-              </Col>
-              {this.renderIndustryForm()}
-              <Col lg={12} md={12} sm={12}>
-                <FormItem
-                  label={formatMessage({
-                    id: 'bp.maintain_details.verification_data.special_invoice',
-                  })}
-                >
-                  {getFieldDecorator('specialInvoice')(
-                    <Switch
-                      style={{ marginLeft: '7px' }}
-                      checkedChildren={formatMessage({ id: 'bp.maintain.ChangeModal.on' })}
-                      unCheckedChildren={formatMessage({ id: 'bp.maintain.ChangeModal.off' })}
-                      onChange={() => {
-                        this.setState({
-                          specialInvoice: !specialInvoice,
-                        });
-                      }}
-                      checked={specialInvoice}
-                    />,
-                  )}
-                </FormItem>
-              </Col>
-
-              <Col lg={12} md={12} sm={12}>
-                <FormItem
-                  label={formatMessage({
-                    id: 'bp.maintain_details.verification_data.VAT_Business',
-                  })}
-                  hasFeedback
-                  validateStatus={
-                    taxNoEmpty
-                      ? form.getFieldValue('taxNo') ||
-                        (userData.organizationCertification
-                          ? !!userData.organizationCertification.taxNo
-                          : '')
-                        ? 'success'
-                        : 'error'
-                      : 'error'
-                  }
-                  // help={form.getFieldValue('taxNo') ? '' : '请输入信息'}
-                >
-                  {getFieldDecorator('taxNo', {
-                    // eslint-disable-next-line no-nested-ternary
-                    initialValue: this.taxNoShow(userData, industryCategory),
-                  })(
-                    <Input
-                      placeholder={formatMessage({ id: 'bp.inputHere' })}
-                      onChange={e => {
-                        if (!e.target.value) {
-                          this.setState({
-                            taxNoEmpty: false,
-                          });
-                        } else {
-                          this.setState({
-                            taxNoEmpty: true,
-                          });
-                        }
-                      }}
-                      readOnly={
-                        readOnlyBool ||
-                        this.readOnlyStatus(
-                          industryCategory.length !== 0 ? industryCategory : userDataTaxNo,
-                        )
-                      }
-                    />,
-                  )}
-                </FormItem>
-              </Col>
-              <Col lg={12} md={12} sm={12}>
-                <FormItem
-                  label={formatMessage({ id: 'bp.maintain_details.verification_data.bank_name' })}
-                  className="marginLeft7"
-                  hasFeedback
-                  // eslint-disable-next-line max-len
-                  validateStatus={
-                    form.getFieldValue('bankCode') ||
-                    (userData.organizationCertification
-                      ? !!userData.organizationCertification.bankName
-                      : '')
-                      ? 'success'
-                      : 'error'
-                  }
-                  // help={form.getFieldValue('bankCode') ? '' : '请输入信息'}
-                >
-                  {getFieldDecorator('bankCode', {
-                    // eslint-disable-next-line no-nested-ternary
-                    initialValue: userData.organizationCertification
-                      ? userData.organizationCertification.bankName
-                        ? userData.organizationCertification.bankName
-                        : ''
-                      : '',
-                  })(
-                    <Select
-                      showSearch
-                      notFoundContent={bankFetching ? <Spin size="small" /> : null}
-                      filterOption={false}
-                      onSearch={this.fetchBank}
-                      style={{ marginLeft: '7px' }}
-                    >
-                      {bank.map(d => (
-                        <Option key={d.code} value={d.code}>
-                          {d.fullName}
-                        </Option>
-                      ))}
-                    </Select>,
-                  )}
-                </FormItem>
-              </Col>
-              <Col lg={12} md={12} sm={12}>
-                <FormItem
-                  label={formatMessage({
-                    id: 'bp.maintain_details.verification_data.account_number',
-                  })}
-                  hasFeedback
-                  // eslint-disable-next-line max-len
-                  validateStatus={
-                    bankAccountEmpty
-                      ? form.getFieldValue('bankAccount') ||
-                        (userData.organizationCertification
-                          ? !!userData.organizationCertification.bankAccount
-                          : '')
-                        ? 'success'
-                        : 'error'
-                      : 'error'
-                  }
-                  // help={form.getFieldValue('bankAccount') ? '' : '请输入信息'}
-                >
-                  {getFieldDecorator('bankAccount', {
-                    // eslint-disable-next-line no-nested-ternary
-                    initialValue: userData.organizationCertification
-                      ? userData.organizationCertification.bankAccount
-                        ? userData.organizationCertification.bankAccount
-                        : ''
-                      : '',
-                  })(
-                    <Input
-                      placeholder={formatMessage({ id: 'bp.inputHere' })}
-                      onChange={e => {
-                        if (!e.target.value) {
-                          this.setState({
-                            bankAccountEmpty: false,
-                          });
-                        } else {
-                          this.setState({
-                            bankAccountEmpty: true,
-                          });
-                        }
-                      }}
-                    />,
-                  )}
-                </FormItem>
-              </Col>
-              <Col lg={24} md={12} sm={12}>
-                <FormItem
-                  label={formatMessage({ id: 'bp.maintain_details.verification_data.address' })}
-                  labelCol={{ span: 4 }}
-                  wrapperCol={{ span: 20 }}
-                  hasFeedback
-                  // eslint-disable-next-line max-len
-                  validateStatus={
-                    regisAddressEmpty
-                      ? form.getFieldValue('regisAddress') ||
-                        (userData.organizationCertification
-                          ? !!userData.organizationCertification.address
-                          : '')
-                        ? 'success'
-                        : 'error'
-                      : 'error'
-                  }
-                  // help={form.getFieldValue('regisAddress') ? '' : '请输入信息'}
-                >
-                  {getFieldDecorator('regisAddress', {
-                    // eslint-disable-next-line no-nested-ternary
-                    initialValue: userData.organizationCertification
-                      ? userData.organizationCertification.address
-                        ? userData.organizationCertification.address
-                        : ''
-                      : '',
-                  })(
-                    <Input
-                      placeholder={formatMessage({ id: 'bp.inputHere' })}
-                      onChange={e => {
-                        if (!e.target.value) {
-                          this.setState({
-                            regisAddressEmpty: false,
-                          });
-                        } else {
-                          this.setState({
-                            regisAddressEmpty: true,
-                          });
-                        }
-                      }}
-                    />,
-                  )}
-                </FormItem>
-              </Col>
-              <Col lg={24} md={12} sm={12}>
-                <Form.Item
-                  label={formatMessage({ id: 'bp.maintain_details.verification_data.memo' })}
-                  hasFeedback
-                  labelCol={{ span: 4 }}
-                  wrapperCol={{ span: 20 }}
-                  // eslint-disable-next-line max-len
-                  validateStatus={
-                    notesEmpty
-                      ? form.getFieldValue('notes') ||
-                        (userData.organizationCertification
-                          ? !!userData.organizationCertification.notes
-                          : '')
-                        ? 'success'
-                        : 'error'
-                      : 'error'
-                  }
-                  // help={form.getFieldValue('notes') ? '' : '请输入信息'}
-                >
-                  {getFieldDecorator('notes', {
-                    // eslint-disable-next-line no-nested-ternary
-                    initialValue: userData.organizationCertification
-                      ? userData.organizationCertification.notes
-                        ? userData.organizationCertification.notes
-                        : ''
-                      : '',
-                  })(
-                    <TextArea
-                      rows={2}
-                      onChange={e => {
-                        if (!e.target.value) {
-                          this.setState({
-                            notesEmpty: false,
-                          });
-                        } else {
-                          this.setState({
-                            notesEmpty: true,
-                          });
-                        }
-                      }}
-                    />,
-                  )}
-                </Form.Item>
-              </Col>
-              <Col lg={24} md={12} sm={12}>
-                <Form.Item
-                  label={formatMessage({
-                    id: 'bp.maintain_details.verification_data.verification_documents',
-                  })}
-                  labelCol={{ span: 4 }}
-                  wrapperCol={{ span: 20 }}
-                >
-                  {getFieldDecorator('attachmentList', {
-                    initialValue: fileList,
-                    valuePropName: 'fileList',
-                    getValueFromEvent: this.normFile,
-                  })(uploadModal)}
-                </Form.Item>
-              </Col>
-              <Divider style={{ margin: 0 }} />
-              <Button
-                htmlType="submit"
-                type="primary"
-                style={{ float: 'right', margin: '10px 20px' }}
-                loading={buttonLoading}
-              >
-                {formatMessage({ id: 'action.submit' })}
-              </Button>
-            </Row>
-          </Form>
-        </>
-      );
-    } else if (recordMsg && recordMsg.type === 2) {
-      modelWidth = 800;
-      modelContent = (
-        <>
-          <Form {...formItemLayout} onSubmit={this.handleOrganization}>
-            <Row gutter={32}>
-              {this.renderGroupNameForm()}
-              {this.renderAdressForm()}
-              <Col lg={24} md={12} sm={12}>
-                <FormItem
-                  label={formatMessage({ id: 'bp.maintain.ChangeModal.taxExemptID' })}
-                  labelCol={{ span: 4 }}
-                  wrapperCol={{ span: 20 }}
-                  required
-                  validateStatus={
-                    taxNoEmpty
-                      ? form.getFieldValue('taxNo') ||
-                        (userData.organizationCertification
-                          ? !!userData.organizationCertification.taxNo
-                          : '')
-                        ? 'success'
-                        : 'error'
-                      : 'error'
-                  }
-                  // help={form.getFieldValue('taxNo') ? '' : '请输入信息'}
-                >
-                  {getFieldDecorator('taxNo', {
-                    // eslint-disable-next-line no-nested-ternary
-                    initialValue: userData.organizationCertification
-                      ? userData.organizationCertification.taxNo
-                        ? userData.organizationCertification.taxNo
-                        : ''
-                      : '',
-                  })(
-                    <Input
-                      placeholder={formatMessage({ id: 'bp.inputHere' })}
-                      onChange={e => {
-                        if (!e.target.value) {
-                          this.setState({
-                            taxNoEmpty: false,
-                          });
-                        } else {
-                          this.setState({
-                            taxNoEmpty: true,
-                          });
-                        }
-                      }}
-                    />,
-                  )}
-                </FormItem>
-              </Col>
-              <Col lg={24} md={12} sm={12}>
-                <Form.Item
-                  label={formatMessage({ id: 'bp.maintain_details.verification_data.memo' })}
-                  labelCol={{ span: 4 }}
-                  wrapperCol={{ span: 20 }}
-                  validateStatus={
-                    notesEmpty
-                      ? form.getFieldValue('notes') ||
-                        (userData.organizationCertification
-                          ? !!userData.organizationCertification.notes
-                          : '')
-                        ? 'success'
-                        : 'error'
-                      : 'error'
-                  }
-                  // help={form.getFieldValue('notes') ? '' : '请输入信息'}
-                >
-                  {getFieldDecorator('notes', {
-                    // eslint-disable-next-line no-nested-ternary
-                    initialValue: userData.organizationCertification
-                      ? userData.organizationCertification.notes
-                        ? userData.organizationCertification.notes
-                        : ''
-                      : '',
-                  })(
-                    <TextArea
-                      rows={2}
-                      onChange={e => {
-                        if (!e.target.value) {
-                          this.setState({
-                            notesEmpty: false,
-                          });
-                        } else {
-                          this.setState({
-                            notesEmpty: true,
-                          });
-                        }
-                      }}
-                    />,
-                  )}
-                </Form.Item>
-              </Col>
-              <Col lg={24} md={12} sm={12}>
-                <Form.Item
-                  className="customLabelStyles"
-                  label={formatMessage({
-                    id: 'bp.maintain_details.verification_data.verification_documents',
-                  })}
-                  labelCol={{ span: 4 }}
-                  wrapperCol={{ span: 20 }}
-                >
-                  {getFieldDecorator('attachmentList', {
-                    initialValue: fileList,
-                    valuePropName: 'fileList',
-                    getValueFromEvent: this.normFile,
-                  })(uploadModal)}
-                </Form.Item>
-              </Col>
-              <Divider style={{ margin: 0 }} />
-              <Button
-                htmlType="submit"
-                type="primary"
-                style={{ float: 'right', margin: '10px 20px' }}
-                loading={buttonLoading}
-              >
-                {formatMessage({ id: 'action.submit' })}
-              </Button>
-            </Row>
-          </Form>
-        </>
-      );
+      modelContent = this.orgcontent();
     } else if (recordMsg && recordMsg.type === 2 && userData.basic.sapCountryCode === 'GB') {
       modelWidth = 800;
-      modelContent = (
-        <>
-          <Form {...formItemLayout} onSubmit={this.handleOrganization}>
-            <Row gutter={32}>
-              {this.renderGroupNameForm()}
-              {this.renderAdressForm()}
-              <Col lg={24} md={12} sm={12}>
-                <FormItem
-                  label={formatMessage({ id: 'bp.maintain.ChangeModal.vat' })}
-                  labelCol={{ span: 4 }}
-                  wrapperCol={{ span: 20 }}
-                  validateStatus={
-                    taxNoEmpty
-                      ? form.getFieldValue('taxNo') ||
-                        (userData.organizationCertification
-                          ? !!userData.organizationCertification.taxNo
-                          : '')
-                        ? 'success'
-                        : 'error'
-                      : 'error'
-                  }
-                  // help={form.getFieldValue('taxNo') ? '' : '请输入信息'}
-                >
-                  {getFieldDecorator('taxNo', {
-                    initialValue: userData.organizationCertification
-                      ? userData.organizationCertification.taxNo
-                        ? userData.organizationCertification.taxNo
-                        : ''
-                      : '',
-                  })(
-                    <Input
-                      placeholder={formatMessage({ id: 'bp.inputHere' })}
-                      onChange={e => {
-                        if (!e.target.value) {
-                          this.setState({
-                            taxNoEmpty: false,
-                          });
-                        } else {
-                          this.setState({
-                            taxNoEmpty: true,
-                          });
-                        }
-                      }}
-                    />,
-                  )}
-                </FormItem>
-              </Col>
-              <Col lg={24} md={12} sm={12}>
-                <Form.Item
-                  label={formatMessage({ id: 'bp.maintain_details.verification_data.memo' })}
-                  labelCol={{ span: 4 }}
-                  wrapperCol={{ span: 20 }}
-                  validateStatus={
-                    notesEmpty
-                      ? form.getFieldValue('notes') ||
-                        (userData.organizationCertification
-                          ? !!userData.organizationCertification.notes
-                          : '')
-                        ? 'success'
-                        : 'error'
-                      : 'error'
-                  }
-                  // help={form.getFieldValue('notes') ? '' : '请输入信息'}
-                >
-                  {getFieldDecorator('notes', {
-                    // eslint-disable-next-line no-nested-ternary
-                    initialValue: userData.organizationCertification
-                      ? userData.organizationCertification.notes
-                        ? userData.organizationCertification.notes
-                        : ''
-                      : '',
-                  })(
-                    <TextArea
-                      rows={2}
-                      onChange={e => {
-                        if (!e.target.value) {
-                          this.setState({
-                            notesEmpty: false,
-                          });
-                        } else {
-                          this.setState({
-                            notesEmpty: true,
-                          });
-                        }
-                      }}
-                    />,
-                  )}
-                </Form.Item>
-              </Col>
-              <Col lg={24} md={12} sm={12}>
-                <Form.Item
-                  label={formatMessage({
-                    id: 'bp.maintain_details.verification_data.verification_documents',
-                  })}
-                  labelCol={{ span: 4 }}
-                  wrapperCol={{ span: 20 }}
-                >
-                  {getFieldDecorator('attachmentList', {
-                    initialValue: fileList,
-                    valuePropName: 'fileList',
-                    getValueFromEvent: this.normFile,
-                  })(uploadModal)}
-                </Form.Item>
-              </Col>
-              <Divider style={{ margin: 0 }} />
-              <Button
-                htmlType="submit"
-                type="primary"
-                style={{ float: 'right', margin: '10px 20px' }}
-                loading={buttonLoading}
-              >
-                {formatMessage({ id: 'action.submit' })}
-              </Button>
-            </Row>
-          </Form>
-        </>
-      );
+      modelContent = this.GBcontent();
+    } else if (recordMsg && recordMsg.type === 2) {
+      modelWidth = 800;
+      modelContent = this.otherContent();
     }
 
     // 提交通过页面
@@ -2676,35 +2160,33 @@ class ChangeModal extends Component {
     );
 
     return (
-      <div>
-        <Modal
-          width={submitNext === 1 ? modelWidth : 400}
-          centered
-          title={
-            submitNext === 1
-              ? formatMessage({
-                  id: 'bp.maintain.ChangeModal.changeApprovedData',
-                })
-              : ''
-          }
-          visible={changeModal}
-          onCancel={this.handleCancel}
-          destroyOnClose
-          maskClosable={false}
-          footer={null}
-          className="myModel"
-        >
-          <Spin spinning={pageLoading}>
-            {pageLoading ? (
-              <Empty style={{ padding: 300, background: '#fff' }} description="loading..." />
-            ) : submitNext === 1 ? (
-              modelContent
-            ) : (
-              passPage
-            )}
-          </Spin>
-        </Modal>
-      </div>
+      <Modal
+        width={submitNext === 1 ? modelWidth : 400}
+        centered
+        title={
+          submitNext === 1
+            ? formatMessage({
+                id: 'bp.maintain.ChangeModal.changeApprovedData',
+              })
+            : ''
+        }
+        visible={changeModal}
+        onCancel={this.handleCancel}
+        destroyOnClose
+        maskClosable={false}
+        footer={null}
+        className="myModel"
+      >
+        <Spin spinning={pageLoading}>
+          {pageLoading ? (
+            <Empty style={{ padding: 300, background: '#fff' }} description="loading..." />
+          ) : submitNext === 1 ? (
+            modelContent
+          ) : (
+            passPage
+          )}
+        </Spin>
+      </Modal>
     );
   }
 }

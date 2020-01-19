@@ -87,9 +87,27 @@ class PersonCertificationAddModal extends Component {
   };
 
   render() {
-    const { modalVisible, form, handleModalVisible, authorization } = this.props;
-    const { uploadUrl, receivingParty, newBillToPartyId } = this.state;
+    const {
+      modalVisible,
+      form,
+      handleModalVisible,
+      authorization,
+      newDataList,
+      userPersonData,
+    } = this.props;
+    const { uploadUrl, receivingParty } = this.state;
     const newReceivingParty = [];
+    const newBillToPartyId = [];
+    userPersonData.forEach(item => {
+      if (!newBillToPartyId.includes(item.id)) {
+        newBillToPartyId.push(item.id);
+      }
+    });
+    newDataList.forEach(item => {
+      if (!newBillToPartyId.includes(item.billToPartyId)) {
+        newBillToPartyId.push(item.billToPartyId);
+      }
+    });
     this.uniq(receivingParty).forEach(item => {
       if (!newBillToPartyId.includes(item.id)) {
         newReceivingParty.push(item);
