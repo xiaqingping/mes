@@ -6,6 +6,11 @@ const SeqModel = {
     details: null,
     type: null,
     supplier: null,
+    // 客户收货地址来源
+    addressSource: [
+      { id: 1, name: '线上' },
+      { id: 2, name: '线下' },
+    ],
     // 业务伙伴认证状态
     BpCertificationStatus: [
       {
@@ -505,7 +510,6 @@ const SeqModel = {
         }),
       },
     ],
-
     // 验证方式
     verifyTest: [
       {
@@ -527,7 +531,6 @@ const SeqModel = {
         }),
       },
     ],
-
     // 变更渠道
     verifyChannel: [
       {
@@ -543,7 +546,6 @@ const SeqModel = {
         }),
       },
     ],
-
     // 变更类型
     verifyChangeType: [
       {
@@ -559,7 +561,6 @@ const SeqModel = {
         }),
       },
     ],
-
     // 操作记录状态
     operationStatus: {
       1: {
