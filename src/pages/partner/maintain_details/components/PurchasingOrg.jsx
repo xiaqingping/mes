@@ -1,3 +1,4 @@
+// 采购组织
 import {
   Card,
   Form,
@@ -112,7 +113,7 @@ class PurchasingOrg extends React.Component {
               span={2}
               label={formatMessage({ id: 'bp.maintain_details.purchase_org.supplier_level' })}
             >
-              {formatter(VendorLevelCode, item.levelCode)}
+              {formatMessage({ id: formatter(VendorLevelCode, item.levelCode, 'id', 'i18n') })}
             </DescriptionsItem>
             <DescriptionsItem
               span={2}
@@ -121,7 +122,9 @@ class PurchasingOrg extends React.Component {
               })}
             >
               {item.invoicePostInReceive
-                ? formatter(InvoiceWithGood, item.invoicePostInReceive)
+                ? formatMessage({
+                    id: formatter(InvoiceWithGood, item.invoicePostInReceive, 'id', 'i18n'),
+                  })
                 : ''}
             </DescriptionsItem>
             <DescriptionsItem

@@ -166,7 +166,7 @@ class BasicInfo extends Component {
           return (
             <Badge
               status={formatter(status, text, 'value', 'status')}
-              text={formatter(status, text, 'value', 'text')}
+              text={formatMessage({ id: formatter(status, text, 'value', 'i18n') })}
             />
           );
         },
@@ -200,7 +200,7 @@ class BasicInfo extends Component {
           return (
             <Badge
               status={formatter(status, text, 'value', 'status')}
-              text={formatter(status, text, 'value', 'text')}
+              text={formatMessage({ id: formatter(status, text, 'value', 'i18n') })}
             />
           );
         },
@@ -234,7 +234,7 @@ class BasicInfo extends Component {
           return (
             <Badge
               status={formatter(status, text, 'value', 'status')}
-              text={formatter(status, text, 'value', 'text')}
+              text={formatMessage({ id: formatter(status, text, 'value', 'i18n') })}
             />
           );
         },
@@ -337,7 +337,9 @@ class BasicInfo extends Component {
                       <span>
                         <Badge
                           status={formatter(SalesOrderBlock, item.salesOrderBlock, 'id', 'badge')}
-                          text={formatter(SalesOrderBlock, item.salesOrderBlock)}
+                          text={formatMessage({
+                            id: formatter(SalesOrderBlock, item.salesOrderBlock, 'id', 'i18n'),
+                          })}
                         />
                       </span>
                     </DescriptionsItem>

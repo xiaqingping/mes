@@ -133,12 +133,14 @@ class BasicInfo extends Component {
                     'id',
                     'badge',
                   )}
-                  text={formatter(
-                    BpCertificationStatus,
-                    details.basic.certificationStatus,
-                    'id',
-                    'name',
-                  )}
+                  text={formatMessage({
+                    id: formatter(
+                      BpCertificationStatus,
+                      details.basic.certificationStatus,
+                      'id',
+                      'i18n',
+                    ),
+                  })}
                 />
                 &nbsp;&nbsp;&nbsp;&nbsp;
                 {this.certificationStatus(details.basic.certificationStatus, details)}

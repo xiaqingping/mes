@@ -329,11 +329,12 @@ class Maintain extends React.Component {
                 <Select
                   placeholder={formatMessage({ id: 'bp.pleaseSelect' })}
                   maxTagCount={1}
+                  maxTagTextLength={4}
                   mode="multiple"
                 >
                   {BpCertificationStatus.map(item => (
                     <Option key={item.id} value={item.id}>
-                      {item.name}
+                      {formatMessage({ id: item.i18n })}
                     </Option>
                   ))}
                 </Select>,
@@ -346,7 +347,7 @@ class Maintain extends React.Component {
                 <Select placeholder={formatMessage({ id: 'bp.pleaseSelect' })}>
                   {salesOrderBlock.map(item => (
                     <Option key={item.id} value={item.id}>
-                      {item.name}
+                      {formatMessage({ id: item.i18n })}
                     </Option>
                   ))}
                 </Select>,
@@ -359,7 +360,7 @@ class Maintain extends React.Component {
                 <Select placeholder={formatMessage({ id: 'bp.pleaseSelect' })}>
                   {CustomerDataStatus.map(item => (
                     <Option key={item.id} value={item.id}>
-                      {item.name}
+                      {formatMessage({ id: item.i18n })}
                     </Option>
                   ))}
                 </Select>,
@@ -372,7 +373,7 @@ class Maintain extends React.Component {
                 <Select placeholder={formatMessage({ id: 'bp.pleaseSelect' })}>
                   {CustomerDataStatus.map(item => (
                     <Option key={item.id} value={item.id}>
-                      {item.name}
+                      {formatMessage({ id: item.i18n })}
                     </Option>
                   ))}
                 </Select>,
@@ -530,7 +531,9 @@ class Maintain extends React.Component {
           return (
             <Badge
               status={formatter(BpCertificationStatus, val, 'id', 'badge')}
-              text={formatter(BpCertificationStatus, val, 'id', 'name')}
+              text={formatMessage({
+                id: formatter(BpCertificationStatus, val, 'id', 'i18n'),
+              })}
             />
           );
         },

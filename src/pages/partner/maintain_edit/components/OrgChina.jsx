@@ -66,7 +66,9 @@ class OrgChina extends Component {
         <Descriptions.Item label={formatMessage({ id: 'bp.maintain_details.status' })}>
           <Badge
             status={formatter(BpCertificationStatus, data.status, 'id', 'badge')}
-            text={formatter(BpCertificationStatus, data.status, 'id', 'name')}
+            text={formatMessage({
+              id: formatter(BpCertificationStatus, data.status, 'id', 'i18n'),
+            })}
           />
         </Descriptions.Item>
         <Descriptions.Item label={formatMessage({ id: 'bp.operation.operator' })}>
@@ -87,7 +89,9 @@ class OrgChina extends Component {
         <Descriptions.Item
           label={formatMessage({ id: 'bp.maintain_details.verification_data.special_invoice' })}
         >
-          {formatter(SpecialInvoice, organizationCertification.specialInvoice)}
+          {formatMessage({
+            id: formatter(SpecialInvoice, organizationCertification.specialInvoice, 'id', 'i18n'),
+          })}
         </Descriptions.Item>
         <Descriptions.Item label={formatMessage({ id: 'bp.maintain.ChangeModal.businessType' })}>
           {formatter(industryCategories, organizationCertification.industryCode, 'code')}

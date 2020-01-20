@@ -11,8 +11,8 @@ import './style.less';
 
 const FormItem = Form.Item;
 
-@connect(({ operation, global }) => ({
-  status: operation.operationStatus,
+@connect(({ global }) => ({
+  // status: operation.operationStatus,
   languageCode: global.languageCode,
 }))
 class Operation extends React.Component {

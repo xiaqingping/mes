@@ -129,13 +129,10 @@ class RecordListForm extends React.Component {
                 <Col span={16} className={styles.labelVal}>
                   <Badge
                     style={{ color: '#999' }}
-                    status={
-                      VerifyRecordStatus.filter(item => item.value === historyRecord.status)[0]
-                        .status
-                    }
-                    text={
-                      VerifyRecordStatus.filter(item => item.value === historyRecord.status)[0].text
-                    }
+                    status={formatter(VerifyRecordStatus, historyRecord.status, 'value', 'status')}
+                    text={formatMessage({
+                      id: formatter(VerifyRecordStatus, historyRecord.status, 'value', 'i18n'),
+                    })}
                   />
                   {typeName === 'piCertification'
                     ? `(${historyRecord.piCertification.billToPartyName})`
@@ -669,7 +666,11 @@ class CheckModel extends React.Component {
                   {formatMessage({ id: 'bp.verification.changeVerifiedPhoneAndEmail.changeType' })}
                 </Col>
                 <Col span={16} className={styles.labelVal}>
-                  {detailsValue.type ? formatter(verifyChangeType, detailsValue.type) : ''}
+                  {detailsValue.type
+                    ? formatMessage({
+                        id: formatter(verifyChangeType, detailsValue.type, 'id', 'i18n'),
+                      })
+                    : ''}
                 </Col>
               </Row>
             </li>
@@ -681,7 +682,11 @@ class CheckModel extends React.Component {
                   })}
                 </Col>
                 <Col span={16} className={styles.labelVal}>
-                  {detailsValue.channel ? formatter(verifyChannel, detailsValue.channel) : ''}
+                  {detailsValue.channel
+                    ? formatMessage({
+                        id: formatter(verifyChannel, detailsValue.channel, 'id', 'i18n'),
+                      })
+                    : ''}
                 </Col>
               </Row>
             </li>
@@ -693,7 +698,11 @@ class CheckModel extends React.Component {
                   })}
                 </Col>
                 <Col span={16} className={styles.labelVal}>
-                  {detailsValue.verifyType ? formatter(verifyTest, detailsValue.verifyType) : ''}
+                  {detailsValue.verifyType
+                    ? formatMessage({
+                        id: formatter(verifyTest, detailsValue.verifyType, 'id', 'i18n'),
+                      })
+                    : ''}
                 </Col>
               </Row>
             </li>
@@ -751,12 +760,14 @@ class CheckModel extends React.Component {
                             'value',
                             'status',
                           )}
-                          text={formatter(
-                            VerifyRecordStatus,
-                            detailsValue.oldContactInfoVerifyStatus,
-                            'value',
-                            'text',
-                          )}
+                          text={formatMessage({
+                            id: formatter(
+                              VerifyRecordStatus,
+                              detailsValue.oldContactInfoVerifyStatus,
+                              'value',
+                              'i18n',
+                            ),
+                          })}
                         />
                       ) : (
                         ''
@@ -854,12 +865,14 @@ class CheckModel extends React.Component {
                         'value',
                         'status',
                       )}
-                      text={formatter(
-                        VerifyRecordStatus,
-                        detailsValue.newContactInfoVerifyStatus,
-                        'value',
-                        'text',
-                      )}
+                      text={formatMessage({
+                        id: formatter(
+                          VerifyRecordStatus,
+                          detailsValue.newContactInfoVerifyStatus,
+                          'value',
+                          'i18n',
+                        ),
+                      })}
                     />
                   ) : (
                     ''
@@ -1011,7 +1024,9 @@ class CheckModel extends React.Component {
                 </Col>
                 <Col span={16} className={styles.labelVal}>
                   {/* {detailsValue.type} */}
-                  {formatter(VerifyLinkSoldToPartyType, detailsValue.type)}
+                  {formatMessage({
+                    id: formatter(VerifyLinkSoldToPartyType, detailsValue.type, 'id', 'i18n'),
+                  })}
                 </Col>
               </Row>
             </li>
@@ -1035,7 +1050,9 @@ class CheckModel extends React.Component {
                   {detailsValue.status ? (
                     <Badge
                       status={formatter(VerifyRecordStatus, detailsValue.status, 'value', 'status')}
-                      text={formatter(VerifyRecordStatus, detailsValue.status, 'value', 'text')}
+                      text={formatMessage({
+                        id: formatter(VerifyRecordStatus, detailsValue.status, 'value', 'i18n'),
+                      })}
                     />
                   ) : (
                     ''
@@ -1081,7 +1098,11 @@ class CheckModel extends React.Component {
                   {formatMessage({ id: 'bp.verification.verification.verificationType' })}
                 </Col>
                 <Col span={16} className={styles.labelVal}>
-                  {detailsValue.type ? formatter(VerifyPhoneOrEmailType, detailsValue.type) : ''}
+                  {detailsValue.type
+                    ? formatMessage({
+                        id: formatter(VerifyPhoneOrEmailType, detailsValue.type, 'id', 'i18n'),
+                      })
+                    : ''}
                 </Col>
               </Row>
             </li>
@@ -1091,7 +1112,11 @@ class CheckModel extends React.Component {
                   {formatMessage({ id: 'bp.verification.verification.verificationMethod' })}
                 </Col>
                 <Col span={16} className={styles.labelVal}>
-                  {detailsValue.channel ? formatter(verifyChannel, detailsValue.channel) : ''}
+                  {detailsValue.channel
+                    ? formatMessage({
+                        id: formatter(verifyChannel, detailsValue.channel, 'id', 'i18n'),
+                      })
+                    : ''}
                 </Col>
               </Row>
             </li>
@@ -1125,7 +1150,9 @@ class CheckModel extends React.Component {
                   {detailsValue.status ? (
                     <Badge
                       status={formatter(VerifyRecordStatus, detailsValue.status, 'value', 'status')}
-                      text={formatter(VerifyRecordStatus, detailsValue.status, 'value', 'text')}
+                      text={formatMessage({
+                        id: formatter(VerifyRecordStatus, detailsValue.status, 'value', 'i18n'),
+                      })}
                     />
                   ) : (
                     ''

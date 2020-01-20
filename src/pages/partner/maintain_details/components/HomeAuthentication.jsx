@@ -137,12 +137,14 @@ class BasicInfo extends Component {
                     'id',
                     'badge',
                   )}
-                  text={formatter(
-                    BpCertificationStatus,
-                    details.basic.certificationStatus,
-                    'id',
-                    'name',
-                  )}
+                  text={formatMessage({
+                    id: formatter(
+                      BpCertificationStatus,
+                      details.basic.certificationStatus,
+                      'id',
+                      'i18n',
+                    ),
+                  })}
                 />
                 &nbsp;&nbsp;&nbsp;&nbsp;
                 {this.certificationStatus(details.basic.certificationStatus, details)}
@@ -158,7 +160,14 @@ class BasicInfo extends Component {
                     : '否'
                   : ''} */}
                 {details.organizationCertification
-                  ? formatter(SpecialInvoice, details.organizationCertification.specialInvoice)
+                  ? formatMessage({
+                      id: formatter(
+                        SpecialInvoice,
+                        details.organizationCertification.specialInvoice,
+                        'id',
+                        'i18n',
+                      ),
+                    })
                   : ''}
               </DescriptionsItem>
               <DescriptionsItem

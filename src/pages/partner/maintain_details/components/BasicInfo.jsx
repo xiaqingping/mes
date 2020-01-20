@@ -121,7 +121,9 @@ class BasicInfo extends Component {
               'id',
               'badge',
             )}
-            text={formatter(mobilePhoneVerifyStatus, basic.mobilePhoneVerifyStatus)}
+            text={formatMessage({
+              id: formatter(mobilePhoneVerifyStatus, basic.mobilePhoneVerifyStatus, 'id', 'i18n'),
+            })}
           />
         );
       }
@@ -166,7 +168,9 @@ class BasicInfo extends Component {
         return (
           <Badge
             status={formatter(emailVerifyStatus, basic.emailVerifyStatus, 'id', 'badge')}
-            text={formatter(emailVerifyStatus, basic.emailVerifyStatus)}
+            text={formatMessage({
+              id: formatter(emailVerifyStatus, basic.emailVerifyStatus, 'id', 'i18n'),
+            })}
           />
         );
       }
@@ -366,7 +370,9 @@ class BasicInfo extends Component {
                     'id',
                     'badge',
                   )}
-                  text={formatter(salesOrderBlock, details.vendor.invoicePostBlock)}
+                  text={formatMessage({
+                    id: formatter(salesOrderBlock, details.vendor.invoicePostBlock, 'id', 'i18n'),
+                  })}
                 />
               ) : (
                 ''
@@ -374,7 +380,9 @@ class BasicInfo extends Component {
             ) : details.customer ? (
               <Badge
                 status={formatter(salesOrderBlock, details.customer.salesOrderBlock, 'id', 'badge')}
-                text={formatter(salesOrderBlock, details.customer.salesOrderBlock)}
+                text={formatMessage({
+                  id: formatter(salesOrderBlock, details.customer.salesOrderBlock, 'id', 'i18n'),
+                })}
               />
             ) : (
               ''

@@ -94,7 +94,9 @@ class PersonCertification extends React.Component {
                 /> */}
                 <Badge
                   status={formatter(PiCertificationStatus, item.status, 'id', 'badge')}
-                  text={formatter(PiCertificationStatus, item.status, 'id', 'name')}
+                  text={formatMessage({
+                    id: formatter(PiCertificationStatus, item.status, 'id', 'i18n'),
+                  })}
                 />
               </CertificationPopover>
             </div>

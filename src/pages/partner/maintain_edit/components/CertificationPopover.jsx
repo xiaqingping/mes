@@ -11,6 +11,7 @@ import OrgChina from './OrgChina';
 import OrgUsa from './OrgUsa';
 import OrgGb from './OrgGb';
 import PersonRecord from './PersonRecord';
+import { formatter } from '@/utils/utils';
 
 @connect(({ bp }) => ({
   VerifyRecordStatus: bp.VerifyRecordStatus,
@@ -67,7 +68,7 @@ class CertificationPopover extends React.Component {
       );
     }
 
-    const status = VerifyRecordStatus.filter(e => data.status === e.value)[0];
+    // const status = VerifyRecordStatus.filter(e => data.status === e.value)[0];
 
     return (
       <div style={style}>
@@ -81,7 +82,12 @@ class CertificationPopover extends React.Component {
           <div style={{ marginTop: 10 }}>{data.organizationCertification.taxNo}</div>
         ) : null}
         <div style={{ marginTop: 10 }}>
-          <Badge status={status.status} text={status.text} />
+          <Badge
+            status={formatter(VerifyRecordStatus, data.status, 'value', 'status')}
+            text={formatMessage({
+              id: formatter(VerifyRecordStatus, data.status, 'value', 'i18n'),
+            })}
+          />
           {/* 验证中 显示过期时间 */}
           {data.status === 1 ? (
             <span style={{ marginLeft: '1em' }}>{moment(data.expireDate).fromNow()}过期</span>
