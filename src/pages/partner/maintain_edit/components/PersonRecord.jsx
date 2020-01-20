@@ -9,11 +9,10 @@ import { formatter } from '@/utils/utils';
 import api from '@/api';
 import '@/pages/partner/maintain_edit/style.less';
 
-
 @connect(({ basicCache, bp }) => ({
   industryCategories: basicCache.industryCategories,
   BpCertificationStatus: bp.BpCertificationStatus,
-  SpecialInvoice: bp.SpecialInvoice,
+  // SpecialInvoice: bp.SpecialInvoice,
 }))
 class PersonRecord extends Component {
   constructor(props) {
@@ -27,9 +26,9 @@ class PersonRecord extends Component {
     this.props.dispatch({
       type: 'basicCache/getCache',
       payload: { type: 'industryCategories' },
-    })
+    });
     const newData = [];
-    const { data } = this.props
+    const { data } = this.props;
     if (data.piCertification.attachmentCode) {
       api.disk
         .getFiles({
@@ -50,43 +49,37 @@ class PersonRecord extends Component {
   }
 
   render() {
-    const { data, BpCertificationStatus } = this.props
-    const { pic } = this.state
-    const { piCertification } = data
+    const { data, BpCertificationStatus } = this.props;
+    const { pic } = this.state;
+    const { piCertification } = data;
     return (
       <Descriptions column={2} style={{ width: '1000px' }} className="orgStyle">
-        <Descriptions.Item
-        label={formatMessage({ id: 'bp.maintain.customerName' })}
-        span={2}
-        >
+        <Descriptions.Item label={formatMessage({ id: 'bp.maintain.customerName' })} span={2}>
           {piCertification.name}
         </Descriptions.Item>
-        <Descriptions.Item
-        label={formatMessage({ id: 'bp.maintain_details.status' })}
-        span={2}
-        >
+        <Descriptions.Item label={formatMessage({ id: 'bp.maintain_details.status' })} span={2}>
           <Badge
-          status={formatter(BpCertificationStatus, data.status, 'id', 'badge')}
-          text={formatter(BpCertificationStatus, data.status, 'id', 'name')}
-          />&nbsp;&nbsp;&nbsp;&nbsp;
+            status={formatter(BpCertificationStatus, data.status, 'id', 'badge')}
+            text={formatMessage({
+              id: formatter(BpCertificationStatus, data.status, 'id', 'i18n'),
+            })}
+          />
+          &nbsp;&nbsp;&nbsp;&nbsp;
           {data.finishDate}
         </Descriptions.Item>
-        <Descriptions.Item
-        label={formatMessage({ id: 'bp.operation.operator' })}
-        span={2}
-        >
+        <Descriptions.Item label={formatMessage({ id: 'bp.operation.operator' })} span={2}>
           {data.operatorName}&nbsp;&nbsp;&nbsp;&nbsp;
           {data.operatorDate}
         </Descriptions.Item>
         <Descriptions.Item
-        label={formatMessage({ id: 'bp.maintain_details.verification_data.memo' })}
-        span={2}
+          label={formatMessage({ id: 'bp.maintain_details.verification_data.memo' })}
+          span={2}
         >
           {piCertification.notes}
         </Descriptions.Item>
         <Descriptions.Item
-        label={formatMessage({ id: 'bp.maintain_details.popover.attachment' })}
-        span={2}
+          label={formatMessage({ id: 'bp.maintain_details.popover.attachment' })}
+          span={2}
         >
           {pic.map((item, index) => (
             <li
@@ -108,7 +101,7 @@ class PersonRecord extends Component {
           ))}
         </Descriptions.Item>
       </Descriptions>
-    )
+    );
   }
 }
 

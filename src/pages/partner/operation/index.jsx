@@ -41,7 +41,7 @@ function renderOption(item) {
 }
 
 @connect(({ bp, global }) => ({
-  status: bp.operationStatus,
+  operationStatus: bp.operationStatus,
   languageCode: global.languageCode,
 }))
 class Operation extends React.Component {
@@ -356,7 +356,7 @@ class Operation extends React.Component {
       detailsVisible,
       detailsValue,
     } = this.state;
-    const { status, languageCode } = this.props;
+    const { operationStatus, languageCode } = this.props;
     const dataList = { list, pagination: { current, pageSize, total } };
     const columns = [
       {
@@ -421,7 +421,10 @@ class Operation extends React.Component {
           if (val) {
             return (
               <span>
-                <Badge status={status[val].value} text={status[val].text} />
+                <Badge
+                  status={operationStatus[val].value}
+                  text={formatMessage({ id: operationStatus[val].i18n })}
+                />
                 <br />
                 <span>{val === 3 ? record.finishDate : ''}</span>
               </span>

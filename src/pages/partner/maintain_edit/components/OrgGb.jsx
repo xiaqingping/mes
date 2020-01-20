@@ -8,11 +8,9 @@ import { formatMessage } from 'umi/locale';
 import api from '@/api';
 import '@/pages/partner/maintain_edit/style.less';
 
-
-@connect(({ basicCache, bp }) => ({
+@connect(({ basicCache }) => ({
   industryCategories: basicCache.industryCategories,
-  BpCertificationStatus: bp.BpCertificationStatus,
-  SpecialInvoice: bp.SpecialInvoice,
+  // SpecialInvoice: bp.SpecialInvoice,
 }))
 class OrgChina extends Component {
   constructor(props) {
@@ -26,9 +24,9 @@ class OrgChina extends Component {
     this.props.dispatch({
       type: 'basicCache/getCache',
       payload: { type: 'industryCategories' },
-    })
+    });
     const newData = [];
-    const { data } = this.props
+    const { data } = this.props;
     if (data.organizationCertification.attachmentCode) {
       api.disk
         .getFiles({
@@ -49,30 +47,24 @@ class OrgChina extends Component {
   }
 
   render() {
-    const { data } = this.props
-    const { pic } = this.state
-    const { organizationCertification } = data
+    const { data } = this.props;
+    const { pic } = this.state;
+    const { organizationCertification } = data;
     return (
       <Descriptions column={2} style={{ width: '1000px' }} className="orgStyle">
-        <Descriptions.Item
-        label={formatMessage({ id: 'bp.maintain.customerName' })}
-        >
+        <Descriptions.Item label={formatMessage({ id: 'bp.maintain.customerName' })}>
           {organizationCertification.name}
         </Descriptions.Item>
-        <Descriptions.Item
-        label={formatMessage({ id: 'bp.maintain.ChangeModal.vat' })}
-        >
+        <Descriptions.Item label={formatMessage({ id: 'bp.maintain.ChangeModal.vat' })}>
           {organizationCertification.taxNo}
         </Descriptions.Item>
         <Descriptions.Item
-        label={formatMessage({ id: 'bp.maintain_details.verification_data.memo' })}
-        span={2}
+          label={formatMessage({ id: 'bp.maintain_details.verification_data.memo' })}
+          span={2}
         >
           {organizationCertification.notes}
         </Descriptions.Item>
-        <Descriptions.Item
-        label={formatMessage({ id: 'bp.maintain_details.popover.attachment' })}
-        >
+        <Descriptions.Item label={formatMessage({ id: 'bp.maintain_details.popover.attachment' })}>
           {pic.map((item, index) => (
             <li
               // eslint-disable-next-line react/no-array-index-key
@@ -93,7 +85,7 @@ class OrgChina extends Component {
           ))}
         </Descriptions.Item>
       </Descriptions>
-    )
+    );
   }
 }
 

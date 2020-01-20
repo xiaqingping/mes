@@ -1,11 +1,11 @@
-import { formatMessage } from 'umi/locale';
+// import { formatMessage } from 'umi/locale';
 
 const SeqModel = {
   namespace: 'bp',
   state: {
-    details: null,
-    type: null,
-    supplier: null,
+    // details: null,
+    // type: null,
+    // supplier: null,
     // 客户收货地址来源
     addressSource: [
       { id: 1, name: '线上' },
@@ -15,30 +15,26 @@ const SeqModel = {
     BpCertificationStatus: [
       {
         id: 1,
-        name: formatMessage({
-          id: 'bp.unapproved',
-        }),
+        name: '未认证',
+        i18n: 'bp.unapproved',
         badge: 'default',
       },
       {
         id: 2,
-        name: formatMessage({
-          id: 'bp.processing',
-        }),
+        name: '审核中',
+        i18n: 'bp.processing',
         badge: 'warning',
       },
       {
         id: 3,
-        name: formatMessage({
-          id: 'bp.partialApproved',
-        }),
+        name: '部分认证',
+        i18n: 'bp.partialApproved',
         badge: 'warning',
       },
       {
         id: 4,
-        name: formatMessage({
-          id: 'bp.approveds',
-        }),
+        name: '已认证',
+        i18n: 'bp.approveds',
         badge: 'success',
       },
     ],
@@ -46,23 +42,20 @@ const SeqModel = {
     PiCertificationStatus: [
       {
         id: 1,
-        name: formatMessage({
-          id: 'bp.processing',
-        }),
+        name: '审核中',
+        i18n: 'bp.processing',
         badge: 'warning',
       },
       {
         id: 2,
-        name: formatMessage({
-          id: 'bp.approveds',
-        }),
+        name: '已认证',
+        i18n: 'bp.approveds',
         badge: 'success',
       },
       {
         id: 3,
-        name: formatMessage({
-          id: 'bp.unapproved',
-        }),
+        name: '未认证',
+        i18n: 'bp.unapproved',
         badge: 'default',
       },
     ],
@@ -70,36 +63,31 @@ const SeqModel = {
     BpOperationItemStatus: [
       {
         id: 1,
-        name: formatMessage({
-          id: 'bp.operation.needVerified',
-        }),
+        name: '待验证',
+        i18n: 'bp.operation.needVerified',
       },
       {
         id: 2,
-        name: formatMessage({
-          id: 'bp.operation.finished',
-        }),
+        name: '已完成',
+        i18n: 'bp.operation.finished',
       },
       {
         id: 3,
-        name: formatMessage({
-          id: 'bp.operation.rejected',
-        }),
+        name: '已拒绝',
+        i18n: 'bp.operation.rejected',
       },
     ],
     // 操作记录类型
     BpOperationRecordType: [
       {
         id: 1,
-        name: formatMessage({
-          id: 'action.add',
-        }),
+        name: '新增',
+        i18n: 'action.add',
       },
       {
         id: 2,
-        name: formatMessage({
-          id: 'action.change',
-        }),
+        name: '变更',
+        i18n: 'action.change',
       },
     ],
     // 业务伙伴类别
@@ -107,16 +95,14 @@ const SeqModel = {
       // 人员
       {
         id: 1,
-        name: formatMessage({
-          id: 'bp.maintain_details.person',
-        }),
+        name: '人员',
+        i18n: 'bp.maintain_details.person',
       },
       // 组织
       {
         id: 2,
-        name: formatMessage({
-          id: 'bp.maintain_details.organization',
-        }),
+        name: '组织',
+        i18n: 'bp.maintain_details.organization',
       },
     ],
     // 国家代码
@@ -166,15 +152,13 @@ const SeqModel = {
     CustomerDataStatus: [
       {
         id: 1,
-        name: formatMessage({
-          id: 'bp.maintain.completed',
-        }),
+        name: '完整',
+        i18n: 'bp.maintain.completed',
       },
       {
         id: 2,
-        name: formatMessage({
-          id: 'bp.maintain.incomplete',
-        }),
+        name: '不完整',
+        i18n: 'bp.maintain.incomplete',
       },
     ],
     // 默认开票类型
@@ -192,65 +176,63 @@ const SeqModel = {
     EmailVerifyStatus: [
       {
         id: 1,
-        name: formatMessage({
-          id: 'bp.EmailVerifyStatus.unverified',
-        }),
+        name: '未验证',
+        i18n: 'bp.EmailVerifyStatus.unverified',
       },
       {
         id: 2,
         name: '验证中',
+        i18n: 'bp.verfication',
         badge: 'warning',
       },
       {
         id: 3,
         name: '变更中',
+        i18n: 'bp.EmailVerifyStatus.inChange',
         badge: 'warning',
       },
       {
         id: 4,
-        name: formatMessage({
-          id: 'bp.EmailVerifyStatus.verified',
-        }),
+        name: '已验证',
+        i18n: 'bp.EmailVerifyStatus.verified',
       },
     ],
     // 手机验证状态
     MobilePhoneVerifyStatus: [
       {
         id: 1,
-        name: formatMessage({
-          id: 'bp.EmailVerifyStatus.unverified',
-        }),
+        name: '未验证',
+        i18n: 'bp.EmailVerifyStatus.unverified',
       },
       {
         id: 2,
         name: '验证中',
+        i18n: 'bp.verfication',
         badge: 'warning',
       },
       {
         id: 3,
         name: '变更中',
+        i18n: 'bp.EmailVerifyStatus.inChange',
         badge: 'warning',
       },
       {
         id: 4,
-        name: formatMessage({
-          id: 'bp.EmailVerifyStatus.verified',
-        }),
+        name: '已验证',
+        i18n: 'bp.EmailVerifyStatus.verified',
       },
     ],
     // 随货开票
     InvoiceWithGood: [
       {
         id: 1,
-        name: formatMessage({
-          id: 'bp.InvoiceWithGood.yes',
-        }),
+        name: '是',
+        i18n: 'bp.InvoiceWithGood.yes',
       },
       {
         id: 2,
-        name: formatMessage({
-          id: 'bp.InvoiceWithGood.no',
-        }),
+        name: '否',
+        i18n: 'bp.InvoiceWithGood.no',
       },
     ],
     // 付款条件
@@ -284,16 +266,14 @@ const SeqModel = {
     SalesOrderBlock: [
       {
         id: 1,
-        name: formatMessage({
-          id: 'bp.block',
-        }),
+        name: '冻结',
+        i18n: 'bp.block',
         badge: 'error',
       },
       {
         id: 2,
-        name: formatMessage({
-          id: 'bp.normal',
-        }),
+        name: '正常',
+        i18n: 'bp.normal',
         badge: 'success',
       },
     ],
@@ -308,126 +288,108 @@ const SeqModel = {
     SpecialInvoice: [
       {
         id: 1,
-        name: formatMessage({
-          id: 'bp.InvoiceWithGood.yes',
-        }),
+        name: '是',
+        i18n: 'bp.InvoiceWithGood.yes',
       },
       {
         id: 2,
-        name: formatMessage({
-          id: 'bp.InvoiceWithGood.no',
-        }),
+        name: '否',
+        i18n: 'bp.InvoiceWithGood.no',
       },
     ],
     // 供应商数据状态
     VendorDateStatus: [
       {
         id: 1,
-        name: formatMessage({
-          id: 'bp.InvoiceWithGood.yes',
-        }),
+        name: '是',
+        i18n: 'bp.InvoiceWithGood.yes',
       },
       {
         id: 2,
-        name: formatMessage({
-          id: 'bp.InvoiceWithGood.no',
-        }),
+        name: '否',
+        i18n: 'bp.InvoiceWithGood.no',
       },
     ],
     // 供应商级别
     VendorLevelCode: [
       {
         id: 'A',
-        name: formatMessage({
-          id: 'bp.VendorLevelCode.important',
-        }),
+        name: '重要',
+        i18n: 'bp.VendorLevelCode.important',
       },
       {
         id: 'B',
-        name: formatMessage({
-          id: 'bp.VendorLevelCode.moreImportant',
-        }),
+        name: '比较重要',
+        i18n: 'bp.VendorLevelCode.moreImportant',
       },
       {
         id: 'C',
-        name: formatMessage({
-          id: 'bp.VendorLevelCode.commonly',
-        }),
+        name: '一般',
+        i18n: 'bp.VendorLevelCode.commonly',
       },
     ],
     // 验证记录-关联售达方记录-验证结果
     VerifyLinkSoldToPartyStatus: [
       {
         id: 1,
-        name: formatMessage({
-          id: 'bp.verfication',
-        }),
+        name: '验证中',
+        i18n: 'bp.verfication',
       },
       {
         id: 2,
-        name: formatMessage({
-          id: 'bp.completed',
-        }),
+        name: '已验证',
+        i18n: 'bp.completed',
       },
       {
         id: 3,
-        name: formatMessage({
-          id: 'bp.rejected',
-        }),
+        name: '已拒绝',
+        i18n: 'bp.rejected',
       },
       {
         id: 4,
-        name: formatMessage({
-          id: 'bp.cancelled',
-        }),
+        name: '已取消',
+        i18n: 'bp.cancelled',
       },
       {
         id: 5,
-        name: formatMessage({
-          id: 'bp.expired',
-        }),
+        name: '已过期',
+        i18n: 'bp.expired',
       },
     ],
     // 验证记录-关联售达方记录-验证类型
     VerifyLinkSoldToPartyType: [
       {
         id: 1,
-        name: formatMessage({
-          id: 'bp.verification.mobilePhone',
-        }),
+        name: '手机',
+        i18n: 'bp.verification.mobilePhone',
       },
       {
         id: 2,
-        name: formatMessage({
-          id: 'bp.verification.email',
-        }),
+        name: '邮箱',
+        i18n: 'bp.verification.email',
       },
       {
         id: 3,
-        name: formatMessage({
-          id: 'bp.verification.user',
-        }),
+        name: '用户',
+        i18n: 'bp.verification.user',
       },
       {
         id: 4,
-        name: formatMessage({
-          id: 'bp.verification.manualAudit',
-        }),
+        name: '人工审核',
+        i18n: 'bp.verification.manualAudit',
       },
     ],
     // 验证记录-手机验证和邮箱验证-验证类型
     VerifyPhoneOrEmailType: [
       {
         id: 1,
-        name: formatMessage({
-          id: 'bp.verification.verification.mobileVerification',
-        }),
+        name: '手机验证',
+        i18n: 'bp.verification.verification.mobileVerification',
       },
       {
         id: 2,
-        name: formatMessage({
-          id: 'bp.verification.verification.mailboxVerification',
-        }),
+        name: '邮箱验证',
+        i18n: 'bp.verification.verification.mailboxVerification',
       },
     ],
     // 验证记录状态
@@ -435,33 +397,29 @@ const SeqModel = {
       // 验证中
       {
         value: 1,
-        text: formatMessage({
-          id: 'bp.verfication',
-        }),
+        text: '验证中',
+        i18n: 'bp.verfication',
         status: 'warning',
       },
       // 已验证
       {
         value: 2,
-        text: formatMessage({
-          id: 'bp.completed',
-        }),
+        text: '已验证',
+        i18n: 'bp.completed',
         status: 'success',
       },
       // 已拒绝
       {
         value: 3,
-        text: formatMessage({
-          id: 'bp.rejected',
-        }),
+        text: '已拒绝',
+        i18n: 'bp.rejected',
         status: 'error',
       },
       // 已过期
       {
         value: 4,
-        text: formatMessage({
-          id: 'bp.expired',
-        }),
+        text: '已过期',
+        i18n: 'bp.expired',
         status: 'error',
       },
     ],
@@ -469,140 +427,123 @@ const SeqModel = {
     VerifyRecordType: [
       {
         value: 1,
-        text: formatMessage({
-          id: 'bp.verification.organizationVerification',
-        }),
+        text: '组织认证',
+        i18n: 'bp.verification.organizationVerification',
       },
       {
         value: 2,
-        text: formatMessage({
-          id: 'bp.verification.PIVerfication',
-        }),
+        text: 'PI认证',
+        i18n: 'bp.verification.PIVerfication',
       },
       {
         value: 3,
-        text: formatMessage({
-          id: 'bp.verification.soldToPartyBundle',
-        }),
+        text: '绑定售达方',
+        i18n: 'bp.verification.soldToPartyBundle',
       },
       {
         value: 4,
-        text: formatMessage({
-          id: 'bp.verification.verifyCellPhone',
-        }),
+        text: '验证手机',
+        i18n: 'bp.verification.verifyCellPhone',
       },
       {
         value: 5,
-        text: formatMessage({
-          id: 'bp.verification.verifyMailbox',
-        }),
+        text: '验证邮箱',
+        i18n: 'bp.verification.verifyMailbox',
       },
       {
         value: 6,
-        text: formatMessage({
-          id: 'bp.verification.changeMobilePhone',
-        }),
+        text: '变更验证手机',
+        i18n: 'bp.verification.changeMobilePhone',
       },
       {
         value: 7,
-        text: formatMessage({
-          id: 'bp.verification.changeEmail',
-        }),
+        text: '变更验证邮箱',
+        i18n: 'bp.verification.changeEmail',
       },
     ],
     // 验证方式
     verifyTest: [
       {
         id: 1,
-        name: formatMessage({
-          id: 'bp.verification.mobilePhone',
-        }),
+        name: '手机',
+        i18n: 'bp.verification.mobilePhone',
       },
       {
         id: 2,
-        name: formatMessage({
-          id: 'bp.verification.email',
-        }),
+        name: '邮箱',
+        i18n: 'bp.verification.email',
       },
       {
         id: 3,
-        name: formatMessage({
-          id: 'bp.verification.question',
-        }),
+        name: '问题',
+        i18n: 'bp.verification.question',
       },
     ],
     // 变更渠道
     verifyChannel: [
       {
         id: 1,
-        name: formatMessage({
-          id: 'bp.verification.validateLogon',
-        }),
+        name: '登录验证',
+        i18n: 'bp.verification.validateLogon',
       },
       {
         id: 2,
-        name: formatMessage({
-          id: 'bp.verification.selfHelpVerification',
-        }),
+        name: '自助验证',
+        i18n: 'bp.verification.selfHelpVerification',
       },
     ],
     // 变更类型
     verifyChangeType: [
       {
         id: 1,
-        name: formatMessage({
-          id: 'bp.verification.verifyCellPhone',
-        }),
+        name: '验证手机',
+        i18n: 'bp.verification.verifyCellPhone',
       },
       {
         id: 2,
-        name: formatMessage({
-          id: 'bp.verification.verifyMailbox',
-        }),
+        name: '验证邮箱',
+        i18n: 'bp.verification.verifyMailbox',
       },
     ],
     // 操作记录状态
     operationStatus: {
       1: {
         value: 'default',
-        text: formatMessage({
-          id: 'bp.operation.unfinished',
-        }),
+        text: '未完成',
+        i18n: 'bp.operation.unfinished',
       },
       2: {
         value: 'warning',
-        text: formatMessage({
-          id: 'bp.operation.partiallyCompleted',
-        }),
+        text: '部分完成',
+        i18n: 'bp.operation.partiallyCompleted',
       },
       3: {
         value: 'success',
-        text: formatMessage({
-          id: 'bp.operation.finished',
-        }),
+        text: '已完成',
+        i18n: 'bp.operation.finished',
       },
     },
   },
   effects: {},
   reducers: {
-    setDetails(state, action) {
-      return {
-        ...state,
-        details: action.payload,
-      };
-    },
-    setType(state, action) {
-      return {
-        ...state,
-        type: action.payload,
-      };
-    },
-    setSupplier(state, action) {
-      return {
-        ...state,
-        supplier: action.payload,
-      };
-    },
+    // setDetails(state, action) {
+    //   return {
+    //     ...state,
+    //     details: action.payload,
+    //   };
+    // },
+    // setType(state, action) {
+    //   return {
+    //     ...state,
+    //     type: action.payload,
+    //   };
+    // },
+    // setSupplier(state, action) {
+    //   return {
+    //     ...state,
+    //     supplier: action.payload,
+    //   };
+    // },
   },
 };
 export default SeqModel;

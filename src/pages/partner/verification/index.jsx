@@ -241,11 +241,16 @@ class Verification extends React.Component {
                 <Select
                   placeholder={formatMessage({ id: 'bp.pleaseSelect' })}
                   optionLabelProp="label"
+                  style={{ width: '220px' }}
                 >
                   {preTypeAll.map(state => (
-                    <Option key={state.value} value={state.value} label={state.text}>
+                    <Option
+                      key={state.value}
+                      value={state.value}
+                      label={formatMessage({ id: state.i18n })}
+                    >
                       {' '}
-                      {state.text}
+                      {formatMessage({ id: state.i18n })}
                     </Option>
                   ))}
                 </Select>,
@@ -315,11 +320,16 @@ class Verification extends React.Component {
                 <Select
                   placeholder={formatMessage({ id: 'bp.pleaseSelect' })}
                   optionLabelProp="label"
+                  style={{ width: '234px' }}
                 >
                   {preTypeAll.map(state => (
-                    <Option key={state.value} value={state.value} label={state.text}>
+                    <Option
+                      key={state.value}
+                      value={state.value}
+                      label={formatMessage({ id: state.i18n })}
+                    >
                       {' '}
-                      {state.text}
+                      {formatMessage({ id: state.i18n })}
                     </Option>
                   ))}
                 </Select>,
@@ -333,10 +343,16 @@ class Verification extends React.Component {
                   mode="multiple"
                   placeholder={formatMessage({ id: 'bp.pleaseSelect' })}
                   optionLabelProp="label"
+                  maxTagCount={1}
+                  maxTagTextLength={3}
                 >
                   {preStateAll.map(state => (
-                    <Option key={state.value} value={state.value} label={state.text}>
-                      {state.text}
+                    <Option
+                      key={state.value}
+                      value={state.value}
+                      label={formatMessage({ id: state.i18n })}
+                    >
+                      {formatMessage({ id: state.i18n })}
                     </Option>
                   ))}
                 </Select>,
@@ -434,7 +450,7 @@ class Verification extends React.Component {
         filters: preTypeAll,
         width: 150,
         onFilter: (value, records) => records.type.toString().indexOf(value.toString()) === 0,
-        render: value => preTypeAll[value - 1].text,
+        render: value => formatMessage({ id: preTypeAll[value - 1].i18n }),
       },
       {
         title: formatMessage({ id: 'bp.verification.status' }),
@@ -445,7 +461,10 @@ class Verification extends React.Component {
         render(value, records) {
           return (
             <>
-              <Badge status={preStateAll[value - 1].status} text={preStateAll[value - 1].text} />
+              <Badge
+                status={preStateAll[value - 1].status}
+                text={formatMessage({ id: preStateAll[value - 1].i18n })}
+              />
               {value === 1 ? '' : <div>{records.finishDate}</div>}
             </>
           );
