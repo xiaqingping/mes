@@ -14,7 +14,7 @@ const { Option } = Select;
 const { RangePicker } = DatePicker;
 
 @connect(({ operation, global }) => ({
-  status: operation.operationStatus,
+  // status: operation.operationStatus,
   recordType: operation.recordType,
   languageCode: global.languageCode,
 }))

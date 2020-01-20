@@ -1325,7 +1325,9 @@ class ChangeModal extends Component {
             <div style={{ marginBottom: '.8em' }}>
               <Badge
                 status={formatter(PiCertificationStatus, item.status, 'id', 'badge')}
-                text={formatter(PiCertificationStatus, item.status, 'id', 'name')}
+                text={formatMessage({
+                  id: formatter(PiCertificationStatus, item.status, 'id', 'i18n'),
+                })}
               />
             </div>
             <Paragraph

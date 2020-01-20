@@ -9,11 +9,10 @@ import { formatter } from '@/utils/utils';
 import api from '@/api';
 import '@/pages/partner/maintain_edit/style.less';
 
-
 @connect(({ basicCache, bp }) => ({
   industryCategories: basicCache.industryCategories,
   BpCertificationStatus: bp.BpCertificationStatus,
-  SpecialInvoice: bp.SpecialInvoice,
+  // SpecialInvoice: bp.SpecialInvoice,
 }))
 class OrgUsa extends Component {
   constructor(props) {
@@ -27,9 +26,9 @@ class OrgUsa extends Component {
     this.props.dispatch({
       type: 'basicCache/getCache',
       payload: { type: 'industryCategories' },
-    })
+    });
     const newData = [];
-    const { data } = this.props
+    const { data } = this.props;
     if (data.organizationCertification.attachmentCode) {
       api.disk
         .getFiles({
@@ -50,49 +49,37 @@ class OrgUsa extends Component {
   }
 
   render() {
-    const { data, BpCertificationStatus } = this.props
-    const { pic } = this.state
-    const { organizationCertification } = data
+    const { data, BpCertificationStatus } = this.props;
+    const { pic } = this.state;
+    const { organizationCertification } = data;
     return (
       <Descriptions column={2} style={{ width: '1000px' }} className="orgStyle">
-        <Descriptions.Item
-        label={formatMessage({ id: 'bp.maintain.customerName' })}
-        >
+        <Descriptions.Item label={formatMessage({ id: 'bp.maintain.customerName' })}>
           {organizationCertification.name}
         </Descriptions.Item>
-        <Descriptions.Item
-        label={formatMessage({ id: 'bp.maintain.ChangeModal.taxExemptID' })}
-        >
+        <Descriptions.Item label={formatMessage({ id: 'bp.maintain.ChangeModal.taxExemptID' })}>
           {organizationCertification.taxNo}
         </Descriptions.Item>
-        <Descriptions.Item
-        label={formatMessage({ id: 'bp.maintain_details.status' })}
-        >
+        <Descriptions.Item label={formatMessage({ id: 'bp.maintain_details.status' })}>
           <Badge
-          status={formatter(BpCertificationStatus, data.status, 'id', 'badge')}
-          text={formatter(BpCertificationStatus, data.status, 'id', 'name')}
+            status={formatter(BpCertificationStatus, data.status, 'id', 'badge')}
+            text={formatMessage({
+              id: formatter(BpCertificationStatus, data.status, 'id', 'i18n'),
+            })}
           />
         </Descriptions.Item>
-        <Descriptions.Item
-        label={formatMessage({ id: 'bp.operation.operator' })}
-        >
+        <Descriptions.Item label={formatMessage({ id: 'bp.operation.operator' })}>
           {data.operatorName}
         </Descriptions.Item>
-        <Descriptions.Item label="">
-          {data.finishDate}
-        </Descriptions.Item>
-        <Descriptions.Item label="">
-        {data.operatorDate}
-        </Descriptions.Item>
+        <Descriptions.Item label="">{data.finishDate}</Descriptions.Item>
+        <Descriptions.Item label="">{data.operatorDate}</Descriptions.Item>
         <Descriptions.Item
-        label={formatMessage({ id: 'bp.maintain_details.verification_data.memo' })}
-        span={2}
+          label={formatMessage({ id: 'bp.maintain_details.verification_data.memo' })}
+          span={2}
         >
           {organizationCertification.notes}
         </Descriptions.Item>
-        <Descriptions.Item
-        label={formatMessage({ id: 'bp.maintain_details.popover.attachment' })}
-        >
+        <Descriptions.Item label={formatMessage({ id: 'bp.maintain_details.popover.attachment' })}>
           {pic.map((item, index) => (
             <li
               // eslint-disable-next-line react/no-array-index-key
@@ -113,7 +100,7 @@ class OrgUsa extends Component {
           ))}
         </Descriptions.Item>
       </Descriptions>
-    )
+    );
   }
 }
 
