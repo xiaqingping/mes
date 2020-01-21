@@ -413,6 +413,14 @@ class Verification extends React.Component {
     } = this.state;
     const { preTypeAll, preStateAll, languageCode } = this.props;
     const data = { list, pagination: { current, pageSize, total } };
+    const preTypeAlls = [];
+    const preStateAlls = [];
+    preTypeAll.forEach(item => {
+      preTypeAlls.push({ value: item.value, text: formatMessage({ id: item.i18n }) });
+    });
+    preStateAll.forEach(item => {
+      preStateAlls.push({ value: item.value, text: formatMessage({ id: item.i18n }) });
+    });
     const columns = [
       {
         title: `${formatMessage({ id: 'bp.customerID' })}
@@ -447,7 +455,7 @@ class Verification extends React.Component {
       {
         title: formatMessage({ id: 'bp.verification.type' }),
         dataIndex: 'type',
-        filters: preTypeAll,
+        filters: preTypeAlls,
         width: 150,
         onFilter: (value, records) => records.type.toString().indexOf(value.toString()) === 0,
         render: value => formatMessage({ id: preTypeAll[value - 1].i18n }),
@@ -455,7 +463,7 @@ class Verification extends React.Component {
       {
         title: formatMessage({ id: 'bp.verification.status' }),
         dataIndex: 'status',
-        filters: preStateAll,
+        filters: preStateAlls,
         width: 150,
         onFilter: (value, records) => records.status.toString().indexOf(value.toString()) === 0,
         render(value, records) {

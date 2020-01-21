@@ -12,76 +12,6 @@ class Details extends React.Component {
     loading: true,
   };
 
-  columns = [
-    {
-      title: formatMessage({ id: 'operation.actionTypePropertyDescription' }),
-      dataIndex: 'operationTypePropertyDescribe',
-      render: text => (
-        <div className="addEllipsis" style={{ width: '200px' }} title={text}>
-          {text}
-        </div>
-      ),
-    },
-    {
-      title: formatMessage({ id: 'bp.operation.newValue' }),
-      dataIndex: 'newValue',
-      render: text => (
-        <div className="addEllipsis" style={{ width: '100px' }} title={text}>
-          {text}
-        </div>
-      ),
-    },
-    {
-      title: formatMessage({ id: 'bp.operation.oldValue' }),
-      dataIndex: 'oldValue',
-      render: text => (
-        <div className="addEllipsis" style={{ width: '100px' }} title={text}>
-          {text}
-        </div>
-      ),
-    },
-    {
-      title: formatMessage({ id: 'bp.operation.keyword' }),
-      dataIndex: 'keyword',
-      render: text => (
-        <div className="addEllipsis" style={{ width: '100px' }} title={text}>
-          {text}
-        </div>
-      ),
-    },
-    // {
-    //   title: formatMessage({ id: 'bp.operation.state' }),
-    //   dataIndex: 'status',
-    //   render(val) {
-    //     return <Badge className="addEllipsis"
-    //     style={{ width: '80px' }} status={status[val].value} text={status[val].text}/>;
-    //   },
-    // },
-    // {
-    //   title: formatMessage({ id: 'bp.operation.verificationRecordNo' }),
-    //   dataIndex: 'verifyRecordList',
-    //   render(val) {
-    //     let data = '';
-    //     if (val) {
-    //       // eslint-disable-next-line array-callback-return
-    //       val.map((item, index) => {
-    //           if (item.code) {
-    //             if (index < 2) {
-    //               data += `${item.code}<br/>`
-    //             } else {
-    //               data += '……'
-    //             }
-    //           }
-    //         },
-    //       )
-    //     }
-    //     return <span className="addEllipsis"
-    //      // eslint-disable-next-line react/no-danger
-    //      style={{ width: '80px' }} dangerouslySetInnerHTML={{ __html: data }} />
-    //   },
-    // },
-  ];
-
   componentDidMount() {
     this.props.onRef(this);
   }
@@ -125,6 +55,44 @@ class Details extends React.Component {
 
   render() {
     const { list, visible, loading, err } = this.state;
+    const columns = [
+      {
+        title: formatMessage({ id: 'operation.actionTypePropertyDescription' }),
+        dataIndex: 'operationTypePropertyDescribe',
+        render: text => (
+          <div className="addEllipsis" style={{ width: '200px' }} title={text}>
+            {text}
+          </div>
+        ),
+      },
+      {
+        title: formatMessage({ id: 'bp.operation.newValue' }),
+        dataIndex: 'newValue',
+        render: text => (
+          <div className="addEllipsis" style={{ width: '100px' }} title={text}>
+            {text}
+          </div>
+        ),
+      },
+      {
+        title: formatMessage({ id: 'bp.operation.oldValue' }),
+        dataIndex: 'oldValue',
+        render: text => (
+          <div className="addEllipsis" style={{ width: '100px' }} title={text}>
+            {text}
+          </div>
+        ),
+      },
+      {
+        title: formatMessage({ id: 'bp.operation.keyword' }),
+        dataIndex: 'keyword',
+        render: text => (
+          <div className="addEllipsis" style={{ width: '100px' }} title={text}>
+            {text}
+          </div>
+        ),
+      },
+    ];
     return (
       <div>
         <Drawer
@@ -141,7 +109,7 @@ class Details extends React.Component {
             <Table
               dataSource={list}
               rowKey={(record, index) => index}
-              columns={this.columns}
+              columns={columns}
               loading={loading}
               size="small"
               pagination={false}

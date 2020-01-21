@@ -493,13 +493,13 @@ class Maintain extends React.Component {
     const CustomerStatus = []; // 客户数据状态
 
     BpCertificationStatus.forEach(item => {
-      CertificationStatus.push({ value: item.id, text: item.name });
+      CertificationStatus.push({ value: item.id, text: formatMessage({ id: item.i18n }) });
     });
     salesOrderBlock.forEach(item => {
-      salesBlock.push({ value: item.id, text: item.name });
+      salesBlock.push({ value: item.id, text: formatMessage({ id: item.i18n }) });
     });
     CustomerDataStatus.forEach(item => {
-      CustomerStatus.push({ value: item.id, text: item.name });
+      CustomerStatus.push({ value: item.id, text: formatMessage({ id: item.i18n }) });
     });
 
     const columns = [
