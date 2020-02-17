@@ -181,8 +181,8 @@ class Chart extends React.Component {
           newData.push({
             regionCode: formatter(regions, item.regionCode, 'code'),
             amount: parseFloat(item.amount),
-            monthDate: item[xField],
-            // monthDate: this.xFieldName(item[xField], type),
+            // monthDate: item[xField],
+            monthDate: this.xFieldName(item[xField], type),
           });
         });
         if (columnPlot) {
@@ -276,8 +276,8 @@ class Chart extends React.Component {
           newData.push({
             officeCode: formatter(offices, item.officeCode, 'code'),
             amount: parseFloat(item.amount),
-            monthDate: item[xField],
-            // monthDate: this.xFieldName(item[xField], type),
+            // monthDate: item[xField],
+            monthDate: this.xFieldName(item[xField], type),
           });
         });
 
@@ -380,8 +380,8 @@ class Chart extends React.Component {
           newData.push({
             salerCode: index,
             amount: parseFloat(item.amount),
-            // monthDate: this.xFieldName(item[xField], type),
-            monthDate: item[xField],
+            monthDate: this.xFieldName(item[xField], type),
+            // monthDate: item[xField],
           });
         });
 

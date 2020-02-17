@@ -440,7 +440,6 @@ class Sale extends React.Component {
   };
 
   errorPage = err => {
-    console.log(err);
     this.setState({
       err,
     });
