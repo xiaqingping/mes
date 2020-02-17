@@ -176,7 +176,12 @@ class BillToParty extends React.Component {
         title: formatMessage({ id: 'bp.maintain_details.status' }),
         dataIndex: 'verifyStatus',
         width: '10%',
-        render: text => formatMessage({ id: formatter(VerifyRecordStatus, text, 'value', 'i18n') }),
+        render: text => {
+          if (text) {
+            return formatMessage({ id: formatter(VerifyRecordStatus, text, 'value', 'i18n') });
+          }
+          return '';
+        },
       },
       {
         title: formatMessage({ id: 'action.operation' }),
