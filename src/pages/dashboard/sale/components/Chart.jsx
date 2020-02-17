@@ -44,8 +44,8 @@ class Chart extends React.Component {
         chartData.profitCenterList.length !== 0 ? chartData.profitCenterList.join(',') : '',
     };
 
-    let beginTime = '';
-    let endTime = '';
+    // let beginTime = '';
+    // let endTime = '';
 
     // 月份添加到条件里
     if (parseInt(type, 10) === 1) {
@@ -56,8 +56,8 @@ class Chart extends React.Component {
           data.length !== 0 ? data[1].format('YYYYMM') : `${new Date().getFullYear()}12`,
       });
       xField = 'monthDate';
-      beginTime = params.monthDateBegin;
-      endTime = params.monthDateEnd;
+      // beginTime = params.monthDateBegin;
+      // endTime = params.monthDateEnd;
     }
 
     // 季度添加到条件里
@@ -99,8 +99,8 @@ class Chart extends React.Component {
         quarterDateEnd: quarterEnd,
       });
       xField = 'quarterDate';
-      beginTime = params.quarterDateBegin;
-      endTime = params.quarterDateEnd;
+      // beginTime = params.quarterDateBegin;
+      // endTime = params.quarterDateEnd;
     }
 
     // 半年添加到条件里
@@ -141,8 +141,8 @@ class Chart extends React.Component {
       });
       xField = 'halfYear';
 
-      beginTime = params.halfYearBegin;
-      endTime = params.halfYearEnd;
+      // beginTime = params.halfYearBegin;
+      // endTime = params.halfYearEnd;
     }
 
     // 整年添加到条件里
@@ -156,8 +156,8 @@ class Chart extends React.Component {
         yearEnd: data.length !== 0 ? data[1].format('YYYY') : new Date().getFullYear(),
       });
       xField = 'year';
-      beginTime = params.yearBegin;
-      endTime = params.yearEnd;
+      // beginTime = params.yearBegin;
+      // endTime = params.yearEnd;
     }
 
     // 大区模式
@@ -169,20 +169,20 @@ class Chart extends React.Component {
 
       api.temporary.getSalesAnalysisRegion(params).then(res => {
         const newData = [];
-        const resData = this.setNewData(
-          res,
-          regions,
-          beginTime,
-          endTime,
-          parseInt(type, 10),
-          'regionCode',
-        );
-        resData.forEach(item => {
+        // const resData = this.setNewData(
+        //   res,
+        //   regions,
+        //   beginTime,
+        //   endTime,
+        //   parseInt(type, 10),
+        //   'regionCode',
+        // );
+        res.forEach(item => {
           newData.push({
             regionCode: formatter(regions, item.regionCode, 'code'),
             amount: parseFloat(item.amount),
-            // monthDate: item[xField],
-            monthDate: this.xFieldName(item[xField], type),
+            monthDate: item[xField],
+            // monthDate: this.xFieldName(item[xField], type),
           });
         });
         if (columnPlot) {
@@ -264,19 +264,20 @@ class Chart extends React.Component {
       if (offices.length === 0) return null;
       api.temporary.getSalesAnalysisOffice(params).then(res => {
         const newData = [];
-        const resData = this.setNewData(
-          res,
-          offices,
-          beginTime,
-          endTime,
-          parseInt(type, 10),
-          'officeCode',
-        );
-        resData.forEach(item => {
+        // const resData = this.setNewData(
+        //   res,
+        //   offices,
+        //   beginTime,
+        //   endTime,
+        //   parseInt(type, 10),
+        //   'officeCode',
+        // );
+        res.forEach(item => {
           newData.push({
             officeCode: formatter(offices, item.officeCode, 'code'),
             amount: parseFloat(item.amount),
-            monthDate: this.xFieldName(item[xField], type),
+            monthDate: item[xField],
+            // monthDate: this.xFieldName(item[xField], type),
           });
         });
 
@@ -360,20 +361,27 @@ class Chart extends React.Component {
         salerCode: chartData.salersList,
       });
       api.temporary.getSalesAnalysisSaler(params).then(res => {
+        // if (res.length === 0) {
+        //   this.setState({
+        //     errs: true,
+        //   });
+        //   return false;
+        // }
         const newData = [];
-        const resData = this.setNewData(
-          res,
-          offices,
-          beginTime,
-          endTime,
-          parseInt(type, 10),
-          'salerCode',
-        );
-        resData.forEach((item, index) => {
+        // const resData = this.setNewData(
+        //   res,
+        //   offices,
+        //   beginTime,
+        //   endTime,
+        //   parseInt(type, 10),
+        //   'salerCode',
+        // );
+        res.forEach((item, index) => {
           newData.push({
             salerCode: index,
             amount: parseFloat(item.amount),
-            monthDate: this.xFieldName(item[xField], type),
+            // monthDate: this.xFieldName(item[xField], type),
+            monthDate: item[xField],
           });
         });
 
@@ -725,6 +733,7 @@ class Chart extends React.Component {
         return null;
       })
       .catch(() => {
+        console.log(123);
         this.props.errorPage(true);
         this.setState({ errs: true });
       });
