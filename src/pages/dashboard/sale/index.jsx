@@ -383,7 +383,7 @@ class Sale extends React.Component {
                           this.salersChange(v);
                         }
                       }}
-                      maxTagCount={3}
+                      maxTagCount={2}
                       maxTagTextLength={4}
                       allowClear
                       placeholder={

@@ -12,45 +12,6 @@ class Details extends React.Component {
     err: false,
   };
 
-  columns = [
-    {
-      title: formatMessage({ id: 'operation.operationType.actionTypePropertyNumber' }),
-      dataIndex: 'code',
-      render: text => (
-        <div className="addEllipsis" style={{ width: '150px' }} title={text}>
-          {text}
-        </div>
-      ),
-    },
-    {
-      title: formatMessage({ id: 'operation.actionTypePropertyDescription' }),
-      dataIndex: 'describe',
-      render: text => (
-        <div className="addEllipsis" style={{ width: '150px' }} title={text}>
-          {text}
-        </div>
-      ),
-    },
-    {
-      title: formatMessage({ id: 'operation.operatorName' }),
-      dataIndex: 'operatorName',
-      render: text => (
-        <div className="addEllipsis" style={{ width: '150px' }} title={text}>
-          {text}
-        </div>
-      ),
-    },
-    {
-      title: formatMessage({ id: 'operation.operationTime' }),
-      dataIndex: 'operationDate',
-      render: text => (
-        <div className="addEllipsis" style={{ width: '100px' }} title={text}>
-          {text}
-        </div>
-      ),
-    },
-  ];
-
   componentDidMount() {
     this.props.onRef(this);
   }
@@ -93,6 +54,44 @@ class Details extends React.Component {
 
   render() {
     const { list, visible, loading, err } = this.state;
+    const columns = [
+      {
+        title: formatMessage({ id: 'operation.operationType.actionTypePropertyNumber' }),
+        dataIndex: 'code',
+        render: text => (
+          <div className="addEllipsis" style={{ width: '150px' }} title={text}>
+            {text}
+          </div>
+        ),
+      },
+      {
+        title: formatMessage({ id: 'operation.actionTypePropertyDescription' }),
+        dataIndex: 'describe',
+        render: text => (
+          <div className="addEllipsis" style={{ width: '150px' }} title={text}>
+            {text}
+          </div>
+        ),
+      },
+      {
+        title: formatMessage({ id: 'operation.operatorName' }),
+        dataIndex: 'operatorName',
+        render: text => (
+          <div className="addEllipsis" style={{ width: '150px' }} title={text}>
+            {text}
+          </div>
+        ),
+      },
+      {
+        title: formatMessage({ id: 'operation.operationTime' }),
+        dataIndex: 'operationDate',
+        render: text => (
+          <div className="addEllipsis" style={{ width: '100px' }} title={text}>
+            {text}
+          </div>
+        ),
+      },
+    ];
     return (
       <div>
         <Drawer
@@ -110,7 +109,7 @@ class Details extends React.Component {
             <Table
               dataSource={list}
               rowKey={(record, index) => index}
-              columns={this.columns}
+              columns={columns}
               loading={loading}
               size="small"
               pagination={false}

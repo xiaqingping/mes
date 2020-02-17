@@ -137,7 +137,7 @@ class PersonCertificationAddModal extends Component {
     return (
       <Modal
         destroyOnClose
-        title="PI认证"
+        title={formatMessage({ id: 'bp.maintain_details.PI_verification' })}
         visible={modalVisible}
         onOk={this.okHandle}
         onCancel={() => handleModalVisible(false)}
