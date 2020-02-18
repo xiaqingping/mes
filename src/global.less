@@ -52,3 +52,146 @@ ol {
     min-height: 100vh;
   }
 }
+
+.ant-page-header {
+  .ant-page-header-heading-title {
+    color: #666;
+    font-size: 16px;
+  }
+}
+
+// 去掉FormItem required的红色*
+// .ant-form-item-required::before {
+//   content: '' !important;
+// }
+
+// 下拉选择框中的国家图片
+.select-countryPic-box {
+  display: inline-block;
+  width: 14px;
+  height: 100%;
+  margin-right: 5px;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 14px;
+}
+
+// 表格布局
+.tableList {
+  .tableListOperator {
+    margin-bottom: 16px;
+    button {
+      margin-right: 8px;
+    }
+  }
+  .marginLeft {
+    padding-left: 100px;
+  }
+  .ant-table-small {
+    border: none;
+    .ant-table-thead > tr > th {
+      background: #fafafa !important;
+    }
+  }
+}
+
+// 表格顶部表单
+.tableListForm {
+  .ant-form-inline {
+    .ant-form-item {
+      display: flex;
+      margin-right: 0;
+      margin-bottom: 24px;
+      // form label 宽度控制
+      > .ant-form-item-label {
+        width: 70px;
+        label {
+          display: inline-block;
+          width: 70px;
+          text-align: left;
+        }
+      }
+      .ant-form-item-control {
+        line-height: 34px;
+      }
+    }
+    .ant-form-item-control-wrapper {
+      flex: 1;
+    }
+  }
+  .submitButtons {
+    display: block;
+    margin-bottom: 24px;
+    white-space: nowrap;
+  }
+}
+
+:global {
+  // upload 上传组件样式重写
+  .ant-upload-picture-card-wrapper {
+    .ant-upload-list-picture-card-container {
+      width: 90px;
+      height: 90px;
+      .ant-upload-list-item-list-type-picture-card {
+        width: 90px;
+        height: 90px;
+      }
+    }
+    .ant-upload.ant-upload-select-picture-card {
+      width: 90px;
+      height: 90px;
+    }
+  }
+
+  // 编辑表格错误提示位置
+  .editable-row {
+    .ant-form-item {
+      margin: 0;
+    }
+    .ant-form-explain {
+      position: absolute;
+      margin-top: -4px;
+      font-size: 12px;
+    }
+  }
+  // 描述列表
+  .s-descriptions {
+    &.ant-descriptions {
+      .ant-descriptions-row:nth-child(2n + 1) {
+        .ant-descriptions-item {
+          padding-bottom: 12px;
+        }
+      }
+      .ant-descriptions-row:nth-child(2n) {
+        .ant-descriptions-item {
+          padding-bottom: 32px;
+        }
+      }
+      .ant-descriptions-row:last-child {
+        .ant-descriptions-item {
+          padding-bottom: 16px;
+        }
+      }
+    }
+  }
+
+  .ant-cascader-menus ul {
+    overflow: hidden;
+  }
+
+  .ant-cascader-menus ul:hover {
+    overflow-y: scroll;
+  }
+}
+
+@media screen and (max-width: @screen-lg) {
+  .tableListForm :global(.ant-form-item) {
+    margin-right: 24px;
+  }
+}
+
+@media screen and (max-width: @screen-md) {
+  .tableListForm :global(.ant-form-item) {
+    margin-right: 8px;
+  }
+}

@@ -1,56 +1,128 @@
-/**
- * request 网络请求工具
- * 更详细的 api 文档: https://github.com/umijs/umi-request
- */
-import { extend } from 'umi-request';
+import axios from 'axios';
 import { notification } from 'antd';
-const codeMessage = {
-  200: '服务器成功返回请求的数据。',
-  201: '新建或修改数据成功。',
-  202: '一个请求已经进入后台排队（异步任务）。',
-  204: '删除数据成功。',
-  400: '发出的请求有错误，服务器没有进行新建或修改数据的操作。',
-  401: '用户没有权限（令牌、用户名、密码错误）。',
-  403: '用户得到授权，但是访问是被禁止的。',
-  404: '发出的请求针对的是不存在的记录，服务器没有进行操作。',
-  406: '请求的格式不可得。',
-  410: '请求的资源被永久删除，且不会再得到的。',
-  422: '当创建一个对象时，发生一个验证错误。',
-  500: '服务器发生错误，请检查服务器。',
-  502: '网关错误。',
-  503: '服务不可用，服务器暂时过载或维护。',
-  504: '网关超时。',
+import { router } from 'umi';
+import { formatMessage } from 'umi/locale';
+
+const baseURLMap = {
+  dev: 'https://devapi.sangon.com:8443/api',
+  test: 'https://testapi.sangon.com:8443/api',
+  pre: 'https://preapi.sangon.com/api',
+  prod: 'https://api.sangon.com/api',
 };
-/**
- * 异常处理程序
- */
 
-const errorHandler = error => {
-  const { response } = error;
+// BASE_API 是 .env 文件中定义的环境变量，如果没有设置过此环境变量，则默认值为pre（具体查看config.js）。
+const env = BASE_API;
+const baseURL = baseURLMap[env];
 
-  if (response && response.status) {
-    const errorText = codeMessage[response.status] || response.statusText;
-    const { status, url } = response;
-    notification.error({
-      message: `请求错误 ${status}: ${url}`,
-      description: errorText,
-    });
-  } else if (!response) {
-    notification.error({
-      description: '您的网络发生异常，无法连接服务器',
-      message: '网络异常',
-    });
+// 创建 axios 实例
+const service = axios.create({
+  baseURL: baseURLMap[env],
+  timeout: 60000,
+});
+
+// 错误消息结构
+// let err = {
+//   type: Number,
+//   name: String,
+//   desc: String,
+//   code: Number,
+//   message: String|Array,
+// }
+
+// 国际化错误消息结构
+// let errI18n = {
+//
+// }
+
+const requestErr = data => {
+  let errMsg = ['系统异常,请与系统管理员联系!'];
+
+  if (data) {
+    if (data.message) {
+      errMsg = [data.message];
+    }
+    if (data.details && data.details.length > 0) {
+      errMsg = data.details;
+    }
+
+    if (data.type === 41 && data.code === 40000) {
+      localStorage.removeItem('token');
+      const URL = window.location.href;
+      if (URL.indexOf('/user/login') === -1) {
+        router.push(`/user/login?redirect=${encodeURIComponent(window.location.href)}`);
+      }
+    }
+  } else {
+    errMsg = [errMsg];
   }
 
-  return response;
-};
-/**
- * 配置request请求时的默认参数
- */
+  let message = (data && data.desc) || '错误提示';
+  let description = errMsg.join('，') || '请求错误！';
+  try {
+    message = formatMessage({ id: message });
+    description = formatMessage({ id: description });
+  } catch (error) {
+    console.log(`缺少错误消息国际化\nmessage:${message}\ndescription${description}`);
+  }
 
-const request = extend({
-  errorHandler,
-  // 默认错误处理
-  credentials: 'include', // 默认请求是否带上cookie
-});
-export default request;
+  notification.error({
+    message,
+    description,
+  });
+};
+
+const err = error => {
+  const { response = {} } = error;
+  const { data } = response;
+  requestErr(data);
+  return Promise.reject(data);
+};
+
+/* eslint-disable no-param-reassign */
+// 请求拦截
+service.interceptors.request.use(config => {
+  const token = localStorage.getItem('token');
+  // GET请求处理请求参数
+  // 去掉首尾空格
+  if (config.method === 'get') {
+    const { params } = config;
+    // eslint-disable-next-line no-restricted-syntax
+    for (const key in params) {
+      if (params.hasOwnProperty(key)) {
+        const element = params[key];
+        if (typeof element === 'string') {
+          config.params[key] = element.trim();
+        }
+      }
+    }
+  }
+  if (token) {
+    config.headers.Authorization = token;
+
+    // FIXME: 开发时代理临时接口（配合webpack proxy 使用）
+    if (process.env.NODE_ENV === 'development') {
+      if (config.url.indexOf('http://192.168.19.71:8550/') > -1) {
+        config.url = config.url.replace('http://192.168.19.71:8550/', '/192.168.19.71:8550/');
+        config.baseURL = '/';
+      }
+      if (config.url.indexOf('http://192.168.19.71:8001/') > -1) {
+        config.url = config.url.replace('http://192.168.19.71:8001/', '/192.168.19.71:8001/');
+        config.baseURL = '/';
+      }
+    }
+  }
+
+  if (config.url.indexOf('/zuul/api/disk/') > -1) {
+    // disk 服务接口在定义时已经有了 /api/ 所以拼接baseURL时，去掉baseURL的 /api/
+    config.url = new URL(baseURLMap[env]).origin + config.url;
+  }
+
+  return config;
+}, err);
+/* eslint-enable no-param-reassign */
+
+// 响应拦截
+service.interceptors.response.use(response => response.data, err);
+
+export default service;
+export { baseURL, requestErr };
