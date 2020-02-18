@@ -1,8 +1,8 @@
-import { Avatar, Icon, Menu, Spin } from 'antd';
-import { FormattedMessage } from 'umi-plugin-react/locale';
+import { LogoutOutlined, SettingOutlined, UserOutlined } from '@ant-design/icons';
+import { Avatar, Menu, Spin } from 'antd';
 import React from 'react';
 import { connect } from 'dva';
-import router from 'umi/router';
+import { router } from 'umi';
 import HeaderDropdown from '../HeaderDropdown';
 import styles from './index.less';
 
@@ -37,21 +37,21 @@ class AvatarDropdown extends React.Component {
       <Menu className={styles.menu} selectedKeys={[]} onClick={this.onMenuClick}>
         {menu && (
           <Menu.Item key="center">
-            <Icon type="user" />
-            <FormattedMessage id="menu.account.center" defaultMessage="account center" />
+            <UserOutlined />
+            个人中心
           </Menu.Item>
         )}
         {menu && (
           <Menu.Item key="settings">
-            <Icon type="setting" />
-            <FormattedMessage id="menu.account.settings" defaultMessage="account settings" />
+            <SettingOutlined />
+            个人设置
           </Menu.Item>
         )}
         {menu && <Menu.Divider />}
 
         <Menu.Item key="logout">
-          <Icon type="logout" />
-          <FormattedMessage id="menu.account.logout" defaultMessage="logout" />
+          <LogoutOutlined />
+          退出登录
         </Menu.Item>
       </Menu>
     );
