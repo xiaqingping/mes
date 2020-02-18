@@ -5,6 +5,10 @@ module.exports = {
   icon: 'smile',
   routes: [
     {
+      path: '/seq',
+      redirect: '/seq/order',
+    },
+    {
       name: 'order',
       path: '/seq/order',
       component: './seq/order',

@@ -95,37 +95,6 @@ ol {
   }
 }
 
-// 表格顶部表单
-.tableListForm {
-  .ant-form-inline {
-    .ant-form-item {
-      display: flex;
-      margin-right: 0;
-      margin-bottom: 24px;
-      // form label 宽度控制
-      > .ant-form-item-label {
-        width: 70px;
-        label {
-          display: inline-block;
-          width: 70px;
-          text-align: left;
-        }
-      }
-      .ant-form-item-control {
-        line-height: 34px;
-      }
-    }
-    .ant-form-item-control-wrapper {
-      flex: 1;
-    }
-  }
-  .submitButtons {
-    display: block;
-    margin-bottom: 24px;
-    white-space: nowrap;
-  }
-}
-
 :global {
   // upload 上传组件样式重写
   .ant-upload-picture-card-wrapper {
@@ -193,5 +162,19 @@ ol {
 @media screen and (max-width: @screen-md) {
   .tableListForm :global(.ant-form-item) {
     margin-right: 8px;
+  }
+}
+
+// 表格搜索表单
+.table-search-form {
+  .ant-form-item {
+    display: flex;
+  }
+  .ant-form-item-label {
+    width: 70px;
+    text-align: left;
+  }
+  .ant-form-item-control {
+    flex: 1;
   }
 }

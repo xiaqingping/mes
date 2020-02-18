@@ -79,12 +79,13 @@ class Search extends Component {
       </Form>
     );
   }
+
   render() {
     return (
       <div className="tableListForm">{this.renderForm()}</div>
     );
   }
-  
+
 }
 
 
@@ -142,8 +143,9 @@ class Modifications extends Component {
     loading: true,
     selectedRows: [],
     editIndex: -1,
-    id: 0, // 新增数据时，提供负数id 
+    id: 0, // 新增数据时，提供负数id
   }
+
   // 分页
   handleStandardTableChange = pagination => {
     this.getTableData({
@@ -151,13 +153,14 @@ class Modifications extends Component {
       rows: pagination.pageSize,
     });
   }
-  
+
   // 选择行
   handleSelectRows = rows => {
     this.setState({
       selectedRows: rows,
     });
   };
+
   // 获取表格数据
   getTableData = (options = {}) => {
     const { formValues } = this.state;
@@ -167,7 +170,7 @@ class Modifications extends Component {
       formValues: query,
       loading: true,
     });
-    
+
     api.sampletype.getSampleType(query,true).then(res => {
       this.setState({
         list: res.rows,
@@ -202,12 +205,14 @@ class Modifications extends Component {
       });
     }
   }
+
   // 删除数据
   deleteRow = row => {
     api.sampletype.cancelSampleType(row.id).then(() => {
       this.getTableData();
     });
   }
+
   // 保存和修改之后的保存
   saveRow = index => {
     this.props.form.validateFields((error, row) => {
@@ -222,6 +227,7 @@ class Modifications extends Component {
       }
     });
   }
+
   // 新增
   handleAdd = () => {
     const { editIndex, id, list } = this.state;
@@ -240,9 +246,10 @@ class Modifications extends Component {
         },
         ...list,
       ],
-      
+
     });
   }
+
   // 排序验证
   checkNameInput = (rule, value, callback) => {
     // const {value,serial,list} =this.state;
@@ -267,7 +274,7 @@ class Modifications extends Component {
     if (serial == newSerial) {
       callback('排序不能重复');
     } else {
-      
+
     }
     callback();
 
@@ -378,7 +385,7 @@ class Modifications extends Component {
         },
       },
     ];
-    
+
 
     columns = columns.map(col => {
       if (!col.width) col.width = 100;
@@ -422,7 +429,7 @@ class Modifications extends Component {
                 onChange={this.handleStandardTableChange}
               />
             </EditableContext.Provider>
-            
+
           </div>
         </Card>
       </PageHeaderWrapper>

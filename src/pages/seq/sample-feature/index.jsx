@@ -733,8 +733,7 @@ class Group extends Component {
                 />
               </EditableContext.Provider>
             </Col>
-            <Col span={1}>
-            </Col>
+            <Col span={1} />
             <Col span={8}>
               <Button icon="plus" type="primary" onClick={() => this.handleAdd('GR')}>
                 新建
