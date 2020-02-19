@@ -10,107 +10,17 @@ import {
   message,
   Popconfirm
 } from 'antd';
-import { DownOutlined, UpOutlined } from '@ant-design/icons';
-import React, { Component, useState } from 'react';
+import React, { Component } from 'react';
 import { connect } from 'dva';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import StandardTable from '@/components/StandardTable';
+import TableSearchForm from '@/components/TableSearchForm';
 import api from '@/api';
 import { formatter } from '@/utils/utils';
 
 const EditableContext = React.createContext();
 const FormItem = Form.Item;
 const { Option } = Select;
-
-/**
- * 页面顶部筛选表单
- */
-let SearchForm = props => {
-  const [expand, setExpand] = useState(false);
-  const [form] = Form.useForm();
-
-  // 查询
-  const onFinish = values => {
-    props.getTableData({ page: 1, ...values})
-  };
-
-  // 简单表单
-  const SimpleForm = () => (
-    <>
-      <Col span={6}>
-        <FormItem label="编号" name="code">
-          <Input />
-        </FormItem>
-      </Col>
-      <Col span={6}>
-        <FormItem label="名称" name="name">
-          <Input />
-        </FormItem>
-      </Col>
-      <Col lg={6}>
-        <FormItem label="状态" name="status">
-          <Select>
-            <Option value="">全部</Option>
-            <Option value="1">正常</Option>
-            <Option value="2">已删除</Option>
-          </Select>
-        </FormItem>
-      </Col>
-      <Col lg={6}>
-        <FormItem label="工厂" name="factory">
-          <Select allowClear>
-            {props.factory.map(e =>
-              <Option value={e.id} key={e.id}>{e.name}</Option>,
-            )}
-          </Select>
-        </FormItem>
-      </Col>
-    </>
-  );
-
-  // 复杂表单
-  const AdvancedForm = () => (
-    <>
-    </>
-  );
-
-  return (
-    <Form
-      form={form}
-      name="表格搜索表单"
-      className="table-search-form"
-      onFinish={onFinish}
-    >
-      <Row gutter={24}>
-        <SimpleForm />
-        { expand ? <AdvancedForm /> : null }
-      </Row>
-      <Row>
-        <Col span={24} style={{ textAlign: 'right' }}>
-          <Button type="primary" htmlType="submit">
-            查询
-          </Button>
-          <Button
-            style={{ marginLeft: 8 }}
-            onClick={() => { form.resetFields() }}
-          >
-            重置
-          </Button>
-          <a
-            style={{ marginLeft: 8, fontSize: 12 }}
-            onClick={() => { setExpand(!expand) }}
-          >
-            { expand ? <>收起<UpOutlined /></> : <>展开<DownOutlined /></> }
-          </a>
-        </Col>
-      </Row>
-    </Form>
-  );
-}
-
-SearchForm = connect(({ seq }) => ({
-  factory: seq.factory,
-}))(SearchForm);
 
 /**
  * 表格编辑组件
@@ -154,7 +64,7 @@ class EditableCell extends React.Component {
   storages: basicCache.storages,
   factory: seq.factory,
 }))
-class SeqFactory1 extends Component {
+class SeqFactory extends Component {
 
   state = {
     formValues: {
@@ -169,12 +79,57 @@ class SeqFactory1 extends Component {
     id: 0, // 新增数据时，提供负数id
   }
 
-  componentDidMount() {
-    this.getCacheData();
+  // 顶部表单默认值
+  initialValues = {
+    status: 1
   }
 
+  // 组件挂载时
+  componentDidMount() {
+    this.getCacheData();
+    this.getTableData(this.initialValues);
+  }
+
+  // 顶部表单简单搜索
+  simpleForm = () => (
+    <>
+      <Col span={6}>
+        <FormItem label="编号" name="code">
+          <Input />
+        </FormItem>
+      </Col>
+      <Col span={6}>
+        <FormItem label="名称" name="name">
+          <Input />
+        </FormItem>
+      </Col>
+      <Col lg={6}>
+        <FormItem label="状态" name="status">
+          <Select allowClear>
+            <Option value={1}>正常</Option>
+            <Option value={2}>已删除</Option>
+          </Select>
+        </FormItem>
+      </Col>
+      <Col lg={6}>
+        <FormItem label="工厂" name="factory">
+          <Select allowClear>
+            {this.props.factory.map(e =>
+              <Option value={e.id} key={e.id}>{e.name}</Option>,
+            )}
+          </Select>
+        </FormItem>
+      </Col>
+    </>
+  )
+
+  // 顶部表单复杂搜索
+  advancedForm = () => (
+    <></>
+  )
+
   // 获取此页面需要用到的基础数据
-  getCacheData() {
+  getCacheData = () => {
     const basicCacheList = [
       { type: 'storages' }, // 仓库
     ];
@@ -461,7 +416,11 @@ class SeqFactory1 extends Component {
       <PageHeaderWrapper>
         <Card bordered={false}>
           <div className="tableList">
-            <SearchForm getTableData={this.getTableData} />
+            <TableSearchForm
+              initialValues={this.initialValues}
+              getTableData={this.getTableData}
+              simpleForm={this.simpleForm}
+            />
             <div className="tableListOperator">
               <Button type="primary" onClick={() => this.handleAdd()}>
                 新建
@@ -487,218 +446,4 @@ class SeqFactory1 extends Component {
   }
 }
 
-const SeqFactory = props => {
-  const [form] = Form.useForm();
-  console.log(form);
-
-  const getTableData = () => {};
-  const handleAdd = () => {};
-
-  const editRow = () => {};
-  const deleteRow = () => {};
-  const saveRow = () => {};
-  const cancelEdit = () => {};
-  const handleSelectRows = () => {};
-  const handleStandardTableChange = () => {};
-
-  const {
-    formValues: { page: current, rows: pageSize },
-    selectedRows,
-    list,
-    total,
-    loading,
-  } = this.state;
-  const data = { list, pagination: { current, pageSize, total } };
-  let tableWidth = 0;
-
-  const components = {
-    body: {
-      cell: EditableCell,
-    },
-  };
-  let columns = [
-    {
-      title: '编号',
-      dataIndex: 'code',
-      width: 100,
-    },
-    {
-      title: '名称',
-      dataIndex: 'name',
-      width: 150,
-      editable: true,
-      inputType: <Input style={{ width: '90%' }}/>,
-      rules: [
-        { required: true, message: '必填' },
-      ],
-    },
-    {
-      title: 'SAP工厂',
-      dataIndex: 'factory',
-      width: 200,
-      editable: true,
-      render: text => {
-        if (text === 3100) return '3100-生工上海工厂';
-        if (text === 3101) return '3101-生工北京工厂';
-        if (text === 3102) return '3102-生工广州工厂';
-        if (text === 3103) return '3103-生工武汉工厂';
-        if (text === 3105) return '3105-生工成都工厂';
-        if (text === 3106) return '3106-生工青岛工厂';
-        if (text === 3107) return '3104-生工南京工厂';
-        if (text === 3108) return '3108-生工郑州工厂';
-        if (text === 3109) return '3108-生工长春工厂';
-        return ''
-      },
-      inputType: (
-        <Select style={{ width: 100 }}>
-          {props.factory.map(e =>
-            <Option value={e.id} key={e.id}>{e.name}</Option>,
-          )}
-        </Select>
-      ),
-      rules: [
-        { required: true, message: '必填' },
-      ],
-    },
-    {
-      title: '仓库',
-      dataIndex: 'storageCode',
-      width: 180,
-      inputType: (
-        <Select style={{ width: 100 }}>
-          {props.storages.map(e =>
-            <Option value={e.code} key={e.code}>{e.name}</Option>,
-          )}
-        </Select>
-      ),
-      render: text => `${text  }-${ formatter(props.storages, text, 'code', 'name')}`,
-      rules: [
-        { required: true, message: '必填' },
-      ],
-    },
-    {
-      title: '状态',
-      dataIndex: 'status',
-      width: 100,
-      render: text => {
-        if (text === 1) return '正常';
-        if (text === 2) return '已删除';
-        return ''
-      },
-    },
-    {
-      title: '创建人',
-      dataIndex: 'creatorName',
-      width: 100,
-    },
-    {
-      title: '创建时间',
-      dataIndex: 'createDate',
-      width: 180,
-    },
-    {
-      title: '修改人',
-      dataIndex: 'changeName',
-      width: 100,
-    },
-    {
-      title: '修改时间',
-      dataIndex: 'changeDate',
-      width: 180,
-    },
-    {
-      title: '作废人',
-      dataIndex: 'cancelName',
-      width: 100,
-    },
-    {
-      title: '作废时间',
-      dataIndex: 'cancelDate',
-      width: 180,
-    },
-    {
-      fixed: 'right',
-      title: '操作',
-      width: 120,
-      render: (value, row, index) => {
-        const { status } = row;
-        const { editIndex } = this.state;
-        let actions;
-        if (editIndex !== index && status === 1) {
-          actions = (
-            <>
-              <Popconfirm title="确定作废数据？" onConfirm={() => deleteRow(row)}>
-                <a>删除</a>
-              </Popconfirm>
-              <Divider type="vertical" />
-              <a onClick={() => editRow(index)}>修改</a>
-            </>
-          );
-        }
-        if (editIndex === index) {
-          actions = (
-            <>
-              <a onClick={() => saveRow(index)}>保存</a>
-              <Divider type="vertical" />
-              <a onClick={() => cancelEdit(row, -1)}>退出</a>
-            </>
-          );
-        }
-        return actions;
-      },
-    },
-  ];
-
-  columns = columns.map(col => {
-    if (!col.width) col.width = 100;
-    tableWidth += col.width;
-    if (!col.editable) {
-      return col;
-    }
-    return {
-      ...col,
-      onCell: (record, rowIndex) => ({
-        record,
-        rules: col.rules,
-        inputType: col.inputType,
-        dataIndex: col.dataIndex,
-        title: col.title,
-        editing: rowIndex === this.state.editIndex,
-      }),
-    };
-  });
-
-
-  return (
-    <PageHeaderWrapper>
-      <Card bordered={false}>
-        <div className="tableList">
-          <SearchForm getTableData={getTableData} />
-          <div className="tableListOperator">
-            <Button type="primary" onClick={() => handleAdd()}>
-              新建
-            </Button>
-          </div>
-          <EditableContext.Provider value={form}>
-            <StandardTable
-              scroll={{ x: tableWidth }}
-              rowClassName="editable-row"
-              selectedRows={selectedRows}
-              components={components}
-              loading={loading}
-              data={data}
-              columns={columns}
-              onSelectRow={handleSelectRows}
-              onChange={handleStandardTableChange}
-            />
-          </EditableContext.Provider>
-        </div>
-      </Card>
-    </PageHeaderWrapper>
-  );
-}
-
-export default connect(({ basicCache, seq }) => ({
-  storages: basicCache.storages,
-  factory: seq.factory,
-}))(SeqFactory);
+export default SeqFactory;

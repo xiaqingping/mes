@@ -5,7 +5,6 @@ import {
   Divider,
   Form,
   Input,
-  Row,
   Select,
   message,
   Popconfirm
@@ -14,104 +13,18 @@ import React, { Component } from 'react';
 import { connect } from 'dva';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import StandardTable from '@/components/StandardTable';
+import TableSearchForm from '@/components/TableSearchForm';
 import api from '@/api';
-// import { formatter } from '@/utils/utils';
 
 const EditableContext = React.createContext();
 const FormItem = Form.Item;
 const { Option } = Select;
 
-
-/**
- * 页面顶部筛选表单
- */
-@connect(({ seq }) => ({
-  seqfactoryIdList: seq.seqfactoryIdList,
-}))
-@Form.create()
-class Search extends Component {
-  componentDidMount() {
-    this.submit();
-  }
-
-  // 查询
-  submit = e => {
-    if (e) e.preventDefault();
-    const val = this.props.form.getFieldsValue();
-    this.props.getTableData({ page: 1,...val});
-  }
-
-  // 渲染头部表单
-  renderForm = () => {
-    const {
-      form: { getFieldDecorator },
-    } = this.props;
-    return (
-      <Form onSubmit={this.submit} layout="inline">
-        <Row gutter={{ lg: 24, md: 12, sm: 6 }}>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="测序仪编号">
-              {getFieldDecorator('code')(<Input />)}
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="测序仪名称">
-              {getFieldDecorator('name')(<Input />)}
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="测序仪状态">
-              {getFieldDecorator('status', { initialValue: '1' })(
-                <Select>
-                  <Option value="">全部</Option>
-                  <Option value="1">正常</Option>
-                  <Option value="2">已删除</Option>
-                </Select>,
-              )}
-            </FormItem>
-          </Col>
-          {/* <Col lg={6} md={8} sm={12}>
-            <FormItem label="测序点">
-              {getFieldDecorator('seqfactoryIdList')(<Input />)}
-            </FormItem>
-          </Col> */}
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="测序点">
-              {getFieldDecorator('seqfactoryIdList')(
-                <Select allowClear>
-                  {this.props.seqfactoryIdList.map(e =>
-                    <Option value={e.id} key={e.id}>{e.name}</Option>,
-                  )}
-                </Select>,
-              )}
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <span className="submitButtons">
-              <Button type="primary" htmlType="submit">
-                查询
-              </Button>
-            </span>
-          </Col>
-        </Row>
-      </Form>
-    );
-  }
-
-  render() {
-    return (
-      <div className="tableListForm">{this.renderForm()}</div>
-    );
-  }
-
-}
-
-
 /**
  * 表格编辑组件
  */
 class EditableCell extends React.Component {
-  renderCell = ({ getFieldDecorator }) => {
+  renderCell = () => {
     const {
       editing,
       dataIndex,
@@ -126,11 +39,8 @@ class EditableCell extends React.Component {
     return (
       <td {...restProps}>
         {editing ? (
-          <Form.Item>
-            {getFieldDecorator(dataIndex, {
-              rules,
-              initialValue: record[dataIndex],
-            })(inputType)}
+          <Form.Item name={dataIndex} rules={rules}>
+            {inputType}
           </Form.Item>
         ) : (
           children
@@ -151,7 +61,6 @@ class EditableCell extends React.Component {
 @connect(({ seq }) => ({
   seqfactoryIdList: seq.seqfactoryIdList,
 }))
-@Form.create()
 class Modifications extends Component {
 
   state = {
@@ -166,6 +75,54 @@ class Modifications extends Component {
     editIndex: -1,
     id: 0, // 新增数据时，提供负数id
   }
+
+  // 顶部表单默认值
+  initialValues = {
+    status: 1
+  }
+
+  // 组件挂载时
+  componentDidMount() {
+    this.getTableData(this.initialValues);
+  }
+
+  // 顶部表单简单搜索
+  simpleForm = () => (
+    <>
+      <Col lg={6} md={8} sm={12}>
+        <FormItem label="编号" name="code">
+          <Input />
+        </FormItem>
+      </Col>
+      <Col lg={6} md={8} sm={12}>
+        <FormItem label="名称" name="name">
+          <Input />
+        </FormItem>
+      </Col>
+      <Col lg={6} md={8} sm={12}>
+        <FormItem label="状态" name="status">
+          <Select allowClear>
+            <Option value={1}>正常</Option>
+            <Option value={2}>已删除</Option>
+          </Select>
+        </FormItem>
+      </Col>
+      <Col lg={6} md={8} sm={12}>
+        <FormItem label="测序点" name="seqfactoryIdList">
+          <Select allowClear>
+            {this.props.seqfactoryIdList.map(e =>
+              <Option value={e.id} key={e.id}>{e.name}</Option>,
+            )}
+          </Select>
+        </FormItem>
+      </Col>
+    </>
+  )
+
+  // 顶部表单复杂搜索
+  advancedForm = () => (
+    <></>
+  )
 
   // 分页
   handleStandardTableChange = pagination => {
@@ -199,7 +156,6 @@ class Modifications extends Component {
         loading: false,
         editIndex: -1,
       });
-      console.log(res);
     });
   }
 
@@ -271,7 +227,6 @@ class Modifications extends Component {
     });
   }
 
-
   render() {
     const {
       formValues: { page: current, rows: pageSize },
@@ -281,7 +236,6 @@ class Modifications extends Component {
       loading,
     } = this.state;
     const data = { list, pagination: { current, pageSize, total } };
-    // console.log(data);
     let tableWidth = 0;
 
     const components = {
@@ -409,7 +363,6 @@ class Modifications extends Component {
       },
     ];
 
-
     columns = columns.map(col => {
       if (!col.width) col.width = 100;
       tableWidth += col.width;
@@ -433,9 +386,13 @@ class Modifications extends Component {
       <PageHeaderWrapper>
         <Card bordered={false}>
           <div className="tableList">
-            <Search  getTableData={this.getTableData}/>
+            <TableSearchForm
+              initialValues={this.initialValues}
+              getTableData={this.getTableData}
+              simpleForm={this.simpleForm}
+            />
             <div className="tableListOperator">
-              <Button icon="plus" type="primary" onClick={() => this.handleAdd()}>
+              <Button type="primary" onClick={() => this.handleAdd()}>
                 新建
               </Button>
             </div>
