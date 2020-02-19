@@ -3,16 +3,15 @@
  * You can view component api by:
  * https://github.com/ant-design/ant-design-pro-layout
  */
-import ProLayout, { DefaultFooter, SettingDrawer } from '@ant-design/pro-layout';
+import ProLayout, { SettingDrawer } from '@ant-design/pro-layout';
 import { formatMessage } from 'umi-plugin-react/locale';
 import React, { useEffect } from 'react';
 import { Link } from 'umi';
 import { connect } from 'dva';
-import { GithubOutlined } from '@ant-design/icons';
 import { Result, Button } from 'antd';
 import Authorized from '@/utils/Authorized';
 import RightContent from '@/components/GlobalHeader/RightContent';
-import { isAntDesignPro, getAuthorityFromRouter } from '@/utils/utils';
+import { getAuthorityFromRouter } from '@/utils/utils';
 import logo from '../assets/logo.svg';
 
 const noMatch = (
@@ -48,14 +47,40 @@ const BasicLayout = props => {
       pathname: '/',
     },
   } = props;
+
+  const resizeBasicLayout = () => {
+    const { clientWidth } = document.documentElement;
+    if (dispatch) {
+      dispatch({
+        type: 'global/setClientWidth',
+        payload: clientWidth,
+      });
+
+      let collapsed;
+      const collapsedCache = sessionStorage.getItem('global/collapsed');
+      if (clientWidth <= 1440) collapsed = true;
+      if (clientWidth > 1440) collapsed = false;
+      if (typeof collapsedCache === 'string') collapsed = JSON.parse(collapsedCache);
+      dispatch({
+        type: 'global/changeLayoutCollapsed',
+        payload: collapsed,
+      });
+    }
+  };
+
   /**
    * constructor
    */
 
   useEffect(() => {
+    resizeBasicLayout();
+
     if (dispatch) {
       dispatch({
         type: 'user/fetchCurrent',
+      });
+      dispatch({
+        type: 'settings/getSetting',
       });
     }
   }, []);
@@ -64,6 +89,8 @@ const BasicLayout = props => {
    */
 
   const handleMenuCollapse = payload => {
+    sessionStorage.setItem('global/collapsed', payload);
+
     if (dispatch) {
       dispatch({
         type: 'global/changeLayoutCollapsed',
@@ -86,6 +113,7 @@ const BasicLayout = props => {
             {titleDom}
           </Link>
         )}
+        breakpoint={false}
         onCollapse={handleMenuCollapse}
         menuItemRender={(menuItemProps, defaultDom) => {
           if (menuItemProps.isUrl || menuItemProps.children || !menuItemProps.path) {
@@ -97,7 +125,10 @@ const BasicLayout = props => {
         breadcrumbRender={(routers = []) => [
           {
             path: '/',
-            breadcrumbName: '首页',
+            breadcrumbName:  formatMessage({
+              id: 'menu.home',
+              defaultMessage: 'Home',
+            }),
           },
           ...routers,
         ]}

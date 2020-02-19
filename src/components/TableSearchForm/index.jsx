@@ -6,6 +6,7 @@ import {
 } from 'antd';
 import { DownOutlined, UpOutlined } from '@ant-design/icons';
 import React, { useState } from 'react';
+import { formatMessage, FormattedMessage } from 'umi/locale';
 import styles from './index.less';
 
 /**
@@ -40,13 +41,13 @@ const TableSearchForm = props => {
       <Row>
         <Col span={24} style={{ textAlign: 'right' }}>
           <Button type="primary" htmlType="submit">
-            查询
+            <FormattedMessage id="action.search" />
           </Button>
           <Button
             style={{ marginLeft: 8 }}
             onClick={() => { form.resetFields() }}
           >
-            重置
+            <FormattedMessage id="action.reset" />
           </Button>
           {
             props.advancedForm ? (
@@ -54,7 +55,11 @@ const TableSearchForm = props => {
                 style={{ marginLeft: 8, fontSize: 12 }}
                 onClick={() => { setExpand(!expand) }}
               >
-                { expand ? <>收起<UpOutlined /></> : <>展开<DownOutlined /></> }
+                {
+                  expand
+                  ? <><FormattedMessage id="action.unexpand" /><UpOutlined /></>
+                  : <><FormattedMessage id="action.expand" /><DownOutlined /></>
+                }
               </a>
             ) : null
           }

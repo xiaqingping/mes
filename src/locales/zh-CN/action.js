@@ -3,6 +3,7 @@ export default {
   'action.search': '搜索',
   'action.reset': '重置',
   'action.expand': '展开',
+  'action.unexpand': '收起',
   'action.choose': '选择',
   'action.add': '新增',
   'action.change': '修改',

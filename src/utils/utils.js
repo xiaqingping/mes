@@ -6,23 +6,7 @@ import { formatMessage } from 'umi/locale';
 /* eslint no-useless-escape:0 import/prefer-default-export:0 */
 const reg = /(((^https?:(?:\/\/)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+(?::\d+)?|(?:www.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\+=&;%@.\w_]*)#?(?:[\w]*))?)$/;
 export const isUrl = path => reg.test(path);
-export const isAntDesignPro = () => {
-  if (ANT_DESIGN_PRO_ONLY_DO_NOT_USE_IN_YOUR_PRODUCTION === 'site') {
-    return true;
-  }
 
-  return window.location.hostname === 'preview.pro.ant.design';
-}; // 给官方演示站点用，用于关闭真实开发环境不需要使用的特性
-
-export const isAntDesignProOrDev = () => {
-  const { NODE_ENV } = process.env;
-
-  if (NODE_ENV === 'development') {
-    return true;
-  }
-
-  return isAntDesignPro();
-};
 export const getPageQuery = () => parse(window.location.href.split('?')[1]);
 /**
  * props.route.routes
@@ -58,6 +42,24 @@ export const getRouteAuthority = (path, routeData) => {
     }
   });
   return authorities;
+};
+
+/**
+ * 下拉列表数据格式化，为列表中的数据添加 text 属性。 text = code - name
+ * @param {Array} list
+ * @param {String} key1
+ * @param {String} key2
+ */
+export const formatSelectData = (list, key1, key2) => {
+  if (!list || list.length === 0) return [];
+  return list.map(e => {
+    const code = e[key1 || 'code'];
+    const name = e[key2 || 'name'];
+    return {
+      ...e,
+      text: `${code} - ${name}`,
+    }
+  });
 };
 
 /**

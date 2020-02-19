@@ -1,10 +1,10 @@
 import { Button, Col, Input, Row, Form, message } from 'antd';
 import React, { useState, useCallback, useEffect } from 'react';
 import omit from 'omit.js';
-// import { getFakeCaptcha } from '@/services/login';
 import ItemMap from './map';
 import LoginContext from './LoginContext';
 import styles from './index.less';
+import api from '@/api';
 
 const FormItem = Form.Item;
 
@@ -43,14 +43,13 @@ const LoginItem = props => {
     ...restProps
   } = props;
   const onGetCaptcha = useCallback(async mobile => {
-    // const result = await getFakeCaptcha(mobile);
-    const result = true;
+    const result = await api.user.getVerifycode(mobile);
 
     if (result === false) {
       return;
     }
 
-    message.success('获取验证码成功！验证码为：1234');
+    message.success('获取验证码成功！');
     setTiming(true);
   }, []);
   useEffect(() => {

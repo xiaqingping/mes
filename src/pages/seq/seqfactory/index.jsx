@@ -5,7 +5,6 @@ import {
   Divider,
   Form,
   Input,
-  Row,
   Select,
   message,
   Popconfirm
@@ -18,53 +17,44 @@ import TableSearchForm from '@/components/TableSearchForm';
 import api from '@/api';
 import { formatter } from '@/utils/utils';
 
-const EditableContext = React.createContext();
 const FormItem = Form.Item;
 const { Option } = Select;
 
 /**
  * 表格编辑组件
  */
-class EditableCell extends React.Component {
-  renderCell = () => {
-    const {
-      editing,
-      dataIndex,
-      title,
-      inputType,
-      record,
-      index,
-      children,
-      rules,
-      ...restProps
-    } = this.props;
-    return (
-      <td {...restProps}>
-        {editing ? (
-          <Form.Item name={dataIndex} rules={rules}>
-            {inputType}
-          </Form.Item>
-        ) : (
-          children
-        )}
-      </td>
-    );
-  };
-
-
-  render() {
-    return <EditableContext.Consumer>{this.renderCell}</EditableContext.Consumer>;
-  }
-}
+const EditableCell = ({
+  editing,
+  dataIndex,
+  title,
+  inputType,
+  record,
+  index,
+  children,
+  rules,
+  ...restProps
+}) => (
+  <td {...restProps}>
+    {editing ? (
+      <Form.Item name={dataIndex} style={{ margin: 0 }} rules={rules} >
+        {inputType}
+      </Form.Item>
+    ) : (
+      children
+    )}
+  </td>
+);
 
 /**
  * 页面根组件
  */
-@connect(({ basicCache, seq }) => ({
+@connect(({ basicCache }) =>({
   storages: basicCache.storages,
-  factory: seq.factory,
+  plants: basicCache.plants,
 }))
 class SeqFactory extends Component {
+
+  tableFormRef = React.createRef();
 
   state = {
     formValues: {
@@ -114,8 +104,8 @@ class SeqFactory extends Component {
       <Col lg={6}>
         <FormItem label="工厂" name="factory">
           <Select allowClear>
-            {this.props.factory.map(e =>
-              <Option value={e.id} key={e.id}>{e.name}</Option>,
+            {this.props.plants.map(e =>
+              <Option value={e.code} key={e.code}>{e.text}</Option>,
             )}
           </Select>
         </FormItem>
@@ -132,6 +122,7 @@ class SeqFactory extends Component {
   getCacheData = () => {
     const basicCacheList = [
       { type: 'storages' }, // 仓库
+      { type: 'plants' }, // 工厂
     ];
     basicCacheList.forEach(item => {
       this.props.dispatch({
@@ -177,11 +168,12 @@ class SeqFactory extends Component {
   }
 
   // 修改,开启编辑
-  editRow = index => {
+  editRow = (row, index) => {
     if (this.state.editIndex !== -1) {
       message.warning('请先保存或退出正在编辑的数据');
       return;
     }
+    this.tableFormRef.current.setFieldsValue({...row});
     this.setState({
       editIndex: index,
     });
@@ -281,22 +273,11 @@ class SeqFactory extends Component {
         dataIndex: 'factory',
         width: 200,
         editable: true,
-        render: text => {
-          if (text === 3100) return '3100-生工上海工厂';
-          if (text === 3101) return '3101-生工北京工厂';
-          if (text === 3102) return '3102-生工广州工厂';
-          if (text === 3103) return '3103-生工武汉工厂';
-          if (text === 3105) return '3105-生工成都工厂';
-          if (text === 3106) return '3106-生工青岛工厂';
-          if (text === 3107) return '3104-生工南京工厂';
-          if (text === 3108) return '3108-生工郑州工厂';
-          if (text === 3109) return '3108-生工长春工厂';
-          return ''
-        },
+        render: text => formatter(this.props.plants, text, 'code', 'text'),
         inputType: (
           <Select style={{ width: 100 }}>
-            {this.props.factory.map(e =>
-              <Option value={e.id} key={e.id}>{e.name}</Option>,
+            {this.props.plants.map(e =>
+              <Option value={e.code} key={e.code}>{e.text}</Option>,
             )}
           </Select>
         ),
@@ -308,14 +289,15 @@ class SeqFactory extends Component {
         title: '仓库',
         dataIndex: 'storageCode',
         width: 180,
+        editable: true,
         inputType: (
           <Select style={{ width: 100 }}>
             {this.props.storages.map(e =>
-              <Option value={e.code} key={e.code}>{e.name}</Option>,
+              <Option value={e.code} key={e.code}>{e.text}</Option>,
             )}
           </Select>
         ),
-        render: text => `${text  }-${ formatter(this.props.storages, text, 'code', 'name')}`,
+        render: text => formatter(this.props.storages, text, 'code', 'text'),
         rules: [
           { required: true, message: '必填' },
         ],
@@ -375,7 +357,7 @@ class SeqFactory extends Component {
                   <a>删除</a>
                 </Popconfirm>
                 <Divider type="vertical" />
-                <a onClick={() => this.editRow(index)}>修改</a>
+                <a onClick={() => this.editRow(row, index)}>修改</a>
               </>
             );
           }
@@ -426,7 +408,7 @@ class SeqFactory extends Component {
                 新建
               </Button>
             </div>
-            <EditableContext.Provider value={this.props.form}>
+            <Form ref={this.tableFormRef}>
               <StandardTable
                 scroll={{ x: tableWidth }}
                 rowClassName="editable-row"
@@ -438,7 +420,7 @@ class SeqFactory extends Component {
                 onSelectRow={this.handleSelectRows}
                 onChange={this.handleStandardTableChange}
               />
-            </EditableContext.Provider>
+            </Form>
           </div>
         </Card>
       </PageHeaderWrapper>

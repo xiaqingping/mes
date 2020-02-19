@@ -1,4 +1,5 @@
 import basic from '@/api/basic';
+import { formatSelectData } from '@/utils/utils'
 
 const namespace = 'basicCache';
 
@@ -95,8 +96,8 @@ const INIT_STATE = {
   countryProvinceTimeZone: [],
   // 仓库
   storages: [],
-  // 工厂
-  factorys: [],
+  // 工厂 // TODO: 废弃，使用plants
+  // factorys: [],
 };
 
 const BasicModel = {
@@ -164,7 +165,10 @@ const BasicModel = {
       const { type, targetState } = payload;
 
       // 数据处理方法
-      const format = {};
+      const format = {
+        plants(list) { return formatSelectData(list) },
+        storages(list) { return formatSelectData(list) },
+      };
 
       const data = (format[type] && format[type](targetState)) || targetState;
 

@@ -3,6 +3,7 @@ export default {
   'action.search': 'Search',
   'action.reset': 'Reset',
   'action.expand': 'Expand',
+  'action.unexpand': 'Unexpand',
   'action.choose': 'Choose',
   'action.add': 'Add',
   'action.change': 'Change',
