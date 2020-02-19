@@ -16,7 +16,7 @@ import styles from './index.less';
  * @param {ReactDOM} props.advancedForm 复杂表单
  * @param {Object} props.initialValues 表单默认值
  */
-const SearchForm = props => {
+const TableSearchForm = props => {
   const [expand, setExpand] = useState(false);
   const [form] = Form.useForm();
 
@@ -64,4 +64,4 @@ const SearchForm = props => {
   );
 }
 
-export default SearchForm;
+export default TableSearchForm;
