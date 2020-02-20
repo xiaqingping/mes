@@ -228,6 +228,7 @@ class Modifications extends Component {
   }
 
   render() {
+    const a = 1;
     const {
       formValues: { page: current, rows: pageSize },
       selectedRows,
@@ -417,5 +418,6 @@ class Modifications extends Component {
   }
 }
 export default Modifications;
+
 
 

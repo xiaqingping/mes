@@ -1,3 +1,6 @@
+/**
+ * 样品类型
+ */
 import {
   Button,
   Card,
@@ -21,9 +24,6 @@ import api from '@/api';
 const FormItem = Form.Item;
 const { Option } = Select;
 
-/**
- * 页面根组件
- */
 const SampleType = props => {
   const tableSearchFormRef = React.createRef();
   const [form] = Form.useForm();

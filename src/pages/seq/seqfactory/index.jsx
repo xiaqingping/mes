@@ -1,3 +1,6 @@
+/**
+ * 测序点
+ */
 import {
   Button,
   Card,
@@ -22,9 +25,6 @@ import api from '@/api';
 const FormItem = Form.Item;
 const { Option } = Select;
 
-/**
- * 页面根组件
- */
 class Seqfactory extends Component {
 
   tableSearchFormRef = React.createRef();
