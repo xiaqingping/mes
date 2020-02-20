@@ -12,8 +12,10 @@ import {
 import React, { Component } from 'react';
 import { connect } from 'dva';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
+import { PlusOutlined } from '@ant-design/icons';
 import StandardTable from '@/components/StandardTable';
 import TableSearchForm from '@/components/TableSearchForm';
+import EditableCell from '@/components/EditableCell';
 import api from '@/api';
 import { formatter } from '@/utils/utils';
 
@@ -21,38 +23,9 @@ const FormItem = Form.Item;
 const { Option } = Select;
 
 /**
- * 表格编辑组件
- */
-const EditableCell = ({
-  editing,
-  dataIndex,
-  title,
-  inputType,
-  record,
-  index,
-  children,
-  rules,
-  ...restProps
-}) => (
-  <td {...restProps}>
-    {editing ? (
-      <Form.Item name={dataIndex} style={{ margin: 0 }} rules={rules} >
-        {inputType}
-      </Form.Item>
-    ) : (
-      children
-    )}
-  </td>
-);
-
-/**
  * 页面根组件
  */
-@connect(({ basicCache }) =>({
-  storages: basicCache.storages,
-  plants: basicCache.plants,
-}))
-class SeqFactory extends Component {
+class Page extends Component {
 
   tableFormRef = React.createRef();
 
@@ -83,17 +56,17 @@ class SeqFactory extends Component {
   // 顶部表单简单搜索
   simpleForm = () => (
     <>
-      <Col span={6}>
+      <Col lg={6} md={8} sm={12}>
         <FormItem label="编号" name="code">
           <Input />
         </FormItem>
       </Col>
-      <Col span={6}>
+      <Col lg={6} md={8} sm={12}>
         <FormItem label="名称" name="name">
           <Input />
         </FormItem>
       </Col>
-      <Col lg={6}>
+      <Col lg={6} md={8} sm={12}>
         <FormItem label="状态" name="status">
           <Select allowClear>
             <Option value={1}>正常</Option>
@@ -101,7 +74,7 @@ class SeqFactory extends Component {
           </Select>
         </FormItem>
       </Col>
-      <Col lg={6}>
+      <Col lg={6} md={8} sm={12}>
         <FormItem label="工厂" name="factory">
           <Select allowClear>
             {this.props.plants.map(e =>
@@ -200,18 +173,21 @@ class SeqFactory extends Component {
   }
 
   // 保存和修改之后的保存
-  saveRow = index => {
-    this.props.form.validateFields((error, row) => {
-      if (error) return;
+  saveRow = async index => {
+    const { storages } = this.props;
+    try {
+      const row = await this.tableFormRef.current.validateFields();
+      const storageName = storages.filter(e => e.code === row.storageCode)[0].name;
       const { list } = this.state;
-      const newData = { ...list[index], ...row };
-
+      const newData = { ...list[index], ...row, storageName };
       if (newData.id < 0) {
         api.seqfactory.addSeqfactory(newData).then(() => this.getTableData());
       } else {
         api.seqfactory.addSeqfactory(newData).then(() => this.getTableData());
       }
-    });
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   // 新增
@@ -405,7 +381,7 @@ class SeqFactory extends Component {
             />
             <div className="tableListOperator">
               <Button type="primary" onClick={() => this.handleAdd()}>
-                新建
+                <PlusOutlined />新建
               </Button>
             </div>
             <Form ref={this.tableFormRef}>
@@ -428,4 +404,7 @@ class SeqFactory extends Component {
   }
 }
 
-export default SeqFactory;
+export default connect(({ basicCache }) =>({
+  storages: basicCache.storages,
+  plants: basicCache.plants,
+}))(Page);
