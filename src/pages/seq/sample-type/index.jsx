@@ -27,7 +27,6 @@ const { Option } = Select;
 const SampleType = props => {
   const tableSearchFormRef = React.createRef();
   const [form] = Form.useForm();
-  a
   // 表格数据
   const [list, setList] = useState([]);
   // 分页参数
