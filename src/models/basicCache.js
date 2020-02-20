@@ -4,6 +4,11 @@ import { formatSelectData } from '@/utils/utils'
 const namespace = 'basicCache';
 
 const INIT_STATE = {
+  // 基础数据状态
+  basicStatus: [
+    { id: 1, name: '正常' },
+    { id: 2, name: '已删除' },
+  ],
   // 国家
   countrys: [],
   // 地区（省）

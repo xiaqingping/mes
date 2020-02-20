@@ -16,8 +16,8 @@ import { PlusOutlined } from '@ant-design/icons';
 import StandardTable from '@/components/StandardTable';
 import TableSearchForm from '@/components/TableSearchForm';
 import EditableCell from '@/components/EditableCell';
-import api from '@/api';
 import { formatter } from '@/utils/utils';
+import api from '@/api';
 
 const FormItem = Form.Item;
 const { Option } = Select;
@@ -79,8 +79,9 @@ class Seqfactory extends Component {
       <Col lg={6} md={8} sm={12}>
         <FormItem label="状态" name="status">
           <Select allowClear>
-            <Option value={1}>正常</Option>
-            <Option value={2}>已删除</Option>
+            {this.props.basicStatus.map(e =>
+              <Option value={e.id} key={e.id}>{e.name}</Option>,
+            )}
           </Select>
         </FormItem>
       </Col>
@@ -299,11 +300,7 @@ class Seqfactory extends Component {
         title: '状态',
         dataIndex: 'status',
         width: 100,
-        render: text => {
-          if (text === 1) return '正常';
-          if (text === 2) return '已删除';
-          return ''
-        },
+        render: text => formatter(this.props.basicStatus, text),
       },
       {
         title: '创建人',
@@ -425,4 +422,5 @@ class Seqfactory extends Component {
 export default connect(({ basicCache }) =>({
   storages: basicCache.storages,
   plants: basicCache.plants,
+  basicStatus: basicCache.basicStatus,
 }))(Seqfactory);

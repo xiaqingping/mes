@@ -10,10 +10,12 @@ import {
   Popconfirm
 } from 'antd';
 import React, { useState, useEffect } from 'react';
+import { connect } from 'dva';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import StandardTable from '@/components/StandardTable';
 import TableSearchForm from '@/components/TableSearchForm';
 import EditableCell from '@/components/EditableCell';
+import { formatter } from '@/utils/utils';
 import api from '@/api';
 
 const FormItem = Form.Item;
@@ -22,18 +24,24 @@ const { Option } = Select;
 /**
  * 页面根组件
  */
-const SampleType = () => {
+const SampleType = props => {
   const tableSearchFormRef = React.createRef();
   const [form] = Form.useForm();
+  // 表格数据
   const [list, setList] = useState([]);
+  // 分页参数
   const [pagination, setPagination] = useState({
     // current: 1,
     // pageSize: 10,
     // total: 0,
   });
+  // 编辑行
   const [editIndex, setEditIndex] = useState(-1);
+  // 加载状态
   const [loading, setLoading] = useState(false);
+  // 自减ID（新增数据时，提供负数id做为列表的key）
   const [id, setId] = useState(0);
+  // 选中行数据
   const [selectedRows, setSelectedRows] = useState([]);
 
   const initialValues = {
@@ -58,8 +66,9 @@ const SampleType = () => {
       <Col lg={6} md={8} sm={12}>
         <FormItem label="状态" name="status">
           <Select allowClear>
-            <Option value={1}>正常</Option>
-            <Option value={2}>已删除</Option>
+            {props.basicStatus.map(e =>
+              <Option value={e.id} key={e.id}>{e.name}</Option>,
+            )}
           </Select>
         </FormItem>
       </Col>
@@ -188,11 +197,7 @@ const SampleType = () => {
     {
       title: '状态',
       dataIndex: 'status',
-      render: text => {
-        if (text === 1) return '正常';
-        if (text === 2) return '已删除';
-        return ''
-      },
+      render: text => formatter(props.basicStatus, text),
     },
     {
       title: '创建人',
@@ -290,4 +295,6 @@ const SampleType = () => {
   );
 }
 
-export default SampleType;
+export default connect(({ basicCache }) =>({
+  basicStatus: basicCache.basicStatus,
+}))(SampleType);
