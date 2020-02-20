@@ -6,7 +6,7 @@ import {
 } from 'antd';
 import { DownOutlined, UpOutlined } from '@ant-design/icons';
 import React, { useState } from 'react';
-import { formatMessage, FormattedMessage } from 'umi/locale';
+import { FormattedMessage } from 'umi/locale';
 import styles from './index.less';
 
 /**
@@ -17,17 +17,18 @@ import styles from './index.less';
  * @param {ReactDOM} props.advancedForm 复杂表单
  * @param {Object} props.initialValues 表单默认值
  */
-const TableSearchForm = props => {
+const TableSearchForm = React.forwardRef((props, ref) => {
   const [expand, setExpand] = useState(false);
   const [form] = Form.useForm();
 
   // 查询
-  const onFinish = values => {
-    props.getTableData({ page: 1, ...values})
+  const onFinish = () => {
+    props.getTableData({ page: 1 })
   };
 
   return (
     <Form
+      ref={ref}
       form={form}
       name="表格搜索表单"
       className={styles['table-search-form']}
@@ -67,6 +68,6 @@ const TableSearchForm = props => {
       </Row>
     </Form>
   );
-}
+})
 
 export default TableSearchForm;

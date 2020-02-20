@@ -27,24 +27,34 @@ const { Option } = Select;
  */
 class Seqfactory extends Component {
 
+  tableSearchFormRef = React.createRef();
+
   tableFormRef = React.createRef();
 
   state = {
-    formValues: {
-      page: 1,
-      rows: 10,
+    // 分页参数
+    pagination: {
+      // current: 1,
+      // pageSize: 10,
+      // total: 0,
     },
+    // 表格数据
     list: [],
-    total: 0,
+    // 加载状态
     loading: true,
+    // 选中行数据
     selectedRows: [],
+    // 编辑行
     editIndex: -1,
-    id: 0, // 新增数据时，提供负数id
+    // 自减ID（新增数据时，提供负数id做为列表的key）
+    id: 0,
   }
 
   // 顶部表单默认值
   initialValues = {
-    status: 1
+    status: 1,
+    page: 1,
+    rows: 10,
   }
 
   // 组件挂载时
@@ -106,10 +116,10 @@ class Seqfactory extends Component {
   }
 
   // 分页
-  handleStandardTableChange = pagination => {
+  handleStandardTableChange = data => {
     this.getTableData({
-      page: pagination.current,
-      rows: pagination.pageSize,
+      page: data.current,
+      rows: data.pageSize,
     });
   }
 
@@ -122,18 +132,26 @@ class Seqfactory extends Component {
 
   // 获取表格数据
   getTableData = (options = {}) => {
-    const { formValues } = this.state;
-    const query = Object.assign({}, formValues, options);
+    this.setState({ loading: true });
 
-    this.setState({
-      formValues: query,
-      loading: true,
-    });
+    const formData = this.tableSearchFormRef.current.getFieldsValue();
+    const { pagination } = this.state;
+    const { current: page, pageSize: rows } = pagination;
+    const data = {
+      page,
+      rows,
+      ...formData,
+      ...options,
+    };
 
-    api.seqfactory.getSeqfactory(query,true).then(res => {
+    api.seqfactory.getSeqfactory(data, true).then(res => {
       this.setState({
         list: res.rows,
-        total: res.total,
+        pagination: {
+          current: data.page,
+          pageSize: data.rows,
+          total: res.total,
+        },
         loading: false,
         editIndex: -1,
       });
@@ -183,7 +201,7 @@ class Seqfactory extends Component {
       if (newData.id < 0) {
         api.seqfactory.addSeqfactory(newData).then(() => this.getTableData());
       } else {
-        api.seqfactory.addSeqfactory(newData).then(() => this.getTableData());
+        api.seqfactory.updateSeqfactory(newData).then(() => this.getTableData());
       }
     } catch (error) {
       console.log(error);
@@ -199,6 +217,7 @@ class Seqfactory extends Component {
     }
 
     const newId = id - 1;
+    this.tableFormRef.current.resetFields();
     this.setState({
       id: newId,
       editIndex: 0,
@@ -213,13 +232,11 @@ class Seqfactory extends Component {
 
   render() {
     const {
-      formValues: { page: current, rows: pageSize },
+      pagination,
       selectedRows,
       list,
-      total,
       loading,
     } = this.state;
-    const data = { list, pagination: { current, pageSize, total } };
     let tableWidth = 0;
 
     const components = {
@@ -375,6 +392,7 @@ class Seqfactory extends Component {
         <Card bordered={false}>
           <div className="tableList">
             <TableSearchForm
+              ref={this.tableSearchFormRef}
               initialValues={this.initialValues}
               getTableData={this.getTableData}
               simpleForm={this.simpleForm}
@@ -391,7 +409,7 @@ class Seqfactory extends Component {
                 selectedRows={selectedRows}
                 components={components}
                 loading={loading}
-                data={data}
+                data={{ list, pagination }}
                 columns={columns}
                 onSelectRow={this.handleSelectRows}
                 onChange={this.handleStandardTableChange}
