@@ -22,7 +22,7 @@ const { Option } = Select;
 /**
  * 页面根组件
  */
-class Page extends Component {
+class SampleType extends Component {
   tableFormRef = React.createRef();
 
   state = {
@@ -343,4 +343,4 @@ class Page extends Component {
   }
 }
 
-export default Page;
+export default SampleType;

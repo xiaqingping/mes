@@ -25,7 +25,7 @@ const { Option } = Select;
 /**
  * 页面根组件
  */
-class Page extends Component {
+class Seqfactory extends Component {
 
   tableFormRef = React.createRef();
 
@@ -407,4 +407,4 @@ class Page extends Component {
 export default connect(({ basicCache }) =>({
   storages: basicCache.storages,
   plants: basicCache.plants,
-}))(Page);
+}))(Seqfactory);

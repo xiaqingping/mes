@@ -3,7 +3,7 @@
  * You can view component api by:
  * https://github.com/ant-design/ant-design-pro-layout
  */
-import ProLayout, { SettingDrawer } from '@ant-design/pro-layout';
+import ProLayout from '@ant-design/pro-layout';
 import { formatMessage } from 'umi-plugin-react/locale';
 import React, { useEffect } from 'react';
 import { Link } from 'umi';
@@ -150,15 +150,6 @@ const BasicLayout = props => {
           {children}
         </Authorized>
       </ProLayout>
-      <SettingDrawer
-        settings={settings}
-        onSettingChange={config =>
-          dispatch({
-            type: 'settings/changeSetting',
-            payload: config,
-          })
-        }
-      />
     </>
   );
 };

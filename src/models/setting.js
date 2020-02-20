@@ -1,6 +1,5 @@
 // import { message } from 'antd';
 import defaultSettings from '../../config/defaultSettings';
-// import themeColorClient from '../components/SettingDrawer/themeColorClient';
 
 const updateTheme = newPrimaryColor => {
   if (newPrimaryColor) {
