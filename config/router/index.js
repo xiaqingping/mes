@@ -8,23 +8,28 @@ const hts = require('./hts');
 const dashboard = require('./dashboard');
 const operation = require('./operation');
 
-module.exports = [{
+module.exports = [
+  {
     path: '/user',
     component: '../layouts/UserLayout',
-    routes: [{
-      name: 'login',
-      path: '/user/login',
-      component: './user/login',
-    }, ],
+    routes: [
+      {
+        name: 'login',
+        path: '/user/login',
+        component: './user/login',
+      },
+    ],
   },
   {
     path: '/',
     component: '../layouts/SecurityLayout',
-    routes: [{
+    routes: [
+      {
         path: '/',
         component: '../layouts/BasicLayout',
         authority: ['admin', 'user'],
-        routes: [{
+        routes: [
+          {
             path: '/',
             redirect: '/seq',
           },
@@ -32,7 +37,7 @@ module.exports = [{
           seq,
           // bp,
           // operation,
-          // peptide,
+          peptide,
           // system,
           // personel,
           // purchase,
