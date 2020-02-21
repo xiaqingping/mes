@@ -1,17 +1,7 @@
 /**
  * 测序点
  */
-import {
-  Button,
-  Card,
-  Col,
-  Divider,
-  Form,
-  Input,
-  Select,
-  message,
-  Popconfirm
-} from 'antd';
+import { Button, Card, Col, Divider, Form, Input, Select, message, Popconfirm } from 'antd';
 import React, { Component } from 'react';
 import { connect } from 'dva';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
@@ -26,7 +16,6 @@ const FormItem = Form.Item;
 const { Option } = Select;
 
 class Seqfactory extends Component {
-
   tableSearchFormRef = React.createRef();
 
   tableFormRef = React.createRef();
@@ -48,14 +37,14 @@ class Seqfactory extends Component {
     editIndex: -1,
     // 自减ID（新增数据时，提供负数id做为列表的key）
     id: 0,
-  }
+  };
 
   // 顶部表单默认值
   initialValues = {
     status: 1,
     page: 1,
     rows: 10,
-  }
+  };
 
   // 组件挂载时
   componentDidMount() {
@@ -79,28 +68,30 @@ class Seqfactory extends Component {
       <Col lg={6} md={8} sm={12}>
         <FormItem label="状态" name="status">
           <Select allowClear>
-            {this.props.basicStatus.map(e =>
-              <Option value={e.id} key={e.id}>{e.name}</Option>,
-            )}
+            {this.props.basicStatus.map(e => (
+              <Option value={e.id} key={e.id}>
+                {e.name}
+              </Option>
+            ))}
           </Select>
         </FormItem>
       </Col>
       <Col lg={6} md={8} sm={12}>
         <FormItem label="工厂" name="factory">
           <Select allowClear>
-            {this.props.plants.map(e =>
-              <Option value={e.code} key={e.code}>{e.text}</Option>,
-            )}
+            {this.props.plants.map(e => (
+              <Option value={e.code} key={e.code}>
+                {e.text}
+              </Option>
+            ))}
           </Select>
         </FormItem>
       </Col>
     </>
-  )
+  );
 
   // 顶部表单复杂搜索
-  advancedForm = () => (
-    <></>
-  )
+  advancedForm = () => <></>;
 
   // 获取此页面需要用到的基础数据
   getCacheData = () => {
@@ -114,7 +105,7 @@ class Seqfactory extends Component {
         payload: item,
       });
     });
-  }
+  };
 
   // 分页
   handleStandardTableChange = data => {
@@ -122,7 +113,7 @@ class Seqfactory extends Component {
       page: data.current,
       rows: data.pageSize,
     });
-  }
+  };
 
   // 选择行
   handleSelectRows = rows => {
@@ -157,7 +148,7 @@ class Seqfactory extends Component {
         editIndex: -1,
       });
     });
-  }
+  };
 
   // 修改,开启编辑
   editRow = (row, index) => {
@@ -165,11 +156,11 @@ class Seqfactory extends Component {
       message.warning('请先保存或退出正在编辑的数据');
       return;
     }
-    this.tableFormRef.current.setFieldsValue({...row});
+    this.tableFormRef.current.setFieldsValue({ ...row });
     this.setState({
       editIndex: index,
     });
-  }
+  };
 
   // 退出编辑
   cancelEdit = (row, index) => {
@@ -182,14 +173,14 @@ class Seqfactory extends Component {
         editIndex: index,
       });
     }
-  }
+  };
 
   // 删除数据
   deleteRow = row => {
     api.seqfactory.cancelSeqfactory(row.id).then(() => {
       this.getTableData();
     });
-  }
+  };
 
   // 保存和修改之后的保存
   saveRow = async index => {
@@ -207,7 +198,7 @@ class Seqfactory extends Component {
     } catch (error) {
       console.log(error);
     }
-  }
+  };
 
   // 新增
   handleAdd = () => {
@@ -229,15 +220,10 @@ class Seqfactory extends Component {
         ...list,
       ],
     });
-  }
+  };
 
   render() {
-    const {
-      pagination,
-      selectedRows,
-      list,
-      loading,
-    } = this.state;
+    const { pagination, selectedRows, list, loading } = this.state;
     let tableWidth = 0;
 
     const components = {
@@ -257,10 +243,8 @@ class Seqfactory extends Component {
         dataIndex: 'name',
         width: 150,
         editable: true,
-        inputType: <Input style={{ width: '90%' }}/>,
-        rules: [
-          { required: true, message: '必填' },
-        ],
+        inputType: <Input style={{ width: '90%' }} />,
+        rules: [{ required: true, message: '必填' }],
       },
       {
         title: 'SAP工厂',
@@ -270,14 +254,14 @@ class Seqfactory extends Component {
         render: text => formatter(this.props.plants, text, 'code', 'text'),
         inputType: (
           <Select style={{ width: 100 }}>
-            {this.props.plants.map(e =>
-              <Option value={e.code} key={e.code}>{e.text}</Option>,
-            )}
+            {this.props.plants.map(e => (
+              <Option value={e.code} key={e.code}>
+                {e.text}
+              </Option>
+            ))}
           </Select>
         ),
-        rules: [
-          { required: true, message: '必填' },
-        ],
+        rules: [{ required: true, message: '必填' }],
       },
       {
         title: '仓库',
@@ -286,15 +270,15 @@ class Seqfactory extends Component {
         editable: true,
         inputType: (
           <Select style={{ width: 100 }}>
-            {this.props.storages.map(e =>
-              <Option value={e.code} key={e.code}>{e.text}</Option>,
-            )}
+            {this.props.storages.map(e => (
+              <Option value={e.code} key={e.code}>
+                {e.text}
+              </Option>
+            ))}
           </Select>
         ),
         render: text => formatter(this.props.storages, text, 'code', 'text'),
-        rules: [
-          { required: true, message: '必填' },
-        ],
+        rules: [{ required: true, message: '必填' }],
       },
       {
         title: '状态',
@@ -396,7 +380,8 @@ class Seqfactory extends Component {
             />
             <div className="tableListOperator">
               <Button type="primary" onClick={() => this.handleAdd()}>
-                <PlusOutlined />新建
+                <PlusOutlined />
+                新建
               </Button>
             </div>
             <Form ref={this.tableFormRef}>
@@ -419,7 +404,7 @@ class Seqfactory extends Component {
   }
 }
 
-export default connect(({ basicCache }) =>({
+export default connect(({ basicCache }) => ({
   storages: basicCache.storages,
   plants: basicCache.plants,
   basicStatus: basicCache.basicStatus,
