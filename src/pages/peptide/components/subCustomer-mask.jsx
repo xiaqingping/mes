@@ -1,209 +1,21 @@
 // 负责人弹框
-import { Button, Col, Form, Input, Row, Select, Table, Modal } from 'antd';
+import { Button, Col, Form, Input, Select, Table, Modal } from 'antd';
 import React, { Component } from 'react';
 
 import api from '@/api';
 import './style.less';
 import { connect } from 'dva';
+import TableSearchForm from '@/components/TableSearchForm';
+// import EditableCell from '@/components/EditableCell';
 
 const FormItem = Form.Item;
 const { Option } = Select;
 
-/**
- * 页面顶部筛选表单
- */
-// @Form.create()
-// @connect(({ peptide, global }) => ({
-//   peptide,
-//   language: global.languageCode,
-// }))
-class Search extends Component {
-  componentDidMount() {
-    this.submit();
-  }
-
-  submit = e => {
-    if (e) e.preventDefault();
-    const val = this.props.form.getFieldsValue();
-    this.props.getTableData({ page: 1, ...val });
-  };
-
-  handleFormReset = () => {
-    this.props.form.resetFields();
-  };
-
-  // 渲染表单
-  renderForm = () => {
-    const {
-      form: { getFieldDecorator },
-      peptide: { payMethods, payTerms, salesRanges },
-      peptide,
-      language,
-    } = this.props;
-
-    const regions = peptide.regions.filter(e => e.languageCode === language);
-    const offices = peptide.offices.filter(e => e.languageCode === language);
-    const currencies = peptide.currencies.filter(e => e.languageCode === language);
-
-    return (
-      <Form onSubmit={this.submit} layout="inline">
-        <Row gutter={{ lg: 24, md: 12, sm: 6 }}>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="编号">
-              {getFieldDecorator('code')(<Input style={{ width: '192px' }} />)}
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="名称">
-              {getFieldDecorator('name')(<Input style={{ width: '192px' }} />)}
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="电话">
-              {getFieldDecorator('telNo')(<Input style={{ width: '192px' }} />)}
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="手机">
-              {getFieldDecorator('mobNo')(<Input style={{ width: '192px' }} />)}
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="邮箱">
-              {getFieldDecorator('email')(<Input style={{ width: '192px' }} />)}
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="客户编号">
-              {getFieldDecorator('customerCode')(<Input style={{ width: '192px' }} />)}
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="客户名称">
-              {getFieldDecorator('customerName')(<Input style={{ width: '192px' }} />)}
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="大区">
-              {getFieldDecorator('regionCode', { initialValue: '' })(
-                <Select style={{ width: '192px' }}>
-                  <Option value="">全部</Option>
-                  {regions.map(item => (
-                    <Option key={item.code} value={item.code}>
-                      {`${item.code}-${item.name}`}
-                    </Option>
-                  ))}
-                </Select>,
-              )}
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="网点">
-              {getFieldDecorator('officeCode', { initialValue: '' })(
-                <Select style={{ width: '192px' }}>
-                  <Option value="">全部</Option>
-                  {offices.map(item => (
-                    <Option key={item.code} value={item.code}>
-                      {`${item.code}-${item.name}`}
-                    </Option>
-                  ))}
-                </Select>,
-              )}
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="币种">
-              {getFieldDecorator('currency', { initialValue: '' })(
-                <Select style={{ width: '192px' }}>
-                  <Option value="">全部</Option>
-                  {currencies.map(item => (
-                    <Option key={item.code} value={item.code}>
-                      {`${item.code}-${item.shortText}`}
-                    </Option>
-                  ))}
-                </Select>,
-              )}
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="付款方式">
-              {getFieldDecorator('payMethodCode', { initialValue: '' })(
-                <Select style={{ width: '192px' }}>
-                  <Option value="">全部</Option>
-                  {payMethods.map(item => (
-                    <Option key={item.code} value={item.code}>
-                      {`${item.code}-${item.name}`}
-                    </Option>
-                  ))}
-                </Select>,
-              )}
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="付款条件">
-              {getFieldDecorator('payTermsCode', { initialValue: '' })(
-                <Select style={{ width: '200px' }}>
-                  <Option value="">全部</Option>
-                  {payTerms.map(item => (
-                    <Option key={item.code} value={item.code}>
-                      {`${item.code}-${item.name}`}
-                    </Option>
-                  ))}
-                </Select>,
-              )}
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="销售员编号">
-              {getFieldDecorator('salerCode')(<Input style={{ width: '192px' }} />)}
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="销售员名称">
-              {getFieldDecorator('salerName')(<Input style={{ width: '192px' }} />)}
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="销售范围">
-              {getFieldDecorator('rangeOrganization', { initialValue: '' })(
-                <Select style={{ width: '192px' }}>
-                  <Option value="">全部</Option>
-                  {salesRanges.map(item => (
-                    <Option
-                      key={`${item.organization}${item.channel}`}
-                      value={`${item.channelName} - ${item.organizationName}`}
-                    >
-                      {`${item.channelName} - ${item.organizationName}`}
-                    </Option>
-                  ))}
-                </Select>,
-              )}
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <span className="submitButtons">
-              <Button type="primary" htmlType="submit">
-                查询
-              </Button>
-              <Button style={{ marginLeft: 8 }} onClick={this.handleFormReset}>
-                重置
-              </Button>
-            </span>
-          </Col>
-        </Row>
-      </Form>
-    );
-  };
-
-  render() {
-    return <div className="tableListForm">{this.renderForm()}</div>;
-  }
-}
-
-@connect(({ peptide }) => ({
-  peptide,
-}))
 class SubCustomer extends Component {
+  tableSearchFormRef = React.createRef();
+
+  tableFormRef = React.createRef();
+
   state = {
     formValues: {
       page: 1,
@@ -214,6 +26,13 @@ class SubCustomer extends Component {
     loading: false,
     visible: false, // 遮罩层的判断
     modificationType: [],
+  };
+
+  // 顶部表单默认值
+  initialValues = {
+    status: 1,
+    page: 1,
+    rows: 10,
   };
 
   componentDidMount() {
@@ -264,6 +83,166 @@ class SubCustomer extends Component {
 
   handleFormReset = () => {
     this.props.form.resetFields();
+  };
+
+  simpleForm = () => {
+    const {
+      form: { getFieldDecorator },
+      peptide: { payMethods, payTerms, salesRanges },
+      peptide,
+      language,
+    } = this.props;
+
+    const regions = peptide.regions.filter(e => e.languageCode === language);
+    const offices = peptide.offices.filter(e => e.languageCode === language);
+    const currencies = peptide.currencies.filter(e => e.languageCode === language);
+
+    return (
+      <>
+        <Col lg={6} md={8} sm={12}>
+          <FormItem label="编号">
+            {getFieldDecorator('code')(<Input style={{ width: '192px' }} />)}
+          </FormItem>
+        </Col>
+        <Col lg={6} md={8} sm={12}>
+          <FormItem label="名称">
+            {getFieldDecorator('name')(<Input style={{ width: '192px' }} />)}
+          </FormItem>
+        </Col>
+        <Col lg={6} md={8} sm={12}>
+          <FormItem label="电话">
+            {getFieldDecorator('telNo')(<Input style={{ width: '192px' }} />)}
+          </FormItem>
+        </Col>
+        <Col lg={6} md={8} sm={12}>
+          <FormItem label="手机">
+            {getFieldDecorator('mobNo')(<Input style={{ width: '192px' }} />)}
+          </FormItem>
+        </Col>
+        <Col lg={6} md={8} sm={12}>
+          <FormItem label="邮箱">
+            {getFieldDecorator('email')(<Input style={{ width: '192px' }} />)}
+          </FormItem>
+        </Col>
+        <Col lg={6} md={8} sm={12}>
+          <FormItem label="客户编号">
+            {getFieldDecorator('customerCode')(<Input style={{ width: '192px' }} />)}
+          </FormItem>
+        </Col>
+        <Col lg={6} md={8} sm={12}>
+          <FormItem label="客户名称">
+            {getFieldDecorator('customerName')(<Input style={{ width: '192px' }} />)}
+          </FormItem>
+        </Col>
+        <Col lg={6} md={8} sm={12}>
+          <FormItem label="大区">
+            {getFieldDecorator('regionCode', { initialValue: '' })(
+              <Select style={{ width: '192px' }}>
+                <Option value="">全部</Option>
+                {regions.map(item => (
+                  <Option key={item.code} value={item.code}>
+                    {`${item.code}-${item.name}`}
+                  </Option>
+                ))}
+              </Select>,
+            )}
+          </FormItem>
+        </Col>
+        <Col lg={6} md={8} sm={12}>
+          <FormItem label="网点">
+            {getFieldDecorator('officeCode', { initialValue: '' })(
+              <Select style={{ width: '192px' }}>
+                <Option value="">全部</Option>
+                {offices.map(item => (
+                  <Option key={item.code} value={item.code}>
+                    {`${item.code}-${item.name}`}
+                  </Option>
+                ))}
+              </Select>,
+            )}
+          </FormItem>
+        </Col>
+        <Col lg={6} md={8} sm={12}>
+          <FormItem label="币种">
+            {getFieldDecorator('currency', { initialValue: '' })(
+              <Select style={{ width: '192px' }}>
+                <Option value="">全部</Option>
+                {currencies.map(item => (
+                  <Option key={item.code} value={item.code}>
+                    {`${item.code}-${item.shortText}`}
+                  </Option>
+                ))}
+              </Select>,
+            )}
+          </FormItem>
+        </Col>
+        <Col lg={6} md={8} sm={12}>
+          <FormItem label="付款方式">
+            {getFieldDecorator('payMethodCode', { initialValue: '' })(
+              <Select style={{ width: '192px' }}>
+                <Option value="">全部</Option>
+                {payMethods.map(item => (
+                  <Option key={item.code} value={item.code}>
+                    {`${item.code}-${item.name}`}
+                  </Option>
+                ))}
+              </Select>,
+            )}
+          </FormItem>
+        </Col>
+        <Col lg={6} md={8} sm={12}>
+          <FormItem label="付款条件">
+            {getFieldDecorator('payTermsCode', { initialValue: '' })(
+              <Select style={{ width: '200px' }}>
+                <Option value="">全部</Option>
+                {payTerms.map(item => (
+                  <Option key={item.code} value={item.code}>
+                    {`${item.code}-${item.name}`}
+                  </Option>
+                ))}
+              </Select>,
+            )}
+          </FormItem>
+        </Col>
+        <Col lg={6} md={8} sm={12}>
+          <FormItem label="销售员编号">
+            {getFieldDecorator('salerCode')(<Input style={{ width: '192px' }} />)}
+          </FormItem>
+        </Col>
+        <Col lg={6} md={8} sm={12}>
+          <FormItem label="销售员名称">
+            {getFieldDecorator('salerName')(<Input style={{ width: '192px' }} />)}
+          </FormItem>
+        </Col>
+        <Col lg={6} md={8} sm={12}>
+          <FormItem label="销售范围">
+            {getFieldDecorator('rangeOrganization', { initialValue: '' })(
+              <Select style={{ width: '192px' }}>
+                <Option value="">全部</Option>
+                {salesRanges.map(item => (
+                  <Option
+                    key={`${item.organization}${item.channel}`}
+                    value={`${item.channelName} - ${item.organizationName}`}
+                  >
+                    {`${item.channelName} - ${item.organizationName}`}
+                  </Option>
+                ))}
+              </Select>,
+            )}
+          </FormItem>
+        </Col>
+        <Col lg={6} md={8} sm={12}>
+          <span className="submitButtons">
+            <Button type="primary" htmlType="submit">
+              查询
+            </Button>
+            <Button style={{ marginLeft: 8 }} onClick={this.handleFormReset}>
+              重置
+            </Button>
+          </span>
+        </Col>
+      </>
+    );
   };
 
   render() {
@@ -416,10 +395,11 @@ class SubCustomer extends Component {
           onCancel={this.handleCancel}
           footer={null}
         >
-          <Search
+          <TableSearchForm
+            ref={this.tableSearchFormRef}
+            initialValues={this.initialValues}
             getTableData={this.getTableData}
-            status={commonData.status}
-            modificationType={modificationType}
+            simpleForm={this.simpleForm}
           />
           <div className="tableListOperator" />
           <Table
@@ -438,4 +418,6 @@ class SubCustomer extends Component {
   }
 }
 
-export default Form.create()(SubCustomer);
+export default connect(({ peptide }) => ({
+  peptide,
+}))(SubCustomer);

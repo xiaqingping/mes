@@ -6,7 +6,6 @@ import {
   Divider,
   Form,
   Input,
-  Row,
   Select,
   message,
   Popconfirm,
@@ -15,165 +14,52 @@ import {
 import React, { Component } from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import StandardTable from '@/components/StandardTable';
-import Products from '@/pages/peptide/components/products-mask'
+// import Products from '@/pages/peptide/components/products-mask';
 import api from '@/api';
 import { connect } from 'dva';
+import TableSearchForm from '@/components/TableSearchForm';
+import EditableCell from '@/components/EditableCell';
+import { PlusOutlined } from '@ant-design/icons';
 
-const EditableContext = React.createContext();
 const FormItem = Form.Item;
 const { Option } = Select;
 const { Search } = Input;
 
-/**
- * 页面顶部筛选表单
- */
-@Form.create()
-class SearchPage extends Component {
-  componentDidMount() {
-    this.submit();
-  }
-
-  submit = e => {
-    if (e) e.preventDefault();
-    const val = this.props.form.getFieldsValue();
-    this.props.getTableData({ page: 1, ...val });
-  }
-
-  handleFormReset = () => {
-    this.props.form.resetFields();
-  }
-
-  // 渲染表单
-  renderForm = () => {
-    const {
-      form: { getFieldDecorator },
-      purityValue,
-      status,
-    } = this.props;
-    return (
-      <Form onSubmit={this.submit} layout="inline">
-      <Row gutter={{ lg: 24, md: 12, sm: 6 }}>
-        <Col lg={6} md={8} sm={12}>
-          <FormItem label="编号">
-            {getFieldDecorator('code')(<Input />)}
-          </FormItem>
-        </Col>
-        <Col lg={6} md={8} sm={12}>
-          <FormItem label="纯度">
-            {getFieldDecorator('purityID')(<Select
-                  >
-                    {purityValue.map(item =>
-                      // eslint-disable-next-line no-unused-expressions
-                      <Option key={item.id} value={item.id}>{item.purity}</Option>,
-                    )}
-                  </Select>)}
-          </FormItem>
-        </Col>
-        <Col lg={6} md={8} sm={12}>
-          <FormItem label="类型">
-          {getFieldDecorator('aminoAcidType', { initialValue: '' })(
-              <Select>
-                <Option value="">全部</Option>
-                <Option value="L">L</Option>
-                <Option value="D">D</Option>
-              </Select>)}
-          </FormItem>
-        </Col>
-        <Col lg={6} md={8} sm={12}>
-          <FormItem label="状态">
-          {getFieldDecorator('status', { initialValue: 1 })(
-              <Select>
-                    {status.map(item =>
-                      <Option key={item.id} value={item.id}>{item.name}</Option>,
-                    )}
-                  </Select>)}
-          </FormItem>
-        </Col>
-        <Col lg={6} md={8} sm={12}>
-          <span className="submitButtons">
-            <Button type="primary" htmlType="submit">
-              查询
-            </Button>
-            <Button style={{ marginLeft: 8 }} onClick={this.handleFormReset}>
-              重置
-            </Button>
-          </span>
-        </Col>
-      </Row>
-    </Form>
-    );
-  }
-
-  render() {
-    return (
-      <div className="tableListForm">{this.renderForm()}</div>
-    );
-  }
-}
-
-/**
- * 表格编辑组件
- */
-class EditableCell extends React.Component {
-  renderCell = ({ getFieldDecorator }) => {
-    const {
-      editing,
-      dataIndex,
-      title,
-      inputType,
-      record,
-      index,
-      children,
-      rules,
-      ...restProps
-    } = this.props;
-    if (editing) {
-      return (
-        <td {...restProps} style={{ padding: 0 }}>
-            <Form.Item>
-              {getFieldDecorator(dataIndex, {
-                rules,
-                valuePropName: 'checked',
-                initialValue: record[dataIndex],
-              })(inputType)}
-            </Form.Item>
-        </td>
-      );
-    }
-    return (<td {...restProps}>{children}</td>);
-  };
-
-
-  render() {
-    return <EditableContext.Consumer>{this.renderCell}</EditableContext.Consumer>;
-  }
-}
-
-@connect(({ peptide }) => ({
-  peptide,
-}))
 class Product extends Component {
+  tableSearchFormRef = React.createRef();
+
+  tableFormRef = React.createRef();
+
   state = {
-    formValues: {
-      page: 1,
-      rows: 10,
+    pagination: {
+      // current: 1,
+      // pageSize: 10,
+      // total: 0,
     },
     list: [],
-    total: 0,
     loading: false,
     selectedRows: [],
     editIndex: -1,
     id: 0, // 新增数据时，提供负数id
     purityValue: [],
     sonProducts: [],
-  }
+  };
+
+  // 顶部表单默认值
+  initialValues = {
+    aminoAcidType: '',
+    status: 1,
+    page: 1,
+    rows: 10,
+  };
 
   componentDidMount() {
     api.peptideBase.getPurity({ status: 1 }).then(res => {
       this.setState({
         purityValue: res,
-      })
-    })
+      });
+    });
+    this.getTableData(this.initialValues);
   }
 
   // 分页
@@ -182,7 +68,7 @@ class Product extends Component {
       page: pagination.current,
       rows: pagination.pageSize,
     });
-  }
+  };
 
   // 选择行
   handleSelectRows = rows => {
@@ -193,47 +79,50 @@ class Product extends Component {
 
   // 获取表格数据
   getTableData = (options = {}) => {
-    const { formValues } = this.state;
-    const query = Object.assign({}, formValues, options);
+    this.setState({ loading: true });
+    const formData = this.tableSearchFormRef.current.getFieldsValue();
+    const { pagination } = this.state;
+    const { current: page, pageSize: rows } = pagination;
+    const data = {
+      page,
+      rows,
+      ...formData,
+      ...options,
+    };
 
-    this.setState({
-      formValues: query,
-      loading: true,
-    });
-
-    api.peptideBase.getProduct(query).then(res => {
+    api.peptideBase.getProduct(data).then(res => {
       this.setState({
         list: res.rows,
-        total: res.total,
+        pagination: {
+          current: data.page,
+          pageSize: data.rows,
+          total: res.total,
+        },
         loading: false,
         editIndex: -1,
       });
     });
-  }
+  };
 
   getMaskData = v => {
-    this.props.form.setFieldsValue({
+    this.tableSearchFormRef.current.setFieldsValue({
       sapProductCode: v.code,
       sapProductName: v.name,
     });
     this.setState({
       sonProducts: v,
-    })
-  }
+    });
+  };
 
   // 清空弹框的选择内容
   clearInput = () => {
-    this.props.form.setFieldsValue({
+    this.tableSearchFormRef.current.setFieldsValue({
       sapProductCode: '',
       sapProductName: '',
     });
     this.setState({
       sonProducts: [],
-    })
-  }
-
-  handleFormReset = () => {
-    this.props.form.resetFields();
+    });
   };
 
   // 退出编辑
@@ -247,8 +136,8 @@ class Product extends Component {
         editIndex: index,
       });
     }
-    this.clearInput()
-  }
+    this.clearInput();
+  };
 
   // 删除数据
   deleteRow = row => {
@@ -269,7 +158,8 @@ class Product extends Component {
     this.props.form.validateFields((error, row) => {
       if (error) return;
       const { list } = this.state;
-      const newData = { ...list[index],
+      const newData = {
+        ...list[index],
         ...row,
         isNeedDesalting: row.isNeedDesalting ? 1 : 2,
         aminoAcidMinimumCharge: 0,
@@ -280,15 +170,13 @@ class Product extends Component {
       if (newData.id > 0) {
         // api.peptideBase.updateSeries(newData).then(() => this.getTableData());
       } else {
-        api.peptideBase.insertProduct(newData).then(
-          () => {
-            this.getTableData();
-            this.clearInput()
-          },
-        );
+        api.peptideBase.insertProduct(newData).then(() => {
+          this.getTableData();
+          this.clearInput();
+        });
       }
     });
-  }
+  };
 
   // 新增
   handleAdd = () => {
@@ -308,21 +196,64 @@ class Product extends Component {
         ...list,
       ],
     });
-  }
+  };
+
+  simpleForm = () => {
+    const { purityValue } = this.state;
+    const {
+      peptide: {
+        commonData: { status },
+      },
+    } = this.props;
+    return (
+      <>
+        <Col lg={6} md={8} sm={12}>
+          <FormItem label="编号" name="code">
+            <Input />
+          </FormItem>
+        </Col>
+        <Col lg={6} md={8} sm={12}>
+          <FormItem label="纯度" name="purityID">
+            <Select>
+              {purityValue.map(item => (
+                // eslint-disable-next-line no-unused-expressions
+                <Option key={item.id} value={item.id}>
+                  {item.purity}
+                </Option>
+              ))}
+            </Select>
+          </FormItem>
+        </Col>
+        <Col lg={6} md={8} sm={12}>
+          <FormItem label="类型" name="aminoAcidType">
+            <Select>
+              <Option value="">全部</Option>
+              <Option value="L">L</Option>
+              <Option value="D">D</Option>
+            </Select>
+          </FormItem>
+        </Col>
+        <Col lg={6} md={8} sm={12}>
+          <FormItem label="状态" name="status">
+            <Select>
+              {status.map(item => (
+                <Option key={item.id} value={item.id}>
+                  {item.name}
+                </Option>
+              ))}
+            </Select>
+          </FormItem>
+        </Col>
+      </>
+    );
+  };
 
   render() {
-    const {
-      formValues: { page: current, rows: pageSize },
-      selectedRows,
-      list,
-      total,
-      loading,
-      purityValue,
-      sonProducts,
-    } = this.state;
-    const data = { list, pagination: { current, pageSize, total } };
+    const { pagination, selectedRows, list, loading, purityValue, sonProducts } = this.state;
     let tableWidth = 0;
-    const { peptide: { commonData } } = this.props
+    const {
+      peptide: { commonData },
+    } = this.props;
 
     let columns = [
       {
@@ -335,20 +266,16 @@ class Product extends Component {
         dataIndex: 'providerTotalAmountBegin',
         width: 150,
         editable: true,
-        inputType: <Input style={{ width: '90%' }}/>,
-        rules: [
-          { required: true, message: '必填' },
-        ],
+        inputType: <Input style={{ width: '90%' }} />,
+        rules: [{ required: true, message: '必填' }],
       },
       {
         title: '提供总量至',
         dataIndex: 'providerTotalAmountEnd',
         width: 150,
         editable: true,
-        inputType: <Input style={{ width: '90%' }}/>,
-        rules: [
-          { required: true, message: '必填' },
-        ],
+        inputType: <Input style={{ width: '90%' }} />,
+        rules: [{ required: true, message: '必填' }],
       },
       {
         title: '纯度',
@@ -357,20 +284,21 @@ class Product extends Component {
         editable: true,
         inputType: (
           <Select style={{ width: '90%' }}>
-          {purityValue.map(item =>
-            <Option value={`${item.id}-${item.code}-${item.purity}`} key={item.id}>{item.purity}</Option>,
-          )}
-          </Select>),
-        rules: [
-          { required: true, message: '必填' },
-        ],
+            {purityValue.map(item => (
+              <Option value={`${item.id}-${item.code}-${item.purity}`} key={item.id}>
+                {item.purity}
+              </Option>
+            ))}
+          </Select>
+        ),
+        rules: [{ required: true, message: '必填' }],
         render: text => {
           let val = null;
           purityValue.forEach(item => {
             if (item.id === text) {
-              val = item.purity
+              val = item.purity;
             }
-          })
+          });
           return val;
         },
       },
@@ -379,20 +307,16 @@ class Product extends Component {
         dataIndex: 'aminoAcidLengthBegin',
         width: 100,
         editable: true,
-        inputType: <Input style={{ width: '90%' }}/>,
-        rules: [
-          { required: true, message: '必填' },
-        ],
+        inputType: <Input style={{ width: '90%' }} />,
+        rules: [{ required: true, message: '必填' }],
       },
       {
         title: '长度至',
         dataIndex: 'aminoAcidLengthEnd',
         width: 100,
         editable: true,
-        inputType: <Input style={{ width: '90%' }}/>,
-        rules: [
-          { required: true, message: '必填' },
-        ],
+        inputType: <Input style={{ width: '90%' }} />,
+        rules: [{ required: true, message: '必填' }],
       },
       {
         title: '是否脱盐',
@@ -401,7 +325,7 @@ class Product extends Component {
         width: 100,
         render: text => (text === 1 ? '√' : ''),
         editable: true,
-        inputType: <Checkbox style={{ textAlign: 'center', display: 'block' }}/>,
+        inputType: <Checkbox style={{ textAlign: 'center', display: 'block' }} />,
       },
       {
         title: '氨基酸类型',
@@ -410,30 +334,40 @@ class Product extends Component {
         editable: true,
         inputType: (
           <Select style={{ width: '90%' }}>
-              <Option value="L">L</Option>
-              <Option value="D">D</Option>
-          </Select>),
+            <Option value="L">L</Option>
+            <Option value="D">D</Option>
+          </Select>
+        ),
       },
       {
         title: '产品编号',
         dataIndex: 'sapProductCode',
         width: 150,
         editable: true,
-        inputType: <Input style={{ width: '90%' }} value={sonProducts.code ? sonProducts.code : ''} readOnly/>,
-        rules: [
-          { required: true, message: '必填' },
-        ],
+        inputType: (
+          <Input
+            style={{ width: '90%' }}
+            value={sonProducts.code ? sonProducts.code : ''}
+            readOnly
+          />
+        ),
+        rules: [{ required: true, message: '必填' }],
       },
-      {
-        title: '产品名称',
-        dataIndex: 'sapProductName',
-        width: 300,
-        editable: true,
-        inputType: <Search style={{ width: '90%' }} onSearch={() => this.productShow.visibleShow(true)} value={sonProducts.name ? sonProducts.name : ''} readOnly/>,
-        rules: [
-          { required: true, message: '必填' },
-        ],
-      },
+      // {
+      //   title: '产品名称',
+      //   dataIndex: 'sapProductName',
+      //   width: 300,
+      //   editable: true,
+      //   inputType: (
+      //     <Search
+      //       style={{ width: '90%' }}
+      //       // onSearch={() => this.productShow.visibleShow(true)}
+      //       value={sonProducts.name ? sonProducts.name : ''}
+      //       readOnly
+      //     />
+      //   ),
+      //   rules: [{ required: true, message: '必填' }],
+      // },
       {
         title: '操作',
         width: 150,
@@ -499,33 +433,46 @@ class Product extends Component {
       <PageHeaderWrapper>
         <Card bordered={false}>
           <div className="tableList">
-            <SearchPage getTableData={this.getTableData}
-            purityValue={purityValue} status={commonData.status}/>
+            <TableSearchForm
+              ref={this.tableSearchFormRef}
+              initialValues={this.initialValues}
+              getTableData={this.getTableData}
+              simpleForm={this.simpleForm}
+            />
             <div className="tableListOperator">
-              <Button icon="plus" type="primary" onClick={() => this.handleAdd()}>
+              <Button type="primary" onClick={() => this.handleAdd()}>
+                <PlusOutlined />
                 新建
               </Button>
             </div>
-            <EditableContext.Provider value={this.props.form}>
+            <Form ref={this.tableFormRef}>
               <StandardTable
                 scroll={{ x: tableWidth }}
                 rowClassName="editable-row"
                 components={components}
                 selectedRows={selectedRows}
                 loading={loading}
-                data={data}
+                data={{ list, pagination }}
                 columns={columns}
                 onSelectRow={this.handleSelectRows}
                 onChange={this.handleStandardTableChange}
               />
-            </EditableContext.Provider>
+            </Form>
           </div>
         </Card>
-        <Products onRef={ ref => { this.productShow = ref }}
-        getData={ v => { this.getMaskData(v) } }/>
+        {/* <Products
+          onRef={ref => {
+            this.productShow = ref;
+          }}
+          getData={v => {
+            this.getMaskData(v);
+          }}
+        /> */}
       </PageHeaderWrapper>
     );
   }
 }
 
-export default Form.create()(Product);
+export default connect(({ peptide }) => ({
+  peptide,
+}))(Product);
