@@ -1,20 +1,21 @@
 // 多肽订单
-import { Button, Card, Col, DatePicker, Form, Input, Row, Select } from 'antd';
+import { Button, Card, Col, DatePicker, Form, Input, Select } from 'antd';
 import React, { Component } from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import StandardTable from '@/components/StandardTable';
 import { connect } from 'dva';
 import { formatter } from '@/utils/utils';
 import api from '@/api';
-import OrderMask from '@/pages/peptide/components/order-mask';
-// import CustomerMask from '@/pages/peptide/components/customer-mask';
-// import SubCustomerMask from '@/pages/peptide/components/subCustomer-mask';
-// import ContactMask from '@/pages/peptide/components/contact-mask';
-// import SalerMask from '@/pages/peptide/components/saler-mask';
+// import OrderMask from '@/pages/peptide/components/order-mask';
+import CustomerMask from '@/pages/peptide/components/customer-mask';
+import SubCustomerMask from '@/pages/peptide/components/subCustomer-mask';
+import ContactMask from '@/pages/peptide/components/contact-mask';
+import SalerMask from '@/pages/peptide/components/saler-mask';
 import TableSearchForm from '@/components/TableSearchForm';
 import EditableCell from '@/components/EditableCell';
+import { PlusOutlined } from '@ant-design/icons';
 
-const EditableContext = React.createContext();
+// const EditableContext = React.createContext();
 const FormItem = Form.Item;
 const { Option } = Select;
 const { RangePicker } = DatePicker;
@@ -28,7 +29,6 @@ class Order extends Component {
   state = {
     pagination: {},
     list: [],
-    total: 0,
     loading: false,
     selectedRows: [],
     editIndex: -1,
@@ -36,7 +36,6 @@ class Order extends Component {
 
   // 顶部表单默认值
   initialValues = {
-    status: 1,
     page: 1,
     rows: 10,
   };
@@ -100,11 +99,14 @@ class Order extends Component {
       ...formData,
       ...options,
     };
-
     api.peptideorder.getOrder(data).then(res => {
       this.setState({
         list: res.rows,
-        total: res.total,
+        pagination: {
+          current: data.page,
+          pageSize: data.rows,
+          total: res.total,
+        },
         loading: false,
         editIndex: -1,
       });
@@ -112,7 +114,7 @@ class Order extends Component {
   };
 
   handleFormReset = () => {
-    this.props.form.resetFields();
+    this.tableSearchFormRef.current.resetFields();
   };
 
   toggleForm = () => {
@@ -120,11 +122,6 @@ class Order extends Component {
     this.setState({
       expandForm: !expandForm,
     });
-  };
-
-  renderForm = () => {
-    const { expandForm } = this.state;
-    return expandForm ? this.renderAdvancedForm() : this.renderSimpleForm();
   };
 
   // 作废数据
@@ -136,22 +133,22 @@ class Order extends Component {
 
   getMaskData = (v, type) => {
     if (type === 'customer') {
-      this.props.form.setFieldsValue({
+      this.tableSearchFormRef.current.setFieldsValue({
         customerCode: v.code,
       });
     }
     if (type === 'subCustomer') {
-      this.props.form.setFieldsValue({
+      this.tableSearchFormRef.current.setFieldsValue({
         subCustomerCode: v.code,
       });
     }
     if (type === 'contact') {
-      this.props.form.setFieldsValue({
+      this.tableSearchFormRef.current.setFieldsValue({
         contactCode: v.code,
       });
     }
     if (type === 'saler') {
-      this.props.form.setFieldsValue({
+      this.tableSearchFormRef.current.setFieldsValue({
         salerCode: v.code,
       });
     }
@@ -159,14 +156,61 @@ class Order extends Component {
 
   // 顶部表单简单搜索
   simpleForm = () => (
-    <Form onSubmit={this.submit} layout="inline">
-      <Row gutter={{ lg: 24, md: 12, sm: 6 }}>
+    <>
+      {/* <Form onSubmit={this.submit} layout="inline">
+        <Row gutter={{ lg: 24, md: 12, sm: 6 }}> */}
+      <Col lg={6} md={8} sm={12}>
+        <FormItem label="订单编号" name="code">
+          <Input />
+        </FormItem>
+      </Col>
+      <Col lg={6} md={8} sm={12}>
+        <FormItem label="客户" name="customerCode">
+          <Search onSearch={() => this.showCustomer.visibleShow(true)} />
+        </FormItem>
+      </Col>
+      <Col lg={6} md={8} sm={12}>
+        <FormItem label="负责人" name="subCustomerCode">
+          <Search onSearch={() => this.showSubCustomer.visibleShow(true)} />
+        </FormItem>
+      </Col>
+      <Col lg={6} md={8} sm={12}>
+        <FormItem label="订货人" name="contactCode">
+          <Search onSearch={() => this.showContact.visibleShow(true)} />
+        </FormItem>
+      </Col>
+      <Col lg={6} md={8} sm={12}>
+        <FormItem label="销售员" name="salerCode">
+          <Search onSearch={() => this.showSaler.visibleShow(true)} />
+        </FormItem>
+      </Col>
+      {/* </Row>
+      </Form> */}
+    </>
+  );
+
+  advancedForm() {
+    const {
+      peptide: { commonData },
+      peptide,
+      language,
+    } = this.props;
+
+    const regions = peptide.regions.filter(e => e.languageCode === language);
+
+    const offices = peptide.offices.filter(e => e.languageCode === language);
+    const currencies = peptide.currencies.filter(e => e.languageCode === language);
+
+    return (
+      // <Form onSubmit={this.submit} layout="inline">
+      //   <Row gutter={{ lg: 24, md: 12, sm: 6 }}>
+      <>
         <Col lg={6} md={8} sm={12}>
           <FormItem label="订单编号" name="code">
             <Input />
           </FormItem>
         </Col>
-        {/* <Col lg={6} md={8} sm={12}>
+        <Col lg={6} md={8} sm={12}>
           <FormItem label="客户" name="customerCode">
             <Search onSearch={() => this.showCustomer.visibleShow(true)} />
           </FormItem>
@@ -185,151 +229,75 @@ class Order extends Component {
           <FormItem label="销售员" name="salerCode">
             <Search onSearch={() => this.showSaler.visibleShow(true)} />
           </FormItem>
-        </Col> */}
-        <Col lg={6} md={8} sm={12}>
-          <span className="submitButtons">
-            <Button type="primary" htmlType="submit">
-              查询
-            </Button>
-            <Button style={{ marginLeft: 8 }} onClick={this.handleFormReset}>
-              重置
-            </Button>
-            {/* <a style={{ marginLeft: 8 }} onClick={this.toggleForm}>
-              展开 <Icon type="down" />
-            </a> */}
-          </span>
         </Col>
-      </Row>
-    </Form>
-  );
-
-  advancedForm() {
-    const {
-      peptide: { commonData },
-      peptide,
-      language,
-    } = this.props;
-    const regions = peptide.regions.filter(e => e.languageCode === language);
-
-    const offices = peptide.offices.filter(e => e.languageCode === language);
-    const currencies = peptide.currencies.filter(e => e.languageCode === language);
-
-    return (
-      <Form onSubmit={this.submit} layout="inline">
-        <Row gutter={{ lg: 24, md: 12, sm: 6 }}>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="订单编号" name="code">
-              <Input />
-            </FormItem>
-          </Col>
-          {/* <Col lg={6} md={8} sm={12}>
-            <FormItem label="客户" name="customerCode">
-              <Search onSearch={() => this.showCustomer.visibleShow(true)} />
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="负责人" name="subCustomerCode">
-              <Search onSearch={() => this.showSubCustomer.visibleShow(true)} />
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="订货人" name="contactCode">
-              <Search onSearch={() => this.showContact.visibleShow(true)} />
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="销售员" name="salerCode">
-              <Search onSearch={() => this.showSaler.visibleShow(true)} />
-            </FormItem>
-          </Col> */}
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="币种" name="currency">
-              <Select>
-                <Option value="">全部</Option>
-                {currencies.map(item => (
-                  <Option key={item.code} value={item.code}>
-                    {`${item.code}-${item.shortText}`}
-                  </Option>
-                ))}
-              </Select>
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="销售网点" name="officeCode">
-              <Select>
-                <Option value="">全部</Option>
-                {offices.map(item => (
-                  <Option key={item.code} value={item.code}>{`${item.code}-${item.name}`}</Option>
-                ))}
-              </Select>
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="销售大区" name="regionCode">
-              <Select>
-                <Option value="">全部</Option>
-                {regions.map(item => (
-                  <Option key={item.code} value={item.code}>
-                    {`${item.code}-${item.name}`}
-                  </Option>
-                ))}
-              </Select>
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="销售组织" name="rangeOrganization">
-              <Select>
-                {commonData.rangeOrganization.map(item => (
-                  <Option key={item.id} value={item.id}>
-                    {item.name}
-                  </Option>
-                ))}
-              </Select>
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="销售渠道" name="rangeChannel">
-              <Select>
-                {commonData.rangeChannel.map(item => (
-                  <Option key={item.id} value={item.id}>
-                    {item.name}
-                  </Option>
-                ))}
-              </Select>
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="创建日期" name="wanchengshijian">
-              <RangePicker />
-            </FormItem>
-          </Col>
-        </Row>
-        <div style={{ overflow: 'hidden' }}>
-          <div style={{ float: 'right', marginBottom: 24 }}>
-            <Button type="primary" htmlType="submit">
-              查询
-            </Button>
-            <Button style={{ marginLeft: 8 }} onClick={this.handleFormReset}>
-              重置
-            </Button>
-            {/* <a style={{ marginLeft: 8 }} onClick={this.toggleForm}>
-              收起 <Icon type="up" />
-            </a> */}
-          </div>
-        </div>
-      </Form>
+        <Col lg={6} md={8} sm={12}>
+          <FormItem label="币种" name="currency">
+            <Select>
+              <Option value="">全部</Option>
+              {currencies.map(item => (
+                <Option key={item.code} value={item.code}>
+                  {`${item.code}-${item.shortText}`}
+                </Option>
+              ))}
+            </Select>
+          </FormItem>
+        </Col>
+        <Col lg={6} md={8} sm={12}>
+          <FormItem label="销售网点" name="officeCode">
+            <Select>
+              <Option value="">全部</Option>
+              {offices.map(item => (
+                <Option key={item.code} value={item.code}>{`${item.code}-${item.name}`}</Option>
+              ))}
+            </Select>
+          </FormItem>
+        </Col>
+        <Col lg={6} md={8} sm={12}>
+          <FormItem label="销售大区" name="regionCode">
+            <Select>
+              <Option value="">全部</Option>
+              {regions.map(item => (
+                <Option key={item.code} value={item.code}>
+                  {`${item.code}-${item.name}`}
+                </Option>
+              ))}
+            </Select>
+          </FormItem>
+        </Col>
+        <Col lg={6} md={8} sm={12}>
+          <FormItem label="销售组织" name="rangeOrganization">
+            <Select>
+              {commonData.rangeOrganization.map(item => (
+                <Option key={item.id} value={item.id}>
+                  {item.name}
+                </Option>
+              ))}
+            </Select>
+          </FormItem>
+        </Col>
+        <Col lg={6} md={8} sm={12}>
+          <FormItem label="销售渠道" name="rangeChannel">
+            <Select>
+              {commonData.rangeChannel.map(item => (
+                <Option key={item.id} value={item.id}>
+                  {item.name}
+                </Option>
+              ))}
+            </Select>
+          </FormItem>
+        </Col>
+        <Col lg={6} md={8} sm={12}>
+          <FormItem label="创建日期" name="wanchengshijian">
+            <RangePicker />
+          </FormItem>
+        </Col>
+      </>
     );
   }
 
   render() {
-    const {
-      formValues: { page: current, rows: pageSize },
-      selectedRows,
-      list,
-      total,
-      loading,
-    } = this.state;
-
+    const { pagination, selectedRows, list, loading } = this.state;
+    console.log(pagination);
     const {
       peptide: { commonData, invtypes, payMethods, payTerms },
       peptide,
@@ -339,7 +307,6 @@ class Order extends Component {
     const regions = peptide.regions.filter(e => e.languageCode === language);
     const offices = peptide.offices.filter(e => e.languageCode === language);
     const currencies = peptide.currencies.filter(e => e.languageCode === language);
-    const data = { list, pagination: { current, pageSize, total } };
     let tableWidth = 0;
     let columns = [
       {
@@ -624,31 +591,31 @@ class Order extends Component {
             />
             <div className="tableListOperator">
               <Button
-                icon="plus"
                 type="primary"
                 onClick={() => {
                   this.showOrder.visibleShow(true);
                 }}
               >
+                <PlusOutlined />
                 新建
               </Button>
             </div>
-            <EditableContext.Provider value={this.props.form}>
+            <Form ref={this.tableFormRef}>
               <StandardTable
                 scroll={{ x: tableWidth }}
                 rowClassName="editable-row"
                 components={components}
                 selectedRows={selectedRows}
                 loading={loading}
-                data={data}
+                data={{ list, pagination }}
                 columns={columns}
                 onSelectRow={this.handleSelectRows}
                 onChange={this.handleStandardTableChange}
               />
-            </EditableContext.Provider>
+            </Form>
           </div>
         </Card>
-        {/* <CustomerMask
+        <CustomerMask
           onRef={ref => {
             this.showCustomer = ref;
           }}
@@ -671,12 +638,12 @@ class Order extends Component {
             this.showSaler = ref;
           }}
           getData={v => this.getMaskData(v, 'saler')}
-        /> */}
-        <OrderMask
+        />
+        {/* <OrderMask
           onRef={ref => {
             this.showOrder = ref;
           }}
-        />
+        /> */}
       </PageHeaderWrapper>
     );
   }

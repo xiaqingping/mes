@@ -83,9 +83,9 @@ class Order extends Component {
     });
   };
 
-  handleFormReset = () => {
-    this.props.form.resetFields();
-  };
+  // handleFormReset = () => {
+  //   this.tableSearchFormRef.current.resetFields();
+  // };
 
   // 退出编辑
   cancelEdit = (row, index) => {
@@ -177,16 +177,6 @@ class Order extends Component {
               ))}
             </Select>
           </FormItem>
-        </Col>
-        <Col lg={6} md={8} sm={12}>
-          <span className="submitButtons">
-            <Button type="primary" htmlType="submit">
-              查询
-            </Button>
-            <Button style={{ marginLeft: 8 }} onClick={this.handleFormReset}>
-              重置
-            </Button>
-          </span>
         </Col>
       </>
     );

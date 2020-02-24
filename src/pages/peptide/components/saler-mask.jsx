@@ -1,141 +1,21 @@
 // 销售员弹框
-import {
-  Button,
-  Col,
-  Form,
-  Input,
-  Row,
-  Select,
-  Table,
-  Modal,
-} from 'antd';
+import { Button, Col, Form, Input, Row, Select, Table, Modal } from 'antd';
 import React, { Component } from 'react';
 
 import api from '@/api';
-import './style.less'
+import './style.less';
 import { connect } from 'dva';
+import TableSearchForm from '@/components/TableSearchForm';
+// import EditableCell from '@/components/EditableCell';
 
 const FormItem = Form.Item;
 const { Option } = Select;
 
-/**
- * 页面顶部筛选表单
- */
-@Form.create()
-@connect(({ peptide, global }) => ({
-  peptide,
-  language: global.languageCode,
-}))
-class Search extends Component {
-  componentDidMount() {
-    this.submit();
-  }
-
-  submit = e => {
-    if (e) e.preventDefault();
-    const val = this.props.form.getFieldsValue();
-    this.props.getTableData({ page: 1, ...val });
-  }
-
-  handleFormReset = () => {
-    this.props.form.resetFields();
-  }
-
-  // 渲染表单
-  renderForm = () => {
-    const {
-      form: { getFieldDecorator },
-      peptide,
-      language,
-    } = this.props;
-
-    const regions = peptide.regions.filter(
-      e => e.languageCode === language,
-    )
-    const offices = peptide.offices.filter(
-      e => e.languageCode === language,
-    )
-    return (
-      <Form onSubmit={this.submit} layout="inline">
-        <Row gutter={{ lg: 24, md: 12, sm: 6 }}>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="编号">
-              {getFieldDecorator('code')(<Input style={{ width: '192px' }}/>)}
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="姓名">
-              {getFieldDecorator('name')(<Input style={{ width: '192px' }}/>)}
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="销售组织">
-              {getFieldDecorator('organizationName')(<Input style={{ width: '192px' }}/>)}
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="大区">
-              {getFieldDecorator('regionCode', { initialValue: '' })(
-                <Select style={{ width: '192px' }}>
-                  <Option value="">全部</Option>
-                  {regions.map(item => <Option key={item.code} value={item.code}>
-                    {`${item.code}-${item.name}`}
-                  </Option>)}
-                </Select>)}
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="网点">
-              {getFieldDecorator('officeCode', { initialValue: '' })(
-                <Select style={{ width: '192px' }}>
-                  <Option value="">全部</Option>
-                  {offices.map(item => <Option key={item.code} value={item.code}>
-                    {`${item.code}-${item.name}`}
-                  </Option>)}
-                </Select>)}
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="部门">
-              {getFieldDecorator('department')(<Input style={{ width: '192px' }}/>)}
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="个人手机">
-              {getFieldDecorator('personalMobNo')(<Input style={{ width: '192px' }}/>)}
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="工作手机">
-              {getFieldDecorator('mobNo')(<Input style={{ width: '192px' }}/>)}
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <span className="submitButtons">
-              <Button type="primary" htmlType="submit">
-                查询
-              </Button>
-              <Button style={{ marginLeft: 8 }} onClick={this.handleFormReset}>
-                重置
-              </Button>
-            </span>
-          </Col>
-        </Row>
-      </Form>
-    );
-  }
-
-  render() {
-    return (
-      <div className="tableListForm">{this.renderForm()}</div>
-    );
-  }
-}
-
-@connect(({ peptide }) => ({
-  peptide,
-}))
 class Saler extends Component {
+  tableSearchFormRef = React.createRef();
+
+  tableFormRef = React.createRef();
+
   state = {
     formValues: {
       page: 1,
@@ -146,19 +26,19 @@ class Saler extends Component {
     loading: false,
     visible: false, // 遮罩层的判断
     modificationType: [],
-  }
+  };
 
   componentDidMount() {
-    this.props.onRef(this)
+    this.props.onRef(this);
   }
 
   visibleShow = visible => {
-    this.setState({ visible })
-  }
+    this.setState({ visible });
+  };
 
   handleSelect = data => {
     this.props.getData(data);
-    this.handleCancel()
+    this.handleCancel();
   };
 
   handleCancel = () => {
@@ -173,7 +53,7 @@ class Saler extends Component {
       page: pagination.current,
       rows: pagination.pageSize,
     });
-  }
+  };
 
   // 获取表格数据
   getTableData = (options = {}) => {
@@ -192,10 +72,95 @@ class Saler extends Component {
         loading: false,
       });
     });
-  }
+  };
 
   handleFormReset = () => {
     this.props.form.resetFields();
+  };
+
+  simpleForm = () => {
+    const {
+      form: { getFieldDecorator },
+      peptide,
+      language,
+    } = this.props;
+
+    const regions = peptide.regions.filter(e => e.languageCode === language);
+    const offices = peptide.offices.filter(e => e.languageCode === language);
+    return (
+      <Form onSubmit={this.submit} layout="inline">
+        <Row gutter={{ lg: 24, md: 12, sm: 6 }}>
+          <Col lg={6} md={8} sm={12}>
+            <FormItem label="编号">
+              {getFieldDecorator('code')(<Input style={{ width: '192px' }} />)}
+            </FormItem>
+          </Col>
+          <Col lg={6} md={8} sm={12}>
+            <FormItem label="姓名">
+              {getFieldDecorator('name')(<Input style={{ width: '192px' }} />)}
+            </FormItem>
+          </Col>
+          <Col lg={6} md={8} sm={12}>
+            <FormItem label="销售组织">
+              {getFieldDecorator('organizationName')(<Input style={{ width: '192px' }} />)}
+            </FormItem>
+          </Col>
+          <Col lg={6} md={8} sm={12}>
+            <FormItem label="大区">
+              {getFieldDecorator('regionCode', { initialValue: '' })(
+                <Select style={{ width: '192px' }}>
+                  <Option value="">全部</Option>
+                  {regions.map(item => (
+                    <Option key={item.code} value={item.code}>
+                      {`${item.code}-${item.name}`}
+                    </Option>
+                  ))}
+                </Select>,
+              )}
+            </FormItem>
+          </Col>
+          <Col lg={6} md={8} sm={12}>
+            <FormItem label="网点">
+              {getFieldDecorator('officeCode', { initialValue: '' })(
+                <Select style={{ width: '192px' }}>
+                  <Option value="">全部</Option>
+                  {offices.map(item => (
+                    <Option key={item.code} value={item.code}>
+                      {`${item.code}-${item.name}`}
+                    </Option>
+                  ))}
+                </Select>,
+              )}
+            </FormItem>
+          </Col>
+          <Col lg={6} md={8} sm={12}>
+            <FormItem label="部门">
+              {getFieldDecorator('department')(<Input style={{ width: '192px' }} />)}
+            </FormItem>
+          </Col>
+          <Col lg={6} md={8} sm={12}>
+            <FormItem label="个人手机">
+              {getFieldDecorator('personalMobNo')(<Input style={{ width: '192px' }} />)}
+            </FormItem>
+          </Col>
+          <Col lg={6} md={8} sm={12}>
+            <FormItem label="工作手机">
+              {getFieldDecorator('mobNo')(<Input style={{ width: '192px' }} />)}
+            </FormItem>
+          </Col>
+          <Col lg={6} md={8} sm={12}>
+            <span className="submitButtons">
+              <Button type="primary" htmlType="submit">
+                查询
+              </Button>
+              <Button style={{ marginLeft: 8 }} onClick={this.handleFormReset}>
+                重置
+              </Button>
+            </span>
+          </Col>
+        </Row>
+      </Form>
+    );
   };
 
   render() {
@@ -208,7 +173,11 @@ class Saler extends Component {
       modificationType,
     } = this.state;
     const data = { list, pagination: { current, pageSize, total } };
-    const { peptide: { commonData }, regions, offices } = this.props
+    const {
+      peptide: { commonData },
+      regions,
+      offices,
+    } = this.props;
     let tableWidth = 0;
 
     let columns = [
@@ -271,9 +240,7 @@ class Saler extends Component {
         title: '操作',
         dataIndex: 'actions',
         fixed: 'right',
-        render: (text, record) => (
-          <a onClick={() => this.handleSelect(record)}>选择</a>
-        ),
+        render: (text, record) => <a onClick={() => this.handleSelect(record)}>选择</a>,
       },
     ];
 
@@ -281,7 +248,7 @@ class Saler extends Component {
       // eslint-disable-next-line no-param-reassign
       if (!col.width) col.width = 100;
       tableWidth += col.width;
-      return col
+      return col;
     });
 
     // const rowSelection = {
@@ -303,29 +270,29 @@ class Saler extends Component {
           onCancel={this.handleCancel}
           footer={null}
         >
-            <Search
-              getTableData={this.getTableData}
-              status={commonData.status}
-              modificationType={modificationType}
-              regions={regions}
-              offices={offices}
-             />
-            <div className="tableListOperator">
-            </div>
-            <Table
-              dataSource={data.list}
-              columns={columns}
-              scroll={{ x: tableWidth, y: 300 }}
-              pagination={data.pagination}
-              rowKey="code"
-              // rowSelection={rowSelection}
-              loading={loading}
-              onChange={this.handleStandardTableChange}
-              />
+          <TableSearchForm
+            ref={this.tableSearchFormRef}
+            initialValues={this.initialValues}
+            getTableData={this.getTableData}
+            simpleForm={this.simpleForm}
+          />
+          <div className="tableListOperator" />
+          <Table
+            dataSource={data.list}
+            columns={columns}
+            scroll={{ x: tableWidth, y: 300 }}
+            pagination={data.pagination}
+            rowKey="code"
+            // rowSelection={rowSelection}
+            loading={loading}
+            onChange={this.handleStandardTableChange}
+          />
         </Modal>
       </div>
     );
   }
 }
 
-export default Form.create()(Saler);
+export default connect(({ peptide }) => ({
+  peptide,
+}))(Saler);
