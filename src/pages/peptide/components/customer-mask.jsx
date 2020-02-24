@@ -1,5 +1,5 @@
 // 客户弹框
-import { Button, Col, Form, Input, Row, Select, Table, Modal } from 'antd';
+import { Col, Form, Input, Select, Table, Modal } from 'antd';
 import React, { Component } from 'react';
 
 import api from '@/api';
@@ -25,10 +25,15 @@ class Customer extends Component {
       // total: 0,
     },
     list: [],
-    total: 0,
     loading: false,
     visible: false, // 遮罩层的判断
     modificationType: [],
+  };
+
+  // 顶部表单默认值
+  initialValues = {
+    page: 1,
+    rows: 10,
   };
 
   componentDidMount() {
@@ -42,6 +47,7 @@ class Customer extends Component {
 
   visibleShow = visible => {
     this.setState({ visible });
+    this.getTableData(this.initialValues);
   };
 
   handleSelect = data => {
@@ -66,8 +72,9 @@ class Customer extends Component {
   // 获取表格数据
   getTableData = (options = {}) => {
     this.setState({ loading: true });
-
-    const formData = this.tableSearchFormRef.current.getFieldsValue();
+    const formData = this.tableSearchFormRef.current
+      ? this.tableSearchFormRef.current.getFieldsValue()
+      : '';
     const { pagination } = this.state;
     const { current: page, pageSize: rows } = pagination;
     const data = {
@@ -80,7 +87,11 @@ class Customer extends Component {
     api.peptideBase.getModifications(data, true).then(res => {
       this.setState({
         list: res.rows,
-        total: res.total,
+        pagination: {
+          current: data.page,
+          pageSize: data.rows,
+          total: res.total,
+        },
         loading: false,
       });
     });
@@ -91,7 +102,7 @@ class Customer extends Component {
   };
 
   // 渲染表单
-  renderForm = () => {
+  simpleForm = () => {
     const {
       peptide: { payMethods, payTerms, salesRanges },
       peptide,
@@ -102,130 +113,112 @@ class Customer extends Component {
     const offices = peptide.offices.filter(e => e.languageCode === language);
 
     return (
-      <Form onSubmit={this.submit} layout="inline">
-        <Row gutter={{ lg: 24, md: 12, sm: 6 }}>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="编号" name="code">
-              <Input style={{ width: '192px' }} />
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="名称" name="name">
-              <Input style={{ width: '192px' }} />
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="电话" name="telNo">
-              <Input style={{ width: '192px' }} />
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="手机" name="mobNo">
-              <Input style={{ width: '192px' }} />
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="邮箱" name="email">
-              <Input style={{ width: '192px' }} />
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="大区" name="regionCode">
-              <Select style={{ width: '192px' }}>
-                <Option value="">全部</Option>
-                {regions.map(item => (
-                  <Option key={item.code} value={item.code}>
-                    {`${item.code}-${item.name}`}
-                  </Option>
-                ))}
-              </Select>
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="网点" name="officeCode">
-              <Select style={{ width: '192px' }}>
-                <Option value="">全部</Option>
-                {offices.map(item => (
-                  <Option key={item.code} value={item.code}>
-                    {`${item.code}-${item.name}`}
-                  </Option>
-                ))}
-              </Select>
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="付款方式" name="payMethodCode">
-              <Select style={{ width: '192px' }}>
-                <Option value="">全部</Option>
-                {payMethods.map(item => (
-                  <Option key={item.code} value={item.code}>
-                    {`${item.code}-${item.name}`}
-                  </Option>
-                ))}
-              </Select>
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="付款条件" name="payTermsCode">
-              <Select style={{ width: '192px' }}>
-                <Option value="">全部</Option>
-                {payTerms.map(item => (
-                  <Option key={item.code} value={item.code}>
-                    {`${item.code}-${item.name}`}
-                  </Option>
-                ))}
-              </Select>
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="销售范围" name="rangeOrganization">
-              <Select style={{ width: '192px' }}>
-                <Option value="">全部</Option>
-                {salesRanges.map(item => (
-                  <Option
-                    key={`${item.organization}${item.channel}`}
-                    value={`${item.channelName} - ${item.organizationName}`}
-                  >
-                    {`${item.channelName} - ${item.organizationName}`}
-                  </Option>
-                ))}
-              </Select>
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="销售员编号" name="salerCode">
-              <Input style={{ width: '192px' }} />
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="销售员名称" name="salerName">
-              <Input style={{ width: '192px' }} />
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <span className="submitButtons">
-              <Button type="primary" htmlType="submit">
-                查询
-              </Button>
-              <Button style={{ marginLeft: 8 }} onClick={this.handleFormReset}>
-                重置
-              </Button>
-            </span>
-          </Col>
-        </Row>
-      </Form>
+      <>
+        <Col lg={6} md={8} sm={12}>
+          <FormItem label="编号" name="code">
+            <Input style={{ width: '192px' }} />
+          </FormItem>
+        </Col>
+        <Col lg={6} md={8} sm={12}>
+          <FormItem label="名称" name="name">
+            <Input style={{ width: '192px' }} />
+          </FormItem>
+        </Col>
+        <Col lg={6} md={8} sm={12}>
+          <FormItem label="电话" name="telNo">
+            <Input style={{ width: '192px' }} />
+          </FormItem>
+        </Col>
+        <Col lg={6} md={8} sm={12}>
+          <FormItem label="手机" name="mobNo">
+            <Input style={{ width: '192px' }} />
+          </FormItem>
+        </Col>
+        <Col lg={6} md={8} sm={12}>
+          <FormItem label="邮箱" name="email">
+            <Input style={{ width: '192px' }} />
+          </FormItem>
+        </Col>
+        <Col lg={6} md={8} sm={12}>
+          <FormItem label="大区" name="regionCode">
+            <Select style={{ width: '192px' }}>
+              <Option value="">全部</Option>
+              {regions.map(item => (
+                <Option key={item.code} value={item.code}>
+                  {`${item.code}-${item.name}`}
+                </Option>
+              ))}
+            </Select>
+          </FormItem>
+        </Col>
+        <Col lg={6} md={8} sm={12}>
+          <FormItem label="网点" name="officeCode">
+            <Select style={{ width: '192px' }}>
+              <Option value="">全部</Option>
+              {offices.map(item => (
+                <Option key={item.code} value={item.code}>
+                  {`${item.code}-${item.name}`}
+                </Option>
+              ))}
+            </Select>
+          </FormItem>
+        </Col>
+        <Col lg={6} md={8} sm={12}>
+          <FormItem label="付款方式" name="payMethodCode">
+            <Select style={{ width: '192px' }}>
+              <Option value="">全部</Option>
+              {payMethods.map(item => (
+                <Option key={item.code} value={item.code}>
+                  {`${item.code}-${item.name}`}
+                </Option>
+              ))}
+            </Select>
+          </FormItem>
+        </Col>
+        <Col lg={6} md={8} sm={12}>
+          <FormItem label="付款条件" name="payTermsCode">
+            <Select style={{ width: '192px' }}>
+              <Option value="">全部</Option>
+              {payTerms.map(item => (
+                <Option key={item.code} value={item.code}>
+                  {`${item.code}-${item.name}`}
+                </Option>
+              ))}
+            </Select>
+          </FormItem>
+        </Col>
+        <Col lg={6} md={8} sm={12}>
+          <FormItem label="销售范围" name="rangeOrganization">
+            <Select style={{ width: '192px' }}>
+              <Option value="">全部</Option>
+              {salesRanges.map(item => (
+                <Option
+                  key={`${item.organization}${item.channel}`}
+                  value={`${item.channelName} - ${item.organizationName}`}
+                >
+                  {`${item.channelName} - ${item.organizationName}`}
+                </Option>
+              ))}
+            </Select>
+          </FormItem>
+        </Col>
+        <Col lg={6} md={8} sm={12}>
+          <FormItem label="销售员编号" name="salerCode">
+            <Input style={{ width: '192px' }} />
+          </FormItem>
+        </Col>
+        <Col lg={6} md={8} sm={12}>
+          <FormItem label="销售员名称" name="salerName">
+            <Input style={{ width: '192px' }} />
+          </FormItem>
+        </Col>
+      </>
     );
   };
 
   render() {
-    const {
-      formValues: { page: current, rows: pageSize },
-      list,
-      total,
-      loading,
-      visible,
-    } = this.state;
-    const data = { list, pagination: { current, pageSize, total } };
+    const { pagination, list, loading, visible } = this.state;
+    const data = { list };
     // const {
     //   peptide: { commonData },
     // } = this.props;
@@ -311,6 +304,7 @@ class Customer extends Component {
         title: '操作',
         dataIndex: 'actions',
         fixed: 'right',
+        width: 100,
         render: (text, record) => <a onClick={() => this.handleSelect(record)}>选择</a>,
       },
     ];
@@ -345,14 +339,14 @@ class Customer extends Component {
             ref={this.tableSearchFormRef}
             initialValues={this.initialValues}
             getTableData={this.getTableData}
-            renderForm={this.renderForm}
+            simpleForm={this.simpleForm}
           />
           <div className="tableListOperator" />
           <Table
             dataSource={data.list}
             columns={columns}
             scroll={{ x: tableWidth, y: 300 }}
-            pagination={data.pagination}
+            pagination={pagination}
             rowKey="code"
             // rowSelection={rowSelection}
             loading={loading}
