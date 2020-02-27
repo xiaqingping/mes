@@ -139,6 +139,7 @@ class Order extends Component {
     }
 
     const newId = id - 1;
+    this.tableFormRef.current.resetFields();
     this.setState({
       id: newId,
       editIndex: 0,
