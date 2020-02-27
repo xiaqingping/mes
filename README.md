@@ -9,7 +9,7 @@
 ```bash
 # 使用 npm 安装依赖
 npm install
-# 使用 yarn 按照依赖
+# 使用 yarn 安装依赖
 yarn install
 
 # 开发
