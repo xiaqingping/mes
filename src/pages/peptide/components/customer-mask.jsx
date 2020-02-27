@@ -104,7 +104,7 @@ class Customer extends Component {
   // 渲染表单
   simpleForm = () => {
     const {
-      peptide: { payMethods, payTerms, salesRanges },
+      peptide: { salesPaymentMethods, paymentTerms, salesRanges },
       peptide,
       language,
     } = this.props;
@@ -167,7 +167,7 @@ class Customer extends Component {
           <FormItem label="付款方式" name="payMethodCode">
             <Select style={{ width: '192px' }}>
               <Option value="">全部</Option>
-              {payMethods.map(item => (
+              {salesPaymentMethods.map(item => (
                 <Option key={item.code} value={item.code}>
                   {`${item.code}-${item.name}`}
                 </Option>
@@ -179,7 +179,7 @@ class Customer extends Component {
           <FormItem label="付款条件" name="payTermsCode">
             <Select style={{ width: '192px' }}>
               <Option value="">全部</Option>
-              {payTerms.map(item => (
+              {paymentTerms.map(item => (
                 <Option key={item.code} value={item.code}>
                   {`${item.code}-${item.name}`}
                 </Option>

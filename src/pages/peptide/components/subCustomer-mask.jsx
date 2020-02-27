@@ -88,7 +88,7 @@ class SubCustomer extends Component {
   simpleForm = () => {
     const {
       form: { getFieldDecorator },
-      peptide: { payMethods, payTerms, salesRanges },
+      peptide: { salesPaymentMethods, paymentTerms, salesRanges },
       peptide,
       language,
     } = this.props;
@@ -181,7 +181,7 @@ class SubCustomer extends Component {
             {getFieldDecorator('payMethodCode', { initialValue: '' })(
               <Select style={{ width: '192px' }}>
                 <Option value="">全部</Option>
-                {payMethods.map(item => (
+                {salesPaymentMethods.map(item => (
                   <Option key={item.code} value={item.code}>
                     {`${item.code}-${item.name}`}
                   </Option>
@@ -195,7 +195,7 @@ class SubCustomer extends Component {
             {getFieldDecorator('payTermsCode', { initialValue: '' })(
               <Select style={{ width: '200px' }}>
                 <Option value="">全部</Option>
-                {payTerms.map(item => (
+                {paymentTerms.map(item => (
                   <Option key={item.code} value={item.code}>
                     {`${item.code}-${item.name}`}
                   </Option>

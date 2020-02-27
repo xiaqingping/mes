@@ -1,153 +1,20 @@
 // 产品弹框
-import { Button, Col, Form, Input, Row, Select, Table, Modal } from 'antd';
+import { Col, Form, Input, Select, Table, Modal } from 'antd';
 import React, { Component } from 'react';
 
 import api from '@/api';
 import './style.less';
 import { connect } from 'dva';
+import TableSearchForm from '@/components/TableSearchForm';
 
 const FormItem = Form.Item;
 const { Option } = Select;
 
-/**
- * 页面顶部筛选表单
- */
-@Form.create()
-@connect(({ peptide }) => ({
-  peptide,
-}))
-class Search extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      factorys: [],
-    };
-  }
-
-  componentDidMount() {
-    this.submit();
-    api.basic.getPlants().then(data => {
-      this.setState({
-        factorys: data,
-      });
-    });
-  }
-
-  componentWillReceiveProps() {}
-
-  submit = e => {
-    if (e) e.preventDefault();
-    const val = this.props.form.getFieldsValue();
-    this.props.getTableData({ page: 1, ...val });
-  };
-
-  handleFormReset = () => {
-    this.props.form.resetFields();
-  };
-
-  // 渲染表单
-  renderForm = () => {
-    const {
-      form: { getFieldDecorator },
-      brands,
-      peptide: { salesRanges },
-    } = this.props;
-    const { factorys } = this.state;
-
-    return (
-      <Form onSubmit={this.submit} layout="inline">
-        <Row gutter={{ lg: 24, md: 12, sm: 6 }}>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="编号">{getFieldDecorator('code')(<Input />)}</FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="产品名称">{getFieldDecorator('desc')(<Input />)}</FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="英文名称">{getFieldDecorator('edesc')(<Input />)}</FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="旧物料号">{getFieldDecorator('oldCode')(<Input />)}</FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="客户编号">{getFieldDecorator('customerCode')(<Input />)}</FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="负责人编号">
-              {getFieldDecorator('subcustomerCode')(<Input />)}
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="销售大区">{getFieldDecorator('regionCode')(<Input />)}</FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="销售网点">{getFieldDecorator('officeCode')(<Input />)}</FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="销售范围">
-              {getFieldDecorator('range_area', { initialValue: '10-3110' })(
-                <Select style={{ width: '192px' }}>
-                  <Option value="">全部</Option>
-                  {salesRanges.map(item => (
-                    <Option
-                      key={`${item.organization}${item.channel}`}
-                      value={`${item.channel}-${item.organization}`}
-                    >
-                      {`${item.channelName} - ${item.organizationName}`}
-                    </Option>
-                  ))}
-                </Select>,
-              )}
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="工厂">
-              {getFieldDecorator('stock_factory', { initialValue: '' })(
-                <Select>
-                  <Option value="">全部</Option>
-                  {factorys.map(item => (
-                    <Option key={item.code} value={item.code}>{`${item.code}-${item.name}`}</Option>
-                  ))}
-                </Select>,
-              )}
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="品牌">
-              {getFieldDecorator('brandCode', { initialValue: '' })(
-                <Select>
-                  <Option value="">全部</Option>
-                  {brands.map(item => (
-                    <Option key={item.code} value={item.code}>{`${item.code}-${item.name}`}</Option>
-                  ))}
-                </Select>,
-              )}
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <span className="submitButtons">
-              <Button type="primary" htmlType="submit">
-                查询
-              </Button>
-              <Button style={{ marginLeft: 8 }} onClick={this.handleFormReset}>
-                重置
-              </Button>
-            </span>
-          </Col>
-        </Row>
-      </Form>
-    );
-  };
-
-  render() {
-    return <div className="tableListForm">{this.renderForm()}</div>;
-  }
-}
-
-@connect(({ peptide }) => ({
-  peptide,
-}))
 class Order extends Component {
+  tableSearchFormRef = React.createRef();
+
+  tableFormRef = React.createRef();
+
   state = {
     formValues: {
       page: 1,
@@ -159,9 +26,28 @@ class Order extends Component {
     visible: false, // 遮罩层的判断
     dataSon: [],
     loadingSon: false,
+    factorys: [],
+  };
+
+  // 顶部表单默认值
+  initialValues = {
+    range_area: '10-3110',
+    stock_factory: '',
+    brandCode: '',
+    page: 1,
+    rows: 10,
   };
 
   componentDidMount() {
+    this.props.dispatch({
+      type: 'peptide/getCache',
+      payload: { type: 'salesRanges' },
+    });
+    api.basic.getPlants().then(data => {
+      this.setState({
+        factorys: data,
+      });
+    });
     this.props.onRef(this);
   }
 
@@ -169,6 +55,7 @@ class Order extends Component {
     this.setState({
       visible,
     });
+    this.getTableData(this.initialValues);
   };
 
   handleSelect = data => {
@@ -231,6 +118,93 @@ class Order extends Component {
     this.props.form.resetFields();
   };
 
+  simpleForm = () => {
+    const {
+      peptide: { salesRanges },
+      peptide,
+    } = this.props;
+    const { factorys } = this.state;
+    return (
+      <>
+        <Col lg={6} md={8} sm={12}>
+          <FormItem label="编号" name="code">
+            <Input />
+          </FormItem>
+        </Col>
+        <Col lg={6} md={8} sm={12}>
+          <FormItem label="产品名称">
+            <Input />
+          </FormItem>
+        </Col>
+        <Col lg={6} md={8} sm={12}>
+          <FormItem label="英文名称" name="edesc">
+            <Input />
+          </FormItem>
+        </Col>
+        <Col lg={6} md={8} sm={12}>
+          <FormItem label="旧物料号" name="oldCode">
+            <Input />
+          </FormItem>
+        </Col>
+        <Col lg={6} md={8} sm={12}>
+          <FormItem label="客户编号" name="customerCode">
+            <Input />
+          </FormItem>
+        </Col>
+        <Col lg={6} md={8} sm={12}>
+          <FormItem label="负责人编号" name="subcustomerCode">
+            <Input />
+          </FormItem>
+        </Col>
+        <Col lg={6} md={8} sm={12}>
+          <FormItem label="销售大区" name="regionCode">
+            <Input />
+          </FormItem>
+        </Col>
+        <Col lg={6} md={8} sm={12}>
+          <FormItem label="销售网点" name="officeCode">
+            <Input />
+          </FormItem>
+        </Col>
+        <Col lg={6} md={8} sm={12}>
+          <FormItem label="销售范围" name="range_area">
+            <Select style={{ width: '192px' }}>
+              <Option value="">全部</Option>
+              {salesRanges.map(item => (
+                <Option
+                  key={`${item.organization}${item.channel}`}
+                  value={`${item.channel}-${item.organization}`}
+                >
+                  {`${item.channelName} - ${item.organizationName}`}
+                </Option>
+              ))}
+            </Select>
+          </FormItem>
+        </Col>
+        <Col lg={6} md={8} sm={12}>
+          <FormItem label="工厂" name="stock_factory">
+            <Select>
+              <Option value="">全部</Option>
+              {factorys.map(item => (
+                <Option key={item.code} value={item.code}>{`${item.code}-${item.name}`}</Option>
+              ))}
+            </Select>
+          </FormItem>
+        </Col>
+        <Col lg={6} md={8} sm={12}>
+          <FormItem label="品牌" name="brandCode">
+            <Select>
+              <Option value="">全部</Option>
+              {peptide.commonData.brands.map(item => (
+                <Option key={item.code} value={item.code}>{`${item.code}-${item.name}`}</Option>
+              ))}
+            </Select>
+          </FormItem>
+        </Col>
+      </>
+    );
+  };
+
   render() {
     const {
       formValues: { page: current, rows: pageSize },
@@ -242,9 +216,9 @@ class Order extends Component {
       loadingSon,
     } = this.state;
     const data = { list, pagination: { current, pageSize, total } };
-    const {
-      peptide: { commonData },
-    } = this.props;
+    // const {
+    //   peptide: { commonData },
+    // } = this.props;
     let tableWidth = 0;
 
     let columns = [
@@ -363,7 +337,7 @@ class Order extends Component {
       {
         title: '仓库',
         dataIndex: 'storageName',
-        width: 100,
+        width: 150,
       },
       {
         title: '数量',
@@ -398,47 +372,42 @@ class Order extends Component {
           onCancel={this.handleCancel}
           footer={null}
         >
-          <Search
+          <TableSearchForm
+            ref={this.tableSearchFormRef}
+            initialValues={this.initialValues}
             getTableData={this.getTableData}
-            brands={commonData.brands}
-            rangeArea={commonData.rangeArea}
+            simpleForm={this.simpleForm}
           />
-          <div className="tableListOperator"></div>
-
-          <Table
-            style={{ width: '800px', height: '100%', display: 'inline-block' }}
-            bordered
-            dataSource={data.list}
-            columns={columns}
-            scroll={{ x: tableWidth, y: 350 }}
-            rowKey="code"
-            // rowSelection={rowSelection}
-            loading={loading}
-            onChange={this.handleStandardTableChange}
-            onRow={record => ({ onClick: e => this.dataSon(record, e) })}
-            pagination={false}
-          />
-
-          <Table
-            style={{
-              width: '300px',
-              height: '100%',
-              display: 'inline-block',
-              marginLeft: '50px',
-              verticalAlign: 'top',
-            }}
-            bordered
-            dataSource={dataSon}
-            columns={columnSon}
-            scroll={{ x: 250, y: 350 }}
-            rowKey="storage"
-            loading={loadingSon}
-            pagination={false}
-          />
+          <div className="tableListOperator" />
+          <div className="divTables">
+            <Table
+              bordered
+              dataSource={data.list}
+              columns={columns}
+              scroll={{ x: tableWidth, y: 350 }}
+              rowKey="code"
+              // rowSelection={rowSelection}
+              loading={loading}
+              onChange={this.handleStandardTableChange}
+              onRow={record => ({ onClick: e => this.dataSon(record, e) })}
+              pagination={false}
+            />
+            <Table
+              bordered
+              dataSource={dataSon}
+              columns={columnSon}
+              scroll={{ x: 250, y: 350 }}
+              rowKey="storage"
+              loading={loadingSon}
+              pagination={false}
+            />
+          </div>
         </Modal>
       </div>
     );
   }
 }
 
-export default Form.create()(Order);
+export default connect(({ peptide }) => ({
+  peptide,
+}))(Order);

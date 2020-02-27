@@ -105,7 +105,7 @@ class AddPage extends Component {
   renderForm = () => {
     const {
       form: { getFieldDecorator, getFieldValue },
-      peptide: { commonData, salesRanges, invtypes, payMethods },
+      peptide: { commonData, salesRanges, taxInvoiceTypes, salesPaymentMethods },
       peptide,
       language,
     } = this.props;
@@ -222,7 +222,7 @@ class AddPage extends Component {
             <FormItem label="开票方式">
               {getFieldDecorator('invoiceType', { initialValue: '20' })(
                 <Select>
-                  {invtypes.map(item => (
+                  {taxInvoiceTypes.map(item => (
                     <Option key={item.code} value={item.code}>{`${item.code}-${item.name}`}</Option>
                   ))}
                 </Select>,
@@ -238,7 +238,7 @@ class AddPage extends Component {
                 //  rules: [{ required: true }],
               })(
                 <Select>
-                  {payMethods.map(item => (
+                  {salesPaymentMethods.map(item => (
                     <Option key={item.code} value={item.code}>{`${item.code}-${item.name}`}</Option>
                   ))}
                 </Select>,
@@ -664,9 +664,7 @@ class Order extends Component {
 
     const arrData = [];
     let strId = '';
-    // eslint-disable-next-line array-callback-return
     data.map((item, key) => {
-      // console.log(item)
       if (item.length === 1 && item[0] === '') {
         return false;
       }
@@ -680,6 +678,7 @@ class Order extends Component {
         subpackage: item[5],
       });
       strId = `${strId + (id - key - 1)},`;
+      return true;
     });
     if (arrData.length === 0) {
       const newId = id - 1;
@@ -1236,7 +1235,7 @@ class Order extends Component {
               />
             </EditableContext.Provider>
           </Col>
-          <Col span={1}></Col>
+          <Col span={1} />
           <Col span={9}>
             <Table
               dataSource={dataSon}

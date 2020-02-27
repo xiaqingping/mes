@@ -14,7 +14,7 @@ import {
 import React, { Component } from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import StandardTable from '@/components/StandardTable';
-// import Products from '@/pages/peptide/components/products-mask';
+import Products from '@/pages/peptide/components/products-mask';
 import api from '@/api';
 import { connect } from 'dva';
 import TableSearchForm from '@/components/TableSearchForm';
@@ -42,7 +42,7 @@ class Product extends Component {
     editIndex: -1,
     id: 0, // 新增数据时，提供负数id
     purityValue: [],
-    sonProducts: [],
+    // sonProducts: [],
   };
 
   // 顶部表单默认值
@@ -105,25 +105,25 @@ class Product extends Component {
   };
 
   getMaskData = v => {
-    this.tableSearchFormRef.current.setFieldsValue({
+    this.tableFormRef.current.setFieldsValue({
       sapProductCode: v.code,
       sapProductName: v.name,
     });
-    this.setState({
-      sonProducts: v,
-    });
+    // this.setState({
+    //   sonProducts: v,
+    // });
   };
 
   // 清空弹框的选择内容
-  clearInput = () => {
-    this.tableSearchFormRef.current.setFieldsValue({
-      sapProductCode: '',
-      sapProductName: '',
-    });
-    this.setState({
-      sonProducts: [],
-    });
-  };
+  // clearInput = () => {
+  //   // this.tableFormRef.current.setFieldsValue({
+  //   //   sapProductCode: '',
+  //   //   sapProductName: '',
+  //   // });
+  //   this.setState({
+  //     sonProducts: [],
+  //   });
+  // };
 
   // 退出编辑
   cancelEdit = (row, index) => {
@@ -136,7 +136,7 @@ class Product extends Component {
         editIndex: index,
       });
     }
-    this.clearInput();
+    // this.clearInput();
   };
 
   // 删除数据
@@ -154,9 +154,9 @@ class Product extends Component {
   };
 
   // 保存
-  saveRow = index => {
-    this.props.form.validateFields((error, row) => {
-      if (error) return;
+  saveRow = async index => {
+    try {
+      const row = await this.tableFormRef.current.validateFields();
       const { list } = this.state;
       const newData = {
         ...list[index],
@@ -172,10 +172,12 @@ class Product extends Component {
       } else {
         api.peptideBase.insertProduct(newData).then(() => {
           this.getTableData();
-          this.clearInput();
+          // this.clearInput();
         });
       }
-    });
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   // 新增
@@ -186,6 +188,7 @@ class Product extends Component {
       return;
     }
     const newId = id - 1;
+    this.tableFormRef.current.resetFields();
     this.setState({
       id: newId,
       editIndex: 0,
@@ -249,11 +252,11 @@ class Product extends Component {
   };
 
   render() {
-    const { pagination, selectedRows, list, loading, purityValue, sonProducts } = this.state;
+    const { pagination, selectedRows, list, loading, purityValue } = this.state;
     let tableWidth = 0;
-    const {
-      peptide: { commonData },
-    } = this.props;
+    // const {
+    //   peptide: { commonData },
+    // } = this.props;
 
     let columns = [
       {
@@ -325,6 +328,7 @@ class Product extends Component {
         width: 100,
         render: text => (text === 1 ? '√' : ''),
         editable: true,
+        checkType: true,
         inputType: <Checkbox style={{ textAlign: 'center', display: 'block' }} />,
       },
       {
@@ -347,27 +351,27 @@ class Product extends Component {
         inputType: (
           <Input
             style={{ width: '90%' }}
-            value={sonProducts.code ? sonProducts.code : ''}
+            // value={sonProducts.code ? sonProducts.code : ''}
             readOnly
           />
         ),
         rules: [{ required: true, message: '必填' }],
       },
-      // {
-      //   title: '产品名称',
-      //   dataIndex: 'sapProductName',
-      //   width: 300,
-      //   editable: true,
-      //   inputType: (
-      //     <Search
-      //       style={{ width: '90%' }}
-      //       // onSearch={() => this.productShow.visibleShow(true)}
-      //       value={sonProducts.name ? sonProducts.name : ''}
-      //       readOnly
-      //     />
-      //   ),
-      //   rules: [{ required: true, message: '必填' }],
-      // },
+      {
+        title: '产品名称',
+        dataIndex: 'sapProductName',
+        width: 300,
+        editable: true,
+        inputType: (
+          <Search
+            style={{ width: '90%' }}
+            onSearch={() => this.productShow.visibleShow(true)}
+            // value={sonProducts.name ? sonProducts.name : ''}
+            readOnly
+          />
+        ),
+        rules: [{ required: true, message: '必填' }],
+      },
       {
         title: '操作',
         width: 150,
@@ -422,6 +426,7 @@ class Product extends Component {
           record,
           rules: col.rules,
           inputType: col.inputType,
+          checkType: col.checkType,
           dataIndex: col.dataIndex,
           title: col.title,
           editing: rowIndex === this.state.editIndex,
@@ -460,14 +465,14 @@ class Product extends Component {
             </Form>
           </div>
         </Card>
-        {/* <Products
+        <Products
           onRef={ref => {
             this.productShow = ref;
           }}
           getData={v => {
             this.getMaskData(v);
           }}
-        /> */}
+        />
       </PageHeaderWrapper>
     );
   }
