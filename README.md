@@ -4,9 +4,13 @@
 
 ## 1. 使用
 
+推荐使用 [yarn](https://yarn.bootcss.com/) 管理项目依赖。
+
 ```bash
-# 安装依赖
+# 使用 npm 安装依赖
 npm install
+# 使用 yarn 按照依赖
+yarn install
 
 # 开发
 npm start
