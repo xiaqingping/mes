@@ -70,38 +70,38 @@ const Model = {
         { id: 2, name: '已删除' },
       ],
       // 品牌
-    brands: [
-      { code: '001', name: '进口分装' },
-      { code: '002', name: '生工' },
-      { code: '003', name: 'Worthington' },
-      { code: '004', name: 'G-Bios' },
-      { code: '005', name: '进口' },
-      { code: '006', name: '国产' },
-      { code: '007', name: 'HANNA' },
-      { code: '008', name: '康宁' },
-      { code: '009', name: '耶拿' },
-      { code: '010', name: '大龙' },
-      { code: '011', name: '复日科技' },
-      { code: '012', name: 'KleanAB' },
-      { code: '013', name: '康健' },
-      { code: '014', name: '振威' },
-      { code: '015', name: '双杰' },
-      { code: '016', name: '杭州仪表' },
-      { code: '017', name: '虹益' },
-      { code: '018', name: '天达' },
-      { code: '019', name: '沪西' },
-      { code: '020', name: '华利达' },
-      { code: '021', name: '百晶' },
-      { code: '022', name: 'QSP' },
-      { code: '023', name: 'Simport' },
-      { code: '024', name: '3M' },
-      { code: '025', name: 'Amresco' },
-      { code: '026', name: 'Spetrum' },
-      { code: '027', name: 'Parafilm' },
-      { code: '028', name: '欧西亚' },
-      { code: 'BBI', name: 'BBI' },
-      { code: 'MBI', name: 'MBI' },
-    ],
+      brands: [
+        { code: '001', name: '进口分装' },
+        { code: '002', name: '生工' },
+        { code: '003', name: 'Worthington' },
+        { code: '004', name: 'G-Bios' },
+        { code: '005', name: '进口' },
+        { code: '006', name: '国产' },
+        { code: '007', name: 'HANNA' },
+        { code: '008', name: '康宁' },
+        { code: '009', name: '耶拿' },
+        { code: '010', name: '大龙' },
+        { code: '011', name: '复日科技' },
+        { code: '012', name: 'KleanAB' },
+        { code: '013', name: '康健' },
+        { code: '014', name: '振威' },
+        { code: '015', name: '双杰' },
+        { code: '016', name: '杭州仪表' },
+        { code: '017', name: '虹益' },
+        { code: '018', name: '天达' },
+        { code: '019', name: '沪西' },
+        { code: '020', name: '华利达' },
+        { code: '021', name: '百晶' },
+        { code: '022', name: 'QSP' },
+        { code: '023', name: 'Simport' },
+        { code: '024', name: '3M' },
+        { code: '025', name: 'Amresco' },
+        { code: '026', name: 'Spetrum' },
+        { code: '027', name: 'Parafilm' },
+        { code: '028', name: '欧西亚' },
+        { code: 'BBI', name: 'BBI' },
+        { code: 'MBI', name: 'MBI' },
+      ],
     },
     // // 修饰类型
     // modificationTypes: [],
@@ -112,11 +112,11 @@ const Model = {
     // 销售网点
     offices: [],
     // 开票类型
-    invtypes: [],
+    taxInvoiceTypes: [],
     // 付款方式
-    payMethods: [],
+    salesPaymentMethods: [],
     // 付款条件
-    payTerms: [],
+    paymentTerms: [],
     // 币种类型
     currencies: [],
     // 销售范围
@@ -146,7 +146,7 @@ const Model = {
         // 三：数据请求接口
         const methods = {
           // countrys: basic.getCountrys,
-        }
+        };
 
         // 四：确定请求方法
         // example: type = countrys，则 methodName = getCountrys，如果你的接口命名规则与此不同，则需要将你的方法写到 methods 里

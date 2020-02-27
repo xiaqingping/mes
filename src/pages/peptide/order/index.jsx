@@ -52,15 +52,15 @@ class Order extends Component {
     });
     dispatch({
       type: 'peptide/getCache', // 开票方式
-      payload: { type: 'invtypes' },
+      payload: { type: 'taxInvoiceTypes' },
     });
     dispatch({
       type: 'peptide/getCache', // 付款方式
-      payload: { type: 'payMethods' },
+      payload: { type: 'salesPaymentMethods' },
     });
     dispatch({
       type: 'peptide/getCache', // 付款条件
-      payload: { type: 'payTerms' },
+      payload: { type: 'paymentTerms' },
     });
     dispatch({
       type: 'peptide/getCache', // 货币类型
@@ -68,7 +68,7 @@ class Order extends Component {
     });
     dispatch({
       type: 'peptide/getCache', // 销售范围
-      payload: { type: 'SalesRanges' },
+      payload: { type: 'salesRanges' },
     });
     this.getTableData(this.initialValues);
   }
@@ -157,8 +157,6 @@ class Order extends Component {
   // 顶部表单简单搜索
   simpleForm = () => (
     <>
-      {/* <Form onSubmit={this.submit} layout="inline">
-        <Row gutter={{ lg: 24, md: 12, sm: 6 }}> */}
       <Col lg={6} md={8} sm={12}>
         <FormItem label="订单编号" name="code">
           <Input />
@@ -184,12 +182,10 @@ class Order extends Component {
           <Search onSearch={() => this.showSaler.visibleShow(true)} />
         </FormItem>
       </Col>
-      {/* </Row>
-      </Form> */}
     </>
   );
 
-  advancedForm() {
+  advancedForm = () => {
     const {
       peptide: { commonData },
       peptide,
@@ -202,8 +198,6 @@ class Order extends Component {
     const currencies = peptide.currencies.filter(e => e.languageCode === language);
 
     return (
-      // <Form onSubmit={this.submit} layout="inline">
-      //   <Row gutter={{ lg: 24, md: 12, sm: 6 }}>
       <>
         <Col lg={6} md={8} sm={12}>
           <FormItem label="订单编号" name="code">
@@ -293,13 +287,12 @@ class Order extends Component {
         </Col>
       </>
     );
-  }
+  };
 
   render() {
     const { pagination, selectedRows, list, loading } = this.state;
-    console.log(pagination);
     const {
-      peptide: { commonData, invtypes, payMethods, payTerms },
+      peptide: { commonData, taxInvoiceTypes, salesPaymentMethods, paymentTerms },
       peptide,
       language,
     } = this.props;
@@ -397,7 +390,7 @@ class Order extends Component {
         dataIndex: 'invoiceType',
         width: 150,
         render(text) {
-          return formatter(invtypes, text, 'code', 'name');
+          return formatter(taxInvoiceTypes, text, 'code', 'name');
         },
       },
       {
@@ -405,7 +398,7 @@ class Order extends Component {
         dataIndex: 'paymentMethod',
         width: 100,
         render(text) {
-          return formatter(payMethods, text, 'code', 'name');
+          return formatter(salesPaymentMethods, text, 'code', 'name');
         },
       },
       {
@@ -413,7 +406,7 @@ class Order extends Component {
         dataIndex: 'paymentTerm',
         width: 250,
         render(text) {
-          return `${text} - ${formatter(payTerms, text, 'code', 'name')}`;
+          return `${text} - ${formatter(paymentTerms, text, 'code', 'name')}`;
         },
       },
       {

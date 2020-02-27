@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 import React from 'react';
 import { Form } from 'antd';
 
@@ -8,6 +9,7 @@ const EditableCell = ({
   editing,
   dataIndex,
   title,
+  checkType,
   inputType,
   record,
   index,
@@ -17,7 +19,12 @@ const EditableCell = ({
 }) => (
   <td {...restProps}>
     {editing ? (
-      <Form.Item name={dataIndex} style={{ margin: 0 }} rules={rules} >
+      <Form.Item
+        name={dataIndex}
+        style={{ margin: 0 }}
+        rules={rules}
+        valuePropName={checkType ? 'checked' : 'value'}
+      >
         {inputType}
       </Form.Item>
     ) : (

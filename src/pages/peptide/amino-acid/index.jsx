@@ -6,7 +6,6 @@ import {
   Divider,
   Form,
   Input,
-  Row,
   Select,
   message,
   Popconfirm,
@@ -16,165 +15,42 @@ import React, { Component, Fragment } from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import StandardTable from '@/components/StandardTable';
 import api from '@/api';
-import './style.less'
+import './style.less';
 import { connect } from 'dva';
+import TableSearchForm from '@/components/TableSearchForm';
+import EditableCell from '@/components/EditableCell';
+import { PlusOutlined } from '@ant-design/icons';
 
-const EditableContext = React.createContext();
 const FormItem = Form.Item;
 const { Option } = Select;
 
-/**
- * 页面顶部筛选表单
- */
-@Form.create()
-class Search extends Component {
-  componentDidMount() {
-    this.submit();
-  }
-
-  submit = e => {
-    if (e) e.preventDefault();
-    const val = this.props.form.getFieldsValue();
-    this.props.getTableData({ page: 1, ...val });
-  }
-
-  handleFormReset = () => {
-    this.props.form.resetFields();
-  }
-
-  // 渲染表单
-  renderForm = () => {
-    const {
-      form: { getFieldDecorator },
-      status,
-    } = this.props;
-    return (
-      <Form onSubmit={this.submit} layout="inline">
-        <Row gutter={{ lg: 24, md: 12, sm: 6 }}>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="编号">
-              {getFieldDecorator('code')(<Input />)}
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="名称">
-              {getFieldDecorator('name')(<Input />)}
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="代码">
-            {getFieldDecorator('aminoAcidCode')(<Input />)}
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="状态">
-            {getFieldDecorator('status', { initialValue: 1 })(
-                <Select>
-                    {status.map(item =>
-                      <Option key={item.id} value={item.id}>{item.name}</Option>,
-                    )}
-                  </Select>)}
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <span className="submitButtons">
-              <Button type="primary" htmlType="submit">
-                查询
-              </Button>
-              <Button style={{ marginLeft: 8 }} onClick={this.handleFormReset}>
-                重置
-              </Button>
-            </span>
-          </Col>
-        </Row>
-      </Form>
-    );
-  }
-
-  render() {
-    return (
-      <div className="tableListForm">{this.renderForm()}</div>
-    );
-  }
-}
-
-/**
- * 表格编辑组件
- */
-class EditableCell extends React.Component {
-  renderCell = ({ getFieldDecorator }) => {
-    const {
-      editing,
-      dataIndex,
-      title,
-      inputType,
-      record,
-      index,
-      children,
-      rules,
-      double,
-      ...restProps
-    } = this.props;
-    if (editing) {
-      if (double) {
-        return (
-          <td {...restProps} style={{ padding: 0 }}>
-              <Form.Item style={{ margin: 0, padding: 0 }}>
-                {getFieldDecorator(`${dataIndex}0`, {
-                  rules,
-                  initialValue: record[`${dataIndex}0`],
-                })(inputType)}
-              </Form.Item>
-              <Divider type="horizontal" style={{ margin: 0 }}/>
-              <Form.Item style={{ margin: 0, padding: 0 }}>
-                {getFieldDecorator(`${dataIndex}1`, {
-                  rules,
-                  initialValue: record[`${dataIndex}1`],
-                })(inputType)}
-              </Form.Item>
-          </td>
-        );
-      }
-      return (
-        <td {...restProps} style={{ padding: 0 }}>
-            <Form.Item>
-              {getFieldDecorator(dataIndex, {
-                rules,
-                valuePropName: 'checked',
-                initialValue: record[dataIndex],
-              })(inputType)}
-            </Form.Item>
-        </td>
-      );
-    }
-    return (<td {...restProps}>{children}</td>);
-  };
-
-
-  render() {
-    return <EditableContext.Consumer>{this.renderCell}</EditableContext.Consumer>;
-  }
-}
-
-@connect(({ peptide }) => ({
-  peptide,
-}))
 class Order extends Component {
+  tableSearchFormRef = React.createRef();
+
+  tableFormRef = React.createRef();
+
   state = {
-    formValues: {
-      page: 1,
-      rows: 10,
-    },
+    pagination: {},
     list: [],
-    total: 0,
     loading: false,
     selectedRows: [],
     editIndex: -1,
     id: 0, // 新增数据时，提供负数id
-  }
+    longCode0: '',
+    longCode1: '',
+    shortCode0: '',
+    shortCode1: '',
+  };
+
+  // 顶部表单默认值
+  initialValues = {
+    status: 1,
+    page: 1,
+    rows: 10,
+  };
 
   componentDidMount() {
-    //
+    this.getTableData(this.initialValues);
   }
 
   // 分页
@@ -183,7 +59,7 @@ class Order extends Component {
       page: pagination.current,
       rows: pagination.pageSize,
     });
-  }
+  };
 
   // 选择行
   handleSelectRows = rows => {
@@ -194,16 +70,20 @@ class Order extends Component {
 
   // 获取表格数据
   getTableData = (options = {}) => {
-    const { formValues } = this.state;
-    const query = Object.assign({}, formValues, options);
+    this.setState({ loading: true });
+    const formData = this.tableSearchFormRef.current.getFieldsValue();
+    const { pagination } = this.state;
+    const { current: page, pageSize: rows } = pagination;
+    const dataVal = {
+      page,
+      rows,
+      ...formData,
+      ...options,
+    };
 
-    this.setState({
-      formValues: query,
-      loading: true,
-    });
-
-    api.peptideBase.getAminoAcid(query, true).then(data => {
-      const map = {}; const dest = [];
+    api.peptideBase.getAminoAcid(dataVal, true).then(data => {
+      const map = {};
+      const dest = [];
       for (let i = 0; i < data.rows.length; i++) {
         const ai = data.rows[i];
         if (!map[ai.id]) {
@@ -242,7 +122,8 @@ class Order extends Component {
               dj.longCode = dj.longCode || ai.longCode ? [dj.longCode, ai.longCode] : '';
               // dj.longCode = (dj.longCode ? dj.longCode : '')
               // + (ai.longCode ? ` | ${ai.longCode}` : '');
-              dj.aminoAcidType = dj.aminoAcidType || ai.aminoAcidType ? [dj.aminoAcidType, ai.aminoAcidType] : '';
+              dj.aminoAcidType =
+                dj.aminoAcidType || ai.aminoAcidType ? [dj.aminoAcidType, ai.aminoAcidType] : '';
               // dj.aminoAcidType = (dj.aminoAcidType ? dj.aminoAcidType : '')
               // + (ai.aminoAcidType ? ` | ${ai.aminoAcidType}` : '');
               break;
@@ -253,14 +134,14 @@ class Order extends Component {
       this.setState({
         loading: false,
         list: dest,
-        total: dest.length * 2,
+        pagination: {
+          current: dataVal.page,
+          pageSize: dataVal.rows,
+          total: dest.length * 2,
+        },
         editIndex: -1,
       });
     });
-  }
-
-  handleFormReset = () => {
-    this.props.form.resetFields();
   };
 
   // 退出编辑
@@ -274,7 +155,7 @@ class Order extends Component {
         editIndex: index,
       });
     }
-  }
+  };
 
   // 删除数据
   deleteRow = row => {
@@ -291,37 +172,40 @@ class Order extends Component {
   };
 
   // 保存
-  saveRow = index => {
-    this.props.form.validateFields((error, row) => {
-      if (error) return;
-      const { list } = this.state;
-      const newData = { ...list[index],
-                        ...row,
-                        hydrophilic: row.hydrophilic ? 1 : 2,
-                        hydrophobic: row.hydrophobic ? 1 : 2,
-                        acidic: row.acidic ? 1 : 2,
-                        alkaline: row.alkaline ? 1 : 2,
-                        isCanDisulfideBond: row.isCanDisulfideBond ? 1 : 2,
-                        details: [
-                                {
-                                  aminoAcidType: 'L',
-                                  longCode: row.longCode0,
-                                  shortCode: row.shortCode0,
-                                },
-                                {
-                                  aminoAcidType: 'D',
-                                  longCode: row.longCode1,
-                                  shortCode: row.shortCode1,
-                                },
-                              ],
-                      };
+  saveRow = async index => {
+    try {
+      const row = await this.tableFormRef.current.validateFields();
+      const { list, longCode0, longCode1, shortCode0, shortCode1 } = this.state;
+      const newData = {
+        ...list[index],
+        ...row,
+        hydrophilic: row.hydrophilic ? 1 : 2,
+        hydrophobic: row.hydrophobic ? 1 : 2,
+        acidic: row.acidic ? 1 : 2,
+        alkaline: row.alkaline ? 1 : 2,
+        isCanDisulfideBond: row.isCanDisulfideBond ? 1 : 2,
+        details: [
+          {
+            aminoAcidType: 'L',
+            longCode: longCode0,
+            shortCode: shortCode0,
+          },
+          {
+            aminoAcidType: 'D',
+            longCode: longCode1,
+            shortCode: shortCode1,
+          },
+        ],
+      };
       if (newData.id > 0) {
         // api.peptideBase.updateSeries(newData).then(() => this.getTableData());
       } else {
         api.peptideBase.insertAminoAcid(newData).then(() => this.getTableData());
       }
-    });
-  }
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   // 新增
   handleAdd = () => {
@@ -332,9 +216,14 @@ class Order extends Component {
     }
 
     const newId = id - 1;
+    this.tableFormRef.current.resetFields();
     this.setState({
       id: newId,
       editIndex: 0,
+      longCode0: '',
+      longCode1: '',
+      shortCode0: '',
+      shortCode1: '',
       list: [
         {
           id: newId,
@@ -342,18 +231,49 @@ class Order extends Component {
         ...list,
       ],
     });
-  }
+  };
+
+  // 渲染表单
+  simpleForm = () => {
+    const {
+      peptide: {
+        commonData: { status },
+      },
+    } = this.props;
+    return (
+      <>
+        <Col lg={6} md={8} sm={12}>
+          <FormItem label="编号" name="code">
+            <Input />
+          </FormItem>
+        </Col>
+        <Col lg={6} md={8} sm={12}>
+          <FormItem label="名称" name="name">
+            <Input />
+          </FormItem>
+        </Col>
+        <Col lg={6} md={8} sm={12}>
+          <FormItem label="代码" name="aminoAcidCode">
+            <Input />
+          </FormItem>
+        </Col>
+        <Col lg={6} md={8} sm={12}>
+          <FormItem label="状态" name="status">
+            <Select>
+              {status.map(item => (
+                <Option key={item.id} value={item.id}>
+                  {item.name}
+                </Option>
+              ))}
+            </Select>
+          </FormItem>
+        </Col>
+      </>
+    );
+  };
 
   render() {
-    const {
-      formValues: { page: current, rows: pageSize },
-      selectedRows,
-      list,
-      total,
-      loading,
-    } = this.state;
-    const data = { list, pagination: { current, pageSize, total } };
-    const { peptide: { commonData } } = this.props
+    const { pagination, selectedRows, list, loading } = this.state;
     let tableWidth = 0;
 
     let columns = [
@@ -365,12 +285,10 @@ class Order extends Component {
       {
         title: '名称',
         dataIndex: 'name',
-        width: 85,
+        width: 100,
         editable: true,
-        inputType: <Input style={{ width: '90%' }}/>,
-        rules: [
-          { required: true, message: '必填' },
-        ],
+        inputType: <Input />,
+        rules: [{ required: true, message: '必填' }],
       },
       {
         title: '亲水性',
@@ -379,7 +297,8 @@ class Order extends Component {
         align: 'center',
         render: text => (text === 1 ? '√' : ''),
         editable: true,
-        inputType: <Checkbox style={{ textAlign: 'center', display: 'block' }}/>,
+        checkType: true,
+        inputType: <Checkbox />,
       },
       {
         title: '疏水性',
@@ -388,7 +307,8 @@ class Order extends Component {
         width: 100,
         render: text => (text === 1 ? '√' : ''),
         editable: true,
-        inputType: <Checkbox style={{ textAlign: 'center', display: 'block' }}/>,
+        checkType: true,
+        inputType: <Checkbox />,
       },
       {
         title: '酸性',
@@ -397,7 +317,8 @@ class Order extends Component {
         width: 65,
         render: text => (text === 1 ? '√' : ''),
         editable: true,
-        inputType: <Checkbox style={{ textAlign: 'center', display: 'block' }}/>,
+        checkType: true,
+        inputType: <Checkbox />,
       },
       {
         title: '碱性',
@@ -406,7 +327,8 @@ class Order extends Component {
         width: 65,
         render: text => (text === 1 ? '√' : ''),
         editable: true,
-        inputType: <Checkbox style={{ textAlign: 'center', display: 'block' }}/>,
+        checkType: true,
+        inputType: <Checkbox />,
       },
       {
         title: '是否可做二硫键',
@@ -415,47 +337,40 @@ class Order extends Component {
         width: 180,
         render: text => (text === 1 ? '√' : ''),
         editable: true,
-        inputType: <Checkbox style={{ textAlign: 'center', display: 'block' }}/>,
+        checkType: true,
+        inputType: <Checkbox />,
       },
       {
         title: '分子量',
         dataIndex: 'molecularWeight',
         width: 100,
         editable: true,
-        inputType: <Input style={{ width: '90%' }}/>,
-        rules: [
-          { required: true, message: '必填' },
-        ],
+        inputType: <Input />,
+        rules: [{ required: true, message: '必填' }],
       },
       {
         title: '等电点',
         dataIndex: 'isoelectricPoint',
         width: 100,
         editable: true,
-        inputType: <Input style={{ width: '90%' }}/>,
-        rules: [
-          { required: true, message: '必填' },
-        ],
+        inputType: <Input />,
+        rules: [{ required: true, message: '必填' }],
       },
       {
         title: '羧基解离常数',
         dataIndex: 'carboxylationDissociationConstant',
         width: 140,
         editable: true,
-        inputType: <Input style={{ width: '90%' }}/>,
-        rules: [
-          { required: true, message: '必填' },
-        ],
+        inputType: <Input />,
+        rules: [{ required: true, message: '必填' }],
       },
       {
         title: '氨基解离常数',
         dataIndex: 'aminoDissociationConstant',
         width: 140,
         editable: true,
-        inputType: <Input style={{ width: '90%' }}/>,
-        rules: [
-          { required: true, message: '必填' },
-        ],
+        inputType: <Input />,
+        rules: [{ required: true, message: '必填' }],
       },
       {
         title: '状态',
@@ -464,7 +379,7 @@ class Order extends Component {
         render: text => {
           if (text === 1) return '正常';
           if (text === 2) return '已删除';
-          return ''
+          return '';
         },
       },
       {
@@ -476,19 +391,6 @@ class Order extends Component {
         title: '创建时间',
         dataIndex: 'createDate',
         width: 300,
-        // render: (value, row, index) => {
-        //   const obj = {
-        //     children: value,
-        //     props: {},
-        //   };
-        //   if (index % 2 === 0) {
-        //     obj.props.rowSpan = 2;
-        //   }
-        //   if (index % 2 === 1) {
-        //     obj.props.rowSpan = 0;
-        //   }
-        //   return obj;
-        // },
       },
       {
         title: '删除人',
@@ -496,11 +398,13 @@ class Order extends Component {
         width: 100,
         render: text => {
           if (!text) return false;
-          return (<Fragment>
-                    <span>{text[0]}</span>
-                    <Divider type="horizontal" style={{ margin: 0 }}/>
-                    <span>{text[1]}</span>
-                </Fragment>)
+          return (
+            <Fragment>
+              <span>{text[0]}</span>
+              <Divider type="horizontal" style={{ margin: 0 }} />
+              <span>{text[1]}</span>
+            </Fragment>
+          );
         },
       },
       {
@@ -509,11 +413,13 @@ class Order extends Component {
         width: 300,
         render: text => {
           if (!text) return false;
-          return (<Fragment>
-                    <span>{text[0]}</span>
-                    <Divider type="horizontal" style={{ margin: 0 }}/>
-                    <span>{text[1]}</span>
-                </Fragment>)
+          return (
+            <Fragment>
+              <span>{text[0]}</span>
+              <Divider type="horizontal" style={{ margin: 0 }} />
+              <span>{text[1]}</span>
+            </Fragment>
+          );
         },
       },
       {
@@ -527,7 +433,7 @@ class Order extends Component {
             <Select style={{ width: '90%', display: 'block', margin: '0 auto' }} defaultValue="L">
               <Option value="L">L</Option>
             </Select>
-            <Divider type="horizontal" style={{ margin: 0 }}/>
+            <Divider type="horizontal" style={{ margin: '2px 0 0 0 ' }} />
             <Select style={{ width: '90%', display: 'block', margin: '0 auto' }} defaultValue="D">
               <Option value="D">D</Option>
             </Select>
@@ -535,11 +441,13 @@ class Order extends Component {
         ),
         render: text => {
           if (!text) return false;
-          return (<Fragment>
-                    <span>{text[0]}</span>
-                    <Divider type="horizontal" style={{ margin: 0 }}/>
-                    <span>{text[1]}</span>
-                </Fragment>)
+          return (
+            <Fragment>
+              <span>{text[0]}</span>
+              <Divider type="horizontal" style={{ margin: '2px 0 0 0 ' }} />
+              <span>{text[1]}</span>
+            </Fragment>
+          );
         },
       },
       {
@@ -547,34 +455,76 @@ class Order extends Component {
         dataIndex: 'longCode',
         width: 100,
         align: 'center',
-        double: true,
+        editable: true,
+        inputType: (
+          <Fragment>
+            <Input
+              style={{ width: '90%', display: 'block', margin: '0 auto' }}
+              onChange={e => {
+                this.setState({
+                  longCode0: e.target.value,
+                });
+              }}
+            />
+            <Divider type="horizontal" style={{ margin: '2px 0 0 0 ' }} />
+            <Input
+              style={{ width: '90%', display: 'block', margin: '0 auto' }}
+              onChange={e => {
+                this.setState({
+                  longCode1: e.target.value,
+                });
+              }}
+            />
+          </Fragment>
+        ),
         render: text => {
           if (!text) return false;
-          return (<Fragment>
-                    <span>{text[0]}</span>
-                    <Divider type="horizontal" style={{ margin: 0 }}/>
-                    <span>{text[1]}</span>
-                </Fragment>)
+          return (
+            <Fragment>
+              <span>{text[0]}</span>
+              <Divider type="horizontal" style={{ margin: '2px 0 0 0 ' }} />
+              <span>{text[1]}</span>
+            </Fragment>
+          );
         },
-        editable: true,
-        inputType: <Input style={{ width: '90%', display: 'block', margin: '0 auto' }}/>,
       },
       {
         title: '短代码',
         dataIndex: 'shortCode',
         width: 100,
         align: 'center',
-        double: true,
+        editable: true,
+        inputType: (
+          <Fragment>
+            <Input
+              style={{ width: '90%', display: 'block', margin: '0 auto' }}
+              onChange={e => {
+                this.setState({
+                  shortCode0: e.target.value,
+                });
+              }}
+            />
+            <Divider type="horizontal" style={{ margin: '2px 0 0 0 ' }} />
+            <Input
+              style={{ width: '90%', display: 'block', margin: '0 auto' }}
+              onChange={e => {
+                this.setState({
+                  shortCode1: e.target.value,
+                });
+              }}
+            />
+          </Fragment>
+        ),
         render: text => {
           if (!text) return false;
-          return (<Fragment>
-                    <span>{text[0]}</span>
-                    <Divider type="horizontal" style={{ margin: 0 }}/>
-                    <span>{text[1]}</span>
-                </Fragment>)
+          return (
+            <Fragment>
+              <span>{text[0]}</span>
+              <Divider type="horizontal" style={{ margin: '2px 0 0 0 ' }} />
+              <span>{text[1]}</span>
+            </Fragment>
+          );
         },
-        editable: true,
-        inputType: <Input style={{ width: '90%', display: 'block', margin: '0 auto' }}/>,
       },
       {
         title: '操作',
@@ -632,6 +582,7 @@ class Order extends Component {
           record,
           rules: col.rules,
           inputType: col.inputType,
+          checkType: col.checkType,
           dataIndex: col.dataIndex,
           title: col.title,
           editing: rowIndex === this.state.editIndex,
@@ -644,13 +595,19 @@ class Order extends Component {
       <PageHeaderWrapper>
         <Card bordered={false}>
           <div className="tableList">
-            <Search getTableData={this.getTableData} status={commonData.status}/>
+            <TableSearchForm
+              ref={this.tableSearchFormRef}
+              initialValues={this.initialValues}
+              getTableData={this.getTableData}
+              simpleForm={this.simpleForm}
+            />
             <div className="tableListOperator">
-              <Button icon="plus" type="primary" onClick={() => this.handleAdd()}>
+              <Button type="primary" onClick={() => this.handleAdd()}>
+                <PlusOutlined />
                 新建
               </Button>
             </div>
-            <EditableContext.Provider value={this.props.form}>
+            <Form ref={this.tableFormRef}>
               <StandardTable
                 className="mytables"
                 scroll={{ x: tableWidth }}
@@ -658,12 +615,12 @@ class Order extends Component {
                 components={components}
                 selectedRows={selectedRows}
                 loading={loading}
-                data={data}
+                data={{ list, pagination }}
                 columns={columns}
                 onSelectRow={this.handleSelectRows}
                 onChange={this.handleStandardTableChange}
               />
-            </EditableContext.Provider>
+            </Form>
           </div>
         </Card>
       </PageHeaderWrapper>
@@ -671,4 +628,6 @@ class Order extends Component {
   }
 }
 
-export default Form.create()(Order);
+export default connect(({ peptide }) => ({
+  peptide,
+}))(Order);
