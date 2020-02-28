@@ -16,12 +16,8 @@ class Order extends Component {
   tableFormRef = React.createRef();
 
   state = {
-    formValues: {
-      page: 1,
-      rows: 10,
-    },
+    pagination: {},
     list: [],
-    total: 0,
     loading: false,
     visible: false, // 遮罩层的判断
     dataSon: [],
@@ -34,8 +30,8 @@ class Order extends Component {
     range_area: '10-3110',
     stock_factory: '',
     brandCode: '',
-    page: 1,
-    rows: 10,
+    // page: 1,
+    // rows: 10,
   };
 
   componentDidMount() {
@@ -93,23 +89,34 @@ class Order extends Component {
 
   // 获取表格数据
   getTableData = (options = {}) => {
-    const { formValues } = this.state;
+    this.setState({ loading: true });
+
+    const formData = this.tableSearchFormRef.current
+      ? this.tableSearchFormRef.current.getFieldsValue()
+      : '';
+    const { pagination } = this.state;
+    const { current: page, pageSize: rows } = pagination;
     const conditions = [];
     conditions['range.channel'] = options.range_area ? options.range_area.split('-')[0] : '';
     conditions['range.organization'] = options.range_area ? options.range_area.split('-')[1] : '';
     conditions['stock.factory'] = options.stock_factory ? options.stock_factory : 3100;
-    const query = Object.assign({}, formValues, options, conditions);
+    const data = {
+      page,
+      rows,
+      ...conditions,
+      ...formData,
+      ...options,
+    };
 
-    this.setState({
-      formValues: query,
-      loading: true,
-    });
-
-    api.basic.getProducts(query).then(data => {
+    api.basic.getProducts(data).then(res => {
       this.setState({
-        list: data,
-        total: data.length,
+        list: res,
         loading: false,
+        pagination: {
+          current: data.page,
+          pageSize: data.rows,
+          total: res.total,
+        },
       });
     });
   };
@@ -206,16 +213,7 @@ class Order extends Component {
   };
 
   render() {
-    const {
-      formValues: { page: current, rows: pageSize },
-      list,
-      total,
-      loading,
-      visible,
-      dataSon,
-      loadingSon,
-    } = this.state;
-    const data = { list, pagination: { current, pageSize, total } };
+    const { list, loading, visible, dataSon, loadingSon } = this.state;
     // const {
     //   peptide: { commonData },
     // } = this.props;
@@ -382,7 +380,7 @@ class Order extends Component {
           <div className="divTables">
             <Table
               bordered
-              dataSource={data.list}
+              dataSource={list}
               columns={columns}
               scroll={{ x: tableWidth, y: 350 }}
               rowKey="code"
