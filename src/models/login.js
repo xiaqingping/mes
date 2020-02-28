@@ -32,7 +32,6 @@ const Model = {
           type: 'user/saveCurrentUser',
           payload: response,
         });
-        console.log(response);
 
         if (response) {
           const urlParams = new URL(window.location.href);

@@ -7,7 +7,7 @@ const { pwa } = defaultSettings;
 
 // 所有路由信息
 const routes = require('./router');
-const { REACT_APP_ENV, BASE_API } = process.env;
+const { BASE_API } = process.env;
 const plugins = [
   ['umi-plugin-antd-icon-config', {}],
   [
@@ -61,7 +61,6 @@ export default {
   },
   define: {
     BASE_API: BASE_API || 'dev',
-    REACT_APP_ENV: REACT_APP_ENV || false,
   },
   ignoreMomentLocale: true,
   lessLoaderOptions: {
