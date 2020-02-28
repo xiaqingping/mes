@@ -1,149 +1,37 @@
 // 多肽纯度
-import {
-  Button,
-  Card,
-  Col,
-  Divider,
-  Form,
-  Input,
-  Row,
-  Select,
-  message,
-  Popconfirm,
-} from 'antd';
+import { Button, Card, Col, Divider, Form, Input, Select, message, Popconfirm } from 'antd';
 import React, { Component } from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import StandardTable from '@/components/StandardTable';
 import api from '@/api';
 import { connect } from 'dva';
+import TableSearchForm from '@/components/TableSearchForm';
+import EditableCell from '@/components/EditableCell';
+import { PlusOutlined } from '@ant-design/icons';
 
-const EditableContext = React.createContext();
 const FormItem = Form.Item;
 const { Option } = Select;
 
-/**
- * 页面顶部筛选表单
- */
-@Form.create()
-class Search extends Component {
-  componentDidMount() {
-    this.submit();
-  }
-
-  submit = e => {
-    if (e) e.preventDefault();
-    const val = this.props.form.getFieldsValue();
-    this.props.getTableData({ page: 1, ...val });
-  }
-
-  handleFormReset = () => {
-    this.props.form.resetFields();
-  }
-
-  // 渲染表单
-  renderForm = () => {
-    const {
-      form: { getFieldDecorator },
-      status,
-    } = this.props;
-    return (
-      <Form onSubmit={this.submit} layout="inline">
-      <Row gutter={{ lg: 24, md: 12, sm: 6 }}>
-        <Col lg={6} md={8} sm={12}>
-          <FormItem label="编号">
-            {getFieldDecorator('code')(<Input />)}
-          </FormItem>
-        </Col>
-        <Col lg={6} md={8} sm={12}>
-          <FormItem label="修饰类型">
-            {getFieldDecorator('modificationType')(<Input />)}
-          </FormItem>
-        </Col>
-        <Col lg={6} md={8} sm={12}>
-          <FormItem label="状态">
-          {getFieldDecorator('status', { initialValue: 1 })(
-            <Select>
-              {status.map(item =>
-                <Option key={item.id} value={item.id}>{item.name}</Option>,
-              )}
-            </Select>)}
-          </FormItem>
-        </Col>
-        <Col lg={6} md={8} sm={12}>
-          <span className="submitButtons">
-            <Button type="primary" htmlType="submit">
-              查询
-            </Button>
-            <Button style={{ marginLeft: 8 }} onClick={this.handleFormReset}>
-              重置
-            </Button>
-          </span>
-        </Col>
-      </Row>
-    </Form>
-    );
-  }
-
-  render() {
-    return (
-      <div className="tableListForm">{this.renderForm()}</div>
-    );
-  }
-}
-
-/**
- * 表格编辑组件
- */
-class EditableCell extends React.Component {
-  renderCell = ({ getFieldDecorator }) => {
-    const {
-      editing,
-      dataIndex,
-      title,
-      inputType,
-      record,
-      index,
-      children,
-      rules,
-      ...restProps
-    } = this.props;
-    if (editing) {
-      return (
-        <td {...restProps} style={{ padding: 0 }}>
-            <Form.Item>
-              {getFieldDecorator(dataIndex, {
-                rules,
-                initialValue: record[dataIndex],
-              })(inputType)}
-            </Form.Item>
-        </td>
-      );
-    }
-    return (<td {...restProps}>{children}</td>);
-  };
-
-
-  render() {
-    return <EditableContext.Consumer>{this.renderCell}</EditableContext.Consumer>;
-  }
-}
-
-@connect(({ peptide }) => ({
-  peptide,
-}))
 class ModificationsType extends Component {
+  tableSearchFormRef = React.createRef();
+
+  tableFormRef = React.createRef();
+
   state = {
-    formValues: {
-      page: 1,
-      rows: 10,
-    },
+    pagination: {},
     list: [],
-    total: 0,
     loading: false,
     selectedRows: [],
     editIndex: -1,
     id: 0, // 新增数据时，提供负数id
-  }
+  };
+
+  // 顶部表单默认值
+  initialValues = {
+    status: 1,
+    page: 1,
+    rows: 10,
+  };
 
   columns = [
     {
@@ -156,10 +44,8 @@ class ModificationsType extends Component {
       dataIndex: 'modificationType',
       width: 200,
       editable: true,
-      inputType: <Input style={{ width: '90%' }}/>,
-      rules: [
-        { required: true, message: '必填' },
-      ],
+      inputType: <Input style={{ width: '90%' }} />,
+      rules: [{ required: true, message: '必填' }],
     },
     {
       title: '状态',
@@ -168,7 +54,7 @@ class ModificationsType extends Component {
       render: text => {
         if (text === 1) return '正常';
         if (text === 2) return '已删除';
-        return ''
+        return '';
       },
     },
     {
@@ -227,7 +113,7 @@ class ModificationsType extends Component {
   ];
 
   componentDidMount() {
-    //
+    this.getTableData(this.initialValues);
   }
 
   // 分页
@@ -236,7 +122,7 @@ class ModificationsType extends Component {
       page: pagination.current,
       rows: pagination.pageSize,
     });
-  }
+  };
 
   // 选择行
   handleSelectRows = rows => {
@@ -247,25 +133,29 @@ class ModificationsType extends Component {
 
   // 获取表格数据
   getTableData = (options = {}) => {
-    const { formValues } = this.state;
-    const query = Object.assign({}, formValues, options);
-    this.setState({
-      formValues: query,
-      loading: true,
-    });
+    this.setState({ loading: true });
+    const formData = this.tableSearchFormRef.current.getFieldsValue();
+    const { pagination } = this.state;
+    const { current: page, pageSize: rows } = pagination;
+    const data = {
+      page,
+      rows,
+      ...formData,
+      ...options,
+    };
 
-    api.peptideBase.getModificationTypes(query, true).then(res => {
+    api.peptideBase.getModificationTypes(data, true).then(res => {
       this.setState({
         list: res.rows,
-        total: res.total,
+        pagination: {
+          current: data.page,
+          pageSize: data.rows,
+          total: res.total,
+        },
         loading: false,
         editIndex: -1,
       });
     });
-  }
-
-  handleFormReset = () => {
-    this.props.form.resetFields();
   };
 
   // 退出编辑
@@ -279,7 +169,7 @@ class ModificationsType extends Component {
         editIndex: index,
       });
     }
-  }
+  };
 
   // 删除数据
   deleteRow = row => {
@@ -296,9 +186,9 @@ class ModificationsType extends Component {
   };
 
   // 保存
-  saveRow = index => {
-    this.props.form.validateFields((error, row) => {
-      if (error) return;
+  saveRow = async index => {
+    try {
+      const row = await this.tableFormRef.current.validateFields();
       const { list } = this.state;
       const newData = { ...list[index], ...row };
       if (newData.id > 0) {
@@ -306,8 +196,10 @@ class ModificationsType extends Component {
       } else {
         api.peptideBase.insertModificationTypes(newData).then(() => this.getTableData());
       }
-    });
-  }
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   // 新增
   handleAdd = () => {
@@ -318,6 +210,7 @@ class ModificationsType extends Component {
     }
 
     const newId = id - 1;
+    this.tableFormRef.current.resetFields();
     this.setState({
       id: newId,
       editIndex: 0,
@@ -328,19 +221,44 @@ class ModificationsType extends Component {
         ...list,
       ],
     });
-  }
+  };
+
+  simpleForm = () => {
+    const {
+      peptide: {
+        commonData: { status },
+      },
+    } = this.props;
+    return (
+      <>
+        <Col lg={6} md={8} sm={12}>
+          <FormItem label="编号" name="code">
+            <Input />
+          </FormItem>
+        </Col>
+        <Col lg={6} md={8} sm={12}>
+          <FormItem label="修饰类型" name="modificationType">
+            <Input />
+          </FormItem>
+        </Col>
+        <Col lg={6} md={8} sm={12}>
+          <FormItem label="状态" name="status">
+            <Select>
+              {status.map(item => (
+                <Option key={item.id} value={item.id}>
+                  {item.name}
+                </Option>
+              ))}
+            </Select>
+          </FormItem>
+        </Col>
+      </>
+    );
+  };
 
   render() {
-    const {
-      formValues: { page: current, rows: pageSize },
-      selectedRows,
-      list,
-      total,
-      loading,
-    } = this.state;
-    const data = { list, pagination: { current, pageSize, total } };
+    const { pagination, selectedRows, list, loading } = this.state;
     let tableWidth = 0;
-    const { peptide: { commonData } } = this.props
 
     const components = {
       body: {
@@ -372,25 +290,31 @@ class ModificationsType extends Component {
       <PageHeaderWrapper>
         <Card bordered={false}>
           <div className="tableList">
-            <Search getTableData={this.getTableData} status={commonData.status}/>
+            <TableSearchForm
+              ref={this.tableSearchFormRef}
+              initialValues={this.initialValues}
+              getTableData={this.getTableData}
+              simpleForm={this.simpleForm}
+            />
             <div className="tableListOperator">
-              <Button icon="plus" type="primary" onClick={() => this.handleAdd()}>
+              <Button type="primary" onClick={() => this.handleAdd()}>
+                <PlusOutlined />
                 新建
               </Button>
             </div>
-            <EditableContext.Provider value={this.props.form}>
+            <Form ref={this.tableFormRef}>
               <StandardTable
                 scroll={{ x: tableWidth }}
                 rowClassName="editable-row"
                 components={components}
                 selectedRows={selectedRows}
                 loading={loading}
-                data={data}
+                data={{ list, pagination }}
                 columns={columns}
                 onSelectRow={this.handleSelectRows}
                 onChange={this.handleStandardTableChange}
               />
-            </EditableContext.Provider>
+            </Form>
           </div>
         </Card>
       </PageHeaderWrapper>
@@ -398,4 +322,6 @@ class ModificationsType extends Component {
   }
 }
 
-export default Form.create()(ModificationsType);
+export default connect(({ peptide }) => ({
+  peptide,
+}))(ModificationsType);

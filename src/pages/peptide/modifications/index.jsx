@@ -18,12 +18,11 @@ import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import StandardTable from '@/components/StandardTable';
 import api from '@/api';
 import { connect } from 'dva';
-// import AminoAcid from '@/pages/peptide/components/amino-acid-mask';
+import AminoAcid from '@/pages/peptide/components/amino-acid-mask';
 import TableSearchForm from '@/components/TableSearchForm';
 import EditableCell from '@/components/EditableCell';
 import { PlusOutlined } from '@ant-design/icons';
 
-const EditableContext = React.createContext();
 const FormItem = Form.Item;
 const { Option } = Select;
 const { Search } = Input;
@@ -35,6 +34,8 @@ class Modifications extends Component {
   tableSearchFormRef = React.createRef();
 
   tableFormRef = React.createRef();
+
+  tableFormRef1 = React.createRef();
 
   state = {
     pagination: {},
@@ -71,25 +72,19 @@ class Modifications extends Component {
 
   // 设置子值
   dataSon = (v, e) => {
-    if (
-      e.target.className === 'operate' ||
-      e.target.className.indexOf('ant-btn-sm') !== -1 ||
-      v.id < 1
-    ) {
-      // 点击范围控制
-      return;
-    }
-    this.setState({
-      loadingSon: true,
-    });
-    setTimeout(() => {
+    if (e.target.className === 'ant-table-cell') {
       this.setState({
-        dataSon: v.details,
-        selectParantData: true,
-        loadingSon: false,
-        parantData: v,
+        loadingSon: true,
       });
-    }, 500);
+      setTimeout(() => {
+        this.setState({
+          dataSon: v.details,
+          selectParantData: true,
+          loadingSon: false,
+          parantData: v,
+        });
+      }, 500);
+    }
   };
 
   // 分页
@@ -200,10 +195,9 @@ class Modifications extends Component {
   };
 
   // 保存
-  saveRow = (index, son) => {
+  saveRow = async (index, son) => {
     if (son === 'son') {
-      this.props.form.validateFields(error => {
-        if (error) return;
+      try {
         const { parantData, sonAminoAcid } = this.state;
         const newData = {
           name: sonAminoAcid.name,
@@ -221,10 +215,12 @@ class Modifications extends Component {
             this.getTableData([], 'son');
           });
         }
-      });
+      } catch (error) {
+        console.log(error);
+      }
     } else {
-      this.props.form.validateFields((error, row) => {
-        if (error) return;
+      try {
+        const row = await this.tableFormRef.current.validateFields();
         const { list } = this.state;
         const newData = {
           ...list[index],
@@ -236,7 +232,9 @@ class Modifications extends Component {
         } else {
           api.peptideBase.insertModifications(newData).then(() => this.getTableData());
         }
-      });
+      } catch (error) {
+        console.log(error);
+      }
     }
   };
 
@@ -249,6 +247,7 @@ class Modifications extends Component {
     }
 
     const newId = id - 1;
+    this.tableFormRef.current.resetFields();
     this.setState({
       id: newId,
       editIndex: 0,
@@ -275,6 +274,7 @@ class Modifications extends Component {
     }
 
     const newId = id - 1;
+    this.tableFormRef1.current.resetFields();
     this.setState({
       id: newId,
       editIndexSon: 0,
@@ -293,19 +293,9 @@ class Modifications extends Component {
     this.setState({
       sonAminoAcid: data,
     });
-    this.props.form.setFieldsValue({
+    this.tableFormRef1.current.setFieldsValue({
       code: data.code,
       name: data.name,
-    });
-  };
-
-  clearInput = () => {
-    this.setState({
-      sonAminoAcid: [],
-    });
-    this.props.form.setFieldsValue({
-      code: '',
-      name: '',
     });
   };
 
@@ -426,7 +416,8 @@ class Modifications extends Component {
         width: 100,
         render: text => (text === 1 ? '√' : ''),
         editable: true,
-        inputType: <Checkbox style={{ textAlign: 'center', display: 'block' }} />,
+        checkType: true,
+        inputType: <Checkbox />,
       },
       {
         title: '修饰类别',
@@ -640,6 +631,7 @@ class Modifications extends Component {
           record,
           rules: col.rules,
           inputType: col.inputType,
+          checkType: col.checkType,
           dataIndex: col.dataIndex,
           title: col.title,
           editing: rowIndex === this.state.editIndex,
@@ -706,7 +698,7 @@ class Modifications extends Component {
                   <PlusOutlined />
                   新建
                 </Button>
-                <EditableContext.Provider value={this.props.form}>
+                <Form ref={this.tableFormRef1}>
                   <Table
                     scroll={{ x: tableWidthSon }}
                     loading={loadingSon}
@@ -717,19 +709,19 @@ class Modifications extends Component {
                     rowClassName="editable-row"
                     components={components}
                   />
-                </EditableContext.Provider>
+                </Form>
               </Col>
             </Row>
           </div>
         </Card>
-        {/* <AminoAcid
+        <AminoAcid
           getData={v => {
             this.getSonAminoAcid(v);
           }}
           onRef={ref => {
             this.AminoAcidShow = ref;
           }}
-        /> */}
+        />
       </PageHeaderWrapper>
     );
   }

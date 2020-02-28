@@ -154,7 +154,9 @@ class Order extends Component {
 
   simpleForm = () => {
     const {
-      peptide: { commonData },
+      peptide: {
+        commonData: { status },
+      },
     } = this.props;
     return (
       <>
@@ -171,7 +173,7 @@ class Order extends Component {
         <Col lg={6} md={8} sm={12}>
           <FormItem label="状态" name="status">
             <Select>
-              {commonData.status.map(item => (
+              {status.map(item => (
                 <Option key={item.id} value={item.id}>
                   {item.name}
                 </Option>

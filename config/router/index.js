@@ -33,7 +33,7 @@ module.exports = [
             path: '/',
             redirect: '/seq',
           },
-          // dashboard,
+          dashboard,
           seq,
           // bp,
           // operation,

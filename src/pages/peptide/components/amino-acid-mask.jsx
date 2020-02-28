@@ -1,125 +1,44 @@
 // 氨基酸弹框
-import {
-  Button,
-  Col,
-  Divider,
-  Form,
-  Input,
-  Row,
-  Select,
-  Table,
-  Modal,
-} from 'antd';
+import { Col, Divider, Form, Input, Select, Table, Modal } from 'antd';
 import React, { Component, Fragment } from 'react';
 
 import api from '@/api';
-import './style.less'
+import './style.less';
 import { connect } from 'dva';
+import TableSearchForm from '@/components/TableSearchForm';
 
 const FormItem = Form.Item;
 const { Option } = Select;
 
-/**
- * 页面顶部筛选表单
- */
-@Form.create()
-class Search extends Component {
-  componentDidMount() {
-    this.submit();
-  }
-
-  submit = e => {
-    if (e) e.preventDefault();
-    const val = this.props.form.getFieldsValue();
-    this.props.getTableData({ page: 1, ...val });
-  }
-
-  handleFormReset = () => {
-    this.props.form.resetFields();
-  }
-
-  // 渲染表单
-  renderForm = () => {
-    const {
-      form: { getFieldDecorator },
-      status,
-    } = this.props;
-    return (
-      <Form onSubmit={this.submit} layout="inline">
-        <Row gutter={{ lg: 24, md: 12, sm: 6 }}>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="编号">
-              {getFieldDecorator('code')(<Input />)}
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="名称">
-              {getFieldDecorator('name')(<Input />)}
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="代码">
-            {getFieldDecorator('aminoAcidCode')(<Input />)}
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="状态">
-            {getFieldDecorator('status', { initialValue: 1 })(
-                <Select>
-                    {status.map(item =>
-                      <Option key={item.id} value={item.id}>{item.name}</Option>,
-                    )}
-                  </Select>)}
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <span className="submitButtons">
-              <Button type="primary" htmlType="submit">
-                查询
-              </Button>
-              <Button style={{ marginLeft: 8 }} onClick={this.handleFormReset}>
-                重置
-              </Button>
-            </span>
-          </Col>
-        </Row>
-      </Form>
-    );
-  }
-
-  render() {
-    return (
-      <div className="tableListForm">{this.renderForm()}</div>
-    );
-  }
-}
-
-@connect(({ peptide }) => ({
-  peptide,
-}))
 class Order extends Component {
+  tableSearchFormRef = React.createRef();
+
   state = {
-    formValues: {
-      page: 1,
-      rows: 10,
-    },
+    pagination: {},
     list: [],
-    total: 0,
     loading: false,
     visible: false, // 遮罩层的判断
-  }
+  };
 
-  componentDidMount () {
+  // 顶部表单默认值
+  initialValues = {
+    status: 1,
+    page: 1,
+    rows: 10,
+  };
+
+  componentDidMount() {
     this.props.onRef(this);
   }
 
   visibleShow = visible => {
-    this.setState({ visible })
-  }
+    this.setState({ visible });
+    this.getTableData(this.initialValues);
+  };
 
   handleSelect = data => {
     this.props.getData(data);
-    this.handleCancel()
+    this.handleCancel();
   };
 
   handleCancel = () => {
@@ -134,20 +53,27 @@ class Order extends Component {
       page: pagination.current,
       rows: pagination.pageSize,
     });
-  }
+  };
 
   // 获取表格数据
   getTableData = (options = {}) => {
-    const { formValues } = this.state;
-    const query = Object.assign({}, formValues, options);
+    this.setState({ loading: true });
 
-    this.setState({
-      formValues: query,
-      loading: true,
-    });
+    const formData = this.tableSearchFormRef.current
+      ? this.tableSearchFormRef.current.getFieldsValue()
+      : '';
+    const { pagination } = this.state;
+    const { current: page, pageSize: rows } = pagination;
+    const datas = {
+      page,
+      rows,
+      ...formData,
+      ...options,
+    };
 
-    api.peptideBase.getAminoAcid(query, true).then(data => {
-      const map = {}; const dest = [];
+    api.peptideBase.getAminoAcid(datas, true).then(data => {
+      const map = {};
+      const dest = [];
       for (let i = 0; i < data.rows.length; i++) {
         const ai = data.rows[i];
         if (!map[ai.id]) {
@@ -186,7 +112,8 @@ class Order extends Component {
               dj.longCode = dj.longCode || ai.longCode ? [dj.longCode, ai.longCode] : '';
               // dj.longCode = (dj.longCode ? dj.longCode : '')
               // + (ai.longCode ? ` | ${ai.longCode}` : '');
-              dj.aminoAcidType = dj.aminoAcidType || ai.aminoAcidType ? [dj.aminoAcidType, ai.aminoAcidType] : '';
+              dj.aminoAcidType =
+                dj.aminoAcidType || ai.aminoAcidType ? [dj.aminoAcidType, ai.aminoAcidType] : '';
               // dj.aminoAcidType = (dj.aminoAcidType ? dj.aminoAcidType : '')
               // + (ai.aminoAcidType ? ` | ${ai.aminoAcidType}` : '');
               break;
@@ -197,25 +124,59 @@ class Order extends Component {
       this.setState({
         loading: false,
         list: dest,
-        total: dest.length * 2,
+        pagination: {
+          current: datas.page,
+          pageSize: datas.rows,
+          total: dest.length * 2,
+        },
       });
     });
-  }
+  };
 
   handleFormReset = () => {
-    this.props.form.resetFields();
+    this.tableSearchFormRef.current.resetFields();
+  };
+
+  simpleForm = () => {
+    const {
+      peptide: {
+        commonData: { status },
+      },
+    } = this.props;
+    return (
+      <>
+        <Col lg={6} md={8} sm={12}>
+          <FormItem label="编号" name="code">
+            <Input />
+          </FormItem>
+        </Col>
+        <Col lg={6} md={8} sm={12}>
+          <FormItem label="名称" name="name">
+            <Input />
+          </FormItem>
+        </Col>
+        <Col lg={6} md={8} sm={12}>
+          <FormItem label="代码" name="aminoAcidCode">
+            <Input />
+          </FormItem>
+        </Col>
+        <Col lg={6} md={8} sm={12}>
+          <FormItem label="状态" name="status">
+            <Select>
+              {status.map(item => (
+                <Option key={item.id} value={item.id}>
+                  {item.name}
+                </Option>
+              ))}
+            </Select>
+          </FormItem>
+        </Col>
+      </>
+    );
   };
 
   render() {
-    const {
-      formValues: { page: current, rows: pageSize },
-      list,
-      total,
-      loading,
-      visible,
-    } = this.state;
-    const data = { list, pagination: { current, pageSize, total } };
-    const { peptide: { commonData } } = this.props
+    const { pagination, list, loading, visible } = this.state;
     let tableWidth = 0;
 
     let columns = [
@@ -291,7 +252,7 @@ class Order extends Component {
         render: text => {
           if (text === 1) return '正常';
           if (text === 2) return '已删除';
-          return ''
+          return '';
         },
       },
       {
@@ -310,11 +271,13 @@ class Order extends Component {
         width: 100,
         render: text => {
           if (!text) return false;
-          return (<Fragment>
-                    <span>{text[0]}</span>
-                    <Divider type="horizontal" style={{ margin: 0 }}/>
-                    <span>{text[1]}</span>
-                </Fragment>)
+          return (
+            <Fragment>
+              <span>{text[0]}</span>
+              <Divider type="horizontal" style={{ margin: 0 }} />
+              <span>{text[1]}</span>
+            </Fragment>
+          );
         },
       },
       {
@@ -323,11 +286,13 @@ class Order extends Component {
         width: 300,
         render: text => {
           if (!text) return false;
-          return (<Fragment>
-                    <span>{text[0]}</span>
-                    <Divider type="horizontal" style={{ margin: 0 }}/>
-                    <span>{text[1]}</span>
-                </Fragment>)
+          return (
+            <Fragment>
+              <span>{text[0]}</span>
+              <Divider type="horizontal" style={{ margin: 0 }} />
+              <span>{text[1]}</span>
+            </Fragment>
+          );
         },
       },
       {
@@ -337,11 +302,13 @@ class Order extends Component {
         align: 'center',
         render: text => {
           if (!text) return false;
-          return (<Fragment>
-                    <span>{text[0]}</span>
-                    <Divider type="horizontal" style={{ margin: 0 }}/>
-                    <span>{text[1]}</span>
-                </Fragment>)
+          return (
+            <Fragment>
+              <span>{text[0]}</span>
+              <Divider type="horizontal" style={{ margin: 0 }} />
+              <span>{text[1]}</span>
+            </Fragment>
+          );
         },
       },
       {
@@ -352,11 +319,13 @@ class Order extends Component {
         double: true,
         render: text => {
           if (!text) return false;
-          return (<Fragment>
-                    <span>{text[0]}</span>
-                    <Divider type="horizontal" style={{ margin: 0 }}/>
-                    <span>{text[1]}</span>
-                </Fragment>)
+          return (
+            <Fragment>
+              <span>{text[0]}</span>
+              <Divider type="horizontal" style={{ margin: 0 }} />
+              <span>{text[1]}</span>
+            </Fragment>
+          );
         },
       },
       {
@@ -367,39 +336,29 @@ class Order extends Component {
         double: true,
         render: text => {
           if (!text) return false;
-          return (<Fragment>
-                    <span>{text[0]}</span>
-                    <Divider type="horizontal" style={{ margin: 0 }}/>
-                    <span>{text[1]}</span>
-                </Fragment>)
+          return (
+            <Fragment>
+              <span>{text[0]}</span>
+              <Divider type="horizontal" style={{ margin: 0 }} />
+              <span>{text[1]}</span>
+            </Fragment>
+          );
         },
       },
       {
         title: '操作',
         dataIndex: 'actions',
         fixed: 'right',
-        render: (text, record) => (
-          <a onClick={() => this.handleSelect(record)}>选择</a>
-        ),
+        render: (text, record) => <a onClick={() => this.handleSelect(record)}>选择</a>,
       },
     ];
-
 
     columns = columns.map(col => {
       // eslint-disable-next-line no-param-reassign
       if (!col.width) col.width = 100;
       tableWidth += col.width;
-      return col
+      return col;
     });
-
-    // const rowSelection = {
-    //   type: 'radio',
-    //   onChange: (selectedRowKeys, selectedRows) => {
-    //       this.setState({
-    //           data: selectedRows[0],
-    //         })
-    //     },
-    // }
 
     return (
       <div>
@@ -411,23 +370,29 @@ class Order extends Component {
           onCancel={this.handleCancel}
           footer={null}
         >
-            <Search getTableData={this.getTableData} status={commonData.status}/>
-            <div className="tableListOperator">
-            </div>
-              <Table
-                dataSource={data.list}
-                columns={columns}
-                scroll={{ x: tableWidth, y: 400 }}
-                pagination={data.pagination}
-                rowKey="code"
-                // rowSelection={rowSelection}
-                loading={loading}
-                onChange={this.handleStandardTableChange}
-               />
+          <TableSearchForm
+            ref={this.tableSearchFormRef}
+            initialValues={this.initialValues}
+            getTableData={this.getTableData}
+            simpleForm={this.simpleForm}
+          />
+          <div className="tableListOperator" />
+          <Table
+            dataSource={list}
+            columns={columns}
+            scroll={{ x: tableWidth, y: 400 }}
+            pagination={pagination}
+            rowKey="code"
+            // rowSelection={rowSelection}
+            loading={loading}
+            onChange={this.handleStandardTableChange}
+          />
         </Modal>
       </div>
     );
   }
 }
 
-export default Form.create()(Order);
+export default connect(({ peptide }) => ({
+  peptide,
+}))(Order);
