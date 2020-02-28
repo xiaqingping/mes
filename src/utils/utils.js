@@ -4,6 +4,7 @@ import pathRegexp from 'path-to-regexp';
 import { formatMessage } from 'umi/locale';
 
 /* eslint no-useless-escape:0 import/prefer-default-export:0 */
+// eslint-disable-next-line max-len
 const reg = /(((^https?:(?:\/\/)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+(?::\d+)?|(?:www.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\+=&;%@.\w_]*)#?(?:[\w]*))?)$/;
 export const isUrl = path => reg.test(path);
 
@@ -58,12 +59,12 @@ export const formatSelectData = (list, key1, key2) => {
     return {
       ...e,
       text: `${code} - ${name}`,
-    }
+    };
   });
 };
 
 /**
- * 数据格式化
+ * 根据 key1 在 arr 中遍历查找 value，并返回匹配数据的 key2
  * @param {Array} arr 需要遍历的数组
  * @param {any} value 输入数据
  * @param {string} key1 查找字段（默认id）
@@ -89,6 +90,7 @@ export const formatter = (arr, value, key1, key2) => {
  * 验证表单所有字段
  *   正确返回 [true, data]
  *   错误返回 [false, error]
+ * @param {Object} form
  */
 export const validateForm = form =>
   form
@@ -98,7 +100,7 @@ export const validateForm = form =>
 
 /**
  * 获取表单的值（不验证）
- * @param {Object}} form
+ * @param {Object} form
  */
 export const getFormValue = form => form.getFieldsValue();
 
@@ -157,3 +159,74 @@ export const validateEmpty = (val, fieldName) => {
  * @param {String} id
  */
 export const format = id => formatMessage({ id });
+
+/**
+ * 获取缓存数据
+ * @param {String} namespace 全局 Store 命名空间
+ * @param {Object} action
+ * @param {Object} effects
+ * @param {Object} defaultApi 默认请求接口列表
+ * @param {Object} customApi 自定义请求接口列表
+ */
+export function* getCache(namespace, action, effects, defaultApi, customApi) {
+  const { payload } = action;
+  const { call, put, select } = effects;
+  const { type, options } = payload;
+
+  let targetState;
+
+  // 一：如果目标上已经有数据了，则放弃本次请求
+  targetState = yield select(state => state[namespace][type]);
+  // 类型：数组，检查 length
+  if (targetState instanceof Array && targetState.length > 0) return;
+
+  // 二：检查浏览器缓存数据是否有目标数据
+  targetState = JSON.parse(sessionStorage.getItem(`${namespace}/${type}`));
+
+  if (!targetState) {
+    // 三：确定请求方法
+    // example: type = countrys，则 methodName = getCountrys，如果你的接口命名规则与此不同，则需要将你的方法写到 customApi 里
+    let method;
+    if (customApi[type]) {
+      method = customApi[type];
+    } else {
+      const methodName = `get${type.slice(0, 1).toUpperCase()}${type.slice(1)}`;
+      if (!defaultApi[methodName]) {
+        console.error(`${namespace} getCache type=${type} 对应的接口不存在`);
+        return;
+      }
+      method = defaultApi[methodName];
+    }
+
+    // 四：请求数据
+    try {
+      targetState = yield call(method, options);
+    } catch (error) {
+      console.error(`${namespace} getCache type=${type} 接口请求失败`);
+    }
+  }
+
+  if (targetState) {
+    // 五：设置数据
+    yield put({
+      type: 'setCache',
+      payload: { type, targetState },
+    });
+  }
+}
+
+/**
+ * 设置数据缓存
+ * @param {String} namespace 全局 Store 命名空间
+ * @param {Object} payload { type 缓存目标, targetState 缓存目标数据 }
+ * @param {Function} fun 数据处理方法
+ */
+export const setCache = (namespace, payload, fun) => {
+  const { type, targetState } = payload;
+
+  const data = (fun[type] && fun[type](targetState)) || targetState;
+
+  sessionStorage.setItem(`${namespace}/${type}`, JSON.stringify(data));
+
+  return { type, data };
+};
