@@ -1,4 +1,4 @@
-import { routerRedux } from 'dva/router';
+import { routerRedux } from 'dva';
 import { stringify } from 'querystring';
 
 import user from '@/api/user';
