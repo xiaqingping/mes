@@ -7,16 +7,14 @@
 推荐使用 [yarn](https://yarn.bootcss.com/) 管理项目依赖。
 
 ```bash
-# 使用 npm 安装依赖
-npm install
 # 使用 yarn 安装依赖
 yarn install
 
 # 开发
-npm start
+yarn start
 
 # 生产
-npm run build
+yarn run build
 ```
 
 ## 2. 技术栈
