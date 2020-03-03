@@ -81,10 +81,10 @@ TableSearchForm.defaultProps = {
 };
 
 TableSearchForm.propTypes = {
-  getTableData: PropTypes.func.isRequired,
   initialValues: PropTypes.object,
-  simpleForm: PropTypes.elementType,
-  advancedForm: PropTypes.elementType,
+  getTableData: PropTypes.func.isRequired,
+  simpleForm: PropTypes.func,
+  advancedForm: PropTypes.func,
 };
 
 export default TableSearchForm;
