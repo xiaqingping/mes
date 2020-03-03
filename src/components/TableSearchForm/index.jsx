@@ -1,11 +1,7 @@
-import {
-  Button,
-  Col,
-  Form,
-  Row,
-} from 'antd';
+import { Button, Col, Form, Row } from 'antd';
 import { DownOutlined, UpOutlined } from '@ant-design/icons';
 import React, { useState } from 'react';
+import PropTypes from 'prop-types';
 import { FormattedMessage } from 'umi/locale';
 import styles from './index.less';
 
@@ -23,7 +19,7 @@ const TableSearchForm = React.forwardRef((props, ref) => {
 
   // 查询
   const onFinish = () => {
-    props.getTableData({ page: 1 })
+    props.getTableData({ page: 1 });
   };
 
   return (
@@ -46,28 +42,49 @@ const TableSearchForm = React.forwardRef((props, ref) => {
           </Button>
           <Button
             style={{ marginLeft: 8 }}
-            onClick={() => { form.resetFields() }}
+            onClick={() => {
+              form.resetFields();
+            }}
           >
             <FormattedMessage id="action.reset" />
           </Button>
-          {
-            props.advancedForm ? (
-              <a
-                style={{ marginLeft: 8, fontSize: 12 }}
-                onClick={() => { setExpand(!expand) }}
-              >
-                {
-                  expand
-                  ? <><FormattedMessage id="action.unexpand" /><UpOutlined /></>
-                  : <><FormattedMessage id="action.expand" /><DownOutlined /></>
-                }
-              </a>
-            ) : null
-          }
+          {props.advancedForm ? (
+            <a
+              style={{ marginLeft: 8, fontSize: 12 }}
+              onClick={() => {
+                setExpand(!expand);
+              }}
+            >
+              {expand ? (
+                <>
+                  <FormattedMessage id="action.unexpand" />
+                  <UpOutlined />
+                </>
+              ) : (
+                <>
+                  <FormattedMessage id="action.expand" />
+                  <DownOutlined />
+                </>
+              )}
+            </a>
+          ) : null}
         </Col>
       </Row>
     </Form>
   );
-})
+});
+
+TableSearchForm.defaultProps = {
+  initialValues: {},
+  simpleForm: null,
+  advancedForm: null,
+};
+
+TableSearchForm.propTypes = {
+  getTableData: PropTypes.func.isRequired,
+  initialValues: PropTypes.object,
+  simpleForm: PropTypes.elementType,
+  advancedForm: PropTypes.elementType,
+};
 
 export default TableSearchForm;
