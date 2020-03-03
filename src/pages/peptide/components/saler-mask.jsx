@@ -1,5 +1,5 @@
 // 销售员弹框
-import { Button, Col, Form, Input, Row, Select, Table, Modal } from 'antd';
+import { Col, Form, Input, Select, Table, Modal } from 'antd';
 import React, { Component } from 'react';
 
 import api from '@/api';
@@ -17,15 +17,18 @@ class Saler extends Component {
   tableFormRef = React.createRef();
 
   state = {
-    formValues: {
-      page: 1,
-      rows: 10,
-    },
+    pagination: {},
     list: [],
-    total: 0,
     loading: false,
     visible: false, // 遮罩层的判断
-    modificationType: [],
+  };
+
+  // 顶部表单默认值
+  initialValues = {
+    regionCode: '',
+    officeCode: '',
+    page: 1,
+    rows: 10,
   };
 
   componentDidMount() {
@@ -34,6 +37,7 @@ class Saler extends Component {
 
   visibleShow = visible => {
     this.setState({ visible });
+    this.getTableData(this.initialValues);
   };
 
   handleSelect = data => {
@@ -57,18 +61,27 @@ class Saler extends Component {
 
   // 获取表格数据
   getTableData = (options = {}) => {
-    const { formValues } = this.state;
-    const query = Object.assign({}, formValues, options);
+    this.setState({ loading: true });
+    const formData = this.tableSearchFormRef.current
+      ? this.tableSearchFormRef.current.getFieldsValue()
+      : '';
+    const { pagination } = this.state;
+    const { current: page, pageSize: rows } = pagination;
+    const data = {
+      page,
+      rows,
+      ...formData,
+      ...options,
+    };
 
-    this.setState({
-      formValues: query,
-      loading: true,
-    });
-
-    api.peptideBase.getModifications(query, true).then(res => {
+    api.peptideBase.getModifications(data, true).then(res => {
       this.setState({
         list: res.rows,
-        total: res.total,
+        pagination: {
+          current: data.page,
+          pageSize: data.rows,
+          total: res.total,
+        },
         loading: false,
       });
     });
@@ -79,105 +92,72 @@ class Saler extends Component {
   };
 
   simpleForm = () => {
-    const {
-      form: { getFieldDecorator },
-      peptide,
-      language,
-    } = this.props;
+    const { peptide, language } = this.props;
 
     const regions = peptide.regions.filter(e => e.languageCode === language);
     const offices = peptide.offices.filter(e => e.languageCode === language);
     return (
-      <Form onSubmit={this.submit} layout="inline">
-        <Row gutter={{ lg: 24, md: 12, sm: 6 }}>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="编号">
-              {getFieldDecorator('code')(<Input style={{ width: '192px' }} />)}
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="姓名">
-              {getFieldDecorator('name')(<Input style={{ width: '192px' }} />)}
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="销售组织">
-              {getFieldDecorator('organizationName')(<Input style={{ width: '192px' }} />)}
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="大区">
-              {getFieldDecorator('regionCode', { initialValue: '' })(
-                <Select style={{ width: '192px' }}>
-                  <Option value="">全部</Option>
-                  {regions.map(item => (
-                    <Option key={item.code} value={item.code}>
-                      {`${item.code}-${item.name}`}
-                    </Option>
-                  ))}
-                </Select>,
-              )}
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="网点">
-              {getFieldDecorator('officeCode', { initialValue: '' })(
-                <Select style={{ width: '192px' }}>
-                  <Option value="">全部</Option>
-                  {offices.map(item => (
-                    <Option key={item.code} value={item.code}>
-                      {`${item.code}-${item.name}`}
-                    </Option>
-                  ))}
-                </Select>,
-              )}
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="部门">
-              {getFieldDecorator('department')(<Input style={{ width: '192px' }} />)}
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="个人手机">
-              {getFieldDecorator('personalMobNo')(<Input style={{ width: '192px' }} />)}
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="工作手机">
-              {getFieldDecorator('mobNo')(<Input style={{ width: '192px' }} />)}
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <span className="submitButtons">
-              <Button type="primary" htmlType="submit">
-                查询
-              </Button>
-              <Button style={{ marginLeft: 8 }} onClick={this.handleFormReset}>
-                重置
-              </Button>
-            </span>
-          </Col>
-        </Row>
-      </Form>
+      <>
+        <Col lg={6} md={8} sm={12}>
+          <FormItem label="编号" name="code">
+            <Input style={{ width: '192px' }} />
+          </FormItem>
+        </Col>
+        <Col lg={6} md={8} sm={12}>
+          <FormItem label="姓名" name="name">
+            <Input style={{ width: '192px' }} />
+          </FormItem>
+        </Col>
+        <Col lg={6} md={8} sm={12}>
+          <FormItem label="销售组织" name="organizationName">
+            <Input style={{ width: '192px' }} />
+          </FormItem>
+        </Col>
+        <Col lg={6} md={8} sm={12}>
+          <FormItem label="大区" name="regionCode">
+            <Select style={{ width: '192px' }}>
+              <Option value="">全部</Option>
+              {regions.map(item => (
+                <Option key={item.code} value={item.code}>
+                  {`${item.code}-${item.name}`}
+                </Option>
+              ))}
+            </Select>
+          </FormItem>
+        </Col>
+        <Col lg={6} md={8} sm={12}>
+          <FormItem label="网点" name="officeCode">
+            <Select style={{ width: '192px' }}>
+              <Option value="">全部</Option>
+              {offices.map(item => (
+                <Option key={item.code} value={item.code}>
+                  {`${item.code}-${item.name}`}
+                </Option>
+              ))}
+            </Select>
+          </FormItem>
+        </Col>
+        <Col lg={6} md={8} sm={12}>
+          <FormItem label="部门" name="department">
+            <Input style={{ width: '192px' }} />
+          </FormItem>
+        </Col>
+        <Col lg={6} md={8} sm={12}>
+          <FormItem label="个人手机" name="personalMobNo">
+            <Input style={{ width: '192px' }} />
+          </FormItem>
+        </Col>
+        <Col lg={6} md={8} sm={12}>
+          <FormItem label="工作手机" name="mobNo">
+            <Input style={{ width: '192px' }} />
+          </FormItem>
+        </Col>
+      </>
     );
   };
 
   render() {
-    const {
-      formValues: { page: current, rows: pageSize },
-      list,
-      total,
-      loading,
-      visible,
-      modificationType,
-    } = this.state;
-    const data = { list, pagination: { current, pageSize, total } };
-    const {
-      peptide: { commonData },
-      regions,
-      offices,
-    } = this.props;
+    const { pagination, list, loading, visible } = this.state;
     let tableWidth = 0;
 
     let columns = [
@@ -278,10 +258,10 @@ class Saler extends Component {
           />
           <div className="tableListOperator" />
           <Table
-            dataSource={data.list}
+            dataSource={list}
             columns={columns}
             scroll={{ x: tableWidth, y: 300 }}
-            pagination={data.pagination}
+            pagination={pagination}
             rowKey="code"
             // rowSelection={rowSelection}
             loading={loading}
@@ -293,6 +273,7 @@ class Saler extends Component {
   }
 }
 
-export default connect(({ peptide }) => ({
+export default connect(({ peptide, global }) => ({
   peptide,
+  language: global.languageCode || [],
 }))(Saler);

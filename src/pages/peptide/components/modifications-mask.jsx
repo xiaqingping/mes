@@ -1,143 +1,66 @@
 // 多肽修饰弹框
-import {
-  Button,
-  Col,
-  Form,
-  Input,
-  Row,
-  Select,
-  Table,
-  Modal,
-} from 'antd';
+import { Col, Form, Input, Select, Table, Modal } from 'antd';
 import React, { Component } from 'react';
 
 import api from '@/api';
-import './style.less'
+import './style.less';
 import { connect } from 'dva';
+import TableSearchForm from '@/components/TableSearchForm';
 
 const FormItem = Form.Item;
 const { Option } = Select;
 
-/**
- * 页面顶部筛选表单
- */
-@Form.create()
-class Search extends Component {
-  componentDidMount() {
-    this.submit();
-  }
-
-  submit = e => {
-    if (e) e.preventDefault();
-    const val = this.props.form.getFieldsValue();
-    this.props.getTableData({ page: 1, ...val });
-  }
-
-  handleFormReset = () => {
-    this.props.form.resetFields();
-  }
-
-  // 渲染表单
-  renderForm = () => {
-    const {
-      form: { getFieldDecorator },
-      modificationType,
-      status,
-    } = this.props;
-    return (
-      <Form onSubmit={this.submit} layout="inline">
-        <Row gutter={{ lg: 24, md: 12, sm: 6 }}>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="编号">
-              {getFieldDecorator('code')(<Input />)}
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="名称">
-              {getFieldDecorator('name')(<Input />)}
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="修饰类型">
-              {getFieldDecorator('modificationTypeID', { initialValue: '0' })(
-                <Select>
-                  <Option value="0">全部</Option>
-                  {modificationType.map(item => <Option key={item.id} value={item.id}>
-                  {item.modificationType}
-                  </Option>)}
-                </Select>)}
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="状态">
-            {getFieldDecorator('status', { initialValue: 1 })(
-                <Select>
-                    {status.map(item =>
-                      <Option key={item.id} value={item.id}>{item.name}</Option>,
-                    )}
-                  </Select>)}
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <span className="submitButtons">
-              <Button type="primary" htmlType="submit">
-                查询
-              </Button>
-              <Button style={{ marginLeft: 8 }} onClick={this.handleFormReset}>
-                重置
-              </Button>
-            </span>
-          </Col>
-        </Row>
-      </Form>
-    );
-  }
-
-  render() {
-    return (
-      <div className="tableListForm">{this.renderForm()}</div>
-    );
-  }
-}
-
-@connect(({ peptide }) => ({
-  peptide,
-}))
 class Order extends Component {
+  tableSearchFormRef = React.createRef();
+
+  tableFormRef = React.createRef();
+
   state = {
-    formValues: {
-      page: 1,
-      rows: 10,
-    },
+    pagination: {},
     list: [],
-    total: 0,
     loading: false,
     visible: false, // 遮罩层的判断
     modificationType: [],
-  }
+  };
+
+  // 顶部表单默认值
+  initialValues = {
+    modificationTypeID: '0',
+    status: 1,
+    page: 1,
+    rows: 10,
+  };
 
   componentDidMount() {
     this.props.onRef(this);
   }
 
-  componentWillReceiveProps(nextProps) {
+  // componentWillReceiveProps(nextProps) {
+  //   api.peptideBase.getModificationTypes().then(res => {
+  //     this.setState({
+  //       modificationType: res,
+  //     });
+  //   });
+  //   this.setState({
+  //     visible: nextProps.visible,
+  //   });
+  // }
+
+  visibleShow = visible => {
     api.peptideBase.getModificationTypes().then(res => {
       this.setState({
         modificationType: res,
-      })
-    })
+      });
+    });
     this.setState({
-      visible: nextProps.visible,
-    })
-  }
-
-  visibleShow = visible => {
-    this.setState({ visible })
-  }
+      visible,
+    });
+    this.getTableData(this.initialValues);
+  };
 
   handleSelect = data => {
     this.props.getData(data);
-    this.handleCancel()
+    this.handleCancel();
   };
 
   handleCancel = () => {
@@ -152,42 +75,91 @@ class Order extends Component {
       page: pagination.current,
       rows: pagination.pageSize,
     });
-  }
+  };
 
   // 获取表格数据
   getTableData = (options = {}) => {
-    const { formValues } = this.state;
-    const query = Object.assign({}, formValues, options);
+    this.setState({ loading: true });
+    const formData = this.tableSearchFormRef.current
+      ? this.tableSearchFormRef.current.getFieldsValue()
+      : '';
+    const { pagination } = this.state;
+    const { current: page, pageSize: rows } = pagination;
+    const data = {
+      page,
+      rows,
+      ...formData,
+      ...options,
+    };
 
-    this.setState({
-      formValues: query,
-      loading: true,
-    });
-
-    api.peptideBase.getModifications(query, true).then(res => {
+    api.peptideBase.getModifications(data, true).then(res => {
       this.setState({
         list: res.rows,
-        total: res.total,
+        pagination: {
+          current: data.page,
+          pageSize: data.rows,
+          total: res.total,
+        },
         loading: false,
       });
     });
-  }
+  };
 
   handleFormReset = () => {
     this.props.form.resetFields();
   };
 
-  render() {
+  simpleForm = () => {
+    const { modificationType } = this.state;
     const {
-      formValues: { page: current, rows: pageSize },
-      list,
-      total,
-      loading,
-      visible,
-      modificationType,
-    } = this.state;
-    const data = { list, pagination: { current, pageSize, total } };
-    const { peptide: { commonData } } = this.props
+      peptide: {
+        commonData: { status },
+      },
+    } = this.props;
+    return (
+      <>
+        <Col lg={6} md={8} sm={12}>
+          <FormItem label="编号" name="code">
+            <Input />
+          </FormItem>
+        </Col>
+        <Col lg={6} md={8} sm={12}>
+          <FormItem label="名称" name="name">
+            <Input />
+          </FormItem>
+        </Col>
+        <Col lg={6} md={8} sm={12}>
+          <FormItem label="修饰类型" name="modificationTypeID">
+            <Select>
+              <Option value="0">全部</Option>
+              {modificationType.map(item => (
+                <Option key={item.id} value={item.id}>
+                  {item.modificationType}
+                </Option>
+              ))}
+            </Select>
+          </FormItem>
+        </Col>
+        <Col lg={6} md={8} sm={12}>
+          <FormItem label="状态" name="status">
+            <Select>
+              {status.map(item => (
+                <Option key={item.id} value={item.id}>
+                  {item.name}
+                </Option>
+              ))}
+            </Select>
+          </FormItem>
+        </Col>
+      </>
+    );
+  };
+
+  render() {
+    const { pagination, list, loading, visible, modificationType } = this.state;
+    const {
+      peptide: { commonData },
+    } = this.props;
     let tableWidth = 0;
 
     let columns = [
@@ -214,9 +186,9 @@ class Order extends Component {
           let val = null;
           commonData.modificationPosition.forEach(item => {
             if (item.id === text) {
-              val = item.name
+              val = item.name;
             }
-          })
+          });
           return val;
         },
       },
@@ -235,9 +207,9 @@ class Order extends Component {
           let val = null;
           modificationType.forEach(item => {
             if (item.id === text) {
-              val = item.modificationType
+              val = item.modificationType;
             }
-          })
+          });
           return val;
         },
       },
@@ -248,7 +220,7 @@ class Order extends Component {
         render: text => {
           if (text === 1) return '正常';
           if (text === 2) return '已删除';
-          return ''
+          return '';
         },
       },
       {
@@ -275,9 +247,7 @@ class Order extends Component {
         title: '操作',
         dataIndex: 'actions',
         fixed: 'right',
-        render: (text, record) => (
-          <a onClick={() => this.handleSelect(record)}>选择</a>
-        ),
+        render: (text, record) => <a onClick={() => this.handleSelect(record)}>选择</a>,
       },
     ];
 
@@ -285,7 +255,7 @@ class Order extends Component {
       // eslint-disable-next-line no-param-reassign
       if (!col.width) col.width = 100;
       tableWidth += col.width;
-      return col
+      return col;
     });
 
     // const rowSelection = {
@@ -307,24 +277,29 @@ class Order extends Component {
           onCancel={this.handleCancel}
           footer={null}
         >
-            <Search getTableData={this.getTableData} status={commonData.status}
-             modificationType={ modificationType }/>
-            <div className="tableListOperator">
-            </div>
-            <Table
-              dataSource={data.list}
-              columns={columns}
-              scroll={{ x: tableWidth, y: 400 }}
-              pagination={data.pagination}
-              rowKey="code"
-              // rowSelection={rowSelection}
-              loading={loading}
-              onChange={this.handleStandardTableChange}
-              />
+          <TableSearchForm
+            ref={this.tableSearchFormRef}
+            initialValues={this.initialValues}
+            getTableData={this.getTableData}
+            simpleForm={this.simpleForm}
+          />
+          <div className="tableListOperator" />
+          <Table
+            dataSource={list}
+            columns={columns}
+            scroll={{ x: tableWidth, y: 400 }}
+            pagination={pagination}
+            rowKey="code"
+            // rowSelection={rowSelection}
+            loading={loading}
+            onChange={this.handleStandardTableChange}
+          />
         </Modal>
       </div>
     );
   }
 }
 
-export default Form.create()(Order);
+export default connect(({ peptide }) => ({
+  peptide,
+}))(Order);

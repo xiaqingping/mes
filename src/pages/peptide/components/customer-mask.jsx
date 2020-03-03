@@ -19,15 +19,10 @@ class Customer extends Component {
   tableFormRef = React.createRef();
 
   state = {
-    pagination: {
-      // current: 1,
-      // pageSize: 10,
-      // total: 0,
-    },
+    pagination: {},
     list: [],
     loading: false,
     visible: false, // 遮罩层的判断
-    modificationType: [],
   };
 
   // 顶部表单默认值
@@ -39,11 +34,6 @@ class Customer extends Component {
   componentDidMount() {
     this.props.onRef(this);
   }
-  // componentWillReceiveProps(nextProps) {
-  //   this.setState({
-  //     visible: nextProps.visible,
-  //   })
-  // }
 
   visibleShow = visible => {
     this.setState({ visible });
@@ -104,13 +94,17 @@ class Customer extends Component {
   // 渲染表单
   simpleForm = () => {
     const {
-      peptide: { salesPaymentMethods, paymentTerms, salesRanges },
+      peptide: { salesRanges },
       peptide,
       language,
     } = this.props;
 
     const regions = peptide.regions.filter(e => e.languageCode === language);
     const offices = peptide.offices.filter(e => e.languageCode === language);
+    const salesPaymentMethods = peptide.salesPaymentMethods.filter(
+      e => e.languageCode === language,
+    );
+    const paymentTerms = peptide.paymentTerms.filter(e => e.languageCode === language);
 
     return (
       <>
@@ -358,6 +352,7 @@ class Customer extends Component {
   }
 }
 
-export default connect(({ peptide }) => ({
+export default connect(({ peptide, global }) => ({
   peptide,
+  language: global.languageCode || [],
 }))(Customer);
