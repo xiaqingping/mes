@@ -1,61 +1,30 @@
 // 编辑收货地址
 import { Button, Divider, Form, Input, message, Popconfirm, Modal } from 'antd';
 import React, { Component } from 'react';
-import StandardTable from '@/components/StandardTable';
 import api from '@/api';
 import { connect } from 'dva';
-
-const EditableContext = React.createContext();
-
-/**
- * 表格编辑组件
- */
-class EditableCell extends React.Component {
-  renderCell = ({ getFieldDecorator }) => {
-    const {
-      editing,
-      dataIndex,
-      title,
-      inputType,
-      record,
-      index,
-      children,
-      rules,
-      ...restProps
-    } = this.props;
-    if (editing) {
-      return (
-        <td {...restProps} style={{ padding: 0 }}>
-          <Form.Item>
-            {getFieldDecorator(dataIndex, {
-              rules,
-              initialValue: record[dataIndex],
-            })(inputType)}
-          </Form.Item>
-        </td>
-      );
-    }
-    return <td {...restProps}>{children}</td>;
-  };
-
-  render() {
-    return <EditableContext.Consumer>{this.renderCell}</EditableContext.Consumer>;
-  }
-}
+import EditableCell from '@/components/EditableCell';
+import StandardTable from '@/components/StandardTable';
+import { PlusOutlined } from '@ant-design/icons';
 
 class Order extends Component {
+  tableFormRef = React.createRef();
+
   state = {
-    formValues: {
-      page: 1,
-      rows: 10,
-    },
+    pagination: {},
     list: [],
-    total: 0,
     loading: false,
     selectedRows: [],
     editIndex: -1,
     id: 0, // 新增数据时，提供负数id
     visible: false,
+  };
+
+  // 顶部表单默认值
+  initialValues = {
+    status: 1,
+    page: 1,
+    rows: 10,
   };
 
   componentDidMount() {
@@ -66,6 +35,7 @@ class Order extends Component {
     this.setState({
       visible,
     });
+    this.getTableData(this.initialValues);
   };
   // componentWillReceiveProps(nextProps) {
   //   this.setState({
@@ -100,26 +70,27 @@ class Order extends Component {
 
   // 获取表格数据
   getTableData = (options = {}) => {
-    const { formValues } = this.state;
-    const query = Object.assign({}, formValues, options);
+    this.setState({ loading: true });
+    const { pagination } = this.state;
+    const { current: page, pageSize: rows } = pagination;
+    const data = {
+      page,
+      rows,
+      ...options,
+    };
 
-    this.setState({
-      formValues: query,
-      loading: true,
-    });
-
-    api.peptideBase.getPurity(query, true).then(res => {
+    api.peptideBase.getPurity(data, true).then(res => {
       this.setState({
         list: res.rows,
-        total: res.total,
+        pagination: {
+          current: data.page,
+          pageSize: data.rows,
+          total: res.total,
+        },
         loading: false,
         editIndex: -1,
       });
     });
-  };
-
-  handleFormReset = () => {
-    this.props.form.resetFields();
   };
 
   // 退出编辑
@@ -150,9 +121,9 @@ class Order extends Component {
   };
 
   // 保存
-  saveRow = index => {
-    this.props.form.validateFields((error, row) => {
-      if (error) return;
+  saveRow = async index => {
+    try {
+      const row = await this.tableFormRef.current.validateFields();
       const { list } = this.state;
       const newData = { ...list[index], ...row };
       if (newData.id > 0) {
@@ -160,7 +131,9 @@ class Order extends Component {
       } else {
         api.peptideBase.insertPurity(newData).then(() => this.getTableData());
       }
-    });
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   // 新增
@@ -172,6 +145,7 @@ class Order extends Component {
     }
 
     const newId = id - 1;
+    this.tableFormRef.current.resetFields();
     this.setState({
       id: newId,
       editIndex: 0,
@@ -185,15 +159,7 @@ class Order extends Component {
   };
 
   render() {
-    const {
-      formValues: { page: current, rows: pageSize },
-      selectedRows,
-      list,
-      total,
-      loading,
-      visible,
-    } = this.state;
-    const data = { list, pagination: { current, pageSize, total } };
+    const { pagination, list, loading, visible, selectedRows } = this.state;
     let tableWidth = 0;
 
     let columns = [
@@ -281,7 +247,8 @@ class Order extends Component {
       },
       {
         title: '操作',
-        width: 200,
+        width: 100,
+        fixed: 'right',
         render: (value, row, index) => {
           const { editIndex } = this.state;
           let actions;
@@ -349,26 +316,38 @@ class Order extends Component {
         onCancel={this.handleCancel}
         keyboard={false}
         maskClosable={false}
+        className="addressModal"
       >
         <div className="tableList">
           <div className="tableListOperator">
-            <Button icon="plus" type="primary" onClick={() => this.handleAdd()}>
+            <Button type="primary" onClick={() => this.handleAdd()}>
+              <PlusOutlined />
               新建
             </Button>
           </div>
-          <EditableContext.Provider value={this.props.form}>
+          <Form ref={this.tableFormRef}>
             <StandardTable
               scroll={{ x: tableWidth }}
               rowClassName="editable-row"
               components={components}
               selectedRows={selectedRows}
               loading={loading}
-              data={data}
+              data={{ list, pagination }}
               columns={columns}
               onSelectRow={this.handleSelectRows}
               onChange={this.handleStandardTableChange}
             />
-          </EditableContext.Provider>
+            {/* <Table
+              dataSource={list}
+              columns={columns}
+              scroll={{ x: tableWidth }}
+              pagination={pagination}
+              rowKey="code"
+              // rowSelection={rowSelection}
+              loading={loading}
+              onChange={this.handleStandardTableChange}
+            /> */}
+          </Form>
         </div>
       </Modal>
     );

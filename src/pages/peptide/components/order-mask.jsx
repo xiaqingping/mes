@@ -1,38 +1,47 @@
 // 多肽订单新增弹框
-import { Button, Col, Form, Input, Row, Select, Table, Modal, message, Divider, Icon } from 'antd';
+import { Button, Col, Form, Input, Row, Select, Table, Modal, message, Divider } from 'antd';
 import React, { Component } from 'react';
-
 import api from '@/api';
 import './style.less';
 import { connect } from 'dva';
+import { PlusOutlined } from '@ant-design/icons';
 import AddressMask from './address-mask';
 import CustomerMask from '@/pages/peptide/components/customer-mask';
 import SubCustomerMask from '@/pages/peptide/components/subCustomer-mask';
 import ContactMask from '@/pages/peptide/components/contact-mask';
 import SalerMask from '@/pages/peptide/components/saler-mask';
 import LoadMask from '@/pages/peptide/components/load-mask';
+import TableSearchForm from '@/components/TableSearchForm';
+import EditableCell from '@/components/EditableCell';
 
 const FormItem = Form.Item;
 const { Option } = Select;
 const { Search } = Input;
-const EditableContext = React.createContext();
 
-/**
- * 页面顶部筛选表单
- */
-@Form.create()
-@connect(({ peptide, global }) => ({
-  peptide,
-  language: global.languageCode,
-}))
 class AddPage extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      factorys: [],
-      plusStatus: false,
-    };
-  }
+  tableSearchFormRef = React.createRef();
+
+  state = {
+    factorys: [],
+    plusStatus: false,
+  };
+
+  initialValues = {
+    rangeOrganization: '',
+    regionCode: '3100',
+    officeCode: '998',
+    invoiceType: '20',
+    invoiceByGoods: 0,
+    deliveryType: '01',
+    factory: '3100',
+    productAmount: (9546.23).toFixed(2),
+    orderTypeStatus: 0,
+    freight: (0.0).toFixed(2),
+    // amount:
+    //   parseFloat(this.tableSearchFormRef.current.getFieldValue('productAmount')) +
+    //   parseFloat(this.tableSearchFormRef.current.getFieldValue('freight')).toFixed(2),
+    currency: 'CNY',
+  };
 
   componentDidMount() {
     api.basic.getPlants().then(data => {
@@ -65,22 +74,22 @@ class AddPage extends Component {
 
   getMaskData = (v, type) => {
     if (type === 'customer') {
-      this.props.form.setFieldsValue({
+      this.tableSearchFormRef.current.setFieldsValue({
         customerName: v.name,
       });
     }
     if (type === 'subCustomer') {
-      this.props.form.setFieldsValue({
+      this.tableSearchFormRef.current.setFieldsValue({
         subCustomerName: v.name,
       });
     }
     if (type === 'contact') {
-      this.props.form.setFieldsValue({
+      this.tableSearchFormRef.current.setFieldsValue({
         contactName: v.name,
       });
     }
     if (type === 'saler') {
-      this.props.form.setFieldsValue({
+      this.tableSearchFormRef.current.setFieldsValue({
         salerName: v.name,
       });
     }
@@ -102,10 +111,9 @@ class AddPage extends Component {
   };
 
   // 渲染表单
-  renderForm = () => {
+  simpleForm = () => {
     const {
-      form: { getFieldDecorator, getFieldValue },
-      peptide: { commonData, salesRanges, taxInvoiceTypes, salesPaymentMethods },
+      peptide: { commonData, salesRanges, salesPaymentMethods },
       peptide,
       language,
     } = this.props;
@@ -113,356 +121,337 @@ class AddPage extends Component {
     const regions = peptide.regions.filter(e => e.languageCode === language);
     const offices = peptide.offices.filter(e => e.languageCode === language);
     const currencies = peptide.currencies.filter(e => e.languageCode === language);
+    const taxInvoiceTypes = peptide.taxInvoiceTypes.filter(e => e.languageCode === language);
     return (
-      <Form layout="inline" onSubmit={this.handleSubmit} className="myForm">
-        <Row gutter={{ lg: 24, md: 12, sm: 6 }}>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="订单编号">{getFieldDecorator('code')(<Input />)}</FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="销售类型">
-              {getFieldDecorator('salesType')(
-                <Select>
-                  <Option value="0">全部</Option>
-                </Select>,
-              )}
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="客户">
-              {getFieldDecorator('customerName', {
-                //  rules: [{ required: true }],
-              })(<Search onSearch={() => this.showCustomer.visibleShow(true)} />)}
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="销售范围">
-              {getFieldDecorator('rangeOrganization', { initialValue: '' })(
-                <Select>
-                  <Option value="">全部</Option>
-                  {salesRanges.map(item => (
-                    <Option
-                      key={`${item.organization}${item.channel}`}
-                      value={`${item.channelName} - ${item.organizationName}`}
-                    >
-                      {`${item.channelName} - ${item.organizationName}`}
-                    </Option>
-                  ))}
-                </Select>,
-              )}
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="负责人">
-              {getFieldDecorator('subCustomerName', {
-                //  rules: [{ required: true }],
-              })(<Search onSearch={() => this.showSubCustomer.visibleShow(true)} />)}
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="销售大区">
-              {getFieldDecorator('regionCode', { initialValue: '3100' })(
-                <Select dropdownMenuStyle={{ display: 'none' }}>
-                  {regions.map(item => (
-                    <Option key={item.code} value={item.code}>{`${item.code}-${item.name}`}</Option>
-                  ))}
-                </Select>,
-              )}
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="订货人">
-              {getFieldDecorator('contactName', {
-                //  rules: [{ required: true }],
-              })(<Search onSearch={() => this.showContact.visibleShow(true)} />)}
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="销售网点">
-              {getFieldDecorator('officeCode', { initialValue: '998' })(
-                <Select dropdownMenuStyle={{ display: 'none' }}>
-                  {offices.map(item => (
-                    <Option key={item.code} value={item.code}>{`${item.code}-${item.name}`}</Option>
-                  ))}
-                </Select>,
-              )}
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="配送网点">
-              {getFieldDecorator('dofficeCode', {
-                //  rules: [{ required: true }],
-              })(
-                <Select>
-                  <Option value="0">全部</Option>
-                </Select>,
-              )}
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="销售员">
-              {getFieldDecorator('salerName', {
-                //  rules: [{ required: true }],
-              })(<Search onSearch={() => this.showSaler.visibleShow(true)} />)}
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="销售部门">
-              {getFieldDecorator('departmentCode')(
-                <Select>
-                  <Option value="0">全部</Option>
-                </Select>,
-              )}
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="信用额度">{getFieldDecorator('credit')(<Input />)}</FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="开票方式">
-              {getFieldDecorator('invoiceType', { initialValue: '20' })(
-                <Select>
-                  {taxInvoiceTypes.map(item => (
-                    <Option key={item.code} value={item.code}>{`${item.code}-${item.name}`}</Option>
-                  ))}
-                </Select>,
-              )}
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="信用余额">{getFieldDecorator('balance')(<Input />)}</FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="付款方式">
-              {getFieldDecorator('paymentMethod', {
-                //  rules: [{ required: true }],
-              })(
-                <Select>
-                  {salesPaymentMethods.map(item => (
-                    <Option key={item.code} value={item.code}>{`${item.code}-${item.name}`}</Option>
-                  ))}
-                </Select>,
-              )}
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="专项经费">{getFieldDecorator('depositBalance')(<Input />)}</FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="付款条件">
-              {getFieldDecorator('paymentTerm', {
-                //  rules: [{ required: true }],
-              })(
-                <Select>
-                  <Option value="0">全部</Option>
-                </Select>,
-              )}
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="SAP销售订单编号">
-              {getFieldDecorator('sapOrderCode')(<Input />)}
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="随货开票">
-              {getFieldDecorator('invoiceByGoods', { initialValue: 0 })(
-                <Select>
-                  {commonData.invoiceByGoodsStatus.map(item => (
-                    <Option key={item.id} value={item.id}>
-                      {item.name}
-                    </Option>
-                  ))}
-                </Select>,
-              )}
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="SAP交货单号">
-              {getFieldDecorator('sapDeliveryCode')(<Input />)}
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="sap采购申请单号">
-              {getFieldDecorator('sapProcureApplyCode')(<Input />)}
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="客户订单号">{getFieldDecorator('customerPoCode')(<Input />)}</FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="客户订单日期">
-              {getFieldDecorator('customerPoDate')(<Input />)}
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="交货方式">
-              {getFieldDecorator('deliveryType', { initialValue: '01' })(
-                <Select dropdownMenuStyle={{ display: 'none' }}>
-                  {commonData.deliveryTypeStatus.map(item => (
-                    <Option key={item.id} value={item.id}>{`${item.id}-${item.name}`}</Option>
-                  ))}
-                </Select>,
-              )}
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="仓库">{getFieldDecorator('storageCode')(<Input />)}</FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="SAP交货单号">
-              {getFieldDecorator('sapDeliveryCode')(
-                <Select>
-                  <Option value="0">全部</Option>
-                </Select>,
-              )}
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="工厂">
-              {getFieldDecorator('factory', { initialValue: '3100' })(
-                <Select dropdownMenuStyle={{ display: 'none' }}>
-                  {factorys.map(item => (
-                    <Option key={item.code} value={item.code}>{`${item.code}-${item.name}`}</Option>
-                  ))}
-                </Select>,
-              )}
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="产品金额">
-              {getFieldDecorator('productAmount', { initialValue: (9546.23).toFixed(2) })(
-                <Input readOnly />,
-              )}
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="订单类型">
-              {getFieldDecorator('orderTypeStatus', { initialValue: 0 })(
-                <Select>
-                  {commonData.orderTypeStatus.map(item => (
-                    <Option key={item.id} value={item.id}>
-                      {item.name}
-                    </Option>
-                  ))}
-                </Select>,
-              )}
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="运费">
-              {getFieldDecorator('freight', { initialValue: (0.0).toFixed(2) })(<Input />)}
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="订单金额">
-              {getFieldDecorator('amount', {
-                initialValue: (
-                  parseFloat(getFieldValue('productAmount')) + parseFloat(getFieldValue('freight'))
-                ).toFixed(2),
-              })(<Input readOnly />)}
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="订货人邮箱">
-              {getFieldDecorator('contactEmail', {
-                //  rules: [{ required: true }],
-              })(<Input />)}
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="订货人手机">
-              {getFieldDecorator('contactMobile', {
-                //  rules: [{ required: true }],
-              })(<Input />)}
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="币种">
-              {getFieldDecorator('currency', { initialValue: 'CNY' })(
-                <Select dropdownMenuStyle={{ display: 'none' }}>
-                  {currencies.map(item => (
-                    <Option
-                      key={item.code}
-                      value={item.code}
-                    >{`${item.code}-${item.shortText}`}</Option>
-                  ))}
-                </Select>,
-              )}
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="备注">{getFieldDecorator('remark')(<Input />)}</FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="地址">
-              {getFieldDecorator('address')(
-                <Select>
-                  <Option value="0">全部</Option>
-                </Select>,
-              )}
-              <div
-                style={{ position: 'absolute', top: '-8px', right: '40px', cursor: 'pointer' }}
-                onMouseLeave={() => {
-                  this.changePlusStatus(false);
-                }}
-                onMouseEnter={() => {
-                  this.changePlusStatus(true);
-                }}
-                onClick={() => this.showAddress.visibleShow(true)}
-              >
-                <Icon
-                  type="plus"
-                  className={plusStatus ? 'select-plus' : ''}
-                  style={{ color: 'green', opacity: '0.4' }}
-                />
-              </div>
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="创建人">{getFieldDecorator('creatorName')(<Input />)}</FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="创建日期">{getFieldDecorator('createDate')(<Input />)}</FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="修改人">{getFieldDecorator('changerName')(<Input />)}</FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="修改日期">{getFieldDecorator('changeDate')(<Input />)}</FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="审核人">{getFieldDecorator('checkName')(<Input />)}</FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="审核日期">{getFieldDecorator('checkDate')(<Input />)}</FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="完成人">{getFieldDecorator('finishName')(<Input />)}</FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="完成日期">{getFieldDecorator('finishDate')(<Input />)}</FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12} style={{ marginTop: '20px' }}>
-            <span className="submitButtons">
-              <Button onClick={() => this.showLoad.visibleShow(true)}>批量导入序列</Button>
-              <Button style={{ marginLeft: 8 }} type="primary" htmlType="submit">
-                新增
-              </Button>
-              <Button style={{ marginLeft: 8 }} onClick={this.handleFormReset}>
-                重置
-              </Button>
-            </span>
-          </Col>
-        </Row>
-      </Form>
+      // <Form layout="inline" onSubmit={this.handleSubmit} className="myForm">
+      //   <Row gutter={{ lg: 24, md: 12, sm: 6 }}>
+      <>
+        <Col lg={6} md={8} sm={12}>
+          <FormItem label="订单编号" name="code">
+            <Input />
+          </FormItem>
+        </Col>
+        <Col lg={6} md={8} sm={12}>
+          <FormItem label="销售类型" name="salesType">
+            <Select>
+              <Option value="0">全部</Option>
+            </Select>
+          </FormItem>
+        </Col>
+        <Col lg={6} md={8} sm={12}>
+          <FormItem label="客户" name="customerName">
+            <Search onSearch={() => this.showCustomer.visibleShow(true)} />
+          </FormItem>
+        </Col>
+        <Col lg={6} md={8} sm={12}>
+          <FormItem label="销售范围" name="rangeOrganization">
+            <Select>
+              <Option value="">全部</Option>
+              {salesRanges.map(item => (
+                <Option
+                  key={`${item.organization}${item.channel}`}
+                  value={`${item.channelName} - ${item.organizationName}`}
+                >
+                  {`${item.channelName} - ${item.organizationName}`}
+                </Option>
+              ))}
+            </Select>
+          </FormItem>
+        </Col>
+        <Col lg={6} md={8} sm={12}>
+          <FormItem label="负责人" name="subCustomerName">
+            <Search onSearch={() => this.showSubCustomer.visibleShow(true)} />
+          </FormItem>
+        </Col>
+        <Col lg={6} md={8} sm={12}>
+          <FormItem label="销售大区" name="regionCode">
+            <Select disabled>
+              {regions.map(item => (
+                <Option key={item.code} value={item.code}>{`${item.code}-${item.name}`}</Option>
+              ))}
+            </Select>
+          </FormItem>
+        </Col>
+        <Col lg={6} md={8} sm={12}>
+          <FormItem label="订货人" name="contactName">
+            <Search onSearch={() => this.showContact.visibleShow(true)} />
+          </FormItem>
+        </Col>
+        <Col lg={6} md={8} sm={12}>
+          <FormItem label="销售网点" name="officeCode">
+            <Select disabled>
+              {offices.map(item => (
+                <Option key={item.code} value={item.code}>{`${item.code}-${item.name}`}</Option>
+              ))}
+            </Select>
+          </FormItem>
+        </Col>
+        <Col lg={6} md={8} sm={12}>
+          <FormItem label="配送网点" name="dofficeCode">
+            <Select>
+              <Option value="0">全部</Option>
+            </Select>
+          </FormItem>
+        </Col>
+        <Col lg={6} md={8} sm={12}>
+          <FormItem label="销售员" name="salerName">
+            <Search onSearch={() => this.showSaler.visibleShow(true)} />
+          </FormItem>
+        </Col>
+        <Col lg={6} md={8} sm={12}>
+          <FormItem label="销售部门" name="departmentCode">
+            <Select>
+              <Option value="0">全部</Option>
+            </Select>
+          </FormItem>
+        </Col>
+        <Col lg={6} md={8} sm={12}>
+          <FormItem label="信用额度" name="credit">
+            <Input />
+          </FormItem>
+        </Col>
+        <Col lg={6} md={8} sm={12}>
+          <FormItem label="开票方式" name="invoiceType">
+            <Select>
+              {taxInvoiceTypes.map(item => (
+                <Option key={item.code} value={item.code}>{`${item.code}-${item.name}`}</Option>
+              ))}
+            </Select>
+          </FormItem>
+        </Col>
+        <Col lg={6} md={8} sm={12}>
+          <FormItem label="信用余额" name="balance">
+            <Input />
+          </FormItem>
+        </Col>
+        <Col lg={6} md={8} sm={12}>
+          <FormItem label="付款方式" name="paymentMethod">
+            <Select>
+              {salesPaymentMethods.map(item => (
+                <Option key={item.code} value={item.code}>{`${item.code}-${item.name}`}</Option>
+              ))}
+            </Select>
+          </FormItem>
+        </Col>
+        <Col lg={6} md={8} sm={12}>
+          <FormItem label="专项经费" name="depositBalance">
+            <Input />
+          </FormItem>
+        </Col>
+        <Col lg={6} md={8} sm={12}>
+          <FormItem label="付款条件" name="paymentTerm">
+            <Select>
+              <Option value="0">全部</Option>
+            </Select>
+          </FormItem>
+        </Col>
+        <Col lg={6} md={8} sm={12}>
+          <FormItem label="SAP销售订单编号" name="sapOrderCode">
+            <Input />
+          </FormItem>
+        </Col>
+        <Col lg={6} md={8} sm={12}>
+          <FormItem label="随货开票" name="invoiceByGoods">
+            <Select>
+              {commonData.invoiceByGoodsStatus.map(item => (
+                <Option key={item.id} value={item.id}>
+                  {item.name}
+                </Option>
+              ))}
+            </Select>
+          </FormItem>
+        </Col>
+        <Col lg={6} md={8} sm={12}>
+          <FormItem label="SAP交货单号" name="sapDeliveryCode">
+            <Input />
+          </FormItem>
+        </Col>
+        <Col lg={6} md={8} sm={12}>
+          <FormItem label="sap采购申请单号" name="sapProcureApplyCode">
+            <Input />
+          </FormItem>
+        </Col>
+        <Col lg={6} md={8} sm={12}>
+          <FormItem label="客户订单号" name="customerPoCode">
+            <Input />
+          </FormItem>
+        </Col>
+        <Col lg={6} md={8} sm={12}>
+          <FormItem label="客户订单日期" name="customerPoDate">
+            <Input />
+          </FormItem>
+        </Col>
+        <Col lg={6} md={8} sm={12}>
+          <FormItem label="交货方式" name="deliveryType">
+            <Select disabled>
+              {commonData.deliveryTypeStatus.map(item => (
+                <Option key={item.id} value={item.id}>{`${item.id}-${item.name}`}</Option>
+              ))}
+            </Select>
+          </FormItem>
+        </Col>
+        <Col lg={6} md={8} sm={12}>
+          <FormItem label="仓库" name="storageCode">
+            <Input />
+          </FormItem>
+        </Col>
+        <Col lg={6} md={8} sm={12}>
+          <FormItem label="SAP交货单号" name="sapDeliveryCode">
+            <Select>
+              <Option value="0">全部</Option>
+            </Select>
+          </FormItem>
+        </Col>
+        <Col lg={6} md={8} sm={12}>
+          <FormItem label="工厂" name="factory">
+            <Select disabled>
+              {factorys.map(item => (
+                <Option key={item.code} value={item.code}>{`${item.code}-${item.name}`}</Option>
+              ))}
+            </Select>
+          </FormItem>
+        </Col>
+        <Col lg={6} md={8} sm={12}>
+          <FormItem label="产品金额" name="productAmount">
+            <Input readOnly />
+          </FormItem>
+        </Col>
+        <Col lg={6} md={8} sm={12}>
+          <FormItem label="订单类型" name="orderTypeStatus">
+            <Select>
+              {commonData.orderTypeStatus.map(item => (
+                <Option key={item.id} value={item.id}>
+                  {item.name}
+                </Option>
+              ))}
+            </Select>
+          </FormItem>
+        </Col>
+        <Col lg={6} md={8} sm={12}>
+          <FormItem label="运费" name="freight">
+            <Input />
+          </FormItem>
+        </Col>
+        <Col lg={6} md={8} sm={12}>
+          <FormItem label="订单金额" name="amount">
+            <Input readOnly />
+          </FormItem>
+        </Col>
+        <Col lg={6} md={8} sm={12}>
+          <FormItem label="订货人邮箱" name="contactEmail">
+            <Input />
+          </FormItem>
+        </Col>
+        <Col lg={6} md={8} sm={12}>
+          <FormItem label="订货人手机" name="contactMobile">
+            <Input />
+          </FormItem>
+        </Col>
+        <Col lg={6} md={8} sm={12}>
+          <FormItem label="币种" name="currency">
+            <Select disabled>
+              {currencies.map(item => (
+                <Option
+                  key={item.code}
+                  value={item.code}
+                >{`${item.code}-${item.shortText}`}</Option>
+              ))}
+            </Select>
+          </FormItem>
+        </Col>
+        <Col lg={6} md={8} sm={12}>
+          <FormItem label="备注" name="remark">
+            <Input />
+          </FormItem>
+        </Col>
+        <Col lg={6} md={8} sm={12}>
+          <FormItem label="地址" name="address">
+            <Select>
+              <Option value="0">全部</Option>
+            </Select>
+          </FormItem>
+          <div
+            style={{ position: 'absolute', top: '5px', right: '40px', cursor: 'pointer' }}
+            onMouseLeave={() => {
+              this.changePlusStatus(false);
+            }}
+            onMouseEnter={() => {
+              this.changePlusStatus(true);
+            }}
+            onClick={() => this.showAddress.visibleShow(true)}
+          >
+            <PlusOutlined
+              className={plusStatus ? 'select-plus' : ''}
+              style={{ color: 'green', opacity: '0.4' }}
+            />
+          </div>
+        </Col>
+        <Col lg={6} md={8} sm={12}>
+          <FormItem label="创建人" name="creatorName">
+            <Input />
+          </FormItem>
+        </Col>
+        <Col lg={6} md={8} sm={12}>
+          <FormItem label="创建日期" name="createDate">
+            <Input />
+          </FormItem>
+        </Col>
+        <Col lg={6} md={8} sm={12}>
+          <FormItem label="修改人" name="changerName">
+            <Input />
+          </FormItem>
+        </Col>
+        <Col lg={6} md={8} sm={12}>
+          <FormItem label="修改日期" name="changeDate">
+            <Input />
+          </FormItem>
+        </Col>
+        <Col lg={6} md={8} sm={12}>
+          <FormItem label="审核人" name="checkName">
+            <Input />
+          </FormItem>
+        </Col>
+        <Col lg={6} md={8} sm={12}>
+          <FormItem label="审核日期" name="checkDate">
+            <Input />
+          </FormItem>
+        </Col>
+        <Col lg={6} md={8} sm={12}>
+          <FormItem label="完成人" name="finishName">
+            <Input />
+          </FormItem>
+        </Col>
+        <Col lg={6} md={8} sm={12}>
+          <FormItem label="完成日期" name="finishDate">
+            <Input />
+          </FormItem>
+        </Col>
+        <Col lg={6} md={8} sm={12} style={{ marginTop: '20px' }}>
+          <span className="submitButtons">
+            <Button onClick={() => this.showLoad.visibleShow(true)}>批量导入序列</Button>
+            <Button style={{ marginLeft: 8 }} type="primary" htmlType="submit">
+              新增
+            </Button>
+            <Button style={{ marginLeft: 8 }} onClick={this.handleFormReset}>
+              重置
+            </Button>
+          </span>
+        </Col>
+      </>
+      //   </Row>
+      // </Form>
     );
   };
 
   render() {
     return (
       <div className="tableListForm">
-        {this.renderForm()}
+        <TableSearchForm
+          ref={this.tableSearchFormRef}
+          initialValues={this.initialValues}
+          getTableData={this.handleSubmit}
+          simpleForm={this.simpleForm}
+        />
         <CustomerMask
           onRef={ref => {
             this.showCustomer = ref;
@@ -503,50 +492,11 @@ class AddPage extends Component {
   }
 }
 
-/**
- * 表格编辑组件
- */
-class EditableCell extends React.Component {
-  renderCell = ({ getFieldDecorator }) => {
-    const {
-      editing,
-      dataIndex,
-      title,
-      inputType,
-      record,
-      index,
-      children,
-      rules,
-      value,
-      ...restProps
-    } = this.props;
-    // console.log(record[dataIndex])
-    if (editing) {
-      return (
-        <td {...restProps} style={{ padding: 0 }}>
-          <Form.Item>
-            {getFieldDecorator(dataIndex, {
-              rules,
-              valuePropName: 'checked',
-              initialValue: value,
-            })(inputType)}
-          </Form.Item>
-        </td>
-      );
-    }
-    return <td {...restProps}>{children}</td>;
-  };
-
-  render() {
-    return <EditableContext.Consumer>{this.renderCell}</EditableContext.Consumer>;
-  }
-}
-
-@connect(({ peptide, global }) => ({
-  peptide,
-  language: global.languageCode,
-}))
 class Order extends Component {
+  tableSearchFormRef = React.createRef();
+
+  tableFormRef = React.createRef();
+
   state = {
     formValues: {
       page: 1,
@@ -1169,6 +1119,7 @@ class Order extends Component {
         cell: EditableCell,
       },
     };
+
     // const rowNum = editIndex.substr(0, editIndex.length - 1).split(',')
     columns = columns.map(col => {
       // eslint-disable-next-line no-param-reassign
@@ -1219,35 +1170,45 @@ class Order extends Component {
         className="orderMask"
       >
         <div>
-          <AddPage openAddressMask={this.openAddressMask} handleAdd={this.handleAdd} />
-          <Col span={14}>
-            <EditableContext.Provider value={this.props.form}>
+          <AddPage
+            openAddressMask={this.openAddressMask}
+            handleAdd={this.handleAdd}
+            peptide={this.props.peptide}
+            language={this.props.language}
+          />
+          <Row>
+            <Col span={14}>
+              <Form ref={this.tableFormRef}>
+                <Table
+                  dataSource={data.list}
+                  columns={columns}
+                  scroll={{ x: tableWidth, y: 300 }}
+                  pagination={data.pagination}
+                  rowKey="id"
+                  loading={loading}
+                  onChange={this.handleStandardTableChange}
+                  components={components}
+                  rowClassName="editable-row"
+                />
+              </Form>
+            </Col>
+            <Col span={1} />
+            <Col span={9}>
               <Table
-                dataSource={data.list}
-                columns={columns}
-                scroll={{ x: tableWidth, y: 300 }}
-                pagination={data.pagination}
-                rowKey="id"
-                loading={loading}
-                onChange={this.handleStandardTableChange}
-                components={components}
-                rowClassName="editable-row"
+                dataSource={dataSon}
+                columns={columnSon}
+                scroll={{ x: tableWidthSon, y: 300 }}
+                loading={loadingSon}
               />
-            </EditableContext.Provider>
-          </Col>
-          <Col span={1} />
-          <Col span={9}>
-            <Table
-              dataSource={dataSon}
-              columns={columnSon}
-              scroll={{ x: tableWidthSon, y: 300 }}
-              loading={loadingSon}
-            />
-          </Col>
+            </Col>
+          </Row>
         </div>
       </Modal>
     );
   }
 }
 
-export default Form.create()(Order);
+export default connect(({ peptide, global }) => ({
+  peptide,
+  language: global.languageCode,
+}))(Order);

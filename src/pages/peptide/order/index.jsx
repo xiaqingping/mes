@@ -6,7 +6,7 @@ import StandardTable from '@/components/StandardTable';
 import { connect } from 'dva';
 import { formatter } from '@/utils/utils';
 import api from '@/api';
-// import OrderMask from '@/pages/peptide/components/order-mask';
+import OrderMask from '@/pages/peptide/components/order-mask';
 import CustomerMask from '@/pages/peptide/components/customer-mask';
 import SubCustomerMask from '@/pages/peptide/components/subCustomer-mask';
 import ContactMask from '@/pages/peptide/components/contact-mask';
@@ -607,11 +607,11 @@ class Order extends Component {
           }}
           getData={v => this.getMaskData(v, 'saler')}
         />
-        {/* <OrderMask
+        <OrderMask
           onRef={ref => {
             this.showOrder = ref;
           }}
-        /> */}
+        />
       </PageHeaderWrapper>
     );
   }

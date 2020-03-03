@@ -1,9 +1,4 @@
-import {
-  Button,
-  Col,
-  Form,
-  Row,
-} from 'antd';
+import { Button, Col, Form, Row } from 'antd';
 import { DownOutlined, UpOutlined } from '@ant-design/icons';
 import React, { useState } from 'react';
 import { FormattedMessage } from 'umi/locale';
@@ -18,12 +13,13 @@ import styles from './index.less';
  * @param {Object} props.initialValues 表单默认值
  */
 const TableSearchForm = React.forwardRef((props, ref) => {
+  console.log(ref);
   const [expand, setExpand] = useState(false);
   const [form] = Form.useForm();
 
   // 查询
   const onFinish = () => {
-    props.getTableData({ page: 1 })
+    props.getTableData({ page: 1 });
   };
 
   return (
@@ -46,28 +42,36 @@ const TableSearchForm = React.forwardRef((props, ref) => {
           </Button>
           <Button
             style={{ marginLeft: 8 }}
-            onClick={() => { form.resetFields() }}
+            onClick={() => {
+              form.resetFields();
+            }}
           >
             <FormattedMessage id="action.reset" />
           </Button>
-          {
-            props.advancedForm ? (
-              <a
-                style={{ marginLeft: 8, fontSize: 12 }}
-                onClick={() => { setExpand(!expand) }}
-              >
-                {
-                  expand
-                  ? <><FormattedMessage id="action.unexpand" /><UpOutlined /></>
-                  : <><FormattedMessage id="action.expand" /><DownOutlined /></>
-                }
-              </a>
-            ) : null
-          }
+          {props.advancedForm ? (
+            <a
+              style={{ marginLeft: 8, fontSize: 12 }}
+              onClick={() => {
+                setExpand(!expand);
+              }}
+            >
+              {expand ? (
+                <>
+                  <FormattedMessage id="action.unexpand" />
+                  <UpOutlined />
+                </>
+              ) : (
+                <>
+                  <FormattedMessage id="action.expand" />
+                  <DownOutlined />
+                </>
+              )}
+            </a>
+          ) : null}
         </Col>
       </Row>
     </Form>
   );
-})
+});
 
 export default TableSearchForm;
