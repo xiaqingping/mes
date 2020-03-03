@@ -200,31 +200,6 @@ class Order extends Component {
     return (
       <>
         <Col lg={6} md={8} sm={12}>
-          <FormItem label="订单编号" name="code">
-            <Input />
-          </FormItem>
-        </Col>
-        <Col lg={6} md={8} sm={12}>
-          <FormItem label="客户" name="customerCode">
-            <Search onSearch={() => this.showCustomer.visibleShow(true)} />
-          </FormItem>
-        </Col>
-        <Col lg={6} md={8} sm={12}>
-          <FormItem label="负责人" name="subCustomerCode">
-            <Search onSearch={() => this.showSubCustomer.visibleShow(true)} />
-          </FormItem>
-        </Col>
-        <Col lg={6} md={8} sm={12}>
-          <FormItem label="订货人" name="contactCode">
-            <Search onSearch={() => this.showContact.visibleShow(true)} />
-          </FormItem>
-        </Col>
-        <Col lg={6} md={8} sm={12}>
-          <FormItem label="销售员" name="salerCode">
-            <Search onSearch={() => this.showSaler.visibleShow(true)} />
-          </FormItem>
-        </Col>
-        <Col lg={6} md={8} sm={12}>
           <FormItem label="币种" name="currency">
             <Select>
               <Option value="">全部</Option>

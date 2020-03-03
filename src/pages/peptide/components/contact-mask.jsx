@@ -6,7 +6,6 @@ import api from '@/api';
 import './style.less';
 import { connect } from 'dva';
 import TableSearchForm from '@/components/TableSearchForm';
-// import EditableCell from '@/components/EditableCell';
 
 const FormItem = Form.Item;
 const { Option } = Select;
@@ -17,20 +16,15 @@ class Customer extends Component {
   tableFormRef = React.createRef();
 
   state = {
-    formValues: {
-      page: 1,
-      rows: 10,
-    },
+    pagination: {},
     list: [],
-    total: 0,
     loading: false,
     visible: false, // 遮罩层的判断
-    modificationType: [],
   };
 
   // 顶部表单默认值
   initialValues = {
-    status: 1,
+    rangeOrganization: '',
     page: 1,
     rows: 10,
   };
@@ -41,6 +35,7 @@ class Customer extends Component {
 
   visibleShow = visible => {
     this.setState({ visible });
+    this.getTableData(this.initialValues);
   };
 
   handleSelect = data => {
@@ -64,18 +59,27 @@ class Customer extends Component {
 
   // 获取表格数据
   getTableData = (options = {}) => {
-    const { formValues } = this.state;
-    const query = Object.assign({}, formValues, options);
+    this.setState({ loading: true });
+    const formData = this.tableSearchFormRef.current
+      ? this.tableSearchFormRef.current.getFieldsValue()
+      : '';
+    const { pagination } = this.state;
+    const { current: page, pageSize: rows } = pagination;
+    const data = {
+      page,
+      rows,
+      ...formData,
+      ...options,
+    };
 
-    this.setState({
-      formValues: query,
-      loading: true,
-    });
-
-    api.peptideBase.getModifications(query, true).then(res => {
+    api.peptideBase.getModifications(data, true).then(res => {
       this.setState({
         list: res.rows,
-        total: res.total,
+        pagination: {
+          current: data.page,
+          pageSize: data.rows,
+          total: res.total,
+        },
         loading: false,
       });
     });
@@ -87,90 +91,66 @@ class Customer extends Component {
 
   simpleForm = () => {
     const {
-      form: { getFieldDecorator },
       peptide: { salesRanges },
     } = this.props;
     return (
       <>
         <Col lg={6} md={8} sm={12}>
-          <FormItem label="编号">
-            {getFieldDecorator('code')(<Input style={{ width: '192px' }} />)}
+          <FormItem label="编号" name="code">
+            <Input style={{ width: '192px' }} />
           </FormItem>
         </Col>
         <Col lg={6} md={8} sm={12}>
-          <FormItem label="名称">
-            {getFieldDecorator('name')(<Input style={{ width: '192px' }} />)}
+          <FormItem label="名称" name="name">
+            <Input style={{ width: '192px' }} />
           </FormItem>
         </Col>
         <Col lg={6} md={8} sm={12}>
-          <FormItem label="电话">
-            {getFieldDecorator('telNo')(<Input style={{ width: '192px' }} />)}
+          <FormItem label="电话" name="telNo">
+            <Input style={{ width: '192px' }} />
           </FormItem>
         </Col>
         <Col lg={6} md={8} sm={12}>
-          <FormItem label="手机">
-            {getFieldDecorator('mobNo')(<Input style={{ width: '192px' }} />)}
+          <FormItem label="手机" name="mobNo">
+            <Input style={{ width: '192px' }} />
           </FormItem>
         </Col>
         <Col lg={6} md={8} sm={12}>
-          <FormItem label="邮箱">
-            {getFieldDecorator('email')(<Input style={{ width: '192px' }} />)}
+          <FormItem label="邮箱" name="email">
+            <Input style={{ width: '192px' }} />
           </FormItem>
         </Col>
         <Col lg={6} md={8} sm={12}>
-          <FormItem label="负责人编号">
-            {getFieldDecorator('subcustomerCode')(<Input style={{ width: '192px' }} />)}
+          <FormItem label="负责人编号" name="subcustomerCode">
+            <Input style={{ width: '192px' }} />
           </FormItem>
         </Col>
         <Col lg={6} md={8} sm={12}>
-          <FormItem label="负责人名称">
-            {getFieldDecorator('subcustomerName')(<Input style={{ width: '192px' }} />)}
+          <FormItem label="负责人名称" name="subcustomerName">
+            <Input style={{ width: '192px' }} />
           </FormItem>
         </Col>
         <Col lg={6} md={8} sm={12}>
-          <FormItem label="销售范围">
-            {getFieldDecorator('rangeOrganization', { initialValue: '' })(
-              <Select style={{ width: '192px' }}>
-                <Option value="">全部</Option>
-                {salesRanges.map(item => (
-                  <Option
-                    key={`${item.organization}${item.channel}`}
-                    value={`${item.channelName} - ${item.organizationName}`}
-                  >
-                    {`${item.channelName} - ${item.organizationName}`}
-                  </Option>
-                ))}
-              </Select>,
-            )}
+          <FormItem label="销售范围" name="rangeOrganization">
+            <Select style={{ width: '192px' }}>
+              <Option value="">全部</Option>
+              {salesRanges.map(item => (
+                <Option
+                  key={`${item.organization}${item.channel}`}
+                  value={`${item.channelName} - ${item.organizationName}`}
+                >
+                  {`${item.channelName} - ${item.organizationName}`}
+                </Option>
+              ))}
+            </Select>
           </FormItem>
-        </Col>
-        <Col lg={6} md={8} sm={12}>
-          <span className="submitButtons">
-            <Button type="primary" htmlType="submit">
-              查询
-            </Button>
-            <Button style={{ marginLeft: 8 }} onClick={this.handleFormReset}>
-              重置
-            </Button>
-          </span>
         </Col>
       </>
     );
   };
 
   render() {
-    const {
-      formValues: { page: current, rows: pageSize },
-      list,
-      total,
-      loading,
-      visible,
-      modificationType,
-    } = this.state;
-    const data = { list, pagination: { current, pageSize, total } };
-    const {
-      peptide: { commonData },
-    } = this.props;
+    const { pagination, list, loading, visible } = this.state;
     let tableWidth = 0;
 
     let columns = [
@@ -269,15 +249,6 @@ class Customer extends Component {
       return col;
     });
 
-    // const rowSelection = {
-    //   type: 'radio',
-    //   onChange: (selectedRowKeys, selectedRows) => {
-    //       this.setState({
-    //           data: selectedRows[0],
-    //         })
-    //     },
-    // }
-
     return (
       <div>
         <Modal
@@ -296,10 +267,10 @@ class Customer extends Component {
           />
           <div className="tableListOperator" />
           <Table
-            dataSource={data.list}
+            dataSource={list}
             columns={columns}
             scroll={{ x: tableWidth, y: 300 }}
-            pagination={data.pagination}
+            pagination={pagination}
             rowKey="code"
             // rowSelection={rowSelection}
             loading={loading}
