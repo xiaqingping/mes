@@ -6,7 +6,6 @@ import {
   Divider,
   Form,
   Input,
-  Row,
   Select,
   message,
   Popconfirm,
@@ -17,136 +16,39 @@ import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import StandardTable from '@/components/StandardTable';
 import api from '@/api';
 import { connect } from 'dva';
-import Modifications from '@/pages/peptide/components/modifications-mask'
-import Products from '@/pages/peptide/components/products-mask'
+import Modifications from '@/pages/peptide/components/modifications-mask';
+import Products from '@/pages/peptide/components/products-mask';
+import TableSearchForm from '@/components/TableSearchForm';
+import EditableCell from '@/components/EditableCell';
+import { PlusOutlined } from '@ant-design/icons';
+import { formatter } from '@/utils/utils';
 
-const EditableContext = React.createContext();
 const FormItem = Form.Item;
 const { Option } = Select;
 const { Search } = Input;
 
-/**
- * 页面顶部筛选表单
- */
-@Form.create()
-class SearchPage extends Component {
-  componentDidMount() {
-    this.submit();
-  }
-
-  submit = e => {
-    if (e) e.preventDefault();
-    const val = this.props.form.getFieldsValue();
-    this.props.getTableData({ page: 1, ...val });
-  }
-
-  handleFormReset = () => {
-    this.props.form.resetFields();
-  }
-
-  // 渲染表单
-  renderForm = () => {
-    const {
-      form: { getFieldDecorator },
-      status,
-    } = this.props;
-    return (
-      <Form onSubmit={this.submit} layout="inline">
-      <Row gutter={{ lg: 24, md: 12, sm: 6 }}>
-        <Col lg={6} md={8} sm={12}>
-          <FormItem label="编号">
-            {getFieldDecorator('code')(<Input />)}
-          </FormItem>
-        </Col>
-        <Col lg={6} md={8} sm={12}>
-            <FormItem label="状态">
-            {getFieldDecorator('status', { initialValue: 1 })(
-                <Select>
-                    {status.map(item =>
-                      <Option key={item.id} value={item.id}>{item.name}</Option>,
-                    )}
-                  </Select>)}
-            </FormItem>
-          </Col>
-        <Col lg={6} md={8} sm={12}>
-          <span className="submitButtons">
-            <Button type="primary" htmlType="submit">
-              查询
-            </Button>
-            <Button style={{ marginLeft: 8 }} onClick={this.handleFormReset}>
-              重置
-            </Button>
-          </span>
-        </Col>
-      </Row>
-    </Form>
-    );
-  }
-
-  render() {
-    return (
-      <div className="tableListForm">{this.renderForm()}</div>
-    );
-  }
-}
-
-/**
- * 表格编辑组件
- */
-class EditableCell extends React.Component {
-  renderCell = ({ getFieldDecorator }) => {
-    const {
-      editing,
-      dataIndex,
-      title,
-      inputType,
-      record,
-      index,
-      children,
-      rules,
-      ...restProps
-    } = this.props;
-    if (editing) {
-      return (
-        <td {...restProps} style={{ padding: 0 }}>
-            <Form.Item>
-              {getFieldDecorator(dataIndex, {
-                rules,
-                valuePropName: 'checked',
-                initialValue: record[dataIndex],
-              })(inputType)}
-            </Form.Item>
-        </td>
-      );
-    }
-    return (<td {...restProps}>{children}</td>);
-  };
-
-
-  render() {
-    return <EditableContext.Consumer>{this.renderCell}</EditableContext.Consumer>;
-  }
-}
-
-@connect(({ peptide }) => ({
-  peptide,
-}))
 class ModificationProducts extends Component {
+  tableSearchFormRef = React.createRef();
+
+  tableFormRef = React.createRef();
+
   state = {
-    formValues: {
-      page: 1,
-      rows: 10,
-    },
+    pagination: {},
     list: [],
-    total: 0,
     loading: false,
     selectedRows: [],
     editIndex: -1,
     aminoAcid: [], // 氨基酸
     id: 0, // 新增数据时，提供负数id
     sonModification: [],
-    sonProducts: [],
-  }
+  };
+
+  // 顶部表单默认值
+  initialValues = {
+    status: 1,
+    page: 1,
+    rows: 10,
+  };
 
   componentDidMount() {
     api.peptideBase.getAminoAcid({ status: 1 }, true).then(data => {
@@ -165,8 +67,9 @@ class ModificationProducts extends Component {
       }
       this.setState({
         aminoAcid: dest,
-      })
+      });
     });
+    this.getTableData(this.initialValues);
   }
 
   // 分页
@@ -175,7 +78,7 @@ class ModificationProducts extends Component {
       page: pagination.current,
       rows: pagination.pageSize,
     });
-  }
+  };
 
   // 选择行
   handleSelectRows = rows => {
@@ -186,26 +89,29 @@ class ModificationProducts extends Component {
 
   // 获取表格数据
   getTableData = (options = {}) => {
-    const { formValues } = this.state;
-    const query = Object.assign({}, formValues, options);
+    this.setState({ loading: true });
+    const formData = this.tableSearchFormRef.current.getFieldsValue();
+    const { pagination } = this.state;
+    const { current: page, pageSize: rows } = pagination;
+    const data = {
+      page,
+      rows,
+      ...formData,
+      ...options,
+    };
 
-    this.setState({
-      formValues: query,
-      loading: true,
-    });
-
-    api.peptideBase.getModificationProducts(query).then(res => {
+    api.peptideBase.getModificationProducts(data).then(res => {
       this.setState({
         list: res.rows,
-        total: res.total,
+        pagination: {
+          current: data.page,
+          pageSize: data.rows,
+          total: res.total,
+        },
         loading: false,
         editIndex: -1,
       });
     });
-  }
-
-  handleFormReset = () => {
-    this.props.form.resetFields();
   };
 
   // 退出编辑
@@ -220,22 +126,21 @@ class ModificationProducts extends Component {
         editIndex: index,
       });
     }
-    this.clearInput()
-  }
+    // this.clearInput();
+  };
 
   // 清空弹框的选择内容
-  clearInput = () => {
-    this.props.form.setFieldsValue({
-      sapProductCode: '',
-      sapProductName: '',
-      modificationPosition: '',
-      modificationName: '',
-    });
-    this.setState({
-      sonProducts: [],
-      sonModification: [],
-    })
-  }
+  // clearInput = () => {
+  //   this.tableFormRef.current.setFieldsValue({
+  //     sapProductCode: '',
+  //     sapProductName: '',
+  //     modificationPosition: '',
+  //     modificationName: '',
+  //   });
+  //   this.setState({
+  //     sonModification: [],
+  //   });
+  // };
 
   // 删除数据
   deleteRow = row => {
@@ -252,60 +157,58 @@ class ModificationProducts extends Component {
   };
 
   // 保存
-  saveRow = index => {
-    this.props.form.validateFields((error, row) => {
-      if (error) return;
+  saveRow = async index => {
+    try {
+      const row = await this.tableFormRef.current.validateFields();
       const { list, sonModification } = this.state;
-      const newData = { ...list[index],
-         ...row,
-         isNeedDesalting: row.isNeedDesalting ? 1 : 2,
-         aminoAcidLengthBegin: parseInt(row.aminoAcidLengthBegin, 10),
-         aminoAcidLengthEnd: parseInt(row.aminoAcidLengthEnd, 10),
-         providerTotalAmountBegin: parseInt(row.providerTotalAmountBegin, 10),
-         providerTotalAmountEnd: parseInt(row.providerTotalAmountEnd, 10),
-         modificationCode: sonModification.modificationCode,
-         modificationID: sonModification.id,
-         aminoAcidCode: row.aminoAcidName.split('-')[0],
-         aminoAcidID: row.aminoAcidName.split('-')[1],
-         aminoAcidName: row.aminoAcidName.split('-')[2],
-        };
+      const newData = {
+        ...list[index],
+        ...row,
+        isNeedDesalting: row.isNeedDesalting ? 1 : 2,
+        aminoAcidLengthBegin: parseInt(row.aminoAcidLengthBegin, 10),
+        aminoAcidLengthEnd: parseInt(row.aminoAcidLengthEnd, 10),
+        providerTotalAmountBegin: parseInt(row.providerTotalAmountBegin, 10),
+        providerTotalAmountEnd: parseInt(row.providerTotalAmountEnd, 10),
+        modificationCode: sonModification.modificationCode,
+        modificationID: sonModification.id,
+        aminoAcidCode: row.aminoAcidName.split('-')[0],
+        aminoAcidID: row.aminoAcidName.split('-')[1],
+        aminoAcidName: row.aminoAcidName.split('-')[2],
+        modificationPosition: sonModification.modificationPosition,
+      };
       if (newData.id > 0) {
         // api.peptideBase.updateSeries(newData).then(() => this.getTableData());
       } else {
-        api.peptideBase.insertModificationProducts(newData).then(
-          () => { this.getTableData(); this.clearInput() },
-          );
+        api.peptideBase.insertModificationProducts(newData).then(() => {
+          this.getTableData();
+          // this.clearInput();
+        });
       }
-    });
-  }
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   // 得到修饰搜索的值
   getSonData = (data, type) => {
     if (type === 'modifications') {
-      this.props.form.setFieldsValue({
-        modificationPosition: data.modificationPosition,
+      this.tableFormRef.current.setFieldsValue({
+        modificationPosition: formatter(
+          this.props.peptide.commonData.modificationPosition,
+          data.modificationPosition,
+        ),
         modificationName: data.name,
-      })
-      // eslint-disable-next-line array-callback-return
-      this.props.peptide.commonData.modificationPosition.map(item => {
-        if (item.id === data.modificationPosition) {
-          // eslint-disable-next-line no-param-reassign
-          data.modificationPosition = item.name
-        }
-      })
+      });
       this.setState({
         sonModification: data,
-      })
+      });
     } else {
-      this.setState({
-        sonProducts: data,
-      })
-      this.props.form.setFieldsValue({
+      this.tableFormRef.current.setFieldsValue({
         sapProductCode: data.code,
         sapProductName: data.name,
-      })
+      });
     }
-  }
+  };
 
   // 新增
   handleAdd = () => {
@@ -314,9 +217,10 @@ class ModificationProducts extends Component {
       message.warning('请先保存或退出正在编辑的数据');
       return;
     }
-
     const newId = id - 1;
+    this.tableFormRef.current.resetFields();
     this.setState({
+      sonModification: [],
       id: newId,
       editIndex: 0,
       list: [
@@ -326,21 +230,38 @@ class ModificationProducts extends Component {
         ...list,
       ],
     });
-  }
+  };
+
+  simpleForm = () => {
+    const {
+      peptide: {
+        commonData: { status },
+      },
+    } = this.props;
+    return (
+      <>
+        <Col lg={6} md={8} sm={12}>
+          <FormItem label="编号" name="code">
+            <Input />
+          </FormItem>
+        </Col>
+        <Col lg={6} md={8} sm={12}>
+          <FormItem label="状态" name="status">
+            <Select>
+              {status.map(item => (
+                <Option key={item.id} value={item.id}>
+                  {item.name}
+                </Option>
+              ))}
+            </Select>
+          </FormItem>
+        </Col>
+      </>
+    );
+  };
 
   render() {
-    const {
-      formValues: { page: current, rows: pageSize },
-      selectedRows,
-      list,
-      total,
-      loading,
-      sonModification,
-      aminoAcid,
-      sonProducts,
-    } = this.state;
-    const data = { list, pagination: { current, pageSize, total } };
-    const { peptide: { commonData } } = this.props
+    const { pagination, selectedRows, list, loading, sonModification, aminoAcid } = this.state;
     let tableWidth = 0;
 
     let columns = [
@@ -354,27 +275,36 @@ class ModificationProducts extends Component {
         dataIndex: 'modificationName',
         width: 250,
         editable: true,
-        inputType: <Search style={{ width: 230 }} onSearch={() => this.modificationShow.visibleShow(true)} value={sonModification.name ? sonModification.name : ''} readOnly/>,
-        rules: [
-          { required: true, message: '必填' },
-        ],
+        inputType: (
+          <Search
+            style={{ width: 230 }}
+            onSearch={() => this.modificationShow.visibleShow(true)}
+            value={sonModification.name ? sonModification.name : ''}
+            readOnly
+          />
+        ),
+        rules: [{ required: true, message: '必填' }],
       },
       {
         title: '修饰位置',
         dataIndex: 'modificationPosition',
         width: 110,
         editable: true,
-        inputType: <Input style={{ width: 90 }} value={sonModification.modificationPosition ? sonModification.modificationPosition : ''} readOnly/>,
-        rules: [
-          { required: true, message: '必填' },
-        ],
+        inputType: (
+          <Input
+            style={{ width: 90 }}
+            value={sonModification.modificationPosition ? sonModification.modificationPosition : ''}
+            readOnly
+          />
+        ),
+        rules: [{ required: true, message: '必填' }],
         render: text => {
           let val = null;
           this.props.peptide.commonData.modificationPosition.forEach(item => {
             if (item.id === text) {
-              val = item.name
+              val = item.name;
             }
-          })
+          });
           return val;
         },
       },
@@ -385,13 +315,14 @@ class ModificationProducts extends Component {
         editable: true,
         inputType: (
           <Select style={{ width: 110 }}>
-          {aminoAcid.map(item =>
-            <Option value={`${item.code}-${item.id}-${item.name}`} key={item.id}>{item.name}</Option>,
-          )}
-          </Select>),
-        rules: [
-          { required: true, message: '必填' },
-        ],
+            {aminoAcid.map(item => (
+              <Option value={`${item.code}-${item.id}-${item.name}`} key={item.id}>
+                {item.name}
+              </Option>
+            ))}
+          </Select>
+        ),
+        rules: [{ required: true, message: '必填' }],
       },
       {
         title: '氨基酸类型',
@@ -402,50 +333,41 @@ class ModificationProducts extends Component {
           <Select style={{ width: 90 }}>
             <Option value="L">L</Option>
             <Option value="D">D</Option>
-          </Select>),
-        rules: [
-          { required: true, message: '必填' },
-        ],
+          </Select>
+        ),
+        rules: [{ required: true, message: '必填' }],
       },
       {
         title: '提供总量从',
         dataIndex: 'providerTotalAmountBegin',
         width: 110,
         editable: true,
-        inputType: <Input style={{ width: 90 }}/>,
-        rules: [
-          { required: true, message: '必填' },
-        ],
+        inputType: <Input style={{ width: 90 }} />,
+        rules: [{ required: true, message: '必填' }],
       },
       {
         title: '提供总量至',
         dataIndex: 'providerTotalAmountEnd',
         width: 120,
         editable: true,
-        inputType: <Input style={{ width: 100 }}/>,
-        rules: [
-          { required: true, message: '必填' },
-        ],
+        inputType: <Input style={{ width: 100 }} />,
+        rules: [{ required: true, message: '必填' }],
       },
       {
         title: '长度从',
         dataIndex: 'aminoAcidLengthBegin',
         width: 100,
         editable: true,
-        inputType: <Input style={{ width: 80 }}/>,
-        rules: [
-          { required: true, message: '必填' },
-        ],
+        inputType: <Input style={{ width: 80 }} />,
+        rules: [{ required: true, message: '必填' }],
       },
       {
         title: '长度至',
         dataIndex: 'aminoAcidLengthEnd',
         width: 100,
         editable: true,
-        inputType: <Input style={{ width: 80 }}/>,
-        rules: [
-          { required: true, message: '必填' },
-        ],
+        inputType: <Input style={{ width: 80 }} />,
+        rules: [{ required: true, message: '必填' }],
       },
       {
         title: '是否脱盐',
@@ -454,27 +376,30 @@ class ModificationProducts extends Component {
         align: 'center',
         render: text => (text === 1 ? '√' : ''),
         editable: true,
-        inputType: <Checkbox style={{ textAlign: 'center', display: 'block' }}/>,
+        checkType: true,
+        inputType: <Checkbox style={{ textAlign: 'center', display: 'block' }} />,
       },
       {
         title: '产品编号',
         dataIndex: 'sapProductCode',
         width: 200,
         editable: true,
-        inputType: <Input style={{ width: 180 }} value={sonProducts.code ? sonProducts.code : ''} readOnly/>,
-        rules: [
-          { required: true, message: '必填' },
-        ],
+        inputType: <Input style={{ width: 180 }} readOnly />,
+        rules: [{ required: true, message: '必填' }],
       },
       {
         title: '产品名称',
         dataIndex: 'sapProductName',
         width: 300,
         editable: true,
-        inputType: <Search style={{ width: 280 }} onSearch={() => this.productShow.visibleShow(true)} value={sonProducts.name ? sonProducts.name : ''} readOnly/>,
-        rules: [
-          { required: true, message: '必填' },
-        ],
+        inputType: (
+          <Search
+            style={{ width: 280 }}
+            onSearch={() => this.productShow.visibleShow(true)}
+            readOnly
+          />
+        ),
+        rules: [{ required: true, message: '必填' }],
       },
       {
         title: '状态',
@@ -483,7 +408,7 @@ class ModificationProducts extends Component {
         render: text => {
           if (text === 1) return '正常';
           if (text === 2) return '已删除';
-          return ''
+          return '';
         },
       },
       {
@@ -548,7 +473,7 @@ class ModificationProducts extends Component {
       },
     };
 
-   columns = columns.map(col => {
+    columns = columns.map(col => {
       // eslint-disable-next-line no-param-reassign
       if (!col.width) col.width = 100;
       tableWidth += col.width;
@@ -561,6 +486,7 @@ class ModificationProducts extends Component {
           record,
           rules: col.rules,
           inputType: col.inputType,
+          checkType: col.checkType,
           dataIndex: col.dataIndex,
           title: col.title,
           editing: rowIndex === this.state.editIndex,
@@ -572,34 +498,54 @@ class ModificationProducts extends Component {
       <PageHeaderWrapper>
         <Card bordered={false}>
           <div className="tableList">
-            <SearchPage getTableData={this.getTableData} status={commonData.status}/>
+            <TableSearchForm
+              ref={this.tableSearchFormRef}
+              initialValues={this.initialValues}
+              getTableData={this.getTableData}
+              simpleForm={this.simpleForm}
+            />
             <div className="tableListOperator">
-              <Button icon="plus" type="primary" onClick={() => this.handleAdd()}>
+              <Button type="primary" onClick={() => this.handleAdd()}>
+                <PlusOutlined />
                 新建
               </Button>
             </div>
-            <EditableContext.Provider value={this.props.form}>
+            <Form ref={this.tableFormRef}>
               <StandardTable
                 scroll={{ x: tableWidth }}
                 rowClassName="editable-row"
                 components={components}
                 selectedRows={selectedRows}
                 loading={loading}
-                data={data}
+                data={{ list, pagination }}
                 columns={columns}
                 onSelectRow={this.handleSelectRows}
                 onChange={this.handleStandardTableChange}
               />
-            </EditableContext.Provider>
+            </Form>
           </div>
         </Card>
-        <Modifications getData={v => { this.getSonData(v, 'modifications') }}
-        onRef={ ref => { this.modificationShow = ref }}/>
-        <Products getData={v => { this.getSonData(v, 'products') }}
-        onRef={ ref => { this.productShow = ref }}/>
+        <Modifications
+          getData={v => {
+            this.getSonData(v, 'modifications');
+          }}
+          onRef={ref => {
+            this.modificationShow = ref;
+          }}
+        />
+        <Products
+          getData={v => {
+            this.getSonData(v, 'products');
+          }}
+          onRef={ref => {
+            this.productShow = ref;
+          }}
+        />
       </PageHeaderWrapper>
     );
   }
 }
 
-export default Form.create()(ModificationProducts);
+export default connect(({ peptide }) => ({
+  peptide,
+}))(ModificationProducts);
