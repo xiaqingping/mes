@@ -1,6 +1,7 @@
 import { Button, Col, Form, Row } from 'antd';
 import { DownOutlined, UpOutlined } from '@ant-design/icons';
 import React, { useState } from 'react';
+import PropTypes from 'prop-types';
 import { FormattedMessage } from 'umi/locale';
 import styles from './index.less';
 
@@ -72,5 +73,18 @@ const TableSearchForm = React.forwardRef((props, ref) => {
     </Form>
   );
 });
+
+TableSearchForm.defaultProps = {
+  initialValues: {},
+  simpleForm: null,
+  advancedForm: null,
+};
+
+TableSearchForm.propTypes = {
+  initialValues: PropTypes.object,
+  getTableData: PropTypes.func.isRequired,
+  simpleForm: PropTypes.func,
+  advancedForm: PropTypes.func,
+};
 
 export default TableSearchForm;

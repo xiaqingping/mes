@@ -9,12 +9,12 @@ const reg = /(((^https?:(?:\/\/)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+(?::\d+)?|(
 export const isUrl = path => reg.test(path);
 
 export const getPageQuery = () => parse(window.location.href.split('?')[1]);
+
 /**
  * props.route.routes
  * @param router [{}]
  * @param pathname string
  */
-
 export const getAuthorityFromRouter = (router = [], pathname) => {
   const authority = router.find(
     ({ routes, path = '/' }) =>
@@ -24,6 +24,7 @@ export const getAuthorityFromRouter = (router = [], pathname) => {
   if (authority) return authority;
   return undefined;
 };
+
 export const getRouteAuthority = (path, routeData) => {
   let authorities;
   routeData.forEach(route => {
@@ -116,26 +117,26 @@ export const guid = () => {
 };
 
 /**
- * 深度对比两个对象数组，返回 next 相对与 pre 的（新增、修改、删除）对象
- * @param {Array[Object]} pre 旧的对象数组
+ * 深度对比两个对象数组，返回 next 相对与 prev 的（新增、修改、删除）对象
+ * @param {Array[Object]} prev 旧的对象数组
  * @param {Array[Object]} next 新的对象数组
  * @param {String} key 新旧数据有相同的key，说明是同一条数据，需要深度对比，字段有无变更
  */
-export const diff = (pre, next, key = 'id') => {
+export const diff = (prev, next, key = 'id') => {
   // 新增add 修改update 删除del 相同equal
 
-  // next 有，pre 没有的数据，则为新增数据
-  const add = _.differenceWith(next, pre, (n, p) => p[key] === n[key]);
+  // next 有，prev 没有的数据，则为新增数据
+  const add = _.differenceWith(next, prev, (n, p) => p[key] === n[key]);
 
   // 在next中，过滤掉add数据 = 已有数据未修改 + 已有数据修改
   const nextOther = _.differenceWith(next, add, _.isEqual);
 
   // 在nextOther中，过滤掉pre数据 = 已有数据修改
-  const update = _.differenceWith(nextOther, pre, _.isEqual);
+  const update = _.differenceWith(nextOther, prev, _.isEqual);
 
-  // pre有，next没有，则是删除数据
-  const del = pre.filter(
-    preItem => !nextOther.some(nextOtherItem => nextOtherItem[key] === preItem[key]),
+  // prev 有，next没有，则是删除数据
+  const del = prev.filter(
+    prevItem => !nextOther.some(nextOtherItem => nextOtherItem[key] === prevItem[key]),
   );
 
   return { add, del, update };
