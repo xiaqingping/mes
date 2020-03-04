@@ -24,6 +24,9 @@ class AddPage extends Component {
   state = {
     factorys: [],
     plusStatus: false,
+    productAmount: parseFloat(9546.23).toFixed(2),
+    // freight: parseFloat(5).toFixed(2),
+    amount: (9546.23 + 5.0).toFixed(2),
   };
 
   initialValues = {
@@ -36,10 +39,7 @@ class AddPage extends Component {
     factory: '3100',
     productAmount: (9546.23).toFixed(2),
     orderTypeStatus: 0,
-    freight: (0.0).toFixed(2),
-    // amount:
-    //   parseFloat(this.tableSearchFormRef.current.getFieldValue('productAmount')) +
-    //   parseFloat(this.tableSearchFormRef.current.getFieldValue('freight')).toFixed(2),
+    freight: (5).toFixed(2),
     currency: 'CNY',
   };
 
@@ -53,23 +53,12 @@ class AddPage extends Component {
 
   // 获取批量导入序列
   loadData = v => {
-    // eslint-disable-next-line no-param-reassign
-    v = v.replace(/[\uff0c]/g, ',');
-    const val = v.split('\n');
+    const val = v.replace(/[\uff0c]/g, ',').split('\n');
     let data = [];
-    // eslint-disable-next-line array-callback-return
-    val.map(item => {
+    val.forEach(item => {
       data = [...data, item.split(',')];
     });
     this.props.handleAdd(data);
-  };
-
-  addAddress = () => {
-    console.log(123);
-  };
-
-  handleFormReset = () => {
-    this.props.form.resetFields();
   };
 
   getMaskData = (v, type) => {
@@ -117,7 +106,7 @@ class AddPage extends Component {
       peptide,
       language,
     } = this.props;
-    const { factorys, plusStatus } = this.state;
+    const { factorys, plusStatus, amount, productAmount } = this.state;
     const regions = peptide.regions.filter(e => e.languageCode === language);
     const offices = peptide.offices.filter(e => e.languageCode === language);
     const currencies = peptide.currencies.filter(e => e.languageCode === language);
@@ -329,12 +318,18 @@ class AddPage extends Component {
         </Col>
         <Col lg={6} md={8} sm={12}>
           <FormItem label="运费" name="freight">
-            <Input />
+            <Input
+              onChange={e => {
+                this.tableSearchFormRef.current.setFieldsValue({
+                  amount: parseFloat(e.target.value) + parseFloat(productAmount),
+                });
+              }}
+            />
           </FormItem>
         </Col>
         <Col lg={6} md={8} sm={12}>
           <FormItem label="订单金额" name="amount">
-            <Input readOnly />
+            <Input readOnly defaultValue={amount} value={amount} />
           </FormItem>
         </Col>
         <Col lg={6} md={8} sm={12}>

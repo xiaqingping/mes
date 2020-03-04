@@ -6,7 +6,7 @@ import api from '@/api';
 import './style.less';
 import { connect } from 'dva';
 import TableSearchForm from '@/components/TableSearchForm';
-// import EditableCell from '@/components/EditableCell';
+import { formatter } from '@/utils/utils';
 
 const FormItem = Form.Item;
 const { Option } = Select;
@@ -30,7 +30,7 @@ class SubCustomer extends Component {
     currency: '',
     payMethodCode: '',
     payTermsCode: '',
-    rangeOrganization: '',
+    rangeOrganization: '3110-10',
     page: 1,
     rows: 10,
   };
@@ -69,6 +69,14 @@ class SubCustomer extends Component {
     const formData = this.tableSearchFormRef.current
       ? this.tableSearchFormRef.current.getFieldsValue()
       : '';
+    const range = formData
+      ? formData.rangeOrganization.split('-')
+      : options.rangeOrganization.split('-');
+    const rangeData = {
+      rangeChannel: range[1],
+      rangeGroup: '00',
+      rangeOrganization: range[0],
+    };
     const { pagination } = this.state;
     const { current: page, pageSize: rows } = pagination;
     const data = {
@@ -76,15 +84,16 @@ class SubCustomer extends Component {
       rows,
       ...formData,
       ...options,
+      ...rangeData,
     };
 
-    api.peptideBase.getModifications(data, true).then(res => {
+    api.basic.getSubcustomer(data).then(res => {
       this.setState({
-        list: res.rows,
+        list: res,
         pagination: {
           current: data.page,
           pageSize: data.rows,
-          total: res.total,
+          total: res.length,
         },
         loading: false,
       });
@@ -94,17 +103,12 @@ class SubCustomer extends Component {
   simpleForm = () => {
     const {
       peptide: { salesRanges },
-      peptide,
-      language,
+      regions,
+      offices,
+      salesPaymentMethods,
+      currencies,
+      paymentTerms,
     } = this.props;
-
-    const regions = peptide.regions.filter(e => e.languageCode === language);
-    const offices = peptide.offices.filter(e => e.languageCode === language);
-    const currencies = peptide.currencies.filter(e => e.languageCode === language);
-    const paymentTerms = peptide.paymentTerms.filter(e => e.languageCode === language);
-    const salesPaymentMethods = peptide.salesPaymentMethods.filter(
-      e => e.languageCode === language,
-    );
 
     return (
       <>
@@ -193,7 +197,7 @@ class SubCustomer extends Component {
         </Col>
         <Col lg={6} md={8} sm={12}>
           <FormItem label="付款条件" name="payTermsCode">
-            <Select style={{ width: '200px' }}>
+            <Select style={{ width: '192px' }}>
               <Option value="">全部</Option>
               {paymentTerms.map(item => (
                 <Option key={item.code} value={item.code}>
@@ -220,7 +224,7 @@ class SubCustomer extends Component {
               {salesRanges.map(item => (
                 <Option
                   key={`${item.organization}${item.channel}`}
-                  value={`${item.channelName} - ${item.organizationName}`}
+                  value={`${item.organization}-${item.channel}`}
                 >
                   {`${item.channelName} - ${item.organizationName}`}
                 </Option>
@@ -234,13 +238,14 @@ class SubCustomer extends Component {
 
   render() {
     const { pagination, list, loading, visible } = this.state;
+    const { regions, offices, salesPaymentMethods, paymentTerms, currencies } = this.props;
     let tableWidth = 0;
 
     let columns = [
       {
         title: '编号',
         dataIndex: 'code',
-        width: 100,
+        width: 120,
       },
       {
         title: '名称',
@@ -250,27 +255,27 @@ class SubCustomer extends Component {
       {
         title: '电话',
         dataIndex: 'telNo',
-        width: 100,
+        width: 200,
       },
       {
         title: '手机',
         dataIndex: 'mobNo',
-        width: 100,
+        width: 200,
       },
       {
         title: '邮箱',
         dataIndex: 'email',
-        width: 100,
+        width: 200,
       },
       {
         title: '客户编号',
         dataIndex: 'customerCode',
-        width: 100,
+        width: 120,
       },
       {
         title: '客户名称',
         dataIndex: 'customerName',
-        width: 100,
+        width: 200,
       },
       {
         title: '客户分类',
@@ -280,27 +285,32 @@ class SubCustomer extends Component {
       {
         title: '大区',
         dataIndex: 'regionCode',
-        width: 100,
+        width: 150,
+        render: value => `${value} - ${formatter(regions, value, 'code', 'name')}`,
       },
       {
         title: '网点',
         dataIndex: 'officeCode',
-        width: 100,
+        width: 150,
+        render: value => `${value} - ${formatter(offices, value, 'code', 'name')}`,
       },
       {
         title: '币种',
         dataIndex: 'currency',
-        width: 100,
+        width: 150,
+        render: value => `${value} - ${formatter(currencies, value, 'code', 'shortText')}`,
       },
       {
         title: '付款方式',
         dataIndex: 'payMethodCode',
-        width: 100,
+        width: 150,
+        render: value => `${value} - ${formatter(salesPaymentMethods, value, 'code', 'name')}`,
       },
       {
         title: '付款条件',
         dataIndex: 'payTermsCode',
-        width: 100,
+        width: 150,
+        render: value => `${value} - ${formatter(paymentTerms, value, 'code', 'name')}`,
       },
       {
         title: '销售员',
@@ -394,7 +404,21 @@ class SubCustomer extends Component {
   }
 }
 
-export default connect(({ peptide, global }) => ({
-  peptide,
-  language: global.languageCode || [],
-}))(SubCustomer);
+export default connect(({ peptide, global }) => {
+  const regions = peptide.regions.filter(e => e.languageCode === global.languageCode);
+  const offices = peptide.offices.filter(e => e.languageCode === global.languageCode);
+  const currencies = peptide.currencies.filter(e => e.languageCode === global.languageCode);
+  const salesPaymentMethods = peptide.salesPaymentMethods.filter(
+    e => e.languageCode === global.languageCode,
+  );
+  const paymentTerms = peptide.paymentTerms.filter(e => e.languageCode === global.languageCode);
+  return {
+    peptide,
+    language: global.languageCode || [],
+    regions,
+    offices,
+    currencies,
+    salesPaymentMethods,
+    paymentTerms,
+  };
+})(SubCustomer);

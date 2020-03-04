@@ -13,7 +13,6 @@ import styles from './index.less';
  * @param {Object} props.initialValues 表单默认值
  */
 const TableSearchForm = React.forwardRef((props, ref) => {
-  console.log(ref);
   const [expand, setExpand] = useState(false);
   const [form] = Form.useForm();
 
