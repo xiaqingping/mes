@@ -6,7 +6,6 @@ import api from '@/api';
 import './style.less';
 import { connect } from 'dva';
 import TableSearchForm from '@/components/TableSearchForm';
-// import EditableCell from '@/components/EditableCell';
 
 const FormItem = Form.Item;
 const { Option } = Select;
