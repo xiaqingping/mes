@@ -45,10 +45,6 @@ class Load extends Component {
     });
   };
 
-  handleFormReset = () => {
-    this.props.form.resetFields();
-  };
-
   render() {
     const { visible } = this.state;
     return (

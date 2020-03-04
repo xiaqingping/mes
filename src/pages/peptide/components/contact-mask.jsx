@@ -121,13 +121,13 @@ class Customer extends Component {
           </FormItem>
         </Col>
         <Col lg={6} md={8} sm={12}>
-          <FormItem label="负责人编号" name="subcustomerCode">
-            <Input style={{ width: '192px' }} />
+          <FormItem label="负责人编号" className="fiveWord" name="subcustomerCode">
+            <Input style={{ width: '182px' }} />
           </FormItem>
         </Col>
         <Col lg={6} md={8} sm={12}>
-          <FormItem label="负责人名称" name="subcustomerName">
-            <Input style={{ width: '192px' }} />
+          <FormItem label="负责人名称" className="fiveWord" name="subcustomerName">
+            <Input style={{ width: '182px' }} />
           </FormItem>
         </Col>
         <Col lg={6} md={8} sm={12}>

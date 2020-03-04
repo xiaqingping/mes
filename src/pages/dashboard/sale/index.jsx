@@ -284,7 +284,14 @@ class Sale extends React.Component {
 
     return (
       <div style={{ marginRight: '100px' }}>
-        <Form ref={this.tableFormRef} className="mySet">
+        <Form
+          ref={this.tableFormRef}
+          className="mySet"
+          initialValues={{
+            companys: ['3100'],
+            type: '1',
+          }}
+        >
           <Row>
             <Col xxl={7} lg={12} sm={24}>
               <Form.Item name="companys">

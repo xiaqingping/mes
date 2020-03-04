@@ -31,12 +31,12 @@ export default {
     return request('/basic/v1/contacts');
   },
   // 查询客户
-  getCustomers() {
-    return request('/basic/v1/customers');
+  getCustomers(params) {
+    return request('/basic/v1/customers', { params });
   },
   // 查询负责人
-  getSubcustomer() {
-    return request('/basic/v1/subcustomer');
+  getSubcustomer(params) {
+    return request('/basic/v1/subcustomer', { params });
   },
   // 查询产品
   getProducts(params) {
