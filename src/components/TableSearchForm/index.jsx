@@ -35,41 +35,45 @@ const TableSearchForm = React.forwardRef((props, ref) => {
         {props.simpleForm()}
         {expand && props.advancedForm ? props.advancedForm() : null}
       </Row>
-      <Row>
-        <Col span={24} style={{ textAlign: 'right' }}>
-          <Button type="primary" htmlType="submit">
-            <FormattedMessage id="action.search" />
-          </Button>
-          <Button
-            style={{ marginLeft: 8 }}
-            onClick={() => {
-              form.resetFields();
-            }}
-          >
-            <FormattedMessage id="action.reset" />
-          </Button>
-          {props.advancedForm ? (
-            <a
-              style={{ marginLeft: 8, fontSize: 12 }}
+      {props.noButton ? (
+        ''
+      ) : (
+        <Row>
+          <Col span={24} style={{ textAlign: 'right' }}>
+            <Button type="primary" htmlType="submit">
+              <FormattedMessage id="action.search" />
+            </Button>
+            <Button
+              style={{ marginLeft: 8 }}
               onClick={() => {
-                setExpand(!expand);
+                form.resetFields();
               }}
             >
-              {expand ? (
-                <>
-                  <FormattedMessage id="action.unexpand" />
-                  <UpOutlined />
-                </>
-              ) : (
-                <>
-                  <FormattedMessage id="action.expand" />
-                  <DownOutlined />
-                </>
-              )}
-            </a>
-          ) : null}
-        </Col>
-      </Row>
+              <FormattedMessage id="action.reset" />
+            </Button>
+            {props.advancedForm ? (
+              <a
+                style={{ marginLeft: 8, fontSize: 12 }}
+                onClick={() => {
+                  setExpand(!expand);
+                }}
+              >
+                {expand ? (
+                  <>
+                    <FormattedMessage id="action.unexpand" />
+                    <UpOutlined />
+                  </>
+                ) : (
+                  <>
+                    <FormattedMessage id="action.expand" />
+                    <DownOutlined />
+                  </>
+                )}
+              </a>
+            ) : null}
+          </Col>
+        </Row>
+      )}
     </Form>
   );
 });

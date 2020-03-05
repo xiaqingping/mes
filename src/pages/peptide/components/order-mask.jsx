@@ -1,5 +1,17 @@
 // 多肽订单新增弹框
-import { Button, Col, Form, Input, Row, Select, Table, Modal, message, Divider } from 'antd';
+import {
+  Button,
+  Col,
+  Form,
+  Input,
+  Row,
+  Select,
+  Table,
+  Modal,
+  message,
+  Divider,
+  notification,
+} from 'antd';
 import React, { Component } from 'react';
 import api from '@/api';
 import './style.less';
@@ -23,10 +35,14 @@ class AddPage extends Component {
 
   state = {
     factorys: [],
+    orderTypes: [],
     plusStatus: false,
     productAmount: parseFloat(9546.23).toFixed(2),
     // freight: parseFloat(5).toFixed(2),
     amount: (9546.23 + 5.0).toFixed(2),
+    customerCode: '',
+    subCustomerCode: '',
+    contactCode: '',
   };
 
   initialValues = {
@@ -49,7 +65,16 @@ class AddPage extends Component {
         factorys: data,
       });
     });
+    api.basic.getOrderTypes().then(data => {
+      this.setState({
+        orderTypes: data,
+      });
+    });
   }
+
+  handleFormReset = () => {
+    this.tableSearchFormRef.current.resetFields();
+  };
 
   // 获取批量导入序列
   loadData = v => {
@@ -63,16 +88,25 @@ class AddPage extends Component {
 
   getMaskData = (v, type) => {
     if (type === 'customer') {
+      this.setState({
+        customerCode: v.code,
+      });
       this.tableSearchFormRef.current.setFieldsValue({
         customerName: v.name,
       });
     }
     if (type === 'subCustomer') {
+      this.setState({
+        subCustomerCode: v.code,
+      });
       this.tableSearchFormRef.current.setFieldsValue({
         subCustomerName: v.name,
       });
     }
     if (type === 'contact') {
+      this.setState({
+        contactCode: v.code,
+      });
       this.tableSearchFormRef.current.setFieldsValue({
         contactName: v.name,
       });
@@ -106,7 +140,16 @@ class AddPage extends Component {
       peptide,
       language,
     } = this.props;
-    const { factorys, plusStatus, amount, productAmount } = this.state;
+    const {
+      factorys,
+      plusStatus,
+      amount,
+      productAmount,
+      customerCode,
+      subCustomerCode,
+      orderTypes,
+      contactCode,
+    } = this.state;
     const regions = peptide.regions.filter(e => e.languageCode === language);
     const offices = peptide.offices.filter(e => e.languageCode === language);
     const currencies = peptide.currencies.filter(e => e.languageCode === language);
@@ -116,24 +159,28 @@ class AddPage extends Component {
       //   <Row gutter={{ lg: 24, md: 12, sm: 6 }}>
       <>
         <Col lg={6} md={8} sm={12}>
-          <FormItem label="订单编号" name="code">
+          <FormItem label="订单编号" name="code" className="shrinkWord">
             <Input />
           </FormItem>
         </Col>
         <Col lg={6} md={8} sm={12}>
-          <FormItem label="销售类型" name="salesType">
+          <FormItem label="销售类型" name="salesType" className="shrinkWord">
             <Select>
-              <Option value="0">全部</Option>
+              {orderTypes.map(item => (
+                <Option key={`${item.code} - ${item.name}`} value={`${item.code} - ${item.name}`}>
+                  {`${item.code} - ${item.name}`}
+                </Option>
+              ))}
             </Select>
           </FormItem>
         </Col>
         <Col lg={6} md={8} sm={12}>
-          <FormItem label="客户" name="customerName">
+          <FormItem label="客户" name="customerName" className="shrinkWord">
             <Search onSearch={() => this.showCustomer.visibleShow(true)} />
           </FormItem>
         </Col>
         <Col lg={6} md={8} sm={12}>
-          <FormItem label="销售范围" name="rangeOrganization">
+          <FormItem label="销售范围" name="rangeOrganization" className="shrinkWord">
             <Select>
               <Option value="">全部</Option>
               {salesRanges.map(item => (
@@ -148,12 +195,24 @@ class AddPage extends Component {
           </FormItem>
         </Col>
         <Col lg={6} md={8} sm={12}>
-          <FormItem label="负责人" name="subCustomerName">
-            <Search onSearch={() => this.showSubCustomer.visibleShow(true)} />
+          <FormItem label="负责人" name="subCustomerName" className="shrinkWord">
+            <Search
+              // disabled={!customerCode}
+              onSearch={() => {
+                if (customerCode) {
+                  this.showSubCustomer.visibleShow(true);
+                } else {
+                  notification.error({
+                    message: '消息',
+                    description: '请选择客户',
+                  });
+                }
+              }}
+            />
           </FormItem>
         </Col>
         <Col lg={6} md={8} sm={12}>
-          <FormItem label="销售大区" name="regionCode">
+          <FormItem label="销售大区" name="regionCode" className="shrinkWord">
             <Select disabled>
               {regions.map(item => (
                 <Option key={item.code} value={item.code}>{`${item.code}-${item.name}`}</Option>
@@ -162,12 +221,23 @@ class AddPage extends Component {
           </FormItem>
         </Col>
         <Col lg={6} md={8} sm={12}>
-          <FormItem label="订货人" name="contactName">
-            <Search onSearch={() => this.showContact.visibleShow(true)} />
+          <FormItem label="订货人" name="contactName" className="shrinkWord">
+            <Search
+              onSearch={() => {
+                if (subCustomerCode) {
+                  this.showContact.visibleShow(true);
+                } else {
+                  notification.error({
+                    message: '消息',
+                    description: '请选择负责人',
+                  });
+                }
+              }}
+            />
           </FormItem>
         </Col>
         <Col lg={6} md={8} sm={12}>
-          <FormItem label="销售网点" name="officeCode">
+          <FormItem label="销售网点" name="officeCode" className="shrinkWord">
             <Select disabled>
               {offices.map(item => (
                 <Option key={item.code} value={item.code}>{`${item.code}-${item.name}`}</Option>
@@ -176,31 +246,33 @@ class AddPage extends Component {
           </FormItem>
         </Col>
         <Col lg={6} md={8} sm={12}>
-          <FormItem label="配送网点" name="dofficeCode">
+          <FormItem label="配送网点" name="dofficeCode" className="shrinkWord">
             <Select>
-              <Option value="0">全部</Option>
+              {offices.map(item => (
+                <Option key={item.code} value={item.code}>{`${item.code}-${item.name}`}</Option>
+              ))}
             </Select>
           </FormItem>
         </Col>
         <Col lg={6} md={8} sm={12}>
-          <FormItem label="销售员" name="salerName">
+          <FormItem label="销售员" name="salerName" className="shrinkWord">
             <Search onSearch={() => this.showSaler.visibleShow(true)} />
           </FormItem>
         </Col>
         <Col lg={6} md={8} sm={12}>
-          <FormItem label="销售部门" name="departmentCode">
+          <FormItem label="销售部门" name="departmentCode" className="shrinkWord">
             <Select>
               <Option value="0">全部</Option>
             </Select>
           </FormItem>
         </Col>
         <Col lg={6} md={8} sm={12}>
-          <FormItem label="信用额度" name="credit">
+          <FormItem label="信用额度" name="credit" className="shrinkWord">
             <Input />
           </FormItem>
         </Col>
         <Col lg={6} md={8} sm={12}>
-          <FormItem label="开票方式" name="invoiceType">
+          <FormItem label="开票方式" name="invoiceType" className="shrinkWord">
             <Select>
               {taxInvoiceTypes.map(item => (
                 <Option key={item.code} value={item.code}>{`${item.code}-${item.name}`}</Option>
@@ -209,12 +281,12 @@ class AddPage extends Component {
           </FormItem>
         </Col>
         <Col lg={6} md={8} sm={12}>
-          <FormItem label="信用余额" name="balance">
+          <FormItem label="信用余额" name="balance" className="shrinkWord">
             <Input />
           </FormItem>
         </Col>
         <Col lg={6} md={8} sm={12}>
-          <FormItem label="付款方式" name="paymentMethod">
+          <FormItem label="付款方式" name="paymentMethod" className="shrinkWord">
             <Select>
               {salesPaymentMethods.map(item => (
                 <Option key={item.code} value={item.code}>{`${item.code}-${item.name}`}</Option>
@@ -223,24 +295,24 @@ class AddPage extends Component {
           </FormItem>
         </Col>
         <Col lg={6} md={8} sm={12}>
-          <FormItem label="专项经费" name="depositBalance">
+          <FormItem label="专项经费" name="depositBalance" className="shrinkWord">
             <Input />
           </FormItem>
         </Col>
         <Col lg={6} md={8} sm={12}>
-          <FormItem label="付款条件" name="paymentTerm">
+          <FormItem label="付款条件" name="paymentTerm" className="shrinkWord">
             <Select>
               <Option value="0">全部</Option>
             </Select>
           </FormItem>
         </Col>
         <Col lg={6} md={8} sm={12}>
-          <FormItem label="SAP销售订单编号" name="sapOrderCode">
+          <FormItem label="SAP销售订单编号" name="sapOrderCode" className="shrinkWord">
             <Input />
           </FormItem>
         </Col>
         <Col lg={6} md={8} sm={12}>
-          <FormItem label="随货开票" name="invoiceByGoods">
+          <FormItem label="随货开票" name="invoiceByGoods" className="shrinkWord">
             <Select>
               {commonData.invoiceByGoodsStatus.map(item => (
                 <Option key={item.id} value={item.id}>
@@ -251,27 +323,27 @@ class AddPage extends Component {
           </FormItem>
         </Col>
         <Col lg={6} md={8} sm={12}>
-          <FormItem label="SAP交货单号" name="sapDeliveryCode">
+          <FormItem label="SAP交货单号" name="sapDeliveryCode" className="shrinkWord">
             <Input />
           </FormItem>
         </Col>
         <Col lg={6} md={8} sm={12}>
-          <FormItem label="sap采购申请单号" name="sapProcureApplyCode">
+          <FormItem label="SAP采购申请单号" name="sapProcureApplyCode" className="shrinkWord">
             <Input />
           </FormItem>
         </Col>
         <Col lg={6} md={8} sm={12}>
-          <FormItem label="客户订单号" name="customerPoCode">
+          <FormItem label="客户订单号" name="customerPoCode" className="shrinkWord">
             <Input />
           </FormItem>
         </Col>
         <Col lg={6} md={8} sm={12}>
-          <FormItem label="客户订单日期" name="customerPoDate">
+          <FormItem label="客户订单日期" name="customerPoDate" className="shrinkWord">
             <Input />
           </FormItem>
         </Col>
         <Col lg={6} md={8} sm={12}>
-          <FormItem label="交货方式" name="deliveryType">
+          <FormItem label="交货方式" name="deliveryType" className="shrinkWord">
             <Select disabled>
               {commonData.deliveryTypeStatus.map(item => (
                 <Option key={item.id} value={item.id}>{`${item.id}-${item.name}`}</Option>
@@ -280,19 +352,19 @@ class AddPage extends Component {
           </FormItem>
         </Col>
         <Col lg={6} md={8} sm={12}>
-          <FormItem label="仓库" name="storageCode">
+          <FormItem label="仓库" name="storageCode" className="shrinkWord">
             <Input />
           </FormItem>
         </Col>
         <Col lg={6} md={8} sm={12}>
-          <FormItem label="SAP交货单号" name="sapDeliveryCode">
+          <FormItem label="SAP交货单号" name="sapDeliveryCode" className="shrinkWord">
             <Select>
               <Option value="0">全部</Option>
             </Select>
           </FormItem>
         </Col>
         <Col lg={6} md={8} sm={12}>
-          <FormItem label="工厂" name="factory">
+          <FormItem label="工厂" name="factory" className="shrinkWord">
             <Select disabled>
               {factorys.map(item => (
                 <Option key={item.code} value={item.code}>{`${item.code}-${item.name}`}</Option>
@@ -301,12 +373,12 @@ class AddPage extends Component {
           </FormItem>
         </Col>
         <Col lg={6} md={8} sm={12}>
-          <FormItem label="产品金额" name="productAmount">
+          <FormItem label="产品金额" name="productAmount" className="shrinkWord">
             <Input readOnly />
           </FormItem>
         </Col>
         <Col lg={6} md={8} sm={12}>
-          <FormItem label="订单类型" name="orderTypeStatus">
+          <FormItem label="订单类型" name="orderTypeStatus" className="shrinkWord">
             <Select>
               {commonData.orderTypeStatus.map(item => (
                 <Option key={item.id} value={item.id}>
@@ -317,7 +389,7 @@ class AddPage extends Component {
           </FormItem>
         </Col>
         <Col lg={6} md={8} sm={12}>
-          <FormItem label="运费" name="freight">
+          <FormItem label="运费" name="freight" className="shrinkWord">
             <Input
               onChange={e => {
                 this.tableSearchFormRef.current.setFieldsValue({
@@ -328,22 +400,22 @@ class AddPage extends Component {
           </FormItem>
         </Col>
         <Col lg={6} md={8} sm={12}>
-          <FormItem label="订单金额" name="amount">
+          <FormItem label="订单金额" name="amount" className="shrinkWord">
             <Input readOnly defaultValue={amount} value={amount} />
           </FormItem>
         </Col>
         <Col lg={6} md={8} sm={12}>
-          <FormItem label="订货人邮箱" name="contactEmail">
+          <FormItem label="订货人邮箱" name="contactEmail" className="shrinkWord">
             <Input />
           </FormItem>
         </Col>
         <Col lg={6} md={8} sm={12}>
-          <FormItem label="订货人手机" name="contactMobile">
+          <FormItem label="订货人手机" name="contactMobile" className="shrinkWord">
             <Input />
           </FormItem>
         </Col>
         <Col lg={6} md={8} sm={12}>
-          <FormItem label="币种" name="currency">
+          <FormItem label="币种" name="currency" className="shrinkWord">
             <Select disabled>
               {currencies.map(item => (
                 <Option
@@ -355,12 +427,12 @@ class AddPage extends Component {
           </FormItem>
         </Col>
         <Col lg={6} md={8} sm={12}>
-          <FormItem label="备注" name="remark">
+          <FormItem label="备注" name="remark" className="shrinkWord">
             <Input />
           </FormItem>
         </Col>
         <Col lg={6} md={8} sm={12}>
-          <FormItem label="地址" name="address">
+          <FormItem label="地址" name="address" className="shrinkWord">
             <Select>
               <Option value="0">全部</Option>
             </Select>
@@ -382,49 +454,63 @@ class AddPage extends Component {
           </div>
         </Col>
         <Col lg={6} md={8} sm={12}>
-          <FormItem label="创建人" name="creatorName">
+          <FormItem label="创建人" name="creatorName" className="shrinkWord">
             <Input />
           </FormItem>
         </Col>
         <Col lg={6} md={8} sm={12}>
-          <FormItem label="创建日期" name="createDate">
+          <FormItem label="创建日期" name="createDate" className="shrinkWord">
             <Input />
           </FormItem>
         </Col>
         <Col lg={6} md={8} sm={12}>
-          <FormItem label="修改人" name="changerName">
+          <FormItem label="修改人" name="changerName" className="shrinkWord">
             <Input />
           </FormItem>
         </Col>
         <Col lg={6} md={8} sm={12}>
-          <FormItem label="修改日期" name="changeDate">
+          <FormItem label="修改日期" name="changeDate" className="shrinkWord">
             <Input />
           </FormItem>
         </Col>
         <Col lg={6} md={8} sm={12}>
-          <FormItem label="审核人" name="checkName">
+          <FormItem label="审核人" name="checkName" className="shrinkWord">
             <Input />
           </FormItem>
         </Col>
         <Col lg={6} md={8} sm={12}>
-          <FormItem label="审核日期" name="checkDate">
+          <FormItem label="审核日期" name="checkDate" className="shrinkWord">
             <Input />
           </FormItem>
         </Col>
         <Col lg={6} md={8} sm={12}>
-          <FormItem label="完成人" name="finishName">
+          <FormItem label="完成人" name="finishName" className="shrinkWord">
             <Input />
           </FormItem>
         </Col>
         <Col lg={6} md={8} sm={12}>
-          <FormItem label="完成日期" name="finishDate">
+          <FormItem label="完成日期" name="finishDate" className="shrinkWord">
             <Input />
           </FormItem>
         </Col>
         <Col lg={6} md={8} sm={12} style={{ marginTop: '20px' }}>
           <span className="submitButtons">
             <Button onClick={() => this.showLoad.visibleShow(true)}>批量导入序列</Button>
-            <Button style={{ marginLeft: 8 }} type="primary" htmlType="submit">
+            <Button
+              style={{ marginLeft: 8 }}
+              type="primary"
+              onClick={() => {
+                if (contactCode) {
+                  // TODO: 新增数据
+                  console.log(1111);
+                } else {
+                  notification.error({
+                    message: '消息',
+                    description: '请选择订货人',
+                  });
+                }
+              }}
+            >
               新增
             </Button>
             <Button style={{ marginLeft: 8 }} onClick={this.handleFormReset}>
@@ -439,6 +525,7 @@ class AddPage extends Component {
   };
 
   render() {
+    const { customerCode, subCustomerCode } = this.state;
     return (
       <div className="tableListForm">
         <TableSearchForm
@@ -446,6 +533,7 @@ class AddPage extends Component {
           initialValues={this.initialValues}
           getTableData={this.handleSubmit}
           simpleForm={this.simpleForm}
+          noButton
         />
         <CustomerMask
           onRef={ref => {
@@ -458,12 +546,14 @@ class AddPage extends Component {
             this.showSubCustomer = ref;
           }}
           getData={v => this.getMaskData(v, 'subCustomer')}
+          customerCode={customerCode}
         />
         <ContactMask
           onRef={ref => {
             this.showContact = ref;
           }}
           getData={v => this.getMaskData(v, 'contact')}
+          subCustomerCode={subCustomerCode}
         />
         <SalerMask
           onRef={ref => {

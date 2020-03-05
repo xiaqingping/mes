@@ -1,5 +1,5 @@
 // 订货人弹框
-import { Button, Col, Form, Input, Select, Table, Modal } from 'antd';
+import { Col, Form, Input, Select, Table, Modal } from 'antd';
 import React, { Component } from 'react';
 
 import api from '@/api';
@@ -22,20 +22,25 @@ class Customer extends Component {
     visible: false, // 遮罩层的判断
   };
 
-  // 顶部表单默认值
-  initialValues = {
-    rangeOrganization: '',
-    page: 1,
-    rows: 10,
-  };
-
   componentDidMount() {
     this.props.onRef(this);
   }
 
   visibleShow = visible => {
     this.setState({ visible });
-    this.getTableData(this.initialValues);
+    this.getTableData(this.initialValues());
+  };
+
+  initialValues = () => {
+    const { subCustomerCode } = this.props;
+    return {
+      payMethodCode: '',
+      payTermsCode: '',
+      rangeOrganization: '3110-10',
+      page: 1,
+      rows: 10,
+      subcustomerCode: subCustomerCode,
+    };
   };
 
   handleSelect = data => {
@@ -63,6 +68,14 @@ class Customer extends Component {
     const formData = this.tableSearchFormRef.current
       ? this.tableSearchFormRef.current.getFieldsValue()
       : '';
+    const range = formData
+      ? formData.rangeOrganization.split('-')
+      : options.rangeOrganization.split('-');
+    const rangeData = {
+      rangeChannel: range[1],
+      rangeGroup: '00',
+      rangeOrganization: range[0],
+    };
     const { pagination } = this.state;
     const { current: page, pageSize: rows } = pagination;
     const data = {
@@ -70,23 +83,20 @@ class Customer extends Component {
       rows,
       ...formData,
       ...options,
+      ...rangeData,
     };
 
-    api.peptideBase.getModifications(data, true).then(res => {
+    api.basic.getContacts(data).then(res => {
       this.setState({
-        list: res.rows,
+        list: res,
         pagination: {
           current: data.page,
           pageSize: data.rows,
-          total: res.total,
+          total: res.length,
         },
         loading: false,
       });
     });
-  };
-
-  handleFormReset = () => {
-    this.props.form.resetFields();
   };
 
   simpleForm = () => {
@@ -133,11 +143,11 @@ class Customer extends Component {
         <Col lg={6} md={8} sm={12}>
           <FormItem label="销售范围" name="rangeOrganization">
             <Select style={{ width: '192px' }}>
-              <Option value="">全部</Option>
+              {/* <Option value="">全部</Option> */}
               {salesRanges.map(item => (
                 <Option
                   key={`${item.organization}${item.channel}`}
-                  value={`${item.channelName} - ${item.organizationName}`}
+                  value={`${item.organization}-${item.channel}`}
                 >
                   {`${item.channelName} - ${item.organizationName}`}
                 </Option>
@@ -157,27 +167,27 @@ class Customer extends Component {
       {
         title: '编号',
         dataIndex: 'code',
-        width: 100,
+        width: 120,
       },
       {
         title: '名称',
         dataIndex: 'name',
-        width: 100,
+        width: 200,
       },
       {
         title: '负责人',
         dataIndex: 'subcustomerCode',
-        width: 100,
+        width: 120,
       },
       {
         title: '负责人',
         dataIndex: 'subcustomerName',
-        width: 100,
+        width: 200,
       },
       {
         title: '电话',
         dataIndex: 'telNo',
-        width: 100,
+        width: 150,
       },
       {
         title: '分机号',
@@ -187,12 +197,12 @@ class Customer extends Component {
       {
         title: '手机',
         dataIndex: 'mobNo',
-        width: 100,
+        width: 120,
       },
       {
         title: '邮箱',
         dataIndex: 'email',
-        width: 100,
+        width: 200,
       },
       {
         title: '国家/地区',
@@ -222,17 +232,17 @@ class Customer extends Component {
       {
         title: '地址',
         dataIndex: 'address',
-        width: 200,
+        width: 300,
       },
       {
         title: '销售冻结(当前渠道)',
         dataIndex: 'customerRangeFrozen',
-        width: 200,
+        width: 160,
       },
       {
         title: '销售冻结(所有渠道)',
         dataIndex: 'customerFrozen',
-        width: 200,
+        width: 160,
       },
       {
         title: '操作',
@@ -261,7 +271,7 @@ class Customer extends Component {
         >
           <TableSearchForm
             ref={this.tableSearchFormRef}
-            initialValues={this.initialValues}
+            initialValues={this.initialValues()}
             getTableData={this.getTableData}
             simpleForm={this.simpleForm}
           />

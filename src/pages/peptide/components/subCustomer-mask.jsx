@@ -1,5 +1,5 @@
 // 负责人弹框
-import { Col, Form, Input, Select, Table, Modal } from 'antd';
+import { Col, Form, Input, Select, Table, Modal, notification } from 'antd';
 import React, { Component } from 'react';
 
 import api from '@/api';
@@ -24,16 +24,6 @@ class SubCustomer extends Component {
   };
 
   // 顶部表单默认值
-  initialValues = {
-    regionCode: '',
-    officeCode: '',
-    currency: '',
-    payMethodCode: '',
-    payTermsCode: '',
-    rangeOrganization: '3110-10',
-    page: 1,
-    rows: 10,
-  };
 
   componentDidMount() {
     this.props.onRef(this);
@@ -41,12 +31,38 @@ class SubCustomer extends Component {
 
   visibleShow = visible => {
     this.setState({ visible });
-    this.getTableData(this.initialValues);
+    this.getTableData(this.initialValues());
+  };
+
+  initialValues = () => {
+    const { customerCode } = this.props;
+    return {
+      regionCode: '',
+      officeCode: '',
+      currency: '',
+      payMethodCode: '',
+      payTermsCode: '',
+      rangeOrganization: '3110-10',
+      page: 1,
+      rows: 10,
+      customerCode,
+    };
   };
 
   handleSelect = data => {
+    const { customerCode } = this.props;
+    if (customerCode) {
+      if (!data.custType && data.code === customerCode) {
+        notification.error({
+          message: '消息',
+          description: '院校客户和负责人不能一样',
+        });
+        return false;
+      }
+    }
     this.props.getData(data);
     this.handleCancel();
+    return true;
   };
 
   handleCancel = () => {
@@ -86,7 +102,6 @@ class SubCustomer extends Component {
       ...options,
       ...rangeData,
     };
-
     api.basic.getSubcustomer(data).then(res => {
       this.setState({
         list: res,
@@ -220,7 +235,7 @@ class SubCustomer extends Component {
         <Col lg={6} md={8} sm={12}>
           <FormItem label="销售范围" name="rangeOrganization">
             <Select style={{ width: '192px' }}>
-              <Option value="">全部</Option>
+              {/* <Option value="">全部</Option> */}
               {salesRanges.map(item => (
                 <Option
                   key={`${item.organization}${item.channel}`}
@@ -383,7 +398,7 @@ class SubCustomer extends Component {
         >
           <TableSearchForm
             ref={this.tableSearchFormRef}
-            initialValues={this.initialValues}
+            initialValues={this.initialValues()}
             getTableData={this.getTableData}
             simpleForm={this.simpleForm}
           />
