@@ -103,10 +103,6 @@ class Customer extends Component {
     });
   };
 
-  handleFormReset = () => {
-    this.props.form.resetFields();
-  };
-
   // 渲染表单
   simpleForm = () => {
     const {
@@ -194,7 +190,7 @@ class Customer extends Component {
         <Col lg={6} md={8} sm={12}>
           <FormItem label="销售范围" name="rangeOrganization">
             <Select style={{ width: '192px' }}>
-              <Option value="">全部</Option>
+              {/* <Option value="">全部</Option> */}
               {salesRanges.map(item => (
                 <Option
                   key={`${item.organization}${item.channel}`}
@@ -224,7 +220,6 @@ class Customer extends Component {
     const { pagination, list, loading, visible } = this.state;
     const { regions, offices, salesPaymentMethods, paymentTerms, currencies } = this.props;
     let tableWidth = 0;
-    console.log(currencies);
     let columns = [
       {
         title: '编号',

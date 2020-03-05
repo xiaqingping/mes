@@ -24,8 +24,9 @@ class Saler extends Component {
 
   // 顶部表单默认值
   initialValues = {
-    regionCode: '',
-    officeCode: '',
+    // regionCode: '',
+    // officeCode: '',
+    organizationName: '销售',
     page: 1,
     rows: 10,
   };
@@ -73,17 +74,17 @@ class Saler extends Component {
       ...options,
     };
 
-    api.peptideBase.getModifications(data, true).then(res => {
-      this.setState({
-        list: res.rows,
-        pagination: {
-          current: data.page,
-          pageSize: data.rows,
-          total: res.total,
-        },
-        loading: false,
-      });
-    });
+    // api.basic.getSaler(data).then(res => {
+    //   this.setState({
+    //     list: res,
+    //     pagination: {
+    //       current: data.page,
+    //       pageSize: data.rows,
+    //       total: res.total,
+    //     },
+    //     loading: false,
+    //   });
+    // });
   };
 
   handleFormReset = () => {

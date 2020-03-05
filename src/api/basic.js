@@ -27,8 +27,8 @@ export default {
   //   return request('/basic/v1/payterms');
   // },
   // 查询订货人
-  getContacts() {
-    return request('/basic/v1/contacts');
+  getContacts(params) {
+    return request('/basic/v1/contacts', { params });
   },
   // 查询客户
   getCustomers(params) {
@@ -151,6 +151,10 @@ export default {
   // 开票类型
   getTaxInvoiceTypes() {
     return request('/taxInvoiceTypes/v1');
+  },
+  // 开票类型
+  getOrderTypes() {
+    return request('/basic/v1/ordertypes');
   },
   // 客户组 2主数据（新客户分类）
   getCustomerCategories() {
