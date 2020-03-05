@@ -42,6 +42,7 @@ class AddPage extends Component {
     amount: (9546.23 + 5.0).toFixed(2),
     customerCode: '',
     subCustomerCode: '',
+    contactCode: '',
   };
 
   initialValues = {
@@ -103,6 +104,9 @@ class AddPage extends Component {
       });
     }
     if (type === 'contact') {
+      this.setState({
+        contactCode: v.code,
+      });
       this.tableSearchFormRef.current.setFieldsValue({
         contactName: v.name,
       });
@@ -144,6 +148,7 @@ class AddPage extends Component {
       customerCode,
       subCustomerCode,
       orderTypes,
+      contactCode,
     } = this.state;
     const regions = peptide.regions.filter(e => e.languageCode === language);
     const offices = peptide.offices.filter(e => e.languageCode === language);
@@ -491,7 +496,21 @@ class AddPage extends Component {
         <Col lg={6} md={8} sm={12} style={{ marginTop: '20px' }}>
           <span className="submitButtons">
             <Button onClick={() => this.showLoad.visibleShow(true)}>批量导入序列</Button>
-            <Button style={{ marginLeft: 8 }} type="primary" htmlType="submit">
+            <Button
+              style={{ marginLeft: 8 }}
+              type="primary"
+              onClick={() => {
+                if (contactCode) {
+                  // TODO: 新增数据
+                  console.log(1111);
+                } else {
+                  notification.error({
+                    message: '消息',
+                    description: '请选择订货人',
+                  });
+                }
+              }}
+            >
               新增
             </Button>
             <Button style={{ marginLeft: 8 }} onClick={this.handleFormReset}>
