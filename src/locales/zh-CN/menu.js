@@ -39,6 +39,7 @@ export default {
   'menu.operation.operation-type': '操作记录类型列表',
   'menu.peptide': '多肽合成',
   'menu.peptide.order': '多肽订单管理',
+  'menu.peptide.orderPrint': '多肽订单管理打印',
   'menu.peptide.purity': '多肽纯度',
   'menu.peptide.product': '多肽合成产品',
   'menu.peptide.amino-acid': '多肽氨基酸',

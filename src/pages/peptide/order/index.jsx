@@ -1,5 +1,5 @@
 // 多肽订单
-import { Button, Card, Col, DatePicker, Form, Input, Select } from 'antd';
+import { Button, Card, Col, DatePicker, Form, Input, Select, notification } from 'antd';
 import React, { Component } from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import StandardTable from '@/components/StandardTable';
@@ -15,7 +15,6 @@ import TableSearchForm from '@/components/TableSearchForm';
 import EditableCell from '@/components/EditableCell';
 import { PlusOutlined } from '@ant-design/icons';
 
-// const EditableContext = React.createContext();
 const FormItem = Form.Item;
 const { Option } = Select;
 const { RangePicker } = DatePicker;
@@ -80,6 +79,19 @@ class Order extends Component {
     });
   };
 
+  // 点击打印按钮
+  showOrderPrint = () => {
+    const { selectedRows } = this.state;
+    if (selectedRows.length === 0) {
+      notification.error({
+        message: '消息',
+        description: '请选择要打印的订单',
+      });
+    } else {
+      sessionStorage.setItem('orderPrint', JSON.stringify(selectedRows));
+    }
+  };
+
   handleSelectRows = rows => {
     this.setState({
       selectedRows: rows,
@@ -110,17 +122,6 @@ class Order extends Component {
         loading: false,
         editIndex: -1,
       });
-    });
-  };
-
-  handleFormReset = () => {
-    this.tableSearchFormRef.current.resetFields();
-  };
-
-  toggleForm = () => {
-    const { expandForm } = this.state;
-    this.setState({
-      expandForm: !expandForm,
     });
   };
 
@@ -566,6 +567,16 @@ class Order extends Component {
               >
                 <PlusOutlined />
                 新建
+              </Button>
+              <Button
+                type="primary"
+                href="/peptide/orderPrint"
+                target="_blank"
+                onClick={() => {
+                  this.showOrderPrint();
+                }}
+              >
+                打印
               </Button>
             </div>
             <Form ref={this.tableFormRef}>

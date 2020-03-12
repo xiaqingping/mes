@@ -39,6 +39,7 @@ export default {
   'menu.operation.operation-type': 'Operation Record Type',
   'menu.peptide': 'peptide',
   'menu.peptide.order': 'order',
+  'menu.peptide.orderPrint': 'orderPrint',
   'menu.peptide.purity': 'purity',
   'menu.peptide.product': 'product',
   'menu.peptide.amino-acid': 'amino-acid',
