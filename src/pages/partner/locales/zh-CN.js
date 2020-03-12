@@ -1,0 +1,41 @@
+import ErrorMsg from './zh-CN/error-msg';
+
+export default {
+  ...ErrorMsg,
+  // 本页模块通用数据
+  'bp.bp': '业务伙伴',
+  'bp.customer': '客户',
+  'bp.vendor': '供应商',
+  'bp.approved': '认证',
+  'bp.block': '冻结',
+  'bp.normal': '正常',
+  'bp.contact_information': '联系方式',
+  'bp.address': '地址',
+  'bp.customerID': '编号',
+  'bp.inputHere': '请输入',
+  'bp.pleaseSelect': '请选择',
+  'bp.verfication': '验证中',
+  'bp.completed': '已验证',
+  'bp.rejected': '已拒绝',
+  'bp.expired': '已过期',
+  'bp.cancelled': '已取消',
+  'bp.unapproved': '未认证',
+  'bp.processing': '审核中',
+  'bp.partialApproved': '部分认证',
+  'bp.approveds': '已认证',
+  'bp.mobilePhone': '移动电话',
+  'bp.chinese': '中文',
+  'bp.english': '英文',
+  'bp.newCertifications': '新增认证',
+
+  // model本地数据
+  'bp.VendorLevelCode.important': '重要',
+  'bp.VendorLevelCode.moreImportant': '比较重要',
+  'bp.VendorLevelCode.commonly': '一般',
+  'bp.EmailVerifyStatus.unverified': '未验证',
+  'bp.EmailVerifyStatus.verfication': '验证中',
+  'bp.EmailVerifyStatus.inChange': '变更中',
+  'bp.EmailVerifyStatus.verified': '已验证',
+  'bp.InvoiceWithGood.yes': '是',
+  'bp.InvoiceWithGood.no': '否',
+};

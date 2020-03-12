@@ -10,6 +10,13 @@ module.exports = {
       component: './peptide/order',
     },
     {
+      // name: 'orderPrint',
+      path: '/peptide/orderPrint',
+      hideChildrenInMenu: true,
+      component: './peptide/order/order-print.jsx',
+      exact: false,
+    },
+    {
       name: 'purity',
       path: '/peptide/purity',
       component: './peptide/purity',
@@ -43,6 +50,6 @@ module.exports = {
       name: 'disulfide-bond-products',
       path: '/peptide/disulfide-bond-products',
       component: './peptide/disulfide-bond-products',
-    }
+    },
   ],
 };

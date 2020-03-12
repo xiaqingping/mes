@@ -1,6 +1,7 @@
 // 编辑收货地址
-import { Input, Modal, Button, Icon, Typography } from 'antd';
+import { Input, Modal, Button, Typography } from 'antd';
 import React, { Component } from 'react';
+import { SaveOutlined } from '@ant-design/icons';
 
 const { TextArea } = Input;
 const { Text } = Typography;
@@ -60,7 +61,7 @@ class Load extends Component {
         style={{ marginTop: '80px' }}
         footer={[
           <Button key="submit" onClick={this.handleOk}>
-            <Icon type="save" />
+            <SaveOutlined />
             保存
           </Button>,
         ]}

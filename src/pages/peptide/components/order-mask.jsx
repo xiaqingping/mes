@@ -36,13 +36,14 @@ class AddPage extends Component {
   state = {
     factorys: [],
     orderTypes: [],
+    storages: [],
     plusStatus: false,
     productAmount: parseFloat(9546.23).toFixed(2),
     // freight: parseFloat(5).toFixed(2),
     amount: (9546.23 + 5.0).toFixed(2),
     customerCode: '',
     subCustomerCode: '',
-    contactCode: '',
+    contactValue: [],
   };
 
   initialValues = {
@@ -68,6 +69,11 @@ class AddPage extends Component {
     api.basic.getOrderTypes().then(data => {
       this.setState({
         orderTypes: data,
+      });
+    });
+    api.basic.getStorages().then(data => {
+      this.setState({
+        storages: data,
       });
     });
   }
@@ -105,7 +111,7 @@ class AddPage extends Component {
     }
     if (type === 'contact') {
       this.setState({
-        contactCode: v.code,
+        contactValue: v,
       });
       this.tableSearchFormRef.current.setFieldsValue({
         contactName: v.name,
@@ -148,7 +154,8 @@ class AddPage extends Component {
       customerCode,
       subCustomerCode,
       orderTypes,
-      contactCode,
+      contactValue,
+      storages,
     } = this.state;
     const regions = peptide.regions.filter(e => e.languageCode === language);
     const offices = peptide.offices.filter(e => e.languageCode === language);
@@ -176,7 +183,7 @@ class AddPage extends Component {
         </Col>
         <Col lg={6} md={8} sm={12}>
           <FormItem label="客户" name="customerName" className="shrinkWord">
-            <Search onSearch={() => this.showCustomer.visibleShow(true)} />
+            <Search onSearch={() => this.showCustomer.visibleShow(true)} readOnly />
           </FormItem>
         </Col>
         <Col lg={6} md={8} sm={12}>
@@ -197,7 +204,7 @@ class AddPage extends Component {
         <Col lg={6} md={8} sm={12}>
           <FormItem label="负责人" name="subCustomerName" className="shrinkWord">
             <Search
-              // disabled={!customerCode}
+              readOnly
               onSearch={() => {
                 if (customerCode) {
                   this.showSubCustomer.visibleShow(true);
@@ -223,6 +230,7 @@ class AddPage extends Component {
         <Col lg={6} md={8} sm={12}>
           <FormItem label="订货人" name="contactName" className="shrinkWord">
             <Search
+              readOnly
               onSearch={() => {
                 if (subCustomerCode) {
                   this.showContact.visibleShow(true);
@@ -238,7 +246,7 @@ class AddPage extends Component {
         </Col>
         <Col lg={6} md={8} sm={12}>
           <FormItem label="销售网点" name="officeCode" className="shrinkWord">
-            <Select disabled>
+            <Select>
               {offices.map(item => (
                 <Option key={item.code} value={item.code}>{`${item.code}-${item.name}`}</Option>
               ))}
@@ -353,7 +361,13 @@ class AddPage extends Component {
         </Col>
         <Col lg={6} md={8} sm={12}>
           <FormItem label="仓库" name="storageCode" className="shrinkWord">
-            <Input />
+            <Select>
+              {storages.map(item => (
+                <Option key={item.code} value={item.code}>
+                  {item.name}
+                </Option>
+              ))}
+            </Select>
           </FormItem>
         </Col>
         <Col lg={6} md={8} sm={12}>
@@ -433,8 +447,27 @@ class AddPage extends Component {
         </Col>
         <Col lg={6} md={8} sm={12}>
           <FormItem label="地址" name="address" className="shrinkWord">
-            <Select>
-              <Option value="0">全部</Option>
+            <Select
+              style={{ width: 295 }}
+              defaultValue=""
+              title={
+                contactValue.length !== 0
+                  ? // eslint-disable-next-line max-len
+                    `${contactValue.countryName} ${contactValue.provinceName} ${contactValue.county} ${contactValue.city} ${contactValue.street} ${contactValue.address} ${contactValue.mobNo}`
+                  : ''
+              }
+            >
+              <Option value="">
+                {contactValue.length !== 0
+                  ? `${contactValue.countryName}
+                   ${contactValue.provinceName}
+                   ${contactValue.county}
+                   ${contactValue.city}
+                   ${contactValue.street}
+                   ${contactValue.address}
+                   ${contactValue.mobNo}`
+                  : ''}
+              </Option>
             </Select>
           </FormItem>
           <div
@@ -500,9 +533,9 @@ class AddPage extends Component {
               style={{ marginLeft: 8 }}
               type="primary"
               onClick={() => {
-                if (contactCode) {
+                if (contactValue.length !== 0) {
                   // TODO: 新增数据
-                  console.log(1111);
+                  this.props.handleAdd();
                 } else {
                   notification.error({
                     message: '消息',
@@ -696,26 +729,7 @@ class Order extends Component {
       message.warning('请先保存或退出正在编辑的数据');
       return;
     }
-
-    const arrData = [];
-    let strId = '';
-    data.map((item, key) => {
-      if (item.length === 1 && item[0] === '') {
-        return false;
-      }
-      arrData.push({
-        id: id - key - 1,
-        name: item[0],
-        providerTotalAmount: item[1],
-        isNeedDesalting: item[2] === '是' ? '是' : '否',
-        peptidePurityId: item[3],
-        sequence: item[4],
-        subpackage: item[5],
-      });
-      strId = `${strId + (id - key - 1)},`;
-      return true;
-    });
-    if (arrData.length === 0) {
+    if (!data) {
       const newId = id - 1;
       this.setState({
         id: newId,
@@ -728,6 +742,24 @@ class Order extends Component {
         ],
       });
     } else {
+      const arrData = [];
+      let strId = '';
+      data.map((item, key) => {
+        if (item.length === 1 && item[0] === '') {
+          return false;
+        }
+        arrData.push({
+          id: id - key - 1,
+          name: item[0],
+          providerTotalAmount: item[1],
+          isNeedDesalting: item[2] === '是' ? '是' : '否',
+          peptidePurityId: item[3],
+          sequence: item[4],
+          subpackage: item[5],
+        });
+        strId = `${strId + (id - key - 1)},`;
+        return true;
+      });
       this.setState({
         id: arrData[0],
         editIndex: strId,
@@ -872,7 +904,6 @@ class Order extends Component {
    * @param {int} rowIndex 当前指针位置
    * @param {string} event 事件
    */
-  // eslint-disable-next-line consistent-return
   selectType = (data, type, selectList, widthValue, rowIndex, event) => {
     if (type === 'input') {
       if (event === 'onkeydown') {
@@ -902,6 +933,7 @@ class Order extends Component {
         </Select>
       );
     }
+    return true;
   };
 
   // 格式化数据
@@ -1224,7 +1256,7 @@ class Order extends Component {
             list[rowIndex][col.dataIndex],
             col.inputType,
             col.selectList,
-            col.width ? col.width - 10 : 90,
+            col.width ? col.width - 20 : 80,
             rowIndex,
             col.event,
           ),
