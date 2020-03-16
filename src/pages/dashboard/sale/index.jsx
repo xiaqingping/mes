@@ -274,6 +274,7 @@ class Sale extends React.Component {
         // style={{ width: '200px' }}
         onPanelChange={this.handlePanelChange}
         allowClear={false}
+        allowEmpty={parseInt(type, 10) === 4 ? [true, true] : [false, false]}
       />
     );
   };

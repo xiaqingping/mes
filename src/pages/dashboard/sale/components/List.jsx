@@ -106,12 +106,12 @@ class Lists extends React.Component {
       <div
         style={
           document.body.clientWidth < 1600
-            ? { width: '600px', height: '480px', overflow: 'hidden' }
+            ? { width: '300px', height: '480px', overflow: 'hidden' }
             : {
                 position: 'absolute',
                 top: '20px',
                 left: '1100px',
-                width: '600px',
+                width: '280px',
                 height: '480px',
                 overflow: 'hidden',
               }

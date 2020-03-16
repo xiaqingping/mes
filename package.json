@@ -43,7 +43,7 @@
   "dependencies": {
     "@ant-design/icons": "^4.0.2",
     "@ant-design/pro-layout": "^5.0.5",
-    "@antv/g2plot": "^0.11.35",
+    "@antv/g2plot": "^0.11.22",
     "antd": "^4.0.0",
     "axios": "^0.19.2",
     "classnames": "^2.2.6",

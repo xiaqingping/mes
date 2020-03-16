@@ -35,7 +35,7 @@ module.exports = [
           },
           dashboard,
           seq,
-          // bp,
+          bp,
           operation,
           peptide,
           // system,

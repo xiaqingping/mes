@@ -37,8 +37,8 @@ class Chart extends React.Component {
         chartData.profitCenterList.length !== 0 ? chartData.profitCenterList.join(',') : '',
     };
 
-    // let beginTime = '';
-    // let endTime = '';
+    let beginTime = '';
+    let endTime = '';
 
     // 月份添加到条件里
     if (parseInt(type, 10) === 1) {
@@ -49,8 +49,8 @@ class Chart extends React.Component {
           data.length !== 0 ? data[1].format('YYYYMM') : `${new Date().getFullYear()}12`,
       });
       xField = 'monthDate';
-      // beginTime = params.monthDateBegin;
-      // endTime = params.monthDateEnd;
+      beginTime = params.monthDateBegin;
+      endTime = params.monthDateEnd;
     }
 
     // 季度添加到条件里
@@ -92,8 +92,8 @@ class Chart extends React.Component {
         quarterDateEnd: quarterEnd,
       });
       xField = 'quarterDate';
-      // beginTime = params.quarterDateBegin;
-      // endTime = params.quarterDateEnd;
+      beginTime = params.quarterDateBegin;
+      endTime = params.quarterDateEnd;
     }
 
     // 半年添加到条件里
@@ -134,8 +134,8 @@ class Chart extends React.Component {
       });
       xField = 'halfYear';
 
-      // beginTime = params.halfYearBegin;
-      // endTime = params.halfYearEnd;
+      beginTime = params.halfYearBegin;
+      endTime = params.halfYearEnd;
     }
 
     // 整年添加到条件里
@@ -149,8 +149,8 @@ class Chart extends React.Component {
         yearEnd: data.length !== 0 ? data[1].format('YYYY') : new Date().getFullYear(),
       });
       xField = 'year';
-      // beginTime = params.yearBegin;
-      // endTime = params.yearEnd;
+      beginTime = params.yearBegin;
+      endTime = params.yearEnd;
     }
 
     // 大区模式
@@ -160,17 +160,17 @@ class Chart extends React.Component {
       });
       if (regions.length === 0) return null;
 
-      api.temporary.getSalesAnalysisRegion(params).then(res => {
+      api.temporary.getSalesAnalysis(params, 'region').then(res => {
         const newData = [];
-        // const resData = this.setNewData(
-        //   res,
-        //   regions,
-        //   beginTime,
-        //   endTime,
-        //   parseInt(type, 10),
-        //   'regionCode',
-        // );
-        res.forEach(item => {
+        const resData = this.setNewData(
+          res,
+          regions,
+          beginTime,
+          endTime,
+          parseInt(type, 10),
+          'regionCode',
+        );
+        resData.forEach(item => {
           newData.push({
             regionCode: formatter(regions, item.regionCode, 'code'),
             amount: parseFloat(item.amount),
@@ -215,7 +215,6 @@ class Chart extends React.Component {
               line: {
                 visible: true,
               },
-              tickInterval: 10,
               title: {
                 text: '销售额(CNY)',
               },
@@ -255,17 +254,17 @@ class Chart extends React.Component {
         officeCodeList: chartData.officesList.length !== 0 ? chartData.officesList.join(',') : '',
       });
       if (offices.length === 0) return null;
-      api.temporary.getSalesAnalysisOffice(params).then(res => {
+      api.temporary.getSalesAnalysisOffice(params, 'office').then(res => {
         const newData = [];
-        // const resData = this.setNewData(
-        //   res,
-        //   offices,
-        //   beginTime,
-        //   endTime,
-        //   parseInt(type, 10),
-        //   'officeCode',
-        // );
-        res.forEach(item => {
+        const resData = this.setNewData(
+          res,
+          offices,
+          beginTime,
+          endTime,
+          parseInt(type, 10),
+          'officeCode',
+        );
+        resData.forEach(item => {
           newData.push({
             officeCode: formatter(offices, item.officeCode, 'code'),
             amount: parseFloat(item.amount),
@@ -311,7 +310,6 @@ class Chart extends React.Component {
               line: {
                 visible: true,
               },
-              tickInterval: 10,
               title: {
                 text: '销售额(CNY)',
               },
@@ -353,7 +351,7 @@ class Chart extends React.Component {
       Object.assign(params, {
         salerCode: chartData.salersList,
       });
-      api.temporary.getSalesAnalysisSaler(params).then(res => {
+      api.temporary.getSalesAnalysis(params, 'saler').then(res => {
         // if (res.length === 0) {
         //   this.setState({
         //     errs: true,
@@ -361,15 +359,15 @@ class Chart extends React.Component {
         //   return false;
         // }
         const newData = [];
-        // const resData = this.setNewData(
-        //   res,
-        //   offices,
-        //   beginTime,
-        //   endTime,
-        //   parseInt(type, 10),
-        //   'salerCode',
-        // );
-        res.forEach((item, index) => {
+        const resData = this.setNewData(
+          res,
+          offices,
+          beginTime,
+          endTime,
+          parseInt(type, 10),
+          'salerCode',
+        );
+        resData.forEach((item, index) => {
           newData.push({
             salerCode: index,
             amount: parseFloat(item.amount),
@@ -415,7 +413,6 @@ class Chart extends React.Component {
               line: {
                 visible: true,
               },
-              tickInterval: 10,
               title: {
                 text: '销售额(CNY)',
               },
@@ -560,12 +557,16 @@ class Chart extends React.Component {
     const { regions } = this.props;
     const monthDateBegin = `${new Date().getFullYear() - 1}01`;
     const monthDateEnd = `${new Date().getFullYear()}12`;
+
     api.temporary
-      .getSalesAnalysisRegion({
-        monthDateBegin,
-        monthDateEnd,
-        companyCodeList: '3100',
-      })
+      .getSalesAnalysis(
+        {
+          monthDateBegin,
+          monthDateEnd,
+          companyCodeList: '3100',
+        },
+        'region',
+      )
       .then(res => {
         //
         if (regions.length !== 0) {
@@ -609,7 +610,6 @@ class Chart extends React.Component {
               line: {
                 visible: true,
               },
-              tickInterval: 10,
               title: {
                 text: '销售额(CNY)',
               },
@@ -648,6 +648,7 @@ class Chart extends React.Component {
             const data = [];
             if (!(res instanceof Array)) return null;
             const resData = this.setNewData(res, reg, monthDateBegin, monthDateEnd);
+
             resData.forEach(item => {
               data.push({
                 regionCode: formatter(reg, item.regionCode, 'code'),
@@ -665,11 +666,11 @@ class Chart extends React.Component {
               data,
               width: document.body.clientWidth < 1300 ? 780 : 1000,
               height: 500,
-              // meta: {
-              //   amount: {
-              //     range: [0, 1],
-              //   },
-              // },
+              meta: {
+                amount: {
+                  range: [0, 1],
+                },
+              },
               xField: 'monthDate',
               yField: 'amount',
               xAxis: {
@@ -685,7 +686,6 @@ class Chart extends React.Component {
                 line: {
                   visible: true,
                 },
-                tickInterval: 10,
                 title: {
                   text: '销售额(CNY)',
                 },

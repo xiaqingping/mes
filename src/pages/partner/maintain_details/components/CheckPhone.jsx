@@ -11,9 +11,6 @@ const { Option } = Select;
 const FormItem = Form.Item;
 const { TabPane } = Tabs;
 
-@connect(({ basicCache }) => ({
-  countryDiallingCodes: basicCache.countryDiallingCodes,
-}))
 class CheckPhone extends Component {
   state = {
     status: 1,
@@ -646,4 +643,6 @@ class CheckPhone extends Component {
   }
 }
 
-export default Form.create()(CheckPhone);
+export default connect(({ basicCache }) => ({
+  countryDiallingCodes: basicCache.countryDiallingCodes,
+}))(CheckPhone);
