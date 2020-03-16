@@ -265,20 +265,6 @@ class AddressGroup extends Component {
   }
 }
 
-@connect(({ basicCache, user, global, bpCache, bp }) => {
-  const industryCategories = basicCache.industryCategories.filter(
-    e => e.languageCode === global.languageCode,
-  );
-  // const industryCategories = bp.Industry;
-  return {
-    industryCategories,
-    // industryCategories: basicCache.industryCategories,
-    countryDiallingCodes: basicCache.countryDiallingCodes,
-    authorization: user.currentUser.authorization,
-    industryCategoryAll: bpCache.industryCategoryAll,
-    PiCertificationStatus: bp.PiCertificationStatus,
-  };
-})
 class ChangeModal extends Component {
   constructor(props) {
     super(props);
@@ -2193,4 +2179,17 @@ class ChangeModal extends Component {
   }
 }
 
-export default Form.create()(ChangeModal);
+export default connect(({ basicCache, user, global, bpCache, bp }) => {
+  const industryCategories = basicCache.industryCategories.filter(
+    e => e.languageCode === global.languageCode,
+  );
+  // const industryCategories = bp.Industry;
+  return {
+    industryCategories,
+    // industryCategories: basicCache.industryCategories,
+    countryDiallingCodes: basicCache.countryDiallingCodes,
+    authorization: user.currentUser.authorization,
+    industryCategoryAll: bpCache.industryCategoryAll,
+    PiCertificationStatus: bp.PiCertificationStatus,
+  };
+})(ChangeModal);

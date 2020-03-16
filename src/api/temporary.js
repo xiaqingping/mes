@@ -2,23 +2,11 @@
 import request from '@/utils/request';
 
 export default {
-  // 网点查询销售分析
-  getSalesAnalysisOffice(params) {
-    return request('/dataanalysis/v1/salesAnalysis/office', {
-      params,
-    });
-  },
-
-  // 大区查询销售分析
-  getSalesAnalysisRegion(params) {
-    return request('/dataanalysis/v1/salesAnalysis/region', {
-      params,
-    });
-  },
-
-  // 销售员查询销售分析
-  getSalesAnalysisSaler(params) {
-    return request('/dataanalysis/v1/salesAnalysis/saler', {
+  /* 查询销售分析
+  type  网点是 office, 大区是region, 销售员是saler
+  */
+  getSalesAnalysis(params, type) {
+    return request(`/dataanalysis/salesAnalysis/v1/${type}`, {
       params,
     });
   },

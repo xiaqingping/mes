@@ -9,16 +9,16 @@ import CheckEmail from '@/pages/partner/maintain_details/components/CheckEmail';
 import CheckPhone from '@/pages/partner/maintain_details/components/CheckPhone';
 import { formatter } from '@/utils/utils';
 
-@Form.create()
-@connect(({ bp, basicCache, global }) => {
-  const industryCategories = basicCache.industryCategories.filter(
-    e => e.languageCode === global.languageCode,
-  );
-  return {
-    VerifyRecordStatus: bp.VerifyRecordStatus,
-    industryCategories: industryCategories.length !== 0 ? industryCategories : [],
-  };
-})
+// @Form.create()
+// @connect(({ bp, basicCache, global }) => {
+//   const industryCategories = basicCache.industryCategories.filter(
+//     e => e.languageCode === global.languageCode,
+//   );
+//   return {
+//     VerifyRecordStatus: bp.VerifyRecordStatus,
+//     industryCategories: industryCategories.length !== 0 ? industryCategories : [],
+//   };
+// })
 class RecordListForm extends React.Component {
   constructor(props) {
     super(props);
@@ -386,22 +386,6 @@ class RecordListForm extends React.Component {
   }
 }
 
-@connect(({ bp, basicCache, global }) => {
-  const industryCategories = basicCache.industryCategories.filter(
-    e => e.languageCode === global.languageCode,
-  );
-  return {
-    SpecialInvoice: bp.SpecialInvoice,
-    countryDiallingCodes: basicCache.countryDiallingCodes,
-    industryCategories: industryCategories.length !== 0 ? industryCategories : [],
-    VerifyLinkSoldToPartyType: bp.VerifyLinkSoldToPartyType,
-    verifyTest: bp.verifyTest,
-    verifyChannel: bp.verifyChannel,
-    verifyChangeType: bp.verifyChangeType,
-    VerifyRecordStatus: bp.VerifyRecordStatus,
-    VerifyPhoneOrEmailType: bp.VerifyPhoneOrEmailType,
-  };
-})
 class CheckModel extends React.Component {
   constructor(props) {
     super(props);
@@ -1559,4 +1543,19 @@ class CheckModel extends React.Component {
     );
   }
 }
-export default CheckModel;
+export default connect(({ bp, basicCache, global }) => {
+  const industryCategories = basicCache.industryCategories.filter(
+    e => e.languageCode === global.languageCode,
+  );
+  return {
+    SpecialInvoice: bp.SpecialInvoice,
+    countryDiallingCodes: basicCache.countryDiallingCodes,
+    industryCategories: industryCategories.length !== 0 ? industryCategories : [],
+    VerifyLinkSoldToPartyType: bp.VerifyLinkSoldToPartyType,
+    verifyTest: bp.verifyTest,
+    verifyChannel: bp.verifyChannel,
+    verifyChangeType: bp.verifyChangeType,
+    VerifyRecordStatus: bp.VerifyRecordStatus,
+    VerifyPhoneOrEmailType: bp.VerifyPhoneOrEmailType,
+  };
+})(CheckModel);

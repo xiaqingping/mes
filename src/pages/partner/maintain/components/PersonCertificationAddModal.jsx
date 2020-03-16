@@ -219,4 +219,4 @@ class PersonCertificationAddModal extends Component {
   }
 }
 
-export default Form.create()(PersonCertificationAddModal);
+export default PersonCertificationAddModal;

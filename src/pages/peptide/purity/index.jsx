@@ -18,11 +18,7 @@ class Order extends Component {
   tableFormRef = React.createRef();
 
   state = {
-    pagination: {
-      // current: 1,
-      // pageSize: 10,
-      // total: 0,
-    },
+    pagination: {},
     list: [],
     loading: false,
     selectedRows: [],

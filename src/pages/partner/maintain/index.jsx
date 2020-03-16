@@ -7,10 +7,8 @@ import {
   Divider,
   Dropdown,
   Form,
-  Icon,
   Input,
   Menu,
-  Row,
   Select,
   Cascader,
   AutoComplete,
@@ -23,10 +21,12 @@ import { formatter } from '@/utils/utils';
 import StandardTable from '@/components/StandardTable';
 import { connect } from 'dva';
 import _ from 'lodash';
-import ChangeModal from './components/ChangeModal';
 import { formatMessage } from 'umi/locale';
+import { PlusOutlined, HomeOutlined, UserOutlined, DownOutlined } from '@ant-design/icons';
+import ChangeModal from './components/ChangeModal';
 import styles from './index.less';
 import api from '@/api';
+import TableSearchForm from '@/components/TableSearchForm';
 
 const FormItem = Form.Item;
 const { Option } = Select;
@@ -66,28 +66,24 @@ function renderOption(item) {
   );
 }
 
-@connect(({ basicCache, global, bp }) => {
-  const regionOffice = basicCache.regionOffice.filter(e => e.languageCode === global.languageCode);
-  return {
-    languageCode: global.languageCode,
-    regionOffice,
-    BpCertificationStatus: bp.BpCertificationStatus,
-    salesOrderBlock: bp.SalesOrderBlock,
-    CustomerDataStatus: bp.CustomerDataStatus,
-  };
-})
 class Maintain extends React.Component {
+  tableSearchFormRef = React.createRef();
+
+  tableFormRef = React.createRef();
+
+  // 顶部表单默认值
+  initialValues = {
+    page: 1,
+    pageSize: 10,
+  };
+
   constructor(props) {
     super(props);
     this.state = {
-      formValues: {
-        page: 1,
-        pageSize: 10,
-      },
+      pagination: {},
       selectedRows: [],
       expandForm: false,
       list: [],
-      total: 0,
       // formValues: {},
       xiaoshuoguishu: [],
       // kaipiaofang: [],
@@ -121,7 +117,7 @@ class Maintain extends React.Component {
         payload: item,
       });
     });
-    this.getTableData();
+    this.getTableData(this.initialValues);
   }
 
   // 销售归属查询
@@ -200,20 +196,27 @@ class Maintain extends React.Component {
 
   /** table数据 */
   getTableData = (options = {}) => {
-    const {
-      formValues: { pageSize },
-    } = this.state;
-    const query = Object.assign({}, { page: 1, pageSize }, options);
-    this.setState({
-      formValues: query,
-      loading: true,
-    });
+    this.setState({ loading: true });
+    const formData = this.tableSearchFormRef.current.getFieldsValue();
+    const { pagination } = this.state;
+    const { current: page, pageSize } = pagination;
+    const data = {
+      page,
+      pageSize,
+      ...formData,
+      ...options,
+    };
+
     api.bp
-      .getBPList(query)
+      .getBPList(data)
       .then(res => {
         this.setState({
           list: res.results,
-          total: res.total,
+          pagination: {
+            current: data.page,
+            pageSize: data.pageSize,
+            total: res.total,
+          },
           loading: false,
         });
       })
@@ -282,9 +285,8 @@ class Maintain extends React.Component {
   };
 
   /** 完整筛选条件 */
-  renderAdvancedForm() {
+  advancedForm = () => {
     const {
-      form: { getFieldDecorator },
       regionOffice,
       BpCertificationStatus,
       salesOrderBlock,
@@ -293,201 +295,133 @@ class Maintain extends React.Component {
     } = this.props;
     const { xiaoshuoguishu, receivingParty } = this.state;
     return (
-      <Form onSubmit={this.handleSearch} layout="inline">
-        <Row gutter={{ xxl: 100, lg: 80 }}>
-          <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
-            <FormItem label={formatMessage({ id: 'bp.customerID' })}>
-              {getFieldDecorator('code')(
-                <Input placeholder={formatMessage({ id: 'bp.inputHere' })} />,
-              )}
-            </FormItem>
-          </Col>
-          <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
-            <FormItem label={formatMessage({ id: 'bp.maintain.customerName' })}>
-              {getFieldDecorator('name')(
-                <Input placeholder={formatMessage({ id: 'bp.inputHere' })} />,
-              )}
-            </FormItem>
-          </Col>
-          <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
-            <FormItem label={formatMessage({ id: 'bp.mobilePhone' })}>
-              {getFieldDecorator('mobilePhone')(
-                <Input placeholder={formatMessage({ id: 'bp.inputHere' })} />,
-              )}
-            </FormItem>
-          </Col>
-          <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
-            <FormItem label={formatMessage({ id: 'bp.maintain.email' })}>
-              {getFieldDecorator('email')(
-                <Input placeholder={formatMessage({ id: 'bp.inputHere' })} />,
-              )}
-            </FormItem>
-          </Col>
-          <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
-            <FormItem label={formatMessage({ id: 'bp.maintain.verificationStatus' })}>
-              {getFieldDecorator('certificationStatusList')(
-                <Select
-                  placeholder={formatMessage({ id: 'bp.pleaseSelect' })}
-                  maxTagCount={1}
-                  maxTagTextLength={4}
-                  mode="multiple"
-                >
-                  {BpCertificationStatus.map(item => (
-                    <Option key={item.id} value={item.id}>
-                      {formatMessage({ id: item.i18n })}
-                    </Option>
-                  ))}
-                </Select>,
-              )}
-            </FormItem>
-          </Col>
-          <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
-            <FormItem label={formatMessage({ id: 'bp.maintain.salesBlocked' })}>
-              {getFieldDecorator('salesOrderBlock')(
-                <Select placeholder={formatMessage({ id: 'bp.pleaseSelect' })}>
-                  {salesOrderBlock.map(item => (
-                    <Option key={item.id} value={item.id}>
-                      {formatMessage({ id: item.i18n })}
-                    </Option>
-                  ))}
-                </Select>,
-              )}
-            </FormItem>
-          </Col>
-          <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
-            <FormItem label={formatMessage({ id: 'bp.maintain.customerData' })}>
-              {getFieldDecorator('customerDataStatus')(
-                <Select placeholder={formatMessage({ id: 'bp.pleaseSelect' })}>
-                  {CustomerDataStatus.map(item => (
-                    <Option key={item.id} value={item.id}>
-                      {formatMessage({ id: item.i18n })}
-                    </Option>
-                  ))}
-                </Select>,
-              )}
-            </FormItem>
-          </Col>
-          <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
-            <FormItem label={formatMessage({ id: 'bp.maintain.vendorData' })}>
-              {getFieldDecorator('vendorDataStatus')(
-                <Select placeholder={formatMessage({ id: 'bp.pleaseSelect' })}>
-                  {CustomerDataStatus.map(item => (
-                    <Option key={item.id} value={item.id}>
-                      {formatMessage({ id: item.i18n })}
-                    </Option>
-                  ))}
-                </Select>,
-              )}
-            </FormItem>
-          </Col>
-          <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
-            <FormItem label={formatMessage({ id: 'bp.maintain.salesArea' })}>
-              {getFieldDecorator('regionalAttr')(
-                <Cascader
-                  options={regionOffice}
-                  placeholder={formatMessage({ id: 'bp.pleaseSelect' })}
-                  fieldNames={{ label: 'name', value: 'code', children: 'officeList' }}
-                />,
-              )}
-            </FormItem>
-          </Col>
-          <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
-            <FormItem label={formatMessage({ id: 'bp.maintain.salesRep' })}>
-              {getFieldDecorator('salerCode')(
-                <AutoComplete
-                  dataSource={xiaoshuoguishu.map(renderOption)}
-                  onSearch={this.searchSaler}
-                  optionLabelProp="text"
-                  placeholder={formatMessage({ id: 'bp.inputHere' })}
-                />,
-              )}
-            </FormItem>
-          </Col>
-          <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
-            <FormItem label={formatMessage({ id: 'bp.maintain.billToParty' })}>
-              {getFieldDecorator('billToPartyId')(
-                <AutoComplete
-                  dataSource={receivingParty.map(renderOption)}
-                  onSearch={this.searchCustomer}
-                  optionLabelProp="text"
-                />,
-              )}
-            </FormItem>
-          </Col>
-        </Row>
-        <div style={{ overflow: 'hidden' }}>
-          <div style={{ float: 'right', marginBottom: 24 }}>
-            <Button type="primary" htmlType="submit">
-              {formatMessage({ id: 'bp.maintain.search' })}
-            </Button>
-            <Button style={{ marginLeft: 8 }} onClick={this.handleFormReset}>
-              {formatMessage({ id: 'bp.maintain.reset' })}
-            </Button>
-            <a style={{ marginLeft: 8 }} onClick={this.toggleForm}>
-              {formatMessage({ id: 'bp.maintain.putAway' })} <Icon type="up" />
-            </a>
-          </div>
-        </div>
-      </Form>
+      <>
+        <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
+          <FormItem label={formatMessage({ id: 'bp.maintain.email' })} name="email">
+            <Input placeholder={formatMessage({ id: 'bp.inputHere' })} />
+          </FormItem>
+        </Col>
+        <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
+          <FormItem
+            label={formatMessage({ id: 'bp.maintain.verificationStatus' })}
+            name="certificationStatusList"
+          >
+            <Select
+              placeholder={formatMessage({ id: 'bp.pleaseSelect' })}
+              maxTagCount={1}
+              maxTagTextLength={4}
+              mode="multiple"
+            >
+              {BpCertificationStatus.map(item => (
+                <Option key={item.id} value={item.id}>
+                  {formatMessage({ id: item.i18n })}
+                </Option>
+              ))}
+            </Select>
+          </FormItem>
+        </Col>
+        <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
+          <FormItem
+            label={formatMessage({ id: 'bp.maintain.salesBlocked' })}
+            name="salesOrderBlock"
+          >
+            <Select placeholder={formatMessage({ id: 'bp.pleaseSelect' })}>
+              {salesOrderBlock.map(item => (
+                <Option key={item.id} value={item.id}>
+                  {formatMessage({ id: item.i18n })}
+                </Option>
+              ))}
+            </Select>
+          </FormItem>
+        </Col>
+        <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
+          <FormItem
+            label={formatMessage({ id: 'bp.maintain.customerData' })}
+            name="customerDataStatus"
+          >
+            <Select placeholder={formatMessage({ id: 'bp.pleaseSelect' })}>
+              {CustomerDataStatus.map(item => (
+                <Option key={item.id} value={item.id}>
+                  {formatMessage({ id: item.i18n })}
+                </Option>
+              ))}
+            </Select>
+          </FormItem>
+        </Col>
+        <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
+          <FormItem
+            label={formatMessage({ id: 'bp.maintain.vendorData' })}
+            name="vendorDataStatus"
+            className="fiveWord"
+          >
+            <Select placeholder={formatMessage({ id: 'bp.pleaseSelect' })}>
+              {CustomerDataStatus.map(item => (
+                <Option key={item.id} value={item.id}>
+                  {formatMessage({ id: item.i18n })}
+                </Option>
+              ))}
+            </Select>
+          </FormItem>
+        </Col>
+        <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
+          <FormItem label={formatMessage({ id: 'bp.maintain.salesArea' })} name="regionalAttr">
+            <Cascader
+              options={regionOffice}
+              placeholder={formatMessage({ id: 'bp.pleaseSelect' })}
+              fieldNames={{ label: 'name', value: 'code', children: 'officeList' }}
+            />
+          </FormItem>
+        </Col>
+        <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
+          <FormItem label={formatMessage({ id: 'bp.maintain.salesRep' })} name="salerCode">
+            <AutoComplete
+              dataSource={xiaoshuoguishu.map(renderOption)}
+              onSearch={this.searchSaler}
+              optionLabelProp="text"
+              placeholder={formatMessage({ id: 'bp.inputHere' })}
+            />
+          </FormItem>
+        </Col>
+        <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
+          <FormItem label={formatMessage({ id: 'bp.maintain.billToParty' })} name="billToPartyId">
+            <AutoComplete
+              dataSource={receivingParty.map(renderOption)}
+              onSearch={this.searchCustomer}
+              optionLabelProp="text"
+            />
+          </FormItem>
+        </Col>
+      </>
     );
-  }
+  };
 
   /** 部分筛选条件 */
-  renderSimpleForm() {
-    const { form, languageCode } = this.props;
-    const { getFieldDecorator } = form;
+  simpleForm = () => {
+    const { languageCode } = this.props;
     return (
-      <Form onSubmit={this.handleSearch} layout="inline">
-        <Row gutter={{ xxl: 100, lg: 80 }}>
-          <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
-            <FormItem label={formatMessage({ id: 'bp.customerID' })}>
-              {getFieldDecorator('code')(
-                <Input placeholder={formatMessage({ id: 'bp.inputHere' })} />,
-              )}
-            </FormItem>
-          </Col>
-          <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
-            <FormItem label={formatMessage({ id: 'bp.maintain.customerName' })}>
-              {getFieldDecorator('name')(
-                <Input placeholder={formatMessage({ id: 'bp.inputHere' })} />,
-              )}
-            </FormItem>
-          </Col>
-          <Col xxl={6} lg={languageCode === 'EN' ? 12 : 0}>
-            <FormItem label={formatMessage({ id: 'bp.mobilePhone' })}>
-              {getFieldDecorator('mobilePhone')(
-                <Input placeholder={formatMessage({ id: 'bp.inputHere' })} />,
-              )}
-            </FormItem>
-          </Col>
-          <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
-            <span className="submitButtons">
-              <Button type="primary" htmlType="submit">
-                {formatMessage({ id: 'bp.maintain.search' })}
-              </Button>
-              <Button style={{ marginLeft: 8 }} onClick={this.handleFormReset}>
-                {formatMessage({ id: 'bp.maintain.reset' })}
-              </Button>
-              <a style={{ marginLeft: 8 }} onClick={this.toggleForm}>
-                {formatMessage({ id: 'bp.verification.open' })} <Icon type="down" />
-              </a>
-            </span>
-          </Col>
-        </Row>
-      </Form>
+      <>
+        <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
+          <FormItem label={formatMessage({ id: 'bp.customerID' })} name="code">
+            <Input placeholder={formatMessage({ id: 'bp.inputHere' })} />
+          </FormItem>
+        </Col>
+        <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
+          <FormItem label={formatMessage({ id: 'bp.maintain.customerName' })} name="name">
+            <Input placeholder={formatMessage({ id: 'bp.inputHere' })} />
+          </FormItem>
+        </Col>
+        <Col xxl={6} lg={languageCode === 'EN' ? 12 : 0}>
+          <FormItem label={formatMessage({ id: 'bp.mobilePhone' })} name="mobilePhone">
+            <Input placeholder={formatMessage({ id: 'bp.inputHere' })} />
+          </FormItem>
+        </Col>
+      </>
     );
-  }
+  };
 
   render() {
-    const {
-      formValues: { page: current, pageSize },
-      list,
-      selectedRows,
-      loading,
-      total,
-    } = this.state;
+    const { pagination, list, selectedRows, loading } = this.state;
     const { BpCertificationStatus, salesOrderBlock, CustomerDataStatus, languageCode } = this.props;
-    const data = { list, pagination: { current, pageSize, total } };
     const CertificationStatus = []; // 认证状态
     const salesBlock = []; // 销售冻结
     const CustomerStatus = []; // 客户数据状态
@@ -514,7 +448,7 @@ class Maintain extends React.Component {
               // eslint-disable-next-line max-len
               to={`/bp/maintain/details/${record.id}?type=${record.type}&customerDataStatus=${record.customerDataStatus}&vendorDataStatus=${record.vendorDataStatus}`}
             >
-              <Icon type={record.type === 1 ? 'user' : 'home'} /> &nbsp;{record.name}
+              {record.type === 1 ? <UserOutlined /> : <HomeOutlined />} &nbsp;{record.name}
               <div className={styles.partCode}>{val}</div>
             </Link>
           );
@@ -715,7 +649,7 @@ class Maintain extends React.Component {
               <Divider type="vertical" />
               <Dropdown overlay={menu}>
                 <a className="ant-dropdown-link">
-                  {formatMessage({ id: 'bp.maintain.moreOption' })} <Icon type="down" />
+                  {formatMessage({ id: 'bp.maintain.moreOption' })} <DownOutlined />
                 </a>
               </Dropdown>
             </>
@@ -727,9 +661,18 @@ class Maintain extends React.Component {
       <PageHeaderWrapper>
         <Card bordered={false} className={languageCode === 'EN' ? 'mySet' : ''}>
           <div className="tableList">
-            <div className="tableListForm">{this.renderForm()}</div>
+            <div className="tableListForm">
+              <TableSearchForm
+                ref={this.tableSearchFormRef}
+                initialValues={this.initialValues}
+                getTableData={this.getTableData}
+                simpleForm={this.simpleForm}
+                advancedForm={this.advancedForm}
+              />
+            </div>
             <div className="tableListOperator">
-              <Button icon="plus" type="primary" onClick={() => this.handleModalVisible(true)}>
+              <Button type="primary" onClick={() => this.handleModalVisible(true)}>
+                <PlusOutlined />
                 {formatMessage({ id: 'bp.maintain.new' })}
               </Button>
             </div>
@@ -739,7 +682,7 @@ class Maintain extends React.Component {
               selectedRows={selectedRows}
               loading={loading}
               rowKey={record => record.id}
-              data={data}
+              data={{ list, pagination }}
               columns={columns}
               onSelectRow={this.handleSelectRows}
               onChange={this.handleStandardTableChange}
@@ -762,4 +705,13 @@ class Maintain extends React.Component {
   }
 }
 
-export default Form.create()(Maintain);
+export default connect(({ basicCache, global, bp }) => {
+  const regionOffice = basicCache.regionOffice.filter(e => e.languageCode === global.languageCode);
+  return {
+    languageCode: global.languageCode,
+    regionOffice,
+    BpCertificationStatus: bp.BpCertificationStatus,
+    salesOrderBlock: bp.SalesOrderBlock,
+    CustomerDataStatus: bp.CustomerDataStatus,
+  };
+})(Maintain);
