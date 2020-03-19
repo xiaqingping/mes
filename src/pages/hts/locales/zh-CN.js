@@ -1,5 +1,5 @@
-// import menu from './zh-CN/menu';
+import menu from './zh-CN/menu';
 
-// export default {
-//   ...menu,
-// }
+export default {
+  ...menu,
+};
