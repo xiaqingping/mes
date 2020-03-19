@@ -9,30 +9,30 @@ module.exports = {
       path: '/system/user',
       component: './system/user',
     },
-    {
-      name: 'authorization',
-      path: '/system/authorization',
-      component: './system/authorization',
-    },
-    {
-      name: 'code-rule',
-      path: '/system/code-rule',
-      component: './system/code-rule',
-    },
+    // {
+    //   name: 'authorization',
+    //   path: '/system/authorization',
+    //   component: './system/authorization',
+    // },
+    // {
+    //   name: 'code-rule',
+    //   path: '/system/code-rule',
+    //   component: './system/code-rule',
+    // },
     {
       name: 'sources',
       path: '/system/sources',
       component: './system/sources',
     },
     {
-      name: 'rule',
-      path: '/system/rule',
-      component: './system/rule',
+      name: 'rules',
+      path: '/system/rules',
+      component: './system/rules',
     },
-    {
-      name: 'group',
-      path: '/system/group',
-      component: './system/group',
-    },
+    // {
+    //   name: 'group',
+    //   path: '/system/group',
+    //   component: './system/group',
+    // },
   ],
 };

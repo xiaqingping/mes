@@ -24,7 +24,7 @@ import user from './user';
 import peptideBase from './peptide-base';
 import peptideorder from './peptideorder';
 import pay from './pay';
-import system from './system';
+import dataauth from './dataauth';
 import serial from './serial';
 import bp from './bp';
 import employees from './employees';
@@ -59,7 +59,7 @@ export default {
   peptideBase,
   peptideorder,
   pay,
-  system,
+  dataauth,
   serial,
   bp,
   employees,
@@ -95,7 +95,7 @@ export {
   peptideBase,
   peptideorder,
   pay,
-  system,
+  dataauth,
   serial,
   bp,
   employees,
