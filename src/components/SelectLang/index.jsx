@@ -18,7 +18,7 @@ const SelectLang = props => {
     });
   };
 
-  setLanguageCode(selectedLang);
+  // setLanguageCode(selectedLang);
 
   const changeLang = ({ key }) => {
     document.documentElement.setAttribute('lang', key);
