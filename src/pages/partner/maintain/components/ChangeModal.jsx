@@ -1,5 +1,5 @@
 /* eslint-disable no-nested-ternary */
-// 组织是1，PI是2, 英国3，其他4 gtype
+// 默认gtype是0， 组织是1，PI是2, 英国3，其他4
 import {
   Modal,
   Form,
@@ -836,6 +836,7 @@ class ChangeModal extends Component {
     return personalShow ? this.personalShow(name) : this.persnalInput(name);
   };
 
+  // 个人的显示
   personalShow = name => (
     <div style={{ marginLeft: '30%' }}>
       <Form.Item label={formatMessage({ id: 'bp.maintain_details.name' })}>
@@ -854,7 +855,13 @@ class ChangeModal extends Component {
       userData: {
         basic: { sapCountryCode },
       },
+      gtype,
     } = this.state;
+
+    // 如果gtype有值的话，已经选择过国家了
+    if (gtype) {
+      return;
+    }
     if (v.type === 'group') {
       if (sapCountryCode) {
         this.setState({
@@ -929,6 +936,7 @@ class ChangeModal extends Component {
     }
   };
 
+  // 个人名称的输入
   persnalInput = name => {
     const { form } = this.props;
     const { getFieldDecorator } = form;

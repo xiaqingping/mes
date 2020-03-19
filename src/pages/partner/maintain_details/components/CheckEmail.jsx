@@ -198,9 +198,6 @@ class CheckEmail extends Component {
 
   // 用户自行变更
   userChange = () => {
-    const {
-      form: { getFieldDecorator },
-    } = this.props;
     const { status } = this.state;
     if (status === 2) {
       return (
@@ -218,13 +215,14 @@ class CheckEmail extends Component {
     return (
       <Form layout="inline" onSubmit={this.handleSend}>
         <div style={{ height: '200px', textAlign: 'center', paddingTop: '68px' }}>
-          <FormItem label={formatMessage({ id: 'bp.maintain_details.phone.contactInformation' })}>
-            {getFieldDecorator('phone')(
-              <Input
-                style={{ width: '300px' }}
-                placeholder={formatMessage({ id: 'bp.maintain_details.phone.phoneOrEmail' })}
-              />,
-            )}
+          <FormItem
+            label={formatMessage({ id: 'bp.maintain_details.phone.contactInformation' })}
+            name="phone"
+          >
+            <Input
+              style={{ width: '300px' }}
+              placeholder={formatMessage({ id: 'bp.maintain_details.phone.phoneOrEmail' })}
+            />
           </FormItem>
         </div>
         <div
@@ -246,10 +244,7 @@ class CheckEmail extends Component {
 
   // 人工辅助变更
   manChange = () => {
-    const {
-      form: { getFieldDecorator },
-      proceed,
-    } = this.props;
+    const { proceed } = this.props;
     const { status, oneQuestion, twoQuestion, threeQuestion } = this.state;
     if (status === 4) {
       return (
@@ -266,6 +261,25 @@ class CheckEmail extends Component {
             className="tools"
             hasFeedback
             validateStatus={oneQuestion}
+            name="qone"
+            rules={[
+              // { required: true, message: '请输入内容' },
+              {
+                validator: (rule, value, callback) => {
+                  if (parseInt(value, 10) !== 2 && value) {
+                    this.setState({
+                      oneQuestion: 'error',
+                    });
+                    // callback('您输入的答案有误！');
+                  } else {
+                    this.setState({
+                      oneQuestion: 'success',
+                    });
+                  }
+                  callback();
+                },
+              },
+            ]}
           >
             <div
               style={{
@@ -281,37 +295,33 @@ class CheckEmail extends Component {
             >
               <span>1+1=？</span>
             </div>
-            {getFieldDecorator('qone', {
-              rules: [
-                // { required: true, message: '请输入内容' },
-                {
-                  validator: (rule, value, callback) => {
-                    if (parseInt(value, 10) !== 2 && value) {
-                      this.setState({
-                        oneQuestion: 'error',
-                      });
-                      // callback('您输入的答案有误！');
-                    } else {
-                      this.setState({
-                        oneQuestion: 'success',
-                      });
-                    }
-                    callback();
-                  },
-                },
-              ],
-            })(
-              <Input
-                style={{ width: '300px' }}
-                placeholder={formatMessage({ id: 'bp.inputHere' })}
-              />,
-            )}
+
+            <Input style={{ width: '300px' }} placeholder={formatMessage({ id: 'bp.inputHere' })} />
           </FormItem>
           <FormItem
             label={formatMessage({ id: 'bp.maintain_details.phone.question2' })}
             className="tools"
             hasFeedback
             validateStatus={twoQuestion}
+            name="qtwo"
+            rules={[
+              // { required: true, message: '请输入内容' },
+              {
+                validator: (rule, value, callback) => {
+                  if (parseInt(value, 10) !== 4 && value) {
+                    this.setState({
+                      twoQuestion: 'error',
+                    });
+                    // callback('您输入的答案有误！');
+                  } else {
+                    this.setState({
+                      twoQuestion: 'success',
+                    });
+                  }
+                  callback();
+                },
+              },
+            ]}
           >
             <div
               style={{
@@ -327,31 +337,7 @@ class CheckEmail extends Component {
             >
               <span>2*2=？</span>
             </div>
-            {getFieldDecorator('qtwo', {
-              rules: [
-                // { required: true, message: '请输入内容' },
-                {
-                  validator: (rule, value, callback) => {
-                    if (parseInt(value, 10) !== 4 && value) {
-                      this.setState({
-                        twoQuestion: 'error',
-                      });
-                      // callback('您输入的答案有误！');
-                    } else {
-                      this.setState({
-                        twoQuestion: 'success',
-                      });
-                    }
-                    callback();
-                  },
-                },
-              ],
-            })(
-              <Input
-                style={{ width: '300px' }}
-                placeholder={formatMessage({ id: 'bp.inputHere' })}
-              />,
-            )}
+            <Input style={{ width: '300px' }} placeholder={formatMessage({ id: 'bp.inputHere' })} />
           </FormItem>
           <FormItem
             label={formatMessage({ id: 'bp.maintain_details.phone.question3' })}
@@ -359,6 +345,25 @@ class CheckEmail extends Component {
             hasFeedback
             validateStatus={threeQuestion}
             className="tools"
+            name="qthree"
+            rules={[
+              // { required: true, message: '请输入内容' },
+              {
+                validator: (rule, value, callback) => {
+                  if (parseInt(value, 10) !== 9 && value) {
+                    this.setState({
+                      threeQuestion: 'error',
+                    });
+                    // callback('您输入的答案有误！');
+                  } else {
+                    this.setState({
+                      threeQuestion: 'success',
+                    });
+                  }
+                  callback();
+                },
+              },
+            ]}
           >
             <div
               style={{
@@ -374,31 +379,7 @@ class CheckEmail extends Component {
             >
               <span>10-1=？</span>
             </div>
-            {getFieldDecorator('qthree', {
-              rules: [
-                // { required: true, message: '请输入内容' },
-                {
-                  validator: (rule, value, callback) => {
-                    if (parseInt(value, 10) !== 9 && value) {
-                      this.setState({
-                        threeQuestion: 'error',
-                      });
-                      // callback('您输入的答案有误！');
-                    } else {
-                      this.setState({
-                        threeQuestion: 'success',
-                      });
-                    }
-                    callback();
-                  },
-                },
-              ],
-            })(
-              <Input
-                style={{ width: '300px' }}
-                placeholder={formatMessage({ id: 'bp.inputHere' })}
-              />,
-            )}
+            <Input style={{ width: '300px' }} placeholder={formatMessage({ id: 'bp.inputHere' })} />
           </FormItem>
           <div style={{ textAlign: 'right', padding: '10px 20px', borderTop: '1px solid #E8E8E8' }}>
             <FormItem>
@@ -450,16 +431,14 @@ class CheckEmail extends Component {
       );
     }
     return (
-      <Form layout="inline" onSubmit={this.handleNext}>
+      <Form layout="inline" onSubmit={this.handleNext} initialValues={{ type: '1' }}>
         <div style={{ height: '200px', textAlign: 'center', paddingTop: '68px' }}>
-          <FormItem label={formatMessage({ id: 'bp.maintain_details.phone.identity' })}>
-            {getFieldDecorator('type', { initialValue: '1' })(
-              <Select style={{ width: '300px' }}>
-                <Option value="1">
-                  {formatMessage({ id: 'bp.maintain_details.phone.questions' })}
-                </Option>
-              </Select>,
-            )}
+          <FormItem label={formatMessage({ id: 'bp.maintain_details.phone.identity' })} name="type">
+            <Select style={{ width: '300px' }}>
+              <Option value="1">
+                {formatMessage({ id: 'bp.maintain_details.phone.questions' })}
+              </Option>
+            </Select>
           </FormItem>
         </div>
         <div style={{ textAlign: 'right', padding: '10px 20px', borderTop: '1px solid #E8E8E8' }}>
@@ -475,11 +454,7 @@ class CheckEmail extends Component {
 
   // 继续验证和问题验证后的页面
   pageRetrun = () => {
-    const {
-      form: { getFieldDecorator },
-      emailAccount,
-      proceed,
-    } = this.props;
+    const { emailAccount, proceed } = this.props;
     const { btnText, time } = this.state;
     if (proceed) {
       return (
@@ -493,13 +468,12 @@ class CheckEmail extends Component {
           <FormItem
             label={formatMessage({ id: 'bp.maintain_details.phone.verificationCode' })}
             style={{ margin: '20px 16px 60px 0' }}
+            name="code"
           >
-            {getFieldDecorator('code')(
-              <Input
-                style={{ width: '180px' }}
-                placeholder={formatMessage({ id: 'bp.maintain_details.phone.pleaseEnterCode' })}
-              />,
-            )}
+            <Input
+              style={{ width: '180px' }}
+              placeholder={formatMessage({ id: 'bp.maintain_details.phone.pleaseEnterCode' })}
+            />
             &nbsp;&nbsp;&nbsp;&nbsp;
             <Button
               type="primary"
@@ -522,24 +496,18 @@ class CheckEmail extends Component {
     }
     return (
       <Fragment>
-        <FormItem label={formatMessage({ id: 'bp.maintain_details.email.email' })}>
-          {getFieldDecorator('userEmail')(
-            <Input
-              style={{ width: '297px' }}
-              placeholder={formatMessage({ id: 'bp.inputHere' })}
-            />,
-          )}
+        <FormItem label={formatMessage({ id: 'bp.maintain_details.email.email' })} name="userEmail">
+          <Input style={{ width: '297px' }} placeholder={formatMessage({ id: 'bp.inputHere' })} />
         </FormItem>
         <FormItem
           label={formatMessage({ id: 'bp.maintain_details.phone.verificationCode' })}
           style={{ margin: '20px 16px 60px 0' }}
+          name="code"
         >
-          {getFieldDecorator('code')(
-            <Input
-              style={{ width: '180px' }}
-              placeholder={formatMessage({ id: 'bp.maintain_details.phone.pleaseEnterCode' })}
-            />,
-          )}
+          <Input
+            style={{ width: '180px' }}
+            placeholder={formatMessage({ id: 'bp.maintain_details.phone.pleaseEnterCode' })}
+          />
           &nbsp;&nbsp;&nbsp;&nbsp;
           <Button
             type="primary"

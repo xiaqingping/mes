@@ -254,10 +254,12 @@ class Basic extends React.Component {
     if (key === 'name') {
       if (value.type === 1) {
         newBasic.industryCode = '07';
+        this.props.form.setFieldsValue({ industryCode: '07' });
         this.setState({ industrySelectOpen: true });
       } else {
         if (basic.industryCode === '07') {
           newBasic.industryCode = '';
+          this.props.form.setFieldsValue({ industryCode: '' });
         }
         this.setState({ industrySelectOpen: true });
       }

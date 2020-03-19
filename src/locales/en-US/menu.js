@@ -62,4 +62,11 @@ export default {
   'menu.purchase.supplier': 'Supplier Subjects',
   'menu.hts': '高通量',
   'menu.hts.home': '示例',
+  'menu.project': 'Project Management',
+  'menu.project.project-management': 'Project Management',
+  'menu.project.task-management': 'Task Management',
+  'menu.project.project-model': 'Project Model',
+  'menu.project.task-model': 'Task Model',
+  'menu.project.project-model-type': 'Project Model Type',
+  'menu.project.task-model-type': 'Task Model Type',
 };

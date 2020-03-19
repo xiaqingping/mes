@@ -62,4 +62,11 @@ export default {
   'menu.purchase.supplier': '供应商科目',
   'menu.hts': '高通量',
   'menu.hts.home': '示例',
+  'menu.project': '项目管理',
+  'menu.project.project-management': '项目管理',
+  'menu.project.task-management': '任务管理',
+  'menu.project.project-model': '项目模型',
+  'menu.project.task-model': '任务模型',
+  'menu.project.project-model-type': '项目模型类别',
+  'menu.project.task-model-type': '任务模型类别',
 };
