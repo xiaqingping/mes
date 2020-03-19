@@ -1,6 +1,7 @@
-import { Card, Descriptions, Table, Tabs, Badge, Icon, Empty } from 'antd';
+import { Card, Descriptions, Table, Tabs, Badge, Empty } from 'antd';
 import React, { Component } from 'react';
 import { formatter } from '@/utils/utils';
+import { HomeOutlined, UserOutlined } from '@ant-design/icons';
 import { formatMessage } from 'umi/locale';
 import './style.less';
 import { connect } from 'dva';
@@ -142,10 +143,11 @@ class BasicInfo extends Component {
         title: formatMessage({ id: 'bp.maintain_details.name' }),
         width: 500,
         dataIndex: 'name',
+        className: 'tableFirstPadding',
         render(text, record) {
           return (
             <>
-              <Icon type={record.type === 2 ? 'home' : 'user'} /> {text}
+              {record.type === 2 ? <HomeOutlined /> : <UserOutlined />} {text}
             </>
           );
         },
@@ -157,7 +159,7 @@ class BasicInfo extends Component {
         render(text, record) {
           return (
             <>
-              <Icon type={record.type === 2 ? 'home' : 'user'} /> {text}
+              {record.type === 2 ? <HomeOutlined /> : <UserOutlined />} {text}
             </>
           );
         },
@@ -189,10 +191,11 @@ class BasicInfo extends Component {
         title: formatMessage({ id: 'bp.maintain_details.name' }),
         width: 500,
         dataIndex: 'name',
+        className: 'tableFirstPadding',
         render(text, record) {
           return (
             <>
-              <Icon type={record.type === 2 ? 'home' : 'user'} /> {text}
+              {record.type === 2 ? <HomeOutlined /> : <UserOutlined />} {text}
             </>
           );
         },
@@ -223,10 +226,11 @@ class BasicInfo extends Component {
         title: formatMessage({ id: 'bp.maintain_details.name' }),
         width: 700,
         dataIndex: 'name',
+        className: 'tableFirstPadding',
         render(text, record) {
           return (
             <>
-              <Icon type={record.type === 2 ? 'home' : 'user'} /> {text}
+              {record.type === 2 ? <HomeOutlined /> : <UserOutlined />} {text}
             </>
           );
         },
@@ -258,6 +262,7 @@ class BasicInfo extends Component {
         title: formatMessage({ id: 'bp.maintain_details.name' }),
         width: 1200,
         dataIndex: 'name',
+        className: 'tableFirstPadding',
         // render(text, record) {
         //   return <><Icon type={record.type === 1 ? 'home' : 'user'}/> {text}</>
         // },

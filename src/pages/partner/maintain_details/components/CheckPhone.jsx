@@ -12,6 +12,8 @@ const FormItem = Form.Item;
 const { TabPane } = Tabs;
 
 class CheckPhone extends Component {
+  tableFormRef = React.createRef();
+
   state = {
     status: 1,
     oneQuestion: null,
@@ -197,9 +199,6 @@ class CheckPhone extends Component {
 
   // 用户自行变更
   userChange = () => {
-    const {
-      form: { getFieldDecorator },
-    } = this.props;
     const { status } = this.state;
     if (status === 2) {
       return (
@@ -217,13 +216,14 @@ class CheckPhone extends Component {
     return (
       <Form layout="inline" onSubmit={this.handleSend}>
         <div style={{ height: '200px', textAlign: 'center', paddingTop: '68px' }}>
-          <FormItem label={formatMessage({ id: 'bp.maintain_details.phone.contactInformation' })}>
-            {getFieldDecorator('phone')(
-              <Input
-                style={{ width: '300px' }}
-                placeholder={formatMessage({ id: 'bp.maintain_details.phone.phoneOrEmail' })}
-              />,
-            )}
+          <FormItem
+            label={formatMessage({ id: 'bp.maintain_details.phone.contactInformation' })}
+            name="phone"
+          >
+            <Input
+              style={{ width: '300px' }}
+              placeholder={formatMessage({ id: 'bp.maintain_details.phone.phoneOrEmail' })}
+            />
           </FormItem>
         </div>
         <div style={{ textAlign: 'right', padding: '10px 20px', borderTop: '1px solid #E8E8E8' }}>
@@ -245,33 +245,29 @@ class CheckPhone extends Component {
 
   // 人工辅助变更
   manChange = () => {
-    const {
-      form: { getFieldDecorator },
-      countryDiallingCodes,
-      proceed,
-    } = this.props;
+    const { countryDiallingCodes, proceed } = this.props;
     const { status, oneQuestion, twoQuestion, threeQuestion } = this.state;
-    const prefixSelector = getFieldDecorator('prefix', {
-      initialValue: 'CN',
-    })(
-      <Select
-        style={{ width: '100px' }}
-        onChange={val => this.valueChange({ mobilePhoneCountryCode: val })}
-        showSearch
-        filterOption={(input, option) => option.props.children[1].indexOf(input) >= 0}
-      >
-        {countryDiallingCodes.map(e => (
-          <Option key={e.countryCode} value={e.countryCode}>
-            <div
-              className="select-countryPic-box"
-              style={{ backgroundImage: `url(/images/country/${e.countryCode}.png)` }}
-            >
-              &nbsp;
-            </div>
-            {`+${e.diallingCode}`}
-          </Option>
-        ))}
-      </Select>,
+    const prefixSelector = (
+      <FormItem name="prefix">
+        <Select
+          style={{ width: '100px' }}
+          onChange={val => this.valueChange({ mobilePhoneCountryCode: val })}
+          showSearch
+          filterOption={(input, option) => option.props.children[1].indexOf(input) >= 0}
+        >
+          {countryDiallingCodes.map(e => (
+            <Option key={e.countryCode} value={e.countryCode}>
+              <div
+                className="select-countryPic-box"
+                style={{ backgroundImage: `url(/images/country/${e.countryCode}.png)` }}
+              >
+                &nbsp;
+              </div>
+              {`+${e.diallingCode}`}
+            </Option>
+          ))}
+        </Select>
+      </FormItem>
     );
 
     if (status === 4) {
@@ -301,7 +297,7 @@ class CheckPhone extends Component {
             >
               <span>1+1=？</span>
             </div>
-            {getFieldDecorator('qone', {
+            {this.tableFormRef.current.getFieldDecorator('qone', {
               rules: [
                 // { required: true, message: '请输入内容' },
                 {
@@ -347,7 +343,7 @@ class CheckPhone extends Component {
             >
               <span>2*2=？</span>
             </div>
-            {getFieldDecorator('qtwo', {
+            {this.tableFormRef.current.getFieldDecorator('qtwo', {
               rules: [
                 // { required: true, message: '请输入内容' },
                 {
@@ -394,7 +390,7 @@ class CheckPhone extends Component {
             >
               <span>10-1=？</span>
             </div>
-            {getFieldDecorator('qthree', {
+            {this.tableFormRef.current.getFieldDecorator('qthree', {
               rules: [
                 // { required: true, message: '请输入内容' },
                 {
@@ -466,19 +462,17 @@ class CheckPhone extends Component {
       );
     }
     return (
-      <Form layout="inline" onSubmit={this.handleNext}>
+      <Form layout="inline" onSubmit={this.handleNext} initialValues={{ type: '1' }}>
         <div style={{ height: '200px', textAlign: 'center', paddingTop: '68px' }}>
-          <FormItem label={formatMessage({ id: 'bp.maintain_details.phone.identity' })}>
-            {getFieldDecorator('type', { initialValue: '1' })(
-              <Select
-                style={{ width: '300px' }}
-                // placeholder={formatMessage({ id: 'bp.maintain_details.phone.questions' })}
-              >
-                <Option value="1">
-                  {formatMessage({ id: 'bp.maintain_details.phone.questions' })}
-                </Option>
-              </Select>,
-            )}
+          <FormItem label={formatMessage({ id: 'bp.maintain_details.phone.identity' })} name="type">
+            <Select
+              style={{ width: '300px' }}
+              // placeholder={formatMessage({ id: 'bp.maintain_details.phone.questions' })}
+            >
+              <Option value="1">
+                {formatMessage({ id: 'bp.maintain_details.phone.questions' })}
+              </Option>
+            </Select>
           </FormItem>
         </div>
         <div style={{ textAlign: 'right', padding: '10px 20px', borderTop: '1px solid #E8E8E8' }}>
@@ -494,12 +488,7 @@ class CheckPhone extends Component {
 
   // 继续验证和问题验证后的页面
   pageRetrun = prefixSelector => {
-    const {
-      form: { getFieldDecorator },
-      phoneAccount,
-      proceed,
-      countryDiallingCodes,
-    } = this.props;
+    const { phoneAccount, proceed, countryDiallingCodes } = this.props;
 
     const { btnText, time } = this.state;
     if (proceed) {
@@ -526,13 +515,12 @@ class CheckPhone extends Component {
           <FormItem
             label={formatMessage({ id: 'bp.maintain_details.phone.verificationCode' })}
             style={{ margin: '20px 16px 60px 0' }}
+            name="code"
           >
-            {getFieldDecorator('code')(
-              <Input
-                style={{ width: '180px' }}
-                placeholder={formatMessage({ id: 'bp.maintain_details.phone.pleaseEnterCode' })}
-              />,
-            )}
+            <Input
+              style={{ width: '180px' }}
+              placeholder={formatMessage({ id: 'bp.maintain_details.phone.pleaseEnterCode' })}
+            />
             &nbsp;&nbsp;&nbsp;&nbsp;
             <Button
               type="primary"
@@ -555,25 +543,25 @@ class CheckPhone extends Component {
     }
     return (
       <Fragment>
-        <FormItem label={formatMessage({ id: 'bp.maintain_details.phone.mobilePhone' })}>
-          {getFieldDecorator('userPhone')(
-            <Input
-              addonBefore={prefixSelector}
-              style={{ width: '300px' }}
-              placeholder={formatMessage({ id: 'bp.inputHere' })}
-            />,
-          )}
+        <FormItem
+          label={formatMessage({ id: 'bp.maintain_details.phone.mobilePhone' })}
+          name="userPhone"
+        >
+          <Input
+            addonBefore={prefixSelector}
+            style={{ width: '300px' }}
+            placeholder={formatMessage({ id: 'bp.inputHere' })}
+          />
         </FormItem>
         <FormItem
           label={formatMessage({ id: 'bp.maintain_details.phone.verificationCode' })}
           style={{ margin: '20px 16px 60px 0' }}
+          name="code"
         >
-          {getFieldDecorator('code')(
-            <Input
-              style={{ width: '180px' }}
-              placeholder={formatMessage({ id: 'bp.maintain_details.phone.pleaseEnterCode' })}
-            />,
-          )}
+          <Input
+            style={{ width: '180px' }}
+            placeholder={formatMessage({ id: 'bp.maintain_details.phone.pleaseEnterCode' })}
+          />
           &nbsp;&nbsp;&nbsp;&nbsp;
           <Button
             type="primary"

@@ -1,10 +1,11 @@
 // 个人认证
-import { Button, Card, Icon, List, Typography, Badge } from 'antd';
+import { Button, Card, List, Typography, Badge } from 'antd';
 import React from 'react';
 import { connect } from 'dva';
 import api from '@/api';
 import { formatter } from '@/utils/utils';
 import { formatMessage } from 'umi/locale';
+import { PlusOutlined } from '@ant-design/icons';
 import CertificationPopover from '@/pages/partner/maintain_edit/components/CertificationPopover';
 import PersonCertificationAddModal from './PersonCertificationAddModal';
 
@@ -141,7 +142,7 @@ class PersonCertification extends React.Component {
             style={{ width: '100%', height: 304 }}
             onClick={() => this.handleModalVisible(true)}
           >
-            <Icon type="plus" /> {formatMessage({ id: 'bp.newCertifications' })}
+            <PlusOutlined /> {formatMessage({ id: 'bp.newCertifications' })}
           </Button>
         </List.Item>
       );

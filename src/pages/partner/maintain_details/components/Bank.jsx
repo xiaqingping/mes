@@ -65,4 +65,4 @@ class Bank extends Component {
   }
 }
 
-export default Form.create()(Bank);
+export default Bank;

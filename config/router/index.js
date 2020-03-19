@@ -7,6 +7,7 @@ const purchase = require('./purchase');
 const hts = require('./hts');
 const dashboard = require('./dashboard');
 const operation = require('./operation');
+const project = require('./project');
 
 module.exports = [
   {
@@ -38,6 +39,7 @@ module.exports = [
           bp,
           operation,
           peptide,
+          project,
           // system,
           // personel,
           // purchase,

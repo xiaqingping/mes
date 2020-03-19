@@ -69,7 +69,7 @@ class StandardTable extends Component {
 
   handlePaginationChange = (current, pageSize) => {
     this.handleTableChange({ current, pageSize });
-  }
+  };
 
   cleanSelectedKeys = () => {
     if (this.handleRowSelectChange) {

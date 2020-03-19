@@ -1,7 +1,7 @@
-import { Icon, Spin, Empty, Badge } from 'antd';
+import { Spin, Empty, Badge } from 'antd';
 import React, { Component } from 'react';
 import { connect } from 'dva';
-
+import { EditOutlined } from '@ant-design/icons';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import Link from 'umi/link';
 import { formatMessage } from 'umi/locale';
@@ -194,7 +194,7 @@ class CustomerDetails extends Component {
             // });
           }}
         >
-          <Icon type="edit" style={{ color: 'black' }} />
+          <EditOutlined style={{ color: 'black' }} />
         </Link>
       </div>
     );
@@ -248,7 +248,7 @@ class CustomerDetails extends Component {
             <Empty
               style={{ padding: 300, background: '#fff' }}
               description={errPage ? '' : 'loading...'}
-            ></Empty>
+            />
           ) : (
             {
               customer: (

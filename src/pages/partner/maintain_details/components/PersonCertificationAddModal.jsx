@@ -13,43 +13,7 @@ import { guid } from '@/utils/utils';
 const FormItem = Form.Item;
 const { Option } = Select;
 
-@Form.create()
-@connect(
-  ({ partnerMaintainEdit, user }) => {
-    const details = partnerMaintainEdit.details || {};
-    const basic = details.basic || {};
-    const customer = details.customer || {};
-    const salesAreaList = customer.salesAreaList || [];
-    const piCertificationList = details.piCertificationList || [];
-
-    // 所有收票方合并去重
-    let billToPartyList = salesAreaList.map(e => e.billToPartyList);
-    // eslint-disable-next-line prefer-spread
-    billToPartyList = uniqBy([].concat.apply([], billToPartyList), 'id');
-    billToPartyList = billToPartyList.filter(e => {
-      // 过滤空数据
-      if (!e) return false;
-      // 过滤掉收票方是自己
-      if (e.id === basic.id) return false;
-      // 过滤掉售达方不是自己
-      if (e.soldToPartyId !== basic.id) return false;
-      // 新增认证时：过滤掉认证中已经存在的收票方
-      // 变更刚刚新增的数据时：不能过滤掉此数据的开票方（这里已经过滤掉了，需要在渲染列表时重新添加进去）
-      if (piCertificationList.some(e1 => e1.billToPartyId === e.id)) return false;
-      return true;
-    });
-
-    return {
-      details,
-      salesAreaList,
-      billToPartyList,
-      authorization: user.currentUser.authorization,
-    };
-  },
-  null,
-  null,
-  { withRef: true },
-)
+// @Form.create()
 class PICertificationAddModal extends React.Component {
   constructor(props) {
     super(props);
@@ -255,4 +219,39 @@ class PICertificationAddModal extends React.Component {
   }
 }
 
-export default PICertificationAddModal;
+export default connect(
+  ({ partnerMaintainEdit, user }) => {
+    const details = partnerMaintainEdit.details || {};
+    const basic = details.basic || {};
+    const customer = details.customer || {};
+    const salesAreaList = customer.salesAreaList || [];
+    const piCertificationList = details.piCertificationList || [];
+
+    // 所有收票方合并去重
+    let billToPartyList = salesAreaList.map(e => e.billToPartyList);
+    // eslint-disable-next-line prefer-spread
+    billToPartyList = uniqBy([].concat.apply([], billToPartyList), 'id');
+    billToPartyList = billToPartyList.filter(e => {
+      // 过滤空数据
+      if (!e) return false;
+      // 过滤掉收票方是自己
+      if (e.id === basic.id) return false;
+      // 过滤掉售达方不是自己
+      if (e.soldToPartyId !== basic.id) return false;
+      // 新增认证时：过滤掉认证中已经存在的收票方
+      // 变更刚刚新增的数据时：不能过滤掉此数据的开票方（这里已经过滤掉了，需要在渲染列表时重新添加进去）
+      if (piCertificationList.some(e1 => e1.billToPartyId === e.id)) return false;
+      return true;
+    });
+
+    return {
+      details,
+      salesAreaList,
+      billToPartyList,
+      authorization: user.currentUser.authorization,
+    };
+  },
+  null,
+  null,
+  // { withRef: true },
+)(PICertificationAddModal);
