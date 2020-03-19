@@ -43,7 +43,7 @@ module.exports = [
           // system,
           // personel,
           // purchase,
-          // hts,
+          hts,
           {
             component: './404',
           },
