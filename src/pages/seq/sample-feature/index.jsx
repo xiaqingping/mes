@@ -15,14 +15,13 @@ import React, { Component } from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import StandardTable from '@/components/StandardTable';
 import api from '@/api';
-import ChooseRuleList from '@/components/choosse/system/chooseRuleList';
 import { connect } from 'dva';
 
 
 const EditableContext = React.createContext();
 const FormItem = Form.Item;
 // const { Option } = Select;
-const { Search } = Input;
+// const { Search } = Input;
 
 
 /**
