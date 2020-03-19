@@ -5,34 +5,34 @@ module.exports = {
   icon: 'user',
   routes: [
     {
-      name: 'project-management',
-      path: '/project/project-management',
-      component: './project-management/project-management',
+      name: 'project-manage',
+      path: '/project/project-manage',
+      component: './project-manage/project-manage',
     },
     {
-      name: 'task-management',
-      path: '/project/task-management',
-      component: './project-management/task-management',
+      name: 'task-manage',
+      path: '/project/task-manage',
+      component: './project-manage/task-manage',
     },
     {
       name: 'project-model',
       path: '/project/project-model',
-      component: './project-management/project-model',
+      component: './project-manage/project-model',
     },
     {
       name: 'task-model',
       path: '/project/task-model',
-      component: './project-management/task-model',
+      component: './project-manage/task-model',
     },
     {
       name: 'project-model-type',
       path: '/project/project-model-type',
-      component: './project-management/project-model-type',
+      component: './project-manage/project-model-type',
     },
     {
       name: 'task-model-type',
       path: '/project/task-model-type',
-      component: './project-management/task-model-type',
+      component: './project-manage/task-model-type',
     },
   ],
 };
