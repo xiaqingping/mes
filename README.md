@@ -20,7 +20,15 @@ yarn run build
 ## 2. 技术栈
 
 [React](https://zh-hans.reactjs.org/) + [UmiJS](https://umijs.org/zh/) + [DvaJS](https://dvajs.com/)  
-[Ant Design of React](https://ant.design/docs/react/introduce-cn) [i18n](https://github.com/formatjs/react-intl)
+[Antd](https://ant.design/docs/react/introduce-cn) + [i18n](https://github.com/formatjs/react-intl)
+
+## 3. 如何开始一个新项目
+
+开始工作前要明白三个概念：系统、项目和页面。
+
+- 系统：系统由多个项目构成。比如魔方系统，也是唯一的系统，它由测序管理、多肽合成、业务伙伴等多个项目构成
+- 项目：项目由多个页面构成。比如测序管理，它由取样单、测序订单、样品制备、样品排版等多个页面构成
+- 页面：页面由多个组件构成。每个页面对应一个路由。
 
 ## 3. 命名规范
 
@@ -44,18 +52,6 @@ yarn run build
 
 一般只有在正式生产服务器才会使用 `prod` 环境（或者有时候需要使用生产数据 debug），开发时一般用其他三种就可以。
 
-### 4.2 使用
-
-- 加载全部接口 `import api from '@/api'`  
-  使用：`api.bp.xxx()`
-
-- 加载单个接口 `import bpAPI from '@/api/bp'`(加载单个接口，要在接口名后加大写的 API)  
-  使用：`bpAPI.xxx()`
-
-### 4.3 开发环境
-
-### 4.4 生产环境
-
 ## 5. [全局数据](/docs/全局数据.md)
 
 ## 6. 负责人
@@ -67,11 +63,10 @@ yarn run build
 业务伙伴：石雷
 测序管理：孟禹丞
 用户权限：孟禹丞
-高通量：孟禹丞 + 吴贺珍
-物料项目：
-RNA合成：王星名 -> 吴贺珍
+高通量：
+RNA合成：吴贺珍
 人事管理：吴贺珍
-采购管理：王星名 -> 张文惠
+采购管理：张文惠
 系统管理：张文慧
 </code></pre>
 </details>
