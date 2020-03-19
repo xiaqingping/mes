@@ -236,4 +236,4 @@ class PurchasingOrg extends React.Component {
   }
 }
 
-export default Form.create()(PurchasingOrg);
+export default PurchasingOrg;

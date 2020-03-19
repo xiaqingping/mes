@@ -1,9 +1,10 @@
 /* eslint-disable no-nested-ternary */
-import { Card, Descriptions, Icon, Badge, Popconfirm } from 'antd';
+import { Card, Descriptions, Badge, Popconfirm } from 'antd';
 import React, { Component } from 'react';
 import { connect } from 'dva';
 import { formatMessage } from 'umi/locale';
 import { formatter } from '@/utils/utils';
+import { HomeOutlined, UserOutlined } from '@ant-design/icons';
 import CheckPhone from './CheckPhone';
 import CheckEmail from './CheckEmail';
 import ChangeModal from '@/pages/partner/maintain/components/ChangeModal';
@@ -230,7 +231,7 @@ class BasicInfo extends Component {
       >
         <Descriptions className="s-descriptions" layout="vertical" column={8}>
           <DescriptionsItem span={2} label={formatMessage({ id: 'bp.maintain_details.basic' })}>
-            <Icon type={basic.type === 1 ? 'user' : 'home'} />
+            {basic.type === 1 ? <UserOutlined /> : <HomeOutlined />}
             &nbsp;&nbsp;
             {basic.type === 1
               ? formatMessage({ id: 'bp.maintain_details.person' })
