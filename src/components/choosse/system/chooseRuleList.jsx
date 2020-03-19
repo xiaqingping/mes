@@ -1,13 +1,4 @@
-import {
-  Button,
-  Col,
-  Form,
-  Input,
-  Row,
-  Select,
-  Modal,
-  Table,
-} from 'antd';
+import { Button, Col, Form, Input, Row, Select, Modal, Table } from 'antd';
 import React, { Component } from 'react';
 import api from '@/api';
 
@@ -22,21 +13,21 @@ const typeList = [
   { value: 'PUT', text: 'PUT' },
 ];
 // 参数类型
-const paramType = {
-  1: { value: 1, text: '参数' },
-  2: { value: 2, text: '属性' },
-  3: { value: 3, text: '接口' },
-};
+// const paramType = {
+//   1: { value: 1, text: '参数' },
+//   2: { value: 2, text: '属性' },
+//   3: { value: 3, text: '接口' },
+// };
 const paramTypeList = [
   { value: 1, text: '参数' },
   { value: 2, text: '属性' },
   { value: 3, text: '接口' },
 ];
 // 状态
-const statu = {
-  0: { value: 0, text: '有效' },
-  1: { value: 1, text: '过期' },
-};
+// const statu = {
+//   0: { value: 0, text: '有效' },
+//   1: { value: 1, text: '过期' },
+// };
 const statuList = [
   { value: 0, text: '有效' },
   { value: 1, text: '过期' },
@@ -55,12 +46,12 @@ class Search extends Component {
     if (e) e.preventDefault();
     const val = this.props.form.getFieldsValue();
     this.props.getTableData({ page: 1, ...val });
-  }
+  };
 
   // 重置
   handleFormReset = () => {
     this.props.form.resetFields();
-  }
+  };
 
   // 渲染表单
   renderForm = () => {
@@ -73,17 +64,17 @@ class Search extends Component {
         <Row gutter={{ lg: 24, md: 12, sm: 6 }}>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="规则名称">
-              {getFieldDecorator('name')(<Input placeholder="请输入"/>)}
+              {getFieldDecorator('name')(<Input placeholder="请输入" />)}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="Client">
-              {getFieldDecorator('client')(<Input placeholder="请输入"/>)}
+              {getFieldDecorator('client')(<Input placeholder="请输入" />)}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="参数">
-              {getFieldDecorator('parameterField')(<Input placeholder="请输入"/>)}
+              {getFieldDecorator('parameterField')(<Input placeholder="请输入" />)}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
@@ -91,7 +82,11 @@ class Search extends Component {
               {getFieldDecorator('sourceType')(
                 <Select placeholder="请选择">
                   <Option value="">全部</Option>
-                  {typeList.map(item => <Option key={item.value} value={item.value}>{item.text}</Option>)}
+                  {typeList.map(item => (
+                    <Option key={item.value} value={item.value}>
+                      {item.text}
+                    </Option>
+                  ))}
                 </Select>,
               )}
             </FormItem>
@@ -101,7 +96,11 @@ class Search extends Component {
               {getFieldDecorator('paramType')(
                 <Select placeholder="请选择">
                   <Option value="">全部</Option>
-                  {paramTypeList.map(item => <Option key={item.value} value={item.value}>{item.text}</Option>)}
+                  {paramTypeList.map(item => (
+                    <Option key={item.value} value={item.value}>
+                      {item.text}
+                    </Option>
+                  ))}
                 </Select>,
               )}
             </FormItem>
@@ -110,7 +109,11 @@ class Search extends Component {
             <FormItem label="状态">
               {getFieldDecorator('status')(
                 <Select placeholder="请选择">
-                  {statuList.map(item => <Option key={item.value} value={item.value}>{item.text}</Option>)}
+                  {statuList.map(item => (
+                    <Option key={item.value} value={item.value}>
+                      {item.text}
+                    </Option>
+                  ))}
                 </Select>,
               )}
             </FormItem>
@@ -128,12 +131,10 @@ class Search extends Component {
         </Row>
       </Form>
     );
-  }
+  };
 
   render() {
-    return (
-      <div className="tableListForm">{this.renderForm()}</div>
-    );
+    return <div className="tableListForm">{this.renderForm()}</div>;
   }
 }
 
@@ -151,7 +152,7 @@ class Rule extends Component {
     total: 0,
     loading: false,
     visible: false,
-  }
+  };
 
   // 设置列
   columns = [
@@ -186,16 +187,16 @@ class Rule extends Component {
   componentWillReceiveProps(nextProps) {
     this.setState({
       visible: nextProps.visible,
-    })
+    });
   }
 
   // 分页
-  handleStandardTableChange = (pagination, filtersArg, sorter) => {
+  handleStandardTableChange = pagination => {
     this.getTableData({
       page: pagination.current,
       rows: pagination.pageSize,
     });
-  }
+  };
 
   // 获取表格数据
   getTableData = (options = {}) => {
@@ -207,14 +208,14 @@ class Rule extends Component {
       loading: true,
     });
 
-    api.system.getRules(query, true).then(data => {
+    api.dataauth.getRules(query, true).then(data => {
       this.setState({
         list: data.rows,
         total: data.total,
         loading: false,
       });
     });
-  }
+  };
 
   // 点击确定
   handleOk = () => {
@@ -223,7 +224,7 @@ class Rule extends Component {
 
   // 点击取消
   handleCancel = () => {
-    this.props.closeMask(false)
+    this.props.closeMask(false);
     this.setState({
       visible: false,
     });
@@ -242,11 +243,11 @@ class Rule extends Component {
     const rowSelection = {
       type: 'radio',
       onChange: (selectedRowKeys, selectedRows) => {
-          this.setState({
-              data: selectedRows[0],
-            })
-        },
-    }
+        this.setState({
+          data: selectedRows[0],
+        });
+      },
+    };
 
     return (
       <div>
@@ -258,16 +259,16 @@ class Rule extends Component {
           onCancel={this.handleCancel}
         >
           <Search getTableData={this.getTableData} />
-            <Table
-              scroll={{ x: 800, y: 400 }}
-              loading={loading}
-              dataSource={data.list}
-              pagination={data.pagination}
-              rowKey="id"
-              rowSelection={rowSelection}
-              columns={this.columns}
-              onChange={this.handleStandardTableChange}
-            />
+          <Table
+            scroll={{ x: 800, y: 400 }}
+            loading={loading}
+            dataSource={data.list}
+            pagination={data.pagination}
+            rowKey="id"
+            rowSelection={rowSelection}
+            columns={this.columns}
+            onChange={this.handleStandardTableChange}
+          />
         </Modal>
       </div>
     );

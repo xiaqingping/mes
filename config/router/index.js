@@ -8,6 +8,7 @@ const hts = require('./hts');
 const dashboard = require('./dashboard');
 const operation = require('./operation');
 const project = require('./project');
+const sample = require('./sample');
 
 module.exports = [
   {
@@ -40,7 +41,8 @@ module.exports = [
           operation,
           peptide,
           project,
-          // system,
+          system,
+          sample,
           // personel,
           // purchase,
           hts,

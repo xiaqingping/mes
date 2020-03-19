@@ -1,13 +1,4 @@
-import {
-  Button,
-  Col,
-  Form,
-  Input,
-  Row,
-  Select,
-  Modal,
-  Table,
-} from 'antd';
+import { Button, Col, Form, Input, Row, Select, Modal, Table } from 'antd';
 import React, { Component } from 'react';
 import api from '@/api';
 
@@ -35,12 +26,12 @@ class Search extends Component {
     if (e) e.preventDefault();
     const val = this.props.form.getFieldsValue();
     this.props.getTableData({ page: 1, ...val });
-  }
+  };
 
   // 重置
   handleFormReset = () => {
     this.props.form.resetFields();
-  }
+  };
 
   // 渲染表单
   renderForm = () => {
@@ -53,7 +44,7 @@ class Search extends Component {
         <Row gutter={{ lg: 24, md: 12, sm: 6 }}>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="Client">
-              {getFieldDecorator('client')(<Input placeholder="请输入"/>)}
+              {getFieldDecorator('client')(<Input placeholder="请输入" />)}
             </FormItem>
           </Col>
           <Col lg={6} md={8} sm={12}>
@@ -61,9 +52,11 @@ class Search extends Component {
               {getFieldDecorator('type', { initialValue: '' })(
                 <Select>
                   <Option value="">全部</Option>
-                  {type.map(item =>
-                    <Option key={item.value} value={item.value}>{item.text}</Option>,
-                  )}
+                  {type.map(item => (
+                    <Option key={item.value} value={item.value}>
+                      {item.text}
+                    </Option>
+                  ))}
                 </Select>,
               )}
             </FormItem>
@@ -81,12 +74,10 @@ class Search extends Component {
         </Row>
       </Form>
     );
-  }
+  };
 
   render() {
-    return (
-      <div className="tableListForm">{this.renderForm()}</div>
-    );
+    return <div className="tableListForm">{this.renderForm()}</div>;
   }
 }
 
@@ -103,7 +94,7 @@ class Sources extends Component {
     list: [],
     total: 0,
     loading: false,
-  }
+  };
 
   // 设置列
   columns = [
@@ -133,16 +124,16 @@ class Sources extends Component {
   componentWillReceiveProps(nextProps) {
     this.setState({
       visible: nextProps.visible,
-    })
+    });
   }
 
   // 分页
-  handleStandardTableChange = (pagination, filtersArg, sorter) => {
+  handleStandardTableChange = pagination => {
     this.getTableData({
       page: pagination.current,
       rows: pagination.pageSize,
     });
-  }
+  };
 
   // 获取表格数据
   getTableData = (options = {}) => {
@@ -154,14 +145,14 @@ class Sources extends Component {
       loading: true,
     });
 
-    api.system.getSources(query, true).then(data => {
+    api.dataauth.getSources(query, true).then(data => {
       this.setState({
         loading: false,
         list: data.rows,
         total: data.total,
       });
     });
-  }
+  };
 
   // 点击确定
   handleOk = () => {
@@ -170,7 +161,7 @@ class Sources extends Component {
 
   // 点击取消
   handleCancel = () => {
-    this.props.closeMask(false)
+    this.props.closeMask(false);
     this.setState({
       visible: false,
     });
@@ -189,11 +180,11 @@ class Sources extends Component {
     const rowSelection = {
       type: 'radio',
       onChange: (selectedRowKeys, selectedRows) => {
-          this.setState({
-              data: selectedRows[0],
-            })
-        },
-    }
+        this.setState({
+          data: selectedRows[0],
+        });
+      },
+    };
 
     return (
       <div>
@@ -205,16 +196,16 @@ class Sources extends Component {
           onCancel={this.handleCancel}
         >
           <Search getTableData={this.getTableData} />
-            <Table
-              scroll={{ x: 800, y: 400 }}
-              loading={loading}
-              dataSource={data.list}
-              pagination={data.pagination}
-              rowSelection={rowSelection}
-              rowKey="id"
-              columns={this.columns}
-              onChange={this.handleStandardTableChange}
-            />
+          <Table
+            scroll={{ x: 800, y: 400 }}
+            loading={loading}
+            dataSource={data.list}
+            pagination={data.pagination}
+            rowSelection={rowSelection}
+            rowKey="id"
+            columns={this.columns}
+            onChange={this.handleStandardTableChange}
+          />
         </Modal>
       </div>
     );
