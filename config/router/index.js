@@ -10,6 +10,8 @@ const operation = require('./operation');
 const project = require('./project');
 const sample = require('./sample');
 
+const { DEFAULT_ROUTE } = process.env;
+
 module.exports = [
   {
     path: '/user',
@@ -33,7 +35,7 @@ module.exports = [
         routes: [
           {
             path: '/',
-            redirect: '/seq',
+            redirect: DEFAULT_ROUTE || '/bp/maintain',
           },
           dashboard,
           seq,
