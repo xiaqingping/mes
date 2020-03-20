@@ -1,7 +1,7 @@
 /**
  * 元数据分析
  */
-import { Card, Col, Divider, Form, Input } from 'antd';
+import { Card, Col, Divider, Form, Input, Badge } from 'antd';
 import React, { Component } from 'react';
 import { connect } from 'dva';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
@@ -185,6 +185,10 @@ class Metadata extends Component {
       {
         title: '状态',
         dataIndex: 'status',
+        render: text => {
+          if (text !== 1) return <Badge status="error" text="失败" />;
+          return <Badge status="success" text="正常" />;
+        },
       },
       {
         fixed: 'right',
