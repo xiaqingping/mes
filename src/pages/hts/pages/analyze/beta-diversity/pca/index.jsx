@@ -102,6 +102,7 @@ class PAC extends Component {
     };
 
     const list = Object.keys(Array.from({ length: 10 })).map(() => ({
+      id: Math.random(),
       code: '123',
       projectCode: '456',
       taskCode: '789',
