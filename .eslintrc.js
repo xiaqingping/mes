@@ -13,6 +13,7 @@ module.exports = {
   ...myEslint,
   globals: {
     BASE_API: true,
+    UPLOAD_URL: true,
     page: true,
   },
 };
