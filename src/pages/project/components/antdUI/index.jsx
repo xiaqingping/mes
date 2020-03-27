@@ -1,78 +1,76 @@
-import React from 'react';
-import {
-  Button,
-  Card,
-  Col,
-  Divider,
-  Form,
-  Input,
-  Popconfirm,
-  Select,
-  DatePicker,
-  Badge,
-} from 'antd';
-const FormItem = Form.Item;
-const { Option } = Select;
-const { RangePicker } = DatePicker;
+import React, { useState } from 'react';
+import { Tooltip, Button, Drawer, Collapse } from 'antd';
+import { QuestionCircleOutlined, CaretRightOutlined } from '@ant-design/icons';
+import './index.less';
+
+const { Panel } = Collapse;
+/**
+ * 问号的说明作用
+ * @param {String} title 说明内容
+ */
+const MarkTool = props => (
+  <Tooltip title={props.title}>
+    <span>
+      <QuestionCircleOutlined style={{ fontSize: props.size }} />
+    </span>
+  </Tooltip>
+);
+
+const CollapseTool = value => (
+  <Collapse
+    expandIcon={({ isActive }) => <CaretRightOutlined rotate={isActive ? 90 : 0} />}
+    bordered={false}
+    style={{ margin: 0 }}
+  >
+    <Panel header={`${value.code}/${value.name}`} style={{ border: 'none' }}>
+      <p>12312312</p>
+    </Panel>
+  </Collapse>
+);
 
 /**
- * input封装
- * @param {String} languageCode 语言
- * @param {String} label label的名称
- * @param {String} name  组件的名称
- * @param {String} placeholder 提示语
+ * 抽屉的使用
+ * @param {String} visible 显示抽屉
  */
-const InputUI = props => {
-  const { languageCode, label, name, placeholder } = props;
+const DrawerTool = props => {
+  const [childrenDrawer, setChildrenDrawer] = useState(false);
+
+  const onClose = () => {
+    props.onClose();
+  };
+
+  const showChildrenDrawer = () => {
+    setChildrenDrawer(true);
+  };
+
+  const onChildrenDrawerClose = () => {
+    setChildrenDrawer(false);
+  };
   return (
-    <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
-      <FormItem label={label} name={name}>
-        <Input placeholder={placeholder} />
-      </FormItem>
-    </Col>
+    <div>
+      <Drawer
+        title={CollapseTool(props.detailValue)}
+        width={520}
+        closable={false}
+        onClose={onClose}
+        visible={props.visible}
+        className="drawer-style"
+      >
+        <Button type="primary" onClick={showChildrenDrawer}>
+          Two-level drawer
+        </Button>
+        <Drawer
+          title="Two-level Drawer"
+          width={320}
+          closable={false}
+          onClose={onChildrenDrawerClose}
+          visible={childrenDrawer}
+        >
+          This is two-level drawer
+        </Drawer>
+      </Drawer>
+    </div>
   );
 };
 
-/**
- * select的封装
- * @param {String} languageCode 语言
- * @param {String} label label的名称
- * @param {String} name  组件的名称
- * @param {Array} data option里需要的数据
- */
-const SelectUI = props => {
-  const { languageCode, label, name, data } = props;
-  return (
-    <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
-      <FormItem label={label} name={name}>
-        <Select>
-          {data.map(item => (
-            <Option key={item.key ? item.key : item.value} value={item.value}>
-              {item.data}
-            </Option>
-          ))}
-        </Select>
-      </FormItem>
-    </Col>
-  );
-};
-
-/**
- * input封装
- * @param {String} languageCode 语言
- * @param {String} label label的名称
- * @param {String} name  组件的名称
- * @param {String} placeholder 提示语
- */
-const DataUI = props => {
-  const { languageCode, label, name, placeholder } = props;
-  return (
-    <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
-      <FormItem label={label} name={name}>
-        <RangePicker placeholder={placeholder} style={{ width: '100%' }} />
-      </FormItem>
-    </Col>
-  );
-};
-
-export { InputUI, SelectUI, DataUI };
+export { MarkTool, DrawerTool };

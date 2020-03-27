@@ -1,14 +1,14 @@
 // 项目管理
 import React, { Component } from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
-import { Button, Card, Divider, Form, Progress, Tag, Badge } from 'antd';
+import { Button, Card, Divider, Form, Progress, Tag } from 'antd';
 import TableSearchForm from '@/components/TableSearchForm';
 import { PlusOutlined } from '@ant-design/icons';
-import StandardTable from '../components/StandardTable';
-import api from '@/api';
 import { connect } from 'dva';
-import { InputUI, SelectUI, DataUI } from '../components/antdUI';
-import SonTable from '../components/SonTable';
+import StandardTable from '../components/StandardTable';
+// import api from '@/api';
+import { InputUI, SelectUI, DataUI } from '../components/AntdSearchUI';
+// import { expandedRowRender } from '../functions';
 
 class ProjectManagement extends Component {
   tableSearchFormRef = React.createRef();
@@ -55,7 +55,6 @@ class ProjectManagement extends Component {
     //   });
     // });
     const data = this.props.project.projectManage;
-    console.log(data, options);
     this.setState({
       list: data,
       pagination: {
@@ -64,7 +63,6 @@ class ProjectManagement extends Component {
         total: data.total,
       },
       loading: false,
-      editIndex: -1,
     });
     // console.log(this.props.project.projectManage);
   };
@@ -128,28 +126,24 @@ class ProjectManagement extends Component {
       {
         title: '创建人/时间',
         dataIndex: 'creatorName',
-        render: (value, row) => {
-          return (
-            <>
-              {value}
-              <br />
-              {row.creatorTime}
-            </>
-          );
-        },
+        render: (value, row) => (
+          <>
+            {value}
+            <br />
+            {row.creatorTime}
+          </>
+        ),
       },
       {
         title: '修改人/时间',
         dataIndex: 'changerName',
-        render: (value, row) => {
-          return (
-            <>
-              {value}
-              <br />
-              {row.changerTime}
-            </>
-          );
-        },
+        render: (value, row) => (
+          <>
+            {value}
+            <br />
+            {row.changerTime}
+          </>
+        ),
       },
       {
         title: '状态',
@@ -162,13 +156,11 @@ class ProjectManagement extends Component {
         dataIndex: 'label',
         render: value => (
           <>
-            {value.map((item, index) => {
-              return (
-                <Tag key={index} color={item}>
-                  {item}
-                </Tag>
-              );
-            })}
+            {value.map(item => (
+              <Tag key={item} color={item}>
+                {item}
+              </Tag>
+            ))}
           </>
         ),
       },
@@ -179,32 +171,28 @@ class ProjectManagement extends Component {
       {
         title: '项目模型名称/版本',
         dataIndex: 'projectModelName',
-        render: (value, row) => {
-          return (
-            <>
-              {value}
-              <br />
-              <Tag color="success">&nbsp;&nbsp;V{row.copyRight}&nbsp;&nbsp;</Tag>
-            </>
-          );
-        },
+        render: (value, row) => (
+          <>
+            {value}
+            <br />
+            <Tag color="success">&nbsp;&nbsp;V{row.copyRight}&nbsp;&nbsp;</Tag>
+          </>
+        ),
       },
       {
         title: '开始-截止时间',
         dataIndex: 'StartTime',
-        render: (value, row) => {
-          return (
-            <>
-              {value}
-              <br />
-              {row.endTime}
-            </>
-          );
-        },
+        render: (value, row) => (
+          <>
+            {value}
+            <br />
+            {row.endTime}
+          </>
+        ),
       },
       {
         title: '操作',
-        render: (value, row, index) => (
+        render: () => (
           <>
             <a onClick={() => console.log(111)}>修改</a>
             <Divider type="vertical" />
@@ -217,107 +205,103 @@ class ProjectManagement extends Component {
     ];
 
     // 子table
-    let sonTablecolumns = [
-      {
-        title: '编号/名称',
-        dataIndex: 'code',
-      },
-      {
-        title: '描述',
-        dataIndex: 'describe',
-      },
-      {
-        title: '创建人/时间',
-        dataIndex: 'creatorName',
-        render: (value, row) => {
-          return (
-            <>
-              {value}
-              <br />
-              {row.creatorTime}
-            </>
-          );
-        },
-      },
-      {
-        title: '修改人/时间',
-        dataIndex: 'changerName',
-        render: (value, row) => {
-          return (
-            <>
-              {value}
-              <br />
-              {row.changerTime}
-            </>
-          );
-        },
-      },
-      {
-        title: '状态',
-        dataIndex: 'status',
-        width: '80px',
-        render: value =>
-          value === 1 ? <Badge color="green" text="有效" /> : <Badge color="red" text="无效" />,
-      },
-      {
-        title: '成员数',
-        dataIndex: 'memberNumber',
-      },
-      {
-        title: '项目模型名称/版本',
-        dataIndex: 'projectModelName',
-        render: (value, row) => {
-          return (
-            <>
-              {value}
-              <br />
-              <Tag color="success">&nbsp;&nbsp;V{row.copyRight}&nbsp;&nbsp;</Tag>
-            </>
-          );
-        },
-      },
-      {
-        title: '开始-截止时间',
-        dataIndex: 'StartTime',
-        render: (value, row) => {
-          return (
-            <>
-              {value}
-              <br />
-              {row.endTime}
-            </>
-          );
-        },
-      },
-      {
-        title: '操作',
-        render: (value, row, index) => (
-          <>
-            <a onClick={() => console.log(111)}>完成</a>
-            <Divider type="vertical" />
-            <a onClick={() => console.log(222)}>关闭</a>
-            <Divider type="vertical" />
-            <a onClick={() => console.log(333)}>挂起</a>
-          </>
-        ),
-      },
-    ];
+    // let sonTablecolumns = [
+    //   {
+    //     title: '编号/名称',
+    //     dataIndex: 'code',
+    //   },
+    //   {
+    //     title: '描述',
+    //     dataIndex: 'describe',
+    //   },
+    //   {
+    //     title: '创建人/时间',
+    //     dataIndex: 'creatorName',
+    //     render: (value, row) => (
+    //       <>
+    //         {value}
+    //         <br />
+    //         {row.creatorTime}
+    //       </>
+    //     ),
+    //   },
+    //   {
+    //     title: '修改人/时间',
+    //     dataIndex: 'changerName',
+    //     render: (value, row) => (
+    //       <>
+    //         {value}
+    //         <br />
+    //         {row.changerTime}
+    //       </>
+    //     ),
+    //   },
+    //   {
+    //     title: '状态',
+    //     dataIndex: 'status',
+    //     width: '80px',
+    //     render: value =>
+    //       value === 1 ? <Badge color="green" text="有效" /> : <Badge color="red" text="无效" />,
+    //   },
+    //   {
+    //     title: '成员数',
+    //     dataIndex: 'memberNumber',
+    //   },
+    //   {
+    //     title: '项目模型名称/版本',
+    //     dataIndex: 'projectModelName',
+    //     render: (value, row) => (
+    //       <>
+    //         {value}
+    //         <br />
+    //         <Tag color="success">&nbsp;&nbsp;V{row.copyRight}&nbsp;&nbsp;</Tag>
+    //       </>
+    //     ),
+    //   },
+    //   {
+    //     title: '开始-截止时间',
+    //     dataIndex: 'StartTime',
+    //     render: (value, row) => (
+    //       <>
+    //         {value}
+    //         <br />
+    //         {row.endTime}
+    //       </>
+    //     ),
+    //   },
+    //   {
+    //     title: '操作',
+    //     render: () => (
+    //       <>
+    //         <a onClick={() => console.log(111)}>完成</a>
+    //         <Divider type="vertical" />
+    //         <a onClick={() => console.log(222)}>关闭</a>
+    //         <Divider type="vertical" />
+    //         <a onClick={() => console.log(333)}>挂起</a>
+    //       </>
+    //     ),
+    //   },
+    // ];
 
     columns = columns.map(col => {
+      // eslint-disable-next-line no-param-reassign
       if (!col.width) col.width = 100;
       tableWidth += col.width;
       if (!col.editable) {
         return col;
       }
+      return true;
     });
 
-    sonTablecolumns = sonTablecolumns.map(col => {
-      if (!col.width) col.width = 100;
-      tableWidth += col.width;
-      if (!col.editable) {
-        return col;
-      }
-    });
+    // sonTablecolumns = sonTablecolumns.map(col => {
+    //   // eslint-disable-next-line no-param-reassign
+    //   if (!col.width) col.width = 100;
+    //   tableWidth += col.width;
+    //   if (!col.editable) {
+    //     return col;
+    //   }
+    //   return true;
+    // });
 
     return (
       <PageHeaderWrapper>
@@ -345,10 +329,11 @@ class ProjectManagement extends Component {
                 columns={columns}
                 onSelectRow={this.handleSelectRows}
                 onChange={this.handleStandardTableChange}
-                expandable={{
-                  expandedRowRender: value => SonTable(value.list, sonTablecolumns), //用方法创建子table
-                  rowExpandable: record => (record.list ? true : false),
-                }}
+                // expandable={{
+                //   // 用方法创建子table
+                //   expandedRowRender: value => expandedRowRender(value.list, sonTablecolumns),
+                //   rowExpandable: record => !!record.list,
+                // }}
               />
             </Form>
           </div>
@@ -358,9 +343,7 @@ class ProjectManagement extends Component {
   }
 }
 
-export default connect(({ global, project }) => {
-  return {
-    languageCode: global.languageCode,
-    project,
-  };
-})(ProjectManagement);
+export default connect(({ global, project }) => ({
+  languageCode: global.languageCode,
+  project,
+}))(ProjectManagement);
