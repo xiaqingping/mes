@@ -1,4 +1,4 @@
-// 项目管理
+// 流程模型
 import React, { Component } from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import { Button, Card, Divider, Form, Progress, Tag } from 'antd';
@@ -43,7 +43,6 @@ class ProjectManagement extends Component {
     //   ...formData,
     //   ...options,
     // };
-
     // api.peptideBase.getPurity(data, true).then(res => {
     //   this.setState({
     //     list: res.rows,
@@ -56,16 +55,16 @@ class ProjectManagement extends Component {
     //     editIndex: -1,
     //   });
     // });
-    const data = this.props.project.projectManage;
-    this.setState({
-      list: data,
-      pagination: {
-        current: options.page,
-        pageSize: options.rows,
-        total: data.total,
-      },
-      loading: false,
-    });
+    // const data = this.props.project.projectManage;
+    // this.setState({
+    //   list: data,
+    //   pagination: {
+    //     current: options.page,
+    //     pageSize: options.rows,
+    //     total: data.total,
+    //   },
+    //   loading: false,
+    // });
     // console.log(this.props.project.projectManage);
   };
 
