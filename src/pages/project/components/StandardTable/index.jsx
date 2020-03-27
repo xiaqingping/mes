@@ -79,7 +79,7 @@ class StandardTable extends Component {
 
   render() {
     const { selectedRowKeys } = this.state;
-    const { expandable, data, rowKey, ...rest } = this.props;
+    const { data, rowKey, ...rest } = this.props;
     const { list = [], pagination = false } = data || {};
     const paginationProps = pagination
       ? {
@@ -125,10 +125,10 @@ class StandardTable extends Component {
         <Table
           size="small"
           rowKey={rowKey || 'id'}
+          // rowSelection={rowSelection}
           dataSource={list}
           pagination={false}
           onChange={this.handleTableChange}
-          expandable={expandable}
           {...rest}
         />
         <Pagination

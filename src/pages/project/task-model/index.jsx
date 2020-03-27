@@ -1,5 +1,6 @@
 import React from 'react';
 import './index.less';
+// import { sortable } from 'react-sortable';
 
 const STATUS_TODO = 'STATUS_TODO';
 
@@ -14,75 +15,43 @@ const STATUS_CODE = {
   STATUS_6: 'F类',
 };
 
-// 需要分类的项目
-const tasks = [
-  {
-    id: 0,
-    status: STATUS_TODO,
-    username: 'aa',
-  },
-  {
-    id: 1,
-    status: STATUS_TODO,
-    username: 'bb',
-  },
-  {
-    id: 2,
-    status: STATUS_TODO,
-    username: 'cc',
-  },
-  {
-    id: 3,
-    status: STATUS_TODO,
-    username: 'dd',
-  },
-  {
-    id: 4,
-    status: STATUS_TODO,
-    username: 'ee',
-  },
-  {
-    id: 5,
-    status: STATUS_TODO,
-    username: 'ff',
-  },
-];
-
 class TaskItem extends React.Component {
   state = {
-    dragStatus: false,
+    // dragStatus: false,
+    // itemId: '',
   };
 
   // 拖拽开始获取项目的ID
   handleDragStart = () => {
-    this.setState({
-      dragStatus: true,
-    });
-    this.props.onDragStart(this.props.id);
+    this.props.dragOldId(this.props.id);
   };
 
   handleDragEnd = () => {
-    this.props.onDragEnd;
-    this.setState({
-      dragStatus: false,
-    });
+    this.props.onDragEnd();
+    // this.setState({
+    //   dragStatus: false,
+    // });
+  };
+
+  handleDrop = e => {
+    e.preventDefault();
+    this.props.dragToItem(this.props.id);
+    // this.setState({
+    //   in: false,
+    // });
   };
 
   render() {
     const { id, point, username, active } = this.props;
-    const { dragStatus } = this.state;
+    // const { dragStatus } = this.state;
     return (
       <div
         onDragStart={this.handleDragStart}
         onDragEnd={this.handleDragEnd}
+        onDrop={this.handleDrop}
         id={`item-${id}`}
         className={`item${active ? ' active' : ''}`}
         draggable="true"
-        onMouseEnter={item => {
-          if (dragStatus) {
-            console.log(item.target);
-          }
-        }}
       >
         <header className="item-header">
           <span className="item-header-username">{username}</span>
@@ -101,6 +70,7 @@ class TaskCol extends React.Component {
 
   handleDragEnter = e => {
     e.preventDefault();
+
     // if (this.props.canDragIn) {
     // this.setState({
     //   in: true,
@@ -148,6 +118,39 @@ class TaskCol extends React.Component {
 class App extends React.Component {
   state = {
     activeId: null,
+    // eslint-disable-next-line react/no-unused-state
+    tasks: [
+      {
+        id: 0,
+        status: STATUS_TODO,
+        username: 'aa',
+      },
+      {
+        id: 1,
+        status: STATUS_TODO,
+        username: 'bb',
+      },
+      {
+        id: 2,
+        status: STATUS_TODO,
+        username: 'cc',
+      },
+      {
+        id: 3,
+        status: STATUS_TODO,
+        username: 'dd',
+      },
+      {
+        id: 4,
+        status: STATUS_TODO,
+        username: 'ee',
+      },
+      {
+        id: 5,
+        status: STATUS_TODO,
+        username: 'ff',
+      },
+    ],
   };
 
   /**
@@ -156,17 +159,21 @@ class App extends React.Component {
   onDragStart = id => {
     this.setState({
       activeId: id,
+      oldId: '',
     });
   };
 
   // 项目归到分类里
   dragTo = status => {
-    const { activeId } = this.state;
+    const { activeId, tasks } = this.state;
+    // console.log(activeId);
     const task = tasks[activeId];
-    if (task.status !== status) {
-      task.status = status;
+    if (task) {
+      if (task.status !== status) {
+        task.status = status;
+      }
+      this.cancelSelect();
     }
-    this.cancelSelect();
   };
 
   // 取消选择
@@ -176,8 +183,17 @@ class App extends React.Component {
     });
   };
 
+  dragToId = id => {
+    const { oldId } = this.state;
+    console.log(oldId, id);
+  };
+
+  dragOldId = id => {
+    this.setState({ oldId: id });
+  };
+
   render() {
-    const { activeId } = this.state;
+    const { activeId, tasks } = this.state;
     const { onDragStart, cancelSelect } = this;
     return (
       <div className="task-wrapper">
@@ -195,6 +211,8 @@ class App extends React.Component {
                   key={t.id}
                   active={t.id === activeId}
                   id={t.id}
+                  dragToItem={this.dragToId}
+                  dragOldId={this.dragOldId}
                   title={t.title}
                   point={t.point}
                   username={t.username}
@@ -204,6 +222,7 @@ class App extends React.Component {
               ))}
           </TaskCol>
         ))}
+        ;
       </div>
     );
   }
