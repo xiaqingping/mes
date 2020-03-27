@@ -7,7 +7,7 @@ import { PlusOutlined } from '@ant-design/icons';
 import { connect } from 'dva';
 import StandardTable from '../components/StandardTable';
 // import api from '@/api';
-import { InputUI, SelectUI, DataUI } from '../components/AntdSearchUI';
+import { InputUI, SelectUI, DateUI } from '../components/AntdSearchUI';
 // import { expandedRowRender } from '../functions';
 
 class ProjectManagement extends Component {
@@ -95,7 +95,7 @@ class ProjectManagement extends Component {
             { value: 3, data: '状态三', key: '3' },
           ]}
         />
-        <DataUI
+        <DateUI
           languageCode={languageCode}
           label="时间"
           name="times"

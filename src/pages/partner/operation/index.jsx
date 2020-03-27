@@ -17,8 +17,8 @@ import { formatMessage } from 'umi/locale';
 import StandardTable from '@/components/StandardTable';
 import { connect } from 'dva';
 import _ from 'lodash';
-import DetailsList from './components/details';
 import api from '@/api';
+import DetailsList from './components/details';
 import './style.less';
 
 const FormItem = Form.Item;

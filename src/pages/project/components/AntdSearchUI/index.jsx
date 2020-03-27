@@ -48,13 +48,13 @@ const SelectUI = props => {
 };
 
 /**
- * input封装
+ * 日期封装
  * @param {String} languageCode 语言
  * @param {String} label label的名称
  * @param {String} name  组件的名称
  * @param {String} placeholder 提示语
  */
-const DataUI = props => {
+const DateUI = props => {
   const { languageCode, label, name, placeholder } = props;
   return (
     <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
@@ -65,4 +65,4 @@ const DataUI = props => {
   );
 };
 
-export { InputUI, SelectUI, DataUI };
+export { InputUI, SelectUI, DateUI };
