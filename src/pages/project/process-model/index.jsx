@@ -1,16 +1,17 @@
 // 流程模型
 import React, { Component } from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
-import { Button, Card, Divider, Form, Progress, Col, AutoComplete } from 'antd';
+import { Button, Card, Divider, Form, Col, AutoComplete, Avatar, Tag, Badge } from 'antd';
 import TableSearchForm from '@/components/TableSearchForm';
 import { PlusOutlined, UserOutlined } from '@ant-design/icons';
 import router from 'umi/router';
 import { connect } from 'dva';
 import _ from 'lodash';
 import { InputUI, SelectUI, DateUI } from '@/pages/project/components/AntdSearchUI';
+import { formatter } from '@/utils/utils';
 import StandardTable from '../components/StandardTable';
 // import api from '@/api';
-// import { DrawerTool } from '../components/AntdUI';
+import { DrawerTool } from '../components/AntdUI';
 
 const FormItem = Form.Item;
 class ProcessModel extends Component {
@@ -122,11 +123,13 @@ class ProcessModel extends Component {
   };
 
   // 分页
-  handleStandardTableChange = pagination => {
-    this.getTableData({
-      page: pagination.current,
-      rows: pagination.pageSize,
-    });
+  handleStandardTableChange = (pagination, filters) => {
+    // 获取搜索值
+    console.log(filters);
+    // this.getTableData({
+    //   page: pagination.current,
+    //   rows: pagination.pageSize,
+    // });
   };
 
   simpleForm = () => {
@@ -201,6 +204,7 @@ class ProcessModel extends Component {
 
   render() {
     const { pagination, list, loading, visible, detailValue } = this.state;
+    const { status } = this.props;
     let tableWidth = 0;
     let columns = [
       {
@@ -208,45 +212,51 @@ class ProcessModel extends Component {
         dataIndex: 'code',
         render: (value, row) => (
           <>
-            <span>{row.name}</span>
-            <br />
-            {value}
+            <Avatar
+              src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
+              style={{ float: 'left' }}
+              size="large"
+            />
+            <div style={{ float: 'left' }}>
+              <div>12312312333</div>
+              <div>肠道菌群宏</div>
+            </div>
           </>
         ),
       },
       {
-        title: '发布人',
-        dataIndex: 'publishName',
+        title: '描述',
+        dataIndex: 'describe',
       },
       {
-        title: '发布时间',
-        dataIndex: 'publishDate',
+        title: '发布人/时间',
+        dataIndex: 'publishName',
+        render: (value, row) => (
+          <>
+            <div>{value}</div>
+            <div>{row.publishDate}</div>
+          </>
+        ),
       },
       {
         title: '版本',
         dataIndex: 'version',
-      },
-      {
-        title: '状态',
-        dataIndex: 'status',
-      },
-
-      {
-        title: '修改人/时间',
-        dataIndex: 'changerName',
-        render: (value, row) => (
-          <>
-            {value}
-            <br />
-            {row.changerTime}
-          </>
+        render: () => (
+          <Tag color="green" style={{ padding: '0 10px' }}>
+            V1.0
+          </Tag>
         ),
       },
       {
         title: '状态',
         dataIndex: 'status',
-        width: '80px',
-        render: value => <Progress percent={value} size="small" />,
+        filters: status,
+        render: value => (
+          <Badge
+            status={formatter(status, value, 'value', 'status')}
+            text={formatter(status, value, 'value', 'text')}
+          />
+        ),
       },
       {
         title: '操作',
@@ -306,7 +316,12 @@ class ProcessModel extends Component {
                 // }}
               />
             </Form>
-            {/* <DrawerTool visible={visible} onClose={this.onClose} detailValue={detailValue} /> */}
+            <DrawerTool
+              visible={visible}
+              onClose={this.onClose}
+              detailValue={detailValue}
+              status={status}
+            />
           </div>
         </Card>
       </PageHeaderWrapper>
@@ -314,7 +329,8 @@ class ProcessModel extends Component {
   }
 }
 
-export default connect(({ global, processModel }) => ({
+export default connect(({ global, processModel, project }) => ({
   languageCode: global.languageCode,
   processModel,
+  status: project.status,
 }))(ProcessModel);
