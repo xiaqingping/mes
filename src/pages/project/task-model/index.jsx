@@ -1,362 +1,231 @@
-// 项目管理
-import React, { Component } from 'react';
-import { PageHeaderWrapper } from '@ant-design/pro-layout';
-import { Button, Card, Divider, Form, Progress, Tag, Badge } from 'antd';
-import TableSearchForm from '@/components/TableSearchForm';
-import { PlusOutlined, ArrowDownOutlined, EyeInvisibleOutlined } from '@ant-design/icons';
-import { connect } from 'dva';
-import StandardTable from '../components/StandardTable';
-// import api from '@/api';
-import { InputUI, SelectUI, DataUI } from '../components/AntdSearchUI';
-import { expandedRowRender } from '../functions';
+import React from 'react';
 import './index.less';
+// import { sortable } from 'react-sortable';
 
-class ProjectManagement extends Component {
-  tableSearchFormRef = React.createRef();
+const STATUS_TODO = 'STATUS_TODO';
 
+// 类别
+const STATUS_CODE = {
+  STATUS_TODO: '待处理',
+  STATUS_1: 'A类',
+  STATUS_2: 'B类',
+  STATUS_3: 'C类',
+  STATUS_4: 'D类',
+  STATUS_5: 'E类',
+  STATUS_6: 'F类',
+};
+
+class TaskItem extends React.Component {
   state = {
-    pagination: {},
-    loading: false,
+    // dragStatus: false,
+    // itemId: '',
   };
 
-  // 顶部表单默认值
-  initialValues = {
-    status: 1,
-    page: 1,
-    rows: 10,
+  // 拖拽开始获取项目的ID
+  handleDragStart = () => {
+    this.props.dragOldId(this.props.id);
   };
 
-  componentDidMount() {
-    this.getTableData(this.initialValues);
-  }
-
-  // 获取表格数据
-  getTableData = (options = {}) => {
-    // this.setState({ loading: true });
-    // const formData = this.tableSearchFormRef.current.getFieldsValue();
-    // const { pagination } = this.state;
-    // const { current: page, pageSize: rows } = pagination;
-    // const data = {
-    //   page,
-    //   rows,
-    //   ...formData,
-    //   ...options,
-    // };
-
-    // api.peptideBase.getPurity(data, true).then(res => {
-    //   this.setState({
-    //     list: res.rows,
-    //     pagination: {
-    //       current: data.page,
-    //       pageSize: data.rows,
-    //       total: res.total,
-    //     },
-    //     loading: false,
-    //     editIndex: -1,
-    //   });
+  handleDragEnd = () => {
+    this.props.onDragEnd();
+    // this.setState({
+    //   dragStatus: false,
     // });
-    const data = this.props.project.projectManage;
-    this.setState({
-      list: data,
-      pagination: {
-        current: options.page,
-        pageSize: options.rows,
-        total: data.total,
-      },
-      loading: false,
-    });
-    // console.log(this.props.project.projectManage);
   };
 
-  // 分页
-  handleStandardTableChange = pagination => {
-    this.getTableData({
-      page: pagination.current,
-      rows: pagination.pageSize,
-    });
-  };
-
-  simpleForm = () => {
-    const { languageCode } = this.props;
-    return (
-      <>
-        <InputUI
-          languageCode={languageCode}
-          label="创建人"
-          name="creatorName"
-          placeholder="请输入"
-        />
-        <SelectUI
-          languageCode={languageCode}
-          label="状态"
-          name="status"
-          data={[
-            { value: 1, data: '状态一', key: '1' },
-            { value: 2, data: '状态二', key: '2' },
-            { value: 3, data: '状态三', key: '3' },
-          ]}
-        />
-        <DataUI
-          languageCode={languageCode}
-          label="时间"
-          name="times"
-          placeholder={['开始时间', '结束时间']}
-        />
-      </>
-    );
-  };
-
-  // 新增
-  handleAdd = () => {
-    console.log(123);
+  handleDrop = e => {
+    e.preventDefault();
+    this.props.dragToItem(this.props.id);
+    // this.setState({
+    //   in: false,
+    // });
   };
 
   render() {
-    const { pagination, list, loading } = this.state;
-    let tableWidth = 0;
-
-    let columns = [
-      {
-        title: '',
-        width: 35,
-        className: 'tdIcon',
-        render: () => (
-          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-            <EyeInvisibleOutlined />
-            <ArrowDownOutlined />
-          </div>
-        ),
-      },
-      {
-        title: '编号/名称',
-        dataIndex: 'code',
-      },
-      {
-        title: '描述',
-        dataIndex: 'describe',
-      },
-      {
-        title: '创建人/时间',
-        dataIndex: 'creatorName',
-        render: (value, row) => (
-          <>
-            {value}
-            <br />
-            {row.creatorTime}
-          </>
-        ),
-      },
-      {
-        title: '修改人/时间',
-        dataIndex: 'changerName',
-        render: (value, row) => (
-          <>
-            {value}
-            <br />
-            {row.changerTime}
-          </>
-        ),
-      },
-      {
-        title: '状态',
-        dataIndex: 'status',
-        width: '80px',
-        render: value => <Progress percent={value} size="small" />,
-      },
-      {
-        title: '标签',
-        dataIndex: 'label',
-        render: value => (
-          <>
-            {value.map(item => (
-              <Tag key={item} color={item}>
-                {item}
-              </Tag>
-            ))}
-          </>
-        ),
-      },
-      {
-        title: '成员数',
-        dataIndex: 'memberNumber',
-      },
-      {
-        title: '项目模型名称/版本',
-        dataIndex: 'projectModelName',
-        render: (value, row) => (
-          <>
-            {value}
-            <br />
-            <Tag color="success">&nbsp;&nbsp;V{row.copyRight}&nbsp;&nbsp;</Tag>
-          </>
-        ),
-      },
-      {
-        title: '开始-截止时间',
-        dataIndex: 'StartTime',
-        render: (value, row) => (
-          <>
-            {value}
-            <br />
-            {row.endTime}
-          </>
-        ),
-      },
-      {
-        title: '操作',
-        render: () => (
-          <>
-            <a onClick={() => console.log(111)}>修改</a>
-            <Divider type="vertical" />
-            <a onClick={() => console.log(222)}>作废</a>
-            <Divider type="vertical" />
-            <a onClick={() => console.log(333)}>开始</a>
-          </>
-        ),
-      },
-    ];
-
-    // 子table
-    let sonTablecolumns = [
-      {
-        title: '编号/名称',
-        dataIndex: 'code',
-      },
-      {
-        title: '描述',
-        dataIndex: 'describe',
-      },
-      {
-        title: '创建人/时间',
-        dataIndex: 'creatorName',
-        render: (value, row) => (
-          <>
-            {value}
-            <br />
-            {row.creatorTime}
-          </>
-        ),
-      },
-      {
-        title: '修改人/时间',
-        dataIndex: 'changerName',
-        render: (value, row) => (
-          <>
-            {value}
-            <br />
-            {row.changerTime}
-          </>
-        ),
-      },
-      {
-        title: '状态',
-        dataIndex: 'status',
-        width: '80px',
-        render: value =>
-          value === 1 ? <Badge color="green" text="有效" /> : <Badge color="red" text="无效" />,
-      },
-      {
-        title: '成员数',
-        dataIndex: 'memberNumber',
-      },
-      {
-        title: '项目模型名称/版本',
-        dataIndex: 'projectModelName',
-        render: (value, row) => (
-          <>
-            {value}
-            <br />
-            <Tag color="success">&nbsp;&nbsp;V{row.copyRight}&nbsp;&nbsp;</Tag>
-          </>
-        ),
-      },
-      {
-        title: '开始-截止时间',
-        dataIndex: 'StartTime',
-        render: (value, row) => (
-          <>
-            {value}
-            <br />
-            {row.endTime}
-          </>
-        ),
-      },
-      {
-        title: '操作',
-        render: () => (
-          <>
-            <a onClick={() => console.log(111)}>完成</a>
-            <Divider type="vertical" />
-            <a onClick={() => console.log(222)}>关闭</a>
-            <Divider type="vertical" />
-            <a onClick={() => console.log(333)}>挂起</a>
-          </>
-        ),
-      },
-    ];
-
-    columns = columns.map(col => {
-      // eslint-disable-next-line no-param-reassign
-      if (!col.width) col.width = 100;
-      tableWidth += col.width;
-      if (!col.editable) {
-        return col;
-      }
-      return true;
-    });
-
-    sonTablecolumns = sonTablecolumns.map(col => {
-      // eslint-disable-next-line no-param-reassign
-      if (!col.width) col.width = 100;
-      tableWidth += col.width;
-      if (!col.editable) {
-        return col;
-      }
-      return true;
-    });
-
+    const { id, point, username, active } = this.props;
+    // const { dragStatus } = this.state;
     return (
-      <PageHeaderWrapper>
-        <Card bordered={false}>
-          <div className="tableList">
-            <TableSearchForm
-              ref={this.tableSearchFormRef}
-              initialValues={this.initialValues}
-              getTableData={this.getTableData}
-              simpleForm={this.simpleForm}
-            />
-            <div className="tableListOperator">
-              <Button type="primary" onClick={() => this.handleAdd()}>
-                <PlusOutlined />
-                新建
-              </Button>
-            </div>
-            <Form ref={this.tableFormRef}>
-              <StandardTable
-                scroll={{ x: tableWidth }}
-                rowClassName="editable-row"
-                className="tableIcon"
-                selectedRows=""
-                loading={loading}
-                data={{ list, pagination }}
-                columns={columns}
-                onSelectRow={this.handleSelectRows}
-                onChange={this.handleStandardTableChange}
-                expandable={{
-                  // 用方法创建子table
-                  expandedRowRender: value => expandedRowRender(value.list, sonTablecolumns),
-                  rowExpandable: record => !!record.list,
-                }}
-              />
-            </Form>
-          </div>
-        </Card>
-      </PageHeaderWrapper>
+      <div
+        onDragStart={this.handleDragStart}
+        onDragEnd={this.handleDragEnd}
+        onDrop={this.handleDrop}
+        id={`item-${id}`}
+        className={`item${active ? ' active' : ''}`}
+        draggable="true"
+      >
+        <header className="item-header">
+          <span className="item-header-username">{username}</span>
+          <span className="item-header-point">{point}</span>
+        </header>
+        {/* <main className="item-main">{title}</main> */}
+      </div>
     );
   }
 }
 
-export default connect(({ global, project }) => ({
-  languageCode: global.languageCode,
-  project,
-}))(ProjectManagement);
+class TaskCol extends React.Component {
+  // state = {
+  //   in: false,
+  // };
+
+  handleDragEnter = e => {
+    e.preventDefault();
+
+    // if (this.props.canDragIn) {
+    // this.setState({
+    //   in: true,
+    // });
+    // }
+  };
+
+  handleDragLeave = e => {
+    e.preventDefault();
+    // if (this.props.canDragIn) {
+    // this.setState({
+    //   in: false,
+    // });
+    // }
+  };
+
+  handleDrop = e => {
+    e.preventDefault();
+    this.props.dragTo(this.props.status);
+    // this.setState({
+    //   in: false,
+    // });
+  };
+
+  render() {
+    const { status, children } = this.props;
+    return (
+      <div
+        id={`col-${status}`}
+        onDragEnter={this.handleDragEnter}
+        onDragLeave={this.handleDragLeave}
+        onDragOver={this.handleDragEnter}
+        onDrop={this.handleDrop}
+        className="col"
+      >
+        <header className="col-header">{STATUS_CODE[status]}</header>
+        {/* <main className={`col-main${this.state.in ? ' active' : ''}`}>{children}</main> */}
+        {/* 选择的类型 */}
+        <main>{children}</main>
+      </div>
+    );
+  }
+}
+
+class App extends React.Component {
+  state = {
+    activeId: null,
+    // eslint-disable-next-line react/no-unused-state
+    tasks: [
+      {
+        id: 0,
+        status: STATUS_TODO,
+        username: 'aa',
+      },
+      {
+        id: 1,
+        status: STATUS_TODO,
+        username: 'bb',
+      },
+      {
+        id: 2,
+        status: STATUS_TODO,
+        username: 'cc',
+      },
+      {
+        id: 3,
+        status: STATUS_TODO,
+        username: 'dd',
+      },
+      {
+        id: 4,
+        status: STATUS_TODO,
+        username: 'ee',
+      },
+      {
+        id: 5,
+        status: STATUS_TODO,
+        username: 'ff',
+      },
+    ],
+  };
+
+  /**
+   * 传入被拖拽任务项的 id
+   */
+  onDragStart = id => {
+    this.setState({
+      activeId: id,
+      oldId: '',
+    });
+  };
+
+  // 项目归到分类里
+  dragTo = status => {
+    const { activeId, tasks } = this.state;
+    // console.log(activeId);
+    const task = tasks[activeId];
+    if (task) {
+      if (task.status !== status) {
+        task.status = status;
+      }
+      this.cancelSelect();
+    }
+  };
+
+  // 取消选择
+  cancelSelect = () => {
+    this.setState({
+      activeId: null,
+    });
+  };
+
+  dragToId = id => {
+    const { oldId } = this.state;
+    console.log(oldId, id);
+  };
+
+  dragOldId = id => {
+    this.setState({ oldId: id });
+  };
+
+  render() {
+    const { activeId, tasks } = this.state;
+    const { onDragStart, cancelSelect } = this;
+    return (
+      <div className="task-wrapper">
+        {Object.keys(STATUS_CODE).map(status => (
+          <TaskCol
+            status={status}
+            key={status}
+            dragTo={this.dragTo}
+            canDragIn={activeId !== null && tasks[activeId].status !== status}
+          >
+            {tasks
+              .filter(t => t.status === status)
+              .map(t => (
+                <TaskItem
+                  key={t.id}
+                  active={t.id === activeId}
+                  id={t.id}
+                  dragToItem={this.dragToId}
+                  dragOldId={this.dragOldId}
+                  title={t.title}
+                  point={t.point}
+                  username={t.username}
+                  onDragStart={onDragStart}
+                  onDragEnd={cancelSelect}
+                />
+              ))}
+          </TaskCol>
+        ))}
+        ;
+      </div>
+    );
+  }
+}
+
+export default App;

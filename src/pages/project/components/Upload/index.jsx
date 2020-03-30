@@ -2,7 +2,7 @@ import React from 'react';
 import { Upload, message, Button } from 'antd';
 import { UploadOutlined, CloseOutlined } from '@ant-design/icons';
 
-const url = UPLOAD_URL || 'https://www.mocky.io/v2/5cc8019d300000980a055e76';
+const url = 'https://www.mocky.io/v2/5cc8019d300000980a055e76';
 const props = {
   name: 'file',
   action: url,

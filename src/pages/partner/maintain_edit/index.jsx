@@ -12,6 +12,8 @@ import { connect } from 'dva';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import FooterToolbar from '@/components/FooterToolbar';
 
+import api from '@/api';
+import { validateForm, diff } from '@/utils/utils';
 import Basic from './components/Basic';
 import SalesArea from './components/SalesArea';
 import OrgCredit from './components/OrgCredit';
@@ -22,9 +24,6 @@ import PICertification from './components/PICertification';
 import Address from './components/Address';
 import PurchasingOrg from './components/PurchasingOrg';
 import Bank from './components/Bank';
-
-import api from '@/api';
-import { validateForm, diff } from '@/utils/utils';
 
 @connect(({ loading, bpEdit }) => ({
   oldDetails: bpEdit.oldDetails || {},
@@ -662,7 +661,7 @@ class CustomerEdit extends Component {
           <>
             {editType === 'update' ? <OrgCredit /> : null}
             {editType === 'update' ? (
-              <OrgCertificationRead></OrgCertificationRead>
+              <OrgCertificationRead />
             ) : (
               <OrgCertification
                 // eslint-disable-next-line no-return-assign
@@ -710,7 +709,7 @@ class CustomerEdit extends Component {
           <>
             {editType === 'update' ? <OrgCredit /> : null}
             {editType === 'update' ? (
-              <OrgCertificationRead></OrgCertificationRead>
+              <OrgCertificationRead />
             ) : (
               <OrgCertification
                 // eslint-disable-next-line no-return-assign
@@ -818,7 +817,7 @@ class CustomerEdit extends Component {
       >
         <Spin spinning={pageLoading}>
           {editType === 'update' && pageLoading ? (
-            <Empty style={{ padding: 300, background: '#fff' }} description="loading..."></Empty>
+            <Empty style={{ padding: 300, background: '#fff' }} description="loading..." />
           ) : (
             <>
               <div style={{ paddingBottom: 50 }}>{this.renderContent()}</div>

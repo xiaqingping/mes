@@ -377,7 +377,7 @@ class BasicInfo extends Component {
                     </DescriptionsItem>
                   </Descriptions>
                   <div style={{ border: '1px solid #E6E6E6', width: '100%', height: '100%' }}>
-                    <Tabs defaultActiveKey="1" className="tabs">
+                    <Tabs defaultActiveKey="1" className="tabs" animated={false}>
                       <TabPane
                         tab={formatMessage({
                           id: 'bp.maintain_details.sales_distribution.bill_to_party',

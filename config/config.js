@@ -61,8 +61,6 @@ export default {
   },
   define: {
     BASE_API: BASE_API || 'dev',
-    // 上传文件路径的URL
-    UPLOAD_URL: '',
   },
   ignoreMomentLocale: true,
   lessLoaderOptions: {
