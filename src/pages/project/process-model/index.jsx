@@ -7,9 +7,9 @@ import { PlusOutlined, UserOutlined } from '@ant-design/icons';
 import router from 'umi/router';
 import { connect } from 'dva';
 import _ from 'lodash';
+import { InputUI, SelectUI, DateUI } from '@/pages/project/components/AntdSearchUI';
 import StandardTable from '../components/StandardTable';
 // import api from '@/api';
-import { InputUI, SelectUI, DateUI } from '../components/AntdSearchUI';
 // import { DrawerTool } from '../components/AntdUI';
 
 const FormItem = Form.Item;
@@ -181,8 +181,14 @@ class ProcessModel extends Component {
     });
   };
 
+  // 新建
   handleModalVisible = () => {
     router.push('/project/process-model/add');
+  };
+
+  // 升级
+  upgrade = value => {
+    router.push(`/project/process-model/edit/${value.id}`);
   };
 
   // 查看详情
@@ -249,7 +255,7 @@ class ProcessModel extends Component {
           <>
             <a onClick={() => console.log(111)}>禁用</a>
             <Divider type="vertical" />
-            <a onClick={() => console.log(222)}>升级</a>
+            <a onClick={() => this.upgrade(value)}>升级</a>
             <Divider type="vertical" />
             <a onClick={() => this.searchDetails(value)}>查看</a>
           </>
