@@ -3,8 +3,7 @@ module.exports = {
   path: '/project',
   name: 'project',
   icon: 'user',
-  routes: [
-    {
+  routes: [{
       name: 'project-manage',
       path: '/project/project-manage',
       component: './project/project-manage',
@@ -13,8 +12,7 @@ module.exports = {
       name: 'process-model',
       path: '/project/process-model',
       hideChildrenInMenu: true,
-      routes: [
-        {
+      routes: [{
           path: '/project/process-model',
           component: './project/process-model',
         },
@@ -33,7 +31,22 @@ module.exports = {
     {
       name: 'task-model',
       path: '/project/task-model',
-      component: './project/task-model',
+      hideChildrenInMenu: true,
+      routes: [{
+          path: '/project/task-model',
+          component: './project/task-model',
+        },
+        {
+          name: "add",
+          path: "/project/task-model/add",
+          component: './project/task-model/addTaskModel.jsx',
+        },
+        {
+          name: "edit",
+          path: "/project/task-model/edit/:id",
+          component: './project/task-model/addTaskModel.jsx',
+        }
+      ]
     },
   ],
 };

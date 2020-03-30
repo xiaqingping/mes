@@ -57,7 +57,7 @@ class AssociatedProcessModel extends React.Component {
     //     editIndex: -1,
     //   });
     // });
-    const data = this.props.processModel.processModelData;
+    const data = (this.props.processModel || {}).processModelData;
     this.setState({
       list: data,
       // pagination: {

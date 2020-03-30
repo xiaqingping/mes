@@ -5,4 +5,6 @@ export default {
   'menu.project.task-model': '任务模型',
   'menu.project.process-model.add': '新建流程模型',
   'menu.project.process-model.edit': '修改',
+  'menu.project.task-model.add': '新建任务模型',
+  'menu.project.task-model.edit': '修改'
 };
