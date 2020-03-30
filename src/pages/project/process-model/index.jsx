@@ -10,7 +10,7 @@ import _ from 'lodash';
 import StandardTable from '../components/StandardTable';
 // import api from '@/api';
 import { InputUI, SelectUI, DateUI } from '../components/AntdSearchUI';
-import { DrawerTool } from '../components/AntdUI';
+// import { DrawerTool } from '../components/AntdUI';
 
 const FormItem = Form.Item;
 class ProcessModel extends Component {
@@ -300,7 +300,7 @@ class ProcessModel extends Component {
                 // }}
               />
             </Form>
-            <DrawerTool visible={visible} onClose={this.onClose} detailValue={detailValue} />
+            {/* <DrawerTool visible={visible} onClose={this.onClose} detailValue={detailValue} /> */}
           </div>
         </Card>
       </PageHeaderWrapper>
