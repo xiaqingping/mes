@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import { Drawer } from 'antd';
 import { connect } from 'dva';
+import TitleModel from './components/titleModel';
+import TaskModelTabs from './components/taskModelTabs';
 
 class TaskModel extends Component {
   static getDerivedStateFromProps(nextProps) {
@@ -22,14 +24,19 @@ class TaskModel extends Component {
     return (
       <>
         <Drawer
-          width={640}
+          width={600}
           placement="right"
           closable={false}
           onClose={this.onClose}
           visible={this.props.visible}
           destroyOnClose
         >
-          <p>{this.props.viewId}</p>
+          <div>
+            <TitleModel />
+          </div>
+          <div>
+            <TaskModelTabs />
+          </div>
         </Drawer>
       </>
     );
