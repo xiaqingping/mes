@@ -101,6 +101,11 @@ class ProjectManagement extends Component {
     router.push('/project/project-manage/add');
   };
 
+  // 项目管理详情页面
+  searchDetails = () => {
+    router.push('/project/project-manage/detail');
+  }
+
   render() {
     const { pagination, list, loading } = this.state;
     let tableWidth = 0;
