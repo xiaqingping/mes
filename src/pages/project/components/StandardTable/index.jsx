@@ -78,8 +78,8 @@ class StandardTable extends Component {
   };
 
   render() {
-    const { selectedRowKeys, needTotalList } = this.state;
-    const { expandable, data, rowKey, ...rest } = this.props;
+    const { selectedRowKeys } = this.state;
+    const { data, rowKey, ...rest } = this.props;
     const { list = [], pagination = false } = data || {};
     const paginationProps = pagination
       ? {
@@ -95,7 +95,7 @@ class StandardTable extends Component {
       : false;
     return (
       <div className={styles.standardTable}>
-        <div className={styles.tableAlert}>
+        {/* <div className={styles.tableAlert}>
           <Alert
             message={
               <Fragment>
@@ -121,14 +121,14 @@ class StandardTable extends Component {
             type="info"
             showIcon
           />
-        </div>
+        </div> */}
         <Table
           size="small"
           rowKey={rowKey || 'id'}
+          // rowSelection={rowSelection}
           dataSource={list}
           pagination={false}
           onChange={this.handleTableChange}
-          expandable={expandable}
           {...rest}
         />
         <Pagination

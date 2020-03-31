@@ -10,29 +10,30 @@ module.exports = {
       component: './project/project-manage',
     },
     {
-      name: 'task-manage',
-      path: '/project/task-manage',
-      component: './project/task-manage',
-    },
-    {
-      name: 'project-model',
-      path: '/project/project-model',
-      component: './project/project-model',
+      name: 'process-model',
+      path: '/project/process-model',
+      hideChildrenInMenu: true,
+      routes: [
+        {
+          path: '/project/process-model',
+          component: './project/process-model',
+        },
+        {
+          name: 'add',
+          path: '/project/process-model/add',
+          component: './project/process-model/process-model-edit',
+        },
+        {
+          name: 'edit',
+          path: '/project/process-model/edit/:id',
+          component: './project/process-model/process-model-edit',
+        },
+      ],
     },
     {
       name: 'task-model',
       path: '/project/task-model',
       component: './project/task-model',
-    },
-    {
-      name: 'project-model-type',
-      path: '/project/project-model-type',
-      component: './project/project-model-type',
-    },
-    {
-      name: 'task-model-type',
-      path: '/project/task-model-type',
-      component: './project/task-model-type',
     },
   ],
 };

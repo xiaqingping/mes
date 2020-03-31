@@ -43,7 +43,7 @@
   "dependencies": {
     "@ant-design/icons": "^4.0.2",
     "@ant-design/pro-layout": "^5.0.5",
-    "@antv/g2plot": "^0.11.22",
+    "@antv/g2plot": "^1.0.1",
     "antd": "^4.0.0",
     "axios": "^0.19.2",
     "classnames": "^2.2.6",
@@ -62,6 +62,7 @@
     "react-dom": "^16.13.0",
     "react-helmet": "^5.2.1",
     "react-router": "^4.3.1",
+    "react-sortable": "^2.0.0",
     "redux": "^4.0.5",
     "umi": "^2.13.3",
     "umi-plugin-react": "^1.15.2",

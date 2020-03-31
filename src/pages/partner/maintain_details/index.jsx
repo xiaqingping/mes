@@ -5,6 +5,7 @@ import { EditOutlined } from '@ant-design/icons';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import Link from 'umi/link';
 import { formatMessage } from 'umi/locale';
+import api from '@/api';
 import PersonCertification from './components/PersonCertification';
 import PersonCredit from './components/PersonCredit';
 import BasicInfo from './components/BasicInfo';
@@ -15,7 +16,6 @@ import AbroadAuthentication from './components/AbroadAuthentication';
 import Address from './components/Address';
 import Bank from './components/Bank';
 import PurchasingOrg from './components/PurchasingOrg';
-import api from '@/api';
 
 @connect(({ partnerMaintainEdit, basicCache }) => ({
   customer: partnerMaintainEdit.details,

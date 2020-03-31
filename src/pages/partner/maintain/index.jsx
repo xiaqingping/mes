@@ -23,10 +23,10 @@ import { connect } from 'dva';
 import _ from 'lodash';
 import { formatMessage } from 'umi/locale';
 import { PlusOutlined, HomeOutlined, UserOutlined, DownOutlined } from '@ant-design/icons';
-import ChangeModal from './components/ChangeModal';
-import styles from './index.less';
 import api from '@/api';
 import TableSearchForm from '@/components/TableSearchForm';
+import ChangeModal from './components/ChangeModal';
+import styles from './index.less';
 
 const FormItem = Form.Item;
 const { Option } = Select;
