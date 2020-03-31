@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { Tooltip, Button, Drawer, Collapse } from 'antd';
-import { QuestionCircleOutlined, CaretRightOutlined } from '@ant-design/icons';
+import { Tooltip, Drawer, Avatar, Tag, List, Card, Descriptions, Badge } from 'antd';
+import { QuestionCircleOutlined, DownOutlined, UpOutlined } from '@ant-design/icons';
+import { formatter } from '@/utils/utils';
 import './index.less';
 
-const { Panel } = Collapse;
 /**
  * 问号的说明作用
  * @param {String} title 说明内容
@@ -16,17 +16,57 @@ const MarkTool = props => (
   </Tooltip>
 );
 
-const CollapseTool = value => (
-  <Collapse
-    expandIcon={({ isActive }) => <CaretRightOutlined rotate={isActive ? 90 : 0} />}
-    bordered={false}
-    style={{ margin: 0 }}
-  >
-    <Panel header={`${value.code}/${value.name}`} style={{ border: 'none' }}>
-      <p>12312312</p>
-    </Panel>
-  </Collapse>
-);
+const CollapseTool = value => {
+  const [open, setOpen] = useState(false);
+  return (
+    <div style={{ marginTop: '25px' }}>
+      <Avatar
+        src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
+        style={{ float: 'left' }}
+        size="large"
+      />
+      <div style={{ float: 'left' }}>
+        <div>123123123333333333333</div>
+        <div style={{ width: '255px', height: '50px', wordWrap: 'break-word' }}>
+          肠道菌群宏基因组示例-demo2018-03-06
+        </div>
+      </div>
+
+      <div style={{ float: 'right', marginLeft: '30px', fontSize: '14px' }}>
+        <div style={{ color: 'red', marginBottom: '20px' }}>禁用</div>
+        <div>
+          {open ? (
+            <a href="#" onClick={() => setOpen(!open)}>
+              收起
+              <DownOutlined />
+            </a>
+          ) : (
+            <a href="#" onClick={() => setOpen(!open)}>
+              展开
+              <UpOutlined />
+            </a>
+          )}
+        </div>
+      </div>
+      <div style={{ float: 'right' }}>
+        <Tag color="green" style={{ padding: '0 10px' }}>
+          V1.0
+        </Tag>
+      </div>
+      {open ? (
+        <div style={{ marginLeft: '40px', color: '#858585', fontSize: '14px' }}>
+          <div style={{ clear: 'both', marginTop: '36px' }}>某某某发布人</div>
+          <div style={{ marginBottom: '20px' }}>(2017-01-12 13:55:34)</div>
+          <div style={{ width: '400px' }}>
+            该任务旨在分析肠道微生物与肥胖之间的关系。本次实验分析共，该任务旨在分析肠道微生物与肥胖之间的关系。
+          </div>
+        </div>
+      ) : (
+        ''
+      )}
+    </div>
+  );
+};
 
 /**
  * 抽屉的使用
@@ -34,11 +74,13 @@ const CollapseTool = value => (
  */
 const DrawerTool = props => {
   const [childrenDrawer, setChildrenDrawer] = useState(false);
+  const { status = [] } = props;
 
   const onClose = () => {
     props.onClose();
   };
 
+  // 弹出二级抽屉
   const showChildrenDrawer = () => {
     setChildrenDrawer(true);
   };
@@ -46,6 +88,7 @@ const DrawerTool = props => {
   const onChildrenDrawerClose = () => {
     setChildrenDrawer(false);
   };
+
   return (
     <div>
       <Drawer
@@ -56,9 +99,55 @@ const DrawerTool = props => {
         visible={props.visible}
         className="drawer-style"
       >
-        <Button type="primary" onClick={showChildrenDrawer}>
-          Two-level drawer
-        </Button>
+        <List
+          rowKey="id"
+          dataSource={[123, 3, 4, 56]}
+          renderItem={item => (
+            <List.Item key={item}>
+              <Card hoverable style={{ width: '470px', height: '240px' }}>
+                <Avatar
+                  src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
+                  style={{ float: 'left' }}
+                  size="large"
+                />
+                <div style={{ float: 'left' }}>
+                  <div>123123123333333333333</div>
+                  <div style={{ width: '255px', height: '50px', wordWrap: 'break-word' }}>
+                    肠道菌群宏基因组示例-demo2018-03-06
+                  </div>
+                </div>
+                <Tag color="green" style={{ padding: '0 10px', float: 'right' }}>
+                  V1.0
+                </Tag>
+                <div style={{ clear: 'both' }}>
+                  <div>
+                    <span>前置任务: </span>
+                    <span style={{ marginLeft: '15px' }}>
+                      <a onClick={showChildrenDrawer}>查看</a>
+                    </span>
+                  </div>
+                  <div style={{ margin: '8px 0' }}>
+                    <span>状态: </span>
+                    <span style={{ marginLeft: '45px' }}>
+                      <Badge
+                        status={formatter(status, 2, 'value', 'status')}
+                        text={formatter(status, 2, 'value', 'text')}
+                      />
+                    </span>
+                  </div>
+                  <div>
+                    <div style={{ float: 'left', width: '20%' }}>描述: </div>
+                    <div style={{ float: 'left', width: '80%' }}>
+                      该任务旨在分析肠道微生物与肥胖之该任务旨在分析肠道微生物与肥胖之该任务旨在分析肠道微生物与肥胖之
+                    </div>
+                  </div>
+                </div>
+              </Card>
+            </List.Item>
+          )}
+          className="list-style"
+          split={false}
+        />
         <Drawer
           title="Two-level Drawer"
           width={320}

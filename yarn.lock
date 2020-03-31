@@ -13672,6 +13672,16 @@ react-dev-utils@9.0.1:
     strip-ansi "5.2.0"
     text-table "0.2.0"
 
+react-dom@16.x.x:
+  version "16.13.1"
+  resolved "http://maven.sangon.com:88/repository/npm-group/react-dom/-/react-dom-16.13.1.tgz#c1bd37331a0486c078ee54c4740720993b2e0e7f"
+  integrity sha1-wb03MxoEhsB47lTEdAcgmTsuDn8=
+  dependencies:
+    loose-envify "^1.1.0"
+    object-assign "^4.1.1"
+    prop-types "^15.6.2"
+    scheduler "^0.19.1"
+
 react-dom@^16.13.0, react-dom@^16.8.6:
   version "16.13.0"
   resolved "https://registry.npm.taobao.org/react-dom/download/react-dom-16.13.0.tgz?cache=0&sync_timestamp=1584494161732&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Freact-dom%2Fdownload%2Freact-dom-16.13.0.tgz#cdde54b48eb9e8a0ca1b3dc9943d9bb409b81866"
@@ -13837,6 +13847,14 @@ react-slick@~0.25.2:
     lodash.debounce "^4.0.8"
     resize-observer-polyfill "^1.5.0"
 
+react-sortable@^2.0.0:
+  version "2.0.0"
+  resolved "http://maven.sangon.com:88/repository/npm-group/react-sortable/-/react-sortable-2.0.0.tgz#677350ace58d2de0145c7c6bed3573ce6a376ae7"
+  integrity sha1-Z3NQrOWNLeAUXHxr7TVzzmo3auc=
+  dependencies:
+    react "16.x.x"
+    react-dom "16.x.x"
+
 react-test-renderer@^16.0.0-0:
   version "16.13.0"
   resolved "https://registry.npm.taobao.org/react-test-renderer/download/react-test-renderer-16.13.0.tgz?cache=0&sync_timestamp=1584494138417&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Freact-test-renderer%2Fdownload%2Freact-test-renderer-16.13.0.tgz#39ba3bf72cedc8210c3f81983f0bb061b14a3014"
@@ -13854,6 +13872,15 @@ react-tween-state@^0.1.5:
   dependencies:
     raf "^3.1.0"
     tween-functions "^1.0.1"
+
+react@16.x.x:
+  version "16.13.1"
+  resolved "http://maven.sangon.com:88/repository/npm-group/react/-/react-16.13.1.tgz#2e818822f1a9743122c063d6410d85c1e3afe48e"
+  integrity sha1-LoGIIvGpdDEiwGPWQQ2FweOv5I4=
+  dependencies:
+    loose-envify "^1.1.0"
+    object-assign "^4.1.1"
+    prop-types "^15.6.2"
 
 react@^16.13.0, react@^16.8.6:
   version "16.13.0"
@@ -14736,6 +14763,14 @@ scheduler@^0.19.0:
   version "0.19.0"
   resolved "https://registry.npm.taobao.org/scheduler/download/scheduler-0.19.0.tgz#a715d56302de403df742f4a9be11975b32f5698d"
   integrity sha1-pxXVYwLeQD33QvSpvhGXWzL1aY0=
+  dependencies:
+    loose-envify "^1.1.0"
+    object-assign "^4.1.1"
+
+scheduler@^0.19.1:
+  version "0.19.1"
+  resolved "http://maven.sangon.com:88/repository/npm-group/scheduler/-/scheduler-0.19.1.tgz#4f3e2ed2c1a7d65681f4c854fa8c5a1ccb40f196"
+  integrity sha1-Tz4u0sGn1laB9MhU+oxaHMtA8ZY=
   dependencies:
     loose-envify "^1.1.0"
     object-assign "^4.1.1"
