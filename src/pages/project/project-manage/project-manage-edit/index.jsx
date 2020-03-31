@@ -73,11 +73,11 @@ class Test extends Component {
           </FormItem>
           {/* 标签：<CheckableTag {...this.props} checked={this.state.checked}
               onChange={this.handleChange} /> */}
-          <Button type="primary" onClick={() => this.handleAdd(true)}>
-            确定
-          </Button>
           <Button type="primary" onClick={() => this.handleSave(true)}>
             保存
+          </Button>
+          <Button type="primary" onClick={() => this.handleAdd(true)}>
+            添加流程
           </Button>
         </Card>
       </PageHeaderWrapper>

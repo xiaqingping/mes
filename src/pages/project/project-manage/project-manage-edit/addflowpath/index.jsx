@@ -2,57 +2,168 @@
 import React, { Component } from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import {
-  Input,
+  // Input,
   Card,
   Form,
-  // Tag,
-  Button,
+  Divider,
+  Tag,
+  // Button,
+  // Avatar,
+  Badge,
 } from 'antd';
-import router from 'umi/router';
+import { PlusOutlined } from '@ant-design/icons';
+// import router from 'umi/router';
+// import TableSearchForm from '@/components/TableSearchForm';
 import { connect } from 'dva';
+import StandardTable from '@/components/StandardTable';
+import { formatter } from '@/utils/utils';
 // import { expandedRowRender } from '../functions';
+
+// const FormItem = Form.Item;
 
 class Test extends Component {
   tableSearchFormRef = React.createRef();
 
+  constructor(props) {
+    super(props);
+    this.state = {
+      // pagination: {},
+      // loading: false,
+    };
+    // 异步验证做节流处理
+    // this.callParter = _.debounce(this.callParter, 500);
+  }
+
   // 跳转到新建项目页面
   handleAdd = () => {
-    router.push('/project/project-manage/add');
+    // router.push('/project/project-manage/add');
+    console.log('跳转到新建项目页面');
+  };
+
+  // 获取表格数据
+  getTableData = (options = {}) => {
+    const data = this.props.project.projectManage;
+    this.setState({
+      list: data,
+      pagination: {
+        current: options.page,
+        pageSize: options.rows,
+        total: data.total,
+      },
+      loading: false,
+    });
+    // console.log(this.props.project.projectManage);
+  };
+
+  // 分页
+  handleStandardTableChange = (pagination, filters) => {
+    // 获取搜索值
+    console.log(filters);
+    // this.getTableData({
+    //   page: pagination.current,
+    //   rows: pagination.pageSize,
+    // });
   };
 
   render() {
-    // 文本域
-    const { TextArea, Search } = Input;
-    // 表单
-    const FormItem = Form.Item;
-    // 标签
-    // const { CheckableTag } = Tag;
-    // state = { checked: true };
+    const { status } = this.props;
+    const { pagination, list, loading } = this.state;
 
-    // handleChange = checked => {
-    //   this.setState({ checked });
-    // };
+    let tableWidth = 0;
+    let columns = [
+      {
+        title: '编号/名称',
+        dataIndex: 'code',
+        // render: (value, row) => (
+        //   <>
+        //     <Avatar
+        //       src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
+        //       style={{ float: 'left' }}
+        //       size="large"
+        //     />
+        //     <div style={{ float: 'left' }}>
+        //       <div>12312312333</div>
+        //       <div>肠道菌群宏</div>
+        //     </div>
+        //   </>
+        // ),
+      },
+      {
+        title: '描述',
+        dataIndex: 'describe',
+      },
+      {
+        title: '发布人/时间',
+        dataIndex: 'publishName',
+        render: (value, row) => (
+          <>
+            <div>{value}</div>
+            <div>{row.publishDate}</div>
+          </>
+        ),
+      },
+      {
+        title: '版本',
+        dataIndex: 'version',
+        render: () => (
+          <Tag color="green" style={{ padding: '0 10px' }}>
+            V1.0
+          </Tag>
+        ),
+      },
+      {
+        title: '状态',
+        dataIndex: 'status',
+        filters: status,
+        render: value => (
+          <Badge
+            status={formatter(status, value, 'value', 'status')}
+            text={formatter(status, value, 'value', 'text')}
+          />
+        ),
+      },
+      {
+        title: '操作',
+        width: 200,
+        render: value => (
+          <>
+            <a onClick={() => console.log(111)}>删除</a>
+            <Divider type="vertical" />
+            <a onClick={() => this.upgrade(value)}>修改</a>
+          </>
+        ),
+      },
+    ];
 
+    columns = columns.map(col => {
+      // eslint-disable-next-line no-param-reassign
+      if (!col.width) col.width = 100;
+      tableWidth += col.width;
+      if (!col.editable) {
+        return col;
+      }
+      return true;
+    });
     return (
       <PageHeaderWrapper>
         <Card bordered={false}>
           <div className="tableList">
-            <div className="tableListOperator">
-              <FormItem label="名称" name="customerCode">
-                <Input placeholder="请输入项目名称" maxLength={20} />
-              </FormItem>
-              <FormItem label="描述" name="describe">
-                <TextArea rows={4} placeholder="请输入项目描述" maxLength="200" />
-              </FormItem>
-              <FormItem label="所有人" name="owner">
-                <Search onSearch={() => this.showCustomer.visibleShow(true)} />
-              </FormItem>
-              {/* 标签：<CheckableTag {...this.props} checked={this.state.checked}
-              onChange={this.handleChange} /> */}
-              <Button type="primary" onClick={() => this.handleAdd(true)}>
-                确定
-              </Button>
-            </div>
+            <Form ref={this.tableFormRef}>
+              <StandardTable
+                scroll={{ x: tableWidth }}
+                rowClassName="editable-row"
+                selectedRows=""
+                loading={loading}
+                data={{ list, pagination }}
+                columns={columns}
+                onSelectRow={this.handleSelectRows}
+                onChange={this.handleStandardTableChange}
+              />
+            </Form>
+          </div>
+          <div className="add">
+            <PlusOutlined />
+            新建
           </div>
         </Card>
       </PageHeaderWrapper>
