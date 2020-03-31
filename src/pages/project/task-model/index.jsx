@@ -190,6 +190,10 @@ class TaskModel extends Component {
 
   render() {
     const { visible } = this.state;
+    const { taskModel } = this.props;
+    const { statusObj } = taskModel;
+    const { status } = taskModel;
+
     let tableWidth = 0;
     let columns = [
       {
@@ -200,14 +204,14 @@ class TaskModel extends Component {
           return (
             <div style={{ display: 'flex' }}>
               <img
-                src="http://img1.imgtn.bdimg.com/it/u=1828061713,3436718872&fm=26&gp=0.jpg"
+                src="https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=2912333032,1411506376&fm=26&gp=0.jpg"
                 alt=""
-                height="50"
-                width="50"
+                height="40"
+                width="40"
                 style={{ borderRadius: '2px' }}
               />
               <div style={{ marginLeft: 10 }}>
-                <h4 style={{ color: '#545454' }}>{row.name}</h4>
+                <div style={{ color: '#545454' }}>{row.name}</div>
                 <div style={{ color: '#888' }}>{row.code}</div>
               </div>
             </div>
@@ -245,10 +249,11 @@ class TaskModel extends Component {
         title: '状态',
         dataIndex: 'status',
         width: '80px',
+        filters: status,
         render: value => {
           try {
-            const { taskModel } = this.props;
-            const { statusObj } = taskModel;
+            // const { taskModel } = this.props;
+            // const { statusObj } = taskModel;
             return (
               <>
                 <Badge status={statusObj[value].badgeStatus} text={statusObj[value].label} />

@@ -3,6 +3,40 @@
 const SeqModel = {
   namespace: 'taskModel',
   state: {
+    formItemType: [{
+        type: "input",
+        text: "单行输入框"
+      },
+      {
+        type: "textArea",
+        text: "多行输入框"
+      },
+      {
+        type: "radio",
+        text: "单选框"
+      },
+      {
+        type: "checkbox",
+        text: "多选框"
+      },
+      {
+        type: "select",
+        text: "选择框"
+      },
+      {
+        type: "dataPicker",
+        text: "日期选择"
+      },
+      {
+        type: "timePicker",
+        text: "时间选择"
+      },
+      {
+        type: "switch",
+        text: "开关"
+      },
+
+    ],
     taskModelStatusOptions: [{
         label: '未发布',
         value: '1'
@@ -41,22 +75,56 @@ const SeqModel = {
     statusList: [{
         value: 1,
         data: '未发布',
+        text: '未发布',
         key: '1'
       },
       {
         value: 2,
         data: '已发布',
+        text: '已发布',
         key: '2'
       },
       {
         value: 3,
         data: '已禁用',
+        text: '已禁用',
         key: '3'
       },
       {
         value: 4,
         data: '已过期',
+        text: '已过期',
         key: '4'
+      },
+    ],
+    status: [
+      // 未发布
+      {
+        value: 1,
+        text: '未发布',
+        // i18n: 'bp.verfication',
+        status: 'default',
+      },
+      // 已发布
+      {
+        value: 2,
+        text: '已验证',
+        // i18n: 'bp.completed',
+        status: 'success',
+      },
+      // 已禁用
+      {
+        value: 3,
+        text: '已拒绝',
+        // i18n: 'bp.rejected',
+        status: 'error',
+      },
+      // 已过期
+      {
+        value: 4,
+        text: '已过期',
+        // i18n: 'bp.expired',
+        status: 'warning',
       },
     ],
     taskModelList: [{
