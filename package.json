@@ -62,6 +62,7 @@
     "react-dom": "^16.13.1",
     "react-helmet": "^5.2.1",
     "react-router": "^4.3.1",
+    "react-sortable": "^2.0.0",
     "redux": "^4.0.5",
     "umi": "^2.13.3",
     "umi-plugin-react": "^1.15.2",
