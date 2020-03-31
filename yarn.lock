@@ -195,7 +195,7 @@
     "@antv/util" "^2.0.7"
     tslib "^1.10.0"
 
-"@antv/component@^0.5.0":
+"@antv/component@^0.5.0", "@antv/component@~0.5.0":
   version "0.5.2"
   resolved "https://registry.npm.taobao.org/@antv/component/download/@antv/component-0.5.2.tgz?cache=0&sync_timestamp=1584601992847&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2F%40antv%2Fcomponent%2Fdownload%2F%40antv%2Fcomponent-0.5.2.tgz#b2c490174ab24a0638110c5a7e764689c5785d50"
   integrity sha1-ssSQF0qySgY4EQxafnZGicV4XVA=
@@ -208,16 +208,16 @@
     "@antv/util" "~2.0.0"
     tslib "^1.10.0"
 
-"@antv/coord@^0.2.1":
+"@antv/coord@^0.2.1", "@antv/coord@~0.2.4":
   version "0.2.4"
-  resolved "https://registry.npm.taobao.org/@antv/coord/download/@antv/coord-0.2.4.tgz?cache=0&sync_timestamp=1582009349071&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2F%40antv%2Fcoord%2Fdownload%2F%40antv%2Fcoord-0.2.4.tgz#1d491681d1347bdcb490240fdfd5df33ab32ba36"
+  resolved "https://registry.npm.taobao.org/@antv/coord/download/@antv/coord-0.2.4.tgz#1d491681d1347bdcb490240fdfd5df33ab32ba36"
   integrity sha1-HUkWgdE0e9y0kCQP39XfM6syujY=
   dependencies:
     "@antv/matrix-util" "~2.0.1-beta.1"
     "@antv/util" "~2.0.3"
     tslib "^1.10.0"
 
-"@antv/dom-util@~2.0.1":
+"@antv/dom-util@~2.0.1", "@antv/dom-util@~2.0.2":
   version "2.0.2"
   resolved "https://registry.npm.taobao.org/@antv/dom-util/download/@antv/dom-util-2.0.2.tgz#4c7b0a195e027e55570435a6825cec56dfb0b590"
   integrity sha1-THsKGV4CflVXBDWmglzsVt+wtZA=
@@ -244,7 +244,7 @@
     d3-interpolate "^1.3.2"
     d3-timer "^1.0.9"
 
-"@antv/g-base@~0.4.0":
+"@antv/g-base@^0.4.0", "@antv/g-base@~0.4.0":
   version "0.4.0"
   resolved "https://registry.npm.taobao.org/@antv/g-base/download/@antv/g-base-0.4.0.tgz#9fd85ceab327a2dc184ac12ecd3fab1422b3a61f"
   integrity sha1-n9hc6rMnotwYSsEuzT+rFCKzph8=
@@ -270,6 +270,17 @@
     "@antv/path-util" "~2.0.3-beta.1"
     "@antv/util" "~2.0.0"
 
+"@antv/g-canvas@~0.4.0":
+  version "0.4.2"
+  resolved "https://registry.npm.taobao.org/@antv/g-canvas/download/@antv/g-canvas-0.4.2.tgz#38652356c2a9d1260e7608230f812092345268d5"
+  integrity sha1-OGUjVsKp0SYOdggjD4EgkjRSaNU=
+  dependencies:
+    "@antv/g-base" "^0.4.0"
+    "@antv/g-math" "^0.1.1"
+    "@antv/gl-matrix" "~2.7.1"
+    "@antv/path-util" "~2.0.5"
+    "@antv/util" "~2.0.0"
+
 "@antv/g-math@^0.1.1":
   version "0.1.1"
   resolved "https://registry.npm.taobao.org/@antv/g-math/download/@antv/g-math-0.1.1.tgz#3a00ec607b34c4c5de2b8ad25069b25c1f59626a"
@@ -288,7 +299,17 @@
     "@antv/util" "~2.0.0"
     detect-browser "^4.6.0"
 
-"@antv/g2@^4.0.0-beta.17":
+"@antv/g-svg@~0.4.0":
+  version "0.4.0"
+  resolved "https://registry.npm.taobao.org/@antv/g-svg/download/@antv/g-svg-0.4.0.tgz#3dfd13423a7a162c137c0bdbe9e93172526bde2f"
+  integrity sha1-Pf0TQjp6FiwTfAvb6ekxclJr3i8=
+  dependencies:
+    "@antv/g-base" "^0.4.0"
+    "@antv/g-math" "^0.1.1"
+    "@antv/util" "~2.0.0"
+    detect-browser "^4.6.0"
+
+"@antv/g2@~4.0.2":
   version "4.0.2"
   resolved "https://registry.npm.taobao.org/@antv/g2/download/@antv/g2-4.0.2.tgz#475f584b5f3e19c8346b55873e247d235e75eceb"
   integrity sha1-R19YS18+Gcg0a1WHPiR9I1517Os=
@@ -308,24 +329,32 @@
     "@antv/util" "~2.0.5"
     tslib "^1.10.0"
 
-"@antv/g2plot@^1.0.1":
-  version "1.0.1"
-  resolved "https://registry.npm.taobao.org/@antv/g2plot/download/@antv/g2plot-1.0.1.tgz#2fe055ab01adbbda8f07d83f11d59faad5208e92"
-  integrity sha1-L+BVqwGtu9qPB9g/EdWfqtUgjpI=
+"@antv/g2plot@^1.0.2":
+  version "1.0.2"
+  resolved "https://registry.npm.taobao.org/@antv/g2plot/download/@antv/g2plot-1.0.2.tgz#f075adf6375c55663f822b44c5f8f890eb103432"
+  integrity sha1-8HWt9jdcVWY/gitExfj4kOsQNDI=
   dependencies:
+    "@antv/component" "~0.5.0"
+    "@antv/coord" "~0.2.4"
+    "@antv/dom-util" "~2.0.2"
     "@antv/event-emitter" "~0.1.1"
-    "@antv/g2" "^4.0.0-beta.17"
-    d3-regression "^1.2.8"
-    fecha "~4.0.0"
+    "@antv/g-base" "~0.4.0"
+    "@antv/g-canvas" "~0.4.0"
+    "@antv/g-svg" "~0.4.0"
+    "@antv/g2" "~4.0.2"
+    "@antv/matrix-util" "~2.0.5"
+    "@antv/scale" "~0.3.1"
+    "@antv/util" "~2.0.7"
+    d3-regression "~1.2.8"
     resize-observer-polyfill "^1.5.1"
-    warning "~4.0.3"
+    warning "^4.0.3"
 
 "@antv/gl-matrix@^2.7.1", "@antv/gl-matrix@~2.7.1":
   version "2.7.1"
   resolved "https://registry.npm.taobao.org/@antv/gl-matrix/download/@antv/gl-matrix-2.7.1.tgz#acb8e37f7ab3df01345aba4372d7942be42eba14"
   integrity sha1-rLjjf3qz3wE0WrpDcteUK+QuuhQ=
 
-"@antv/matrix-util@^2.0.4", "@antv/matrix-util@~2.0.1-beta.1", "@antv/matrix-util@~2.0.4":
+"@antv/matrix-util@^2.0.4", "@antv/matrix-util@~2.0.1-beta.1", "@antv/matrix-util@~2.0.4", "@antv/matrix-util@~2.0.5":
   version "2.0.5"
   resolved "https://registry.npm.taobao.org/@antv/matrix-util/download/@antv/matrix-util-2.0.5.tgz#6fc851956ca7810a380778f485b0bfe2f738781b"
   integrity sha1-b8hRlWyngQo4B3j0hbC/4vc4eBs=
@@ -351,7 +380,7 @@
     fecha "~3.0.3"
     tslib "^1.10.0"
 
-"@antv/util@^2.0.7", "@antv/util@~2.0.0", "@antv/util@~2.0.3", "@antv/util@~2.0.5":
+"@antv/util@^2.0.7", "@antv/util@~2.0.0", "@antv/util@~2.0.3", "@antv/util@~2.0.5", "@antv/util@~2.0.7":
   version "2.0.7"
   resolved "https://registry.npm.taobao.org/@antv/util/download/@antv/util-2.0.7.tgz#b96466bca7d4143c20dce485396cd97b5fab7214"
   integrity sha1-uWRmvKfUFDwg3OSFOWzZe1+rchQ=
@@ -5169,10 +5198,10 @@ d3-interpolate@^1.3.2:
   dependencies:
     d3-color "1"
 
-d3-regression@^1.2.8:
-  version "1.3.4"
-  resolved "https://registry.npm.taobao.org/d3-regression/download/d3-regression-1.3.4.tgz#a3414b1abe5a20d46a208d95e565a418be9a0e23"
-  integrity sha1-o0FLGr5aINRqII2V5WWkGL6aDiM=
+d3-regression@~1.2.8:
+  version "1.2.8"
+  resolved "https://registry.npm.taobao.org/d3-regression/download/d3-regression-1.2.8.tgz#921cf32c43f2f1497a1a143d37d350633ee279ce"
+  integrity sha1-khzzLEPy8Ul6GhQ9N9NQYz7iec4=
 
 d3-timer@^1.0.9:
   version "1.0.10"
@@ -6926,11 +6955,6 @@ fecha@~3.0.3:
   version "3.0.3"
   resolved "https://registry.npm.taobao.org/fecha/download/fecha-3.0.3.tgz#fabbd416497649a42c24d34bfa726b579203a1e2"
   integrity sha1-+rvUFkl2SaQsJNNL+nJrV5IDoeI=
-
-fecha@~4.0.0:
-  version "4.0.0"
-  resolved "https://registry.npm.taobao.org/fecha/download/fecha-4.0.0.tgz#aae81accdee4a18199f81b0f260a119b8f562fd8"
-  integrity sha1-qugazN7koYGZ+BsPJgoRm49WL9g=
 
 figgy-pudding@^3.5.1:
   version "3.5.1"
