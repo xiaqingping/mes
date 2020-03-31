@@ -7,7 +7,18 @@ module.exports = {
     {
       name: 'project-manage',
       path: '/project/project-manage',
-      component: './project/project-manage',
+      hideChildrenInMenu: true,
+      routes: [
+        {
+          path: '/project/project-manage',
+          component: './project/project-manage',
+        },
+        {
+          name: 'detail',
+          path: '/project/project-manage/detail',
+          component: './project/project-manage/project-manage-detail',
+        },
+      ],
     },
     {
       name: 'process-model',
