@@ -7,7 +7,7 @@ import { connect } from 'dva';
 import './index.less';
 
 import AssociatedProcessModel from '@/pages/project/process-model/components/AssociatedProcessModel';
-// import { expandedRowRender } from '../functions';
+import ArgumentModel from './components/argumentModel';
 
 function getBase64(img, callback) {
   const reader = new FileReader();
@@ -40,6 +40,7 @@ class ProcessEdit extends Component {
     id: '',
     visible: false,
     tableData: [],
+    argumentVisible: false, // 参数弹框是否显示
   };
 
   componentDidMount() {
@@ -72,7 +73,13 @@ class ProcessEdit extends Component {
   };
 
   // 任务模型列表title样式
-  titleContent = () => <div style={{ fontWeight: 'bolder' }}>前置任务列表</div>;
+  titleContent = () => {
+    return (
+      <>
+        <div style={{ fontWeight: 'bolder' }}>前置任务列表</div>
+      </>
+    );
+  };
 
   // 是否可自动运行和交互分析
   onChange = checked => {
@@ -103,8 +110,22 @@ class ProcessEdit extends Component {
     console.log(row);
   };
 
+  openArgumentModel = () => {
+    this.setState({
+      argumentVisible: true,
+    });
+  };
+
+  onArgumentClose = () => {
+    this.setState({
+      argumentVisible: false,
+    });
+  };
+
   // 提交
-  handleSubmit = () => {};
+  handleSubmit = () => {
+    console.log('object');
+  };
 
   render() {
     const uploadButton = (
@@ -173,7 +194,7 @@ class ProcessEdit extends Component {
         ),
       },
     ];
-    const { tableData, visible } = this.state;
+    const { tableData, visible, argumentVisible } = this.state;
     return (
       <PageHeaderWrapper title={id || ''}>
         <Form onFinish={this.onFinish}>
@@ -224,7 +245,7 @@ class ProcessEdit extends Component {
             </div>
             <div style={{ float: 'right', marginRight: '142px', fontSize: '16px' }}>
               <SettingOutlined />
-              <a href="#" style={{ marginLeft: '10px' }}>
+              <a href="#" style={{ marginLeft: '10px' }} onClick={this.openArgumentModel}>
                 参数
               </a>
             </div>
@@ -276,7 +297,7 @@ class ProcessEdit extends Component {
               style={{ float: 'right', marginTop: '-16px' }}
               htmlType="submit"
               onClick={() => {
-                this.handleSubmit;
+                this.handleSubmit();
               }}
             >
               提交
@@ -284,6 +305,7 @@ class ProcessEdit extends Component {
           </Card>
         </Form>
         <AssociatedProcessModel visible={visible} onClose={this.onClose} />
+        <ArgumentModel visible={argumentVisible} onClose={this.onArgumentClose} />
       </PageHeaderWrapper>
     );
   }
