@@ -41,22 +41,56 @@ const SeqModel = {
     statusList: [{
         value: 1,
         data: '未发布',
+        text: '未发布',
         key: '1'
       },
       {
         value: 2,
         data: '已发布',
+        text: '已发布',
         key: '2'
       },
       {
         value: 3,
         data: '已禁用',
+        text: '已禁用',
         key: '3'
       },
       {
         value: 4,
         data: '已过期',
+        text: '已过期',
         key: '4'
+      },
+    ],
+    status: [
+      // 未发布
+      {
+        value: 1,
+        text: '未发布',
+        // i18n: 'bp.verfication',
+        status: 'default',
+      },
+      // 已发布
+      {
+        value: 2,
+        text: '已验证',
+        // i18n: 'bp.completed',
+        status: 'success',
+      },
+      // 已禁用
+      {
+        value: 3,
+        text: '已拒绝',
+        // i18n: 'bp.rejected',
+        status: 'error',
+      },
+      // 已过期
+      {
+        value: 4,
+        text: '已过期',
+        // i18n: 'bp.expired',
+        status: 'warning',
       },
     ],
     taskModelList: [{

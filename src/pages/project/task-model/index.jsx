@@ -190,6 +190,10 @@ class TaskModel extends Component {
 
   render() {
     const { visible } = this.state;
+    const { taskModel } = this.props;
+    const { statusObj } = taskModel;
+    const { status } = taskModel;
+
     let tableWidth = 0;
     let columns = [
       {
@@ -245,10 +249,11 @@ class TaskModel extends Component {
         title: '状态',
         dataIndex: 'status',
         width: '80px',
+        filters: status,
         render: value => {
           try {
-            const { taskModel } = this.props;
-            const { statusObj } = taskModel;
+            // const { taskModel } = this.props;
+            // const { statusObj } = taskModel;
             return (
               <>
                 <Badge status={statusObj[value].badgeStatus} text={statusObj[value].label} />
