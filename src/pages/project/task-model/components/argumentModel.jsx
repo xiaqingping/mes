@@ -88,7 +88,6 @@ class ArgumentModel extends Component {
             title={this.titleContent()}
           >
             <ArgumentForm />
-            <p>kksk</p>
           </Drawer>
         </Drawer>
       </>
