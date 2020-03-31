@@ -1,10 +1,18 @@
 // 项目管理
 import React, { Component } from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
-import { Button, Card, Divider, Form, Progress, Tag } from 'antd';
+import {
+  Button,
+  Card,
+  Divider,
+  Form,
+  // Progress,
+  Tag,
+} from 'antd';
 import TableSearchForm from '@/components/TableSearchForm';
 import { PlusOutlined } from '@ant-design/icons';
 import { connect } from 'dva';
+import router from 'umi/router';
 import StandardTable from '../components/StandardTable';
 // import api from '@/api';
 import { InputUI, SelectUI, DateUI } from '../components/AntdSearchUI';
@@ -90,9 +98,11 @@ class ProjectManagement extends Component {
           label="状态"
           name="status"
           data={[
-            { value: 1, data: '状态一', key: '1' },
-            { value: 2, data: '状态二', key: '2' },
-            { value: 3, data: '状态三', key: '3' },
+            { value: 1, data: '未开始', key: '1' },
+            { value: 2, data: '进行中', key: '2' },
+            { value: 3, data: '已完成', key: '3' },
+            { value: 4, data: '已终止', key: '4' },
+            { value: 5, data: '待处理', key: '5' },
           ]}
         />
         <DateUI
@@ -107,7 +117,8 @@ class ProjectManagement extends Component {
 
   // 新增
   handleAdd = () => {
-    console.log(123);
+    // console.log(123);
+    router.push('/project/project-manage/add');
   };
 
   render() {
@@ -149,7 +160,14 @@ class ProjectManagement extends Component {
         title: '状态',
         dataIndex: 'status',
         width: '80px',
-        render: value => <Progress percent={value} size="small" />,
+        render: text => {
+          if (text === 1) return '未开始';
+          if (text === 2) return '进行中';
+          if (text === 3) return '已完成';
+          if (text === 4) return '已终止';
+          if (text === 5) return '待处理';
+          return '';
+        },
       },
       {
         title: '标签',
@@ -168,17 +186,17 @@ class ProjectManagement extends Component {
         title: '成员数',
         dataIndex: 'memberNumber',
       },
-      {
-        title: '项目模型名称/版本',
-        dataIndex: 'projectModelName',
-        render: (value, row) => (
-          <>
-            {value}
-            <br />
-            <Tag color="success">&nbsp;&nbsp;V{row.copyRight}&nbsp;&nbsp;</Tag>
-          </>
-        ),
-      },
+      // {
+      //   title: '项目模型名称/版本',
+      //   dataIndex: 'projectModelName',
+      //   render: (value, row) => (
+      //     <>
+      //       {value}
+      //       <br />
+      //       <Tag color="success">&nbsp;&nbsp;V{row.copyRight}&nbsp;&nbsp;</Tag>
+      //     </>
+      //   ),
+      // },
       {
         title: '开始-截止时间',
         dataIndex: 'StartTime',
@@ -191,14 +209,15 @@ class ProjectManagement extends Component {
         ),
       },
       {
+        fixed: 'right',
         title: '操作',
         render: () => (
           <>
-            <a onClick={() => console.log(111)}>修改</a>
+            {/* <a onClick={() => console.log(111)}>修改</a>
+            <Divider type="vertical" /> */}
+            <a onClick={() => console.log(222)}>删除</a>
             <Divider type="vertical" />
-            <a onClick={() => console.log(222)}>作废</a>
-            <Divider type="vertical" />
-            <a onClick={() => console.log(333)}>开始</a>
+            {/* <a onClick={() => console.log(333)}>开始</a> */}
           </>
         ),
       },
