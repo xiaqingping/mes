@@ -29,10 +29,10 @@ module.exports = {
       path: '/system/rules',
       component: './system/rules',
     },
-    // {
-    //   name: 'group',
-    //   path: '/system/group',
-    //   component: './system/group',
-    // },
+    {
+      name: 'group',
+      path: '/system/group',
+      component: './system/group',
+    },
   ],
 };

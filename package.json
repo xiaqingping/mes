@@ -8,12 +8,12 @@
     "build": "umi build",
     "dev": "npm run start:dev",
     "format-imports": "cross-env import-sort --write '**/*.{js,jsx,ts,tsx}'",
-    "lint": "npm run lint:js && npm run lint:style && npm run lint:prettier",
+    "lint": "umi g tmp && npm run lint:js && npm run lint:style && npm run lint:prettier",
+    "lint:prettier": "prettier --check \"**/*\" --end-of-line auto",
     "lint-staged": "lint-staged",
     "lint-staged:js": "eslint --ext .js,.jsx,.ts,.tsx ",
     "lint:fix": "eslint --fix --cache --ext .js,.jsx,.ts,.tsx --format=pretty ./src && npm run lint:style",
     "lint:js": "eslint --cache --ext .js,.jsx,.ts,.tsx --format=pretty ./src",
-    "lint:prettier": "check-prettier lint",
     "lint:style": "stylelint --fix \"src/**/*.less\" --syntax less",
     "prettier": "prettier -c --write \"**/*\"",
     "start": "cross-env UMI_UI=none umi dev",
@@ -31,8 +31,7 @@
     "**/*.less": "stylelint --syntax less",
     "**/*.{js,jsx,ts,tsx}": "npm run lint-staged:js",
     "**/*.{js,jsx,tsx,ts,less,md,json}": [
-      "prettier --write",
-      "git add"
+      "prettier --write"
     ]
   },
   "browserslist": [
@@ -43,7 +42,7 @@
   "dependencies": {
     "@ant-design/icons": "^4.0.2",
     "@ant-design/pro-layout": "^5.0.5",
-    "@antv/g2plot": "^1.0.1",
+    "@antv/g2plot": "^1.0.2",
     "antd": "^4.0.0",
     "axios": "^0.19.2",
     "classnames": "^2.2.6",
@@ -58,8 +57,8 @@
     "path-to-regexp": "^2.4.0",
     "prop-types": "^15.5.10",
     "qs": "^6.9.1",
-    "react": "^16.13.0",
-    "react-dom": "^16.13.0",
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1",
     "react-helmet": "^5.2.1",
     "react-router": "^4.3.1",
     "react-sortable": "^2.0.0",
