@@ -9,8 +9,8 @@ import { connect } from 'dva';
 import debounce from 'lodash/debounce';
 import router from 'umi/router';
 import TaskModelView from './taskModelView';
-
-import api from '@/api';
+import { formatter } from '@/utils/utils';
+import api from '@/pages/project/api/taskmodel';
 import StandardTable from '../components/StandardTable';
 import { SelectUI } from '../components/AntdSearchUI';
 
@@ -21,15 +21,14 @@ class TaskModel extends Component {
   tableSearchFormRef = React.createRef();
 
   initialValues = {
-    status: 1,
     page: 1,
     rows: 10,
   };
 
-  constructor(props) {
-    super(props);
-    this.fetchSearchList = debounce(this.fetchSearchList, 500);
-  }
+  // constructor(props) {
+  //   super(props);
+
+  // }
 
   state = {
     name: '', // 搜素-任务模型值
@@ -73,35 +72,61 @@ class TaskModel extends Component {
     });
   };
 
-  // 当键盘敲下时候的值 在这里请求后台接口查询
+  // 任务模型当键盘敲下时候的值 在这里请求后台接口查询
   fetchSearchList = (v, type) => {
     // 根据不同的条目请求不同接口
     const taskModelSearchObj = {
       taskModel: 'searchTaskModel',
       publisher: 'searchPublisherName',
     };
-    // api.taskModel.searchTaskModel(v);
-    api.taskModel[taskModelSearchObj[type]](v);
+    api[taskModelSearchObj[type]](v).then(res => {
+      if (type === 'taskModel') {
+        this.setState({
+          taskModelOptions: res || [],
+        });
+      } else if (type === 'publisher') {
+        this.setState({
+          taskModelPublisherOptions: res || [],
+        });
+      }
+    });
+  };
+
+  handleItemSearch = (v, type) => {
+    console.log(v, type);
   };
 
   // 当 选择项目时候的值
-
   handleSearchChange = (value, type) => {
-    console.log(value, type);
+    const taskModelSearchObj = {
+      taskModel: 'searchTaskModel',
+      publisher: 'searchPublisherName',
+    };
+    api[taskModelSearchObj[type]](value).then(res => {
+      console.log(res);
+    });
+    // console.log(value, type);
+    // api.taskmodel.searchTaskModel();
   };
 
   simpleForm = () => {
     const { languageCode } = this.props;
     // 获取options TODO 看后台返回数据结果taskModelOptions
-    const taskModelOptions = this.state.taskModelOptions.map(item => <Option>{item.label}</Option>);
+    const taskModelOptions = this.state.taskModelOptions.map(item => (
+      <Option value={item.code} key={item.code}>
+        {item.name}
+      </Option>
+    ));
 
     const taskModelPublisherOptions = this.state.taskModelPublisherOptions.map(item => (
-      <Option>{item.label}</Option>
+      <Option value={item.code} key={item.code}>
+        {item.name}
+      </Option>
     ));
     return (
       <>
         <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
-          <FormItem label="任务模型">
+          <FormItem label="任务模型" name="code">
             <Select
               showSearch
               value={this.state.name}
@@ -121,34 +146,17 @@ class TaskModel extends Component {
           languageCode={languageCode}
           label="状态"
           name="status"
-          data={this.props.taskModel.statusList}
+          data={this.props.taskModel.taskModelStatusOptions}
         />
-        {/* <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
-          <FormItem label="状态">
-            <Select
-              showSearch
-              value={this.state.status}
-              placeholder="请输入"
-              showArrow={false}
-              filterOption={false}
-              // TODO这个方法需要进行封装， 传参
-              onSearch={v => this.fetchSearchList(v, 'status')}
-              onChange={v => this.handleSearchChange(v, 'status')}
-              // notFoundContent={null}
-            >
-              {taskModelStatusOptions}
-            </Select>
-          </FormItem>
-        </Col> */}
         <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
-          <FormItem label="发布人">
+          <FormItem label="发布人" name="publishName">
             <Select
               showSearch
               value={this.state.publisherName}
               placeholder="请输入"
               showArrow={false}
               filterOption={false}
-              onSearch={v => this.handleItemSearch(v, 'taskModel')}
+              onSearch={v => this.fetchSearchList(v, 'publisher')}
               onChange={v => this.handleSearchChange(v, 'publisher')}
               // notFoundContent={null}
             >
@@ -188,11 +196,14 @@ class TaskModel extends Component {
     });
   };
 
+  fetchSearchList = debounce(this.fetchSearchList, 500);
+
+  handleSearchChange = debounce(this.handleSearchChange, 500);
+
   render() {
     const { visible } = this.state;
     const { taskModel } = this.props;
-    const { statusObj } = taskModel;
-    const { status } = taskModel;
+    const { taskModelStatusOptions } = taskModel;
 
     let tableWidth = 0;
     let columns = [
@@ -249,19 +260,17 @@ class TaskModel extends Component {
         title: '状态',
         dataIndex: 'status',
         width: '80px',
-        filters: status,
+        filters: taskModelStatusOptions,
         render: value => {
-          try {
-            // const { taskModel } = this.props;
-            // const { statusObj } = taskModel;
-            return (
-              <>
-                <Badge status={statusObj[value].badgeStatus} text={statusObj[value].label} />
-              </>
-            );
-          } catch (error) {
-            return console.log(error);
-          }
+          // console.log(value);
+          return (
+            <>
+              <Badge
+                status={formatter(taskModelStatusOptions, value, 'value', 'status')}
+                text={formatter(taskModelStatusOptions, value, 'value', 'label')}
+              />
+            </>
+          );
         },
       },
       {

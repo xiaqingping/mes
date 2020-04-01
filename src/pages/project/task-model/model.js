@@ -3,6 +3,20 @@
 const SeqModel = {
   namespace: 'taskModel',
   state: {
+    arguments: [{
+      "describe": "string", // 描述
+      "id": "string",
+      "paramKey": "string", // name 
+      "paramProperties": [ // 其他选项列表
+        {
+          "isRequired": true,
+        }, {
+          "placeholder": "请输入",
+        }, {
+          "defaultValue": "默认值",
+        }
+      ]
+    }],
     formItemType: [{
         type: "input",
         text: "单行输入框"
@@ -38,93 +52,33 @@ const SeqModel = {
 
     ],
     taskModelStatusOptions: [{
-        label: '未发布',
-        value: '1'
-      },
-      {
-        label: '已发布',
-        value: '2'
-      },
-      {
-        label: '已禁用',
-        value: '3'
-      },
-      {
-        label: '已过期',
-        value: '4'
-      },
-    ],
-    statusObj: {
-      "1": {
-        label: '未发布',
-        badgeStatus: "default"
-      },
-      "2": {
-        label: '已发布',
-        badgeStatus: "success"
-      },
-      "3": {
-        label: '已禁用',
-        badgeStatus: "error"
-      },
-      "4": {
-        label: '已过期',
-        badgeStatus: "warning"
-      },
-    },
-    statusList: [{
         value: 1,
-        data: '未发布',
-        text: '未发布',
-        key: '1'
+        data: "未发布",
+        key: '1',
+        label: '未发布',
+        status: "default",
+
       },
       {
         value: 2,
-        data: '已发布',
-        text: '已发布',
-        key: '2'
+        data: "已发布",
+        key: '2',
+        label: '已发布',
+        status: "success",
       },
       {
+        label: '已禁用',
         value: 3,
-        data: '已禁用',
-        text: '已禁用',
+        status: "error",
+        data: "已禁用",
         key: '3'
       },
       {
+        label: '已过期',
         value: 4,
-        data: '已过期',
-        text: '已过期',
+        status: "warning",
+        data: "已过期",
         key: '4'
-      },
-    ],
-    status: [
-      // 未发布
-      {
-        value: 1,
-        text: '未发布',
-        // i18n: 'bp.verfication',
-        status: 'default',
-      },
-      // 已发布
-      {
-        value: 2,
-        text: '已验证',
-        // i18n: 'bp.completed',
-        status: 'success',
-      },
-      // 已禁用
-      {
-        value: 3,
-        text: '已拒绝',
-        // i18n: 'bp.rejected',
-        status: 'error',
-      },
-      // 已过期
-      {
-        value: 4,
-        text: '已过期',
-        // i18n: 'bp.expired',
-        status: 'warning',
       },
     ],
     taskModelList: [{
