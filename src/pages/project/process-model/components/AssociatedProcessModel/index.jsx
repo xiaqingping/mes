@@ -156,6 +156,7 @@ class AssociatedProcessModel extends React.Component {
         onOk={this.handleOk}
         onCancel={onClose}
         width={747}
+        footer={null}
       >
         <div className="tableList">
           <TableSearchForm

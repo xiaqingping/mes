@@ -101,12 +101,22 @@ service.interceptors.request.use(config => {
 
     // FIXME: 开发时代理临时接口（配合webpack proxy 使用）
     if (process.env.NODE_ENV === 'development') {
-      if (config.url.indexOf('http://192.168.19.71:8550/') > -1) {
-        config.url = config.url.replace('http://192.168.19.71:8550/', '/192.168.19.71:8550/');
+      // 销售分析开发
+      // if (config.url.indexOf('http://192.168.19.71:8550/') > -1) {
+      //   config.url = config.url.replace('http://192.168.19.71:8550/', '/192.168.19.71:8550/');
+      //   config.baseURL = '/';
+      // }
+      // if (config.url.indexOf('http://192.168.19.71:8001/') > -1) {
+      //   config.url = config.url.replace('http://192.168.19.71:8001/', '/192.168.19.71:8001/');
+      //   config.baseURL = '/';
+      // }
+      // 项目管理开发
+      if (config.url.indexOf('http://192.168.20.12:8360/') > -1) {
+        config.url = config.url.replace('http://192.168.20.12:8360/', '/192.168.20.12:8360/');
         config.baseURL = '/';
       }
-      if (config.url.indexOf('http://192.168.19.71:8001/') > -1) {
-        config.url = config.url.replace('http://192.168.19.71:8001/', '/192.168.19.71:8001/');
+      if (config.url.indexOf('http://192.168.20.6:8166/') > -1) {
+        config.url = config.url.replace('http://192.168.20.6:8166/', '/192.168.20.6:8166/');
         config.baseURL = '/';
       }
     }
