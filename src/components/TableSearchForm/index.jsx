@@ -34,12 +34,13 @@ const TableSearchForm = React.forwardRef((props, ref) => {
       <Row gutter={24}>
         {props.simpleForm()}
         {expand && props.advancedForm ? props.advancedForm() : null}
-      </Row>
-      {props.noButton ? (
-        ''
-      ) : (
-        <Row>
-          <Col span={24} style={{ textAlign: 'right' }}>
+        {props.noButton ? (
+          ''
+        ) : (
+          <Col
+            span={expand && props.advancedForm ? 24 : 6}
+            style={expand && props.advancedForm ? { textAlign: 'right' } : { textAlign: 'center' }}
+          >
             <Button type="primary" htmlType="submit">
               <FormattedMessage id="action.search" />
             </Button>
@@ -72,8 +73,8 @@ const TableSearchForm = React.forwardRef((props, ref) => {
               </a>
             ) : null}
           </Col>
-        </Row>
-      )}
+        )}
+      </Row>
     </Form>
   );
 });

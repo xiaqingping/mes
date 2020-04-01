@@ -159,17 +159,24 @@ class ProcessModel extends Component {
           name="publishDate"
           placeholder={['开始时间', '结束时间']}
         />
-        <SelectUI
-          languageCode={languageCode}
-          label="状态"
-          name="status"
-          data={[
-            { value: 1, data: '状态一', key: '1' },
-            { value: 2, data: '状态二', key: '2' },
-            { value: 3, data: '状态三', key: '3' },
-          ]}
-        />
       </>
+    );
+  };
+
+  /** 完整筛选条件 */
+  advancedForm = () => {
+    const { languageCode } = this.state;
+    return (
+      <SelectUI
+        languageCode={languageCode}
+        label="状态"
+        name="status"
+        data={[
+          { value: 1, data: '状态一', key: '1' },
+          { value: 2, data: '状态二', key: '2' },
+          { value: 3, data: '状态三', key: '3' },
+        ]}
+      />
     );
   };
 
@@ -292,6 +299,7 @@ class ProcessModel extends Component {
               initialValues={this.initialValues}
               getTableData={this.getTableData}
               simpleForm={this.simpleForm}
+              advancedForm={this.advancedForm}
             />
             <div className="tableListOperator">
               <Button type="primary" onClick={() => this.handleModalVisible(true)}>
