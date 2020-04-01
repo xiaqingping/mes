@@ -9,7 +9,7 @@ import { connect } from 'dva';
 import _ from 'lodash';
 import { InputUI, SelectUI, DateUI } from '@/pages/project/components/AntdSearchUI';
 import { formatter } from '@/utils/utils';
-import api from '@/pages/project/api/project';
+import api from '@/pages/project/api/processModel/';
 import StandardTable from '../components/StandardTable';
 import { DrawerTool } from '../components/AntdUI';
 
