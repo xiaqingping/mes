@@ -9,8 +9,8 @@ import { connect } from 'dva';
 import _ from 'lodash';
 import { InputUI, SelectUI, DateUI } from '@/pages/project/components/AntdSearchUI';
 import { formatter } from '@/utils/utils';
+import api from '@/pages/project/api/processModel/';
 import StandardTable from '../components/StandardTable';
-// import api from '@/api';
 import { DrawerTool } from '../components/AntdUI';
 
 const FormItem = Form.Item;
@@ -49,39 +49,27 @@ class ProcessModel extends Component {
 
   // 获取表格数据
   getTableData = (options = {}) => {
-    // this.setState({ loading: true });
-    // const formData = this.tableSearchFormRef.current.getFieldsValue();
-    // const { pagination } = this.state;
-    // const { current: page, pageSize: rows } = pagination;
-    // const data = {
-    //   page,
-    //   rows,
-    //   ...formData,
-    //   ...options,
-    // };
-    // api.peptideBase.getPurity(data, true).then(res => {
-    //   this.setState({
-    //     list: res.rows,
-    //     pagination: {
-    //       current: data.page,
-    //       pageSize: data.rows,
-    //       total: res.total,
-    //     },
-    //     loading: false,
-    //     editIndex: -1,
-    //   });
-    // });
-    const data = this.props.processModel.processModelData;
-    this.setState({
-      list: data,
-      pagination: {
-        current: options.page,
-        pageSize: options.rows,
-        total: data.total,
-      },
-      loading: false,
+    this.setState({ loading: true });
+    const formData = this.tableSearchFormRef.current.getFieldsValue();
+    const { pagination } = this.state;
+    const { current: page, pageSize: rows } = pagination;
+    const data = {
+      page,
+      rows,
+      ...formData,
+      ...options,
+    };
+    api.getProcess(data).then(res => {
+      this.setState({
+        list: res.rows,
+        pagination: {
+          current: data.page,
+          pageSize: data.rows,
+          total: res.total,
+        },
+        loading: false,
+      });
     });
-    // console.log(this.props.project.projectManage);
   };
 
   renderOption = item => ({
@@ -159,17 +147,24 @@ class ProcessModel extends Component {
           name="publishDate"
           placeholder={['开始时间', '结束时间']}
         />
-        <SelectUI
-          languageCode={languageCode}
-          label="状态"
-          name="status"
-          data={[
-            { value: 1, data: '状态一', key: '1' },
-            { value: 2, data: '状态二', key: '2' },
-            { value: 3, data: '状态三', key: '3' },
-          ]}
-        />
       </>
+    );
+  };
+
+  /** 完整筛选条件 */
+  advancedForm = () => {
+    const { languageCode } = this.state;
+    return (
+      <SelectUI
+        languageCode={languageCode}
+        label="状态"
+        name="status"
+        data={[
+          { value: 1, data: '状态一', key: '1' },
+          { value: 2, data: '状态二', key: '2' },
+          { value: 3, data: '状态三', key: '3' },
+        ]}
+      />
     );
   };
 
@@ -218,8 +213,8 @@ class ProcessModel extends Component {
               size="large"
             />
             <div style={{ float: 'left' }}>
-              <div>12312312333</div>
-              <div>肠道菌群宏</div>
+              <div>{value}</div>
+              <div>{row.name}</div>
             </div>
           </>
         ),
@@ -292,6 +287,7 @@ class ProcessModel extends Component {
               initialValues={this.initialValues}
               getTableData={this.getTableData}
               simpleForm={this.simpleForm}
+              advancedForm={this.advancedForm}
             />
             <div className="tableListOperator">
               <Button type="primary" onClick={() => this.handleModalVisible(true)}>
