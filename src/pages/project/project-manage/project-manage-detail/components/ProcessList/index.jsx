@@ -3,7 +3,7 @@ import { Form, Table, Tag, Progress, Divider } from 'antd';
 import React, { Component } from 'react';
 import { connect } from 'dva';
 import { SlidersOutlined } from '@ant-design/icons';
-import { DrawerTool } from '../AntdUI'
+import  DrawerTool  from '../AntdUI'
 
 // import StandardTable from '@/components/StandardTable';
 // import EditableCell from '@/components/EditableCell';
@@ -68,7 +68,6 @@ class ProcessList extends Component {
 
   // 查看任务列表及执行记录
   searchTaskList = row => {
-    console.log(row);
     this.setState({
       visible: true,
       detailValue: row,
