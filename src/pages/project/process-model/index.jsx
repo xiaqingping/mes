@@ -32,6 +32,7 @@ class ProcessModel extends Component {
       visible: false,
       detailValue: {},
       nameCodeVal: [],
+      searchCode: '',
     };
     // 异步验证做节流处理
     this.callParter = _.debounce(this.callParter, 500);
@@ -42,23 +43,29 @@ class ProcessModel extends Component {
   }
 
   callParter = value => {
-    // api.bp.getBPByCodeOrName({ code_or_name: value }).then(res => {
-    //   this.setState({ nameCodeVal: res });
-    // });
+    api.getProcessCodeAndName(value).then(res => {
+      this.setState({ nameCodeVal: res });
+    });
   };
 
   // 获取表格数据
   getTableData = (options = {}) => {
     this.setState({ loading: true });
     const formData = this.tableSearchFormRef.current.getFieldsValue();
-    const { pagination } = this.state;
+    const { pagination, searchCode } = this.state;
     const { current: page, pageSize: rows } = pagination;
+    const code = { code: formData.name ? searchCode : '' };
     const data = {
       page,
       rows,
+      ...code,
       ...formData,
       ...options,
     };
+    if (!formData.name) {
+      delete data.code;
+    }
+    delete data.name;
     api.getProcess(data).then(res => {
       this.setState({
         list: res.rows,
@@ -72,30 +79,40 @@ class ProcessModel extends Component {
     });
   };
 
-  renderOption = item => ({
-    value: item.id,
-    label: (
-      // <Option key={item.id} text={item.name}>
-      <div style={{ display: 'flex' }}>
-        <span>
-          <UserOutlined />
-        </span>
-        &nbsp;&nbsp;
-        <span>{item.code}</span>&nbsp;&nbsp;
-        <span>{item.name}</span>
-      </div>
-      // </Option>
-    ),
-  });
+  renderOption = item => {
+    // this.setState({
+    //   searchCode: item.code,
+    // });
+    console.log(item);
+    return {
+      value: item.name,
+      label: (
+        // <Option key={item.id} text={item.name}>
+        <div style={{ display: 'flex' }}>
+          <span>
+            <UserOutlined />
+          </span>
+          &nbsp;&nbsp;
+          <span>{item.code}</span>&nbsp;&nbsp;
+          <span>{item.name}</span>
+        </div>
+        // </Option>
+      ),
+    };
+  };
 
   // 筛选值
   inputValue = value => {
+    const { nameCodeVal } = this.state;
     const arr = [];
     if (!value) {
       return false;
     }
     this.callParter(value);
-    this.state.nameCodeVal.forEach(item => {
+    if (nameCodeVal.length === 0) {
+      return false;
+    }
+    nameCodeVal.forEach(item => {
       if (item.name.indexOf(value) !== -1) {
         arr.push(item);
       }
@@ -123,10 +140,11 @@ class ProcessModel extends Component {
   simpleForm = () => {
     const { languageCode } = this.props;
     const { nameCodeVal } = this.state;
+    console.log(nameCodeVal);
     return (
       <>
         <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
-          <FormItem label="编号/名称" name="code">
+          <FormItem label="编号/名称" name="name">
             <AutoComplete
               onSearch={this.inputValue}
               options={nameCodeVal.map(this.renderOption)}
