@@ -16,39 +16,13 @@ class Parameter extends React.Component {
     typeEnlargeVisible: false,
     typeEnlargeData: [],
     moveType: 0,
-    // eslint-disable-next-line react/no-unused-state
-    // tasks: [
-    //   {
-    //     id: 0,
-    //     status: STATUS_TODO,
-    //     username: 'aa',
-    //   },
-    //   {
-    //     id: 1,
-    //     status: STATUS_TODO,
-    //     username: 'bb',
-    //   },
-    //   {
-    //     id: 2,
-    //     status: STATUS_TODO,
-    //     username: 'cc',
-    //   },
-    //   {
-    //     id: 3,
-    //     status: STATUS_TODO,
-    //     username: 'dd',
-    //   },
-    //   {
-    //     id: 4,
-    //     status: STATUS_TODO,
-    //     username: 'ee',
-    //   },
-    //   {
-    //     id: 5,
-    //     status: STATUS_TODO,
-    //     username: 'ff',
-    //   },
-    // ],
+    data: [
+      { title: 'a', data: [1, 2, 3, 4, 5, 6] },
+      { title: 'b', data: [111, 211, 3111, 41, 51, 61] },
+      { title: 'c', data: [12, 22, 32, 42, 52, 62] },
+      { title: 'd', data: [13, 23, 33, 43, 53, 63] },
+      { title: 'e', data: [14, 24, 34, 44, 54, 64] },
+    ],
   };
 
   // 分类变大打开
@@ -84,23 +58,23 @@ class Parameter extends React.Component {
   // 拖拽元素经过放置元素时
   dragOver = e => {
     e.preventDefault(); // 此处的代码是必须的  不然无法拖拽
-    console.log('拖拽中');
+    // console.log('拖拽中');
   };
 
   // 拖拽元素放到放置元素时
   drop = item => {
-    if (!item) {
-      this.setState({
-        moveType: 1,
-      });
-    }
+    // if (!item) {
+    //   this.setState({
+    //     moveType: 1,
+    //   });
+    // }
     // 放置之后的后续操作
     console.log(item);
   };
 
   render() {
     const { handleClose } = this.props;
-    const { visible, typeEnlargeVisible, typeEnlargeData, moveType } = this.state;
+    const { visible, typeEnlargeVisible, typeEnlargeData, moveType, data } = this.state;
     // const { onDragStart, cancelSelect } = this;
     return (
       <Modal
@@ -126,13 +100,7 @@ class Parameter extends React.Component {
           {/* type列表 */}
           <List
             rowKey="id"
-            dataSource={[
-              { title: 'a', data: [1, 2, 3, 4, 5, 6] },
-              { title: 'b', data: [111, 211, 3111, 41, 51, 61] },
-              { title: 'c', data: [12, 22, 32, 42, 52, 62] },
-              { title: 'd', data: [13, 23, 33, 43, 53, 63] },
-              { title: 'e', data: [14, 24, 34, 44, 54, 64] },
-            ]}
+            dataSource={data}
             grid={{
               column: 2,
             }}
@@ -143,9 +111,9 @@ class Parameter extends React.Component {
                   hoverable
                   style={{ width: '269px', height: '203px' }}
                   draggable
-                  onDrop={moveType === 2 ? null : () => this.drop(item)}
+                  onDrop={() => this.drop(item)}
                   onDragOver={e => this.dragOver(e)}
-                  onDragStart={() => this.dragStart(item, 2)}
+                  onDragStart={() => this.dragStart(item, 3)}
                 >
                   <div>
                     {item.data.map(v => (
@@ -177,6 +145,8 @@ class Parameter extends React.Component {
             display: 'inline-block',
             overflowY: 'auto',
           }}
+          onDrop={() => this.drop('未分组')}
+          onDragOver={e => this.dragOver(e)}
         >
           {/* item列表 */}
           <List
@@ -186,12 +156,7 @@ class Parameter extends React.Component {
               <List.Item key={item}>
                 <Card hoverable>
                   <div>
-                    <div
-                      draggable
-                      onDrop={this.handleDrop}
-                      onDragStart={() => this.dragStart(item, 1)}
-                      // onDragEnd={() => this.handleDragEnd(item)}
-                    >
+                    <div draggable onDragStart={() => this.dragStart(item, 1)}>
                       {item}
                     </div>
                   </div>
