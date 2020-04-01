@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React from 'react';
 
-import { Form, Input, Radio, Button, Row, Col, Switch } from 'antd';
+import { Form, Input, Button, Row, Col, Switch } from 'antd';
 
 import { connect } from 'dva';
 
@@ -25,6 +25,8 @@ class ArgumentForm extends React.Component {
 
   onFinish = values => {
     // 校验通过， values就是form对象
+    const data = JSON.parse(JSON.stringify(values));
+    delete data.describe;
     console.log('Received values of form: ', values);
   };
 

@@ -1,13 +1,15 @@
 // 流程模型的编辑
 import React, { Component } from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
-import { Card, Upload, message, Input, Tag, Table, Button, Form, Badge } from 'antd';
+import { Card, Upload, message, Input, Tag, Table, Button, Form, Badge, Switch } from 'antd';
 import { LoadingOutlined, SettingOutlined, PlusOutlined, DeleteOutlined } from '@ant-design/icons';
 import { connect } from 'dva';
 import './index.less';
 
-import AssociatedProcessModel from '@/pages/project/process-model/components/AssociatedProcessModel';
+import BeforeTask from './components/beforeTask';
 import ArgumentModel from './components/argumentModel';
+import { formatter } from '@/utils/utils';
+import api from '@/api';
 
 function getBase64(img, callback) {
   const reader = new FileReader();
@@ -27,7 +29,7 @@ function beforeUpload(file) {
   return isJpgOrPng && isLt2M;
 }
 
-class ProcessEdit extends Component {
+class TaskModel extends Component {
   tableSearchFormRef = React.createRef();
 
   static getDerivedStateFromProps(nextProps) {
@@ -41,6 +43,8 @@ class ProcessEdit extends Component {
     visible: false,
     tableData: [],
     argumentVisible: false, // 参数弹框是否显示
+    page: 1,
+    rows: 100,
   };
 
   componentDidMount() {
@@ -54,6 +58,15 @@ class ProcessEdit extends Component {
       this.getTableData();
     }
   }
+
+  getTableData = () => {
+    this.setState({
+      loading: true,
+    });
+    const { page,rows } = this.state;
+    
+    api.getTaskModels();
+  };
 
   // 图片上传
   handleChange = info => {
@@ -90,6 +103,10 @@ class ProcessEdit extends Component {
   onFinish = values => {
     const { imageUrl } = this.state;
     console.log(imageUrl, values);
+  };
+
+  onFinishFailed = () => {
+    return false;
   };
 
   // 点击打开关联
@@ -169,14 +186,17 @@ class ProcessEdit extends Component {
       {
         title: '状态',
         dataIndex: 'status',
-        width: '80px',
+        // width: '80px',
         render: value => {
           try {
             const { taskModel } = this.props;
-            const { statusObj } = taskModel;
+            const { taskModelStatusOptions } = taskModel;
             return (
               <>
-                <Badge status={statusObj[value].badgeStatus} text={statusObj[value].label} />
+                <Badge
+                  status={formatter(taskModelStatusOptions, value, 'value', 'status')}
+                  text={formatter(taskModelStatusOptions, value, 'value', 'data')}
+                />
               </>
             );
           } catch (error) {
@@ -188,7 +208,7 @@ class ProcessEdit extends Component {
         title: '操作',
         render: row => (
           <>
-            <DeleteOutlined />
+            <DeleteOutlined onClick={() => this.handleDelete(row)} />
             {/* <a onClick={() => this.handleDelete(row)}>删除</a> */}
           </>
         ),
@@ -197,7 +217,11 @@ class ProcessEdit extends Component {
     const { tableData, visible, argumentVisible } = this.state;
     return (
       <PageHeaderWrapper title={id || ''}>
-        <Form onFinish={this.onFinish}>
+        <Form
+          onFinish={this.onFinish}
+          ref={this.tableSearchFormRef}
+          onFinishFailed={this.onFinishFailed}
+        >
           <Card className="process-model-edit">
             <div style={{ float: 'left', marginLeft: '20px' }}>
               {/* <Form.Item name="uploadPIc"> */}
@@ -223,14 +247,22 @@ class ProcessEdit extends Component {
               {/* </Form.Item> */}
             </div>
             <div style={{ float: 'left', width: '552px', marginLeft: '20px' }}>
-              <Form.Item name="processName">
+              <Form.Item
+                name="name"
+                rules={[
+                  {
+                    required: true,
+                    message: '请输入参数名称',
+                  },
+                ]}
+              >
                 <Input
                   placeholder="请输入任务名称"
                   style={{ marginBottom: '10px' }}
                   defaultValue={this.state.taskModelName}
                 />
               </Form.Item>
-              <Form.Item name="processDetails">
+              <Form.Item name="describe">
                 <Input.TextArea
                   placeholder="请输入任务描述"
                   rows={4}
@@ -239,32 +271,26 @@ class ProcessEdit extends Component {
               </Form.Item>
             </div>
             <div style={{ float: 'left', marginLeft: '20px' }}>
-              <Form.Item name="copyRight">
+              <Form.Item name="version">
                 <Tag color="green">V1.1</Tag>
               </Form.Item>
             </div>
+
             <div style={{ float: 'right', marginRight: '142px', fontSize: '16px' }}>
               <SettingOutlined />
               <a href="#" style={{ marginLeft: '10px' }} onClick={this.openArgumentModel}>
                 参数
               </a>
             </div>
-            {/* <div style={{ float: 'left', marginLeft: '88px' }}>
-              <span style={{ fontSize: '16px', verticalAlign: 'middle' }}>是否可自动运行：</span>
-              <Switch
-                style={{ verticalAlign: 'middle', marginLeft: '22px' }}
-                defaultChecked
-                onChange={this.onChange}
-              />
-            </div> */}
-            {/* <div style={{ float: 'left', marginLeft: '50px' }}>
-              <span style={{ fontSize: '16px', verticalAlign: 'middle' }}>交互分析：</span>
-              <Switch
-                style={{ verticalAlign: 'middle', marginLeft: '22px' }}
-                defaultChecked
-                onChange={this.onChange}
-              />
-            </div> */}
+
+            <div style={{ float: 'right', marginRight: '100px', fontSize: '16px' }}>
+              <Form.Item name="isAutomatic" valuePropName="checked">
+                <span style={{ fontSize: '16px', verticalAlign: 'middle', marginRight: 10 }}>
+                  是否可自动运行：
+                </span>
+                <Switch />
+              </Form.Item>
+            </div>
           </Card>
 
           <Card style={{ marginTop: '24px' }} title={this.titleContent()}>
@@ -292,19 +318,21 @@ class ProcessEdit extends Component {
           <Card
             style={{ height: '48px', width: '100%', position: 'fixed', bottom: '0', left: '0' }}
           >
-            <Button
-              type="primary"
-              style={{ float: 'right', marginTop: '-16px' }}
-              htmlType="submit"
-              onClick={() => {
-                this.handleSubmit();
-              }}
-            >
-              提交
-            </Button>
+            <Form.Item>
+              <Button
+                type="primary"
+                style={{ float: 'right', marginTop: '-32px' }}
+                htmlType="submit"
+                onClick={() => {
+                  this.handleSubmit();
+                }}
+              >
+                提交
+              </Button>
+            </Form.Item>
           </Card>
         </Form>
-        <AssociatedProcessModel visible={visible} onClose={this.onClose} />
+        <BeforeTask visible={visible} onClose={this.onClose} />
         <ArgumentModel visible={argumentVisible} onClose={this.onArgumentClose} />
       </PageHeaderWrapper>
     );
@@ -314,4 +342,4 @@ class ProcessEdit extends Component {
 export default connect(({ global, project }) => ({
   languageCode: global.languageCode,
   project,
-}))(ProcessEdit);
+}))(TaskModel);
