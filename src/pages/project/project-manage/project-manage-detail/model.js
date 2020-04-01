@@ -119,12 +119,71 @@ const projectDetailModel = {
         authority: '3'
       },
     ],
+    taskList: [
+      {
+        key: '1',
+        code: '202220005547',
+        status: '1',
+        parameterList: [],
+        startTime: '2020/03/31 18:30:27',
+        endTime: '2020/04/02 19:40:37',
+        progress: 0,
+      },
+      {
+        key: '2',
+        code: '202220005547',
+        status: '2',
+        parameterList: [],
+        runTime: '3m5s',
+        startTime: '2020/03/31 19:30:27',
+        endTime: '2020/03/31 19:35:11',
+        progress: 50,
+      },
+      {
+        key: '3',
+        code: '202220005547',
+        status: '3',
+        parameterList: [],
+        runTime: '3m5s',
+        startTime: '2020/03/31 19:30:27',
+        endTime: '2020/04/05 11:45:50',
+        progress: 100,
+      },
+    ],
     // 权限
     authority: [
       { id: 1, name: '所有者' },
       { id: 2, name: '管理者' },
       { id: 3, name: '参与者' },
-    ]
+    ],
+    // 执行记录状态
+    execRecordStatus: [
+      {
+        id: '1',
+        name: '等待中',
+        status: 'default',
+      },
+      {
+        id: '2',
+        name: '运行中',
+        status: 'processing',
+      },
+      {
+        id: '3',
+        name: '已暂停',
+        status: 'warning',
+      },
+      {
+        id: '4',
+        name: '已完成',
+        status: 'success',
+      },
+      {
+        id: '5',
+        name: '已失败',
+        status: 'error',
+      },
+    ],
   },
   effects: {},
   reducers: {},
