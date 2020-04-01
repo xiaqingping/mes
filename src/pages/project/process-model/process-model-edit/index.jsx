@@ -236,7 +236,7 @@ class ProcessEdit extends Component {
           </Card>
         </Form>
         <AssociatedProcessModel visible={visible} onClose={this.onClose} />
-        <Parameter visible handleClose={this.handleClose} />
+        <Parameter visible={parameterVisible} handleClose={this.handleClose} />
       </PageHeaderWrapper>
     );
   }
