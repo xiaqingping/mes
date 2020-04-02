@@ -18,10 +18,20 @@ export default {
     return request(`${http}v1/task/task`, {
       params
     });
-  }
+  },
 
-  // // 查询利润中心主数据
-  // getProfitCenters() {
-  //   return request('/profitCenters/v1');
-  // },
+  // 获取前置列表
+  getPreTasks(id) {
+    return request(`${http}v1/task/${id}/preTasks`);
+  },
+
+  // 获取后置列表
+  getPostTasks(id) {
+    return request(`${http}v1/task/${id}/postTasks`);
+  },
+
+  // 获取任务模型详细信息
+  getTaskModelDetail(id) {
+    return request(`${http}v1/task/${id}`);
+  },
 };

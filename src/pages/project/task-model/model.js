@@ -82,6 +82,9 @@ const SeqModel = {
         key: '4'
       },
     ],
+
+    viewId: "",  // 任务模型列表点击查看的id
+    selectParamsId:"", // 根据前置后置任务id查询参数的id
     taskModelList: [{
         id: 2,
         code: 111112221,
@@ -206,6 +209,7 @@ const SeqModel = {
 
   },
   reducers: {
+    // 参数数据
     getArgumentsList(state, {
       payload
     }) {
@@ -214,6 +218,22 @@ const SeqModel = {
       return {
         ...state,
         argumentList: payload
+      }
+
+    },
+    setViewId(state, {
+      payload
+    }) {
+      console.log(payload);
+      return {
+        ...state,
+        viewId: payload
+      }
+    },
+    setViewParamsId(state, {payload}) {
+      return {
+        ...state,
+        selectParamsId: payload
       }
 
     }

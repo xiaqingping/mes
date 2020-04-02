@@ -1,15 +1,15 @@
 // 任务模型
 import React, { Component } from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
-import { Form, Button, Card, Col, Tag, Select, Divider, Badge } from 'antd';
+import { Form, Button, Card, Col, Tag, Select, Divider, Badge, Menu, Dropdown } from 'antd';
+import { DownOutlined, PlusOutlined } from '@ant-design/icons';
 import TableSearchForm from '@/components/TableSearchForm';
 
-import { PlusOutlined } from '@ant-design/icons';
 import { connect } from 'dva';
 import debounce from 'lodash/debounce';
 import router from 'umi/router';
 import TaskModelView from './taskModelView';
-import { formatter } from '@/utils/utils';
+import { formatter, getOperates } from '@/utils/utils';
 import api from '@/pages/project/api/taskmodel';
 import StandardTable from '../components/StandardTable';
 import { SelectUI } from '../components/AntdSearchUI';
@@ -45,24 +45,33 @@ class TaskModel extends Component {
     viewId: '',
   };
 
+  operaList = [];
+
   componentDidMount() {
     this.getTableData(this.initialValues);
   }
 
   getTableData = (options = {}) => {
-    // this.setState({ loading: true });
+    this.setState({ loading: true });
+    api.getTaskModels().then(res => {
+      console.log(res);
+      this.setState({
+        list: res.rows,
+        loading: false,
+      });
+    });
     // const formData = this.tableSearchFormRef.current.getFieldsValue();
     // console.log(formData);
-    const data = this.props.taskModel.taskModelList;
-    this.setState({
-      list: data,
-      pagination: {
-        current: options.page,
-        pageSize: options.rows,
-        total: data.total,
-      },
-      loading: false,
-    });
+    // const data = this.props.taskModel.taskModelList;
+    // this.setState({
+    //   list: data,
+    //   pagination: {
+    //     current: options.page,
+    //     pageSize: options.rows,
+    //     total: data.total,
+    //   },
+    //   loading: false,
+    // });
   };
 
   handleStandardTableChange = pagination => {
@@ -189,7 +198,11 @@ class TaskModel extends Component {
   };
 
   viewDetails = v => {
-    console.log('object');
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'taskModel/setViewId',
+      payload: v.id,
+    });
     this.setState({
       visible: true,
       viewId: v.id,
@@ -204,7 +217,6 @@ class TaskModel extends Component {
     const { visible } = this.state;
     const { taskModel } = this.props;
     const { taskModelStatusOptions } = taskModel;
-
     let tableWidth = 0;
     let columns = [
       {
@@ -259,7 +271,7 @@ class TaskModel extends Component {
       {
         title: '状态',
         dataIndex: 'status',
-        width: '80px',
+
         filters: taskModelStatusOptions,
         render: value => {
           // console.log(value);
@@ -275,14 +287,44 @@ class TaskModel extends Component {
       },
       {
         title: '操作',
-        width: 200,
+
         fixed: 'right',
         render: value => {
           const text = value.status;
+          const operaList = getOperates(text);
+          const menu = (
+            <Menu>
+              {operaList.map((item, index) => {
+                return (
+                  index && (
+                    <Menu.Item key={index}>
+                      <a
+                        className="task_model_add_argument_list"
+                        onClick={() => {
+                          // this.toggleChildrenDrawer(true, item);
+                        }}
+                      >
+                        {item}
+                      </a>
+                    </Menu.Item>
+                  )
+                );
+              })}
+            </Menu>
+          );
 
           return (
             <>
-              {(text * 1 === 1 || text * 1 === 3) && <a onClick={() => console.log(333)}>发布</a>}
+              <a onClick={() => console.log(333)}>{operaList[0]}</a>
+              <Divider type="vertical" />
+              <Dropdown overlay={menu} trigger={['click']}>
+                <a className="ant-dropdown-link" onClick={e => e.preventDefault()}>
+                  更多
+                  <DownOutlined />
+                </a>
+              </Dropdown>
+
+              {/* {(text * 1 === 1 || text * 1 === 3) && <a onClick={() => console.log(333)}>发布</a>}
               {text * 1 === 1 && (
                 <>
                   <Divider type="vertical" />
@@ -308,7 +350,7 @@ class TaskModel extends Component {
                 </>
               )}
               <Divider type="vertical" />
-              <a onClick={() => this.viewDetails(value)}>查看</a>
+              <a onClick={() => this.viewDetails(value)}>查看</a> */}
             </>
           );
         },

@@ -262,3 +262,18 @@ export const setCache = (namespace, payload, fun) => {
     data
   };
 };
+
+// 任务模型获取操作列表
+export const getOperates = v => {
+  let operas = null;
+  if (v * 1 === 1) {
+    operas = ['发布', '修改', '删除', '查看'];
+  } else if (v * 1 === 2) {
+    operas = ['禁用', '升级', '查看'];
+  } else if (v * 1 === 3) {
+    operas = ['发布', '升级', '查看'];
+  } else if (v * 1 === 4) {
+    operas = ['禁用', '查看'];
+  }
+  return operas;
+};

@@ -23,7 +23,6 @@ class ArgumentModel extends Component {
       this.setState({
         argumentList: [],
       });
-      debugger;
       const { dispatch } = this.props;
       dispatch({
         type: 'taskModel/getArgumentsList',
@@ -60,7 +59,6 @@ class ArgumentModel extends Component {
     this.setState({
       argumentList: list,
     });
-    debugger;
     const { dispatch } = this.props;
     dispatch({
       type: 'taskModel/getArgumentsList',
@@ -98,7 +96,6 @@ class ArgumentModel extends Component {
     this.setState({
       argumentList: list,
     });
-    debugger;
     const { dispatch } = this.props;
     dispatch({
       type: 'taskModel/getArgumentsList',
@@ -125,7 +122,7 @@ class ArgumentModel extends Component {
   deleteArgumentItem = () => {};
 
   render() {
-    const { visible, onClose } = this.props;
+    const { visible, onClose, fromView } = this.props;
     const { childrenDrawer, argumentList, loading, editOriginData } = this.state;
     const { formItemType } = this.props.taskModel;
     const menu = (
@@ -204,6 +201,7 @@ class ArgumentModel extends Component {
             title={this.titleContent()}
           >
             <ArgumentForm
+              fromView
               editOriginData={editOriginData}
               emitArguments={this.emitArguments}
               onClose={() => {
