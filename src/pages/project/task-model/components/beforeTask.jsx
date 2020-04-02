@@ -1,13 +1,14 @@
 // 关联流程模型
 import React from 'react';
-import { Modal, Table, Avatar, Form, Input, Select, Col, Tag, Popconfirm } from 'antd';
+import { Modal, Table, Avatar, Form, Input, Select, Col, Tag, Button } from 'antd';
 import TableSearchForm from '@/components/TableSearchForm';
 import { connect } from 'dva';
+import api from '@/pages/project/api/taskmodel';
 
 const FormItem = Form.Item;
 const { Option } = Select;
 
-class AssociatedProcessModel extends React.Component {
+class BeforeTask extends React.Component {
   tableSearchFormRef = React.createRef();
 
   static getDerivedStateFromProps(nextProps) {
@@ -35,9 +36,24 @@ class AssociatedProcessModel extends React.Component {
   };
 
   getTableData = (options = {}) => {
-    console.log(this.tableSearchFormRef.current);
-    // this.setState({ loading: true });
-    // const formData = this.tableSearchFormRef.current.getFieldsValue();
+    this.setState({ loading: true });
+    const { page, rows } = this.state;
+    const formData =
+      this.tableSearchFormRef.current && this.tableSearchFormRef.current.getFieldsValue();
+
+    const data = {
+      page,
+      rows,
+      ...formData,
+    };
+    api.getTaskModels(data).then(res => {
+      this.setState({
+        loading: false,
+        list: res.rows,
+      });
+    });
+
+    // console.log(this.tableSearchFormRef);
     // const { pagination } = this.state;
     // const { current: page, pageSize: rows } = pagination;
     // const data = {
@@ -58,17 +74,6 @@ class AssociatedProcessModel extends React.Component {
     //     editIndex: -1,
     //   });
     // });
-    const data = (this.props.processModel || {}).processModelData;
-    this.setState({
-      list: data,
-      // pagination: {
-      //   current: options.page,
-      //   pageSize: options.rows,
-      //   total: data.total,
-      // },
-      loading: false,
-    });
-    // console.log(this.props.project.projectManage);
   };
 
   handleCancel = () => {
@@ -77,15 +82,20 @@ class AssociatedProcessModel extends React.Component {
     });
   };
 
+  // 被选中的model
+  selectModel = row => {
+    this.props.onClose(row);
+  };
+
   simpleForm = () => (
     <>
       <Col lg={8}>
-        <FormItem label="名称" name="name">
+        <FormItem label="名称" name="code">
           <Input placeholder="请输入" />
         </FormItem>
       </Col>
       <Col lg={8}>
-        <FormItem label="发布人" name="publisher">
+        <FormItem label="发布人" name="creatorCode">
           <Select>
             <Option value="jack">Jack</Option>
             <Option value="lucy">Lucy</Option>
@@ -107,45 +117,51 @@ class AssociatedProcessModel extends React.Component {
         title: '编号/名称',
         dataIndex: 'code',
         width: 220,
-        render: (value, row) => (
-          <>
-            <Avatar
-              src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
-              style={{ float: 'left' }}
-            />
-            <div style={{ float: 'left' }}>
-              <div>123</div>
-              <div>123</div>
-            </div>
-          </>
-        ),
+        render: (value, row) => {
+          return (
+            <>
+              <Avatar
+                src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
+                style={{ float: 'left' }}
+              />
+              <div style={{ float: 'left' }}>
+                <div>{row.code}</div>
+                <div>{row.name}</div>
+              </div>
+            </>
+          );
+        },
       },
       {
         title: '描述',
         width: 280,
-        dataIndex: 'publishDate',
+        dataIndex: 'describe',
       },
       {
         title: '版本',
         width: 100,
         dataIndex: 'version',
-        render: value => <Tag color="green" style={{ padding: '0 10px' }}>{`V${value}`}</Tag>,
+        render: (value, row) => {
+          return (
+            <Tag color="green" style={{ padding: '0 5px' }}>
+              {value}
+            </Tag>
+          );
+        },
       },
       {
         title: '操作',
-        width: 100,
-        render: value => (
-          <>
-            <Popconfirm
-              placement="topLeft"
-              title="有前置任务，无法删除。"
-              onConfirm={this.confirm}
-              okText="Yes"
-              cancelText="No"
-            >
-              删除
-            </Popconfirm>
-          </>
+        // width: 100,
+        render: (value, row) => (
+          <Button
+            type="link"
+            block
+            onClick={() => {
+              this.selectModel(row);
+            }}
+          >
+            选择
+          </Button>
         ),
       },
     ];
@@ -184,4 +200,4 @@ class AssociatedProcessModel extends React.Component {
 export default connect(({ global, processModel }) => ({
   languageCode: global.languageCode,
   processModel,
-}))(AssociatedProcessModel);
+}))(BeforeTask);

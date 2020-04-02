@@ -31,11 +31,11 @@ const InputUI = props => {
  * @param {Array} data option里需要的数据
  */
 const SelectUI = props => {
-  const { languageCode, label, name, data } = props;
+  const { languageCode, label, name, data, placeholder } = props;
   return (
     <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
       <FormItem label={label} name={name}>
-        <Select>
+        <Select placeholder={placeholder || '请选择'}>
           {data.map(item => (
             <Option key={item.key ? item.key : item.value} value={item.value}>
               {item.data}
