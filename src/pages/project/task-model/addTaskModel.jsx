@@ -127,7 +127,7 @@ class TaskModel extends Component {
     this.setState({
       tableData,
     });
-    console.log('object');
+    
   };
 
   handleDelete = row => {
@@ -161,9 +161,6 @@ class TaskModel extends Component {
   render() {
     const { taskModel } = this.props;
     const { taskModelStatusOptions } = taskModel;
-    console.log(this.props);
-    console.log(this.state.tableData);
-
     const { tableData, visible, argumentVisible, tableLoading } = this.state;
 
     const uploadButton = (

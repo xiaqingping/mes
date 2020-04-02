@@ -3,6 +3,7 @@
 const SeqModel = {
   namespace: 'taskModel',
   state: {
+    argumentList: null,
     arguments: [{
       "describe": "string", // 描述
       "id": "string",
@@ -205,6 +206,17 @@ const SeqModel = {
 
   },
   reducers: {
+    getArgumentsList(state, {
+      payload
+    }) {
+
+      console.log(payload);
+      return {
+        ...state,
+        argumentList: payload
+      }
+
+    }
 
   },
 };

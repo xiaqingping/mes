@@ -17,12 +17,17 @@ class ArgumentModel extends Component {
 
   componentDidMount() {
     // 获取列表
-
     const isAdd = window.location.href.indexOf('add');
     if (isAdd) {
       // 如果是新增
       this.setState({
         argumentList: [],
+      });
+      debugger;
+      const { dispatch } = this.props;
+      dispatch({
+        type: 'taskModel/getArgumentsList',
+        payload: this.state.argumentList,
       });
     } else {
       this.getArgumentList();
@@ -54,6 +59,12 @@ class ArgumentModel extends Component {
     }
     this.setState({
       argumentList: list,
+    });
+    debugger;
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'taskModel/getArgumentsList',
+      payload: this.state.argumentList,
     });
   };
 
@@ -87,6 +98,12 @@ class ArgumentModel extends Component {
     this.setState({
       argumentList: list,
     });
+    debugger;
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'taskModel/getArgumentsList',
+      payload: this.state.argumentList,
+    });
   };
 
   toViewArgumrnt = (item, idx) => {
@@ -110,10 +127,7 @@ class ArgumentModel extends Component {
   render() {
     const { visible, onClose } = this.props;
     const { childrenDrawer, argumentList, loading, editOriginData } = this.state;
-    console.log(editOriginData);
     const { formItemType } = this.props.taskModel;
-    console.log(this.state.argumentList);
-
     const menu = (
       <Menu style={{ height: 200, overflow: 'auto' }}>
         {formItemType.map(item => {
