@@ -1,5 +1,5 @@
 const projectModel = {
-  namespace: 'project',
+  namespace: 'projectManage',
   state: {
     projectManage: [
       {

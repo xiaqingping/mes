@@ -26,7 +26,7 @@ class AssociatedProcessModel extends React.Component {
     this.getTableData(this.initialValues);
   }
 
-  titleContent = () => <div style={{ fontSize: '16px' }}>关联任务模型</div>;
+  titleContent = () => <div style={{ fontSize: '16px' }}>选择任务模型</div>;
 
   handleOk = () => {
     this.setState({
@@ -35,7 +35,6 @@ class AssociatedProcessModel extends React.Component {
   };
 
   getTableData = (options = {}) => {
-    console.log(this.tableSearchFormRef.current);
     // this.setState({ loading: true });
     // const formData = this.tableSearchFormRef.current.getFieldsValue();
     // const { pagination } = this.state;
@@ -58,7 +57,7 @@ class AssociatedProcessModel extends React.Component {
     //     editIndex: -1,
     //   });
     // });
-    const data = (this.props.processModel || {}).processModelData;
+    const data = this.props.processModel.processModelData;
     this.setState({
       list: data,
       // pagination: {
