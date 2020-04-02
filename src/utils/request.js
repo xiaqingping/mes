@@ -119,6 +119,11 @@ service.interceptors.request.use(config => {
         config.url = config.url.replace('http://192.168.20.6:8166/', '/192.168.20.6:8166/');
         config.baseURL = '/';
       }
+      // TODO: 针对mock接口做处理
+      if (config.url.indexOf('/mock') === 0) {
+        config.url = config.url.replace('/mock', '');
+        config.baseURL = '/';
+      }
     }
   }
 
