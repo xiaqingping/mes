@@ -1,42 +1,35 @@
 const projectModel = {
   namespace: 'processModel',
   state: {
-    processModelData: [
-      {
-        id: 1,
-        code: 111111,
-        name: '木木1',
-        describe: '描述1',
-        creatorCode: '大大创建1',
-        creatorName: '2019/10/20',
-        createDate: '大大修改1',
-        changerCode: '大大修改1',
-        changerName: '2019/10/20',
-        publishName: 'NIKO',
-        publishDate: '2019/10/20',
-        picture: '2019/10/20',
-        status: '1',
-        version: '10',
-      },
-      {
-        id: 2,
-        code: 111111,
-        name: '木木1',
-        describe: '描述1',
-        creatorCode: '大大创建1',
-        creatorName: '2019/10/20',
-        createDate: '大大修改1',
-        changerCode: '大大修改1',
-        changerName: '2019/10/20',
-        publishName: 'NIKO',
-        publishDate: '2019/10/20',
-        picture: '2019/10/20',
-        status: '2',
-        version: '10',
-      },
-    ],
+    processAddData: {
+      name: '',
+      describe: '',
+      picture: '',
+      interactionAnalysis: '',
+      version: '',
+      // groups: [
+      //   {
+      //     sortNo: '',
+      //     groupName: '',
+      //     groupDesc: '',
+      //     params: [
+      //       {
+      //         paramId: '',
+      //         taskModelId: '',
+      //         processModelId: '',
+      //         sortNo: '',
+      //       },
+      //     ],
+      //   },
+      // ],
+      taskModelIds: [],
+    },
   },
   effects: {},
-  reducers: {},
+  reducers: {
+    setProcessAddData(state, action) {
+      return { ...state, processAddData: action.payload };
+    },
+  },
 };
 export default projectModel;
