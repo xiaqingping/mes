@@ -12,25 +12,21 @@ class ArgumentForm extends React.Component {
 
   state = {
     loading: false,
-    formItem: {},
   };
 
   componentDidMount() {
-    console.log(this.myRef);
-    const isAdd = window.location.href.indexOf('add');
-    if (!isAdd) {
-      // 如果是新增
-      // this.setState({
-      //   formItem: {},
-      // });
-    }
+    const { editOriginData } = this.props;
+    let obj = {};
+    (editOriginData.paramProperties || []).forEach(item => {
+      obj = { ...obj, ...item };
+    });
+    this.myRef.current.setFieldsValue({
+      paramKey: editOriginData.paramKey,
+      paramName: editOriginData.paramName,
+      myId: editOriginData.myId,
+      ...obj,
+    });
   }
-
-  handleSubmit = () => {
-    console.log(this.myRef.current);
-    console.log(this.myRef.current.getFieldValue());
-    console.log(this.myRef.current.getFieldsValue());
-  };
 
   onFinish = values => {
     // 校验通过， values就是form对象
@@ -40,8 +36,10 @@ class ArgumentForm extends React.Component {
     argumentValues.paramName = data.paramName;
     delete data.paramName;
     delete data.paramKey;
-    argumentValues.paramProperties = data;
-    console.log('Received values of form: ', argumentValues);
+    argumentValues.paramProperties = [data];
+    argumentValues.myId = this.props.editOriginData.myId
+      ? this.props.editOriginData.myId
+      : Date.now();
     this.props.emitArguments(argumentValues);
     this.props.onClose();
   };
@@ -80,7 +78,16 @@ class ArgumentForm extends React.Component {
           >
             <Input placeholder="请输入参数名称 " />
           </Form.Item>
-          <Form.Item label="参数描述：" name="paramName">
+          <Form.Item
+            label="参数描述："
+            name="paramName"
+            rules={[
+              {
+                required: true,
+                message: '请输入参数名称',
+              },
+            ]}
+          >
             <Input placeholder="请输入 " />
           </Form.Item>
           <Row gutter={16}>

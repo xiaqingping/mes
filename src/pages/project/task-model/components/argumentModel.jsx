@@ -10,6 +10,9 @@ class ArgumentModel extends Component {
     loading: false,
     childrenDrawer: false,
     argumentList: [],
+    isAdd: window.location.href.indexOf('add'),
+    paramName: '', // 控制下一个抽屉的标题显示
+    editOriginData: {}, // 修改参数时传给二级抽屉的原始参数对象,
   };
 
   componentDidMount() {
@@ -35,7 +38,20 @@ class ArgumentModel extends Component {
   emitArguments = props => {
     const { argumentList } = this.state;
     const list = [...argumentList];
-    list.push(props);
+    let idx = null;
+    list.some((item, index) => {
+      if (item.myId === props.myId) {
+        idx = index;
+      } else {
+        idx = null;
+      }
+      return item.myId === props.myId;
+    });
+    if (idx || idx === 0) {
+      list[idx] = props;
+    } else {
+      list.push(props);
+    }
     this.setState({
       argumentList: list,
     });
@@ -47,27 +63,54 @@ class ArgumentModel extends Component {
     });
     if (item) {
       this.setState({
-        title: item.describe,
+        title: item.text,
+        editOriginData: {},
       });
     }
   };
 
   titleContent = () => {
-    const { title } = this.state;
+    const { title, isAdd, paramName } = this.state;
     return (
       <>
-        <div style={{ fontSize: '16px' }}>{title}</div>
+        <div style={{ fontSize: '16px' }}>{`${title}---${isAdd ? '新增' : paramName}`}</div>
       </>
     );
   };
 
-  handleDelete = item => {
-    console.log(item);
+  handleDelete = (item, index) => {
+    const { argumentList } = this.state;
+    let list = [...argumentList];
+    list = list.filter((v, idx) => {
+      return idx !== index;
+    });
+    this.setState({
+      argumentList: list,
+    });
   };
+
+  toViewArgumrnt = (item, idx) => {
+    this.setState({
+      paramName: item.paramName,
+    });
+    this.toggleChildrenDrawer(true);
+    if (idx || idx === 0) {
+      this.setState({
+        editOriginData: item,
+      });
+    } else {
+      this.setState({
+        editOriginData: {},
+      });
+    }
+  };
+
+  deleteArgumentItem = () => {};
 
   render() {
     const { visible, onClose } = this.props;
-    const { childrenDrawer, argumentList, loading } = this.state;
+    const { childrenDrawer, argumentList, loading, editOriginData } = this.state;
+    console.log(editOriginData);
     const { formItemType } = this.props.taskModel;
     console.log(this.state.argumentList);
 
@@ -92,7 +135,14 @@ class ArgumentModel extends Component {
 
     return (
       <>
-        <Drawer visible={visible} closable={false} onClose={onClose} title="参数" width={500}>
+        <Drawer
+          visible={visible}
+          closable={false}
+          onClose={onClose}
+          title="参数"
+          width={500}
+          destroyOnClose
+        >
           {loading ? (
             <div style={{ textAlign: 'center', marginTop: 15 }}>
               <Spin size="small" />
@@ -103,8 +153,8 @@ class ArgumentModel extends Component {
                 return (
                   <div style={{ overflow: 'hidden' }} key={item.paramKey}>
                     <span
-                      style={{ fontSize: '14px', fontWeight: 600 }}
-                      onClick={this.toViewArgumrnt}
+                      style={{ fontSize: '14px', fontWeight: 600, cursor: 'point' }}
+                      onClick={() => this.toViewArgumrnt(item, index)}
                     >
                       {item.paramKey}
                     </span>
@@ -112,7 +162,7 @@ class ArgumentModel extends Component {
                     <Popconfirm
                       placement={index === 0 ? 'bottom' : 'top'}
                       title="确定要删除吗?"
-                      onConfirm={() => this.handleDelete(item)}
+                      onConfirm={() => this.handleDelete(item, index)}
                       okText="确认"
                       cancelText="取消"
                     >
@@ -132,6 +182,7 @@ class ArgumentModel extends Component {
             </>
           )}
           <Drawer
+            destroyOnClose
             width={400}
             visible={childrenDrawer}
             closable={false}
@@ -139,6 +190,7 @@ class ArgumentModel extends Component {
             title={this.titleContent()}
           >
             <ArgumentForm
+              editOriginData={editOriginData}
               emitArguments={this.emitArguments}
               onClose={() => {
                 this.toggleChildrenDrawer(false);
