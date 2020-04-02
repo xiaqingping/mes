@@ -4,8 +4,10 @@ import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import {
   Button,
   Card,
-  Divider,
+  // Divider,
   Form,
+  Select,
+  Popconfirm,
   // Progress,
   // Tag,
 } from 'antd';
@@ -16,17 +18,23 @@ import router from 'umi/router';
 import StandardTable from '../components/StandardTable';
 // import api from '@/api';
 import api from '@/pages/project/project-manage/api/projectManageModel/';
-import { InputUI, SelectUI, DateUI } from '../components/AntdSearchUI';
+import {
+  InputUI,
+  // SelectUI,
+  DateUI,
+} from '../components/AntdSearchUI';
+
+const { Option } = Select;
+const FormItem = Form.Item;
 
 class ProjectManagement extends Component {
-
   tableSearchFormRef = React.createRef();
   // tableFormRef = React.createRef();
 
   state = {
     pagination: {},
     loading: false,
-    list:[],
+    list: [],
   };
 
   // 顶部表单默认值
@@ -50,7 +58,7 @@ class ProjectManagement extends Component {
       pageSize,
       ...formData,
       ...options,
-    }
+    };
     api.getProjectManage(data, true).then(res => {
       this.setState({
         list: res.results,
@@ -75,6 +83,7 @@ class ProjectManagement extends Component {
 
   simpleForm = () => {
     const { languageCode } = this.props;
+    // console.log(this.props);
     return (
       <>
         <InputUI
@@ -83,34 +92,50 @@ class ProjectManagement extends Component {
           name="name"
           placeholder="请输入项目名称"
         />
-        <SelectUI
-          languageCode={languageCode}
-          label="状态"
-          name="status"
-          mode="multiple"
-          allowClear
-          data={[
-            { value: 1, data: '未开始', key: '1' },
-            { value: 2, data: '进行中', key: '2' },
-            { value: 3, data: '已完成', key: '3' },
-            { value: 4, data: '已终止', key: '4' },
-            { value: 5, data: '待处理', key: '5' },
-          ]}
-        />
+        <FormItem label="状态" name="status">
+          <Select
+            mode="multiple"
+            label="状态"
+            style={{ width: '200px' }}
+            allowClear
+            placeholder="请选择"
+            // defaultValue={['a10', 'c12']}
+            onChange={this.handleChange}
+          >
+            {this.props.statusview.map(e => (
+              <Option value={e.id} key={e.id}>
+                {e.name}
+              </Option>
+            ))}
+          </Select>
+        </FormItem>
+
         <InputUI
           languageCode={languageCode}
           label="创建人"
           name="creatorName"
           placeholder="请输入"
         />
-        <DateUI
-          languageCode={languageCode}
-          label="创建时间"
-          name="times"
-          placeholder={['开始时间', '结束时间']}
-        />
       </>
     );
+  };
+
+  // 完整查询条件
+  advancedForm = () => {
+    const { languageCode } = this.state;
+    return (
+      <DateUI
+        languageCode={languageCode}
+        label="创建时间"
+        name="times"
+        placeholder={['开始时间', '结束时间']}
+      />
+    );
+  };
+
+  // 状态多选框
+  handleChange = () => {
+    console.log('状态多选框');
   };
 
   // 新增
@@ -122,7 +147,22 @@ class ProjectManagement extends Component {
   // 项目管理详情页面
   searchDetails = () => {
     router.push('/project/project-manage/detail');
-  }
+  };
+
+  // 删除数据
+  deleteRow = row => {
+    api.deleteProjectManage(row.id).then(() => {
+      this.getTableData();
+    });
+    console.log(row);
+  };
+
+  // 修改数据
+  // resumeRow = row => {
+  //   api.peptideBase.resumePurity(row.id).then(() => {
+  //     this.getTableData();
+  //   });
+  // };
 
   render() {
     const { pagination, list, loading } = this.state;
@@ -194,17 +234,6 @@ class ProjectManagement extends Component {
         title: '成员数',
         dataIndex: 'memberCount',
       },
-      // {
-      //   title: '项目模型名称/版本',
-      //   dataIndex: 'projectModelName',
-      //   render: (value, row) => (
-      //     <>
-      //       {value}
-      //       <br />
-      //       <Tag color="success">&nbsp;&nbsp;V{row.copyRight}&nbsp;&nbsp;</Tag>
-      //     </>
-      //   ),
-      // },
       {
         title: '开始-截止时间',
         dataIndex: 'StartTime',
@@ -219,15 +248,35 @@ class ProjectManagement extends Component {
       {
         fixed: 'right',
         title: '操作',
-        render: () => (
-          <>
-            {/* <a onClick={() => console.log(111)}>修改</a>
-            <Divider type="vertical" /> */}
-            <a onClick={() => console.log(222)}>删除</a>
-            <Divider type="vertical" />
-            {/* <a onClick={() => console.log(333)}>开始</a> */}
-          </>
-        ),
+        // render: () => (
+        //   <>
+        //     {/* <a onClick={() => console.log(111)}>修改</a>
+        //     <Divider type="vertical" /> */}
+        //     <a onClick={() => this.deleteRow(results)}>删除</a>
+        //     <Divider type="vertical" />
+        //     {/* <a onClick={() => console.log(333)}>开始</a> */}
+        //   </>
+        // ),
+        render: (value, row, index) => {
+          const { editIndex } = this.state;
+          let actions;
+          if (editIndex !== index) {
+            if (row.status === 1) {
+              actions = (
+                <Popconfirm title="确定删除数据？" onConfirm={() => this.deleteRow(row)}>
+                  <a>删除</a>
+                </Popconfirm>
+              );
+            } else {
+              actions = (
+                <Popconfirm title="确定恢复数据？" onConfirm={() => this.resumeRow(row)}>
+                  <a>恢复</a>
+                </Popconfirm>
+              );
+            }
+          }
+          return actions;
+        },
       },
     ];
 
@@ -250,6 +299,7 @@ class ProjectManagement extends Component {
               initialValues={this.initialValues}
               getTableData={this.getTableData}
               simpleForm={this.simpleForm}
+              advancedForm={this.advancedForm}
             />
             <div className="tableListOperator">
               <Button type="primary" onClick={() => this.handleAdd()}>
@@ -279,4 +329,5 @@ class ProjectManagement extends Component {
 export default connect(({ global, project }) => ({
   languageCode: global.languageCode,
   project,
+  statusview: project.status,
 }))(ProjectManagement);

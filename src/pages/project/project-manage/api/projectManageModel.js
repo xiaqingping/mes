@@ -10,7 +10,11 @@ export default {
   // 项目管理接口
   // 项目管理分页列表
   getProjectManage(params) {
-    return request(`${http1}/projects/v1`, { params });
+    return request(`${http1}/projects/v1/`, { params });
   },
 
+  // 项目管理删除
+  deleteProjectManage(id) {
+    return request(`${http1}/projects/v1/${id}/deleted`, { method: 'PUT' });
+  },
 };
