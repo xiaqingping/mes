@@ -95,7 +95,6 @@ class ProjectManagement extends Component {
         <FormItem label="状态" name="status">
           <Select
             mode="multiple"
-            label="状态"
             style={{ width: '200px' }}
             allowClear
             placeholder="请选择"
