@@ -5,8 +5,9 @@ import { Card, Upload, message, Input, Tag, Switch, Table, Button, Divider, Form
 import { LoadingOutlined, SettingOutlined, PlusOutlined } from '@ant-design/icons';
 import { connect } from 'dva';
 import './index.less';
-import AssociatedProcessModel from '../components/AssociatedProcessModel';
-// import { expandedRowRender } from '../functions';
+// eslint-disable-next-line max-len
+import AssociatedProcessModel from '@/pages/project/process-model/components/AssociatedProcessModel';
+import Parameter from '@/pages/project/process-model/components/Parameter';
 
 function getBase64(img, callback) {
   const reader = new FileReader();
@@ -38,6 +39,7 @@ class ProcessEdit extends Component {
     loading: false,
     id: '',
     visible: false,
+    parameterVisible: false,
   };
 
   // 图片上传
@@ -85,6 +87,20 @@ class ProcessEdit extends Component {
     });
   };
 
+  // 打开参数
+  handleOpen = () => {
+    this.setState({
+      parameterVisible: true,
+    });
+  };
+
+  // 关闭参数
+  handleClose = () => {
+    this.setState({
+      parameterVisible: false,
+    });
+  };
+
   render() {
     const uploadButton = (
       <div style={{ borderRadius: '50%' }}>
@@ -92,7 +108,7 @@ class ProcessEdit extends Component {
         {/* <div className="ant-upload-text">Upload</div> */}
       </div>
     );
-    const { imageUrl, id, visible } = this.state;
+    const { imageUrl, id, visible, parameterVisible } = this.state;
     const columns = [
       {
         title: '编号/名称',
@@ -160,27 +176,32 @@ class ProcessEdit extends Component {
                 <Tag color="green">V1.1</Tag>
               </Form.Item>
             </div>
-            <div style={{ float: 'left', marginLeft: '142px', fontSize: '16px' }}>
-              <SettingOutlined />
-              <a href="#" style={{ marginLeft: '10px' }}>
-                参数
-              </a>
-            </div>
-            <div style={{ float: 'left', marginLeft: '88px' }}>
+            {/* <div style={{ float: 'left', marginLeft: '88px' }}>
               <span style={{ fontSize: '16px', verticalAlign: 'middle' }}>是否可自动运行：</span>
               <Switch
                 style={{ verticalAlign: 'middle', marginLeft: '22px' }}
                 defaultChecked
                 onChange={this.onChange}
               />
-            </div>
-            <div style={{ float: 'left', marginLeft: '50px' }}>
+            </div> */}
+            <div style={{ float: 'right', marginRight: '80px' }}>
               <span style={{ fontSize: '16px', verticalAlign: 'middle' }}>交互分析：</span>
               <Switch
                 style={{ verticalAlign: 'middle', marginLeft: '22px' }}
                 defaultChecked
                 onChange={this.onChange}
               />
+            </div>
+            <div style={{ float: 'right', marginRight: '30px', fontSize: '16px' }}>
+              <SettingOutlined />
+              <a
+                onClick={() => {
+                  this.handleOpen();
+                }}
+                style={{ marginLeft: '10px' }}
+              >
+                参数
+              </a>
             </div>
           </Card>
 
@@ -215,6 +236,7 @@ class ProcessEdit extends Component {
           </Card>
         </Form>
         <AssociatedProcessModel visible={visible} onClose={this.onClose} />
+        <Parameter visible={parameterVisible} handleClose={this.handleClose} />
       </PageHeaderWrapper>
     );
   }
