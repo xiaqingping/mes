@@ -1,13 +1,16 @@
 // 流程模型的编辑
 import React, { Component } from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
-import { Card, Upload, message, Input, Tag, Switch, Table, Button, Divider, Form } from 'antd';
+import { Card, Upload, message, Input, Tag, Switch, Table, Button, Popconfirm, Form } from 'antd';
 import { LoadingOutlined, SettingOutlined, PlusOutlined } from '@ant-design/icons';
 import { connect } from 'dva';
 import './index.less';
 // eslint-disable-next-line max-len
 import AssociatedProcessModel from '@/pages/project/process-model/components/AssociatedProcessModel';
 import Parameter from '@/pages/project/process-model/components/Parameter';
+import { guid } from '@/utils/utils';
+import disk from '@/pages/project/api/disk';
+import api from '@/pages/project/api/processModel/';
 
 function getBase64(img, callback) {
   const reader = new FileReader();
@@ -34,13 +37,18 @@ class ProcessEdit extends Component {
     return { id: nextProps.match.params.id || '' };
   }
 
-  state = {
-    imageUrl: '',
-    loading: false,
-    id: '',
-    visible: false,
-    parameterVisible: false,
-  };
+  constructor(props) {
+    super(props);
+    const guuid = guid();
+    this.state = {
+      imageUrl: '',
+      loading: false,
+      id: '',
+      guuid,
+      visible: false,
+      parameterVisible: false,
+    };
+  }
 
   // 图片上传
   handleChange = info => {
@@ -60,7 +68,7 @@ class ProcessEdit extends Component {
   };
 
   // 流程模型列表title样式
-  titleContent = () => <div style={{ fontWeight: 'bolder' }}>流程模型列表</div>;
+  titleContent = () => <div style={{ fontWeight: 'bolder' }}>任务列表</div>;
 
   // 是否可自动运行和交互分析
   onChange = checked => {
@@ -69,8 +77,26 @@ class ProcessEdit extends Component {
 
   // 提交上传
   onFinish = values => {
-    const { imageUrl } = this.state;
-    console.log(imageUrl, values);
+    const { imageUrl, guuid } = this.state;
+    const { processAddData } = this.props;
+    const data = processAddData;
+    console.log(values);
+    if (imageUrl) {
+      data.picture = guuid;
+    }
+    data.name = values.name;
+    data.describe = values.describe;
+    data.interactionAnalysis = values.interactionAnalysis;
+    data.version = '1.0';
+    this.props.dispatch({
+      type: 'processModel/setProcessAddData',
+      payload: {
+        ...data,
+      },
+    });
+    api.addProcess(processAddData).then(res => {
+      console.log(res);
+    });
   };
 
   // 点击打开关联
@@ -108,7 +134,7 @@ class ProcessEdit extends Component {
         {/* <div className="ant-upload-text">Upload</div> */}
       </div>
     );
-    const { imageUrl, id, visible, parameterVisible } = this.state;
+    const { imageUrl, id, visible, parameterVisible, guuid } = this.state;
     const columns = [
       {
         title: '编号/名称',
@@ -123,31 +149,43 @@ class ProcessEdit extends Component {
         dataIndex: 'status',
       },
       {
+        title: '自动运行',
+        dataIndex: 'status',
+        render: () => <Switch />,
+      },
+      {
         title: '操作',
         render: () => (
           <>
-            <a onClick={() => console.log(111)}>修改</a>
-            <Divider type="vertical" />
-            <a onClick={() => console.log(222)}>作废</a>
-            <Divider type="vertical" />
-            <a onClick={() => console.log(333)}>开始</a>
+            <Popconfirm
+              placement="topLeft"
+              title="有前置任务，无法删除。"
+              onConfirm={this.confirm}
+              okText="Yes"
+              cancelText="No"
+            >
+              选择
+            </Popconfirm>
           </>
         ),
       },
     ];
 
+    const uploadUrl = disk.uploadMoreFiles('project_process_model', guuid);
+
     return (
       <PageHeaderWrapper title={id || ''}>
-        <Form onFinish={this.onFinish}>
+        <Form onFinish={this.onFinish} initialValues={{ interactionAnalysis: true }}>
           <Card className="process-model-edit">
             <div style={{ float: 'left', marginLeft: '20px' }}>
               {/* <Form.Item name="uploadPIc"> */}
               <Upload
-                name="avatar"
+                name="files"
                 listType="picture-card"
                 className="avatar-uploader"
                 showUploadList={false}
-                action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
+                action={uploadUrl}
+                headers={{ Authorization: this.props.authorization }}
                 beforeUpload={beforeUpload}
                 onChange={this.handleChange}
               >
@@ -164,16 +202,16 @@ class ProcessEdit extends Component {
               {/* </Form.Item> */}
             </div>
             <div style={{ float: 'left', width: '552px', marginLeft: '20px' }}>
-              <Form.Item name="processName">
+              <Form.Item name="name">
                 <Input placeholder="请输入任务名称" style={{ marginBottom: '10px' }} />
               </Form.Item>
-              <Form.Item name="processDetails">
+              <Form.Item name="describe">
                 <Input.TextArea placeholder="请输入任务描述" rows={4} />
               </Form.Item>
             </div>
             <div style={{ float: 'left', marginLeft: '20px' }}>
-              <Form.Item name="copyRight">
-                <Tag color="green">V1.1</Tag>
+              <Form.Item name="version">
+                <Tag color="green">V1.0</Tag>
               </Form.Item>
             </div>
             {/* <div style={{ float: 'left', marginLeft: '88px' }}>
@@ -184,13 +222,18 @@ class ProcessEdit extends Component {
                 onChange={this.onChange}
               />
             </div> */}
+
             <div style={{ float: 'right', marginRight: '80px' }}>
               <span style={{ fontSize: '16px', verticalAlign: 'middle' }}>交互分析：</span>
-              <Switch
-                style={{ verticalAlign: 'middle', marginLeft: '22px' }}
-                defaultChecked
-                onChange={this.onChange}
-              />
+              <span>
+                <Form.Item
+                  name="interactionAnalysis"
+                  valuePropName="checked"
+                  style={{ float: 'right', marginTop: '-4px' }}
+                >
+                  <Switch style={{ verticalAlign: 'middle' }} defaultChecked />
+                </Form.Item>
+              </span>
             </div>
             <div style={{ float: 'right', marginRight: '30px', fontSize: '16px' }}>
               <SettingOutlined />
@@ -242,7 +285,9 @@ class ProcessEdit extends Component {
   }
 }
 
-export default connect(({ global, project }) => ({
+export default connect(({ global, user, project, processModel }) => ({
   languageCode: global.languageCode,
+  authorization: user.currentUser.authorization,
   project,
+  processAddData: processModel.processAddData,
 }))(ProcessEdit);

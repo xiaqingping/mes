@@ -1,25 +1,37 @@
 // 流程模型
 import React, { Component } from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
-import { Button, Card, Divider, Form, Col, AutoComplete, Avatar, Tag, Badge } from 'antd';
+import {
+  Button,
+  Card,
+  Divider,
+  Form,
+  Col,
+  AutoComplete,
+  Avatar,
+  Tag,
+  Badge,
+  Select,
+  Input,
+} from 'antd';
 import TableSearchForm from '@/components/TableSearchForm';
-import { PlusOutlined, UserOutlined } from '@ant-design/icons';
+import { PlusOutlined } from '@ant-design/icons';
 import router from 'umi/router';
 import { connect } from 'dva';
 import _ from 'lodash';
-import { InputUI, SelectUI, DateUI } from '@/pages/project/components/AntdSearchUI';
+import { DateUI } from '@/pages/project/components/AntdSearchUI';
 import { formatter } from '@/utils/utils';
 import api from '@/pages/project/api/processModel/';
 import StandardTable from '../components/StandardTable';
-import { DrawerTool } from '../components/AntdUI';
+import { DrawerTool } from './components/Details';
 
 const FormItem = Form.Item;
+const { Option } = Select;
 class ProcessModel extends Component {
   tableSearchFormRef = React.createRef();
 
   // 顶部表单默认值
   initialValues = {
-    status: 1,
     page: 1,
     rows: 10,
   };
@@ -32,10 +44,11 @@ class ProcessModel extends Component {
       visible: false,
       detailValue: {},
       nameCodeVal: [],
-      searchCode: '',
+      nameCodeValPublish: [],
     };
     // 异步验证做节流处理
     this.callParter = _.debounce(this.callParter, 500);
+    this.callPublish = _.debounce(this.callPublish, 500);
   }
 
   componentDidMount() {
@@ -48,24 +61,41 @@ class ProcessModel extends Component {
     });
   };
 
+  callPublish = value => {
+    api.getProcessPublisherCodeAndName(value).then(res => {
+      this.setState({ nameCodeVal: res });
+    });
+  };
+
   // 获取表格数据
   getTableData = (options = {}) => {
     this.setState({ loading: true });
     const formData = this.tableSearchFormRef.current.getFieldsValue();
-    const { pagination, searchCode } = this.state;
+
+    const { pagination } = this.state;
     const { current: page, pageSize: rows } = pagination;
-    const code = { code: formData.name ? searchCode : '' };
+
+    let newData = [];
+    if (formData.status) {
+      newData = { ...newData, status: formData.status.join(',') };
+      delete formData.status;
+    }
+
+    if (formData.publishDate) {
+      newData = {
+        ...newData,
+        publishBeginDate: formData.publishDate[0].format('YYYY-MM-DD'),
+        publicEndDate: formData.publishDate[1].format('YYYY-MM-DD'),
+      };
+      delete formData.publishDate;
+    }
     const data = {
       page,
       rows,
-      ...code,
+      ...newData,
       ...formData,
       ...options,
     };
-    if (!formData.name) {
-      delete data.code;
-    }
-    delete data.name;
     api.getProcess(data).then(res => {
       this.setState({
         list: res.rows,
@@ -79,27 +109,17 @@ class ProcessModel extends Component {
     });
   };
 
-  renderOption = item => {
-    // this.setState({
-    //   searchCode: item.code,
-    // });
-    console.log(item);
-    return {
-      value: item.name,
-      label: (
-        // <Option key={item.id} text={item.name}>
-        <div style={{ display: 'flex' }}>
-          <span>
-            <UserOutlined />
-          </span>
-          &nbsp;&nbsp;
-          <span>{item.code}</span>&nbsp;&nbsp;
-          <span>{item.name}</span>
-        </div>
-        // </Option>
-      ),
-    };
-  };
+  renderOption = item => ({
+    value: item.code,
+    label: (
+      // <Option key={item.id} text={item.name}>
+      <div style={{ display: 'flex' }}>
+        <span>{item.code}</span>&nbsp;&nbsp;
+        <span>{item.name}</span>
+      </div>
+      // </Option>
+    ),
+  });
 
   // 筛选值
   inputValue = value => {
@@ -127,6 +147,43 @@ class ProcessModel extends Component {
     return true;
   };
 
+  renderOptionPublish = item => ({
+    value: item.publisherCode,
+    label: (
+      // <Option key={item.id} text={item.name}>
+      <div style={{ display: 'flex' }}>
+        <span>{item.publisherName}</span>
+      </div>
+      // </Option>
+    ),
+  });
+
+  // 筛选值
+  inputValuePublish = value => {
+    const { nameCodeValPublish } = this.state;
+    const arr = [];
+    if (!value) {
+      return false;
+    }
+    this.callPublish(value);
+    if (nameCodeValPublish.length === 0) {
+      return false;
+    }
+    nameCodeValPublish.forEach(item => {
+      if (item.name.indexOf(value) !== -1) {
+        arr.push(item);
+      }
+      if (item.code.indexOf(value) !== -1 && arr.indexOf(item)) {
+        arr.push(item);
+      }
+    });
+    this.setState({
+      nameCodeValPublish: arr,
+      // allowClear: 'ture',
+    });
+    return true;
+  };
+
   // 分页
   handleStandardTableChange = (pagination, filters) => {
     // 获取搜索值
@@ -138,13 +195,12 @@ class ProcessModel extends Component {
   };
 
   simpleForm = () => {
-    const { languageCode } = this.props;
+    const { languageCode, status } = this.props;
     const { nameCodeVal } = this.state;
-    console.log(nameCodeVal);
     return (
       <>
         <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
-          <FormItem label="编号/名称" name="name">
+          <FormItem label="流程模型" name="code">
             <AutoComplete
               onSearch={this.inputValue}
               options={nameCodeVal.map(this.renderOption)}
@@ -153,18 +209,27 @@ class ProcessModel extends Component {
             />
           </FormItem>
         </Col>
-        <InputUI
-          languageCode={languageCode}
-          label="发布人"
-          name="publishName"
-          placeholder="发布人"
-        />
-        <DateUI
-          languageCode={languageCode}
-          label="发布时间"
-          name="publishDate"
-          placeholder={['开始时间', '结束时间']}
-        />
+        <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
+          <FormItem label="状态" name="status">
+            <Select mode="multiple" maxTagCount={2} maxTagTextLength={3}>
+              {status.map(item => (
+                <Option key={item.value} value={item.value}>
+                  {item.text}
+                </Option>
+              ))}
+            </Select>
+          </FormItem>
+        </Col>
+        <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
+          <FormItem label="发布人" name="publisherCode">
+            <AutoComplete
+              onSearch={this.inputValuePublish}
+              options={nameCodeVal.map(this.renderOptionPublish)}
+              // placeholder={formatMessage({ id: 'bp.inputHere' })}
+              placeholder="发布人"
+            />
+          </FormItem>
+        </Col>
       </>
     );
   };
@@ -173,15 +238,11 @@ class ProcessModel extends Component {
   advancedForm = () => {
     const { languageCode } = this.state;
     return (
-      <SelectUI
+      <DateUI
         languageCode={languageCode}
-        label="状态"
-        name="status"
-        data={[
-          { value: 1, data: '状态一', key: '1' },
-          { value: 2, data: '状态二', key: '2' },
-          { value: 3, data: '状态三', key: '3' },
-        ]}
+        label="发布时间"
+        name="publishDate"
+        placeholder={['开始时间', '结束时间']}
       />
     );
   };
@@ -197,6 +258,15 @@ class ProcessModel extends Component {
     });
   };
 
+  // 更换版本
+  handleChangeVersion = v => {
+    api.getProcessChangeVersion(v).then(res => {
+      this.setState({
+        detailValue: res,
+      });
+    });
+  };
+
   // 新建
   handleModalVisible = () => {
     router.push('/project/process-model/add');
@@ -209,9 +279,11 @@ class ProcessModel extends Component {
 
   // 查看详情
   searchDetails = value => {
-    this.setState({
-      visible: true,
-      detailValue: value,
+    api.getProcessDetail(value.id).then(res => {
+      this.setState({
+        visible: true,
+        detailValue: res,
+      });
     });
   };
 
@@ -243,7 +315,7 @@ class ProcessModel extends Component {
       },
       {
         title: '发布人/时间',
-        dataIndex: 'publishName',
+        dataIndex: 'publisherName',
         render: (value, row) => (
           <>
             <div>{value}</div>
@@ -276,9 +348,13 @@ class ProcessModel extends Component {
         width: 200,
         render: value => (
           <>
-            <a onClick={() => console.log(111)}>禁用</a>
+            <a onClick={() => console.log(111)}>变更</a>
             <Divider type="vertical" />
-            <a onClick={() => this.upgrade(value)}>升级</a>
+            <a onClick={() => console.log(111)}>删除</a>
+            <Divider type="vertical" />
+            <a onClick={() => console.log(111)}>升级</a>
+            <Divider type="vertical" />
+            <a onClick={() => console.log(111)}>修改</a>
             <Divider type="vertical" />
             <a onClick={() => this.searchDetails(value)}>查看</a>
           </>
@@ -332,9 +408,11 @@ class ProcessModel extends Component {
             </Form>
             <DrawerTool
               visible={visible}
+              // visible
               onClose={this.onClose}
               detailValue={detailValue}
               status={status}
+              handleChangeVersion={v => this.handleChangeVersion(v)}
             />
           </div>
         </Card>

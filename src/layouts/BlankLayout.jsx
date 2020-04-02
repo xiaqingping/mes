@@ -1,5 +1,5 @@
 import React from 'react';
 
-const Layout = ({ children }) => <>{children}</>;
+const Layout = ({ children }) => <div>{children}</div>;
 
 export default Layout;
