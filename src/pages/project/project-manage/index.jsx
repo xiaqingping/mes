@@ -7,7 +7,7 @@ import {
   Divider,
   Form,
   // Progress,
-  Tag,
+  // Tag,
 } from 'antd';
 import TableSearchForm from '@/components/TableSearchForm';
 import { PlusOutlined } from '@ant-design/icons';
@@ -15,23 +15,25 @@ import { connect } from 'dva';
 import router from 'umi/router';
 import StandardTable from '../components/StandardTable';
 // import api from '@/api';
+import api from '@/pages/project/project-manage/api/projectManageModel/';
 import { InputUI, SelectUI, DateUI } from '../components/AntdSearchUI';
-// import { DrawerTool } from '../components/AntdUI';
-// import { expandedRowRender } from '../functions';
 
 class ProjectManagement extends Component {
+
   tableSearchFormRef = React.createRef();
+  // tableFormRef = React.createRef();
 
   state = {
     pagination: {},
     loading: false,
+    list:[],
   };
 
   // 顶部表单默认值
   initialValues = {
     status: 1,
     page: 1,
-    rows: 10,
+    pageSize: 10,
   };
 
   componentDidMount() {
@@ -40,24 +42,34 @@ class ProjectManagement extends Component {
 
   // 获取表格数据
   getTableData = (options = {}) => {
-    const data = this.props.project.projectManage;
-    this.setState({
-      list: data,
-      pagination: {
-        current: options.page,
-        pageSize: options.rows,
-        total: data.total,
-      },
-      loading: false,
+    const formData = this.tableSearchFormRef.current.getFieldsValue();
+    const { pagination } = this.state;
+    const { current: page, pageSize } = pagination;
+    const data = {
+      page,
+      pageSize,
+      ...formData,
+      ...options,
+    }
+    api.getProjectManage(data, true).then(res => {
+      this.setState({
+        list: res.results,
+        pagination: {
+          current: data.page,
+          pageSize: data.pageSize,
+          total: res.total,
+        },
+        loading: false,
+      });
     });
-    // console.log(this.props.project.projectManage);
+    // console.log(list);
   };
 
   // 分页
   handleStandardTableChange = pagination => {
     this.getTableData({
       page: pagination.current,
-      rows: pagination.pageSize,
+      pageSize: pagination.pageSize,
     });
   };
 
@@ -67,9 +79,9 @@ class ProjectManagement extends Component {
       <>
         <InputUI
           languageCode={languageCode}
-          label="创建人"
-          name="creatorName"
-          placeholder="请输入"
+          label="项目"
+          name="name"
+          placeholder="请输入项目名称"
         />
         <SelectUI
           languageCode={languageCode}
@@ -85,9 +97,15 @@ class ProjectManagement extends Component {
             { value: 5, data: '待处理', key: '5' },
           ]}
         />
+        <InputUI
+          languageCode={languageCode}
+          label="创建人"
+          name="creatorName"
+          placeholder="请输入"
+        />
         <DateUI
           languageCode={languageCode}
-          label="时间"
+          label="创建时间"
           name="times"
           placeholder={['开始时间', '结束时间']}
         />
@@ -162,19 +180,19 @@ class ProjectManagement extends Component {
       {
         title: '标签',
         dataIndex: 'label',
-        render: value => (
-          <>
-            {value.map(item => (
-              <Tag key={item} color={item}>
-                {item}
-              </Tag>
-            ))}
-          </>
-        ),
+        // render: value => (
+        //   <>
+        //     {value.map(item => (
+        //       <Tag key={item} color={item}>
+        //         {item}
+        //       </Tag>
+        //     ))}
+        //   </>
+        // ),
       },
       {
         title: '成员数',
-        dataIndex: 'memberNumber',
+        dataIndex: 'memberCount',
       },
       // {
       //   title: '项目模型名称/版本',
