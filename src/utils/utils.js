@@ -1,7 +1,11 @@
 import _ from 'lodash';
-import { parse } from 'querystring';
+import {
+  parse
+} from 'querystring';
 import pathRegexp from 'path-to-regexp';
-import { formatMessage } from 'umi/locale';
+import {
+  formatMessage
+} from 'umi/locale';
 
 /* eslint no-useless-escape:0 import/prefer-default-export:0 */
 // eslint-disable-next-line max-len
@@ -17,9 +21,12 @@ export const getPageQuery = () => parse(window.location.href.split('?')[1]);
  */
 export const getAuthorityFromRouter = (router = [], pathname) => {
   const authority = router.find(
-    ({ routes, path = '/' }) =>
-      (path && pathRegexp(path).exec(pathname)) ||
-      (routes && getAuthorityFromRouter(routes, pathname)),
+    ({
+      routes,
+      path = '/'
+    }) =>
+    (path && pathRegexp(path).exec(pathname)) ||
+    (routes && getAuthorityFromRouter(routes, pathname)),
   );
   if (authority) return authority;
   return undefined;
@@ -95,9 +102,9 @@ export const formatter = (arr, value, key1, key2) => {
  */
 export const validateForm = form =>
   form
-    .validateFields()
-    .then(data => [true, data])
-    .catch(error => [false, error]);
+  .validateFields()
+  .then(data => [true, data])
+  .catch(error => [false, error]);
 
 /**
  * 获取表单的值（不验证）
@@ -139,7 +146,11 @@ export const diff = (prev, next, key = 'id') => {
     prevItem => !nextOther.some(nextOtherItem => nextOtherItem[key] === prevItem[key]),
   );
 
-  return { add, del, update };
+  return {
+    add,
+    del,
+    update
+  };
 };
 
 /**
@@ -159,7 +170,9 @@ export const validateEmpty = (val, fieldName) => {
  * 简化 formatMessage 使用
  * @param {String} id
  */
-export const format = id => formatMessage({ id });
+export const format = id => formatMessage({
+  id
+});
 
 /**
  * 获取缓存数据
@@ -170,9 +183,18 @@ export const format = id => formatMessage({ id });
  * @param {Object} customApi 自定义请求接口列表
  */
 export function* getCache(namespace, action, effects, defaultApi, customApi) {
-  const { payload } = action;
-  const { call, put, select } = effects;
-  const { type, options } = payload;
+  const {
+    payload
+  } = action;
+  const {
+    call,
+    put,
+    select
+  } = effects;
+  const {
+    type,
+    options
+  } = payload;
 
   let targetState;
 
@@ -211,7 +233,10 @@ export function* getCache(namespace, action, effects, defaultApi, customApi) {
     // 五：设置数据
     yield put({
       type: 'setCache',
-      payload: { type, targetState },
+      payload: {
+        type,
+        targetState
+      },
     });
   }
 }
@@ -223,11 +248,17 @@ export function* getCache(namespace, action, effects, defaultApi, customApi) {
  * @param {Function} fun 数据处理方法
  */
 export const setCache = (namespace, payload, fun) => {
-  const { type, targetState } = payload;
+  const {
+    type,
+    targetState
+  } = payload;
 
   const data = (fun[type] && fun[type](targetState)) || targetState;
 
   sessionStorage.setItem(`${namespace}/${type}`, JSON.stringify(data));
 
-  return { type, data };
+  return {
+    type,
+    data
+  };
 };

@@ -1,7 +1,7 @@
 // 流程模型的编辑
 import React, { Component } from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
-import { Card, Upload, message, Input, Tag, Table, Button, Form, Badge, Switch } from 'antd';
+import { Card, Upload, message, Input, Tag, Table, Button, Form, Badge, Switch, Spin } from 'antd';
 import { LoadingOutlined, SettingOutlined, PlusOutlined, DeleteOutlined } from '@ant-design/icons';
 import { connect } from 'dva';
 import './index.less';
@@ -39,6 +39,7 @@ class TaskModel extends Component {
   state = {
     imageUrl: '',
     loading: false,
+    tableLoading: false,
     id: '',
     visible: false,
     tableData: [],
@@ -61,10 +62,10 @@ class TaskModel extends Component {
 
   getTableData = () => {
     this.setState({
-      loading: true,
+      tableLoading: true,
     });
-    const { page,rows } = this.state;
-    
+    const { page, rows } = this.state;
+
     api.getTaskModels();
   };
 
@@ -116,15 +117,28 @@ class TaskModel extends Component {
     });
   };
 
-  // 点击关闭关联
-  onClose = () => {
+  // 点击关闭关联 添加数据到表格
+  onClose = row => {
     this.setState({
       visible: false,
     });
+    const tableData = [...this.state.tableData];
+    tableData.unshift(row);
+    this.setState({
+      tableData,
+    });
+    console.log('object');
   };
 
   handleDelete = row => {
-    console.log(row);
+    // console.log(row);
+    let list = [...this.state.tableData];
+    list = list.filter(item => {
+      return item.id !== row.id;
+    });
+    this.setState({
+      tableData: list,
+    });
   };
 
   openArgumentModel = () => {
@@ -145,6 +159,13 @@ class TaskModel extends Component {
   };
 
   render() {
+    const { taskModel } = this.props;
+    const { taskModelStatusOptions } = taskModel;
+    console.log(this.props);
+    console.log(this.state.tableData);
+
+    const { tableData, visible, argumentVisible, tableLoading } = this.state;
+
     const uploadButton = (
       <div style={{ borderRadius: '50%' }}>
         {this.state.loading ? <LoadingOutlined /> : ''}
@@ -156,19 +177,19 @@ class TaskModel extends Component {
       {
         title: '编号/名称',
         dataIndex: 'code',
-        render: row => {
+        render: (value, row) => {
           return (
             <div style={{ display: 'flex' }}>
               <img
                 src="http://img1.imgtn.bdimg.com/it/u=1828061713,3436718872&fm=26&gp=0.jpg"
                 alt=""
-                width={50}
-                height={50}
+                width={40}
+                height={40}
                 style={{ borderRadius: '2px' }}
               />
               <div>
-                <h5>{row.name}</h5>
-                <div>{row.code}</div>
+                <h5>{row.code}</h5>
+                <div>{row.name}</div>
               </div>
             </div>
           );
@@ -176,7 +197,7 @@ class TaskModel extends Component {
       },
       {
         title: '版本',
-        dataIndex: 'describe',
+        dataIndex: 'version',
         render: value => (
           <>
             <Tag color="green">{value}</Tag>
@@ -188,20 +209,14 @@ class TaskModel extends Component {
         dataIndex: 'status',
         // width: '80px',
         render: value => {
-          try {
-            const { taskModel } = this.props;
-            const { taskModelStatusOptions } = taskModel;
-            return (
-              <>
-                <Badge
-                  status={formatter(taskModelStatusOptions, value, 'value', 'status')}
-                  text={formatter(taskModelStatusOptions, value, 'value', 'data')}
-                />
-              </>
-            );
-          } catch (error) {
-            return console.log(error);
-          }
+          return (
+            <>
+              <Badge
+                status={formatter(taskModelStatusOptions, value, 'value', 'status')}
+                text={formatter(taskModelStatusOptions, value, 'value', 'data')}
+              />
+            </>
+          );
         },
       },
       {
@@ -214,7 +229,7 @@ class TaskModel extends Component {
         ),
       },
     ];
-    const { tableData, visible, argumentVisible } = this.state;
+
     return (
       <PageHeaderWrapper title={id || ''}>
         <Form
@@ -294,13 +309,15 @@ class TaskModel extends Component {
           </Card>
 
           <Card style={{ marginTop: '24px' }} title={this.titleContent()}>
+            {tableLoading ? <Spin/>
+            :
             <Table
               rowKey="id"
               dataSource={tableData}
               columns={columns}
               rowClassName="editable-row"
               pagination={false}
-            />
+            />}
             <Button
               style={{
                 width: '100%',
@@ -339,7 +356,7 @@ class TaskModel extends Component {
   }
 }
 
-export default connect(({ global, project }) => ({
+export default connect(({ global, taskModel }) => ({
   languageCode: global.languageCode,
-  project,
+  taskModel,
 }))(TaskModel);

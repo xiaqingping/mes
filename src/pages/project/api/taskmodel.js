@@ -13,9 +13,11 @@ export default {
   searchPublisherName(params) {
     return request(`${http}v1/task/${params}/publisherFuzzySearch`);
   },
-  // 前置参数列表
-  getOwnTaskModel(params) {
-    return request(`${http}v1/task/${params}/publisherFuzzySearch`);
+  // 获取任务列表
+  getTaskModels(params) {
+    return request(`${http}v1/task/task`, {
+      params
+    });
   }
 
   // // 查询利润中心主数据

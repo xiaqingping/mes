@@ -35,6 +35,7 @@ class AssociatedProcessModel extends React.Component {
   };
 
   getTableData = (options = {}) => {
+    console.log(this.tableSearchFormRef.current);
     // this.setState({ loading: true });
     // const formData = this.tableSearchFormRef.current.getFieldsValue();
     // const { pagination } = this.state;
