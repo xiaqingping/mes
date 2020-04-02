@@ -18,6 +18,21 @@ module.exports = {
           path: '/project/project-manage/detail',
           component: './project/project-manage/project-manage-detail',
         },
+        {
+          name: 'add',
+          path: '/project/project-manage/add',
+          component: './project/project-manage/project-manage-edit',
+        },
+        {
+          name: 'addflowpath',
+          path: '/project/project-manage/add/addflowpath',
+          component: './project/project-manage/project-manage-edit/addflowpath',
+        },
+        {
+          name: 'edit',
+          path: '/project/project-manage/edit/:id',
+          component: './project/project-manage/project-manage-edit',
+        },
       ],
     },
     {
