@@ -144,7 +144,7 @@ class Test extends Component {
               </FormItem>
             </div>
             <Modal
-              title="所有人"
+              title="业务伙伴-客户"
               visible={this.state.visible}
               onOk={this.handleOk}
               onCancel={this.handleCancel}

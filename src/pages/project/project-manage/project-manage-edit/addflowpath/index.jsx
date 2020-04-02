@@ -11,7 +11,7 @@ import {
   Button,
   Col,
   Row,
-  // Avatar,
+  Avatar,
   Table,
   Badge,
 } from 'antd';
@@ -29,7 +29,7 @@ import { formatter } from '@/utils/utils';
 class Test extends Component {
   tableSearchFormRef = React.createRef();
 
-  state = { visible: false ,viewvisible:false};
+  state = { visible: false, viewvisible: false };
 
   constructor(props) {
     super(props);
@@ -92,12 +92,12 @@ class Test extends Component {
     });
   };
 
-  viewModal= () => {
+  viewModal = () => {
     console.log(111);
     this.setState({
       viewvisible: true,
     });
-  }
+  };
 
   vieweOk = e => {
     console.log(e);
@@ -127,10 +127,9 @@ class Test extends Component {
   //   });
   // };
 
-
   render() {
     const { status } = this.props;
-    const { pagination, list, loading} = this.state;
+    const { pagination, list, loading } = this.state;
 
     let tableWidth = 0;
     let columns = [
@@ -256,270 +255,348 @@ class Test extends Component {
               />
             </Form>
           </div>
-          <div style={{
-              width: '100%',
-              paddingBottom:'100px',
-            }}>
-            <Button type="dashed" onClick={this.showModal} icon={<PlusOutlined />}
+          <div
             style={{
               width: '100%',
-              marginTop: 16,
-              paddingBottom: 8,
-            }}>
+              paddingBottom: '100px',
+            }}
+          >
+            <Button
+              type="dashed"
+              onClick={this.showModal}
+              icon={<PlusOutlined />}
+              style={{
+                width: '100%',
+                marginTop: 16,
+                paddingBottom: 8,
+              }}
+            >
               选择流程模型
             </Button>
             <div>
-            <Modal
-              title="选择流程模型"
-              visible={this.state.visible}
-              onOk={this.handleOk}
-              onCancel={this.handleCancel}
-              width={1200}
+              <Modal
+                title="选择流程模型"
+                visible={this.state.visible}
+                onOk={this.handleOk}
+                onCancel={this.handleCancel}
+                width={1200}
               >
                 <div>
-                  <Row gutter={16} style={{margin:'0',}}>
-                    <Col span={7} style={{padding:'0',marginBottom:'10px',marginRight:'10px'}}>
-                      <Card  bodyStyle={{width:'300px',padding:'0'}}>
-                        <div style={{height:'80px',
-                          width:'300px',padding:'5px'}}>
-                          <div style={{width:'50px',height:'50px',float:'left',
-                            borderRadius:'50%',backgroundColor:'red',
-                            textAlign:'center',
-                            lineHeight:'40px',marginRight:'10px'}}>
-                              头像
-                          </div>
-                          <div style={{float:'left',height:'50px',width:'100px',
-                            textAlign:'center'}}>
-                            <ul style={{padding:'0',textAlign:'center'}}>
+                  <Row gutter={16} style={{ margin: '0' }}>
+                    <Col
+                      span={7}
+                      style={{ padding: '0', marginBottom: '10px', marginRight: '10px' }}
+                    >
+                      <Card bodyStyle={{ width: '300px', padding: '0' }}>
+                        <div style={{ height: '80px', width: '300px', padding: '5px' }}>
+                          <Avatar
+                            src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
+                            style={{ float: 'left', marginRight: '10px' }}
+                            size="large"
+                          />
+                          <div
+                            style={{
+                              float: 'left',
+                              height: '50px',
+                              width: '100px',
+                              textAlign: 'center',
+                            }}
+                          >
+                            <ul style={{ padding: '0', textAlign: 'center' }}>
+                              <li>某某某</li>
                               <li>
-                                某某某
-                              </li>
-                              <li style={{width:'30px',height:'20px',border:'1px',
-                                marginLeft:'32px',color:'green',borderColor:'yellowgreen',
-                                borderStyle:'solid',textAlign:'center',lineHeight:'20px'}}>
-                                v1.2
+                                <Tag color="green" style={{ width: '50px', height: '20px' }}>
+                                  v1.2
+                                </Tag>
                               </li>
                             </ul>
                           </div>
-                          <div style={{fontSize:'14px',float:'right',
-                            color:'#005bc3',marginRight:'10px'}}>
-                            <Button onClick={this.viewModal}>
+                          <div
+                            style={{
+                              fontSize: '14px',
+                              float: 'right',
+                              color: '#005bc3',
+                              marginRight: '10px',
+                            }}
+                          >
+                            <Button
+                              onClick={this.viewModal}
+                              style={{ border: '0', color: '#005bc3' }}
+                            >
                               查看
                             </Button>
-                            <Modal title="查看流程模型"
-                                visible={this.state.viewvisible}
-                                onOk={this.vieweOk}
-                                onCancel={this.viewCancel}
-                                width={600}>
-                                  <div style={{height:'320px'}}>
-                                    {/* 上部 */}
-                                    <div style={{height:'50px'}}>
-                                      <div style={{float:'left',width:'50px',height:'50px',
-                                        borderRadius:'50%',backgroundColor:'red',
-                                        textAlign:'center',
-                                        lineHeight:'40px',marginRight:'10px'}}>
-                                          头像
-                                      </div>
-                                      <div style={{float:'left',height:'50px',width:'100px',
-                                        textAlign:'center',marginRight:'20px'}}>
-                                        <ul style={{padding:'0',textAlign:'center'}}>
-                                          <li>
-                                            565656443464
-                                          </li>
-                                          <li style={{height:'20px',border:'1px',}}>
-                                            某某某
-                                          </li>
-                                        </ul>
-                                      </div>
-                                      <div style={{float:'left',border:'1px',width:'30px',
-                                        height:'20px',color:'green',borderColor:'yellowgreen',
-                                        borderStyle:'solid',textAlign:'center',lineHeight:'20px'}}>
-                                        v1.2
-                                      </div>
-                                    </div>
-                                    {/* 描述 */}
-                                    <div style={{fontSize:'14px',padding:'5px'}}>
-                                      心灵鸡汤来一碗,心灵鸡汤来两碗,心灵鸡汤来三碗，心灵鸡汤来四碗,心灵鸡汤来一碗,
-                                      心灵鸡汤来两碗,心灵鸡汤来三碗，心灵鸡汤来四碗
-                                    </div>
-                                    {/* 表格 */}
-                                    <div>
-                                      <Table columns={columnView} dataSource={data} size="small" />
-                                    </div>
+                            <Modal
+                              title="查看流程模型"
+                              visible={this.state.viewvisible}
+                              onOk={this.vieweOk}
+                              onCancel={this.viewCancel}
+                              width={600}
+                            >
+                              <div style={{ height: '320px' }}>
+                                {/* 上部 */}
+                                <div style={{ height: '50px' }}>
+                                  <Avatar
+                                    src="https://zos.alipayobjects.com/rmsportal
+                                        /ODTLcjxAfvqbxHnVXCYX.png"
+                                    style={{ float: 'left', marginRight: '10px' }}
+                                    size="large"
+                                  />
+                                  <div
+                                    style={{
+                                      float: 'left',
+                                      height: '50px',
+                                      width: '100px',
+                                      textAlign: 'center',
+                                      marginRight: '20px',
+                                    }}
+                                  >
+                                    <ul style={{ padding: '0', textAlign: 'center' }}>
+                                      <li>565656443464</li>
+                                      <li style={{ height: '20px', border: '1px' }}>某某某</li>
+                                    </ul>
                                   </div>
+
+                                  <div style={{ float: 'left' }}>
+                                    <Tag color="green" style={{ width: '40px', height: '20px' }}>
+                                      v1.2
+                                    </Tag>
+                                  </div>
+                                </div>
+                                {/* 描述 */}
+                                <div style={{ fontSize: '14px', padding: '5px' }}>
+                                  心灵鸡汤来一碗,心灵鸡汤来两碗,心灵鸡汤来三碗，心灵鸡汤来四碗,心灵鸡汤来一碗,
+                                  心灵鸡汤来两碗,心灵鸡汤来三碗，心灵鸡汤来四碗
+                                </div>
+                                {/* 表格 */}
+                                <div>
+                                  <Table columns={columnView} dataSource={data} size="small" />
+                                </div>
+                              </div>
                             </Modal>
                           </div>
                         </div>
-                        <div style={{fontSize:'14px',padding:'5px'}}>
+                        <div style={{ fontSize: '14px', padding: '10px' }}>
                           心灵鸡汤来一碗,心灵鸡汤来两碗,心灵鸡汤来三碗，心灵鸡汤来四碗
                         </div>
                       </Card>
                     </Col>
-                    <Col span={7} style={{padding:'0',marginBottom:'10px',marginRight:'10px'}}>
-                      <Card bodyStyle={{width:'300px',padding:'0'}}>
-                          <div style={{height:'80px',
-                            width:'300px',padding:'5px'}}>
-                            <div style={{width:'50px',height:'50px',float:'left',
-                              borderRadius:'50%',backgroundColor:'red',
-                              textAlign:'center',
-                              lineHeight:'40px',marginRight:'10px'}}>
-                                头像
-                            </div>
-                            <div style={{float:'left',height:'50px',width:'100px',
-                              }}>
-                              <ul style={{padding:'0',textAlign:'center'}}>
-                                <li>
-                                  某某某
-                                </li>
-                                <li style={{width:'40px',height:'20px',border:'1px',
-                                marginLeft:'32px',color:'green',borderColor:'yellowgreen',
-                                borderStyle:'solid',textAlign:'center',lineHeight:'20px'}}>
-                                v1.2
-                              </li>
-                              </ul>
-                            </div>
-                            <div style={{fontSize:'14px',float:'right',
-                              color:'#005bc3',marginRight:'10px'}}>
-                              查看
-                            </div>
-                          </div>
-                          <div style={{fontSize:'14px'}}>
-                            心灵鸡汤来一碗,心灵鸡汤来两碗,心灵鸡汤来三碗，心灵鸡汤来四碗
-                          </div>
-                      </Card>
-                    </Col>
-                    <Col span={7} style={{padding:'0',marginBottom:'10px'}}>
-                      <Card bodyStyle={{width:'300px',
-                          padding:'0'}}>
-                        <div style={{height:'80px',
-                          width:'300px',padding:'5px'}}>
-                          <div style={{width:'50px',height:'50px',float:'left',
-                            borderRadius:'50%',backgroundColor:'red',
-                            textAlign:'center',
-                            lineHeight:'40px',marginRight:'10px'}}>
-                              头像
-                          </div>
-                          <div style={{float:'left',height:'50px',width:'100px',}}>
-                            <ul style={{padding:'0',textAlign:'center'}}>
+                    <Col
+                      span={7}
+                      style={{ padding: '0', marginBottom: '10px', marginRight: '10px' }}
+                    >
+                      <Card bodyStyle={{ width: '300px', padding: '0' }}>
+                        <div style={{ height: '80px', width: '300px', padding: '5px' }}>
+                          <Avatar
+                            src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
+                            style={{ float: 'left', marginRight: '10px' }}
+                            size="large"
+                          />
+                          <div
+                            style={{
+                              float: 'left',
+                              height: '50px',
+                              width: '100px',
+                              textAlign: 'center',
+                            }}
+                          >
+                            <ul style={{ padding: '0', textAlign: 'center' }}>
+                              <li>某某某</li>
                               <li>
-                                某某某
-                              </li>
-                              <li style={{width:'40px',height:'20px',border:'1px',
-                                marginLeft:'32px',color:'green',borderColor:'yellowgreen',
-                                borderStyle:'solid',textAlign:'center',lineHeight:'20px'}}>
-                                v1.2
+                                <Tag color="green" style={{ width: '50px', height: '20px' }}>
+                                  v1.2
+                                </Tag>
                               </li>
                             </ul>
                           </div>
-                          <div style={{fontSize:'14px',float:'right',
-                            color:'#005bc3',marginRight:'10px'}}>
+                          <div
+                            style={{
+                              fontSize: '14px',
+                              float: 'right',
+                              color: '#005bc3',
+                              marginRight: '10px',
+                            }}
+                          >
                             查看
                           </div>
                         </div>
-                        <div style={{fontSize:'14px',padding:'5px'}}>
+                        <div style={{ fontSize: '14px', padding: '10px' }}>
                           心灵鸡汤来一碗,心灵鸡汤来两碗,心灵鸡汤来三碗，心灵鸡汤来四碗
                         </div>
                       </Card>
                     </Col>
-                    <Col span={7} style={{padding:'0',marginBottom:'10px',marginRight:'10px'}}>
-                      <Card  bodyStyle={{width:'300px',padding:'0'}}>
-                        <div style={{height:'80px',
-                          width:'300px',padding:'5px'}}>
-                          <div style={{width:'50px',height:'50px',float:'left',
-                            borderRadius:'50%',backgroundColor:'red',
-                            textAlign:'center',
-                            lineHeight:'40px',marginRight:'10px'}}>
-                              头像
-                          </div>
-                          <div style={{float:'left',height:'50px',width:'100px',
-                            textAlign:'center'}}>
-                            <ul style={{padding:'0',textAlign:'center'}}>
+                    <Col span={7} style={{ padding: '0', marginBottom: '10px' }}>
+                      <Card bodyStyle={{ width: '300px', padding: '0' }}>
+                        <div style={{ height: '80px', width: '300px', padding: '5px' }}>
+                          <Avatar
+                            src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
+                            style={{ float: 'left', marginRight: '10px' }}
+                            size="large"
+                          />
+                          <div
+                            style={{
+                              float: 'left',
+                              height: '50px',
+                              width: '100px',
+                              textAlign: 'center',
+                            }}
+                          >
+                            <ul style={{ padding: '0', textAlign: 'center' }}>
+                              <li>某某某</li>
                               <li>
-                                某某某
-                              </li>
-                              <li style={{width:'40px',height:'20px',border:'1px',
-                                marginLeft:'32px',color:'green',borderColor:'yellowgreen',
-                                borderStyle:'solid',textAlign:'center',lineHeight:'20px'}}>
-                                v1.2
+                                <Tag color="green" style={{ width: '50px', height: '20px' }}>
+                                  v1.2
+                                </Tag>
                               </li>
                             </ul>
                           </div>
-                          <div style={{fontSize:'14px',float:'right',
-                            color:'#005bc3',marginRight:'10px'}}>
+                          <div
+                            style={{
+                              fontSize: '14px',
+                              float: 'right',
+                              color: '#005bc3',
+                              marginRight: '10px',
+                            }}
+                          >
                             查看
                           </div>
                         </div>
-                        <div style={{fontSize:'14px',padding:'5px'}}>
+                        <div style={{ fontSize: '14px', padding: '5px' }}>
                           心灵鸡汤来一碗,心灵鸡汤来两碗,心灵鸡汤来三碗，心灵鸡汤来四碗
                         </div>
                       </Card>
                     </Col>
-                    <Col span={7} style={{padding:'0',marginBottom:'10px',marginRight:'10px'}}>
-                      <Card  bodyStyle={{width:'300px',padding:'0'}}>
-                          <div style={{height:'80px',
-                            width:'300px',padding:'5px'}}>
-                            <div style={{width:'50px',height:'50px',float:'left',
-                              borderRadius:'50%',backgroundColor:'red',
-                              textAlign:'center',
-                              lineHeight:'40px',marginRight:'10px'}}>
-                                头像
-                            </div>
-                            <div style={{float:'left',height:'50px',width:'100px',}}>
-                              <ul style={{padding:'0',textAlign:'center'}}>
-                                <li>
-                                  某某某
-                                </li>
-                                <li style={{width:'30px',height:'20px',border:'1px',
-                                marginLeft:'32px',color:'green',borderColor:'yellowgreen',
-                                borderStyle:'solid',textAlign:'center',lineHeight:'20px'}}>
-                                v1.2
-                              </li>
-                              </ul>
-                            </div>
-                            <div style={{fontSize:'14px',float:'right',
-                              color:'#005bc3',marginRight:'10px'}}>
-                              查看
-                            </div>
-                          </div>
-                          <div style={{fontSize:'14px',padding:'5px'}}>
-                            心灵鸡汤来一碗,心灵鸡汤来两碗,心灵鸡汤来三碗，心灵鸡汤来四碗
-                          </div>
-                      </Card>
-                    </Col>
-                    <Col span={7} style={{padding:'0',marginBottom:'10px'}}>
-                      <Card  bodyStyle={{width:'300px',padding:'0'}}>
-                        <div style={{height:'80px',width:'300px',padding:'5px'}}>
-                          <div style={{width:'50px',height:'50px',float:'left',
-                            borderRadius:'50%',backgroundColor:'red',
-                            textAlign:'center',
-                            lineHeight:'40px',marginRight:'10px'}}>
-                              头像
-                          </div>
-                          <div style={{float:'left',height:'50px',width:'100px',}}>
-                            <ul style={{padding:'0',textAlign:'center'}}>
+                    <Col
+                      span={7}
+                      style={{ padding: '0', marginBottom: '10px', marginRight: '10px' }}
+                    >
+                      <Card bodyStyle={{ width: '300px', padding: '0' }}>
+                        <div style={{ height: '80px', width: '300px', padding: '5px' }}>
+                          <Avatar
+                            src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
+                            style={{ float: 'left', marginRight: '10px' }}
+                            size="large"
+                          />
+                          <div
+                            style={{
+                              float: 'left',
+                              height: '50px',
+                              width: '100px',
+                              textAlign: 'center',
+                            }}
+                          >
+                            <ul style={{ padding: '0', textAlign: 'center' }}>
+                              <li>某某某</li>
                               <li>
-                                某某某
-                              </li>
-                              <li style={{width:'30px',height:'20px',border:'1px',
-                                marginLeft:'32px',color:'green',borderColor:'yellowgreen',
-                                borderStyle:'solid',textAlign:'center',lineHeight:'20px'}}>
-                                v1.2
+                                <Tag color="green" style={{ width: '50px', height: '20px' }}>
+                                  v1.2
+                                </Tag>
                               </li>
                             </ul>
                           </div>
-                          <div style={{fontSize:'14px',float:'right',
-                            color:'#005bc3',marginRight:'10px'}}>
+                          <div
+                            style={{
+                              fontSize: '14px',
+                              float: 'right',
+                              color: '#005bc3',
+                              marginRight: '10px',
+                            }}
+                          >
                             查看
                           </div>
                         </div>
-                        <div style={{fontSize:'14px',padding:'5px'}}>
+                        <div style={{ fontSize: '14px', padding: '10px' }}>
+                          心灵鸡汤来一碗,心灵鸡汤来两碗,心灵鸡汤来三碗，心灵鸡汤来四碗
+                        </div>
+                      </Card>
+                    </Col>
+                    <Col
+                      span={7}
+                      style={{ padding: '0', marginBottom: '10px', marginRight: '10px' }}
+                    >
+                      <Card bodyStyle={{ width: '300px', padding: '0' }}>
+                        <div style={{ height: '80px', width: '300px', padding: '5px' }}>
+                          <Avatar
+                            src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
+                            style={{ float: 'left', marginRight: '10px' }}
+                            size="large"
+                          />
+                          <div
+                            style={{
+                              float: 'left',
+                              height: '50px',
+                              width: '100px',
+                              textAlign: 'center',
+                            }}
+                          >
+                            <ul style={{ padding: '0', textAlign: 'center' }}>
+                              <li>某某某</li>
+                              <li>
+                                <Tag color="green" style={{ width: '50px', height: '20px' }}>
+                                  v1.2
+                                </Tag>
+                              </li>
+                            </ul>
+                          </div>
+                          <div
+                            style={{
+                              fontSize: '14px',
+                              float: 'right',
+                              color: '#005bc3',
+                              marginRight: '10px',
+                            }}
+                          >
+                            查看
+                          </div>
+                        </div>
+                        <div style={{ fontSize: '14px', padding: '10px' }}>
+                          心灵鸡汤来一碗,心灵鸡汤来两碗,心灵鸡汤来三碗，心灵鸡汤来四碗
+                        </div>
+                      </Card>
+                    </Col>
+                    <Col span={7} style={{ padding: '0', marginBottom: '10px' }}>
+                      <Card bodyStyle={{ width: '300px', padding: '0' }}>
+                        <div style={{ height: '80px', width: '300px', padding: '5px' }}>
+                          <Avatar
+                            src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
+                            style={{ float: 'left', marginRight: '10px' }}
+                            size="large"
+                          />
+                          <div
+                            style={{
+                              float: 'left',
+                              height: '50px',
+                              width: '100px',
+                              textAlign: 'center',
+                            }}
+                          >
+                            <ul style={{ padding: '0', textAlign: 'center' }}>
+                              <li>某某某</li>
+                              <li>
+                                <Tag color="green" style={{ width: '50px', height: '20px' }}>
+                                  v1.2
+                                </Tag>
+                              </li>
+                            </ul>
+                          </div>
+                          <div
+                            style={{
+                              fontSize: '14px',
+                              float: 'right',
+                              color: '#005bc3',
+                              marginRight: '10px',
+                            }}
+                          >
+                            查看
+                          </div>
+                        </div>
+                        <div style={{ fontSize: '14px', padding: '10px' }}>
                           心灵鸡汤来一碗,心灵鸡汤来两碗,心灵鸡汤来三碗，心灵鸡汤来四碗
                         </div>
                       </Card>
                     </Col>
                   </Row>
                 </div>
-            </Modal>
+              </Modal>
             </div>
           </div>
         </Card>
