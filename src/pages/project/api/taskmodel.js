@@ -33,8 +33,13 @@ export default {
     return request(`${http}/v1/task/${id}/allPreTasks`);
   },
 
-  // // 查询利润中心主数据
-  // getProfitCenters() {
-  //   return request('/profitCenters/v1');
-  // },
+  // 获取后置列表
+  getPostTasks(id) {
+    return request(`${http}v1/task/${id}/postTasks`);
+  },
+
+  // 获取任务模型详细信息
+  getTaskModelDetail(id) {
+    return request(`${http}v1/task/${id}`);
+  },
 };
