@@ -55,6 +55,7 @@ const SeqModel = {
     taskModelStatusOptions: [{
         value: 1,
         data: "未发布",
+        text: "未发布",
         key: '1',
         label: '未发布',
         status: "default",
@@ -63,28 +64,31 @@ const SeqModel = {
       {
         value: 2,
         data: "已发布",
+        text: "已发布",
         key: '2',
         label: '已发布',
         status: "success",
       },
       {
         label: '已禁用',
+        data: "已发布",
         value: 3,
         status: "error",
-        data: "已禁用",
+        text: "已禁用",
         key: '3'
       },
       {
         label: '已过期',
+        data: "已发布",
         value: 4,
         status: "warning",
-        data: "已过期",
+        text: "已过期",
         key: '4'
       },
     ],
 
-    viewId: "",  // 任务模型列表点击查看的id
-    selectParamsId:"", // 根据前置后置任务id查询参数的id
+    viewId: "", // 任务模型列表点击查看的id
+    selectParamsId: "", // 根据前置后置任务id查询参数的id
     taskModelList: [{
         id: 2,
         code: 111112221,
@@ -230,7 +234,10 @@ const SeqModel = {
         viewId: payload
       }
     },
-    setViewParamsId(state, {payload}) {
+    setViewParamsId(state, {
+      payload
+    }) {
+      console.log(payload);
       return {
         ...state,
         selectParamsId: payload

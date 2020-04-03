@@ -16,6 +16,7 @@ class TaskModelTabs extends Component {
     postTasks: [], // 后置任务列表
     preLoading: false,
     postLoading: false,
+    toViewArgument: false,
   };
 
   componentDidMount() {
@@ -46,12 +47,15 @@ class TaskModelTabs extends Component {
     });
     console.log(this.props);
     // TODO 获取数据参数数据
-    // const { dispatch } = this.props.taskModel;
+    const { dispatch } = this.props;
 
-    // dispatch({
-    //   type: 'taskModel/setViewParamsId',
-    //   payload: item.id,
-    // });
+    dispatch({
+      type: 'taskModel/setViewParamsId',
+      payload: item.id,
+    });
+    this.setState({
+      toViewArgument: true,
+    });
   };
 
   onViewClose = () => {
@@ -61,14 +65,21 @@ class TaskModelTabs extends Component {
   };
 
   render() {
-    const { viewVisible, preTaskList, postTasks, preLoading, postLoading } = this.state;
+    const {
+      viewVisible,
+      preTaskList,
+      postTasks,
+      preLoading,
+      postLoading,
+      toViewArgument,
+    } = this.state;
     const { taskModel } = this.props;
     const { taskModelStatusOptions } = taskModel.taskModel;
     return (
       <>
         <Tabs defaultActiveKey="1" onChange={this.onChange}>
           <TabPane tab="前置任务" key="1">
-            {preLoading ? (
+            {false ? (
               <div className="task_model_pre_task_loading">
                 <Spin />
               </div>
@@ -105,7 +116,7 @@ class TaskModelTabs extends Component {
             )}
           </TabPane>
           <TabPane tab="后置任务" key="2">
-            {postLoading ? (
+            {false ? (
               <div className="task_model_pre_task_loading">
                 <Spin />
               </div>
@@ -142,7 +153,9 @@ class TaskModelTabs extends Component {
             )}
           </TabPane>
         </Tabs>
-        <ArgumentModel visible={viewVisible} onClose={this.onViewClose} fromView />
+        {toViewArgument && (
+          <ArgumentModel visible={viewVisible} onClose={this.onViewClose} fromView />
+        )}
       </>
     );
   }

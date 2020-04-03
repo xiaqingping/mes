@@ -5,11 +5,13 @@ import { Card, Upload, message, Input, Tag, Table, Button, Form, Badge, Switch, 
 import { LoadingOutlined, SettingOutlined, PlusOutlined, DeleteOutlined } from '@ant-design/icons';
 import { connect } from 'dva';
 import './index.less';
-
+import { guid, formatter } from '@/utils/utils';
 import BeforeTask from './components/beforeTask';
 import ArgumentModel from './components/argumentModel';
-import { formatter } from '@/utils/utils';
-import api from '@/api';
+
+import router from 'umi/router';
+import disk from '@/pages/project/api/disk';
+import api from '@/pages/project/api/taskmodel';
 
 function getBase64(img, callback) {
   const reader = new FileReader();
@@ -36,17 +38,23 @@ class TaskModel extends Component {
     return { id: nextProps.match.params.id || '' };
   }
 
-  state = {
-    imageUrl: '',
-    loading: false,
-    tableLoading: false,
-    id: '',
-    visible: false,
-    tableData: [],
-    argumentVisible: false, // 参数弹框是否显示
-    page: 1,
-    rows: 100,
-  };
+  constructor(props) {
+    super(props);
+    const guuid = guid();
+    this.state = {
+      imageUrl: '',
+      loading: false,
+      tableLoading: false,
+      id: '',
+      visible: false,
+      tableData: [],
+      argumentVisible: false, // 参数弹框是否显示
+      page: 1,
+      rows: 10,
+      checked: false,
+      guuid,
+    };
+  }
 
   componentDidMount() {
     const isAdd = this.props.match.path.indexOf('add');
@@ -102,16 +110,25 @@ class TaskModel extends Component {
 
   // 提交上传
   onFinish = values => {
-    const { imageUrl, tableData } = this.state;
-    console.log(imageUrl, values);
+    const { checked, tableData, imageUrl, guuid } = this.state;
     const ids = [];
-    console.log(tableData);
-    const parentIds = tableData.map(item=>{
-      return ids.push(item.id)
-    })
-
-    console.log(parentIds);
-
+    const { argumentList } = this.props.taskModel;
+    const form = this.tableSearchFormRef.current.getFieldsValue();
+    form.isAutomatic = checked ? 1 : 2;
+    form.params = argumentList;
+    tableData.map(item => {
+      return ids.push(item.id);
+    });
+    form.parentIds = ids;
+    form.version = 'V1.0';
+    if (imageUrl) {
+      form.picture = guuid;
+    }
+    console.log(form);
+    api.createTaskModel(form).then(res => {
+      message.success('任务模型创建成功!');
+      router.push('/project/task-model');
+    });
   };
 
   onFinishFailed = () => {
@@ -130,17 +147,17 @@ class TaskModel extends Component {
     this.setState({
       visible: false,
     });
-    const tableData = [...this.state.tableData];
-    tableData.unshift(row);
+    const { tableData } = this.state;
+    const tableData1 = [...tableData];
+    tableData1.unshift(row);
     this.setState({
-      tableData,
+      tableData: tableData1,
     });
-    
   };
 
   handleDelete = row => {
     // console.log(row);
-    const {tableData} = this.state;
+    const { tableData } = this.state;
     let list = [...tableData];
     list = list.filter(item => {
       return item.id !== row.id;
@@ -162,15 +179,16 @@ class TaskModel extends Component {
     });
   };
 
-  // 提交
-  handleSubmit = () => {
-    console.log('object');
+  switchChange = e => {
+    this.setState({
+      checked: e,
+    });
   };
 
   render() {
     const { taskModel } = this.props;
     const { taskModelStatusOptions } = taskModel;
-    const { tableData, visible, argumentVisible, tableLoading } = this.state;
+    const { tableData, visible, argumentVisible, tableLoading, guuid } = this.state;
 
     const uploadButton = (
       <div style={{ borderRadius: '50%' }}>
@@ -178,7 +196,7 @@ class TaskModel extends Component {
         {/* <div className="ant-upload-text">Upload</div> */}
       </div>
     );
-    const { imageUrl, id } = this.state;
+    const { imageUrl, id, checked } = this.state;
     const columns = [
       {
         title: '编号/名称',
@@ -236,6 +254,8 @@ class TaskModel extends Component {
       },
     ];
 
+    const uploadUrl = disk.uploadMoreFiles('project_process_model', guuid);
+
     return (
       <PageHeaderWrapper title={id || ''}>
         <Form
@@ -247,11 +267,12 @@ class TaskModel extends Component {
             <div style={{ float: 'left', marginLeft: '20px' }}>
               {/* <Form.Item name="uploadPIc"> */}
               <Upload
-                name="avatar"
+                name="picture"
                 listType="picture-card"
                 className="avatar-uploader"
                 showUploadList={false}
-                action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
+                action={uploadUrl}
+                headers={{ Authorization: this.props.authorization }}
                 beforeUpload={beforeUpload}
                 onChange={this.handleChange}
               >
@@ -293,7 +314,7 @@ class TaskModel extends Component {
             </div>
             <div style={{ float: 'left', marginLeft: '20px' }}>
               <Form.Item name="version">
-                <Tag color="green">V1.1</Tag>
+                <Tag color="green">V1.0</Tag>
               </Form.Item>
             </div>
 
@@ -309,21 +330,23 @@ class TaskModel extends Component {
                 <span style={{ fontSize: '16px', verticalAlign: 'middle', marginRight: 10 }}>
                   是否可自动运行：
                 </span>
-                <Switch />
+                <Switch checked={checked} onChange={this.switchChange} />
               </Form.Item>
             </div>
           </Card>
 
           <Card style={{ marginTop: '24px' }} title={this.titleContent()}>
-            {tableLoading ? <Spin/>
-            :
-            <Table
-              rowKey="id"
-              dataSource={tableData}
-              columns={columns}
-              rowClassName="editable-row"
-              pagination={false}
-            />}
+            {tableLoading ? (
+              <Spin />
+            ) : (
+              <Table
+                rowKey="id"
+                dataSource={tableData}
+                columns={columns}
+                rowClassName="editable-row"
+                pagination={false}
+              />
+            )}
             <Button
               style={{
                 width: '100%',
@@ -346,9 +369,6 @@ class TaskModel extends Component {
                 type="primary"
                 style={{ float: 'right', marginTop: '-32px' }}
                 htmlType="submit"
-                onClick={() => {
-                  this.handleSubmit();
-                }}
               >
                 提交
               </Button>
@@ -362,7 +382,8 @@ class TaskModel extends Component {
   }
 }
 
-export default connect(({ global, taskModel }) => ({
+export default connect(({ global, taskModel, user }) => ({
   languageCode: global.languageCode,
   taskModel,
+  authorization: user.currentUser.authorization,
 }))(TaskModel);

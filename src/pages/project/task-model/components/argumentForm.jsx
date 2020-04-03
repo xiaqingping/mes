@@ -12,22 +12,26 @@ class ArgumentForm extends React.Component {
 
   state = {
     loading: false,
+    viewForm: {}, // 当是查看的时候, 表单数据
   };
 
   componentDidMount() {
-    // 从查看列表过来的。。。
-    const { fromView } = this.props;
     const { editOriginData } = this.props;
     let otherProperties = {};
     (editOriginData.paramProperties || []).forEach(item => {
       otherProperties = { ...otherProperties, ...item };
     });
-    this.myRef.current.setFieldsValue({
+    const viewForm = {
       paramKey: editOriginData.paramKey,
       paramName: editOriginData.paramName,
       myId: editOriginData.myId,
       ...otherProperties,
+    };
+    this.setState({
+      viewForm,
     });
+
+    this.myRef.current.setFieldsValue(viewForm);
   }
 
   onFinish = values => {
@@ -38,6 +42,7 @@ class ArgumentForm extends React.Component {
     argumentValues.paramName = data.paramName;
     delete data.paramName;
     delete data.paramKey;
+    argumentValues.type = this.props.type;
     argumentValues.paramProperties = [data];
     argumentValues.myId = this.props.editOriginData.myId
       ? this.props.editOriginData.myId
@@ -54,7 +59,9 @@ class ArgumentForm extends React.Component {
   render() {
     const formItemLayout = null;
     const buttonItemLayout = null;
-    const { loading } = this.state;
+    const { loading, viewForm } = this.state;
+    console.log(viewForm);
+    viewForm.isrequired = viewForm.isrequired ? '是' : '否';
     const { fromView } = this.props;
     return loading ? (
       <div style={{ textAlign: 'center', marginTop: 15 }}>
@@ -72,61 +79,69 @@ class ArgumentForm extends React.Component {
           <Form.Item
             label="参数Key："
             name="paramKey"
-            rules={[
-              {
-                required: true,
-                message: '请输入参数名称',
-              },
-            ]}
+            rules={
+              !fromView && [
+                {
+                  required: true,
+                  message: '请输入参数名称',
+                },
+              ]
+            }
           >
-            {fromView ? 'ddd' : <Input placeholder="请输入参数名称 " />}
+            {fromView ? viewForm.paramKey : <Input placeholder="请输入参数名称 " />}
           </Form.Item>
           <Form.Item
             label="参数描述："
             name="paramName"
-            rules={[
-              {
-                required: true,
-                message: '请输入参数名称',
-              },
-            ]}
+            rules={
+              !fromView && [
+                {
+                  required: true,
+                  message: '请输入参数名称',
+                },
+              ]
+            }
           >
-            <Input placeholder="请输入 " />
+            {fromView ? viewForm.paramName : <Input placeholder="请输入 " />}
           </Form.Item>
           <Row gutter={16}>
             <Col span={12}>
               <Form.Item label="是否必填：" name="isrequired" valuePropName="checked">
-                <Switch defaultChecked />
+                {fromView ? viewForm.isrequired : <Switch defaultChecked />}
               </Form.Item>
             </Col>
             <Col span={12}>
               <Form.Item label="提示文字：" name="placeholder">
-                <Input placeholder="请输入 " />
+                {fromView ? viewForm.placeholder : <Input placeholder="请输入 " />}
               </Form.Item>
             </Col>
           </Row>
           <Row gutter={16}>
             <Col span={12}>
               <Form.Item label="默认值：" name="defaultValue">
-                <Input placeholder="请输入 " />
+                {fromView ? viewForm.defaultValue : <Input placeholder="请输入 " />}
               </Form.Item>
             </Col>
 
             <Col span={12}>
               <Form.Item label="验证规则：" name="validRule">
-                <Input placeholder="请输入 " />
+                {fromView ? viewForm.validRule : <Input placeholder="请输入 " />}
               </Form.Item>
             </Col>
           </Row>
 
           <Form.Item label="验证说明：" name="validDesc">
-            <Input placeholder="请输入 " />
+            {fromView ? viewForm.validDesc : <Input placeholder="请输入 " />}
           </Form.Item>
 
           <Form.Item {...buttonItemLayout}>
-            <Button type="primary" htmlType="submit">
-              确认
-            </Button>
+            {fromView ? (
+              ''
+            ) : (
+              <Button type="primary" htmlType="submit">
+                确认
+              </Button>
+            )}
           </Form.Item>
         </Form>
       </div>

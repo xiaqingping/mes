@@ -1,7 +1,13 @@
 import axios from 'axios';
-import { notification } from 'antd';
-import { router } from 'umi';
-import { formatMessage } from 'umi/locale';
+import {
+  notification
+} from 'antd';
+import {
+  router
+} from 'umi';
+import {
+  formatMessage
+} from 'umi/locale';
 
 const baseURLMap = {
   dev: 'https://devapi.sangon.com:30443/api',
@@ -59,8 +65,12 @@ const requestErr = data => {
   let message = (data && data.desc) || '错误提示';
   let description = errMsg.join('，') || '请求错误！';
   try {
-    message = formatMessage({ id: message });
-    description = formatMessage({ id: description });
+    message = formatMessage({
+      id: message
+    });
+    description = formatMessage({
+      id: description
+    });
   } catch (error) {
     console.log(`缺少错误消息国际化\nmessage:${message}\ndescription${description}`);
   }
@@ -72,8 +82,12 @@ const requestErr = data => {
 };
 
 const err = error => {
-  const { response = {} } = error;
-  const { data } = response;
+  const {
+    response = {}
+  } = error;
+  const {
+    data
+  } = response;
   requestErr(data);
   return Promise.reject(data);
 };
@@ -85,7 +99,9 @@ service.interceptors.request.use(config => {
   // GET请求处理请求参数
   // 去掉首尾空格
   if (config.method === 'get') {
-    const { params } = config;
+    const {
+      params
+    } = config;
     // eslint-disable-next-line no-restricted-syntax
     for (const key in params) {
       if (params.hasOwnProperty(key)) {
@@ -98,6 +114,8 @@ service.interceptors.request.use(config => {
   }
   if (token) {
     config.headers.Authorization = token;
+    config.headers.usercode = '123';
+    config.headers.username = '123';
 
     // FIXME: 开发时代理临时接口（配合webpack proxy 使用）
     if (process.env.NODE_ENV === 'development') {
@@ -140,4 +158,7 @@ service.interceptors.request.use(config => {
 service.interceptors.response.use(response => response.data, err);
 
 export default service;
-export { baseURL, requestErr };
+export {
+  baseURL,
+  requestErr
+};

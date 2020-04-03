@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
-
 import { Drawer, Button, Popconfirm, Dropdown, Menu, Spin } from 'antd';
-
+import api from '@/pages/project/api/taskmodel';
 import { connect } from 'dva';
 import ArgumentForm from './argumentForm';
 
@@ -10,14 +9,15 @@ class ArgumentModel extends Component {
     loading: false,
     childrenDrawer: false,
     argumentList: [],
-    isAdd: window.location.href.indexOf('add'),
+    isAdd: window.location.href.indexOf('add') > 0,
     paramName: '', // 控制下一个抽屉的标题显示
     editOriginData: {}, // 修改参数时传给二级抽屉的原始参数对象,
+    type: '', // 组件类型 ,比如: input
   };
 
   componentDidMount() {
     // 获取列表
-    const isAdd = window.location.href.indexOf('add');
+    const isAdd = window.location.href.indexOf('add') > 0;
     if (isAdd) {
       // 如果是新增
       this.setState({
@@ -34,8 +34,17 @@ class ArgumentModel extends Component {
   }
 
   getArgumentList = () => {
+    const { selectParamsId } = this.props.taskModel;
     this.setState({
       loading: true,
+    });
+    console.log(selectParamsId);
+    // debugger;
+    api.getTaskModelDetail(selectParamsId).then(res => {
+      console.log(res);
+      this.setState({
+        argumentList: res.params,
+      });
     });
   };
 
@@ -73,16 +82,17 @@ class ArgumentModel extends Component {
     if (item) {
       this.setState({
         title: item.text,
+        type: item.type,
         editOriginData: {},
       });
     }
   };
 
   titleContent = () => {
-    const { title, isAdd, paramName } = this.state;
+    const { type, isAdd, paramName } = this.state;
     return (
       <>
-        <div style={{ fontSize: '16px' }}>{`${title}---${isAdd ? '新增' : paramName}`}</div>
+        <div style={{ fontSize: '16px' }}>{`${type}---${isAdd ? '新增' : paramName}`}</div>
       </>
     );
   };
@@ -104,10 +114,13 @@ class ArgumentModel extends Component {
   };
 
   toViewArgumrnt = (item, idx) => {
+    const { fromView } = this.props;
+    const { argumentList } = this.state;
     this.setState({
       paramName: item.paramName,
     });
     this.toggleChildrenDrawer(true);
+    // 当关闭时候需要展示的列表
     if (idx || idx === 0) {
       this.setState({
         editOriginData: item,
@@ -117,13 +130,30 @@ class ArgumentModel extends Component {
         editOriginData: {},
       });
     }
+
+    // -------------------当打开某一个参数的时候获取它的详细信息--------------------
+
+    if (fromView) {
+      argumentList.some(v => {
+        if (v.paramId === item.paramId) {
+          console.log(item);
+
+          this.setState({
+            editOriginData: v,
+            type: v.type,
+          });
+          return true;
+        }
+        return v;
+      });
+    }
   };
 
   deleteArgumentItem = () => {};
 
   render() {
     const { visible, onClose, fromView } = this.props;
-    const { childrenDrawer, argumentList, loading, editOriginData } = this.state;
+    const { childrenDrawer, argumentList, loading, editOriginData, type } = this.state;
     const { formItemType } = this.props.taskModel;
     const menu = (
       <Menu style={{ height: 200, overflow: 'auto' }}>
@@ -154,7 +184,7 @@ class ArgumentModel extends Component {
           width={500}
           destroyOnClose
         >
-          {loading ? (
+          {false ? (
             <div style={{ textAlign: 'center', marginTop: 15 }}>
               <Spin size="small" />
             </div>
@@ -164,32 +194,36 @@ class ArgumentModel extends Component {
                 return (
                   <div style={{ overflow: 'hidden' }} key={item.paramKey}>
                     <span
-                      style={{ fontSize: '14px', fontWeight: 600, cursor: 'point' }}
+                      style={{ fontSize: '14px', fontWeight: 600, cursor: 'pointer' }}
                       onClick={() => this.toViewArgumrnt(item, index)}
                     >
                       {item.paramKey}
                     </span>
                     <span style={{ marginLeft: 40 }}>{item.paramName}</span>
-                    <Popconfirm
-                      placement={index === 0 ? 'bottom' : 'top'}
-                      title="确定要删除吗?"
-                      onConfirm={() => this.handleDelete(item, index)}
-                      okText="确认"
-                      cancelText="取消"
-                    >
-                      <Button type="link" style={{ float: 'right', marginLeft: 40 }}>
-                        删除
-                      </Button>
-                    </Popconfirm>
+                    {!fromView && (
+                      <Popconfirm
+                        placement={index === 0 ? 'bottom' : 'top'}
+                        title="确定要删除吗?"
+                        onConfirm={() => this.handleDelete(item, index)}
+                        okText="确认"
+                        cancelText="取消"
+                      >
+                        <Button type="link" style={{ float: 'right', marginLeft: 40 }}>
+                          删除
+                        </Button>
+                      </Popconfirm>
+                    )}
                   </div>
                 );
               })}
 
-              <Dropdown overlay={menu} trigger={['click']}>
-                <Button type="dashed" block style={{ marginTop: 30 }}>
-                  新增
-                </Button>
-              </Dropdown>
+              {!fromView && (
+                <Dropdown overlay={menu} trigger={['click']}>
+                  <Button type="dashed" block style={{ marginTop: 30 }}>
+                    新增
+                  </Button>
+                </Dropdown>
+              )}
             </>
           )}
           <Drawer
@@ -201,7 +235,8 @@ class ArgumentModel extends Component {
             title={this.titleContent()}
           >
             <ArgumentForm
-              fromView
+              fromView={fromView}
+              type={type}
               editOriginData={editOriginData}
               emitArguments={this.emitArguments}
               onClose={() => {

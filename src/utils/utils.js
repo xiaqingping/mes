@@ -311,6 +311,6 @@ export const getOperates = v => {
   } else if (v * 1 === 4) {
     operas = ['禁用', '查看'];
   }
-  return operas;
+  return operas || [];
 
 };
