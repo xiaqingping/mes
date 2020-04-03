@@ -1,6 +1,6 @@
 // 关联流程模型
 import React from 'react';
-import { Modal, Table, Avatar, Form, Input, Select, Col, Tag, Button } from 'antd';
+import { Modal, Table, Avatar, Form, AutoComplete, Input, Select, Col, Tag, Button } from 'antd';
 import TableSearchForm from '@/components/TableSearchForm';
 import { connect } from 'dva';
 import api from '@/pages/project/api/taskmodel';
@@ -18,7 +18,6 @@ class BeforeTask extends React.Component {
   state = { visible: false, pagination: {} };
 
   initialValues = {
-    status: 1,
     page: 1,
     rows: 10,
   };
@@ -28,12 +27,6 @@ class BeforeTask extends React.Component {
   }
 
   titleContent = () => <div style={{ fontSize: '16px' }}>关联任务模型</div>;
-
-  handleOk = () => {
-    this.setState({
-      visible: false,
-    });
-  };
 
   getTableData = (options = {}) => {
     this.setState({ loading: true });
@@ -84,7 +77,7 @@ class BeforeTask extends React.Component {
 
   // 被选中的model
   selectModel = row => {
-    this.props.onClose(row);
+    this.props.onClose(row, 'select');
   };
 
   simpleForm = () => (
@@ -104,6 +97,22 @@ class BeforeTask extends React.Component {
       </Col>
     </>
   );
+
+  // simpleForm = () => {
+  //   const { languageCode } = this.props;
+  //   return (
+  //     <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
+  //       <FormItem label="任务模型" name="code">
+  //         <AutoComplete
+  //           onSearch={this.inputValue}
+  //           options={nameCodeVal.map(this.renderOption)}
+  //           // placeholder={formatMessage({ id: 'bp.inputHere' })}
+  //           // optionLabelProp="text"
+  //         />
+  //       </FormItem>
+  //     </Col>
+  //   );
+  // };
 
   confirm = () => {
     console.log(123);
@@ -141,13 +150,7 @@ class BeforeTask extends React.Component {
         title: '版本',
         width: 100,
         dataIndex: 'version',
-        render: (value, row) => {
-          return (
-            <Tag color="green" style={{ padding: '0 5px' }}>
-              {value}
-            </Tag>
-          );
-        },
+        render: value => <>{value && <Tag color="green">{value}</Tag>}</>,
       },
       {
         title: '操作',
@@ -170,10 +173,9 @@ class BeforeTask extends React.Component {
       <Modal
         title={this.titleContent()}
         visible={this.state.visible}
-        onOk={this.handleOk}
-        onCancel={onClose}
         width={747}
         footer={null}
+        onCancel={onClose}
       >
         <div className="tableList">
           <TableSearchForm

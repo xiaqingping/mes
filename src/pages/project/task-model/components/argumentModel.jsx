@@ -29,21 +29,29 @@ class ArgumentModel extends Component {
         payload: this.state.argumentList,
       });
     } else {
+      // -----------------------------因为总是以前调用接口,先闭掉,,,一会解开------------------------------------------------------
       this.getArgumentList();
     }
   }
 
   getArgumentList = () => {
-    const { selectParamsId } = this.props.taskModel;
+    const { selectParamsId, editTaskModelId } = this.props.taskModel;
+    const { isAdd } = this.state;
     this.setState({
       loading: true,
     });
     console.log(selectParamsId);
+    const id = isAdd ? selectParamsId : editTaskModelId;
+    console.log(id);
     // debugger;
-    api.getTaskModelDetail(selectParamsId).then(res => {
+    api.getTaskModelDetail(id).then(res => {
       console.log(res);
+      const list = res.params.map(item => {
+        item.myId = Date.now();
+        return item;
+      });
       this.setState({
-        argumentList: res.params,
+        argumentList: list,
       });
     });
   };
@@ -52,7 +60,7 @@ class ArgumentModel extends Component {
     const { argumentList } = this.state;
     const list = [...argumentList];
     let idx = null;
-    list.some((item, index) => {
+    const isEdit = list.some((item, index) => {
       if (item.myId === props.myId) {
         idx = index;
       } else {
@@ -60,7 +68,7 @@ class ArgumentModel extends Component {
       }
       return item.myId === props.myId;
     });
-    if (idx || idx === 0) {
+    if (isEdit) {
       list[idx] = props;
     } else {
       list.push(props);
@@ -89,10 +97,10 @@ class ArgumentModel extends Component {
   };
 
   titleContent = () => {
-    const { type, isAdd, paramName } = this.state;
+    const { title, isAdd, paramName } = this.state;
     return (
       <>
-        <div style={{ fontSize: '16px' }}>{`${type}---${isAdd ? '新增' : paramName}`}</div>
+        <div style={{ fontSize: '16px' }}>{`${title}---${isAdd ? '新增' : paramName}`}</div>
       </>
     );
   };
@@ -114,6 +122,20 @@ class ArgumentModel extends Component {
   };
 
   toViewArgumrnt = (item, idx) => {
+    console.log(item);
+    const { formItemType } = this.props.taskModel;
+    console.log(this.props.taskModel);
+    let title = null;
+    formItemType.some(v => {
+      if (v.type == item.type) {
+        title = v.text;
+      }
+    });
+
+    this.setState({
+      type: item.type,
+      title,
+    });
     const { fromView } = this.props;
     const { argumentList } = this.state;
     this.setState({

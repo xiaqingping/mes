@@ -49,32 +49,61 @@ class TaskModel extends Component {
       visible: false,
       tableData: [],
       argumentVisible: false, // 参数弹框是否显示
-      page: 1,
-      rows: 10,
       checked: false,
       guuid,
+      // editOriginModelData: {}, // 修改时进页面时候的任务模型详细数据
+      isAdd: this.props.match.path.indexOf('add') > 0,
     };
   }
 
   componentDidMount() {
-    const isAdd = this.props.match.path.indexOf('add');
+    const { isAdd } = this.state;
     if (isAdd) {
       // 如果是新增
       this.setState({
         tableData: [],
       });
     } else {
-      this.getTableData();
+      const paramId = this.props.match.params.id;
+      const { editOriginModelData } = this.props.taskModel;
+      console.log(editOriginModelData);
+      console.log(this.tableSearchFormRef.current);
+      this.tableSearchFormRef.current.setFieldsValue(editOriginModelData);
+      // const { editOriginModelData } = this.state;
+      // api.getTaskModelDetail(paramId).then(res => {
+      //   console.log(res);
+      //   this.setState(
+      //     {
+      //       editOriginModelData: res,
+      //     },
+      //     () => {
+      //       console.log(this.props);
+      //       this.tableSearchFormRef.current.setFieldsValue(editOriginModelData);
+      //       console.log(editOriginModelData);
+      //       console.log(this.props.taskModel.editOriginModelData);
+      //     },
+      //   );
+      // });
+
+      this.setState({
+        checked: editOriginModelData.isAutomatic == 1,
+      });
+
+      this.getTableData(paramId);
     }
   }
 
-  getTableData = () => {
+  getTableData = id => {
     this.setState({
       tableLoading: true,
     });
-    const { page, rows } = this.state;
-
-    api.getTaskModels();
+    api.getPreTasks(id).then(res => {
+      // console.log(res);
+      this.setState({
+        tableData: res,
+        tableLoading: false,
+      });
+    });
   };
 
   // 图片上传
@@ -110,7 +139,7 @@ class TaskModel extends Component {
 
   // 提交上传
   onFinish = values => {
-    const { checked, tableData, imageUrl, guuid } = this.state;
+    const { checked, tableData, imageUrl, guuid, isAdd } = this.state;
     const ids = [];
     const { argumentList } = this.props.taskModel;
     const form = this.tableSearchFormRef.current.getFieldsValue();
@@ -125,8 +154,10 @@ class TaskModel extends Component {
       form.picture = guuid;
     }
     console.log(form);
+
     api.createTaskModel(form).then(res => {
-      message.success('任务模型创建成功!');
+      const msg = isAdd ? '任务模型创建成功!' : '任务模型修改成功!';
+      message.success(msg);
       router.push('/project/task-model');
     });
   };
@@ -143,16 +174,18 @@ class TaskModel extends Component {
   };
 
   // 点击关闭关联 添加数据到表格
-  onClose = row => {
+  onClose = (row, select) => {
+    const { tableData } = this.state;
+    const tableData1 = [...tableData];
     this.setState({
       visible: false,
     });
-    const { tableData } = this.state;
-    const tableData1 = [...tableData];
-    tableData1.unshift(row);
-    this.setState({
-      tableData: tableData1,
-    });
+    if (select) {
+      tableData1.push(row);
+      this.setState({
+        tableData: tableData1,
+      });
+    }
   };
 
   handleDelete = row => {
@@ -168,8 +201,13 @@ class TaskModel extends Component {
   };
 
   openArgumentModel = () => {
+    const { dispatch } = this.props;
     this.setState({
       argumentVisible: true,
+    });
+    dispatch({
+      type: 'taskModel/setEditTaskModelId',
+      payload: this.props.match.params.id,
     });
   };
 
@@ -294,22 +332,25 @@ class TaskModel extends Component {
                 rules={[
                   {
                     required: true,
-                    message: '请输入参数名称',
+                    message: '请输入任务名称',
                   },
                 ]}
               >
-                <Input
-                  placeholder="请输入任务名称"
-                  style={{ marginBottom: '10px' }}
-                  defaultValue={this.state.taskModelName}
-                />
+                <Input placeholder="请输入任务名称" />
               </Form.Item>
               <Form.Item name="describe">
-                <Input.TextArea
-                  placeholder="请输入任务描述"
-                  rows={4}
-                  defaultValue={this.state.taskModelName}
-                />
+                <Input.TextArea placeholder="请输入任务描述" rows={4} />
+              </Form.Item>
+              <Form.Item
+                name="taskFlag"
+                rules={[
+                  {
+                    required: true,
+                    message: '请输入标识',
+                  },
+                ]}
+              >
+                <Input placeholder="请输入标识" />
               </Form.Item>
             </div>
             <div style={{ float: 'left', marginLeft: '20px' }}>
@@ -336,17 +377,14 @@ class TaskModel extends Component {
           </Card>
 
           <Card style={{ marginTop: '24px' }} title={this.titleContent()}>
-            {tableLoading ? (
-              <Spin />
-            ) : (
-              <Table
-                rowKey="id"
-                dataSource={tableData}
-                columns={columns}
-                rowClassName="editable-row"
-                pagination={false}
-              />
-            )}
+            <Table
+              rowKey="id"
+              dataSource={tableData}
+              columns={columns}
+              rowClassName="editable-row"
+              pagination={false}
+              loading={tableLoading}
+            />
             <Button
               style={{
                 width: '100%',
@@ -357,7 +395,7 @@ class TaskModel extends Component {
               onClick={this.onOpen}
               icon={<PlusOutlined />}
             >
-              新增
+              前置任务
             </Button>
           </Card>
 
@@ -376,7 +414,9 @@ class TaskModel extends Component {
           </Card>
         </Form>
         <BeforeTask visible={visible} onClose={this.onClose} />
-        <ArgumentModel visible={argumentVisible} onClose={this.onArgumentClose} />
+        {argumentVisible && (
+          <ArgumentModel visible={argumentVisible} onClose={this.onArgumentClose} />
+        )}
       </PageHeaderWrapper>
     );
   }

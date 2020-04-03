@@ -300,10 +300,17 @@ class TaskModel extends Component {
   };
 
   operate = (op, v) => {
+    // op: 操作  v: 每行的数据
+    const { dispatch } = this.props;
     if (op === '发布') {
-      console.log('发布');
+      // console.log('发布');
+      router.push(`/project/task-model/edit/${v.id}`);
     } else if (op === '修改') {
-      console.log('修改');
+      dispatch({
+        type: 'taskModel/getEditOriginModelData',
+        payload: v,
+      });
+      this.goToEdit(v.id);
     } else if (op === '删除') {
       console.log('delete');
     } else if (op === '查看') {

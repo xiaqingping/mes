@@ -79,7 +79,7 @@ class TaskModelTabs extends Component {
       <>
         <Tabs defaultActiveKey="1" onChange={this.onChange}>
           <TabPane tab="前置任务" key="1">
-            {false ? (
+            {preLoading ? (
               <div className="task_model_pre_task_loading">
                 <Spin />
               </div>
@@ -116,7 +116,7 @@ class TaskModelTabs extends Component {
             )}
           </TabPane>
           <TabPane tab="后置任务" key="2">
-            {false ? (
+            {postLoading ? (
               <div className="task_model_pre_task_loading">
                 <Spin />
               </div>
