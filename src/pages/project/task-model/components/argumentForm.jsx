@@ -15,16 +15,18 @@ class ArgumentForm extends React.Component {
   };
 
   componentDidMount() {
+    // 从查看列表过来的。。。
+    const { fromView } = this.props;
     const { editOriginData } = this.props;
-    let obj = {};
+    let otherProperties = {};
     (editOriginData.paramProperties || []).forEach(item => {
-      obj = { ...obj, ...item };
+      otherProperties = { ...otherProperties, ...item };
     });
     this.myRef.current.setFieldsValue({
       paramKey: editOriginData.paramKey,
       paramName: editOriginData.paramName,
       myId: editOriginData.myId,
-      ...obj,
+      ...otherProperties,
     });
   }
 
@@ -53,6 +55,7 @@ class ArgumentForm extends React.Component {
     const formItemLayout = null;
     const buttonItemLayout = null;
     const { loading } = this.state;
+    const { fromView } = this.props;
     return loading ? (
       <div style={{ textAlign: 'center', marginTop: 15 }}>
         <Spin />
@@ -76,7 +79,7 @@ class ArgumentForm extends React.Component {
               },
             ]}
           >
-            <Input placeholder="请输入参数名称 " />
+            {fromView ? 'ddd' : <Input placeholder="请输入参数名称 " />}
           </Form.Item>
           <Form.Item
             label="参数描述："

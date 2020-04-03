@@ -102,8 +102,16 @@ class TaskModel extends Component {
 
   // 提交上传
   onFinish = values => {
-    const { imageUrl } = this.state;
+    const { imageUrl, tableData } = this.state;
     console.log(imageUrl, values);
+    const ids = [];
+    console.log(tableData);
+    const parentIds = tableData.map(item=>{
+      return ids.push(item.id)
+    })
+
+    console.log(parentIds);
+
   };
 
   onFinishFailed = () => {
@@ -132,7 +140,8 @@ class TaskModel extends Component {
 
   handleDelete = row => {
     // console.log(row);
-    let list = [...this.state.tableData];
+    const {tableData} = this.state;
+    let list = [...tableData];
     list = list.filter(item => {
       return item.id !== row.id;
     });
