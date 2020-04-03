@@ -76,6 +76,7 @@ class ProcessEdit extends Component {
       versionOpen: false, // 升级版本可以选择
       selectVersion: '', // 选择的版本值
       versionType: null, // 可以选择的版本
+      picture: '',
     };
   }
 
@@ -84,6 +85,11 @@ class ProcessEdit extends Component {
     if (this.props.match.params.id) {
       data = this.props.match.params.id.split('-');
       api.getProcessDetail(data[0]).then(res => {
+        this.getData(res.taskModels);
+        this.setState({
+          taskList: res.taskModels,
+          picture: res.picture,
+        });
         disk
           .getFiles({
             sourceCode: res.picture,
@@ -91,13 +97,13 @@ class ProcessEdit extends Component {
           })
           .then(v => {
             this.setState({
-              imageUrl: v && v[0].id ? disk.downloadFiles(v[0].id, { view: true }) : '',
+              imageUrl: v.length !== 0 ? disk.downloadFiles(v[0].id, { view: true }) : '',
             });
             this.props.dispatch({
               type: 'processModel/setProcessDetail',
               payload: {
                 ...res,
-                fileId: v && v[0].id ? v[0].id : '',
+                fileId: v.length !== 0 ? v[0].id : '',
               },
               // const newList = res.rows.map(e => {
               // const filterItem = v.filter(item => item.sourceCode === e.picture);
@@ -123,6 +129,7 @@ class ProcessEdit extends Component {
 
   // 图片上传
   handleChange = info => {
+    const { guuid } = this.state;
     if (info.file.status === 'uploading') {
       this.setState({ loading: true });
       return;
@@ -133,6 +140,7 @@ class ProcessEdit extends Component {
         this.setState({
           imageUrl,
           loading: false,
+          picture: guuid,
         }),
       );
     }
@@ -159,7 +167,7 @@ class ProcessEdit extends Component {
 
   // 提交上传
   onFinish = values => {
-    const { imageUrl, guuid, taskList, selectVersion, pageModel, id } = this.state;
+    const { imageUrl, guuid, taskList, selectVersion, pageModel, id, picture } = this.state;
     const { processAddData } = this.props;
     const data = processAddData;
     const taskModelIds = [];
@@ -171,10 +179,11 @@ class ProcessEdit extends Component {
     }
     data.name = values.name;
     data.describe = values.describe;
-    data.interactionAnalysis = values.interactionAnalysis;
+    data.interactionAnalysis = values.interactionAnalysis ? 1 : 2;
     data.version = selectVersion || 'V1.0';
-    data.taskModelIds = taskModelIds;
-
+    data.taskModels = taskModelIds;
+    data.picture = picture;
+    delete data.taskModelIds;
     // this.props.dispatch({
     //   type: 'processModel/setProcessAddData',
     //   payload: {
@@ -256,12 +265,13 @@ class ProcessEdit extends Component {
   };
 
   // 获取子级数据
-  getData = async value => {
+  getData = value => {
     const { taskList, ids, sonIds } = this.state;
     let data = taskList;
     const idsData = ids;
     const sonIdsData = sonIds;
     data = [...taskList, ...value];
+
     value.forEach(item => {
       idsData.push(item.id);
       sonIdsData.push(...item.preTaskIds);
@@ -379,7 +389,7 @@ class ProcessEdit extends Component {
       }
       return '';
     };
-
+    console.log(initialValues());
     return (
       <PageHeaderWrapper title={this.navContent()}>
         <Form onFinish={this.onFinish} initialValues={initialValues()}>
