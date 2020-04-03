@@ -14,11 +14,8 @@ export default {
   },
 
   // 项目管理：项目模糊搜索
-  // gettProjectManageCodeAndName() {
-  //   return request(`${http1}/projects/v1/likeFinByNameOrCode`);
-  // },
   gettProjectManageCodeAndName(params) {
-    return request(`${http1}/projects/v1/likeFinByNameOrCode`, { params });
+    return request(`${http1}/projects/v1/likeFindByNameOrCode`, { params });
   },
 
   // 项目管理删除
