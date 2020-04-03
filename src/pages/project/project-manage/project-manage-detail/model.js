@@ -9,6 +9,7 @@ const projectDetailModel = {
         decs: '描述描述描述描述描述描述描述描述描述111',
         version: 'V1.1',
         schedule: '0',
+        status: '1',
         processList: {
           path: '/favicon.png',
           name: '微生物多样式分析',
@@ -22,6 +23,7 @@ const projectDetailModel = {
         decs: '描述描述描述描述描述描述描述描述描述111',
         version: 'V1.1',
         schedule: '50',
+        status: '2',
         processList: {
           path: '/favicon.png',
           name: '微生物多样式分析',
@@ -35,6 +37,7 @@ const projectDetailModel = {
         decs: '描述描述描述描述描述描述描述描述描述111',
         version: 'V1.1',
         schedule: '50',
+        status: '3',
         processList: {
           path: '/favicon.png',
           name: '微生物多样式分析',
@@ -48,6 +51,7 @@ const projectDetailModel = {
         decs: '描述描述描述描述描述描述描述描述描述111',
         version: 'V1.1',
         schedule: '100',
+        status: '4',
         processList: {
           path: '/favicon.png',
           name: '微生物多样式分析',
@@ -119,39 +123,9 @@ const projectDetailModel = {
         authority: '3'
       },
     ],
-    taskList: [
-      {
-        key: '1',
-        code: '202220005547',
-        status: '1',
-        parameterList: [],
-        startTime: '2020/03/31 18:30:27',
-        endTime: '2020/04/02 19:40:37',
-        progress: 0,
-      },
-      {
-        key: '2',
-        code: '202220005547',
-        status: '2',
-        parameterList: [],
-        runTime: '3m5s',
-        startTime: '2020/03/31 19:30:27',
-        endTime: '2020/03/31 19:35:11',
-        progress: 50,
-      },
-      {
-        key: '3',
-        code: '202220005547',
-        status: '3',
-        parameterList: [],
-        runTime: '3m5s',
-        startTime: '2020/03/31 19:30:27',
-        endTime: '2020/04/05 11:45:50',
-        progress: 100,
-      },
-    ],
+
     // 权限
-    authority: [
+    jurisdiction: [
       { id: 1, name: '所有者' },
       { id: 2, name: '管理者' },
       { id: 3, name: '参与者' },
