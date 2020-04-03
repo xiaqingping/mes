@@ -1,15 +1,19 @@
 // 流程列表
-import { Form, Table, Tag, Progress, Divider } from 'antd';
+import { Form, Table, Tag, Progress, Divider, Button } from 'antd';
 import React, { Component } from 'react';
 import { connect } from 'dva';
-import { SlidersOutlined } from '@ant-design/icons';
-import  DrawerTool  from '../AntdUI'
-
-// import StandardTable from '@/components/StandardTable';
-// import EditableCell from '@/components/EditableCell';
+import {
+  SlidersOutlined,
+  PlayCircleOutlined,
+  PauseCircleOutlined,
+  EditOutlined
+  } from '@ant-design/icons';
+import router from 'umi/router';
+import api from '@/pages/project/api/projectManageDetail'
+import DrawerTool  from '../AntdUI';
+import { EditInforModel }  from '../ModelUI';
 // import { formatter } from '@/utils/utils';
-// import api from '@/api';
-import './index.less';
+
 
 class ProcessList extends Component {
   tableSearchFormRef = React.createRef();
@@ -17,167 +21,221 @@ class ProcessList extends Component {
   tableFormRef = React.createRef();
 
   state = {
-    // 分页参数
-    // pagination: {},
-    // 表格数据
-    list: [],
-    // 加载状态
-    loading: true,
-    // 选中行数据
-    // selectedRows: [],
-    // 编辑行
-    // editIndex: -1,
-    // 自减ID（新增数据时，提供负数id做为列表的key）
-    // id: 0,
+    // 表格
+    list: [],         // 表格数据
+    loading: false,    // 加载状态
+    editIndex: -1,    // 当前编辑行icon
+    visibleModel: false,    // 是否显示编辑模态框
+    processList: [],    // 选中编辑行数据
 
     // 任务列表抽屉
-    visible: false,
-    detailValue: [],
-  };
+    visibleDrawer: false,   // 是否显示抽屉
+    detailList: [],   // 项目信息
+    taskList: [],     // 任务列表信息
 
-  // 顶部表单默认值
-  initialValues = {
-    // status: 1,
-    page: 1,
-    rows: 10,
+    // 项目ID
+    // projectId: 0,
   };
 
   // 组件挂载时
   componentDidMount() {
-    this.getCacheData();
-    this.getTableData(this.initialValues);
+    const { projectId } = this.props;
+    console.log(projectId);
+    this.getTableData(projectId);
   }
 
-  // 获取此页面需要用到的基础数据
-  getCacheData = () => {};
-
-  // 分页
-  handleStandardTableChange = data => {
-    this.getTableData({
-      page: data.current,
-      rows: data.pageSize,
+  // 获取表格数据
+  getTableData = projectId => {
+    this.setState({ loading: true });
+    api.getProjectProcess(projectId).then(res => {
+      this.setState({
+        list: res.processList,
+        loading: false,
+      });
     });
   };
 
-  // 选择行
-  // handleSelectRows = rows => {
-  //   this.setState({
-  //     selectedRows: rows,
-  //   });
-  // };
+  // 编辑名称描述模态框
+  editBasicInfor = row => {
+    console.log(row);
+    this.setState({
+      visibleModel: true,
+      processList: row,
+    })
+  }
+
+  // 关闭编辑模态框
+  onCloseModel = () => {
+    this.setState({
+      visibleModel: false,
+    });
+    this.setState();
+  };
+
+  // 获取回传数据进行保存
+  getEditModelData = data => {
+    const { projectId } = this.props;
+    try {
+      api.saveProcessInfor(data).then(() => {
+        this.setState({
+          visibleModel: false,
+        });
+        this.getTableData(projectId);
+      })
+    } catch (errorInfo) {
+      console.log(errorInfo);
+    }
+  }
 
   // 查看任务列表及执行记录
   searchTaskList = row => {
-    this.setState({
-      visible: true,
-      detailValue: row,
-    });
+    const data = { processId: row.id };
+    api.getProjectTask(data).then(res => {
+      this.setState({
+        visibleDrawer: true,
+        detailList: row,
+        taskList: res,
+      });
+    })
+  }
+
+   // 查看流程参数
+  searchProcessParam = row => {
+    api.getProcessParam(row.id).then(res => {
+      router.push('/project/project-manage/process-parameter', { res });
+    })
   }
 
   // 关闭任务列表抽屉
   onClose = () => {
     this.setState({
-      visible: false,
+      visibleDrawer: false,
     });
   };
 
-  // 获取表格数据
-  // getTableData = (options = {}) => {
-  getTableData = () => {
-    // this.setState({ loading: true });
+  // 流程进度开始
+  processStart = row => {
+    this.setState({ loading: true });
+    const { projectId } = this.props;
+    api.startProcessesProcess(row.id).then(() => {
+      this.getTableData(projectId);
+      this.setState({ loading: false });
+    })
+  }
 
-    // const { pagination } = this.state;
-    // const { current: page, pageSize: rows } = pagination;
-    // const data = {
-    //   page,
-    //   rows,
-    //   ...options,
-    // };
+  // 流程进度开始
+  processPause = row => {
+    this.setState({ loading: true });
+    const { projectId } = this.props;
+    api.pauseProcessesProcess(row.id).then(() => {
+      this.getTableData(projectId);
+      this.setState({ loading: false });
+    })
+  }
 
-    // api.dataauth.getSources(data, true).then(res => {
-    //   this.setState({
-    //     list: res.rows,
-    //     pagination: {
-    //       current: data.page,
-    //       pageSize: data.rows,
-    //       total: res.total,
-    //     },
-    //     loading: false,
-    //     // editIndex: -1,
-    //   });
-    // });
-    const data = this.props.projectDetail.processList;
-    this.setState({
-        list: data,
-        // pagination: {
-        //   current: options.page,
-        //   pageSize: options.rows,
-        //   total: data.total,
-        // },
-        loading: false,
-        // editIndex: -1,
-      });
-  };
+
 
   render() {
     const {
-      // pagination, selectedRows,
-    list, loading,
-    visible, detailValue
+      list,
+      loading,
+      editIndex,
+      visibleModel,
+      processList,
+      visibleDrawer,
+      detailList,
+      taskList,
     } = this.state;
-    let tableWidth = 0;
 
-    // const components = {
-    //   body: {
-    //     cell: EditableCell,
-    //   },
-    // };
+    let tableWidth = 0;
+    console.log(loading);
 
     let columns = [
       {
         title: '名称',
         dataIndex: 'name',
-        width: 150,
-        render: (text, row) => (
-          <a onClick={() => this.searchTaskList(row)}>{text}</a>
-        )
-      },
-      {
-        title: '描述',
-        dataIndex: 'decs',
-        width: 350,
+        width: 300,
+        render: (value, row, index) => {
+          if (index === editIndex) {
+            return (
+              <>
+                <span>
+                  <a onClick={() => this.searchTaskList(row)}>
+                    {value} <br/> {row.describe}
+                  </a>
+                </span>
+                <EditOutlined
+                  onClick={() => this.editBasicInfor(row)}
+                  style={{ float: 'right', marginRight: 20, fontSize: 20}}
+                />
+              </>
+            )
+          }
+          return <a onClick={() => this.searchTaskList(row)}>{value} <br/> {row.describe}</a>
+        }
       },
       {
         title: '版本',
-        dataIndex: 'version',
+        dataIndex: 'processModeVersion',
         width: 100,
-        render: text => <Tag color="green">{text}</Tag>
+        render: value => <Tag color="green">{value}</Tag>
       },
       {
         title: '进度',
-        dataIndex: 'schedule',
-        width: 150,
-        render: text => {
-          if (text === '0') return <a>运行</a>
-          if (text === '0' && text === '100') return <Progress percent={text} size="small" />
-          return <Progress percent={text} size="small"/>
+        dataIndex: 'processProgress',
+        width: 200,
+        render: (value, row) => {
+          const val = value.toFixed(2) * 100;
+          if (row.status === 1) {
+            return (
+              <Button
+                onClick={() => this.processStart(row)}
+                type='primary'
+                style={{ borderRadius: '50px' }}
+              >
+                运行
+              </Button>
+            )
+          }
+          if (row.status === 2) {
+            return (
+              <>
+                <Progress percent={val} size="small" style={{ float: 'left', width: '80%' }}/>
+                <PauseCircleOutlined
+                  style={{ marginLeft: '10px' }}
+                  onClick={() => this.processPause(row)}
+                />
+              </>
+            )
+          } if (row.status === 3) {
+            return (
+              <>
+                <Progress percent={val} size="small" style={{ float: 'left', width: '80%' }}/>
+                <PlayCircleOutlined
+                  style={{ marginLeft: '10px' }}
+                  onClick={() => this.processStart(row)}
+                />
+              </>
+            )
+          }
+          return <Progress percent={val} size="small" style={{ width: '80%' }}/>
         }
       },
       {
         title: '流程模型',
-        dataIndex: 'processList',
+        dataIndex: 'processModelName',
         width: 250,
-        render: text => (
+        render: (value, row) => (
           <div style={{display:"flex"}}>
-            <img
-              src={text.path}
-              alt=""
+            {/* <img
+              src={row.processModelPicture}
+              alt="Sangon"
               height='50'
               width="50"
               style={{borderRadius: '100%' }}
-            />
-            <div style={{marginLeft:10}}>
-              <p>{text.name} <br/> {text.code} </p>
+            /> */}
+            <div style={{ marginLeft: 10, marginTop: 4}}>
+              <p>{value} <br/> {row.processModelCode} </p>
             </div>
 
           </div>
@@ -187,20 +245,28 @@ class ProcessList extends Component {
         title: '参数',
         dataIndex: 'type',
         width: 100,
-        render: () => <SlidersOutlined />,
+        render: (value, row) => (
+          <SlidersOutlined
+            onClick={() => this.searchProcessParam(row)}
+            style={{ fontSize: 20 }}
+          />
+        )
       },
       {
         title: '操作',
         width: 150,
-        render: () => (
-          <>
-            <a onClick={() => console.log(111)}>删除</a>
-            <Divider type="vertical" />
-            <a onClick={() => console.log(222)}>修改</a>
-            <Divider type="vertical" />
-            <a onClick={() => console.log(333)}>交互分析</a>
-          </>
-        ),
+        render: (value, row) => {
+          if(row.interactionAnalysis === 1) {
+            return (
+              <>
+                <a onClick={() => console.log(111)}>删除</a>
+                <Divider type="vertical" />
+                <a onClick={() => console.log(333)}>交互分析</a>
+              </>
+            )
+          }
+          return <a onClick={() => console.log(111)}>删除</a>
+        }
       },
     ];
 
@@ -210,7 +276,6 @@ class ProcessList extends Component {
       if (!col.editable) {
         return col;
       }
-      console.log(tableWidth)
       return true;
     });
 
@@ -222,15 +287,25 @@ class ProcessList extends Component {
             rowKey="id"
             loading={loading}
             dataSource={list}
-            // pagination={pagination}
             columns={columns}
             onChange={this.handleStandardTableChange}
+            onRow={( record, index ) => ({
+                onMouseEnter: () => { this.setState({ editIndex: index }) },
+                onMouseLeave: () => { this.setState({ editIndex: -1 }) }
+              })}
           />
         </Form>
         <DrawerTool
-          visible={visible}
+          visible={visibleDrawer}
           onClose={this.onClose}
-          detailValue={detailValue}
+          detailList={detailList}
+          taskList={taskList}
+        />
+        <EditInforModel
+          visible={visibleModel}
+          onClose={this.onCloseModel}
+          processList={processList}
+          getData={this.getEditModelData}
         />
       </>
     );
