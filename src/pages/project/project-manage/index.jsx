@@ -10,7 +10,7 @@ import {
   Popconfirm,
   Col,
   AutoComplete,
-  // Badge,
+  Badge,
   Input,
   // Progress,
   // Tag,
@@ -21,7 +21,7 @@ import { connect } from 'dva';
 import _ from 'lodash';
 import router from 'umi/router';
 import StandardTable from '../components/StandardTable';
-// import { formatter, } from '@/utils/utils';
+import { formatter } from '@/utils/utils';
 import api from '@/pages/project/project-manage/api/projectManageModel/';
 import {
   // InputUI,
@@ -76,7 +76,7 @@ class ProjectManagement extends Component {
   // 获取表格数据
   getTableData = (options = {}) => {
     const formData = this.tableSearchFormRef.current.getFieldsValue();
-    console.log(formData);
+    // console.log(formData);
     const { pagination } = this.state;
     const { current: page, pageSize } = pagination;
 
@@ -157,10 +157,28 @@ class ProjectManagement extends Component {
   };
 
   // 分页
-  handleStandardTableChange = pagination => {
+  handleStandardTableChange = (pagination, filters) => {
+    const { filtersData } = this.state;
+    let filterData = {};
+    const page = pagination;
+
+    if (filters) {
+      if (filters.status && filters.status[0]) {
+        filterData.status = filters.status.join(',');
+      }
+      this.setState({
+        filtersData: filterData,
+      });
+      page.current = 1;
+      page.pageSize = 10;
+    } else if (filtersData) {
+      filterData = filtersData;
+    }
+
     this.getTableData({
-      page: pagination.current,
-      pageSize: pagination.pageSize,
+      page: page.current,
+      pageSize: page.pageSize,
+      ...filterData,
     });
   };
 
@@ -226,8 +244,9 @@ class ProjectManagement extends Component {
   };
 
   // 项目管理详情页面
-  searchDetails = () => {
-    router.push('/project/project-manage/detail');
+  searchDetails = row => {
+    const projectId = row.id;
+    router.push('/project/project-manage/detail', { projectId });
   };
 
   // 删除数据
@@ -235,11 +254,12 @@ class ProjectManagement extends Component {
     api.deleteProjectManage(row.id).then(() => {
       this.getTableData();
     });
-    console.log(row);
+    // console.log(row);
   };
 
   render() {
     const { pagination, list, loading } = this.state;
+    const { statusList } = this.props;
     let tableWidth = 0;
 
     let columns = [
@@ -251,7 +271,7 @@ class ProjectManagement extends Component {
           <>
             <div>{row.name}</div>
             <div>
-              <a onClick={() => this.searchDetails(value)}>{value}</a>
+              <a onClick={() => this.searchDetails(row)}>{value}</a>
             </div>
           </>
         ),
@@ -286,13 +306,14 @@ class ProjectManagement extends Component {
       {
         title: '状态',
         dataIndex: 'status',
-        width: '80px',
-        // render: value => (
-        //   <Badge
-        //     status={formatter(statusList, value, 'value', 'status')}
-        //     text={formatter(statusList, value, 'value', 'text')}
-        //   />
-        // ),
+        width: '100px',
+        filters: statusList,
+        render: value => (
+          <Badge
+            status={formatter(statusList, value, 'value', 'status')}
+            text={formatter(statusList, value, 'value', 'text')}
+          />
+        ),
       },
       {
         title: '标签',
