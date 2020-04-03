@@ -9,9 +9,9 @@ import {
   //  Select,
   //  Col,
   //  Card,
-   Tag,
+  //  Tag,
   //  Popconfirm
-  } from 'antd';
+} from 'antd';
 // import TableSearchForm from '@/components/TableSearchForm';
 import { connect } from 'dva';
 
@@ -25,7 +25,7 @@ class ChooseProcessModel extends React.Component {
     return { visible: nextProps.visible || false };
   }
 
-  state = { visible: false,};
+  // state = { visible: false,};
 
   initialValues = {
     status: 1,
@@ -38,40 +38,38 @@ class ChooseProcessModel extends React.Component {
   }
 
   // titleContent = () => <div style={{ fontSize: '16px' }}>关联任务模型</div>;
-  showModal = () => {
-    this.setState({
-      visible: true,
-    });
-  };
+  // showModal = () => {
+  //   this.setState({
+  //     visible: true,
+  //   });
+  // };
 
-  handleOk = () => {
-    this.setState({
-      visible: false,
-    });
-  };
+  // handleOk = () => {
+  //   this.setState({
+  //     visible: false,
+  //   });
+  // };
 
-  handleCancel = () => {
-    this.setState({
-      visible: false,
-    });
-  };
+  // handleCancel = () => {
+  //   this.setState({
+  //     visible: false,
+  //   });
+  // };
 
-  getTableData = (options = {}) => {
+  // getTableData = (options = {}) => {
 
-    const data = this.props.processModel.processModelData;
-    this.setState({
-      list: data,
-      // pagination: {
-      //   current: options.page,
-      //   pageSize: options.rows,
-      //   total: data.total,
-      // },
-      loading: false,
-    });
-    // console.log(this.props.project.projectManage);
-  };
-
-
+  //   const data = this.props.processModel.processModelData;
+  //   this.setState({
+  //     // list: data,
+  //     // pagination: {
+  //     //   current: options.page,
+  //     //   pageSize: options.rows,
+  //     //   total: data.total,
+  //     // },
+  //     // loading: false,
+  //   });
+  //   // console.log(this.props.project.projectManage);
+  // };
 
   // simpleForm = () => (
   //   <>
@@ -86,47 +84,11 @@ class ChooseProcessModel extends React.Component {
   //   </>
   // );
 
-
-
-
   render() {
     const { onClose } = this.props;
-    const { list, loading, pagination } = this.state;
+    // const { list, loading, pagination } = this.state;
     // const { pagination } = this.state;
-    const columns = [
-      {
-        title: '编号/名称',
-        dataIndex: 'code',
-        width: 220,
-        // render: (value, row) => (
-        //   <>
-        //     <Avatar
-        //       src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
-        //       style={{ float: 'left' }}
-        //     />
-        //     <div style={{ float: 'left' }}>
-        //       <div>123</div>
-        //       <div>123</div>
-        //     </div>
-        //   </>
-        // ),
-      },
-      {
-        title: '描述',
-        width: 280,
-        dataIndex: 'publishDate',
-      },
-      {
-        title: '版本',
-        width: 100,
-        dataIndex: 'version',
-        render: value => <Tag color="green" style={{ padding: '0 10px' }}>{`V${value}`}</Tag>,
-      },
-      {
-        title: '操作',
-        width: 100,
-      },
-    ];
+
     return (
       // <Modal
       //   title={this.titleContent()}
@@ -148,13 +110,13 @@ class ChooseProcessModel extends React.Component {
       // </Modal>
       <Modal
         title="Title"
-        visible={visible}
+        // visible={visible}
         onOk={this.handleOk}
         onCancel={onClose}
         width={747}
         // confirmLoading={confirmLoading}
         // onCancel={this.handleCancel}
-        >
+      >
         {/* <p>{ModalText}</p> */}
       </Modal>
     );
