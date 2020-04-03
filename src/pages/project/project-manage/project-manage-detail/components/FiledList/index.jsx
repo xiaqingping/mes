@@ -1,12 +1,15 @@
 // 流程列表
-import { Form, Table, Divider } from 'antd';
+import { Form, Table, Divider, Col, Input, Button  } from 'antd';
 import React, { Component } from 'react';
 import { connect } from 'dva';
+import { FileExclamationOutlined } from '@ant-design/icons';
 
 // import StandardTable from '@/components/StandardTable';
 // import EditableCell from '@/components/EditableCell';
 // import { formatter } from '@/utils/utils';
 // import api from '@/api';
+const FormItem = Form.Item;
+const { Search } = Input;
 
 class FiledList extends Component {
   tableSearchFormRef = React.createRef();
@@ -52,13 +55,6 @@ class FiledList extends Component {
     });
   };
 
-  // 选择行
-  // handleSelectRows = rows => {
-  //   this.setState({
-  //     selectedRows: rows,
-  //   });
-  // };
-
   // 获取表格数据
   getTableData = () => {
     const data = this.props.projectDetail.filedList;
@@ -74,6 +70,17 @@ class FiledList extends Component {
       });
   };
 
+  // 顶部表单简单搜索
+  simpleForm = () => (
+    <>
+      <Col lg={6} md={8} sm={12}>
+        <FormItem label="" name="fieldName">
+          <Search />
+        </FormItem>
+      </Col>
+    </>
+  );
+
   render() {
     const {
       // pagination,
@@ -81,6 +88,7 @@ class FiledList extends Component {
       list, loading
     } = this.state;
     let tableWidth = 0;
+    console.log(list);
 
     // const components = {
     //   body: {
@@ -93,18 +101,22 @@ class FiledList extends Component {
         title: '文件名称',
         dataIndex: 'name',
         width: 150,
-        render: (text, row) => (
+        render: value => (
           <>
-            {text}
-            <br />
-            {row.processName}
+            <FileExclamationOutlined style={{ fontSize: 18 }}/>
+            <span style={{marginLeft: 10}}>{value}</span>
           </>
-        ),
+        )
       },
       {
         title: '描述',
         dataIndex: 'decs',
         width: 350,
+      },
+      {
+        title: '来源',
+        dataIndex: 'processName',
+        width: 150,
       },
       {
         title: '修改时间',
@@ -151,6 +163,24 @@ class FiledList extends Component {
 
     return (
       <>
+        {/* <TableSearchForm
+          ref={this.tableSearchFormRef}
+          initialValues={this.initialValues}
+          getTableData={this.getTableData}
+          simpleForm={this.simpleForm}
+        /> */}
+        <Form ref={this.tableSearchFormRef}>
+          <Col lg={6} md={8} sm={12}>
+            <FormItem label="" name="fieldName">
+              <Search />
+            </FormItem>
+          </Col>
+          <Col lg={6} md={8} sm={12}>
+          <FormItem label="" name="">
+              <Button>下载</Button>
+            </FormItem>
+          </Col>
+        </Form>
         <Form ref={this.tableFormRef}>
           <Table
             scroll={{ x: tableWidth, y: 400 }}

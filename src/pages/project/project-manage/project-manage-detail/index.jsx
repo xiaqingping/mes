@@ -1,70 +1,90 @@
 // 项目管理 编辑
-import { Card, Avatar, Descriptions, Row, Col, Tabs } from 'antd';
+import { Card, Tabs, Spin } from 'antd';
 import React, { Component } from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import { connect } from 'dva';
-import style from './index.less';
+import { PlusSquareOutlined } from '@ant-design/icons';
+import api from '@/pages/project/api/projectManageDetail'
+import styles from './index.less';
 import ProcessList from './components/ProcessList/index'
 import FiledList from './components/FiledList/index'
 import MemberList from './components/MemberList/index'
 // import { expandedRowRender } from '../functions';
 
-const DescriptionsItem = Descriptions.Item;
 const { TabPane } = Tabs;
 
 class ProjectDetail extends Component {
   tableSearchFormRef = React.createRef();
 
   state = {
-    list: {
-      name: '微生物多样性分析',
-      code: '569568542833845550000',
-      desc: '段落示意：蚂蚁金服设计平台 ant.design，用最小的工作量，无缝接入蚂蚁金服生态，提供跨越设计与开发的体验解决方案。蚂蚁金服设计平台 ant.design，用最小的工作量，无缝接入蚂蚁金服生态，提供跨越设计与开发的体验解决方案。段落示意：蚂蚁金服设计平台 ant.design，用最小的工作量，无缝接入蚂蚁金服生态，提供跨越设计与开发的体验解决方案。蚂蚁金服设计平台 ant.design，用最小的工作量，无缝接入蚂蚁金服生态，提供跨越设计与开发的体验解决方案。'
-    },
+    loading: true,
+    list: {},     // 基础信息数据
+    projectId: 0, // 项目ID
+  }
+
+  componentDidMount() {
+    const { projectId } = this.props.location.state;
+    this.setState({ projectId });
+    this.getTableData(projectId);
   }
 
   callback = key => {
     console.log(key);
   }
 
+  operations = () => <PlusSquareOutlined onClick={() => console.log(123)}/>
+
+  // 获取表格数据
+  getTableData = projectId => {
+    api.getProjectProcess(projectId).then(res => {
+      this.setState({
+        list: res,
+        loading: false,
+      });
+    });
+  };
+
 
   render() {
-    const currentUser = JSON.parse(localStorage.getItem('user'));
-    const { list } = this.state;
+    const { list, loading, projectId } = this.state;
+
+    if (loading) {
+      return (
+        <div className="example">
+          <Spin size="large" />
+        </div>
+      )
+    }
 
     return (
       <PageHeaderWrapper>
-        <Card className={style.titleCard}>
-          <Row>
-            <Col flex="80px">
-              <Avatar src={currentUser.avatar} alt="avatar" style={{height: 60, width: 60}}/>
-            </Col>
-
-            <Col flex="90%" >
-              <div className="width">
-                <DescriptionsItem>{list.name}</DescriptionsItem>
-                <span style={{ display: 'inline-block',marginLeft: 50 }}>
-                  <DescriptionsItem>{list.code}</DescriptionsItem>
-                </span>
-              </div>
-              <div style={{marginTop: 20}}>
-                <DescriptionsItem>{list.desc}</DescriptionsItem>
-              </div>
-            </Col>
-          </Row>
+        <Card className={styles.titleCard}>
+          <div className={styles.width}>
+            {list.name}
+            <span className={styles.textCode}>
+              {list.code}
+            </span>
+          </div>
+          <div className={styles.textDesc}>{list.describe}</div>
         </Card>
         <Card>
-            <Tabs defaultActiveKey="1" onChange={this.callback} style={{height: 480}}>
-              <TabPane tab="流程列表" key="1">
-                <ProcessList />
-              </TabPane>
-              <TabPane tab="文件" key="2">
-                <FiledList/>
-              </TabPane>
-              <TabPane tab="成员" key="3">
-                <MemberList/>
-              </TabPane>
-            </Tabs>
+          <Tabs
+            defaultActiveKey="1"
+            onChange={key => this.callback(key)}
+            style={{height: 480}}
+            tabBarExtraContent={this.operations()}
+            loading={loading}
+          >
+            <TabPane tab="流程列表" key="1">
+              <ProcessList projectId={projectId}/>
+            </TabPane>
+            <TabPane tab="文件" key="2">
+              <FiledList/>
+            </TabPane>
+            <TabPane tab="成员" key="3">
+              <MemberList projectId={projectId}/>
+            </TabPane>
+          </Tabs>
         </Card>
       </PageHeaderWrapper>
     );
