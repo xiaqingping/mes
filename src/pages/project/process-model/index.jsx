@@ -12,18 +12,21 @@ import {
   Tag,
   Badge,
   Select,
-  Input,
+  Dropdown,
+  Menu,
 } from 'antd';
 import TableSearchForm from '@/components/TableSearchForm';
-import { PlusOutlined } from '@ant-design/icons';
+import { PlusOutlined, DownOutlined } from '@ant-design/icons';
 import router from 'umi/router';
 import { connect } from 'dva';
 import _ from 'lodash';
 import { DateUI } from '@/pages/project/components/AntdSearchUI';
-import { formatter } from '@/utils/utils';
+import { formatter, getOperates } from '@/utils/utils';
 import api from '@/pages/project/api/processModel/';
+import disk from '@/pages/project/api/disk';
 import StandardTable from '../components/StandardTable';
 import { DrawerTool } from './components/Details';
+import './index.less';
 
 const FormItem = Form.Item;
 const { Option } = Select;
@@ -45,6 +48,8 @@ class ProcessModel extends Component {
       detailValue: {},
       nameCodeVal: [],
       nameCodeValPublish: [],
+      filtersData: null,
+      processList: [],
     };
     // 异步验证做节流处理
     this.callParter = _.debounce(this.callParter, 500);
@@ -53,6 +58,14 @@ class ProcessModel extends Component {
 
   componentDidMount() {
     this.getTableData(this.initialValues);
+    // disk
+    //   .getFiles({
+    //     sourceCode: 'b616f8e3ac92e4c1612b017925f8af7c',
+    //     sourceKey: 'project_process_model',
+    //   })
+    //   .then(res => {
+    //     console.log(res);
+    //   });
   }
 
   callParter = value => {
@@ -71,7 +84,6 @@ class ProcessModel extends Component {
   getTableData = (options = {}) => {
     this.setState({ loading: true });
     const formData = this.tableSearchFormRef.current.getFieldsValue();
-
     const { pagination } = this.state;
     const { current: page, pageSize: rows } = pagination;
 
@@ -96,9 +108,29 @@ class ProcessModel extends Component {
       ...formData,
       ...options,
     };
+
     api.getProcess(data).then(res => {
+      const uuids = res.rows.map(e => e.picture);
+      disk
+        .getFiles({
+          sourceCode: uuids.join(','),
+          sourceKey: 'project_process_model',
+        })
+        .then(v => {
+          const newList = res.rows.map(e => {
+            const filterItem = v.filter(item => item.sourceCode === e.picture);
+            const fileId = filterItem[0] && filterItem[0].id;
+            return {
+              ...e,
+              fileId,
+            };
+          });
+          this.setState({
+            list: newList,
+          });
+        });
+
       this.setState({
-        list: res.rows,
         pagination: {
           current: data.page,
           pageSize: data.rows,
@@ -186,12 +218,27 @@ class ProcessModel extends Component {
 
   // 分页
   handleStandardTableChange = (pagination, filters) => {
-    // 获取搜索值
-    console.log(filters);
-    // this.getTableData({
-    //   page: pagination.current,
-    //   rows: pagination.pageSize,
-    // });
+    const { filtersData } = this.state;
+    let filterData = {};
+    const page = pagination;
+    if (filters) {
+      if (filters.status && filters.status[0]) {
+        filterData.status = filters.status.join(',');
+      }
+      this.setState({
+        filtersData: filterData,
+      });
+      page.current = 1;
+      page.pageSize = 10;
+    } else if (filtersData) {
+      filterData = filtersData;
+    }
+
+    this.getTableData({
+      page: page.current,
+      rows: page.pageSize,
+      ...filterData,
+    });
   };
 
   simpleForm = () => {
@@ -220,7 +267,7 @@ class ProcessModel extends Component {
             </Select>
           </FormItem>
         </Col>
-        <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
+        <Col xxl={6} lg={languageCode === 'EN' ? 12 : 0}>
           <FormItem label="发布人" name="publisherCode">
             <AutoComplete
               onSearch={this.inputValuePublish}
@@ -273,8 +320,42 @@ class ProcessModel extends Component {
   };
 
   // 升级
-  upgrade = value => {
+  handleUpgrade = value => {
+    api.getProcessDetail(value.id).then(res => {
+      this.props.dispatch({
+        type: 'processModel/setProcessDetail',
+        payload: {
+          ...res,
+        },
+      });
+      router.push(`/project/process-model/up/${value.id}-up`);
+    });
+  };
+
+  // 修改
+  handleChange = value => {
     router.push(`/project/process-model/edit/${value.id}`);
+  };
+
+  // 删除
+  handleDelete = value => {
+    api.deleteProcess(value.id).then(() => {
+      this.getTableData();
+    });
+  };
+
+  // 发布
+  handlePublish = value => {
+    api.publishment(value.id).then(() => {
+      this.getTableData();
+    });
+  };
+
+  // 禁用
+  handleUnPublish = value => {
+    api.unPublishment(value.id).then(() => {
+      this.getTableData();
+    });
   };
 
   // 查看详情
@@ -288,7 +369,7 @@ class ProcessModel extends Component {
   };
 
   render() {
-    const { pagination, list, loading, visible, detailValue } = this.state;
+    const { pagination, loading, visible, detailValue, list } = this.state;
     const { status } = this.props;
     let tableWidth = 0;
     let columns = [
@@ -298,7 +379,7 @@ class ProcessModel extends Component {
         render: (value, row) => (
           <>
             <Avatar
-              src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
+              src={row.fileId ? disk.downloadFiles(row.fileId, { view: true }) : ''}
               style={{ float: 'left' }}
               size="large"
             />
@@ -326,9 +407,9 @@ class ProcessModel extends Component {
       {
         title: '版本',
         dataIndex: 'version',
-        render: () => (
+        render: value => (
           <Tag color="green" style={{ padding: '0 10px' }}>
-            V1.0
+            {value}
           </Tag>
         ),
       },
@@ -346,19 +427,111 @@ class ProcessModel extends Component {
       {
         title: '操作',
         width: 200,
-        render: value => (
-          <>
-            <a onClick={() => console.log(111)}>变更</a>
-            <Divider type="vertical" />
-            <a onClick={() => console.log(111)}>删除</a>
-            <Divider type="vertical" />
-            <a onClick={() => console.log(111)}>升级</a>
-            <Divider type="vertical" />
-            <a onClick={() => console.log(111)}>修改</a>
-            <Divider type="vertical" />
-            <a onClick={() => this.searchDetails(value)}>查看</a>
-          </>
-        ),
+        render: (value, row) => {
+          const text = row.status;
+          const operaList = getOperates(text);
+          const menu = (
+            <Menu>
+              {operaList.map(
+                (item, index) =>
+                  index && (
+                    <Menu.Item key={item}>
+                      <a
+                        className="task_model_add_argument_list"
+                        onClick={() => {
+                          if (item === '查看') {
+                            return this.searchDetails(row);
+                          }
+                          if (item === '修改') {
+                            return this.handleChange(row);
+                          }
+                          if (item === '升级') {
+                            return this.handleUpgrade(row);
+                          }
+                          if (item === '删除') {
+                            return this.handleDelete(row);
+                          }
+                          if (item === '发布') {
+                            return this.handlePublish(row);
+                          }
+                          if (item === '禁用') {
+                            return this.handleUnPublish(row);
+                          }
+                          return true;
+                        }}
+                      >
+                        {item}
+                      </a>
+                    </Menu.Item>
+                  ),
+              )}
+            </Menu>
+          );
+          return (
+            <>
+              <a
+                onClick={() => {
+                  if (operaList[0] === '查看') {
+                    return this.searchDetails(row);
+                  }
+                  if (operaList[0] === '修改') {
+                    return this.handleChange(row);
+                  }
+                  if (operaList[0] === '升级') {
+                    return this.handleUpgrade(row);
+                  }
+                  if (operaList[0] === '删除') {
+                    return this.handleDelete(row);
+                  }
+                  if (operaList[0] === '发布') {
+                    return this.handlePublish(row);
+                  }
+                  if (operaList[0] === '禁用') {
+                    return this.handleUnPublish(row);
+                  }
+                  return true;
+                }}
+              >
+                {operaList[0]}
+              </a>
+              <Divider type="vertical" />
+              <Dropdown overlay={menu} trigger={['click']}>
+                <a className="ant-dropdown-link" onClick={e => e.preventDefault()}>
+                  更多
+                  <DownOutlined />
+                </a>
+              </Dropdown>
+
+              {/* {(text * 1 === 1 || text * 1 === 3) && <a onClick={() => console.log(333)}>发布</a>}
+              {text * 1 === 1 && (
+                <>
+                  <Divider type="vertical" />
+                  <a onClick={() => this.goToEdit(value.id)}>修改</a>
+                </>
+              )}
+              {(text * 1 === 2 || text * 1 === 3) && (
+                <>
+                  <Divider type="vertical" />
+                  <a onClick={() => console.log(111)}>升级</a>
+                </>
+              )}
+              {(text * 1 === 2 || text * 1 === 4) && (
+                <>
+                  <Divider type="vertical" />
+                  <a onClick={() => console.log(111)}>禁用</a>
+                </>
+              )}
+              {text * 1 === 1 && (
+                <>
+                  <Divider type="vertical" />
+                  <a onClick={() => console.log(111)}>删除</a>
+                </>
+              )}
+              <Divider type="vertical" />
+              <a onClick={() => this.viewDetails(value)}>查看</a> */}
+            </>
+          );
+        },
       },
     ];
 
@@ -384,7 +557,7 @@ class ProcessModel extends Component {
               advancedForm={this.advancedForm}
             />
             <div className="tableListOperator">
-              <Button type="primary" onClick={() => this.handleModalVisible(true)}>
+              <Button type="primary" onClick={() => this.handleModalVisible()}>
                 <PlusOutlined />
                 新建
               </Button>
@@ -399,6 +572,7 @@ class ProcessModel extends Component {
                 columns={columns}
                 onSelectRow={this.handleSelectRows}
                 onChange={this.handleStandardTableChange}
+                // pagination={{ ...pagination }}
                 // expandable={{
                 //   // 用方法创建子table
                 //   expandedRowRender: value => expandedRowRender(value.list, sonTablecolumns),
@@ -425,4 +599,5 @@ export default connect(({ global, processModel, project }) => ({
   languageCode: global.languageCode,
   processModel,
   status: project.status,
+  processList: project.processList,
 }))(ProcessModel);

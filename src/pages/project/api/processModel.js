@@ -1,8 +1,5 @@
 import request from '@/utils/request';
 
-// 1组
-const http1 = 'http://192.168.20.6:8166';
-
 // 2组
 const http2 = 'http://192.168.20.12:8360';
 
@@ -18,6 +15,43 @@ export default {
     return request(`${http2}/v1/process`, {
       method: 'POST',
       data,
+    });
+  },
+
+  // 创建流程模型
+  upgradeProcess(id, data) {
+    return request(`${http2}/v1/process/${id}/upgrade`, {
+      method: 'POST',
+      data,
+    });
+  },
+
+  // 修改流程模型
+  changeProcess(data) {
+    return request(`${http2}/v1/process`, {
+      method: 'PUT',
+      data,
+    });
+  },
+
+  // 删除流程模型
+  deleteProcess(id) {
+    return request(`${http2}/v1/process/${id}/deletion`, {
+      method: 'PUT',
+    });
+  },
+
+  // 发布流程模型
+  publishment(id) {
+    return request(`${http2}/v1/process/${id}/publishment`, {
+      method: 'PUT',
+    });
+  },
+
+  // 禁用流程模型
+  unPublishment(id) {
+    return request(`${http2}/v1/process/${id}/forbiddance`, {
+      method: 'PUT',
     });
   },
 

@@ -3,7 +3,8 @@ module.exports = {
   path: '/project',
   name: 'project',
   icon: 'user',
-  routes: [{
+  routes: [
+    {
       name: 'project-manage',
       path: '/project/project-manage',
       hideChildrenInMenu: true,
@@ -17,28 +18,14 @@ module.exports = {
           path: '/project/project-manage/detail',
           component: './project/project-manage/project-manage-detail',
         },
-        {
-          name: 'add',
-          path: '/project/project-manage/add',
-          component: './project/project-manage/project-manage-edit',
-        },
-        {
-          name: 'addflowpath',
-          path: '/project/project-manage/add/addflowpath',
-          component: './project/project-manage/project-manage-edit/addflowpath',
-        },
-        {
-          name: 'edit',
-          path: '/project/project-manage/edit/:id',
-          component: './project/project-manage/project-manage-edit',
-        },
       ],
     },
     {
       name: 'process-model',
       path: '/project/process-model',
       hideChildrenInMenu: true,
-      routes: [{
+      routes: [
+        {
           path: '/project/process-model',
           component: './project/process-model',
         },
@@ -52,27 +39,33 @@ module.exports = {
           path: '/project/process-model/edit/:id',
           component: './project/process-model/process-model-edit',
         },
+        {
+          name: 'up',
+          path: '/project/process-model/up/:id',
+          component: './project/process-model/process-model-edit',
+        },
       ],
     },
     {
       name: 'task-model',
       path: '/project/task-model',
       hideChildrenInMenu: true,
-      routes: [{
+      routes: [
+        {
           path: '/project/task-model',
           component: './project/task-model',
         },
         {
-          name: "add",
-          path: "/project/task-model/add",
+          name: 'add',
+          path: '/project/task-model/add',
           component: './project/task-model/addTaskModel.jsx',
         },
         {
-          name: "edit",
-          path: "/project/task-model/edit/:id",
+          name: 'edit',
+          path: '/project/task-model/edit/:id',
           component: './project/task-model/addTaskModel.jsx',
-        }
-      ]
+        },
+      ],
     },
   ],
 };
