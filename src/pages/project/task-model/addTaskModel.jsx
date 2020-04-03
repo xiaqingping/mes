@@ -5,11 +5,13 @@ import { Card, Upload, message, Input, Tag, Table, Button, Form, Badge, Switch, 
 import { LoadingOutlined, SettingOutlined, PlusOutlined, DeleteOutlined } from '@ant-design/icons';
 import { connect } from 'dva';
 import './index.less';
-
+import { guid, formatter } from '@/utils/utils';
 import BeforeTask from './components/beforeTask';
 import ArgumentModel from './components/argumentModel';
-import { formatter } from '@/utils/utils';
-import api from '@/api';
+
+import router from 'umi/router';
+import disk from '@/pages/project/api/disk';
+import api from '@/pages/project/api/taskmodel';
 
 function getBase64(img, callback) {
   const reader = new FileReader();
@@ -36,37 +38,72 @@ class TaskModel extends Component {
     return { id: nextProps.match.params.id || '' };
   }
 
-  state = {
-    imageUrl: '',
-    loading: false,
-    tableLoading: false,
-    id: '',
-    visible: false,
-    tableData: [],
-    argumentVisible: false, // 参数弹框是否显示
-    page: 1,
-    rows: 100,
-  };
+  constructor(props) {
+    super(props);
+    const guuid = guid();
+    this.state = {
+      imageUrl: '',
+      loading: false,
+      tableLoading: false,
+      id: '',
+      visible: false,
+      tableData: [],
+      argumentVisible: false, // 参数弹框是否显示
+      checked: false,
+      guuid,
+      // editOriginModelData: {}, // 修改时进页面时候的任务模型详细数据
+      isAdd: this.props.match.path.indexOf('add') > 0,
+    };
+  }
 
   componentDidMount() {
-    const isAdd = this.props.match.path.indexOf('add');
+    const { isAdd } = this.state;
     if (isAdd) {
       // 如果是新增
       this.setState({
         tableData: [],
       });
     } else {
-      this.getTableData();
+      const paramId = this.props.match.params.id;
+      const { editOriginModelData } = this.props.taskModel;
+      console.log(editOriginModelData);
+      console.log(this.tableSearchFormRef.current);
+      this.tableSearchFormRef.current.setFieldsValue(editOriginModelData);
+      // const { editOriginModelData } = this.state;
+      // api.getTaskModelDetail(paramId).then(res => {
+      //   console.log(res);
+      //   this.setState(
+      //     {
+      //       editOriginModelData: res,
+      //     },
+      //     () => {
+      //       console.log(this.props);
+      //       this.tableSearchFormRef.current.setFieldsValue(editOriginModelData);
+      //       console.log(editOriginModelData);
+      //       console.log(this.props.taskModel.editOriginModelData);
+      //     },
+      //   );
+      // });
+
+      this.setState({
+        checked: editOriginModelData.isAutomatic == 1,
+      });
+
+      this.getTableData(paramId);
     }
   }
 
-  getTableData = () => {
+  getTableData = id => {
     this.setState({
       tableLoading: true,
     });
-    const { page, rows } = this.state;
-
-    api.getTaskModels();
+    api.getPreTasks(id).then(res => {
+      // console.log(res);
+      this.setState({
+        tableData: res,
+        tableLoading: false,
+      });
+    });
   };
 
   // 图片上传
@@ -102,16 +139,27 @@ class TaskModel extends Component {
 
   // 提交上传
   onFinish = values => {
-    const { imageUrl, tableData } = this.state;
-    console.log(imageUrl, values);
+    const { checked, tableData, imageUrl, guuid, isAdd } = this.state;
     const ids = [];
-    console.log(tableData);
-    const parentIds = tableData.map(item=>{
-      return ids.push(item.id)
-    })
+    const { argumentList } = this.props.taskModel;
+    const form = this.tableSearchFormRef.current.getFieldsValue();
+    form.isAutomatic = checked ? 1 : 2;
+    form.params = argumentList;
+    tableData.map(item => {
+      return ids.push(item.id);
+    });
+    form.parentIds = ids;
+    form.version = 'V1.0';
+    if (imageUrl) {
+      form.picture = guuid;
+    }
+    console.log(form);
 
-    console.log(parentIds);
-
+    api.createTaskModel(form).then(res => {
+      const msg = isAdd ? '任务模型创建成功!' : '任务模型修改成功!';
+      message.success(msg);
+      router.push('/project/task-model');
+    });
   };
 
   onFinishFailed = () => {
@@ -126,21 +174,23 @@ class TaskModel extends Component {
   };
 
   // 点击关闭关联 添加数据到表格
-  onClose = row => {
+  onClose = (row, select) => {
+    const { tableData } = this.state;
+    const tableData1 = [...tableData];
     this.setState({
       visible: false,
     });
-    const tableData = [...this.state.tableData];
-    tableData.unshift(row);
-    this.setState({
-      tableData,
-    });
-    
+    if (select) {
+      tableData1.push(row);
+      this.setState({
+        tableData: tableData1,
+      });
+    }
   };
 
   handleDelete = row => {
     // console.log(row);
-    const {tableData} = this.state;
+    const { tableData } = this.state;
     let list = [...tableData];
     list = list.filter(item => {
       return item.id !== row.id;
@@ -151,8 +201,13 @@ class TaskModel extends Component {
   };
 
   openArgumentModel = () => {
+    const { dispatch } = this.props;
     this.setState({
       argumentVisible: true,
+    });
+    dispatch({
+      type: 'taskModel/setEditTaskModelId',
+      payload: this.props.match.params.id,
     });
   };
 
@@ -162,15 +217,16 @@ class TaskModel extends Component {
     });
   };
 
-  // 提交
-  handleSubmit = () => {
-    console.log('object');
+  switchChange = e => {
+    this.setState({
+      checked: e,
+    });
   };
 
   render() {
     const { taskModel } = this.props;
     const { taskModelStatusOptions } = taskModel;
-    const { tableData, visible, argumentVisible, tableLoading } = this.state;
+    const { tableData, visible, argumentVisible, tableLoading, guuid } = this.state;
 
     const uploadButton = (
       <div style={{ borderRadius: '50%' }}>
@@ -178,7 +234,7 @@ class TaskModel extends Component {
         {/* <div className="ant-upload-text">Upload</div> */}
       </div>
     );
-    const { imageUrl, id } = this.state;
+    const { imageUrl, id, checked } = this.state;
     const columns = [
       {
         title: '编号/名称',
@@ -236,6 +292,8 @@ class TaskModel extends Component {
       },
     ];
 
+    const uploadUrl = disk.uploadMoreFiles('project_process_model', guuid);
+
     return (
       <PageHeaderWrapper title={id || ''}>
         <Form
@@ -247,11 +305,12 @@ class TaskModel extends Component {
             <div style={{ float: 'left', marginLeft: '20px' }}>
               {/* <Form.Item name="uploadPIc"> */}
               <Upload
-                name="avatar"
+                name="picture"
                 listType="picture-card"
                 className="avatar-uploader"
                 showUploadList={false}
-                action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
+                action={uploadUrl}
+                headers={{ Authorization: this.props.authorization }}
                 beforeUpload={beforeUpload}
                 onChange={this.handleChange}
               >
@@ -273,27 +332,30 @@ class TaskModel extends Component {
                 rules={[
                   {
                     required: true,
-                    message: '请输入参数名称',
+                    message: '请输入任务名称',
                   },
                 ]}
               >
-                <Input
-                  placeholder="请输入任务名称"
-                  style={{ marginBottom: '10px' }}
-                  defaultValue={this.state.taskModelName}
-                />
+                <Input placeholder="请输入任务名称" />
               </Form.Item>
               <Form.Item name="describe">
-                <Input.TextArea
-                  placeholder="请输入任务描述"
-                  rows={4}
-                  defaultValue={this.state.taskModelName}
-                />
+                <Input.TextArea placeholder="请输入任务描述" rows={4} />
+              </Form.Item>
+              <Form.Item
+                name="taskFlag"
+                rules={[
+                  {
+                    required: true,
+                    message: '请输入标识',
+                  },
+                ]}
+              >
+                <Input placeholder="请输入标识" />
               </Form.Item>
             </div>
             <div style={{ float: 'left', marginLeft: '20px' }}>
               <Form.Item name="version">
-                <Tag color="green">V1.1</Tag>
+                <Tag color="green">V1.0</Tag>
               </Form.Item>
             </div>
 
@@ -309,21 +371,20 @@ class TaskModel extends Component {
                 <span style={{ fontSize: '16px', verticalAlign: 'middle', marginRight: 10 }}>
                   是否可自动运行：
                 </span>
-                <Switch />
+                <Switch checked={checked} onChange={this.switchChange} />
               </Form.Item>
             </div>
           </Card>
 
           <Card style={{ marginTop: '24px' }} title={this.titleContent()}>
-            {tableLoading ? <Spin/>
-            :
             <Table
               rowKey="id"
               dataSource={tableData}
               columns={columns}
               rowClassName="editable-row"
               pagination={false}
-            />}
+              loading={tableLoading}
+            />
             <Button
               style={{
                 width: '100%',
@@ -334,7 +395,7 @@ class TaskModel extends Component {
               onClick={this.onOpen}
               icon={<PlusOutlined />}
             >
-              新增
+              前置任务
             </Button>
           </Card>
 
@@ -346,9 +407,6 @@ class TaskModel extends Component {
                 type="primary"
                 style={{ float: 'right', marginTop: '-32px' }}
                 htmlType="submit"
-                onClick={() => {
-                  this.handleSubmit();
-                }}
               >
                 提交
               </Button>
@@ -356,13 +414,16 @@ class TaskModel extends Component {
           </Card>
         </Form>
         <BeforeTask visible={visible} onClose={this.onClose} />
-        <ArgumentModel visible={argumentVisible} onClose={this.onArgumentClose} />
+        {argumentVisible && (
+          <ArgumentModel visible={argumentVisible} onClose={this.onArgumentClose} />
+        )}
       </PageHeaderWrapper>
     );
   }
 }
 
-export default connect(({ global, taskModel }) => ({
+export default connect(({ global, taskModel, user }) => ({
   languageCode: global.languageCode,
   taskModel,
+  authorization: user.currentUser.authorization,
 }))(TaskModel);

@@ -8,8 +8,7 @@ module.exports = {
       name: 'project-manage',
       path: '/project/project-manage',
       hideChildrenInMenu: true,
-      routes: [
-        {
+      routes: [{
           path: '/project/project-manage',
           component: './project/project-manage',
         },

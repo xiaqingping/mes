@@ -16,6 +16,7 @@ class TaskModelTabs extends Component {
     postTasks: [], // 后置任务列表
     preLoading: false,
     postLoading: false,
+    toViewArgument: false,
   };
 
   componentDidMount() {
@@ -46,12 +47,15 @@ class TaskModelTabs extends Component {
     });
     console.log(this.props);
     // TODO 获取数据参数数据
-    // const { dispatch } = this.props.taskModel;
+    const { dispatch } = this.props;
 
-    // dispatch({
-    //   type: 'taskModel/setViewParamsId',
-    //   payload: item.id,
-    // });
+    dispatch({
+      type: 'taskModel/setViewParamsId',
+      payload: item.id,
+    });
+    this.setState({
+      toViewArgument: true,
+    });
   };
 
   onViewClose = () => {
@@ -61,7 +65,14 @@ class TaskModelTabs extends Component {
   };
 
   render() {
-    const { viewVisible, preTaskList, postTasks, preLoading, postLoading } = this.state;
+    const {
+      viewVisible,
+      preTaskList,
+      postTasks,
+      preLoading,
+      postLoading,
+      toViewArgument,
+    } = this.state;
     const { taskModel } = this.props;
     const { taskModelStatusOptions } = taskModel.taskModel;
     return (
@@ -142,7 +153,9 @@ class TaskModelTabs extends Component {
             )}
           </TabPane>
         </Tabs>
-        <ArgumentModel visible={viewVisible} onClose={this.onViewClose} fromView />
+        {toViewArgument && (
+          <ArgumentModel visible={viewVisible} onClose={this.onViewClose} fromView />
+        )}
       </>
     );
   }
