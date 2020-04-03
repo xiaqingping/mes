@@ -13,8 +13,24 @@ export default {
     return request(`${http1}/projects/v1/`, { params });
   },
 
+  // 项目管理：项目模糊搜索
+  // gettProjectManageCodeAndName() {
+  //   return request(`${http1}/projects/v1/likeFinByNameOrCode`);
+  // },
+  gettProjectManageCodeAndName(params) {
+    return request(`${http1}/projects/v1/likeFinByNameOrCode`, { params });
+  },
+
   // 项目管理删除
   deleteProjectManage(id) {
     return request(`${http1}/projects/v1/${id}/deleted`, { method: 'PUT' });
+  },
+
+  // 创建项目数据
+  addProjects(data) {
+    return request(`${http1}/projects/v1/`, {
+      method: 'POST',
+      data,
+    });
   },
 };

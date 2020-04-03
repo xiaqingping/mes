@@ -13,32 +13,46 @@ import {
   Row,
   Avatar,
   Table,
-  Badge,
+  // Badge,
 } from 'antd';
-import { PlusOutlined } from '@ant-design/icons';
+import { PlusOutlined, SlidersOutlined } from '@ant-design/icons';
 // import router from 'umi/router';
 // import TableSearchForm from '@/components/TableSearchForm';
 import { connect } from 'dva';
 import StandardTable from '@/components/StandardTable';
-import { formatter } from '@/utils/utils';
+// import { formatter } from '@/utils/utils';
+// import api from '@/pages/project/api/processModel/';
+import api from '@/pages/project/project-manage/api/projectManageModel/';
 // import ChooseProcessModel from '@/components/ChooseProcessModel';
-// import { expandedRowRender } from '../functions';
 
 // const FormItem = Form.Item;
 
 class Test extends Component {
-  tableSearchFormRef = React.createRef();
+  // tableSearchFormRef = React.createRef();
 
-  state = { visible: false, viewvisible: false };
+  // state = { visible: false, viewvisible: false };
+
+  // 表单默认值
+  initialValues = {
+    status: 1,
+    page: 1,
+    pageSize: 10,
+  };
 
   constructor(props) {
     super(props);
     this.state = {
       // pagination: {},
       // loading: false,
+      visible: false,
+      viewvisible: false,
     };
     // 异步验证做节流处理
     // this.callParter = _.debounce(this.callParter, 500);
+  }
+
+  componentDidMount() {
+    this.getTableData(this.initialValues);
   }
 
   // 跳转到新建项目页面
@@ -49,17 +63,16 @@ class Test extends Component {
 
   // 获取表格数据
   getTableData = (options = {}) => {
-    const data = this.props.project.projectManage;
-    this.setState({
-      list: data,
-      pagination: {
-        current: options.page,
-        pageSize: options.rows,
-        total: data.total,
-      },
-      loading: false,
+    const data = {
+      ...options,
+    };
+    api.getProjectManage(data, true).then(res => {
+      this.setState({
+        list: res.results,
+        loading: false,
+      });
     });
-    // console.log(this.props.project.projectManage);
+    // console.log(list);
   };
 
   // 分页
@@ -128,47 +141,54 @@ class Test extends Component {
   // };
 
   render() {
-    const { status } = this.props;
-    const { pagination, list, loading } = this.state;
+    // const { status } = this.props;
 
+    const { pagination, list, loading } = this.state;
     let tableWidth = 0;
     let columns = [
       {
-        title: '编号/名称',
-        dataIndex: 'code',
-      },
-      {
-        title: '描述',
-        dataIndex: 'describe',
-      },
-      {
-        title: '发布人/时间',
-        dataIndex: 'publishName',
+        title: '名称/描述',
+        dataIndex: 'name',
+        width: 300,
         render: (value, row) => (
           <>
             <div>{value}</div>
-            <div>{row.publishDate}</div>
+            <div>{row.describe}</div>
           </>
         ),
       },
       {
+        title: '流程模型',
+        dataIndex: 'name',
+        width: 300,
+        render: (value, row) => (
+          <>
+            <Avatar
+              src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
+              style={{ float: 'left' }}
+              size="large"
+            />
+            <div style={{ float: 'left' }}>
+              <div>{value}</div>
+              <div>{row.code}</div>
+            </div>
+          </>
+        ),
+      },
+      {
+        title: '参数',
+        dataIndex: 'parameter',
+        width: 100,
+        render: () => <SlidersOutlined style={{ fontSize: '25px' }} />,
+      },
+      {
         title: '版本',
         dataIndex: 'version',
+        width: 100,
         render: () => (
           <Tag color="green" style={{ padding: '0 10px' }}>
             V1.0
           </Tag>
-        ),
-      },
-      {
-        title: '状态',
-        dataIndex: 'status',
-        filters: status,
-        render: value => (
-          <Badge
-            status={formatter(status, value, 'value', 'status')}
-            text={formatter(status, value, 'value', 'text')}
-          />
         ),
       },
       {

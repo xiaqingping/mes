@@ -1,4 +1,4 @@
-// 项目管理
+// 项目列表
 import React, { Component } from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import {
@@ -8,18 +8,21 @@ import {
   Form,
   Select,
   Popconfirm,
+  Col,
+  AutoComplete,
   // Progress,
   // Tag,
 } from 'antd';
 import TableSearchForm from '@/components/TableSearchForm';
 import { PlusOutlined } from '@ant-design/icons';
 import { connect } from 'dva';
+import _ from 'lodash';
 import router from 'umi/router';
 import StandardTable from '../components/StandardTable';
-// import api from '@/api';
+import aaa from '@/pages/project/api/processModel/';
 import api from '@/pages/project/project-manage/api/projectManageModel/';
 import {
-  InputUI,
+  // InputUI,
   // SelectUI,
   DateUI,
 } from '../components/AntdSearchUI';
@@ -31,11 +34,11 @@ class ProjectManagement extends Component {
   tableSearchFormRef = React.createRef();
   // tableFormRef = React.createRef();
 
-  state = {
-    pagination: {},
-    loading: false,
-    list: [],
-  };
+  // state = {
+  //   pagination: {},
+  //   loading: false,
+  //   list: [],
+  // };
 
   // 顶部表单默认值
   initialValues = {
@@ -44,9 +47,37 @@ class ProjectManagement extends Component {
     pageSize: 10,
   };
 
+  constructor(props) {
+    super(props);
+    this.state = {
+      pagination: {},
+      loading: false,
+      // visible: false,
+      // detailValue: {},
+      list: [],
+      nameCodeVal: [],
+      nameCodeValPublish: [],
+    };
+    // 异步验证做节流处理
+    this.callParter = _.debounce(this.callParter, 500);
+    this.callPublish = _.debounce(this.callPublish, 500);
+  }
+
   componentDidMount() {
     this.getTableData(this.initialValues);
   }
+
+  callParter = value => {
+    aaa.getProcessCodeAndName(value).then(res => {
+      this.setState({ nameCodeVal: res });
+    });
+  };
+
+  callPublish = value => {
+    aaa.getProcessPublisherCodeAndName(value).then(res => {
+      this.setState({ nameCodeVal: res });
+    });
+  };
 
   // 获取表格数据
   getTableData = (options = {}) => {
@@ -73,6 +104,83 @@ class ProjectManagement extends Component {
     // console.log(list);
   };
 
+  // 项目名称联想
+  renderOption = item => ({
+    value: item.code,
+    label: (
+      // <Option key={item.id} text={item.name}>
+      <div style={{ display: 'flex' }}>
+        <span>{item.code}</span>&nbsp;&nbsp;
+        <span>{item.name}</span>
+      </div>
+      // </Option>
+    ),
+  });
+
+  // 筛选值
+  inputValue = value => {
+    const { nameCodeVal } = this.state;
+    const arr = [];
+    if (!value) {
+      return false;
+    }
+    this.callParter(value);
+    if (nameCodeVal.length === 0) {
+      return false;
+    }
+    nameCodeVal.forEach(item => {
+      if (item.name.indexOf(value) !== -1) {
+        arr.push(item);
+      }
+      if (item.code.indexOf(value) !== -1 && arr.indexOf(item)) {
+        arr.push(item);
+      }
+    });
+    this.setState({
+      nameCodeVal: arr,
+      // allowClear: 'ture',
+    });
+    return true;
+  };
+
+  // 创建人联想
+  renderOptionPublish = item => ({
+    value: item.creatorName,
+    label: (
+      // <Option key={item.id} text={item.name}>
+      <div style={{ display: 'flex' }}>
+        <span>{item.publisherName}</span>
+      </div>
+      // </Option>
+    ),
+  });
+
+  // 筛选值
+  inputValuePublish = value => {
+    const { nameCodeValPublish } = this.state;
+    const arr = [];
+    if (!value) {
+      return false;
+    }
+    this.callPublish(value);
+    if (nameCodeValPublish.length === 0) {
+      return false;
+    }
+    nameCodeValPublish.forEach(item => {
+      if (item.name.indexOf(value) !== -1) {
+        arr.push(item);
+      }
+      if (item.code.indexOf(value) !== -1 && arr.indexOf(item)) {
+        arr.push(item);
+      }
+    });
+    this.setState({
+      nameCodeValPublish: arr,
+      // allowClear: 'ture',
+    });
+    return true;
+  };
+
   // 分页
   handleStandardTableChange = pagination => {
     this.getTableData({
@@ -82,39 +190,48 @@ class ProjectManagement extends Component {
   };
 
   simpleForm = () => {
-    const { languageCode } = this.props;
+    const { languageCode, status } = this.props;
+    // const { nameCodeVal } = this.state;
     // console.log(this.props);
     return (
       <>
-        <InputUI
-          languageCode={languageCode}
-          label="项目"
-          name="name"
-          placeholder="请输入项目名称"
-        />
-        <FormItem label="状态" name="status">
-          <Select
-            mode="multiple"
-            style={{ width: '200px' }}
-            allowClear
-            placeholder="请选择"
-            // defaultValue={['a10', 'c12']}
-            onChange={this.handleChange}
-          >
-            {this.props.statusview.map(e => (
-              <Option value={e.id} key={e.id}>
-                {e.name}
-              </Option>
-            ))}
-          </Select>
-        </FormItem>
-
-        <InputUI
-          languageCode={languageCode}
-          label="创建人"
-          name="creatorName"
-          placeholder="请输入"
-        />
+        <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
+          <FormItem label="项目" name="name">
+            <AutoComplete
+              onSearch={this.inputValue}
+              // options={nameCodeVal.map(this.renderOption)}
+              placeholder="请输入项目名称"
+            />
+          </FormItem>
+        </Col>
+        <Col>
+          <FormItem label="状态" name="status">
+            <Select
+              mode="multiple"
+              maxTagCount={2}
+              maxTagTextLength={3}
+              style={{ width: '200px' }}
+              allowClear
+              placeholder="请选择状态"
+            >
+              {status.map(e => (
+                <Option value={e.id} key={e.id}>
+                  {e.name}
+                </Option>
+              ))}
+            </Select>
+          </FormItem>
+        </Col>
+        <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
+          <FormItem label="创建人" name="creatorName">
+            <AutoComplete
+              onSearch={this.inputValuePublish}
+              // options={nameCodeVal.map(this.renderOptionPublish)}
+              // placeholder={formatMessage({ id: 'bp.inputHere' })}
+              placeholder="请输入创建人"
+            />
+          </FormItem>
+        </Col>
       </>
     );
   };
@@ -130,11 +247,6 @@ class ProjectManagement extends Component {
         placeholder={['开始时间', '结束时间']}
       />
     );
-  };
-
-  // 状态多选框
-  handleChange = () => {
-    console.log('状态多选框');
   };
 
   // 新增
@@ -171,15 +283,20 @@ class ProjectManagement extends Component {
       {
         title: '编号/名称',
         dataIndex: 'code',
-        render: value => (
+        width: '200px',
+        render: (value, row) => (
           <>
-            <a onClick={() => this.searchDetails(value)}>{value}</a>
+            <div>{row.name}</div>
+            <div>
+              <a onClick={() => this.searchDetails(value)}>{value}</a>
+            </div>
           </>
         ),
       },
       {
         title: '描述',
         dataIndex: 'describe',
+        width: '200px',
       },
       {
         title: '创建人/时间',
@@ -325,8 +442,8 @@ class ProjectManagement extends Component {
   }
 }
 
-export default connect(({ global, project }) => ({
+export default connect(({ global, projectManage }) => ({
   languageCode: global.languageCode,
-  project,
-  statusview: project.status,
+  projectManage,
+  status: projectManage.status,
 }))(ProjectManagement);
