@@ -95,8 +95,14 @@ class Parameter extends React.Component {
             padding: '24px 0 24px 30px',
             display: 'inline-block',
             overflowY: 'auto',
+            position: 'relative',
           }}
         >
+          <EnlargePage
+            visible={typeEnlargeVisible}
+            handleBigClose={this.handleBigClose}
+            typeEnlargeData={typeEnlargeData}
+          />
           {/* type列表 */}
           <List
             rowKey="id"
@@ -167,11 +173,6 @@ class Parameter extends React.Component {
             split={false}
           />
         </div>
-        <EnlargePage
-          visible={typeEnlargeVisible}
-          handleBigClose={this.handleBigClose}
-          typeEnlargeData={typeEnlargeData}
-        />
       </Modal>
     );
   }
