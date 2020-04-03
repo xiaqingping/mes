@@ -8,9 +8,9 @@ import TableSearchForm from '@/components/TableSearchForm';
 import { connect } from 'dva';
 import debounce from 'lodash/debounce';
 import router from 'umi/router';
-import TaskModelView from './taskModelView';
 import { formatter, getOperates } from '@/utils/utils';
 import api from '@/pages/project/api/taskmodel';
+import TaskModelView from './taskModelView';
 import StandardTable from '../components/StandardTable';
 import { SelectUI } from '../components/AntdSearchUI';
 
@@ -223,23 +223,21 @@ class TaskModel extends Component {
         title: '编号/名称',
         dataIndex: 'codeAndName',
         key: 'codeAndName',
-        render: (text, row) => {
-          return (
-            <div style={{ display: 'flex' }}>
-              <img
-                src="https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=2912333032,1411506376&fm=26&gp=0.jpg"
-                alt=""
-                height="40"
-                width="40"
-                style={{ borderRadius: '2px' }}
-              />
-              <div style={{ marginLeft: 10 }}>
-                <div style={{ color: '#545454' }}>{row.name}</div>
-                <div style={{ color: '#888' }}>{row.code}</div>
-              </div>
+        render: (text, row) => (
+          <div style={{ display: 'flex' }}>
+            <img
+              src="https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=2912333032,1411506376&fm=26&gp=0.jpg"
+              alt=""
+              height="40"
+              width="40"
+              style={{ borderRadius: '2px' }}
+            />
+            <div style={{ marginLeft: 10 }}>
+              <div style={{ color: '#545454' }}>{row.name}</div>
+              <div style={{ color: '#888' }}>{row.code}</div>
             </div>
-          );
-        },
+          </div>
+        ),
       },
       {
         title: '描述',
@@ -273,17 +271,15 @@ class TaskModel extends Component {
         dataIndex: 'status',
 
         filters: taskModelStatusOptions,
-        render: value => {
+        render: value => (
           // console.log(value);
-          return (
-            <>
-              <Badge
-                status={formatter(taskModelStatusOptions, value, 'value', 'status')}
-                text={formatter(taskModelStatusOptions, value, 'value', 'label')}
-              />
-            </>
-          );
-        },
+          <>
+            <Badge
+              status={formatter(taskModelStatusOptions, value, 'value', 'status')}
+              text={formatter(taskModelStatusOptions, value, 'value', 'label')}
+            />
+          </>
+        ),
       },
       {
         title: '操作',
@@ -294,8 +290,8 @@ class TaskModel extends Component {
           const operaList = getOperates(text);
           const menu = (
             <Menu>
-              {operaList.map((item, index) => {
-                return (
+              {operaList.map(
+                (item, index) =>
                   index && (
                     <Menu.Item key={index}>
                       <a
@@ -307,9 +303,8 @@ class TaskModel extends Component {
                         {item}
                       </a>
                     </Menu.Item>
-                  )
-                );
-              })}
+                  ),
+              )}
             </Menu>
           );
 

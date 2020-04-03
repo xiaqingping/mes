@@ -98,6 +98,8 @@ service.interceptors.request.use(config => {
   }
   if (token) {
     config.headers.Authorization = token;
+    config.headers.usercode = '123';
+    config.headers.username = '123';
 
     // FIXME: 开发时代理临时接口（配合webpack proxy 使用）
     if (process.env.NODE_ENV === 'development') {

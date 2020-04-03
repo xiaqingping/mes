@@ -1,16 +1,29 @@
 // 流程模型的编辑
 import React, { Component } from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
-import { Card, Upload, message, Input, Tag, Switch, Table, Button, Popconfirm, Form } from 'antd';
-import { LoadingOutlined, SettingOutlined, PlusOutlined } from '@ant-design/icons';
+import {
+  Card,
+  Upload,
+  message,
+  Input,
+  Tag,
+  Switch,
+  Table,
+  Button,
+  Popconfirm,
+  Form,
+  Badge,
+} from 'antd';
+import { LoadingOutlined, SettingOutlined, PlusOutlined, DeleteOutlined } from '@ant-design/icons';
 import { connect } from 'dva';
 import './index.less';
 // eslint-disable-next-line max-len
 import AssociatedProcessModel from '@/pages/project/process-model/components/AssociatedProcessModel';
 import Parameter from '@/pages/project/process-model/components/Parameter';
-import { guid } from '@/utils/utils';
+import { guid, formatter, versionFun } from '@/utils/utils';
 import disk from '@/pages/project/api/disk';
 import api from '@/pages/project/api/processModel/';
+import router from 'umi/router';
 
 function getBase64(img, callback) {
   const reader = new FileReader();
@@ -34,20 +47,78 @@ class ProcessEdit extends Component {
   tableSearchFormRef = React.createRef();
 
   static getDerivedStateFromProps(nextProps) {
-    return { id: nextProps.match.params.id || '' };
+    let data = [];
+    if (nextProps.match.params.id) {
+      data = nextProps.match.params.id.split('-');
+    }
+
+    if (data.length !== 0) {
+      return { id: data[0], pageModel: data.length };
+    }
+    return { id: '' };
   }
 
+  // pageModel 0 新增默认，1修改，2升级
   constructor(props) {
     super(props);
     const guuid = guid();
     this.state = {
+      pageModel: 0,
       imageUrl: '',
       loading: false,
       id: '',
       guuid,
       visible: false,
       parameterVisible: false,
+      taskList: [],
+      ids: [],
+      sonIds: [],
+      versionOpen: false, // 升级版本可以选择
+      selectVersion: '', // 选择的版本值
+      versionType: null, // 可以选择的版本
     };
+  }
+
+  componentDidMount() {
+    let data = [];
+    if (this.props.match.params.id) {
+      data = this.props.match.params.id.split('-');
+      api.getProcessDetail(data[0]).then(res => {
+        disk
+          .getFiles({
+            sourceCode: res.picture,
+            sourceKey: 'project_process_model',
+          })
+          .then(v => {
+            this.setState({
+              imageUrl: v && v[0].id ? disk.downloadFiles(v[0].id, { view: true }) : '',
+            });
+            this.props.dispatch({
+              type: 'processModel/setProcessDetail',
+              payload: {
+                ...res,
+                fileId: v && v[0].id ? v[0].id : '',
+              },
+              // const newList = res.rows.map(e => {
+              // const filterItem = v.filter(item => item.sourceCode === e.picture);
+              // const fileId = filterItem[0] && filterItem[0].id;
+              // return {
+              //   ...e,
+              //   fileId,
+              // };
+              // });
+              // this.setState({
+              //   list: newList,
+              // });
+            });
+          });
+        if (res.version) {
+          this.setState({
+            versionType: versionFun(res.version),
+          });
+        }
+      });
+    }
   }
 
   // 图片上传
@@ -67,6 +138,17 @@ class ProcessEdit extends Component {
     }
   };
 
+  // 导航列表title样式
+  navContent = () => {
+    const { pageModel } = this.state;
+    const { processDetail } = this.props;
+
+    if (pageModel) {
+      return <div>{`${processDetail.name} ${processDetail.id}`}</div>;
+    }
+    return '';
+  };
+
   // 流程模型列表title样式
   titleContent = () => <div style={{ fontWeight: 'bolder' }}>任务列表</div>;
 
@@ -77,26 +159,45 @@ class ProcessEdit extends Component {
 
   // 提交上传
   onFinish = values => {
-    const { imageUrl, guuid } = this.state;
+    const { imageUrl, guuid, taskList, selectVersion, pageModel, id } = this.state;
     const { processAddData } = this.props;
     const data = processAddData;
-    console.log(values);
+    const taskModelIds = [];
+    taskList.forEach(item => {
+      taskModelIds.push({ taskModelId: item.id, automatic: item.automatic });
+    });
     if (imageUrl) {
       data.picture = guuid;
     }
     data.name = values.name;
     data.describe = values.describe;
     data.interactionAnalysis = values.interactionAnalysis;
-    data.version = '1.0';
-    this.props.dispatch({
-      type: 'processModel/setProcessAddData',
-      payload: {
-        ...data,
-      },
-    });
-    api.addProcess(processAddData).then(res => {
-      console.log(res);
-    });
+    data.version = selectVersion || 'V1.0';
+    data.taskModelIds = taskModelIds;
+
+    // this.props.dispatch({
+    //   type: 'processModel/setProcessAddData',
+    //   payload: {
+    //     ...data,
+    //   },
+    // });
+
+    if (pageModel === 1) {
+      data.id = id;
+      api.changeProcess(processAddData).then(() => {
+        router.push('/project/process-model');
+      });
+    }
+    if (pageModel === 2) {
+      api.upgradeProcess(id, processAddData).then(() => {
+        router.push('/project/process-model');
+      });
+    }
+    if (!pageModel) {
+      api.addProcess(processAddData).then(() => {
+        router.push('/project/process-model');
+      });
+    }
   };
 
   // 点击打开关联
@@ -127,6 +228,66 @@ class ProcessEdit extends Component {
     });
   };
 
+  // 删除任务
+  confirm = value => {
+    const { taskList, ids, sonIds } = this.state;
+    const data = taskList;
+    // const { ids, sonIds } = this.props;
+    const idsData = ids;
+    const sonIdsData = sonIds;
+    // data = [...taskList, ...value];
+    // value.forEach(item => {
+    //   idsData.push(item.id);
+    //   sonIdsData.push(...item.preTaskIds);
+    // });
+    const newData = data.filter(item => item.id !== value.id);
+    const newIdsData = idsData.filter(item => item !== value.id);
+    let newSonIdsData = [];
+    if (value.preTaskIds.length !== 0) {
+      value.preTaskIds.forEach(i => {
+        newSonIdsData = sonIdsData.filter(item => item !== i);
+      });
+    }
+    this.setState({
+      taskList: newData,
+      ids: newIdsData,
+      sonIds: newSonIdsData,
+    });
+  };
+
+  // 获取子级数据
+  getData = async value => {
+    const { taskList, ids, sonIds } = this.state;
+    let data = taskList;
+    const idsData = ids;
+    const sonIdsData = sonIds;
+    data = [...taskList, ...value];
+    value.forEach(item => {
+      idsData.push(item.id);
+      sonIdsData.push(...item.preTaskIds);
+    });
+
+    this.setState({
+      taskList: data,
+      ids: idsData,
+      sonIds: sonIdsData,
+    });
+  };
+
+  // 修改任务列表的开关
+  changeIsAutomatic = (row, index) => {
+    const { taskList } = this.state;
+    const newTaskList = taskList;
+    if (newTaskList[index].automatic === 1) {
+      newTaskList[index].automatic = 2;
+    } else {
+      newTaskList[index].automatic = 1;
+    }
+    this.setState({
+      taskList: newTaskList,
+    });
+  };
+
   render() {
     const uploadButton = (
       <div style={{ borderRadius: '50%' }}>
@@ -134,7 +295,27 @@ class ProcessEdit extends Component {
         {/* <div className="ant-upload-text">Upload</div> */}
       </div>
     );
-    const { imageUrl, id, visible, parameterVisible, guuid } = this.state;
+
+    const {
+      imageUrl,
+      visible,
+      parameterVisible,
+      guuid,
+      taskList,
+      sonIds,
+      ids,
+      pageModel,
+      selectVersion,
+      versionOpen,
+      versionType,
+    } = this.state;
+    const {
+      processDetail,
+      project: { status },
+    } = this.props;
+    if (!processDetail && pageModel !== 0) {
+      return false;
+    }
     const columns = [
       {
         title: '编号/名称',
@@ -147,35 +328,61 @@ class ProcessEdit extends Component {
       {
         title: '状态',
         dataIndex: 'status',
+        render: value => (
+          <Badge
+            status={formatter(status, value, 'value', 'status')}
+            text={formatter(status, value, 'value', 'text')}
+          />
+        ),
       },
       {
         title: '自动运行',
-        dataIndex: 'status',
-        render: () => <Switch />,
+        dataIndex: 'isAutomatic',
+        render: (value, row, index) => (
+          <Switch disabled={value === 2} onChange={() => this.changeIsAutomatic(row, index)} />
+        ),
       },
       {
         title: '操作',
-        render: () => (
-          <>
-            <Popconfirm
-              placement="topLeft"
-              title="有前置任务，无法删除。"
-              onConfirm={this.confirm}
-              okText="Yes"
-              cancelText="No"
-            >
-              选择
-            </Popconfirm>
-          </>
-        ),
+        render: (value, row) => {
+          if (!sonIds.includes(row.id)) {
+            return (
+              <>
+                <Popconfirm
+                  placement="topLeft"
+                  title="确定要删除吗？"
+                  onConfirm={() => this.confirm(row)}
+                  okText="Yes"
+                  cancelText="No"
+                >
+                  <DeleteOutlined />
+                </Popconfirm>
+              </>
+            );
+          }
+          return true;
+        },
       },
     ];
 
     const uploadUrl = disk.uploadMoreFiles('project_process_model', guuid);
 
+    // 设置默认值
+    const initialValues = () => {
+      if (pageModel) {
+        const defaultData = {
+          name: processDetail.name,
+          describe: processDetail.describe,
+          interactionAnalysis: processDetail.interactionAnalysis === 1,
+        };
+        return defaultData;
+      }
+      return '';
+    };
+
     return (
-      <PageHeaderWrapper title={id || ''}>
-        <Form onFinish={this.onFinish} initialValues={{ interactionAnalysis: true }}>
+      <PageHeaderWrapper title={this.navContent()}>
+        <Form onFinish={this.onFinish} initialValues={initialValues()}>
           <Card className="process-model-edit">
             <div style={{ float: 'left', marginLeft: '20px' }}>
               {/* <Form.Item name="uploadPIc"> */}
@@ -203,26 +410,58 @@ class ProcessEdit extends Component {
             </div>
             <div style={{ float: 'left', width: '552px', marginLeft: '20px' }}>
               <Form.Item name="name">
-                <Input placeholder="请输入任务名称" style={{ marginBottom: '10px' }} />
+                <Input placeholder="请输入流程名称" style={{ marginBottom: '10px' }} />
               </Form.Item>
               <Form.Item name="describe">
-                <Input.TextArea placeholder="请输入任务描述" rows={4} />
+                <Input.TextArea placeholder="请输入流程描述" rows={4} />
               </Form.Item>
             </div>
-            <div style={{ float: 'left', marginLeft: '20px' }}>
-              <Form.Item name="version">
-                <Tag color="green">V1.0</Tag>
-              </Form.Item>
-            </div>
-            {/* <div style={{ float: 'left', marginLeft: '88px' }}>
-              <span style={{ fontSize: '16px', verticalAlign: 'middle' }}>是否可自动运行：</span>
-              <Switch
-                style={{ verticalAlign: 'middle', marginLeft: '22px' }}
-                defaultChecked
-                onChange={this.onChange}
-              />
-            </div> */}
 
+            {/* 版本选择 */}
+            <div style={{ float: 'left' }}>
+              <div style={{ position: 'relative', display: 'inline-block', marginLeft: '30px' }}>
+                <Tag
+                  color="green"
+                  style={{ cursor: 'pointer' }}
+                  onClick={() => {
+                    this.setState({
+                      versionOpen: !versionOpen,
+                    });
+                  }}
+                >
+                  {pageModel ? selectVersion || processDetail.version : 'V1.0'}
+                  {/* {selectVersion || processDetail.version} */}
+                </Tag>
+                {versionOpen && pageModel === 2 ? (
+                  <Card
+                    style={{ position: 'absolute', zIndex: '100', top: '28px' }}
+                    hoverable
+                    className="padding-none"
+                  >
+                    {versionType.length !== 0
+                      ? versionType.map(item => (
+                          <Tag
+                            key={item}
+                            style={{ cursor: 'pointer' }}
+                            onClick={() => {
+                              this.setState({
+                                selectVersion: item,
+                                versionOpen: !versionOpen,
+                              });
+                            }}
+                          >
+                            {item}
+                          </Tag>
+                        ))
+                      : ''}
+                  </Card>
+                ) : (
+                  ''
+                )}
+              </div>
+            </div>
+
+            {/* 交互分析 */}
             <div style={{ float: 'right', marginRight: '80px' }}>
               <span style={{ fontSize: '16px', verticalAlign: 'middle' }}>交互分析：</span>
               <span>
@@ -251,7 +490,7 @@ class ProcessEdit extends Component {
           <Card style={{ marginTop: '24px' }} title={this.titleContent()}>
             <Table
               rowKey="id"
-              // dataSource={tableData}
+              dataSource={taskList}
               columns={columns}
               rowClassName="editable-row"
               pagination={false}
@@ -278,7 +517,12 @@ class ProcessEdit extends Component {
             </Button>
           </Card>
         </Form>
-        <AssociatedProcessModel visible={visible} onClose={this.onClose} />
+        <AssociatedProcessModel
+          visible={visible}
+          onClose={this.onClose}
+          getData={v => this.getData(v)}
+          ids={ids}
+        />
         <Parameter visible={parameterVisible} handleClose={this.handleClose} />
       </PageHeaderWrapper>
     );
@@ -290,4 +534,7 @@ export default connect(({ global, user, project, processModel }) => ({
   authorization: user.currentUser.authorization,
   project,
   processAddData: processModel.processAddData,
+  processDetail: processModel.processDetail,
+  // ids: processModel.ids,
+  // sonIds: processModel.sonIds,
 }))(ProcessEdit);

@@ -1,11 +1,7 @@
 import _ from 'lodash';
-import {
-  parse
-} from 'querystring';
+import { parse } from 'querystring';
 import pathRegexp from 'path-to-regexp';
-import {
-  formatMessage
-} from 'umi/locale';
+import { formatMessage } from 'umi/locale';
 
 /* eslint no-useless-escape:0 import/prefer-default-export:0 */
 // eslint-disable-next-line max-len
@@ -21,12 +17,9 @@ export const getPageQuery = () => parse(window.location.href.split('?')[1]);
  */
 export const getAuthorityFromRouter = (router = [], pathname) => {
   const authority = router.find(
-    ({
-      routes,
-      path = '/'
-    }) =>
-    (path && pathRegexp(path).exec(pathname)) ||
-    (routes && getAuthorityFromRouter(routes, pathname)),
+    ({ routes, path = '/' }) =>
+      (path && pathRegexp(path).exec(pathname)) ||
+      (routes && getAuthorityFromRouter(routes, pathname)),
   );
   if (authority) return authority;
   return undefined;
@@ -102,9 +95,9 @@ export const formatter = (arr, value, key1, key2) => {
  */
 export const validateForm = form =>
   form
-  .validateFields()
-  .then(data => [true, data])
-  .catch(error => [false, error]);
+    .validateFields()
+    .then(data => [true, data])
+    .catch(error => [false, error]);
 
 /**
  * 获取表单的值（不验证）
@@ -184,18 +177,9 @@ export const format = id =>
  * @param {Object} customApi 自定义请求接口列表
  */
 export function* getCache(namespace, action, effects, defaultApi, customApi) {
-  const {
-    payload
-  } = action;
-  const {
-    call,
-    put,
-    select
-  } = effects;
-  const {
-    type,
-    options
-  } = payload;
+  const { payload } = action;
+  const { call, put, select } = effects;
+  const { type, options } = payload;
 
   let targetState;
 
@@ -249,10 +233,7 @@ export function* getCache(namespace, action, effects, defaultApi, customApi) {
  * @param {Function} fun 数据处理方法
  */
 export const setCache = (namespace, payload, fun) => {
-  const {
-    type,
-    targetState
-  } = payload;
+  const { type, targetState } = payload;
 
   const data = (fun[type] && fun[type](targetState)) || targetState;
 
@@ -264,7 +245,6 @@ export const setCache = (namespace, payload, fun) => {
   };
 };
 
-
 /** 参数说明：
  * 根据长度截取先使用字符串，超长部分追加…
  * str 对象字符串
@@ -273,6 +253,7 @@ export const setCache = (namespace, payload, fun) => {
  */
 export const cutString = (str, len) => {
   // length属性读出来的汉字长度为1
+  if (!str) return false;
   if (str.length * 2 <= len) {
     return str;
   }
@@ -296,8 +277,7 @@ export const cutString = (str, len) => {
     }
   }
   return s;
-}
-
+};
 
 // 任务模型获取操作列表
 export const getOperates = v => {
@@ -312,5 +292,13 @@ export const getOperates = v => {
     operas = ['禁用', '查看'];
   }
   return operas;
+};
 
+/**
+ * 版本输出
+ * @param {String} v 字符串版本号
+ */
+export const versionFun = v => {
+  const version = v.substr(1);
+  return [`V${((version * 10 + 1) / 10).toFixed(1)}`, `V${((version * 10 + 10) / 10).toFixed(1)}`];
 };

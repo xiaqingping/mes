@@ -13,14 +13,14 @@ const projectModel = {
       // 已发布
       {
         value: 2,
-        text: '已验证',
+        text: '已发布',
         // i18n: 'bp.completed',
         status: 'success',
       },
       // 已禁用
       {
         value: 3,
-        text: '已拒绝',
+        text: '已禁用',
         // i18n: 'bp.rejected',
         status: 'error',
       },

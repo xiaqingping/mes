@@ -29,8 +29,11 @@ export default {
   },
 
   // 查询出所有的前置任务，包括前置任务的前置任务
-  getAllPreTasks(id) {
-    return request(`${http}/v1/task/${id}/allPreTasks`);
+  getAllPreTasks(id, data) {
+    return request(`${http}/v1/task/${id}/allPreTasks`, {
+      method: 'post',
+      data,
+    });
   },
 
   // 获取后置列表

@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Tooltip, Drawer, Avatar, Tag, List, Card, Badge, Button } from 'antd';
+import React, { useState } from 'react';
+import { Tooltip, Drawer, Avatar, Tag, List, Card, Badge } from 'antd';
 import {
   QuestionCircleOutlined,
   DownOutlined,
