@@ -244,8 +244,9 @@ class ProjectManagement extends Component {
   };
 
   // 项目管理详情页面
-  searchDetails = () => {
-    router.push('/project/project-manage/detail');
+  searchDetails = row => {
+    const projectId = row.id;
+    router.push('/project/project-manage/detail', { projectId });
   };
 
   // 删除数据
@@ -270,7 +271,7 @@ class ProjectManagement extends Component {
           <>
             <div>{row.name}</div>
             <div>
-              <a onClick={() => this.searchDetails(value)}>{value}</a>
+              <a onClick={() => this.searchDetails(row)}>{value}</a>
             </div>
           </>
         ),
