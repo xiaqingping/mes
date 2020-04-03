@@ -307,7 +307,7 @@ class Test extends Component {
                       span={7}
                       style={{ padding: '0', marginBottom: '10px', marginRight: '10px' }}
                     >
-                      <Card bodyStyle={{ width: '300px', padding: '0' }}>
+                      <Card.Grid style={{ width: '300px', padding: '0' }}>
                         <div style={{ height: '80px', width: '300px', padding: '5px' }}>
                           <Avatar
                             src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
@@ -398,13 +398,13 @@ class Test extends Component {
                         <div style={{ fontSize: '14px', padding: '10px' }}>
                           心灵鸡汤来一碗,心灵鸡汤来两碗,心灵鸡汤来三碗，心灵鸡汤来四碗
                         </div>
-                      </Card>
+                      </Card.Grid>
                     </Col>
                     <Col
                       span={7}
                       style={{ padding: '0', marginBottom: '10px', marginRight: '10px' }}
                     >
-                      <Card bodyStyle={{ width: '300px', padding: '0' }}>
+                      <Card.Grid style={{ width: '300px', padding: '0' }}>
                         <div style={{ height: '80px', width: '300px', padding: '5px' }}>
                           <Avatar
                             src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
@@ -442,54 +442,10 @@ class Test extends Component {
                         <div style={{ fontSize: '14px', padding: '10px' }}>
                           心灵鸡汤来一碗,心灵鸡汤来两碗,心灵鸡汤来三碗，心灵鸡汤来四碗
                         </div>
-                      </Card>
+                      </Card.Grid>
                     </Col>
                     <Col span={7} style={{ padding: '0', marginBottom: '10px' }}>
-                      <Card bodyStyle={{ width: '300px', padding: '0' }}>
-                        <div style={{ height: '80px', width: '300px', padding: '5px' }}>
-                          <Avatar
-                            src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
-                            style={{ float: 'left', marginRight: '10px' }}
-                            size="large"
-                          />
-                          <div
-                            style={{
-                              float: 'left',
-                              height: '50px',
-                              width: '100px',
-                              textAlign: 'center',
-                            }}
-                          >
-                            <ul style={{ padding: '0', textAlign: 'center' }}>
-                              <li>某某某</li>
-                              <li>
-                                <Tag color="green" style={{ width: '50px', height: '20px' }}>
-                                  v1.2
-                                </Tag>
-                              </li>
-                            </ul>
-                          </div>
-                          <div
-                            style={{
-                              fontSize: '14px',
-                              float: 'right',
-                              color: '#005bc3',
-                              marginRight: '10px',
-                            }}
-                          >
-                            查看
-                          </div>
-                        </div>
-                        <div style={{ fontSize: '14px', padding: '5px' }}>
-                          心灵鸡汤来一碗,心灵鸡汤来两碗,心灵鸡汤来三碗，心灵鸡汤来四碗
-                        </div>
-                      </Card>
-                    </Col>
-                    <Col
-                      span={7}
-                      style={{ padding: '0', marginBottom: '10px', marginRight: '10px' }}
-                    >
-                      <Card bodyStyle={{ width: '300px', padding: '0' }}>
+                      <Card.Grid style={{ width: '300px', padding: '0' }}>
                         <div style={{ height: '80px', width: '300px', padding: '5px' }}>
                           <Avatar
                             src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
@@ -527,13 +483,13 @@ class Test extends Component {
                         <div style={{ fontSize: '14px', padding: '10px' }}>
                           心灵鸡汤来一碗,心灵鸡汤来两碗,心灵鸡汤来三碗，心灵鸡汤来四碗
                         </div>
-                      </Card>
+                      </Card.Grid>
                     </Col>
                     <Col
                       span={7}
                       style={{ padding: '0', marginBottom: '10px', marginRight: '10px' }}
                     >
-                      <Card bodyStyle={{ width: '300px', padding: '0' }}>
+                      <Card.Grid style={{ width: '300px', padding: '0' }}>
                         <div style={{ height: '80px', width: '300px', padding: '5px' }}>
                           <Avatar
                             src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
@@ -571,10 +527,54 @@ class Test extends Component {
                         <div style={{ fontSize: '14px', padding: '10px' }}>
                           心灵鸡汤来一碗,心灵鸡汤来两碗,心灵鸡汤来三碗，心灵鸡汤来四碗
                         </div>
-                      </Card>
+                      </Card.Grid>
+                    </Col>
+                    <Col
+                      span={7}
+                      style={{ padding: '0', marginBottom: '10px', marginRight: '10px' }}
+                    >
+                      <Card.Grid style={{ width: '300px', padding: '0' }}>
+                        <div style={{ height: '80px', width: '300px', padding: '5px' }}>
+                          <Avatar
+                            src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
+                            style={{ float: 'left', marginRight: '10px' }}
+                            size="large"
+                          />
+                          <div
+                            style={{
+                              float: 'left',
+                              height: '50px',
+                              width: '100px',
+                              textAlign: 'center',
+                            }}
+                          >
+                            <ul style={{ padding: '0', textAlign: 'center' }}>
+                              <li>某某某</li>
+                              <li>
+                                <Tag color="green" style={{ width: '50px', height: '20px' }}>
+                                  v1.2
+                                </Tag>
+                              </li>
+                            </ul>
+                          </div>
+                          <div
+                            style={{
+                              fontSize: '14px',
+                              float: 'right',
+                              color: '#005bc3',
+                              marginRight: '10px',
+                            }}
+                          >
+                            查看
+                          </div>
+                        </div>
+                        <div style={{ fontSize: '14px', padding: '10px' }}>
+                          心灵鸡汤来一碗,心灵鸡汤来两碗,心灵鸡汤来三碗，心灵鸡汤来四碗
+                        </div>
+                      </Card.Grid>
                     </Col>
                     <Col span={7} style={{ padding: '0', marginBottom: '10px' }}>
-                      <Card bodyStyle={{ width: '300px', padding: '0' }}>
+                      <Card.Grid style={{ width: '300px', padding: '0' }}>
                         <div style={{ height: '80px', width: '300px', padding: '5px' }}>
                           <Avatar
                             src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
@@ -612,7 +612,7 @@ class Test extends Component {
                         <div style={{ fontSize: '14px', padding: '10px' }}>
                           心灵鸡汤来一碗,心灵鸡汤来两碗,心灵鸡汤来三碗，心灵鸡汤来四碗
                         </div>
-                      </Card>
+                      </Card.Grid>
                     </Col>
                   </Row>
                 </div>
