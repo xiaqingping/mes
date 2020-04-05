@@ -7,21 +7,21 @@ const projectModel = {
       picture: '',
       interactionAnalysis: '',
       version: '',
-      // groups: [
-      //   {
-      //     sortNo: '',
-      //     groupName: '',
-      //     groupDesc: '',
-      //     params: [
-      //       {
-      //         paramId: '',
-      //         taskModelId: '',
-      //         processModelId: '',
-      //         sortNo: '',
-      //       },
-      //     ],
-      //   },
-      // ],
+      groups: [
+        {
+          sortNo: '',
+          groupName: 'no',
+          groupDesc: '',
+          params: [
+            // {
+            //   paramId: '',
+            //   taskModelId: '',
+            //   processModelId: '',
+            //   sortNo: '',
+            // },
+          ],
+        },
+      ],
       taskModelIds: [],
     },
     // ids: [],
