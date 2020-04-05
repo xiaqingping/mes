@@ -147,9 +147,6 @@ class Parameter extends React.Component {
       }
     }
     if (moveType === 2) {
-      console.log(moveElement, moveIndex);
-
-      console.log(value, index);
       newData[moveIndex] = value;
       newData[index] = moveElement;
       this.setState({
