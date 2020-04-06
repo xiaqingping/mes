@@ -45,6 +45,7 @@ class TaskModel extends Component {
     viewId: '',
     nameCodeVal: [],
     nameCodeValPublish: [],
+    filtersData: null,
   };
 
   operaList = [];
@@ -96,13 +97,29 @@ class TaskModel extends Component {
     });
   };
 
+  // 筛选状态
   handleStandardTableChange = (pagination, filters) => {
-    // console.log(pagination);
-    // console.log(filters);
-    // this.getTableData({
-    //   page: pagination.current,
-    //   rows: pagination.pageSize,
-    // });
+    const { filtersData } = this.state;
+    let filterData = {};
+    const page = pagination;
+    if (filters) {
+      if (filters.status && filters.status[0]) {
+        filterData.status = filters.status.join(',');
+      }
+      this.setState({
+        filtersData: filterData,
+      });
+      page.current = 1;
+      page.pageSize = 10;
+    } else if (filtersData) {
+      filterData = filtersData;
+    }
+
+    this.getTableData({
+      page: page.current,
+      rows: page.pageSize,
+      ...filterData,
+    });
   };
 
   // ------------------------------------------------------------------------
