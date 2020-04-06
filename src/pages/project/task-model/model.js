@@ -91,11 +91,20 @@ const SeqModel = {
     selectParamsId: "", // 根据前置后置任务id查询参数的id
     editOriginModelData: {}, // index页点击一条任务模型时候的信息
     editTaskModelId: "", // 任务模型修改时候传的任务id, 查询参数列表
+    taskDetail: null, // 任务模型详细信息
   },
   effects: {
 
   },
   reducers: {
+    getTaskDetail(state, {
+      payload
+    }) {
+      return {
+        ...state,
+        taskDetail: payload
+      }
+    },
     setEditTaskModelId(state, {
       payload
     }) {

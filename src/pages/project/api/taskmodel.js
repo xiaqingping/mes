@@ -57,5 +57,20 @@ export default {
   // 获取某项任务的详细信息---现在获取参数列表
   getArgumentList(id) {
     return request(`${http}/v1/task/${id}`);
+  },
+
+  // 修改任务模型
+  editTaskModel(params) {
+    return request(`${http}/v1/task`, {
+      method: 'PUT',
+      params,
+    });
+  },
+  // 升级任务模型
+  upgradeTaskModel(id, params) {
+    return request(`${http}/v1/task/${id}/upgrade`, {
+      method: 'POST',
+      params,
+    });
   }
 };

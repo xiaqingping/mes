@@ -56,7 +56,6 @@ class TaskModel extends Component {
   getTableData = (options = {}) => {
     const { pagination } = this.state;
     this.setState({ loading: true });
-    console.log(this.tableSearchFormRef);
     const formData = this.tableSearchFormRef.current
       ? this.tableSearchFormRef.current.getFieldsValue()
       : '';
@@ -85,7 +84,6 @@ class TaskModel extends Component {
     };
     console.log(data);
     api.getTaskModels(data).then(res => {
-      console.log(res);
       this.setState({
         list: res.rows,
         pagination: {
@@ -99,8 +97,8 @@ class TaskModel extends Component {
   };
 
   handleStandardTableChange = (pagination, filters) => {
-    console.log(pagination);
-    console.log(filters);
+    // console.log(pagination);
+    // console.log(filters);
     // this.getTableData({
     //   page: pagination.current,
     //   rows: pagination.pageSize,
@@ -301,15 +299,10 @@ class TaskModel extends Component {
 
   operate = (op, v) => {
     // op: 操作  v: 每行的数据
-    const { dispatch } = this.props;
     if (op === '发布') {
       // console.log('发布');
       router.push(`/project/task-model/edit/${v.id}`);
     } else if (op === '修改') {
-      dispatch({
-        type: 'taskModel/getEditOriginModelData',
-        payload: v,
-      });
       this.goToEdit(v.id);
     } else if (op === '删除') {
       console.log('delete');

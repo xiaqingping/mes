@@ -35,7 +35,16 @@ class TaskModel extends Component {
   tableSearchFormRef = React.createRef();
 
   static getDerivedStateFromProps(nextProps) {
-    return { id: nextProps.match.params.id || '' };
+    // 根据-分割传过来的id, 如果长度为0 则为新增, 为1则未编辑, 为2则为升级.
+    let data = [];
+    if (nextProps.match.params.id) {
+      data = nextProps.match.params.id.split('-');
+    }
+
+    if (data.length !== 0) {
+      return { id: data[0], pageModel: data.length };
+    }
+    return { id: '' };
   }
 
   constructor(props) {
@@ -51,12 +60,15 @@ class TaskModel extends Component {
       argumentVisible: false, // 参数弹框是否显示
       checked: false,
       guuid,
-      // editOriginModelData: {}, // 修改时进页面时候的任务模型详细数据
+      editOriginModelData: {}, // 修改时进页面时候的任务模型详细数据
       isAdd: this.props.match.path.indexOf('add') > 0,
+      pageModel: 0,
     };
   }
 
   componentDidMount() {
+    const paramId = this.props.match.params.id;
+    const { editOriginModelData } = this.props.taskModel;
     const { isAdd } = this.state;
     if (isAdd) {
       // 如果是新增
@@ -64,29 +76,26 @@ class TaskModel extends Component {
         tableData: [],
       });
     } else {
-      const paramId = this.props.match.params.id;
-      const { editOriginModelData } = this.props.taskModel;
-      console.log(editOriginModelData);
-      console.log(this.tableSearchFormRef.current);
-      this.tableSearchFormRef.current.setFieldsValue(editOriginModelData);
-      // const { editOriginModelData } = this.state;
-      // api.getTaskModelDetail(paramId).then(res => {
-      //   console.log(res);
-      //   this.setState(
-      //     {
-      //       editOriginModelData: res,
-      //     },
-      //     () => {
-      //       console.log(this.props);
-      //       this.tableSearchFormRef.current.setFieldsValue(editOriginModelData);
-      //       console.log(editOriginModelData);
-      //       console.log(this.props.taskModel.editOriginModelData);
-      //     },
-      //   );
-      // });
+      api.getTaskModelDetail(paramId).then(res => {
+        console.log(res);
+        const { dispatch } = this.props;
+        dispatch({
+          type: 'taskModel/getEditOriginModelData',
+          payload: res,
+        });
+        this.tableSearchFormRef.current.setFieldsValue(res);
+        // this.setState(
+        //   {
+        //     editOriginModelData: res,
+        //   },
+        //   () => {
+        //     this.tableSearchFormRef.current.setFieldsValue(res);
+        //   },
+        // );
+      });
 
       this.setState({
-        checked: editOriginModelData.isAutomatic == 1,
+        checked: editOriginModelData.isAutomatic * 1 === 1,
       });
 
       this.getTableData(paramId);
@@ -123,6 +132,17 @@ class TaskModel extends Component {
     }
   };
 
+  // 导航列表title样式
+  // navContent = () => {
+  //   const { pageModel } = this.state;
+  //   const { processDetail } = this.props;
+
+  //   if (pageModel) {
+  //     return <div>{`${processDetail.name} ${processDetail.id}`}</div>;
+  //   }
+  //   return '';
+  // };
+
   // 任务模型列表title样式
   titleContent = () => {
     return (
@@ -139,7 +159,7 @@ class TaskModel extends Component {
 
   // 提交上传
   onFinish = values => {
-    const { checked, tableData, imageUrl, guuid, isAdd } = this.state;
+    const { checked, tableData, imageUrl, guuid, pageModel, id } = this.state;
     const ids = [];
     const { argumentList } = this.props.taskModel;
     const form = this.tableSearchFormRef.current.getFieldsValue();
@@ -154,12 +174,25 @@ class TaskModel extends Component {
       form.picture = guuid;
     }
     console.log(form);
-
-    api.createTaskModel(form).then(res => {
-      const msg = isAdd ? '任务模型创建成功!' : '任务模型修改成功!';
-      message.success(msg);
-      router.push('/project/task-model');
-    });
+    if (pageModel === 0) {
+      api.createTaskModel(form).then(() => {
+        message.success('任务模型创建成功!');
+        router.push('/project/task-model');
+      });
+    }
+    if (pageModel === 1) {
+      api.editTaskModel(form).then(() => {
+        message.success('任务模型修改成功!');
+        router.push('/project/task-model');
+      });
+    }
+    if (pageModel === 2) {
+      console.log(id);
+      api.upgradeTaskModel(id, form).then(() => {
+        message.success('任务模型升级成功!');
+        router.push('/project/task-model');
+      });
+    }
   };
 
   onFinishFailed = () => {
@@ -293,11 +326,20 @@ class TaskModel extends Component {
     ];
 
     const uploadUrl = disk.uploadMoreFiles('project_process_model', guuid);
+    console.log(this.state.editOriginModelData);
+    // const initialValues = ()=>{
+    //   return {
+    //     name: editOriginModelData.name,
+    //   }
+    // }
+    // debugger;
 
     return (
-      <PageHeaderWrapper title={id || ''}>
+      // 这里有个title;
+      <PageHeaderWrapper>
         <Form
           onFinish={this.onFinish}
+          initialValues={this.state.editOriginModelData}
           ref={this.tableSearchFormRef}
           onFinishFailed={this.onFinishFailed}
         >
