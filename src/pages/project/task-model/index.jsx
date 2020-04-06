@@ -14,6 +14,7 @@ import {
   Dropdown,
   AutoComplete,
   Spin,
+  message,
 } from 'antd';
 import { DownOutlined, PlusOutlined } from '@ant-design/icons';
 import TableSearchForm from '@/components/TableSearchForm';
@@ -314,17 +315,64 @@ class TaskModel extends Component {
     });
   };
 
+  // 发布
+  publishModel = v => {
+    api.publishTaskModel(v.id).then(() => {
+      message.success('任务模型发布成功!');
+      this.updateListData(v.id);
+    });
+  };
+
+  // 更新某行数据
+  updateListData = id => {
+    const { list } = this.state;
+    api.getTaskModelDetail(id).then(res => {
+      let lists = [...list];
+      lists = lists.map(item => {
+        if (item.id === id) {
+          item = res;
+        }
+        return item;
+      });
+      this.setState({
+        list: lists,
+      });
+    });
+  };
+
+  // 禁用模型
+  forbiddenModel = id => {
+    api.forbiddenTaskModel(id).then(res => {
+      message.success('任务模型已禁用!');
+      this.updateListData(id);
+    });
+  };
+
+  // 删除模型
+  deleteModel = id => {
+    api.deleteTaskModel(id).then(() => {
+      message.success('任务模型删除成功!');
+      this.getTableData();
+    });
+  };
+
+  // 升级
+  upgradeModel = id => {};
+
   operate = (op, v) => {
     // op: 操作  v: 每行的数据
     if (op === '发布') {
-      // console.log('发布');
-      router.push(`/project/task-model/edit/${v.id}`);
+      this.publishModel(v);
     } else if (op === '修改') {
       this.goToEdit(v.id);
     } else if (op === '删除') {
-      console.log('delete');
+      this.deleteModel(v.id);
     } else if (op === '查看') {
       this.viewDetails(v);
+    } else if (op === '升级') {
+      this.upgradeModel(v.id);
+    } else if (op === '禁用') {
+      this.forbiddenModel(v.id);
     }
   };
 

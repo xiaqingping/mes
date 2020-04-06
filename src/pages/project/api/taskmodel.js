@@ -72,5 +72,25 @@ export default {
       method: 'POST',
       params,
     });
+  },
+  // 发布任务模型
+  publishTaskModel(id) {
+    return request(`${http}/v1/task/${id}/publishment`, {
+      method: 'PUT',
+    });
+  },
+  // 禁用任务模型
+  forbiddenTaskModel(id) {
+    return request(`${http}/v1/task/${id}/forbiddance`, {
+      method: 'PUT',
+    });
+  },
+  // 删除任务模型
+  deleteTaskModel(id) {
+    return request(`${http}/v1/task/${id}/deletion`, {
+      method: 'PUT',
+    });
   }
+
+
 };
