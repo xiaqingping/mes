@@ -357,7 +357,9 @@ class TaskModel extends Component {
   };
 
   // 升级
-  upgradeModel = id => {};
+  upgradeModel = id => {
+    router.push(`/project/task-model/up/${id}-up`);
+  };
 
   operate = (op, v) => {
     // op: 操作  v: 每行的数据

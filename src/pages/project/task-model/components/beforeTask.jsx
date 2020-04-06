@@ -1,6 +1,18 @@
 // 关联流程模型
 import React from 'react';
-import { Modal, Table, Avatar, Form, AutoComplete, Input, Select, Col, Tag, Button } from 'antd';
+import {
+  Modal,
+  Table,
+  Avatar,
+  Form,
+  AutoComplete,
+  Input,
+  Select,
+  Col,
+  Tag,
+  Button,
+  Spin,
+} from 'antd';
 import TableSearchForm from '@/components/TableSearchForm';
 import { connect } from 'dva';
 import api from '@/pages/project/api/taskmodel';
@@ -15,7 +27,7 @@ class BeforeTask extends React.Component {
     return { visible: nextProps.visible || false };
   }
 
-  state = { visible: false, pagination: {} };
+  state = { visible: false, pagination: {}, fetching: false, data: [], code: '', value: '' };
 
   initialValues = {
     page: 1,
@@ -29,16 +41,19 @@ class BeforeTask extends React.Component {
   titleContent = () => <div style={{ fontSize: '16px' }}>关联任务模型</div>;
 
   getTableData = (options = {}) => {
+    const { code } = this.state;
     this.setState({ loading: true });
     const { page, rows } = this.state;
     const formData =
       this.tableSearchFormRef.current && this.tableSearchFormRef.current.getFieldsValue();
-
+    console.log(formData);
     const data = {
       page,
       rows,
-      ...formData,
+      ...code,
+      ...options,
     };
+    console.log(data);
     api.getTaskModels(data).then(res => {
       this.setState({
         loading: false,
@@ -80,39 +95,49 @@ class BeforeTask extends React.Component {
     this.props.onClose(row, 'select');
   };
 
-  simpleForm = () => (
-    <>
-      <Col lg={8}>
-        <FormItem label="名称" name="code">
-          <Input placeholder="请输入" />
-        </FormItem>
-      </Col>
-      <Col lg={8}>
-        <FormItem label="发布人" name="creatorCode">
-          <Select>
-            <Option value="jack">Jack</Option>
-            <Option value="lucy">Lucy</Option>
-          </Select>
-        </FormItem>
-      </Col>
-    </>
-  );
+  handleSearch = v => {
+    api.getTaskNameAndCode(v).then(res => {
+      console.log(res);
+      this.setState({
+        data: res,
+      });
+    });
+  };
 
-  // simpleForm = () => {
-  //   const { languageCode } = this.props;
-  //   return (
-  //     <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
-  //       <FormItem label="任务模型" name="code">
-  //         <AutoComplete
-  //           onSearch={this.inputValue}
-  //           options={nameCodeVal.map(this.renderOption)}
-  //           // placeholder={formatMessage({ id: 'bp.inputHere' })}
-  //           // optionLabelProp="text"
-  //         />
-  //       </FormItem>
-  //     </Col>
-  //   );
-  // };
+  handleChange = v => {
+    this.setState({
+      code: { code: v.join(',') },
+      value: v,
+    });
+  };
+
+  simpleForm = () => {
+    const { fetching, data, value } = this.state;
+    return (
+      <>
+        <Col lg={10}>
+          <FormItem label="名称" name="code">
+            <Select
+              value={value}
+              mode="multiple"
+              notFoundContent={fetching ? <Spin size="small" /> : null}
+              optionFilterProp="children"
+              optionLabelProp="name"
+              onSearch={this.handleSearch}
+              onChange={this.handleChange}
+              style={{ width: '100%' }}
+            >
+              {data.map(d => (
+                <Option key={d.code} value={d.code} name={d.name}>
+                  {d.code} &nbsp;{d.name}
+                </Option>
+              ))}
+            </Select>
+          </FormItem>
+        </Col>
+      </>
+    );
+  };
 
   confirm = () => {
     console.log(123);
@@ -171,6 +196,7 @@ class BeforeTask extends React.Component {
 
     return (
       <Modal
+        destroyOnClose
         title={this.titleContent()}
         visible={this.state.visible}
         width={747}
@@ -184,7 +210,6 @@ class BeforeTask extends React.Component {
             getTableData={this.getTableData}
             simpleForm={this.simpleForm}
           />
-          <span>{this.titleContent()}</span>
           <Table
             columns={columns}
             dataSource={list}

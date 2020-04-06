@@ -5,7 +5,7 @@ import { Card, Upload, message, Input, Tag, Table, Button, Form, Badge, Switch, 
 import { LoadingOutlined, SettingOutlined, PlusOutlined, DeleteOutlined } from '@ant-design/icons';
 import { connect } from 'dva';
 import './index.less';
-import { guid, formatter } from '@/utils/utils';
+import { guid, formatter, versionFun } from '@/utils/utils';
 import BeforeTask from './components/beforeTask';
 import ArgumentModel from './components/argumentModel';
 
@@ -63,20 +63,22 @@ class TaskModel extends Component {
       editOriginModelData: {}, // 修改时进页面时候的任务模型详细数据
       isAdd: this.props.match.path.indexOf('add') > 0,
       pageModel: 0,
+      versionType: null, // 可以选择的版本
+      versionOpen: false, // 升级版本可以选择
+      selectVersion: '', // 选择的版本值
     };
   }
 
   componentDidMount() {
-    const paramId = this.props.match.params.id;
     const { editOriginModelData } = this.props.taskModel;
-    const { isAdd } = this.state;
+    const { isAdd, pageModel, id } = this.state;
     if (isAdd) {
       // 如果是新增
       this.setState({
         tableData: [],
       });
     } else {
-      api.getTaskModelDetail(paramId).then(res => {
+      api.getTaskModelDetail(id).then(res => {
         console.log(res);
         const { dispatch } = this.props;
         dispatch({
@@ -84,21 +86,18 @@ class TaskModel extends Component {
           payload: res,
         });
         this.tableSearchFormRef.current.setFieldsValue(res);
-        // this.setState(
-        //   {
-        //     editOriginModelData: res,
-        //   },
-        //   () => {
-        //     this.tableSearchFormRef.current.setFieldsValue(res);
-        //   },
-        // );
+        if (res.version) {
+          this.setState({
+            versionType: versionFun(res.version),
+          });
+        }
       });
 
       this.setState({
         checked: editOriginModelData.isAutomatic * 1 === 1,
       });
 
-      this.getTableData(paramId);
+      this.getTableData(id);
     }
   }
 
@@ -133,15 +132,15 @@ class TaskModel extends Component {
   };
 
   // 导航列表title样式
-  // navContent = () => {
-  //   const { pageModel } = this.state;
-  //   const { processDetail } = this.props;
+  navContent = () => {
+    const { pageModel } = this.state;
+    const { editOriginModelData } = this.props.taskModel;
 
-  //   if (pageModel) {
-  //     return <div>{`${processDetail.name} ${processDetail.id}`}</div>;
-  //   }
-  //   return '';
-  // };
+    if (pageModel) {
+      return <div>{`${editOriginModelData.name} ${editOriginModelData.id}`}</div>;
+    }
+    return '';
+  };
 
   // 任务模型列表title样式
   titleContent = () => {
@@ -159,7 +158,7 @@ class TaskModel extends Component {
 
   // 提交上传
   onFinish = values => {
-    const { checked, tableData, imageUrl, guuid, pageModel, id } = this.state;
+    const { checked, tableData, imageUrl, guuid, pageModel, id, selectVersion } = this.state;
     const ids = [];
     const { argumentList } = this.props.taskModel;
     const form = this.tableSearchFormRef.current.getFieldsValue();
@@ -173,6 +172,7 @@ class TaskModel extends Component {
     if (imageUrl) {
       form.picture = guuid;
     }
+    form.version = selectVersion || 'V1.0';
     console.log(form);
     if (pageModel === 0) {
       api.createTaskModel(form).then(() => {
@@ -235,12 +235,13 @@ class TaskModel extends Component {
 
   openArgumentModel = () => {
     const { dispatch } = this.props;
+    const { id } = this.state;
     this.setState({
       argumentVisible: true,
     });
     dispatch({
       type: 'taskModel/setEditTaskModelId',
-      payload: this.props.match.params.id,
+      payload: id,
     });
   };
 
@@ -258,8 +259,18 @@ class TaskModel extends Component {
 
   render() {
     const { taskModel } = this.props;
-    const { taskModelStatusOptions } = taskModel;
-    const { tableData, visible, argumentVisible, tableLoading, guuid } = this.state;
+    const { taskModelStatusOptions, editOriginModelData } = taskModel;
+    const {
+      tableData,
+      visible,
+      argumentVisible,
+      tableLoading,
+      guuid,
+      selectVersion,
+      versionOpen,
+      versionType,
+      pageModel,
+    } = this.state;
 
     const uploadButton = (
       <div style={{ borderRadius: '50%' }}>
@@ -336,7 +347,7 @@ class TaskModel extends Component {
 
     return (
       // 这里有个title;
-      <PageHeaderWrapper>
+      <PageHeaderWrapper title={this.navContent()}>
         <Form
           onFinish={this.onFinish}
           initialValues={this.state.editOriginModelData}
@@ -395,10 +406,46 @@ class TaskModel extends Component {
                 <Input placeholder="请输入标识" />
               </Form.Item>
             </div>
-            <div style={{ float: 'left', marginLeft: '20px' }}>
-              <Form.Item name="version">
-                <Tag color="green">V1.0</Tag>
-              </Form.Item>
+
+            {/* 版本选择 */}
+            <div style={{ float: 'left' }}>
+              <div style={{ position: 'relative', display: 'inline-block', marginLeft: '30px' }}>
+                <Tag
+                  color="green"
+                  style={{ cursor: 'pointer' }}
+                  onClick={() => {
+                    this.setState({
+                      versionOpen: !versionOpen,
+                    });
+                  }}
+                >
+                  {pageModel ? selectVersion || editOriginModelData.version : 'V1.0'}
+                  {/* {selectVersion || processDetail.version} */}
+                </Tag>
+                {versionOpen && pageModel === 2 && (
+                  <Card
+                    style={{ position: 'absolute', zIndex: '100', top: '28px' }}
+                    hoverable
+                    className="padding-none"
+                  >
+                    {versionType.length !== 0 &&
+                      versionType.map(item => (
+                        <Tag
+                          key={item}
+                          style={{ cursor: 'pointer' }}
+                          onClick={() => {
+                            this.setState({
+                              selectVersion: item,
+                              versionOpen: !versionOpen,
+                            });
+                          }}
+                        >
+                          {item}
+                        </Tag>
+                      ))}
+                  </Card>
+                )}
+              </div>
             </div>
 
             <div style={{ float: 'right', marginRight: '142px', fontSize: '16px' }}>
