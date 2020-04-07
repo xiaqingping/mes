@@ -49,7 +49,8 @@ class ProcessModel extends Component {
       nameCodeVal: [],
       nameCodeValPublish: [],
       filtersData: null,
-      processList: [],
+      codeValue: '',
+      // processList: [],
     };
     // 异步验证做节流处理
     this.callParter = _.debounce(this.callParter, 500);
@@ -84,13 +85,18 @@ class ProcessModel extends Component {
   getTableData = (options = {}) => {
     this.setState({ loading: true });
     const formData = this.tableSearchFormRef.current.getFieldsValue();
-    const { pagination } = this.state;
+    const { pagination, codeValue } = this.state;
     const { current: page, pageSize: rows } = pagination;
 
     let newData = [];
     if (formData.status) {
       newData = { ...newData, status: formData.status.join(',') };
       delete formData.status;
+    }
+
+    if (codeValue) {
+      newData = { ...newData, code: codeValue };
+      delete formData.name;
     }
 
     if (formData.publishDate) {
@@ -142,7 +148,8 @@ class ProcessModel extends Component {
   };
 
   renderOption = item => ({
-    value: item.code,
+    value: item.name,
+    codeValue: item.code,
     label: (
       // <Option key={item.id} text={item.name}>
       <div style={{ display: 'flex' }}>
@@ -247,12 +254,17 @@ class ProcessModel extends Component {
     return (
       <>
         <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
-          <FormItem label="流程模型" name="code">
+          <FormItem label="流程模型" name="name">
             <AutoComplete
               onSearch={this.inputValue}
               options={nameCodeVal.map(this.renderOption)}
               // placeholder={formatMessage({ id: 'bp.inputHere' })}
               // optionLabelProp="text"
+              onSelect={(value, option) => {
+                this.setState({
+                  codeValue: option.codeValue,
+                });
+              }}
             />
           </FormItem>
         </Col>

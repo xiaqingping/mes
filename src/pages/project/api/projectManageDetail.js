@@ -1,10 +1,13 @@
 import request from '@/utils/request';
 
 // 1组
-const http1 = 'http://192.168.20.6:8166';
+let http1 = 'http://192.168.20.6:8166';
 
 // 2组
 const http2 = 'http://192.168.20.12:8360';
+if (process.env.NODE_ENV !== 'development') {
+  http1 = '/xu';
+}
 
 export default {
   /**
@@ -23,12 +26,12 @@ export default {
 
   // 项目流程暂停运行
   pauseProcessesProcess(data) {
-    return request(`${http1}/projects/v1/processes/${data}/pause`, { method: 'PUT'});
+    return request(`${http1}/projects/v1/processes/${data}/pause`, { method: 'PUT' });
   },
 
   // 项目流程开始运行
   startProcessesProcess(data) {
-    return request(`${http1}/projects/v1/processes/${data}/start`, { method: 'PUT'});
+    return request(`${http1}/projects/v1/processes/${data}/start`, { method: 'PUT' });
   },
 
   // 查询成员列表
@@ -38,16 +41,13 @@ export default {
 
   // 保存流程名称和描述
   saveProcessInfor(data) {
-    return request(`${http1}/projects/v1/processes`, { method: 'PUT', data});
+    return request(`${http1}/projects/v1/processes`, { method: 'PUT', data });
   },
 
   // 保存流程名称和描述
   deleteProcessInfor(data) {
-    return request(`${http1}/projects/v1/processes/${data}/deleted`, { method: 'PUT'});
+    return request(`${http1}/projects/v1/processes/${data}/deleted`, { method: 'PUT' });
   },
-
-
-
 
   /**
    * 流程模型
@@ -56,7 +56,6 @@ export default {
   getProcessParam(params) {
     return request(`${http2}/v1/process/${params}/params`);
   },
-
 
   /**
    * 任务模型

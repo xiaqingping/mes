@@ -1,7 +1,10 @@
 import request from '@/utils/request';
 
 // 2组
-const http2 = 'http://192.168.20.12:8360';
+let http2 = 'http://192.168.20.12:8360';
+if (process.env.NODE_ENV !== 'development') {
+  http2 = '/yue';
+}
 
 export default {
   // 流程模型接口
