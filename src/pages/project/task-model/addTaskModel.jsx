@@ -13,6 +13,7 @@ import {
   Badge,
   Switch,
   Popconfirm,
+  Spin,
 } from 'antd';
 import { LoadingOutlined, SettingOutlined, PlusOutlined, DeleteOutlined } from '@ant-design/icons';
 import { connect } from 'dva';
@@ -20,7 +21,7 @@ import './index.less';
 import { guid, formatter, versionFun } from '@/utils/utils';
 import BeforeTask from './components/beforeTask';
 import ArgumentModel from './components/argumentModel';
-
+import classNames from 'classnames';
 import router from 'umi/router';
 import disk from '@/pages/project/api/disk';
 import api from '@/pages/project/api/taskmodel';
@@ -78,7 +79,6 @@ class TaskModel extends Component {
       versionType: null, // 可以选择的版本
       versionOpen: false, // 升级版本可以选择
       selectVersion: '', // 选择的版本值
-
       sonIds: [], // 所有前置任务的id
       ids: [], // 所有选择的id
     };
@@ -93,7 +93,13 @@ class TaskModel extends Component {
         tableData: [],
       });
     } else {
+      this.setState({
+        loading: true,
+      });
       api.getTaskModelDetail(id).then(res => {
+        this.setState({
+          loading: false,
+        });
         console.log(res);
         const { dispatch } = this.props;
         dispatch({
@@ -176,6 +182,8 @@ class TaskModel extends Component {
     const { checked, tableData, imageUrl, guuid, pageModel, id, selectVersion } = this.state;
     const ids = [];
     const { argumentList } = this.props.taskModel;
+    const { dispatch } = this.props;
+
     const form = this.tableSearchFormRef.current.getFieldsValue();
     form.isAutomatic = checked ? 1 : 2;
     form.params = argumentList;
@@ -189,9 +197,19 @@ class TaskModel extends Component {
     }
     form.version = selectVersion || 'V1.0';
     console.log(form);
+    this.setState({
+      loading: true,
+    });
+    const dispatchList = () => {
+      dispatch({
+        type: 'taskModel/getArgumentsList',
+        payload: null,
+      });
+    };
     if (pageModel === 0) {
       api.createTaskModel(form).then(() => {
         message.success('任务模型创建成功!');
+        dispatchList();
         router.push('/project/task-model');
       });
     }
@@ -199,6 +217,7 @@ class TaskModel extends Component {
       form.id = id;
       api.editTaskModel(form).then(() => {
         message.success('任务模型修改成功!');
+        dispatchList();
         router.push('/project/task-model');
       });
     }
@@ -207,6 +226,7 @@ class TaskModel extends Component {
       form.id = id;
       api.upgradeTaskModel(id, form).then(() => {
         message.success('任务模型升级成功!');
+        dispatchList();
         router.push('/project/task-model');
       });
     }
@@ -327,7 +347,7 @@ class TaskModel extends Component {
       versionOpen,
       versionType,
       pageModel,
-
+      loading,
       sonIds,
       ids,
     } = this.state;
@@ -338,7 +358,7 @@ class TaskModel extends Component {
         {/* <div className="ant-upload-text">Upload</div> */}
       </div>
     );
-    const { imageUrl, id, checked } = this.state;
+    const { imageUrl, checked } = this.state;
     const columns = [
       {
         title: '编号/名称',
@@ -410,17 +430,21 @@ class TaskModel extends Component {
 
     const uploadUrl = disk.uploadMoreFiles('project_process_model', guuid);
     console.log(this.state.editOriginModelData);
-    // const initialValues = ()=>{
-    //   return {
-    //     name: editOriginModelData.name,
-    //   }
-    // }
-    // debugger;
-
     return (
-      // 这里有个title;
       <PageHeaderWrapper title={this.navContent()}>
+        <Card>
+          <div
+            className={classNames(
+              { task_model_isHidden: !loading },
+              'task_model_add_loading_style',
+            )}
+          >
+            <Spin />
+          </div>
+        </Card>
+
         <Form
+          className={classNames({ task_model_isHidden: loading })}
           onFinish={this.onFinish}
           initialValues={this.state.editOriginModelData}
           ref={this.tableSearchFormRef}

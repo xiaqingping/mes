@@ -21,35 +21,7 @@ const SeqModel = {
     formItemType: [{
         type: "input",
         text: "单行输入框"
-      },
-      {
-        type: "textArea",
-        text: "多行输入框"
-      },
-      {
-        type: "radio",
-        text: "单选框"
-      },
-      {
-        type: "checkbox",
-        text: "多选框"
-      },
-      {
-        type: "select",
-        text: "选择框"
-      },
-      {
-        type: "dataPicker",
-        text: "日期选择"
-      },
-      {
-        type: "timePicker",
-        text: "时间选择"
-      },
-      {
-        type: "switch",
-        text: "开关"
-      },
+      }
 
     ],
     taskModelStatusOptions: [{

@@ -15,8 +15,9 @@ import {
   AutoComplete,
   Spin,
   message,
+  Modal,
 } from 'antd';
-import { DownOutlined, PlusOutlined } from '@ant-design/icons';
+import { DownOutlined, PlusOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import TableSearchForm from '@/components/TableSearchForm';
 import { DateUI } from '@/pages/project/components/AntdSearchUI';
 import { connect } from 'dva';
@@ -368,7 +369,8 @@ class TaskModel extends Component {
     } else if (op === '修改') {
       this.goToEdit(v.id);
     } else if (op === '删除') {
-      this.deleteModel(v.id);
+      this.confirm(v.id);
+      // this.deleteModel(v.id);
     } else if (op === '查看') {
       this.viewDetails(v);
     } else if (op === '升级') {
@@ -377,6 +379,16 @@ class TaskModel extends Component {
       this.forbiddenModel(v.id);
     }
   };
+
+  confirm(id) {
+    Modal.confirm({
+      title: '是否确定删除?',
+      icon: <ExclamationCircleOutlined />,
+      okText: '确认',
+      cancelText: '取消',
+      onOk: () => this.deleteModel(id),
+    });
+  }
 
   render() {
     const { visible } = this.state;
@@ -530,7 +542,7 @@ class TaskModel extends Component {
             </div>
           </Spin>
         </Card>
-        <TaskModelView visible={visible} onClose={this.onClose} viewId={viewId} />
+        {viewId && <TaskModelView visible={visible} onClose={this.onClose} viewId={viewId} />}
       </PageHeaderWrapper>
     );
   }

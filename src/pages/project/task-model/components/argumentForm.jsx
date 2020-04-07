@@ -17,10 +17,18 @@ class ArgumentForm extends React.Component {
 
   componentDidMount() {
     const { editOriginData } = this.props;
-    let otherProperties = {};
-    (editOriginData.paramProperties || []).forEach(item => {
-      otherProperties = { ...otherProperties, ...item };
-    });
+    console.log(editOriginData);
+    const otherProperties = editOriginData.paramPropertiesStr
+      ? JSON.parse(editOriginData.paramPropertiesStr)
+      : editOriginData.paramPropertiesMap;
+    if (otherProperties) {
+      if (otherProperties.isrequired === 'true') {
+        otherProperties.isrequired = true;
+      } else {
+        otherProperties.isrequired = false;
+      }
+    }
+
     const viewForm = {
       paramKey: editOriginData.paramKey,
       paramName: editOriginData.paramName,
@@ -43,10 +51,14 @@ class ArgumentForm extends React.Component {
     delete data.paramName;
     delete data.paramKey;
     argumentValues.type = this.props.type;
-    argumentValues.paramProperties = [data];
+    data.isrequired = data.isrequired ? 'true' : 'false';
+    argumentValues.paramPropertiesStr = JSON.stringify(data);
+    argumentValues.paramProperties = [];
     argumentValues.myId = this.props.editOriginData.myId
       ? this.props.editOriginData.myId
       : Date.now();
+    console.log(argumentValues);
+
     this.props.emitArguments(argumentValues);
     this.props.onClose();
   };

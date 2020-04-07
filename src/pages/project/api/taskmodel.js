@@ -90,6 +90,10 @@ export default {
     return request(`${http}/v1/task/${id}/deletion`, {
       method: 'PUT',
     });
+  },
+  // 根据code和版本查询详细信息
+  getdetailByCodeVer(code, version) {
+    return request(`${http}/v1/task/${code}/${version}`);
   }
 
 
