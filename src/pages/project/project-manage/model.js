@@ -207,12 +207,12 @@ const projectModel = {
         endTime: '2019/10/1',
       },
     ],
-    status: [
-      { id: 1, name: '未开始' },
-      { id: 2, name: '进行中' },
-      { id: 3, name: '已完成' },
-      { id: 4, name: '已终止' },
-      { id: 5, name: '待处理' },
+    statusList: [
+      { value: 1, text: '未开始', status: 'default' },
+      { value: 2, text: '进行中', status: 'Warning' },
+      { value: 3, text: '已完成', status: 'success' },
+      { value: 4, text: '已终止', status: 'error' },
+      { value: 5, text: '待处理', status: 'Processing' },
     ],
   },
   effects: {},

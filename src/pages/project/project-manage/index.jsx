@@ -10,6 +10,8 @@ import {
   Popconfirm,
   Col,
   AutoComplete,
+  Badge,
+  Input,
   // Progress,
   // Tag,
 } from 'antd';
@@ -19,7 +21,7 @@ import { connect } from 'dva';
 import _ from 'lodash';
 import router from 'umi/router';
 import StandardTable from '../components/StandardTable';
-import aaa from '@/pages/project/api/processModel/';
+import { formatter } from '@/utils/utils';
 import api from '@/pages/project/project-manage/api/projectManageModel/';
 import {
   // InputUI,
@@ -42,7 +44,7 @@ class ProjectManagement extends Component {
 
   // 顶部表单默认值
   initialValues = {
-    status: 1,
+    // status: 1,
     page: 1,
     pageSize: 10,
   };
@@ -56,25 +58,17 @@ class ProjectManagement extends Component {
       // detailValue: {},
       list: [],
       nameCodeVal: [],
-      nameCodeValPublish: [],
     };
     // 异步验证做节流处理
     this.callParter = _.debounce(this.callParter, 500);
-    this.callPublish = _.debounce(this.callPublish, 500);
   }
 
   componentDidMount() {
     this.getTableData(this.initialValues);
   }
 
-  callParter = value => {
-    aaa.getProcessCodeAndName(value).then(res => {
-      this.setState({ nameCodeVal: res });
-    });
-  };
-
-  callPublish = value => {
-    aaa.getProcessPublisherCodeAndName(value).then(res => {
+  callParter = name => {
+    api.gettProjectManageCodeAndName({ codeOrName: name }).then(res => {
       this.setState({ nameCodeVal: res });
     });
   };
@@ -82,11 +76,30 @@ class ProjectManagement extends Component {
   // 获取表格数据
   getTableData = (options = {}) => {
     const formData = this.tableSearchFormRef.current.getFieldsValue();
+    // console.log(formData);
     const { pagination } = this.state;
     const { current: page, pageSize } = pagination;
+
+    let newData = [];
+    if (formData.statusList) {
+      newData = { ...newData, statusList: formData.statusList.join(',') };
+      delete formData.statusList;
+    }
+
+    // 创建时间
+    if (formData.createDate) {
+      newData = {
+        ...newData,
+        beginDate: formData.createDate[0].format('YYYY-MM-DD'),
+        endDate: formData.createDate[1].format('YYYY-MM-DD'),
+      };
+      delete formData.createDate;
+    }
+
     const data = {
       page,
       pageSize,
+      ...newData,
       ...formData,
       ...options,
     };
@@ -105,13 +118,13 @@ class ProjectManagement extends Component {
   };
 
   // 项目名称联想
-  renderOption = item => ({
-    value: item.code,
+  renderOption = codeOrName => ({
+    value: codeOrName.name,
     label: (
       // <Option key={item.id} text={item.name}>
       <div style={{ display: 'flex' }}>
-        <span>{item.code}</span>&nbsp;&nbsp;
-        <span>{item.name}</span>
+        <span>{codeOrName.name}</span>&nbsp;&nbsp;
+        <span>{codeOrName.code}</span>
       </div>
       // </Option>
     ),
@@ -143,55 +156,35 @@ class ProjectManagement extends Component {
     return true;
   };
 
-  // 创建人联想
-  renderOptionPublish = item => ({
-    value: item.creatorName,
-    label: (
-      // <Option key={item.id} text={item.name}>
-      <div style={{ display: 'flex' }}>
-        <span>{item.publisherName}</span>
-      </div>
-      // </Option>
-    ),
-  });
-
-  // 筛选值
-  inputValuePublish = value => {
-    const { nameCodeValPublish } = this.state;
-    const arr = [];
-    if (!value) {
-      return false;
-    }
-    this.callPublish(value);
-    if (nameCodeValPublish.length === 0) {
-      return false;
-    }
-    nameCodeValPublish.forEach(item => {
-      if (item.name.indexOf(value) !== -1) {
-        arr.push(item);
-      }
-      if (item.code.indexOf(value) !== -1 && arr.indexOf(item)) {
-        arr.push(item);
-      }
-    });
-    this.setState({
-      nameCodeValPublish: arr,
-      // allowClear: 'ture',
-    });
-    return true;
-  };
-
   // 分页
-  handleStandardTableChange = pagination => {
+  handleStandardTableChange = (pagination, filters) => {
+    const { filtersData } = this.state;
+    let filterData = {};
+    const page = pagination;
+
+    if (filters) {
+      if (filters.status && filters.status[0]) {
+        filterData.status = filters.status.join(',');
+      }
+      this.setState({
+        filtersData: filterData,
+      });
+      page.current = 1;
+      page.pageSize = 10;
+    } else if (filtersData) {
+      filterData = filtersData;
+    }
+
     this.getTableData({
-      page: pagination.current,
-      pageSize: pagination.pageSize,
+      page: page.current,
+      pageSize: page.pageSize,
+      ...filterData,
     });
   };
 
   simpleForm = () => {
-    const { languageCode, status } = this.props;
-    // const { nameCodeVal } = this.state;
+    const { languageCode, statusList } = this.props;
+    const { nameCodeVal } = this.state;
     // console.log(this.props);
     return (
       <>
@@ -199,13 +192,13 @@ class ProjectManagement extends Component {
           <FormItem label="项目" name="name">
             <AutoComplete
               onSearch={this.inputValue}
-              // options={nameCodeVal.map(this.renderOption)}
+              options={nameCodeVal.map(this.renderOption)}
               placeholder="请输入项目名称"
             />
           </FormItem>
         </Col>
         <Col>
-          <FormItem label="状态" name="status">
+          <FormItem label="状态" name="statusList">
             <Select
               mode="multiple"
               maxTagCount={2}
@@ -214,9 +207,9 @@ class ProjectManagement extends Component {
               allowClear
               placeholder="请选择状态"
             >
-              {status.map(e => (
-                <Option value={e.id} key={e.id}>
-                  {e.name}
+              {statusList.map(e => (
+                <Option value={e.value} key={e.value}>
+                  {e.text}
                 </Option>
               ))}
             </Select>
@@ -224,12 +217,7 @@ class ProjectManagement extends Component {
         </Col>
         <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
           <FormItem label="创建人" name="creatorName">
-            <AutoComplete
-              onSearch={this.inputValuePublish}
-              // options={nameCodeVal.map(this.renderOptionPublish)}
-              // placeholder={formatMessage({ id: 'bp.inputHere' })}
-              placeholder="请输入创建人"
-            />
+            <Input placeholder="请输入创建人" />
           </FormItem>
         </Col>
       </>
@@ -243,7 +231,7 @@ class ProjectManagement extends Component {
       <DateUI
         languageCode={languageCode}
         label="创建时间"
-        name="times"
+        name="createDate"
         placeholder={['开始时间', '结束时间']}
       />
     );
@@ -256,8 +244,9 @@ class ProjectManagement extends Component {
   };
 
   // 项目管理详情页面
-  searchDetails = () => {
-    router.push('/project/project-manage/detail');
+  searchDetails = row => {
+    const projectId = row.id;
+    router.push('/project/project-manage/detail', { projectId });
   };
 
   // 删除数据
@@ -265,18 +254,12 @@ class ProjectManagement extends Component {
     api.deleteProjectManage(row.id).then(() => {
       this.getTableData();
     });
-    console.log(row);
+    // console.log(row);
   };
-
-  // 修改数据
-  // resumeRow = row => {
-  //   api.peptideBase.resumePurity(row.id).then(() => {
-  //     this.getTableData();
-  //   });
-  // };
 
   render() {
     const { pagination, list, loading } = this.state;
+    const { statusList } = this.props;
     let tableWidth = 0;
 
     let columns = [
@@ -288,7 +271,7 @@ class ProjectManagement extends Component {
           <>
             <div>{row.name}</div>
             <div>
-              <a onClick={() => this.searchDetails(value)}>{value}</a>
+              <a onClick={() => this.searchDetails(row)}>{value}</a>
             </div>
           </>
         ),
@@ -323,15 +306,14 @@ class ProjectManagement extends Component {
       {
         title: '状态',
         dataIndex: 'status',
-        width: '80px',
-        render: text => {
-          if (text === 1) return '未开始';
-          if (text === 2) return '进行中';
-          if (text === 3) return '已完成';
-          if (text === 4) return '已终止';
-          if (text === 5) return '待处理';
-          return '';
-        },
+        width: '100px',
+        filters: statusList,
+        render: value => (
+          <Badge
+            status={formatter(statusList, value, 'value', 'status')}
+            text={formatter(statusList, value, 'value', 'text')}
+          />
+        ),
       },
       {
         title: '标签',
@@ -445,5 +427,5 @@ class ProjectManagement extends Component {
 export default connect(({ global, projectManage }) => ({
   languageCode: global.languageCode,
   projectManage,
-  status: projectManage.status,
+  statusList: projectManage.statusList,
 }))(ProjectManagement);

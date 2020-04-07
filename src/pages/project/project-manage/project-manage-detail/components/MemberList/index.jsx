@@ -1,12 +1,14 @@
 // 流程列表
-import { Form, Table, Divider } from 'antd';
+import { Form, Table, Select } from 'antd';
 import React, { Component } from 'react';
 import { connect } from 'dva';
+// import router from 'umi/router';
+import api from '@/pages/project/api/projectManageDetail';
+import { EditJurisdictionModel } from '../ModelUI';
 
-// import StandardTable from '@/components/StandardTable';
-// import EditableCell from '@/components/EditableCell';
-import { formatter } from '@/utils/utils';
-// import api from '@/api';
+// import { formatter } from '@/utils/utils';
+
+const { Option } = Select;
 
 class MemberList extends Component {
   tableSearchFormRef = React.createRef();
@@ -15,11 +17,13 @@ class MemberList extends Component {
 
   state = {
     // 分页参数
-    // pagination: {},
+    pagination: {},
     // 表格数据
     list: [],
     // 加载状态
     loading: true,
+    visibleModel: false,
+    menberInfor: [],
     // 选中行数据
     // selectedRows: [],
     // 编辑行
@@ -28,59 +32,79 @@ class MemberList extends Component {
     // id: 0,
   };
 
-  // 顶部表单默认值
-  initialValues = {
-    status: 1,
-    page: 1,
-    rows: 10,
-  };
-
   // 组件挂载时
   componentDidMount() {
+    const { projectId } = this.props;
     this.getCacheData();
-    this.getTableData(this.initialValues);
+    this.getTableData(projectId);
   }
 
   // 获取此页面需要用到的基础数据
   getCacheData = () => {};
 
-  // 分页
-  handleStandardTableChange = data => {
-    this.getTableData({
-      page: data.current,
-      rows: data.pageSize,
+  // 获取表格数据
+  getTableData = projectId => {
+    this.setState({ loading: true });
+    const data = { projectId }
+    api.getProjectMember(data).then(res => {
+      this.setState({
+        list: res,
+        loading: false,
+      });
+    })
+
+  };
+
+  // 修改成员权限
+  handleUpdateJurisdiction = (value, row) => {
+    let jurisdictionName = '';
+    if (value === 1) jurisdictionName = '所有者';
+    if (value === 2) jurisdictionName = '管理者';
+    if (value === 3) jurisdictionName = '参与者';
+
+    const data = {
+      id: row.id,
+      name: row.creatorName,
+      jurisdictionName,
+      jurisdictionValue: value,
+    }
+    this.setState({
+      visibleModel: true,
+      menberInfor: data,
+    });
+  }
+
+  // 确认修改权限
+  getEditModelData = data => {
+    if(data.type === 'ok') {
+      api.updateMemberJurisdiction(data).then(() => {
+        this.getTableData(this.props.projectId);
+      })
+    }
+  }
+
+  // 关闭编辑模态框
+  onCloseModel = () => {
+    this.setState({
+      visibleModel: false,
     });
   };
 
-  // 选择行
-  // handleSelectRows = rows => {
-  //   this.setState({
-  //     selectedRows: rows,
-  //   });
-  // };
-
-  // 获取表格数据
-  getTableData = () => {
-    const data = this.props.projectDetail.menberList;
-    this.setState({
-        list: data,
-        // pagination: {
-        //   current: options.page,
-        //   pageSize: options.rows,
-        //   total: data.total,
-        // },
-        loading: false,
-        // editIndex: -1,
-      });
-  };
+   // 退出
+  handleExit = row => {
+    console.log(row);
+    api.deleteMember(row.id).then(() => {
+      this.getTableData(this.props.projectId);
+    })
+  }
 
   render() {
     const {
-      // pagination,
+      pagination,
       // selectedRows,
-      list, loading
+      list, loading, visibleModel, menberInfor
     } = this.state;
-    const { authority } = this.props.projectDetail;
+    const { jurisdiction } = this.props.projectDetail;
     let tableWidth = 0;
 
     // const components = {
@@ -92,19 +116,20 @@ class MemberList extends Component {
     let columns = [
       {
         title: '用户名',
-        dataIndex: 'name',
-        width: 150,
-        render: (text, row) => (
+        dataIndex: 'creatorName',
+        width: 200,
+        render: value => (
           <div style={{display:"flex"}}>
             <img
-              src={row.path}
+              // src={row.path}
+              src='/favicon.png'
               alt=""
-              height='30'
-              width="30"
+              height='50'
+              width="50"
               style={{borderRadius: '100%' }}
             />
-            <div style={{marginLeft:10}}>
-              <p>{text}</p>
+            <div style={{marginLeft:10, marginTop: 6}}>
+              <p>{value}</p>
             </div>
 
           </div>
@@ -112,25 +137,37 @@ class MemberList extends Component {
       },
       {
         title: '加入时间',
-        dataIndex: 'joinTime',
-        width: 350,
+        dataIndex: 'createDate',
+        width: 150,
       },
       {
         title: '权限',
-        dataIndex: 'authority',
+        dataIndex: 'jurisdictionValue',
         width: 150,
-        render: text => formatter(authority, text),
+        render: (value, row) => (
+            <Select
+              style={{ width: 100 }}
+              disabled={value === 1}
+              defaultValue={value}
+              bordered={false}
+              onChange={() => this.handleUpdateJurisdiction(value, row)}
+            >
+              {jurisdiction.map(e => (
+                <Option value={e.id} key={e.name}>
+                  {e.name}
+                </Option>
+              ))}
+            </Select>
+          )
       },
       {
         title: '操作',
+        dataIndex: 'jurisdictionValue',
         width: 150,
-        render: () => (
-          <>
-            <a onClick={() => console.log(111)}>删除</a>
-            <Divider type="vertical" />
-            <a onClick={() => console.log(222)}>修改</a>
-          </>
-        ),
+        render: (value, row) => {
+          if (value === 1) return '';
+          return <a onClick={() => this.handleExit(row)}>退出</a>;
+        }
       },
     ];
 
@@ -152,11 +189,17 @@ class MemberList extends Component {
             loading={loading}
             dataSource={list}
             // selectedRows={selectedRows}
-            // pagination={pagination}
+            pagination={pagination}
             columns={columns}
             onChange={this.handleStandardTableChange}
           />
         </Form>
+        <EditJurisdictionModel
+          visible={visibleModel}
+          onClose={this.onCloseModel}
+          data={menberInfor}
+          getData={this.getEditModelData}
+        />
       </>
     );
   }

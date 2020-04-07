@@ -18,6 +18,11 @@ module.exports = {
           component: './project/project-manage/project-manage-detail',
         },
         {
+          name: 'process-parameter',
+          path: '/project/project-manage/process-parameter',
+          component: './project/project-manage/project-manage-detail/process-parameter',
+        },
+        {
           name: 'add',
           path: '/project/project-manage/add',
           component: './project/project-manage/project-manage-edit',

@@ -1,13 +1,14 @@
 import React from 'react';
 import { Modal, List, Card, Button } from 'antd';
-import { ArrowsAltOutlined } from '@ant-design/icons';
+import { ArrowsAltOutlined, PlusOutlined } from '@ant-design/icons';
 import EnlargePage from './enlargePage';
+import AddGroup from './addGroup';
 import './index.less';
 // import { sortable } from 'react-sortable';
 
 class Parameter extends React.Component {
   static getDerivedStateFromProps(nextProps) {
-    return { visible: nextProps.visible || false };
+    return { visible: nextProps.visible || false, data: nextProps.paramter };
   }
 
   state = {
@@ -15,14 +16,11 @@ class Parameter extends React.Component {
     visible: false,
     typeEnlargeVisible: false,
     typeEnlargeData: [],
+    addGroupVisible: false,
     moveType: 0,
-    data: [
-      { title: 'a', data: [1, 2, 3, 4, 5, 6] },
-      { title: 'b', data: [111, 211, 3111, 41, 51, 61] },
-      { title: 'c', data: [12, 22, 32, 42, 52, 62] },
-      { title: 'd', data: [13, 23, 33, 43, 53, 63] },
-      { title: 'e', data: [14, 24, 34, 44, 54, 64] },
-    ],
+    moveElement: null,
+    moveIndex: 0,
+    data: [],
   };
 
   // 分类变大打开
@@ -35,9 +33,36 @@ class Parameter extends React.Component {
     this.setState({ typeEnlargeVisible: false });
   };
 
-  titleContent = item => (
-    <div style={{ padding: '0' }}>
-      {`大${item}`}
+  // 添加组分类打开
+  handleAddGroup = () => {
+    this.setState({ addGroupVisible: true });
+  };
+
+  // 关闭组分类
+  handleCloseGroup = (v, type) => {
+    const { data } = this.state;
+    if (type) {
+      const newData = data;
+      newData.push({
+        sortNo: '',
+        groupName: v.groupName,
+        groupDesc: v.groupDesc,
+        params: [],
+      });
+      this.setState({
+        data: newData,
+      });
+    }
+    this.setState({ addGroupVisible: false });
+  };
+
+  titleContent = (item, index) => (
+    <div
+      style={{ padding: '0' }}
+      draggable
+      onDragStart={() => this.dragStartType(item, 2, index + 1)}
+    >
+      {item.groupName}
       <Button
         icon={<ArrowsAltOutlined />}
         style={{ border: 'none', float: 'right', marginRight: '10px' }}
@@ -45,14 +70,47 @@ class Parameter extends React.Component {
           this.handleBigOpen(item);
         }}
       />
+      <br />
+      <div
+        style={{
+          width: '220px',
+          fontWeight: '200',
+          marginTop: '5px',
+        }}
+      >
+        {item.groupDesc}
+      </div>
     </div>
   );
 
-  dragStart = (item, items) => {
+  /**
+   * 开始拖动的对象
+   * @param {Object} item 开始拖动的元素
+   * @param {Int} type 元素的类型 1.元素  2.分类
+   * @param {Int} index 元素移动的分类项键
+   */
+  dragStart = (item, type, index = null) => {
+    if (type === 1) {
+      this.setState({
+        moveType: type,
+        moveElement: item,
+        moveIndex: index,
+      });
+    }
+  };
+
+  /**
+   * 开始拖动的对象
+   * @param {Object} item 开始拖动的元素
+   * @param {Int} type 元素的类型 1.元素  2.分类
+   * @param {Int} index 元素移动的分类项键
+   */
+  dragStartType = (item, type, index = null) => {
     this.setState({
-      moveType: items,
+      moveType: type,
+      moveElement: item,
+      moveIndex: index,
     });
-    console.log(item, items);
   };
 
   // 拖拽元素经过放置元素时
@@ -61,30 +119,83 @@ class Parameter extends React.Component {
     // console.log('拖拽中');
   };
 
-  // 拖拽元素放到放置元素时
-  drop = item => {
-    // if (!item) {
-    //   this.setState({
-    //     moveType: 1,
-    //   });
-    // }
-    // 放置之后的后续操作
-    console.log(item);
+  /**
+   * 拖到的对象
+   * @param {Object} item 拖到的元素
+   * @param {Int} type 元素的类型 1.元素  2.分类
+   * @param {Int} index 元素的位置
+   */
+  drop = (value, type, index) => {
+    const { data, moveType, moveElement, moveIndex } = this.state;
+    const newData = data;
+    // console.log(data);
+    // 拖动的是元素放入分类，或者元素排序变更
+    if (moveType === 1) {
+      // 拖到具体分类
+      if (type === 2) {
+        if (value.params.filter(item => item.id === moveElement.id).length === 0) {
+          // 添加到新对象里
+          newData.map((item, i) => {
+            if (item.groupName === value.groupName) {
+              newData[i].params.push(moveElement);
+            }
+          });
+          // 把移动过的对象删除
+          newData[moveIndex].params = newData[moveIndex].params.filter(
+            item => item !== moveElement,
+          );
+        }
+      }
+
+      // 数据排序
+      if (type === 1) {
+        let move = 0;
+        let old = 0;
+        let typeIndex = 0;
+        data.forEach((item, ind) => {
+          item.params.forEach((i, sindex) => {
+            if (i === moveElement) {
+              move = sindex;
+              typeIndex = ind;
+            }
+
+            if (i === value) {
+              old = sindex;
+            }
+          });
+        });
+        if (typeof move === 'number' && typeof old === 'number' && typeof typeIndex === 'number') {
+          newData[typeIndex].params.splice(move, 1, value);
+          newData[typeIndex].params.splice(old, 1, moveElement);
+        }
+      }
+
+      this.setState({
+        data: newData,
+      });
+    }
+    if (moveType === 2) {
+      newData[moveIndex] = value;
+      newData[index] = moveElement;
+      this.setState({
+        data: newData,
+      });
+    }
   };
 
   render() {
-    const { handleClose } = this.props;
-    const { visible, typeEnlargeVisible, typeEnlargeData, moveType, data } = this.state;
-    // const { onDragStart, cancelSelect } = this;
+    const { visible, typeEnlargeVisible, typeEnlargeData, addGroupVisible, data } = this.state;
+    if (!data.filter(item => item.groupName === 'no')[0]) {
+      return false;
+    }
     return (
       <Modal
         title="参数"
         visible={visible}
-        onOk={this.handleOk}
-        onCancel={handleClose}
+        onCancel={() => this.props.handleClose(data)}
         width={871}
         footer={null}
-        className="parameter-style"
+        className="parameter-style desc-title-style"
       >
         <div
           style={{
@@ -95,43 +206,110 @@ class Parameter extends React.Component {
             padding: '24px 0 24px 30px',
             display: 'inline-block',
             overflowY: 'auto',
+            position: 'relative',
           }}
         >
-          {/* type列表 */}
+          <EnlargePage
+            visible={typeEnlargeVisible}
+            handleBigClose={this.handleBigClose}
+            typeEnlargeData={typeEnlargeData}
+          />
+          <AddGroup
+            visible={addGroupVisible}
+            handleCloseGroup={(v, type = '') => this.handleCloseGroup(v, type)}
+          />
+
+          {/* 分组列表 */}
           <List
+            style={{ float: 'left' }}
             rowKey="id"
-            dataSource={data}
+            dataSource={
+              data.filter(item => item.groupName !== 'no').length === 0
+                ? ['noData']
+                : data.filter(item => item.groupName !== 'no')
+            }
             grid={{
               column: 2,
             }}
-            renderItem={item => (
-              <List.Item key={item}>
-                <Card
-                  title={this.titleContent(item.title)}
-                  hoverable
-                  style={{ width: '269px', height: '203px' }}
-                  draggable
-                  onDrop={() => this.drop(item)}
-                  onDragOver={e => this.dragOver(e)}
-                  onDragStart={() => this.dragStart(item, 3)}
-                >
-                  <div>
-                    {item.data.map(v => (
-                      <Card hoverable key={v} style={{ float: 'left', margin: '10px' }}>
-                        <div
-                          onDrop={() => this.drop(v)}
-                          onDragOver={e => this.dragOver(e)}
-                          draggable
-                          onDragStart={() => this.dragStart(v, 1)}
-                        >
-                          {v}
+            renderItem={(item, index) => {
+              if (item === 'noData') {
+                return (
+                  <Button
+                    style={{
+                      width: '269px',
+                      height: '234px',
+                      float: 'left',
+                      padding: 0,
+                      margin: '0 10px',
+                    }}
+                    type="dashed"
+                    onClick={this.handleAddGroup}
+                    icon={<PlusOutlined />}
+                  >
+                    新增
+                  </Button>
+                );
+              }
+              return (
+                <>
+                  {/* 新增卡片 */}
+                  {index === 0 ? (
+                    <Button
+                      style={{
+                        width: '269px',
+                        height: '234px',
+                        float: 'left',
+                        padding: 0,
+                        margin: '0 10px',
+                      }}
+                      type="dashed"
+                      onClick={this.handleAddGroup}
+                      icon={<PlusOutlined />}
+                    >
+                      新增
+                    </Button>
+                  ) : (
+                    ''
+                  )}
+
+                  <List.Item key={index}>
+                    <Card
+                      title={this.titleContent(item, index)}
+                      hoverable
+                      style={{ width: '269px', height: '234px' }}
+                      onDrop={() => this.drop(item, 2, index + 1)}
+                      onDragOver={e => this.dragOver(e)}
+                    >
+                      {data.filter(i => i.groupName !== 'no').length === 0 ? (
+                        ''
+                      ) : (
+                        <div>
+                          {item.params.map(v => (
+                            <Card
+                              hoverable
+                              key={v.paramId}
+                              style={{
+                                float: 'left',
+                                margin: '10px',
+                              }}
+                            >
+                              <div
+                                onDrop={() => this.drop(v, 1)}
+                                // onDragOver={e => this.dragOver(e)}
+                                draggable
+                                onDragStart={() => this.dragStart(v, 1, index + 1)}
+                              >
+                                {v.paramName}
+                              </div>
+                            </Card>
+                          ))}
                         </div>
-                      </Card>
-                    ))}
-                  </div>
-                </Card>
-              </List.Item>
-            )}
+                      )}
+                    </Card>
+                  </List.Item>
+                </>
+              );
+            }}
             className="list-style card-item-style"
             split={false}
           />
@@ -145,33 +323,32 @@ class Parameter extends React.Component {
             display: 'inline-block',
             overflowY: 'auto',
           }}
-          onDrop={() => this.drop('未分组')}
+          onDrop={() => this.drop(data.filter(item => item.groupName === 'no')[0], 2)}
           onDragOver={e => this.dragOver(e)}
         >
-          {/* item列表 */}
+          {/* 未分组列表 */}
           <List
             rowKey="id"
-            dataSource={[123, 3, 4, 56, 55345345, 65645, 4232]}
+            dataSource={data.filter(item => item.groupName === 'no')[0].params}
             renderItem={item => (
-              <List.Item key={item}>
-                <Card hoverable>
-                  <div>
-                    <div draggable onDragStart={() => this.dragStart(item, 1)}>
-                      {item}
+              <List.Item key={item.paramId}>
+                {item.paramId ? (
+                  <Card hoverable>
+                    <div>
+                      <div draggable onDragStart={() => this.dragStart(item, 1, 0)}>
+                        {item.paramName}
+                      </div>
                     </div>
-                  </div>
-                </Card>
+                  </Card>
+                ) : (
+                  ''
+                )}
               </List.Item>
             )}
             className="list-style card-item-style"
             split={false}
           />
         </div>
-        <EnlargePage
-          visible={typeEnlargeVisible}
-          handleBigClose={this.handleBigClose}
-          typeEnlargeData={typeEnlargeData}
-        />
       </Modal>
     );
   }

@@ -383,7 +383,7 @@ class ProcessModel extends Component {
               style={{ float: 'left' }}
               size="large"
             />
-            <div style={{ float: 'left' }}>
+            <div style={{ float: 'left', marginLeft: '10px' }}>
               <div>{value}</div>
               <div>{row.name}</div>
             </div>

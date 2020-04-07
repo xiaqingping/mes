@@ -10,12 +10,13 @@ const EnlargePage = props => (
     footer={null}
     mask={false}
     maskClosable={false}
-    width={871}
+    width={550}
     closeIcon={<ShrinkOutlined />}
+    style={{ top: 180, right: 120 }}
   >
     <List
       rowKey="id"
-      style={{ height: '460px', overflowY: 'auto' }}
+      style={{ height: '350px', overflowY: 'auto' }}
       dataSource={[123, 3, 4, 56, 55345345, 65645, 4232]}
       renderItem={item => (
         <List.Item key={item}>
