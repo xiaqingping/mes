@@ -1,7 +1,19 @@
 // 流程模型的编辑
 import React, { Component } from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
-import { Card, Upload, message, Input, Tag, Table, Button, Form, Badge, Switch, Spin } from 'antd';
+import {
+  Card,
+  Upload,
+  message,
+  Input,
+  Tag,
+  Table,
+  Button,
+  Form,
+  Badge,
+  Switch,
+  Popconfirm,
+} from 'antd';
 import { LoadingOutlined, SettingOutlined, PlusOutlined, DeleteOutlined } from '@ant-design/icons';
 import { connect } from 'dva';
 import './index.less';
@@ -66,12 +78,15 @@ class TaskModel extends Component {
       versionType: null, // 可以选择的版本
       versionOpen: false, // 升级版本可以选择
       selectVersion: '', // 选择的版本值
+
+      sonIds: [], // 所有前置任务的id
+      ids: [], // 所有选择的id
     };
   }
 
   componentDidMount() {
     const { editOriginModelData } = this.props.taskModel;
-    const { isAdd, pageModel, id } = this.state;
+    const { isAdd, id } = this.state;
     if (isAdd) {
       // 如果是新增
       this.setState({
@@ -85,7 +100,7 @@ class TaskModel extends Component {
           type: 'taskModel/getEditOriginModelData',
           payload: res,
         });
-        this.tableSearchFormRef.current.setFieldsValue(res);
+        (this.tableSearchFormRef.current || {}).setFieldsValue(res);
         if (res.version) {
           this.setState({
             versionType: versionFun(res.version),
@@ -181,6 +196,7 @@ class TaskModel extends Component {
       });
     }
     if (pageModel === 1) {
+      form.id = id;
       api.editTaskModel(form).then(() => {
         message.success('任务模型修改成功!');
         router.push('/project/task-model');
@@ -188,6 +204,7 @@ class TaskModel extends Component {
     }
     if (pageModel === 2) {
       console.log(id);
+      form.id = id;
       api.upgradeTaskModel(id, form).then(() => {
         message.success('任务模型升级成功!');
         router.push('/project/task-model');
@@ -257,6 +274,46 @@ class TaskModel extends Component {
     });
   };
 
+  // 获取子级数据
+  getData = async value => {
+    const { tableData, ids, sonIds } = this.state;
+    let data = tableData;
+    const idsData = ids;
+    const sonIdsData = sonIds;
+    data = [...tableData, ...value];
+    value.forEach(item => {
+      idsData.push(item.id);
+      sonIdsData.push(...item.preTaskIds);
+    });
+
+    this.setState({
+      tableData: data,
+      ids: idsData,
+      sonIds: sonIdsData,
+    });
+  };
+
+  // 删除确认
+  confirm = value => {
+    const { tableData, ids, sonIds } = this.state;
+    const data = tableData;
+    const idsData = ids;
+    const sonIdsData = sonIds;
+    const newData = data.filter(item => item.id !== value.id);
+    const newIdsData = idsData.filter(item => item !== value.id);
+    let newSonIdsData = [];
+    if ((value.preTaskIds || []).length !== 0) {
+      value.preTaskIds.forEach(i => {
+        newSonIdsData = sonIdsData.filter(item => item !== i);
+      });
+    }
+    this.setState({
+      tableData: newData,
+      ids: newIdsData,
+      sonIds: newSonIdsData,
+    });
+  };
+
   render() {
     const { taskModel } = this.props;
     const { taskModelStatusOptions, editOriginModelData } = taskModel;
@@ -270,6 +327,9 @@ class TaskModel extends Component {
       versionOpen,
       versionType,
       pageModel,
+
+      sonIds,
+      ids,
     } = this.state;
 
     const uploadButton = (
@@ -327,12 +387,24 @@ class TaskModel extends Component {
       },
       {
         title: '操作',
-        render: row => (
-          <>
-            <DeleteOutlined onClick={() => this.handleDelete(row)} />
-            {/* <a onClick={() => this.handleDelete(row)}>删除</a> */}
-          </>
-        ),
+        render: (value, row) => {
+          if (!sonIds.includes(row.id)) {
+            return (
+              <>
+                <Popconfirm
+                  placement="topLeft"
+                  title="确定要删除吗？"
+                  onConfirm={() => this.confirm(row)}
+                  okText="Yes"
+                  cancelText="No"
+                >
+                  <DeleteOutlined />
+                </Popconfirm>
+              </>
+            );
+          }
+          return true;
+        },
       },
     ];
 
@@ -502,7 +574,13 @@ class TaskModel extends Component {
             </Form.Item>
           </Card>
         </Form>
-        <BeforeTask visible={visible} onClose={this.onClose} />
+        <BeforeTask
+          visible={visible}
+          onClose={this.onClose}
+          getData={v => this.getData(v)}
+          ids={ids}
+        />
+
         {argumentVisible && (
           <ArgumentModel visible={argumentVisible} onClose={this.onArgumentClose} />
         )}

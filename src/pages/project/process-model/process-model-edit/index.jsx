@@ -257,6 +257,8 @@ class ProcessEdit extends Component {
 
   // 获取子级数据
   getData = async value => {
+    console.log(value);
+    debugger;
     const { taskList, ids, sonIds } = this.state;
     let data = taskList;
     const idsData = ids;

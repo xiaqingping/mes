@@ -60,17 +60,17 @@ export default {
   },
 
   // 修改任务模型
-  editTaskModel(params) {
+  editTaskModel(data) {
     return request(`${http}/v1/task`, {
       method: 'PUT',
-      params,
+      data,
     });
   },
   // 升级任务模型
-  upgradeTaskModel(id, params) {
+  upgradeTaskModel(id, data) {
     return request(`${http}/v1/task/${id}/upgrade`, {
       method: 'POST',
-      params,
+      data,
     });
   },
   // 发布任务模型
