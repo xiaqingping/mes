@@ -2,10 +2,10 @@
 import { Form, Table, Select } from 'antd';
 import React, { Component } from 'react';
 import { connect } from 'dva';
-import api from '@/pages/project/api/projectManageDetail'
+// import router from 'umi/router';
+import api from '@/pages/project/api/projectManageDetail';
+import { EditJurisdictionModel } from '../ModelUI';
 
-// import StandardTable from '@/components/StandardTable';
-// import EditableCell from '@/components/EditableCell';
 // import { formatter } from '@/utils/utils';
 
 const { Option } = Select;
@@ -22,6 +22,8 @@ class MemberList extends Component {
     list: [],
     // 加载状态
     loading: true,
+    visibleModel: false,
+    menberInfor: [],
     // 选中行数据
     // selectedRows: [],
     // 编辑行
@@ -43,11 +45,8 @@ class MemberList extends Component {
   // 获取表格数据
   getTableData = projectId => {
     this.setState({ loading: true });
-
-    console.log(projectId);
     const data = { projectId }
     api.getProjectMember(data).then(res => {
-      console.log(res);
       this.setState({
         list: res,
         loading: false,
@@ -56,11 +55,54 @@ class MemberList extends Component {
 
   };
 
+  // 修改成员权限
+  handleUpdateJurisdiction = (value, row) => {
+    let jurisdictionName = '';
+    if (value === 1) jurisdictionName = '所有者';
+    if (value === 2) jurisdictionName = '管理者';
+    if (value === 3) jurisdictionName = '参与者';
+
+    const data = {
+      id: row.id,
+      name: row.creatorName,
+      jurisdictionName,
+      jurisdictionValue: value,
+    }
+    this.setState({
+      visibleModel: true,
+      menberInfor: data,
+    });
+  }
+
+  // 确认修改权限
+  getEditModelData = data => {
+    if(data.type === 'ok') {
+      api.updateMemberJurisdiction(data).then(() => {
+        this.getTableData(this.props.projectId);
+      })
+    }
+  }
+
+  // 关闭编辑模态框
+  onCloseModel = () => {
+    this.setState({
+      visibleModel: false,
+    });
+  };
+
+   // 退出
+  handleExit = row => {
+    console.log(row);
+    api.deleteMember(row.id).then(() => {
+      this.getTableData(this.props.projectId);
+    })
+  }
+
   render() {
     const {
       pagination,
       // selectedRows,
-      list, loading
+      list, loading, visibleModel, menberInfor
     } = this.state;
     const { jurisdiction } = this.props.projectDetail;
     let tableWidth = 0;
@@ -75,18 +117,18 @@ class MemberList extends Component {
       {
         title: '用户名',
         dataIndex: 'creatorName',
-        width: 150,
-        // render: (value, row) => (
+        width: 200,
         render: value => (
           <div style={{display:"flex"}}>
-            {/* <img
-              src={row.path}
+            <img
+              // src={row.path}
+              src='/favicon.png'
               alt=""
-              height='30'
-              width="30"
+              height='50'
+              width="50"
               style={{borderRadius: '100%' }}
-            /> */}
-            <div style={{marginLeft:10}}>
+            />
+            <div style={{marginLeft:10, marginTop: 6}}>
               <p>{value}</p>
             </div>
 
@@ -96,27 +138,20 @@ class MemberList extends Component {
       {
         title: '加入时间',
         dataIndex: 'createDate',
-        width: 350,
+        width: 150,
       },
       {
         title: '权限',
         dataIndex: 'jurisdictionValue',
         width: 150,
-        render: value => {
-          // formatter(jurisdiction, value);
-          if (value === 1) {
-            return (
-              <Select style={{ width: 100 }} disabled defaultValue={value} bordered={false}>
-                {jurisdiction.map(e => (
-                  <Option value={e.id} key={e.name}>
-                    {e.name}
-                  </Option>
-                ))}
-              </Select>
-            )
-          }
-          return (
-            <Select style={{ width: 100 }} defaultValue={value} bordered={false}>
+        render: (value, row) => (
+            <Select
+              style={{ width: 100 }}
+              disabled={value === 1}
+              defaultValue={value}
+              bordered={false}
+              onChange={() => this.handleUpdateJurisdiction(value, row)}
+            >
               {jurisdiction.map(e => (
                 <Option value={e.id} key={e.name}>
                   {e.name}
@@ -124,16 +159,14 @@ class MemberList extends Component {
               ))}
             </Select>
           )
-        }
       },
       {
         title: '操作',
         dataIndex: 'jurisdictionValue',
         width: 150,
-        render: value => {
-          if (value === 2 || value === 3) {
-            return <a onClick={() => console.log('退出')}>退出</a>
-          }
+        render: (value, row) => {
+          if (value === 1) return '';
+          return <a onClick={() => this.handleExit(row)}>退出</a>;
         }
       },
     ];
@@ -161,6 +194,12 @@ class MemberList extends Component {
             onChange={this.handleStandardTableChange}
           />
         </Form>
+        <EditJurisdictionModel
+          visible={visibleModel}
+          onClose={this.onCloseModel}
+          data={menberInfor}
+          getData={this.getEditModelData}
+        />
       </>
     );
   }
