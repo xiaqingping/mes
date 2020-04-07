@@ -3,24 +3,69 @@ import { Drawer } from 'antd';
 import { connect } from 'dva';
 import TitleModel from './components/titleModel';
 import TaskModelTabs from './components/taskModelTabs';
+import api from '@/pages/project/api/taskmodel';
 
 class TaskModel extends Component {
   static getDerivedStateFromProps(nextProps) {
     return { visible: nextProps.visible || false };
   }
 
-  state = {};
+  state = { nowId: '', preLoading: false, postLoading: false, postTasks: [], preTaskList: [] };
 
   componentDidMount() {
     // 获取抽屉数据
-    // const { viewId } = this.props;
+    // console.log(this.props);
+    const { viewId } = this.props;
+    console.log(viewId);
+    if (viewId) {
+      this.getPreData(viewId);
+      this.getPostData(viewId);
+    }
   }
 
   onClose = () => {
     this.props.onClose();
   };
 
+  getId = v => {
+    const { nowId } = this.state;
+    this.setState(
+      {
+        nowId: v,
+      },
+      () => {
+        this.getPreData(v);
+        this.getPostData(v);
+      },
+    );
+  };
+
+  getPreData = id => {
+    this.setState({
+      preLoading: true,
+    });
+    api.getPreTasks(id).then(res => {
+      this.setState({
+        preTaskList: res || [],
+        preLoading: false,
+      });
+    });
+  };
+
+  getPostData = id => {
+    this.setState({
+      postLoading: true,
+    });
+    api.getPostTasks(id).then(res => {
+      this.setState({
+        postTasks: res || [],
+        postLoading: false,
+      });
+    });
+  };
+
   render() {
+    const { nowId, preTaskList, postTasks, preLoading, postLoading } = this.state;
     return (
       <>
         <Drawer
@@ -32,10 +77,16 @@ class TaskModel extends Component {
           destroyOnClose
         >
           <div>
-            <TitleModel />
+            <TitleModel emitData={this.getId} />
           </div>
           <div>
-            <TaskModelTabs />
+            <TaskModelTabs
+              nowId={nowId}
+              preTaskList={preTaskList}
+              postTasks={postTasks}
+              preLoading={preLoading}
+              postLoading={postLoading}
+            />
           </div>
         </Drawer>
       </>
@@ -43,6 +94,6 @@ class TaskModel extends Component {
   }
 }
 
-export default connect(project => ({
-  project,
+export default connect(taskModel => ({
+  taskModel,
 }))(TaskModel);

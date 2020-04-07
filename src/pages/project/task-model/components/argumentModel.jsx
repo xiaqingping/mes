@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
-import { Drawer, Button, Popconfirm, Dropdown, Menu, Spin } from 'antd';
+import { Drawer, Button, Popconfirm, Dropdown, Menu, Spin, Empty } from 'antd';
 import api from '@/pages/project/api/taskmodel';
 import { connect } from 'dva';
 import ArgumentForm from './argumentForm';
+import '../index.less';
 
 class ArgumentModel extends Component {
   state = {
@@ -16,32 +17,62 @@ class ArgumentModel extends Component {
   };
 
   componentDidMount() {
+    // alert(1);
     // 获取列表
     const isAdd = window.location.href.indexOf('add') > 0;
-    if (isAdd) {
-      // 如果是新增
+    const { argumentList } = this.props.taskModel;
+    console.log(argumentList);
+    debugger;
+    if (argumentList && argumentList.length > 0) {
+      this.setState({
+        argumentList,
+      });
+    } else if ((argumentList || []).length === 0 && isAdd) {
       this.setState({
         argumentList: [],
       });
       const { dispatch } = this.props;
       dispatch({
         type: 'taskModel/getArgumentsList',
-        payload: this.state.argumentList,
+        payload: [],
       });
     } else {
-      // -----------------------------因为总是以前调用接口,先闭掉,,,一会解开------------------------------------------------------
       this.getArgumentList();
     }
+
+    // if (isAdd) {
+    //   // 如果是新增
+    //   if (argumentList && !argumentList.length) {
+    //     this.setState({
+    //       argumentList,
+    //     });
+    //   } else {
+    //     this.setState({
+    //       argumentList: [],
+    //     });
+    //     const { dispatch } = this.props;
+    //     dispatch({
+    //       type: 'taskModel/getArgumentsList',
+    //       payload: this.state.argumentList,
+    //     });
+    //   }
+    // } else {
+    //   this.getArgumentList();
+    // }
   }
 
   getArgumentList = () => {
     const { selectParamsId, editTaskModelId } = this.props.taskModel;
+    const { fromView } = this.props;
     const { isAdd } = this.state;
     this.setState({
       loading: true,
     });
     console.log(selectParamsId);
-    const id = isAdd ? selectParamsId : editTaskModelId;
+    let id = isAdd ? selectParamsId : editTaskModelId;
+    if (fromView) {
+      id = selectParamsId;
+    }
     console.log(id);
     // debugger;
     api.getTaskModelDetail(id).then(res => {
@@ -52,6 +83,7 @@ class ArgumentModel extends Component {
       });
       this.setState({
         argumentList: list,
+        loading: false,
       });
     });
   };
@@ -178,7 +210,7 @@ class ArgumentModel extends Component {
     const { childrenDrawer, argumentList, loading, editOriginData, type } = this.state;
     const { formItemType } = this.props.taskModel;
     const menu = (
-      <Menu style={{ height: 200, overflow: 'auto' }}>
+      <Menu style={{ maxHeight: 200, overflow: 'auto' }}>
         {formItemType.map(item => {
           return (
             <Menu.Item key={item.type}>
@@ -206,22 +238,28 @@ class ArgumentModel extends Component {
           width={500}
           destroyOnClose
         >
-          {false ? (
+          {loading ? (
             <div style={{ textAlign: 'center', marginTop: 15 }}>
               <Spin size="small" />
             </div>
           ) : (
             <>
+              {argumentList.length === 0 && <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />}
               {argumentList.map((item, index) => {
                 return (
-                  <div style={{ overflow: 'hidden' }} key={item.paramKey}>
+                  <div className="task_model_argumrnt_list" key={item.paramKey}>
                     <span
-                      style={{ fontSize: '14px', fontWeight: 600, cursor: 'pointer' }}
+                      className="task_model_argu_label"
                       onClick={() => this.toViewArgumrnt(item, index)}
                     >
                       {item.paramKey}
                     </span>
-                    <span style={{ marginLeft: 40 }}>{item.paramName}</span>
+                    <span
+                      className="task_model_argu_content"
+                      // style={{ display: 'inline-block', width: '200px' }}
+                    >
+                      {item.paramName}
+                    </span>
                     {!fromView && (
                       <Popconfirm
                         placement={index === 0 ? 'bottom' : 'top'}

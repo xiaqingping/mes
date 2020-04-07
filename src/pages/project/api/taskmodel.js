@@ -57,5 +57,44 @@ export default {
   // 获取某项任务的详细信息---现在获取参数列表
   getArgumentList(id) {
     return request(`${http}/v1/task/${id}`);
+  },
+
+  // 修改任务模型
+  editTaskModel(data) {
+    return request(`${http}/v1/task`, {
+      method: 'PUT',
+      data,
+    });
+  },
+  // 升级任务模型
+  upgradeTaskModel(id, data) {
+    return request(`${http}/v1/task/${id}/upgrade`, {
+      method: 'POST',
+      data,
+    });
+  },
+  // 发布任务模型
+  publishTaskModel(id) {
+    return request(`${http}/v1/task/${id}/publishment`, {
+      method: 'PUT',
+    });
+  },
+  // 禁用任务模型
+  forbiddenTaskModel(id) {
+    return request(`${http}/v1/task/${id}/forbiddance`, {
+      method: 'PUT',
+    });
+  },
+  // 删除任务模型
+  deleteTaskModel(id) {
+    return request(`${http}/v1/task/${id}/deletion`, {
+      method: 'PUT',
+    });
+  },
+  // 根据code和版本查询详细信息
+  getdetailByCodeVer(code, version) {
+    return request(`${http}/v1/task/${code}/${version}`);
   }
+
+
 };

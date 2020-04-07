@@ -14,8 +14,10 @@ import {
   Dropdown,
   AutoComplete,
   Spin,
+  message,
+  Modal,
 } from 'antd';
-import { DownOutlined, PlusOutlined } from '@ant-design/icons';
+import { DownOutlined, PlusOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import TableSearchForm from '@/components/TableSearchForm';
 import { DateUI } from '@/pages/project/components/AntdSearchUI';
 import { connect } from 'dva';
@@ -45,6 +47,7 @@ class TaskModel extends Component {
     viewId: '',
     nameCodeVal: [],
     nameCodeValPublish: [],
+    filtersData: null,
   };
 
   operaList = [];
@@ -56,7 +59,6 @@ class TaskModel extends Component {
   getTableData = (options = {}) => {
     const { pagination } = this.state;
     this.setState({ loading: true });
-    console.log(this.tableSearchFormRef);
     const formData = this.tableSearchFormRef.current
       ? this.tableSearchFormRef.current.getFieldsValue()
       : '';
@@ -85,7 +87,6 @@ class TaskModel extends Component {
     };
     console.log(data);
     api.getTaskModels(data).then(res => {
-      console.log(res);
       this.setState({
         list: res.rows,
         pagination: {
@@ -98,13 +99,29 @@ class TaskModel extends Component {
     });
   };
 
+  // 筛选状态
   handleStandardTableChange = (pagination, filters) => {
-    console.log(pagination);
-    console.log(filters);
-    // this.getTableData({
-    //   page: pagination.current,
-    //   rows: pagination.pageSize,
-    // });
+    const { filtersData } = this.state;
+    let filterData = {};
+    const page = pagination;
+    if (filters) {
+      if (filters.status && filters.status[0]) {
+        filterData.status = filters.status.join(',');
+      }
+      this.setState({
+        filtersData: filterData,
+      });
+      page.current = 1;
+      page.pageSize = 10;
+    } else if (filtersData) {
+      filterData = filtersData;
+    }
+
+    this.getTableData({
+      page: page.current,
+      rows: page.pageSize,
+      ...filterData,
+    });
   };
 
   // ------------------------------------------------------------------------
@@ -299,24 +316,79 @@ class TaskModel extends Component {
     });
   };
 
+  // 发布
+  publishModel = v => {
+    api.publishTaskModel(v.id).then(() => {
+      message.success('任务模型发布成功!');
+      this.updateListData(v.id);
+    });
+  };
+
+  // 更新某行数据
+  updateListData = id => {
+    const { list } = this.state;
+    api.getTaskModelDetail(id).then(res => {
+      let lists = [...list];
+      lists = lists.map(item => {
+        if (item.id === id) {
+          item = res;
+        }
+        return item;
+      });
+      this.setState({
+        list: lists,
+      });
+    });
+  };
+
+  // 禁用模型
+  forbiddenModel = id => {
+    api.forbiddenTaskModel(id).then(res => {
+      message.success('任务模型已禁用!');
+      this.updateListData(id);
+    });
+  };
+
+  // 删除模型
+  deleteModel = id => {
+    api.deleteTaskModel(id).then(() => {
+      message.success('任务模型删除成功!');
+      this.getTableData();
+    });
+  };
+
+  // 升级
+  upgradeModel = id => {
+    router.push(`/project/task-model/up/${id}-up`);
+  };
+
   operate = (op, v) => {
     // op: 操作  v: 每行的数据
-    const { dispatch } = this.props;
     if (op === '发布') {
-      // console.log('发布');
-      router.push(`/project/task-model/edit/${v.id}`);
+      this.publishModel(v);
     } else if (op === '修改') {
-      dispatch({
-        type: 'taskModel/getEditOriginModelData',
-        payload: v,
-      });
       this.goToEdit(v.id);
     } else if (op === '删除') {
-      console.log('delete');
+      this.confirm(v.id);
+      // this.deleteModel(v.id);
     } else if (op === '查看') {
       this.viewDetails(v);
+    } else if (op === '升级') {
+      this.upgradeModel(v.id);
+    } else if (op === '禁用') {
+      this.forbiddenModel(v.id);
     }
   };
+
+  confirm(id) {
+    Modal.confirm({
+      title: '是否确定删除?',
+      icon: <ExclamationCircleOutlined />,
+      okText: '确认',
+      cancelText: '取消',
+      onOk: () => this.deleteModel(id),
+    });
+  }
 
   render() {
     const { visible } = this.state;
@@ -470,7 +542,7 @@ class TaskModel extends Component {
             </div>
           </Spin>
         </Card>
-        <TaskModelView visible={visible} onClose={this.onClose} viewId={viewId} />
+        {viewId && <TaskModelView visible={visible} onClose={this.onClose} viewId={viewId} />}
       </PageHeaderWrapper>
     );
   }
