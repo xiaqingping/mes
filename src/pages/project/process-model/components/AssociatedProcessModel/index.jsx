@@ -80,7 +80,6 @@ class AssociatedProcessModel extends React.Component {
               fileId,
             };
           });
-          console.log(newList);
           this.setState({
             list: newList,
           });
