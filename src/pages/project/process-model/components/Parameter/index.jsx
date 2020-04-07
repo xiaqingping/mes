@@ -133,9 +133,11 @@ class Parameter extends React.Component {
     if (moveType === 1) {
       // 拖到具体分类
       if (type === 2) {
-        if (value.params.filter(item => item.id === moveElement.id).length === 0) {
+        // console.log(value, moveElement);
+        // console.log(value.params.filter(item => item.paramId === moveElement.paramId).length);
+        if (value.params.filter(item => item.paramId === moveElement.paramId).length === 0) {
           // 添加到新对象里
-          newData.map((item, i) => {
+          newData.forEach((item, i) => {
             if (item.groupName === value.groupName) {
               newData[i].params.push(moveElement);
             }
@@ -330,9 +332,9 @@ class Parameter extends React.Component {
           <List
             rowKey="id"
             dataSource={data.filter(item => item.groupName === 'no')[0].params}
-            renderItem={item => (
-              <List.Item key={item.paramId}>
-                {item.paramId ? (
+            renderItem={item =>
+              item.paramId ? (
+                <List.Item key={item.paramId}>
                   <Card hoverable>
                     <div>
                       <div draggable onDragStart={() => this.dragStart(item, 1, 0)}>
@@ -340,11 +342,11 @@ class Parameter extends React.Component {
                       </div>
                     </div>
                   </Card>
-                ) : (
-                  ''
-                )}
-              </List.Item>
-            )}
+                </List.Item>
+              ) : (
+                <div />
+              )
+            }
             className="list-style card-item-style"
             split={false}
           />

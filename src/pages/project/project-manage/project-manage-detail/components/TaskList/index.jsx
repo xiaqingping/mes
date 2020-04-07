@@ -13,47 +13,56 @@ import {
   PauseCircleOutlined,
 } from '@ant-design/icons';
 import { ModelType } from '@/pages/project/components/ModelComponents';
-import { calculateTimeDifference, comparisonMerge } from '../../functions'
+import { calculateTimeDifference, comparisonMerge } from '../../functions';
 import style from './index.less';
 
 class TaskList extends Component {
-
   state = {
     // selectedIds: [],      // 当前展开Table
-    visibleTable: false,  // 执行记录表显示
+    visibleTable: false, // 执行记录表显示
     visibleParam: false,
     parameterList: [],
+    openId: [],
   };
 
   // 获取此页面需要用到的基础数据
   getCacheData = () => {};
 
   // 是否显示执行记录表
-  showTable = (visible, id, type) => {
-    const arr = [];
-    if (type === 'true') arr.push(id);
-    if (type === 'false') arr.filter(item => item !== id);
-    console.log(arr);
+  showTable = (id, type) => {
+    const { openId } = this.state;
+    const newData = openId;
+    let arr = [];
+    if (type === 1) {
+      arr = [...arr, id];
+    }
+    if (type === 2) {
+      const index = openId.map((item, ind) => {
+        if (item === id) return ind;
+      });
+      newData.splice(index, 1);
+    }
     this.setState({
-      visibleTable: visible,
-      // selectedIds: arr,
-    })
-  }
+      openId: arr,
+    });
+  };
 
   // 提示框 时间信息
   time = row => {
     if (row.status === 1) {
-      return <span>未开始</span>
-    } if (row.status === 4) {
+      return <span>未开始</span>;
+    }
+    if (row.status === 4) {
       return (
         <>
-          <span>开始：{row.beginDate}</span><br/>
+          <span>开始：{row.beginDate}</span>
+          <br />
           <span>结束：{row.endDate}</span>
         </>
       );
     }
-    return <span>开始：{row.beginDate}</span>
-  }
+    return <span>开始：{row.beginDate}</span>;
+  };
 
   // 查看任执行记录的参数
   searchParameter = row => {
@@ -65,39 +74,38 @@ class TaskList extends Component {
         const newItem = JSON.parse(JSON.stringify(item));
         newItem.index = JSON.parse(JSON.stringify(index));
         newItem.paramProperties.forEach(e => {
-          newItem[e.paramPropertyKey] = e.paramPropertyValue
-        })
+          newItem[e.paramPropertyKey] = e.paramPropertyValue;
+        });
         paramData.push(newItem);
-      })
+      });
       // 合并参数列表和参数值列表
       const parameterList = comparisonMerge(paramData, valueData);
       this.setState({ visibleParam: true, parameterList });
-    })
-  }
+    });
+  };
 
   // 任务执行记录开始运行
   startExecRecord = row => {
     console.log(row);
     api.startExecRecord(row.id).then(() => {
       this.props.onClose();
-    })
-
-  }
+    });
+  };
 
   // 任务执行记录暂停运行
   pauseExecRecord = row => {
     console.log(row);
     api.pauseExecRecord(row.id).then(() => {
       this.props.onClose();
-    })
-  }
+    });
+  };
 
   // 关闭二级抽屉
   onCloseParam = () => {
     this.setState({
-      visibleParam: false
-    })
-  }
+      visibleParam: false,
+    });
+  };
 
   render() {
     const {
@@ -105,6 +113,7 @@ class TaskList extends Component {
       visibleParam,
       // selectedIds,
       parameterList,
+      openId,
     } = this.state;
     const { detailList, taskList, visible } = this.props;
     const { execRecordStatus } = this.props.projectDetail;
@@ -114,7 +123,7 @@ class TaskList extends Component {
         title: '编号',
         dataIndex: 'code',
         width: 100,
-        render: (value, row) =>(
+        render: (value, row) => (
           <>
             <span>{value}</span>
             <SlidersOutlined
@@ -122,7 +131,7 @@ class TaskList extends Component {
               onClick={() => this.searchParameter(row)}
             />
           </>
-        )
+        ),
       },
       {
         title: '状态',
@@ -138,8 +147,8 @@ class TaskList extends Component {
                 <ClockCircleOutlined className={style.marginLeft} />
               </Tooltip>
             </>
-          )
-        }
+          );
+        },
       },
       {
         title: '',
@@ -149,21 +158,22 @@ class TaskList extends Component {
           const duration = calculateTimeDifference(row.startTime, row.endTime);
           if (value === 4) {
             return duration;
-          } if (value === 1) {
-            return <PauseCircleOutlined onClick={() => this.pauseExecRecord(row)}/>
-          } if (value === 3) {
+          }
+          if (value === 1) {
+            return <PauseCircleOutlined onClick={() => this.pauseExecRecord(row)} />;
+          }
+          if (value === 3) {
             return (
               <PlayCircleOutlined
-                style={{color: '#1890ff'}}
+                style={{ color: '#1890ff' }}
                 onClick={() => this.startExecRecord(row)}
               />
-            )
+            );
           }
           return '';
-        }
+        },
       },
     ];
-
     return (
       <>
         <Drawer
@@ -178,7 +188,7 @@ class TaskList extends Component {
             split={false}
             renderItem={item => (
               <List.Item key={item}>
-                <Card hoverable style={{ width: '100%' }} >
+                <Card hoverable style={{ width: '100%' }}>
                   <Avatar
                     src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
                     size="large"
@@ -199,23 +209,25 @@ class TaskList extends Component {
 
                   <div className={style.open}>
                     {/* {visibleTable && selectedIds.indexOf(item.id) > -1 ? ( */}
-                    {visibleTable? (
+                    {openId.filter(i => i === item.id).length !== 0 ? (
                       // <a onClick={() => this.showTable(false, item.id, 'fales')}>
-                      <a onClick={() => this.showTable(!visibleTable)}>
-                        收起<UpOutlined />
+                      <a onClick={() => this.showTable(!visibleTable, item.id, 2)}>
+                        收起
+                        <UpOutlined />
                       </a>
                     ) : (
-                      <a onClick={() => this.showTable(!visibleTable)}>
-                        展开<DownOutlined />
+                      <a onClick={() => this.showTable(!visibleTable, item.id, 1)}>
+                        展开
+                        <DownOutlined />
                       </a>
                     )}
                   </div>
-                  {visibleTable? (
+                  {visibleTable ? (
                     <>
                       <Table
                         size="small"
                         columns={columns}
-                        rowKey='id'
+                        rowKey="id"
                         dataSource={item.taskExecRecordList}
                         pagination={false}
                       />
@@ -241,7 +253,7 @@ class TaskList extends Component {
             renderItem={item => (
               <List.Item key={item}>
                 <Form>
-                  <ModelType data={item}/>
+                  <ModelType data={item} />
                 </Form>
               </List.Item>
             )}

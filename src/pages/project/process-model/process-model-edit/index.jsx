@@ -271,7 +271,6 @@ class ProcessEdit extends Component {
   // 删除任务
   handleDelete = value => {
     const { taskList, ids, sonIds, paramter } = this.state;
-    console.log(value, paramter);
     const data = taskList;
     // const { ids, sonIds } = this.props;
     const idsData = ids;
@@ -317,11 +316,13 @@ class ProcessEdit extends Component {
     value.forEach(item => {
       if (item.params && item.params.length !== 0) {
         item.params.forEach(i => {
-          oldModelProcess[0].params.push({
-            paramId: i.paramId,
-            paramName: i.paramName,
-            taskModelId: i.taskModelId,
-          });
+          if (i.paramId) {
+            oldModelProcess[0].params.push({
+              paramId: i.paramId,
+              paramName: i.paramName,
+              taskModelId: i.taskModelId,
+            });
+          }
         });
       }
     });
@@ -459,6 +460,7 @@ class ProcessEdit extends Component {
                 headers={{ Authorization: this.props.authorization }}
                 beforeUpload={beforeUpload}
                 onChange={this.handleChange}
+                style={{ width: '60px', height: '60px' }}
               >
                 {imageUrl ? (
                   <img

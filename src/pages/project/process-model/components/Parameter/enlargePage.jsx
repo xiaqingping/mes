@@ -4,7 +4,7 @@ import { ShrinkOutlined } from '@ant-design/icons';
 
 const EnlargePage = props => (
   <Modal
-    title={props.typeEnlargeData}
+    title={props.typeEnlargeData.groupName}
     visible={props.visible}
     onCancel={props.handleBigClose}
     footer={null}
@@ -17,12 +17,12 @@ const EnlargePage = props => (
     <List
       rowKey="id"
       style={{ height: '350px', overflowY: 'auto' }}
-      dataSource={[123, 3, 4, 56, 55345345, 65645, 4232]}
+      dataSource={props.typeEnlargeData.params}
       renderItem={item => (
-        <List.Item key={item}>
+        <List.Item key={item.id}>
           <Card hoverable>
             <div>
-              <div>{item}</div>
+              <div>{item.paramName}</div>
             </div>
           </Card>
         </List.Item>
