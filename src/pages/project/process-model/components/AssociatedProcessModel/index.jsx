@@ -5,6 +5,7 @@ import TableSearchForm from '@/components/TableSearchForm';
 import { connect } from 'dva';
 import './index.less';
 import api from '@/pages/project/api/taskmodel';
+import disk from '@/pages/project/api/disk';
 import { cutString } from '@/utils/utils';
 import _ from 'lodash';
 
@@ -19,7 +20,7 @@ class AssociatedProcessModel extends React.Component {
 
   initialValues = {
     page: 1,
-    rows: 10,
+    rows: 5,
   };
 
   constructor(props) {
@@ -64,8 +65,28 @@ class AssociatedProcessModel extends React.Component {
       ...options,
     };
     api.getTaskModels(data).then(res => {
+      const uuids = res.rows.map(e => e.picture);
+      disk
+        .getFiles({
+          sourceCode: uuids.join(','),
+          sourceKey: 'project_task_model',
+        })
+        .then(v => {
+          const newList = res.rows.map(e => {
+            const filterItem = v ? v.filter(item => item.sourceCode === e.picture) : [];
+            const fileId = filterItem[0] && filterItem[0].id;
+            return {
+              ...e,
+              fileId,
+            };
+          });
+          console.log(newList);
+          this.setState({
+            list: newList,
+          });
+        });
+
       this.setState({
-        list: res.rows,
         pagination: {
           current: data.page,
           pageSize: data.rows,
@@ -138,6 +159,13 @@ class AssociatedProcessModel extends React.Component {
     this.props.onClose();
   };
 
+  handleStandardTableChange = pagination => {
+    this.getTableData({
+      page: pagination.current,
+      rows: pagination.pageSize,
+    });
+  };
+
   render() {
     const { onClose } = this.props;
     const { list, loading, pagination } = this.state;
@@ -149,10 +177,10 @@ class AssociatedProcessModel extends React.Component {
         render: (value, row) => (
           <>
             <Avatar
-              src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
+              src={row.fileId ? disk.downloadFiles(row.fileId, { view: true }) : ''}
               style={{ float: 'left' }}
             />
-            <div style={{ float: 'left' }}>
+            <div style={{ float: 'left', marginLeft: '10px' }}>
               <div>{value}</div>
               <div>{row.name}</div>
             </div>
@@ -217,6 +245,7 @@ class AssociatedProcessModel extends React.Component {
             rowKey="id"
             size="small"
             pagination={pagination}
+            onChange={this.handleStandardTableChange}
           />
         </div>
       </Modal>

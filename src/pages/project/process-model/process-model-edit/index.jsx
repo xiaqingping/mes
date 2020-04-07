@@ -53,9 +53,9 @@ class ProcessEdit extends Component {
     }
 
     if (data.length !== 0) {
-      return { id: data[0], pageModel: data.length };
+      return { id: data[0], pageModel: data.length, loading: false };
     }
-    return { id: '' };
+    return { id: '', loading: false };
   }
 
   // pageModel 0 新增默认，1修改，2升级
@@ -70,6 +70,7 @@ class ProcessEdit extends Component {
       guuid,
       visible: false,
       parameterVisible: false,
+      paramter: [], // 用于保存参数
       taskList: [],
       ids: [],
       sonIds: [],
@@ -77,6 +78,7 @@ class ProcessEdit extends Component {
       selectVersion: '', // 选择的版本值
       versionType: null, // 可以选择的版本
       picture: '',
+      processData: [],
     };
   }
 
@@ -85,10 +87,23 @@ class ProcessEdit extends Component {
     if (this.props.match.params.id) {
       data = this.props.match.params.id.split('-');
       api.getProcessDetail(data[0]).then(res => {
+        let itemIndex = 0;
+        res.groups.map((item, index) => {
+          if (item.groupName === 'no') {
+            itemIndex = index;
+          }
+        });
+        if (itemIndex) {
+          const itemData = res.groups.splice(itemIndex, 1);
+          res.groups.unshift(itemData[0]);
+        }
         this.getData(res.taskModels);
         this.setState({
+          paramter: res.groups,
           taskList: res.taskModels,
           picture: res.picture,
+          loading: true,
+          processData: res,
         });
         disk
           .getFiles({
@@ -105,17 +120,6 @@ class ProcessEdit extends Component {
                 ...res,
                 fileId: v.length !== 0 ? v[0].id : '',
               },
-              // const newList = res.rows.map(e => {
-              // const filterItem = v.filter(item => item.sourceCode === e.picture);
-              // const fileId = filterItem[0] && filterItem[0].id;
-              // return {
-              //   ...e,
-              //   fileId,
-              // };
-              // });
-              // this.setState({
-              //   list: newList,
-              // });
             });
           });
         if (res.version) {
@@ -123,6 +127,17 @@ class ProcessEdit extends Component {
             versionType: versionFun(res.version),
           });
         }
+      });
+    } else {
+      this.setState({
+        paramter: [
+          {
+            sortNo: '',
+            groupName: 'no',
+            groupDesc: '',
+            params: [],
+          },
+        ],
       });
     }
   }
@@ -147,12 +162,10 @@ class ProcessEdit extends Component {
   };
 
   // 导航列表title样式
-  navContent = () => {
+  navContent = processData => {
     const { pageModel } = this.state;
-    const { processDetail } = this.props;
-
     if (pageModel) {
-      return <div>{`${processDetail.name} ${processDetail.id}`}</div>;
+      return <div>{`${processData.name} ${processData.id}`}</div>;
     }
     return '';
   };
@@ -167,9 +180,18 @@ class ProcessEdit extends Component {
 
   // 提交上传
   onFinish = values => {
-    const { imageUrl, guuid, taskList, selectVersion, pageModel, id, picture } = this.state;
-    const { processAddData } = this.props;
-    const data = processAddData;
+    const {
+      imageUrl,
+      guuid,
+      taskList,
+      selectVersion,
+      pageModel,
+      id,
+      picture,
+      paramter,
+    } = this.state;
+    // const { processAddData } = this.props;
+    const data = {};
     const taskModelIds = [];
     taskList.forEach(item => {
       taskModelIds.push({ taskModelId: item.id, automatic: item.automatic });
@@ -183,27 +205,22 @@ class ProcessEdit extends Component {
     data.version = selectVersion || 'V1.0';
     data.taskModels = taskModelIds;
     data.picture = picture;
+    data.groups = paramter;
     delete data.taskModelIds;
-    // this.props.dispatch({
-    //   type: 'processModel/setProcessAddData',
-    //   payload: {
-    //     ...data,
-    //   },
-    // });
 
     if (pageModel === 1) {
       data.id = id;
-      api.changeProcess(processAddData).then(() => {
+      api.changeProcess(data).then(() => {
         router.push('/project/process-model');
       });
     }
     if (pageModel === 2) {
-      api.upgradeProcess(id, processAddData).then(() => {
+      api.upgradeProcess(id, data).then(() => {
         router.push('/project/process-model');
       });
     }
     if (!pageModel) {
-      api.addProcess(processAddData).then(() => {
+      api.addProcess(data).then(() => {
         router.push('/project/process-model');
       });
     }
@@ -213,6 +230,7 @@ class ProcessEdit extends Component {
   onOpen = () => {
     this.setState({
       visible: true,
+      parameterVisible: false,
     });
   };
 
@@ -231,15 +249,29 @@ class ProcessEdit extends Component {
   };
 
   // 关闭参数
-  handleClose = () => {
+  handleClose = value => {
+    const newData = value.map((item, index) => {
+      const itemLength = value.length;
+      return { ...item, sortNo: itemLength - index };
+    });
+    const sonData = newData;
+    newData.map((item, index) => {
+      sonData[index].params = item.params.map((i, ind) => {
+        const iLength = item.params.length;
+        return { ...i, sortNo: iLength - ind };
+      });
+    });
+    sonData[0].sortNo = 0;
     this.setState({
       parameterVisible: false,
+      paramter: sonData,
     });
   };
 
   // 删除任务
-  confirm = value => {
-    const { taskList, ids, sonIds } = this.state;
+  handleDelete = value => {
+    const { taskList, ids, sonIds, paramter } = this.state;
+    console.log(value, paramter);
     const data = taskList;
     // const { ids, sonIds } = this.props;
     const idsData = ids;
@@ -257,30 +289,49 @@ class ProcessEdit extends Component {
         newSonIdsData = sonIdsData.filter(item => item !== i);
       });
     }
+    // 删除参数分类里的数据
+    // let paramterData = paramter;
+    const paramterData = paramter.map(item => {
+      const params = item.params.filter(i => i.taskModelId !== value.id);
+      return { ...item, params };
+    });
     this.setState({
       taskList: newData,
       ids: newIdsData,
       sonIds: newSonIdsData,
+      paramter: paramterData,
     });
   };
 
   // 获取子级数据
   getData = value => {
-    const { taskList, ids, sonIds } = this.state;
+    const { taskList, ids, sonIds, paramter } = this.state;
+    // const { processAddData } = this.props;
+    const oldModelProcess = paramter;
     let data = taskList;
     const idsData = ids;
     const sonIdsData = sonIds;
     data = [...taskList, ...value];
-
+    value.forEach(item => {
+      if (item.params && item.params.length !== 0) {
+        item.params.forEach(i => {
+          oldModelProcess[0].params.push({
+            paramId: i.paramId,
+            paramName: i.paramName,
+            taskModelId: i.taskModelId,
+          });
+        });
+      }
+    });
     value.forEach(item => {
       idsData.push(item.id);
       sonIdsData.push(...item.preTaskIds);
     });
-
     this.setState({
       taskList: data,
       ids: idsData,
       sonIds: sonIdsData,
+      paramter: oldModelProcess,
     });
   };
 
@@ -318,12 +369,14 @@ class ProcessEdit extends Component {
       selectVersion,
       versionOpen,
       versionType,
+      paramter,
+      processData,
     } = this.state;
+    // console.log(paramter, parameterVisible);
     const {
-      processDetail,
       project: { status },
     } = this.props;
-    if (!processDetail && pageModel !== 0) {
+    if (pageModel !== 0 && processData.length === 0) {
       return false;
     }
     const columns = [
@@ -361,7 +414,7 @@ class ProcessEdit extends Component {
                 <Popconfirm
                   placement="topLeft"
                   title="确定要删除吗？"
-                  onConfirm={() => this.confirm(row)}
+                  onConfirm={() => this.handleDelete(row)}
                   okText="Yes"
                   cancelText="No"
                 >
@@ -381,17 +434,16 @@ class ProcessEdit extends Component {
     const initialValues = () => {
       if (pageModel) {
         const defaultData = {
-          name: processDetail.name,
-          describe: processDetail.describe,
-          interactionAnalysis: processDetail.interactionAnalysis === 1,
+          name: processData.name,
+          describe: processData.describe,
+          interactionAnalysis: processData.interactionAnalysis === 1,
         };
         return defaultData;
       }
       return '';
     };
-    console.log(initialValues());
     return (
-      <PageHeaderWrapper title={this.navContent()}>
+      <PageHeaderWrapper title={this.navContent(processData)}>
         <Form onFinish={this.onFinish} initialValues={initialValues()}>
           <Card className="process-model-edit">
             <div style={{ float: 'left', marginLeft: '20px' }}>
@@ -439,7 +491,7 @@ class ProcessEdit extends Component {
                     });
                   }}
                 >
-                  {pageModel ? selectVersion || processDetail.version : 'V1.0'}
+                  {pageModel ? selectVersion || processData.version : 'V1.0'}
                   {/* {selectVersion || processDetail.version} */}
                 </Tag>
                 {versionOpen && pageModel === 2 ? (
@@ -533,7 +585,12 @@ class ProcessEdit extends Component {
           getData={v => this.getData(v)}
           ids={ids}
         />
-        <Parameter visible={parameterVisible} handleClose={this.handleClose} />
+        {/* 参数弹框 */}
+        <Parameter
+          visible={parameterVisible}
+          handleClose={value => this.handleClose(value)}
+          paramter={paramter}
+        />
       </PageHeaderWrapper>
     );
   }
@@ -543,7 +600,7 @@ export default connect(({ global, user, project, processModel }) => ({
   languageCode: global.languageCode,
   authorization: user.currentUser.authorization,
   project,
-  processAddData: processModel.processAddData,
+  // processAddData: processModel.processAddData,
   processDetail: processModel.processDetail,
   // ids: processModel.ids,
   // sonIds: processModel.sonIds,
