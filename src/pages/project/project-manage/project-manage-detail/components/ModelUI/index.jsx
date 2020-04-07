@@ -1,13 +1,17 @@
 import React, { useState } from 'react';
 import { Modal, Form, Input } from 'antd';
-// import api from '@/pages/project/api/projectManageDetail';
+import { InfoCircleOutlined } from '@ant-design/icons';
 
 const FormItem = Form.Item;
 const { TextArea } = Input;
 
+/**
+ * 流程 编辑名称描述 模态框
+ * @param {String} visible 是否显示
+ */
 const EditInforModel = props => {
   const [form] = Form.useForm();
-  const [confirmLoading, setConfirmLoading] = useState(false);
+  const [confirmLoading] = useState(false);
 
   // 关闭Model
   const handleCancel = () => {
@@ -23,30 +27,7 @@ const EditInforModel = props => {
     }
     props.getData(data);
     props.onClose();
-    // setConfirmLoading(false)
-    // try {
-    //   const row = await form.validateFields();
-    //   console.log(props.processList)
-    //   const data = {
-    //     id: props.processList.id,
-    //     ...row
-    //   }
-    //   console.log(data);
-    //   api.saveProcessInfor(data).then(res => {
-    //     props.onClose();
-    //     setConfirmLoading(false);
-    //   })
-    // } catch (errorInfo) {
-    //   console.log(errorInfo);
-    // }
-    // setConfirmLoading(true)
-    // setTimeout(() => {
-    //   props.visible = false;
-    //   setConfirmLoading(false);
-    // }, 2000);
   };
-
-
 
   return (
     <div>
@@ -59,7 +40,6 @@ const EditInforModel = props => {
         centered
       >
         <Form
-          // {...layout}
           name="basic"
           form={form}
           initialValues={{ name: props.processList.name , describe: props.processList.describe}}
@@ -84,4 +64,50 @@ const EditInforModel = props => {
   );
 }
 
-export { EditInforModel };
+/**
+ * 成员 修改权限 模态框
+ * @param {String} visible 是否显示
+ */
+const EditJurisdictionModel = props => {
+  const [confirmLoading] = useState(false);
+
+  // 关闭Model
+  const handleCancel = () => {
+    props.onClose();
+  };
+
+  // 确定保存
+  const handleOk = async () => {
+    const data = {
+      type: 'ok',
+      id: props.data.id,
+      jurisdictionValue: props.data.jurisdictionValue,
+    }
+    props.getData(data);
+    props.onClose();
+  };
+
+  return (
+    <div>
+      <Modal
+        visible={props.visible}
+        onOk={handleOk}
+        confirmLoading={confirmLoading}
+        onCancel={handleCancel}
+        centered
+        closable={false}
+        width={350}
+      >
+        <div style={{ textAlign: 'center' }}>
+          <InfoCircleOutlined style={{ fontSize: 40, color: '#f6b03b' }}/>
+          <p style={{ marginTop: 25, fontSize: 16, marginBottom: 5}}>
+            是否将{props.data.name}修改为{props.data.jurisdictionName}?
+          </p>
+        </div>
+      </Modal>
+    </div>
+  );
+
+}
+
+export { EditInforModel, EditJurisdictionModel };

@@ -21,16 +21,6 @@ export default {
     return request(`${http1}/projects/v1/tasks`, { params });
   },
 
-  // 项目流程暂停运行
-  pauseProcessesProcess(data) {
-    return request(`${http1}/projects/v1/processes/${data}/pause`, { method: 'PUT' });
-  },
-
-  // 项目流程开始运行
-  startProcessesProcess(data) {
-    return request(`${http1}/projects/v1/processes/${data}/start`, { method: 'PUT' });
-  },
-
   // 查询成员列表
   getProjectMember(params) {
     return request(`${http1}/projects/v1/member`, { params });
@@ -38,13 +28,49 @@ export default {
 
   // 保存流程名称和描述
   saveProcessInfor(data) {
-    return request(`${http1}/projects/v1/processes`, { method: 'PUT', data });
+    return request(`${http1}/projects/v1/processes`, { method: 'PUT', data});
   },
 
-  // 保存流程名称和描述
-  deleteProcessInfor(data) {
-    return request(`${http1}/projects/v1/processes/${data}/deleted`, { method: 'PUT' });
+  // 删除流程
+  deleteProjectProcess(data) {
+    return request(`${http1}/projects/v1/processes/${data}/deleted`, { method: 'PUT'});
   },
+
+  // 项目流程暂停运行
+  pauseProcessesProcess(data) {
+    return request(`${http1}/projects/v1/processes/${data}/pause`, { method: 'PUT'});
+  },
+
+  // 项目流程开始运行
+  startProcessesProcess(data) {
+    return request(`${http1}/projects/v1/processes/${data}/start`, { method: 'PUT'});
+  },
+
+  // 修改成员权限
+  updateMemberJurisdiction(data) {
+    return request(`${http1}/projects/v1/member/${data.id}/jurisdiction`, { method: 'PUT'});
+  },
+
+  // 删除项目成员
+  deleteMember(data) {
+    return request(`${http1}/projects/v1/member/${data}/deleted`, { method: 'PUT'});
+  },
+
+  // 任务执行记录参数查询
+  getExecRecordParam(data) {
+    return request(`${http1}/projects/v1/tasks/execRecord/${data}/param`);
+  },
+
+  // 任务执行记录开始运行
+  startExecRecord(data) {
+    return request(`${http1}/projects/v1/tasks/execRecord/${data}/start`, { method: 'PUT'});
+  },
+
+  // 任务执行记录暂停运行
+  pauseExecRecord(data) {
+    return request(`${http1}/projects/v1/tasks/execRecord/${data}/pause`, { method: 'PUT'});
+  },
+
 
   /**
    * 流程模型
@@ -53,6 +79,7 @@ export default {
   getProcessParam(params) {
     return request(`${http2}/v1/process/${params}/params`);
   },
+
 
   /**
    * 任务模型

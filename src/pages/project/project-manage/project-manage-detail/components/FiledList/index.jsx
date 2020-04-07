@@ -1,8 +1,9 @@
 // 流程列表
-import { Form, Table, Divider, Col, Input, Button  } from 'antd';
+import { Form, Table, Col, Input, Button  } from 'antd';
 import React, { Component } from 'react';
 import { connect } from 'dva';
 import { FileExclamationOutlined } from '@ant-design/icons';
+import TableSearchForm from '@/components/TableSearchForm';
 
 // import StandardTable from '@/components/StandardTable';
 // import EditableCell from '@/components/EditableCell';
@@ -17,18 +18,9 @@ class FiledList extends Component {
   tableFormRef = React.createRef();
 
   state = {
-    // 分页参数
+    list: [],       // 表格数据
+    loading: true,  // 加载状态
     // pagination: {},
-    // 表格数据
-    list: [],
-    // 加载状态
-    loading: true,
-    // 选中行数据
-    // selectedRows: [],
-    // 编辑行
-    // editIndex: -1,
-    // 自减ID（新增数据时，提供负数id做为列表的key）
-    // id: 0,
   };
 
   // 顶部表单默认值
@@ -48,12 +40,12 @@ class FiledList extends Component {
   getCacheData = () => {};
 
   // 分页
-  handleStandardTableChange = data => {
-    this.getTableData({
-      page: data.current,
-      rows: data.pageSize,
-    });
-  };
+  // handleStandardTableChange = data => {
+  //   this.getTableData({
+  //     page: data.current,
+  //     rows: data.pageSize,
+  //   });
+  // };
 
   // 获取表格数据
   getTableData = () => {
@@ -78,6 +70,11 @@ class FiledList extends Component {
           <Search />
         </FormItem>
       </Col>
+      <Col lg={6} md={8} sm={12}>
+      <FormItem label="" name="">
+          <Button>下载</Button>
+        </FormItem>
+      </Col>
     </>
   );
 
@@ -88,7 +85,6 @@ class FiledList extends Component {
       list, loading
     } = this.state;
     let tableWidth = 0;
-    console.log(list);
 
     // const components = {
     //   body: {
@@ -127,16 +123,14 @@ class FiledList extends Component {
         title: '大小',
         dataIndex: 'size',
         width: 100,
-        render: text => `${text  }kb`
+        render: text => `${text}kb`
       },
       {
         title: '操作',
         width: 150,
         render: () => (
           <>
-            <a onClick={() => console.log(111)}>删除</a>
-            <Divider type="vertical" />
-            <a onClick={() => console.log(222)}>修改</a>
+            <a onClick={() => console.log('删除')}>删除</a>
           </>
         ),
       },
@@ -163,13 +157,13 @@ class FiledList extends Component {
 
     return (
       <>
-        {/* <TableSearchForm
+        <TableSearchForm
           ref={this.tableSearchFormRef}
           initialValues={this.initialValues}
           getTableData={this.getTableData}
           simpleForm={this.simpleForm}
-        /> */}
-        <Form ref={this.tableSearchFormRef}>
+        />
+        {/* <Form ref={this.tableSearchFormRef}>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="" name="fieldName">
               <Search />
@@ -180,7 +174,7 @@ class FiledList extends Component {
               <Button>下载</Button>
             </FormItem>
           </Col>
-        </Form>
+        </Form> */}
         <Form ref={this.tableFormRef}>
           <Table
             scroll={{ x: tableWidth, y: 400 }}

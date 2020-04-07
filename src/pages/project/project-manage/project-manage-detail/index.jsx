@@ -4,6 +4,7 @@ import React, { Component } from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import { connect } from 'dva';
 import { PlusSquareOutlined } from '@ant-design/icons';
+import router from 'umi/router';
 import api from '@/pages/project/api/projectManageDetail'
 import styles from './index.less';
 import ProcessList from './components/ProcessList/index'
@@ -18,21 +19,45 @@ class ProjectDetail extends Component {
 
   state = {
     loading: true,
-    list: {},     // 基础信息数据
-    projectId: 0, // 项目ID
+    list: {},       // 基础信息数据
+    projectId: 0,   // 项目ID
+    selectKey: '1', // Tabs切换
   }
 
   componentDidMount() {
+    // console.log(this.props)
+    // console.log(this.props.location)
+    // if (!this.props.location.state.projectId) {
+    //   router.push('/project/project-manage');
+    //   return;
+    // }
     const { projectId } = this.props.location.state;
     this.setState({ projectId });
     this.getTableData(projectId);
   }
 
+  // Tabs切换
   callback = key => {
-    console.log(key);
+    this.setState({
+      selectKey: key
+    })
+    this.operations();
   }
 
-  operations = () => <PlusSquareOutlined onClick={() => console.log(123)}/>
+  // Tabs抬头操作
+  operations = () => {
+    const { selectKey } = this.state;
+    if (selectKey === '1') {
+      return (
+        <PlusSquareOutlined
+          onClick={() => console.log(selectKey)}
+          style={{ fontSize: 20, color: '#1890ff' }}
+        />
+      )
+    }
+    return '';
+  }
+
 
   // 获取表格数据
   getTableData = projectId => {

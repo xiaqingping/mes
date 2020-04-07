@@ -1,6 +1,18 @@
 import React from 'react';
 import { Input, Form } from 'antd';
 
+
+/**
+ * 判断类型
+ * @param {String} type
+ */
+const ModelType = props => {
+  const { data } = props;
+  if (data.type === 'txtShuRuKuang') return <InputModel data={data}/>
+  if (data.type === 'input') return <InputModel data={data}/>
+  return '';
+}
+
 /**
  * 单行输入框
  * @param {String} paramName 参数名称
@@ -12,7 +24,7 @@ import { Input, Form } from 'antd';
  * @param {String} validDesc 验证说明
  */
 const InputModel = props => {
-  // console.log(props);
+  console.log(props);
   const { data } = props;
   return (
     <Form.Item
@@ -22,9 +34,9 @@ const InputModel = props => {
         { required: !!data.isRequired, pattern: data.validRules || '', message: data.validDesc },
       ]}
     >
-      <Input placeholder={data.placeholder} defaultValue={data.defaultValue} />
+      <Input placeholder={data.placeholder} defaultValue={data.defaultValue || data.paramValue} />
     </Form.Item>
   );
 }
 
-export { InputModel };
+export { ModelType, InputModel };

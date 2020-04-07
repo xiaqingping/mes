@@ -10,7 +10,7 @@ import {
   } from '@ant-design/icons';
 import router from 'umi/router';
 import api from '@/pages/project/api/projectManageDetail'
-import DrawerTool  from '../AntdUI';
+import TaskList  from '../TaskList';
 import { EditInforModel }  from '../ModelUI';
 // import { formatter } from '@/utils/utils';
 
@@ -39,8 +39,11 @@ class ProcessList extends Component {
 
   // 组件挂载时
   componentDidMount() {
+    // if (this.props.location.state.projectId === undefined) {
+    //   router.push('/project/project-manage');
+    //   return;
+    // }
     const { projectId } = this.props;
-    console.log(projectId);
     this.getTableData(projectId);
   }
 
@@ -54,38 +57,6 @@ class ProcessList extends Component {
       });
     });
   };
-
-  // 编辑名称描述模态框
-  editBasicInfor = row => {
-    console.log(row);
-    this.setState({
-      visibleModel: true,
-      processList: row,
-    })
-  }
-
-  // 关闭编辑模态框
-  onCloseModel = () => {
-    this.setState({
-      visibleModel: false,
-    });
-    this.setState();
-  };
-
-  // 获取回传数据进行保存
-  getEditModelData = data => {
-    const { projectId } = this.props;
-    try {
-      api.saveProcessInfor(data).then(() => {
-        this.setState({
-          visibleModel: false,
-        });
-        this.getTableData(projectId);
-      })
-    } catch (errorInfo) {
-      console.log(errorInfo);
-    }
-  }
 
   // 查看任务列表及执行记录
   searchTaskList = row => {
@@ -101,17 +72,10 @@ class ProcessList extends Component {
 
    // 查看流程参数
   searchProcessParam = row => {
-    api.getProcessParam(row.id).then(res => {
+    api.getProcessParam(row.processModelId).then(res => {
       router.push('/project/project-manage/process-parameter', { res });
     })
   }
-
-  // 关闭任务列表抽屉
-  onClose = () => {
-    this.setState({
-      visibleDrawer: false,
-    });
-  };
 
   // 流程进度开始
   processStart = row => {
@@ -133,7 +97,50 @@ class ProcessList extends Component {
     })
   }
 
+  // 删除
+  handleDelete = row => {
+    console.log(row);
+    api.deleteProjectProcess(row.id).then(() => {
+      this.getTableData(this.props.projectId);
+    });
+  }
 
+  // 编辑名称描述模态框
+  editBasicInfor = row => {
+    this.setState({
+      visibleModel: true,
+      processList: row,
+    })
+  }
+
+  // 获取回传数据进行保存
+  getEditModelData = data => {
+    const { projectId } = this.props;
+    try {
+      api.saveProcessInfor(data).then(() => {
+        this.setState({
+          visibleModel: false,
+        });
+        this.getTableData(projectId);
+      })
+    } catch (errorInfo) {
+      console.log(errorInfo);
+    }
+  }
+
+  // 关闭编辑模态框
+  onCloseModel = () => {
+    this.setState({
+      visibleModel: false,
+    });
+  };
+
+  // 关闭任务列表抽屉
+  onCloseTask = () => {
+    this.setState({
+      visibleDrawer: false,
+    });
+  };
 
   render() {
     const {
@@ -148,7 +155,6 @@ class ProcessList extends Component {
     } = this.state;
 
     let tableWidth = 0;
-    console.log(loading);
 
     let columns = [
       {
@@ -177,14 +183,16 @@ class ProcessList extends Component {
       {
         title: '版本',
         dataIndex: 'processModeVersion',
-        width: 100,
+        width: 80,
         render: value => <Tag color="green">{value}</Tag>
       },
       {
         title: '进度',
         dataIndex: 'processProgress',
-        width: 200,
+        width: 150,
         render: (value, row) => {
+          // console.log(value); // TODO:
+          if (value === undefined) return '';
           const val = value.toFixed(2) * 100;
           if (row.status === 1) {
             return (
@@ -224,18 +232,22 @@ class ProcessList extends Component {
       {
         title: '流程模型',
         dataIndex: 'processModelName',
-        width: 250,
+        width: 200,
         render: (value, row) => (
           <div style={{display:"flex"}}>
-            {/* <img
-              src={row.processModelPicture}
+            <img
+              // src={row.processModelPicture}
+              src='/favicon.png'
               alt="Sangon"
               height='50'
               width="50"
               style={{borderRadius: '100%' }}
-            /> */}
+            />
             <div style={{ marginLeft: 10, marginTop: 4}}>
-              <p>{value} <br/> {row.processModelCode} </p>
+              <p>
+                {value} <br/> {row.processModelCode}
+                <Tag color="green">{row.processModeVersion}</Tag>
+              </p>
             </div>
 
           </div>
@@ -244,7 +256,7 @@ class ProcessList extends Component {
       {
         title: '参数',
         dataIndex: 'type',
-        width: 100,
+        width: 80,
         render: (value, row) => (
           <SlidersOutlined
             onClick={() => this.searchProcessParam(row)}
@@ -254,18 +266,18 @@ class ProcessList extends Component {
       },
       {
         title: '操作',
-        width: 150,
+        width: 120,
         render: (value, row) => {
           if(row.interactionAnalysis === 1) {
             return (
               <>
-                <a onClick={() => console.log(111)}>删除</a>
+                <a onClick={() => this.handleDelete(row)}>删除</a>
                 <Divider type="vertical" />
-                <a onClick={() => console.log(333)}>交互分析</a>
+                <a onClick={() => console.log('交互分析')}>交互分析</a>
               </>
             )
           }
-          return <a onClick={() => console.log(111)}>删除</a>
+          return <a onClick={() => this.handleDelete(row)}>删除</a>
         }
       },
     ];
@@ -295,9 +307,9 @@ class ProcessList extends Component {
               })}
           />
         </Form>
-        <DrawerTool
+        <TaskList
           visible={visibleDrawer}
-          onClose={this.onClose}
+          onClose={this.onCloseTask}
           detailList={detailList}
           taskList={taskList}
         />
