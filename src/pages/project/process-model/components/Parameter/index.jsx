@@ -90,7 +90,6 @@ class Parameter extends React.Component {
    * @param {Int} index 元素移动的分类项键
    */
   dragStart = (item, type, index = null) => {
-    console.log(321);
     if (type === 1) {
       this.setState({
         moveType: type,
@@ -107,7 +106,6 @@ class Parameter extends React.Component {
    * @param {Int} index 元素移动的分类项键
    */
   dragStartType = (item, type, index = null) => {
-    console.log(123);
     this.setState({
       moveType: type,
       moveElement: item,
@@ -130,21 +128,51 @@ class Parameter extends React.Component {
   drop = (value, type, index) => {
     const { data, moveType, moveElement, moveIndex } = this.state;
     const newData = data;
+    // console.log(data);
     // 拖动的是元素放入分类，或者元素排序变更
     if (moveType === 1) {
+      // 拖到具体分类
       if (type === 2) {
-        // 添加到新对象里
-        newData.map((item, i) => {
-          if (item.groupName === value.groupName) {
-            newData[i].params.push(moveElement);
-          }
-        });
-        // 把移动过的对象删除
-        newData[moveIndex].params = newData[moveIndex].params.filter(item => item !== moveElement);
-        this.setState({
-          data: newData,
-        });
+        if (value.params.filter(item => item.id === moveElement.id).length === 0) {
+          // 添加到新对象里
+          newData.map((item, i) => {
+            if (item.groupName === value.groupName) {
+              newData[i].params.push(moveElement);
+            }
+          });
+          // 把移动过的对象删除
+          newData[moveIndex].params = newData[moveIndex].params.filter(
+            item => item !== moveElement,
+          );
+        }
       }
+
+      // 数据排序
+      if (type === 1) {
+        let move = 0;
+        let old = 0;
+        let typeIndex = 0;
+        data.forEach((item, ind) => {
+          item.params.forEach((i, sindex) => {
+            if (i === moveElement) {
+              move = sindex;
+              typeIndex = ind;
+            }
+
+            if (i === value) {
+              old = sindex;
+            }
+          });
+        });
+        if (typeof move === 'number' && typeof old === 'number' && typeof typeIndex === 'number') {
+          newData[typeIndex].params.splice(move, 1, value);
+          newData[typeIndex].params.splice(old, 1, moveElement);
+        }
+      }
+
+      this.setState({
+        data: newData,
+      });
     }
     if (moveType === 2) {
       newData[moveIndex] = value;
@@ -157,11 +185,9 @@ class Parameter extends React.Component {
 
   render() {
     const { visible, typeEnlargeVisible, typeEnlargeData, addGroupVisible, data } = this.state;
-    // const { onDragStart, cancelSelect } = this;
     if (!data.filter(item => item.groupName === 'no')[0]) {
       return false;
     }
-    // console.log(data);
     return (
       <Modal
         title="参数"
@@ -306,13 +332,17 @@ class Parameter extends React.Component {
             dataSource={data.filter(item => item.groupName === 'no')[0].params}
             renderItem={item => (
               <List.Item key={item.paramId}>
-                <Card hoverable>
-                  <div>
-                    <div draggable onDragStart={() => this.dragStart(item, 1, 0)}>
-                      {item.paramName}
+                {item.paramId ? (
+                  <Card hoverable>
+                    <div>
+                      <div draggable onDragStart={() => this.dragStart(item, 1, 0)}>
+                        {item.paramName}
+                      </div>
                     </div>
-                  </div>
-                </Card>
+                  </Card>
+                ) : (
+                  ''
+                )}
               </List.Item>
             )}
             className="list-style card-item-style"

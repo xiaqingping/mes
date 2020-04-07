@@ -2,7 +2,9 @@ import React from 'react';
 import { Form, Input, Button, Modal } from 'antd';
 
 const AddGroup = props => {
+  const [form] = Form.useForm();
   const onFinish = values => {
+    form.resetFields();
     if (!values.groupName || !values.groupDesc || values.groupName === 'no') {
       return false;
     }
@@ -26,6 +28,7 @@ const AddGroup = props => {
           wrapperCol: { span: 14 },
         }}
         onFinish={onFinish}
+        form={form}
       >
         <Form.Item label="分组名称" name="groupName">
           <Input placeholder="请输入分组名称" />

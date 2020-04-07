@@ -20,7 +20,7 @@ class AssociatedProcessModel extends React.Component {
 
   initialValues = {
     page: 1,
-    rows: 10,
+    rows: 5,
   };
 
   constructor(props) {
@@ -73,17 +73,19 @@ class AssociatedProcessModel extends React.Component {
         })
         .then(v => {
           const newList = res.rows.map(e => {
-            const filterItem = v.filter(item => item.sourceCode === e.picture);
+            const filterItem = v ? v.filter(item => item.sourceCode === e.picture) : [];
             const fileId = filterItem[0] && filterItem[0].id;
             return {
               ...e,
               fileId,
             };
           });
+          console.log(newList);
           this.setState({
             list: newList,
           });
         });
+
       this.setState({
         pagination: {
           current: data.page,
@@ -155,6 +157,13 @@ class AssociatedProcessModel extends React.Component {
     const res = await api.getAllPreTasks(id, this.props.ids);
     this.props.getData(res);
     this.props.onClose();
+  };
+
+  handleStandardTableChange = pagination => {
+    this.getTableData({
+      page: pagination.current,
+      rows: pagination.pageSize,
+    });
   };
 
   render() {
@@ -236,6 +245,7 @@ class AssociatedProcessModel extends React.Component {
             rowKey="id"
             size="small"
             pagination={pagination}
+            onChange={this.handleStandardTableChange}
           />
         </div>
       </Modal>

@@ -87,8 +87,19 @@ class ProcessEdit extends Component {
     if (this.props.match.params.id) {
       data = this.props.match.params.id.split('-');
       api.getProcessDetail(data[0]).then(res => {
+        let itemIndex = 0;
+        res.groups.map((item, index) => {
+          if (item.groupName === 'no') {
+            itemIndex = index;
+          }
+        });
+        if (itemIndex) {
+          const itemData = res.groups.splice(itemIndex, 1);
+          res.groups.unshift(itemData[0]);
+        }
         this.getData(res.taskModels);
         this.setState({
+          paramter: res.groups,
           taskList: res.taskModels,
           picture: res.picture,
           loading: true,
@@ -117,6 +128,17 @@ class ProcessEdit extends Component {
           });
         }
       });
+    } else {
+      this.setState({
+        paramter: [
+          {
+            sortNo: '',
+            groupName: 'no',
+            groupDesc: '',
+            params: [],
+          },
+        ],
+      });
     }
   }
 
@@ -140,12 +162,10 @@ class ProcessEdit extends Component {
   };
 
   // 导航列表title样式
-  navContent = () => {
+  navContent = processData => {
     const { pageModel } = this.state;
-    const { processDetail } = this.props;
-
     if (pageModel) {
-      return <div>{`${processDetail.name} ${processDetail.id}`}</div>;
+      return <div>{`${processData.name} ${processData.id}`}</div>;
     }
     return '';
   };
@@ -170,8 +190,8 @@ class ProcessEdit extends Component {
       picture,
       paramter,
     } = this.state;
-    const { processAddData } = this.props;
-    const data = processAddData;
+    // const { processAddData } = this.props;
+    const data = {};
     const taskModelIds = [];
     taskList.forEach(item => {
       taskModelIds.push({ taskModelId: item.id, automatic: item.automatic });
@@ -187,26 +207,20 @@ class ProcessEdit extends Component {
     data.picture = picture;
     data.groups = paramter;
     delete data.taskModelIds;
-    // this.props.dispatch({
-    //   type: 'processModel/setProcessAddData',
-    //   payload: {
-    //     ...data,
-    //   },
-    // });
 
     if (pageModel === 1) {
       data.id = id;
-      api.changeProcess(processAddData).then(() => {
+      api.changeProcess(data).then(() => {
         router.push('/project/process-model');
       });
     }
     if (pageModel === 2) {
-      api.upgradeProcess(id, processAddData).then(() => {
+      api.upgradeProcess(id, data).then(() => {
         router.push('/project/process-model');
       });
     }
     if (!pageModel) {
-      api.addProcess(processAddData).then(() => {
+      api.addProcess(data).then(() => {
         router.push('/project/process-model');
       });
     }
@@ -216,6 +230,7 @@ class ProcessEdit extends Component {
   onOpen = () => {
     this.setState({
       visible: true,
+      parameterVisible: false,
     });
   };
 
@@ -247,7 +262,6 @@ class ProcessEdit extends Component {
       });
     });
     sonData[0].sortNo = 0;
-    console.log(sonData);
     this.setState({
       parameterVisible: false,
       paramter: sonData,
@@ -255,8 +269,9 @@ class ProcessEdit extends Component {
   };
 
   // 删除任务
-  confirm = value => {
-    const { taskList, ids, sonIds } = this.state;
+  handleDelete = value => {
+    const { taskList, ids, sonIds, paramter } = this.state;
+    console.log(value, paramter);
     const data = taskList;
     // const { ids, sonIds } = this.props;
     const idsData = ids;
@@ -274,48 +289,49 @@ class ProcessEdit extends Component {
         newSonIdsData = sonIdsData.filter(item => item !== i);
       });
     }
+    // 删除参数分类里的数据
+    // let paramterData = paramter;
+    const paramterData = paramter.map(item => {
+      const params = item.params.filter(i => i.taskModelId !== value.id);
+      return { ...item, params };
+    });
     this.setState({
       taskList: newData,
       ids: newIdsData,
       sonIds: newSonIdsData,
+      paramter: paramterData,
     });
   };
 
   // 获取子级数据
   getData = value => {
-    const { taskList, ids, sonIds } = this.state;
-    const { processAddData } = this.props;
-    const oldModelProcess = processAddData;
-    // console.log(oldModelProcess);
+    const { taskList, ids, sonIds, paramter } = this.state;
+    // const { processAddData } = this.props;
+    const oldModelProcess = paramter;
     let data = taskList;
     const idsData = ids;
     const sonIdsData = sonIds;
     data = [...taskList, ...value];
     value.forEach(item => {
-      item.params.forEach(i => {
-        oldModelProcess.groups[0].params.push({
-          paramId: i.paramId,
-          paramName: i.paramName,
-          taskModelId: i.taskModelId,
+      if (item.params && item.params.length !== 0) {
+        item.params.forEach(i => {
+          oldModelProcess[0].params.push({
+            paramId: i.paramId,
+            paramName: i.paramName,
+            taskModelId: i.taskModelId,
+          });
         });
-      });
+      }
     });
     value.forEach(item => {
       idsData.push(item.id);
       sonIdsData.push(...item.preTaskIds);
     });
-    this.props.dispatch({
-      type: 'processModel/setProcessDetail',
-      payload: {
-        oldModelProcess,
-      },
-    });
-
     this.setState({
       taskList: data,
       ids: idsData,
       sonIds: sonIdsData,
-      paramter: oldModelProcess.groups,
+      paramter: oldModelProcess,
     });
   };
 
@@ -356,11 +372,10 @@ class ProcessEdit extends Component {
       paramter,
       processData,
     } = this.state;
+    // console.log(paramter, parameterVisible);
     const {
-      processDetail,
       project: { status },
     } = this.props;
-
     if (pageModel !== 0 && processData.length === 0) {
       return false;
     }
@@ -399,7 +414,7 @@ class ProcessEdit extends Component {
                 <Popconfirm
                   placement="topLeft"
                   title="确定要删除吗？"
-                  onConfirm={() => this.confirm(row)}
+                  onConfirm={() => this.handleDelete(row)}
                   okText="Yes"
                   cancelText="No"
                 >
@@ -427,9 +442,8 @@ class ProcessEdit extends Component {
       }
       return '';
     };
-
     return (
-      <PageHeaderWrapper title={this.navContent()}>
+      <PageHeaderWrapper title={this.navContent(processData)}>
         <Form onFinish={this.onFinish} initialValues={initialValues()}>
           <Card className="process-model-edit">
             <div style={{ float: 'left', marginLeft: '20px' }}>
@@ -477,7 +491,7 @@ class ProcessEdit extends Component {
                     });
                   }}
                 >
-                  {pageModel ? selectVersion || processDetail.version : 'V1.0'}
+                  {pageModel ? selectVersion || processData.version : 'V1.0'}
                   {/* {selectVersion || processDetail.version} */}
                 </Tag>
                 {versionOpen && pageModel === 2 ? (
@@ -586,7 +600,7 @@ export default connect(({ global, user, project, processModel }) => ({
   languageCode: global.languageCode,
   authorization: user.currentUser.authorization,
   project,
-  processAddData: processModel.processAddData,
+  // processAddData: processModel.processAddData,
   processDetail: processModel.processDetail,
   // ids: processModel.ids,
   // sonIds: processModel.sonIds,
