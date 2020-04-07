@@ -49,7 +49,7 @@ class ProcessModel extends Component {
       nameCodeVal: [],
       nameCodeValPublish: [],
       filtersData: null,
-      processList: [],
+      // processList: [],
     };
     // 异步验证做节流处理
     this.callParter = _.debounce(this.callParter, 500);
@@ -145,7 +145,7 @@ class ProcessModel extends Component {
     value: item.code,
     label: (
       // <Option key={item.id} text={item.name}>
-      <div style={{ display: 'flex' }}>
+      <div style={{ display: 'flex', marginLeft: '14px', padding: '6px 0' }}>
         <span>{item.code}</span>&nbsp;&nbsp;
         <span>{item.name}</span>
       </div>
@@ -249,6 +249,7 @@ class ProcessModel extends Component {
         <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
           <FormItem label="流程模型" name="code">
             <AutoComplete
+              style={{ width: '260px' }}
               onSearch={this.inputValue}
               options={nameCodeVal.map(this.renderOption)}
               // placeholder={formatMessage({ id: 'bp.inputHere' })}
@@ -258,7 +259,7 @@ class ProcessModel extends Component {
         </Col>
         <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
           <FormItem label="状态" name="status">
-            <Select mode="multiple" maxTagCount={2} maxTagTextLength={3}>
+            <Select mode="multiple" maxTagCount={2} maxTagTextLength={3} style={{ width: '260px' }}>
               {status.map(item => (
                 <Option key={item.value} value={item.value}>
                   {item.text}
@@ -270,6 +271,7 @@ class ProcessModel extends Component {
         <Col xxl={6} lg={languageCode === 'EN' ? 12 : 0}>
           <FormItem label="发布人" name="publisherCode">
             <AutoComplete
+              style={{ width: '260px' }}
               onSearch={this.inputValuePublish}
               options={nameCodeVal.map(this.renderOptionPublish)}
               // placeholder={formatMessage({ id: 'bp.inputHere' })}
@@ -376,16 +378,16 @@ class ProcessModel extends Component {
       {
         title: '编号/名称',
         dataIndex: 'code',
+        width: 250,
         render: (value, row) => (
           <>
             <Avatar
               src={row.fileId ? disk.downloadFiles(row.fileId, { view: true }) : ''}
-              style={{ float: 'left' }}
-              size="large"
+              style={{ float: 'left', width: '46px', height: '46px' }}
             />
             <div style={{ float: 'left', marginLeft: '10px' }}>
               <div>{value}</div>
-              <div>{row.name}</div>
+              <div style={{ color: '#B9B9B9' }}>{row.name}</div>
             </div>
           </>
         ),
@@ -393,10 +395,12 @@ class ProcessModel extends Component {
       {
         title: '描述',
         dataIndex: 'describe',
+        width: 400,
       },
       {
         title: '发布人/时间',
         dataIndex: 'publisherName',
+        width: 200,
         render: (value, row) => (
           <>
             <div>{value}</div>
@@ -407,6 +411,7 @@ class ProcessModel extends Component {
       {
         title: '版本',
         dataIndex: 'version',
+        width: 140,
         render: value => (
           <Tag color="green" style={{ padding: '0 10px' }}>
             {value}
@@ -416,6 +421,7 @@ class ProcessModel extends Component {
       {
         title: '状态',
         dataIndex: 'status',
+        width: 150,
         filters: status,
         render: value => (
           <Badge
@@ -498,7 +504,6 @@ class ProcessModel extends Component {
               <Dropdown overlay={menu} trigger={['click']}>
                 <a className="ant-dropdown-link" onClick={e => e.preventDefault()}>
                   更多
-                  <DownOutlined />
                 </a>
               </Dropdown>
 
@@ -547,8 +552,8 @@ class ProcessModel extends Component {
 
     return (
       <PageHeaderWrapper>
-        <Card bordered={false}>
-          <div className="tableList">
+        <div className="tableList">
+          <Card bordered={false}>
             <TableSearchForm
               ref={this.tableSearchFormRef}
               initialValues={this.initialValues}
@@ -556,13 +561,19 @@ class ProcessModel extends Component {
               simpleForm={this.simpleForm}
               advancedForm={this.advancedForm}
             />
+          </Card>
+          <Card style={{ marginTop: '24px' }}>
             <div className="tableListOperator">
-              <Button type="primary" onClick={() => this.handleModalVisible()}>
+              <Button
+                type="primary"
+                onClick={() => this.handleModalVisible()}
+                style={{ marginLeft: '8px' }}
+              >
                 <PlusOutlined />
                 新建
               </Button>
             </div>
-            <Form ref={this.tableFormRef}>
+            <Form ref={this.tableFormRef} className="table-style-set">
               <StandardTable
                 scroll={{ x: tableWidth }}
                 rowClassName="editable-row"
@@ -572,24 +583,18 @@ class ProcessModel extends Component {
                 columns={columns}
                 onSelectRow={this.handleSelectRows}
                 onChange={this.handleStandardTableChange}
-                // pagination={{ ...pagination }}
-                // expandable={{
-                //   // 用方法创建子table
-                //   expandedRowRender: value => expandedRowRender(value.list, sonTablecolumns),
-                //   rowExpandable: record => !!record.list,
-                // }}
               />
             </Form>
-            <DrawerTool
-              visible={visible}
-              // visible
-              onClose={this.onClose}
-              detailValue={detailValue}
-              status={status}
-              handleChangeVersion={v => this.handleChangeVersion(v)}
-            />
-          </div>
-        </Card>
+          </Card>
+          <DrawerTool
+            visible={visible}
+            // visible
+            onClose={this.onClose}
+            detailValue={detailValue}
+            status={status}
+            handleChangeVersion={v => this.handleChangeVersion(v)}
+          />
+        </div>
       </PageHeaderWrapper>
     );
   }
