@@ -16,7 +16,7 @@ export default {
   },
   // 获取任务列表
   getTaskModels(params) {
-    return request(`${http}/v1/task/task`, {
+    return request(`${http}/v1/task`, {
       params,
     });
   },
@@ -53,7 +53,7 @@ export default {
   createTaskModel(data) {
     return request(`${http}/v1/task`, {
       method: 'POST',
-      data
+      data,
     });
   },
 
@@ -97,7 +97,5 @@ export default {
   // 根据code和版本查询详细信息
   getdetailByCodeVer(code, version) {
     return request(`${http}/v1/task/${code}/${version}`);
-  }
-
-
+  },
 };
