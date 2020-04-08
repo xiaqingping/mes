@@ -1,41 +1,90 @@
 import React, { Component } from 'react';
-
-import { Drawer, Button, Popconfirm, Dropdown, Menu, Spin } from 'antd';
-
+import { Drawer, Button, Popconfirm, Dropdown, Menu, Spin, Empty } from 'antd';
+import api from '@/pages/project/api/taskmodel';
 import { connect } from 'dva';
 import ArgumentForm from './argumentForm';
+import '../index.less';
 
 class ArgumentModel extends Component {
   state = {
     loading: false,
     childrenDrawer: false,
     argumentList: [],
-    isAdd: window.location.href.indexOf('add'),
+    isAdd: window.location.href.indexOf('add') > 0,
     paramName: '', // 控制下一个抽屉的标题显示
     editOriginData: {}, // 修改参数时传给二级抽屉的原始参数对象,
+    type: '', // 组件类型 ,比如: input
   };
 
   componentDidMount() {
+    // alert(1);
     // 获取列表
-    const isAdd = window.location.href.indexOf('add');
-    if (isAdd) {
-      // 如果是新增
+    const isAdd = window.location.href.indexOf('add') > 0;
+    const { argumentList } = this.props.taskModel;
+    console.log(argumentList);
+    debugger;
+    if (argumentList && argumentList.length > 0) {
+      this.setState({
+        argumentList,
+      });
+    } else if ((argumentList || []).length === 0 && isAdd) {
       this.setState({
         argumentList: [],
       });
       const { dispatch } = this.props;
       dispatch({
         type: 'taskModel/getArgumentsList',
-        payload: this.state.argumentList,
+        payload: [],
       });
     } else {
       this.getArgumentList();
     }
+
+    // if (isAdd) {
+    //   // 如果是新增
+    //   if (argumentList && !argumentList.length) {
+    //     this.setState({
+    //       argumentList,
+    //     });
+    //   } else {
+    //     this.setState({
+    //       argumentList: [],
+    //     });
+    //     const { dispatch } = this.props;
+    //     dispatch({
+    //       type: 'taskModel/getArgumentsList',
+    //       payload: this.state.argumentList,
+    //     });
+    //   }
+    // } else {
+    //   this.getArgumentList();
+    // }
   }
 
   getArgumentList = () => {
+    const { selectParamsId, editTaskModelId } = this.props.taskModel;
+    const { fromView } = this.props;
+    const { isAdd } = this.state;
     this.setState({
       loading: true,
+    });
+    console.log(selectParamsId);
+    let id = isAdd ? selectParamsId : editTaskModelId;
+    if (fromView) {
+      id = selectParamsId;
+    }
+    console.log(id);
+    // debugger;
+    api.getTaskModelDetail(id).then(res => {
+      console.log(res);
+      const list = res.params.map(item => {
+        item.myId = Date.now();
+        return item;
+      });
+      this.setState({
+        argumentList: list,
+        loading: false,
+      });
     });
   };
 
@@ -43,7 +92,7 @@ class ArgumentModel extends Component {
     const { argumentList } = this.state;
     const list = [...argumentList];
     let idx = null;
-    list.some((item, index) => {
+    const isEdit = list.some((item, index) => {
       if (item.myId === props.myId) {
         idx = index;
       } else {
@@ -51,7 +100,7 @@ class ArgumentModel extends Component {
       }
       return item.myId === props.myId;
     });
-    if (idx || idx === 0) {
+    if (isEdit) {
       list[idx] = props;
     } else {
       list.push(props);
@@ -73,6 +122,7 @@ class ArgumentModel extends Component {
     if (item) {
       this.setState({
         title: item.text,
+        type: item.type,
         editOriginData: {},
       });
     }
@@ -104,10 +154,27 @@ class ArgumentModel extends Component {
   };
 
   toViewArgumrnt = (item, idx) => {
+    console.log(item);
+    const { formItemType } = this.props.taskModel;
+    console.log(this.props.taskModel);
+    let title = null;
+    formItemType.some(v => {
+      if (v.type == item.type) {
+        title = v.text;
+      }
+    });
+
+    this.setState({
+      type: item.type,
+      title,
+    });
+    const { fromView } = this.props;
+    const { argumentList } = this.state;
     this.setState({
       paramName: item.paramName,
     });
     this.toggleChildrenDrawer(true);
+    // 当关闭时候需要展示的列表
     if (idx || idx === 0) {
       this.setState({
         editOriginData: item,
@@ -117,16 +184,33 @@ class ArgumentModel extends Component {
         editOriginData: {},
       });
     }
+
+    // -------------------当打开某一个参数的时候获取它的详细信息--------------------
+
+    if (fromView) {
+      argumentList.some(v => {
+        if (v.paramId === item.paramId) {
+          console.log(item);
+
+          this.setState({
+            editOriginData: v,
+            type: v.type,
+          });
+          return true;
+        }
+        return v;
+      });
+    }
   };
 
   deleteArgumentItem = () => {};
 
   render() {
     const { visible, onClose, fromView } = this.props;
-    const { childrenDrawer, argumentList, loading, editOriginData } = this.state;
+    const { childrenDrawer, argumentList, loading, editOriginData, type } = this.state;
     const { formItemType } = this.props.taskModel;
     const menu = (
-      <Menu style={{ height: 200, overflow: 'auto' }}>
+      <Menu style={{ maxHeight: 200, overflow: 'auto' }}>
         {formItemType.map(item => {
           return (
             <Menu.Item key={item.type}>
@@ -160,36 +244,46 @@ class ArgumentModel extends Component {
             </div>
           ) : (
             <>
+              {argumentList.length === 0 && <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />}
               {argumentList.map((item, index) => {
                 return (
-                  <div style={{ overflow: 'hidden' }} key={item.paramKey}>
+                  <div className="task_model_argumrnt_list" key={item.paramKey}>
                     <span
-                      style={{ fontSize: '14px', fontWeight: 600, cursor: 'point' }}
+                      className="task_model_argu_label"
                       onClick={() => this.toViewArgumrnt(item, index)}
                     >
                       {item.paramKey}
                     </span>
-                    <span style={{ marginLeft: 40 }}>{item.paramName}</span>
-                    <Popconfirm
-                      placement={index === 0 ? 'bottom' : 'top'}
-                      title="确定要删除吗?"
-                      onConfirm={() => this.handleDelete(item, index)}
-                      okText="确认"
-                      cancelText="取消"
+                    <span
+                      className="task_model_argu_content"
+                      // style={{ display: 'inline-block', width: '200px' }}
                     >
-                      <Button type="link" style={{ float: 'right', marginLeft: 40 }}>
-                        删除
-                      </Button>
-                    </Popconfirm>
+                      {item.paramName}
+                    </span>
+                    {!fromView && (
+                      <Popconfirm
+                        placement={index === 0 ? 'bottom' : 'top'}
+                        title="确定要删除吗?"
+                        onConfirm={() => this.handleDelete(item, index)}
+                        okText="确认"
+                        cancelText="取消"
+                      >
+                        <Button type="link" style={{ float: 'right', marginLeft: 40 }}>
+                          删除
+                        </Button>
+                      </Popconfirm>
+                    )}
                   </div>
                 );
               })}
 
-              <Dropdown overlay={menu} trigger={['click']}>
-                <Button type="dashed" block style={{ marginTop: 30 }}>
-                  新增
-                </Button>
-              </Dropdown>
+              {!fromView && (
+                <Dropdown overlay={menu} trigger={['click']}>
+                  <Button type="dashed" block style={{ marginTop: 30 }}>
+                    新增
+                  </Button>
+                </Dropdown>
+              )}
             </>
           )}
           <Drawer
@@ -201,7 +295,8 @@ class ArgumentModel extends Component {
             title={this.titleContent()}
           >
             <ArgumentForm
-              fromView
+              fromView={fromView}
+              type={type}
               editOriginData={editOriginData}
               emitArguments={this.emitArguments}
               onClose={() => {

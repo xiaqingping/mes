@@ -1,10 +1,25 @@
 // 任务模型
 import React, { Component } from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
-import { Form, Button, Card, Col, Tag, Select, Divider, Badge, Menu, Dropdown } from 'antd';
-import { DownOutlined, PlusOutlined } from '@ant-design/icons';
+import {
+  Form,
+  Button,
+  Card,
+  Col,
+  Tag,
+  Select,
+  Divider,
+  Badge,
+  Menu,
+  Dropdown,
+  AutoComplete,
+  Spin,
+  message,
+  Modal,
+} from 'antd';
+import { DownOutlined, PlusOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import TableSearchForm from '@/components/TableSearchForm';
-
+import { DateUI } from '@/pages/project/components/AntdSearchUI';
 import { connect } from 'dva';
 import debounce from 'lodash/debounce';
 import router from 'umi/router';
@@ -12,7 +27,6 @@ import { formatter, getOperates } from '@/utils/utils';
 import api from '@/pages/project/api/taskmodel';
 import TaskModelView from './taskModelView';
 import StandardTable from '../components/StandardTable';
-import { SelectUI } from '../components/AntdSearchUI';
 
 const FormItem = Form.Item;
 const { Option } = Select;
@@ -25,24 +39,15 @@ class TaskModel extends Component {
     rows: 10,
   };
 
-  // constructor(props) {
-  //   super(props);
-
-  // }
-
   state = {
-    name: '', // 搜素-任务模型值
-    // 搜素-状态值
-    publisherName: '', // 搜素-发布人值
-    // 任务模型列表
-    taskModelOptions: [],
-    // 发布人列表
-    taskModelPublisherOptions: [],
     loading: false,
     list: [],
     pagination: {},
     visible: false, // 点击查看抽屉是否显示
     viewId: '',
+    nameCodeVal: [],
+    nameCodeValPublish: [],
+    filtersData: null,
   };
 
   operaList = [];
@@ -52,54 +57,92 @@ class TaskModel extends Component {
   }
 
   getTableData = (options = {}) => {
+    const { pagination } = this.state;
     this.setState({ loading: true });
-    api.getTaskModels().then(res => {
-      console.log(res);
+    const formData = this.tableSearchFormRef.current
+      ? this.tableSearchFormRef.current.getFieldsValue()
+      : '';
+    const { current: page, pageSize: rows } = pagination;
+    let newData = [];
+    console.log(formData);
+    if (formData.status) {
+      newData = { ...newData, status: formData.status.join(',') };
+      delete formData.status;
+    }
+
+    if (formData.publishDate) {
+      newData = {
+        ...newData,
+        publishBeginDate: formData.publishDate[0].format('YYYY-MM-DD'),
+        publicEndDate: formData.publishDate[1].format('YYYY-MM-DD'),
+      };
+      delete formData.publishDate;
+    }
+    const data = {
+      page,
+      rows,
+      ...newData,
+      ...formData,
+      ...options,
+    };
+    console.log(data);
+    api.getTaskModels(data).then(res => {
       this.setState({
         list: res.rows,
+        pagination: {
+          current: data.page,
+          pageSize: data.rows,
+          total: res.total,
+        },
         loading: false,
       });
     });
-    // const formData = this.tableSearchFormRef.current.getFieldsValue();
-    // console.log(formData);
-    // const data = this.props.taskModel.taskModelList;
-    // this.setState({
-    //   list: data,
-    //   pagination: {
-    //     current: options.page,
-    //     pageSize: options.rows,
-    //     total: data.total,
-    //   },
-    //   loading: false,
-    // });
   };
 
-  handleStandardTableChange = pagination => {
-    this.getTableData({
-      page: pagination.current,
-      rows: pagination.pageSize,
-    });
-  };
-
-  // 任务模型当键盘敲下时候的值 在这里请求后台接口查询
-  fetchSearchList = (v, type) => {
-    // 根据不同的条目请求不同接口
-    const taskModelSearchObj = {
-      taskModel: 'searchTaskModel',
-      publisher: 'searchPublisherName',
-    };
-    api[taskModelSearchObj[type]](v).then(res => {
-      if (type === 'taskModel') {
-        this.setState({
-          taskModelOptions: res || [],
-        });
-      } else if (type === 'publisher') {
-        this.setState({
-          taskModelPublisherOptions: res || [],
-        });
+  // 筛选状态
+  handleStandardTableChange = (pagination, filters) => {
+    const { filtersData } = this.state;
+    let filterData = {};
+    const page = pagination;
+    if (filters) {
+      if (filters.status && filters.status[0]) {
+        filterData.status = filters.status.join(',');
       }
+      this.setState({
+        filtersData: filterData,
+      });
+      page.current = 1;
+      page.pageSize = 10;
+    } else if (filtersData) {
+      filterData = filtersData;
+    }
+
+    this.getTableData({
+      page: page.current,
+      rows: page.pageSize,
+      ...filterData,
     });
   };
+
+  // ------------------------------------------------------------------------
+  callParter = value => {
+    console.log(value);
+
+    api.searchTaskModel(value).then(res => {
+      this.setState({ nameCodeVal: res });
+    });
+  };
+
+  callPublish = value => {
+    api.searchPublisherName(value).then(res => {
+      this.setState({ nameCodeVal: res });
+    });
+  };
+
+  callParter = debounce(this.callParter, 500);
+
+  callPublish = debounce(this.callPublish, 500);
+  // -------------------------------------------------------------------------
 
   handleItemSearch = (v, type) => {
     console.log(v, type);
@@ -118,68 +161,132 @@ class TaskModel extends Component {
     // api.taskmodel.searchTaskModel();
   };
 
-  simpleForm = () => {
-    const { languageCode } = this.props;
-    // 获取options TODO 看后台返回数据结果taskModelOptions
-    const taskModelOptions = this.state.taskModelOptions.map(item => (
-      <Option value={item.code} key={item.code}>
-        {item.name}
-      </Option>
-    ));
+  // 筛选值
+  inputValue = value => {
+    const { nameCodeVal } = this.state;
+    const arr = [];
+    if (!value) {
+      return false;
+    }
+    this.callParter(value);
+    if (nameCodeVal.length === 0) {
+      return false;
+    }
+    nameCodeVal.forEach(item => {
+      if (item.name.indexOf(value) !== -1) {
+        arr.push(item);
+      }
+      if (item.code.indexOf(value) !== -1 && arr.indexOf(item)) {
+        arr.push(item);
+      }
+    });
+    this.setState({
+      nameCodeVal: arr,
+      // allowClear: 'ture',
+    });
+    return true;
+  };
 
-    const taskModelPublisherOptions = this.state.taskModelPublisherOptions.map(item => (
-      <Option value={item.code} key={item.code}>
-        {item.name}
-      </Option>
-    ));
+  // 筛选值
+  inputValuePublish = value => {
+    const { nameCodeValPublish } = this.state;
+    const arr = [];
+    if (!value) {
+      return false;
+    }
+    this.callPublish(value);
+    if (nameCodeValPublish.length === 0) {
+      return false;
+    }
+    nameCodeValPublish.forEach(item => {
+      if (item.name.indexOf(value) !== -1) {
+        arr.push(item);
+      }
+      if (item.code.indexOf(value) !== -1 && arr.indexOf(item)) {
+        arr.push(item);
+      }
+    });
+    this.setState({
+      nameCodeValPublish: arr,
+      // allowClear: 'ture',
+    });
+    return true;
+  };
+
+  renderOption = item => ({
+    value: item.code,
+    label: (
+      <div style={{ display: 'flex' }}>
+        <span>{item.code}</span>&nbsp;&nbsp;
+        <span>{item.name}</span>
+      </div>
+    ),
+  });
+
+  renderOptionPublish = item => ({
+    value: item.publisherCode,
+    label: (
+      // <Option key={item.id} text={item.name}>
+      <div style={{ display: 'flex' }}>
+        <span>{item.publisherName}</span>
+      </div>
+      // </Option>
+    ),
+  });
+
+  simpleForm = () => {
+    const { languageCode, status } = this.props;
+    const { nameCodeVal } = this.state;
+    console.log(nameCodeVal);
+
     return (
       <>
         <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
           <FormItem label="任务模型" name="code">
-            <Select
-              showSearch
-              value={this.state.name}
-              placeholder="请输入"
-              showArrow={false}
-              filterOption={false}
-              // TODO这个方法需要进行封装， 传参
-              onSearch={v => this.fetchSearchList(v, 'taskModel')}
-              onChange={v => this.handleSearchChange(v, 'taskModel')}
-              // notFoundContent={null}
-            >
-              {taskModelOptions}
+            <AutoComplete
+              onSearch={this.inputValue}
+              options={nameCodeVal.map(this.renderOption)}
+              // placeholder={formatMessage({ id: 'bp.inputHere' })}
+              // optionLabelProp="text"
+            />
+          </FormItem>
+        </Col>
+        <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
+          <FormItem label="状态" name="status">
+            <Select mode="multiple" maxTagCount={2} maxTagTextLength={3}>
+              {status.map(item => (
+                <Option key={item.value} value={item.value}>
+                  {item.text}
+                </Option>
+              ))}
             </Select>
           </FormItem>
         </Col>
-        <SelectUI
-          languageCode={languageCode}
-          label="状态"
-          name="status"
-          data={this.props.taskModel.taskModelStatusOptions}
-        />
-        <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
-          <FormItem label="发布人" name="publishName">
-            <Select
-              showSearch
-              value={this.state.publisherName}
-              placeholder="请输入"
-              showArrow={false}
-              filterOption={false}
-              onSearch={v => this.fetchSearchList(v, 'publisher')}
-              onChange={v => this.handleSearchChange(v, 'publisher')}
-              // notFoundContent={null}
-            >
-              {taskModelPublisherOptions}
-            </Select>
+        <Col xxl={6} lg={languageCode === 'EN' ? 12 : 0}>
+          <FormItem label="发布人" name="publisherCode">
+            <AutoComplete
+              onSearch={this.inputValuePublish}
+              options={nameCodeVal.map(this.renderOptionPublish)}
+              // placeholder={formatMessage({ id: 'bp.inputHere' })}
+              placeholder="发布人"
+            />
           </FormItem>
         </Col>
       </>
     );
   };
 
+  /** 完整筛选条件 */
   advancedForm = () => {
-    // const { languageCode } = this.props;
-    // return <div></div>;
+    const { languageCode } = this.props;
+    return (
+      <DateUI
+        languageCode={languageCode}
+        label="发布时间"
+        name="publishDate"
+        placeholder={['开始时间', '结束时间']}
+      />
+    );
   };
 
   onClose = () => {
@@ -209,9 +316,79 @@ class TaskModel extends Component {
     });
   };
 
-  fetchSearchList = debounce(this.fetchSearchList, 500);
+  // 发布
+  publishModel = v => {
+    api.publishTaskModel(v.id).then(() => {
+      message.success('任务模型发布成功!');
+      this.updateListData(v.id);
+    });
+  };
 
-  handleSearchChange = debounce(this.handleSearchChange, 500);
+  // 更新某行数据
+  updateListData = id => {
+    const { list } = this.state;
+    api.getTaskModelDetail(id).then(res => {
+      let lists = [...list];
+      lists = lists.map(item => {
+        if (item.id === id) {
+          item = res;
+        }
+        return item;
+      });
+      this.setState({
+        list: lists,
+      });
+    });
+  };
+
+  // 禁用模型
+  forbiddenModel = id => {
+    api.forbiddenTaskModel(id).then(res => {
+      message.success('任务模型已禁用!');
+      this.updateListData(id);
+    });
+  };
+
+  // 删除模型
+  deleteModel = id => {
+    api.deleteTaskModel(id).then(() => {
+      message.success('任务模型删除成功!');
+      this.getTableData();
+    });
+  };
+
+  // 升级
+  upgradeModel = id => {
+    router.push(`/project/task-model/up/${id}-up`);
+  };
+
+  operate = (op, v) => {
+    // op: 操作  v: 每行的数据
+    if (op === '发布') {
+      this.publishModel(v);
+    } else if (op === '修改') {
+      this.goToEdit(v.id);
+    } else if (op === '删除') {
+      this.confirm(v.id);
+      // this.deleteModel(v.id);
+    } else if (op === '查看') {
+      this.viewDetails(v);
+    } else if (op === '升级') {
+      this.upgradeModel(v.id);
+    } else if (op === '禁用') {
+      this.forbiddenModel(v.id);
+    }
+  };
+
+  confirm(id) {
+    Modal.confirm({
+      title: '是否确定删除?',
+      icon: <ExclamationCircleOutlined />,
+      okText: '确认',
+      cancelText: '取消',
+      onOk: () => this.deleteModel(id),
+    });
+  }
 
   render() {
     const { visible } = this.state;
@@ -260,11 +437,7 @@ class TaskModel extends Component {
         title: '版本',
         key: 'version',
         dataIndex: 'version',
-        render: value => (
-          <>
-            <Tag color="green">{value}</Tag>
-          </>
-        ),
+        render: value => <>{value && <Tag color="green">{value}</Tag>}</>,
       },
       {
         title: '状态',
@@ -297,7 +470,7 @@ class TaskModel extends Component {
                       <a
                         className="task_model_add_argument_list"
                         onClick={() => {
-                          // this.toggleChildrenDrawer(true, item);
+                          this.operate(item, value);
                         }}
                       >
                         {item}
@@ -310,7 +483,13 @@ class TaskModel extends Component {
 
           return (
             <>
-              <a onClick={() => console.log(333)}>{operaList[0]}</a>
+              <a
+                onClick={() => {
+                  this.operate(operaList[0], value);
+                }}
+              >
+                {operaList[0]}
+              </a>
               <Divider type="vertical" />
               <Dropdown overlay={menu} trigger={['click']}>
                 <a className="ant-dropdown-link" onClick={e => e.preventDefault()}>
@@ -318,34 +497,6 @@ class TaskModel extends Component {
                   <DownOutlined />
                 </a>
               </Dropdown>
-
-              {/* {(text * 1 === 1 || text * 1 === 3) && <a onClick={() => console.log(333)}>发布</a>}
-              {text * 1 === 1 && (
-                <>
-                  <Divider type="vertical" />
-                  <a onClick={() => this.goToEdit(value.id)}>修改</a>
-                </>
-              )}
-              {(text * 1 === 2 || text * 1 === 3) && (
-                <>
-                  <Divider type="vertical" />
-                  <a onClick={() => console.log(111)}>升级</a>
-                </>
-              )}
-              {(text * 1 === 2 || text * 1 === 4) && (
-                <>
-                  <Divider type="vertical" />
-                  <a onClick={() => console.log(111)}>禁用</a>
-                </>
-              )}
-              {text * 1 === 1 && (
-                <>
-                  <Divider type="vertical" />
-                  <a onClick={() => console.log(111)}>删除</a>
-                </>
-              )}
-              <Divider type="vertical" />
-              <a onClick={() => this.viewDetails(value)}>查看</a> */}
             </>
           );
         },
@@ -364,38 +515,34 @@ class TaskModel extends Component {
     return (
       <PageHeaderWrapper>
         <Card bordered={false} className="taskmodel">
-          <div className="tableList">
-            <TableSearchForm
-              ref={this.tableSearchFormRef}
-              initialValues={this.initialValues}
-              getTableData={this.getTableData}
-              simpleForm={this.simpleForm}
-              advancedForm={this.advancedForm}
-            />
-            <div className="tableListOperator">
-              <Button type="primary" onClick={() => this.handleAdd()}>
-                <PlusOutlined />
-                新建
-              </Button>
+          <Spin spinning={loading} size="large">
+            <div className="tableList">
+              <TableSearchForm
+                ref={this.tableSearchFormRef}
+                initialValues={this.initialValues}
+                getTableData={this.getTableData}
+                simpleForm={this.simpleForm}
+                advancedForm={this.advancedForm}
+              />
+              <div className="tableListOperator">
+                <Button type="primary" onClick={() => this.handleAdd()}>
+                  <PlusOutlined />
+                  新建
+                </Button>
+              </div>
+              <StandardTable
+                scroll={{ x: tableWidth }}
+                rowClassName="editable-row"
+                selectedRows=""
+                // loading={loading}
+                data={{ list, pagination }}
+                columns={columns}
+                onChange={this.handleStandardTableChange}
+              />
             </div>
-            <StandardTable
-              scroll={{ x: tableWidth }}
-              rowClassName="editable-row"
-              selectedRows=""
-              loading={loading}
-              data={{ list, pagination }}
-              columns={columns}
-              // onSelectRow={this.handleSelectRows}
-              onChange={this.handleStandardTableChange}
-              // expandable={{
-              //   // 用方法创建子table
-              //   expandedRowRender: value => expandedRowRender(value.list, sonTablecolumns),
-              //   rowExpandable: record => !!record.list,
-              // }}
-            />
-          </div>
+          </Spin>
         </Card>
-        <TaskModelView visible={visible} onClose={this.onClose} viewId={viewId} />
+        {viewId && <TaskModelView visible={visible} onClose={this.onClose} viewId={viewId} />}
       </PageHeaderWrapper>
     );
   }
@@ -403,5 +550,6 @@ class TaskModel extends Component {
 
 export default connect(({ taskModel, global }) => ({
   taskModel,
+  status: taskModel.taskModelStatusOptions,
   languageCode: global.languageCode,
 }))(TaskModel);

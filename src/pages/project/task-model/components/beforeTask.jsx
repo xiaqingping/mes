@@ -1,12 +1,14 @@
-// 关联流程模型
+// 选择任务模型
 import React from 'react';
-import { Modal, Table, Avatar, Form, Input, Select, Col, Tag, Button } from 'antd';
+import { Modal, Table, Avatar, Form, Col, Tag, AutoComplete } from 'antd';
 import TableSearchForm from '@/components/TableSearchForm';
 import { connect } from 'dva';
+
 import api from '@/pages/project/api/taskmodel';
+import { cutString } from '@/utils/utils';
+import _ from 'lodash';
 
 const FormItem = Form.Item;
-const { Option } = Select;
 
 class BeforeTask extends React.Component {
   tableSearchFormRef = React.createRef();
@@ -15,19 +17,32 @@ class BeforeTask extends React.Component {
     return { visible: nextProps.visible || false };
   }
 
-  state = { visible: false, pagination: {} };
-
   initialValues = {
-    status: 1,
     page: 1,
     rows: 10,
   };
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      visible: false,
+      pagination: {},
+      nameCodeVal: [],
+    };
+    this.callParter = _.debounce(this.callParter, 500);
+  }
 
   componentDidMount() {
     this.getTableData(this.initialValues);
   }
 
-  titleContent = () => <div style={{ fontSize: '16px' }}>关联任务模型</div>;
+  callParter = value => {
+    api.getTaskNameAndCode(value).then(res => {
+      this.setState({ nameCodeVal: res });
+    });
+  };
+
+  titleContent = () => <div style={{ fontSize: '16px' }}>选择任务模型</div>;
 
   handleOk = () => {
     this.setState({
@@ -37,76 +52,102 @@ class BeforeTask extends React.Component {
 
   getTableData = (options = {}) => {
     this.setState({ loading: true });
-    const { page, rows } = this.state;
-    const formData =
-      this.tableSearchFormRef.current && this.tableSearchFormRef.current.getFieldsValue();
-
+    const formData = this.tableSearchFormRef.current
+      ? this.tableSearchFormRef.current.getFieldsValue()
+      : '';
+    const { pagination } = this.state;
+    const { current: page, pageSize: rows } = pagination;
     const data = {
       page,
       rows,
       ...formData,
+      ...options,
     };
     api.getTaskModels(data).then(res => {
       this.setState({
-        loading: false,
         list: res.rows,
+        pagination: {
+          current: data.page,
+          pageSize: data.rows,
+          total: res.total,
+        },
+        loading: false,
       });
     });
-
-    // console.log(this.tableSearchFormRef);
-    // const { pagination } = this.state;
-    // const { current: page, pageSize: rows } = pagination;
-    // const data = {
-    //   page,
-    //   rows,
-    //   ...formData,
-    //   ...options,
-    // };
-    // api.peptideBase.getPurity(data, true).then(res => {
-    //   this.setState({
-    //     list: res.rows,
-    //     pagination: {
-    //       current: data.page,
-    //       pageSize: data.rows,
-    //       total: res.total,
-    //     },
-    //     loading: false,
-    //     editIndex: -1,
-    //   });
-    // });
   };
 
-  handleCancel = () => {
-    this.setState({
-      visible: false,
+  renderOption = item => ({
+    value: item.code,
+    label: (
+      // <Option key={item.id} text={item.name}>
+      <div style={{ display: 'flex' }} key={item.code}>
+        <span>{item.code}</span>&nbsp;&nbsp;
+        <span>{item.name}</span>
+      </div>
+      // </Option>
+    ),
+  });
+
+  // 筛选值
+  inputValue = value => {
+    const { nameCodeVal } = this.state;
+    const arr = [];
+    if (!value) {
+      return false;
+    }
+    this.callParter(value);
+    if (nameCodeVal.length === 0) {
+      return false;
+    }
+    nameCodeVal.forEach(item => {
+      if (item.name.indexOf(value) !== -1) {
+        arr.push(item);
+      }
+      if (item.code.indexOf(value) !== -1 && arr.indexOf(item)) {
+        arr.push(item);
+      }
     });
+    this.setState({
+      nameCodeVal: arr,
+      // allowClear: 'ture',
+    });
+    return true;
   };
 
-  // 被选中的model
-  selectModel = row => {
-    this.props.onClose(row);
+  simpleForm = () => {
+    const { nameCodeVal } = this.state;
+    return (
+      <>
+        <Col lg={10}>
+          <FormItem label="名称" name="code">
+            <AutoComplete
+              onSearch={this.inputValue}
+              options={nameCodeVal.map(this.renderOption)}
+              // placeholder={formatMessage({ id: 'bp.inputHere' })}
+              // optionLabelProp="text"
+            />
+          </FormItem>
+        </Col>
+      </>
+    );
   };
 
-  simpleForm = () => (
-    <>
-      <Col lg={8}>
-        <FormItem label="名称" name="code">
-          <Input placeholder="请输入" />
-        </FormItem>
-      </Col>
-      <Col lg={8}>
-        <FormItem label="发布人" name="creatorCode">
-          <Select>
-            <Option value="jack">Jack</Option>
-            <Option value="lucy">Lucy</Option>
-          </Select>
-        </FormItem>
-      </Col>
-    </>
-  );
+  sendData = async id => {
+    const res = await api.getAllPreTasks(id, this.props.ids);
+    this.props.getData(res);
+    this.props.onClose();
+  };
 
-  confirm = () => {
-    console.log(123);
+  handleChange = p => {
+    console.log(p);
+    const page = p.current;
+    const rows = p.pageSize;
+    const pagination = { page, rows };
+    console.log(pagination);
+    this.setState({
+      pagination,
+    });
+    this.getTableData(pagination);
   };
 
   render() {
@@ -117,51 +158,50 @@ class BeforeTask extends React.Component {
         title: '编号/名称',
         dataIndex: 'code',
         width: 220,
-        render: (value, row) => {
-          return (
-            <>
-              <Avatar
-                src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
-                style={{ float: 'left' }}
-              />
-              <div style={{ float: 'left' }}>
-                <div>{row.code}</div>
-                <div>{row.name}</div>
-              </div>
-            </>
-          );
-        },
+        render: (value, row) => (
+          <>
+            <Avatar
+              src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
+              style={{ float: 'left' }}
+            />
+            <div style={{ float: 'left' }}>
+              <div>{value}</div>
+              <div>{row.name}</div>
+            </div>
+          </>
+        ),
       },
       {
         title: '描述',
         width: 280,
         dataIndex: 'describe',
+        render: value => (
+          <div
+            // className="addEllipsis"
+            title={value}
+            style={{ width: '250px', height: '50px', wordWrap: 'break-word' }}
+          >
+            {cutString(value, 65)}
+          </div>
+        ),
       },
       {
         title: '版本',
         width: 100,
         dataIndex: 'version',
-        render: (value, row) => {
-          return (
-            <Tag color="green" style={{ padding: '0 5px' }}>
-              {value}
-            </Tag>
-          );
-        },
+        render: value => (
+          <Tag color="green" style={{ padding: '0 10px' }}>
+            {value}
+          </Tag>
+        ),
       },
       {
         title: '操作',
-        // width: 100,
+        width: 100,
         render: (value, row) => (
-          <Button
-            type="link"
-            block
-            onClick={() => {
-              this.selectModel(row);
-            }}
-          >
-            选择
-          </Button>
+          <>
+            <a onClick={() => this.sendData(row.id)}>选择</a>
+          </>
         ),
       },
     ];
@@ -175,14 +215,13 @@ class BeforeTask extends React.Component {
         width={747}
         footer={null}
       >
-        <div className="tableList">
+        <div className="tableList buttonStyle">
           <TableSearchForm
             ref={this.tableSearchFormRef}
             initialValues={this.initialValues}
             getTableData={this.getTableData}
             simpleForm={this.simpleForm}
           />
-          <span>{this.titleContent()}</span>
           <Table
             columns={columns}
             dataSource={list}
@@ -190,6 +229,7 @@ class BeforeTask extends React.Component {
             rowKey="id"
             size="small"
             pagination={pagination}
+            onChange={this.handleChange}
           />
         </div>
       </Modal>
@@ -197,7 +237,7 @@ class BeforeTask extends React.Component {
   }
 }
 
-export default connect(({ global, processModel }) => ({
+export default connect(({ global, taskModel }) => ({
   languageCode: global.languageCode,
-  processModel,
+  taskModel,
 }))(BeforeTask);
