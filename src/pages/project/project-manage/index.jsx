@@ -22,7 +22,7 @@ import _ from 'lodash';
 import router from 'umi/router';
 import StandardTable from '@/components/StandardTable';
 import { formatter } from '@/utils/utils';
-import api from '@/pages/project/project-manage/api/projectManageModel/';
+import api from '@/pages/project/api/projectManage';
 import {
   // InputUI,
   // SelectUI,
