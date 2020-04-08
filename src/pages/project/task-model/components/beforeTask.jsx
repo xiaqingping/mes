@@ -63,6 +63,7 @@ class BeforeTask extends React.Component {
       rows,
       ...formData,
       ...options,
+      status: 2,
     };
     api.getTaskModels(data).then(res => {
       const uuids = res.rows.map(e => e.picture);
@@ -152,9 +153,9 @@ class BeforeTask extends React.Component {
   };
 
   sendData = async id => {
+    this.props.onClose();
     const res = await api.getAllPreTasks(id, this.props.ids);
     this.props.getData(res);
-    this.props.onClose();
   };
 
   handleChange = p => {

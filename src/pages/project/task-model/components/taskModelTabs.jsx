@@ -153,21 +153,20 @@ class TaskModelTabs extends Component {
                 renderItem={item => (
                   <List.Item key={item.id} onClick={() => this.toViewParams(item)}>
                     <Card hoverable style={{ width: '550px' }}>
-                      <div style={{ display: 'flex', marginRight: 10 }}>
-                        <Avatar
-                          src={item.fileId ? disk.downloadFiles(item.fileId, { view: true }) : ''}
-                          style={{ float: 'left' }}
-                          size="large"
-                        />
-                        <div>
-                          <div>{item.code}</div>
-                          <div style={{ wordWrap: 'break-word' }}>{item.name}</div>
-                        </div>
+                      <Avatar
+                        src={item.fileId ? disk.downloadFiles(item.fileId, { view: true }) : ''}
+                        style={{ float: 'left', marginRight: 10 }}
+                        size="large"
+                      />
+                      <div style={{ display: 'inline-block' }}>
+                        <div>{item.code}</div>
+                        <div style={{ wordWrap: 'break-word' }}>{item.name}</div>
                       </div>
+
                       <Badge
                         status={formatter(taskModelStatusOptions, item.status, 'value', 'status')}
                         text={formatter(taskModelStatusOptions, item.status, 'value', 'label')}
-                        style={{ float: 'right' }}
+                        style={{ float: 'right', marginLeft: 10 }}
                       />
                       <Tag color="green" style={{ padding: '0 10px', float: 'right' }}>
                         V1.0

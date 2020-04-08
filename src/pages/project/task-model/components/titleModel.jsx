@@ -1,10 +1,11 @@
 import React from 'react';
-import { Avatar, Tag, Card } from 'antd';
+import { Avatar, Tag, Card, Badge } from 'antd';
 import { DownOutlined, UpOutlined, SettingOutlined } from '@ant-design/icons';
 import { connect } from 'dva';
 import api from '@/pages/project/api/taskmodel';
 import ArgumentModel from './argumentModel';
 import disk from '@/pages/project/api/disk';
+import { formatter } from '@/utils/utils';
 
 import '../index.less';
 
@@ -23,30 +24,21 @@ class TitleModel extends React.Component {
     const { viewId } = this.props.taskModel.taskModel;
     if (viewId) {
       api.getTaskModelDetail(viewId).then(res => {
-        this.setState({
-          viewData: res,
-        });
-        // const uuids = res.picture;
-        // disk
-        //   .getFiles({
-        //     sourceCode: uuids,
-        //     sourceKey: 'project_task_model',
-        //   })
-        //   .then(v => {
-        //     const newList = v.id;
-        //     console.log(v);
-        //     // const newList = res.map(e => {
-        //     //   const filterItem = v.filter(item => item.sourceCode === e.picture);
-        //     //   const fileId = filterItem[0] && filterItem[0].id;
-        //     //   return {
-        //     //     ...e,
-        //     //     fileId,
-        //     //   };
-        //     // });
-        //     this.setState({
-        //       viewData: newList,
-        //     });
-        //   });
+        // this.setState({
+        //   viewData: res,
+        // });
+        const uuids = res.picture;
+        disk
+          .getFiles({
+            sourceCode: uuids,
+            sourceKey: 'project_task_model',
+          })
+          .then(v => {
+            const newList = { ...res, fileId: (v[0] || {}).id };
+            this.setState({
+              viewData: newList,
+            });
+          });
 
         if (res.version) {
           this.setState({
@@ -125,6 +117,8 @@ class TitleModel extends React.Component {
       viewVisible,
       toViewArgument,
     } = this.state;
+    const { taskModelStatusOptions } = this.props.taskModel.taskModel;
+    // console.log(this.props.taskModel);
     return (
       <>
         <div
@@ -133,14 +127,14 @@ class TitleModel extends React.Component {
             // overflow: 'auto',
             // position: 'relative',
             display: 'flex',
+            justifyContent: 'space-between',
           }}
         >
           <div>
             <Avatar
-              src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
-              style={{ float: 'left' }}
+              src={viewData.fileId ? disk.downloadFiles(viewData.fileId, { view: true }) : ''}
+              style={{ float: 'left', marginRight: 10 }}
               size="large"
-              shape="circle"
             />
             <div style={{ fontWeight: '900', marginLeft: 10 }}>
               <div style={{ fontWeight: '700' }}>{viewData.code}</div>
@@ -185,12 +179,16 @@ class TitleModel extends React.Component {
             </div>
           </div>
 
-          <div style={{ marginLeft: 30, float: 'left' }} onClick={() => this.viewParams(viewData)}>
+          <div style={{ marginLeft: 30 }} onClick={() => this.viewParams(viewData)}>
             <SettingOutlined />
           </div>
 
-          <div style={{ marginLeft: '30px', fontSize: '14px' }}>
-            <div>
+          <div style={{ marginLeft: '85px', fontSize: '14px' }}>
+            <Badge
+              status={formatter(taskModelStatusOptions, viewData.status, 'value', 'status')}
+              text={formatter(taskModelStatusOptions, viewData.status, 'value', 'label')}
+            />
+            <div style={{ marginTop: 15, fontSize: 12, marginLeft: 16 }}>
               {open ? (
                 <a href="#" onClick={() => this.setState({ open: !open })}>
                   收起
