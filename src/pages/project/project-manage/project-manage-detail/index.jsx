@@ -25,12 +25,10 @@ class ProjectDetail extends Component {
   }
 
   componentDidMount() {
-    // console.log(this.props)
-    // console.log(this.props.location)
-    // if (!this.props.location.state.projectId) {
-    //   router.push('/project/project-manage');
-    //   return;
-    // }
+    if (this.props.location.state === undefined) {
+      router.push('/project/project-manage');
+      return;
+    }
     const { projectId } = this.props.location.state;
     this.setState({ projectId });
     this.getTableData(projectId);
@@ -46,11 +44,11 @@ class ProjectDetail extends Component {
 
   // Tabs抬头操作
   operations = () => {
-    const { selectKey } = this.state;
+    const { selectKey, list } = this.state;
     if (selectKey === '1') {
       return (
         <PlusSquareOutlined
-          onClick={() => console.log(selectKey)}
+          onClick={() => console.log(selectKey, list.id)}
           style={{ fontSize: 20, color: '#1890ff' }}
         />
       )
@@ -69,6 +67,14 @@ class ProjectDetail extends Component {
     });
   };
 
+  // 导航列表title样式
+  navContent = list => {
+    if (list) {
+      return <div>{list.name}</div>;
+    }
+    return '';
+  };
+
 
   render() {
     const { list, loading, projectId } = this.state;
@@ -82,7 +88,7 @@ class ProjectDetail extends Component {
     }
 
     return (
-      <PageHeaderWrapper>
+      <PageHeaderWrapper title={this.navContent(list)}>
         <Card className={styles.titleCard}>
           <div className={styles.width}>
             {list.name}

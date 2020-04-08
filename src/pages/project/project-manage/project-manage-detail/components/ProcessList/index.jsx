@@ -1,5 +1,5 @@
 // 流程列表
-import { Form, Table, Tag, Progress, Divider, Button } from 'antd';
+import { Form, Table, Tag, Progress, Divider, Button, message } from 'antd';
 import React, { Component } from 'react';
 import { connect } from 'dva';
 import {
@@ -12,6 +12,8 @@ import router from 'umi/router';
 import api from '@/pages/project/api/projectManageDetail'
 import TaskList  from '../TaskList';
 import { EditInforModel }  from '../ModelUI';
+import { comparisonMerge } from '../../functions';
+// import BPList from '../BPList';
 // import { formatter } from '@/utils/utils';
 
 
@@ -39,10 +41,6 @@ class ProcessList extends Component {
 
   // 组件挂载时
   componentDidMount() {
-    // if (this.props.location.state.projectId === undefined) {
-    //   router.push('/project/project-manage');
-    //   return;
-    // }
     const { projectId } = this.props;
     this.getTableData(projectId);
   }
@@ -72,8 +70,14 @@ class ProcessList extends Component {
 
    // 查看流程参数
   searchProcessParam = row => {
-    api.getProcessParam(row.processModelId).then(res => {
-      router.push('/project/project-manage/process-parameter', { res });
+    // console.log(row);
+    api.getProcessParam(row.processModelId).then(paramData => {
+      api.getProcessParamValue(row.id).then(valueData => {
+        // console.log(paramData)
+        // console.log(valueData)
+        const newData = comparisonMerge(paramData, valueData);
+        router.push('/project/project-manage/process-parameter', { newData });
+      })
     })
   }
 
@@ -99,7 +103,6 @@ class ProcessList extends Component {
 
   // 删除
   handleDelete = row => {
-    console.log(row);
     api.deleteProjectProcess(row.id).then(() => {
       this.getTableData(this.props.projectId);
     });
@@ -141,6 +144,12 @@ class ProcessList extends Component {
       visibleDrawer: false,
     });
   };
+
+  // 获取回传数据
+  getBPData = data => {
+    console.log(data);
+  }
+
 
   render() {
     const {
@@ -185,13 +194,17 @@ class ProcessList extends Component {
         dataIndex: 'processModeVersion',
         width: 80,
         render: value => <Tag color="green">{value}</Tag>
+        // render: value => (
+        //   <a onClick={() => this.showBPList.visibleShow(true)}>
+        //     <Tag color="green">{value}</Tag>
+        //   </a>
+        // )
       },
       {
         title: '进度',
         dataIndex: 'processProgress',
         width: 150,
         render: (value, row) => {
-          // console.log(value); // TODO:
           if (value === undefined) return '';
           const val = value.toFixed(2) * 100;
           if (row.status === 1) {
@@ -273,7 +286,7 @@ class ProcessList extends Component {
               <>
                 <a onClick={() => this.handleDelete(row)}>删除</a>
                 <Divider type="vertical" />
-                <a onClick={() => console.log('交互分析')}>交互分析</a>
+                <a onClick={() => message('交互分析')}>交互分析</a>
               </>
             )
           }
@@ -302,9 +315,10 @@ class ProcessList extends Component {
             columns={columns}
             onChange={this.handleStandardTableChange}
             onRow={( record, index ) => ({
-                onMouseEnter: () => { this.setState({ editIndex: index }) },
-                onMouseLeave: () => { this.setState({ editIndex: -1 }) }
-              })}
+              onMouseEnter: () => { this.setState({ editIndex: index }) },
+              onMouseLeave: () => { this.setState({ editIndex: -1 }) }
+            })}
+            height={80}
           />
         </Form>
         <TaskList
@@ -319,6 +333,14 @@ class ProcessList extends Component {
           processList={processList}
           getData={this.getEditModelData}
         />
+        {/* <BPList
+          onRef={ref => {
+            this.showBPList = ref;
+          }}
+          getData={v => {
+            this.getBPData(v);
+          }}
+        /> */}
       </>
     );
   }

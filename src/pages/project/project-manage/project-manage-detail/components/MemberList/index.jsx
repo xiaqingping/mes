@@ -2,11 +2,9 @@
 import { Form, Table, Select } from 'antd';
 import React, { Component } from 'react';
 import { connect } from 'dva';
-// import router from 'umi/router';
 import api from '@/pages/project/api/projectManageDetail';
 import { EditJurisdictionModel } from '../ModelUI';
 
-// import { formatter } from '@/utils/utils';
 
 const { Option } = Select;
 
@@ -16,20 +14,11 @@ class MemberList extends Component {
   tableFormRef = React.createRef();
 
   state = {
-    // 分页参数
-    pagination: {},
-    // 表格数据
-    list: [],
-    // 加载状态
-    loading: true,
-    visibleModel: false,
-    menberInfor: [],
-    // 选中行数据
-    // selectedRows: [],
-    // 编辑行
-    // editIndex: -1,
-    // 自减ID（新增数据时，提供负数id做为列表的key）
-    // id: 0,
+    pagination: {},       // 分页参数
+    list: [],             // 表格数据
+    loading: true,        // 加载状态
+    visibleModel: false,  // 编辑名称描述模态框是否显示
+    menberInfor: [],      // 成员名称描述
   };
 
   // 组件挂载时
@@ -92,26 +81,15 @@ class MemberList extends Component {
 
    // 退出
   handleExit = row => {
-    console.log(row);
     api.deleteMember(row.id).then(() => {
       this.getTableData(this.props.projectId);
     })
   }
 
   render() {
-    const {
-      pagination,
-      // selectedRows,
-      list, loading, visibleModel, menberInfor
-    } = this.state;
+    const { pagination, list, loading, visibleModel, menberInfor } = this.state;
     const { jurisdiction } = this.props.projectDetail;
     let tableWidth = 0;
-
-    // const components = {
-    //   body: {
-    //     cell: EditableCell,
-    //   },
-    // };
 
     let columns = [
       {
@@ -172,7 +150,6 @@ class MemberList extends Component {
     ];
 
     columns = columns.map(col => {
-      // if (!col.width) col.width = 100;
       tableWidth += col.width;
       if (!col.editable) {
         return col;
@@ -188,7 +165,6 @@ class MemberList extends Component {
             rowKey="id"
             loading={loading}
             dataSource={list}
-            // selectedRows={selectedRows}
             pagination={pagination}
             columns={columns}
             onChange={this.handleStandardTableChange}

@@ -16,6 +16,11 @@ export default {
     return request(`${http1}/projects/v1/${params}`);
   },
 
+  // 查询流程参数值
+  getProcessParamValue(params) {
+    return request(`${http1}/projects/v1/processes/${params}/parameter`);
+  },
+
   // 查询任务列表
   getProjectTask(params) {
     return request(`${http1}/projects/v1/tasks`, { params });

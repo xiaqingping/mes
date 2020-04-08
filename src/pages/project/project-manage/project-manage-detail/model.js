@@ -1,64 +1,6 @@
 const projectDetailModel = {
   namespace: 'projectDetail',
   state: {
-    processList: [
-      {
-        id: 1,
-        code: 111111,
-        name: '微生物11111',
-        decs: '描述描述描述描述描述描述描述描述描述111',
-        version: 'V1.1',
-        schedule: '0',
-        status: '1',
-        processList: {
-          path: '/favicon.png',
-          name: '微生物多样式分析',
-          code: '36648542221'
-        },
-      },
-      {
-        id: 2,
-        code: 222222,
-        name: '微生物2222',
-        decs: '描述描述描述描述描述描述描述描述描述111',
-        version: 'V1.1',
-        schedule: '50',
-        status: '2',
-        processList: {
-          path: '/favicon.png',
-          name: '微生物多样式分析',
-          code: '36648542221'
-        },
-      },
-      {
-        id: 3,
-        code: 33333333,
-        name: '微生物3333',
-        decs: '描述描述描述描述描述描述描述描述描述111',
-        version: 'V1.1',
-        schedule: '50',
-        status: '3',
-        processList: {
-          path: '/favicon.png',
-          name: '微生物多样式分析',
-          code: '36648542221'
-        },
-      },
-      {
-        id: 4,
-        code: 444444444,
-        name: '微生物4444',
-        decs: '描述描述描述描述描述描述描述描述描述111',
-        version: 'V1.1',
-        schedule: '100',
-        status: '4',
-        processList: {
-          path: '/favicon.png',
-          name: '微生物多样式分析',
-          code: '36648542221'
-        },
-      },
-    ],
     filedList: [
       {
         id: 1,
@@ -97,32 +39,6 @@ const projectDetailModel = {
         size: '128'
       },
     ],
-    menberList: [
-      {
-        name: 'XXXX用户名',
-        path: '/favicon.png',
-        joinTime: '2020-03-18 12:00:38',
-        authority: '1'
-      },
-      {
-        name: 'XXXX用户名',
-        path: '/favicon.png',
-        joinTime: '2020-03-18 12:00:38',
-        authority: '2'
-      },
-      {
-        name: 'XXXX用户名',
-        path: '/favicon.png',
-        joinTime: '2020-03-18 12:00:38',
-        authority: '3'
-      },
-      {
-        name: 'XXXX用户名',
-        path: '/favicon.png',
-        joinTime: '2020-03-18 12:00:38',
-        authority: '3'
-      },
-    ],
 
     // 权限
     jurisdiction: [
@@ -156,6 +72,48 @@ const projectDetailModel = {
         id: '5',
         name: '已失败',
         status: 'error',
+      },
+    ],
+    // 业务伙伴认证状态
+    BpCertificationStatus: [
+      {
+        id: 1,
+        name: '未认证',
+        // i18n: 'bp.unapproved',
+        badge: 'default',
+      },
+      {
+        id: 2,
+        name: '审核中',
+        // i18n: 'bp.processing',
+        badge: 'warning',
+      },
+      {
+        id: 3,
+        name: '部分认证',
+        // i18n: 'bp.partialApproved',
+        badge: 'warning',
+      },
+      {
+        id: 4,
+        name: '已认证',
+        // i18n: 'bp.approveds',
+        badge: 'success',
+      },
+    ],
+    // 销售范围冻结状态
+    SalesOrderBlock: [
+      {
+        id: 1,
+        name: '冻结',
+        // i18n: 'bp.block',
+        badge: 'error',
+      },
+      {
+        id: 2,
+        name: '正常',
+        // i18n: 'bp.normal',
+        badge: 'success',
       },
     ],
   },

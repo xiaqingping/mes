@@ -1,79 +1,90 @@
 // 项目管理：新建项目
 import React, { Component } from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
-import { Input, Card, Form, Tag, Button, Row, Col, Modal, DatePicker } from 'antd';
+import { Input, Card, Form, Tag, Button, DatePicker, message } from 'antd';
 import router from 'umi/router';
 import { connect } from 'dva';
-// import { expandedRowRender } from '../functions';
+import api from '@/pages/project/api/projectManage';
+import BPList from './components/BPList';
+
 const { CheckableTag } = Tag;
-const tagsFromServer = [
-  'Movies',
-  'Books',
-  'Music',
-  'red',
-  'pink',
-  'yellow',
-  'green',
-  'gold',
-  'cyan',
-  'purple',
-  'gray',
-];
 
 const { RangePicker } = DatePicker;
 
-class Test extends Component {
-  tableSearchFormRef = React.createRef();
+class ProjectEdit extends Component {
+  formRef = React.createRef();
 
-  // 标签
   state = {
-    selectedTags: [],
-    visible: false,
+    selectedTags: [], // 选中标签
+    bpCode: '',       // bp编号
+    bpName: '',       // bp名称
+    beginDate: '',    // 开始时间
+    endDate: '',      // 结束时间
   };
+
+  // 保存时所需数据
+  saveData = () => {
+    const { selectedTags, bpCode, bpName, endDate, beginDate } = this.state;
+    const formData = this.formRef.current.getFieldsValue();
+
+    if (formData.name === undefined) return message.error('项目名称不能为空！');
+    if (formData.describe === undefined) return message.error('项目描述不能为空！');
+    if (bpName === '') return message.error('所有者不能为空！');
+    if (beginDate === '') return message.error('开始时间不能为空！');
+    if (endDate === '') return message.error('结束时间不能为空！');
+
+    const data = {
+      name: formData.name,
+      describe: formData.describe,
+      bpCode,
+      bpName,
+      endDate,
+      beginDate,
+      labelList: selectedTags
+    }
+    return data;
+  }
 
   // 跳转到添加流程页面
   handleAdd = () => {
-    router.push('/project/project-manage/add/addflowpath');
+    const data = this.saveData();
+    router.push('/project/project-manage/add/addflowpath', { data });
   };
 
+  // 保存
   handleSave = () => {
-    console.log('保存');
+    const data = this.saveData();
+    console.log(data);
+    api.addProjects(data).then(() => {
+      router.push('/project/project-manage');
+    })
   };
 
-  showModal = () => {
-    console.log('弹框');
+  // 选中时间
+  onChangeTime = (value, dateString) => {
     this.setState({
-      visible: true,
-    });
-  };
+      beginDate: dateString[0],
+      endDate: dateString[1],
+    })
+  }
 
-  handleOk = e => {
-    console.log(e);
-    this.setState({
-      visible: false,
-    });
-  };
-
-  handleCancel = e => {
-    console.log(e);
-    this.setState({
-      visible: false,
-    });
-  };
-
-  onChange = () => {
-    console.log(222);
-  };
-
-  onOk = () => {
-    console.log(3333);
-  };
-
-  handleChange(tag, checked) {
+  handleChange = (tag, checked) => {
     const { selectedTags } = this.state;
     const nextSelectedTags = checked ? [...selectedTags, tag] : selectedTags.filter(t => t !== tag);
     console.log('You are interested in: ', nextSelectedTags);
     this.setState({ selectedTags: nextSelectedTags });
+  }
+
+  // 获取业务伙伴模态框回传数据
+  getBPData = data => {
+    console.log(data);
+    this.formRef.current.setFieldsValue({
+      bpName: data.name,
+    });
+    this.setState({
+      bpCode: data.code,
+      bpName: data.name,
+    })
   }
 
   render() {
@@ -83,15 +94,26 @@ class Test extends Component {
     const FormItem = Form.Item;
     // 标签
     const { selectedTags } = this.state;
+    const { labelList } = this.props.projectManage;
 
     return (
       <PageHeaderWrapper>
-        <Form>
+        <Form ref={this.formRef}>
           <Card bordered={false}>
-            <FormItem label="名称" name="customerCode" style={{ paddingRight: '50px' }}>
+            <FormItem
+              label="名称"
+              name="name"
+              style={{ paddingRight: '50px' }}
+              rules={[{ required: true, message: '请输入项目名称！' }]}
+            >
               <Input placeholder="请输入项目名称" maxLength={20} style={{ marginLeft: '40px' }} />
             </FormItem>
-            <FormItem label="描述" name="describe" style={{ paddingRight: '50px' }}>
+            <FormItem
+              label="描述"
+              name="describe"
+              style={{ paddingRight: '50px' }}
+              rules={[{ required: true, message: '请输入项目描述！' }]}
+            >
               <TextArea
                 rows={4}
                 placeholder="请输入项目描述"
@@ -100,69 +122,60 @@ class Test extends Component {
               />
             </FormItem>
             <div style={{ width: '300px' }}>
-              <FormItem label="所有者" name="owner">
-                <Search onClick={this.showModal} style={{ marginLeft: '26px' }} />
+              <FormItem
+                label="所有者"
+                name="bpName"
+                rules={[{ required: true, message: '请选择所有者！' }]}
+              >
+                <Search
+                  onClick={() => this.showBPList.visibleShow(true)}
+                  style={{ marginLeft: '26px' }}
+                />
               </FormItem>
             </div>
             <div>
-              <FormItem label="时间" name="time" style={{ paddingRight: '50px' }}>
+              <FormItem
+                label="时间"
+                name="time"
+                style={{ paddingRight: '50px' }}
+                rules={[{ required: true, message: '请选择时间！' }]}
+              >
                 <RangePicker
-                  showTime={{ format: 'HH:mm' }}
-                  format="YYYY-MM-DD HH:mm"
-                  onChange={this.onChange}
-                  onOk={this.onOk}
+                  showTime={{ format: 'HH:mm:ss' }}
+                  format="YYYY-MM-DD HH:mm:ss"
+                  onChange={this.onChangeTime}
+                  // onOk={this.onOk}
                   style={{ marginLeft: '40px' }}
                 />
               </FormItem>
             </div>
-            <div style={{ height: '250px' }}>
+            <div style={{ height: '250px', marginLeft: 10 }}>
               <FormItem label="标签" name="label">
                 <div style={{ marginLeft: '40px', marginRight: '270px' }}>
                   {/* <span style={{ marginRight: 8 }}>Categories:</span> */}
-                  {tagsFromServer.map(tag => (
-                    <CheckableTag
-                      key={tag}
-                      checked={selectedTags.indexOf(tag) > -1}
-                      onChange={checked => this.handleChange(tag, checked)}
-                      style={{
-                        width: '70px',
-                        height: '30px',
-                        border: '1px',
-                        borderStyle: 'solid',
-                        borderColor: '#dcdcdc',
-                        lineHeight: '30px',
-                        textAlign: 'center',
-                        // backgroundColor: '#F5F5F5',
-                      }}
-                    >
-                      {tag}
-                    </CheckableTag>
-                  ))}
+                  {labelList.map(item => (
+                      <CheckableTag
+                        key={item.id}
+                        checked={selectedTags.indexOf(item.id) > -1}
+                        onChange={checked => this.handleChange(item.id, checked)}
+                        style={{
+                          height: '30px',
+                          border: '1px',
+                          borderStyle: 'solid',
+                          borderColor: '#dcdcdc',
+                          lineHeight: '30px',
+                          textAlign: 'center',
+                          // backgroundColor: '#F5F5F5',
+                        }}
+                      >
+                        {item.name} {item.text}
+                      </CheckableTag>
+                    )
+                    )
+                  }
                 </div>
               </FormItem>
             </div>
-            <Modal
-              title="业务伙伴-客户"
-              visible={this.state.visible}
-              onOk={this.handleOk}
-              onCancel={this.handleCancel}
-            >
-              <div className="site-card-wrapper">
-                <Row gutter={16}>
-                  <Col span={8}>
-                    <Card bordered={false} bodyStyle={{ width: '200px', backgroundColor: 'pink' }}>
-                      Card content
-                    </Card>
-                  </Col>
-                  <Col span={8}>
-                    <Card bordered={false}>Card content</Card>
-                  </Col>
-                  <Col span={8}>
-                    <Card bordered={false}>Card content</Card>
-                  </Col>
-                </Row>
-              </div>
-            </Modal>
           </Card>
           <Card
             style={{
@@ -190,11 +203,21 @@ class Test extends Component {
             </Button>
           </Card>
         </Form>
+        {/* 业务伙伴模态框 */}
+        <BPList
+          onRef={ref => {
+            this.showBPList = ref;
+          }}
+          getData={data => {
+            this.getBPData(data);
+          }}
+        />
       </PageHeaderWrapper>
     );
   }
 }
 
-export default connect(({ global }) => ({
+export default connect(({ global, projectManage }) => ({
   languageCode: global.languageCode,
-}))(Test);
+  projectManage,
+}))(ProjectEdit);
