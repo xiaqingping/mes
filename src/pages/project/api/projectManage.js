@@ -25,7 +25,7 @@ export default {
 
   // 创建项目数据
   addProjects(data) {
-    return request(`${http1}/projects/v1/`, {
+    return request(`${http1}/projects/v1`, {
       method: 'POST',
       data,
     });
