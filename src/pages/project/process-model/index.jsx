@@ -141,6 +141,7 @@ class ProcessModel extends Component {
     });
   };
 
+  // 流程模型选择样式
   renderOption = item => ({
     value: item.code,
     label: (
@@ -153,7 +154,7 @@ class ProcessModel extends Component {
     ),
   });
 
-  // 筛选值
+  // 流程模型筛选值
   inputValue = value => {
     const { nameCodeVal } = this.state;
     const arr = [];
@@ -179,6 +180,7 @@ class ProcessModel extends Component {
     return true;
   };
 
+  // 发布人选择样式
   renderOptionPublish = item => ({
     value: item.publisherCode,
     label: (
@@ -190,7 +192,7 @@ class ProcessModel extends Component {
     ),
   });
 
-  // 筛选值
+  // 发布人筛选值
   inputValuePublish = value => {
     const { nameCodeValPublish } = this.state;
     const arr = [];
@@ -296,6 +298,7 @@ class ProcessModel extends Component {
     );
   };
 
+  // 关闭详情抽屉
   onClose = () => {
     this.setState({
       visible: false,
@@ -326,6 +329,7 @@ class ProcessModel extends Component {
                     });
                   });
               }
+              return true;
             });
           }
         });
@@ -416,6 +420,7 @@ class ProcessModel extends Component {
                   });
                 });
             }
+            return true;
           });
         }
       });
