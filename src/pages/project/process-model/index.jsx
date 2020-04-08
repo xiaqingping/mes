@@ -58,14 +58,6 @@ class ProcessModel extends Component {
 
   componentDidMount() {
     this.getTableData(this.initialValues);
-    // disk
-    //   .getFiles({
-    //     sourceCode: 'b616f8e3ac92e4c1612b017925f8af7c',
-    //     sourceKey: 'project_process_model',
-    //   })
-    //   .then(res => {
-    //     console.log(res);
-    //   });
   }
 
   callParter = value => {
