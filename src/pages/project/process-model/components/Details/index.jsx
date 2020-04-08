@@ -8,7 +8,6 @@ import api from '@/pages/project/api/taskmodel';
 import processApi from '@/pages/project/api/processModel/';
 import disk from '@/pages/project/api/disk';
 import Parameter from '@/pages/project/process-model/components/Parameter';
-import taskModel from '@/pages/project/task-model';
 
 /**
  * 抽屉的使用

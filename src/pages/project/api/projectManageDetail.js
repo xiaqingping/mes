@@ -1,10 +1,14 @@
 import request from '@/utils/request';
 
-// 1组
-const http1 = 'http://192.168.20.6:8166';
+let http1 = 'http://192.168.20.6:8166';
+if (process.env.NODE_ENV !== 'development') {
+  http1 = '/projects';
+}
 
-// 2组
-const http2 = 'http://192.168.20.12:8360';
+let http2 = 'http://192.168.20.12:8360';
+if (process.env.NODE_ENV !== 'development') {
+  http2 = '/projectmodel';
+}
 
 export default {
   /**
@@ -33,32 +37,32 @@ export default {
 
   // 保存流程名称和描述
   saveProcessInfor(data) {
-    return request(`${http1}/projects/v1/processes`, { method: 'PUT', data});
+    return request(`${http1}/projects/v1/processes`, { method: 'PUT', data });
   },
 
   // 删除流程
   deleteProjectProcess(data) {
-    return request(`${http1}/projects/v1/processes/${data}/deleted`, { method: 'PUT'});
+    return request(`${http1}/projects/v1/processes/${data}/deleted`, { method: 'PUT' });
   },
 
   // 项目流程暂停运行
   pauseProcessesProcess(data) {
-    return request(`${http1}/projects/v1/processes/${data}/pause`, { method: 'PUT'});
+    return request(`${http1}/projects/v1/processes/${data}/pause`, { method: 'PUT' });
   },
 
   // 项目流程开始运行
   startProcessesProcess(data) {
-    return request(`${http1}/projects/v1/processes/${data}/start`, { method: 'PUT'});
+    return request(`${http1}/projects/v1/processes/${data}/start`, { method: 'PUT' });
   },
 
   // 修改成员权限
   updateMemberJurisdiction(data) {
-    return request(`${http1}/projects/v1/member/${data.id}/jurisdiction`, { method: 'PUT'});
+    return request(`${http1}/projects/v1/member/${data.id}/jurisdiction`, { method: 'PUT' });
   },
 
   // 删除项目成员
   deleteMember(data) {
-    return request(`${http1}/projects/v1/member/${data}/deleted`, { method: 'PUT'});
+    return request(`${http1}/projects/v1/member/${data}/deleted`, { method: 'PUT' });
   },
 
   // 任务执行记录参数查询
@@ -68,14 +72,13 @@ export default {
 
   // 任务执行记录开始运行
   startExecRecord(data) {
-    return request(`${http1}/projects/v1/tasks/execRecord/${data}/start`, { method: 'PUT'});
+    return request(`${http1}/projects/v1/tasks/execRecord/${data}/start`, { method: 'PUT' });
   },
 
   // 任务执行记录暂停运行
   pauseExecRecord(data) {
-    return request(`${http1}/projects/v1/tasks/execRecord/${data}/pause`, { method: 'PUT'});
+    return request(`${http1}/projects/v1/tasks/execRecord/${data}/pause`, { method: 'PUT' });
   },
-
 
   /**
    * 流程模型
@@ -84,7 +87,6 @@ export default {
   getProcessParam(params) {
     return request(`${http2}/v1/process/${params}/params`);
   },
-
 
   /**
    * 任务模型
