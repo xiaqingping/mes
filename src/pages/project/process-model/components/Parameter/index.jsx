@@ -274,6 +274,19 @@ class Parameter extends React.Component {
                     ''
                   )}
 
+                  {/* {item.paramId ? (
+                    <List.Item key={item.paramId}>
+                      <Card hoverable>
+                        <div>
+                          <div draggable onDragStart={() => this.dragStart(item, 1, 0)}>
+                            {item.paramName}
+                          </div>
+                        </div>
+                      </Card>
+                    </List.Item>
+                  ) : (
+                    <div />
+                  )} */}
                   <List.Item key={index}>
                     <Card
                       title={this.titleContent(item, index)}
@@ -286,25 +299,29 @@ class Parameter extends React.Component {
                         ''
                       ) : (
                         <div>
-                          {item.params.map(v => (
-                            <Card
-                              hoverable
-                              key={v.paramId}
-                              style={{
-                                float: 'left',
-                                margin: '10px',
-                              }}
-                            >
-                              <div
-                                onDrop={() => this.drop(v, 1)}
-                                // onDragOver={e => this.dragOver(e)}
-                                draggable
-                                onDragStart={() => this.dragStart(v, 1, index + 1)}
+                          {item.params.map(v =>
+                            v.paramId ? (
+                              <Card
+                                hoverable
+                                key={v.paramId}
+                                style={{
+                                  float: 'left',
+                                  margin: '10px',
+                                }}
                               >
-                                {v.paramName}
-                              </div>
-                            </Card>
-                          ))}
+                                <div
+                                  onDrop={() => this.drop(v, 1)}
+                                  // onDragOver={e => this.dragOver(e)}
+                                  draggable
+                                  onDragStart={() => this.dragStart(v, 1, index + 1)}
+                                >
+                                  {v.paramName}
+                                </div>
+                              </Card>
+                            ) : (
+                              <div key={v.paramId} />
+                            ),
+                          )}
                         </div>
                       )}
                     </Card>

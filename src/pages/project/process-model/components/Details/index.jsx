@@ -48,6 +48,11 @@ const DrawerTool = props => {
     props.onClose();
   };
 
+  const onUnPublish = () => {
+    props.handleUnPublish(detailValue);
+    onClose();
+  };
+
   const CollapseTool = value => (
     <div style={{ marginTop: '25px' }}>
       <Avatar
@@ -106,7 +111,13 @@ const DrawerTool = props => {
       </div>
 
       <div style={{ float: 'right', marginLeft: '30px', fontSize: '14px' }}>
-        {value.status === 2 ? <div style={{ color: 'red', marginBottom: '20px' }}>禁用</div> : ''}
+        {value.status === 2 ? (
+          <a onClick={onUnPublish} style={{ color: 'red', marginBottom: '20px' }}>
+            禁用
+          </a>
+        ) : (
+          ''
+        )}
         <div>
           {open ? (
             <a href="#" onClick={() => setOpen(!open)}>
