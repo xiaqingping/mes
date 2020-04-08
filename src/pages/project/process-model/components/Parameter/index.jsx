@@ -142,7 +142,6 @@ class Parameter extends React.Component {
               newData[i].params.push(moveElement);
             }
           });
-          console.log(moveIndex);
           // 把移动过的对象删除
           newData[moveIndex].params = newData[moveIndex].params.filter(
             item => item !== moveElement,
