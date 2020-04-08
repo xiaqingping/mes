@@ -303,10 +303,12 @@ class ProcessEdit extends Component {
   };
 
   // 获取子级数据
+
   getData = value => {
     const { taskList, ids, sonIds, paramter } = this.state;
     // const { processAddData } = this.props;
     const oldModelProcess = paramter;
+
     let data = taskList;
     const idsData = ids;
     const sonIdsData = sonIds;
