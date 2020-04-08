@@ -12,8 +12,7 @@ import router from 'umi/router';
 import api from '@/pages/project/api/projectManageDetail'
 import TaskList  from '../TaskList';
 import { EditInforModel }  from '../ModelUI';
-import { comparisonMerge } from '../../functions';
-// import BPList from '../BPList';
+import { comparisonMerge, paramDataFilter } from '../../functions';
 // import { formatter } from '@/utils/utils';
 
 
@@ -34,9 +33,6 @@ class ProcessList extends Component {
     visibleDrawer: false,   // 是否显示抽屉
     detailList: [],   // 项目信息
     taskList: [],     // 任务列表信息
-
-    // 项目ID
-    // projectId: 0,
   };
 
   // 组件挂载时
@@ -70,12 +66,10 @@ class ProcessList extends Component {
 
    // 查看流程参数
   searchProcessParam = row => {
-    // console.log(row);
     api.getProcessParam(row.processModelId).then(paramData => {
       api.getProcessParamValue(row.id).then(valueData => {
-        // console.log(paramData)
-        // console.log(valueData)
-        const newData = comparisonMerge(paramData, valueData);
+        const newParamData = paramDataFilter(paramData);
+        const newData = comparisonMerge(paramData, valueData, newParamData);
         router.push('/project/project-manage/process-parameter', { newData });
       })
     })
@@ -145,11 +139,6 @@ class ProcessList extends Component {
     });
   };
 
-  // 获取回传数据
-  getBPData = data => {
-    console.log(data);
-  }
-
 
   render() {
     const {
@@ -188,17 +177,6 @@ class ProcessList extends Component {
           }
           return <a onClick={() => this.searchTaskList(row)}>{value} <br/> {row.describe}</a>
         }
-      },
-      {
-        title: '版本',
-        dataIndex: 'processModeVersion',
-        width: 80,
-        render: value => <Tag color="green">{value}</Tag>
-        // render: value => (
-        //   <a onClick={() => this.showBPList.visibleShow(true)}>
-        //     <Tag color="green">{value}</Tag>
-        //   </a>
-        // )
       },
       {
         title: '进度',
@@ -333,14 +311,6 @@ class ProcessList extends Component {
           processList={processList}
           getData={this.getEditModelData}
         />
-        {/* <BPList
-          onRef={ref => {
-            this.showBPList = ref;
-          }}
-          getData={v => {
-            this.getBPData(v);
-          }}
-        /> */}
       </>
     );
   }

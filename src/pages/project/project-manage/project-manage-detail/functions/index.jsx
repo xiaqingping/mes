@@ -27,39 +27,56 @@ const calculateTimeDifference = (startTime, endTime) => {
 
 
 /**
- * 对比合并取值
+ * 对比参数列表和参数值列表 合并取值
  * @param {String} paramData 参数data
  * @param {String} valueData 参数值data
  */
-const comparisonMerge = (paramData, valueData) => {
+const comparisonMerge = (paramData, valueData, newParamData) => {
   const newData = JSON.parse(JSON.stringify(paramData));
   newData[0].params = [];
-
-  const newParamData = [];
-  paramData.forEach(item => {
-    item.params.forEach(it => {
-      const newIt = JSON.parse(JSON.stringify(it));
-      newIt.paramProperties.forEach(ie => {
-        newIt[ie.paramPropertyKey] = ie.paramPropertyValue
-      })
-      newParamData.push(newIt);
-    })
-  })
+  // console.log(paramData);
+  // console.log(valueData);
+  // console.log(newParamData);
 
   const newList = [];
   newParamData.forEach(paramItem => {
     valueData.forEach(valueItem => {
       const newItem = JSON.parse(JSON.stringify(paramItem));
+      console.log(paramItem.paramKey);
+      console.log(valueItem.paramKey);
       if (paramItem.paramKey === valueItem.paramKey) {
         // newItem.paramKey = valueItem.paramKey;
         newItem.paramValue = valueItem.paramValue;
+        console.log(newItem);
         newList.push(newItem);
       }
     })
   })
+  console.log(newList);
 
   newData[0].params = newList;
   return newData;
 }
 
-export { calculateTimeDifference, comparisonMerge };
+
+/**
+ * 合并参数列表下级数据
+ * @param {String} paramData
+ */
+const paramDataFilter = paramData => {
+  const newParamData = [];
+  paramData.forEach(item => {
+    item.params.forEach(it => {
+      const newIt = JSON.parse(JSON.stringify(it));
+      if (newIt.paramProperties && newIt.paramProperties.length > 0) {
+        newIt.paramProperties.forEach(ie => {
+          newIt[ie.paramPropertyKey] = ie.paramPropertyValue
+        })
+        newParamData.push(newIt);
+      }
+    })
+  })
+  return newParamData;
+}
+
+export { calculateTimeDifference, comparisonMerge, paramDataFilter };
