@@ -5,7 +5,7 @@ import {
   // Input,
   Card,
   Form,
-  Divider,
+  // Divider,
   Tag,
   // Modal,
   Button,
@@ -21,7 +21,7 @@ import { PlusOutlined, SlidersOutlined } from '@ant-design/icons';
 import { connect } from 'dva';
 import StandardTable from '@/components/StandardTable';
 // import { formatter } from '@/utils/utils';
-import api from '@/pages/project/project-manage/api/projectManageModel/';
+import api from '@/pages/project/api/projectManage';
 import ChooseProcessModel from '../components/ChooseProcessModel';
 
 // const FormItem = Form.Item;
@@ -99,7 +99,6 @@ class Test extends Component {
     // const { status } = this.props;
 
     const { pagination, list, loading, visible } = this.state;
-    console.log(visible);
 
     let tableWidth = 0;
     let columns = [
@@ -150,12 +149,11 @@ class Test extends Component {
       },
       {
         title: '操作',
+        fixed: 'right',
         width: 200,
         render: value => (
           <>
             <a onClick={() => console.log(value)}>删除</a>
-            <Divider type="vertical" />
-            <a onClick={() => console.log(222)}>修改</a>
           </>
         ),
       },
