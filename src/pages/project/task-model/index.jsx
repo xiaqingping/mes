@@ -41,18 +41,23 @@ class TaskModel extends Component {
     rows: 10,
   };
 
-  state = {
-    loading: false,
-    list: [],
-    pagination: {},
-    visible: false, // 点击查看抽屉是否显示
-    viewId: '',
-    nameCodeVal: [],
-    nameCodeValPublish: [],
-    filtersData: null,
-  };
-
   operaList = [];
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      loading: false,
+      list: [],
+      pagination: {},
+      visible: false, // 点击查看抽屉是否显示
+      viewId: '',
+      nameCodeVal: [],
+      nameCodeValPublish: [],
+      filtersData: null,
+    };
+    this.callParter = debounce(this.callParter, 500);
+    this.callPublish = debounce(this.callPublish, 500);
+  }
 
   componentDidMount() {
     this.getTableData(this.initialValues);
@@ -167,9 +172,6 @@ class TaskModel extends Component {
     });
   };
 
-  callParter = debounce(this.callParter, 500);
-
-  callPublish = debounce(this.callPublish, 500);
   // -------------------------------------------------------------------------
 
   handleItemSearch = (v, type) => {
@@ -362,7 +364,9 @@ class TaskModel extends Component {
   //     let lists = [...list];
   //     lists = lists.map(item => {
   //       if (item.id === id) {
+  //         const fileId = '';
   //         item = res;
+  //         item.fileId = fileId;
   //       }
   //       return item;
   //     });
@@ -431,6 +435,7 @@ class TaskModel extends Component {
       {
         title: '编号/名称',
         dataIndex: 'codeAndName',
+        width: 250,
         key: 'codeAndName',
         render: (text, row) => (
           <div style={{ display: 'flex' }}>
@@ -447,11 +452,13 @@ class TaskModel extends Component {
       },
       {
         title: '描述',
+        width: 400,
         dataIndex: 'describe',
         key: 'describe',
       },
       {
         title: '发布人/时间',
+        width: 200,
         dataIndex: 'publisherAndPublishTime',
         key: 'publisherAndPublishTime',
         render: (value, row) => (
@@ -464,6 +471,7 @@ class TaskModel extends Component {
       },
       {
         title: '版本',
+        width: 140,
         key: 'version',
         dataIndex: 'version',
         render: value => <>{value && <Tag color="green">{value}</Tag>}</>,
@@ -471,7 +479,7 @@ class TaskModel extends Component {
       {
         title: '状态',
         dataIndex: 'status',
-
+        width: 150,
         filters: taskModelStatusOptions,
         render: value => (
           // console.log(value);
@@ -487,6 +495,7 @@ class TaskModel extends Component {
         title: '操作',
 
         fixed: 'right',
+        width: 200,
         render: value => {
           const text = value.status;
           const operaList = getOperates(text);

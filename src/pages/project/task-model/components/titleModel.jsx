@@ -1,11 +1,11 @@
 import React from 'react';
-import { Avatar, Tag, Card, Badge } from 'antd';
+import { Avatar, Tag, Card, message, Spin } from 'antd';
 import { DownOutlined, UpOutlined, SettingOutlined } from '@ant-design/icons';
 import { connect } from 'dva';
+import router from 'umi/router';
 import api from '@/pages/project/api/taskmodel';
 import ArgumentModel from './argumentModel';
 import disk from '@/pages/project/api/disk';
-import { formatter } from '@/utils/utils';
 
 import '../index.less';
 
@@ -18,15 +18,16 @@ class TitleModel extends React.Component {
     versionType: [],
     viewVisible: false,
     toViewArgument: false,
+    loading: false,
   };
 
   componentDidMount() {
     const { viewId } = this.props.taskModel.taskModel;
     if (viewId) {
       api.getTaskModelDetail(viewId).then(res => {
-        // this.setState({
-        //   viewData: res,
-        // });
+        this.setState({
+          loading: true,
+        });
         const uuids = res.picture;
         disk
           .getFiles({
@@ -43,6 +44,7 @@ class TitleModel extends React.Component {
         if (res.version) {
           this.setState({
             versionType: res.versions,
+            loading: false,
           });
         }
       });
@@ -64,6 +66,15 @@ class TitleModel extends React.Component {
         this.getDetailByCodeVer(viewData.code, this.state.selectVersion);
       },
     );
+  };
+
+  // 点击禁用， 禁用任务
+  handleForbidden = id => {
+    api.forbiddenTaskModel(id).then(res => {
+      message.success('任务模型已禁用!');
+      router.push('/project/task-model');
+      // this.updateListData(id);
+    });
   };
 
   // 根据code和版本获取详细信息
@@ -116,10 +127,13 @@ class TitleModel extends React.Component {
       versionType,
       viewVisible,
       toViewArgument,
+      loading,
     } = this.state;
-    const { taskModelStatusOptions } = this.props.taskModel.taskModel;
-    // console.log(this.props.taskModel);
-    return (
+    return loading ? (
+      <div style={{ textAlign: 'center' }}>
+        <Spin />
+      </div>
+    ) : (
       <>
         <div
           style={{
@@ -158,7 +172,7 @@ class TitleModel extends React.Component {
               </Tag>
               {versionOpen && (versionType || []).length > 1 && (
                 <Card
-                  style={{ position: 'absolute', zIndex: '10000000000', top: '28px' }}
+                  style={{ position: 'absolute', zIndex: '100', top: '28px' }}
                   hoverable
                   className="padding-none"
                 >
@@ -166,6 +180,7 @@ class TitleModel extends React.Component {
                     versionType.map(item => (
                       <Tag
                         key={item}
+                        color={item === (selectVersion || 'V1.0') ? 'green' : ''}
                         style={{ cursor: 'pointer' }}
                         onClick={() => {
                           this.switchVersion(item);
@@ -184,10 +199,16 @@ class TitleModel extends React.Component {
           </div>
 
           <div style={{ marginLeft: '85px', fontSize: '14px' }}>
-            <Badge
-              status={formatter(taskModelStatusOptions, viewData.status, 'value', 'status')}
-              text={formatter(taskModelStatusOptions, viewData.status, 'value', 'label')}
-            />
+            {(viewData.status * 1 === 2 || viewData.status * 1 === 4) && (
+              <div
+                style={{ color: 'red', cursor: 'pointer', marginLeft: 16 }}
+                onClick={() => {
+                  this.handleForbidden(viewData.id);
+                }}
+              >
+                禁用
+              </div>
+            )}
             <div style={{ marginTop: 15, fontSize: 12, marginLeft: 16 }}>
               {open ? (
                 <a href="#" onClick={() => this.setState({ open: !open })}>

@@ -167,7 +167,7 @@ class TaskModel extends Component {
           })
           .then(v => {
             const newList = res.map(e => {
-              const filterItem = v.filter(item => item.sourceCode === e.picture);
+              const filterItem = (v || []).filter(item => item.sourceCode === e.picture);
               const fileId = filterItem[0] && filterItem[0].id;
               return {
                 ...e,
