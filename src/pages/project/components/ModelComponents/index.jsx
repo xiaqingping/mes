@@ -24,7 +24,6 @@ const ModelType = props => {
  * @param {String} validDesc 验证说明
  */
 const InputModel = props => {
-  console.log(props);
   const { data } = props;
   return (
     <Form.Item
@@ -34,7 +33,10 @@ const InputModel = props => {
         { required: !!data.isRequired, pattern: data.validRules || '', message: data.validDesc },
       ]}
     >
-      <Input placeholder={data.placeholder} defaultValue={data.defaultValue || data.paramValue} />
+      <Input
+        placeholder={data.placeholder}
+        defaultValue={data.paramValue ? data.paramValue: data.defaultValue}
+      />
     </Form.Item>
   );
 }

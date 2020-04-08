@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Modal, Form, Input } from 'antd';
+import { Modal, Form, Input, Button } from 'antd';
 import { InfoCircleOutlined } from '@ant-design/icons';
 
 const FormItem = Form.Item;
@@ -37,7 +37,13 @@ const EditInforModel = props => {
         onOk={handleOk}
         confirmLoading={confirmLoading}
         onCancel={handleCancel}
+        footer={[
+          <Button key="submit" type="primary" loading={confirmLoading} onClick={handleOk}>
+            确定
+          </Button>
+        ]}
         centered
+        width={650}
       >
         <Form
           name="basic"
@@ -49,14 +55,14 @@ const EditInforModel = props => {
             name="name"
             rules={[{ required: true, message: '请输入名称!' }]}
           >
-            <Input style={{ width: 250 }} />
+            <Input style={{ width: 260, height: 32 }} />
           </FormItem>
           <FormItem
             label="描述"
             name="describe"
             rules={[{ required: true, message: '请输入相关描述!' }]}
           >
-            <TextArea rows={4} style={{ width: 350 }} />
+            <TextArea rows={4} style={{ width: 470, height: 129, marginBottom: -10 }} />
           </FormItem>
         </Form>
       </Modal>

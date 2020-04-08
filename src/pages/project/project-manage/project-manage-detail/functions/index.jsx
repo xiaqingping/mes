@@ -32,18 +32,34 @@ const calculateTimeDifference = (startTime, endTime) => {
  * @param {String} valueData 参数值data
  */
 const comparisonMerge = (paramData, valueData) => {
+  const newData = JSON.parse(JSON.stringify(paramData));
+  newData[0].params = [];
+
+  const newParamData = [];
+  paramData.forEach(item => {
+    item.params.forEach(it => {
+      const newIt = JSON.parse(JSON.stringify(it));
+      newIt.paramProperties.forEach(ie => {
+        newIt[ie.paramPropertyKey] = ie.paramPropertyValue
+      })
+      newParamData.push(newIt);
+    })
+  })
+
   const newList = [];
-  paramData.forEach(paramItem => {
+  newParamData.forEach(paramItem => {
     valueData.forEach(valueItem => {
-      const newitem = JSON.parse(JSON.stringify(paramItem));
+      const newItem = JSON.parse(JSON.stringify(paramItem));
       if (paramItem.paramKey === valueItem.paramKey) {
-        newitem.paramKey = valueItem.paramKey;
-        newitem.paramValue = valueItem.paramValue;
-        newList.push(newitem);
+        // newItem.paramKey = valueItem.paramKey;
+        newItem.paramValue = valueItem.paramValue;
+        newList.push(newItem);
       }
     })
   })
-  return newList;
+
+  newData[0].params = newList;
+  return newData;
 }
 
 export { calculateTimeDifference, comparisonMerge };
