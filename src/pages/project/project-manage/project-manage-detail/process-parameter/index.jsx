@@ -3,9 +3,8 @@ import React, { Component } from 'react';
 import { Card, List, Form, Layout, Button } from 'antd';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import { connect } from 'dva';
-import { InputModel } from '@/pages/project/components/ModelComponents';
+import { ModelType } from '@/pages/project/components/ModelComponents';
 import style from './index.less';
-// import { OriginalParameter, EnvironmentalFactorTable } from './components/ParamUI'
 
 const { Footer } = Layout;
 
@@ -14,38 +13,30 @@ class ProcessParameter extends Component {
   state = {};
 
   // 排序
-  compare = key => (obj1, obj2) => {
-    const value1 = obj1[key]
-    const value2 = obj2[key]
-    if (value1 > value2) {
-      return 1;
-    } if (value1 < value2) {
-      return -1;
-    }
-    return 0;
-  }
+  // compare = key => (obj1, obj2) => {
+  //   const value1 = obj1[key]
+  //   const value2 = obj2[key]
+  //   if (value1 > value2) {
+  //     return 1;
+  //   } if (value1 < value2) {
+  //     return -1;
+  //   }
+  //   return 0;
+  // }
 
-  // 格式化数据（排序）
-  formatData = parameterList => {
-    parameterList.forEach(item => {
-      item.params.sort(this.compare('sortNo'));
-    })
-    return parameterList;
-  }
-
-  onFinish = values => {
-    console.log('Success:', values);
-  };
-
-  onFinishFailed = errorInfo => {
-    console.log('Failed:', errorInfo);
-  };
+  // // 格式化数据（排序）
+  // formatData = parameterList => {
+  //   parameterList.forEach(item => {
+  //     item.params.sort(this.compare('sortNo'));
+  //   })
+  //   return parameterList;
+  // }
 
 
   render() {
-    const { res } = this.props.location.state;
-    const list = this.formatData(res);          // 数据排序
-    // console.log(list);
+    const { newData } = this.props.location.state;
+    // const list = this.formatData(res);          // 数据排序
+    const list = newData;
 
     return (
       <>
@@ -67,9 +58,7 @@ class ProcessParameter extends Component {
                           newIt.paramProperties.forEach(ie => {
                             newIt[ie.paramPropertyKey] = ie.paramPropertyValue
                           })
-                          return <InputModel key={newIt.index} data={newIt}/>;
-                          // if (it.type === 'input') return <InputModel key={newIt.index} data={newIt}/>;
-                          // return 123;
+                          return <ModelType data={newIt} key={newIt.index} />;
                         })
                       }
                   </Card>

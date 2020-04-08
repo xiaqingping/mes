@@ -18,8 +18,6 @@ import style from './index.less';
 
 class TaskList extends Component {
   state = {
-    // selectedIds: [],      // 当前展开Table
-    visibleTable: false, // 执行记录表显示
     visibleParam: false,
     parameterList: [],
     openId: [],
@@ -32,18 +30,22 @@ class TaskList extends Component {
   showTable = (id, type) => {
     const { openId } = this.state;
     const newData = openId;
-    let arr = [];
+
     if (type === 1) {
-      arr = [...arr, id];
+      newData.push(id);
     }
     if (type === 2) {
-      const index = openId.map((item, ind) => {
-        if (item === id) return ind;
+      let index = null;
+      openId.forEach((item, ind) => {
+        if (item === id) {
+          index = ind
+          }
       });
       newData.splice(index, 1);
     }
+
     this.setState({
-      openId: arr,
+      openId: newData,
     });
   };
 
@@ -109,9 +111,7 @@ class TaskList extends Component {
 
   render() {
     const {
-      visibleTable,
       visibleParam,
-      // selectedIds,
       parameterList,
       openId,
     } = this.state;
@@ -174,6 +174,7 @@ class TaskList extends Component {
         },
       },
     ];
+    console.log(openId)
     return (
       <>
         <Drawer
@@ -208,33 +209,27 @@ class TaskList extends Component {
                   </div>
 
                   <div className={style.open}>
-                    {/* {visibleTable && selectedIds.indexOf(item.id) > -1 ? ( */}
                     {openId.filter(i => i === item.id).length !== 0 ? (
-                      // <a onClick={() => this.showTable(false, item.id, 'fales')}>
-                      <a onClick={() => this.showTable(!visibleTable, item.id, 2)}>
-                        收起
-                        <UpOutlined />
-                      </a>
+                      <>
+                        <a onClick={() => this.showTable(item.id, 2)}>
+                          收起
+                          <UpOutlined />
+                        </a>
+                        <Table
+                          size="small"
+                          columns={columns}
+                          rowKey="id"
+                          dataSource={item.taskExecRecordList}
+                          pagination={false}
+                        />
+                      </>
                     ) : (
-                      <a onClick={() => this.showTable(!visibleTable, item.id, 1)}>
+                      <a onClick={() => this.showTable(item.id, 1)}>
                         展开
                         <DownOutlined />
                       </a>
                     )}
                   </div>
-                  {visibleTable ? (
-                    <>
-                      <Table
-                        size="small"
-                        columns={columns}
-                        rowKey="id"
-                        dataSource={item.taskExecRecordList}
-                        pagination={false}
-                      />
-                    </>
-                  ) : (
-                    ''
-                  )}
                 </Card>
               </List.Item>
             )}
