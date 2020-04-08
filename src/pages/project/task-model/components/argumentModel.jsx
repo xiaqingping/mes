@@ -22,7 +22,7 @@ class ArgumentModel extends Component {
     const isAdd = window.location.href.indexOf('add') > 0;
     const { argumentList } = this.props.taskModel;
     console.log(argumentList);
-    debugger;
+
     if (argumentList && argumentList.length > 0) {
       this.setState({
         argumentList,
@@ -74,7 +74,6 @@ class ArgumentModel extends Component {
       id = selectParamsId;
     }
     console.log(id);
-    // debugger;
     api.getTaskModelDetail(id).then(res => {
       console.log(res);
       const list = res.params.map(item => {
@@ -130,9 +129,12 @@ class ArgumentModel extends Component {
 
   titleContent = () => {
     const { title, isAdd, paramName } = this.state;
+    const paramname = isAdd ? '新增' : paramName;
+    const spliter = paramname ? '---' : '';
     return (
       <>
-        <div style={{ fontSize: '16px' }}>{`${title}---${isAdd ? '新增' : paramName}`}</div>
+        {/* <div style={{ fontSize: '16px' }}>{`${title}---${isAdd ? '新增' : paramName}`}</div> */}
+        <div style={{ fontSize: '16px' }}>{`${title}${spliter}${paramname}`}</div>
       </>
     );
   };
@@ -143,14 +145,23 @@ class ArgumentModel extends Component {
     list = list.filter((v, idx) => {
       return idx !== index;
     });
-    this.setState({
-      argumentList: list,
-    });
-    const { dispatch } = this.props;
-    dispatch({
-      type: 'taskModel/getArgumentsList',
-      payload: this.state.argumentList,
-    });
+    if (!list.length) {
+      this.setState({
+        paramName: '',
+      });
+    }
+    this.setState(
+      {
+        argumentList: list,
+      },
+      () => {
+        const { dispatch } = this.props;
+        dispatch({
+          type: 'taskModel/getArgumentsList',
+          payload: this.state.argumentList,
+        });
+      },
+    );
   };
 
   toViewArgumrnt = (item, idx) => {
@@ -261,17 +272,19 @@ class ArgumentModel extends Component {
                       {item.paramName}
                     </span>
                     {!fromView && (
-                      <Popconfirm
-                        placement={index === 0 ? 'bottom' : 'top'}
-                        title="确定要删除吗?"
-                        onConfirm={() => this.handleDelete(item, index)}
-                        okText="确认"
-                        cancelText="取消"
-                      >
-                        <Button type="link" style={{ float: 'right', marginLeft: 40 }}>
-                          删除
-                        </Button>
-                      </Popconfirm>
+                      <div style={{ float: 'right', paddingLeft: 40 }}>
+                        <Popconfirm
+                          overlayClassName="task_model_argu_model_pop"
+                          // width={200}
+                          placement={index === 0 ? 'bottom' : 'top'}
+                          title="确定要删除吗?"
+                          onConfirm={() => this.handleDelete(item, index)}
+                          okText="确认"
+                          cancelText="取消"
+                        >
+                          <Button type="link">删除</Button>
+                        </Popconfirm>
+                      </div>
                     )}
                   </div>
                 );

@@ -1,9 +1,12 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Avatar, Tag, Card } from 'antd';
 import { DownOutlined, UpOutlined, SettingOutlined } from '@ant-design/icons';
 import { connect } from 'dva';
 import api from '@/pages/project/api/taskmodel';
 import ArgumentModel from './argumentModel';
+import disk from '@/pages/project/api/disk';
+
+import '../index.less';
 
 class TitleModel extends React.Component {
   state = {
@@ -23,6 +26,28 @@ class TitleModel extends React.Component {
         this.setState({
           viewData: res,
         });
+        // const uuids = res.picture;
+        // disk
+        //   .getFiles({
+        //     sourceCode: uuids,
+        //     sourceKey: 'project_task_model',
+        //   })
+        //   .then(v => {
+        //     const newList = v.id;
+        //     console.log(v);
+        //     // const newList = res.map(e => {
+        //     //   const filterItem = v.filter(item => item.sourceCode === e.picture);
+        //     //   const fileId = filterItem[0] && filterItem[0].id;
+        //     //   return {
+        //     //     ...e,
+        //     //     fileId,
+        //     //   };
+        //     // });
+        //     this.setState({
+        //       viewData: newList,
+        //     });
+        //   });
+
         if (res.version) {
           this.setState({
             versionType: res.versions,
@@ -101,91 +126,99 @@ class TitleModel extends React.Component {
       toViewArgument,
     } = this.state;
     return (
-      <div style={{ marginTop: '25px', overflow: 'hidden' }}>
-        <Avatar
-          src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
-          style={{ float: 'left' }}
-          size="large"
-          shape="circle"
-        />
-        <div style={{ float: 'left', fontWeight: '900' }}>
-          <div style={{ fontWeight: '700' }}>{viewData.code}</div>
-          <div style={{ width: '200px', height: '50px', wordWrap: 'break-word' }}>
-            {viewData.name}
-          </div>
-        </div>
-
-        <div style={{ float: 'right', marginLeft: '30px', fontSize: '14px' }}>
+      <>
+        <div
+          style={{
+            marginTop: '25px',
+            // overflow: 'auto',
+            // position: 'relative',
+            display: 'flex',
+          }}
+        >
           <div>
-            {open ? (
-              <a href="#" onClick={() => this.setState({ open: !open })}>
-                收起
-                <DownOutlined />
-              </a>
-            ) : (
-              <a href="#" onClick={() => this.setState({ open: !open })}>
-                展开
-                <UpOutlined />
-              </a>
-            )}
+            <Avatar
+              src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
+              style={{ float: 'left' }}
+              size="large"
+              shape="circle"
+            />
+            <div style={{ fontWeight: '900', marginLeft: 10 }}>
+              <div style={{ fontWeight: '700' }}>{viewData.code}</div>
+              <div style={{ width: '200px', height: '50px', wordWrap: 'break-word' }}>
+                {viewData.name}
+              </div>
+            </div>
           </div>
-        </div>
 
-        <div style={{ float: 'left' }}>
-          <div style={{ position: 'relative', display: 'inline-block' }}>
-            <Tag
-              color="green"
-              style={{ cursor: 'pointer' }}
-              onClick={() => {
-                this.setState({ versionOpen: !versionOpen });
-              }}
-            >
-              {selectVersion || 'V1.0'}
-              {/* {selectVersion || processDetail.version} */}
-            </Tag>
-            {versionOpen && (versionType || []).length > 1 && (
-              <Card
-                style={{ position: 'absolute', zIndex: '1000', top: '28px' }}
-                hoverable
-                className="padding-none"
+          <div>
+            <div style={{ position: 'relative', display: 'inline-block' }}>
+              <Tag
+                color="green"
+                style={{ cursor: 'pointer' }}
+                onClick={() => {
+                  this.setState({ versionOpen: !versionOpen });
+                }}
               >
-                {(versionType || []).length > 1 &&
-                  versionType.map(item => (
-                    <Tag
-                      key={item}
-                      style={{ cursor: 'pointer' }}
-                      onClick={() => {
-                        this.switchVersion(item);
-                      }}
-                    >
-                      {item}
-                    </Tag>
-                  ))}
-              </Card>
-            )}
+                {selectVersion || 'V1.0'}
+                {/* {selectVersion || processDetail.version} */}
+              </Tag>
+              {versionOpen && (versionType || []).length > 1 && (
+                <Card
+                  style={{ position: 'absolute', zIndex: '10000000000', top: '28px' }}
+                  hoverable
+                  className="padding-none"
+                >
+                  {(versionType || []).length > 1 &&
+                    versionType.map(item => (
+                      <Tag
+                        key={item}
+                        style={{ cursor: 'pointer' }}
+                        onClick={() => {
+                          this.switchVersion(item);
+                        }}
+                      >
+                        {item}
+                      </Tag>
+                    ))}
+                </Card>
+              )}
+            </div>
+          </div>
+
+          <div style={{ marginLeft: 30, float: 'left' }} onClick={() => this.viewParams(viewData)}>
+            <SettingOutlined />
+          </div>
+
+          <div style={{ marginLeft: '30px', fontSize: '14px' }}>
+            <div>
+              {open ? (
+                <a href="#" onClick={() => this.setState({ open: !open })}>
+                  收起
+                  <UpOutlined />
+                </a>
+              ) : (
+                <a href="#" onClick={() => this.setState({ open: !open })}>
+                  展开
+                  <DownOutlined />
+                </a>
+              )}
+            </div>
           </div>
         </div>
-
-        <div style={{ marginLeft: 30, float: 'left' }} onClick={() => this.viewParams(viewData)}>
-          <SettingOutlined />
-        </div>
-
-        {open ? (
-          <div style={{ marginLeft: '40px', color: '#858585', fontSize: '14px' }}>
-            <div style={{ clear: 'both', marginTop: '36px' }}>某某某发布人</div>
+        {open && (
+          <div style={{ marginLeft: '40px', color: '#858585', fontSize: '14px', marginBottom: 20 }}>
+            <div>某某某发布人</div>
             <div style={{ marginBottom: '20px' }}>(2017-01-12 13:55:34)</div>
             <div style={{ width: '400px' }}>
               该任务旨在分析肠道微生物与肥胖之间的关系。本次实验分析共，该任务旨在分析肠道微生物与肥胖之间的关系。
             </div>
           </div>
-        ) : (
-          ''
         )}
 
         {toViewArgument && (
           <ArgumentModel visible={viewVisible} onClose={this.onViewClose} fromView />
         )}
-      </div>
+      </>
     );
   }
 }

@@ -14,6 +14,7 @@ import {
   Switch,
   Popconfirm,
   Spin,
+  Avatar,
 } from 'antd';
 import { LoadingOutlined, SettingOutlined, PlusOutlined, DeleteOutlined } from '@ant-design/icons';
 import { connect } from 'dva';
@@ -81,6 +82,7 @@ class TaskModel extends Component {
       selectVersion: '', // 选择的版本值
       sonIds: [], // 所有前置任务的id
       ids: [], // 所有选择的id
+      picture: '',
     };
   }
 
@@ -98,7 +100,9 @@ class TaskModel extends Component {
       });
       api.getTaskModelDetail(id).then(res => {
         this.setState({
+          checked: res.isAutomatic * 1 === 1,
           loading: false,
+          picture: res.picture,
         });
         console.log(res);
         const { dispatch } = this.props;
@@ -107,6 +111,23 @@ class TaskModel extends Component {
           payload: res,
         });
         (this.tableSearchFormRef.current || {}).setFieldsValue(res);
+        disk
+          .getFiles({
+            sourceCode: res.picture,
+            sourceKey: 'project_task_model',
+          })
+          .then(v => {
+            this.setState({
+              imageUrl: v.length !== 0 ? disk.downloadFiles(v[0].id, { view: true }) : '',
+            });
+            // this.props.dispatch({
+            //   type: 'processModel/setProcessDetail',
+            //   payload: {
+            //     ...res,
+            //     fileId: v.length !== 0 ? v[0].id : '',
+            //   },
+            // });
+          });
         if (res.version) {
           this.setState({
             versionType: versionFun(res.version),
@@ -114,12 +135,17 @@ class TaskModel extends Component {
         }
       });
 
-      this.setState({
-        checked: editOriginModelData.isAutomatic * 1 === 1,
-      });
-
       this.getTableData(id);
     }
+  }
+
+  componentWillUnmount() {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'taskModel/getArgumentsList',
+      payload: null,
+    });
+    // this.onFinish
   }
 
   getTableData = id => {
@@ -137,6 +163,7 @@ class TaskModel extends Component {
 
   // 图片上传
   handleChange = info => {
+    const { guuid } = this.state;
     if (info.file.status === 'uploading') {
       this.setState({ loading: true });
       return;
@@ -147,6 +174,7 @@ class TaskModel extends Component {
         this.setState({
           imageUrl,
           loading: false,
+          picture: guuid,
         }),
       );
     }
@@ -179,10 +207,18 @@ class TaskModel extends Component {
 
   // 提交上传
   onFinish = values => {
-    const { checked, tableData, imageUrl, guuid, pageModel, id, selectVersion } = this.state;
+    const {
+      checked,
+      tableData,
+      imageUrl,
+      guuid,
+      pageModel,
+      id,
+      selectVersion,
+      picture,
+    } = this.state;
     const ids = [];
     const { argumentList } = this.props.taskModel;
-    const { dispatch } = this.props;
 
     const form = this.tableSearchFormRef.current.getFieldsValue();
     form.isAutomatic = checked ? 1 : 2;
@@ -195,21 +231,19 @@ class TaskModel extends Component {
     if (imageUrl) {
       form.picture = guuid;
     }
+    form.picture = picture;
     form.version = selectVersion || 'V1.0';
     console.log(form);
     this.setState({
       loading: true,
     });
-    const dispatchList = () => {
-      dispatch({
-        type: 'taskModel/getArgumentsList',
-        payload: null,
-      });
-    };
+    // const dispatchList = () => {
+
+    // };
     if (pageModel === 0) {
       api.createTaskModel(form).then(() => {
         message.success('任务模型创建成功!');
-        dispatchList();
+        // dispatchList();
         router.push('/project/task-model');
       });
     }
@@ -217,7 +251,7 @@ class TaskModel extends Component {
       form.id = id;
       api.editTaskModel(form).then(() => {
         message.success('任务模型修改成功!');
-        dispatchList();
+        // dispatchList();
         router.push('/project/task-model');
       });
     }
@@ -226,7 +260,7 @@ class TaskModel extends Component {
       form.id = id;
       api.upgradeTaskModel(id, form).then(() => {
         message.success('任务模型升级成功!');
-        dispatchList();
+        // dispatchList();
         router.push('/project/task-model');
       });
     }
@@ -366,12 +400,9 @@ class TaskModel extends Component {
         render: (value, row) => {
           return (
             <div style={{ display: 'flex' }}>
-              <img
-                src="http://img1.imgtn.bdimg.com/it/u=1828061713,3436718872&fm=26&gp=0.jpg"
-                alt=""
-                width={40}
-                height={40}
-                style={{ borderRadius: '2px' }}
+              <Avatar
+                src={row.fileId ? disk.downloadFiles(row.fileId, { view: true }) : ''}
+                style={{ float: 'left', width: '46px', height: '46px', marginRight: 10 }}
               />
               <div>
                 <h5>{row.code}</h5>
@@ -399,7 +430,7 @@ class TaskModel extends Component {
             <>
               <Badge
                 status={formatter(taskModelStatusOptions, value, 'value', 'status')}
-                text={formatter(taskModelStatusOptions, value, 'value', 'data')}
+                text={formatter(taskModelStatusOptions, value, 'value', 'label')}
               />
             </>
           );
@@ -428,8 +459,9 @@ class TaskModel extends Component {
       },
     ];
 
-    const uploadUrl = disk.uploadMoreFiles('project_process_model', guuid);
-    console.log(this.state.editOriginModelData);
+    const uploadUrl = disk.uploadMoreFiles('project_task_model', guuid);
+    console.log(uploadUrl);
+
     return (
       <PageHeaderWrapper title={this.navContent()}>
         <Card>
