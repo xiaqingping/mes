@@ -17,7 +17,6 @@ const tagsFromServer = [
   'gold',
   'cyan',
   'purple',
-  'red',
   'gray',
 ];
 
@@ -35,7 +34,6 @@ class Test extends Component {
   // 跳转到添加流程页面
   handleAdd = () => {
     router.push('/project/project-manage/add/addflowpath');
-    // console.log(1234);
   };
 
   handleSave = () => {
@@ -134,7 +132,7 @@ class Test extends Component {
                         borderColor: '#dcdcdc',
                         lineHeight: '30px',
                         textAlign: 'center',
-                        backgroundColor: '#F5F5F5',
+                        // backgroundColor: '#F5F5F5',
                       }}
                     >
                       {tag}

@@ -121,7 +121,6 @@ class ProjectManagement extends Component {
   renderOption = codeOrName => ({
     value: codeOrName.name,
     label: (
-      // <Option key={item.id} text={item.name}>
       <div style={{ display: 'flex' }}>
         <span>{codeOrName.name}</span>&nbsp;&nbsp;
         <span>{codeOrName.code}</span>
