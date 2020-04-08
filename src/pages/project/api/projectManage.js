@@ -1,10 +1,10 @@
 import request from '@/utils/request';
 
-let http1 = 'http://192.168.20.6:8166';
+// 1组
+const http1 = 'http://192.168.20.6:8166';
 
-if (process.env.NODE_ENV !== 'development') {
-  http1 = '';
-}
+// 2组
+const http2 = 'http://192.168.20.12:8360';
 
 export default {
   // 项目管理接口
@@ -29,5 +29,21 @@ export default {
       method: 'POST',
       data,
     });
+  },
+
+  // 流程模型接口
+  // 流程模型分页列表
+  getProcess(params) {
+    return request(`${http2}/v1/process`, { params });
+  },
+
+  // 根据code和version查询流程模型详细信息
+  getProcessChangeVersion(data) {
+    return request(`${http2}/v1/process/${data.code}/${data.version}`);
+  },
+
+  // 添加流程页面删除
+  deleteAddProcess(id) {
+    return request(`${http1}/projects/v1/${id}/deleted`, { method: 'PUT' });
   },
 };
