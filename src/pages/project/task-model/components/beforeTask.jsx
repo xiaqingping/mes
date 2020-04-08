@@ -7,6 +7,7 @@ import { connect } from 'dva';
 import api from '@/pages/project/api/taskmodel';
 import { cutString } from '@/utils/utils';
 import _ from 'lodash';
+import disk from '@/pages/project/api/disk';
 
 const FormItem = Form.Item;
 
@@ -62,10 +63,29 @@ class BeforeTask extends React.Component {
       rows,
       ...formData,
       ...options,
+      status: 2,
     };
     api.getTaskModels(data).then(res => {
+      const uuids = res.rows.map(e => e.picture);
+      disk
+        .getFiles({
+          sourceCode: uuids.join(','),
+          sourceKey: 'project_task_model',
+        })
+        .then(v => {
+          const newList = res.rows.map(e => {
+            const filterItem = v ? v.filter(item => item.sourceCode === e.picture) : [];
+            const fileId = filterItem[0] && filterItem[0].id;
+            return {
+              ...e,
+              fileId,
+            };
+          });
+          this.setState({
+            list: newList,
+          });
+        });
       this.setState({
-        list: res.rows,
         pagination: {
           current: data.page,
           pageSize: data.rows,
@@ -133,9 +153,9 @@ class BeforeTask extends React.Component {
   };
 
   sendData = async id => {
+    this.props.onClose();
     const res = await api.getAllPreTasks(id, this.props.ids);
     this.props.getData(res);
-    this.props.onClose();
   };
 
   handleChange = p => {
@@ -160,13 +180,15 @@ class BeforeTask extends React.Component {
         width: 220,
         render: (value, row) => (
           <>
-            <Avatar
-              src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
-              style={{ float: 'left' }}
-            />
-            <div style={{ float: 'left' }}>
-              <div>{value}</div>
-              <div>{row.name}</div>
+            <div style={{ display: 'flex' }}>
+              <Avatar
+                src={row.fileId ? disk.downloadFiles(row.fileId, { view: true }) : ''}
+                style={{ float: 'left', width: '40px', height: '40px' }}
+              />
+              <div style={{ float: 'left', marginLeft: '10px' }}>
+                <div>{value}</div>
+                <div>{row.name}</div>
+              </div>
             </div>
           </>
         ),

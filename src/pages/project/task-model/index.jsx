@@ -16,6 +16,7 @@ import {
   Spin,
   message,
   Modal,
+  Avatar,
 } from 'antd';
 import { DownOutlined, PlusOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import TableSearchForm from '@/components/TableSearchForm';
@@ -27,6 +28,7 @@ import { formatter, getOperates } from '@/utils/utils';
 import api from '@/pages/project/api/taskmodel';
 import TaskModelView from './taskModelView';
 import StandardTable from '../components/StandardTable';
+import disk from '@/pages/project/api/disk';
 
 const FormItem = Form.Item;
 const { Option } = Select;
@@ -86,17 +88,43 @@ class TaskModel extends Component {
       ...options,
     };
     console.log(data);
-    api.getTaskModels(data).then(res => {
-      this.setState({
-        list: res.rows,
-        pagination: {
-          current: data.page,
-          pageSize: data.rows,
-          total: res.total,
-        },
-        loading: false,
+    api
+      .getTaskModels(data)
+      .then(res => {
+        const uuids = res.rows.map(e => e.picture);
+        disk
+          .getFiles({
+            sourceCode: uuids.join(','),
+            sourceKey: 'project_task_model',
+          })
+          .then(v => {
+            const newList = res.rows.map(e => {
+              const filterItem = v.filter(item => item.sourceCode === e.picture);
+              const fileId = filterItem[0] && filterItem[0].id;
+              return {
+                ...e,
+                fileId,
+              };
+            });
+            this.setState({
+              list: newList,
+            });
+          });
+        this.setState({
+          // list: res.rows,
+          pagination: {
+            current: data.page,
+            pageSize: data.rows,
+            total: res.total,
+          },
+          loading: false,
+        });
+      })
+      .catch(() => {
+        this.setState({
+          loading: false,
+        });
       });
-    });
   };
 
   // 筛选状态
@@ -244,6 +272,7 @@ class TaskModel extends Component {
         <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
           <FormItem label="任务模型" name="code">
             <AutoComplete
+              style={{ width: 260 }}
               onSearch={this.inputValue}
               options={nameCodeVal.map(this.renderOption)}
               // placeholder={formatMessage({ id: 'bp.inputHere' })}
@@ -253,7 +282,7 @@ class TaskModel extends Component {
         </Col>
         <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
           <FormItem label="状态" name="status">
-            <Select mode="multiple" maxTagCount={2} maxTagTextLength={3}>
+            <Select mode="multiple" maxTagCount={2} maxTagTextLength={3} style={{ width: 260 }}>
               {status.map(item => (
                 <Option key={item.value} value={item.value}>
                   {item.text}
@@ -265,6 +294,7 @@ class TaskModel extends Component {
         <Col xxl={6} lg={languageCode === 'EN' ? 12 : 0}>
           <FormItem label="发布人" name="publisherCode">
             <AutoComplete
+              style={{ width: 260 }}
               onSearch={this.inputValuePublish}
               options={nameCodeVal.map(this.renderOptionPublish)}
               // placeholder={formatMessage({ id: 'bp.inputHere' })}
@@ -320,32 +350,34 @@ class TaskModel extends Component {
   publishModel = v => {
     api.publishTaskModel(v.id).then(() => {
       message.success('任务模型发布成功!');
-      this.updateListData(v.id);
+      this.getTableData();
+      // this.updateListData(v.id);
     });
   };
 
   // 更新某行数据
-  updateListData = id => {
-    const { list } = this.state;
-    api.getTaskModelDetail(id).then(res => {
-      let lists = [...list];
-      lists = lists.map(item => {
-        if (item.id === id) {
-          item = res;
-        }
-        return item;
-      });
-      this.setState({
-        list: lists,
-      });
-    });
-  };
+  // updateListData = id => {
+  //   const { list } = this.state;
+  //   api.getTaskModelDetail(id).then(res => {
+  //     let lists = [...list];
+  //     lists = lists.map(item => {
+  //       if (item.id === id) {
+  //         item = res;
+  //       }
+  //       return item;
+  //     });
+  //     this.setState({
+  //       list: lists,
+  //     });
+  //   });
+  // };
 
   // 禁用模型
   forbiddenModel = id => {
     api.forbiddenTaskModel(id).then(res => {
       message.success('任务模型已禁用!');
-      this.updateListData(id);
+      this.getTableData();
+      // this.updateListData(id);
     });
   };
 
@@ -402,12 +434,9 @@ class TaskModel extends Component {
         key: 'codeAndName',
         render: (text, row) => (
           <div style={{ display: 'flex' }}>
-            <img
-              src="https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=2912333032,1411506376&fm=26&gp=0.jpg"
-              alt=""
-              height="40"
-              width="40"
-              style={{ borderRadius: '2px' }}
+            <Avatar
+              src={row.fileId ? disk.downloadFiles(row.fileId, { view: true }) : ''}
+              style={{ float: 'left', width: '46px', height: '46px' }}
             />
             <div style={{ marginLeft: 10 }}>
               <div style={{ color: '#545454' }}>{row.name}</div>
@@ -542,7 +571,7 @@ class TaskModel extends Component {
             </div>
           </Spin>
         </Card>
-        {viewId && <TaskModelView visible={visible} onClose={this.onClose} viewId={viewId} />}
+        {visible && <TaskModelView visible={visible} onClose={this.onClose} viewId={viewId} />}
       </PageHeaderWrapper>
     );
   }
