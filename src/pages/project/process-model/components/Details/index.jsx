@@ -1,27 +1,13 @@
 // 详情二级抽屉
 import React, { useState } from 'react';
-import { Tooltip, Drawer, Avatar, Tag, List, Card, Badge } from 'antd';
-import {
-  QuestionCircleOutlined,
-  DownOutlined,
-  UpOutlined,
-  SettingOutlined,
-} from '@ant-design/icons';
+import { Drawer, Avatar, Tag, List, Card, Badge } from 'antd';
+import { DownOutlined, UpOutlined, SettingOutlined } from '@ant-design/icons';
 import { formatter } from '@/utils/utils';
 import './index.less';
 import api from '@/pages/project/api/taskmodel';
-
-/**
- * 问号的说明作用
- * @param {String} title 说明内容
- */
-const MarkTool = props => (
-  <Tooltip title={props.title}>
-    <span>
-      <QuestionCircleOutlined style={{ fontSize: props.size }} />
-    </span>
-  </Tooltip>
-);
+import processApi from '@/pages/project/api/processModel/';
+import disk from '@/pages/project/api/disk';
+import Parameter from '@/pages/project/process-model/components/Parameter';
 
 /**
  * 抽屉的使用
@@ -40,6 +26,9 @@ const DrawerTool = props => {
   const [task, setTask] = useState([]);
   // 任务名称，用于二级抽屉的名称显示
   const [taskName, setTaskName] = useState();
+  // 参数弹框
+  const [parameterVisible, setParameterVisible] = useState(false);
+
   const { status = [], detailValue } = props;
 
   const onClose = () => {
@@ -53,15 +42,40 @@ const DrawerTool = props => {
     onClose();
   };
 
+  // 关闭参数
+  const handleClose = value => {
+    const newData = value.map((item, index) => {
+      const itemLength = value.length;
+      return { ...item, sortNo: itemLength - index };
+    });
+    const sonData = newData;
+    newData.map((item, index) => {
+      sonData[index].params = item.params.map((i, ind) => {
+        const iLength = item.params.length;
+        return { ...i, sortNo: iLength - ind };
+      });
+    });
+    sonData[0].sortNo = 0;
+    console.log(sonData, props.detailValue);
+    const data = props.detailValue;
+    data.groups = sonData;
+    processApi.changeProcess(data);
+    setParameterVisible(false);
+    // this.setState({
+    //   parameterVisible: false,
+    //   paramter: sonData,
+    // });
+  };
+
   const CollapseTool = value => (
     <div style={{ marginTop: '25px' }}>
       <Avatar
-        src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
+        src={value.picId ? disk.downloadFiles(value.picId, { view: true }) : ''}
         style={{ float: 'left' }}
         size="large"
       />
       {/* 选择版本 */}
-      <div style={{ float: 'left' }}>
+      <div style={{ float: 'left', marginLeft: '10px' }}>
         <div>
           {value.code}
           <div style={{ position: 'relative', display: 'inline-block', marginLeft: '30px' }}>
@@ -103,12 +117,25 @@ const DrawerTool = props => {
               ''
             )}
             <div style={{ float: 'right', marginLeft: '25px', marginTop: ' 3px' }}>
-              <SettingOutlined />
+              <a onClick={() => setParameterVisible(true)}>
+                <SettingOutlined />
+              </a>
             </div>
           </div>
         </div>
         <div style={{ width: '255px', height: '50px', wordWrap: 'break-word' }}>{value.name}</div>
       </div>
+
+      {/* 参数弹框 */}
+      {parameterVisible ? (
+        <Parameter
+          visible={parameterVisible}
+          handleClose={v => handleClose(v)}
+          paramter={props.detailValue.groups}
+        />
+      ) : (
+        ''
+      )}
 
       <div style={{ float: 'right', marginLeft: '30px', fontSize: '14px' }}>
         {value.status === 2 ? (
@@ -132,11 +159,6 @@ const DrawerTool = props => {
           )}
         </div>
       </div>
-      {/* <div style={{ float: 'right' }}>
-          <Tag color="green" style={{ padding: '0 10px' }}>
-            V1.0
-          </Tag>
-        </div> */}
       {open ? (
         <div style={{ marginLeft: '40px', color: '#858585', fontSize: '14px' }}>
           <div style={{ clear: 'both', marginTop: '36px' }}>{value.publisherName}</div>
@@ -153,14 +175,26 @@ const DrawerTool = props => {
   const showChildrenDrawer = item => {
     setTaskName(item.name);
     api.getPreTasks(item.id).then(res => {
-      setTask(res);
+      const uuids = res.map(i => i.picture);
+      disk.getFiles({ sourceCode: uuids.join(','), sourceKey: 'project_task_model' }).then(r => {
+        const newList = res.map(e => {
+          const filterItem = r.filter(it => it.sourceCode === e.picture);
+          const fileId = filterItem[0] && filterItem[0].id;
+          return {
+            ...e,
+            fileId,
+          };
+        });
+        setChildrenDrawer(true);
+        setTask(newList);
+      });
     });
-    setChildrenDrawer(true);
   };
 
   const onChildrenDrawerClose = () => {
     setChildrenDrawer(false);
   };
+
   return (
     <div>
       <Drawer
@@ -178,11 +212,11 @@ const DrawerTool = props => {
             <List.Item key={item}>
               <Card hoverable style={{ width: '470px', height: '240px' }}>
                 <Avatar
-                  src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
+                  src={item.listId ? disk.downloadFiles(item.listId, { view: true }) : ''}
                   style={{ float: 'left' }}
                   size="large"
                 />
-                <div style={{ float: 'left' }}>
+                <div style={{ float: 'left', marginLeft: '10px' }}>
                   <div>{item.code}</div>
                   <div style={{ width: '255px', height: '50px', wordWrap: 'break-word' }}>
                     {item.name}
@@ -236,11 +270,11 @@ const DrawerTool = props => {
               <List.Item key={item}>
                 <Card hoverable style={{ width: '470px', height: '240px' }}>
                   <Avatar
-                    src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
+                    src={item.fileId ? disk.downloadFiles(item.fileId, { view: true }) : ''}
                     style={{ float: 'left' }}
                     size="large"
                   />
-                  <div style={{ float: 'left' }}>
+                  <div style={{ float: 'left', marginLeft: '10px' }}>
                     <div>{item.code}</div>
                     <div style={{ width: '255px', height: '50px', wordWrap: 'break-word' }}>
                       {item.name}
@@ -282,4 +316,4 @@ const DrawerTool = props => {
   );
 };
 
-export { MarkTool, DrawerTool };
+export { DrawerTool };

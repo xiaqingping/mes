@@ -88,11 +88,14 @@ class ProcessEdit extends Component {
       data = this.props.match.params.id.split('-');
       api.getProcessDetail(data[0]).then(res => {
         let itemIndex = 0;
-        res.groups.map((item, index) => {
-          if (item.groupName === 'no') {
-            itemIndex = index;
-          }
-        });
+        if (res.groups) {
+          res.groups.map((item, index) => {
+            if (item.groupName === 'no') {
+              itemIndex = index;
+            }
+          });
+        }
+
         if (itemIndex) {
           const itemData = res.groups.splice(itemIndex, 1);
           res.groups.unshift(itemData[0]);
@@ -243,17 +246,20 @@ class ProcessEdit extends Component {
 
   // 打开参数
   handleOpen = () => {
-    this.setState({
-      parameterVisible: true,
-    });
+    const { paramter } = this.state;
+
+    if (paramter) {
+      this.setState({
+        parameterVisible: true,
+      });
+    } else {
+      message.warning('没有参数可以分类');
+    }
   };
 
   // 关闭参数
   handleClose = value => {
-    const newData = value.map((item, index) => {
-      const itemLength = value.length;
-      return { ...item, sortNo: itemLength - index };
-    });
+    const newData = value.map((item, index) => ({ ...item, sortNo: index }));
     const sonData = newData;
     newData.map((item, index) => {
       sonData[index].params = item.params.map((i, ind) => {
@@ -303,12 +309,10 @@ class ProcessEdit extends Component {
   };
 
   // 获取子级数据
-
   getData = value => {
     const { taskList, ids, sonIds, paramter } = this.state;
     // const { processAddData } = this.props;
     const oldModelProcess = paramter;
-
     let data = taskList;
     const idsData = ids;
     const sonIdsData = sonIds;
