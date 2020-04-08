@@ -1,6 +1,9 @@
 import request from '@/utils/request';
 
-const http = 'http://192.168.20.12:8360';
+let http = 'http://192.168.20.12:8360';
+if (process.env.NODE_ENV !== 'development') {
+  http = '/projectmodel';
+}
 export default {
   // 任务模型模糊搜索
   searchTaskModel(params) {
@@ -13,7 +16,7 @@ export default {
   },
   // 获取任务列表
   getTaskModels(params) {
-    return request(`${http}/v1/task/task`, {
+    return request(`${http}/v1/task`, {
       params,
     });
   },
@@ -50,7 +53,7 @@ export default {
   createTaskModel(data) {
     return request(`${http}/v1/task`, {
       method: 'POST',
-      data
+      data,
     });
   },
 
@@ -94,7 +97,5 @@ export default {
   // 根据code和版本查询详细信息
   getdetailByCodeVer(code, version) {
     return request(`${http}/v1/task/${code}/${version}`);
-  }
-
-
+  },
 };
