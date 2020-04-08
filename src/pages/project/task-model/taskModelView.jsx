@@ -4,6 +4,8 @@ import { connect } from 'dva';
 import TitleModel from './components/titleModel';
 import TaskModelTabs from './components/taskModelTabs';
 import api from '@/pages/project/api/taskmodel';
+import disk from '@/pages/project/api/disk';
+import './index.less';
 
 class TaskModel extends Component {
   static getDerivedStateFromProps(nextProps) {
@@ -28,7 +30,6 @@ class TaskModel extends Component {
   };
 
   getId = v => {
-    const { nowId } = this.state;
     this.setState(
       {
         nowId: v,
@@ -45,10 +46,31 @@ class TaskModel extends Component {
       preLoading: true,
     });
     api.getPreTasks(id).then(res => {
-      this.setState({
-        preTaskList: res || [],
-        preLoading: false,
-      });
+      console.log(res);
+      const uuids = res.map(e => e.picture);
+      disk
+        .getFiles({
+          sourceCode: uuids.join(','),
+          sourceKey: 'project_task_model',
+        })
+        .then(v => {
+          const newList = res.map(e => {
+            const filterItem = (v || []).filter(item => item.sourceCode === e.picture);
+            const fileId = filterItem[0] && filterItem[0].id;
+            return {
+              ...e,
+              fileId,
+            };
+          });
+          this.setState({
+            preTaskList: newList,
+            preLoading: false,
+          });
+        });
+      // this.setState({
+      //   preTaskList: res || [],
+      //   preLoading: false,
+      // });
     });
   };
 
@@ -57,10 +79,30 @@ class TaskModel extends Component {
       postLoading: true,
     });
     api.getPostTasks(id).then(res => {
-      this.setState({
-        postTasks: res || [],
-        postLoading: false,
-      });
+      const uuids = res.map(e => e.picture);
+      disk
+        .getFiles({
+          sourceCode: uuids.join(','),
+          sourceKey: 'project_task_model',
+        })
+        .then(v => {
+          const newList = res.map(e => {
+            const filterItem = v.filter(item => item.sourceCode === e.picture);
+            const fileId = filterItem[0] && filterItem[0].id;
+            return {
+              ...e,
+              fileId,
+            };
+          });
+          this.setState({
+            postTasks: newList,
+            postLoading: false,
+          });
+        });
+      // this.setState({
+      //   postTasks: res || [],
+      //   postLoading: false,
+      // });
     });
   };
 
@@ -79,7 +121,7 @@ class TaskModel extends Component {
           <div>
             <TitleModel emitData={this.getId} />
           </div>
-          <div>
+          <div className="task_model_view_wrap">
             <TaskModelTabs
               nowId={nowId}
               preTaskList={preTaskList}

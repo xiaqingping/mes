@@ -5,6 +5,7 @@ import { Tabs, Avatar, Tag, Badge, Card, List, Spin } from 'antd';
 import ArgumentModel from './argumentModel';
 import api from '@/pages/project/api/taskmodel';
 import { formatter } from '@/utils/utils';
+import disk from '@/pages/project/api/disk';
 
 const { TabPane } = Tabs;
 // import TitleModel from './components/titleModel';
@@ -32,8 +33,7 @@ class TaskModelTabs extends Component {
   };
 
   componentDidMount() {
-    const { viewId } = this.props.taskModel.taskModel;
-
+    // const { viewId } = this.props.taskModel.taskModel;
     // console.log(this.getPreData(viewId));
     // debugger;
     // this.getPostData(viewId);
@@ -116,14 +116,15 @@ class TaskModelTabs extends Component {
                   <List.Item key={item.id} onClick={() => this.toViewParams(item)}>
                     <Card hoverable style={{ width: '550px' }}>
                       <Avatar
-                        src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
-                        style={{ float: 'left' }}
+                        src={item.fileId ? disk.downloadFiles(item.fileId, { view: true }) : ''}
+                        style={{ float: 'left', marginRight: 10 }}
                         size="large"
                       />
-                      <div style={{ float: 'left' }}>
+                      <div style={{ display: 'inline-block' }}>
                         <div>{item.code}</div>
                         <div style={{ wordWrap: 'break-word' }}>{item.name}</div>
                       </div>
+
                       <Badge
                         status={formatter(taskModelStatusOptions, item.status, 'value', 'status')}
                         text={formatter(taskModelStatusOptions, item.status, 'value', 'label')}
@@ -152,14 +153,16 @@ class TaskModelTabs extends Component {
                 renderItem={item => (
                   <List.Item key={item.id} onClick={() => this.toViewParams(item)}>
                     <Card hoverable style={{ width: '550px' }}>
-                      <Avatar
-                        src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
-                        style={{ float: 'left' }}
-                        size="large"
-                      />
-                      <div style={{ float: 'left' }}>
-                        <div>{item.code}</div>
-                        <div style={{ wordWrap: 'break-word' }}>{item.name}</div>
+                      <div style={{ display: 'flex', marginRight: 10 }}>
+                        <Avatar
+                          src={item.fileId ? disk.downloadFiles(item.fileId, { view: true }) : ''}
+                          style={{ float: 'left' }}
+                          size="large"
+                        />
+                        <div>
+                          <div>{item.code}</div>
+                          <div style={{ wordWrap: 'break-word' }}>{item.name}</div>
+                        </div>
                       </div>
                       <Badge
                         status={formatter(taskModelStatusOptions, item.status, 'value', 'status')}

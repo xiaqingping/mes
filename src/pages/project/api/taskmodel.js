@@ -13,7 +13,7 @@ export default {
   },
   // 获取任务列表
   getTaskModels(params) {
-    return request(`${http}/v1/task/task`, {
+    return request(`${http}/v1/task`, {
       params,
     });
   },
