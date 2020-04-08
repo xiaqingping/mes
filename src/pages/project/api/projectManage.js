@@ -3,7 +3,7 @@ import request from '@/utils/request';
 let http1 = 'http://192.168.20.6:8166';
 
 if (process.env.NODE_ENV !== 'development') {
-  http1 = '/projects';
+  http1 = '';
 }
 
 export default {
