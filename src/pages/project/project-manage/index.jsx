@@ -333,12 +333,13 @@ class ProjectManagement extends Component {
       },
       {
         title: '开始-截止时间',
-        dataIndex: 'StartTime',
+        dataIndex: 'beginDate',
+        width: '200px',
         render: (value, row) => (
           <>
             {value}
             <br />
-            {row.endTime}
+            {row.endDate}
           </>
         ),
       },

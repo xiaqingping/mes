@@ -1,231 +1,371 @@
 // 点击选择流程模型的模态框
 import React from 'react';
-import { Modal, Table, Avatar, Form, Col, Tag, AutoComplete } from 'antd';
-import TableSearchForm from '@/components/TableSearchForm';
-import { connect } from 'dva';
+import { Modal, Table, Avatar, Col, Tag, Card, Row, Button } from 'antd';
 import '../../index.less';
-import api from '@/pages/project/api/taskmodel';
-import { cutString } from '@/utils/utils';
-import _ from 'lodash';
-
-const FormItem = Form.Item;
-// ChooseProcessModel
 
 class ChooseProcessModel extends React.Component {
   tableSearchFormRef = React.createRef();
 
-  static getDerivedStateFromProps(nextProps) {
-    return { visible: nextProps.visible || false };
-  }
-
-  initialValues = {
-    page: 1,
-    rows: 10,
-  };
-
   constructor(props) {
+    console.log(props);
     super(props);
-    this.state = {
-      visible: false,
-      pagination: {},
-      nameCodeVal: [],
-    };
-    this.callParter = _.debounce(this.callParter, 500);
+    // this.state = {
+    //   visible: props.visible,
+    // };
   }
-
-  componentDidMount() {
-    this.getTableData(this.initialValues);
-  }
-
-  callParter = value => {
-    api.getTaskNameAndCode(value).then(res => {
-      this.setState({ nameCodeVal: res });
-    });
-  };
-
-  titleContent = () => <div style={{ fontSize: '16px' }}>选择任务模型</div>;
-
-  handleOk = () => {
-    this.setState({
-      visible: false,
-    });
-  };
-
-  getTableData = (options = {}) => {
-    this.setState({ loading: true });
-    const formData = this.tableSearchFormRef.current
-      ? this.tableSearchFormRef.current.getFieldsValue()
-      : '';
-    const { pagination } = this.state;
-    const { current: page, pageSize: rows } = pagination;
-    const data = {
-      page,
-      rows,
-      ...formData,
-      ...options,
-    };
-    api.getTaskModels(data).then(res => {
-      this.setState({
-        list: res.rows,
-        pagination: {
-          current: data.page,
-          pageSize: data.rows,
-          total: res.total,
-        },
-        loading: false,
-      });
-    });
-  };
-
-  renderOption = item => ({
-    value: item.code,
-    label: (
-      // <Option key={item.id} text={item.name}>
-      <div style={{ display: 'flex' }} key={item.code}>
-        <span>{item.code}</span>&nbsp;&nbsp;
-        <span>{item.name}</span>
-      </div>
-      // </Option>
-    ),
-  });
-
-  // 筛选值
-  inputValue = value => {
-    const { nameCodeVal } = this.state;
-    const arr = [];
-    if (!value) {
-      return false;
-    }
-    this.callParter(value);
-    if (nameCodeVal.length === 0) {
-      return false;
-    }
-    nameCodeVal.forEach(item => {
-      if (item.name.indexOf(value) !== -1) {
-        arr.push(item);
-      }
-      if (item.code.indexOf(value) !== -1 && arr.indexOf(item)) {
-        arr.push(item);
-      }
-    });
-    this.setState({
-      nameCodeVal: arr,
-      // allowClear: 'ture',
-    });
-    return true;
-  };
-
-  simpleForm = () => {
-    const { nameCodeVal } = this.state;
-    return (
-      <>
-        <Col lg={10}>
-          <FormItem label="名称" name="code">
-            <AutoComplete
-              onSearch={this.inputValue}
-              options={nameCodeVal.map(this.renderOption)}
-              // placeholder={formatMessage({ id: 'bp.inputHere' })}
-              // optionLabelProp="text"
-            />
-          </FormItem>
-        </Col>
-      </>
-    );
-  };
-
-  sendData = async id => {
-    const res = await api.getAllPreTasks(id, this.props.ids);
-    this.props.getData(res);
-    this.props.onClose();
-  };
 
   render() {
-    const { onClose } = this.props;
-    const { list, loading, pagination } = this.state;
-    const columns = [
+    const columnView = [
       {
-        title: '编号/名称',
-        dataIndex: 'code',
-        width: 220,
-        render: (value, row) => (
-          <>
-            <Avatar
-              src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
-              style={{ float: 'left' }}
-            />
-            <div style={{ float: 'left' }}>
-              <div>{value}</div>
-              <div>{row.name}</div>
-            </div>
-          </>
-        ),
+        title: '任务',
+        dataIndex: 'task',
       },
       {
         title: '描述',
-        width: 280,
         dataIndex: 'describe',
-        render: value => (
-          <div
-            // className="addEllipsis"
-            title={value}
-            style={{ width: '250px', height: '50px', wordWrap: 'break-word' }}
-          >
-            {cutString(value, 65)}
-          </div>
-        ),
       },
       {
         title: '版本',
-        width: 100,
         dataIndex: 'version',
-        render: value => (
-          <Tag color="green" style={{ padding: '0 10px' }}>
-            {value}
-          </Tag>
-        ),
+      },
+    ];
+
+    const data = [
+      {
+        key: '1',
+        task: 'John Brown',
+        describe: '心灵鸡汤来一碗,心灵鸡汤来两碗',
+        version: 'v1.2',
       },
       {
-        title: '操作',
-        width: 100,
-        render: (value, row) => (
-          <>
-            <a onClick={() => this.sendData(row.id)}>选择</a>
-          </>
-        ),
+        key: '2',
+        task: 'John Brown',
+        describe: '心灵鸡汤来一碗,心灵鸡汤来两碗',
+        version: 'v1.2',
+      },
+      {
+        key: '3',
+        task: 'John Brown',
+        describe: '心灵鸡汤来一碗,心灵鸡汤来两碗',
+        version: 'v1.2',
       },
     ];
 
     return (
-      <Modal
-        title={this.titleContent()}
-        visible={this.state.visible}
-        onOk={this.handleOk}
-        onCancel={onClose}
-        width={747}
-        footer={null}
-      >
-        <div className="tableList buttonStyle">
-          <TableSearchForm
-            ref={this.tableSearchFormRef}
-            initialValues={this.initialValues}
-            getTableData={this.getTableData}
-            simpleForm={this.simpleForm}
-          />
-          <Table
-            columns={columns}
-            dataSource={list}
-            loading={loading}
-            rowKey="id"
-            size="small"
-            pagination={pagination}
-          />
+      <Card bordered={false}>
+        <div>
+          <Modal
+            title="选择流程模型"
+            visible={this.props.visible}
+            onOk={this.handleOk}
+            onCancel={this.handleCancel}
+            width={1200}
+          >
+            <div>
+              <Row gutter={16} style={{ margin: '0' }}>
+                <Col span={7} style={{ padding: '0', marginBottom: '10px', marginRight: '10px' }}>
+                  <Card.Grid style={{ width: '300px', padding: '0' }}>
+                    <div style={{ height: '80px', width: '300px', padding: '5px' }}>
+                      <Avatar
+                        src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
+                        style={{ float: 'left', marginRight: '10px' }}
+                        size="large"
+                      />
+                      <div
+                        style={{
+                          float: 'left',
+                          height: '50px',
+                          width: '100px',
+                          textAlign: 'center',
+                        }}
+                      >
+                        <ul style={{ padding: '0', textAlign: 'center' }}>
+                          <li>某某某</li>
+                          <li>
+                            <Tag color="green" style={{ width: '50px', height: '20px' }}>
+                              v1.2
+                            </Tag>
+                          </li>
+                        </ul>
+                      </div>
+                      <div
+                        style={{
+                          fontSize: '14px',
+                          float: 'right',
+                          color: '#005bc3',
+                          marginRight: '10px',
+                        }}
+                      >
+                        <Button onClick={this.viewModal} style={{ border: '0', color: '#005bc3' }}>
+                          查看
+                        </Button>
+                        <Modal
+                          title="查看流程模型"
+                          // visible={this.state.viewvisible}
+                          onOk={this.vieweOk}
+                          onCancel={this.viewCancel}
+                          width={600}
+                        >
+                          <div style={{ height: '320px' }}>
+                            {/* 上部 */}
+                            <div style={{ height: '50px' }}>
+                              <Avatar
+                                src="https://zos.alipayobjects.com/rmsportal
+                                        /ODTLcjxAfvqbxHnVXCYX.png"
+                                style={{ float: 'left', marginRight: '10px' }}
+                                size="large"
+                              />
+                              <div
+                                style={{
+                                  float: 'left',
+                                  height: '50px',
+                                  width: '100px',
+                                  textAlign: 'center',
+                                  marginRight: '20px',
+                                }}
+                              >
+                                <ul style={{ padding: '0', textAlign: 'center' }}>
+                                  <li>565656443464</li>
+                                  <li style={{ height: '20px', border: '1px' }}>某某某</li>
+                                </ul>
+                              </div>
+
+                              <div style={{ float: 'left' }}>
+                                <Tag color="green" style={{ width: '40px', height: '20px' }}>
+                                  v1.2
+                                </Tag>
+                              </div>
+                            </div>
+                            {/* 描述 */}
+                            <div style={{ fontSize: '14px', padding: '5px' }}>
+                              心灵鸡汤来一碗,心灵鸡汤来两碗,心灵鸡汤来三碗，心灵鸡汤来四碗,心灵鸡汤来一碗,
+                              心灵鸡汤来两碗,心灵鸡汤来三碗，心灵鸡汤来四碗
+                            </div>
+                            {/* 表格 */}
+                            <div>
+                              <Table columns={columnView} dataSource={data} size="small" />
+                            </div>
+                          </div>
+                        </Modal>
+                      </div>
+                    </div>
+                    <div style={{ fontSize: '14px', padding: '10px' }}>
+                      心灵鸡汤来一碗,心灵鸡汤来两碗,心灵鸡汤来三碗，心灵鸡汤来四碗
+                    </div>
+                  </Card.Grid>
+                </Col>
+                <Col span={7} style={{ padding: '0', marginBottom: '10px', marginRight: '10px' }}>
+                  <Card.Grid style={{ width: '300px', padding: '0' }}>
+                    <div style={{ height: '80px', width: '300px', padding: '5px' }}>
+                      <Avatar
+                        src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
+                        style={{ float: 'left', marginRight: '10px' }}
+                        size="large"
+                      />
+                      <div
+                        style={{
+                          float: 'left',
+                          height: '50px',
+                          width: '100px',
+                          textAlign: 'center',
+                        }}
+                      >
+                        <ul style={{ padding: '0', textAlign: 'center' }}>
+                          <li>某某某</li>
+                          <li>
+                            <Tag color="green" style={{ width: '50px', height: '20px' }}>
+                              v1.2
+                            </Tag>
+                          </li>
+                        </ul>
+                      </div>
+                      <div
+                        style={{
+                          fontSize: '14px',
+                          float: 'right',
+                          color: '#005bc3',
+                          marginRight: '10px',
+                        }}
+                      >
+                        查看
+                      </div>
+                    </div>
+                    <div style={{ fontSize: '14px', padding: '10px' }}>
+                      心灵鸡汤来一碗,心灵鸡汤来两碗,心灵鸡汤来三碗，心灵鸡汤来四碗
+                    </div>
+                  </Card.Grid>
+                </Col>
+                <Col span={7} style={{ padding: '0', marginBottom: '10px' }}>
+                  <Card.Grid style={{ width: '300px', padding: '0' }}>
+                    <div style={{ height: '80px', width: '300px', padding: '5px' }}>
+                      <Avatar
+                        src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
+                        style={{ float: 'left', marginRight: '10px' }}
+                        size="large"
+                      />
+                      <div
+                        style={{
+                          float: 'left',
+                          height: '50px',
+                          width: '100px',
+                          textAlign: 'center',
+                        }}
+                      >
+                        <ul style={{ padding: '0', textAlign: 'center' }}>
+                          <li>某某某</li>
+                          <li>
+                            <Tag color="green" style={{ width: '50px', height: '20px' }}>
+                              v1.2
+                            </Tag>
+                          </li>
+                        </ul>
+                      </div>
+                      <div
+                        style={{
+                          fontSize: '14px',
+                          float: 'right',
+                          color: '#005bc3',
+                          marginRight: '10px',
+                        }}
+                      >
+                        查看
+                      </div>
+                    </div>
+                    <div style={{ fontSize: '14px', padding: '10px' }}>
+                      心灵鸡汤来一碗,心灵鸡汤来两碗,心灵鸡汤来三碗，心灵鸡汤来四碗
+                    </div>
+                  </Card.Grid>
+                </Col>
+                <Col span={7} style={{ padding: '0', marginBottom: '10px', marginRight: '10px' }}>
+                  <Card.Grid style={{ width: '300px', padding: '0' }}>
+                    <div style={{ height: '80px', width: '300px', padding: '5px' }}>
+                      <Avatar
+                        src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
+                        style={{ float: 'left', marginRight: '10px' }}
+                        size="large"
+                      />
+                      <div
+                        style={{
+                          float: 'left',
+                          height: '50px',
+                          width: '100px',
+                          textAlign: 'center',
+                        }}
+                      >
+                        <ul style={{ padding: '0', textAlign: 'center' }}>
+                          <li>某某某</li>
+                          <li>
+                            <Tag color="green" style={{ width: '50px', height: '20px' }}>
+                              v1.2
+                            </Tag>
+                          </li>
+                        </ul>
+                      </div>
+                      <div
+                        style={{
+                          fontSize: '14px',
+                          float: 'right',
+                          color: '#005bc3',
+                          marginRight: '10px',
+                        }}
+                      >
+                        查看
+                      </div>
+                    </div>
+                    <div style={{ fontSize: '14px', padding: '10px' }}>
+                      心灵鸡汤来一碗,心灵鸡汤来两碗,心灵鸡汤来三碗，心灵鸡汤来四碗
+                    </div>
+                  </Card.Grid>
+                </Col>
+                <Col span={7} style={{ padding: '0', marginBottom: '10px', marginRight: '10px' }}>
+                  <Card.Grid style={{ width: '300px', padding: '0' }}>
+                    <div style={{ height: '80px', width: '300px', padding: '5px' }}>
+                      <Avatar
+                        src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
+                        style={{ float: 'left', marginRight: '10px' }}
+                        size="large"
+                      />
+                      <div
+                        style={{
+                          float: 'left',
+                          height: '50px',
+                          width: '100px',
+                          textAlign: 'center',
+                        }}
+                      >
+                        <ul style={{ padding: '0', textAlign: 'center' }}>
+                          <li>某某某</li>
+                          <li>
+                            <Tag color="green" style={{ width: '50px', height: '20px' }}>
+                              v1.2
+                            </Tag>
+                          </li>
+                        </ul>
+                      </div>
+                      <div
+                        style={{
+                          fontSize: '14px',
+                          float: 'right',
+                          color: '#005bc3',
+                          marginRight: '10px',
+                        }}
+                      >
+                        查看
+                      </div>
+                    </div>
+                    <div style={{ fontSize: '14px', padding: '10px' }}>
+                      心灵鸡汤来一碗,心灵鸡汤来两碗,心灵鸡汤来三碗，心灵鸡汤来四碗
+                    </div>
+                  </Card.Grid>
+                </Col>
+                <Col span={7} style={{ padding: '0', marginBottom: '10px' }}>
+                  <Card.Grid style={{ width: '300px', padding: '0' }}>
+                    <div style={{ height: '80px', width: '300px', padding: '5px' }}>
+                      <Avatar
+                        src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
+                        style={{ float: 'left', marginRight: '10px' }}
+                        size="large"
+                      />
+                      <div
+                        style={{
+                          float: 'left',
+                          height: '50px',
+                          width: '100px',
+                          textAlign: 'center',
+                        }}
+                      >
+                        <ul style={{ padding: '0', textAlign: 'center' }}>
+                          <li>某某某</li>
+                          <li>
+                            <Tag color="green" style={{ width: '50px', height: '20px' }}>
+                              v1.2
+                            </Tag>
+                          </li>
+                        </ul>
+                      </div>
+                      <div
+                        style={{
+                          fontSize: '14px',
+                          float: 'right',
+                          color: '#005bc3',
+                          marginRight: '10px',
+                        }}
+                      >
+                        查看
+                      </div>
+                    </div>
+                    <div style={{ fontSize: '14px', padding: '10px' }}>
+                      心灵鸡汤来一碗,心灵鸡汤来两碗,心灵鸡汤来三碗，心灵鸡汤来四碗
+                    </div>
+                  </Card.Grid>
+                </Col>
+              </Row>
+            </div>
+          </Modal>
         </div>
-      </Modal>
+      </Card>
     );
   }
 }
 
-export default connect(({ global, processModel }) => ({
-  languageCode: global.languageCode,
-  processModel,
-}))(ChooseProcessModel);
+export default ChooseProcessModel;
