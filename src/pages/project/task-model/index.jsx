@@ -88,36 +88,43 @@ class TaskModel extends Component {
       ...options,
     };
     console.log(data);
-    api.getTaskModels(data).then(res => {
-      const uuids = res.rows.map(e => e.picture);
-      disk
-        .getFiles({
-          sourceCode: uuids.join(','),
-          sourceKey: 'project_task_model',
-        })
-        .then(v => {
-          const newList = res.rows.map(e => {
-            const filterItem = v.filter(item => item.sourceCode === e.picture);
-            const fileId = filterItem[0] && filterItem[0].id;
-            return {
-              ...e,
-              fileId,
-            };
+    api
+      .getTaskModels(data)
+      .then(res => {
+        const uuids = res.rows.map(e => e.picture);
+        disk
+          .getFiles({
+            sourceCode: uuids.join(','),
+            sourceKey: 'project_task_model',
+          })
+          .then(v => {
+            const newList = res.rows.map(e => {
+              const filterItem = v.filter(item => item.sourceCode === e.picture);
+              const fileId = filterItem[0] && filterItem[0].id;
+              return {
+                ...e,
+                fileId,
+              };
+            });
+            this.setState({
+              list: newList,
+            });
           });
-          this.setState({
-            list: newList,
-          });
+        this.setState({
+          // list: res.rows,
+          pagination: {
+            current: data.page,
+            pageSize: data.rows,
+            total: res.total,
+          },
+          loading: false,
         });
-      this.setState({
-        // list: res.rows,
-        pagination: {
-          current: data.page,
-          pageSize: data.rows,
-          total: res.total,
-        },
-        loading: false,
+      })
+      .catch(() => {
+        this.setState({
+          loading: false,
+        });
       });
-    });
   };
 
   // 筛选状态
@@ -343,32 +350,34 @@ class TaskModel extends Component {
   publishModel = v => {
     api.publishTaskModel(v.id).then(() => {
       message.success('任务模型发布成功!');
-      this.updateListData(v.id);
+      this.getTableData();
+      // this.updateListData(v.id);
     });
   };
 
   // 更新某行数据
-  updateListData = id => {
-    const { list } = this.state;
-    api.getTaskModelDetail(id).then(res => {
-      let lists = [...list];
-      lists = lists.map(item => {
-        if (item.id === id) {
-          item = res;
-        }
-        return item;
-      });
-      this.setState({
-        list: lists,
-      });
-    });
-  };
+  // updateListData = id => {
+  //   const { list } = this.state;
+  //   api.getTaskModelDetail(id).then(res => {
+  //     let lists = [...list];
+  //     lists = lists.map(item => {
+  //       if (item.id === id) {
+  //         item = res;
+  //       }
+  //       return item;
+  //     });
+  //     this.setState({
+  //       list: lists,
+  //     });
+  //   });
+  // };
 
   // 禁用模型
   forbiddenModel = id => {
     api.forbiddenTaskModel(id).then(res => {
       message.success('任务模型已禁用!');
-      this.updateListData(id);
+      this.getTableData();
+      // this.updateListData(id);
     });
   };
 
