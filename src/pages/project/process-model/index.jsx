@@ -21,7 +21,7 @@ import router from 'umi/router';
 import { connect } from 'dva';
 import _ from 'lodash';
 import { DateUI } from '@/pages/project/components/AntdSearchUI';
-import { formatter, getOperates } from '@/utils/utils';
+import { formatter, getOperates, compare } from '@/utils/utils';
 import api from '@/pages/project/api/processModel/';
 import disk from '@/pages/project/api/disk';
 import StandardTable from '../components/StandardTable';
@@ -296,11 +296,6 @@ class ProcessModel extends Component {
     );
   };
 
-  // 新增
-  handleAdd = () => {
-    console.log('新增');
-  };
-
   onClose = () => {
     this.setState({
       visible: false,
@@ -310,9 +305,35 @@ class ProcessModel extends Component {
   // 更换版本
   handleChangeVersion = v => {
     api.getProcessChangeVersion(v).then(res => {
-      this.setState({
-        detailValue: res,
-      });
+      let newData = {};
+      if (res.picture) {
+        disk.getFiles({ sourceCode: res.picture, sourceKey: 'project_process_model' }).then(i => {
+          const picId = i[0].id;
+          newData = { ...res, picId };
+          this.setState({
+            detailValue: newData,
+          });
+          if (res.taskModels.length !== 0) {
+            res.taskModels.map((item, index) => {
+              if (item.picture) {
+                disk
+                  .getFiles({ sourceCode: item.picture, sourceKey: 'project_process_model' })
+                  .then(r => {
+                    const listId = r[0].id;
+                    newData.taskModels[index].listId = listId;
+                    this.setState({
+                      detailValue: newData,
+                    });
+                  });
+              }
+            });
+          }
+        });
+      } else {
+        this.setState({
+          detailValue: res,
+        });
+      }
     });
   };
 
@@ -363,10 +384,49 @@ class ProcessModel extends Component {
   // 查看详情
   searchDetails = value => {
     api.getProcessDetail(value.id).then(res => {
-      console.log(res);
+      let newData = {};
+      // if (res.picture) {
+      disk.getFiles({ sourceCode: res.picture, sourceKey: 'project_process_model' }).then(i => {
+        const picId = i.length !== 0 ? i[0].id : '';
+        newData = { ...res, picId };
+        console.log(newData);
+        let groupsData = null;
+        // let paramData = null;
+        if (newData.groups && newData.groups.length !== 0) {
+          groupsData = newData.groups.sort(compare('sortNo'));
+          // paramData = newData.groups.map(item => {
+          //   const data = item.params.sort(compare('sortNo'));
+          //   return { ...groupsData, data };
+          // });
+        }
+        newData.groups = groupsData;
+        this.setState({
+          detailValue: newData,
+        });
+        if (res.taskModels.length !== 0) {
+          res.taskModels.map((item, index) => {
+            if (item.picture) {
+              disk
+                .getFiles({ sourceCode: item.picture, sourceKey: 'project_process_model' })
+                .then(r => {
+                  const listId = r[0].id;
+                  newData.taskModels[index].listId = listId;
+                  this.setState({
+                    detailValue: newData,
+                  });
+                });
+            }
+          });
+        }
+      });
+      // } else {
+      //   this.setState({
+      //     detailValue: res,
+      //   });
+      // }
+
       this.setState({
         visible: true,
-        detailValue: res,
       });
     });
   };
@@ -508,34 +568,6 @@ class ProcessModel extends Component {
                   更多
                 </a>
               </Dropdown>
-
-              {/* {(text * 1 === 1 || text * 1 === 3) && <a onClick={() => console.log(333)}>发布</a>}
-              {text * 1 === 1 && (
-                <>
-                  <Divider type="vertical" />
-                  <a onClick={() => this.goToEdit(value.id)}>修改</a>
-                </>
-              )}
-              {(text * 1 === 2 || text * 1 === 3) && (
-                <>
-                  <Divider type="vertical" />
-                  <a onClick={() => console.log(111)}>升级</a>
-                </>
-              )}
-              {(text * 1 === 2 || text * 1 === 4) && (
-                <>
-                  <Divider type="vertical" />
-                  <a onClick={() => console.log(111)}>禁用</a>
-                </>
-              )}
-              {text * 1 === 1 && (
-                <>
-                  <Divider type="vertical" />
-                  <a onClick={() => console.log(111)}>删除</a>
-                </>
-              )}
-              <Divider type="vertical" />
-              <a onClick={() => this.viewDetails(value)}>查看</a> */}
             </>
           );
         },
@@ -588,15 +620,17 @@ class ProcessModel extends Component {
               />
             </Form>
           </Card>
-          <DrawerTool
-            visible={visible}
-            // visible
-            onClose={this.onClose}
-            detailValue={detailValue}
-            status={status}
-            handleChangeVersion={v => this.handleChangeVersion(v)}
-            handleUnPublish={row => this.handleUnPublish(row)}
-          />
+          {visible ? (
+            <DrawerTool
+              visible={visible}
+              // visible
+              onClose={this.onClose}
+              detailValue={detailValue}
+              status={status}
+              handleChangeVersion={v => this.handleChangeVersion(v)}
+              handleUnPublish={row => this.handleUnPublish(row)}
+            />
+          ) : null}
         </div>
       </PageHeaderWrapper>
     );

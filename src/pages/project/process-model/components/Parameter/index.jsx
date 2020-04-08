@@ -187,6 +187,8 @@ class Parameter extends React.Component {
 
   render() {
     const { visible, typeEnlargeVisible, typeEnlargeData, addGroupVisible, data } = this.state;
+
+    if (!data) return false;
     if (!data.filter(item => item.groupName === 'no')[0]) {
       return false;
     }
