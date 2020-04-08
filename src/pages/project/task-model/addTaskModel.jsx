@@ -1,15 +1,30 @@
 // 流程模型的编辑
 import React, { Component } from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
-import { Card, Upload, message, Input, Tag, Table, Button, Form, Badge, Switch, Spin } from 'antd';
+import {
+  Card,
+  Upload,
+  message,
+  Input,
+  Tag,
+  Table,
+  Button,
+  Form,
+  Badge,
+  Switch,
+  Popconfirm,
+  Spin,
+} from 'antd';
 import { LoadingOutlined, SettingOutlined, PlusOutlined, DeleteOutlined } from '@ant-design/icons';
 import { connect } from 'dva';
 import './index.less';
-
+import { guid, formatter, versionFun } from '@/utils/utils';
 import BeforeTask from './components/beforeTask';
 import ArgumentModel from './components/argumentModel';
-import { formatter } from '@/utils/utils';
-import api from '@/api';
+import classNames from 'classnames';
+import router from 'umi/router';
+import disk from '@/pages/project/api/disk';
+import api from '@/pages/project/api/taskmodel';
 
 function getBase64(img, callback) {
   const reader = new FileReader();
@@ -33,40 +48,91 @@ class TaskModel extends Component {
   tableSearchFormRef = React.createRef();
 
   static getDerivedStateFromProps(nextProps) {
-    return { id: nextProps.match.params.id || '' };
+    // 根据-分割传过来的id, 如果长度为0 则为新增, 为1则未编辑, 为2则为升级.
+    let data = [];
+    if (nextProps.match.params.id) {
+      data = nextProps.match.params.id.split('-');
+    }
+
+    if (data.length !== 0) {
+      return { id: data[0], pageModel: data.length };
+    }
+    return { id: '' };
   }
 
-  state = {
-    imageUrl: '',
-    loading: false,
-    tableLoading: false,
-    id: '',
-    visible: false,
-    tableData: [],
-    argumentVisible: false, // 参数弹框是否显示
-    page: 1,
-    rows: 100,
-  };
+  constructor(props) {
+    super(props);
+    const guuid = guid();
+    this.state = {
+      imageUrl: '',
+      loading: false,
+      tableLoading: false,
+      id: '',
+      visible: false,
+      tableData: [],
+      argumentVisible: false, // 参数弹框是否显示
+      checked: false,
+      guuid,
+      editOriginModelData: {}, // 修改时进页面时候的任务模型详细数据
+      isAdd: this.props.match.path.indexOf('add') > 0,
+      pageModel: 0,
+      versionType: null, // 可以选择的版本
+      versionOpen: false, // 升级版本可以选择
+      selectVersion: '', // 选择的版本值
+      sonIds: [], // 所有前置任务的id
+      ids: [], // 所有选择的id
+    };
+  }
 
   componentDidMount() {
-    const isAdd = this.props.match.path.indexOf('add');
+    const { editOriginModelData } = this.props.taskModel;
+    const { isAdd, id } = this.state;
     if (isAdd) {
       // 如果是新增
       this.setState({
         tableData: [],
       });
     } else {
-      this.getTableData();
+      this.setState({
+        loading: true,
+      });
+      api.getTaskModelDetail(id).then(res => {
+        this.setState({
+          loading: false,
+        });
+        console.log(res);
+        const { dispatch } = this.props;
+        dispatch({
+          type: 'taskModel/getEditOriginModelData',
+          payload: res,
+        });
+        (this.tableSearchFormRef.current || {}).setFieldsValue(res);
+        if (res.version) {
+          this.setState({
+            versionType: versionFun(res.version),
+          });
+        }
+      });
+
+      this.setState({
+        checked: editOriginModelData.isAutomatic * 1 === 1,
+      });
+
+      this.getTableData(id);
     }
   }
 
-  getTableData = () => {
+  getTableData = id => {
     this.setState({
       tableLoading: true,
     });
-    const { page, rows } = this.state;
-
-    api.getTaskModels();
+    api.getPreTasks(id).then(res => {
+      // console.log(res);
+      this.setState({
+        tableData: res,
+        tableLoading: false,
+      });
+    });
   };
 
   // 图片上传
@@ -86,6 +152,17 @@ class TaskModel extends Component {
     }
   };
 
+  // 导航列表title样式
+  navContent = () => {
+    const { pageModel } = this.state;
+    const { editOriginModelData } = this.props.taskModel;
+
+    if (pageModel) {
+      return <div>{`${editOriginModelData.name} ${editOriginModelData.id}`}</div>;
+    }
+    return '';
+  };
+
   // 任务模型列表title样式
   titleContent = () => {
     return (
@@ -102,16 +179,57 @@ class TaskModel extends Component {
 
   // 提交上传
   onFinish = values => {
-    const { imageUrl, tableData } = this.state;
-    console.log(imageUrl, values);
+    const { checked, tableData, imageUrl, guuid, pageModel, id, selectVersion } = this.state;
     const ids = [];
-    console.log(tableData);
-    const parentIds = tableData.map(item=>{
-      return ids.push(item.id)
-    })
+    const { argumentList } = this.props.taskModel;
+    const { dispatch } = this.props;
 
-    console.log(parentIds);
-
+    const form = this.tableSearchFormRef.current.getFieldsValue();
+    form.isAutomatic = checked ? 1 : 2;
+    form.params = argumentList;
+    tableData.map(item => {
+      return ids.push(item.id);
+    });
+    form.parentIds = ids;
+    form.version = 'V1.0';
+    if (imageUrl) {
+      form.picture = guuid;
+    }
+    form.version = selectVersion || 'V1.0';
+    console.log(form);
+    this.setState({
+      loading: true,
+    });
+    const dispatchList = () => {
+      dispatch({
+        type: 'taskModel/getArgumentsList',
+        payload: null,
+      });
+    };
+    if (pageModel === 0) {
+      api.createTaskModel(form).then(() => {
+        message.success('任务模型创建成功!');
+        dispatchList();
+        router.push('/project/task-model');
+      });
+    }
+    if (pageModel === 1) {
+      form.id = id;
+      api.editTaskModel(form).then(() => {
+        message.success('任务模型修改成功!');
+        dispatchList();
+        router.push('/project/task-model');
+      });
+    }
+    if (pageModel === 2) {
+      console.log(id);
+      form.id = id;
+      api.upgradeTaskModel(id, form).then(() => {
+        message.success('任务模型升级成功!');
+        dispatchList();
+        router.push('/project/task-model');
+      });
+    }
   };
 
   onFinishFailed = () => {
@@ -126,21 +244,23 @@ class TaskModel extends Component {
   };
 
   // 点击关闭关联 添加数据到表格
-  onClose = row => {
+  onClose = (row, select) => {
+    const { tableData } = this.state;
+    const tableData1 = [...tableData];
     this.setState({
       visible: false,
     });
-    const tableData = [...this.state.tableData];
-    tableData.unshift(row);
-    this.setState({
-      tableData,
-    });
-    
+    if (select) {
+      tableData1.push(row);
+      this.setState({
+        tableData: tableData1,
+      });
+    }
   };
 
   handleDelete = row => {
     // console.log(row);
-    const {tableData} = this.state;
+    const { tableData } = this.state;
     let list = [...tableData];
     list = list.filter(item => {
       return item.id !== row.id;
@@ -151,8 +271,14 @@ class TaskModel extends Component {
   };
 
   openArgumentModel = () => {
+    const { dispatch } = this.props;
+    const { id } = this.state;
     this.setState({
       argumentVisible: true,
+    });
+    dispatch({
+      type: 'taskModel/setEditTaskModelId',
+      payload: id,
     });
   };
 
@@ -162,15 +288,69 @@ class TaskModel extends Component {
     });
   };
 
-  // 提交
-  handleSubmit = () => {
-    console.log('object');
+  switchChange = e => {
+    this.setState({
+      checked: e,
+    });
+  };
+
+  // 获取子级数据
+  getData = async value => {
+    const { tableData, ids, sonIds } = this.state;
+    let data = tableData;
+    const idsData = ids;
+    const sonIdsData = sonIds;
+    data = [...tableData, ...value];
+    value.forEach(item => {
+      idsData.push(item.id);
+      sonIdsData.push(...item.preTaskIds);
+    });
+
+    this.setState({
+      tableData: data,
+      ids: idsData,
+      sonIds: sonIdsData,
+    });
+  };
+
+  // 删除确认
+  confirm = value => {
+    const { tableData, ids, sonIds } = this.state;
+    const data = tableData;
+    const idsData = ids;
+    const sonIdsData = sonIds;
+    const newData = data.filter(item => item.id !== value.id);
+    const newIdsData = idsData.filter(item => item !== value.id);
+    let newSonIdsData = [];
+    if ((value.preTaskIds || []).length !== 0) {
+      value.preTaskIds.forEach(i => {
+        newSonIdsData = sonIdsData.filter(item => item !== i);
+      });
+    }
+    this.setState({
+      tableData: newData,
+      ids: newIdsData,
+      sonIds: newSonIdsData,
+    });
   };
 
   render() {
     const { taskModel } = this.props;
-    const { taskModelStatusOptions } = taskModel;
-    const { tableData, visible, argumentVisible, tableLoading } = this.state;
+    const { taskModelStatusOptions, editOriginModelData } = taskModel;
+    const {
+      tableData,
+      visible,
+      argumentVisible,
+      tableLoading,
+      guuid,
+      selectVersion,
+      versionOpen,
+      versionType,
+      pageModel,
+      loading,
+      sonIds,
+      ids,
+    } = this.state;
 
     const uploadButton = (
       <div style={{ borderRadius: '50%' }}>
@@ -178,7 +358,7 @@ class TaskModel extends Component {
         {/* <div className="ant-upload-text">Upload</div> */}
       </div>
     );
-    const { imageUrl, id } = this.state;
+    const { imageUrl, checked } = this.state;
     const columns = [
       {
         title: '编号/名称',
@@ -227,19 +407,46 @@ class TaskModel extends Component {
       },
       {
         title: '操作',
-        render: row => (
-          <>
-            <DeleteOutlined onClick={() => this.handleDelete(row)} />
-            {/* <a onClick={() => this.handleDelete(row)}>删除</a> */}
-          </>
-        ),
+        render: (value, row) => {
+          if (!sonIds.includes(row.id)) {
+            return (
+              <>
+                <Popconfirm
+                  placement="topLeft"
+                  title="确定要删除吗？"
+                  onConfirm={() => this.confirm(row)}
+                  okText="Yes"
+                  cancelText="No"
+                >
+                  <DeleteOutlined />
+                </Popconfirm>
+              </>
+            );
+          }
+          return true;
+        },
       },
     ];
 
+    const uploadUrl = disk.uploadMoreFiles('project_process_model', guuid);
+    console.log(this.state.editOriginModelData);
     return (
-      <PageHeaderWrapper title={id || ''}>
+      <PageHeaderWrapper title={this.navContent()}>
+        <Card>
+          <div
+            className={classNames(
+              { task_model_isHidden: !loading },
+              'task_model_add_loading_style',
+            )}
+          >
+            <Spin />
+          </div>
+        </Card>
+
         <Form
+          className={classNames({ task_model_isHidden: loading })}
           onFinish={this.onFinish}
+          initialValues={this.state.editOriginModelData}
           ref={this.tableSearchFormRef}
           onFinishFailed={this.onFinishFailed}
         >
@@ -247,11 +454,12 @@ class TaskModel extends Component {
             <div style={{ float: 'left', marginLeft: '20px' }}>
               {/* <Form.Item name="uploadPIc"> */}
               <Upload
-                name="avatar"
+                name="picture"
                 listType="picture-card"
                 className="avatar-uploader"
                 showUploadList={false}
-                action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
+                action={uploadUrl}
+                headers={{ Authorization: this.props.authorization }}
                 beforeUpload={beforeUpload}
                 onChange={this.handleChange}
               >
@@ -273,28 +481,67 @@ class TaskModel extends Component {
                 rules={[
                   {
                     required: true,
-                    message: '请输入参数名称',
+                    message: '请输入任务名称',
                   },
                 ]}
               >
-                <Input
-                  placeholder="请输入任务名称"
-                  style={{ marginBottom: '10px' }}
-                  defaultValue={this.state.taskModelName}
-                />
+                <Input placeholder="请输入任务名称" />
               </Form.Item>
               <Form.Item name="describe">
-                <Input.TextArea
-                  placeholder="请输入任务描述"
-                  rows={4}
-                  defaultValue={this.state.taskModelName}
-                />
+                <Input.TextArea placeholder="请输入任务描述" rows={4} />
+              </Form.Item>
+              <Form.Item
+                name="taskFlag"
+                rules={[
+                  {
+                    required: true,
+                    message: '请输入标识',
+                  },
+                ]}
+              >
+                <Input placeholder="请输入标识" />
               </Form.Item>
             </div>
-            <div style={{ float: 'left', marginLeft: '20px' }}>
-              <Form.Item name="version">
-                <Tag color="green">V1.1</Tag>
-              </Form.Item>
+
+            {/* 版本选择 */}
+            <div style={{ float: 'left' }}>
+              <div style={{ position: 'relative', display: 'inline-block', marginLeft: '30px' }}>
+                <Tag
+                  color="green"
+                  style={{ cursor: 'pointer' }}
+                  onClick={() => {
+                    this.setState({
+                      versionOpen: !versionOpen,
+                    });
+                  }}
+                >
+                  {pageModel ? selectVersion || editOriginModelData.version : 'V1.0'}
+                  {/* {selectVersion || processDetail.version} */}
+                </Tag>
+                {versionOpen && pageModel === 2 && (
+                  <Card
+                    style={{ position: 'absolute', zIndex: '100', top: '28px' }}
+                    hoverable
+                    className="padding-none"
+                  >
+                    {versionType.length !== 0 &&
+                      versionType.map(item => (
+                        <Tag
+                          key={item}
+                          style={{ cursor: 'pointer' }}
+                          onClick={() => {
+                            this.setState({
+                              selectVersion: item,
+                              versionOpen: !versionOpen,
+                            });
+                          }}
+                        >
+                          {item}
+                        </Tag>
+                      ))}
+                  </Card>
+                )}
+              </div>
             </div>
 
             <div style={{ float: 'right', marginRight: '142px', fontSize: '16px' }}>
@@ -309,21 +556,20 @@ class TaskModel extends Component {
                 <span style={{ fontSize: '16px', verticalAlign: 'middle', marginRight: 10 }}>
                   是否可自动运行：
                 </span>
-                <Switch />
+                <Switch checked={checked} onChange={this.switchChange} />
               </Form.Item>
             </div>
           </Card>
 
           <Card style={{ marginTop: '24px' }} title={this.titleContent()}>
-            {tableLoading ? <Spin/>
-            :
             <Table
               rowKey="id"
               dataSource={tableData}
               columns={columns}
               rowClassName="editable-row"
               pagination={false}
-            />}
+              loading={tableLoading}
+            />
             <Button
               style={{
                 width: '100%',
@@ -334,7 +580,7 @@ class TaskModel extends Component {
               onClick={this.onOpen}
               icon={<PlusOutlined />}
             >
-              新增
+              前置任务
             </Button>
           </Card>
 
@@ -346,23 +592,29 @@ class TaskModel extends Component {
                 type="primary"
                 style={{ float: 'right', marginTop: '-32px' }}
                 htmlType="submit"
-                onClick={() => {
-                  this.handleSubmit();
-                }}
               >
                 提交
               </Button>
             </Form.Item>
           </Card>
         </Form>
-        <BeforeTask visible={visible} onClose={this.onClose} />
-        <ArgumentModel visible={argumentVisible} onClose={this.onArgumentClose} />
+        <BeforeTask
+          visible={visible}
+          onClose={this.onClose}
+          getData={v => this.getData(v)}
+          ids={ids}
+        />
+
+        {argumentVisible && (
+          <ArgumentModel visible={argumentVisible} onClose={this.onArgumentClose} />
+        )}
       </PageHeaderWrapper>
     );
   }
 }
 
-export default connect(({ global, taskModel }) => ({
+export default connect(({ global, taskModel, user }) => ({
   languageCode: global.languageCode,
   taskModel,
+  authorization: user.currentUser.authorization,
 }))(TaskModel);

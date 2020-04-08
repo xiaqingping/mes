@@ -16,7 +16,7 @@ import {
   Menu,
 } from 'antd';
 import TableSearchForm from '@/components/TableSearchForm';
-import { PlusOutlined, DownOutlined } from '@ant-design/icons';
+import { PlusOutlined } from '@ant-design/icons';
 import router from 'umi/router';
 import { connect } from 'dva';
 import _ from 'lodash';
@@ -363,6 +363,7 @@ class ProcessModel extends Component {
   // 查看详情
   searchDetails = value => {
     api.getProcessDetail(value.id).then(res => {
+      console.log(res);
       this.setState({
         visible: true,
         detailValue: res,
@@ -433,6 +434,7 @@ class ProcessModel extends Component {
       {
         title: '操作',
         width: 200,
+        fixed: 'right',
         render: (value, row) => {
           const text = row.status;
           const operaList = getOperates(text);
@@ -593,6 +595,7 @@ class ProcessModel extends Component {
             detailValue={detailValue}
             status={status}
             handleChangeVersion={v => this.handleChangeVersion(v)}
+            handleUnPublish={row => this.handleUnPublish(row)}
           />
         </div>
       </PageHeaderWrapper>

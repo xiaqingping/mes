@@ -10,33 +10,54 @@ const { TabPane } = Tabs;
 // import TitleModel from './components/titleModel';
 
 class TaskModelTabs extends Component {
+  static getDerivedStateFromProps(nextProps) {
+    console.log(nextProps.nowId);
+    return {
+      taskId: nextProps.nowId,
+      preTaskList: nextProps.preTaskList,
+      postTasks: nextProps.postTasks,
+      preLoading: nextProps.preLoading,
+      postLoading: nextProps.postLoading,
+    };
+  }
+
   state = {
     viewVisible: false,
     preTaskList: [], // 前置任务列表
     postTasks: [], // 后置任务列表
     preLoading: false,
     postLoading: false,
+    toViewArgument: false,
+    taskId: 0,
   };
 
   componentDidMount() {
     const { viewId } = this.props.taskModel.taskModel;
+
+    // console.log(this.getPreData(viewId));
+    // debugger;
+    // this.getPostData(viewId);
+  }
+
+  getPreData = async id => {
     this.setState({
       preLoading: true,
-      postLoading: true,
     });
-    api.getPreTasks(viewId).then(res => {
+
+    // const data = await api.getPreTasks(id);
+    // api.getPreTasks(id).then()
+
+    this.setState({
+      preLoading: false,
+    });
+    // return data || [];
+    // debugger;
+    api.getPreTasks(id).then(res => {
       this.setState({
         preTaskList: res || [],
-        preLoading: false,
       });
     });
-    api.getPostTasks(viewId).then(res => {
-      this.setState({
-        postTasks: res || [],
-        postLoading: false,
-      });
-    });
-  }
+  };
 
   onChange = () => {};
 
@@ -46,12 +67,15 @@ class TaskModelTabs extends Component {
     });
     console.log(this.props);
     // TODO 获取数据参数数据
-    // const { dispatch } = this.props.taskModel;
+    const { dispatch } = this.props;
 
-    // dispatch({
-    //   type: 'taskModel/setViewParamsId',
-    //   payload: item.id,
-    // });
+    dispatch({
+      type: 'taskModel/setViewParamsId',
+      payload: item.id,
+    });
+    this.setState({
+      toViewArgument: true,
+    });
   };
 
   onViewClose = () => {
@@ -61,9 +85,21 @@ class TaskModelTabs extends Component {
   };
 
   render() {
-    const { viewVisible, preTaskList, postTasks, preLoading, postLoading } = this.state;
+    const {
+      viewVisible,
+      preTaskList,
+      postTasks,
+      preLoading,
+      postLoading,
+      toViewArgument,
+      taskId,
+    } = this.state;
+    console.log(taskId);
+
     const { taskModel } = this.props;
-    const { taskModelStatusOptions } = taskModel.taskModel;
+    const { taskModelStatusOptions, viewId } = taskModel.taskModel;
+
+    // debugger;
     return (
       <>
         <Tabs defaultActiveKey="1" onChange={this.onChange}>
@@ -142,7 +178,9 @@ class TaskModelTabs extends Component {
             )}
           </TabPane>
         </Tabs>
-        <ArgumentModel visible={viewVisible} onClose={this.onViewClose} fromView />
+        {toViewArgument && (
+          <ArgumentModel visible={viewVisible} onClose={this.onViewClose} fromView />
+        )}
       </>
     );
   }

@@ -19,7 +19,7 @@ const TableSearchForm = React.forwardRef((props, ref) => {
 
   // 查询
   const onFinish = () => {
-    props.getTableData({ page: 1 });
+    props.getTableData();
   };
 
   return (
@@ -38,7 +38,7 @@ const TableSearchForm = React.forwardRef((props, ref) => {
           ''
         ) : (
           <Col
-            span={expand && props.advancedForm ? 24 : 5}
+            span={expand && props.advancedForm ? 24 : 6}
             style={expand && props.advancedForm ? { textAlign: 'right' } : { textAlign: 'center' }}
           >
             <Button type="primary" htmlType="submit">
