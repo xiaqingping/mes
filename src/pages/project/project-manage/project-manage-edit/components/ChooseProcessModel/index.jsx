@@ -141,6 +141,8 @@ class ChooseProcessModel extends React.Component {
   };
 
   viewModal = () => {
+    const formData = this.tableSearchFormRef.current.getFieldsValue();
+    console.log(formData);
     // const data = row;
     // console.log(row);
     this.setState({

@@ -75,8 +75,7 @@ class ChooseProcessModelCheck extends React.Component {
                   {/* 上部 */}
                   <div style={{ height: '50px' }}>
                     <Avatar
-                      src="https://zos.alipayobjects.com/rmsportal
-                                        /ODTLcjxAfvqbxHnVXCYX.png"
+                      src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
                       style={{ float: 'left', marginRight: '10px' }}
                       size="large"
                     />
