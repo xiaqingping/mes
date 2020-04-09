@@ -159,15 +159,15 @@ class TaskModel extends Component {
       .getPreTasks(id)
       .then(res => {
         console.log(res);
-        const uuids = res.map(e => e.picture);
+        const uuids = (res || []).map(e => e.picture);
         disk
           .getFiles({
             sourceCode: uuids.join(','),
             sourceKey: 'project_task_model',
           })
           .then(v => {
-            const newList = res.map(e => {
-              const filterItem = (v || []).filter(item => item.sourceCode === e.picture);
+            const newList = (res || []).map(e => {
+              const filterItem = (v || []).filter(item => item.sourceCode === e.picture) || [];
               const fileId = filterItem[0] && filterItem[0].id;
               return {
                 ...e,
@@ -380,20 +380,20 @@ class TaskModel extends Component {
     const idsData = ids;
     const sonIdsData = sonIds;
     data = [...tableData, ...value];
-    value.forEach(item => {
-      idsData.push(item.id);
-      sonIdsData.push(...item.preTaskIds);
+    (value || []).forEach(item => {
+      idsData.unshift(item.id);
+      sonIdsData.unshift(...item.preTaskIds);
     });
 
-    const uuids = data.map(e => e.picture);
+    const uuids = (data || []).map(e => e.picture);
     disk
       .getFiles({
         sourceCode: uuids.join(','),
         sourceKey: 'project_task_model',
       })
       .then(v => {
-        const newList = data.map(e => {
-          const filterItem = v.filter(item => item.sourceCode === e.picture);
+        const newList = (data || []).map(e => {
+          const filterItem = (v || []).filter(item => item.sourceCode === e.picture) || [];
           const fileId = filterItem[0] && filterItem[0].id;
           return {
             ...e,

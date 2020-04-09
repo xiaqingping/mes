@@ -66,14 +66,14 @@ class BeforeTask extends React.Component {
       status: 2,
     };
     api.getTaskModels(data).then(res => {
-      const uuids = res.rows.map(e => e.picture);
+      const uuids = (res.rows||[]).map(e => e.picture);
       disk
         .getFiles({
           sourceCode: uuids.join(','),
           sourceKey: 'project_task_model',
         })
         .then(v => {
-          const newList = res.rows.map(e => {
+          const newList = (res.rows||[]).map(e => {
             const filterItem = v ? v.filter(item => item.sourceCode === e.picture) : [];
             const fileId = filterItem[0] && filterItem[0].id;
             return {
