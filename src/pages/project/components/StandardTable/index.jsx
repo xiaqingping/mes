@@ -1,5 +1,5 @@
-import { Alert, Table, Pagination } from 'antd';
-import React, { Component, Fragment } from 'react';
+import { Table, Pagination } from 'antd';
+import React, { Component } from 'react';
 import styles from './index.less';
 
 function initTotalList(columns) {
@@ -17,31 +17,16 @@ function initTotalList(columns) {
 }
 
 class StandardTable extends Component {
-  static getDerivedStateFromProps(nextProps) {
-    // clean state
-    if (nextProps.selectedRows.length === 0) {
-      const needTotalList = initTotalList(nextProps.columns);
-      return {
-        selectedRowKeys: [],
-        needTotalList,
-      };
-    }
-
-    return null;
-  }
-
   constructor(props) {
     super(props);
     const { columns } = props;
     const needTotalList = initTotalList(columns);
     this.state = {
-      selectedRowKeys: [],
       needTotalList,
     };
   }
 
   handleRowSelectChange = (selectedRowKeys, selectedRows) => {
-    const currySelectedRowKeys = selectedRowKeys;
     let { needTotalList } = this.state;
     needTotalList = needTotalList.map(item => ({
       ...item,
@@ -54,7 +39,6 @@ class StandardTable extends Component {
     }
 
     this.setState({
-      selectedRowKeys: currySelectedRowKeys,
       needTotalList,
     });
   };
@@ -78,7 +62,6 @@ class StandardTable extends Component {
   };
 
   render() {
-    const { selectedRowKeys } = this.state;
     const { data, rowKey, ...rest } = this.props;
     const { list = [], pagination = false } = data || {};
     const paginationProps = pagination
@@ -95,37 +78,9 @@ class StandardTable extends Component {
       : false;
     return (
       <div className={styles.standardTable}>
-        {/* <div className={styles.tableAlert}>
-          <Alert
-            message={
-              <Fragment>
-                已选择{' '}
-                <a
-                  style={{
-                    fontWeight: 600,
-                  }}
-                >
-                  {selectedRowKeys.length}
-                </a>{' '}
-                项&nbsp;&nbsp;
-                <a
-                  onClick={this.cleanSelectedKeys}
-                  style={{
-                    marginLeft: 24,
-                  }}
-                >
-                  清空
-                </a>
-              </Fragment>
-            }
-            type="info"
-            showIcon
-          />
-        </div> */}
         <Table
           size="small"
           rowKey={rowKey || 'id'}
-          // rowSelection={rowSelection}
           dataSource={list}
           pagination={false}
           onChange={this.handleTableChange}

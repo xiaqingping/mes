@@ -21,11 +21,11 @@ import router from 'umi/router';
 import { connect } from 'dva';
 import _ from 'lodash';
 import { DateUI } from '@/pages/project/components/AntdSearchUI';
-import { formatter, getOperates, compare } from '@/utils/utils';
+import { formatter, getOperates } from '@/utils/utils';
 import api from '@/pages/project/api/processModel/';
 import disk from '@/pages/project/api/disk';
 import StandardTable from '../components/StandardTable';
-import { DrawerTool } from './components/Details';
+import ProcessDetail from './process-model-detail';
 import './index.less';
 
 const FormItem = Form.Item;
@@ -109,17 +109,30 @@ class ProcessModel extends Component {
           sourceKey: 'project_process_model',
         })
         .then(v => {
-          const newList = res.rows.map(e => {
-            const filterItem = v.filter(item => item.sourceCode === e.picture);
-            const fileId = filterItem[0] && filterItem[0].id;
-            return {
-              ...e,
-              fileId,
-            };
-          });
-          this.setState({
-            list: newList,
-          });
+          if (v) {
+            const newList = res.rows.map(e => {
+              const filterItem = v.filter(item => item.sourceCode === e.picture);
+              const fileId = filterItem[0] && filterItem[0].id;
+              return {
+                ...e,
+                fileId,
+              };
+            });
+            this.setState({
+              list: newList,
+            });
+          } else {
+            const newList = res.rows.map(e => {
+              const fileId = '';
+              return {
+                ...e,
+                fileId,
+              };
+            });
+            this.setState({
+              list: newList,
+            });
+          }
         });
 
       this.setState({
@@ -158,10 +171,10 @@ class ProcessModel extends Component {
       return false;
     }
     nameCodeVal.forEach(item => {
-      if (item.name.indexOf(value) !== -1) {
+      if (item.name.indexOf(value) !== -1 && arr.indexOf(item) !== -1) {
         arr.push(item);
       }
-      if (item.code.indexOf(value) !== -1 && arr.indexOf(item)) {
+      if (item.code.indexOf(value) !== -1 && arr.indexOf(item) !== -1) {
         arr.push(item);
       }
     });
@@ -169,7 +182,7 @@ class ProcessModel extends Component {
       nameCodeVal: arr,
       // allowClear: 'ture',
     });
-    return true;
+    // return true;
   };
 
   // 发布人选择样式
@@ -196,10 +209,10 @@ class ProcessModel extends Component {
       return false;
     }
     nameCodeValPublish.forEach(item => {
-      if (item.name.indexOf(value) !== -1) {
+      if (item.name.indexOf(value) !== -1 && arr.indexOf(item) !== -1) {
         arr.push(item);
       }
-      if (item.code.indexOf(value) !== -1 && arr.indexOf(item)) {
+      if (item.code.indexOf(value) !== -1 && arr.indexOf(item) !== -1) {
         arr.push(item);
       }
     });
@@ -207,7 +220,7 @@ class ProcessModel extends Component {
       nameCodeValPublish: arr,
       // allowClear: 'ture',
     });
-    return true;
+    // return true;
   };
 
   // 分页
@@ -377,64 +390,22 @@ class ProcessModel extends Component {
 
   // 查看详情
   searchDetails = value => {
-    api.getProcessDetail(value.id).then(res => {
-      let newData = {};
-      // if (res.picture) {
-      disk.getFiles({ sourceCode: res.picture, sourceKey: 'project_process_model' }).then(i => {
-        const picId = i.length !== 0 ? i[0].id : '';
-        newData = { ...res, picId };
-        console.log(newData);
-        let groupsData = null;
-        // let paramData = null;
-        if (newData.groups && newData.groups.length !== 0) {
-          groupsData = newData.groups.sort(compare('sortNo'));
-          // paramData = newData.groups.map(item => {
-          //   const data = item.params.sort(compare('sortNo'));
-          //   return { ...groupsData, data };
-          // });
-        }
-        newData.groups = groupsData;
-        this.setState({
-          detailValue: newData,
-        });
-        if (res.taskModels.length !== 0) {
-          res.taskModels.map((item, index) => {
-            if (item.picture) {
-              disk
-                .getFiles({ sourceCode: item.picture, sourceKey: 'project_process_model' })
-                .then(r => {
-                  const listId = r[0].id;
-                  newData.taskModels[index].listId = listId;
-                  this.setState({
-                    detailValue: newData,
-                  });
-                });
-            }
-            return true;
-          });
-        }
-      });
-      // } else {
-      //   this.setState({
-      //     detailValue: res,
-      //   });
-      // }
-
-      this.setState({
-        visible: true,
-      });
+    this.setState({
+      visible: true,
+      detailValue: value,
     });
   };
 
   render() {
     const { pagination, loading, visible, detailValue, list } = this.state;
+
     const { status } = this.props;
     let tableWidth = 0;
     let columns = [
       {
         title: '编号/名称',
         dataIndex: 'code',
-        width: 250,
+        width: 300,
         render: (value, row) => (
           <>
             <Avatar
@@ -606,7 +577,6 @@ class ProcessModel extends Component {
               <StandardTable
                 scroll={{ x: tableWidth }}
                 rowClassName="editable-row"
-                selectedRows=""
                 loading={loading}
                 data={{ list, pagination }}
                 columns={columns}
@@ -616,11 +586,11 @@ class ProcessModel extends Component {
             </Form>
           </Card>
           {visible ? (
-            <DrawerTool
+            <ProcessDetail
               visible={visible}
               // visible
               onClose={this.onClose}
-              detailValue={detailValue}
+              detailId={detailValue.id}
               status={status}
               handleChangeVersion={v => this.handleChangeVersion(v)}
               handleUnPublish={row => this.handleUnPublish(row)}
