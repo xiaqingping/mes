@@ -47,15 +47,15 @@ class TaskModel extends Component {
     });
     api.getPreTasks(id).then(res => {
       console.log(res);
-      const uuids = res.map(e => e.picture);
+      const uuids = (res || []).map(e => e.picture);
       disk
         .getFiles({
           sourceCode: uuids.join(','),
           sourceKey: 'project_task_model',
         })
         .then(v => {
-          const newList = res.map(e => {
-            const filterItem = (v || []).filter(item => item.sourceCode === e.picture);
+          const newList = (res || []).map(e => {
+            const filterItem = (v || []).filter(item => item.sourceCode === e.picture) || [];
             const fileId = filterItem[0] && filterItem[0].id;
             return {
               ...e,
@@ -79,15 +79,15 @@ class TaskModel extends Component {
       postLoading: true,
     });
     api.getPostTasks(id).then(res => {
-      const uuids = res.map(e => e.picture);
+      const uuids = (res || []).map(e => e.picture);
       disk
         .getFiles({
           sourceCode: uuids.join(','),
           sourceKey: 'project_task_model',
         })
         .then(v => {
-          const newList = res.map(e => {
-            const filterItem = v.filter(item => item.sourceCode === e.picture);
+          const newList = (res || []).map(e => {
+            const filterItem = (v || []).filter(item => item.sourceCode === e.picture) || [];
             const fileId = filterItem[0] && filterItem[0].id;
             return {
               ...e,
