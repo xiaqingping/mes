@@ -1,10 +1,10 @@
 import React from 'react';
-import { Input, Form } from 'antd';
+import { Input, Form, message } from 'antd';
 
 
 /**
  * 判断类型
- * @param {String} type
+ * @param {String} type 参数类型
  */
 const ModelType = props => {
   const { data } = props;
@@ -25,6 +25,19 @@ const ModelType = props => {
  */
 const InputModel = props => {
   const { data } = props;
+
+  // 判断是否可为空
+  const onChange = e => {
+    console.log(e.target.value);
+    if (e.target.value === '') {
+      if(data.isrequired === 1) {
+        message.warning(`${data.paramName}参数值不能为空`);
+        const { paramKey } = data;
+        e.target.setValue({ [paramKey]: data.paramValue || data.defaultValue });
+      }
+    }
+
+  }
   return (
     <Form.Item
       label={data.paramName}
@@ -36,6 +49,7 @@ const InputModel = props => {
       <Input
         placeholder={data.placeholder}
         defaultValue={data.paramValue ? data.paramValue: data.defaultValue}
+        onChange={event => onChange(event)}
       />
     </Form.Item>
   );

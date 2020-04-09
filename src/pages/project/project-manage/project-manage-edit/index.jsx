@@ -27,11 +27,26 @@ class ProjectEdit extends Component {
     const { selectedTags, bpCode, bpName, endDate, beginDate } = this.state;
     const formData = this.formRef.current.getFieldsValue();
 
-    if (formData.name === undefined) return message.error('项目名称不能为空！');
-    if (formData.describe === undefined) return message.error('项目描述不能为空！');
-    if (bpName === '') return message.error('所有者不能为空！');
-    if (beginDate === '') return message.error('开始时间不能为空！');
-    if (endDate === '') return message.error('结束时间不能为空！');
+    if (formData.name === undefined) {
+      message.error('项目名称不能为空！');
+      return 1;
+    }
+    if (formData.describe === undefined) {
+      message.error('项目描述不能为空！');
+      return 1;
+    }
+    if (bpName === '') {
+      message.error('所有者不能为空！');
+      return 1;
+    }
+    if (beginDate === '') {
+      message.error('开始时间不能为空！');
+      return 1;
+    }
+    if (endDate === '') {
+      message.error('结束时间不能为空！');
+      return 1;
+    }
 
     const data = {
       name: formData.name,
@@ -48,6 +63,7 @@ class ProjectEdit extends Component {
   // 跳转到添加流程页面
   handleAdd = () => {
     const data = this.saveData();
+    if (data === 1) return;
     router.push('/project/project-manage/add/addflowpath', { data });
   };
 
@@ -104,7 +120,6 @@ class ProjectEdit extends Component {
               label="名称"
               name="name"
               style={{ paddingRight: '50px' }}
-              rules={[{ required: true, message: '请输入项目名称！' }]}
             >
               <Input placeholder="请输入项目名称" maxLength={20} style={{ marginLeft: '40px' }} />
             </FormItem>
@@ -112,7 +127,6 @@ class ProjectEdit extends Component {
               label="描述"
               name="describe"
               style={{ paddingRight: '50px' }}
-              rules={[{ required: true, message: '请输入项目描述！' }]}
             >
               <TextArea
                 rows={4}
@@ -125,7 +139,6 @@ class ProjectEdit extends Component {
               <FormItem
                 label="所有者"
                 name="bpName"
-                rules={[{ required: true, message: '请选择所有者！' }]}
               >
                 <Search
                   onClick={() => this.showBPList.visibleShow(true)}
@@ -138,7 +151,6 @@ class ProjectEdit extends Component {
                 label="时间"
                 name="time"
                 style={{ paddingRight: '50px' }}
-                rules={[{ required: true, message: '请选择时间！' }]}
               >
                 <RangePicker
                   showTime={{ format: 'HH:mm:ss' }}
@@ -149,7 +161,7 @@ class ProjectEdit extends Component {
                 />
               </FormItem>
             </div>
-            <div style={{ height: '250px', marginLeft: 10 }}>
+            <div style={{ height: '250px' }}>
               <FormItem label="标签" name="label">
                 <div style={{ marginLeft: '40px', marginRight: '270px' }}>
                   {/* <span style={{ marginRight: 8 }}>Categories:</span> */}

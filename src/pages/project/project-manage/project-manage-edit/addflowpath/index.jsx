@@ -16,7 +16,7 @@ import {
   // Badge,
 } from 'antd';
 import { PlusOutlined, SlidersOutlined } from '@ant-design/icons';
-// import router from 'umi/router';
+import router from 'umi/router';
 // import TableSearchForm from '@/components/TableSearchForm';
 import { connect } from 'dva';
 import StandardTable from '@/components/StandardTable';
@@ -44,6 +44,7 @@ class Test extends Component {
       // pagination: {},
       loading: false,
       visible: false,
+      // requestType：'edit',
     };
   }
 
@@ -95,10 +96,27 @@ class Test extends Component {
     });
   };
 
+  // 删除数据
+  deleteRow = row => {
+    console.log(row);
+    // api.deleteAddProcess(row.id).then(() => {
+    //   this.getTableData();
+    // });
+  };
+
+  // 打开参数
+  handleOpen = row => {
+    console.log(row);
+    const data = row;
+    data.requestType = 'addValue';
+    router.push('/project/project-manage/process-parameter', { data });
+  };
+
   render() {
     // const { status } = this.props;
 
     const { pagination, list, loading, visible } = this.state;
+    // console.log(this.state);
 
     let tableWidth = 0;
     let columns = [
@@ -135,7 +153,9 @@ class Test extends Component {
         title: '参数',
         dataIndex: 'parameter',
         width: 100,
-        render: () => <SlidersOutlined style={{ fontSize: '25px' }} />,
+        render: (value, row) => (
+          <SlidersOutlined onClick={() => this.handleOpen(row)} style={{ fontSize: 20 }} />
+        ),
       },
       {
         title: '版本',
@@ -151,9 +171,9 @@ class Test extends Component {
         title: '操作',
         fixed: 'right',
         width: 200,
-        render: value => (
+        render: row => (
           <>
-            <a onClick={() => console.log(value)}>删除</a>
+            <a onClick={() => this.deleteRow(row)}>删除</a>
           </>
         ),
       },
@@ -174,7 +194,7 @@ class Test extends Component {
           <Card
             style={{ height: '48px', width: '100%', position: 'fixed', bottom: '0', left: '0' }}
           >
-            <Button type="primary" style={{ float: 'right', marginTop: '-16px' }} htmlType="submit">
+            <Button type="primary" style={{ float: 'right', marginTop: '-16px' }}>
               保存
             </Button>
           </Card>
@@ -197,7 +217,6 @@ class Test extends Component {
           <div
             style={{
               width: '100%',
-              paddingBottom: '100px',
             }}
           >
             <Button
