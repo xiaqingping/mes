@@ -13,7 +13,6 @@ import api from '@/pages/project/api/projectManageDetail';
 import TaskList from '../TaskList';
 import { EditInforModel } from '../ModelUI';
 import { comparisonMerge } from '../../functions';
-import ProgressMould from '../ProgressMould';
 // import BPList from '../BPList';
 // import { formatter } from '@/utils/utils';
 
@@ -209,7 +208,7 @@ class ProcessList extends Component {
         width: 150,
         render: (value, row) => {
           if (value === undefined) return '';
-
+          const val = value.toFixed(2) * 100;
           if (row.status === 1) {
             return (
               <Button
@@ -224,7 +223,7 @@ class ProcessList extends Component {
           if (row.status === 2) {
             return (
               <>
-                <ProgressMould percentData={row} />
+                <Progress percent={val} size="small" style={{ float: 'left', width: '80%' }} />
                 <PauseCircleOutlined
                   style={{ marginLeft: '10px' }}
                   onClick={() => this.processPause(row)}
@@ -235,7 +234,7 @@ class ProcessList extends Component {
           if (row.status === 3) {
             return (
               <>
-                <ProgressMould percentData={row} />
+                <Progress percent={val} size="small" style={{ float: 'left', width: '80%' }} />
                 <PlayCircleOutlined
                   style={{ marginLeft: '10px' }}
                   onClick={() => this.processStart(row)}
@@ -243,7 +242,7 @@ class ProcessList extends Component {
               </>
             );
           }
-          return <ProgressMould percentData={row} />;
+          return <Progress percent={val} size="small" style={{ width: '80%' }} />;
         },
       },
       {
