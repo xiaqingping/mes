@@ -88,11 +88,6 @@ export default {
     return request(`${http2}/v1/process/${params}/params`);
   },
 
-  // 根据流程ID查询流程进度接口
-  getProcessesProgress(params) {
-    return request(`${http2}/projects/v1/processes/progress`, { params });
-  },
-
   /**
    * 任务模型
    */
