@@ -6,6 +6,7 @@ import '../../index.less';
 import _ from 'lodash';
 import ChooseProcessModelCheck from '../ChooseProcessModelCheck';
 // import api from '@/pages/project/api/projectManage';
+import { connect } from 'dva';
 import apiprocess from '@/pages/project/api/processModel/';
 // import StandardTable from '@/components/StandardTable';
 
@@ -60,7 +61,6 @@ class ChooseProcessModel extends React.Component {
     };
 
     apiprocess.getProcess(data).then(res => {
-      console.log(res);
       this.setState({
         processlist: res.rows,
         // loading: false,
@@ -140,13 +140,20 @@ class ChooseProcessModel extends React.Component {
     this.props.onClose();
   };
 
-  viewModal = () => {
-    const formData = this.tableSearchFormRef.current.getFieldsValue();
-    console.log(formData);
-    // const data = row;
-    // console.log(row);
+  viewModal = item => {
+    // console.log(item);
+    // const {viewlist} = this.props.projectManage
+    // console.log(this.props.dispatch);
+    // const {dispatch} = this.props;
+    // dispatch({
+    //   type:"projectManage/setviewlist",
+    //   payload: item
+    // })
+    // console.log(viewlist);
+
     this.setState({
       viewvisible: true,
+      viewlist: item,
     });
   };
 
@@ -176,7 +183,7 @@ class ChooseProcessModel extends React.Component {
   // }
 
   render() {
-    const { viewvisible, processlist } = this.state;
+    const { viewvisible, processlist, viewlist } = this.state;
 
     // let tableWidth = 0;
     return (
@@ -241,7 +248,7 @@ class ChooseProcessModel extends React.Component {
                             }}
                           >
                             <Button
-                              onClick={this.viewModal}
+                              onClick={() => this.viewModal(item)}
                               style={{ border: '0', color: '#005bc3' }}
                               // onMouseEnter={this.MouseEnter(this)}
                               // onMouseLeave={this.MouseLeave(this)}
@@ -258,11 +265,18 @@ class ChooseProcessModel extends React.Component {
               </Row>
             </div>
           </Modal>
-          <ChooseProcessModelCheck visible={viewvisible} onClose={this.viewClose} />
+          <ChooseProcessModelCheck
+            visible={viewvisible}
+            onClose={this.viewClose}
+            viewlist={viewlist}
+          />
         </div>
       </Card>
     );
   }
 }
 
-export default ChooseProcessModel;
+export default connect(({ global, projectManage }) => ({
+  languageCode: global.languageCode,
+  projectManage,
+}))(ChooseProcessModel);
