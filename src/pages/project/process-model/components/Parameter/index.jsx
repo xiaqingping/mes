@@ -1,8 +1,9 @@
+// 参数分配
 import React from 'react';
 import { Modal, List, Card, Button } from 'antd';
 import { ArrowsAltOutlined, PlusOutlined } from '@ant-design/icons';
-import EnlargePage from './enlargePage';
-import AddGroup from './addGroup';
+import EnlargePage from '../EnlargePage/enlargePage';
+import AddGroup from '../AddGroup/addGroup';
 import './index.less';
 // import { sortable } from 'react-sortable';
 
