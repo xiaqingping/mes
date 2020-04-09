@@ -323,9 +323,17 @@ const projectModel = {
         name: '表观遗传学',
         text: 'epigenetics',
       },
-    ]
+    ],
+    // 点击查看的数据
+    viewlist: [],
   },
   effects: {},
-  reducers: {},
+  reducers: {
+    setviewlist(state, payload) {
+      // console.log(action);
+
+      return { ...state, viewlist: payload };
+    },
+  },
 };
 export default projectModel;
