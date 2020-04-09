@@ -25,7 +25,6 @@ import { guid, formatter, versionFun, isEmpty } from '@/utils/utils';
 import disk from '@/pages/project/api/disk';
 import api from '@/pages/project/api/processModel/';
 import router from 'umi/router';
-import ParamPic from '@/assets/imgs/canshu@1x.png';
 import deletePic from '@/assets/imgs/delete@1x.png';
 
 function getBase64(img, callback) {
@@ -250,6 +249,7 @@ class ProcessEdit extends Component {
         router.push('/project/process-model');
       });
     }
+    return true;
   };
 
   // 点击打开关联
