@@ -84,6 +84,12 @@ class ArgumentModel extends Component {
         argumentList: list,
         loading: false,
       });
+    }).catch((err)=>{
+      console.log(err);
+      this.setState({
+        argumentList: [],
+        loading: false,
+      });
     });
   };
 

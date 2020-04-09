@@ -40,6 +40,8 @@ class BeforeTask extends React.Component {
   callParter = value => {
     api.getTaskNameAndCode(value).then(res => {
       this.setState({ nameCodeVal: res });
+    }).catch(err=>{
+      console.log(err);
     });
   };
 
@@ -65,35 +67,43 @@ class BeforeTask extends React.Component {
       ...options,
       status: 2,
     };
-    api.getTaskModels(data).then(res => {
-      const uuids = (res.rows||[]).map(e => e.picture);
-      disk
-        .getFiles({
-          sourceCode: uuids.join(','),
-          sourceKey: 'project_task_model',
-        })
-        .then(v => {
-          const newList = (res.rows||[]).map(e => {
-            const filterItem = v ? v.filter(item => item.sourceCode === e.picture) : [];
-            const fileId = filterItem[0] && filterItem[0].id;
-            return {
-              ...e,
-              fileId,
-            };
+    api
+      .getTaskModels(data)
+      .then(res => {
+        const uuids = (res.rows || []).map(e => e.picture);
+        disk
+          .getFiles({
+            sourceCode: uuids.join(','),
+            sourceKey: 'project_task_model',
+          })
+          .then(v => {
+            const newList = (res.rows || []).map(e => {
+              const filterItem = v ? v.filter(item => item.sourceCode === e.picture) : [];
+              const fileId = filterItem[0] && filterItem[0].id;
+              return {
+                ...e,
+                fileId,
+              };
+            });
+            this.setState({
+              list: newList,
+            });
           });
-          this.setState({
-            list: newList,
-          });
+        this.setState({
+          pagination: {
+            current: data.page,
+            pageSize: data.rows,
+            total: res.total,
+          },
+          loading: false,
         });
-      this.setState({
-        pagination: {
-          current: data.page,
-          pageSize: data.rows,
-          total: res.total,
-        },
-        loading: false,
+      })
+      .catch(err => {
+        console.log(err);
+        this.setState({
+          loading: false,
+        });
       });
-    });
   };
 
   renderOption = item => ({
@@ -154,7 +164,9 @@ class BeforeTask extends React.Component {
 
   sendData = async id => {
     this.props.onClose();
-    const res = await api.getAllPreTasks(id, this.props.ids);
+    const res = await api.getAllPreTasks(id, this.props.ids).catch(err=>{
+      console.log(err);
+    });
     this.props.getData(res);
   };
 

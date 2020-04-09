@@ -97,46 +97,54 @@ class TaskModel extends Component {
       this.setState({
         loading: true,
       });
-      api.getTaskModelDetail(id).then(res => {
-        this.setState({
-          checked: res.isAutomatic * 1 === 1,
-          loading: false,
-          picture: res.picture,
-        });
-        console.log(res);
-        const { dispatch } = this.props;
-        // dispatch({
-        //   type: 'taskModel/getEditOriginModelData',
-        //   payload: res,
-        // });
-        (this.tableSearchFormRef.current || {}).setFieldsValue(res);
-        disk
-          .getFiles({
-            sourceCode: res.picture,
-            sourceKey: 'project_task_model',
-          })
-          .then(v => {
-            this.setState({
-              imageUrl: v.length !== 0 ? disk.downloadFiles(v[0].id, { view: true }) : '',
-            });
-            dispatch({
-              type: 'taskModel/getEditOriginModelData',
-              payload: { ...res, fileId: v.length !== 0 ? v[0].id : '' },
-            });
-            // this.props.dispatch({
-            //   type: 'processModel/setProcessDetail',
-            //   payload: {
-            //     ...res,
-            //     fileId: v.length !== 0 ? v[0].id : '',
-            //   },
-            // });
-          });
-        if (res.version) {
+      api
+        .getTaskModelDetail(id)
+        .then(res => {
           this.setState({
-            versionType: versionFun(res.version),
+            checked: res.isAutomatic * 1 === 1,
+            loading: false,
+            picture: res.picture,
           });
-        }
-      });
+          console.log(res);
+          const { dispatch } = this.props;
+          // dispatch({
+          //   type: 'taskModel/getEditOriginModelData',
+          //   payload: res,
+          // });
+          (this.tableSearchFormRef.current || {}).setFieldsValue(res);
+          disk
+            .getFiles({
+              sourceCode: res.picture,
+              sourceKey: 'project_task_model',
+            })
+            .then(v => {
+              this.setState({
+                imageUrl: v.length !== 0 ? disk.downloadFiles(v[0].id, { view: true }) : '',
+              });
+              dispatch({
+                type: 'taskModel/getEditOriginModelData',
+                payload: { ...res, fileId: v.length !== 0 ? v[0].id : '' },
+              });
+              // this.props.dispatch({
+              //   type: 'processModel/setProcessDetail',
+              //   payload: {
+              //     ...res,
+              //     fileId: v.length !== 0 ? v[0].id : '',
+              //   },
+              // });
+            });
+          if (res.version) {
+            this.setState({
+              versionType: versionFun(res.version),
+            });
+          }
+        })
+        .catch(err => {
+          console.log(err);
+          this.setState({
+            loading: false,
+          });
+        });
 
       this.getTableData(id);
     }

@@ -24,30 +24,38 @@ class TitleModel extends React.Component {
   componentDidMount() {
     const { viewId } = this.props.taskModel.taskModel;
     if (viewId) {
-      api.getTaskModelDetail(viewId).then(res => {
-        this.setState({
-          loading: true,
-        });
-        const uuids = res.picture;
-        disk
-          .getFiles({
-            sourceCode: uuids,
-            sourceKey: 'project_task_model',
-          })
-          .then(v => {
-            const newList = { ...res, fileId: (v[0] || {}).id };
-            this.setState({
-              viewData: newList,
-            });
-          });
-
-        if (res.version) {
+      api
+        .getTaskModelDetail(viewId)
+        .then(res => {
           this.setState({
-            versionType: res.versions,
+            loading: true,
+          });
+          const uuids = res.picture;
+          disk
+            .getFiles({
+              sourceCode: uuids,
+              sourceKey: 'project_task_model',
+            })
+            .then(v => {
+              const newList = { ...res, fileId: (v[0] || {}).id };
+              this.setState({
+                viewData: newList,
+              });
+            });
+
+          if (res.version) {
+            this.setState({
+              versionType: res.versions,
+              loading: false,
+            });
+          }
+        })
+        .catch(err => {
+          console.log(err);
+          this.setState({
             loading: false,
           });
-        }
-      });
+        });
     }
   }
 
@@ -73,7 +81,6 @@ class TitleModel extends React.Component {
     api.forbiddenTaskModel(id).then(res => {
       message.success('任务模型已禁用!');
       router.push('/project/task-model');
-      // this.updateListData(id);
     });
   };
 
