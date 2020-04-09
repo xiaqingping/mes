@@ -145,15 +145,19 @@ class ArgumentForm extends React.Component {
           <Form.Item label="验证说明：" name="validDesc">
             {fromView ? viewForm.validDesc : <Input placeholder="请输入 " />}
           </Form.Item>
-
-          <div className="task_model_argu_form_submit">
-            <Form.Item>
-              {!fromView && (
-                <Button type="primary" htmlType="submit">
-                  确认
-                </Button>
-              )}
-            </Form.Item>
+          <div
+            style={{ width: '100%' }}
+            // className="task_model_argu_form_submit_wrap"
+          >
+            <div className="task_model_argu_form_submit">
+              <Form.Item>
+                {!fromView && (
+                  <Button type="primary" htmlType="submit">
+                    确认
+                  </Button>
+                )}
+              </Form.Item>
+            </div>
           </div>
         </Form>
       </div>
