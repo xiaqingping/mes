@@ -326,14 +326,19 @@ const projectModel = {
     ],
     // 点击查看的数据
     viewlist: [],
+    // 修改项目参数
+    projectData:[],
   },
   effects: {},
   reducers: {
     setviewlist(state, payload) {
       // console.log(action);
-
       return { ...state, viewlist: payload };
     },
+
+    setProjectData(state, action) {
+      return { ...state, projectData: action.payload };
+    }
   },
 };
 export default projectModel;

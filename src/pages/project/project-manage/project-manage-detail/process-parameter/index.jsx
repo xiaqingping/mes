@@ -5,6 +5,7 @@ import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import { connect } from 'dva';
 import { ModelType } from '@/pages/project/components/ModelComponents';
 import router from 'umi/router';
+import api from '@/pages/project/api/projectManageDetail';
 import style from './index.less';
 
 const { Footer } = Layout;
@@ -12,18 +13,29 @@ const { Footer } = Layout;
 class ProcessParameter extends Component {
   formRef = React.createRef();
 
-  state = {}
-
-  componentDidMount = () => {
-    if (this.props.location.state === undefined) {
-      router.push('/project/project-manage/detail');
-      return;
-    }
-    const { newData } = this.props.location.state;
-    this.setInitialFromValues(newData);
+  constructor(props) {
+    super(props);
+    const { procssesParam } = props.projectDetail;
+    console.log(procssesParam)
+    this.state = {
+      requestType: procssesParam.requestType,
+      paramData: procssesParam,
+    };
+    this.locationUrl(procssesParam);
   }
 
+  // 数据为空时跳转至其他页面
+  locationUrl = data => {
+    if (data.length === 0) {
+      router.push('/project/project-manage/detail');
+    }
+  }
 
+  // 组件加载时
+  componentDidMount = () => {
+    const { paramData } = this.state;
+    this.setInitialFromValues(paramData);
+  }
 
   // 设置表单初始值
   setInitialFromValues = data => {
@@ -37,58 +49,64 @@ class ProcessParameter extends Component {
     });
   }
 
-  // 排序
-  // compare = key => (obj1, obj2) => {
-  //   const value1 = obj1[key]
-  //   const value2 = obj2[key]
-  //   if (value1 > value2) {
-  //     return 1;
-  //   } if (value1 < value2) {
-  //     return -1;
-  //   }
-  //   return 0;
-  // }
-
-  // // 格式化数据（排序）
-  // formatData = parameterList => {
-  //   parameterList.forEach(item => {
-  //     item.params.sort(this.compare('sortNo'));
-  //   })
-  //   return parameterList;
-  // }
-
   // 保存参数
   saveParam = () => {
-    // const { newData } = this.props.location.state;
-    const formData = this.formRef.current.getFieldsValue();
-    console.log(formData);
-
-    const arr = [];
-
-    // for (key in formData) {
-    //   // if ({}.hasOwnProperty.call(formData, key)) {
-    //     console.log(`${key}---${formData[key]}`);
-    //   // }
-    // }
-
-    console.log(arr);
-
-    // var jsonArr = [];
-    // formData.for(var i = 0; i < jsonObj.length; i++) {
-    //       jsonArr[i] = jsonObj[i];
-    // }
-    // console.log(formData);
-    // formData.forEach(item => {
-    //   console.log(item);
-    // });
+    const data = this.conversionData();
+    console.log(data);
+    const { requestType } = this.state;
+    if (requestType === 'addParam') {
+      this.props.dispatch({
+        type: 'projectDetail/setParamList',
+        payload: data
+      })
+    } if (requestType === 'editParam') {
+      const { paramData } = this.state;
+      const id = paramData.processesId;
+      console.log(data);
+      api.updateProcessesParameter(id, data).then(() => {
+        window.history.back(-1)
+      })
+    }
   }
 
+  // 参数数据格式转换
+  conversionData = () => {
+    const { paramData } = this.state;
+    const formData = this.formRef.current.getFieldsValue();
+    console.log(paramData);
+    // 取出键.值
+    const dataKeys = Object.keys(formData);
+    const dataValues = Object.values(formData);
+    // 合并
+    const newList = [];
+    dataKeys.forEach((key, indexK) => {
+      dataValues.forEach((val, indexV) => {
+        const newItem = {};
+        if (indexK === indexV) {
+          newItem.paramKey = key;
+          newItem.paramValue = val;
+          newList.push(newItem);
+        }
+      })
+    })
+
+    const data = [];
+    paramData[0].params.forEach(item => {
+      console.log(item);
+      newList.forEach(it => {
+        const newIt = JSON.parse(JSON.stringify(it));
+        if (item.paramKey === it.paramKey) {
+          newIt.taskModelId = item.taskModelId
+          data.push(newIt);
+        }
+      })
+    })
+    return data;
+  }
 
   render() {
-    // const list = this.formatData(res);          // 数据排序
-    const { newData } = this.props.location.state;
-    const list = newData;
-    // console.log(list);
+    const { paramData } = this.state;
+    const data = paramData;
 
     return (
       <>
@@ -100,7 +118,7 @@ class ProcessParameter extends Component {
             onFinishFailed={this.onFinishFailed}
           >
             <List
-              dataSource={list}
+              dataSource={data}
               renderItem={item => (
                 <List.Item>
                   <Card title={item.groupName} style={{width: '100%'}}>

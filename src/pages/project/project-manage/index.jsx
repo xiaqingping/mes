@@ -238,7 +238,11 @@ class ProjectManagement extends Component {
 
   // 新增
   handleAdd = () => {
-    // console.log(123);
+    const data = { requestType: 'addProject' }
+    this.props.dispatch({
+      type: 'projectManage/setProjectData',
+      payload: data
+    })
     router.push('/project/project-manage/add');
   };
 
@@ -246,9 +250,12 @@ class ProjectManagement extends Component {
   editRow = row => {
     const data = row;
     data.requestType = 'editProject';
-    console.log(data);
-    router.push('/project/project-manage/add/addflowpath', { data });
-  };
+    this.props.dispatch({
+      type: 'projectManage/setProjectData',
+      payload: data
+    })
+    router.push('/project/project-manage/add');
+  }
 
   // 项目管理详情页面
   searchDetails = row => {

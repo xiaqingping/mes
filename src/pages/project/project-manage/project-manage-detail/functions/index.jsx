@@ -34,25 +34,18 @@ const calculateTimeDifference = (startTime, endTime) => {
 const comparisonMerge = (paramData, valueData, newParamData) => {
   const newData = JSON.parse(JSON.stringify(paramData));
   newData[0].params = [];
-  // console.log(paramData);
-  // console.log(valueData);
-  // console.log(newParamData);
 
   const newList = [];
   newParamData.forEach(paramItem => {
     valueData.forEach(valueItem => {
       const newItem = JSON.parse(JSON.stringify(paramItem));
-      console.log(paramItem.paramKey);
-      console.log(valueItem.paramKey);
       if (paramItem.paramKey === valueItem.paramKey) {
         // newItem.paramKey = valueItem.paramKey;
         newItem.paramValue = valueItem.paramValue;
-        console.log(newItem);
         newList.push(newItem);
       }
     })
   })
-  console.log(newList);
 
   newData[0].params = newList;
   return newData;

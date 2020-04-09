@@ -116,8 +116,20 @@ const projectDetailModel = {
         badge: 'success',
       },
     ],
+
+    // 流程列表参数
+    procssesParam: [],
+    // 参数值列表
+    paramList: [],
   },
   effects: {},
-  reducers: {},
+  reducers: {
+    setProcssesParam(state, action) {
+      return { ...state, procssesParam: action.payload };
+    },
+    setParamList(state, action) {
+      return { ...state, paramList: action.payload };
+    },
+  },
 };
 export default  projectDetailModel;
