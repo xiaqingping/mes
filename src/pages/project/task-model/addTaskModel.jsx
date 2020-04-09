@@ -650,9 +650,13 @@ class TaskModel extends Component {
               </div>
             </div>
 
-            <div style={{ float: 'right', marginRight: '142px', fontSize: '16px' }}>
-              <SettingOutlined />
-              <a href="#" style={{ marginLeft: '10px' }} onClick={this.openArgumentModel}>
+            <div
+              style={{ float: 'right', marginRight: '142px', fontSize: '16px' }}
+              onClick={this.openArgumentModel}
+            >
+              {/* <SettingOutlined /> */}
+              <div className="task_model_add_task_icon" />
+              <a href="#" style={{ marginLeft: '10px' }}>
                 参数
               </a>
             </div>

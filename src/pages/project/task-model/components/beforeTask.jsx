@@ -20,7 +20,7 @@ class BeforeTask extends React.Component {
 
   initialValues = {
     page: 1,
-    rows: 10,
+    rows: 5,
   };
 
   constructor(props) {
@@ -38,11 +38,14 @@ class BeforeTask extends React.Component {
   }
 
   callParter = value => {
-    api.getTaskNameAndCode(value).then(res => {
-      this.setState({ nameCodeVal: res });
-    }).catch(err=>{
-      console.log(err);
-    });
+    api
+      .getTaskNameAndCode(value)
+      .then(res => {
+        this.setState({ nameCodeVal: res });
+      })
+      .catch(err => {
+        console.log(err);
+      });
   };
 
   titleContent = () => <div style={{ fontSize: '16px' }}>选择任务模型</div>;
@@ -164,7 +167,7 @@ class BeforeTask extends React.Component {
 
   sendData = async id => {
     this.props.onClose();
-    const res = await api.getAllPreTasks(id, this.props.ids).catch(err=>{
+    const res = await api.getAllPreTasks(id, this.props.ids).catch(err => {
       console.log(err);
     });
     this.props.getData(res);
