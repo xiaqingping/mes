@@ -167,7 +167,17 @@ class TaskModel extends Component {
       .getPreTasks(id)
       .then(res => {
         console.log(res);
-        const uuids = (res || []).map(e => e.picture);
+        const uuids = [];
+        const ids = [];
+        (res || []).forEach(item => {
+          uuids.push(item.picture);
+          ids.push(item.id);
+        });
+        console.log(uuids);
+        console.log(ids);
+
+        // (res || []).map(e => e.picture);
+        // const uuids = (res || []).map(e => e.picture);
         disk
           .getFiles({
             sourceCode: uuids.join(','),
@@ -184,6 +194,7 @@ class TaskModel extends Component {
             });
             this.setState({
               tableData: newList,
+              ids,
               tableLoading: false,
             });
           });

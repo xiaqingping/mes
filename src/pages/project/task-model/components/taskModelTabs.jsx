@@ -120,7 +120,7 @@ class TaskModelTabs extends Component {
                         style={{ float: 'left', marginRight: 10 }}
                         size="large"
                       />
-                      <div style={{ display: 'inline-block', width: '65%' }}>
+                      <div style={{ display: 'inline-block', width: '55%' }}>
                         <div>{item.code}</div>
                         <div style={{ wordWrap: 'break-word' }}>{item.name}</div>
                       </div>
@@ -131,7 +131,7 @@ class TaskModelTabs extends Component {
                         style={{ float: 'right', marginLeft: 10 }}
                       />
                       <Tag color="green" style={{ padding: '0 10px', float: 'right' }}>
-                        V1.0
+                        {item.version}
                       </Tag>
                     </Card>
                   </List.Item>
@@ -158,7 +158,7 @@ class TaskModelTabs extends Component {
                         style={{ float: 'left', marginRight: 10 }}
                         size="large"
                       />
-                      <div style={{ display: 'inline-block', width: '65%' }}>
+                      <div style={{ display: 'inline-block', width: '55%' }}>
                         <div>{item.code}</div>
                         <div style={{ wordWrap: 'break-word' }}>{item.name}</div>
                       </div>
@@ -169,7 +169,7 @@ class TaskModelTabs extends Component {
                         style={{ float: 'right', marginLeft: 10 }}
                       />
                       <Tag color="green" style={{ padding: '0 10px', float: 'right' }}>
-                        V1.0
+                        {item.version}
                       </Tag>
                     </Card>
                   </List.Item>

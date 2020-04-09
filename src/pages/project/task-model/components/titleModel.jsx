@@ -176,7 +176,7 @@ class TitleModel extends React.Component {
                   this.setState({ versionOpen: !versionOpen });
                 }}
               >
-                {selectVersion || 'V1.0'}
+                {selectVersion || viewData.version}
                 {/* {selectVersion || processDetail.version} */}
               </Tag>
               {versionOpen && (versionType || []).length > 1 && (

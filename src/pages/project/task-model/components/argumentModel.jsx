@@ -82,6 +82,11 @@ class ArgumentModel extends Component {
           item.myId = Date.now();
           return item;
         });
+        const { dispatch } = this.props;
+        dispatch({
+          type: 'taskModel/getArgumentsList',
+          payload: list,
+        });
         this.setState({
           argumentList: list,
           loading: false,
@@ -312,7 +317,7 @@ class ArgumentModel extends Component {
           <Drawer
             headerStyle={{ paddingTop: 24, paddingBottom: 24 }}
             destroyOnClose
-            width={400}
+            width={420}
             visible={childrenDrawer}
             closable={false}
             onClose={() => this.toggleChildrenDrawer(false)}
