@@ -141,12 +141,14 @@ class TitleModel extends React.Component {
         <Spin />
       </div>
     ) : (
-      <>
+      // style={{ borderBottom: '1px solid #f0f0f0' }}
+      <div>
         <div
           style={{
             marginTop: '25px',
             // overflow: 'auto',
             // position: 'relative',
+
             display: 'flex',
             justifyContent: 'space-between',
           }}
@@ -159,7 +161,7 @@ class TitleModel extends React.Component {
             />
             <div style={{ fontWeight: '900', marginLeft: 10 }}>
               <div style={{ fontWeight: '700' }}>{viewData.code}</div>
-              <div style={{ width: '200px', height: '50px', wordWrap: 'break-word' }}>
+              <div style={{ width: 170, height: '50px', wordWrap: 'break-word' }}>
                 {viewData.name}
               </div>
             </div>
@@ -201,11 +203,11 @@ class TitleModel extends React.Component {
             </div>
           </div>
 
-          <div style={{ marginLeft: 30 }} onClick={() => this.viewParams(viewData)}>
-            <SettingOutlined />
+          <div style={{ marginLeft: 40 }} onClick={() => this.viewParams(viewData)}>
+            <div className="task_model_add_task_icon" />
           </div>
 
-          <div style={{ marginLeft: '85px', fontSize: '14px' }}>
+          <div style={{ marginRight: '16px', marginLeft: 108, fontSize: '14px' }}>
             {(viewData.status * 1 === 2 || viewData.status * 1 === 4) && (
               <div
                 style={{ color: 'red', cursor: 'pointer', marginLeft: 16 }}
@@ -216,7 +218,7 @@ class TitleModel extends React.Component {
                 禁用
               </div>
             )}
-            <div style={{ marginTop: 15, fontSize: 12, marginLeft: 16 }}>
+            <div style={{ marginTop: 32, marginBottom: 18, fontSize: 14, marginLeft: 16 }}>
               {open ? (
                 <a href="#" onClick={() => this.setState({ open: !open })}>
                   收起
@@ -244,7 +246,7 @@ class TitleModel extends React.Component {
         {toViewArgument && (
           <ArgumentModel visible={viewVisible} onClose={this.onViewClose} fromView />
         )}
-      </>
+      </div>
     );
   }
 }

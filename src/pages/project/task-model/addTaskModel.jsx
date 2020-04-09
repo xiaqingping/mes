@@ -229,7 +229,7 @@ class TaskModel extends Component {
   titleContent = () => {
     return (
       <>
-        <div style={{ fontWeight: 'bolder' }}>前置任务列表</div>
+        <div style={{ fontWeight: 'bolder', marginTop: 10, fontSize: 16 }}>前置任务列表</div>
       </>
     );
   };
@@ -471,6 +471,7 @@ class TaskModel extends Component {
       {
         title: '编号/名称',
         dataIndex: 'code',
+        width: 500,
         render: (value, row) => {
           return (
             <div style={{ display: 'flex' }}>
@@ -489,6 +490,7 @@ class TaskModel extends Component {
       {
         title: '版本',
         dataIndex: 'version',
+        width: 400,
         render: value => (
           <>
             <Tag color="green">{value}</Tag>
@@ -498,7 +500,7 @@ class TaskModel extends Component {
       {
         title: '状态',
         dataIndex: 'status',
-        // width: '80px',
+        width: 400,
         render: value => {
           return (
             <>
@@ -523,7 +525,10 @@ class TaskModel extends Component {
                   okText="Yes"
                   cancelText="No"
                 >
-                  <DeleteOutlined />
+                  <div
+                    style={{ width: 20, height: 20 }}
+                    className="task_model_add_model_delet_icon"
+                  />
                 </Popconfirm>
               </>
             );
@@ -538,16 +543,13 @@ class TaskModel extends Component {
 
     return (
       <PageHeaderWrapper title={this.navContent()}>
-        <Card>
-          <div
-            className={classNames(
-              { task_model_isHidden: !loading },
-              'task_model_add_loading_style',
-            )}
-          >
+        <div
+          className={classNames({ task_model_isHidden: !loading }, 'task_model_add_loading_style')}
+        >
+          <Card>
             <Spin />
-          </div>
-        </Card>
+          </Card>
+        </div>
 
         <Form
           className={classNames({ task_model_isHidden: loading })}
@@ -581,7 +583,7 @@ class TaskModel extends Component {
               </Upload>
               {/* </Form.Item> */}
             </div>
-            <div style={{ float: 'left', width: '552px', marginLeft: '20px' }}>
+            <div style={{ float: 'left', width: '620px', marginLeft: '20px' }}>
               <Form.Item
                 name="name"
                 rules={[
@@ -651,23 +653,25 @@ class TaskModel extends Component {
             </div>
 
             <div
-              style={{ float: 'right', marginRight: '142px', fontSize: '16px' }}
-              onClick={this.openArgumentModel}
+              style={{
+                float: 'right',
+                marginRight: '100px',
+                fontSize: '16px',
+                verticalAlign: 'middle',
+              }}
             >
-              {/* <SettingOutlined /> */}
-              <div className="task_model_add_task_icon" />
-              <a href="#" style={{ marginLeft: '10px' }}>
-                参数
-              </a>
-            </div>
-
-            <div style={{ float: 'right', marginRight: '100px', fontSize: '16px' }}>
               <Form.Item name="isAutomatic" valuePropName="checked">
-                <span style={{ fontSize: '16px', verticalAlign: 'middle', marginRight: 10 }}>
-                  是否可自动运行：
-                </span>
+                <span style={{ fontSize: '16px', marginRight: 10 }}>是否可自动运行：</span>
                 <Switch checked={checked} onChange={this.switchChange} />
               </Form.Item>
+            </div>
+
+            <div style={{ float: 'right', marginRight: '60px', marginTop: 3, fontSize: '16px' }}>
+              {/* <SettingOutlined /> */}
+              {/* <div className="task_model_add_task_icon" /> */}
+              <a href="#" style={{ marginLeft: '10px' }} onClick={this.openArgumentModel}>
+                参数
+              </a>
             </div>
           </Card>
 
@@ -683,7 +687,7 @@ class TaskModel extends Component {
             <Button
               style={{
                 width: '100%',
-                marginTop: 16,
+                marginTop: 40,
                 marginBottom: 8,
               }}
               type="dashed"
