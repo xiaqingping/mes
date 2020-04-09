@@ -182,7 +182,7 @@ class ProcessModel extends Component {
       nameCodeVal: arr,
       // allowClear: 'ture',
     });
-    // return true;
+    return true;
   };
 
   // 发布人选择样式
@@ -220,7 +220,7 @@ class ProcessModel extends Component {
       nameCodeValPublish: arr,
       // allowClear: 'ture',
     });
-    // return true;
+    return true;
   };
 
   // 分页

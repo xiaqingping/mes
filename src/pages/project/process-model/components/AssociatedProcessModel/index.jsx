@@ -179,7 +179,7 @@ class AssociatedProcessModel extends React.Component {
           <>
             <Avatar
               src={row.fileId ? disk.downloadFiles(row.fileId, { view: true }) : ''}
-              style={{ float: 'left' }}
+              style={{ float: 'left', width: '46px', height: '46px' }}
             />
             <div style={{ float: 'left', marginLeft: '10px' }}>
               <div>{value}</div>
@@ -232,7 +232,7 @@ class AssociatedProcessModel extends React.Component {
         width={747}
         footer={null}
       >
-        <div className="tableList buttonStyle">
+        <div className="tableList buttonStyle table-style-set-little" style={{ marginLeft: '8px' }}>
           <TableSearchForm
             ref={this.tableSearchFormRef}
             initialValues={this.initialValues}

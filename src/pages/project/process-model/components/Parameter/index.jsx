@@ -277,19 +277,6 @@ class Parameter extends React.Component {
                     ''
                   )}
 
-                  {/* {item.paramId ? (
-                    <List.Item key={item.paramId}>
-                      <Card hoverable>
-                        <div>
-                          <div draggable onDragStart={() => this.dragStart(item, 1, 0)}>
-                            {item.paramName}
-                          </div>
-                        </div>
-                      </Card>
-                    </List.Item>
-                  ) : (
-                    <div />
-                  )} */}
                   <List.Item key={index}>
                     <Card
                       title={this.titleContent(item, index)}

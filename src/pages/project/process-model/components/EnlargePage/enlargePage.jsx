@@ -11,9 +11,9 @@ const EnlargePage = props => (
     footer={null}
     mask={false}
     maskClosable={false}
-    width={550}
+    width={560}
     closeIcon={<ShrinkOutlined />}
-    style={{ top: 180, right: 120 }}
+    style={{ top: 180, right: 115 }}
   >
     <List
       rowKey="id"
