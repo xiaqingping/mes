@@ -240,10 +240,9 @@ class ProcessModel extends Component {
     const { nameCodeVal } = this.state;
     return (
       <>
-        <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
+        <Col xxl={6} xl={8} lg={languageCode === 'EN' ? 12 : 12}>
           <FormItem label="流程模型" name="code">
             <AutoComplete
-              style={{ width: '260px' }}
               onSearch={this.inputValue}
               options={nameCodeVal.map(this.renderOption)}
               // placeholder={formatMessage({ id: 'bp.inputHere' })}
@@ -251,9 +250,9 @@ class ProcessModel extends Component {
             />
           </FormItem>
         </Col>
-        <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
+        <Col xxl={6} xl={8} lg={languageCode === 'EN' ? 12 : 0}>
           <FormItem label="状态" name="status">
-            <Select mode="multiple" maxTagCount={2} maxTagTextLength={3} style={{ width: '260px' }}>
+            <Select mode="multiple" maxTagCount={2} maxTagTextLength={3}>
               {status.map(item => (
                 <Option key={item.value} value={item.value}>
                   {item.text}
@@ -265,7 +264,6 @@ class ProcessModel extends Component {
         <Col xxl={6} lg={languageCode === 'EN' ? 12 : 0}>
           <FormItem label="发布人" name="publisherCode">
             <AutoComplete
-              style={{ width: '260px' }}
               onSearch={this.inputValuePublish}
               options={nameCodeVal.map(this.renderOptionPublish)}
               // placeholder={formatMessage({ id: 'bp.inputHere' })}
