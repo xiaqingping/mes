@@ -203,10 +203,10 @@ class TaskModel extends Component {
       return false;
     }
     nameCodeVal.forEach(item => {
-      if (item.name.indexOf(value) !== -1) {
+      if (item.name.indexOf(value) !== -1 && arr.indexOf(item) !== -1) {
         arr.push(item);
       }
-      if (item.code.indexOf(value) !== -1 && arr.indexOf(item)) {
+      if (item.code.indexOf(value) !== -1 && arr.indexOf(item) !== -1) {
         arr.push(item);
       }
     });
@@ -229,10 +229,10 @@ class TaskModel extends Component {
       return false;
     }
     nameCodeValPublish.forEach(item => {
-      if (item.name.indexOf(value) !== -1) {
+      if (item.name.indexOf(value) !== -1 && arr.indexOf(item) !== -1) {
         arr.push(item);
       }
-      if (item.code.indexOf(value) !== -1 && arr.indexOf(item)) {
+      if (item.code.indexOf(value) !== -1 && arr.indexOf(item) !== -1) {
         arr.push(item);
       }
     });
