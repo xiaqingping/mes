@@ -74,23 +74,26 @@ class ArgumentModel extends Component {
       id = selectParamsId;
     }
     console.log(id);
-    api.getTaskModelDetail(id).then(res => {
-      console.log(res);
-      const list = res.params.map(item => {
-        item.myId = Date.now();
-        return item;
+    api
+      .getTaskModelDetail(id)
+      .then(res => {
+        console.log(res);
+        const list = res.params.map(item => {
+          item.myId = Date.now();
+          return item;
+        });
+        this.setState({
+          argumentList: list,
+          loading: false,
+        });
+      })
+      .catch(err => {
+        console.log(err);
+        this.setState({
+          argumentList: [],
+          loading: false,
+        });
       });
-      this.setState({
-        argumentList: list,
-        loading: false,
-      });
-    }).catch((err)=>{
-      console.log(err);
-      this.setState({
-        argumentList: [],
-        loading: false,
-      });
-    });
   };
 
   emitArguments = props => {
@@ -246,8 +249,9 @@ class ArgumentModel extends Component {
     );
 
     return (
-      <>
+      <div className="task_model_argu_draw_wrap">
         <Drawer
+          headerStyle={{ paddingTop: 24, paddingBottom: 24 }}
           visible={visible}
           closable={false}
           onClose={onClose}
@@ -306,6 +310,7 @@ class ArgumentModel extends Component {
             </>
           )}
           <Drawer
+            headerStyle={{ paddingTop: 24, paddingBottom: 24 }}
             destroyOnClose
             width={400}
             visible={childrenDrawer}
@@ -324,7 +329,7 @@ class ArgumentModel extends Component {
             />
           </Drawer>
         </Drawer>
-      </>
+      </div>
     );
   }
 }
