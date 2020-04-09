@@ -111,7 +111,7 @@ class TaskModel extends Component {
     return (
       <>
         <Drawer
-          width={500}
+          width={520}
           placement="right"
           closable={false}
           onClose={this.onClose}

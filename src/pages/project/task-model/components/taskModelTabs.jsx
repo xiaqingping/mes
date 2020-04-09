@@ -101,7 +101,7 @@ class TaskModelTabs extends Component {
 
     // debugger;
     return (
-      <>
+      <div className="task_model_view_tab_wrap">
         <Tabs defaultActiveKey="1" onChange={this.onChange}>
           <TabPane tab="前置任务" key="1">
             {preLoading ? (
@@ -114,13 +114,13 @@ class TaskModelTabs extends Component {
                 dataSource={preTaskList}
                 renderItem={item => (
                   <List.Item key={item.id} onClick={() => this.toViewParams(item)}>
-                    <Card hoverable style={{ width: '550px' }}>
+                    <Card hoverable style={{ width: '520px' }}>
                       <Avatar
                         src={item.fileId ? disk.downloadFiles(item.fileId, { view: true }) : ''}
                         style={{ float: 'left', marginRight: 10 }}
                         size="large"
                       />
-                      <div style={{ display: 'inline-block' }}>
+                      <div style={{ display: 'inline-block', width: '65%' }}>
                         <div>{item.code}</div>
                         <div style={{ wordWrap: 'break-word' }}>{item.name}</div>
                       </div>
@@ -152,13 +152,13 @@ class TaskModelTabs extends Component {
                 dataSource={postTasks}
                 renderItem={item => (
                   <List.Item key={item.id} onClick={() => this.toViewParams(item)}>
-                    <Card hoverable style={{ width: '550px' }}>
+                    <Card hoverable style={{ width: '520px' }}>
                       <Avatar
                         src={item.fileId ? disk.downloadFiles(item.fileId, { view: true }) : ''}
                         style={{ float: 'left', marginRight: 10 }}
                         size="large"
                       />
-                      <div style={{ display: 'inline-block' }}>
+                      <div style={{ display: 'inline-block', width: '65%' }}>
                         <div>{item.code}</div>
                         <div style={{ wordWrap: 'break-word' }}>{item.name}</div>
                       </div>
@@ -183,7 +183,7 @@ class TaskModelTabs extends Component {
         {toViewArgument && (
           <ArgumentModel visible={viewVisible} onClose={this.onViewClose} fromView />
         )}
-      </>
+      </div>
     );
   }
 }

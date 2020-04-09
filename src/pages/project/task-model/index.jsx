@@ -552,8 +552,8 @@ class TaskModel extends Component {
     const { loading, list, pagination, viewId } = this.state;
     return (
       <PageHeaderWrapper>
-        <Card bordered={false} className="taskmodel">
-          <Spin spinning={loading} size="large">
+        <Spin spinning={loading} size="large">
+          <Card bordered={false} className="task_model_list_form_body">
             <div className="tableList">
               <TableSearchForm
                 ref={this.tableSearchFormRef}
@@ -562,24 +562,27 @@ class TaskModel extends Component {
                 simpleForm={this.simpleForm}
                 advancedForm={this.advancedForm}
               />
-              <div className="tableListOperator">
-                <Button type="primary" onClick={() => this.handleAdd()}>
-                  <PlusOutlined />
-                  新建
-                </Button>
-              </div>
-              <StandardTable
-                scroll={{ x: tableWidth }}
-                rowClassName="editable-row"
-                selectedRows=""
-                // loading={loading}
-                data={{ list, pagination }}
-                columns={columns}
-                onChange={this.handleStandardTableChange}
-              />
             </div>
-          </Spin>
-        </Card>
+          </Card>
+          <Card style={{ marginTop: 24 }}>
+            <div className="tableListOperator">
+              <Button type="primary" onClick={() => this.handleAdd()}>
+                <PlusOutlined />
+                新建
+              </Button>
+            </div>
+            <StandardTable
+              scroll={{ x: tableWidth }}
+              rowClassName="editable-row"
+              selectedRows=""
+              // loading={loading}
+              data={{ list, pagination }}
+              columns={columns}
+              onChange={this.handleStandardTableChange}
+            />
+            {/* </div> */}
+          </Card>
+        </Spin>
         {visible && <TaskModelView visible={visible} onClose={this.onClose} viewId={viewId} />}
       </PageHeaderWrapper>
     );
