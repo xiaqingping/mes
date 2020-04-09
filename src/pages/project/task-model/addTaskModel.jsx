@@ -97,46 +97,54 @@ class TaskModel extends Component {
       this.setState({
         loading: true,
       });
-      api.getTaskModelDetail(id).then(res => {
-        this.setState({
-          checked: res.isAutomatic * 1 === 1,
-          loading: false,
-          picture: res.picture,
-        });
-        console.log(res);
-        const { dispatch } = this.props;
-        // dispatch({
-        //   type: 'taskModel/getEditOriginModelData',
-        //   payload: res,
-        // });
-        (this.tableSearchFormRef.current || {}).setFieldsValue(res);
-        disk
-          .getFiles({
-            sourceCode: res.picture,
-            sourceKey: 'project_task_model',
-          })
-          .then(v => {
-            this.setState({
-              imageUrl: v.length !== 0 ? disk.downloadFiles(v[0].id, { view: true }) : '',
-            });
-            dispatch({
-              type: 'taskModel/getEditOriginModelData',
-              payload: { ...res, fileId: v.length !== 0 ? v[0].id : '' },
-            });
-            // this.props.dispatch({
-            //   type: 'processModel/setProcessDetail',
-            //   payload: {
-            //     ...res,
-            //     fileId: v.length !== 0 ? v[0].id : '',
-            //   },
-            // });
-          });
-        if (res.version) {
+      api
+        .getTaskModelDetail(id)
+        .then(res => {
           this.setState({
-            versionType: versionFun(res.version),
+            checked: res.isAutomatic * 1 === 1,
+            loading: false,
+            picture: res.picture,
           });
-        }
-      });
+          console.log(res);
+          const { dispatch } = this.props;
+          // dispatch({
+          //   type: 'taskModel/getEditOriginModelData',
+          //   payload: res,
+          // });
+          (this.tableSearchFormRef.current || {}).setFieldsValue(res);
+          disk
+            .getFiles({
+              sourceCode: res.picture,
+              sourceKey: 'project_task_model',
+            })
+            .then(v => {
+              this.setState({
+                imageUrl: v.length !== 0 ? disk.downloadFiles(v[0].id, { view: true }) : '',
+              });
+              dispatch({
+                type: 'taskModel/getEditOriginModelData',
+                payload: { ...res, fileId: v.length !== 0 ? v[0].id : '' },
+              });
+              // this.props.dispatch({
+              //   type: 'processModel/setProcessDetail',
+              //   payload: {
+              //     ...res,
+              //     fileId: v.length !== 0 ? v[0].id : '',
+              //   },
+              // });
+            });
+          if (res.version) {
+            this.setState({
+              versionType: versionFun(res.version),
+            });
+          }
+        })
+        .catch(err => {
+          console.log(err);
+          this.setState({
+            loading: false,
+          });
+        });
 
       this.getTableData(id);
     }
@@ -159,15 +167,15 @@ class TaskModel extends Component {
       .getPreTasks(id)
       .then(res => {
         console.log(res);
-        const uuids = res.map(e => e.picture);
+        const uuids = (res || []).map(e => e.picture);
         disk
           .getFiles({
             sourceCode: uuids.join(','),
             sourceKey: 'project_task_model',
           })
           .then(v => {
-            const newList = res.map(e => {
-              const filterItem = v.filter(item => item.sourceCode === e.picture);
+            const newList = (res || []).map(e => {
+              const filterItem = (v || []).filter(item => item.sourceCode === e.picture) || [];
               const fileId = filterItem[0] && filterItem[0].id;
               return {
                 ...e,
@@ -380,20 +388,20 @@ class TaskModel extends Component {
     const idsData = ids;
     const sonIdsData = sonIds;
     data = [...tableData, ...value];
-    value.forEach(item => {
-      idsData.push(item.id);
-      sonIdsData.push(...item.preTaskIds);
+    (value || []).forEach(item => {
+      idsData.unshift(item.id);
+      sonIdsData.unshift(...item.preTaskIds);
     });
 
-    const uuids = data.map(e => e.picture);
+    const uuids = (data || []).map(e => e.picture);
     disk
       .getFiles({
         sourceCode: uuids.join(','),
         sourceKey: 'project_task_model',
       })
       .then(v => {
-        const newList = data.map(e => {
-          const filterItem = v.filter(item => item.sourceCode === e.picture);
+        const newList = (data || []).map(e => {
+          const filterItem = (v || []).filter(item => item.sourceCode === e.picture) || [];
           const fileId = filterItem[0] && filterItem[0].id;
           return {
             ...e,
@@ -642,9 +650,13 @@ class TaskModel extends Component {
               </div>
             </div>
 
-            <div style={{ float: 'right', marginRight: '142px', fontSize: '16px' }}>
-              <SettingOutlined />
-              <a href="#" style={{ marginLeft: '10px' }} onClick={this.openArgumentModel}>
+            <div
+              style={{ float: 'right', marginRight: '142px', fontSize: '16px' }}
+              onClick={this.openArgumentModel}
+            >
+              {/* <SettingOutlined /> */}
+              <div className="task_model_add_task_icon" />
+              <a href="#" style={{ marginLeft: '10px' }}>
                 参数
               </a>
             </div>
