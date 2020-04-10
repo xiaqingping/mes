@@ -184,7 +184,7 @@ class ArgumentModel extends Component {
     console.log(this.props.taskModel);
     let title = null;
     formItemType.some(v => {
-      if (v.type == item.type) {
+      if (v.type === item.type) {
         title = v.text;
       }
     });

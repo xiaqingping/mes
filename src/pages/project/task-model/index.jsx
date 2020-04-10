@@ -54,6 +54,12 @@ class TaskModel extends Component {
       nameCodeVal: [],
       nameCodeValPublish: [],
       filtersData: null,
+      processCode: '', // 任务模型code
+      publisherCode: '',
+      modelSearchOptions: [], // 任务模型模糊搜素options
+      publisherOptions: [], // 发布人模糊搜索options
+      searchCodevalue: null, // 模糊搜索code值
+      searchPublisherValue: null, // 模糊搜索发布人值
     };
     this.callParter = debounce(this.callParter, 500);
     this.callPublish = debounce(this.callPublish, 500);
@@ -64,7 +70,13 @@ class TaskModel extends Component {
   }
 
   getTableData = (options = {}) => {
-    const { pagination } = this.state;
+    const {
+      pagination,
+      processCode,
+      publisherCode,
+      searchCodevalue,
+      searchPublisherValue,
+    } = this.state;
     this.setState({ loading: true });
     const formData = this.tableSearchFormRef.current
       ? this.tableSearchFormRef.current.getFieldsValue()
@@ -85,11 +97,21 @@ class TaskModel extends Component {
       };
       delete formData.publishDate;
     }
+    if (formData.name) {
+      newData = { ...newData, code: processCode };
+      delete formData.name;
+    }
+    if (formData.publisherName) {
+      newData = { ...newData, publisherCode };
+      delete formData.publisherName;
+    }
     const data = {
       page,
       rows,
       ...newData,
-      ...formData,
+      code: formData.code && searchCodevalue,
+      publisherCode: formData.publisherCode && searchPublisherValue,
+      // ...formData,
       ...options,
     };
     console.log(data);
@@ -244,9 +266,17 @@ class TaskModel extends Component {
   };
 
   renderOption = item => ({
-    value: item.code,
+    code: item.code,
+    value: item.name,
     label: (
-      <div style={{ display: 'flex' }}>
+      <div
+        style={{ display: 'flex', marginLeft: '14px', padding: '6px 0' }}
+        onClick={() => {
+          this.setState({
+            processCode: item.code,
+          });
+        }}
+      >
         <span>{item.code}</span>&nbsp;&nbsp;
         <span>{item.name}</span>
       </div>
@@ -254,37 +284,99 @@ class TaskModel extends Component {
   });
 
   renderOptionPublish = item => ({
-    value: item.publisherCode,
+    value: item.publisherName,
     label: (
-      // <Option key={item.id} text={item.name}>
-      <div style={{ display: 'flex' }}>
+      <div
+        style={{ display: 'flex' }}
+        onClick={() => {
+          this.setState({
+            publisherCode: item.publisherCode,
+          });
+        }}
+      >
         <span>{item.publisherName}</span>
       </div>
-      // </Option>
     ),
   });
 
+  // ---------------------------------------------------------------
+
+  fetchCodeData = value => {
+    api.searchTaskModel(value).then(res => {
+      this.setState({ modelSearchOptions: res || [] });
+    });
+  };
+
+  handleSearchCodeChange = value => {
+    this.setState({
+      searchCodevalue: value && value.value,
+    });
+  };
+
+  fetchPublisherData = value => {
+    api.searchPublisherName(value).then(res => {
+      this.setState({
+        publisherOptions: res || [],
+      });
+    });
+    // debugger;
+    // console.log(value);
+    // api.searchPublisherName(value).then(res => {
+    //   this.setState({ publisherOptions: res || [] });
+    // });
+  };
+
+  handlePubisherChange = v => {
+    this.setState({
+      searchPublisherValue: v && v.value,
+    });
+  };
+
+  // ---------------------------------------------------------------------------------
+
   simpleForm = () => {
     const { languageCode, status } = this.props;
-    const { nameCodeVal } = this.state;
-    console.log(nameCodeVal);
+    const { nameCodeVal, modelSearchOptions, publisherOptions, value } = this.state;
 
     return (
       <>
-        <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
-          <FormItem label="任务模型" name="code">
+        <Col xxl={6} xl={8} lg={languageCode === 'EN' ? 12 : 12}>
+          {/* <FormItem label="任务模型" name="name">
             <AutoComplete
-              style={{ width: 260 }}
+              // style={{ width: 200 }}
               onSearch={this.inputValue}
               options={nameCodeVal.map(this.renderOption)}
               // placeholder={formatMessage({ id: 'bp.inputHere' })}
               // optionLabelProp="text"
             />
+          </FormItem> */}
+          <FormItem label="任务模型" name="code">
+            <Select
+              // mode="tag"
+              allowClear
+              showSearch
+              showArrow={false}
+              labelInValue
+              // value={value} // 有值的话就会展示
+              // placeholder="Select users"
+              filterOption={false}
+              onSearch={this.fetchCodeData}
+              onChange={this.handleSearchCodeChange}
+              style={{ width: '100%' }}
+              optionFilterProp="children" // 对子元素--option进行筛选
+              optionLabelProp="label" // 回填的属性
+            >
+              {modelSearchOptions.map(d => (
+                <Option key={d.code} value={d.code} label={d.name}>
+                  {d.code}&nbsp;&nbsp;{d.name}
+                </Option>
+              ))}
+            </Select>
           </FormItem>
         </Col>
-        <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
+        <Col xxl={6} xl={8} lg={languageCode === 'EN' ? 12 : 0}>
           <FormItem label="状态" name="status">
-            <Select mode="multiple" maxTagCount={2} maxTagTextLength={3} style={{ width: 260 }}>
+            <Select mode="multiple" maxTagCount={2} maxTagTextLength={3}>
               {status.map(item => (
                 <Option key={item.value} value={item.value}>
                   {item.text}
@@ -294,14 +386,37 @@ class TaskModel extends Component {
           </FormItem>
         </Col>
         <Col xxl={6} lg={languageCode === 'EN' ? 12 : 0}>
-          <FormItem label="发布人" name="publisherCode">
+          {/* <FormItem label="发布人" name="publisherCode">
             <AutoComplete
-              style={{ width: 260 }}
+              // style={{ width: 200 }}
               onSearch={this.inputValuePublish}
               options={nameCodeVal.map(this.renderOptionPublish)}
               // placeholder={formatMessage({ id: 'bp.inputHere' })}
               placeholder="发布人"
             />
+          </FormItem> */}
+          <FormItem label="发布人" name="publisherCode">
+            <Select
+              // mode="tag"
+              allowClear
+              showSearch
+              showArrow={false}
+              labelInValue
+              // value={value} // 有值的话就会展示
+              // placeholder="Select users"
+              filterOption={false}
+              onSearch={this.fetchPublisherData}
+              onChange={this.handlePubisherChange}
+              style={{ width: '100%' }}
+              optionFilterProp="children" // 对子元素--option进行筛选
+              optionLabelProp="label" // 回填的属性
+            >
+              {publisherOptions.map(d => (
+                <Option key={d.publisherCode} value={d.publisherCode} label={d.publisherName}>
+                  {d.publisherCode}&nbsp;&nbsp;{d.publisherName}
+                </Option>
+              ))}
+            </Select>
           </FormItem>
         </Col>
       </>

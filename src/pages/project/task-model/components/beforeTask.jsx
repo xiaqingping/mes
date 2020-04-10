@@ -1,11 +1,11 @@
 // 选择任务模型
 import React from 'react';
-import { Modal, Table, Avatar, Form, Col, Tag, AutoComplete, Select } from 'antd';
+import { Modal, Table, Avatar, Form, Col, Tag, Select, Spin } from 'antd';
 import TableSearchForm from '@/components/TableSearchForm';
 import { connect } from 'dva';
 
 import api from '@/pages/project/api/taskmodel';
-import { cutString } from '@/utils/utils';
+// import { cutString } from '@/utils/utils';
 import _ from 'lodash';
 import disk from '@/pages/project/api/disk';
 
@@ -117,18 +117,19 @@ class BeforeTask extends React.Component {
     console.log(value);
     // debugger;
     this.setState({
-      value: value.value,
+      value: value && value.value,
       children: [],
     });
   };
 
   simpleForm = () => {
-    const { value, children } = this.state;
+    const { children } = this.state;
     return (
       <>
         <Col lg={10}>
           <FormItem label="名称" name="code">
             <Select
+              allowClear
               // mode="tag"
               showSearch
               showArrow={false}
@@ -155,11 +156,17 @@ class BeforeTask extends React.Component {
   };
 
   sendData = async id => {
-    this.props.onClose();
+    this.setState({
+      loading: true,
+    });
     const res = await api.getAllPreTasks(id, this.props.ids).catch(err => {
       console.log(err);
+      this.setState({
+        loading: false,
+      });
     });
     this.props.getData(res);
+    this.props.onClose();
   };
 
   handleChange = p => {
@@ -201,15 +208,15 @@ class BeforeTask extends React.Component {
         title: '描述',
         width: 280,
         dataIndex: 'describe',
-        render: value => (
-          <div
-            // className="addEllipsis"
-            title={value}
-            style={{ width: '250px', height: '50px', wordWrap: 'break-word' }}
-          >
-            {cutString(value, 65)}
-          </div>
-        ),
+        // render: value => (
+        //   <div
+        //     // className="addEllipsis"
+        //     title={value}
+        //     style={{ width: '250px', height: '50px', wordWrap: 'break-word' }}
+        //   >
+        //     {cutString(value, 65)}
+        //   </div>
+        // ),
       },
       {
         title: '版本',
@@ -242,25 +249,27 @@ class BeforeTask extends React.Component {
         height={570}
         footer={null}
       >
-        <div className="tableList buttonStyle">
-          <div style={{ paddingLeft: 10 }}>
-            <TableSearchForm
-              ref={this.tableSearchFormRef}
-              initialValues={this.initialValues}
-              getTableData={this.getTableData}
-              simpleForm={this.simpleForm}
+        <Spin spinning={loading}>
+          <div className="tableList buttonStyle">
+            <div style={{ paddingLeft: 10 }}>
+              <TableSearchForm
+                ref={this.tableSearchFormRef}
+                initialValues={this.initialValues}
+                getTableData={this.getTableData}
+                simpleForm={this.simpleForm}
+              />
+            </div>
+            <Table
+              columns={columns}
+              dataSource={list}
+              // loading={loading}
+              rowKey="id"
+              size="small"
+              pagination={pagination}
+              onChange={this.handleChange}
             />
           </div>
-          <Table
-            columns={columns}
-            dataSource={list}
-            loading={loading}
-            rowKey="id"
-            size="small"
-            pagination={pagination}
-            onChange={this.handleChange}
-          />
-        </div>
+        </Spin>
       </Modal>
     );
   }
