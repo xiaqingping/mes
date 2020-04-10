@@ -2,7 +2,7 @@
 import React, { Component } from 'react';
 import { Drawer, Avatar, Tag, List, Card, Badge, Spin, Empty } from 'antd';
 import { DownOutlined, UpOutlined } from '@ant-design/icons';
-import { formatter, compare } from '@/utils/utils';
+import { formatter, compare, cutString } from '@/utils/utils';
 import './index.less';
 import api from '@/pages/project/api/taskmodel';
 import processApi from '@/pages/project/api/processModel/';
@@ -355,7 +355,9 @@ class DrawerTool extends Component {
                         </div>
                         <div>
                           <div style={{ float: 'left', width: '20%' }}>描述: </div>
-                          <div style={{ float: 'left', width: '80%' }}>{item.describe}</div>
+                          <div style={{ float: 'left', width: '80%' }}>
+                            {cutString(item.describe, 100)}
+                          </div>
                         </div>
                       </div>
                     </Card>
