@@ -157,9 +157,8 @@ class Parameter extends React.Component {
               background: moveDescId === index ? '#E2E2E2' : 'white',
               resize: 'none',
             }}
-          >
-            {item.groupDescribe}
-          </textarea>
+            defaultValue={item.groupDescribe}
+          />
         </div>
       </div>
     );
