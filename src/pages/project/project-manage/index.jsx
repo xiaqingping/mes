@@ -4,7 +4,7 @@ import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import {
   Button,
   Card,
-  // Divider,
+  Divider,
   Form,
   Select,
   Popconfirm,
@@ -214,7 +214,7 @@ class ProjectManagement extends Component {
             </Select>
           </FormItem>
         </Col>
-        <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
+        <Col xxl={6} lg={languageCode === 'EN' ? 12 : 0}>
           <FormItem label="创建人" name="creatorName">
             <Input placeholder="请输入创建人" />
           </FormItem>
@@ -238,9 +238,24 @@ class ProjectManagement extends Component {
 
   // 新增
   handleAdd = () => {
-    // console.log(123);
+    const data = { requestType: 'addProject' }
+    this.props.dispatch({
+      type: 'projectManage/setProjectData',
+      payload: data
+    })
     router.push('/project/project-manage/add');
   };
+
+  // 修改
+  editRow = row => {
+    const data = row;
+    data.requestType = 'editProject';
+    this.props.dispatch({
+      type: 'projectManage/setProjectData',
+      payload: data
+    })
+    router.push('/project/project-manage/add');
+  }
 
   // 项目管理详情页面
   searchDetails = row => {
@@ -253,7 +268,6 @@ class ProjectManagement extends Component {
     api.deleteProjectManage(row.id).then(() => {
       this.getTableData();
     });
-    // console.log(row);
   };
 
   render() {
@@ -317,15 +331,6 @@ class ProjectManagement extends Component {
       {
         title: '标签',
         dataIndex: 'label',
-        // render: value => (
-        //   <>
-        //     {value.map(item => (
-        //       <Tag key={item} color={item}>
-        //         {item}
-        //       </Tag>
-        //     ))}
-        //   </>
-        // ),
       },
       {
         title: '成员数',
@@ -346,30 +351,20 @@ class ProjectManagement extends Component {
       {
         fixed: 'right',
         title: '操作',
-        // render: () => (
-        //   <>
-        //     {/* <a onClick={() => console.log(111)}>修改</a>
-        //     <Divider type="vertical" /> */}
-        //     <a onClick={() => this.deleteRow(results)}>删除</a>
-        //     <Divider type="vertical" />
-        //     {/* <a onClick={() => console.log(333)}>开始</a> */}
-        //   </>
-        // ),
         render: (value, row, index) => {
           const { editIndex } = this.state;
           let actions;
+          // console.log(this.state);
           if (editIndex !== index) {
             if (row.status === 1) {
               actions = (
-                <Popconfirm title="确定删除数据？" onConfirm={() => this.deleteRow(row)}>
-                  <a>删除</a>
-                </Popconfirm>
-              );
-            } else {
-              actions = (
-                <Popconfirm title="确定恢复数据？" onConfirm={() => this.resumeRow(row)}>
-                  <a>恢复</a>
-                </Popconfirm>
+                <>
+                  <Popconfirm title="确定删除数据？" onConfirm={() => this.deleteRow(row)}>
+                    <a>删除</a>
+                  </Popconfirm>
+                  <Divider type="vertical" />
+                  <a onClick={() => this.editRow(row)}>修改</a>
+                </>
               );
             }
           }

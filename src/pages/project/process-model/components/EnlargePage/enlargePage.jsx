@@ -1,3 +1,4 @@
+// 参数变大
 import React from 'react';
 import { Modal, List, Card } from 'antd';
 import { ShrinkOutlined } from '@ant-design/icons';
@@ -10,9 +11,9 @@ const EnlargePage = props => (
     footer={null}
     mask={false}
     maskClosable={false}
-    width={550}
+    width={560}
     closeIcon={<ShrinkOutlined />}
-    style={{ top: 180, right: 120 }}
+    style={{ top: 180, right: 115 }}
   >
     <List
       rowKey="id"

@@ -1,6 +1,6 @@
 // 选择任务模型
 import React from 'react';
-import { Modal, Table, Avatar, Form, Col, Tag, AutoComplete } from 'antd';
+import { Modal, Table, Avatar, Form, Col, Tag, AutoComplete, Spin } from 'antd';
 import TableSearchForm from '@/components/TableSearchForm';
 import { connect } from 'dva';
 import './index.less';
@@ -29,6 +29,7 @@ class AssociatedProcessModel extends React.Component {
       visible: false,
       pagination: {},
       nameCodeVal: [],
+      loading: true,
     };
     this.callParter = _.debounce(this.callParter, 500);
   }
@@ -82,6 +83,7 @@ class AssociatedProcessModel extends React.Component {
           });
           this.setState({
             list: newList,
+            loading: false,
           });
         });
 
@@ -120,10 +122,10 @@ class AssociatedProcessModel extends React.Component {
       return false;
     }
     nameCodeVal.forEach(item => {
-      if (item.name.indexOf(value) !== -1) {
+      if (item.name.indexOf(value) !== -1 && arr.indexOf(item) !== -1) {
         arr.push(item);
       }
-      if (item.code.indexOf(value) !== -1 && arr.indexOf(item)) {
+      if (item.code.indexOf(value) !== -1 && arr.indexOf(item) !== -1) {
         arr.push(item);
       }
     });
@@ -177,7 +179,7 @@ class AssociatedProcessModel extends React.Component {
           <>
             <Avatar
               src={row.fileId ? disk.downloadFiles(row.fileId, { view: true }) : ''}
-              style={{ float: 'left' }}
+              style={{ float: 'left', width: '46px', height: '46px' }}
             />
             <div style={{ float: 'left', marginLeft: '10px' }}>
               <div>{value}</div>
@@ -230,22 +232,24 @@ class AssociatedProcessModel extends React.Component {
         width={747}
         footer={null}
       >
-        <div className="tableList buttonStyle">
+        <div className="tableList buttonStyle table-style-set-little" style={{ marginLeft: '8px' }}>
           <TableSearchForm
             ref={this.tableSearchFormRef}
             initialValues={this.initialValues}
             getTableData={this.getTableData}
             simpleForm={this.simpleForm}
           />
-          <Table
-            columns={columns}
-            dataSource={list}
-            loading={loading}
-            rowKey="id"
-            size="small"
-            pagination={pagination}
-            onChange={this.handleStandardTableChange}
-          />
+          <Spin spinning={loading}>
+            <Table
+              columns={columns}
+              dataSource={list}
+              loading={loading}
+              rowKey="id"
+              size="small"
+              pagination={pagination}
+              onChange={this.handleStandardTableChange}
+            />
+          </Spin>
         </div>
       </Modal>
     );

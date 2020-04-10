@@ -1,8 +1,9 @@
+// 参数分配
 import React from 'react';
 import { Modal, List, Card, Button } from 'antd';
 import { ArrowsAltOutlined, PlusOutlined } from '@ant-design/icons';
-import EnlargePage from './enlargePage';
-import AddGroup from './addGroup';
+import EnlargePage from '../EnlargePage/enlargePage';
+import AddGroup from '../AddGroup/addGroup';
 import './index.less';
 // import { sortable } from 'react-sortable';
 
@@ -21,6 +22,8 @@ class Parameter extends React.Component {
     moveElement: null,
     moveIndex: 0,
     data: [],
+    moveTitleId: null,
+    moveDescId: null,
   };
 
   // 分类变大打开
@@ -35,10 +38,21 @@ class Parameter extends React.Component {
 
   // 添加组分类打开
   handleAddGroup = () => {
-    this.setState({ addGroupVisible: true });
+    const { data } = this.state;
+    const newData = data;
+    newData.splice(1, 0, {
+      sortNo: '',
+      groupName: '分组A',
+      groupDescribe: '描述',
+      params: [],
+    });
+    this.setState({
+      data: newData,
+    });
+    // this.setState({ addGroupVisible: true });
   };
 
-  // 关闭组分类
+  // 关闭添加组分类
   handleCloseGroup = (v, type) => {
     const { data } = this.state;
     if (type) {
@@ -46,7 +60,7 @@ class Parameter extends React.Component {
       newData.push({
         sortNo: '',
         groupName: v.groupName,
-        groupDesc: v.groupDesc,
+        groupDescribe: v.groupDescribe,
         params: [],
       });
       this.setState({
@@ -56,32 +70,99 @@ class Parameter extends React.Component {
     this.setState({ addGroupVisible: false });
   };
 
-  titleContent = (item, index) => (
-    <div
-      style={{ padding: '0' }}
-      draggable
-      onDragStart={() => this.dragStartType(item, 2, index + 1)}
-    >
-      {item.groupName}
-      <Button
-        icon={<ArrowsAltOutlined />}
-        style={{ border: 'none', float: 'right', marginRight: '10px' }}
-        onClick={() => {
-          this.handleBigOpen(item);
-        }}
-      />
-      <br />
+  titleContent = (item, index) => {
+    const { moveTitleId, moveDescId, data } = this.state;
+    // const groups = JSON.parse(JSON.stringify(data));
+    return (
       <div
-        style={{
-          width: '220px',
-          fontWeight: '200',
-          marginTop: '5px',
-        }}
+        style={{ padding: '0' }}
+        draggable
+        onDragStart={() => this.dragStartType(item, 2, index + 1)}
       >
-        {item.groupDesc}
+        <input
+          onMouseEnter={() => {
+            this.setState({
+              moveTitleId: index,
+            });
+          }}
+          onMouseLeave={() => {
+            this.setState({
+              moveTitleId: null,
+            });
+          }}
+          onChange={e => {
+            data[index + 1].groupName = e.target.value;
+            this.setState({
+              data: [...data],
+            });
+          }}
+          spellCheck="false"
+          style={{
+            width: '200px',
+            border: 'none',
+            outline: 'none',
+            paddingLeft: '10px',
+            fontSize: '14px',
+            color: 'rgba(0, 0, 0, 0.65)',
+            fontWeight: 'bolder',
+            background: moveTitleId === index ? '#E2E2E2' : 'white',
+          }}
+          defaultValue={item.groupName}
+        />
+
+        <Button
+          icon={<ArrowsAltOutlined />}
+          style={{ border: 'none', float: 'right', marginRight: '10px' }}
+          onClick={() => {
+            this.handleBigOpen(item);
+          }}
+        />
+        <br />
+        <div
+          style={{
+            width: '220px',
+            fontWeight: '200',
+            marginTop: '5px',
+          }}
+        >
+          <textarea
+            onMouseEnter={() => {
+              this.setState({
+                moveDescId: index,
+              });
+            }}
+            onMouseLeave={() => {
+              this.setState({
+                moveDescId: null,
+              });
+            }}
+            onChange={e => {
+              data[index + 1].groupDescribe = e.target.value;
+              console.log(data);
+              this.setState({
+                data: [...data],
+              });
+            }}
+            spellCheck="false"
+            style={{
+              width: '200px',
+              minHeight: '0',
+              maxHeight: '60px',
+              border: 'none',
+              outline: 'none',
+              paddingLeft: '10px',
+              fontSize: '14px',
+              color: 'rgba(0, 0, 0, 0.45)',
+              fontWeight: 'bolder',
+              background: moveDescId === index ? '#E2E2E2' : 'white',
+              resize: 'none',
+            }}
+            defaultValue={item.groupDescribe}
+          />
+        </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   /**
    * 开始拖动的对象
@@ -187,7 +268,6 @@ class Parameter extends React.Component {
 
   render() {
     const { visible, typeEnlargeVisible, typeEnlargeData, addGroupVisible, data } = this.state;
-
     if (!data) return false;
     if (!data.filter(item => item.groupName === 'no')[0]) {
       return false;
@@ -200,6 +280,7 @@ class Parameter extends React.Component {
         width={871}
         footer={null}
         className="parameter-style desc-title-style"
+        maskClosable={false}
       >
         <div
           style={{
@@ -276,19 +357,6 @@ class Parameter extends React.Component {
                     ''
                   )}
 
-                  {/* {item.paramId ? (
-                    <List.Item key={item.paramId}>
-                      <Card hoverable>
-                        <div>
-                          <div draggable onDragStart={() => this.dragStart(item, 1, 0)}>
-                            {item.paramName}
-                          </div>
-                        </div>
-                      </Card>
-                    </List.Item>
-                  ) : (
-                    <div />
-                  )} */}
                   <List.Item key={index}>
                     <Card
                       title={this.titleContent(item, index)}

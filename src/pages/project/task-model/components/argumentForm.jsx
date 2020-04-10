@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { Form, Input, Button, Row, Col, Switch, Spin } from 'antd';
-
+import '../index.less';
 import { connect } from 'dva';
 
 class ArgumentForm extends React.Component {
@@ -70,7 +70,7 @@ class ArgumentForm extends React.Component {
 
   render() {
     const formItemLayout = null;
-    const buttonItemLayout = null;
+    // const buttonItemLayout = null;
     const { loading, viewForm } = this.state;
     console.log(viewForm);
     viewForm.isrequired = viewForm.isrequired ? '是' : '否';
@@ -100,7 +100,7 @@ class ArgumentForm extends React.Component {
               ]
             }
           >
-            {fromView ? viewForm.paramKey : <Input placeholder="请输入参数名称 " />}
+            {fromView ? <span>{viewForm.paramKey}</span> : <Input placeholder="请输入参数名称 " />}
           </Form.Item>
           <Form.Item
             label="参数描述："
@@ -145,16 +145,20 @@ class ArgumentForm extends React.Component {
           <Form.Item label="验证说明：" name="validDesc">
             {fromView ? viewForm.validDesc : <Input placeholder="请输入 " />}
           </Form.Item>
-
-          <Form.Item {...buttonItemLayout}>
-            {fromView ? (
-              ''
-            ) : (
-              <Button type="primary" htmlType="submit">
-                确认
-              </Button>
-            )}
-          </Form.Item>
+          <div
+            style={{ width: '100%' }}
+            // className="task_model_argu_form_submit_wrap"
+          >
+            <div className="task_model_argu_form_submit">
+              <Form.Item>
+                {!fromView && (
+                  <Button type="primary" htmlType="submit">
+                    确认
+                  </Button>
+                )}
+              </Form.Item>
+            </div>
+          </div>
         </Form>
       </div>
     );

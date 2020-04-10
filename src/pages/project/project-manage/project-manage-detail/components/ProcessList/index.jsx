@@ -1,18 +1,19 @@
 // 流程列表
-import { Form, Table, Tag, Progress, Divider, Button, message } from 'antd';
+import { Form, Table, Tag, Divider, Button, message } from 'antd';
 import React, { Component } from 'react';
 import { connect } from 'dva';
 import {
   SlidersOutlined,
   PlayCircleOutlined,
   PauseCircleOutlined,
-  EditOutlined
+  EditOutlined,
   } from '@ant-design/icons';
 import router from 'umi/router';
-import api from '@/pages/project/api/projectManageDetail'
+import api from '@/pages/project/api/projectManageDetail';
 import TaskList  from '../TaskList';
 import { EditInforModel }  from '../ModelUI';
 import { comparisonMerge, paramDataFilter } from '../../functions';
+import ProgressMould from '../ProgressMould';
 // import { formatter } from '@/utils/utils';
 
 
@@ -61,16 +62,23 @@ class ProcessList extends Component {
         detailList: row,
         taskList: res,
       });
-    })
-  }
+    });
+  };
 
    // 查看流程参数
-  searchProcessParam = row => {
+  searchProcessParam = (row, list) => {
     api.getProcessParam(row.processModelId).then(paramData => {
       api.getProcessParamValue(row.id).then(valueData => {
         const newParamData = paramDataFilter(paramData);
-        const newData = comparisonMerge(paramData, valueData, newParamData);
-        router.push('/project/project-manage/process-parameter', { newData });
+        const data = comparisonMerge(paramData, valueData, newParamData);
+        data.requestType = 'editParam';
+        data.processesId = list[0].id;
+
+        this.props.dispatch({
+          type: 'projectDetail/setProcssesParam',
+          payload: data
+        })
+        router.push('/project/project-manage/process-parameter');
       })
     })
   }
@@ -156,7 +164,7 @@ class ProcessList extends Component {
 
     let columns = [
       {
-        title: '名称',
+        title: '名称/描述',
         dataIndex: 'name',
         width: 300,
         render: (value, row, index) => {
@@ -183,8 +191,6 @@ class ProcessList extends Component {
         dataIndex: 'processProgress',
         width: 150,
         render: (value, row) => {
-          if (value === undefined) return '';
-          const val = value.toFixed(2) * 100;
           if (row.status === 1) {
             return (
               <Button
@@ -199,17 +205,18 @@ class ProcessList extends Component {
           if (row.status === 2) {
             return (
               <>
-                <Progress percent={val} size="small" style={{ float: 'left', width: '80%' }}/>
+                <ProgressMould percentData={row} />
                 <PauseCircleOutlined
                   style={{ marginLeft: '10px' }}
                   onClick={() => this.processPause(row)}
                 />
               </>
             )
-          } if (row.status === 3) {
+          }
+          if (row.status === 3) {
             return (
               <>
-                <Progress percent={val} size="small" style={{ float: 'left', width: '80%' }}/>
+                <ProgressMould percentData={row} />
                 <PlayCircleOutlined
                   style={{ marginLeft: '10px' }}
                   onClick={() => this.processStart(row)}
@@ -217,7 +224,7 @@ class ProcessList extends Component {
               </>
             )
           }
-          return <Progress percent={val} size="small" style={{ width: '80%' }}/>
+          return <ProgressMould percentData={row} />;
         }
       },
       {
@@ -250,7 +257,7 @@ class ProcessList extends Component {
         width: 80,
         render: (value, row) => (
           <SlidersOutlined
-            onClick={() => this.searchProcessParam(row)}
+            onClick={() => this.searchProcessParam(row, list)}
             style={{ fontSize: 20 }}
           />
         )

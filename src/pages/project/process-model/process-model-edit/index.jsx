@@ -13,17 +13,19 @@ import {
   Popconfirm,
   Form,
   Badge,
+  Avatar,
 } from 'antd';
-import { LoadingOutlined, SettingOutlined, PlusOutlined, DeleteOutlined } from '@ant-design/icons';
+import { LoadingOutlined, PlusOutlined } from '@ant-design/icons';
 import { connect } from 'dva';
 import './index.less';
 // eslint-disable-next-line max-len
 import AssociatedProcessModel from '@/pages/project/process-model/components/AssociatedProcessModel';
 import Parameter from '@/pages/project/process-model/components/Parameter';
-import { guid, formatter, versionFun } from '@/utils/utils';
+import { guid, formatter, versionFun, isEmpty } from '@/utils/utils';
 import disk from '@/pages/project/api/disk';
 import api from '@/pages/project/api/processModel/';
 import router from 'umi/router';
+import deletePic from '@/assets/imgs/delete@1x.png';
 
 function getBase64(img, callback) {
   const reader = new FileReader();
@@ -79,6 +81,7 @@ class ProcessEdit extends Component {
       versionType: null, // 可以选择的版本
       picture: '',
       processData: [],
+      buttonLoading: false,
     };
   }
 
@@ -103,7 +106,7 @@ class ProcessEdit extends Component {
         }
         this.getData(res.taskModels);
         this.setState({
-          paramter: res.groups,
+          paramter: res.groups ? res.groups : [],
           taskList: res.taskModels,
           picture: res.picture,
           loading: true,
@@ -175,15 +178,13 @@ class ProcessEdit extends Component {
   };
 
   // 流程模型列表title样式
-  titleContent = () => <div style={{ fontWeight: 'bolder' }}>任务列表</div>;
-
-  // 是否可自动运行和交互分析
-  onChange = checked => {
-    console.log(`switch to ${checked}`);
-  };
+  titleContent = () => <div style={{ fontWeight: 'bolder', padding: '8px' }}>任务列表</div>;
 
   // 提交上传
   onFinish = values => {
+    this.setState({
+      buttonLoading: true,
+    });
     const {
       imageUrl,
       guuid,
@@ -203,8 +204,8 @@ class ProcessEdit extends Component {
     if (imageUrl) {
       data.picture = guuid;
     }
-    data.name = values.name;
-    data.describe = values.describe;
+    data.name = values.name.trim();
+    data.describe = values.describe.trim();
     data.interactionAnalysis = values.interactionAnalysis ? 1 : 2;
     data.version = selectVersion || 'V1.0';
     data.taskModels = taskModelIds;
@@ -212,22 +213,63 @@ class ProcessEdit extends Component {
     data.groups = paramter;
     delete data.taskModelIds;
 
+    try {
+      if (isEmpty(data.name)) throw new Error('流程名称不能为空！');
+      if (isEmpty(data.describe)) throw new Error('流程描述不能为空！');
+    } catch (e) {
+      this.setState({
+        buttonLoading: false,
+      });
+      return message.error(e.message);
+    }
+
     if (pageModel === 1) {
       data.id = id;
-      api.changeProcess(data).then(() => {
-        router.push('/project/process-model');
-      });
+      api
+        .changeProcess(data)
+        .then(() => {
+          this.setState({
+            buttonLoading: false,
+          });
+          router.push('/project/process-model');
+        })
+        .catch(() => {
+          this.setState({
+            buttonLoading: false,
+          });
+        });
     }
     if (pageModel === 2) {
-      api.upgradeProcess(id, data).then(() => {
-        router.push('/project/process-model');
-      });
+      api
+        .upgradeProcess(id, data)
+        .then(() => {
+          this.setState({
+            buttonLoading: false,
+          });
+          router.push('/project/process-model');
+        })
+        .catch(() => {
+          this.setState({
+            buttonLoading: false,
+          });
+        });
     }
     if (!pageModel) {
-      api.addProcess(data).then(() => {
-        router.push('/project/process-model');
-      });
+      api
+        .addProcess(data)
+        .then(() => {
+          this.setState({
+            buttonLoading: false,
+          });
+          router.push('/project/process-model');
+        })
+        .catch(() => {
+          this.setState({
+            buttonLoading: false,
+          });
+        });
     }
+    return true;
   };
 
   // 点击打开关联
@@ -260,6 +302,7 @@ class ProcessEdit extends Component {
 
   // 关闭参数
   handleClose = value => {
+    console.log(value);
     const newData = value.map((item, index) => ({ ...item, sortNo: index }));
     const sonData = newData;
     newData.map((item, index) => {
@@ -270,6 +313,7 @@ class ProcessEdit extends Component {
       return true;
     });
     sonData[0].sortNo = 0;
+    console.log(sonData);
     this.setState({
       parameterVisible: false,
       paramter: sonData,
@@ -283,6 +327,7 @@ class ProcessEdit extends Component {
     // const { ids, sonIds } = this.props;
     const idsData = ids;
     const sonIdsData = sonIds;
+    const { preTaskIds } = value;
     // data = [...taskList, ...value];
     // value.forEach(item => {
     //   idsData.push(item.id);
@@ -290,23 +335,33 @@ class ProcessEdit extends Component {
     // });
     const newData = data.filter(item => item.id !== value.id);
     const newIdsData = idsData.filter(item => item !== value.id);
-    let newSonIdsData = [];
-    if (value.preTaskIds.length !== 0) {
-      value.preTaskIds.forEach(i => {
-        newSonIdsData = sonIdsData.filter(item => item !== i);
+
+    if (preTaskIds.length !== 0) {
+      preTaskIds.forEach(i => {
+        sonIdsData.some((item, index) => {
+          if (i === item) {
+            sonIdsData.splice(index, 1);
+            return true;
+          }
+        });
       });
     }
     // 删除参数分类里的数据
     // let paramterData = paramter;
-    const paramterData = paramter.map(item => {
-      const params = item.params.filter(i => i.taskModelId !== value.id);
-      return { ...item, params };
-    });
+    if (paramter) {
+      const paramterData = paramter.map(item => {
+        const params = item.params.filter(i => i.taskModelId !== value.id);
+        return { ...item, params };
+      });
+      this.setState({
+        paramter: paramterData,
+      });
+    }
+
     this.setState({
       taskList: newData,
       ids: newIdsData,
-      sonIds: newSonIdsData,
-      paramter: paramterData,
+      sonIds: sonIdsData,
     });
   };
 
@@ -336,6 +391,40 @@ class ProcessEdit extends Component {
       idsData.push(item.id);
       sonIdsData.push(...item.preTaskIds);
     });
+
+    const uuids = data.map(e => e.picture);
+    disk
+      .getFiles({
+        sourceCode: uuids.join(','),
+        sourceKey: 'project_process_model',
+      })
+      .then(v => {
+        if (v) {
+          const newList = data.map(e => {
+            const filterItem = v.filter(item => item.sourceCode === e.picture);
+            const fileId = filterItem[0] && filterItem[0].id;
+            return {
+              ...e,
+              fileId,
+            };
+          });
+          this.setState({
+            taskList: newList,
+          });
+        } else {
+          const newList = data.map(e => {
+            const fileId = '';
+            return {
+              ...e,
+              fileId,
+            };
+          });
+          this.setState({
+            taskList: newList,
+          });
+        }
+      });
+
     this.setState({
       taskList: data,
       ids: idsData,
@@ -380,8 +469,9 @@ class ProcessEdit extends Component {
       versionType,
       paramter,
       processData,
+      buttonLoading,
     } = this.state;
-    // console.log(paramter, parameterVisible);
+
     const {
       project: { status },
     } = this.props;
@@ -392,14 +482,34 @@ class ProcessEdit extends Component {
       {
         title: '编号/名称',
         dataIndex: 'code',
+        width: 320,
+        render: (value, row) => (
+          <>
+            <Avatar
+              src={row.fileId ? disk.downloadFiles(row.fileId, { view: true }) : ''}
+              style={{ float: 'left', width: '46px', height: '46px' }}
+            />
+            <div style={{ float: 'left', marginLeft: '10px' }}>
+              <div>{value}</div>
+              <div style={{ color: '#B9B9B9' }}>{row.name}</div>
+            </div>
+          </>
+        ),
       },
       {
         title: '版本',
-        dataIndex: 'describe',
+        dataIndex: 'version',
+        width: 300,
+        render: value => (
+          <Tag color="green" style={{ padding: '0 10px' }}>
+            {value}
+          </Tag>
+        ),
       },
       {
         title: '状态',
         dataIndex: 'status',
+        width: 240,
         render: value => (
           <Badge
             status={formatter(status, value, 'value', 'status')}
@@ -410,12 +520,14 @@ class ProcessEdit extends Component {
       {
         title: '自动运行',
         dataIndex: 'isAutomatic',
+        width: 250,
         render: (value, row, index) => (
           <Switch disabled={value === 2} onChange={() => this.changeIsAutomatic(row, index)} />
         ),
       },
       {
         title: '操作',
+        width: 100,
         render: (value, row) => {
           if (!sonIds.includes(row.id)) {
             return (
@@ -427,7 +539,9 @@ class ProcessEdit extends Component {
                   okText="Yes"
                   cancelText="No"
                 >
-                  <DeleteOutlined />
+                  <a>
+                    <img src={deletePic} alt="" width="16" height="16" />
+                  </a>
                 </Popconfirm>
               </>
             );
@@ -454,7 +568,7 @@ class ProcessEdit extends Component {
     return (
       <PageHeaderWrapper title={this.navContent(processData)}>
         <Form onFinish={this.onFinish} initialValues={initialValues()}>
-          <Card className="process-model-edit">
+          <Card className="process-model-edit" style={{ paddingTop: '5px', height: '220px' }}>
             <div style={{ float: 'left', marginLeft: '20px' }}>
               {/* <Form.Item name="uploadPIc"> */}
               <Upload
@@ -480,9 +594,9 @@ class ProcessEdit extends Component {
               </Upload>
               {/* </Form.Item> */}
             </div>
-            <div style={{ float: 'left', width: '552px', marginLeft: '20px' }}>
+            <div style={{ float: 'left', width: '620px', marginLeft: '20px' }}>
               <Form.Item name="name">
-                <Input placeholder="请输入流程名称" style={{ marginBottom: '10px' }} />
+                <Input placeholder="请输入流程名称" />
               </Form.Item>
               <Form.Item name="describe">
                 <Input.TextArea placeholder="请输入流程描述" rows={4} />
@@ -534,8 +648,10 @@ class ProcessEdit extends Component {
             </div>
 
             {/* 交互分析 */}
-            <div style={{ float: 'right', marginRight: '80px' }}>
-              <span style={{ fontSize: '16px', verticalAlign: 'middle' }}>交互分析：</span>
+            <div style={{ float: 'right', marginRight: '80px', marginTop: '5px' }}>
+              <span style={{ fontSize: '16px', verticalAlign: 'middle', marginRight: '10px' }}>
+                交互分析：
+              </span>
               <span>
                 <Form.Item
                   name="interactionAnalysis"
@@ -546,20 +662,26 @@ class ProcessEdit extends Component {
                 </Form.Item>
               </span>
             </div>
-            <div style={{ float: 'right', marginRight: '30px', fontSize: '16px' }}>
-              <SettingOutlined />
+            {/* 参数 */}
+            <div
+              style={{ float: 'right', marginRight: '40px', fontSize: '16px', marginTop: '5px' }}
+            >
               <a
                 onClick={() => {
                   this.handleOpen();
                 }}
-                style={{ marginLeft: '10px' }}
+                style={{ marginLeft: '10px', marginRight: '20px', fontSize: '16px' }}
               >
                 参数
               </a>
             </div>
           </Card>
 
-          <Card style={{ marginTop: '24px' }} title={this.titleContent()}>
+          <Card
+            style={{ marginTop: '24px' }}
+            title={this.titleContent()}
+            className="table-style-set"
+          >
             <Table
               rowKey="id"
               dataSource={taskList}
@@ -584,23 +706,36 @@ class ProcessEdit extends Component {
           <Card
             style={{ height: '48px', width: '100%', position: 'fixed', bottom: '0', left: '0' }}
           >
-            <Button type="primary" style={{ float: 'right', marginTop: '-16px' }} htmlType="submit">
+            <Button
+              type="primary"
+              style={{ float: 'right', marginTop: '-16px' }}
+              htmlType="submit"
+              loading={buttonLoading}
+            >
               提交
             </Button>
           </Card>
         </Form>
-        <AssociatedProcessModel
-          visible={visible}
-          onClose={this.onClose}
-          getData={v => this.getData(v)}
-          ids={ids}
-        />
+        {visible ? (
+          <AssociatedProcessModel
+            visible={visible}
+            onClose={this.onClose}
+            getData={v => this.getData(v)}
+            ids={ids}
+          />
+        ) : (
+          ''
+        )}
         {/* 参数弹框 */}
-        <Parameter
-          visible={parameterVisible}
-          handleClose={value => this.handleClose(value)}
-          paramter={paramter}
-        />
+        {parameterVisible ? (
+          <Parameter
+            visible={parameterVisible}
+            handleClose={value => this.handleClose(value)}
+            paramter={paramter}
+          />
+        ) : (
+          ''
+        )}
       </PageHeaderWrapper>
     );
   }

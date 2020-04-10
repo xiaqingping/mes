@@ -14,7 +14,6 @@ class MemberList extends Component {
   tableFormRef = React.createRef();
 
   state = {
-    pagination: {},       // 分页参数
     list: [],             // 表格数据
     loading: true,        // 加载状态
     visibleModel: false,  // 编辑名称描述模态框是否显示
@@ -87,7 +86,7 @@ class MemberList extends Component {
   }
 
   render() {
-    const { pagination, list, loading, visibleModel, menberInfor } = this.state;
+    const { list, loading, visibleModel, menberInfor } = this.state;
     const { jurisdiction } = this.props.projectDetail;
     let tableWidth = 0;
 
@@ -165,7 +164,6 @@ class MemberList extends Component {
             rowKey="id"
             loading={loading}
             dataSource={list}
-            pagination={pagination}
             columns={columns}
             onChange={this.handleStandardTableChange}
           />

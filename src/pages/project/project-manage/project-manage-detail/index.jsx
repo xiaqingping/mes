@@ -48,12 +48,20 @@ class ProjectDetail extends Component {
     if (selectKey === '1') {
       return (
         <PlusSquareOutlined
-          onClick={() => console.log(selectKey, list.id)}
+          onClick={() => this.handleAddProcesses(list)}
           style={{ fontSize: 20, color: '#1890ff' }}
         />
       )
     }
     return '';
+  }
+
+  // 添加流程
+  handleAddProcesses = data => {
+    const newData = [];
+    newData.id = data.id;
+    newData.requestType = 'add';
+    router.push('/project/project-manage/add/addflowpath', { newData });
   }
 
 

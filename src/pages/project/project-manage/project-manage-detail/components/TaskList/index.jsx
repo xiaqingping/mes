@@ -13,7 +13,7 @@ import {
   PauseCircleOutlined,
 } from '@ant-design/icons';
 import { ModelType } from '@/pages/project/components/ModelComponents';
-import { calculateTimeDifference, comparisonMerge } from '../../functions';
+import { calculateTimeDifference } from '../../functions';
 import style from './index.less';
 
 class TaskList extends Component {
@@ -70,25 +70,43 @@ class TaskList extends Component {
   searchParameter = row => {
     const valueData = row.taskExecRecordParamList;
     api.getTaskParam(row.taskModelId).then(res => {
-      const paramData = [];
-      // 第三级属性数据放置第二层数据中
-      res.forEach((item, index) => {
-        const newItem = JSON.parse(JSON.stringify(item));
-        newItem.index = JSON.parse(JSON.stringify(index));
-        newItem.paramProperties.forEach(e => {
-          newItem[e.paramPropertyKey] = e.paramPropertyValue;
-        });
-        paramData.push(newItem);
-      });
-      // 合并参数列表和参数值列表
-      const parameterList = comparisonMerge(paramData, valueData);
+      // 对比合并参数
+      const paramData = this.disposeTaskData(res);
+      const parameterList = this.disposeParamData(paramData, valueData);
       this.setState({ visibleParam: true, parameterList });
     });
   };
 
+  // 处理任务参数列表
+  disposeTaskData = data => {
+    const newData = [];
+    data.forEach(item => {
+      const newItem = JSON.parse(JSON.stringify(item));
+      newItem.paramProperties.forEach(e => {
+        newItem[e.paramPropertyKey] = e.paramPropertyValue;
+      });
+      newData.push(newItem);
+    });
+    return newData;
+  }
+
+  // 合并参数列表和参数值
+  disposeParamData = (paramData, valueData) => {
+    const newData = [];
+    paramData.forEach(paramItem => {
+      valueData.forEach(valueItem => {
+        const newItem = JSON.parse(JSON.stringify(paramItem));
+        if (paramItem.paramKey === valueItem.paramKey) {
+          newItem.paramValue = valueItem.paramValue;
+          newData.push(newItem);
+        }
+      })
+    })
+    return newData;
+  }
+
   // 任务执行记录开始运行
   startExecRecord = row => {
-    console.log(row);
     api.startExecRecord(row.id).then(() => {
       this.props.onClose();
     });
@@ -96,7 +114,6 @@ class TaskList extends Component {
 
   // 任务执行记录暂停运行
   pauseExecRecord = row => {
-    console.log(row);
     api.pauseExecRecord(row.id).then(() => {
       this.props.onClose();
     });
@@ -174,7 +191,6 @@ class TaskList extends Component {
         },
       },
     ];
-    console.log(openId)
     return (
       <>
         <Drawer
@@ -211,17 +227,22 @@ class TaskList extends Component {
                   <div className={style.open}>
                     {openId.filter(i => i === item.id).length !== 0 ? (
                       <>
-                        <a onClick={() => this.showTable(item.id, 2)}>
+                        <a
+                          onClick={() => this.showTable(item.id, 2)}
+                          style={{ float: 'right' }}
+                        >
                           收起
                           <UpOutlined />
                         </a>
-                        <Table
-                          size="small"
-                          columns={columns}
-                          rowKey="id"
-                          dataSource={item.taskExecRecordList}
-                          pagination={false}
-                        />
+                        <div className={style.taskExecRecordTable}>
+                          <Table
+                            size="small"
+                            columns={columns}
+                            rowKey="id"
+                            dataSource={item.taskExecRecordList}
+                            pagination={false}
+                          />
+                        </div>
                       </>
                     ) : (
                       <a onClick={() => this.showTable(item.id, 1)}>

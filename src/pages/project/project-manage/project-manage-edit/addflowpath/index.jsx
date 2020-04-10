@@ -108,7 +108,7 @@ class Test extends Component {
   handleOpen = row => {
     console.log(row);
     const data = row;
-    data.requestType = 'addValue';
+    data.requestType = 'addParam';
     router.push('/project/project-manage/process-parameter', { data });
   };
 

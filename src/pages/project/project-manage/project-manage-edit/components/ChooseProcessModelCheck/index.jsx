@@ -6,11 +6,34 @@ import '../../index.less';
 // 点击流程模型查看的模态框
 
 class ChooseProcessModelCheck extends React.Component {
-  tableSearchFormRef = React.createRef();
+  // tableSearchFormRef = React.createRef();
+  static getDerivedStateFromProps(nextProps) {
+    return {
+      viewlist: nextProps.viewlist || [],
+    };
+    // if ('value' in nextProps) {
+    //   return {
+    //     email: nextProps.value.email || '',
+    //   };
+    // }
+    // return null;
+  }
 
   constructor(props) {
     console.log(props);
     super(props);
+    this.state = {
+      viewlist: props.viewlist,
+      // projectManage:[], // 带过来的查看数据
+    };
+    console.log(this.state);
+  }
+
+  componentDidMount() {
+    // const {viewlist} = this.props.projectManage;
+    // this.setState({
+    //   viewlist
+    // })
   }
 
   vieweOk = () => {
@@ -22,7 +45,10 @@ class ChooseProcessModelCheck extends React.Component {
   };
 
   render() {
-    console.log(this.props);
+    // console.log(this.props);
+    const { viewlist } = this.state;
+    console.log(viewlist);
+
     const columnView = [
       {
         title: '任务',
@@ -75,8 +101,7 @@ class ChooseProcessModelCheck extends React.Component {
                   {/* 上部 */}
                   <div style={{ height: '50px' }}>
                     <Avatar
-                      src="https://zos.alipayobjects.com/rmsportal
-                                        /ODTLcjxAfvqbxHnVXCYX.png"
+                      src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
                       style={{ float: 'left', marginRight: '10px' }}
                       size="large"
                     />
@@ -90,22 +115,19 @@ class ChooseProcessModelCheck extends React.Component {
                       }}
                     >
                       <ul style={{ padding: '0', textAlign: 'center' }}>
-                        <li>565656443464</li>
-                        <li style={{ height: '20px', border: '1px' }}>某某某</li>
+                        <li>{viewlist.code}</li>
+                        <li style={{ height: '20px', border: '1px' }}>{viewlist.name}</li>
                       </ul>
                     </div>
 
                     <div style={{ float: 'left' }}>
                       <Tag color="green" style={{ width: '40px', height: '20px' }}>
-                        v1.2
+                        {viewlist.version}
                       </Tag>
                     </div>
                   </div>
                   {/* 描述 */}
-                  <div style={{ fontSize: '14px', padding: '5px' }}>
-                    心灵鸡汤来一碗,心灵鸡汤来两碗,心灵鸡汤来三碗，心灵鸡汤来四碗,心灵鸡汤来一碗,
-                    心灵鸡汤来两碗,心灵鸡汤来三碗，心灵鸡汤来四碗
-                  </div>
+                  <div style={{ fontSize: '14px', padding: '5px' }}>{viewlist.describe}</div>
                   {/* 表格 */}
                   <div>
                     <Table columns={columnView} dataSource={data} size="small" />

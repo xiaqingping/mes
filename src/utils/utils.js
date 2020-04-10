@@ -309,3 +309,6 @@ export const compare = property => (a, b) => {
   const value2 = b[property];
   return value1 - value2;
 };
+
+// 判断字符是否为空
+export const isEmpty = obj => typeof obj === 'undefined' || obj === null || obj === '';

@@ -21,11 +21,11 @@ import router from 'umi/router';
 import { connect } from 'dva';
 import _ from 'lodash';
 import { DateUI } from '@/pages/project/components/AntdSearchUI';
-import { formatter, getOperates, compare } from '@/utils/utils';
+import { formatter, getOperates } from '@/utils/utils';
 import api from '@/pages/project/api/processModel/';
 import disk from '@/pages/project/api/disk';
 import StandardTable from '../components/StandardTable';
-import { DrawerTool } from './components/Details';
+import ProcessDetail from './process-model-detail';
 import './index.less';
 
 const FormItem = Form.Item;
@@ -49,6 +49,8 @@ class ProcessModel extends Component {
       nameCodeVal: [],
       nameCodeValPublish: [],
       filtersData: null,
+      processCode: '',
+      publisherCode: '',
       // processList: [],
     };
     // 异步验证做节流处理
@@ -76,7 +78,7 @@ class ProcessModel extends Component {
   getTableData = (options = {}) => {
     this.setState({ loading: true });
     const formData = this.tableSearchFormRef.current.getFieldsValue();
-    const { pagination } = this.state;
+    const { pagination, processCode, publisherCode } = this.state;
     const { current: page, pageSize: rows } = pagination;
 
     let newData = [];
@@ -93,6 +95,14 @@ class ProcessModel extends Component {
       };
       delete formData.publishDate;
     }
+    if (formData.name) {
+      newData = { ...newData, code: processCode };
+      delete formData.name;
+    }
+    if (formData.publisherName) {
+      newData = { ...newData, publisherCode };
+      delete formData.publisherName;
+    }
     const data = {
       page,
       rows,
@@ -100,7 +110,7 @@ class ProcessModel extends Component {
       ...formData,
       ...options,
     };
-
+    console.log(data);
     api.getProcess(data).then(res => {
       const uuids = res.rows.map(e => e.picture);
       disk
@@ -109,17 +119,30 @@ class ProcessModel extends Component {
           sourceKey: 'project_process_model',
         })
         .then(v => {
-          const newList = res.rows.map(e => {
-            const filterItem = v.filter(item => item.sourceCode === e.picture);
-            const fileId = filterItem[0] && filterItem[0].id;
-            return {
-              ...e,
-              fileId,
-            };
-          });
-          this.setState({
-            list: newList,
-          });
+          if (v) {
+            const newList = res.rows.map(e => {
+              const filterItem = v.filter(item => item.sourceCode === e.picture);
+              const fileId = filterItem[0] && filterItem[0].id;
+              return {
+                ...e,
+                fileId,
+              };
+            });
+            this.setState({
+              list: newList,
+            });
+          } else {
+            const newList = res.rows.map(e => {
+              const fileId = '';
+              return {
+                ...e,
+                fileId,
+              };
+            });
+            this.setState({
+              list: newList,
+            });
+          }
         });
 
       this.setState({
@@ -135,10 +158,18 @@ class ProcessModel extends Component {
 
   // 流程模型选择样式
   renderOption = item => ({
-    value: item.code,
+    code: item.code,
+    value: item.name,
     label: (
       // <Option key={item.id} text={item.name}>
-      <div style={{ display: 'flex', marginLeft: '14px', padding: '6px 0' }}>
+      <div
+        style={{ display: 'flex', marginLeft: '14px', padding: '6px 0' }}
+        onClick={() => {
+          this.setState({
+            processCode: item.code,
+          });
+        }}
+      >
         <span>{item.code}</span>&nbsp;&nbsp;
         <span>{item.name}</span>
       </div>
@@ -158,10 +189,10 @@ class ProcessModel extends Component {
       return false;
     }
     nameCodeVal.forEach(item => {
-      if (item.name.indexOf(value) !== -1) {
+      if (item.name.indexOf(value) !== -1 && arr.indexOf(item) !== -1) {
         arr.push(item);
       }
-      if (item.code.indexOf(value) !== -1 && arr.indexOf(item)) {
+      if (item.code.indexOf(value) !== -1 && arr.indexOf(item) !== -1) {
         arr.push(item);
       }
     });
@@ -174,10 +205,17 @@ class ProcessModel extends Component {
 
   // 发布人选择样式
   renderOptionPublish = item => ({
-    value: item.publisherCode,
+    value: item.publisherName,
     label: (
       // <Option key={item.id} text={item.name}>
-      <div style={{ display: 'flex' }}>
+      <div
+        style={{ display: 'flex' }}
+        onClick={() => {
+          this.setState({
+            publisherCode: item.publisherCode,
+          });
+        }}
+      >
         <span>{item.publisherName}</span>
       </div>
       // </Option>
@@ -196,10 +234,10 @@ class ProcessModel extends Component {
       return false;
     }
     nameCodeValPublish.forEach(item => {
-      if (item.name.indexOf(value) !== -1) {
+      if (item.name.indexOf(value) !== -1 && arr.indexOf(item) !== -1) {
         arr.push(item);
       }
-      if (item.code.indexOf(value) !== -1 && arr.indexOf(item)) {
+      if (item.code.indexOf(value) !== -1 && arr.indexOf(item) !== -1) {
         arr.push(item);
       }
     });
@@ -240,10 +278,9 @@ class ProcessModel extends Component {
     const { nameCodeVal } = this.state;
     return (
       <>
-        <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
-          <FormItem label="流程模型" name="code">
+        <Col xxl={6} xl={8} lg={languageCode === 'EN' ? 12 : 12}>
+          <FormItem label="流程模型" name="name">
             <AutoComplete
-              style={{ width: '260px' }}
               onSearch={this.inputValue}
               options={nameCodeVal.map(this.renderOption)}
               // placeholder={formatMessage({ id: 'bp.inputHere' })}
@@ -251,9 +288,9 @@ class ProcessModel extends Component {
             />
           </FormItem>
         </Col>
-        <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
+        <Col xxl={6} xl={8} lg={languageCode === 'EN' ? 12 : 0}>
           <FormItem label="状态" name="status">
-            <Select mode="multiple" maxTagCount={2} maxTagTextLength={3} style={{ width: '260px' }}>
+            <Select mode="multiple" maxTagCount={2} maxTagTextLength={3}>
               {status.map(item => (
                 <Option key={item.value} value={item.value}>
                   {item.text}
@@ -265,7 +302,6 @@ class ProcessModel extends Component {
         <Col xxl={6} lg={languageCode === 'EN' ? 12 : 0}>
           <FormItem label="发布人" name="publisherCode">
             <AutoComplete
-              style={{ width: '260px' }}
               onSearch={this.inputValuePublish}
               options={nameCodeVal.map(this.renderOptionPublish)}
               // placeholder={formatMessage({ id: 'bp.inputHere' })}
@@ -379,64 +415,22 @@ class ProcessModel extends Component {
 
   // 查看详情
   searchDetails = value => {
-    api.getProcessDetail(value.id).then(res => {
-      let newData = {};
-      // if (res.picture) {
-      disk.getFiles({ sourceCode: res.picture, sourceKey: 'project_process_model' }).then(i => {
-        const picId = i.length !== 0 ? i[0].id : '';
-        newData = { ...res, picId };
-        console.log(newData);
-        let groupsData = null;
-        // let paramData = null;
-        if (newData.groups && newData.groups.length !== 0) {
-          groupsData = newData.groups.sort(compare('sortNo'));
-          // paramData = newData.groups.map(item => {
-          //   const data = item.params.sort(compare('sortNo'));
-          //   return { ...groupsData, data };
-          // });
-        }
-        newData.groups = groupsData;
-        this.setState({
-          detailValue: newData,
-        });
-        if (res.taskModels.length !== 0) {
-          res.taskModels.map((item, index) => {
-            if (item.picture) {
-              disk
-                .getFiles({ sourceCode: item.picture, sourceKey: 'project_process_model' })
-                .then(r => {
-                  const listId = r[0].id;
-                  newData.taskModels[index].listId = listId;
-                  this.setState({
-                    detailValue: newData,
-                  });
-                });
-            }
-            return true;
-          });
-        }
-      });
-      // } else {
-      //   this.setState({
-      //     detailValue: res,
-      //   });
-      // }
-
-      this.setState({
-        visible: true,
-      });
+    this.setState({
+      visible: true,
+      detailValue: value,
     });
   };
 
   render() {
     const { pagination, loading, visible, detailValue, list } = this.state;
+
     const { status } = this.props;
     let tableWidth = 0;
     let columns = [
       {
         title: '编号/名称',
         dataIndex: 'code',
-        width: 250,
+        width: 300,
         render: (value, row) => (
           <>
             <Avatar
@@ -608,7 +602,6 @@ class ProcessModel extends Component {
               <StandardTable
                 scroll={{ x: tableWidth }}
                 rowClassName="editable-row"
-                selectedRows=""
                 loading={loading}
                 data={{ list, pagination }}
                 columns={columns}
@@ -618,11 +611,11 @@ class ProcessModel extends Component {
             </Form>
           </Card>
           {visible ? (
-            <DrawerTool
+            <ProcessDetail
               visible={visible}
               // visible
               onClose={this.onClose}
-              detailValue={detailValue}
+              detailId={detailValue.id}
               status={status}
               handleChangeVersion={v => this.handleChangeVersion(v)}
               handleUnPublish={row => this.handleUnPublish(row)}
