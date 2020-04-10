@@ -1,6 +1,6 @@
 // 选择任务模型
 import React from 'react';
-import { Modal, Table, Avatar, Form, Col, Tag, AutoComplete } from 'antd';
+import { Modal, Table, Avatar, Form, Col, Tag, AutoComplete, Select } from 'antd';
 import TableSearchForm from '@/components/TableSearchForm';
 import { connect } from 'dva';
 
@@ -8,6 +8,8 @@ import api from '@/pages/project/api/taskmodel';
 import { cutString } from '@/utils/utils';
 import _ from 'lodash';
 import disk from '@/pages/project/api/disk';
+
+const { Option } = Select;
 
 const FormItem = Form.Item;
 
@@ -28,25 +30,16 @@ class BeforeTask extends React.Component {
     this.state = {
       visible: false,
       pagination: {},
-      nameCodeVal: [],
+      // nameCodeVal: [],
+      value: [],
+      children: [],
     };
-    this.callParter = _.debounce(this.callParter, 500);
+    this.fetchData = _.debounce(this.fetchData, 500);
   }
 
   componentDidMount() {
     this.getTableData(this.initialValues);
   }
-
-  callParter = value => {
-    api
-      .getTaskNameAndCode(value)
-      .then(res => {
-        this.setState({ nameCodeVal: res });
-      })
-      .catch(err => {
-        console.log(err);
-      });
-  };
 
   titleContent = () => <div style={{ fontSize: '16px' }}>选择任务模型</div>;
 
@@ -58,15 +51,17 @@ class BeforeTask extends React.Component {
 
   getTableData = (options = {}) => {
     this.setState({ loading: true });
+    const { pagination, value } = this.state;
     const formData = this.tableSearchFormRef.current
       ? this.tableSearchFormRef.current.getFieldsValue()
       : '';
-    const { pagination } = this.state;
     const { current: page, pageSize: rows } = pagination;
+
     const data = {
       page,
       rows,
-      ...formData,
+      code: formData.code && value,
+      // ...formData,
       ...options,
       status: 2,
     };
@@ -109,56 +104,50 @@ class BeforeTask extends React.Component {
       });
   };
 
-  renderOption = item => ({
-    value: item.code,
-    label: (
-      // <Option key={item.id} text={item.name}>
-      <div style={{ display: 'flex' }} key={item.code}>
-        <span>{item.code}</span>&nbsp;&nbsp;
-        <span>{item.name}</span>
-      </div>
-      // </Option>
-    ),
-  });
+  fetchData = value => {
+    api.getTaskNameAndCode(value).then(res => {
+      console.log(res);
+      this.setState({
+        children: res,
+      });
+    });
+  };
 
-  // 筛选值
-  inputValue = value => {
-    const { nameCodeVal } = this.state;
-    const arr = [];
-    if (!value) {
-      return false;
-    }
-    this.callParter(value);
-    if (nameCodeVal.length === 0) {
-      return false;
-    }
-    nameCodeVal.forEach(item => {
-      if (item.name.indexOf(value) !== -1) {
-        arr.push(item);
-      }
-      if (item.code.indexOf(value) !== -1 && arr.indexOf(item)) {
-        arr.push(item);
-      }
-    });
+  handleSelectChange = value => {
+    console.log(value);
+    // debugger;
     this.setState({
-      nameCodeVal: arr,
-      // allowClear: 'ture',
+      value: value.value,
+      children: [],
     });
-    return true;
   };
 
   simpleForm = () => {
-    const { nameCodeVal } = this.state;
+    const { value, children } = this.state;
     return (
       <>
         <Col lg={10}>
           <FormItem label="名称" name="code">
-            <AutoComplete
-              onSearch={this.inputValue}
-              options={nameCodeVal.map(this.renderOption)}
-              // placeholder={formatMessage({ id: 'bp.inputHere' })}
-              // optionLabelProp="text"
-            />
+            <Select
+              // mode="tag"
+              showSearch
+              showArrow={false}
+              labelInValue
+              // value={value} // 有值的话就会展示
+              // placeholder="Select users"
+              filterOption={false}
+              onSearch={this.fetchData}
+              onChange={this.handleSelectChange}
+              style={{ width: '100%' }}
+              optionFilterProp="children" // 对子元素--option进行筛选
+              optionLabelProp="label" // 回填的属性
+            >
+              {children.map(d => (
+                <Option key={d.code} value={d.code} label={d.name}>
+                  {d.code}&nbsp;&nbsp;{d.name}
+                </Option>
+              ))}
+            </Select>
           </FormItem>
         </Col>
       </>
@@ -249,16 +238,19 @@ class BeforeTask extends React.Component {
         visible={this.state.visible}
         onOk={this.handleOk}
         onCancel={onClose}
-        width={747}
+        width={840}
+        height={570}
         footer={null}
       >
         <div className="tableList buttonStyle">
-          <TableSearchForm
-            ref={this.tableSearchFormRef}
-            initialValues={this.initialValues}
-            getTableData={this.getTableData}
-            simpleForm={this.simpleForm}
-          />
+          <div style={{ paddingLeft: 10 }}>
+            <TableSearchForm
+              ref={this.tableSearchFormRef}
+              initialValues={this.initialValues}
+              getTableData={this.getTableData}
+              simpleForm={this.simpleForm}
+            />
+          </div>
           <Table
             columns={columns}
             dataSource={list}
