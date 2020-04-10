@@ -49,6 +49,8 @@ class ProcessModel extends Component {
       nameCodeVal: [],
       nameCodeValPublish: [],
       filtersData: null,
+      processCode: '',
+      publisherCode: '',
       // processList: [],
     };
     // 异步验证做节流处理
@@ -76,7 +78,7 @@ class ProcessModel extends Component {
   getTableData = (options = {}) => {
     this.setState({ loading: true });
     const formData = this.tableSearchFormRef.current.getFieldsValue();
-    const { pagination } = this.state;
+    const { pagination, processCode, publisherCode } = this.state;
     const { current: page, pageSize: rows } = pagination;
 
     let newData = [];
@@ -93,6 +95,14 @@ class ProcessModel extends Component {
       };
       delete formData.publishDate;
     }
+    if (formData.name) {
+      newData = { ...newData, code: processCode };
+      delete formData.name;
+    }
+    if (formData.publisherName) {
+      newData = { ...newData, publisherCode };
+      delete formData.publisherName;
+    }
     const data = {
       page,
       rows,
@@ -100,7 +110,7 @@ class ProcessModel extends Component {
       ...formData,
       ...options,
     };
-
+    console.log(data);
     api.getProcess(data).then(res => {
       const uuids = res.rows.map(e => e.picture);
       disk
@@ -148,10 +158,18 @@ class ProcessModel extends Component {
 
   // 流程模型选择样式
   renderOption = item => ({
-    value: item.code,
+    code: item.code,
+    value: item.name,
     label: (
       // <Option key={item.id} text={item.name}>
-      <div style={{ display: 'flex', marginLeft: '14px', padding: '6px 0' }}>
+      <div
+        style={{ display: 'flex', marginLeft: '14px', padding: '6px 0' }}
+        onClick={() => {
+          this.setState({
+            processCode: item.code,
+          });
+        }}
+      >
         <span>{item.code}</span>&nbsp;&nbsp;
         <span>{item.name}</span>
       </div>
@@ -187,10 +205,17 @@ class ProcessModel extends Component {
 
   // 发布人选择样式
   renderOptionPublish = item => ({
-    value: item.publisherCode,
+    value: item.publisherName,
     label: (
       // <Option key={item.id} text={item.name}>
-      <div style={{ display: 'flex' }}>
+      <div
+        style={{ display: 'flex' }}
+        onClick={() => {
+          this.setState({
+            publisherCode: item.publisherCode,
+          });
+        }}
+      >
         <span>{item.publisherName}</span>
       </div>
       // </Option>
@@ -254,7 +279,7 @@ class ProcessModel extends Component {
     return (
       <>
         <Col xxl={6} xl={8} lg={languageCode === 'EN' ? 12 : 12}>
-          <FormItem label="流程模型" name="code">
+          <FormItem label="流程模型" name="name">
             <AutoComplete
               onSearch={this.inputValue}
               options={nameCodeVal.map(this.renderOption)}

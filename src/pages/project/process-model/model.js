@@ -11,7 +11,7 @@ const projectModel = {
         {
           sortNo: '',
           groupName: 'no',
-          groupDesc: '',
+          groupDescribe: '',
           params: [
             // {
             //   paramId: '',
@@ -24,8 +24,7 @@ const projectModel = {
       ],
       taskModels: [],
     },
-    // ids: [],
-    // sonIds: [],
+    moveGroup: [],
     processDetail: undefined,
     processList: [],
   },
@@ -34,11 +33,8 @@ const projectModel = {
     setProcessAddData(state, action) {
       return { ...state, processAddData: action.payload };
     },
-    setIds(state, action) {
-      return { ...state, ids: action.payload };
-    },
-    setSonIds(state, action) {
-      return { ...state, sonIds: action.payload };
+    setMoveGroup(state, action) {
+      return { ...state, moveGroup: action.payload };
     },
     setProcessDetail(state, action) {
       return { ...state, processDetail: action.payload };

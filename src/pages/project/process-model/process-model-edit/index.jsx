@@ -106,7 +106,7 @@ class ProcessEdit extends Component {
         }
         this.getData(res.taskModels);
         this.setState({
-          paramter: res.groups,
+          paramter: res.groups ? res.groups : [],
           taskList: res.taskModels,
           picture: res.picture,
           loading: true,
@@ -212,9 +212,8 @@ class ProcessEdit extends Component {
     data.picture = picture;
     data.groups = paramter;
     delete data.taskModelIds;
-    console.log(data);
+
     try {
-      if (isEmpty(data.picture)) throw new Error('图片不能为空！');
       if (isEmpty(data.name)) throw new Error('流程名称不能为空！');
       if (isEmpty(data.describe)) throw new Error('流程描述不能为空！');
     } catch (e) {
@@ -226,28 +225,49 @@ class ProcessEdit extends Component {
 
     if (pageModel === 1) {
       data.id = id;
-      api.changeProcess(data).then(() => {
-        this.setState({
-          buttonLoading: false,
+      api
+        .changeProcess(data)
+        .then(() => {
+          this.setState({
+            buttonLoading: false,
+          });
+          router.push('/project/process-model');
+        })
+        .catch(() => {
+          this.setState({
+            buttonLoading: false,
+          });
         });
-        router.push('/project/process-model');
-      });
     }
     if (pageModel === 2) {
-      api.upgradeProcess(id, data).then(() => {
-        this.setState({
-          buttonLoading: false,
+      api
+        .upgradeProcess(id, data)
+        .then(() => {
+          this.setState({
+            buttonLoading: false,
+          });
+          router.push('/project/process-model');
+        })
+        .catch(() => {
+          this.setState({
+            buttonLoading: false,
+          });
         });
-        router.push('/project/process-model');
-      });
     }
     if (!pageModel) {
-      api.addProcess(data).then(() => {
-        this.setState({
-          buttonLoading: false,
+      api
+        .addProcess(data)
+        .then(() => {
+          this.setState({
+            buttonLoading: false,
+          });
+          router.push('/project/process-model');
+        })
+        .catch(() => {
+          this.setState({
+            buttonLoading: false,
+          });
         });
-        router.push('/project/process-model');
-      });
     }
     return true;
   };
@@ -282,6 +302,7 @@ class ProcessEdit extends Component {
 
   // 关闭参数
   handleClose = value => {
+    console.log(value);
     const newData = value.map((item, index) => ({ ...item, sortNo: index }));
     const sonData = newData;
     newData.map((item, index) => {
@@ -292,6 +313,7 @@ class ProcessEdit extends Component {
       return true;
     });
     sonData[0].sortNo = 0;
+    console.log(sonData);
     this.setState({
       parameterVisible: false,
       paramter: sonData,
@@ -305,6 +327,7 @@ class ProcessEdit extends Component {
     // const { ids, sonIds } = this.props;
     const idsData = ids;
     const sonIdsData = sonIds;
+    const { preTaskIds } = value;
     // data = [...taskList, ...value];
     // value.forEach(item => {
     //   idsData.push(item.id);
@@ -312,23 +335,33 @@ class ProcessEdit extends Component {
     // });
     const newData = data.filter(item => item.id !== value.id);
     const newIdsData = idsData.filter(item => item !== value.id);
-    let newSonIdsData = [];
-    if (value.preTaskIds.length !== 0) {
-      value.preTaskIds.forEach(i => {
-        newSonIdsData = sonIdsData.filter(item => item !== i);
+
+    if (preTaskIds.length !== 0) {
+      preTaskIds.forEach(i => {
+        sonIdsData.some((item, index) => {
+          if (i === item) {
+            sonIdsData.splice(index, 1);
+            return true;
+          }
+        });
       });
     }
     // 删除参数分类里的数据
     // let paramterData = paramter;
-    const paramterData = paramter.map(item => {
-      const params = item.params.filter(i => i.taskModelId !== value.id);
-      return { ...item, params };
-    });
+    if (paramter) {
+      const paramterData = paramter.map(item => {
+        const params = item.params.filter(i => i.taskModelId !== value.id);
+        return { ...item, params };
+      });
+      this.setState({
+        paramter: paramterData,
+      });
+    }
+
     this.setState({
       taskList: newData,
       ids: newIdsData,
-      sonIds: newSonIdsData,
-      paramter: paramterData,
+      sonIds: sonIdsData,
     });
   };
 
@@ -358,7 +391,7 @@ class ProcessEdit extends Component {
       idsData.push(item.id);
       sonIdsData.push(...item.preTaskIds);
     });
-    console.log(data);
+
     const uuids = data.map(e => e.picture);
     disk
       .getFiles({
