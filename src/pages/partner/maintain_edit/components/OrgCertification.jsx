@@ -1,7 +1,8 @@
 /**
  * 组织认证编辑
  */
-import { Card, Row, Col, Form, Input, Switch, Upload, Icon, Badge, Select, Spin } from 'antd';
+import { Card, Row, Col, Form, Input, Switch, Upload, Badge, Select, Spin } from 'antd';
+import { PlusOutlined } from '@ant-design/icons';
 import React, { Component } from 'react';
 import { connect } from 'dva';
 import { formatMessage } from 'umi/locale';
@@ -34,7 +35,7 @@ const { Option } = Select;
   },
   null,
   null,
-  { withRef: true },
+  { forwardRef: true },
 )
 class OrgCertification extends Component {
   constructor(props) {
@@ -64,10 +65,11 @@ class OrgCertification extends Component {
       bank: [],
       bankFetching: false,
     };
+    this.formRef = React.createRef();
     // 防抖
     this.fetchBank = debounce(this.fetchBank, 800);
-    this.checkTelephone = debounce(this.checkTelephone, 800);
-    this.checkTaxNo = debounce(this.checkTaxNo, 800);
+    // this.checkTelephone = debounce(this.checkTelephone, 800);
+    // this.checkTaxNo = debounce(this.checkTaxNo, 800);
   }
 
   fetchBank = value => {
@@ -86,18 +88,16 @@ class OrgCertification extends Component {
       });
   };
 
-  checkTelephone = (rule, value, callback) => {
+  checkTelephone = (rule, value) => {
     if (!value.telephone) {
-      callback('电话必填');
-      return;
+      return Promise.reject(new Error('电话必填'));
     }
-    callback();
+    return Promise.resolve();
   };
 
-  checkTaxNo = (rule, value, callback) => {
+  checkTaxNo = async (rule, value) => {
     if (!value) {
-      callback('税号必填');
-      return;
+      return Promise.reject(new Error('税号必填'));
     }
 
     // 默认税号不进行后台接口检查
@@ -105,31 +105,29 @@ class OrgCertification extends Component {
       e => e.taxNo === value && e.repeatTaxNo === 1,
     );
     if (taxNoReadonly) {
-      callback();
-      return;
+      return Promise.resolve();
     }
 
-    api.bp
-      .checkBPFields({ taxNo: value })
-      .then(res => {
-        if (!res) {
-          callback();
-        } else {
-          callback('税号重复');
-        }
-      })
-      .catch(() => callback('接口验证失败'));
+    try {
+      const res = await api.bp.checkBPFields({ taxNo: value });
+      if (res) {
+        return Promise.reject(new Error('税号重复'));
+      }
+      return Promise.resolve();
+    } catch (error) {
+      return Promise.reject(new Error('接口验证失败'));
+    }
   };
 
-  valueChange = (key, value) => {
-    const { details, basic, organizationCertification, form } = this.props;
+  valueChange = async (key, value) => {
+    const { details, basic, organizationCertification } = this.props;
 
     let obj = {
       [key]: value,
     };
 
     // 设置 增值税专用发票资质默认值
-    const formData = form.getFieldsValue();
+    const formData = await this.formRef.current.getFieldsValue();
     if (
       Object.keys(organizationCertification).indexOf('specialInvoice') === -1 &&
       Object.keys(formData).indexOf('specialInvoice') !== -1
@@ -175,7 +173,7 @@ class OrgCertification extends Component {
 
   uploadButton = () => (
     <div>
-      <Icon type="plus" />
+      <PlusOutlined />
       <div className="ant-upload-text">
         Upload <br />
         支持jpg/png
@@ -192,7 +190,6 @@ class OrgCertification extends Component {
 
   renderChina = () => {
     const {
-      form: { getFieldDecorator },
       basic,
       organizationCertification: orgData,
       authorization,
@@ -225,135 +222,118 @@ class OrgCertification extends Component {
               </Col>
               <Col span={8}>
                 <FormItem
+                  name="specialInvoice"
                   label={formatMessage({
                     id: 'bp.maintain_details.verification_data.special_invoice',
                   })}
+                  valuePropName="checked"
                 >
-                  {getFieldDecorator('specialInvoice', {
-                    valuePropName: 'checked',
-                    initialValue: orgData.specialInvoice === 1,
-                  })(<Switch onChange={value => this.valueChange('specialInvoice', value)} />)}
+                  <Switch onChange={value => this.valueChange('specialInvoice', value)} />
                 </FormItem>
               </Col>
               <Col span={8}>
                 <FormItem
+                  name="taxNo"
                   label={formatMessage({
                     id: 'bp.maintain_details.verification_data.VAT_Business',
                   })}
+                  rules={[{ validator: this.checkTaxNo }]}
                 >
-                  {getFieldDecorator('taxNo', {
-                    initialValue: orgData.taxNo,
-                    rules: [{ validator: this.checkTaxNo }],
-                  })(
-                    <Input
-                      readOnly={taxNoReadonly}
-                      onChange={e => this.valueChange('taxNo', e.target.value)}
-                    />,
-                  )}
+                  <Input
+                    readOnly={taxNoReadonly}
+                    onChange={e => this.valueChange('taxNo', e.target.value)}
+                  />
                 </FormItem>
               </Col>
               <Col span={8}>
                 <FormItem
+                  name="bankCode"
                   label={formatMessage({ id: 'bp.maintain_details.verification_data.bank_name' })}
+                  rules={[{ required: true }]}
                 >
-                  {getFieldDecorator('bankCode', {
-                    initialValue: orgData.bankCode,
-                    rules: [{ required: true }],
-                  })(
-                    <Select
-                      showSearch
-                      disabled={!basic.countryCode}
-                      notFoundContent={bankFetching ? <Spin size="small" /> : null}
-                      filterOption={false}
-                      onSearch={this.fetchBank}
-                      onChange={value => this.valueChange('bankCode', value)}
-                    >
-                      {bank.map(d => (
-                        <Option key={d.code} value={d.code}>
-                          {d.fullName}
-                        </Option>
-                      ))}
-                    </Select>,
-                  )}
+                  <Select
+                    showSearch
+                    disabled={!basic.countryCode}
+                    notFoundContent={bankFetching ? <Spin size="small" /> : null}
+                    filterOption={false}
+                    onSearch={this.fetchBank}
+                    onChange={value => this.valueChange('bankCode', value)}
+                  >
+                    {bank.map(d => (
+                      <Option key={d.code} value={d.code}>
+                        {d.fullName}
+                      </Option>
+                    ))}
+                  </Select>
                 </FormItem>
               </Col>
               <Col span={8}>
                 <FormItem
+                  name="bankAccount"
                   label={formatMessage({
                     id: 'bp.maintain_details.verification_data.account_number',
                   })}
+                  rules={[{ required: true }]}
                 >
-                  {getFieldDecorator('bankAccount', {
-                    initialValue: orgData.bankAccount,
-                    rules: [{ required: true }],
-                  })(<Input onChange={e => this.valueChange('bankAccount', e.target.value)} />)}
+                  <Input onChange={e => this.valueChange('bankAccount', e.target.value)} />
                 </FormItem>
               </Col>
               <Col span={8}>
-                <FormItem label={formatMessage({ id: 'bp.maintain_details.phone' })}>
-                  {getFieldDecorator('telephone', {
-                    initialValue: {
-                      telephoneCountryCode: orgData.telephoneCountryCode,
-                      telephoneAreaCode: orgData.telephoneAreaCode,
-                      telephone: orgData.telephone,
-                      telephoneExtension: orgData.telephoneExtension,
-                    },
-                    rules: [{ validator: this.checkTelephone }],
-                  })(
-                    <TelphoneInput
-                      readOnly
-                      onChange={value => this.valueChange('telephone', value)}
-                    />,
-                  )}
+                <FormItem
+                  name="telephone"
+                  label={formatMessage({ id: 'bp.maintain_details.phone' })}
+                  rules={[{ validator: this.checkTelephone }]}
+                >
+                  <TelphoneInput
+                    readOnly
+                    onChange={value => this.valueChange('telephone', value)}
+                  />
                 </FormItem>
               </Col>
               <Col span={24}>
                 <FormItem
+                  name="address"
                   label={formatMessage({ id: 'bp.maintain_details.verification_data.address' })}
+                  rules={[{ required: true }]}
                 >
-                  {getFieldDecorator('address', {
-                    initialValue: orgData.address,
-                    rules: [{ required: true }],
-                  })(<Input onChange={e => this.valueChange('address', e.target.value)} />)}
+                  <Input onChange={e => this.valueChange('address', e.target.value)} />
                 </FormItem>
               </Col>
             </Row>
           </Col>
           <Col xxl={9} lg={24}>
-            <FormItem label={formatMessage({ id: 'bp.maintain_details.verification_data.memo' })}>
-              {getFieldDecorator('notes', {
-                initialValue: orgData.notes,
-                rules: [{ required: true }],
-              })(<TextArea rows={11} onChange={e => this.valueChange('notes', e.target.value)} />)}
+            <FormItem
+              name="notes"
+              label={formatMessage({ id: 'bp.maintain_details.verification_data.memo' })}
+              rules={[{ required: true }]}
+            >
+              <TextArea rows={11} onChange={e => this.valueChange('notes', e.target.value)} />
             </FormItem>
           </Col>
         </Row>
         <Row>
           <Col>
             <FormItem
+              name="attachmentList"
               label={formatMessage({
                 id: 'bp.maintain_details.verification_data.verification_documents',
               })}
+              rules={[{ required: true }]}
+              valuePropName="fileList"
+              getValueFromEvent={this.normFile}
             >
-              {getFieldDecorator('attachmentList', {
-                initialValue: orgData.attachmentList,
-                rules: [{ required: true }],
-                valuePropName: 'fileList',
-                getValueFromEvent: this.normFile,
-              })(
-                <Upload
-                  name="files"
-                  multiple
-                  listType="picture-card"
-                  showUploadList
-                  action={uploadUrl}
-                  accept=".jpg,.png"
-                  headers={{ Authorization: authorization }}
-                  onChange={value => this.valueChange('attachmentList', value)}
-                >
-                  {this.uploadButton()}
-                </Upload>,
-              )}
+              <Upload
+                name="files"
+                multiple
+                listType="picture-card"
+                showUploadList
+                action={uploadUrl}
+                accept=".jpg,.png"
+                headers={{ Authorization: authorization }}
+                onChange={value => this.valueChange('attachmentList', value)}
+              >
+                {this.uploadButton()}
+              </Upload>
             </FormItem>
           </Col>
         </Row>
@@ -362,11 +342,7 @@ class OrgCertification extends Component {
   };
 
   renderOther = sapCountryCode => {
-    const {
-      form: { getFieldDecorator },
-      organizationCertification: orgData,
-      authorization,
-    } = this.props;
+    const { organizationCertification: orgData, authorization } = this.props;
     const { uploadUrl } = this.state;
 
     if (!orgData.attachmentList) {
@@ -388,47 +364,46 @@ class OrgCertification extends Component {
               </FormItem>
             </Col>
             <Col span={24}>
-              <FormItem label={sapCountryCode === 'US' ? '免税认证号' : '增值税登记号'}>
-                {getFieldDecorator('taxNo', {
-                  initialValue: orgData.taxNo,
-                  rules: [{ validator: this.checkTaxNo }],
-                })(<Input onChange={e => this.valueChange('taxNo', e.target.value)} />)}
+              <FormItem
+                name="taxNo"
+                label={sapCountryCode === 'US' ? '免税认证号' : '增值税登记号'}
+                rules={[{ validator: this.checkTaxNo }]}
+              >
+                <Input onChange={e => this.valueChange('taxNo', e.target.value)} />
               </FormItem>
             </Col>
           </Row>
         </Col>
         <Col span={6}>
           <FormItem
+            name="attachmentList"
             label={formatMessage({
               id: 'bp.maintain_details.verification_data.verification_documents',
             })}
+            rules={[{ required: true }]}
+            valuePropName="fileList"
+            getValueFromEvent={this.normFile}
           >
-            {getFieldDecorator('attachmentList', {
-              initialValue: orgData.attachmentList,
-              rules: [{ required: true }],
-              valuePropName: 'fileList',
-              getValueFromEvent: this.normFile,
-            })(
-              <Upload
-                name="files"
-                multiple
-                listType="picture-card"
-                showUploadList
-                action={uploadUrl}
-                accept=".jpg,.png"
-                headers={{ Authorization: authorization }}
-                onChange={value => this.valueChange('attachmentList', value)}
-              >
-                {this.uploadButton()}
-              </Upload>,
-            )}
+            <Upload
+              name="files"
+              multiple
+              listType="picture-card"
+              showUploadList
+              action={uploadUrl}
+              accept=".jpg,.png"
+              headers={{ Authorization: authorization }}
+              onChange={value => this.valueChange('attachmentList', value)}
+            >
+              {this.uploadButton()}
+            </Upload>
           </FormItem>
         </Col>
         <Col span={10}>
-          <FormItem label={formatMessage({ id: 'bp.maintain_details.verification_data.memo' })}>
-            {getFieldDecorator('notes', {
-              initialValue: orgData.notes,
-            })(<TextArea rows={6} onChange={e => this.valueChange('notes', e.target.value)} />)}
+          <FormItem
+            name="notes"
+            label={formatMessage({ id: 'bp.maintain_details.verification_data.memo' })}
+          >
+            <TextArea rows={6} onChange={e => this.valueChange('notes', e.target.value)} />
           </FormItem>
         </Col>
       </Row>
@@ -451,12 +426,34 @@ class OrgCertification extends Component {
   };
 
   render() {
+    const { organizationCertification: orgData } = this.props;
     return (
       <Card title="认证资料" bordered={false} style={{ marginBottom: '24px' }}>
-        <Form hideRequiredMark>{this.renderForm()}</Form>
+        <Form
+          layout="vertical"
+          hideRequiredMark
+          ref={this.formRef}
+          initialValues={{
+            specialInvoice: orgData.specialInvoice === 1,
+            taxNo: orgData.taxNo,
+            bankCode: orgData.bankCode,
+            bankAccount: orgData.bankAccount,
+            telephone: {
+              telephoneCountryCode: orgData.telephoneCountryCode,
+              telephoneAreaCode: orgData.telephoneAreaCode,
+              telephone: orgData.telephone,
+              telephoneExtension: orgData.telephoneExtension,
+            },
+            address: orgData.address,
+            notes: orgData.notes,
+            attachmentList: orgData.attachmentList,
+          }}
+        >
+          {this.renderForm()}
+        </Form>
       </Card>
     );
   }
 }
 
-export default Form.create()(OrgCertification);
+export default OrgCertification;

@@ -1,7 +1,8 @@
 /**
  * PI认证 新增模态框
  */
-import { Form, Input, Upload, Icon, Select, Modal } from 'antd';
+import { Form, Input, Upload, Select, Modal } from 'antd';
+import { PlusOutlined } from '@ant-design/icons';
 import React from 'react';
 import { connect } from 'dva';
 import { formatMessage } from 'umi-plugin-react/locale';
@@ -13,18 +14,10 @@ import { guid } from '@/utils/utils';
 const FormItem = Form.Item;
 const { Option } = Select;
 
-@Form.create()
-@connect(
-  ({ user }) => ({
-    authorization: user.currentUser.authorization,
-  }),
-  null,
-  null,
-  { withRef: true },
-)
 class PICertificationAddModal extends React.Component {
   constructor(props) {
     super(props);
+    this.formRef = React.createRef();
     const { details, data: billToParty } = props;
     const type = billToParty.billToPartyId ? 2 : 1;
 
@@ -73,7 +66,7 @@ class PICertificationAddModal extends React.Component {
 
   uploadButton = () => (
     <div>
-      <Icon type="plus" />
+      <PlusOutlined />
       <div className="ant-upload-text">Upload</div>
     </div>
   );
@@ -139,25 +132,30 @@ class PICertificationAddModal extends React.Component {
 
   onOk = async () => {
     const { onOk } = this.props;
-    const { deleteFileIdList, oldBillToParty, type, uuid } = this.state;
-    if (type === 2) {
-      // 过滤掉刚新增的图片和删除的图片，得到未改动的图片，copy到新的uuid下
-      const { attachmentList = [] } = oldBillToParty;
-      const copyList = attachmentList.filter(e => deleteFileIdList.indexOf(e.id) > -1);
-      if (copyList.length > 0) {
-        await api.disk.copyFiles({
-          diskFileIdList: copyList.map(e => e.id),
-          sourceCode: uuid,
-          sourceKey: 'bp_pi_certification',
-        });
+    const { deleteFileIdList, oldBillToParty, type, uuid, billToParty } = this.state;
+    try {
+      const formData = await this.formRef.current.validateFields();
+      if (type === 2) {
+        // 过滤掉刚新增的图片和删除的图片，得到未改动的图片，copy到新的uuid下
+        const { attachmentList = [] } = oldBillToParty;
+        const copyList = attachmentList.filter(e => deleteFileIdList.indexOf(e.id) > -1);
+        if (copyList.length > 0) {
+          await api.disk.copyFiles({
+            diskFileIdList: copyList.map(e => e.id),
+            sourceCode: uuid,
+            sourceKey: 'bp_pi_certification',
+          });
+        }
       }
-    }
 
-    onOk();
+      onOk({ ...formData, ...billToParty, uuid });
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   render() {
-    const { visible, onCancel, form, authorization } = this.props;
+    const { visible, onCancel, authorization } = this.props;
     const { uuid, billToParty, type, billToPartyList } = this.state;
     const uploadUrl = api.disk.uploadMoreFiles('bp_pi_certification', uuid);
 
@@ -189,47 +187,60 @@ class PICertificationAddModal extends React.Component {
         onOk={this.onOk}
         onCancel={onCancel}
       >
-        <Form hideRequiredMark>
-          <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="收票方">
-            {form.getFieldDecorator('billToPartyId', {
-              initialValue: billToParty.billToPartyId,
-              rules: [{ required: true }],
-            })(
-              <Select onChange={this.billToPartyChange}>
-                {billToPartyList.map(e => (
-                  <Option value={e.id} key={e.id}>
-                    {`${e.code} - ${e.name}`}
-                  </Option>
-                ))}
-              </Select>,
-            )}
+        <Form
+          hideRequiredMark
+          ref={this.formRef}
+          initialValues={{
+            billToPartyId: billToParty.billToPartyId,
+            notes: billToParty.notes,
+            attachmentList: fileList,
+          }}
+        >
+          <FormItem
+            name="billToPartyId"
+            labelCol={{ span: 5 }}
+            wrapperCol={{ span: 15 }}
+            label="收票方"
+            rules={[{ required: true }]}
+          >
+            <Select onChange={this.billToPartyChange}>
+              {billToPartyList.map(e => (
+                <Option value={e.id} key={e.id}>
+                  {`${e.code} - ${e.name}`}
+                </Option>
+              ))}
+            </Select>
           </FormItem>
-          <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="认证说明">
-            {form.getFieldDecorator('notes', {
-              initialValue: billToParty.notes,
-              rules: [{ required: true }],
-            })(<Input.TextArea />)}
+          <FormItem
+            name="notes"
+            labelCol={{ span: 5 }}
+            wrapperCol={{ span: 15 }}
+            label="认证说明"
+            rules={[{ required: true }]}
+          >
+            <Input.TextArea />
           </FormItem>
-          <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="认证图片">
-            {form.getFieldDecorator('attachmentList', {
-              initialValue: fileList,
-              rules: [{ required: true }],
-              valuePropName: 'fileList',
-              getValueFromEvent: this.normFile,
-            })(
-              <Upload
-                name="files"
-                multiple
-                listType="picture-card"
-                showUploadList
-                action={uploadUrl}
-                accept=".jpg,.png"
-                headers={{ Authorization: authorization }}
-                onChange={value => this.valueChange('attachmentList', value)}
-              >
-                {this.uploadButton()}
-              </Upload>,
-            )}
+          <FormItem
+            name="attachmentList"
+            labelCol={{ span: 5 }}
+            wrapperCol={{ span: 15 }}
+            label="认证图片"
+            rules={[{ required: true }]}
+            valuePropName="fileList"
+            getValueFromEvent={this.normFile}
+          >
+            <Upload
+              name="files"
+              multiple
+              listType="picture-card"
+              showUploadList
+              action={uploadUrl}
+              accept=".jpg,.png"
+              headers={{ Authorization: authorization }}
+              onChange={value => this.valueChange('attachmentList', value)}
+            >
+              {this.uploadButton()}
+            </Upload>
           </FormItem>
         </Form>
       </Modal>
@@ -237,4 +248,11 @@ class PICertificationAddModal extends React.Component {
   }
 }
 
-export default PICertificationAddModal;
+export default connect(
+  ({ user }) => ({
+    authorization: user.currentUser.authorization,
+  }),
+  null,
+  null,
+  { forwardRef: true },
+)(PICertificationAddModal);

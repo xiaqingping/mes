@@ -1,7 +1,8 @@
 /**
  * 基础信息
  */
-import { Icon, Col, Form, Input, Row, Select, Switch, Card, Badge, Popconfirm } from 'antd';
+import { Col, Form, Input, Row, Select, Switch, Card, Badge, Popconfirm } from 'antd';
+import { UserOutlined, HomeOutlined } from '@ant-design/icons';
 import React from 'react';
 import { connect } from 'dva';
 import { formatMessage, FormattedMessage } from 'umi-plugin-react/locale';
@@ -13,13 +14,13 @@ import {
   FaxInput,
   AddressInput,
 } from '@/components/CustomizedFormControls';
-import debounce from 'lodash/debounce';
+// import debounce from 'lodash/debounce';
 import api from '@/api';
-import ContactInformation from './ContactInformation';
 import CheckPhone from '@/pages/partner/maintain_details/components/CheckPhone';
 import CheckEmail from '@/pages/partner/maintain_details/components/CheckEmail';
 import ChangeModal from '@/pages/partner/maintain/components/ChangeModal';
 import { formatter } from '@/utils/utils';
+import ContactInformation from './ContactInformation';
 import styles from '../style.less';
 
 const FormItem = Form.Item;
@@ -64,11 +65,12 @@ const { Option } = Select;
   },
   null,
   null,
-  { withRef: true },
+  { forwardRef: true },
 )
 class Basic extends React.Component {
   constructor(props) {
     super(props);
+    this.formRef = React.createRef();
     this.state = {
       industrySelectOpen: true,
       // 变更移动电话模态框显示状态
@@ -76,151 +78,133 @@ class Basic extends React.Component {
       // 变更邮箱模态框显示状态
       changeEmaileModalVisible: false,
     };
+
+    // 节流验证定时器
+    this.checkNameInputTimer = null;
     // 异步验证做节流处理
-    this.checkNameInput = debounce(this.checkNameInput, 800);
-    this.checkEmail = debounce(this.checkEmail, 800);
-    this.checkMobilePhone = debounce(this.checkMobilePhone, 800);
-    this.checkAddress = debounce(this.checkAddress, 800);
-    this.checkTelePhone = debounce(this.checkTelePhone, 800);
+    // this.checkEmail = debounce(this.checkEmail, 800);
+    // this.checkMobilePhone = debounce(this.checkMobilePhone, 800);
+    // this.checkAddress = debounce(this.checkAddress, 800);
+    // this.checkTelePhone = debounce(this.checkTelePhone, 800);
   }
 
-  checkNameInput = (rule, value, callback) => {
-    const { basic } = this.props;
-
-    if (!value.name) {
-      callback('名称必须');
-      return;
-    }
-
-    // TODO: 修改BP时，名称不能直接修改，只能通过变更认证修改，所以这里的代码注释掉
-    // 修改时业务伙伴时，并且电话号码===旧电话号码（没有修改），则不进行后台验证
-    // if (this.props.editType === 'update') {
-    //   const oldName = this.props.oldDetails.basic.name;
-    //   if (value.name === oldName) {
-    //     callback();
-    //     return;
-    //   }
-    // }
-
-    // 人员类BP，不验证名称
-    if (basic.type === 1) {
-      callback();
-      return;
-    }
-
-    api.bp.checkBPFields({ name: value.name }).then(res => {
-      if (!res) {
-        callback();
-      } else {
-        callback('名称重复');
+  checkNameInput = (rule, value) =>
+    new Promise((resolve, reject) => {
+      if (this.checkNameInputTimer) {
+        clearTimeout(this.checkNameInputTimer);
       }
-    });
-  };
+      this.checkNameInputTimer = setTimeout(async () => {
+        const { basic } = this.props;
 
-  checkEmail = (rule, value, callback) => {
+        if (!value.name) {
+          return reject(new Error('名称必须'));
+        }
+
+        // 人员类BP，不验证名称
+        if (basic.type === 1) {
+          return resolve();
+        }
+
+        try {
+          const res = await api.bp.checkBPFields({ name: value.name });
+          if (res) {
+            return reject(new Error('名称重复'));
+          }
+          return resolve();
+        } catch (error) {
+          return reject(new Error('接口验证失败'));
+        }
+      }, 800);
+    });
+
+  checkEmail = async (rule, value) => {
     const { basic } = this.props;
     // 没有邮箱
     // 1）个人 必须
     // 2）组织 无所谓
     if (!value.email) {
       if (basic.type === 1) {
-        callback('邮箱必填');
-        return;
+        return Promise.reject(new Error('邮箱必填'));
       }
-      callback();
-      return;
+      return Promise.resolve();
     }
 
     if (this.props.editType === 'update') {
       const oldEmail = this.props.oldDetails.basic.email;
       if (value.email === oldEmail) {
-        callback();
-        return;
+        return Promise.resolve();
       }
     }
 
-    api.bp
-      .checkBPFields({ email: value.email })
-      .then(res => {
-        if (!res) {
-          callback();
-        } else {
-          callback('邮箱重复');
-        }
-      })
-      .catch(() => callback('接口验证失败'));
+    try {
+      const res = await api.bp.checkBPFields({ email: value.email });
+      if (res) {
+        return Promise.reject(new Error('邮箱重复'));
+      }
+      return Promise.resolve();
+    } catch (error) {
+      return Promise.reject(new Error('接口验证失败'));
+    }
   };
 
-  checkMobilePhone = (rule, value, callback) => {
+  checkMobilePhone = async (rule, value) => {
     const { basic } = this.props;
     // 没有移动电话
     // 1）个人 必须
     // 2）组织 无所谓
     if (!value.mobilePhone) {
       if (basic.type === 1) {
-        callback('移动电话必填');
-        return;
+        return Promise.reject(new Error('移动电话必填'));
       }
-      callback();
-      return;
+      return Promise.resolve();
     }
 
     // 修改时业务伙伴时，并且电话号码===旧电话号码（没有修改），则不进行后台验证
     if (this.props.editType === 'update') {
       const oldMobilePhone = this.props.oldDetails.basic.mobilePhone;
       if (value.mobilePhone === oldMobilePhone) {
-        callback();
-        return;
+        return Promise.resolve();
       }
     }
 
-    api.bp
-      .checkBPFields({ mobilePhone: value.mobilePhone })
-      .then(res => {
-        if (!res) {
-          callback();
-        } else {
-          callback('移动电话重复');
-        }
-      })
-      .catch(() => callback('接口验证失败'));
+    try {
+      const res = await api.bp.checkBPFields({ mobilePhone: value.mobilePhone });
+      if (res) {
+        return Promise.reject(new Error('移动电话重复'));
+      }
+      return Promise.resolve();
+    } catch (error) {
+      return Promise.reject(new Error('接口验证失败'));
+    }
   };
 
-  checkTelePhone = (rule, value, callback) => {
+  checkTelePhone = (rule, value) => {
     const { basic } = this.props;
     // 没有电话
     // 1）组织 必须
     // 2）个人 无所谓
-    if (!value.telephone) {
-      if (basic.type === 2) {
-        callback('电话必填');
-        return;
-      }
-      callback();
-      return;
+    if (basic.type === 2 && !value.telephone) {
+      return Promise.reject(new Error('电话必填'));
     }
-    callback();
+    return Promise.resolve();
   };
 
-  checkAddress = (rule, value, callback) => {
+  checkAddress = (rule, value) => {
     const { address, countryCode, changedValue = {} } = value;
     const { option = [] } = changedValue;
     if (option.length > 0) {
       const last = option[option.length - 1];
       if (last.isMustLow === 1 && last.level !== 5) {
-        callback('必须选择下一级');
-        return;
+        return Promise.reject(new Error('必须选择下一级'));
       }
     }
     if (!address) {
-      callback('详细地址必填');
-      return;
+      return Promise.reject(new Error('详细地址必填'));
     }
     if (!countryCode) {
-      callback('国家不能为空');
-      return;
+      return Promise.reject(new Error('国家不能为空'));
     }
-    callback();
+    return Promise.resolve();
   };
 
   valueChange = (key, value) => {
@@ -254,12 +238,12 @@ class Basic extends React.Component {
     if (key === 'name') {
       if (value.type === 1) {
         newBasic.industryCode = '07';
-        this.props.form.setFieldsValue({ industryCode: '07' });
+        this.formRef.current.setFieldsValue({ industryCode: '07' });
         this.setState({ industrySelectOpen: true });
       } else {
         if (basic.industryCode === '07') {
           newBasic.industryCode = '';
-          this.props.form.setFieldsValue({ industryCode: '' });
+          this.formRef.current.setFieldsValue({ industryCode: '' });
         }
         this.setState({ industrySelectOpen: true });
       }
@@ -321,7 +305,7 @@ class Basic extends React.Component {
 
         this.showChange.visibleShow(true, basic);
         setTimeout(() => {
-          this.props.form.setFieldsValue({ address: obj });
+          this.formRef.current.setFieldsValue({ address: obj });
         });
         newBasic = { ...newBasic, ...obj };
       }
@@ -396,19 +380,18 @@ class Basic extends React.Component {
 
   // 名称
   renderName = () => {
-    const { form, editType, basic } = this.props;
-    const { getFieldDecorator } = form;
+    const { editType, basic } = this.props;
 
     const type1 = (
       <span>
-        <Icon type="user" />
+        <UserOutlined />
         &nbsp;
         <FormattedMessage id="bp.maintain_details.person" />
       </span>
     );
     const type2 = (
       <span>
-        <Icon type="home" />
+        <HomeOutlined />
         &nbsp;
         <FormattedMessage id="bp.maintain_details.organization" />
       </span>
@@ -437,15 +420,7 @@ class Basic extends React.Component {
     // 编辑状态
     // 页面状态为：新增
     if (editType === 'add') {
-      const edit = getFieldDecorator('name', {
-        initialValue: {
-          type: basic.type,
-          name: basic.name,
-        },
-        rules: [{ validator: this.checkNameInput }],
-      })(<NameInput onChange={value => this.valueChange('name', value)} />);
-
-      return edit;
+      return <NameInput onChange={value => this.valueChange('name', value)} />;
     }
     // 非编辑状态
     if (editType === 'update') {
@@ -456,23 +431,14 @@ class Basic extends React.Component {
 
   // 移动电话
   renderMobilePhone = () => {
-    const { form, editType, basic } = this.props;
-    const { getFieldDecorator } = form;
+    const { editType, basic } = this.props;
     const verifyStatus = basic.mobilePhoneVerifyStatus;
 
     // 编辑状态
     // 1）页面状态为：新增
     // 2）页面状态为：修改 并且 移动电话验证状态为：1(未验证)
     if (editType === 'add' || (editType === 'update' && verifyStatus === 1)) {
-      const edit = getFieldDecorator('mobilePhone', {
-        initialValue: {
-          mobilePhoneCountryCode: basic.mobilePhoneCountryCode,
-          mobilePhone: basic.mobilePhone,
-        },
-        rules: [{ validator: this.checkMobilePhone }],
-      })(<MobilePhoneInput onChange={value => this.valueChange('mobilePhone', value)} />);
-
-      return edit;
+      return <MobilePhoneInput onChange={value => this.valueChange('mobilePhone', value)} />;
     }
 
     // 显示状态
@@ -561,20 +527,14 @@ class Basic extends React.Component {
 
   // 邮箱
   renderEmail = () => {
-    const { form, editType, basic } = this.props;
-    const { getFieldDecorator } = form;
+    const { editType, basic } = this.props;
     const verifyStatus = basic.emailVerifyStatus;
 
     // 编辑状态
     // 1）页面状态为：新增
     // 2）页面状态为：修改 并且 BP类型为人员
     if (editType === 'add' || (editType === 'update' && verifyStatus === 1)) {
-      const edit = getFieldDecorator('email', {
-        initialValue: { email: basic.email },
-        rules: [{ validator: this.checkEmail }],
-      })(<EmailInput onChange={value => this.valueChange('email', value)} />);
-
-      return edit;
+      return <EmailInput onChange={value => this.valueChange('email', value)} />;
     }
 
     // 显示状态
@@ -658,8 +618,7 @@ class Basic extends React.Component {
 
   // 电话
   renderTelephone = () => {
-    const { form, editType, basic } = this.props;
-    const { getFieldDecorator } = form;
+    const { editType, basic } = this.props;
 
     const data = {
       countryCode: basic.telephoneCountryCode,
@@ -691,17 +650,7 @@ class Basic extends React.Component {
       (editType === 'update' && basic.type === 1) ||
       (editType === 'update' && basic.sapCountryCode !== 'CN')
     ) {
-      const edit = getFieldDecorator('telephone', {
-        initialValue: {
-          telephoneCountryCode: basic.telephoneCountryCode,
-          telephoneAreaCode: basic.telephoneAreaCode,
-          telephone: basic.telephone,
-          telephoneExtension: basic.telephoneExtension,
-        },
-        rules: [{ validator: this.checkTelePhone }],
-      })(<TelphoneInput onChange={value => this.valueChange('telephone', value)} />);
-
-      return edit;
+      return <TelphoneInput onChange={value => this.valueChange('telephone', value)} />;
     }
     // 非编辑状态
     if (editType === 'update') {
@@ -712,8 +661,7 @@ class Basic extends React.Component {
 
   // 行业类别
   renderIndustry = () => {
-    const { form, editType, basic, industryCategories } = this.props;
-    const { getFieldDecorator } = form;
+    const { editType, basic, industryCategories } = this.props;
     const { industrySelectOpen } = this.state;
     const industryOption = {};
     if (!industrySelectOpen) industryOption.open = industrySelectOpen;
@@ -721,10 +669,7 @@ class Basic extends React.Component {
     // 编辑状态
     // 页面状态为：新增
     if (editType === 'add' || (editType === 'update' && basic.sapCountryCode !== 'CN')) {
-      const edit = getFieldDecorator('industryCode', {
-        initialValue: basic.industryCode,
-        rules: [{ required: true }],
-      })(
+      const edit = (
         <Select {...industryOption} onChange={value => this.valueChange('industryCode', value)}>
           {industryCategories.map(e => {
             if (basic.type === 1) {
@@ -761,7 +706,7 @@ class Basic extends React.Component {
               </Option>
             );
           })}
-        </Select>,
+        </Select>
       );
 
       return edit;
@@ -816,14 +761,7 @@ class Basic extends React.Component {
   };
 
   render() {
-    const {
-      form: { getFieldDecorator },
-      basic,
-      editType,
-      tabActiveKey,
-      salesOrderBlock,
-      invoicePostBlock,
-    } = this.props;
+    const { basic, editType, tabActiveKey, salesOrderBlock, invoicePostBlock } = this.props;
 
     return (
       <Card
@@ -839,131 +777,173 @@ class Basic extends React.Component {
             getData={() => {}}
           />
         ) : null}
-        <Form layout="vertical" className={styles.sangonForm} hideRequiredMark>
+        <Form
+          layout="vertical"
+          ref={this.formRef}
+          hideRequiredMark
+          initialValues={{
+            name: {
+              type: basic.type,
+              name: basic.name,
+            },
+            mobilePhone: {
+              mobilePhoneCountryCode: basic.mobilePhoneCountryCode,
+              mobilePhone: basic.mobilePhone,
+            },
+            email: {
+              email: basic.email,
+            },
+            telephone: {
+              telephoneCountryCode: basic.telephoneCountryCode,
+              telephoneAreaCode: basic.telephoneAreaCode,
+              telephone: basic.telephone,
+              telephoneExtension: basic.telephoneExtension,
+            },
+            fax: {
+              faxCountryCode: basic.faxCountryCode,
+              faxAreaCode: basic.faxAreaCode,
+              fax: basic.fax,
+              faxExtension: basic.faxExtension,
+            },
+            postCode: basic.postCode,
+            timeZoneCode: basic.timeZoneCode,
+            languageCode: basic.languageCode,
+            industryCode: basic.industryCode,
+            address: {
+              countryCode: basic.countryCode,
+              countryName: basic.countryName,
+              provinceCode: basic.provinceCode,
+              provinceName: basic.provinceName,
+              cityCode: basic.cityCode,
+              cityName: basic.cityName,
+              countyCode: basic.countyCode,
+              countyName: basic.countyName,
+              streetCode: basic.streetCode,
+              streetName: basic.streetName,
+              address: basic.address,
+            },
+            salesOrderBlock: salesOrderBlock === 1,
+            invoicePostBlock: invoicePostBlock === 1,
+          }}
+        >
           <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
             <Col md={6} sm={12}>
-              <FormItem label={formatMessage({ id: 'bp.maintain_details.name' })}>
+              <FormItem
+                name="name"
+                label={formatMessage({ id: 'bp.maintain_details.name' })}
+                rules={[{ validator: this.checkNameInput }]}
+              >
                 {this.renderName()}
               </FormItem>
             </Col>
             <Col md={6} sm={12}>
-              <FormItem label={formatMessage({ id: 'bp.mobilePhone' })}>
+              <FormItem
+                name="mobilePhone"
+                label={formatMessage({ id: 'bp.mobilePhone' })}
+                rules={[{ validator: this.checkMobilePhone }]}
+              >
                 {this.renderMobilePhone()}
               </FormItem>
             </Col>
             <Col md={6} sm={12}>
-              <FormItem label={formatMessage({ id: 'bp.maintain_details.basic.email' })}>
+              <FormItem
+                name="email"
+                label={formatMessage({ id: 'bp.maintain_details.basic.email' })}
+                rules={[{ validator: this.checkEmail }]}
+              >
                 {this.renderEmail()}
               </FormItem>
             </Col>
             <Col md={6} sm={12}>
-              <FormItem label={formatMessage({ id: 'bp.maintain_details.phone' })}>
+              <FormItem
+                name="telephone"
+                label={formatMessage({ id: 'bp.maintain_details.phone' })}
+                rules={[{ validator: this.checkTelePhone }]}
+              >
                 {this.renderTelephone(basic)}
               </FormItem>
             </Col>
           </Row>
           <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
             <Col md={6} sm={12}>
-              <FormItem label={formatMessage({ id: 'bp.maintain_details.basic.fax' })}>
-                {getFieldDecorator('fax', {
-                  initialValue: {
-                    faxCountryCode: basic.faxCountryCode,
-                    faxAreaCode: basic.faxAreaCode,
-                    fax: basic.fax,
-                    faxExtension: basic.faxExtension,
-                  },
-                })(<FaxInput onChange={value => this.valueChange('fax', value)} />)}
+              <FormItem name="fax" label={formatMessage({ id: 'bp.maintain_details.basic.fax' })}>
+                <FaxInput onChange={value => this.valueChange('fax', value)} />
               </FormItem>
             </Col>
             <Col md={3} sm={6}>
-              <FormItem label={formatMessage({ id: 'bp.maintain_details.postal_code' })}>
-                {getFieldDecorator('postCode', {
-                  initialValue: basic.postCode,
-                  rules: [{ pattern: /^\d+$/, message: '必须数字' }],
-                })(<Input onChange={e => this.valueChange('postCode', e.target.value)} />)}
+              <FormItem
+                name="postCode"
+                label={formatMessage({ id: 'bp.maintain_details.postal_code' })}
+                rules={[{ pattern: /^\d+$/, message: '必须数字' }]}
+              >
+                <Input onChange={e => this.valueChange('postCode', e.target.value)} />
               </FormItem>
             </Col>
             <Col md={3} sm={6}>
-              <FormItem label={formatMessage({ id: 'bp.maintain_details.basic.time_zone' })}>
-                {getFieldDecorator('timeZoneCode', {
-                  initialValue: basic.timeZoneCode,
-                })(
-                  <Input
-                    readOnly
-                    onChange={e => this.valueChange('timeZoneCode', e.target.value)}
-                  />,
-                )}
+              <FormItem
+                name="timeZoneCode"
+                label={formatMessage({ id: 'bp.maintain_details.basic.time_zone' })}
+              >
+                <Input readOnly onChange={e => this.valueChange('timeZoneCode', e.target.value)} />
               </FormItem>
             </Col>
             <Col md={6} sm={12}>
-              <FormItem label={formatMessage({ id: 'bp.maintain_details.basic.language' })}>
-                {getFieldDecorator('languageCode', {
-                  initialValue: basic.languageCode,
-                })(
-                  <Select open={false} onChange={value => this.valueChange('languageCode', value)}>
-                    <Option value="ZH">中文</Option>
-                    <Option value="EN">英文</Option>
-                  </Select>,
-                )}
+              <FormItem
+                name="languageCode"
+                label={formatMessage({ id: 'bp.maintain_details.basic.language' })}
+              >
+                <Select open={false} onChange={value => this.valueChange('languageCode', value)}>
+                  <Option value="ZH">中文</Option>
+                  <Option value="EN">英文</Option>
+                </Select>
               </FormItem>
             </Col>
             <Col md={6} sm={12}>
-              <FormItem label={formatMessage({ id: 'bp.maintain_details.basic.business_type' })}>
+              <FormItem
+                name="industryCode"
+                label={formatMessage({ id: 'bp.maintain_details.basic.business_type' })}
+                rules={[{ required: true }]}
+              >
                 {this.renderIndustry()}
               </FormItem>
             </Col>
           </Row>
           <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
             <Col md={18} sm={24}>
-              <FormItem label={formatMessage({ id: 'bp.maintain_details.basic.address' })}>
-                {getFieldDecorator('address', {
-                  rules: [{ validator: this.checkAddress }],
-                  initialValue: {
-                    countryCode: basic.countryCode,
-                    countryName: basic.countryName,
-                    provinceCode: basic.provinceCode,
-                    provinceName: basic.provinceName,
-                    cityCode: basic.cityCode,
-                    cityName: basic.cityName,
-                    countyCode: basic.countyCode,
-                    countyName: basic.countyName,
-                    streetCode: basic.streetCode,
-                    streetName: basic.streetName,
-                    address: basic.address,
-                  },
-                })(
-                  <AddressInput
-                    dataTreating={this.AddressInputDataTreating}
-                    onChange={value => this.valueChange('address', value)}
-                  />,
-                )}
+              <FormItem
+                name="address"
+                label={formatMessage({ id: 'bp.maintain_details.basic.address' })}
+                rules={[{ validator: this.checkAddress }]}
+              >
+                <AddressInput
+                  dataTreating={this.AddressInputDataTreating}
+                  onChange={value => this.valueChange('address', value)}
+                />
               </FormItem>
             </Col>
             {tabActiveKey === 'customer' ? (
               <Col md={6} sm={6}>
                 <FormItem
+                  name="salesOrderBlock"
                   label={formatMessage({
                     id: 'bp.maintain_details.sales_distribution.sales_block',
                   })}
+                  valuePropName="checked"
                 >
-                  {getFieldDecorator('salesOrderBlock', {
-                    initialValue: salesOrderBlock === 1,
-                    valuePropName: 'checked',
-                  })(<Switch onChange={value => this.valueChange('salesOrderBlock', value)} />)}
+                  <Switch onChange={value => this.valueChange('salesOrderBlock', value)} />
                 </FormItem>
               </Col>
             ) : null}
             {tabActiveKey === 'vendor' ? (
               <Col md={6} sm={6}>
                 <FormItem
+                  name="invoicePostBlock"
                   label={formatMessage({
                     id: 'bp.maintain_details.purchase_org.procurement_block',
                   })}
+                  valuePropName="checked"
                 >
-                  {getFieldDecorator('invoicePostBlock', {
-                    initialValue: invoicePostBlock === 1,
-                    valuePropName: 'checked',
-                  })(<Switch onChange={value => this.valueChange('invoicePostBlock', value)} />)}
+                  <Switch onChange={value => this.valueChange('invoicePostBlock', value)} />
                 </FormItem>
               </Col>
             ) : null}
@@ -974,4 +954,4 @@ class Basic extends React.Component {
   }
 }
 
-export default Form.create()(Basic);
+export default Basic;

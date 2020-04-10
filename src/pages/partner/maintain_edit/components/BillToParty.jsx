@@ -2,6 +2,7 @@
  * 客户 销售范围 收票方
  */
 import { Button, Table, Input, Divider, Form, message } from 'antd';
+import { PlusOutlined } from '@ant-design/icons';
 import React from 'react';
 import { connect } from 'dva';
 import { formatMessage, FormattedMessage } from 'umi-plugin-react/locale';
@@ -9,49 +10,33 @@ import { formatter } from '@/utils/utils';
 import ChooseBillToParty from '@/components/choosse/bp/BillToParty';
 
 const { Search } = Input;
-const EditableContext = React.createContext();
 
-class EditableCell extends React.Component {
-  renderCell = ({ getFieldDecorator }) => {
-    const {
-      editing,
-      dataIndex,
-      title,
-      inputType,
-      record,
-      index,
-      children,
-      editOptions,
-      ...restProps
-    } = this.props;
+const EditableCell = props => {
+  const {
+    editing,
+    dataIndex,
+    title,
+    inputType,
+    record,
+    index,
+    children,
+    editOptions,
+    ...restProps
+  } = props;
 
-    let initialValue;
-    if (editing) {
-      initialValue = record[dataIndex];
-    }
+  return (
+    <td {...restProps}>
+      {editing ? (
+        <Form.Item name={dataIndex} {...editOptions}>
+          {inputType}
+        </Form.Item>
+      ) : (
+        children
+      )}
+    </td>
+  );
+};
 
-    return (
-      <td {...restProps}>
-        {editing ? (
-          <Form.Item>
-            {getFieldDecorator(dataIndex, {
-              initialValue,
-              ...editOptions,
-            })(inputType)}
-          </Form.Item>
-        ) : (
-          children
-        )}
-      </td>
-    );
-  };
-
-  render() {
-    return <EditableContext.Consumer>{this.renderCell}</EditableContext.Consumer>;
-  }
-}
-
-@Form.create()
 @connect(({ bp, bpEdit }) => {
   const { details = {} } = bpEdit;
   return {
@@ -66,6 +51,8 @@ class BillToParty extends React.Component {
       editIndex: -1,
       id: 0,
     };
+    this.formRef = React.createRef();
+    this.ChooseBillToParty = React.createRef();
   }
 
   addRow = () => {
@@ -97,18 +84,22 @@ class BillToParty extends React.Component {
   };
 
   save = index => {
-    this.props.form.validateFields((error, row) => {
-      if (error) return;
-      const { tableData } = this.props;
+    this.formRef.current
+      .validateFields()
+      .then(row => {
+        const { tableData } = this.props;
 
-      const newTableData = tableData.map((e, i) => {
-        if (i === index) return { ...e, ...row };
-        return e;
+        const newTableData = tableData.map((e, i) => {
+          if (i === index) return { ...e, ...row };
+          return e;
+        });
+
+        this.setStore(newTableData);
+        this.setState({ editIndex: -1 });
+      })
+      .catch(err => {
+        console.log(err);
       });
-
-      this.setStore(newTableData);
-      this.setState({ editIndex: -1 });
-    });
   };
 
   setStore = newTableData => {
@@ -129,15 +120,12 @@ class BillToParty extends React.Component {
       message.warning('收票方重复');
       return;
     }
-    // if (row.certificationStatus !== 4) {
-    //   message.warning('只能选择已认证的数据');
-    //   return;
-    // }
 
     const newTableData = tableData.map((e, i) => {
       if (i === editIndex) return { ...e, ...row };
       return e;
     });
+    this.formRef.current.setFieldsValue(newTableData[editIndex]);
     this.setStore(newTableData);
   };
 
@@ -145,7 +133,7 @@ class BillToParty extends React.Component {
   disabledChoose = row => row.certificationStatus !== 4;
 
   searchBillToParty = () => {
-    this.ChooseBillToParty.wrappedInstance.changeVisible(true);
+    this.ChooseBillToParty.current.changeVisible(true);
   };
 
   render() {
@@ -240,7 +228,10 @@ class BillToParty extends React.Component {
     });
 
     return (
-      <EditableContext.Provider value={this.props.form}>
+      <Form
+        ref={this.formRef}
+        // initialValues={tableData[this.state.editIndex]}
+      >
         <Table
           rowKey="id"
           components={components}
@@ -257,18 +248,16 @@ class BillToParty extends React.Component {
           }}
           type="dashed"
           onClick={this.addRow}
-          icon="plus"
+          icon={<PlusOutlined />}
         >
           <FormattedMessage id="action.add" />
         </Button>
         <ChooseBillToParty
-          ref={ref => {
-            this.ChooseBillToParty = ref;
-          }}
+          ref={this.ChooseBillToParty}
           selectChooseModalData={this.selectChooseModalData}
           disabledChoose={this.disabledChoose}
         />
-      </EditableContext.Provider>
+      </Form>
     );
   }
 }
