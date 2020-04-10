@@ -80,6 +80,16 @@ export default {
     return request(`${http1}/projects/v1/tasks/execRecord/${data}/pause`, { method: 'PUT' });
   },
 
+  // 查询流程进度
+  getProcessesProgress(params) {
+    return request(`${http1}/projects/v1/processes/progress`, { params });
+  },
+
+  // 修改流程参数
+  updateProcessesParameter(id, data) {
+    return request(`${http1}/projects/v1/processes/${id}/parameter`, { method: 'PUT', data });
+  },
+
   /**
    * 流程模型
    */

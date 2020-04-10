@@ -31,6 +31,13 @@ export default {
     });
   },
 
+  // 修改项目数据
+  updateProjects(data) {
+    return request(`${http1}/projects/v1`, { method: 'PUT', data });
+  },
+
+
+
   // 流程模型接口
   // 流程模型分页列表
   getProcess(params) {
