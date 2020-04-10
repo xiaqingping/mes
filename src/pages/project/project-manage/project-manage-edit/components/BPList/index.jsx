@@ -2,40 +2,46 @@
  * 业务伙伴模态框
  */
 import {
-  Col,
-  Form,
   Input,
   Modal,
   Table,
   Badge,
+  Button,
+  AutoComplete,
 } from 'antd';
 import React, { Component } from 'react';
-import TableSearchForm from '@/components/TableSearchForm';
 import { formatter } from '@/utils/utils';
 import { connect } from 'dva';
-import { UserOutlined } from '@ant-design/icons';
+import { UserOutlined, SearchOutlined } from '@ant-design/icons';
 import api from '@/pages/project/api/bp';
+import _ from 'lodash';
 
-const FormItem = Form.Item;
 
 class BPList extends Component {
   tableSearchFormRef = React.createRef();
 
   tableFormRef = React.createRef();
 
-  state = {
-    // 分页参数
-    pagination: {},
-    list: [],       // 表格数据
-    loading: true,  // 加载状态
-    visible: false, // 遮罩层的判断
-  };
-
   // 顶部表单默认值
   initialValues = {
     page: 1,
     pageSize: 10,
   };
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      // 分页参数
+      pagination: {},
+      list: [],       // 表格数据
+      loading: true,  // 加载状态
+      visible: false, // 遮罩层的判断
+      nameOrCodeList: [],   // 名称编号 模糊查询前十条数据
+      bpCode: '',     // 查询条件bpCode
+    };
+    // 异步验证做节流处理
+    this.searchNameOrCode = _.debounce(this.searchNameOrCode, 500);
+  }
 
   // 组件挂载时
   componentDidMount() {
@@ -63,10 +69,11 @@ class BPList extends Component {
   };
 
   // 分页
-  handleStandardTableChange = data => {
+  handleStandardTableChange = (data, filters) => {
     this.getTableData({
       page: data.current,
       pageSize: data.pageSize,
+      ...filters
     });
   };
 
@@ -77,13 +84,15 @@ class BPList extends Component {
     const formData = this.tableSearchFormRef.current
       ? this.tableSearchFormRef.current.getFieldsValue()
       : '';
-    const { pagination } = this.state;
+    const { pagination, bpCode } = this.state;
     const { current: page, pageSize } = pagination;
+
     const data = {
       page,
       pageSize,
       ...formData,
       ...options,
+      code: bpCode,
     };
 
     api.getBPList(data).then(res => {
@@ -96,24 +105,114 @@ class BPList extends Component {
         },
         loading: false,
       });
+      this.initialValues.email = '';
+      this.initialValues.mobilePhone = '';
     });
   };
 
-  // 顶部表单简单搜索
-  simpleForm = () => (
-    <>
-      <Col lg={6} md={8} sm={12}>
-        <FormItem label="编号" name="code">
-          <Input />
-        </FormItem>
-      </Col>
-      <Col lg={6} md={8} sm={12}>
-        <FormItem label="名称" name="name">
-          <Input />
-        </FormItem>
-      </Col>
-    </>
+  // 名称编号 搜索
+  searchNameOrCode = value => {
+    if (!value) {
+      this.setState({ nameOrCodeList: [] });
+      return;
+    }
+    api.getOrgCustomerByCodeOrName({ code_or_name: value }).then(res => {
+      this.setState({ nameOrCodeList: res, bpCode:'' });
+    });
+  };
+
+  // 联系方式 搜索
+  searchPhoneOrEmail = selectedKeys => {
+    console.log(selectedKeys);
+    const type = this.visibleEmial(selectedKeys);
+    console.log(type);
+    if (type) {
+      this.initialValues.email = selectedKeys
+    } else {
+      this.initialValues.mobilePhone = selectedKeys
+    }
+    this.getTableData(this.initialValues);
+  }
+
+  // 验证邮箱
+  visibleEmial = value => {
+    // eslint-disable-next-line max-len
+    const data = (/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/.test(value))
+    return data;
+  }
+
+  // 名称编号 表头搜索 显示样式
+  renderNameOrCodeList = item => (
+    <AutoComplete.Option key={item.name} text={item.name}>
+      <div style={{ display: 'flex' }}onClick={() => {this.setState({ bpCode: item.code })}}>
+        <span>{item.code}</span>&nbsp;&nbsp;
+        <span>{item.name}</span>
+      </div>
+    </AutoComplete.Option>
   );
+
+  // 名称编号 表头查询条件
+  getColumnSearchPropsNameOrCode = () => {
+    const { nameOrCodeList } = this.state;
+    return ({
+      filterIcon: filtered => (
+        <SearchOutlined style={{ color: filtered ? '#1890ff' : undefined }} />
+      ),
+      filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
+        <div style={{ padding: 8 }}>
+          <AutoComplete
+            style={{ width: 188, marginBottom: 8, display: 'block' }}
+            dataSource={nameOrCodeList.map(this.renderNameOrCodeList)}
+            onSearch={this.searchNameOrCode}
+            optionLabelProp="text"
+            value={selectedKeys}
+            onChange={value => setSelectedKeys(value)}
+          />
+          <Button
+            type="primary"
+            onClick={confirm}
+            size="small"
+            style={{ width: 90, marginRight: 8 }}
+          >
+            <SearchOutlined/>
+            搜索
+          </Button>
+          <Button onClick={clearFilters} size="small" style={{ width: 90 }}>
+            重置
+          </Button>
+        </div>
+      ),
+    });
+  }
+
+  // 联系方式 表头查询条件
+  getColumnSearchPropsPhoneOrEmail = () => ({
+    filterIcon: filtered => (
+      <SearchOutlined style={{ color: filtered ? '#1890ff' : undefined }} />
+    ),
+    filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
+      <div style={{ padding: 8 }}>
+        <Input
+          style={{ width: 188, marginBottom: 8, display: 'block' }}
+          value={selectedKeys}
+          onChange={e => setSelectedKeys(e.target.value)}
+        />
+        <Button
+          type="primary"
+          // onClick={confirm}
+          onClick={() => this.searchPhoneOrEmail(selectedKeys, confirm)}
+          size="small"
+          style={{ width: 90, marginRight: 8 }}
+        >
+          <SearchOutlined/>
+          搜索
+        </Button>
+        <Button onClick={clearFilters} size="small" style={{ width: 90 }}>
+          重置
+        </Button>
+      </div>
+    ),
+  });
 
   render() {
     const { pagination, list, loading, visible } = this.state;
@@ -130,7 +229,8 @@ class BPList extends Component {
             <p><UserOutlined /> &nbsp;{value}</p>
             <p>{row.code}</p>
           </>
-        )
+        ),
+        ...this.getColumnSearchPropsNameOrCode(),
       },
       {
         title: '认证',
@@ -156,6 +256,7 @@ class BPList extends Component {
         title: '联系方式',
         dataIndex: 'mobilePhone',
         width: 200,
+        ...this.getColumnSearchPropsPhoneOrEmail(),
         render: (value, row) => {
           const statusPhone = formatter(
               BpCertificationStatus, row.mobilePhoneVerifyStatus, 'id', 'badge'
@@ -190,18 +291,12 @@ class BPList extends Component {
       <div>
         <Modal
           width="1200px"
-          title="客户列表"
+          title="业务伙伴 - 客户"
           visible={visible}
           onOk={this.handleOk}
           onCancel={this.handleCancel}
           footer={null}
         >
-          <TableSearchForm
-            ref={this.tableSearchFormRef}
-            initialValues={this.initialValues}
-            getTableData={this.getTableData}
-            simpleForm={this.simpleForm}
-          />
           <div className="tableListOperator" />
           <Table
             scroll={{ x: tableWidth, y: 400 }}
@@ -212,6 +307,7 @@ class BPList extends Component {
             columns={columns}
             onChange={this.handleStandardTableChange}
             height={70}
+            // onChange={('', filters) => {console.log(filters)}}
           />
         </Modal>
       </div>
