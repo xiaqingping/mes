@@ -12,24 +12,24 @@ import {
   // Col,
   // Row,
   Avatar,
-  // Table,
+  Table,
+  message,
   // Badge,
 } from 'antd';
 import { PlusOutlined, SlidersOutlined } from '@ant-design/icons';
 import router from 'umi/router';
-// import TableSearchForm from '@/components/TableSearchForm';
 import { connect } from 'dva';
-import StandardTable from '@/components/StandardTable';
-// import { formatter } from '@/utils/utils';
 import api from '@/pages/project/api/projectManage';
 import ChooseProcessModel from '../components/ChooseProcessModel';
 
-// const FormItem = Form.Item;
-
 class Test extends Component {
-  // tableSearchFormRef = React.createRef();
-
-  // state = { visible: false, viewvisible: false };
+  // static getDerivedStateFromProps(nextProps) {
+  //   console.log(nextProps);
+  //   // return {
+  //   //   viewlist: nextProps.viewlist || [],
+  //   // }
+  //   return null
+  // }
 
   // 表单默认值
   initialValues = {
@@ -40,47 +40,27 @@ class Test extends Component {
 
   constructor(props) {
     super(props);
+    console.log(this.props);
+    const { processSelectedList } = this.props.projectManage;
+    console.log(processSelectedList);
+
     this.state = {
-      // pagination: {},
+      list: [],
       loading: false,
       visible: false,
-      // requestType：'edit',
+      // processesList: [],
     };
   }
 
   componentDidMount() {
-    this.getTableData(this.initialValues);
+    this.getData();
+    // 流程列表 参数数据
+    const { paramList } = this.props.projectDetail;
+    const { processSelectedList, projectInfor } = this.props.projectManage;
+    console.log(paramList);
+    console.log(processSelectedList);
+    console.log(projectInfor);
   }
-
-  // 跳转到新建项目页面
-  handleAdd = () => {
-    // router.push('/project/project-manage/add');
-    console.log('跳转到新建项目页面');
-  };
-
-  // 获取表格数据
-  getTableData = (options = {}) => {
-    const data = {
-      ...options,
-    };
-    api.getProjectManage(data, true).then(res => {
-      this.setState({
-        list: res.results,
-        loading: false,
-      });
-    });
-    // console.log(list);
-  };
-
-  // 分页
-  handleStandardTableChange = (pagination, filters) => {
-    // 获取搜索值
-    console.log(filters);
-    // this.getTableData({
-    //   page: pagination.current,
-    //   rows: pagination.pageSize,
-    // });
-  };
 
   // 点击打开关联
   onOpen = () => {
@@ -99,27 +79,46 @@ class Test extends Component {
   // 删除数据
   deleteRow = row => {
     console.log(row);
-    // api.deleteAddProcess(row.id).then(() => {
-    //   this.getTableData();
-    // });
+    api.deleteAddProcess(row.id).then(() => {
+      this.getData();
+    });
   };
 
   // 打开参数
   handleOpen = row => {
-    console.log(row);
-    const data = row;
-    data.requestType = 'addParam';
-    router.push('/project/project-manage/process-parameter', { data });
+    // eslint-disable-next-line consistent-return
+    api.getProcessParam(row.id).then(res => {
+      if (!res || res.length === 0) return message.error('当前流程暂无参数！');
+      const data = res;
+      data.requestType = 'addParam';
+      this.props.dispatch({
+        type: 'projectDetail/setProcssesParam',
+        payload: data,
+      });
+      router.push('/project/project-manage/process-parameter');
+    });
+  };
+
+  // 获取模态框选中的流程模型数据
+  getData = value => {
+    if (!(value === '' || value === undefined)) {
+      this.setState({
+        list: value,
+      });
+      this.props.dispatch({
+        type: 'projectManage/setProcessSelectedList',
+        payload: value,
+      });
+    }
+  };
+
+  onFinish = values => {
+    console.log(values);
   };
 
   render() {
-    // const { status } = this.props;
-
-    const { pagination, list, loading, visible } = this.state;
-    // console.log(this.state);
-
-    let tableWidth = 0;
-    let columns = [
+    const { list, loading, visible } = this.state;
+    const columns = [
       {
         title: '名称/描述',
         dataIndex: 'name',
@@ -179,22 +178,13 @@ class Test extends Component {
       },
     ];
 
-    columns = columns.map(col => {
-      // eslint-disable-next-line no-param-reassign
-      if (!col.width) col.width = 100;
-      tableWidth += col.width;
-      if (!col.editable) {
-        return col;
-      }
-      return true;
-    });
     return (
       <PageHeaderWrapper>
         <Form onFinish={this.onFinish}>
           <Card
             style={{ height: '48px', width: '100%', position: 'fixed', bottom: '0', left: '0' }}
           >
-            <Button type="primary" style={{ float: 'right', marginTop: '-16px' }}>
+            <Button type="primary" style={{ float: 'right', marginTop: '-16px' }} htmlType="submit">
               保存
             </Button>
           </Card>
@@ -202,15 +192,13 @@ class Test extends Component {
         <Card bordered={false}>
           <div className="tableList">
             <Form ref={this.tableFormRef}>
-              <StandardTable
-                scroll={{ x: tableWidth }}
+              <Table
                 rowClassName="editable-row"
-                selectedRows=""
                 loading={loading}
-                data={{ list, pagination }}
+                dataSource={list}
                 columns={columns}
+                pagination={false}
                 onSelectRow={this.handleSelectRows}
-                onChange={this.handleStandardTableChange}
               />
             </Form>
           </div>
@@ -234,12 +222,18 @@ class Test extends Component {
             </Button>
           </div>
         </Card>
-        <ChooseProcessModel visible={visible} onClose={this.onClose} />
+        <ChooseProcessModel
+          visible={visible}
+          onClose={this.onClose}
+          getData={v => this.getData(v)}
+        />
       </PageHeaderWrapper>
     );
   }
 }
 
-export default connect(({ global }) => ({
+export default connect(({ global, projectDetail, projectManage }) => ({
   languageCode: global.languageCode,
+  projectDetail,
+  projectManage,
 }))(Test);

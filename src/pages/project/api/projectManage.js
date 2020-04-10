@@ -36,8 +36,6 @@ export default {
     return request(`${http1}/projects/v1`, { method: 'PUT', data });
   },
 
-
-
   // 流程模型接口
   // 流程模型分页列表
   getProcess(params) {
@@ -52,5 +50,10 @@ export default {
   // 添加流程页面删除
   deleteAddProcess(id) {
     return request(`${http1}/projects/v1/${id}/deleted`, { method: 'PUT' });
+  },
+
+  // 查询流程模型的参数列表
+  getProcessParam(params) {
+    return request(`${http2}/v1/process/${params}/params`);
   },
 };

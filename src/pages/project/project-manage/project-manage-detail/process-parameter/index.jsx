@@ -4,7 +4,6 @@ import { Card, List, Form, Layout, Button } from 'antd';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import { connect } from 'dva';
 import { ModelType } from '@/pages/project/components/ModelComponents';
-import router from 'umi/router';
 import api from '@/pages/project/api/projectManageDetail';
 import style from './index.less';
 
@@ -16,7 +15,7 @@ class ProcessParameter extends Component {
   constructor(props) {
     super(props);
     const { procssesParam } = props.projectDetail;
-    console.log(procssesParam)
+    console.log(procssesParam);
     this.state = {
       requestType: procssesParam.requestType,
       paramData: procssesParam,
@@ -27,15 +26,15 @@ class ProcessParameter extends Component {
   // 数据为空时跳转至其他页面
   locationUrl = data => {
     if (data.length === 0) {
-      router.push('/project/project-manage/detail');
+      window.history.back(-1);
     }
-  }
+  };
 
   // 组件加载时
   componentDidMount = () => {
     const { paramData } = this.state;
     this.setInitialFromValues(paramData);
-  }
+  };
 
   // 设置表单初始值
   setInitialFromValues = data => {
@@ -43,31 +42,36 @@ class ProcessParameter extends Component {
       item.params.forEach(it => {
         const { paramKey } = it;
         this.formRef.current.setFieldsValue({
-          [paramKey]: it.paramValue || it.deafultValue
-        })
-      })
+          [paramKey]: it.paramValue || it.deafultValue,
+        });
+      });
     });
-  }
+  };
 
   // 保存参数
   saveParam = () => {
+    const { paramData } = this.state;
     const data = this.conversionData();
-    console.log(data);
     const { requestType } = this.state;
     if (requestType === 'addParam') {
+      const newData = [];
+      newData.params = data;
+      newData.processesId = paramData[0].id;
+      console.log(newData);
       this.props.dispatch({
         type: 'projectDetail/setParamList',
-        payload: data
-      })
-    } if (requestType === 'editParam') {
-      const { paramData } = this.state;
+        payload: newData,
+      });
+      window.history.back(-1);
+    }
+    if (requestType === 'editParam') {
       const id = paramData.processesId;
       console.log(data);
       api.updateProcessesParameter(id, data).then(() => {
-        window.history.back(-1)
-      })
+        window.history.back(-1);
+      });
     }
-  }
+  };
 
   // 参数数据格式转换
   conversionData = () => {
@@ -87,8 +91,8 @@ class ProcessParameter extends Component {
           newItem.paramValue = val;
           newList.push(newItem);
         }
-      })
-    })
+      });
+    });
 
     const data = [];
     paramData[0].params.forEach(item => {
@@ -96,13 +100,13 @@ class ProcessParameter extends Component {
       newList.forEach(it => {
         const newIt = JSON.parse(JSON.stringify(it));
         if (item.paramKey === it.paramKey) {
-          newIt.taskModelId = item.taskModelId
+          newIt.taskModelId = item.taskModelId;
           data.push(newIt);
         }
-      })
-    })
+      });
+    });
     return data;
-  }
+  };
 
   render() {
     const { paramData } = this.state;
@@ -121,31 +125,31 @@ class ProcessParameter extends Component {
               dataSource={data}
               renderItem={item => (
                 <List.Item>
-                  <Card title={item.groupName} style={{width: '100%'}}>
-                      {
-                        item.params.map((it, index) => {
-                          const newIndex = JSON.parse(JSON.stringify(index));
-                          return <ModelType data={it} key={newIndex} />;
-                        })
-                      }
+                  <Card title={item.groupName} style={{ width: '100%' }}>
+                    {item.params.map((it, index) => {
+                      const newIndex = JSON.parse(JSON.stringify(index));
+                      return <ModelType data={it} key={newIndex} />;
+                    })}
                   </Card>
                 </List.Item>
               )}
             />
             <Footer className={style.footer}>
               <div className={style.button}>
-                <Button className={style.back} onClick={() => window.history.back(-1)} >返回</Button>
-                <Button type="primary" onClick={() => this.saveParam()}>提交</Button>
+                <Button className={style.back} onClick={() => window.history.back(-1)}>
+                  返回
+                </Button>
+                <Button type="primary" onClick={() => this.saveParam()}>
+                  提交
+                </Button>
               </div>
             </Footer>
           </Form>
         </PageHeaderWrapper>
-
-
       </>
     );
-  };
-};
+  }
+}
 
 export default connect(({ projectDetail }) => ({
   projectDetail,
