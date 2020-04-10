@@ -1,7 +1,8 @@
 /**
  * 选择送达方
  */
-import { Modal, Table, Button, AutoComplete, Input, Icon } from 'antd';
+import { Modal, Table, Button, AutoComplete, Input } from 'antd';
+import { SearchOutlined, UserOutlined, HomeOutlined } from '@ant-design/icons';
 import React from 'react';
 import { connect } from 'dva';
 import debounce from 'lodash/debounce';
@@ -17,7 +18,7 @@ import bpAPI from '@/api/bp';
   }),
   null,
   null,
-  { withRef: true },
+  { forwardRef: true },
 )
 class ChooseShipToParty extends React.Component {
   constructor(props) {
@@ -124,7 +125,7 @@ class ChooseShipToParty extends React.Component {
         title: formatMessage({ id: 'bp.maintain_details.sales_distribution.ship_to_party' }),
         dataIndex: 'name',
         filterIcon: filtered => (
-          <Icon type="search" style={{ color: filtered ? '#1890ff' : undefined }} />
+          <SearchOutlined style={{ color: filtered ? '#1890ff' : undefined }} />
         ),
         filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
           <div style={{ width: 210, padding: 8 }}>
@@ -139,7 +140,7 @@ class ChooseShipToParty extends React.Component {
             <Button
               type="primary"
               onClick={confirm}
-              icon="search"
+              icon={<SearchOutlined />}
               size="small"
               style={{ width: 90, marginRight: 8 }}
             >
@@ -153,7 +154,7 @@ class ChooseShipToParty extends React.Component {
         render: (text, row) => (
           <>
             <span style={{ color: '#222' }}>
-              <Icon type={row.type === 1 ? 'user' : 'home'} /> {row.name}
+              {row.type === 1 ? <UserOutlined /> : <HomeOutlined />} {row.name}
             </span>
             <br />
             <span style={{ color: '#999' }}>{row.code}</span>
@@ -164,7 +165,7 @@ class ChooseShipToParty extends React.Component {
         title: formatMessage({ id: 'bp.maintain_details.contact_information' }),
         dataIndex: 'contactInfo',
         filterIcon: filtered => (
-          <Icon type="search" style={{ color: filtered ? '#1890ff' : undefined }} />
+          <SearchOutlined style={{ color: filtered ? '#1890ff' : undefined }} />
         ),
         filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
           <div style={{ width: 210, padding: 8 }}>
@@ -176,7 +177,7 @@ class ChooseShipToParty extends React.Component {
             <Button
               type="primary"
               onClick={confirm}
-              icon="search"
+              icon={<SearchOutlined />}
               size="small"
               style={{ width: 90, marginRight: 8 }}
             >

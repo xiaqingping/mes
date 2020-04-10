@@ -1,18 +1,7 @@
 /**
  * 选择 SAP 产品
  */
-import {
-  Modal,
-  Table,
-  Button,
-  Layout,
-  Col,
-  Form,
-  Input,
-  Row,
-  Select,
-  Icon,
-} from 'antd';
+import { Modal, Table, Button, Layout, Col, Form, Input, Row, Icon } from 'antd';
 import React from 'react';
 // import { connect } from 'dva';
 
@@ -20,16 +9,14 @@ import api from '@/api';
 // import { formatter } from '@/utils/utils';
 
 const FormItem = Form.Item;
-const { Option } = Select;
 const { Sider, Content } = Layout;
 
-@Form.create()
 class Search extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       expandForm: false,
-    }
+    };
   }
 
   componentDidMount() {
@@ -40,11 +27,11 @@ class Search extends React.Component {
     if (e) e.preventDefault();
     const val = this.props.form.getFieldsValue();
     this.props.getTableData({ page: 1, ...val });
-  }
+  };
 
   handleFormReset = () => {
     this.props.form.resetFields();
-  }
+  };
 
   toggleForm = () => {
     const { expandForm } = this.state;
@@ -62,29 +49,19 @@ class Search extends React.Component {
       <Form onSubmit={this.submit} layout="inline">
         <Row gutter={{ xxl: 100, lg: 80 }}>
           <Col xxl={6} lg={8}>
-            <FormItem label="编号">
-              {getFieldDecorator('code')(<Input />)}
-            </FormItem>
+            <FormItem label="编号">{getFieldDecorator('code')(<Input />)}</FormItem>
           </Col>
           <Col xxl={6} lg={8}>
-            <FormItem label="产品名称">
-              {getFieldDecorator('desc')(<Input />)}
-            </FormItem>
+            <FormItem label="产品名称">{getFieldDecorator('desc')(<Input />)}</FormItem>
           </Col>
           <Col xxl={6} lg={8}>
-            <FormItem label="英文名称">
-              {getFieldDecorator('edesc')(<Input />)}
-            </FormItem>
+            <FormItem label="英文名称">{getFieldDecorator('edesc')(<Input />)}</FormItem>
           </Col>
           <Col xxl={6} lg={8}>
-            <FormItem label="旧物料号">
-              {getFieldDecorator('oldCode')(<Input />)}
-            </FormItem>
+            <FormItem label="旧物料号">{getFieldDecorator('oldCode')(<Input />)}</FormItem>
           </Col>
           <Col xxl={6} lg={8}>
-            <FormItem label="客户编号">
-              {getFieldDecorator('customerCode')(<Input />)}
-            </FormItem>
+            <FormItem label="客户编号">{getFieldDecorator('customerCode')(<Input />)}</FormItem>
           </Col>
           <Col xxl={6} lg={8}>
             <FormItem label="负责人编号">
@@ -92,29 +69,19 @@ class Search extends React.Component {
             </FormItem>
           </Col>
           <Col xxl={6} lg={8}>
-            <FormItem label="销售大区">
-              {getFieldDecorator('regionCode')(<Input />)}
-            </FormItem>
+            <FormItem label="销售大区">{getFieldDecorator('regionCode')(<Input />)}</FormItem>
           </Col>
           <Col xxl={6} lg={8}>
-            <FormItem label="销售大区">
-              {getFieldDecorator('officeCode')(<Input />)}
-            </FormItem>
+            <FormItem label="销售大区">{getFieldDecorator('officeCode')(<Input />)}</FormItem>
           </Col>
           <Col xxl={6} lg={8}>
-            <FormItem label="销售范围">
-              {getFieldDecorator('range')(<Input />)}
-            </FormItem>
+            <FormItem label="销售范围">{getFieldDecorator('range')(<Input />)}</FormItem>
           </Col>
           <Col xxl={6} lg={8}>
-            <FormItem label="工厂">
-              {getFieldDecorator('factory')(<Input />)}
-            </FormItem>
+            <FormItem label="工厂">{getFieldDecorator('factory')(<Input />)}</FormItem>
           </Col>
           <Col xxl={6} lg={8}>
-            <FormItem label="品牌">
-              {getFieldDecorator('brandCode')(<Input />)}
-            </FormItem>
+            <FormItem label="品牌">{getFieldDecorator('brandCode')(<Input />)}</FormItem>
           </Col>
         </Row>
         <div style={{ overflow: 'hidden' }}>
@@ -141,19 +108,13 @@ class Search extends React.Component {
       <Form onSubmit={this.submit} layout="inline">
         <Row gutter={{ xxl: 100, lg: 80 }}>
           <Col xxl={6} lg={8}>
-            <FormItem label="编号">
-              {getFieldDecorator('code')(<Input />)}
-            </FormItem>
+            <FormItem label="编号">{getFieldDecorator('code')(<Input />)}</FormItem>
           </Col>
           <Col xxl={6} lg={8}>
-            <FormItem label="产品名称">
-              {getFieldDecorator('desc')(<Input />)}
-            </FormItem>
+            <FormItem label="产品名称">{getFieldDecorator('desc')(<Input />)}</FormItem>
           </Col>
           <Col xxl={6} lg={0}>
-            <FormItem label="英文名称">
-              {getFieldDecorator('edesc')(<Input />)}
-            </FormItem>
+            <FormItem label="英文名称">{getFieldDecorator('edesc')(<Input />)}</FormItem>
           </Col>
           <Col xxl={6} lg={8}>
             <span className="submitButtons">
@@ -177,14 +138,10 @@ class Search extends React.Component {
   renderForm = () => {
     const { expandForm } = this.state;
     return expandForm ? this.renderAdvancedForm() : this.renderSimpleForm();
-  }
+  };
 
   render() {
-    return (
-      <div className="tableListForm">
-        {this.renderForm()}
-      </div>
-    );
+    return <div className="tableListForm">{this.renderForm()}</div>;
   }
 }
 
@@ -196,31 +153,33 @@ class ChooseProduct extends React.Component {
       visible: false,
       table1Data: [],
       table2Data: [],
-    }
+    };
   }
 
   changeVisible = visible => {
     this.setState({ visible });
-  }
+  };
 
   getTableData = () => {
     this.setState({ loading: true });
 
-    api.basic.getProducts({
-      page: 1,
-      rows: 10,
-    }).then(res => {
-      this.setState({
-        table1Data: res,
-        loading: false,
+    api.basic
+      .getProducts({
+        page: 1,
+        rows: 10,
       })
-    });
-  }
+      .then(res => {
+        this.setState({
+          table1Data: res,
+          loading: false,
+        });
+      });
+  };
 
   selectRow = row => {
     this.props.selectChooseModalData(row);
     this.setState({ visible: false });
-  }
+  };
 
   // 设置表格1的列属性
   setColumnsToTable1 = () => {
@@ -300,9 +259,7 @@ class ChooseProduct extends React.Component {
         title: '操作',
         dataIndex: 'actions',
         fixed: 'right',
-        render: (text, record) => (
-          <a onClick={() => this.selectRow(record)}>选择</a>
-        ),
+        render: (text, record) => <a onClick={() => this.selectRow(record)}>选择</a>,
       },
     ];
 
@@ -318,7 +275,7 @@ class ChooseProduct extends React.Component {
       };
     });
     return { columns, tableWidth };
-  }
+  };
 
   // 设置表格2的列属性
   setColumnsToTable2 = () => {
@@ -334,14 +291,14 @@ class ChooseProduct extends React.Component {
     ];
 
     return { columns };
-  }
+  };
 
   setTable2Data = data => {
     const table2Data = data && data.stock && data.stock.storages ? data.stock.storages : [];
     this.setState({
       table2Data,
     });
-  }
+  };
 
   render() {
     const { loading, table1Data, table2Data, visible } = this.state;

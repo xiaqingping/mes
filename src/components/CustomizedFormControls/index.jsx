@@ -1,4 +1,5 @@
-import { Icon, Input, Select, Cascader, AutoComplete } from 'antd';
+import { Input, Select, Cascader, AutoComplete } from 'antd';
+import { UserOutlined, HomeOutlined } from '@ant-design/icons';
 import React from 'react';
 import { connect } from 'dva';
 
@@ -48,15 +49,22 @@ export class EmailInput extends React.Component {
     }
   };
 
+  children = () => {
+    const { dataSource } = this.state;
+    return dataSource.map(e => (
+      <AutoComplete.Option key={e} value={e}>
+        {e}
+      </AutoComplete.Option>
+    ));
+  };
+
   render() {
-    const { email, dataSource } = this.state;
+    const { email } = this.state;
 
     return (
-      <AutoComplete
-        value={email}
-        dataSource={dataSource}
-        onChange={val => this.valueChange({ email: val })}
-      />
+      <AutoComplete value={email} onChange={val => this.valueChange({ email: val })}>
+        {this.children()}
+      </AutoComplete>
     );
   }
 }
@@ -101,10 +109,10 @@ export class NameInput extends React.Component {
           onChange={val => this.valueChange({ type: val })}
         >
           <Option value={1}>
-            <Icon type="user" /> 个人
+            <UserOutlined /> 个人
           </Option>
           <Option value={2}>
-            <Icon type="home" /> 组织
+            <HomeOutlined /> 组织
           </Option>
         </Select>
         <Input
