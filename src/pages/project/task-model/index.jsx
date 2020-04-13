@@ -341,6 +341,16 @@ class TaskModel extends Component {
     });
   };
 
+  reGetData = (v, id) => {
+    if (v) {
+      this.setState({
+        visible: false,
+        loading: true,
+      });
+      this.forbiddenModel(id);
+    }
+  };
+
   // 删除模型
   deleteModel = id => {
     api.deleteTaskModel(id).then(() => {
@@ -539,7 +549,14 @@ class TaskModel extends Component {
             {/* </div> */}
           </Card>
         </Spin>
-        {visible && <TaskModelView visible={visible} onClose={this.onClose} viewId={viewId} />}
+        {visible && (
+          <TaskModelView
+            visible={visible}
+            onClose={this.onClose}
+            viewId={viewId}
+            reload={this.reGetData}
+          />
+        )}
         <SampleSelect />
       </PageHeaderWrapper>
     );

@@ -1,12 +1,11 @@
 import React from 'react';
-import { Avatar, Tag, Card, message, Spin } from 'antd';
-import { DownOutlined, UpOutlined, SettingOutlined } from '@ant-design/icons';
+import { Avatar, Tag, Card, Spin } from 'antd';
+import { DownOutlined, UpOutlined } from '@ant-design/icons';
 import { connect } from 'dva';
-import router from 'umi/router';
 import api from '@/pages/project/api/taskmodel';
 import ArgumentModel from './argumentModel';
 import disk from '@/pages/project/api/disk';
-
+import { versionSort } from '@/utils/utils';
 import '../index.less';
 
 class TitleModel extends React.Component {
@@ -43,9 +42,13 @@ class TitleModel extends React.Component {
               });
             });
 
-          if (res.version) {
+          if (res.versions) {
+            const vers = versionSort(res.versions).map(item => {
+              item = `V${item}`;
+              return item;
+            });
             this.setState({
-              versionType: res.versions,
+              versionType: vers,
               loading: false,
             });
           }
@@ -78,10 +81,19 @@ class TitleModel extends React.Component {
 
   // 点击禁用， 禁用任务
   handleForbidden = id => {
-    api.forbiddenTaskModel(id).then(res => {
-      message.success('任务模型已禁用!');
-      router.push('/project/task-model');
-    });
+    this.props.reload('1', id);
+    // api
+    //   .forbiddenTaskModel(id)
+    //   .then(res => {
+    //     this.setState({ loading: false });
+    //     message.success('任务模型已禁用!');
+
+    //   })
+    //   .catch(err => {
+    //     this.setState({
+    //       loading: false,
+    //     });
+    //   });
   };
 
   // 根据code和版本获取详细信息
@@ -218,7 +230,7 @@ class TitleModel extends React.Component {
                 禁用
               </div>
             )}
-            <div style={{ marginTop: 12, fontSize: 13, marginRight: -2, textAlign:"right" }}>
+            <div style={{ marginTop: 12, fontSize: 13, marginRight: -2, textAlign: 'right' }}>
               {open ? (
                 <a href="#" onClick={() => this.setState({ open: !open })}>
                   收起

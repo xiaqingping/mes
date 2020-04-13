@@ -341,3 +341,29 @@ export const randomcolor = () => {
   const a = Math.random();
   return `rgba(${r},${g},${b},${a})`
 }
+
+// 比较版本
+export const versionSort = version => {
+  const temp = version.map(v => v.replace('V', '').split('.'));
+  for (let i = 0; i < temp.length; i++) {
+    let minIndex = i;
+    for (let j = i; j < temp.length; j++) {
+      for (let k = 0; k < temp[j].length; k++) {
+        const current = +temp[j][k];
+        const max = +temp[minIndex][k];
+        if (current > max) {
+          minIndex = j;
+        }
+        // 只要不等，就立刻结束最内层遍历！
+        if (current !== max) {
+          break
+        }
+      }
+    }
+    [temp[i], temp[minIndex]] = [temp[minIndex], temp[i]];
+  }
+  return temp.map(v => v.join('.'))
+};
+
+// const ver = ["V1.2", "V1.0", "V1.1"]
+// console.log(versionSort(ver));

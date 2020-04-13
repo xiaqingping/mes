@@ -119,7 +119,7 @@ class TaskModel extends Component {
           destroyOnClose
         >
           <div>
-            <TitleModel emitData={this.getId} />
+            <TitleModel emitData={this.getId} reload={this.props.reload} />
           </div>
           <div className="task_model_view_wrap">
             <TaskModelTabs
