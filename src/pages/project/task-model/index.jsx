@@ -27,6 +27,7 @@ import { formatter, getOperates } from '@/utils/utils';
 import api from '@/pages/project/api/taskmodel';
 import TaskModelView from './taskModelView';
 import StandardTable from '../components/StandardTable';
+import SampleSelect from '@/pages/project/components/SampleSelect';
 import disk from '@/pages/project/api/disk';
 
 const FormItem = Form.Item;
@@ -539,6 +540,7 @@ class TaskModel extends Component {
           </Card>
         </Spin>
         {visible && <TaskModelView visible={visible} onClose={this.onClose} viewId={viewId} />}
+        <SampleSelect />
       </PageHeaderWrapper>
     );
   }
