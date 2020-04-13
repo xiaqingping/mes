@@ -1,7 +1,8 @@
 /**
  * 选择销售员
  */
-import { Modal, Table, Button, AutoComplete, Input, Icon, Cascader } from 'antd';
+import { Modal, Table, Button, AutoComplete, Input, Cascader } from 'antd';
+import { SearchOutlined } from '@ant-design/icons';
 import React from 'react';
 import { connect } from 'dva';
 import { formatMessage, FormattedMessage } from 'umi-plugin-react/locale';
@@ -16,7 +17,7 @@ import employees from '@/api/employees';
   }),
   null,
   null,
-  { withRef: true },
+  { forwardRef: true },
 )
 class ChooseSalesPerson extends React.Component {
   constructor(props) {
@@ -124,7 +125,7 @@ class ChooseSalesPerson extends React.Component {
         title: formatMessage({ id: 'bp.maintain_details.sales_distribution.sales_rep' }),
         dataIndex: 'name',
         filterIcon: filtered => (
-          <Icon type="search" style={{ color: filtered ? '#1890ff' : undefined }} />
+          <SearchOutlined style={{ color: filtered ? '#1890ff' : undefined }} />
         ),
         filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
           <div style={{ width: 210, padding: 8 }}>
@@ -139,7 +140,7 @@ class ChooseSalesPerson extends React.Component {
             <Button
               type="primary"
               onClick={confirm}
-              icon="search"
+              icon={<SearchOutlined />}
               size="small"
               style={{ width: 90, marginRight: 8 }}
             >
@@ -156,7 +157,7 @@ class ChooseSalesPerson extends React.Component {
         title: formatMessage({ id: 'bp.maintain_details.sales_distribution.sales_area' }),
         dataIndex: 'area',
         filterIcon: filtered => (
-          <Icon type="search" style={{ color: filtered ? '#1890ff' : undefined }} />
+          <SearchOutlined style={{ color: filtered ? '#1890ff' : undefined }} />
         ),
         filterDropdown: ({ selectedKeys, confirm, clearFilters }) => (
           <div style={{ width: 210, padding: 8 }}>
@@ -164,7 +165,7 @@ class ChooseSalesPerson extends React.Component {
             <Button
               type="primary"
               onClick={() => this.getTableData(selectedKeys, confirm)}
-              icon="search"
+              icon={<SearchOutlined />}
               size="small"
               style={{ width: 90, marginRight: 8 }}
             >
@@ -190,7 +191,7 @@ class ChooseSalesPerson extends React.Component {
         title: formatMessage({ id: 'bp.maintain_details.contact_information' }),
         dataIndex: 'contactInfo',
         filterIcon: filtered => (
-          <Icon type="search" style={{ color: filtered ? '#1890ff' : undefined }} />
+          <SearchOutlined style={{ color: filtered ? '#1890ff' : undefined }} />
         ),
         filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
           <div style={{ width: 210, padding: 8 }}>
@@ -202,7 +203,7 @@ class ChooseSalesPerson extends React.Component {
             <Button
               type="primary"
               onClick={confirm}
-              icon="search"
+              icon={<SearchOutlined />}
               size="small"
               style={{ width: 90, marginRight: 8 }}
             >

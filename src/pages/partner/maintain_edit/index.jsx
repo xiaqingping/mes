@@ -1,7 +1,8 @@
 /**
  * 业务伙伴编辑
  */
-import { Form, Button, Spin, Badge, message, Empty, Icon } from 'antd';
+import { Button, Spin, Badge, message, Empty } from 'antd';
+import { FileSearchOutlined } from '@ant-design/icons';
 import React, { Component } from 'react';
 
 import qs from 'querystring';
@@ -13,7 +14,7 @@ import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import FooterToolbar from '@/components/FooterToolbar';
 
 import api from '@/api';
-import { validateForm, diff } from '@/utils/utils';
+import { diff } from '@/utils/utils';
 import Basic from './components/Basic';
 import SalesArea from './components/SalesArea';
 import OrgCredit from './components/OrgCredit';
@@ -33,6 +34,11 @@ import Bank from './components/Bank';
 class CustomerEdit extends Component {
   constructor(props) {
     super(props);
+    this.basicView = React.createRef();
+    this.salesAreaView = React.createRef();
+    this.addressView = React.createRef();
+    this.purchasingOrgView = React.createRef();
+    this.bankView = React.createRef();
     const editType = props.location.pathname.indexOf('/add') > -1 ? 'add' : 'update';
     this.state = {
       editType,
@@ -214,14 +220,14 @@ class CustomerEdit extends Component {
       resultList.push(0);
       messageList.push('缺少销售范围');
     } else if (this.salesAreaView) {
-      const viewform = this.salesAreaView.wrappedInstance.childrenForm;
+      const viewform = this.salesAreaView.current.formContentRef.current.formRef.current;
       if (viewform) {
-        const result = await validateForm(viewform);
-        if (!result[0]) {
+        try {
+          await viewform.validateFields();
+          resultList.push(1);
+        } catch (error) {
           messageList.push('销售范围验证未通过');
           resultList.push(2);
-        } else {
-          resultList.push(1);
         }
       }
     }
@@ -231,17 +237,18 @@ class CustomerEdit extends Component {
       messageList.push('缺少收货地址');
       resultList.push(0);
     } else if (this.addressView) {
-      const addressView = this.addressView.wrappedInstance;
+      const addressView = this.addressView.current;
+      const addressViewForm = this.addressView.current.formRef.current;
       const { editIndex } = addressView.state;
       // 存在正在编辑的行
       if (editIndex !== -1) {
-        const result = await validateForm(addressView.props.form);
-        if (!result[0]) {
-          messageList.push('正在编辑的收货地址验证不通过');
-          resultList.push(2);
-        } else {
+        try {
+          await addressViewForm.validateFields();
           addressView.save(editIndex);
           resultList.push(1);
+        } catch (error) {
+          messageList.push('正在编辑的收货地址验证不通过');
+          resultList.push(2);
         }
       }
     }
@@ -286,14 +293,14 @@ class CustomerEdit extends Component {
       messageList.push('缺少采购组织');
       resultList.push(0);
     } else if (this.purchasingOrgView) {
-      const viewform = this.purchasingOrgView.wrappedInstance.childrenForm;
+      const viewform = this.purchasingOrgView.current.formContentRef.current.formRef.current;
       if (viewform) {
-        const result = await validateForm(viewform);
-        if (!result[0]) {
+        try {
+          await viewform.validateFields();
+          resultList.push(1);
+        } catch (error) {
           messageList.push('采购组织验证未通过');
           resultList.push(2);
-        } else {
-          resultList.push(1);
         }
       }
     }
@@ -306,13 +313,13 @@ class CustomerEdit extends Component {
     } else if (this.bankView) {
       const hasValue = keys.some(e => paymentBank[e]);
       if (hasValue) {
-        const viewform = this.bankView.wrappedInstance.props.form;
-        const result = await validateForm(viewform);
-        if (!result[0]) {
+        const viewform = this.bankView.current.formRef.current;
+        try {
+          await viewform.validateFields();
+          resultList.push(1);
+        } catch (error) {
           messageList.push('付款银行验证未通过');
           resultList.push(2);
-        } else {
-          resultList.push(1);
         }
       }
     }
@@ -354,9 +361,10 @@ class CustomerEdit extends Component {
       const { details } = this.props;
       // 基础数据验证
       if (this.basicView) {
-        const viewform = this.basicView.wrappedInstance.props.form;
-        const result = await validateForm(viewform);
-        if (!result[0]) {
+        const viewform = this.basicView.current.formRef.current;
+        try {
+          await viewform.validateFields();
+        } catch (error) {
           message.error('基础数据验证未通过');
           throw new Error('基础数据验证未通过');
         }
@@ -366,9 +374,10 @@ class CustomerEdit extends Component {
       if (editType === 'add' && details.basic.type === 2) {
         // 组织验证
         if (this.orgCertificationView) {
-          const viewform = this.orgCertificationView.wrappedInstance.props.form;
-          const result = await validateForm(viewform);
-          if (!result[0]) {
+          const viewform = this.orgCertificationView.current.formRef.current;
+          try {
+            await viewform.validateFields();
+          } catch (error) {
             message.error('组织认证验证未通过');
             throw new Error('组织认证验证未通过');
           }
@@ -648,25 +657,18 @@ class CustomerEdit extends Component {
     return (
       <>
         <Basic
+          ref={this.basicView}
           tabActiveKey={tabActiveKey}
-          // eslint-disable-next-line no-return-assign
-          wrappedComponentRef={ref => (this.basicView = ref)}
           orgCertificationView={this.orgCertificationView}
         />
-        <SalesArea
-          // eslint-disable-next-line no-return-assign
-          ref={ref => (this.salesAreaView = ref)}
-        />
+        <SalesArea ref={this.salesAreaView} />
         {type === 2 ? (
           <>
             {editType === 'update' ? <OrgCredit /> : null}
             {editType === 'update' ? (
               <OrgCertificationRead />
             ) : (
-              <OrgCertification
-                // eslint-disable-next-line no-return-assign
-                wrappedComponentRef={ref => (this.orgCertificationView = ref)}
-              />
+              <OrgCertification ref={this.orgCertificationView} />
             )}
           </>
         ) : null}
@@ -676,10 +678,7 @@ class CustomerEdit extends Component {
             <PICertification />
           </>
         ) : null}
-        <Address
-          // eslint-disable-next-line no-return-assign
-          wrappedComponentRef={ref => (this.addressView = ref)}
-        />
+        <Address ref={this.addressView} />
       </>
     );
   };
@@ -692,29 +691,19 @@ class CustomerEdit extends Component {
     return (
       <>
         <Basic
+          ref={this.basicView}
           tabActiveKey={tabActiveKey}
-          // eslint-disable-next-line no-return-assign
-          wrappedComponentRef={ref => (this.basicView = ref)}
           orgCertificationView={this.orgCertificationView}
         />
-        <PurchasingOrg
-          // eslint-disable-next-line no-return-assign
-          ref={ref => (this.purchasingOrgView = ref)}
-        />
-        <Bank
-          // eslint-disable-next-line no-return-assign
-          wrappedComponentRef={ref => (this.bankView = ref)}
-        />
+        <PurchasingOrg ref={this.purchasingOrgView} />
+        <Bank ref={this.bankView} />
         {type === 2 ? (
           <>
             {editType === 'update' ? <OrgCredit /> : null}
             {editType === 'update' ? (
               <OrgCertificationRead />
             ) : (
-              <OrgCertification
-                // eslint-disable-next-line no-return-assign
-                wrappedComponentRef={ref => (this.orgCertificationView = ref)}
-              />
+              <OrgCertification ref={this.orgCertificationView} />
             )}
           </>
         ) : null}
@@ -791,7 +780,7 @@ class CustomerEdit extends Component {
           <>
             {formatMessage({ id: 'action.change' })} {basic.code}
             <Link to={url}>
-              <Icon style={{ marginLeft: 15, color: '#666' }} type="file-search" />
+              <FileSearchOutlined style={{ marginLeft: 15, color: '#666' }} />
             </Link>
           </>
         );
@@ -841,4 +830,4 @@ class CustomerEdit extends Component {
   }
 }
 
-export default Form.create()(CustomerEdit);
+export default CustomerEdit;

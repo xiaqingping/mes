@@ -6,10 +6,10 @@ import { Form, Card, Row, Col, Badge, Upload, Popconfirm } from 'antd';
 import { connect } from 'dva';
 import { formatMessage } from 'umi-plugin-react/locale';
 import ChangeModal from '@/pages/partner/maintain/components/ChangeModal';
-import ContactInformation from './ContactInformation';
-import CertificationPopover from './CertificationPopover';
 import api from '@/api';
 import { formatter } from '@/utils/utils';
+import ContactInformation from './ContactInformation';
+import CertificationPopover from './CertificationPopover';
 import styles from '../style.less';
 
 const FormItem = Form.Item;
@@ -267,9 +267,7 @@ class OrgCertificationRead extends React.Component {
           </FormItem>
         </Col>
         <Col span={10}>
-          <FormItem
-            label={formatMessage({ id: 'bp.maintain_details.verification_data.memo' })}
-          ></FormItem>
+          <FormItem label={formatMessage({ id: 'bp.maintain_details.verification_data.memo' })} />
         </Col>
       </Row>
     );
@@ -287,7 +285,7 @@ class OrgCertificationRead extends React.Component {
     if (sapCountryCode === 'CN') form = this.renderChina();
     if (sapCountryCode === 'US') form = this.renderOther(sapCountryCode);
     if (sapCountryCode === 'GB') form = this.renderChina(sapCountryCode);
-    return form;
+    return <Form layout="vertical">{form}</Form>;
   };
 
   // 修改审核状态，如果v等于true,说明已经提交变更，状态改为审核中

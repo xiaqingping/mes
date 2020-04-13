@@ -13,4 +13,19 @@ export default {
       params,
     });
   },
+
+  // 按照编号或名称模糊查询组织类客户
+  // 模糊搜索开票方
+  getOrgCustomerByCodeOrName(params) {
+    return request('/businessPartners/v1/org/customer', {
+      params,
+    });
+  },
+
+  // 查询所有业务伙伴类型为组织的数据（带分页） 开票方
+  getInvoiceParty(params) {
+    return request('/businessPartners/v1/org', {
+      params,
+    });
+  },
 };

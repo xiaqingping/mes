@@ -4,17 +4,27 @@ import { Modal, Avatar, Col, Tag, Card, Row, Button, Form, AutoComplete } from '
 import TableSearchForm from '@/components/TableSearchForm';
 import '../../index.less';
 import _ from 'lodash';
-import ChooseProcessModelCheck from '../ChooseProcessModelCheck';
+import classNames from 'classnames';
+// import router from 'umi/router';
+
 // import api from '@/pages/project/api/projectManage';
 import { connect } from 'dva';
-import apiprocess from '@/pages/project/api/processModel/';
-// import StandardTable from '@/components/StandardTable';
+import apiprocess from '@/pages/project/api/processModel';
+// import { isDate } from 'moment';
+import ChooseProcessModelCheck from '../ChooseProcessModelCheck';
+// import apitask from '@/pages/project/api/taskmodel';
 
 const FormItem = Form.Item;
 
 // 选择流程模型模态框
 class ChooseProcessModel extends React.Component {
   tableSearchFormRef = React.createRef();
+
+  // static getDerivedStateFromProps(nextProps) {
+  //   return {
+  //     idslist: nextProps.idslist || [],
+  //   }
+  // }
 
   // 顶部表单默认值
   // initialValues = {
@@ -32,14 +42,14 @@ class ChooseProcessModel extends React.Component {
       nameCodeVal: [],
       viewvisible: false,
       processlist: [],
-      // isenter:false
+      selectedIds: [], // 所有被选择的id集合
+      selectedCode: [],
     };
     // 异步验证做节流处理
     this.callParter = _.debounce(this.callParter, 500);
   }
 
   componentDidMount() {
-    // this.getTableData(this.initialValues);
     this.getTableData();
   }
 
@@ -51,12 +61,15 @@ class ChooseProcessModel extends React.Component {
 
   // 获取表格数据
   getTableData = (options = {}) => {
+    const formData =
+      this.tableSearchFormRef.current && this.tableSearchFormRef.current.getFieldsValue();
     const { pagination } = this.state;
     const { current: page, pageSize: rows } = pagination;
 
     const data = {
       page,
       rows,
+      ...formData,
       ...options,
     };
 
@@ -122,39 +135,46 @@ class ChooseProcessModel extends React.Component {
     return true;
   };
 
-  handleOk = () => {
-    // this.setState({
-    //   visible: false,
-    // });
-    // const data = {
-    //   type: 'ok',
-    //   id: this.props.data.id,
-    //   jurisdictionValue: this.props.data.jurisdictionValue,
-    // }
-    // this.props.getData(data);
-    // this.props.onClose();
-    console.log('点击确定');
-  };
-
+  // 关闭
   handleCancel = () => {
     this.props.onClose();
   };
 
-  viewModal = item => {
-    // console.log(item);
-    // const {viewlist} = this.props.projectManage
-    // console.log(this.props.dispatch);
-    // const {dispatch} = this.props;
-    // dispatch({
-    //   type:"projectManage/setviewlist",
-    //   payload: item
-    // })
-    // console.log(viewlist);
+  // 点击选中
+  clickSelect = item => {
+    const { selectedIds, selectedCode } = this.state;
+    const ids = [...selectedIds, item.id];
+    const idslist = [...new Set(ids)];
 
+    const codeList = [...selectedCode, item];
+    const newCodeList = [...new Set(codeList)];
+    // console.log(newCodeList);
+
+    this.setState({
+      selectedIds: idslist,
+      selectedCode: newCodeList,
+    });
+  };
+
+  // 查看
+  viewModal = item => {
+    apiprocess.getProcessDetail(item.id).then(res => {
+      this.setState({
+        viewlist: res,
+      });
+    });
     this.setState({
       viewvisible: true,
       viewlist: item,
     });
+  };
+
+  // 点击确定保存数据
+  handleOk = () => {
+    const { selectedCode } = this.state;
+    this.props.getData(selectedCode);
+
+    this.props.onClose();
   };
 
   // 点击关闭关联
@@ -164,28 +184,8 @@ class ChooseProcessModel extends React.Component {
     });
   };
 
-  // 移入
-  // MouseEnter() {
-  //   setTimeout(() => {
-  //       this.setState({
-  //           isenter: true
-  //       })
-  //   }, 100)
-  // };
-
-  // 移出
-  // MouseLeave() {
-  //   setTimeout(() => {
-  //       this.setState({
-  //           isenter: false
-  //       })
-  //   }, 100)
-  // }
-
   render() {
     const { viewvisible, processlist, viewlist } = this.state;
-
-    // let tableWidth = 0;
     return (
       <Card bordered={false}>
         <div>
@@ -208,14 +208,21 @@ class ChooseProcessModel extends React.Component {
             </div>
             <div style={{ height: '430px', overflow: 'auto' }}>
               <Row gutter={16} style={{ margin: '0' }}>
-                {processlist.map((item, key) => {
+                {processlist.map((item, index) => {
                   return (
                     <Col
                       span={7}
                       style={{ padding: '0', marginBottom: '10px', marginRight: '10px' }}
-                      key={key}
+                      // eslint-disable-next-line react/no-array-index-key
+                      key={index}
                     >
-                      <Card.Grid style={{ width: '300px', padding: '0' }}>
+                      <Card.Grid
+                        style={{ width: '300px', padding: '0' }}
+                        onClick={() => this.clickSelect(item)}
+                        className={classNames({
+                          isSelect: this.state.selectedIds.includes(item.id),
+                        })}
+                      >
                         <div style={{ height: '80px', width: '300px', padding: '5px' }}>
                           <Avatar
                             src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
@@ -226,7 +233,7 @@ class ChooseProcessModel extends React.Component {
                             style={{
                               float: 'left',
                               height: '50px',
-                              width: '100px',
+                              width: '120px',
                               textAlign: 'center',
                             }}
                           >

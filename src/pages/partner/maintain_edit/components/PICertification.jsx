@@ -1,23 +1,18 @@
 /**
  * PI认证
  */
-import { Button, Card, Icon, List, Typography, Divider, Badge, Upload, Empty } from 'antd';
+import { Button, Card, List, Typography, Divider, Badge, Upload, Empty } from 'antd';
+import { PlusOutlined } from '@ant-design/icons';
 import React from 'react';
 import { connect } from 'dva';
 import { FormattedMessage, formatMessage } from 'umi-plugin-react/locale';
+import api from '@/api';
 import CertificationPopover from './CertificationPopover';
 import PICertificationAddModal from './PICertificationAddModal';
-import api from '@/api';
 import styles from '../style.less';
 
 const { Paragraph } = Typography;
 
-@connect(({ bpEdit, user }) => ({
-  details: bpEdit.details || {},
-  editType: bpEdit.editType,
-  piCertificationList: (bpEdit.details && bpEdit.details.piCertificationList) || [],
-  authorization: user.currentUser.authorization,
-}))
 class PersonCertification extends React.Component {
   constructor(props) {
     super(props);
@@ -29,6 +24,7 @@ class PersonCertification extends React.Component {
       // 修改PI认证时传的数据
       updateItemData: {},
     };
+    this.PICertificationAddModal = React.createRef();
   }
 
   renderListItem = item => {
@@ -111,7 +107,7 @@ class PersonCertification extends React.Component {
     return (
       <List.Item>
         <Button className={styles['piCertification-add']} type="dashed" onClick={this.addNewItem}>
-          <Icon type="plus" />
+          <PlusOutlined />
           <FormattedMessage id="bp.maintain_details.PI_verification.submit_certification" />
         </Button>
       </List.Item>
@@ -166,17 +162,6 @@ class PersonCertification extends React.Component {
       updateItemData: data,
     });
     this.handleModalVisible(true);
-  };
-
-  okHandle = () => {
-    const content = this.PICertificationAddModal.wrappedInstance;
-    const { form } = content.props;
-    const { billToParty, uuid } = content.state;
-    form.validateFields((err, fieldsValue) => {
-      if (err) return;
-      form.resetFields();
-      this.handleAdd({ ...fieldsValue, ...billToParty, uuid });
-    });
   };
 
   handleAdd = async data => {
@@ -259,12 +244,10 @@ class PersonCertification extends React.Component {
           <PICertificationAddModal
             details={details}
             visible={addModalVisible}
-            onOk={this.okHandle}
+            onOk={this.handleAdd}
             onCancel={() => this.handleModalVisible(false)}
             data={updateItemData}
-            wrappedComponentRef={ref => {
-              this.PICertificationAddModal = ref;
-            }}
+            ref={this.PICertificationAddModal}
           />
         ) : null}
       </Card>
@@ -272,4 +255,9 @@ class PersonCertification extends React.Component {
   }
 }
 
-export default PersonCertification;
+export default connect(({ bpEdit, user }) => ({
+  details: bpEdit.details || {},
+  editType: bpEdit.editType,
+  piCertificationList: (bpEdit.details && bpEdit.details.piCertificationList) || [],
+  authorization: user.currentUser.authorization,
+}))(PersonCertification);

@@ -5,251 +5,59 @@ import {
   Divider,
   Form,
   Input,
-  Row,
   Select,
   Checkbox,
   message,
   Popconfirm,
-  Icon,
 } from 'antd';
+import { PlusOutlined } from '@ant-design/icons';
 import React from 'react';
 import { connect } from 'dva';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import StandardTable from '@/components/StandardTable';
-
+import TableSearchForm from '@/components/TableSearchForm';
 import api from '@/api';
-import { formatter, validateForm, getFormValue } from '@/utils/utils';
+import { formatter } from '@/utils/utils';
 import ChooseProduct from '@/components/choosse/seq/Product';
 
-const EditableContext = React.createContext();
 const FormItem = Form.Item;
 const { Option } = Select;
 const { Search } = Input;
 
-/**
- * 页面顶部筛选表单
- */
-@connect(({ seq }) => ({
-  sampleType: seq.sampleType,
-  seqType: seq.seqType,
-}), null, null, { withRef: true })
-@Form.create()
-class TopForm extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      expandForm: false,
-    }
-  }
+const EditableCell = props => {
+  const {
+    editing,
+    dataIndex,
+    title,
+    inputType,
+    record,
+    index,
+    children,
+    editOptions,
+    ...restProps
+  } = props;
 
-  submit = e => {
-    if (e) e.preventDefault();
-    // const val = this.props.form.getFieldsValue();
-    // this.props.getTableData({ page: 1, ...val });
-    this.props.getTableData({ page: 1 });
-  }
-
-  getFormData = () => getFormValue(this.props.form);
-
-  handleFormReset = () => {
-    this.props.form.resetFields();
-  }
-
-  toggleForm = () => {
-    const { expandForm } = this.state;
-    this.setState({
-      expandForm: !expandForm,
-    });
-  };
-
-  renderAdvancedForm = () => {
-    const {
-      form: { getFieldDecorator },
-      sampleType,
-      seqType,
-    } = this.props;
-
-    return (
-      <Form onSubmit={this.submit} layout="inline">
-        <Row gutter={{ xxl: 100, lg: 80 }}>
-          <Col xxl={6} lg={8}>
-            <FormItem label="状态">
-              {getFieldDecorator('status', { initialValue: '1' })(
-                <Select>
-                  <Option value="1">正常</Option>
-                  <Option value="2">已删除</Option>
-                </Select>,
-              )}
-            </FormItem>
-          </Col>
-          <Col xxl={6} lg={8}>
-            <FormItem label="SAP编号">
-              {getFieldDecorator('productCode')(<Search onSearch={() => this.ChooseProduct.changeVisible(true)} />)}
-            </FormItem>
-          </Col>
-          <Col xxl={6} lg={8}>
-            <FormItem label="样品类型">
-              {getFieldDecorator('sampleTypeId')(
-                <Select>
-                  {sampleType.map(e =>
-                    <Option value={e.id} key={e.id}>{e.name}</Option>,
-                  )}
-                </Select>,
-              )}
-            </FormItem>
-          </Col>
-          <Col xxl={6} lg={8}>
-            <FormItem label="测序类型">
-              {getFieldDecorator('seqTypeId')(
-                <Select>
-                  {seqType.map(e =>
-                    <Option value={e.id} key={e.id}>{e.name}</Option>,
-                  )}
-                </Select>,
-              )}
-            </FormItem>
-          </Col>
-        </Row>
-        <div style={{ overflow: 'hidden' }}>
-          <div style={{ float: 'right', marginBottom: 24 }}>
-            <Button type="primary" htmlType="submit">
-              查询
-            </Button>
-            <Button style={{ marginLeft: 8 }} onClick={this.handleFormReset}>
-              重置
-            </Button>
-            <a style={{ marginLeft: 8 }} onClick={this.toggleForm}>
-              收起 <Icon type="up" />
-            </a>
-          </div>
-        </div>
-      </Form>
-    );
-  }
-
-  renderSimpleForm = () => {
-    const { form } = this.props;
-    const { getFieldDecorator } = form;
-    return (
-      <Form onSubmit={this.submit} layout="inline">
-        <Row gutter={{ xxl: 100, lg: 80 }}>
-          <Col xxl={6} lg={8}>
-            <FormItem label="状态">
-              {getFieldDecorator('status', { initialValue: '1' })(
-                <Select>
-                  <Option value="1">正常</Option>
-                  <Option value="2">已删除</Option>
-                </Select>,
-              )}
-            </FormItem>
-          </Col>
-          <Col xxl={6} lg={8}>
-            <FormItem label="SAP编号">
-              {getFieldDecorator('productCode')(<Search onSearch={() => this.ChooseProduct.changeVisible(true)} />)}
-            </FormItem>
-          </Col>
-          <Col xxl={6} lg={0}>
-            <FormItem label="样品类型">
-              {getFieldDecorator('sampleTypeId')(
-                <Select>
-                  <Option value="1">PCR产物(已纯化)</Option>
-                  <Option value="2">PCR产物(未纯化)</Option>
-                </Select>,
-              )}
-            </FormItem>
-          </Col>
-          <Col xxl={6} lg={8}>
-            <span className="submitButtons">
-              <Button type="primary" htmlType="submit">
-                查询
-              </Button>
-              <Button style={{ marginLeft: 8 }} onClick={this.handleFormReset}>
-                重置
-              </Button>
-              <a style={{ marginLeft: 8 }} onClick={this.toggleForm}>
-                展开 <Icon type="down" />
-              </a>
-            </span>
-          </Col>
-        </Row>
-      </Form>
-    );
-  }
-
-  // 渲染表单
-  renderForm = () => {
-    const { expandForm } = this.state;
-    return expandForm ? this.renderAdvancedForm() : this.renderSimpleForm();
-  }
-
-  selectChooseModalData = data => {
-    this.props.form.setFieldsValue({
-      productCode: data.code,
-    });
-  }
-
-  render() {
-    return (
-      <div className="tableListForm">
-        {this.renderForm()}
-        <ChooseProduct
-          ref={ref => { this.ChooseProduct = ref }}
-          selectChooseModalData={this.selectChooseModalData}
-        />
-      </div>
-    );
-  }
-}
-
-/**
- * 表格编辑组件
- */
-class EditableCell extends React.Component {
-  renderCell = ({ getFieldDecorator }) => {
-    const {
-      editing,
-      dataIndex,
-      title,
-      inputType,
-      record,
-      index,
-      children,
-      editOptions,
-      ...restProps
-    } = this.props;
-    return (
-      <td {...restProps}>
-        {editing ? (
-          <Form.Item>
-            {getFieldDecorator(dataIndex, {
-              initialValue: record[dataIndex],
-              ...editOptions,
-            })(inputType)}
-          </Form.Item>
-        ) : (
-          children
-        )}
-      </td>
-    );
-  };
-
-  render() {
-    return <EditableContext.Consumer>{this.renderCell}</EditableContext.Consumer>;
-  }
-}
+  return (
+    <td {...restProps}>
+      {editing ? (
+        <Form.Item name={dataIndex} {...editOptions}>
+          {inputType}
+        </Form.Item>
+      ) : (
+        children
+      )}
+    </td>
+  );
+};
 
 /**
  * 页面根组件
  */
-@connect(({ global, seq }) => ({
-  commonStatus: global.commonStatus,
-  sampleType: seq.sampleType,
-  seqType: seq.seqType,
-}))
-@Form.create()
 class Product extends React.Component {
   constructor(props) {
     super(props);
+    this.formRef = React.createRef();
+    this.TopForm = React.createRef();
     this.state = {
       pagination: {
         current: 1,
@@ -261,7 +69,10 @@ class Product extends React.Component {
       selectedRows: [],
       editKey: null,
       id: 0, // 新增数据时，提供负数id
-    }
+    };
+    this.initialValues = {
+      status: '1',
+    };
   }
 
   componentDidMount() {
@@ -276,12 +87,79 @@ class Product extends React.Component {
     this.getTableData();
   }
 
+  // 顶部表单简单搜索
+  simpleForm = () => (
+    <>
+      <Col xxl={6} lg={8} sm={12}>
+        <FormItem name="status" label="状态">
+          <Select>
+            <Option value="1">正常</Option>
+            <Option value="2">已删除</Option>
+          </Select>
+        </FormItem>
+      </Col>
+      <Col xxl={6} lg={8} sm={12}>
+        <FormItem name="productCode" label="SAP编号">
+          <Search onSearch={() => this.ChooseProduct.changeVisible(true)} />
+        </FormItem>
+      </Col>
+      <Col xxl={6} lg={0} sm={12}>
+        <FormItem name="sampleTypeId" label="样品类型">
+          <Select>
+            <Option value="1">PCR产物(已纯化)</Option>
+            <Option value="2">PCR产物(未纯化)</Option>
+          </Select>
+        </FormItem>
+      </Col>
+    </>
+  );
+
+  advancedForm = () => (
+    <>
+      <Col xxl={6} lg={8} sm={12}>
+        <FormItem name="status" label="状态">
+          <Select>
+            <Option value="1">正常</Option>
+            <Option value="2">已删除</Option>
+          </Select>
+        </FormItem>
+      </Col>
+      <Col xxl={6} lg={8} sm={12}>
+        <FormItem name="productCode" label="SAP编号">
+          <Search onSearch={() => this.ChooseProduct.changeVisible(true)} />
+        </FormItem>
+      </Col>
+      <Col xxl={6} lg={8} sm={12}>
+        <FormItem name="sampleTypeId" label="样品类型">
+          <Select>
+            {this.props.sampleType.map(e => (
+              <Option value={e.id} key={e.id}>
+                {e.name}
+              </Option>
+            ))}
+          </Select>
+        </FormItem>
+      </Col>
+      <Col xxl={6} lg={8} sm={12}>
+        <FormItem name="seqTypeId" label="测序类型">
+          <Select>
+            {this.props.seqType.map(e => (
+              <Option value={e.id} key={e.id}>
+                {e.name}
+              </Option>
+            ))}
+          </Select>
+        </FormItem>
+      </Col>
+    </>
+  );
+
   handleStandardTableChange = ({ current, pageSize, total }) => {
     const pagination = { current, pageSize, total };
     this.setState({ pagination }, () => {
       this.getTableData();
     });
-  }
+  };
 
   handleSelectRows = rows => {
     this.setState({
@@ -290,35 +168,38 @@ class Product extends React.Component {
   };
 
   // 获取表格数据
-  getTableData = (options = {}) => {
-    const formData = this.TopForm.getFormData();
+  getTableData = async (options = {}) => {
+    const formData = await this.TopForm.current.getFieldsValue();
     const { pagination } = this.state;
-    const query = Object.assign({}, {
-      page: pagination.current,
-      rows: pagination.pageSize,
-    }, options, formData);
+    const query = Object.assign(
+      {},
+      {
+        page: pagination.current,
+        rows: pagination.pageSize,
+      },
+      options,
+      formData,
+    );
 
     this.setState({ loading: true });
 
-    api.sampletype.getSeqProduct(query, true).then(res => {
-      this.setState({
-        list: res.rows,
-        pagination: {
-          current: query.page,
-          pageSize: query.rows,
-          total: res.total,
-        },
-        editKey: null,
+    api.sampletype
+      .getSeqProduct(query, true)
+      .then(res => {
+        this.setState({
+          list: res.rows,
+          pagination: {
+            current: query.page,
+            pageSize: query.rows,
+            total: res.total,
+          },
+          editKey: null,
+        });
+      })
+      .finally(() => {
+        this.setState({ loading: false });
       });
-    }).finally(() => {
-      this.setState({ loading: false });
-    });
-  }
-
-  // 取消编辑
-  // cancel = () => {
-  //   this.setState({ editKey: null });
-  // };
+  };
 
   // 作废数据
   deleteRow = row => {
@@ -330,26 +211,27 @@ class Product extends React.Component {
   // 保存
   saveRow = async () => {
     const { sampleType, seqType } = this.props;
-    const validateResult = await validateForm(this.props.form);
-    if (!validateResult[0]) return;
+    try {
+      let row = this.formRef.current.validateFields();
+      const nowSampleType = sampleType.filter(e => e.id === row.sampleTypeName)[0];
+      const nowSeqType = seqType.filter(e => e.id === row.seqTypeName)[0];
 
-    let row = validateResult[1];
-    const nowSampleType = sampleType.filter(e => e.id === row.sampleTypeName)[0];
-    const nowSeqType = seqType.filter(e => e.id === row.seqTypeName)[0];
+      row = {
+        ...row,
+        sampleTypeId: nowSampleType.id,
+        sampleTypeCode: nowSampleType.code,
+        sampleTypeName: nowSampleType.name,
+        seqTypeId: nowSeqType.id,
+        seqTypeCode: nowSeqType.code,
+        seqTypeName: nowSeqType.name,
+        surcharge: row.surcharge ? 1 : 2,
+      };
 
-    row = {
-      ...row,
-      sampleTypeId: nowSampleType.id,
-      sampleTypeCode: nowSampleType.code,
-      sampleTypeName: nowSampleType.name,
-      seqTypeId: nowSeqType.id,
-      seqTypeCode: nowSeqType.code,
-      seqTypeName: nowSeqType.name,
-      surcharge: row.surcharge ? 1 : 2,
+      api.sampletype.addSeqProduct(row).then(() => this.getTableData());
+    } catch (error) {
+      console.log(error);
     }
-
-    api.sampletype.addSeqProduct(row).then(() => this.getTableData());
-  }
+  };
 
   // 退出编辑
   cancelEdit = (row, key) => {
@@ -362,7 +244,7 @@ class Product extends React.Component {
         editKey: key,
       });
     }
-  }
+  };
 
   // 新增
   handleAdd = () => {
@@ -383,14 +265,14 @@ class Product extends React.Component {
         ...list,
       ],
     });
-  }
+  };
 
   selectChooseModalData = data => {
     this.props.form.setFieldsValue({
       productCode: data.code,
       productName: data.name,
     });
-  }
+  };
 
   setColumnsToTable1 = () => {
     const { commonStatus, sampleType, seqType } = this.props;
@@ -411,9 +293,7 @@ class Product extends React.Component {
         editable: true,
         inputType: <Search onSearch={() => this.ChooseProduct.changeVisible(true)} />,
         editOptions: {
-          rules: [
-            { required: true, message: '必填' },
-          ],
+          rules: [{ required: true, message: '必填' }],
         },
       },
       {
@@ -422,19 +302,16 @@ class Product extends React.Component {
         width: 180,
         editable: true,
         inputType: (
-          <Select
-            onChange={this.sampleTypeChange}
-            style={{ width: '100%' }}
-          >
-            {sampleType.map(e =>
-              <Option value={e.id} key={e.id}>{e.name}</Option>,
-            )}
+          <Select onChange={this.sampleTypeChange} style={{ width: '100%' }}>
+            {sampleType.map(e => (
+              <Option value={e.id} key={e.id}>
+                {e.name}
+              </Option>
+            ))}
           </Select>
         ),
         editOptions: {
-          rules: [
-            { required: true, message: '必填' },
-          ],
+          rules: [{ required: true, message: '必填' }],
         },
       },
       {
@@ -444,15 +321,15 @@ class Product extends React.Component {
         editable: true,
         inputType: (
           <Select style={{ width: '100%' }}>
-            {seqType.map(e =>
-              <Option value={e.id} key={e.id}>{e.name}</Option>,
-            )}
+            {seqType.map(e => (
+              <Option value={e.id} key={e.id}>
+                {e.name}
+              </Option>
+            ))}
           </Select>
         ),
         editOptions: {
-          rules: [
-            { required: true, message: '必填' },
-          ],
+          rules: [{ required: true, message: '必填' }],
         },
       },
       {
@@ -460,9 +337,7 @@ class Product extends React.Component {
         dataIndex: 'surcharge',
         width: 120,
         editable: true,
-        inputType: (
-          <Checkbox />
-        ),
+        inputType: <Checkbox />,
         editOptions: {
           valuePropName: 'checked',
         },
@@ -546,15 +421,10 @@ class Product extends React.Component {
     });
 
     return { columns, tableWidth };
-  }
+  };
 
   render() {
-    const {
-      pagination,
-      selectedRows,
-      list,
-      loading,
-    } = this.state;
+    const { pagination, selectedRows, list, loading } = this.state;
 
     const data = { list, pagination };
     const { columns, tableWidth } = this.setColumnsToTable1();
@@ -568,16 +438,19 @@ class Product extends React.Component {
       <PageHeaderWrapper>
         <Card bordered={false}>
           <div className="tableList">
-            <TopForm
-              wrappedComponentRef={ref => { this.TopForm = ref }}
+            <TableSearchForm
+              ref={this.TopForm}
+              initialValues={this.initialValues}
               getTableData={this.getTableData}
+              simpleForm={this.simpleForm}
+              advancedForm={this.advancedForm}
             />
             <div className="tableListOperator">
-              <Button icon="plus" type="primary" onClick={() => this.handleAdd()}>
+              <Button icon={<PlusOutlined />} type="primary" onClick={() => this.handleAdd()}>
                 新建
               </Button>
             </div>
-            <EditableContext.Provider value={this.props.form}>
+            <Form ref={this.formRef}>
               <StandardTable
                 scroll={{ x: tableWidth }}
                 rowClassName="editable-row"
@@ -589,10 +462,12 @@ class Product extends React.Component {
                 onSelectRow={this.handleSelectRows}
                 onChange={this.handleStandardTableChange}
               />
-            </EditableContext.Provider>
+            </Form>
           </div>
           <ChooseProduct
-            ref={ref => { this.ChooseProduct = ref }}
+            ref={ref => {
+              this.ChooseProduct = ref;
+            }}
             selectChooseModalData={this.selectChooseModalData}
           />
         </Card>
@@ -601,4 +476,8 @@ class Product extends React.Component {
   }
 }
 
-export default Product;
+export default connect(({ global, seq }) => ({
+  commonStatus: global.commonStatus,
+  sampleType: seq.sampleType,
+  seqType: seq.seqType,
+}))(Product);

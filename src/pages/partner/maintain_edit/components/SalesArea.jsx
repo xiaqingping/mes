@@ -1,25 +1,11 @@
 /**
  * 客户 销售范围
  */
-import {
-  Form,
-  Row,
-  Col,
-  Select,
-  Switch,
-  Radio,
-  Tabs,
-  Card,
-  Cascader,
-  Icon,
-  Empty,
-  message,
-} from 'antd';
+import { Form, Row, Col, Select, Switch, Radio, Tabs, Card, Cascader, Empty, message } from 'antd';
+import { DownOutlined, CloseOutlined } from '@ant-design/icons';
 import React from 'react';
 import { connect } from 'dva';
 import { formatMessage, FormattedMessage } from 'umi-plugin-react/locale';
-import debounce from 'lodash/debounce';
-import { validateForm } from '@/utils/utils';
 import BillToParty from './BillToParty';
 import SoldToParty from './SoldToParty';
 import ShipToParty from './ShipToParty';
@@ -31,56 +17,56 @@ const FormItem = Form.Item;
 const { Option } = Select;
 const { TabPane } = Tabs;
 
-@Form.create()
-@connect(({ global, basicCache, bpEdit, bp }) => {
-  function byLangFilter(e) {
-    return e.languageCode === global.languageCode;
-  }
-  // 基础数据
-  // 销售范围和大区关系
-  const { salesAreaRegion } = basicCache;
-  // 大区+网点
-  const regionOffice = basicCache.regionOffice.filter(byLangFilter);
-  // 付款方式
-  const salesPaymentMethods = basicCache.salesPaymentMethods.filter(byLangFilter);
-  // 币种
-  const currencies = basicCache.currencies.filter(byLangFilter);
+@connect(
+  ({ global, basicCache, bpEdit, bp }) => {
+    function byLangFilter(e) {
+      return e.languageCode === global.languageCode;
+    }
+    // 基础数据
+    // 销售范围和大区关系
+    const { salesAreaRegion } = basicCache;
+    // 大区+网点
+    const regionOffice = basicCache.regionOffice.filter(byLangFilter);
+    // 付款方式
+    const salesPaymentMethods = basicCache.salesPaymentMethods.filter(byLangFilter);
+    // 币种
+    const currencies = basicCache.currencies.filter(byLangFilter);
 
-  // 业务伙伴数据
-  const details = bpEdit.details || {};
-  const basicInfo = details.basic || {};
+    // 业务伙伴数据
+    const details = bpEdit.details || {};
+    const basicInfo = details.basic || {};
 
-  // 默认开票类型
-  const { DefaultInvoiceType } = bp;
+    // 默认开票类型
+    const { DefaultInvoiceType } = bp;
 
-  return {
-    salesAreaRegion,
-    salesPaymentMethods,
-    regionOffice,
-    currencies,
-    basicInfo,
-    DefaultInvoiceType,
-  };
-})
+    return {
+      salesAreaRegion,
+      salesPaymentMethods,
+      regionOffice,
+      currencies,
+      basicInfo,
+      DefaultInvoiceType,
+    };
+  },
+  null,
+  null,
+  { forwardRef: true },
+)
 class FormContent extends React.Component {
   constructor(props) {
     super(props);
-    props.getChildrenForm(props.form);
-    // 异步验证做节流处理
-    this.checkRegionOffice = debounce(this.checkRegionOffice, 800);
+    this.formRef = React.createRef();
   }
 
-  checkRegionOffice = (rule, value, callback) => {
+  checkRegionOffice = (rule, value) => {
     if (!value[0] || !value[1]) {
-      callback('请选择网点归属');
-      return;
+      return Promise.reject(new Error('请选择网点归属'));
     }
-    callback();
+    return Promise.resolve();
   };
 
   render() {
     const {
-      form: { getFieldDecorator },
       basicInfo,
       data,
       valueChange,
@@ -107,123 +93,116 @@ class FormContent extends React.Component {
     const sapCountryCode = basicInfo.sapCountryCode || 'CN';
 
     return (
-      <Form hideRequiredMark>
+      <Form
+        ref={this.formRef}
+        hideRequiredMark
+        initialValues={{
+          regionOffice: [data.regionCode, data.officeCode],
+          defaultPaymentMethodCode: data.defaultPaymentMethodCode,
+          currencyCode: data.currencyCode,
+          defaultInvoiceTypeCode: data.defaultInvoiceTypeCode,
+          taxClassificCode: data.taxClassificCode,
+          salesOrderBlock: data.salesOrderBlock === 1,
+        }}
+      >
         <Row gutter={32}>
           <Col span={5}>
             <FormItem
+              name="regionOffice"
               label={formatMessage({ id: 'bp.maintain_details.sales_distribution.sales_area' })}
+              rules={[{ required: true, validator: this.checkRegionOffice }]}
             >
-              {getFieldDecorator('regionOffice', {
-                initialValue: [data.regionCode, data.officeCode],
-                rules: [{ required: true, validator: this.checkRegionOffice }],
-              })(
-                <Cascader
-                  fieldNames={{ label: 'name', value: 'code', children: 'officeList' }}
-                  onChange={value => valueChange('regionOffice', value)}
-                  options={regionOfficeFilter}
-                />,
-              )}
+              <Cascader
+                fieldNames={{ label: 'name', value: 'code', children: 'officeList' }}
+                onChange={value => valueChange('regionOffice', value)}
+                options={regionOfficeFilter}
+              />
             </FormItem>
           </Col>
           <Col span={5}>
             <FormItem
+              name="defaultPaymentMethodCode"
               label={formatMessage({
                 id: 'bp.maintain_details.sales_distribution.default_payment_menthod',
               })}
+              rules={[{ required: true }]}
             >
-              {getFieldDecorator('defaultPaymentMethodCode', {
-                initialValue: data.defaultPaymentMethodCode,
-                rules: [{ required: true }],
-              })(
-                <Select onChange={value => valueChange('defaultPaymentMethodCode', value)}>
-                  {salesPaymentMethods.map(e => (
-                    <Option key={e.code} value={e.code}>
-                      {e.name}
-                    </Option>
-                  ))}
-                </Select>,
-              )}
+              <Select onChange={value => valueChange('defaultPaymentMethodCode', value)}>
+                {salesPaymentMethods.map(e => (
+                  <Option key={e.code} value={e.code}>
+                    {e.name}
+                  </Option>
+                ))}
+              </Select>
             </FormItem>
           </Col>
           <Col span={4}>
             <FormItem
+              name="currencyCode"
               label={formatMessage({ id: 'bp.maintain_details.sales_distribution.currency' })}
+              rules={[{ required: true }]}
             >
-              {getFieldDecorator('currencyCode', {
-                initialValue: data.currencyCode,
-                rules: [{ required: true }],
-              })(
-                <Select
-                  showSearch
-                  filterOption={(input, option) => option.props.children.indexOf(input) >= 0}
-                  onChange={value => valueChange('currencyCode', value)}
-                >
-                  {currencies.map(e => (
-                    <Option key={e.code} value={e.code}>
-                      {e.shortText}
-                    </Option>
-                  ))}
-                </Select>,
-              )}
+              <Select
+                showSearch
+                filterOption={(input, option) => option.props.children.indexOf(input) >= 0}
+                onChange={value => valueChange('currencyCode', value)}
+              >
+                {currencies.map(e => (
+                  <Option key={e.code} value={e.code}>
+                    {e.shortText}
+                  </Option>
+                ))}
+              </Select>
             </FormItem>
           </Col>
           {sapCountryCode === 'CN' || !sapCountryCode ? (
             <Col span={7}>
               <FormItem
+                name="defaultInvoiceTypeCode"
                 label={formatMessage({ id: 'bp.maintain_details.sales_distribution.invoice_type' })}
+                rules={[{ required: true }]}
               >
-                {getFieldDecorator('defaultInvoiceTypeCode', {
-                  initialValue: data.defaultInvoiceTypeCode,
-                  rules: [{ required: true }],
-                })(
-                  <Radio.Group
-                    onChange={e => valueChange('defaultInvoiceTypeCode', e.target.value)}
-                  >
-                    {DefaultInvoiceType.map(e => (
-                      <Radio.Button key={e.id} value={e.id}>
-                        {e.name}
-                      </Radio.Button>
-                    ))}
-                  </Radio.Group>,
-                )}
+                <Radio.Group onChange={e => valueChange('defaultInvoiceTypeCode', e.target.value)}>
+                  {DefaultInvoiceType.map(e => (
+                    <Radio.Button key={e.id} value={e.id}>
+                      {e.name}
+                    </Radio.Button>
+                  ))}
+                </Radio.Group>
               </FormItem>
             </Col>
           ) : null}
           {sapCountryCode !== 'CN' && sapCountryCode ? (
             <Col span={6}>
               <FormItem
+                name="taxClassificCode"
                 label={formatMessage({
                   id: 'bp.maintain_details.sales_distribution.tax_classification',
                 })}
+                rules={[{ required: true }]}
               >
-                {getFieldDecorator('taxClassificCode', {
-                  initialValue: data.taxClassificCode,
-                  rules: [{ required: true }],
-                })(
-                  <Select onChange={value => valueChange('taxClassificCode', value)}>
-                    <Option value="0">
-                      {formatMessage({
-                        id: 'bp.maintain_details.sales_distribution.tax_exemption',
-                      })}
-                    </Option>
-                    <Option value="1">
-                      {formatMessage({
-                        id: 'bp.maintain_details.sales_distribution.must_be_taxed',
-                      })}
-                    </Option>
-                  </Select>,
-                )}
+                <Select onChange={value => valueChange('taxClassificCode', value)}>
+                  <Option value="0">
+                    {formatMessage({
+                      id: 'bp.maintain_details.sales_distribution.tax_exemption',
+                    })}
+                  </Option>
+                  <Option value="1">
+                    {formatMessage({
+                      id: 'bp.maintain_details.sales_distribution.must_be_taxed',
+                    })}
+                  </Option>
+                </Select>
               </FormItem>
             </Col>
           ) : null}
           <Col span={3}>
             <FormItem
+              name="salesOrderBlock"
               label={formatMessage({ id: 'bp.maintain_details.sales_distribution.sales_block' })}
+              valuePropName="checked"
             >
-              {getFieldDecorator('salesOrderBlock', {
-                initialValue: data.salesOrderBlock === 1,
-                valuePropName: 'checked',
-              })(<Switch disabled />)}
+              <Switch disabled />
             </FormItem>
           </Col>
         </Row>
@@ -266,11 +245,12 @@ class FormContent extends React.Component {
   },
   null,
   null,
-  { withRef: true },
+  { forwardRef: true },
 )
 class SalesArea extends React.Component {
   constructor(props) {
     super(props);
+    this.formContentRef = React.createRef();
     const { salesAreaList: tabsData } = this.props;
 
     let tabKey = '';
@@ -328,17 +308,15 @@ class SalesArea extends React.Component {
   onTabChange = async tabKey => {
     if (tabKey === 'select') return;
 
-    // 检查当前正在编辑的数据是否验证通过
-    const viewform = this.childrenForm;
-    if (viewform) {
-      const result = await validateForm(viewform);
-      if (!result[0]) {
-        message.error('销售范围验证未通过');
-        return;
+    try {
+      if (this.formContentRef.current && this.formContentRef.current.formRef) {
+        await this.formContentRef.current.formRef.current.validateFields();
+        this.setState({ tabKey });
       }
+    } catch (error) {
+      console.log(error);
+      message.error('销售范围验证未通过');
     }
-
-    this.setState({ tabKey });
   };
 
   onTabelTabChange = activeKey => {
@@ -353,62 +331,61 @@ class SalesArea extends React.Component {
     const { details, customer, salesAreaList: tabsData } = this.props;
     const tabKey = `${salesOrganizationCode}-${distributionChannelCode}`;
 
-    // 检查当前正在编辑的数据是否验证通过
-    const viewform = this.childrenForm;
-    if (viewform) {
-      const result = await validateForm(viewform);
-      if (!result[0]) {
-        message.error('销售范围验证未通过');
-        return;
+    try {
+      if (this.formContentRef.current && this.formContentRef.current.formRef.current) {
+        await this.formContentRef.current.formRef.current.validateFields();
       }
-    }
 
-    // 新增的数据，最多可以一次新增两条，当同一个销售组织下，同时存在直销[10]和电商[20]两个销售渠道时
-    // 新增一个时，会把另一个也新增进去
-    let addArr = [];
-    if (distributionChannelCode === '10' || distributionChannelCode === '20') {
-      salesArea.forEach(e1 => {
-        if (e1.value === salesOrganizationCode) {
-          e1.children.forEach(e2 => {
-            if (e2.value === '10' || e2.value === '20') {
-              addArr.push({
-                // theNew 存在代表是新增数据
-                theNew: true,
-                salesOrganizationCode: e1.value,
-                distributionChannelCode: e2.value,
-              });
-            }
-          });
-        }
-      });
-    }
+      // 新增的数据，最多可以一次新增两条，当同一个销售组织下，同时存在直销[10]和电商[20]两个销售渠道时
+      // 新增一个时，会把另一个也新增进去
+      let addArr = [];
+      if (distributionChannelCode === '10' || distributionChannelCode === '20') {
+        salesArea.forEach(e1 => {
+          if (e1.value === salesOrganizationCode) {
+            e1.children.forEach(e2 => {
+              if (e2.value === '10' || e2.value === '20') {
+                addArr.push({
+                  // theNew 存在代表是新增数据
+                  theNew: true,
+                  salesOrganizationCode: e1.value,
+                  distributionChannelCode: e2.value,
+                });
+              }
+            });
+          }
+        });
+      }
 
-    if (addArr.length !== 2) {
-      addArr = [
-        {
-          // theNew 存在代表是新增数据
-          theNew: true,
-          salesOrganizationCode,
-          distributionChannelCode,
+      if (addArr.length !== 2) {
+        addArr = [
+          {
+            // theNew 存在代表是新增数据
+            theNew: true,
+            salesOrganizationCode,
+            distributionChannelCode,
+          },
+        ];
+      }
+
+      const newSalesAreaList = [].concat(tabsData, ...addArr);
+      const newCustomer = { ...customer, ...{ salesAreaList: newSalesAreaList } };
+      const newDetails = { ...details, ...{ customer: newCustomer } };
+
+      this.props.dispatch({
+        type: 'bpEdit/setState',
+        payload: {
+          type: 'details',
+          data: newDetails,
         },
-      ];
+      });
+
+      this.setState({
+        tabKey,
+      });
+    } catch (error) {
+      console.log(error);
+      message.error('销售范围验证未通过');
     }
-
-    const newSalesAreaList = [].concat(tabsData, ...addArr);
-    const newCustomer = { ...customer, ...{ salesAreaList: newSalesAreaList } };
-    const newDetails = { ...details, ...{ customer: newCustomer } };
-
-    this.props.dispatch({
-      type: 'bpEdit/setState',
-      payload: {
-        type: 'details',
-        data: newDetails,
-      },
-    });
-
-    this.setState({
-      tabKey,
-    });
   };
 
   renderCascader = options => {
@@ -434,7 +411,7 @@ class SalesArea extends React.Component {
       <Cascader options={options} onChange={this.onCascaderChange}>
         <a style={{ fontSize: 14, marginLeft: -16 }}>
           <FormattedMessage id="bp.maintain_details.sales_distribution.sales_org" />
-          <Icon type="down" style={{ fontSize: 12 }} />
+          <DownOutlined style={{ fontSize: 12 }} />
         </a>
       </Cascader>
     );
@@ -531,10 +508,6 @@ class SalesArea extends React.Component {
     this.setState({ tabKey: key });
   };
 
-  getChildrenForm = form => {
-    this.childrenForm = form;
-  };
-
   render() {
     const { salesAreaList: tabsData, editType } = this.props;
     let { tabKey } = this.state;
@@ -567,14 +540,14 @@ class SalesArea extends React.Component {
       if (e.key === tabKey) {
         e.tab = (
           <>
-            {e.tab}{' '}
-            <Icon type="close" style={{ fontSize: 12 }} onClick={() => this.closeTab(e.key)} />
+            {e.tab} <CloseOutlined style={{ fontSize: 12 }} onClick={() => this.closeTab(e.key)} />
           </>
         );
       } else {
         e.tab = (
           <>
-            {e.tab} <Icon type="close" style={{ fontSize: 12, visibility: 'hidden' }} />
+            {e.tab}
+            <CloseOutlined style={{ fontSize: 12, visibility: 'hidden' }} />
           </>
         );
       }
@@ -598,7 +571,7 @@ class SalesArea extends React.Component {
             return (
               <div key={key}>
                 <FormContent
-                  getChildrenForm={this.getChildrenForm}
+                  ref={this.formContentRef}
                   valueChange={this.valueChange}
                   tabKey={tabKey}
                   data={e}
