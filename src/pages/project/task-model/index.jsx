@@ -308,9 +308,22 @@ class TaskModel extends Component {
   };
 
   handleSearchCodeChange = value => {
+    const { pagination } = this.state;
+    console.log(pagination);
+    const page = {
+      current: 1,
+      pageSize: pagination.pageSize,
+    };
+
     this.setState({
       searchCodevalue: value && value.value,
+      pagination: page,
     });
+    // this.getTableData({
+    //   page: 1,
+    //   rows: page.pageSize,
+    //   ...filterData,
+    // });
   };
 
   fetchPublisherData = value => {
@@ -327,8 +340,15 @@ class TaskModel extends Component {
   };
 
   handlePubisherChange = v => {
+    const { pagination } = this.state;
+    console.log(pagination);
+    const page = {
+      current: 1,
+      pageSize: pagination.pageSize,
+    };
     this.setState({
       searchPublisherValue: v && v.value,
+      pagination: page,
     });
   };
 
@@ -353,6 +373,7 @@ class TaskModel extends Component {
           <FormItem label="任务模型" name="code">
             <Select
               // mode="tag"
+              // notFoundContent="Not Found"
               allowClear
               showSearch
               showArrow={false}

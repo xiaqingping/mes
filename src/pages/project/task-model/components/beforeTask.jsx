@@ -114,11 +114,16 @@ class BeforeTask extends React.Component {
   };
 
   handleSelectChange = value => {
-    console.log(value);
+    const { pagination } = this.state;
+    console.log(pagination);
+    const page = {
+      current: 1,
+      pageSize: pagination.pageSize,
+    };
     // debugger;
     this.setState({
       value: value && value.value,
-      children: [],
+      pagination: page,
     });
   };
 
