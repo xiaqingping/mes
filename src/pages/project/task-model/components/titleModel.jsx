@@ -145,7 +145,7 @@ class TitleModel extends React.Component {
       <div>
         <div
           style={{
-            marginTop: '25px',
+            marginTop: '6px',
             // overflow: 'auto',
             // position: 'relative',
 
@@ -153,24 +153,24 @@ class TitleModel extends React.Component {
             justifyContent: 'space-between',
           }}
         >
-          <div>
-            <Avatar
-              src={viewData.fileId ? disk.downloadFiles(viewData.fileId, { view: true }) : ''}
-              style={{ float: 'left', marginRight: 10 }}
-              size="large"
-            />
-            <div style={{ fontWeight: '900', marginLeft: 10 }}>
-              <div style={{ fontWeight: '700' }}>{viewData.code}</div>
-              <div style={{ width: 170, height: '50px', wordWrap: 'break-word' }}>
-                {viewData.name}
-              </div>
+          <div style={{ display: 'flex' }}>
+            <div>
+              <Avatar
+                src={viewData.fileId ? disk.downloadFiles(viewData.fileId, { view: true }) : ''}
+                style={{ marginRight: 10 }}
+                size="large"
+              />
+            </div>
+            <div style={{ fontWeight: '900' }}>
+              <div style={{ fontWeight: '700', width: 170 }}>{viewData.code}</div>
+              <div style={{ width: 170, height: '50px' }}>{viewData.name}</div>
             </div>
           </div>
 
           <div>
             <div style={{ position: 'relative', display: 'inline-block' }}>
               <Tag
-                color="green"
+                // color="green"
                 style={{ cursor: 'pointer' }}
                 onClick={() => {
                   this.setState({ versionOpen: !versionOpen });
@@ -189,7 +189,7 @@ class TitleModel extends React.Component {
                     versionType.map(item => (
                       <Tag
                         key={item}
-                        color={item === (selectVersion || 'V1.0') ? 'green' : ''}
+                        color={item === (selectVersion || viewData.version) ? 'green' : ''}
                         style={{ cursor: 'pointer' }}
                         onClick={() => {
                           this.switchVersion(item);
@@ -207,10 +207,10 @@ class TitleModel extends React.Component {
             <div className="task_model_add_task_icon" />
           </div>
 
-          <div style={{ marginRight: '16px', marginLeft: 108, fontSize: '14px' }}>
+          <div style={{ marginLeft: 68, fontSize: '14px' }}>
             {(viewData.status * 1 === 2 || viewData.status * 1 === 4) && (
               <div
-                style={{ color: 'red', cursor: 'pointer', marginLeft: 16 }}
+                style={{ marginRight: '16px', color: 'red', cursor: 'pointer', marginLeft: 16 }}
                 onClick={() => {
                   this.handleForbidden(viewData.id);
                 }}
@@ -218,7 +218,7 @@ class TitleModel extends React.Component {
                 禁用
               </div>
             )}
-            <div style={{ marginTop: 32, marginBottom: 18, fontSize: 14, marginLeft: 16 }}>
+            <div style={{ marginTop: 12, fontSize: 13, marginRight: -2, textAlign:"right" }}>
               {open ? (
                 <a href="#" onClick={() => this.setState({ open: !open })}>
                   收起
@@ -226,7 +226,7 @@ class TitleModel extends React.Component {
                 </a>
               ) : (
                 <a href="#" onClick={() => this.setState({ open: !open })}>
-                  展开
+                  展开 &nbsp;
                   <DownOutlined />
                 </a>
               )}

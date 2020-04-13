@@ -184,7 +184,7 @@ class ArgumentModel extends Component {
     console.log(this.props.taskModel);
     let title = null;
     formItemType.some(v => {
-      if (v.type == item.type) {
+      if (v.type === item.type) {
         title = v.text;
       }
     });
@@ -323,15 +323,17 @@ class ArgumentModel extends Component {
             onClose={() => this.toggleChildrenDrawer(false)}
             title={this.titleContent()}
           >
-            <ArgumentForm
-              fromView={fromView}
-              type={type}
-              editOriginData={editOriginData}
-              emitArguments={this.emitArguments}
-              onClose={() => {
-                this.toggleChildrenDrawer(false);
-              }}
-            />
+            {type === 'input' && (
+              <ArgumentForm
+                fromView={fromView}
+                type={type}
+                editOriginData={editOriginData}
+                emitArguments={this.emitArguments}
+                onClose={() => {
+                  this.toggleChildrenDrawer(false);
+                }}
+              />
+            )}
           </Drawer>
         </Drawer>
       </div>
