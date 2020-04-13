@@ -16,7 +16,7 @@ import {
   Spin,
   Avatar,
 } from 'antd';
-import { LoadingOutlined, SettingOutlined, PlusOutlined, DeleteOutlined } from '@ant-design/icons';
+import { LoadingOutlined, PlusOutlined } from '@ant-design/icons';
 import { connect } from 'dva';
 import './index.less';
 import { guid, formatter, versionFun } from '@/utils/utils';
@@ -107,10 +107,6 @@ class TaskModel extends Component {
           });
           console.log(res);
           const { dispatch } = this.props;
-          // dispatch({
-          //   type: 'taskModel/getEditOriginModelData',
-          //   payload: res,
-          // });
           (this.tableSearchFormRef.current || {}).setFieldsValue(res);
           disk
             .getFiles({
@@ -125,13 +121,6 @@ class TaskModel extends Component {
                 type: 'taskModel/getEditOriginModelData',
                 payload: { ...res, fileId: v.length !== 0 ? v[0].id : '' },
               });
-              // this.props.dispatch({
-              //   type: 'processModel/setProcessDetail',
-              //   payload: {
-              //     ...res,
-              //     fileId: v.length !== 0 ? v[0].id : '',
-              //   },
-              // });
             });
           if (res.version) {
             this.setState({
@@ -173,11 +162,6 @@ class TaskModel extends Component {
           uuids.push(item.picture);
           ids.push(item.id);
         });
-        console.log(uuids);
-        console.log(ids);
-
-        // (res || []).map(e => e.picture);
-        // const uuids = (res || []).map(e => e.picture);
         disk
           .getFiles({
             sourceCode: uuids.join(','),
@@ -251,7 +235,7 @@ class TaskModel extends Component {
   };
 
   // 提交上传
-  onFinish = values => {
+  onFinish = () => {
     const {
       checked,
       tableData,
@@ -268,9 +252,7 @@ class TaskModel extends Component {
     const form = this.tableSearchFormRef.current.getFieldsValue();
     form.isAutomatic = checked ? 1 : 2;
     form.params = argumentList;
-    tableData.map(item => {
-      return ids.push(item.id);
-    });
+    tableData.map(item => ids.push(item.id));
     form.parentIds = ids;
     form.version = 'V1.0';
     if (imageUrl) {
@@ -438,18 +420,23 @@ class TaskModel extends Component {
     const data = tableData;
     const idsData = ids;
     const sonIdsData = sonIds;
+    const { preTaskIds } = value;
     const newData = data.filter(item => item.id !== value.id);
     const newIdsData = idsData.filter(item => item !== value.id);
-    let newSonIdsData = [];
-    if ((value.preTaskIds || []).length !== 0) {
-      value.preTaskIds.forEach(i => {
-        newSonIdsData = sonIdsData.filter(item => item !== i);
+    if (preTaskIds.length) {
+      preTaskIds.forEach(i => {
+        sonIdsData.some((item, index) => {
+          if (i === item) {
+            sonIdsData.splice(index, 1);
+            return true;
+          }
+        });
       });
     }
     this.setState({
       tableData: newData,
       ids: newIdsData,
-      sonIds: newSonIdsData,
+      sonIds: sonIdsData,
     });
   };
 
@@ -533,8 +520,8 @@ class TaskModel extends Component {
                   placement="topLeft"
                   title="确定要删除吗？"
                   onConfirm={() => this.confirm(row)}
-                  okText="Yes"
-                  cancelText="No"
+                  okText="确定"
+                  cancelText="取消"
                 >
                   <div
                     style={{ width: 20, height: 20 }}
@@ -678,8 +665,6 @@ class TaskModel extends Component {
             </div>
 
             <div style={{ float: 'right', marginRight: '60px', marginTop: 3, fontSize: '16px' }}>
-              {/* <SettingOutlined /> */}
-              {/* <div className="task_model_add_task_icon" /> */}
               <a href="#" style={{ marginLeft: '10px' }} onClick={this.openArgumentModel}>
                 参数
               </a>

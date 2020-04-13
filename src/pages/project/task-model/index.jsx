@@ -12,7 +12,6 @@ import {
   Badge,
   Menu,
   Dropdown,
-  AutoComplete,
   Spin,
   message,
   Modal,
@@ -51,12 +50,16 @@ class TaskModel extends Component {
       pagination: {},
       visible: false, // 点击查看抽屉是否显示
       viewId: '',
-      nameCodeVal: [],
-      nameCodeValPublish: [],
       filtersData: null,
+      processCode: '', // 任务模型code
+      publisherCode: '',
+      modelSearchOptions: [], // 任务模型模糊搜素options
+      publisherOptions: [], // 发布人模糊搜索options
+      searchCodevalue: null, // 模糊搜索code值
+      searchPublisherValue: null, // 模糊搜索发布人值
     };
-    this.callParter = debounce(this.callParter, 500);
-    this.callPublish = debounce(this.callPublish, 500);
+    this.fetchCodeData = debounce(this.fetchCodeData, 500);
+    this.fetchPublisherData = debounce(this.fetchPublisherData, 500);
   }
 
   componentDidMount() {
@@ -64,7 +67,13 @@ class TaskModel extends Component {
   }
 
   getTableData = (options = {}) => {
-    const { pagination } = this.state;
+    const {
+      pagination,
+      processCode,
+      publisherCode,
+      searchCodevalue,
+      searchPublisherValue,
+    } = this.state;
     this.setState({ loading: true });
     const formData = this.tableSearchFormRef.current
       ? this.tableSearchFormRef.current.getFieldsValue()
@@ -85,11 +94,20 @@ class TaskModel extends Component {
       };
       delete formData.publishDate;
     }
+    if (formData.name) {
+      newData = { ...newData, code: processCode };
+      delete formData.name;
+    }
+    if (formData.publisherName) {
+      newData = { ...newData, publisherCode };
+      delete formData.publisherName;
+    }
     const data = {
       page,
       rows,
       ...newData,
-      ...formData,
+      code: formData.code && searchCodevalue,
+      publisherCode: formData.publisherCode && searchPublisherValue,
       ...options,
     };
     console.log(data);
@@ -116,7 +134,6 @@ class TaskModel extends Component {
             });
           });
         this.setState({
-          // list: res.rows,
           pagination: {
             current: data.page,
             pageSize: data.rows,
@@ -157,134 +174,80 @@ class TaskModel extends Component {
     });
   };
 
-  // ------------------------------------------------------------------------
-  callParter = value => {
-    console.log(value);
-
+  fetchCodeData = value => {
     api.searchTaskModel(value).then(res => {
-      this.setState({ nameCodeVal: res });
+      this.setState({ modelSearchOptions: res || [] });
     });
   };
 
-  callPublish = value => {
-    api.searchPublisherName(value).then(res => {
-      this.setState({ nameCodeVal: res });
-    });
-  };
-
-  // -------------------------------------------------------------------------
-
-  handleItemSearch = (v, type) => {
-    console.log(v, type);
-  };
-
-  // 当 选择项目时候的值
-  handleSearchChange = (value, type) => {
-    const taskModelSearchObj = {
-      taskModel: 'searchTaskModel',
-      publisher: 'searchPublisherName',
+  handleSearchCodeChange = value => {
+    const { pagination } = this.state;
+    console.log(pagination);
+    const page = {
+      current: 1,
+      pageSize: pagination.pageSize,
     };
-    api[taskModelSearchObj[type]](value).then(res => {
-      console.log(res);
-    });
-    // console.log(value, type);
-    // api.taskmodel.searchTaskModel();
-  };
 
-  // 筛选值
-  inputValue = value => {
-    const { nameCodeVal } = this.state;
-    const arr = [];
-    if (!value) {
-      return false;
-    }
-    this.callParter(value);
-    if (nameCodeVal.length === 0) {
-      return false;
-    }
-    nameCodeVal.forEach(item => {
-      if (item.name.indexOf(value) !== -1 && arr.indexOf(item) !== -1) {
-        arr.push(item);
-      }
-      if (item.code.indexOf(value) !== -1 && arr.indexOf(item) !== -1) {
-        arr.push(item);
-      }
-    });
     this.setState({
-      nameCodeVal: arr,
-      // allowClear: 'ture',
+      searchCodevalue: value && value.value,
+      pagination: page,
     });
-    return true;
   };
 
-  // 筛选值
-  inputValuePublish = value => {
-    const { nameCodeValPublish } = this.state;
-    const arr = [];
-    if (!value) {
-      return false;
-    }
-    this.callPublish(value);
-    if (nameCodeValPublish.length === 0) {
-      return false;
-    }
-    nameCodeValPublish.forEach(item => {
-      if (item.name.indexOf(value) !== -1 && arr.indexOf(item) !== -1) {
-        arr.push(item);
-      }
-      if (item.code.indexOf(value) !== -1 && arr.indexOf(item) !== -1) {
-        arr.push(item);
-      }
+  fetchPublisherData = value => {
+    api.searchPublisherName(value).then(res => {
+      this.setState({
+        publisherOptions: res || [],
+      });
     });
+  };
+
+  handlePubisherChange = v => {
+    const { pagination } = this.state;
+    console.log(pagination);
+    const page = {
+      current: 1,
+      pageSize: pagination.pageSize,
+    };
     this.setState({
-      nameCodeValPublish: arr,
-      // allowClear: 'ture',
+      searchPublisherValue: v && v.value,
+      pagination: page,
     });
-    return true;
   };
 
-  renderOption = item => ({
-    value: item.code,
-    label: (
-      <div style={{ display: 'flex' }}>
-        <span>{item.code}</span>&nbsp;&nbsp;
-        <span>{item.name}</span>
-      </div>
-    ),
-  });
-
-  renderOptionPublish = item => ({
-    value: item.publisherCode,
-    label: (
-      // <Option key={item.id} text={item.name}>
-      <div style={{ display: 'flex' }}>
-        <span>{item.publisherName}</span>
-      </div>
-      // </Option>
-    ),
-  });
+  // ---------------------------------------------------------------------------------
 
   simpleForm = () => {
     const { languageCode, status } = this.props;
-    const { nameCodeVal } = this.state;
-    console.log(nameCodeVal);
+    const { modelSearchOptions, publisherOptions } = this.state;
 
     return (
       <>
-        <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
+        <Col xxl={6} xl={8} lg={languageCode === 'EN' ? 12 : 12}>
           <FormItem label="任务模型" name="code">
-            <AutoComplete
-              style={{ width: 260 }}
-              onSearch={this.inputValue}
-              options={nameCodeVal.map(this.renderOption)}
-              // placeholder={formatMessage({ id: 'bp.inputHere' })}
-              // optionLabelProp="text"
-            />
+            <Select
+              allowClear
+              showSearch
+              showArrow={false}
+              labelInValue
+              filterOption={false}
+              onSearch={this.fetchCodeData}
+              onChange={this.handleSearchCodeChange}
+              style={{ width: '100%' }}
+              optionFilterProp="children" // 对子元素--option进行筛选
+              optionLabelProp="label" // 回填的属性
+            >
+              {modelSearchOptions.map(d => (
+                <Option key={d.code} value={d.code} label={d.name}>
+                  {d.code}&nbsp;&nbsp;{d.name}
+                </Option>
+              ))}
+            </Select>
           </FormItem>
         </Col>
-        <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
+        <Col xxl={6} xl={8} lg={languageCode === 'EN' ? 12 : 0}>
           <FormItem label="状态" name="status">
-            <Select mode="multiple" maxTagCount={2} maxTagTextLength={3} style={{ width: 260 }}>
+            <Select mode="multiple" maxTagCount={2} maxTagTextLength={3}>
               {status.map(item => (
                 <Option key={item.value} value={item.value}>
                   {item.text}
@@ -295,13 +258,24 @@ class TaskModel extends Component {
         </Col>
         <Col xxl={6} lg={languageCode === 'EN' ? 12 : 0}>
           <FormItem label="发布人" name="publisherCode">
-            <AutoComplete
-              style={{ width: 260 }}
-              onSearch={this.inputValuePublish}
-              options={nameCodeVal.map(this.renderOptionPublish)}
-              // placeholder={formatMessage({ id: 'bp.inputHere' })}
-              placeholder="发布人"
-            />
+            <Select
+              allowClear
+              showSearch
+              showArrow={false}
+              labelInValue
+              filterOption={false}
+              onSearch={this.fetchPublisherData}
+              onChange={this.handlePubisherChange}
+              style={{ width: '100%' }}
+              optionFilterProp="children" // 对子元素--option进行筛选
+              optionLabelProp="label" // 回填的属性
+            >
+              {publisherOptions.map(d => (
+                <Option key={d.publisherCode} value={d.publisherCode} label={d.publisherName}>
+                  {d.publisherCode}&nbsp;&nbsp;{d.publisherName}
+                </Option>
+              ))}
+            </Select>
           </FormItem>
         </Col>
       </>
@@ -357,28 +331,9 @@ class TaskModel extends Component {
     });
   };
 
-  // 更新某行数据
-  // updateListData = id => {
-  //   const { list } = this.state;
-  //   api.getTaskModelDetail(id).then(res => {
-  //     let lists = [...list];
-  //     lists = lists.map(item => {
-  //       if (item.id === id) {
-  //         const fileId = '';
-  //         item = res;
-  //         item.fileId = fileId;
-  //       }
-  //       return item;
-  //     });
-  //     this.setState({
-  //       list: lists,
-  //     });
-  //   });
-  // };
-
   // 禁用模型
   forbiddenModel = id => {
-    api.forbiddenTaskModel(id).then(res => {
+    api.forbiddenTaskModel(id).then(() => {
       message.success('任务模型已禁用!');
       this.getTableData();
       // this.updateListData(id);

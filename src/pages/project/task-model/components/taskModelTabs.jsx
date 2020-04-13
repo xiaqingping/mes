@@ -97,7 +97,7 @@ class TaskModelTabs extends Component {
     console.log(taskId);
 
     const { taskModel } = this.props;
-    const { taskModelStatusOptions, viewId } = taskModel.taskModel;
+    const { taskModelStatusOptions } = taskModel.taskModel;
 
     // debugger;
     return (
