@@ -323,15 +323,17 @@ class ArgumentModel extends Component {
             onClose={() => this.toggleChildrenDrawer(false)}
             title={this.titleContent()}
           >
-            <ArgumentForm
-              fromView={fromView}
-              type={type}
-              editOriginData={editOriginData}
-              emitArguments={this.emitArguments}
-              onClose={() => {
-                this.toggleChildrenDrawer(false);
-              }}
-            />
+            {type === 'input' && (
+              <ArgumentForm
+                fromView={fromView}
+                type={type}
+                editOriginData={editOriginData}
+                emitArguments={this.emitArguments}
+                onClose={() => {
+                  this.toggleChildrenDrawer(false);
+                }}
+              />
+            )}
           </Drawer>
         </Drawer>
       </div>
