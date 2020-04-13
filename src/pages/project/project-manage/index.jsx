@@ -20,7 +20,7 @@ import { PlusOutlined } from '@ant-design/icons';
 import { connect } from 'dva';
 import _ from 'lodash';
 import router from 'umi/router';
-import StandardTable from '@/components/StandardTable';
+import StandardTable from '../components/StandardTable';
 import { formatter } from '@/utils/utils';
 import api from '@/pages/project/api/projectManage';
 import {
@@ -34,13 +34,6 @@ const FormItem = Form.Item;
 
 class ProjectManagement extends Component {
   tableSearchFormRef = React.createRef();
-  // tableFormRef = React.createRef();
-
-  // state = {
-  //   pagination: {},
-  //   loading: false,
-  //   list: [],
-  // };
 
   // 顶部表单默认值
   initialValues = {
@@ -54,8 +47,6 @@ class ProjectManagement extends Component {
     this.state = {
       pagination: {},
       loading: false,
-      // visible: false,
-      // detailValue: {},
       list: [],
       nameCodeVal: [],
     };
@@ -75,6 +66,7 @@ class ProjectManagement extends Component {
 
   // 获取表格数据
   getTableData = (options = {}) => {
+    console.log(options);
     const formData = this.tableSearchFormRef.current.getFieldsValue();
     // console.log(formData);
     const { pagination } = this.state;
@@ -82,6 +74,7 @@ class ProjectManagement extends Component {
 
     let newData = [];
     if (formData.statusList) {
+      console.log(formData.statusList);
       newData = { ...newData, statusList: formData.statusList.join(',') };
       delete formData.statusList;
     }
@@ -103,6 +96,7 @@ class ProjectManagement extends Component {
       ...formData,
       ...options,
     };
+    data.statusList = data.status;
     api.getProjectManage(data, true).then(res => {
       this.setState({
         list: res.results,
@@ -238,11 +232,11 @@ class ProjectManagement extends Component {
 
   // 新增
   handleAdd = () => {
-    const data = { requestType: 'addProject' }
+    const data = { requestType: 'addProject' };
     this.props.dispatch({
       type: 'projectManage/setProjectData',
-      payload: data
-    })
+      payload: data,
+    });
     router.push('/project/project-manage/add');
   };
 
@@ -252,10 +246,10 @@ class ProjectManagement extends Component {
     data.requestType = 'editProject';
     this.props.dispatch({
       type: 'projectManage/setProjectData',
-      payload: data
-    })
+      payload: data,
+    });
     router.push('/project/project-manage/add');
-  }
+  };
 
   // 项目管理详情页面
   searchDetails = row => {
@@ -282,9 +276,11 @@ class ProjectManagement extends Component {
         width: '200px',
         render: (value, row) => (
           <>
-            <div>{row.name}</div>
-            <div>
-              <a onClick={() => this.searchDetails(row)}>{value}</a>
+            <div style={{ float: 'left', paddingLeft: '20px' }}>
+              <div>{row.name}</div>
+              <div>
+                <a onClick={() => this.searchDetails(row)}>{value}</a>
+              </div>
             </div>
           </>
         ),
@@ -297,22 +293,24 @@ class ProjectManagement extends Component {
       {
         title: '创建人/时间',
         dataIndex: 'creatorName',
+        width: '200px',
         render: (value, row) => (
           <>
             {value}
             <br />
-            {row.creatorTime}
+            {row.createDate}
           </>
         ),
       },
       {
         title: '修改人/时间',
+        width: '200px',
         dataIndex: 'changerName',
         render: (value, row) => (
           <>
             {value}
             <br />
-            {row.changerTime}
+            {row.changeDate}
           </>
         ),
       },
@@ -330,7 +328,7 @@ class ProjectManagement extends Component {
       },
       {
         title: '标签',
-        dataIndex: 'label',
+        dataIndex: 'labelList',
       },
       {
         title: '成员数',

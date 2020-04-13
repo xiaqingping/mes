@@ -1,10 +1,21 @@
 import request from '@/utils/request';
 
 // 1组
-const http1 = 'http://192.168.20.6:8166';
+// const http1 = 'http://192.168.20.6:8166';
 
 // 2组
-const http2 = 'http://192.168.20.12:8360';
+// const http2 = 'http://192.168.20.12:8360';
+
+let http1 = 'http://192.168.20.6:8166';
+if (process.env.NODE_ENV !== 'development') {
+  http1 = '';
+}
+
+// 2组
+let http2 = 'http://192.168.20.12:8360';
+if (process.env.NODE_ENV !== 'development') {
+  http2 = '/projectmodel';
+}
 
 export default {
   // 项目管理接口
@@ -36,8 +47,6 @@ export default {
     return request(`${http1}/projects/v1`, { method: 'PUT', data });
   },
 
-
-
   // 流程模型接口
   // 流程模型分页列表
   getProcess(params) {
@@ -51,6 +60,13 @@ export default {
 
   // 添加流程页面删除
   deleteAddProcess(id) {
-    return request(`${http1}/projects/v1/${id}/deleted`, { method: 'PUT' });
+    return request(`${http2}/v1/process/${id}/deletion`, {
+      method: 'PUT',
+    });
+  },
+
+  // 查询流程模型的参数列表
+  getProcessParam(params) {
+    return request(`${http2}/v1/process/${params}/params`);
   },
 };
