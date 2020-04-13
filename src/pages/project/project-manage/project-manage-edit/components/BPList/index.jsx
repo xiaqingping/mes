@@ -69,11 +69,10 @@ class BPList extends Component {
   };
 
   // 分页
-  handleStandardTableChange = (data, filters) => {
+  handleStandardTableChange = (data) => {
     this.getTableData({
       page: data.current,
       pageSize: data.pageSize,
-      ...filters
     });
   };
 
@@ -87,6 +86,7 @@ class BPList extends Component {
     const { pagination, bpCode } = this.state;
     const { current: page, pageSize } = pagination;
 
+
     const data = {
       page,
       pageSize,
@@ -94,6 +94,7 @@ class BPList extends Component {
       ...options,
       code: bpCode,
     };
+    console.log(data);
 
     api.getBPList(data).then(res => {
       this.setState({

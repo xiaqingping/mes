@@ -2,77 +2,38 @@
  * 客户 收货地址
  */
 import { Button, Table, Input, Divider, Form, Card } from 'antd';
+import { PlusOutlined } from '@ant-design/icons';
 import React from 'react';
 import { connect } from 'dva';
-import debounce from 'lodash/debounce';
 import { formatMessage, FormattedMessage } from 'umi-plugin-react/locale';
-import { validateForm } from '@/utils/utils';
-
-import ContactInformation from './ContactInformation';
 import { MobilePhoneInput, AddressInput } from '@/components/CustomizedFormControls';
+import ContactInformation from './ContactInformation';
 
-const EditableContext = React.createContext();
+const EditableCell = props => {
+  const {
+    editing,
+    dataIndex,
+    title,
+    inputType,
+    record,
+    index,
+    children,
+    editOptions,
+    ...restProps
+  } = props;
 
-class EditableCell extends React.Component {
-  renderCell = ({ getFieldDecorator }) => {
-    const {
-      editing,
-      dataIndex,
-      title,
-      inputType,
-      record,
-      index,
-      children,
-      editOptions,
-      ...restProps
-    } = this.props;
-
-    let initialValue;
-    if (editing) {
-      initialValue = record[dataIndex];
-      if (dataIndex === 'mobilePhone') {
-        initialValue = {
-          mobilePhone: record.mobilePhone,
-          mobilePhoneCountryCode: record.mobilePhoneCountryCode,
-        };
-      }
-      if (dataIndex === 'address') {
-        initialValue = {
-          countryCode: record.countryCode,
-          countryName: record.countryName,
-          provinceCode: record.provinceCode,
-          provinceName: record.provinceName,
-          cityCode: record.cityCode,
-          cityName: record.cityName,
-          countyCode: record.countyCode,
-          countyName: record.countyName,
-          streetCode: record.streetCode,
-          streetName: record.streetName,
-          address: record.address,
-        };
-      }
-    }
-
-    return (
-      <td {...restProps}>
-        {editing ? (
-          <Form.Item>
-            {getFieldDecorator(dataIndex, {
-              initialValue,
-              ...editOptions,
-            })(inputType)}
-          </Form.Item>
-        ) : (
-          children
-        )}
-      </td>
-    );
-  };
-
-  render() {
-    return <EditableContext.Consumer>{this.renderCell}</EditableContext.Consumer>;
-  }
-}
+  return (
+    <td {...restProps}>
+      {editing ? (
+        <Form.Item name={dataIndex} {...editOptions}>
+          {inputType}
+        </Form.Item>
+      ) : (
+        children
+      )}
+    </td>
+  );
+};
 
 @connect(
   ({ bpEdit }) => {
@@ -84,9 +45,9 @@ class EditableCell extends React.Component {
   },
   null,
   null,
-  { withRef: true },
+  { forwardRef: true },
 )
-class EditableTable extends React.Component {
+class Address extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -94,50 +55,41 @@ class EditableTable extends React.Component {
       id: 0,
     };
 
-    // 防抖
-    this.checkAddress = debounce(this.checkAddress, 800);
-    this.checkMobilePhone = debounce(this.checkMobilePhone, 800);
+    this.formRef = React.createRef();
   }
 
-  checkAddress = (rule, value, callback) => {
+  checkAddress = (rule, value) => {
     const { address, countryCode, changedValue = {} } = value;
     const { option = [] } = changedValue;
     if (option.length > 0) {
       const last = option[option.length - 1];
       if (last.isMustLow === 1 && last.level !== 5) {
-        callback('必须选择下一级');
-        return;
+        return Promise.reject(new Error('必须选择下一级'));
       }
     }
     if (!address) {
-      callback('详细地址必填');
-      return;
+      return Promise.reject(new Error('详细地址必填'));
     }
     if (!countryCode) {
-      callback('国家不能为空');
-      return;
+      return Promise.reject(new Error('国家不能为空'));
     }
-    callback();
+    return Promise.resolve();
   };
 
-  checkMobilePhone = (rule, value, callback) => {
+  checkMobilePhone = (rule, value) => {
     if (!value.mobilePhone) {
-      callback('手机号码不能为空');
-      return;
+      return Promise.reject(new Error('手机号码不能为空'));
     }
     if (!value.mobilePhoneCountryCode) {
-      callback('国家编码不能为空');
-      return;
+      return Promise.reject(new Error('国家编码不能为空'));
     }
-    callback();
+    return Promise.resolve();
   };
 
   valueChange = (key, value) => {
     if (key === 'address') {
       const { changedValue, ...excludeChangeValue } = value;
-      this.props.form.setFieldsValue({
-        address: excludeChangeValue,
-      });
+      this.formRef.current.setFieldsValue({ address: excludeChangeValue });
     }
   };
 
@@ -146,16 +98,38 @@ class EditableTable extends React.Component {
     const { addressList } = this.props;
     const newId = id - 1;
 
-    if (editIndex !== -1) {
-      const validateResult = await validateForm(this.props.form);
-      if (!validateResult[0]) return false;
+    try {
+      if (editIndex !== -1) {
+        await this.formRef.current.validateFields();
+      }
+      const newAddressList = [
+        ...addressList,
+        {
+          id: newId,
+          name: '',
+          mobilePhoneCountryCode: '',
+          mobilePhone: '',
+          postCode: '',
+          countryCode: '',
+          countryName: '',
+          provinceCode: '',
+          provinceName: '',
+          cityCode: '',
+          cityName: '',
+          countyCode: '',
+          countyName: '',
+          streetCode: '',
+          streetName: '',
+          address: '',
+        },
+      ];
+
+      this.formRef.current.setFieldsValue(newAddressList[newAddressList.length - 1]);
+      this.setStore(newAddressList);
+      this.setState({ editIndex: newAddressList.length - 1, id: newId });
+    } catch (error) {
+      console.log(error);
     }
-
-    const newAddressList = [...addressList, { id: newId }];
-
-    this.setStore(newAddressList);
-    this.setState({ editIndex: newAddressList.length - 1, id: newId });
-    return true;
   };
 
   deleteRow = index => {
@@ -176,25 +150,26 @@ class EditableTable extends React.Component {
   };
 
   save = async index => {
-    const validateResult = await validateForm(this.props.form);
-    if (!validateResult[0]) return false;
+    try {
+      const row = await this.formRef.current.validateFields();
+      // address中排除掉changedValue，不要把此数据赋值给地址
+      const { address } = row;
+      const { changedValue, sapCountryCode, provinceSapCode, ...otherAddress } = address;
+      const { addressList } = this.props;
 
-    const row = validateResult[1];
-    // address中排除掉changedValue，不要把此数据赋值给地址
-    const { address } = row;
-    const { changedValue, sapCountryCode, provinceSapCode, ...otherAddress } = address;
-    const { addressList } = this.props;
+      const newAddressList = addressList.map((e, i) => {
+        if (i === index) {
+          return { ...e, ...row, ...row.mobilePhone, ...otherAddress };
+        }
+        return e;
+      });
 
-    const newAddressList = addressList.map((e, i) => {
-      if (i === index) {
-        return { ...e, ...row, ...row.mobilePhone, ...otherAddress };
-      }
-      return e;
-    });
-
-    this.setStore(newAddressList);
-    this.setState({ editIndex: -1 });
-    return true;
+      this.setStore(newAddressList);
+      this.setState({ editIndex: -1 });
+      return true;
+    } catch (error) {
+      return false;
+    }
   };
 
   setStore = newAddressList => {
@@ -345,7 +320,7 @@ class EditableTable extends React.Component {
 
     return (
       <Card title={formatMessage({ id: 'bp.maintain_details.shipping_address' })} bordered={false}>
-        <EditableContext.Provider value={this.props.form}>
+        <Form ref={this.formRef}>
           <Table
             rowKey="id"
             components={components}
@@ -362,14 +337,14 @@ class EditableTable extends React.Component {
             }}
             type="dashed"
             onClick={this.addRow}
-            icon="plus"
+            icon={<PlusOutlined />}
           >
             <FormattedMessage id="action.add" />
           </Button>
-        </EditableContext.Provider>
+        </Form>
       </Card>
     );
   }
 }
 
-export default Form.create()(EditableTable);
+export default Address;

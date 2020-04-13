@@ -18,20 +18,19 @@ class ProjectEdit extends Component {
 
   constructor(props) {
     super(props);
-    const { projectData, labelList} = props.projectManage;
+    const { projectData, labelList } = props.projectManage;
 
     this.locationUrl(projectData);
     this.state = {
-      requestType: projectData.requestType,  // 请求类型
+      requestType: projectData.requestType, // 请求类型
       selectedlabels: [], // 选中标签
-      bpCode: '',       // bp编号
-      bpName: '',       // bp名称
-      beginDate: '',    // 开始时间
-      endDate: '',      // 结束时间
+      bpCode: '', // bp编号
+      bpName: '', // bp名称
+      beginDate: '', // 开始时间
+      endDate: '', // 结束时间
       projectData,
       labelList,
     };
-
   }
 
   // 数据为空时跳转至其他页面
@@ -39,13 +38,13 @@ class ProjectEdit extends Component {
     if (data.length === 0) {
       router.push('/project/project-manage');
     }
-  }
+  };
 
   // 组件加载时
   componentDidMount = () => {
     const { projectData } = this.state;
     this.requestTypeInit(projectData);
-  }
+  };
 
   // 判断请求类型
   requestTypeInit = data => {
@@ -53,7 +52,7 @@ class ProjectEdit extends Component {
     if (requestType === 'addProject') {
       this.setState({
         requestType,
-      })
+      });
     }
     if (requestType === 'editProject') {
       // 设置初始值
@@ -62,42 +61,46 @@ class ProjectEdit extends Component {
           name: data.name,
           describe: data.describe,
           bpName: data.bpName,
-        })
+        });
       }
       this.setState({
         selectedlabels: data.labelList,
         beginDate: data.beginDate,
         endDate: data.endDate,
-      })
+      });
     }
     return false;
-  }
-
+  };
 
   // 保存
   handleSave = () => {
     const data = this.saveData();
     const { requestType } = this.state;
-    if(requestType === 'addProject') {
+    if (requestType === 'addProject') {
       api.addProjects(data).then(() => {
         router.push('/project/project-manage');
-      })
-    } if (requestType === 'editProject') {
+      });
+    }
+    if (requestType === 'editProject') {
       api.updateProjects(data).then(() => {
         router.push('/project/project-manage');
-      })
+      });
     }
   };
 
   // 保存时所需数据
   saveData = () => {
     const {
-      selectedlabels,bpCode, bpName, endDate, beginDate,
+      selectedlabels,
+      bpCode,
+      bpName,
+      endDate,
+      beginDate,
       requestType,
       projectData,
     } = this.state;
     const formData = this.formRef.current.getFieldsValue();
-    console.log(projectData)
+    console.log(projectData);
 
     if (formData.name === undefined) {
       message.error('项目名称不能为空！');
@@ -132,34 +135,37 @@ class ProjectEdit extends Component {
         bpName,
         endDate,
         beginDate,
-        labelList: selectedlabels
-      }
-    } if (requestType === 'editProject') {
+        labelList: selectedlabels,
+      };
+    }
+    if (requestType === 'editProject') {
       data = {
         id: projectData.id,
         name: formData.name,
         describe: formData.describe,
-        labelList: selectedlabels
-      }
+        labelList: selectedlabels,
+      };
     }
     return data;
-  }
+  };
 
   // 时间选中事件
   handleOnChangeTime = (value, dateString) => {
     this.setState({
       beginDate: dateString[0],
       endDate: dateString[1],
-    })
-  }
+    });
+  };
 
   // 标签选中事件
   handleOnChangelabel = (tag, checked) => {
     const { selectedlabels } = this.state;
     // eslint-disable-next-line max-len
-    const nextSelectedTags = checked ? [...selectedlabels, tag] : selectedlabels.filter(t => t !== tag);
+    const nextSelectedTags = checked
+      ? [...selectedlabels, tag]
+      : selectedlabels.filter(t => t !== tag);
     this.setState({ selectedlabels: nextSelectedTags });
-  }
+  };
 
   // 获取业务伙伴模态框回传数据
   getBPData = data => {
@@ -169,17 +175,18 @@ class ProjectEdit extends Component {
     this.setState({
       bpCode: data.code,
       bpName: data.name,
-    })
-  }
+    });
+  };
 
   // 导航列表title样式
   navContent = data => {
     const { requestType } = this.state;
     let titleName;
     if (requestType === 'addProject') {
-      titleName = '新建项目'
-    } if (requestType === 'editProject') {
-      titleName = data.name
+      titleName = '新建项目';
+    }
+    if (requestType === 'editProject') {
+      titleName = data.name;
     }
 
     return <div>{titleName}</div>;
@@ -189,7 +196,13 @@ class ProjectEdit extends Component {
   handleAdd = () => {
     const data = this.saveData();
     if (data === 1) return;
-    router.push('/project/project-manage/add/addflowpath', { data });
+    this.props.dispatch({
+      type: 'projectManage/setProjectInfor',
+      payload: data,
+    });
+    console.log(data);
+
+    router.push('/project/project-manage/add/addflowpath');
   };
 
   render() {
@@ -198,18 +211,10 @@ class ProjectEdit extends Component {
       <PageHeaderWrapper title={this.navContent(projectData)}>
         <Form ref={this.formRef}>
           <Card bordered={false}>
-            <FormItem
-              label="名称"
-              name="name"
-              style={{ paddingRight: '50px' }}
-            >
+            <FormItem label="名称" name="name" style={{ paddingRight: '50px' }}>
               <Input placeholder="请输入项目名称" maxLength={20} style={{ marginLeft: '40px' }} />
             </FormItem>
-            <FormItem
-              label="描述"
-              name="describe"
-              style={{ paddingRight: '50px' }}
-            >
+            <FormItem label="描述" name="describe" style={{ paddingRight: '50px' }}>
               <TextArea
                 rows={4}
                 placeholder="请输入项目描述"
@@ -218,10 +223,7 @@ class ProjectEdit extends Component {
               />
             </FormItem>
             <div style={{ width: '300px' }}>
-              <FormItem
-                label="所有者"
-                name="bpName"
-              >
+              <FormItem label="所有者" name="bpName">
                 <Search
                   onSearch={() => this.showBPList.visibleShow(true)}
                   style={{ marginLeft: '26px' }}
@@ -231,35 +233,28 @@ class ProjectEdit extends Component {
               </FormItem>
             </div>
             <div>
-
-              <FormItem
-                label="时间"
-                name="time"
-                style={{ paddingRight: '50px' }}
-              >
+              <FormItem label="时间" name="time" style={{ paddingRight: '50px' }}>
                 {requestType === 'addProject' ? (
                   <RangePicker
-                    showTime={{ format: "HH:mm:ss" }}
+                    showTime={{ format: 'HH:mm:ss' }}
                     format="YYYY-MM-DD HH:mm:ss"
                     onChange={this.handleOnChangeTime}
                     style={{ marginLeft: '40px' }}
                     disabled={requestType === 'editProject'}
                   />
-                ):(
+                ) : (
                   <RangePicker
-                    showTime={{ format: "HH:mm:ss" }}
+                    showTime={{ format: 'HH:mm:ss' }}
                     format="YYYY-MM-DD HH:mm:ss"
                     defaultValue={[
-                      moment(projectData.beginDate, "YYYYMMDD HH:mm:ss"),
-                      moment(projectData.endDate, "YYYYMMDD HH:mm:ss")
+                      moment(projectData.beginDate, 'YYYYMMDD HH:mm:ss'),
+                      moment(projectData.endDate, 'YYYYMMDD HH:mm:ss'),
                     ]}
                     onChange={this.handleOnChangeTime}
                     style={{ marginLeft: '40px' }}
                     disabled={requestType === 'editProject'}
                   />
-                )
-                }
-
+                )}
               </FormItem>
             </div>
             <div style={{ height: '250px' }}>
@@ -267,25 +262,23 @@ class ProjectEdit extends Component {
                 <div style={{ marginLeft: '40px', marginRight: '270px' }}>
                   {/* <span style={{ marginRight: 8 }}>Categories:</span> */}
                   {labelList.map(item => (
-                      <CheckableTag
-                        key={item.id}
-                        checked={selectedlabels.indexOf(item.id) > -1}
-                        onChange={checked => this.handleOnChangelabel(item.id, checked)}
-                        style={{
-                          height: '30px',
-                          border: '1px',
-                          borderStyle: 'solid',
-                          borderColor: '#dcdcdc',
-                          lineHeight: '30px',
-                          textAlign: 'center',
-                          // backgroundColor: '#F5F5F5',
-                        }}
-                      >
-                        {item.name} {item.text}
-                      </CheckableTag>
-                    )
-                    )
-                  }
+                    <CheckableTag
+                      key={item.id}
+                      checked={selectedlabels.indexOf(item.id) > -1}
+                      onChange={checked => this.handleOnChangelabel(item.id, checked)}
+                      style={{
+                        height: '30px',
+                        border: '1px',
+                        borderStyle: 'solid',
+                        borderColor: '#dcdcdc',
+                        lineHeight: '30px',
+                        textAlign: 'center',
+                        // backgroundColor: '#F5F5F5',
+                      }}
+                    >
+                      {item.name} {item.text}
+                    </CheckableTag>
+                  ))}
                 </div>
               </FormItem>
             </div>

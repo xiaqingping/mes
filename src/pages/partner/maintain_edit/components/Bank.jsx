@@ -29,7 +29,7 @@ const { Option } = Select;
   },
   null,
   null,
-  { withRef: true },
+  { forwardRef: true },
 )
 class Bank extends Component {
   constructor(props) {
@@ -38,6 +38,7 @@ class Bank extends Component {
       bank: [],
       bankFetching: false,
     };
+    this.formRef = React.createRef();
     // 防抖
     this.fetchBank = debounce(this.fetchBank, 800);
   }
@@ -49,7 +50,7 @@ class Bank extends Component {
     // 修改国家时清掉开户行
     if (key === 'countryCode') {
       newPaymentBank.bankCode = '';
-      this.props.form.setFieldsValue({ bankCode: '' });
+      this.formRef.current.setFieldsValue({ bankCode: '' });
     }
     const newVendor = { ...vendor, ...{ paymentBank: newPaymentBank } };
     const newDetails = { ...details, ...{ vendor: newVendor } };
@@ -80,12 +81,7 @@ class Bank extends Component {
   };
 
   render() {
-    const {
-      form: { getFieldDecorator },
-      basic,
-      paymentBank,
-      countrys,
-    } = this.props;
+    const { basic, paymentBank, countrys } = this.props;
     const type = basic.type || 1;
     const { bank, bankFetching } = this.state;
 
@@ -95,65 +91,75 @@ class Bank extends Component {
         title={formatMessage({ id: 'bp.maintain_details.bank' })}
         style={{ marginBottom: type === 2 ? '24px' : null }}
       >
-        <Form layout="vertical" hideRequiredMark>
+        <Form
+          layout="vertical"
+          ref={this.formRef}
+          hideRequiredMark
+          initialValues={{
+            countryCode: paymentBank.countryCode,
+            bankCode: paymentBank.bankCode,
+            bankAccount: paymentBank.bankAccount,
+            bankAccountName: paymentBank.bankAccountName,
+          }}
+        >
           <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
             <Col md={6}>
-              <FormItem label={formatMessage({ id: 'bp.maintain_details.bank.country' })}>
-                {getFieldDecorator('countryCode', {
-                  initialValue: paymentBank.countryCode,
-                  rules: [{ required: true }],
-                })(
-                  <Select
-                    showSearch
-                    filterOption={(input, option) => option.props.children.indexOf(input) >= 0}
-                    onChange={value => this.valueChange('countryCode', value)}
-                  >
-                    {countrys.map(e => (
-                      <Option key={e.code} value={e.code}>
-                        {e.name}
-                      </Option>
-                    ))}
-                  </Select>,
-                )}
+              <FormItem
+                name="countryCode"
+                label={formatMessage({ id: 'bp.maintain_details.bank.country' })}
+                rules={[{ required: true }]}
+              >
+                <Select
+                  showSearch
+                  filterOption={(input, option) => option.props.children.indexOf(input) >= 0}
+                  onChange={value => this.valueChange('countryCode', value)}
+                >
+                  {countrys.map(e => (
+                    <Option key={e.code} value={e.code}>
+                      {e.name}
+                    </Option>
+                  ))}
+                </Select>
               </FormItem>
             </Col>
             <Col md={6}>
-              <FormItem label={formatMessage({ id: 'bp.maintain_details.bank.bank_name' })}>
-                {getFieldDecorator('bankCode', {
-                  initialValue: paymentBank.bankCode,
-                  rules: [{ required: true }],
-                })(
-                  <Select
-                    showSearch
-                    disabled={!paymentBank.countryCode}
-                    notFoundContent={bankFetching ? <Spin size="small" /> : null}
-                    filterOption={false}
-                    onSearch={this.fetchBank}
-                    onChange={value => this.valueChange('bankCode', value)}
-                  >
-                    {bank.map(d => (
-                      <Option key={d.code} value={d.code}>
-                        {d.fullName}
-                      </Option>
-                    ))}
-                  </Select>,
-                )}
+              <FormItem
+                name="bankCode"
+                label={formatMessage({ id: 'bp.maintain_details.bank.bank_name' })}
+                rules={[{ required: true }]}
+              >
+                <Select
+                  showSearch
+                  disabled={!paymentBank.countryCode}
+                  notFoundContent={bankFetching ? <Spin size="small" /> : null}
+                  filterOption={false}
+                  onSearch={this.fetchBank}
+                  onChange={value => this.valueChange('bankCode', value)}
+                >
+                  {bank.map(d => (
+                    <Option key={d.code} value={d.code}>
+                      {d.fullName}
+                    </Option>
+                  ))}
+                </Select>
               </FormItem>
             </Col>
             <Col md={6}>
-              <FormItem label={formatMessage({ id: 'bp.maintain_details.bank.bank_account' })}>
-                {getFieldDecorator('bankAccount', {
-                  initialValue: paymentBank.bankAccount,
-                  rules: [{ required: true }],
-                })(<Input onChange={e => this.valueChange('bankAccount', e.target.value)} />)}
+              <FormItem
+                name="bankAccount"
+                label={formatMessage({ id: 'bp.maintain_details.bank.bank_account' })}
+                rules={[{ required: true }]}
+              >
+                <Input onChange={e => this.valueChange('bankAccount', e.target.value)} />
               </FormItem>
             </Col>
             <Col md={6}>
-              <FormItem label={formatMessage({ id: 'bp.maintain_details.bank.contact_name' })}>
-                {getFieldDecorator('bankAccountName', {
-                  initialValue: paymentBank.bankAccountName,
-                  rules: [{ required: true }],
-                })(<Input onChange={e => this.valueChange('bankAccountName', e.target.value)} />)}
+              <FormItem
+                name="bankAccountName"
+                label={formatMessage({ id: 'bp.maintain_details.bank.contact_name' })}
+                rules={[{ required: true }]}
+              >
+                <Input onChange={e => this.valueChange('bankAccountName', e.target.value)} />
               </FormItem>
             </Col>
           </Row>
@@ -163,4 +169,4 @@ class Bank extends Component {
   }
 }
 
-export default Form.create()(Bank);
+export default Bank;

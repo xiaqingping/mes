@@ -2,55 +2,40 @@
  * 客户 销售范围 销售员
  */
 import { Button, Table, Input, Divider, Form, message } from 'antd';
+import { PlusOutlined } from '@ant-design/icons';
 import React from 'react';
 import { formatMessage, FormattedMessage } from 'umi-plugin-react/locale';
 
 import ChooseSalesPerson from '@/components/choosse/bp/SalesPerson';
 
 const { Search } = Input;
-const EditableContext = React.createContext();
 
-class EditableCell extends React.Component {
-  renderCell = ({ getFieldDecorator }) => {
-    const {
-      editing,
-      dataIndex,
-      title,
-      inputType,
-      record,
-      index,
-      children,
-      editOptions,
-      ...restProps
-    } = this.props;
+const EditableCell = props => {
+  const {
+    editing,
+    dataIndex,
+    title,
+    inputType,
+    record,
+    index,
+    children,
+    editOptions,
+    ...restProps
+  } = props;
 
-    let initialValue;
-    if (editing) {
-      initialValue = record[dataIndex];
-    }
+  return (
+    <td {...restProps}>
+      {editing ? (
+        <Form.Item name={dataIndex} {...editOptions}>
+          {inputType}
+        </Form.Item>
+      ) : (
+        children
+      )}
+    </td>
+  );
+};
 
-    return (
-      <td {...restProps}>
-        {editing ? (
-          <Form.Item>
-            {getFieldDecorator(dataIndex, {
-              initialValue,
-              ...editOptions,
-            })(inputType)}
-          </Form.Item>
-        ) : (
-          children
-        )}
-      </td>
-    );
-  };
-
-  render() {
-    return <EditableContext.Consumer>{this.renderCell}</EditableContext.Consumer>;
-  }
-}
-
-@Form.create()
 class SalesPerson extends React.Component {
   constructor(props) {
     super(props);
@@ -58,6 +43,8 @@ class SalesPerson extends React.Component {
       editIndex: -1,
       id: 0,
     };
+    this.formRef = React.createRef();
+    this.ChooseSalesPerson = React.createRef();
   }
 
   addRow = () => {
@@ -89,18 +76,22 @@ class SalesPerson extends React.Component {
   };
 
   save = index => {
-    this.props.form.validateFields((error, row) => {
-      if (error) return;
-      const { tableData } = this.props;
+    this.formRef.current
+      .validateFields()
+      .then(row => {
+        const { tableData } = this.props;
 
-      const newTableData = tableData.map((e, i) => {
-        if (i === index) return { ...e, ...row };
-        return e;
+        const newTableData = tableData.map((e, i) => {
+          if (i === index) return { ...e, ...row };
+          return e;
+        });
+
+        this.setStore(newTableData);
+        this.setState({ editIndex: -1 });
+      })
+      .catch(err => {
+        console.log(err);
       });
-
-      this.setStore(newTableData);
-      this.setState({ editIndex: -1 });
-    });
   };
 
   setStore = newTableData => {
@@ -126,11 +117,12 @@ class SalesPerson extends React.Component {
       if (i === editIndex) return { ...e, ...row };
       return e;
     });
+    this.formRef.current.setFieldsValue(newTableData[editIndex]);
     this.setStore(newTableData);
   };
 
   searchSalesPerson = () => {
-    this.ChooseSalesPerson.wrappedInstance.changeVisible(true);
+    this.ChooseSalesPerson.current.changeVisible(true);
   };
 
   render() {
@@ -205,7 +197,7 @@ class SalesPerson extends React.Component {
     });
 
     return (
-      <EditableContext.Provider value={this.props.form}>
+      <Form ref={this.formRef}>
         <Table
           rowKey="id"
           components={components}
@@ -222,17 +214,15 @@ class SalesPerson extends React.Component {
           }}
           type="dashed"
           onClick={this.addRow}
-          icon="plus"
+          icon={<PlusOutlined />}
         >
           <FormattedMessage id="action.add" />
         </Button>
         <ChooseSalesPerson
-          ref={ref => {
-            this.ChooseSalesPerson = ref;
-          }}
+          ref={this.ChooseSalesPerson}
           selectChooseModalData={this.selectChooseModalData}
         />
-      </EditableContext.Provider>
+      </Form>
     );
   }
 }

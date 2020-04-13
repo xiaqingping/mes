@@ -2,6 +2,7 @@
 import React from 'react';
 import { Modal, Table, Avatar, Col, Tag, Card, Row } from 'antd';
 import '../../index.less';
+// import apiprocess from '@/pages/project/api/processModel/';
 
 // 点击流程模型查看的模态框
 
@@ -11,33 +12,20 @@ class ChooseProcessModelCheck extends React.Component {
     return {
       viewlist: nextProps.viewlist || [],
     };
-    // if ('value' in nextProps) {
-    //   return {
-    //     email: nextProps.value.email || '',
-    //   };
-    // }
-    // return null;
   }
 
   constructor(props) {
-    console.log(props);
+    // console.log(props);
     super(props);
     this.state = {
-      viewlist: props.viewlist,
-      // projectManage:[], // 带过来的查看数据
+      viewlist: props.viewlist, // 带过来的查看数据
     };
-    console.log(this.state);
-  }
-
-  componentDidMount() {
-    // const {viewlist} = this.props.projectManage;
-    // this.setState({
-    //   viewlist
-    // })
+    // console.log(this.state);
   }
 
   vieweOk = () => {
-    console.log('点击确定');
+    this.props.onClose();
+    // console.log('点击确定');
   };
 
   viewCancel = () => {
@@ -47,41 +35,22 @@ class ChooseProcessModelCheck extends React.Component {
   render() {
     // console.log(this.props);
     const { viewlist } = this.state;
-    console.log(viewlist);
 
-    const columnView = [
+    const columns = [
       {
         title: '任务',
-        dataIndex: 'task',
+        dataIndex: 'name',
+        width: 50,
       },
       {
         title: '描述',
         dataIndex: 'describe',
+        width: 200,
       },
       {
         title: '版本',
         dataIndex: 'version',
-      },
-    ];
-
-    const data = [
-      {
-        key: '1',
-        task: 'John Brown',
-        describe: '心灵鸡汤来一碗,心灵鸡汤来两碗',
-        version: 'v1.2',
-      },
-      {
-        key: '2',
-        task: 'John Brown',
-        describe: '心灵鸡汤来一碗,心灵鸡汤来两碗',
-        version: 'v1.2',
-      },
-      {
-        key: '3',
-        task: 'John Brown',
-        describe: '心灵鸡汤来一碗,心灵鸡汤来两碗',
-        version: 'v1.2',
+        width: 100,
       },
     ];
 
@@ -95,7 +64,7 @@ class ChooseProcessModelCheck extends React.Component {
                 visible={this.props.visible}
                 onOk={this.vieweOk}
                 onCancel={this.viewCancel}
-                width={600}
+                width={1200}
               >
                 <div style={{ height: '320px' }}>
                   {/* 上部 */}
@@ -130,7 +99,12 @@ class ChooseProcessModelCheck extends React.Component {
                   <div style={{ fontSize: '14px', padding: '5px' }}>{viewlist.describe}</div>
                   {/* 表格 */}
                   <div>
-                    <Table columns={columnView} dataSource={data} size="small" />
+                    <Table
+                      columns={columns}
+                      pagination={false}
+                      dataSource={viewlist.taskModels}
+                      size="small"
+                    />
                   </div>
                 </div>
               </Modal>
