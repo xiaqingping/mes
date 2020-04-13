@@ -31,54 +31,42 @@ class DrawerTool extends Component {
       .getProcessDetail(detailId)
       .then(res => {
         let newData = {};
-        disk
-          .getFiles({ sourceCode: res.picture, sourceKey: 'project_process_model' })
-          .then(i => {
-            const picId = i.length !== 0 ? i[0].id : '';
-            newData = { ...res, picId };
-            let groupsData = null;
-            if (newData.groups && newData.groups.length !== 0) {
-              groupsData = newData.groups.sort(compare('sortNo'));
-            }
-            newData.groups = groupsData;
-            this.setState({
-              detailValue: newData,
-            });
-            if (res.taskModels.length !== 0) {
-              const { taskModels } = res;
-              const ids = taskModels.map(item => item.picture);
-              disk
-                .getFiles({ sourceCode: ids.join(','), sourceKey: 'project_process_model' })
-                .then(r => {
-                  const newList = taskModels.map(e => {
-                    const filterItem = r.filter(item => item.sourceCode === e.picture);
-                    const listId = filterItem[0] && filterItem[0].id;
-                    return {
-                      ...e,
-                      listId,
-                    };
-                  });
-                  newData.taskModels = newList;
-                  this.setState({
-                    detailValue: newData,
-                  });
-                })
-                .catch(() => {
-                  this.setState({
-                    errorPage: true,
-                  });
-                });
-            }
-            this.setState({
-              detailValue: newData,
-              loading: false,
-            });
-          })
-          .catch(() => {
-            this.setState({
-              errorPage: true,
-            });
+        disk.getFiles({ sourceCode: res.picture, sourceKey: 'project_process_model' }).then(i => {
+          const picId = i.length !== 0 ? i[0].id : '';
+          newData = { ...res, picId };
+          let groupsData = null;
+          if (newData.groups && newData.groups.length !== 0) {
+            groupsData = newData.groups.sort(compare('sortNo'));
+          }
+          newData.groups = groupsData;
+          this.setState({
+            detailValue: newData,
           });
+          if (res.taskModels.length !== 0) {
+            const { taskModels } = res;
+            const ids = taskModels.map(item => item.picture);
+            disk
+              .getFiles({ sourceCode: ids.join(','), sourceKey: 'project_process_model' })
+              .then(r => {
+                const newList = taskModels.map(e => {
+                  const filterItem = r.filter(item => item.sourceCode === e.picture);
+                  const listId = filterItem[0] && filterItem[0].id;
+                  return {
+                    ...e,
+                    listId,
+                  };
+                });
+                newData.taskModels = newList;
+                this.setState({
+                  detailValue: newData,
+                });
+              });
+          }
+          this.setState({
+            detailValue: newData,
+            loading: false,
+          });
+        });
       })
       .catch(() => {
         this.setState({
