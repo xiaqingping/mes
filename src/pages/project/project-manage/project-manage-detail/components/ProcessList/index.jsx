@@ -121,16 +121,12 @@ class ProcessList extends Component {
   // 获取回传数据进行保存
   getEditModelData = data => {
     const { projectId } = this.props;
-    try {
-      api.saveProcessInfor(data).then(() => {
-        this.setState({
-          visibleModel: false,
-        });
-        this.getTableData(projectId);
-      })
-    } catch (errorInfo) {
-      console.log(errorInfo);
-    }
+    api.saveProcessInfor(data).then(() => {
+      this.setState({
+        visibleModel: false,
+      });
+      this.getTableData(projectId);
+    }).catch();
   }
 
   // 关闭编辑模态框
@@ -166,7 +162,7 @@ class ProcessList extends Component {
       {
         title: '名称/描述',
         dataIndex: 'name',
-        width: 300,
+        width: 600,
         render: (value, row, index) => {
           if (index === editIndex) {
             return (
@@ -189,7 +185,7 @@ class ProcessList extends Component {
       {
         title: '进度',
         dataIndex: 'processProgress',
-        width: 150,
+        width: 270,
         render: (value, row) => {
           if (row.status === 1) {
             return (
@@ -230,7 +226,7 @@ class ProcessList extends Component {
       {
         title: '流程模型',
         dataIndex: 'processModelName',
-        width: 200,
+        width: 300,
         render: (value, row) => (
           <div style={{display:"flex"}}>
             <img
@@ -254,7 +250,7 @@ class ProcessList extends Component {
       {
         title: '参数',
         dataIndex: 'type',
-        width: 80,
+        width: 90,
         render: (value, row) => (
           <SlidersOutlined
             onClick={() => this.searchProcessParam(row, list)}

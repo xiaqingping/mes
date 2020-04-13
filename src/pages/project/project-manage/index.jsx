@@ -10,8 +10,10 @@ import {
   Popconfirm,
   Col,
   AutoComplete,
-  Badge,
+  Menu,
+  Dropdown,
   Input,
+  Tag,
   // Progress,
   // Tag,
 } from 'antd';
@@ -20,14 +22,10 @@ import { PlusOutlined } from '@ant-design/icons';
 import { connect } from 'dva';
 import _ from 'lodash';
 import router from 'umi/router';
-import StandardTable from '../components/StandardTable';
+import StandardTable from '@/pages/project/components/StandardTable';
 import { formatter } from '@/utils/utils';
 import api from '@/pages/project/api/projectManage';
-import {
-  // InputUI,
-  // SelectUI,
-  DateUI,
-} from '../components/AntdSearchUI';
+import { DateUI } from '../components/AntdSearchUI';
 
 const { Option } = Select;
 const FormItem = Form.Item;
@@ -49,6 +47,9 @@ class ProjectManagement extends Component {
       loading: false,
       list: [],
       nameCodeVal: [],
+      // visible: false,
+      // statusId: '',
+      // statusVisible: false,
     };
     // 异步验证做节流处理
     this.callParter = _.debounce(this.callParter, 500);
@@ -66,9 +67,7 @@ class ProjectManagement extends Component {
 
   // 获取表格数据
   getTableData = (options = {}) => {
-    console.log(options);
     const formData = this.tableSearchFormRef.current.getFieldsValue();
-    // console.log(formData);
     const { pagination } = this.state;
     const { current: page, pageSize } = pagination;
 
@@ -257,16 +256,54 @@ class ProjectManagement extends Component {
     router.push('/project/project-manage/detail', { projectId });
   };
 
-  // 删除数据
+  // 删除
   deleteRow = row => {
     api.deleteProjectManage(row.id).then(() => {
       this.getTableData();
     });
   };
 
+  // 修改项目状态
+  handleUpdateStatus = (row, type) => {
+    if (!(row.status === type)) {
+      const data = {
+        id: row.id,
+        status: type,
+      };
+      api.updateProjectStatus(data).then(() => {
+        console.log('ok');
+        // this.getTableData(this.initialValues);
+      })
+    }
+  }
+
+  // 状态下拉列表
+  menuList = row => (
+  <Menu>
+    <Menu.Item>
+      <a onClick={() => this.handleUpdateStatus(row, 1)}>未开始</a>
+    </Menu.Item>
+    <Menu.Item>
+      <a onClick={() => this.handleUpdateStatus(row, 2)}>进行中</a>
+    </Menu.Item>
+    <Menu.Item>
+      <a onClick={() => this.handleUpdateStatus(row, 3)}>已完成</a>
+    </Menu.Item>
+    <Menu.Item>
+      <a onClick={() => this.handleUpdateStatus(row, 4)}>已终止</a>
+    </Menu.Item>
+    <Menu.Item>
+      <a onClick={() => this.handleUpdateStatus(row, 5)}>待处理</a>
+    </Menu.Item>
+  </Menu>
+);
+
   render() {
-    const { pagination, list, loading } = this.state;
-    const { statusList } = this.props;
+    const {
+      pagination, list, loading,
+    // statusVisible ,statusId
+    } = this.state;
+    const { statusList, labelList } = this.props;
     let tableWidth = 0;
 
     let columns = [
@@ -319,16 +356,35 @@ class ProjectManagement extends Component {
         dataIndex: 'status',
         width: '100px',
         filters: statusList,
-        render: value => (
-          <Badge
-            status={formatter(statusList, value, 'value', 'status')}
-            text={formatter(statusList, value, 'value', 'text')}
-          />
+        render: (value, row) => (
+        <>
+          <Dropdown
+            overlay={this.menuList(row)}
+            // onVisibleChange={() =>
+            //   this.setState({ statusVisible: !statusVisible, statusId: row.id })
+            // }
+            // visible={statusId === row.id && statusVisible}
+          >
+            <Button  >{formatter(statusList, value, 'value', 'text')}</Button>
+          </Dropdown>
+        </>
         ),
       },
       {
         title: '标签',
         dataIndex: 'labelList',
+        width: 250,
+        render: value =>  {
+          const arr = [];
+          value.forEach(item => {
+            labelList.forEach(i => {
+              if(i.id === item){
+                arr.push(<Tag color={i.color}>{i.name} {i.text}</Tag>)
+              }
+            })
+          })
+          return(<>{arr}</>)
+        }
       },
       {
         title: '成员数',
@@ -402,7 +458,7 @@ class ProjectManagement extends Component {
               <StandardTable
                 scroll={{ x: tableWidth }}
                 rowClassName="editable-row"
-                selectedRows=""
+                rowKey='id'
                 loading={loading}
                 data={{ list, pagination }}
                 columns={columns}
@@ -421,4 +477,5 @@ export default connect(({ global, projectManage }) => ({
   languageCode: global.languageCode,
   projectManage,
   statusList: projectManage.statusList,
+  labelList: projectManage.labelList,
 }))(ProjectManagement);

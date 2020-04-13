@@ -23,13 +23,6 @@ import api from '@/pages/project/api/projectManage';
 import ChooseProcessModel from '../components/ChooseProcessModel';
 
 class Test extends Component {
-  // static getDerivedStateFromProps(nextProps) {
-  //   console.log(nextProps);
-  //   // return {
-  //   //   viewlist: nextProps.viewlist || [],
-  //   // }
-  //   return null
-  // }
 
   // 表单默认值
   initialValues = {
@@ -40,15 +33,14 @@ class Test extends Component {
 
   constructor(props) {
     super(props);
-    console.log(this.props);
-    const { processSelectedList } = this.props.projectManage;
-    console.log(processSelectedList);
+    const { processSelectedList, paramList, projectInfor } = this.props.projectManage;
 
     this.state = {
       list: processSelectedList,
       loading: false,
       visible: false,
-      // processesList: [],
+      projectInfor,
+      paramList,
     };
   }
 
@@ -77,20 +69,19 @@ class Test extends Component {
 
   // 打开参数
   handleOpen = row => {
-    // eslint-disable-next-line consistent-return
     api.getProcessParam(row.id).then(res => {
-      // console.log(res);
       if (!res || res.length === 0) return message.error('当前流程暂无参数！');
       const data = res;
       data.requestType = 'addParam';
-      // console.log(data);
+      data.processId = row.id;
       this.props.dispatch({
         type: 'projectDetail/setProcssesParam',
         payload: data,
       });
-      // console.log(this.props);
       router.push('/project/project-manage/process-parameter');
+      return false;
     });
+
   };
 
   // 获取模态框选中的流程模型数据
@@ -106,29 +97,44 @@ class Test extends Component {
     }
   };
 
-  onFinish = () => {
-    if (this.props.projectDetail) {
-      const { paramList } = this.props.projectDetail;
-      console.log(paramList);
-      const { processSelectedList, projectInfor } = this.props.projectManage;
-      console.log(processSelectedList);
-      console.log(projectInfor);
-      if (processSelectedList === '' || processSelectedList === undefined) {
-        // return
-        console.log(123);
-      }
-      // if( processSelectedList !=='' && projectInfor !=='' && paramList !=='') {
-      //   // processSelectedList.(processSelectedList,paramList);
-      //   processSelectedList.push(paramList);
-      //   console.log(processSelectedList);
-      //   let allList = [];
-      //   allList=[processSelectedList,projectInfor];
-      //   console.log(allList);
-      //   api.addProjects(allList).then(() => {
-      //     router.push('/project/project-manage');
-      //   });
-      // }
+  // 保存
+  handleSave = () => {
+    const { list, projectInfor, paramList } = this.state;
+    let status = false;
+    if (list === '' || list === undefined) {
+      status = true;
     }
+    if (projectInfor === '' || projectInfor === undefined) {
+      status = true;
+    }
+    if (paramList === '' || paramList === undefined) {
+      status = true;
+    }
+    if (status) return message.error('数据为空');
+
+    // 设置好的参数追加在流程列表数据中
+    const newList = [];
+    list.forEach(item => {
+      let newItem = {};
+      newItem = {
+        describe: item.describe,
+        name: item.name,
+        processModelId: item.id,
+      }
+      if (item.id === paramList.processId) {
+        newItem.processesParamList = paramList.params;
+      }
+      newList.push(newItem);
+    })
+
+    projectInfor.processList = newList;
+    const data = projectInfor;
+
+    api.addProjects(data).then(() => {
+      console.log(123);
+      // return router.push('/project/project-manage');
+    })
+    return '';
   };
 
   render() {
@@ -195,7 +201,7 @@ class Test extends Component {
 
     return (
       <PageHeaderWrapper>
-        <Form onFinish={this.onFinish}>
+        <Form onFinish={this.handleSave}>
           <Card
             style={{ height: '48px', width: '100%', position: 'fixed', bottom: '0', left: '0' }}
           >
@@ -209,6 +215,7 @@ class Test extends Component {
             <Form ref={this.tableFormRef}>
               <Table
                 rowClassName="editable-row"
+                rowKey="id"
                 loading={loading}
                 dataSource={list}
                 columns={columns}

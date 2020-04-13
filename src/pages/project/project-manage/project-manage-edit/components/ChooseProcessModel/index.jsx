@@ -3,34 +3,16 @@ import React from 'react';
 import { Modal, Avatar, Col, Tag, Card, Row, Button, Form, AutoComplete } from 'antd';
 import TableSearchForm from '@/components/TableSearchForm';
 import '../../index.less';
-import _ from 'lodash';
 import classNames from 'classnames';
-// import router from 'umi/router';
-
-// import api from '@/pages/project/api/projectManage';
 import { connect } from 'dva';
 import apiprocess from '@/pages/project/api/processModel';
-// import { isDate } from 'moment';
 import ChooseProcessModelCheck from '../ChooseProcessModelCheck';
-// import apitask from '@/pages/project/api/taskmodel';
 
 const FormItem = Form.Item;
 
 // 选择流程模型模态框
 class ChooseProcessModel extends React.Component {
   tableSearchFormRef = React.createRef();
-
-  // static getDerivedStateFromProps(nextProps) {
-  //   return {
-  //     idslist: nextProps.idslist || [],
-  //   }
-  // }
-
-  // 顶部表单默认值
-  // initialValues = {
-  //   page: 1,
-  //   rows: 18,
-  // };
 
   constructor(props) {
     // console.log(props);
@@ -45,19 +27,12 @@ class ChooseProcessModel extends React.Component {
       selectedIds: [], // 所有被选择的id集合
       selectedCode: [],
     };
-    // 异步验证做节流处理
-    this.callParter = _.debounce(this.callParter, 500);
   }
 
   componentDidMount() {
     this.getTableData();
   }
 
-  callParter = value => {
-    apiprocess.getProcessCodeAndName(value).then(res => {
-      this.setState({ nameCodeVal: res });
-    });
-  };
 
   // 获取表格数据
   getTableData = (options = {}) => {
@@ -74,6 +49,7 @@ class ChooseProcessModel extends React.Component {
     };
 
     apiprocess.getProcess(data).then(res => {
+      // console.log(res);
       this.setState({
         processlist: res.rows,
         // loading: false,
@@ -109,31 +85,6 @@ class ChooseProcessModel extends React.Component {
       </div>
     ),
   });
-
-  // 流程模型筛选值
-  inputValue = value => {
-    const { nameCodeVal } = this.state;
-    const arr = [];
-    if (!value) {
-      return false;
-    }
-    this.callParter(value);
-    if (nameCodeVal.length === 0) {
-      return false;
-    }
-    nameCodeVal.forEach(item => {
-      if (item.name.indexOf(value) !== -1) {
-        arr.push(item);
-      }
-      if (item.code.indexOf(value) !== -1 && arr.indexOf(item)) {
-        arr.push(item);
-      }
-    });
-    this.setState({
-      nameCodeVal: arr,
-    });
-    return true;
-  };
 
   // 关闭
   handleCancel = () => {
@@ -209,12 +160,13 @@ class ChooseProcessModel extends React.Component {
             <div style={{ height: '430px', overflow: 'auto' }}>
               <Row gutter={16} style={{ margin: '0' }}>
                 {processlist.map((item, index) => {
+                  const newIndex = JSON.parse(JSON.stringify(index));
                   return (
                     <Col
                       span={7}
                       style={{ padding: '0', marginBottom: '10px', marginRight: '10px' }}
                       // eslint-disable-next-line react/no-array-index-key
-                      key={index}
+                      key={newIndex}
                     >
                       <Card.Grid
                         style={{ width: '300px', padding: '0' }}
