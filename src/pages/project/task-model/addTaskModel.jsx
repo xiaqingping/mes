@@ -416,6 +416,7 @@ class TaskModel extends Component {
 
   // 删除确认
   confirm = value => {
+    console.log(value);
     const { tableData, ids, sonIds } = this.state;
     const data = tableData;
     const idsData = ids;
@@ -423,7 +424,7 @@ class TaskModel extends Component {
     const { preTaskIds } = value;
     const newData = data.filter(item => item.id !== value.id);
     const newIdsData = idsData.filter(item => item !== value.id);
-    if (preTaskIds.length) {
+    if (preTaskIds && preTaskIds.length) {
       preTaskIds.forEach(i => {
         sonIdsData.some((item, index) => {
           if (i === item) {
