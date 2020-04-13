@@ -25,6 +25,7 @@ class ProcessParameter extends Component {
 
   // 数据为空时跳转至其他页面
   locationUrl = data => {
+    console.log(data);
     if (data.length === 0) {
       window.history.back(-1);
     }

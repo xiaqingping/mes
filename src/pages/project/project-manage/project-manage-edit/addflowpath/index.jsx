@@ -45,7 +45,7 @@ class Test extends Component {
     console.log(processSelectedList);
 
     this.state = {
-      list: [],
+      list: processSelectedList,
       loading: false,
       visible: false,
       // processesList: [],
@@ -54,12 +54,6 @@ class Test extends Component {
 
   componentDidMount() {
     this.getData();
-    // 流程列表 参数数据
-    const { paramList } = this.props.projectDetail;
-    const { processSelectedList, projectInfor } = this.props.projectManage;
-    console.log(paramList);
-    console.log(processSelectedList);
-    console.log(projectInfor);
   }
 
   // 点击打开关联
@@ -79,22 +73,22 @@ class Test extends Component {
   // 删除数据
   deleteRow = row => {
     console.log(row);
-    api.deleteAddProcess(row.id).then(() => {
-      this.getData();
-    });
   };
 
   // 打开参数
   handleOpen = row => {
     // eslint-disable-next-line consistent-return
     api.getProcessParam(row.id).then(res => {
+      // console.log(res);
       if (!res || res.length === 0) return message.error('当前流程暂无参数！');
       const data = res;
       data.requestType = 'addParam';
+      // console.log(data);
       this.props.dispatch({
         type: 'projectDetail/setProcssesParam',
         payload: data,
       });
+      // console.log(this.props);
       router.push('/project/project-manage/process-parameter');
     });
   };
@@ -112,8 +106,29 @@ class Test extends Component {
     }
   };
 
-  onFinish = values => {
-    console.log(values);
+  onFinish = () => {
+    if (this.props.projectDetail) {
+      const { paramList } = this.props.projectDetail;
+      console.log(paramList);
+      const { processSelectedList, projectInfor } = this.props.projectManage;
+      console.log(processSelectedList);
+      console.log(projectInfor);
+      if (processSelectedList === '' || processSelectedList === undefined) {
+        // return
+        console.log(123);
+      }
+      // if( processSelectedList !=='' && projectInfor !=='' && paramList !=='') {
+      //   // processSelectedList.(processSelectedList,paramList);
+      //   processSelectedList.push(paramList);
+      //   console.log(processSelectedList);
+      //   let allList = [];
+      //   allList=[processSelectedList,projectInfor];
+      //   console.log(allList);
+      //   api.addProjects(allList).then(() => {
+      //     router.push('/project/project-manage');
+      //   });
+      // }
+    }
   };
 
   render() {
