@@ -79,7 +79,7 @@ class SampleChoose extends React.Component {
       <>
         <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
           <Upload name="file" action="" onChange={this.handleUploadChange} showUploadList={false}>
-            <Button>
+            <Button type="primary">
               <UploadOutlined /> 序列文件
             </Button>
           </Upload>

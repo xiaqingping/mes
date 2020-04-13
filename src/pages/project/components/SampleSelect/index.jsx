@@ -176,7 +176,13 @@ class SampleSelect extends React.Component {
         <Button type="dashed" block onClick={this.chooseSample}>
           <PlusOutlined /> 选择样品
         </Button>
-        <Modal title="选择样品" visible={visible} onOk={this.handleOk} onCancel={this.handleCancel}>
+        <Modal
+          title="选择样品"
+          visible={visible}
+          onOk={this.handleOk}
+          onCancel={this.handleCancel}
+          width={820}
+        >
           <SampleChoose />
         </Modal>
       </>

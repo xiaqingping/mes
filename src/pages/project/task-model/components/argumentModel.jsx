@@ -255,6 +255,16 @@ class ArgumentModel extends Component {
       </Menu>
     );
 
+    const props = {
+      fromView,
+      type,
+      editOriginData,
+      emitArguments: this.emitArguments,
+      onClose: () => {
+        this.toggleChildrenDrawer(false);
+      },
+    };
+
     return (
       <div className="task_model_argu_draw_wrap">
         <Drawer
@@ -325,17 +335,7 @@ class ArgumentModel extends Component {
             onClose={() => this.toggleChildrenDrawer(false)}
             title={this.titleContent()}
           >
-            {type === 'input' && (
-              <ArgumentForm
-                fromView={fromView}
-                type={type}
-                editOriginData={editOriginData}
-                emitArguments={this.emitArguments}
-                onClose={() => {
-                  this.toggleChildrenDrawer(false);
-                }}
-              />
-            )}
+            {type === 'input' && <ArgumentForm {...props} />}
             {(type === 'sample_select' || type === 'sample_group') && (
               <SampleSelect
                 fromView={fromView}
