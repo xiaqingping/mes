@@ -69,7 +69,7 @@ class BPList extends Component {
   };
 
   // 分页
-  handleStandardTableChange = (data) => {
+  handleStandardTableChange = data => {
     this.getTableData({
       page: data.current,
       pageSize: data.pageSize,
@@ -94,7 +94,6 @@ class BPList extends Component {
       ...options,
       code: bpCode,
     };
-    console.log(data);
 
     api.getBPList(data).then(res => {
       this.setState({
@@ -263,12 +262,12 @@ class BPList extends Component {
               BpCertificationStatus, row.mobilePhoneVerifyStatus, 'id', 'badge'
             )
           const statusEmail = formatter(
-              BpCertificationStatus, row.mobilePhoneVerifyStatus, 'id', 'badge'
+              BpCertificationStatus, row.emailVerifyStatus, 'id', 'badge'
             )
           return (
             <>
-              <p>{value}&nbsp;&nbsp;&nbsp;<Badge status={statusPhone} text='' /></p>
-              <p>{row.email}&nbsp;&nbsp;&nbsp;<Badge status={statusEmail} text='' /></p>
+            {value ? (<p>{value}&nbsp;&nbsp;&nbsp;<Badge status={statusPhone}/></p>) : ('')}
+            {row.email ? (<p>{row.email}&nbsp;&nbsp;&nbsp;<Badge status={statusEmail}/></p>) : ('')}
             </>
           )
         }
@@ -283,7 +282,7 @@ class BPList extends Component {
     ];
 
     columns = columns.map(col => {
-      if (!col.width) col.width = 100;
+      // if (!col.width) col.width = 100;
       tableWidth += col.width;
       return col;
     });
