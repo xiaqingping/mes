@@ -234,7 +234,7 @@ class TitleModel extends React.Component {
             </div>
           </div>
         </div>
-        {open && (
+        {/* {open && (
           <div style={{ marginLeft: '40px', color: '#858585', fontSize: '14px', marginBottom: 20 }}>
             <div>某某某发布人</div>
             <div style={{ marginBottom: '20px' }}>(2017-01-12 13:55:34)</div>
@@ -242,7 +242,7 @@ class TitleModel extends React.Component {
               该任务旨在分析肠道微生物与肥胖之间的关系。本次实验分析共，该任务旨在分析肠道微生物与肥胖之间的关系。
             </div>
           </div>
-        )}
+        )} */}
 
         {toViewArgument && (
           <ArgumentModel visible={viewVisible} onClose={this.onViewClose} fromView />
