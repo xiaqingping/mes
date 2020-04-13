@@ -3,6 +3,8 @@ import { Drawer, Button, Popconfirm, Dropdown, Menu, Spin, Empty } from 'antd';
 import api from '@/pages/project/api/taskmodel';
 import { connect } from 'dva';
 import ArgumentForm from './argumentForm';
+import SampleSelect from './sampleSelect';
+import SampleGroup from './sampleGroup';
 import '../index.less';
 
 class ArgumentModel extends Component {
@@ -325,6 +327,17 @@ class ArgumentModel extends Component {
           >
             {type === 'input' && (
               <ArgumentForm
+                fromView={fromView}
+                type={type}
+                editOriginData={editOriginData}
+                emitArguments={this.emitArguments}
+                onClose={() => {
+                  this.toggleChildrenDrawer(false);
+                }}
+              />
+            )}
+            {(type === 'sample_select' || type === 'sample_group') && (
+              <SampleSelect
                 fromView={fromView}
                 type={type}
                 editOriginData={editOriginData}
