@@ -1,29 +1,15 @@
 // 项目管理：新建项目：添加流程
 import React, { Component } from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
-import {
-  // Input,
-  Card,
-  Form,
-  // Divider,
-  Tag,
-  // Modal,
-  Button,
-  // Col,
-  // Row,
-  Avatar,
-  Table,
-  message,
-  // Badge,
-} from 'antd';
-import { PlusOutlined, SlidersOutlined } from '@ant-design/icons';
+import { Card, Form, Tag, Button, Avatar, Table, message, Popconfirm } from 'antd';
+import { PlusOutlined } from '@ant-design/icons';
 import router from 'umi/router';
 import { connect } from 'dva';
 import api from '@/pages/project/api/projectManage';
 import ChooseProcessModel from '../components/ChooseProcessModel';
+// import ParamPic from '@/assets/imgs/canshu@1x.png';
 
 class Test extends Component {
-
   // 表单默认值
   initialValues = {
     status: 1,
@@ -34,6 +20,7 @@ class Test extends Component {
   constructor(props) {
     super(props);
     const { processSelectedList, paramList, projectInfor } = this.props.projectManage;
+    console.log(paramList);
 
     this.state = {
       list: processSelectedList,
@@ -63,25 +50,40 @@ class Test extends Component {
   };
 
   // 删除数据
-  deleteRow = row => {
-    console.log(row);
+  deleteRow = value => {
+    const tableData = this.state.list;
+    const newData = tableData.filter(item => item.id !== value.id);
+    this.setState({
+      list: newData,
+    });
   };
 
   // 打开参数
   handleOpen = row => {
-    api.getProcessParam(row.id).then(res => {
-      if (!res || res.length === 0) return message.error('当前流程暂无参数！');
-      const data = res;
-      data.requestType = 'addParam';
-      data.processId = row.id;
-      this.props.dispatch({
-        type: 'projectDetail/setProcssesParam',
-        payload: data,
-      });
-      router.push('/project/project-manage/process-parameter');
-      return false;
-    });
+    const { paramList } = this.props.projectManage;
 
+    if (paramList.length === 0) {
+      api.getProcessParam(row.id).then(res => {
+        if (!res || res.length === 0) return message.error('当前流程暂无参数！');
+        const data = res;
+        data.requestType = 'addParam';
+        data.processId = row.id;
+        this.props.dispatch({
+          type: 'projectDetail/setProcssesParam',
+          payload: data,
+        });
+        router.push('/project/project-manage/process-parameter');
+        return false;
+      });
+    }
+    const data = paramList;
+    data.requestType = 'updateParam';
+    this.props.dispatch({
+      type: 'projectDetail/setProcssesParam',
+      payload: data,
+    });
+    router.push('/project/project-manage/process-parameter');
+    return false;
   };
 
   // 获取模态框选中的流程模型数据
@@ -120,12 +122,12 @@ class Test extends Component {
         describe: item.describe,
         name: item.name,
         processModelId: item.id,
-      }
+      };
       if (item.id === paramList.processId) {
         newItem.processesParamList = paramList.params;
       }
       newList.push(newItem);
-    })
+    });
 
     projectInfor.processList = newList;
     const data = projectInfor;
@@ -133,7 +135,7 @@ class Test extends Component {
     api.addProjects(data).then(() => {
       console.log(123);
       // return router.push('/project/project-manage');
-    })
+    });
     return '';
   };
 
@@ -174,7 +176,11 @@ class Test extends Component {
         dataIndex: 'parameter',
         width: 100,
         render: (value, row) => (
-          <SlidersOutlined onClick={() => this.handleOpen(row)} style={{ fontSize: 20 }} />
+          // <SlidersOutlined onClick={() => this.handleOpen(row)} style={{ fontSize: 20 }} />
+          // <div onClick={() => this.handleOpen(row)} style={{ fontSize: 20 }}>
+          //   {/* <img src={ParamPic} alt=""/> */}
+          // </div>
+          <div className="task_model_add_task_icon" onClick={() => this.handleOpen(row)} />
         ),
       },
       {
@@ -191,9 +197,21 @@ class Test extends Component {
         title: '操作',
         fixed: 'right',
         width: 200,
-        render: row => (
+        render: value => (
           <>
-            <a onClick={() => this.deleteRow(row)}>删除</a>
+            <a onClick={() => this.deleteRow(value)}>删除</a>
+            <Popconfirm
+              placement="topLeft"
+              title="确定要删除吗？"
+              onConfirm={() => this.confirm(value)}
+              okText="确定"
+              cancelText="取消"
+            >
+              {/* <div
+                    style={{ width: 20, height: 20 }}
+                    className="task_model_add_model_delet_icon"
+                  /> */}
+            </Popconfirm>
           </>
         ),
       },

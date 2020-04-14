@@ -6,6 +6,7 @@ import '../../index.less';
 import classNames from 'classnames';
 import { connect } from 'dva';
 import apiprocess from '@/pages/project/api/processModel';
+import disk from '@/pages/project/api/disk';
 import ChooseProcessModelCheck from '../ChooseProcessModelCheck';
 
 const FormItem = Form.Item;
@@ -25,19 +26,21 @@ class ChooseProcessModel extends React.Component {
       viewvisible: false,
       processlist: [],
       selectedIds: [], // 所有被选择的id集合
-      selectedCode: [],
+      selecteditem: [],
     };
   }
 
   componentDidMount() {
     this.getTableData();
+    // const centerScroll = document.getElementById("contentCenter");
+    // console.log(centerScroll);
   }
-
 
   // 获取表格数据
   getTableData = (options = {}) => {
     const formData =
       this.tableSearchFormRef.current && this.tableSearchFormRef.current.getFieldsValue();
+
     const { pagination } = this.state;
     const { current: page, pageSize: rows } = pagination;
 
@@ -50,10 +53,46 @@ class ChooseProcessModel extends React.Component {
 
     apiprocess.getProcess(data).then(res => {
       // console.log(res);
-      this.setState({
-        processlist: res.rows,
-        // loading: false,
-      });
+      const uuids = res.rows.map(e => e.picture);
+      // console.log(uuids);
+      disk
+        .getFiles({
+          sourceCode: uuids.join(','),
+          sourceKey: 'project_process_model',
+        })
+        .then(v => {
+          if (v) {
+            const newList = res.rows.map(e => {
+              const filterItem = v.filter(item => item.sourceCode === e.picture);
+              // console.log(v);
+              const fileId = filterItem[0] && filterItem[0].id;
+              return {
+                ...e,
+                fileId,
+              };
+            });
+            // console.log(newList);
+            this.setState({
+              processlist: newList,
+            });
+          } else {
+            const newList = res.rows.map(e => {
+              const fileId = '';
+              return {
+                ...e,
+                fileId,
+              };
+            });
+            this.setState({
+              processlist: newList,
+            });
+          }
+        });
+
+      // this.setState({
+      //   processlist: res.rows,
+      //   // loading: false,
+      // });
     });
   };
 
@@ -93,17 +132,30 @@ class ChooseProcessModel extends React.Component {
 
   // 点击选中
   clickSelect = item => {
-    const { selectedIds, selectedCode } = this.state;
-    const ids = [...selectedIds, item.id];
-    const idslist = [...new Set(ids)];
-
-    const codeList = [...selectedCode, item];
-    const newCodeList = [...new Set(codeList)];
-    // console.log(newCodeList);
+    // const list =item.id;
+    const { selectedIds, selecteditem } = this.state;
+    console.log(selectedIds);
+    let idslist;
+    let newSelectedItem;
+    if (selectedIds.includes(item.id)) {
+      idslist = selectedIds.filter(value => {
+        return value !== item.id;
+      });
+      console.log(idslist);
+      newSelectedItem = selecteditem.filter(value => {
+        return value !== item.code;
+      });
+      console.log(newSelectedItem);
+    } else {
+      const ids = [...selectedIds, item.id];
+      idslist = [...new Set(ids)];
+      const codeList = [...selecteditem, item];
+      newSelectedItem = [...new Set(codeList)];
+    }
 
     this.setState({
       selectedIds: idslist,
-      selectedCode: newCodeList,
+      selecteditem: newSelectedItem,
     });
   };
 
@@ -122,8 +174,9 @@ class ChooseProcessModel extends React.Component {
 
   // 点击确定保存数据
   handleOk = () => {
-    const { selectedCode } = this.state;
-    this.props.getData(selectedCode);
+    const { selecteditem } = this.state;
+    console.log(selecteditem);
+    this.props.getData(selecteditem);
 
     this.props.onClose();
   };
@@ -137,6 +190,7 @@ class ChooseProcessModel extends React.Component {
 
   render() {
     const { viewvisible, processlist, viewlist } = this.state;
+    // console.log(this.state);
     return (
       <Card bordered={false}>
         <div>
@@ -145,7 +199,7 @@ class ChooseProcessModel extends React.Component {
             visible={this.props.visible}
             onOk={this.handleOk}
             onCancel={this.handleCancel}
-            width={1200}
+            width={1050}
           >
             <div className="tableList">
               <Card bordered={false}>
@@ -157,28 +211,46 @@ class ChooseProcessModel extends React.Component {
                 />
               </Card>
             </div>
-            <div style={{ height: '430px', overflow: 'auto' }}>
+            <div style={{ height: '430px', overflow: 'auto' }} id="contentCenter">
               <Row gutter={16} style={{ margin: '0' }}>
                 {processlist.map((item, index) => {
                   const newIndex = JSON.parse(JSON.stringify(index));
                   return (
                     <Col
-                      span={7}
-                      style={{ padding: '0', marginBottom: '10px', marginRight: '10px' }}
+                      // span={7}
+                      style={{
+                        padding: '0',
+                        marginBottom: '10px',
+                        marginRight: '10px',
+                        width: '300px',
+                      }}
                       // eslint-disable-next-line react/no-array-index-key
                       key={newIndex}
                     >
                       <Card.Grid
-                        style={{ width: '300px', padding: '0' }}
+                        style={{ width: '300px', padding: '0', height: '170px' }}
                         onClick={() => this.clickSelect(item)}
                         className={classNames({
                           isSelect: this.state.selectedIds.includes(item.id),
                         })}
                       >
-                        <div style={{ height: '80px', width: '300px', padding: '5px' }}>
+                        <div
+                          style={{
+                            height: '80px',
+                            width: '300px',
+                            paddingTop: '10px',
+                            marginBottom: '15px',
+                          }}
+                        >
                           <Avatar
-                            src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
-                            style={{ float: 'left', marginRight: '10px' }}
+                            src={item.fileId ? disk.downloadFiles(item.fileId, { view: true }) : ''}
+                            style={{
+                              float: 'left',
+                              marginRight: '10px',
+                              marginLeft: '20px',
+                              width: '60px',
+                              height: '60px',
+                            }}
                             size="large"
                           />
                           <div
@@ -216,7 +288,16 @@ class ChooseProcessModel extends React.Component {
                             </Button>
                           </div>
                         </div>
-                        <div style={{ fontSize: '14px', padding: '10px' }}>{item.describe}</div>
+                        <div style={{ fontSize: '14px', paddingLeft: '20px' }}>{item.describe}</div>
+                        {/* <div style={{width:'15px',height:'12px',backgroundColor:'#1890ff',
+                          position:'absolute',right:'31px',bottom:'0'}}
+                          className={classNames({
+                            isSelect: this.state.selectedIds.includes(item.id),
+                          })} >
+                          <div className="isOk">
+                            &nbsp;
+                          </div>
+                        </div> */}
                       </Card.Grid>
                     </Col>
                   );

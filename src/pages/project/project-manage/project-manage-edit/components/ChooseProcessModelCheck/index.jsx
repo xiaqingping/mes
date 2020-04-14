@@ -65,6 +65,7 @@ class ChooseProcessModelCheck extends React.Component {
                 onOk={this.vieweOk}
                 onCancel={this.viewCancel}
                 width={1200}
+                footer={null}
               >
                 <div style={{ height: '320px' }}>
                   {/* 上部 */}

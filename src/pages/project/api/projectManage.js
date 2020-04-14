@@ -23,7 +23,7 @@ export default {
    */
   // 项目管理分页列表
   getProjectManage(params) {
-    return request(`${http1}/projects/v1/`, { params });
+    return request(`${http1}/projects/v1`, { params });
   },
 
   // 项目管理：项目模糊搜索
@@ -38,7 +38,7 @@ export default {
 
   // 创建项目数据
   addProjects(data) {
-    return request(`${http1}/projects/v1`, { method: 'POST', data, });
+    return request(`${http1}/projects/v1`, { method: 'POST', data });
   },
 
   // 修改项目数据
@@ -48,10 +48,10 @@ export default {
 
   // 修改项目状态
   updateProjectStatus(data) {
-    return request(`${http1}/projects/v1/${data.id}/status`, { method: 'PUT', data });
+    return request(`${http1}/projects/v1/${data.id}/status?status=${data.status}`, {
+      method: 'PUT',
+    });
   },
-
-
 
   /**
    * 模型管理
@@ -68,7 +68,7 @@ export default {
 
   // 添加流程页面删除
   deleteAddProcess(id) {
-    return request(`${http2}/v1/process/${id}/deletion`, { method: 'PUT', });
+    return request(`${http2}/v1/process/${id}/deletion`, { method: 'PUT' });
   },
 
   // 查询流程模型的参数列表
