@@ -28,6 +28,7 @@ import api from '@/pages/project/api/taskmodel';
 import TaskModelView from './taskModelView';
 import StandardTable from '../components/StandardTable';
 import disk from '@/pages/project/api/disk';
+import DefaultHeadPicture from '@/assets/imgs/upload_middle.png';
 
 const FormItem = Form.Item;
 const { Option } = Select;
@@ -410,7 +411,7 @@ class TaskModel extends Component {
         render: (text, row) => (
           <div style={{ display: 'flex' }}>
             <Avatar
-              src={row.fileId ? disk.downloadFiles(row.fileId, { view: true }) : ''}
+              src={row.fileId ? disk.downloadFiles(row.fileId, { view: true }) : DefaultHeadPicture}
               style={{ float: 'left', width: '46px', height: '46px' }}
             />
             <div style={{ marginLeft: 10 }}>

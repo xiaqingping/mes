@@ -26,6 +26,7 @@ import classNames from 'classnames';
 import router from 'umi/router';
 import disk from '@/pages/project/api/disk';
 import api from '@/pages/project/api/taskmodel';
+import DefaultHeadPicture from '@/assets/imgs/upload_middle.png';
 
 function getBase64(img, callback) {
   const reader = new FileReader();
@@ -475,7 +476,9 @@ class TaskModel extends Component {
           return (
             <div style={{ display: 'flex' }}>
               <Avatar
-                src={row.fileId ? disk.downloadFiles(row.fileId, { view: true }) : ''}
+                src={
+                  row.fileId ? disk.downloadFiles(row.fileId, { view: true }) : DefaultHeadPicture
+                }
                 style={{ float: 'left', width: '46px', height: '46px', marginRight: 10 }}
               />
               <div>
