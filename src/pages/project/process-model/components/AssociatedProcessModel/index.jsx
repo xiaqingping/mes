@@ -8,6 +8,7 @@ import api from '@/pages/project/api/taskmodel';
 import disk from '@/pages/project/api/disk';
 import { cutString } from '@/utils/utils';
 import _ from 'lodash';
+import DefaultHeadPicture from '@/assets/imgs/defaultheadpicture.jpg';
 
 const FormItem = Form.Item;
 
@@ -155,9 +156,9 @@ class AssociatedProcessModel extends React.Component {
   };
 
   sendData = async id => {
+    this.props.onClose();
     const res = await api.getAllPreTasks(id, this.props.ids);
     this.props.getData(res);
-    this.props.onClose();
   };
 
   handleStandardTableChange = pagination => {
@@ -178,12 +179,12 @@ class AssociatedProcessModel extends React.Component {
         render: (value, row) => (
           <>
             <Avatar
-              src={row.fileId ? disk.downloadFiles(row.fileId, { view: true }) : ''}
+              src={row.fileId ? disk.downloadFiles(row.fileId, { view: true }) : DefaultHeadPicture}
               style={{ float: 'left', width: '46px', height: '46px' }}
             />
             <div style={{ float: 'left', marginLeft: '10px' }}>
-              <div>{value}</div>
-              <div>{row.name}</div>
+              <div>{cutString(value, 16)}</div>
+              <div>{cutString(row.name, 16)}</div>
             </div>
           </>
         ),

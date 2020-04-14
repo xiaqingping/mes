@@ -6,6 +6,7 @@ import ArgumentModel from './argumentModel';
 import api from '@/pages/project/api/taskmodel';
 import { formatter } from '@/utils/utils';
 import disk from '@/pages/project/api/disk';
+import DefaultHeadPicture from '@/assets/imgs/upload_middle.png';
 
 const { TabPane } = Tabs;
 // import TitleModel from './components/titleModel';
@@ -116,7 +117,11 @@ class TaskModelTabs extends Component {
                   <List.Item key={item.id} onClick={() => this.toViewParams(item)}>
                     <Card hoverable style={{ width: '520px' }}>
                       <Avatar
-                        src={item.fileId ? disk.downloadFiles(item.fileId, { view: true }) : ''}
+                        src={
+                          item.fileId
+                            ? disk.downloadFiles(item.fileId, { view: true })
+                            : DefaultHeadPicture
+                        }
                         style={{ float: 'left', marginRight: 10 }}
                         size="large"
                       />
@@ -154,7 +159,11 @@ class TaskModelTabs extends Component {
                   <List.Item key={item.id} onClick={() => this.toViewParams(item)}>
                     <Card hoverable style={{ width: '520px' }}>
                       <Avatar
-                        src={item.fileId ? disk.downloadFiles(item.fileId, { view: true }) : ''}
+                        src={
+                          item.fileId
+                            ? disk.downloadFiles(item.fileId, { view: true })
+                            : DefaultHeadPicture
+                        }
                         style={{ float: 'left', marginRight: 10 }}
                         size="large"
                       />

@@ -19,7 +19,7 @@ const TableSearchForm = React.forwardRef((props, ref) => {
 
   // 查询
   const onFinish = () => {
-    props.getTableData();
+    props.getTableData({ page: 1 });
   };
 
   return (
