@@ -8,7 +8,7 @@ import api from '@/pages/project/api/taskmodel';
 import disk from '@/pages/project/api/disk';
 import { cutString } from '@/utils/utils';
 import _ from 'lodash';
-import DefaultHeadPicture from '@/assets/imgs/DefaultHeadPicture.jpg';
+import DefaultHeadPicture from '@/assets/imgs/defaultHeadPicture.jpg';
 
 const FormItem = Form.Item;
 
