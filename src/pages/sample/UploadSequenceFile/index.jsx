@@ -1,84 +1,93 @@
 // 上传序列文件
 import React from 'react';
-import { Modal, Button, Upload, Carousel, Table } from 'antd';
+import { Modal, Button, Carousel, Table } from 'antd';
 import { InboxOutlined, CloseOutlined } from '@ant-design/icons';
+import { guid } from '@/utils/utils';
+import request from '@/utils/request';
 import './index.less';
-
-const { Dragger } = Upload;
+import axios from 'axios';
+import disk from '../api/disk';
 
 class UploadSequenceFile extends React.Component {
   static getDerivedStateFromProps(nextProps) {
     return { visible: nextProps.visible };
   }
 
-  state = {
-    loading: false,
-    visible: false,
-    fileLists: [
-      {
-        uid: '1',
-        name: 'i11111mage.png',
-        status: 'done',
-        url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
-      },
-      {
-        uid: '2',
-        name: 'image.png',
-        status: 'done',
-        url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
-      },
-      {
-        uid: '3',
-        name: 'image.png',
-        status: 'done',
-        url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
-      },
-      {
-        uid: '4',
-        name: 'image.png',
-        status: 'done',
-        url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
-      },
-      // {
-      //   uid: '5',
-      //   name: 'image.png',
-      //   status: 'error',
-      // },
-      // {
-      //   uid: '6',
-      //   name: 'image.png',
-      //   status: 'done',
-      //   url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
-      // },
-      // {
-      //   uid: '7',
-      //   name: 'image.png',
-      //   status: 'done',
-      //   url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
-      // },
-      // {
-      //   uid: '8',
-      //   name: 'image.png',
-      //   status: 'done',
-      //   url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
-      // },
-      // {
-      //   uid: '9',
-      //   name: 'image.png',
-      //   status: 'done',
-      //   url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
-      // },
-      // {
-      //   uid: '10',
-      //   name: 'image.png',
-      //   status: 'error',
-      // },
-      // {
-      //   uid: '11',
-      //   name: 'bpic10823_s.jpg',
-      // },
-    ],
-  };
+  constructor(props) {
+    super(props);
+    const guuid = guid();
+    this.state = {
+      guuid,
+      loading: false,
+      visible: false,
+      fileLists: [
+        {
+          uid: '1',
+          name: 'i11111mage.png',
+          status: 'done',
+          url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
+        },
+        {
+          uid: '2',
+          name: 'image.png',
+          status: 'done',
+          url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
+        },
+        {
+          uid: '3',
+          name: 'image.png',
+          status: 'done',
+          url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
+        },
+        {
+          uid: '4',
+          name: 'image.png',
+          status: 'done',
+          url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
+        },
+        // {
+        //   uid: '5',
+        //   name: 'image.png',
+        //   status: 'error',
+        // },
+        // {
+        //   uid: '6',
+        //   name: 'image.png',
+        //   status: 'done',
+        //   url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
+        // },
+        // {
+        //   uid: '7',
+        //   name: 'image.png',
+        //   status: 'done',
+        //   url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
+        // },
+        // {
+        //   uid: '8',
+        //   name: 'image.png',
+        //   status: 'done',
+        //   url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
+        // },
+        // {
+        //   uid: '9',
+        //   name: 'image.png',
+        //   status: 'done',
+        //   url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
+        // },
+        // {
+        //   uid: '10',
+        //   name: 'image.png',
+        //   status: 'error',
+        // },
+        // {
+        //   uid: '11',
+        //   name: 'bpic10823_s.jpg',
+        // },
+      ],
+    };
+  }
+
+  state = {};
 
   getTableData = (options = {}) => {
     const { pagination } = this.state;
@@ -149,9 +158,68 @@ class UploadSequenceFile extends React.Component {
     }
   };
 
+  // 上传操作
+  handleUpload = data => {
+    const { guuid } = this.state;
+    const uploadUrl = disk.uploadMoreFiles('ngs_sample', guuid);
+    const formData = new FormData();
+    console.log(this.refs.inputRef);
+    // data.map((item, index) => {
+    //   const file = {
+    //     uri: data.target.value,
+    //     type: 'application/octet-stream',
+    //     name: '',
+    //   };
+    //   formData.append('file', file);
+    // });
+    request(uploadUrl, {
+      data: formData,
+      method: 'post',
+      headers: { 'Content-Type': 'multipart/form-data' },
+    }).then(res => {
+      console.log(res);
+    });
+
+    //   {
+    //   method: 'post',
+    //   url: uploadUrl,
+    //   data: e.target.value,
+    //   headers: {
+    //     'Content-Type': 'multipart/form-data',
+    //   },
+    // })
+    //   .then(res => {
+    //     console.log(res);
+    //   })
+    //   .catch(err => {
+    //     console.log('上传失败！');
+    //   });
+  };
+
+  update = e => {
+    // 上传照片
+    const file = e.target.files[0];
+    const { guuid } = this.state;
+    const uploadUrl = disk.uploadMoreFiles('ngs_sample', guuid);
+    const data = new FormData();
+    data.append('files', file);
+    const config = {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    };
+    // axios.post(uploadUrl, data, config);
+    request(uploadUrl.replace('https://devapi.sangon.com:30443', ''), {
+      method: 'POST',
+      data,
+      ...config,
+    }).then(res => {
+      // console.log(res);
+    });
+  };
+
   render() {
     const { list, loading, visible, fileLists } = this.state;
     const newFileList = this.expoleArr(fileLists);
+
     const columns = [
       {
         title: '样品',
@@ -184,34 +252,17 @@ class UploadSequenceFile extends React.Component {
         maskClosable={false}
       >
         <div style={{ float: 'left', width: '200px' }}>
-          <Dragger
-            action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
-            multiple
-            onChange={(file, fileList) => this.handleChange(file, fileList)}
-            style={{ width: '173px' }}
-            showUploadList={false}
-          >
-            {this.uploadButton()}
-          </Dragger>
+          <input
+            type="file"
+            onChange={e => this.update(e)}
+            multiple="multiple"
+            style={{ opacity: 1, cursor: 'pointer' }}
+          />
         </div>
         {/* 轮播图 */}
         <div style={{ width: '600px', float: 'left' }}>
           <Carousel>
-            {newFileList.map((item, index) => (
-              <Upload
-                key={index}
-                defaultFileList={item}
-                showUploadList={{
-                  removeIcon: (
-                    <CloseOutlined
-                      onClick={() => {
-                        console.log(123);
-                      }}
-                    />
-                  ),
-                }}
-              />
-            ))}
+            <div>123</div>
           </Carousel>
         </div>
         <div style={{ clear: 'both' }}>

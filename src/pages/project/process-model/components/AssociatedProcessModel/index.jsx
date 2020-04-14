@@ -156,7 +156,7 @@ class AssociatedProcessModel extends React.Component {
   };
 
   sendData = async id => {
-    this.props.onClose();
+    this.props.onClose(true);
     const res = await api.getAllPreTasks(id, this.props.ids);
     this.props.getData(res);
   };

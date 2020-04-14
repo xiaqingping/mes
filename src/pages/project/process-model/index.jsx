@@ -59,7 +59,6 @@ class ProcessModel extends Component {
   }
 
   componentDidMount() {
-    console.log(DefaultHeadPicture);
     this.getTableData(this.initialValues);
   }
 
@@ -119,6 +118,9 @@ class ProcessModel extends Component {
     };
     api.getProcess(data).then(res => {
       const uuids = res.rows.map(e => e.picture);
+      this.setState({
+        list: res.rows,
+      });
       disk
         .getFiles({
           sourceCode: uuids.join(','),
@@ -134,6 +136,7 @@ class ProcessModel extends Component {
                 fileId,
               };
             });
+
             this.setState({
               list: newList,
             });
@@ -145,6 +148,7 @@ class ProcessModel extends Component {
                 fileId,
               };
             });
+
             this.setState({
               list: newList,
             });
@@ -316,7 +320,7 @@ class ProcessModel extends Component {
           </FormItem>
         </Col>
         <Col xxl={6} lg={languageCode === 'EN' ? 12 : 0}>
-          <FormItem label="发布人" name="publisherCode">
+          <FormItem label="发布人" name="publisherName">
             <AutoComplete
               onSearch={this.inputValuePublish}
               options={nameCodeVal.map(this.renderOptionPublish)}

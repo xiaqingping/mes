@@ -40,9 +40,10 @@ class Parameter extends React.Component {
   handleAddGroup = () => {
     const { data } = this.state;
     const newData = data;
+    const num = Math.ceil(Math.random() * 2);
     newData.splice(1, 0, {
       sortNo: '',
-      groupName: '分组A',
+      groupName: `分组${num}`,
       groupDescribe: '描述',
       params: [],
     });
@@ -98,7 +99,7 @@ class Parameter extends React.Component {
           }}
           spellCheck="false"
           style={{
-            width: '200px',
+            width: '180px',
             border: 'none',
             outline: 'none',
             paddingLeft: '10px',
@@ -120,7 +121,7 @@ class Parameter extends React.Component {
         <br />
         <div
           style={{
-            width: '220px',
+            width: '200px',
             fontWeight: '200',
             marginTop: '5px',
           }}
@@ -138,7 +139,6 @@ class Parameter extends React.Component {
             }}
             onChange={e => {
               data[index + 1].groupDescribe = e.target.value;
-              console.log(data);
               this.setState({
                 data: [...data],
               });
@@ -214,12 +214,13 @@ class Parameter extends React.Component {
     if (moveType === 1) {
       // 拖到具体分类
       if (type === 2) {
-        // console.log(value, moveElement);
+        console.log(value, index);
         // console.log(value.params.filter(item => item.paramId === moveElement.paramId).length);
         if (value.params.filter(item => item.paramId === moveElement.paramId).length === 0) {
           // 添加到新对象里
           newData.forEach((item, i) => {
             if (item.groupName === value.groupName) {
+              console.log(i);
               newData[i].params.push(moveElement);
             }
           });
@@ -252,7 +253,6 @@ class Parameter extends React.Component {
           newData[typeIndex].params.splice(old, 1, moveElement);
         }
       }
-
       this.setState({
         data: newData,
       });
@@ -361,7 +361,7 @@ class Parameter extends React.Component {
                     <Card
                       title={this.titleContent(item, index)}
                       hoverable
-                      style={{ width: '269px', height: '234px' }}
+                      style={{ width: '269px', height: '234px', overflowY: 'scroll' }}
                       onDrop={() => this.drop(item, 2, index + 1)}
                       onDragOver={e => this.dragOver(e)}
                     >
