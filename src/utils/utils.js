@@ -334,13 +334,14 @@ export const isEmpty = obj => typeof obj === 'undefined' || obj === null || obj 
 
 
 // 随机生成rgb颜色值
-export const randomcolor = () => {
-  const r = Math.floor(Math.random() * 255);
-  const g = Math.floor(Math.random() * 255);
-  const b = Math.floor(Math.random() * 255);
-  const a = Math.random();
-  return `rgba(${r},${g},${b},${a})`
+export const getrandomColor = function () {
+  return `#${  (function f (color) {
+    return (color += '0123456789abcdef' [Math.floor(Math.random() * 16)]) &&
+      (color.length == 6) ? color : f(color);
+  })('')}`;
 }
+
+
 
 
 // 版本排序

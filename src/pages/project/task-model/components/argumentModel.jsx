@@ -335,18 +335,8 @@ class ArgumentModel extends Component {
             onClose={() => this.toggleChildrenDrawer(false)}
             title={this.titleContent()}
           >
-            {type === 'input' && <ArgumentForm {...props} />}
-            {(type === 'sample_select' || type === 'sample_group') && (
-              <SampleSelect
-                fromView={fromView}
-                type={type}
-                editOriginData={editOriginData}
-                emitArguments={this.emitArguments}
-                onClose={() => {
-                  this.toggleChildrenDrawer(false);
-                }}
-              />
-            )}
+            {type === 'input' && <ArgumentForm />}
+            {(type === 'sample_select' || type === 'sample_group') && <SampleSelect {...props} />}
           </Drawer>
         </Drawer>
       </div>

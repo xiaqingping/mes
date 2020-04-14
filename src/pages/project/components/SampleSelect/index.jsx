@@ -1,9 +1,11 @@
 import React from 'react';
-import { Table, Popconfirm, Button, Modal } from 'antd';
+import { Table, Popconfirm, Button, Modal, Input } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { SketchPicker } from 'react-color';
-import { randomcolor } from '@/utils/utils';
+import { getrandomColor } from '@/utils/utils';
+
 import SampleChoose from './components/SampleChoose';
+import './index.less';
 
 class SampleSelect extends React.Component {
   state = {
@@ -14,7 +16,15 @@ class SampleSelect extends React.Component {
       b: '19',
       a: '1',
     },
-    tableData: [
+    tableData: [],
+  };
+
+  componentDidMount() {
+    this.getTableData();
+  }
+
+  getTableData = () => {
+    let tableData = [
       {
         key: '1',
         name: 'John Brown',
@@ -36,7 +46,14 @@ class SampleSelect extends React.Component {
         sequence: 'New York No. 1 Lake Park2',
         length: 5000 - 7000,
       },
-    ],
+    ];
+    tableData = tableData.map(item => {
+      item.color = getrandomColor();
+      return item;
+    });
+    this.setState({
+      tableData,
+    });
   };
 
   handleDelete = () => {
@@ -63,7 +80,7 @@ class SampleSelect extends React.Component {
   handleChange = (color, record, index) => {
     const { tableData } = this.state;
     const row = { ...record };
-    row.color = color.rgb;
+    row.color = color.hex;
     row.visible = false;
     const datas = [...tableData];
     datas[index] = row;
@@ -88,6 +105,8 @@ class SampleSelect extends React.Component {
     this.toggleVis(false);
   };
 
+  saveData = (row, index) => {};
+
   // 查看已选择的
   viewSelected = () => {
     this.toggleVis(true);
@@ -107,9 +126,7 @@ class SampleSelect extends React.Component {
                 style={{
                   width: 20,
                   height: 20,
-                  backgroundColor: record.color
-                    ? `rgb(${record.color.r},${record.color.g},${record.color.b}) `
-                    : randomcolor(),
+                  backgroundColor: record.color,
                   position: 'relative',
                 }}
                 onClick={() => {
@@ -134,6 +151,19 @@ class SampleSelect extends React.Component {
         title: '别名',
         dataIndex: 'alia',
         key: 'alia',
+        render: (text, record, index) => {
+          return (
+            <div className="project_manage_sample_select_table_alia">
+              <input
+                type="text"
+                defaultValue={text}
+                onBlur={() => {
+                  this.saveData(record, index);
+                }}
+              />
+            </div>
+          );
+        },
       },
       {
         title: '序列',
@@ -187,11 +217,19 @@ class SampleSelect extends React.Component {
 
     return (
       <>
-        <Table columns={columns} dataSource={tableData} pagination={false} />
-        <Button type="dashed" block onClick={this.chooseSample} style={{ marginTop: 20 }}>
+        <div className="project_manage_sample_select_table">
+          <Table columns={columns} dataSource={tableData} pagination={false} />
+        </div>
+        <Button
+          type="dashed"
+          block
+          onClick={this.chooseSample}
+          style={{ marginTop: 20, position: 'static' }}
+        >
           <PlusOutlined /> 选择样品
         </Button>
         <Modal
+          bodyStyle={{ paddingTop: 10 }}
           title="选择样品"
           visible={visible}
           onOk={this.handleOk}

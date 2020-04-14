@@ -1,10 +1,16 @@
 import React from 'react';
-import { Table, Button, Upload, message, Checkbox } from 'antd';
+import { Table, Button, message, Checkbox, Modal } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
+import FileUpload from './fileUpload';
 
 class SampleChoose extends React.Component {
   state = {
-    tableData: [],
+    tableData: [
+      {
+        // name:"11",
+      },
+    ],
+    visible: false,
   };
 
   handleUploadChange = info => {
@@ -16,6 +22,27 @@ class SampleChoose extends React.Component {
   handleCheckboxChange = (e, row) => {
     console.log(e);
     console.log(row);
+  };
+
+  toggleVis = v => {
+    this.setState({
+      visible: v,
+    });
+  };
+
+  openUpload = () => {
+    this.toggleVis(true);
+    // this.setState({
+    //   visible: true,
+    // });
+  };
+
+  handleOk = () => {
+    this.toggleVis(false);
+  };
+
+  handleCancel = () => {
+    this.toggleVis(false);
   };
 
   render() {
@@ -53,48 +80,26 @@ class SampleChoose extends React.Component {
           return <div>ddd</div>;
         },
       },
-      {
-        title: '文件',
-        dataIndex: 'files',
-        key: 'files',
-        render: (text, record) => {
-          return <a>已选{text || 0}个</a>;
-        },
-      },
-      {
-        title: '操作',
-        key: 'action',
-        render: (text, record) => (
-          <a
-            onClick={() => {
-              this.handleDelete(record);
-            }}
-          >
-            删除
-          </a>
-          // <Popconfirm
-          //   placement="topRight"
-          //   title={text}
-          //   onConfirm={() => this.handleDelete}
-          //   okText="Yes"
-          //   cancelText="No"
-          // >
-
-          // </Popconfirm>
-        ),
-      },
     ];
-    const { tableData } = this.state;
+    const { tableData, visible } = this.state;
     return (
       <>
         <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-          <Upload name="file" action="" onChange={this.handleUploadChange} showUploadList={false}>
-            <Button type="primary">
-              <UploadOutlined /> 序列文件
-            </Button>
-          </Upload>
+          <Button type="primary" onClick={() => this.openUpload(true)}>
+            <UploadOutlined /> 序列文件
+          </Button>
         </div>
         <Table columns={columns} dataSource={tableData} pagination={false} />
+        <Modal
+          bodyStyle={{ paddingTop: 10 }}
+          title="上传序列文件"
+          visible={visible}
+          onOk={this.handleOk}
+          onCancel={this.handleCancel}
+          width={820}
+        >
+          <FileUpload />
+        </Modal>
       </>
     );
   }
