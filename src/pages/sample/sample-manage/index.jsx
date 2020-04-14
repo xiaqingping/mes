@@ -10,7 +10,7 @@ import _ from 'lodash';
 import { formatter } from '@/utils/utils';
 import api from '@/pages/project/api/processModel/';
 import disk from '@/pages/project/api/disk';
-import DefaultHeadPicture from '@/assets/imgs/defaultHeadPicture.jpg';
+import DefaultHeadPicture from '@/assets/imgs/defaultheadpicture.jpg';
 import StandardTable from '@/pages/project/components/StandardTable';
 import UploadSequenceFile from '../UploadSequenceFile';
 import SampleDetail from '../sample-detail';

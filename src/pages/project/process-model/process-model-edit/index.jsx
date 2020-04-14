@@ -27,7 +27,7 @@ import disk from '@/pages/project/api/disk';
 import api from '@/pages/project/api/processModel/';
 import router from 'umi/router';
 import deletePic from '@/assets/imgs/delete@1x.png';
-import DefaultHeadPicture from '@/assets/imgs/defaultHeadPicture.jpg';
+import DefaultHeadPicture from '@/assets/imgs/defaultheadpicture.jpg';
 
 function getBase64(img, callback) {
   const reader = new FileReader();
