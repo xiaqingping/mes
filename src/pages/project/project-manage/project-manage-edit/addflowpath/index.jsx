@@ -60,6 +60,9 @@ class Test extends Component {
 
   // 打开参数
   handleOpen = row => {
+    // 传流程id，流程模型id，请求类型。
+    // console.log(row);
+
     const { paramList } = this.props.projectManage;
 
     if (paramList.length === 0) {
@@ -77,6 +80,7 @@ class Test extends Component {
       });
     }
     const data = paramList;
+    console.log(data);
     data.requestType = 'updateParam';
     this.props.dispatch({
       type: 'projectDetail/setProcssesParam',

@@ -134,7 +134,7 @@ class ChooseProcessModel extends React.Component {
   clickSelect = item => {
     // const list =item.id;
     const { selectedIds, selecteditem } = this.state;
-    console.log(selectedIds);
+    // console.log(selectedIds);
     let idslist;
     let newSelectedItem;
     if (selectedIds.includes(item.id)) {
@@ -175,7 +175,7 @@ class ChooseProcessModel extends React.Component {
   // 点击确定保存数据
   handleOk = () => {
     const { selecteditem } = this.state;
-    console.log(selecteditem);
+    // console.log(selecteditem);
     this.props.getData(selecteditem);
 
     this.props.onClose();
