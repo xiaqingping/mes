@@ -9,12 +9,7 @@ import './index.less';
 class SampleSelect extends React.Component {
   state = {
     visible: false,
-    color: {
-      r: '241',
-      g: '112',
-      b: '19',
-      a: '1',
-    },
+
     tableData: [
       {
         key: '1',
@@ -86,6 +81,8 @@ class SampleSelect extends React.Component {
       },
     ],
   };
+
+  setTitle = () => {};
 
   add = () => {
     const { columns } = this.state;
