@@ -24,7 +24,7 @@ import { DateUI } from '@/pages/project/components/AntdSearchUI';
 import { formatter, getOperates } from '@/utils/utils';
 import api from '@/pages/project/api/processModel/';
 import disk from '@/pages/project/api/disk';
-import DefaultHeadPicture from '@/assets/imgs/defaultHeadPicture.jpg';
+import DefaultHeadPicture from '@/assets/imgs/defaultheadpicture.jpg';
 import StandardTable from '../components/StandardTable';
 import ProcessDetail from './process-model-detail';
 import './index.less';
@@ -59,6 +59,7 @@ class ProcessModel extends Component {
   }
 
   componentDidMount() {
+    console.log(DefaultHeadPicture);
     this.getTableData(this.initialValues);
   }
 
