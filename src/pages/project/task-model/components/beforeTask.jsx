@@ -3,7 +3,7 @@ import React from 'react';
 import { Modal, Table, Avatar, Form, Col, Tag, Select, Spin } from 'antd';
 import TableSearchForm from '@/components/TableSearchForm';
 import { connect } from 'dva';
-
+import DefaultHeadPicture from '@/assets/imgs/upload_middle.png';
 import api from '@/pages/project/api/taskmodel';
 // import { cutString } from '@/utils/utils';
 import _ from 'lodash';
@@ -198,7 +198,9 @@ class BeforeTask extends React.Component {
           <>
             <div style={{ display: 'flex' }}>
               <Avatar
-                src={row.fileId ? disk.downloadFiles(row.fileId, { view: true }) : ''}
+                src={
+                  row.fileId ? disk.downloadFiles(row.fileId, { view: true }) : DefaultHeadPicture
+                }
                 style={{ float: 'left', width: '40px', height: '40px' }}
               />
               <div style={{ float: 'left', marginLeft: '10px' }}>
