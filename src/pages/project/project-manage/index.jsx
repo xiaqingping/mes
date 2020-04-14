@@ -60,7 +60,7 @@ class ProjectManagement extends Component {
   callParter = value => {
     console.log(value);
     api.gettProjectManageCodeAndName({ codeOrName: value }).then(res => {
-      console.log(res);
+      // console.log(res);
       this.setState({ nameCodeVal: res });
     });
   };
@@ -68,26 +68,29 @@ class ProjectManagement extends Component {
   // 获取表格数据
   getTableData = (options = {}) => {
     const formData = this.tableSearchFormRef.current.getFieldsValue();
+    console.log(formData);
     const { pagination, projectIds } = this.state;
-    // console.log(this.state);
     const { current: page, pageSize } = pagination;
 
-    // 状态
     let newData = [];
+
+    let changePage = false;
+    // 状态
     if (formData.statusList) {
+      changePage = true;
       newData = { ...newData, statusList: formData.statusList.join(',') };
       delete formData.statusList;
-      // console.log(newData);
     }
     // 项目搜索条件
     if (formData.id) {
+      changePage = true;
       newData = { ...newData, id: projectIds };
       delete formData.id;
-      // console.log(newData);
     }
 
     // 创建时间
     if (formData.createDate) {
+      changePage = true;
       newData = {
         ...newData,
         beginDate: formData.createDate[0].format('YYYY-MM-DD'),
@@ -95,16 +98,17 @@ class ProjectManagement extends Component {
       };
       delete formData.createDate;
     }
-    console.log(newData);
+
+    const newPage = changePage ? { page: 1 } : page;
 
     const data = {
+      ...newPage,
       page,
       pageSize,
       ...newData,
       ...formData,
       ...options,
     };
-    data.statusList = data.status;
     api.getProjectManage(data, true).then(res => {
       // console.log(res)
       this.setState({
@@ -144,7 +148,7 @@ class ProjectManagement extends Component {
   inputValue = value => {
     // console.log(value)
     const { nameCodeVal } = this.state;
-    console.log(nameCodeVal);
+    // console.log(nameCodeVal);
     const arr = [];
     if (!value) {
       return false;
@@ -202,7 +206,7 @@ class ProjectManagement extends Component {
     // console.log(this.props);
     return (
       <>
-        <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
+        <Col xxl={6} xl={8} lg={languageCode === 'EN' ? 12 : 12}>
           <FormItem label="项目" name="id">
             <AutoComplete
               onSearch={this.inputValue}
@@ -211,15 +215,26 @@ class ProjectManagement extends Component {
             />
           </FormItem>
         </Col>
-        <Col>
+        <Col xxl={6} xl={8} lg={languageCode === 'EN' ? 12 : 0}>
+          <FormItem label="状态" name="statusList">
+            <Select mode="multiple" maxTagCount={2} maxTagTextLength={3}>
+              {statusList.map(item => (
+                <Option key={item.value} value={item.value}>
+                  {item.text}
+                </Option>
+              ))}
+            </Select>
+          </FormItem>
+        </Col>
+        {/* <Col>
           <FormItem label="状态" name="statusList">
             <Select
               mode="multiple"
               maxTagCount={2}
               maxTagTextLength={3}
               style={{ width: '200px' }}
-              allowClear
-              placeholder="请选择状态"
+              // allowClear
+              // placeholder="请选择状态"
             >
               {statusList.map(e => (
                 <Option value={e.value} key={e.value}>
@@ -228,8 +243,8 @@ class ProjectManagement extends Component {
               ))}
             </Select>
           </FormItem>
-        </Col>
-        <Col xxl={6} lg={languageCode === 'EN' ? 12 : 0}>
+        </Col> */}
+        <Col xxl={6} xl={8} lg={languageCode === 'EN' ? 12 : 0}>
           <FormItem label="创建人" name="creatorName">
             <Input placeholder="请输入创建人" />
           </FormItem>
@@ -400,7 +415,7 @@ class ProjectManagement extends Component {
             labelList.forEach(i => {
               if (i.id === item) {
                 arr.push(
-                  <Tag color={i.color}>
+                  <Tag color={i.color} key={i.id}>
                     {i.name} {i.text}
                   </Tag>,
                 );
@@ -461,6 +476,8 @@ class ProjectManagement extends Component {
       return true;
     });
 
+    // console.log(list);
+
     return (
       <PageHeaderWrapper>
         <Card bordered={false}>
@@ -482,7 +499,7 @@ class ProjectManagement extends Component {
               <StandardTable
                 scroll={{ x: tableWidth }}
                 rowClassName="editable-row"
-                rowKey="id"
+                // rowKey="id"
                 loading={loading}
                 data={{ list, pagination }}
                 columns={columns}

@@ -6,7 +6,7 @@ const projectModel = {
       { value: 2, text: '进行中', color: 'pink' },
       { value: 3, text: '已完成', color: 'skyblue' },
       { value: 4, text: '已终止', color: 'yellowgreen' },
-      { value: 5, text: '待处理', color: 'origin' },
+      { value: 5, text: '待处理', color: 'indigo' },
     ],
     // 业务伙伴认证状态
     BpCertificationStatus: [

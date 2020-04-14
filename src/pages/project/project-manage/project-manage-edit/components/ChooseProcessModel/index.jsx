@@ -215,6 +215,7 @@ class ChooseProcessModel extends React.Component {
               <Row gutter={16} style={{ margin: '0' }}>
                 {processlist.map((item, index) => {
                   const newIndex = JSON.parse(JSON.stringify(index));
+                  // console.log(index);
                   return (
                     <Col
                       // span={7}
@@ -226,6 +227,7 @@ class ChooseProcessModel extends React.Component {
                       }}
                       // eslint-disable-next-line react/no-array-index-key
                       key={newIndex}
+                      // key={index}
                     >
                       <Card.Grid
                         style={{ width: '300px', padding: '0', height: '170px' }}
