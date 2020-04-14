@@ -123,7 +123,7 @@ class TaskModel extends Component {
           .then(v => {
             const newList = (res.rows || []).map(e => {
               const filterItem = (v || []).filter(item => item.sourceCode === e.picture) || [];
-              const fileId = filterItem[0] && filterItem[0].id;
+              const fileId = (filterItem[0] && filterItem[0].id) || '';
               return {
                 ...e,
                 fileId,
@@ -133,6 +133,11 @@ class TaskModel extends Component {
               list: newList,
             });
           });
+        // .catch(() => {
+        //   this.setState({
+        //     list: res.rows,
+        //   });
+        // });
         this.setState({
           pagination: {
             current: data.page,
