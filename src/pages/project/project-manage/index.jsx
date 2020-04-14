@@ -47,9 +47,7 @@ class ProjectManagement extends Component {
       loading: false,
       list: [],
       nameCodeVal: [],
-      // visible: false,
-      // statusId: '',
-      // statusVisible: false,
+      projectIds: '',
     };
     // 异步验证做节流处理
     this.callParter = _.debounce(this.callParter, 500);
@@ -59,8 +57,10 @@ class ProjectManagement extends Component {
     this.getTableData(this.initialValues);
   }
 
-  callParter = name => {
-    api.gettProjectManageCodeAndName({ codeOrName: name }).then(res => {
+  callParter = value => {
+    console.log(value);
+    api.gettProjectManageCodeAndName({ codeOrName: value }).then(res => {
+      // console.log(res);
       this.setState({ nameCodeVal: res });
     });
   };
@@ -68,18 +68,29 @@ class ProjectManagement extends Component {
   // 获取表格数据
   getTableData = (options = {}) => {
     const formData = this.tableSearchFormRef.current.getFieldsValue();
-    const { pagination } = this.state;
+    console.log(formData);
+    const { pagination, projectIds } = this.state;
     const { current: page, pageSize } = pagination;
 
     let newData = [];
+
+    let changePage = false;
+    // 状态
     if (formData.statusList) {
-      console.log(formData.statusList);
+      changePage = true;
       newData = { ...newData, statusList: formData.statusList.join(',') };
       delete formData.statusList;
+    }
+    // 项目搜索条件
+    if (formData.id) {
+      changePage = true;
+      newData = { ...newData, id: projectIds };
+      delete formData.id;
     }
 
     // 创建时间
     if (formData.createDate) {
+      changePage = true;
       newData = {
         ...newData,
         beginDate: formData.createDate[0].format('YYYY-MM-DD'),
@@ -88,15 +99,18 @@ class ProjectManagement extends Component {
       delete formData.createDate;
     }
 
+    const newPage = changePage ? { page: 1 } : page;
+
     const data = {
+      ...newPage,
       page,
       pageSize,
       ...newData,
       ...formData,
       ...options,
     };
-    data.statusList = data.status;
     api.getProjectManage(data, true).then(res => {
+      // console.log(res)
       this.setState({
         list: res.results,
         pagination: {
@@ -111,20 +125,30 @@ class ProjectManagement extends Component {
   };
 
   // 项目名称联想
-  renderOption = codeOrName => ({
-    value: codeOrName.name,
+  renderOption = item => ({
+    code: item.code,
+    value: item.name,
+    id: item.id,
     label: (
-      <div style={{ display: 'flex' }}>
-        <span>{codeOrName.name}</span>&nbsp;&nbsp;
-        <span>{codeOrName.code}</span>
+      <div
+        style={{ display: 'flex', marginLeft: '14px', padding: '6px 0' }}
+        onClick={() => {
+          this.setState({
+            projectIds: item.id,
+          });
+        }}
+      >
+        <span>{item.code}</span>&nbsp;&nbsp;
+        <span>{item.name}</span>
       </div>
-      // </Option>
     ),
   });
 
   // 筛选值
   inputValue = value => {
+    // console.log(value)
     const { nameCodeVal } = this.state;
+    // console.log(nameCodeVal);
     const arr = [];
     if (!value) {
       return false;
@@ -140,10 +164,12 @@ class ProjectManagement extends Component {
       if (item.code.indexOf(value) !== -1 && arr.indexOf(item)) {
         arr.push(item);
       }
+      if (item.id.indexOf(value) !== -1 && arr.indexOf(item) && item.code.indexOf(value)) {
+        arr.push(item);
+      }
     });
     this.setState({
       nameCodeVal: arr,
-      // allowClear: 'ture',
     });
     return true;
   };
@@ -180,8 +206,8 @@ class ProjectManagement extends Component {
     // console.log(this.props);
     return (
       <>
-        <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
-          <FormItem label="项目" name="name">
+        <Col xxl={6} xl={8} lg={languageCode === 'EN' ? 12 : 12}>
+          <FormItem label="项目" name="id">
             <AutoComplete
               onSearch={this.inputValue}
               options={nameCodeVal.map(this.renderOption)}
@@ -189,15 +215,26 @@ class ProjectManagement extends Component {
             />
           </FormItem>
         </Col>
-        <Col>
+        <Col xxl={6} xl={8} lg={languageCode === 'EN' ? 12 : 0}>
+          <FormItem label="状态" name="statusList">
+            <Select mode="multiple" maxTagCount={2} maxTagTextLength={3}>
+              {statusList.map(item => (
+                <Option key={item.value} value={item.value}>
+                  {item.text}
+                </Option>
+              ))}
+            </Select>
+          </FormItem>
+        </Col>
+        {/* <Col>
           <FormItem label="状态" name="statusList">
             <Select
               mode="multiple"
               maxTagCount={2}
               maxTagTextLength={3}
               style={{ width: '200px' }}
-              allowClear
-              placeholder="请选择状态"
+              // allowClear
+              // placeholder="请选择状态"
             >
               {statusList.map(e => (
                 <Option value={e.value} key={e.value}>
@@ -206,8 +243,8 @@ class ProjectManagement extends Component {
               ))}
             </Select>
           </FormItem>
-        </Col>
-        <Col xxl={6} lg={languageCode === 'EN' ? 12 : 0}>
+        </Col> */}
+        <Col xxl={6} xl={8} lg={languageCode === 'EN' ? 12 : 0}>
           <FormItem label="创建人" name="creatorName">
             <Input placeholder="请输入创建人" />
           </FormItem>
@@ -271,37 +308,38 @@ class ProjectManagement extends Component {
         status: type,
       };
       api.updateProjectStatus(data).then(() => {
-        console.log('ok');
-        // this.getTableData(this.initialValues);
-      })
+        this.getTableData(this.initialValues);
+      });
     }
-  }
+  };
 
   // 状态下拉列表
   menuList = row => (
-  <Menu>
-    <Menu.Item>
-      <a onClick={() => this.handleUpdateStatus(row, 1)}>未开始</a>
-    </Menu.Item>
-    <Menu.Item>
-      <a onClick={() => this.handleUpdateStatus(row, 2)}>进行中</a>
-    </Menu.Item>
-    <Menu.Item>
-      <a onClick={() => this.handleUpdateStatus(row, 3)}>已完成</a>
-    </Menu.Item>
-    <Menu.Item>
-      <a onClick={() => this.handleUpdateStatus(row, 4)}>已终止</a>
-    </Menu.Item>
-    <Menu.Item>
-      <a onClick={() => this.handleUpdateStatus(row, 5)}>待处理</a>
-    </Menu.Item>
-  </Menu>
-);
+    <Menu>
+      <Menu.Item>
+        <a onClick={() => this.handleUpdateStatus(row, 1)}>未开始</a>
+      </Menu.Item>
+      <Menu.Item>
+        <a onClick={() => this.handleUpdateStatus(row, 2)}>进行中</a>
+      </Menu.Item>
+      <Menu.Item>
+        <a onClick={() => this.handleUpdateStatus(row, 3)}>已完成</a>
+      </Menu.Item>
+      <Menu.Item>
+        <a onClick={() => this.handleUpdateStatus(row, 4)}>已终止</a>
+      </Menu.Item>
+      <Menu.Item>
+        <a onClick={() => this.handleUpdateStatus(row, 5)}>待处理</a>
+      </Menu.Item>
+    </Menu>
+  );
 
   render() {
     const {
-      pagination, list, loading,
-    // statusVisible ,statusId
+      pagination,
+      list,
+      loading,
+      // statusVisible ,statusId
     } = this.state;
     const { statusList, labelList } = this.props;
     let tableWidth = 0;
@@ -356,35 +394,36 @@ class ProjectManagement extends Component {
         dataIndex: 'status',
         width: '100px',
         filters: statusList,
-        render: (value, row) => (
-        <>
-          <Dropdown
-            overlay={this.menuList(row)}
-            // onVisibleChange={() =>
-            //   this.setState({ statusVisible: !statusVisible, statusId: row.id })
-            // }
-            // visible={statusId === row.id && statusVisible}
-          >
-            <Button  >{formatter(statusList, value, 'value', 'text')}</Button>
-          </Dropdown>
-        </>
-        ),
+        render: (value, row) => {
+          const color = formatter(statusList, value, 'value', 'color');
+          return (
+            <Dropdown overlay={this.menuList(row)}>
+              <Button style={{ background: color, color: '#fff', borderRadius: '20px' }}>
+                {formatter(statusList, value, 'value', 'text')}
+              </Button>
+            </Dropdown>
+          );
+        },
       },
       {
         title: '标签',
         dataIndex: 'labelList',
         width: 250,
-        render: value =>  {
+        render: value => {
           const arr = [];
           value.forEach(item => {
             labelList.forEach(i => {
-              if(i.id === item){
-                arr.push(<Tag color={i.color}>{i.name} {i.text}</Tag>)
+              if (i.id === item) {
+                arr.push(
+                  <Tag color={i.color} key={i.id}>
+                    {i.name} {i.text}
+                  </Tag>,
+                );
               }
-            })
-          })
-          return(<>{arr}</>)
-        }
+            });
+          });
+          return <>{arr}</>;
+        },
       },
       {
         title: '成员数',
@@ -437,6 +476,8 @@ class ProjectManagement extends Component {
       return true;
     });
 
+    // console.log(list);
+
     return (
       <PageHeaderWrapper>
         <Card bordered={false}>
@@ -458,7 +499,7 @@ class ProjectManagement extends Component {
               <StandardTable
                 scroll={{ x: tableWidth }}
                 rowClassName="editable-row"
-                rowKey='id'
+                // rowKey="id"
                 loading={loading}
                 data={{ list, pagination }}
                 columns={columns}
