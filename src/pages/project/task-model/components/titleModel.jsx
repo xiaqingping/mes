@@ -36,7 +36,7 @@ class TitleModel extends React.Component {
               sourceKey: 'project_task_model',
             })
             .then(v => {
-              const newList = { ...res, fileId: (v[0] || {}).id };
+              const newList = { ...res, fileId: (v[0] || {}).id || '' };
               this.setState({
                 viewData: newList,
               });
@@ -82,18 +82,6 @@ class TitleModel extends React.Component {
   // 点击禁用， 禁用任务
   handleForbidden = id => {
     this.props.reload('1', id);
-    // api
-    //   .forbiddenTaskModel(id)
-    //   .then(res => {
-    //     this.setState({ loading: false });
-    //     message.success('任务模型已禁用!');
-
-    //   })
-    //   .catch(err => {
-    //     this.setState({
-    //       loading: false,
-    //     });
-    //   });
   };
 
   // 根据code和版本获取详细信息
@@ -158,9 +146,7 @@ class TitleModel extends React.Component {
         <div
           style={{
             marginTop: '6px',
-            // overflow: 'auto',
-            // position: 'relative',
-
+            height: 63,
             display: 'flex',
             justifyContent: 'space-between',
           }}
@@ -232,7 +218,11 @@ class TitleModel extends React.Component {
             )}
             <div style={{ marginTop: 12, fontSize: 13, marginRight: -2, textAlign: 'right' }}>
               {open ? (
-                <a href="#" onClick={() => this.setState({ open: !open })}>
+                <a
+                  href="#"
+                  onClick={() => this.setState({ open: !open })}
+                  style={{ marginRight: 7 }}
+                >
                   收起
                   <UpOutlined />
                 </a>
@@ -246,12 +236,10 @@ class TitleModel extends React.Component {
           </div>
         </div>
         {open && (
-          <div style={{ marginLeft: '40px', color: '#858585', fontSize: '14px', marginBottom: 20 }}>
-            <div>某某某发布人</div>
-            <div style={{ marginBottom: '20px' }}>(2017-01-12 13:55:34)</div>
-            <div style={{ width: '400px' }}>
-              该任务旨在分析肠道微生物与肥胖之间的关系。本次实验分析共，该任务旨在分析肠道微生物与肥胖之间的关系。
-            </div>
+          <div style={{ marginLeft: '50px', color: '#858585', fontSize: '14px', marginBottom: 20 }}>
+            <div>{viewData.publisherName}</div>
+            <div style={{ marginBottom: '7px' }}>{viewData.publishDate}</div>
+            <div style={{ width: '400px' }}>{viewData.describe}</div>
           </div>
         )}
 

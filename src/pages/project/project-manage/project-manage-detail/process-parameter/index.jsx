@@ -15,7 +15,6 @@ class ProcessParameter extends Component {
   constructor(props) {
     super(props);
     const { procssesParam } = props.projectDetail;
-    console.log(procssesParam);
     this.state = {
       requestType: procssesParam.requestType,
       paramData: procssesParam,
@@ -25,7 +24,6 @@ class ProcessParameter extends Component {
 
   // 数据为空时跳转至其他页面
   locationUrl = data => {
-    console.log(data);
     if (data.length === 0) {
       window.history.back(-1);
     }
@@ -55,19 +53,18 @@ class ProcessParameter extends Component {
     const data = this.conversionData();
     const { requestType } = this.state;
     if (requestType === 'addParam') {
+      console.log(paramData);
       const newData = [];
       newData.params = data;
-      newData.processesId = paramData[0].id;
-      console.log(newData);
+      newData.processId = paramData.processId;
       this.props.dispatch({
-        type: 'projectDetail/setParamList',
+        type: 'projectManage/setParamList',
         payload: newData,
       });
       window.history.back(-1);
     }
     if (requestType === 'editParam') {
       const id = paramData.processesId;
-      console.log(data);
       api.updateProcessesParameter(id, data).then(() => {
         window.history.back(-1);
       });
@@ -78,7 +75,6 @@ class ProcessParameter extends Component {
   conversionData = () => {
     const { paramData } = this.state;
     const formData = this.formRef.current.getFieldsValue();
-    console.log(paramData);
     // 取出键.值
     const dataKeys = Object.keys(formData);
     const dataValues = Object.values(formData);
@@ -97,7 +93,6 @@ class ProcessParameter extends Component {
 
     const data = [];
     paramData[0].params.forEach(item => {
-      console.log(item);
       newList.forEach(it => {
         const newIt = JSON.parse(JSON.stringify(it));
         if (item.paramKey === it.paramKey) {

@@ -24,6 +24,7 @@ import { DateUI } from '@/pages/project/components/AntdSearchUI';
 import { formatter, getOperates } from '@/utils/utils';
 import api from '@/pages/project/api/processModel/';
 import disk from '@/pages/project/api/disk';
+import DefaultHeadPicture from '@/assets/imgs/defaultheadpicture.jpg';
 import StandardTable from '../components/StandardTable';
 import ProcessDetail from './process-model-detail';
 import './index.less';
@@ -51,7 +52,6 @@ class ProcessModel extends Component {
       filtersData: null,
       processCode: '',
       publisherCode: '',
-      // processList: [],
     };
     // 异步验证做节流处理
     this.callParter = _.debounce(this.callParter, 500);
@@ -59,6 +59,7 @@ class ProcessModel extends Component {
   }
 
   componentDidMount() {
+    console.log(DefaultHeadPicture);
     this.getTableData(this.initialValues);
   }
 
@@ -80,14 +81,16 @@ class ProcessModel extends Component {
     const formData = this.tableSearchFormRef.current.getFieldsValue();
     const { pagination, processCode, publisherCode } = this.state;
     const { current: page, pageSize: rows } = pagination;
-
     let newData = [];
+    let changePage = false;
     if (formData.status) {
+      changePage = true;
       newData = { ...newData, status: formData.status.join(',') };
       delete formData.status;
     }
 
     if (formData.publishDate) {
+      changePage = true;
       newData = {
         ...newData,
         publishBeginDate: formData.publishDate[0].format('YYYY-MM-DD'),
@@ -95,22 +98,25 @@ class ProcessModel extends Component {
       };
       delete formData.publishDate;
     }
+
     if (formData.name) {
+      changePage = true;
       newData = { ...newData, code: processCode };
       delete formData.name;
     }
     if (formData.publisherName) {
+      changePage = true;
       newData = { ...newData, publisherCode };
       delete formData.publisherName;
     }
+    const newPage = changePage ? { page: 1 } : page;
     const data = {
-      page,
+      ...newPage,
       rows,
       ...newData,
       ...formData,
       ...options,
     };
-    console.log(data);
     api.getProcess(data).then(res => {
       const uuids = res.rows.map(e => e.picture);
       disk
@@ -158,18 +164,10 @@ class ProcessModel extends Component {
 
   // 流程模型选择样式
   renderOption = item => ({
-    code: item.code,
-    value: item.name,
+    value: `${item.code}  ${item.name}`,
     label: (
       // <Option key={item.id} text={item.name}>
-      <div
-        style={{ display: 'flex', marginLeft: '14px', padding: '6px 0' }}
-        onClick={() => {
-          this.setState({
-            processCode: item.code,
-          });
-        }}
-      >
+      <div style={{ display: 'flex', marginLeft: '14px', padding: '6px 0' }}>
         <span>{item.code}</span>&nbsp;&nbsp;
         <span>{item.name}</span>
       </div>
@@ -276,16 +274,34 @@ class ProcessModel extends Component {
   simpleForm = () => {
     const { languageCode, status } = this.props;
     const { nameCodeVal } = this.state;
+    const children = nameCodeVal.map(item => (
+      <Option key={item.code} value={item.name}>
+        <div
+          onClick={() => {
+            this.setState({
+              processCode: item.code,
+            });
+          }}
+        >
+          {item.code} {item.name}
+        </div>
+      </Option>
+    ));
     return (
       <>
         <Col xxl={6} xl={8} lg={languageCode === 'EN' ? 12 : 12}>
           <FormItem label="流程模型" name="name">
             <AutoComplete
               onSearch={this.inputValue}
-              options={nameCodeVal.map(this.renderOption)}
-              // placeholder={formatMessage({ id: 'bp.inputHere' })}
-              // optionLabelProp="text"
-            />
+              spellCheck="false"
+              onKeyDown={() => {
+                this.setState({
+                  processCode: '',
+                });
+              }}
+            >
+              {children}
+            </AutoComplete>
           </FormItem>
         </Col>
         <Col xxl={6} xl={8} lg={languageCode === 'EN' ? 12 : 0}>
@@ -434,7 +450,7 @@ class ProcessModel extends Component {
         render: (value, row) => (
           <>
             <Avatar
-              src={row.fileId ? disk.downloadFiles(row.fileId, { view: true }) : ''}
+              src={row.fileId ? disk.downloadFiles(row.fileId, { view: true }) : DefaultHeadPicture}
               style={{ float: 'left', width: '46px', height: '46px' }}
             />
             <div style={{ float: 'left', marginLeft: '10px' }}>

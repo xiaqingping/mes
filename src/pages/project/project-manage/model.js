@@ -56,66 +56,79 @@ const projectModel = {
         id: 1,
         name: '真核转录组',
         text: 'eukaryotic_transcriptome',
+        color: 'pink',
       },
       {
         id: 2,
         name: '宏转录组',
         text: 'metatranscriptome',
+        color: 'purple',
       },
       {
         id: 3,
         name: '真菌基因组',
         text: 'fugus_genome',
+        color: 'blue',
       },
       {
         id: 4,
         name: '外显子组',
         text: 'exome',
+        color: 'green',
       },
       {
         id: 5,
         name: '简化基因组',
         text: 'RAD',
+        color: 'red',
       },
       {
         id: 6,
         name: '宏基因组',
         text: 'metagenome',
+        color: 'red',
       },
       {
         id: 7,
         name: '微生物基因组',
         text: 'microbial_genome',
+        color: 'red',
       },
       {
         id: 8,
         name: '重测序',
         text: 'resequencing',
+        color: 'red',
       },
       {
         id: 9,
         name: '原核转录组',
         text: 'prokaryotic_transcriptom',
+        color: 'red',
       },
       {
         id: 10,
         name: '小RNA',
         text: 'microRNA',
+        color: 'red',
       },
       {
         id: 11,
         name: '动植物基因组',
         text: 'eukaryotic_genome',
+        color: 'red',
       },
       {
         id: 12,
         name: '微生物多样性',
         text: 'microbial_diversity',
+        color: 'red',
       },
       {
         id: 13,
         name: '表观遗传学',
         text: 'epigenetics',
+        color: 'red',
       },
     ],
     // 点击查看的数据
@@ -126,6 +139,8 @@ const projectModel = {
     processSelectedList: [],
     // 新建项目的基础信息
     projectInfor: [],
+    // 流程参数列表
+    paramList: [],
   },
   effects: {},
   reducers: {
@@ -141,6 +156,9 @@ const projectModel = {
     },
     setProjectInfor(state, action) {
       return { ...state, projectInfor: action.payload };
+    },
+    setParamList(state, action) {
+      return { ...state, paramList: action.payload };
     },
   },
 };

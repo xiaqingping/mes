@@ -29,6 +29,7 @@ import TaskModelView from './taskModelView';
 import StandardTable from '../components/StandardTable';
 import SampleSelect from '@/pages/project/components/SampleSelect';
 import disk from '@/pages/project/api/disk';
+import DefaultHeadPicture from '@/assets/imgs/upload_middle.png';
 
 const FormItem = Form.Item;
 const { Option } = Select;
@@ -124,7 +125,7 @@ class TaskModel extends Component {
           .then(v => {
             const newList = (res.rows || []).map(e => {
               const filterItem = (v || []).filter(item => item.sourceCode === e.picture) || [];
-              const fileId = filterItem[0] && filterItem[0].id;
+              const fileId = (filterItem[0] && filterItem[0].id) || '';
               return {
                 ...e,
                 fileId,
@@ -134,6 +135,11 @@ class TaskModel extends Component {
               list: newList,
             });
           });
+        // .catch(() => {
+        //   this.setState({
+        //     list: res.rows,
+        //   });
+        // });
         this.setState({
           pagination: {
             current: data.page,
@@ -406,7 +412,7 @@ class TaskModel extends Component {
         render: (text, row) => (
           <div style={{ display: 'flex' }}>
             <Avatar
-              src={row.fileId ? disk.downloadFiles(row.fileId, { view: true }) : ''}
+              src={row.fileId ? disk.downloadFiles(row.fileId, { view: true }) : DefaultHeadPicture}
               style={{ float: 'left', width: '46px', height: '46px' }}
             />
             <div style={{ marginLeft: 10 }}>

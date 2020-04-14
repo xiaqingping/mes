@@ -26,6 +26,7 @@ import classNames from 'classnames';
 import router from 'umi/router';
 import disk from '@/pages/project/api/disk';
 import api from '@/pages/project/api/taskmodel';
+import DefaultHeadPicture from '@/assets/imgs/upload_middle.png';
 
 function getBase64(img, callback) {
   const reader = new FileReader();
@@ -170,7 +171,7 @@ class TaskModel extends Component {
           .then(v => {
             const newList = (res || []).map(e => {
               const filterItem = (v || []).filter(item => item.sourceCode === e.picture) || [];
-              const fileId = filterItem[0] && filterItem[0].id;
+              const fileId = (filterItem[0] && filterItem[0].id) || '';
               return {
                 ...e,
                 fileId,
@@ -416,6 +417,7 @@ class TaskModel extends Component {
 
   // 删除确认
   confirm = value => {
+    console.log(value);
     const { tableData, ids, sonIds } = this.state;
     const data = tableData;
     const idsData = ids;
@@ -423,7 +425,7 @@ class TaskModel extends Component {
     const { preTaskIds } = value;
     const newData = data.filter(item => item.id !== value.id);
     const newIdsData = idsData.filter(item => item !== value.id);
-    if (preTaskIds.length) {
+    if (preTaskIds && preTaskIds.length) {
       preTaskIds.forEach(i => {
         sonIdsData.some((item, index) => {
           if (i === item) {
@@ -474,7 +476,9 @@ class TaskModel extends Component {
           return (
             <div style={{ display: 'flex' }}>
               <Avatar
-                src={row.fileId ? disk.downloadFiles(row.fileId, { view: true }) : ''}
+                src={
+                  row.fileId ? disk.downloadFiles(row.fileId, { view: true }) : DefaultHeadPicture
+                }
                 style={{ float: 'left', width: '46px', height: '46px', marginRight: 10 }}
               />
               <div>

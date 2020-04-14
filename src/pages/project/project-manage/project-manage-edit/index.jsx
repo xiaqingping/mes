@@ -19,10 +19,10 @@ class ProjectEdit extends Component {
   constructor(props) {
     super(props);
     const { projectData, labelList } = props.projectManage;
+    console.log(projectData)
 
-    this.locationUrl(projectData);
     this.state = {
-      requestType: projectData.requestType, // 请求类型
+      requestType: projectData.requestType || 'addProject', // 请求类型
       selectedlabels: [], // 选中标签
       bpCode: '', // bp编号
       bpName: '', // bp名称
@@ -32,13 +32,6 @@ class ProjectEdit extends Component {
       labelList,
     };
   }
-
-  // 数据为空时跳转至其他页面
-  locationUrl = data => {
-    if (data.length === 0) {
-      router.push('/project/project-manage');
-    }
-  };
 
   // 组件加载时
   componentDidMount = () => {
@@ -100,7 +93,6 @@ class ProjectEdit extends Component {
       projectData,
     } = this.state;
     const formData = this.formRef.current.getFieldsValue();
-    console.log(projectData);
 
     if (formData.name === undefined) {
       message.error('项目名称不能为空！');
@@ -200,7 +192,6 @@ class ProjectEdit extends Component {
       type: 'projectManage/setProjectInfor',
       payload: data,
     });
-    console.log(data);
 
     router.push('/project/project-manage/add/addflowpath');
   };
@@ -240,7 +231,6 @@ class ProjectEdit extends Component {
                     format="YYYY-MM-DD HH:mm:ss"
                     onChange={this.handleOnChangeTime}
                     style={{ marginLeft: '40px' }}
-                    disabled={requestType === 'editProject'}
                   />
                 ) : (
                   <RangePicker
@@ -252,7 +242,7 @@ class ProjectEdit extends Component {
                     ]}
                     onChange={this.handleOnChangeTime}
                     style={{ marginLeft: '40px' }}
-                    disabled={requestType === 'editProject'}
+                    // disabled={requestType === 'editProject'}
                   />
                 )}
               </FormItem>

@@ -9,10 +9,10 @@ module.exports = {
       path: '/sample/sample-manage',
       component: './sample/sample-manage',
     },
-    {
-      name: 'sample-attribute',
-      path: '/sample/sample-attribute',
-      component: './sample/sample-attribute',
-    },
+    // {
+    //   name: 'sample-attribute',
+    //   path: '/sample/sample-attribute',
+    //   component: './sample/sample-attribute',
+    // },
   ],
 };

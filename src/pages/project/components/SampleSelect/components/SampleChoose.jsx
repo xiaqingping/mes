@@ -24,6 +24,7 @@ class SampleChoose extends React.Component {
         title: '样品',
         dataIndex: 'name',
         key: 'name',
+        filters: [],
         render: (text, record, index) => {
           return <Checkbox onChange={e => this.handleCheckboxChange(e, record)}>Checkbox</Checkbox>;
         },
@@ -32,16 +33,25 @@ class SampleChoose extends React.Component {
         title: '文件',
         dataIndex: 'file',
         key: 'alia',
+        render: (text, record, index) => {
+          return <Checkbox onChange={e => this.handleCheckboxChange(e, record)}>Checkbox</Checkbox>;
+        },
       },
       {
         title: '序列',
         dataIndex: 'sequence',
         key: 'sequence',
+        render: (text, record) => {
+          return <div>hsjsjsj</div>;
+        },
       },
       {
         title: '长度',
         dataIndex: 'length',
         key: 'length',
+        render: (text, record) => {
+          return <div>ddd</div>;
+        },
       },
       {
         title: '文件',
@@ -84,7 +94,7 @@ class SampleChoose extends React.Component {
             </Button>
           </Upload>
         </div>
-        <Table columns={columns} dataSource={tableData} />
+        <Table columns={columns} dataSource={tableData} pagination={false} />
       </>
     );
   }

@@ -18,7 +18,9 @@ if (process.env.NODE_ENV !== 'development') {
 }
 
 export default {
-  // 项目管理接口
+  /**
+   * 项目管理
+   */
   // 项目管理分页列表
   getProjectManage(params) {
     return request(`${http1}/projects/v1/`, { params });
@@ -36,10 +38,7 @@ export default {
 
   // 创建项目数据
   addProjects(data) {
-    return request(`${http1}/projects/v1`, {
-      method: 'POST',
-      data,
-    });
+    return request(`${http1}/projects/v1`, { method: 'POST', data, });
   },
 
   // 修改项目数据
@@ -47,7 +46,16 @@ export default {
     return request(`${http1}/projects/v1`, { method: 'PUT', data });
   },
 
-  // 流程模型接口
+  // 修改项目状态
+  updateProjectStatus(data) {
+    return request(`${http1}/projects/v1/${data.id}/status`, { method: 'PUT', data });
+  },
+
+
+
+  /**
+   * 模型管理
+   */
   // 流程模型分页列表
   getProcess(params) {
     return request(`${http2}/v1/process`, { params });
@@ -60,9 +68,7 @@ export default {
 
   // 添加流程页面删除
   deleteAddProcess(id) {
-    return request(`${http2}/v1/process/${id}/deletion`, {
-      method: 'PUT',
-    });
+    return request(`${http2}/v1/process/${id}/deletion`, { method: 'PUT', });
   },
 
   // 查询流程模型的参数列表

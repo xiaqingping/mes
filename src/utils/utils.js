@@ -332,8 +332,8 @@ export const compare = property => (a, b) => {
 // 判断字符是否为空
 export const isEmpty = obj => typeof obj === 'undefined' || obj === null || obj === '';
 
-// 随机生成rgb颜色值
 
+// 随机生成rgb颜色值
 export const randomcolor = () => {
   const r = Math.floor(Math.random() * 255);
   const g = Math.floor(Math.random() * 255);
@@ -342,7 +342,8 @@ export const randomcolor = () => {
   return `rgba(${r},${g},${b},${a})`
 }
 
-// 比较版本
+
+// 版本排序
 export const versionSort = version => {
   const temp = version.map(v => v.replace('V', '').split('.'));
   for (let i = 0; i < temp.length; i++) {
@@ -354,7 +355,7 @@ export const versionSort = version => {
         if (current > max) {
           minIndex = j;
         }
-        // 只要不等，就立刻结束最内层遍历！
+
         if (current !== max) {
           break
         }
@@ -364,6 +365,3 @@ export const versionSort = version => {
   }
   return temp.map(v => v.join('.'))
 };
-
-// const ver = ["V1.2", "V1.0", "V1.1"]
-// console.log(versionSort(ver));

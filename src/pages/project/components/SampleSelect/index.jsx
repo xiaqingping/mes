@@ -75,15 +75,22 @@ class SampleSelect extends React.Component {
   };
 
   handleOk = () => {
+    this.toggleVis(false);
+  };
+
+  toggleVis = v => {
     this.setState({
-      visible: false,
+      visible: v,
     });
   };
 
   handleCancel = () => {
-    this.setState({
-      visible: false,
-    });
+    this.toggleVis(false);
+  };
+
+  // 查看已选择的
+  viewSelected = () => {
+    this.toggleVis(true);
   };
 
   render() {
@@ -143,7 +150,15 @@ class SampleSelect extends React.Component {
         dataIndex: 'files',
         key: 'files',
         render: (text, record) => {
-          return <a>已选{text || 0}个</a>;
+          return (
+            <a
+              onClick={() => {
+                this.viewSelected(record);
+              }}
+            >
+              已选{text || 0}个
+            </a>
+          );
         },
       },
       {
@@ -172,8 +187,8 @@ class SampleSelect extends React.Component {
 
     return (
       <>
-        <Table columns={columns} dataSource={tableData} />
-        <Button type="dashed" block onClick={this.chooseSample}>
+        <Table columns={columns} dataSource={tableData} pagination={false} />
+        <Button type="dashed" block onClick={this.chooseSample} style={{ marginTop: 20 }}>
           <PlusOutlined /> 选择样品
         </Button>
         <Modal
