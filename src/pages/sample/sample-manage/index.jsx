@@ -140,19 +140,6 @@ class ProcessModel extends Component {
     });
   };
 
-  // 流程模型选择样式
-  renderOption = item => ({
-    value: `${item.sampleCode}  ${item.sampleName}`,
-    label: (
-      // <Option key={item.id} text={item.name}>
-      <div style={{ display: 'flex', marginLeft: '14px', padding: '6px 0' }}>
-        <span>{item.sampleCode}</span>&nbsp;&nbsp;
-        <span>{item.sampleName}</span>
-      </div>
-      // </Option>
-    ),
-  });
-
   // 流程模型筛选值
   inputValue = value => {
     const { nameCodeVal } = this.state;
@@ -208,15 +195,15 @@ class ProcessModel extends Component {
     const { languageCode } = this.props;
     const { nameCodeVal } = this.state;
     const children = nameCodeVal.map(item => (
-      <Option key={item.code} value={item.name}>
+      <Option key={item.sampleCode} value={item.sampleName}>
         <div
           onClick={() => {
             this.setState({
-              processCode: item.code,
+              processCode: item.sampleCode,
             });
           }}
         >
-          {item.code} {item.name}
+          {item.sampleCode} {item.sampleName}
         </div>
       </Option>
     ));
