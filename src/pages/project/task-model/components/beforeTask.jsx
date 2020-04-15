@@ -170,6 +170,9 @@ class BeforeTask extends React.Component {
         loading: false,
       });
     });
+    this.setState({
+      loading: false,
+    });
     this.props.getData(res);
     this.props.onClose();
   };
