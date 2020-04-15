@@ -297,11 +297,16 @@ class ProcessEdit extends Component {
 
   // 点击关闭关联
   onClose = v => {
-    console.log(v);
-    this.setState({
-      taskLoading: !!v,
-      visible: false,
-    });
+    if (v === 'close') {
+      this.setState({
+        taskLoading: !!v,
+        visible: false,
+      });
+    } else {
+      this.setState({
+        visible: false,
+      });
+    }
   };
 
   // 打开参数
