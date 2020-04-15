@@ -229,6 +229,7 @@ class ProcessEdit extends Component {
     delete data.taskModelIds;
 
     try {
+      if (isEmpty(data.picture)) throw new Error('图片不能为空！');
       if (isEmpty(data.name)) throw new Error('流程名称不能为空！');
       if (isEmpty(data.describe)) throw new Error('流程描述不能为空！');
     } catch (e) {

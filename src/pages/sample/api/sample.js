@@ -13,18 +13,15 @@ export default {
   },
 
   // 样品列表(分页)
-  getSample(data) {
+  getSample(params) {
     return request(`${http2}/v1/`, {
-      data,
+      params,
     });
   },
 
-  // 修改流程模型
-  changeProcess(data) {
-    return request(`${http2}/v1/process`, {
-      method: 'PUT',
-      data,
-    });
+  // 样品详细页
+  getSampleDetail(id) {
+    return request(`${http2}/v1/${id}`);
   },
 
   // 删除流程模型

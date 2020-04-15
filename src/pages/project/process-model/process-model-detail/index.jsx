@@ -299,7 +299,7 @@ class DrawerTool extends Component {
     });
     api.getPreTasks(item.id).then(res => {
       const uuids = res.map(i => i.picture);
-      if (uuids) {
+      if (uuids && uuids.length !== 0) {
         disk.getFiles({ sourceCode: uuids.join(','), sourceKey: 'project_task_model' }).then(r => {
           const newList = res.map(e => {
             const filterItem = r.filter(it => it.sourceCode === e.picture);
