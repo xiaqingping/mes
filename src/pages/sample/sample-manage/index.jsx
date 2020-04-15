@@ -1,15 +1,12 @@
 // 流程模型
 import React, { Component } from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
-import { Button, Card, Form, Col, AutoComplete, Tag, Badge, Select } from 'antd';
+import { Button, Card, Form, Col, AutoComplete, Select } from 'antd';
 import TableSearchForm from '@/components/TableSearchForm';
 import { UploadOutlined } from '@ant-design/icons';
 import { connect } from 'dva';
 import _ from 'lodash';
-import { formatter } from '@/utils/utils';
 import api from '@/pages/sample/api/sample';
-import disk from '@/pages/project/api/disk';
-import DefaultHeadPicture from '@/assets/imgs/defaultheadpicture.jpg';
 import StandardTable from '@/pages/project/components/StandardTable';
 import UploadSequenceFile from '../UploadSequenceFile';
 import SampleDetail from '../sample-detail';
@@ -33,10 +30,8 @@ class ProcessModel extends Component {
       visible: false,
       detailValue: {},
       nameCodeVal: [],
-      nameCodeValPublish: [],
       filtersData: null,
-      processCode: '',
-      publisherCode: '',
+      sampleCode: '',
       detailVisible: false,
     };
     // 异步验证做节流处理
@@ -57,36 +52,17 @@ class ProcessModel extends Component {
   getTableData = (options = {}) => {
     this.setState({ loading: true });
     const formData = this.tableSearchFormRef.current.getFieldsValue();
-    const { pagination, processCode, publisherCode } = this.state;
+    const { pagination, sampleCode } = this.state;
     const { current: page, pageSize: rows } = pagination;
     let newData = [];
     let changePage = false;
-    if (formData.status) {
-      changePage = true;
-      newData = { ...newData, status: formData.status.join(',') };
-      delete formData.status;
-    }
-
-    if (formData.publishDate) {
-      changePage = true;
-      newData = {
-        ...newData,
-        publishBeginDate: formData.publishDate[0].format('YYYY-MM-DD'),
-        publicEndDate: formData.publishDate[1].format('YYYY-MM-DD'),
-      };
-      delete formData.publishDate;
-    }
 
     if (formData.name) {
       changePage = true;
-      newData = { ...newData, code: processCode };
+      newData = { ...newData, sampleCode };
       delete formData.name;
     }
-    if (formData.publisherName) {
-      changePage = true;
-      newData = { ...newData, publisherCode };
-      delete formData.publisherName;
-    }
+
     const newPage = changePage ? { page: 1 } : page;
     const data = {
       ...newPage,
@@ -95,41 +71,10 @@ class ProcessModel extends Component {
       ...formData,
       ...options,
     };
-    api.getSample(data).then(res => {
-      const uuids = res.rows.map(e => e.picture);
-      disk
-        .getFiles({
-          sourceCode: uuids.join(','),
-          sourceKey: 'project_process_model',
-        })
-        .then(v => {
-          if (v) {
-            const newList = res.rows.map(e => {
-              const filterItem = v.filter(item => item.sourceCode === e.picture);
-              const fileId = filterItem[0] && filterItem[0].id;
-              return {
-                ...e,
-                fileId,
-              };
-            });
-            this.setState({
-              list: newList,
-            });
-          } else {
-            const newList = res.rows.map(e => {
-              const fileId = '';
-              return {
-                ...e,
-                fileId,
-              };
-            });
-            this.setState({
-              list: newList,
-            });
-          }
-        });
 
+    api.getSample(data).then(res => {
       this.setState({
+        list: res.rows,
         pagination: {
           current: data.page,
           pageSize: data.rows,
@@ -151,11 +96,12 @@ class ProcessModel extends Component {
     if (nameCodeVal.length === 0) {
       return false;
     }
+
     nameCodeVal.forEach(item => {
-      if (item.name.indexOf(value) !== -1 && arr.indexOf(item) !== -1) {
+      if (item.sampleName.indexOf(value) !== -1 && arr.indexOf(item) !== -1) {
         arr.push(item);
       }
-      if (item.code.indexOf(value) !== -1 && arr.indexOf(item) !== -1) {
+      if (item.sampleCode.indexOf(value) !== -1 && arr.indexOf(item) !== -1) {
         arr.push(item);
       }
     });
@@ -199,7 +145,7 @@ class ProcessModel extends Component {
         <div
           onClick={() => {
             this.setState({
-              processCode: item.sampleCode,
+              sampleCode: item.sampleCode,
             });
           }}
         >
@@ -216,7 +162,7 @@ class ProcessModel extends Component {
               spellCheck="false"
               onKeyDown={() => {
                 this.setState({
-                  processCode: '',
+                  sampleCode: '',
                 });
               }}
             >

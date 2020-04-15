@@ -26,7 +26,7 @@ class UploadSequenceFile extends React.Component {
     };
   }
 
-  state = {};
+  callback = v => v;
 
   getTableData = (options = {}) => {
     const { pagination } = this.state;
@@ -98,7 +98,7 @@ class UploadSequenceFile extends React.Component {
   };
 
   // 上传文件
-  handleUpload = e => {
+  handleUpload = (e, callback) => {
     const self = this;
     const { filesNameList } = self.state;
     const file = e.target.files;
@@ -114,9 +114,7 @@ class UploadSequenceFile extends React.Component {
     const config = {
       headers: { 'Content-Type': 'multipart/form-data' },
       onUploadProgress(progress) {
-        self.setState({
-          progressStatus: `${Math.round((progress.loaded / progress.total) * 100)}%`,
-        });
+        callback(`${(progress.loaded / progress.total) * 100}%`);
       },
     };
     request(uploadUrl, {
@@ -129,24 +127,27 @@ class UploadSequenceFile extends React.Component {
   };
 
   // 文件列表
-  itemList = (item, index) => (
-    <List.Item
-      style={{ fontSize: '16px', width: '160px', float: 'left', position: 'relative' }}
-      key={index + item}
-    >
-      <span>
-        <PaperClipOutlined style={{ fontSize: '18px' }} />
-        <span style={{ display: 'inline-block', marginLeft: '10px' }}>{item}</span>
-      </span>
-      <Button icon={<CloseOutlined />} style={{ border: 'none' }} />
-      <Progress
-        percent={30}
-        size="small"
-        showInfo={false}
-        style={{ position: 'absolute', top: '55px' }}
-      />
-    </List.Item>
-  );
+  itemList = (item, index) => {
+    const { progressStatus } = this.state;
+    return (
+      <List.Item
+        style={{ fontSize: '16px', width: '160px', float: 'left', position: 'relative' }}
+        key={index + item}
+      >
+        <span>
+          <PaperClipOutlined style={{ fontSize: '18px' }} />
+          <span style={{ display: 'inline-block', marginLeft: '10px' }}>{item}</span>
+        </span>
+        <Button icon={<CloseOutlined />} style={{ border: 'none' }} />
+        <Progress
+          percent={this.callback}
+          size="small"
+          showInfo={false}
+          style={{ position: 'absolute', top: '55px' }}
+        />
+      </List.Item>
+    );
+  };
 
   render() {
     const { list, loading, visible, progressStatus, filesNameList } = this.state;
@@ -199,7 +200,7 @@ class UploadSequenceFile extends React.Component {
           </div>
           <input
             type="file"
-            onChange={e => this.handleUpload(e)}
+            onChange={e => this.handleUpload(e, this.callback)}
             multiple="multiple"
             style={{
               opacity: 0,
