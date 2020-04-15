@@ -221,7 +221,7 @@ class Parameter extends React.Component {
         if (value.params.filter(item => item.paramId === moveElement.paramId).length === 0) {
           // 添加到新对象里
           newData.forEach((item, i) => {
-            if (item.groupName === value.groupName) {
+            if (item.groupName === value.groupName && (index === i || value.groupName === 'no')) {
               newData[i].params.push(moveElement);
             }
           });
