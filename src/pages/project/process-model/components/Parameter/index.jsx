@@ -1,6 +1,6 @@
 // 参数分配
 import React from 'react';
-import { Modal, List, Card, Button } from 'antd';
+import { Modal, List, Card, Button, message } from 'antd';
 import { ArrowsAltOutlined, PlusOutlined } from '@ant-design/icons';
 import EnlargePage from '../EnlargePage/enlargePage';
 import AddGroup from '../AddGroup/addGroup';
@@ -40,10 +40,13 @@ class Parameter extends React.Component {
   handleAddGroup = () => {
     const { data } = this.state;
     const newData = data;
-    const num = Math.ceil(Math.random() * 2);
+    if (data.some(item => item.groupName === '分组A')) {
+      message.error('已经存在了分组A');
+      return false;
+    }
     newData.splice(1, 0, {
       sortNo: '',
-      groupName: `分组${num}`,
+      groupName: '分组A',
       groupDescribe: '描述',
       params: [],
     });
@@ -361,7 +364,7 @@ class Parameter extends React.Component {
                     <Card
                       title={this.titleContent(item, index)}
                       hoverable
-                      style={{ width: '269px', height: '234px', overflowY: 'scroll' }}
+                      style={{ width: '269px', height: '234px', overflowY: 'auto' }}
                       onDrop={() => this.drop(item, 2, index + 1)}
                       onDragOver={e => this.dragOver(e)}
                     >
