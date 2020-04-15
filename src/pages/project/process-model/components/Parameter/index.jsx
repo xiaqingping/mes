@@ -431,7 +431,7 @@ class Parameter extends React.Component {
                   </Card>
                 </List.Item>
               ) : (
-                <div />
+                <div style={{ display: 'none' }} />
               )
             }
             className="list-style card-item-style"

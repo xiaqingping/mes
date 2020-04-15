@@ -199,6 +199,10 @@ class UploadSequenceFile extends React.Component {
   update = e => {
     // 上传照片
     const file = e.target.files[0];
+    console.log(e.target.files);
+    console.log(file);
+    console.log(e.target.files.length);
+    console.log(e.target.files.length);
     const { guuid } = this.state;
     const uploadUrl = disk.uploadMoreFiles('ngs_sample', guuid);
     const data = new FormData();
