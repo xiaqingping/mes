@@ -7,21 +7,14 @@ if (process.env.NODE_ENV !== 'development') {
 }
 
 export default {
-  // 流程模型接口
-  // 流程模型分页列表
-  getProcess(params) {
-    return request(`${http2}/v1/process`, { params });
-  },
-
   // 样品模糊搜索
-  getSearchCodeAndName(data) {
+  getSampleCodeAndName(data) {
     return request(`${http2}/v1/${data}/search`);
   },
 
-  // 创建流程模型
-  upgradeProcess(id, data) {
-    return request(`${http2}/v1/process/${id}/upgrade`, {
-      method: 'POST',
+  // 样品列表(分页)
+  getSample(data) {
+    return request(`${http2}/v1/`, {
       data,
     });
   },

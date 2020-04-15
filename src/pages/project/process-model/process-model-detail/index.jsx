@@ -48,18 +48,20 @@ class DrawerTool extends Component {
             disk
               .getFiles({ sourceCode: ids.join(','), sourceKey: 'project_process_model' })
               .then(r => {
-                const newList = taskModels.map(e => {
-                  const filterItem = r.filter(item => item.sourceCode === e.picture);
-                  const listId = filterItem[0] && filterItem[0].id;
-                  return {
-                    ...e,
-                    listId,
-                  };
-                });
-                newData.taskModels = newList;
-                this.setState({
-                  detailValue: newData,
-                });
+                if (r) {
+                  const newList = taskModels.map(e => {
+                    const filterItem = r.filter(item => item.sourceCode === e.picture);
+                    const listId = filterItem[0] && filterItem[0].id;
+                    return {
+                      ...e,
+                      listId,
+                    };
+                  });
+                  newData.taskModels = newList;
+                  this.setState({
+                    detailValue: newData,
+                  });
+                }
               });
           }
           this.setState({
