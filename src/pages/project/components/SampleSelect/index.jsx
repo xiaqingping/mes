@@ -1,5 +1,5 @@
 import React from 'react';
-import { Table, Popconfirm, Button, Modal, Input } from 'antd';
+import { Table, Popover, Button, Modal, Input } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { SketchPicker } from 'react-color';
 import { getrandomColor } from '@/utils/utils';
@@ -114,6 +114,7 @@ class SampleSelect extends React.Component {
 
   render() {
     const { tableData, visible } = this.state;
+
     const columns = [
       {
         title: '样品',
@@ -122,26 +123,41 @@ class SampleSelect extends React.Component {
         render: (text, record, index) => {
           return (
             <div style={{ display: 'flex' }}>
-              <div
-                style={{
-                  width: 20,
-                  height: 20,
-                  backgroundColor: record.color,
-                  position: 'relative',
-                }}
-                onClick={() => {
-                  this.handleClick(record, index);
-                }}
+              <Popover
+                overlayClassName="project_manage_sample_ui_select"
+                overlayStyle={{ padding: 0 }}
+                content={
+                  <SketchPicker
+                    color={record.color || this.state.color}
+                    onChangeComplete={color => this.handleChange(color, record, index)}
+                  />
+                }
+                trigger="click"
+                placement="bottom"
               >
-                <div style={{ position: 'absolute', zIndex: '9999999999999', top: 24 }}>
-                  {record.visible && (
-                    <SketchPicker
-                      color={record.color || this.state.color}
-                      onChangeComplete={color => this.handleChange(color, record, index)}
-                    />
-                  )}
-                </div>
-              </div>
+                <div
+                  style={{
+                    width: 20,
+                    height: 20,
+                    backgroundColor: record.color,
+                    position: 'relative',
+                  }}
+                  onClick={() => {
+                    this.handleClick(record, index);
+                  }}
+                />
+              </Popover>
+              {/* <div
+                    style={{
+                      position: 'absolute',
+                      zIndex: '99999999999999999999999999999',
+                      top: 24,
+                    }}
+                  >
+                    {record.visible && (
+                      
+                    )}
+                  </div> */}
               <div style={{ marginLeft: 10 }}>{text}</div>
             </div>
           );
