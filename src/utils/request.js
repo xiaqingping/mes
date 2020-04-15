@@ -132,10 +132,23 @@ service.interceptors.request.use(config => {
       }
     }
   }
+  // https://dev.sangon.com/api/
+  // seq/order/{id}
+  // https://dev.sangon.com/api/seq/order/{id}
+
+  // https://dev.sangon.com/api/
+  // /zuul/api/disk/
+  // https://dev.sangon.com/api/zuul/api/disk/
 
   if (config.url.indexOf('/zuul/api/disk/') > -1) {
     // disk 服务接口在定义时已经有了 /api/ 所以拼接baseURL时，去掉baseURL的 /api/
     config.url = new URL(baseURLMap[env]).origin + config.url;
+  }
+
+  // 去掉重复的url
+  const repeatUrl = baseURLMap[env].substr(0, baseURLMap[env].length - 4);
+  if (config.url.split(repeatUrl).length === 3) {
+    config.url = config.url.substr(repeatUrl.length);
   }
 
   return config;

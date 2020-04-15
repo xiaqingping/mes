@@ -30,7 +30,7 @@ class ProcessModel extends Component {
     this.state = {
       pagination: {},
       loading: false,
-      visible: false,
+      visible: true,
       detailValue: {},
       nameCodeVal: [],
       nameCodeValPublish: [],
