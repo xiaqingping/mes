@@ -1,7 +1,7 @@
 import request from '@/utils/request';
 
 // 2组
-let http2 = 'http://192.168.20.12:8360';
+let http2 = 'http://192.168.20.12:8460';
 if (process.env.NODE_ENV !== 'development') {
   http2 = '/projectmodel';
 }
@@ -13,12 +13,9 @@ export default {
     return request(`${http2}/v1/process`, { params });
   },
 
-  // 创建流程模型
-  addProcess(data) {
-    return request(`${http2}/v1/process`, {
-      method: 'POST',
-      data,
-    });
+  // 样品模糊搜索
+  getSearchCodeAndName(data) {
+    return request(`${http2}/v1/${data}/search`);
   },
 
   // 创建流程模型
