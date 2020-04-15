@@ -111,7 +111,7 @@ class Parameter extends React.Component {
             fontWeight: 'bolder',
             background: moveTitleId === index ? '#E2E2E2' : 'white',
           }}
-          defaultValue={item.groupName}
+          value={item.groupName}
         />
 
         <Button
@@ -160,7 +160,7 @@ class Parameter extends React.Component {
               background: moveDescId === index ? '#E2E2E2' : 'white',
               resize: 'none',
             }}
-            defaultValue={item.groupDescribe}
+            value={item.groupDescribe}
           />
         </div>
       </div>
