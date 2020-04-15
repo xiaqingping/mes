@@ -48,7 +48,7 @@ class ProcessModel extends Component {
   }
 
   callParter = value => {
-    api.getSearchCodeAndName(value).then(res => {
+    api.getSampleCodeAndName(value).then(res => {
       this.setState({ nameCodeVal: res });
     });
   };
@@ -142,12 +142,12 @@ class ProcessModel extends Component {
 
   // 流程模型选择样式
   renderOption = item => ({
-    value: `${item.code}  ${item.name}`,
+    value: `${item.sampleCode}  ${item.sampleName}`,
     label: (
       // <Option key={item.id} text={item.name}>
       <div style={{ display: 'flex', marginLeft: '14px', padding: '6px 0' }}>
-        <span>{item.code}</span>&nbsp;&nbsp;
-        <span>{item.name}</span>
+        <span>{item.sampleCode}</span>&nbsp;&nbsp;
+        <span>{item.sampleName}</span>
       </div>
       // </Option>
     ),
@@ -254,13 +254,6 @@ class ProcessModel extends Component {
     );
   };
 
-  // 关闭详情抽屉
-  // onClose = () => {
-  //   this.setState({
-  //     visible: false,
-  //   });
-  // };
-
   // 打开上传序列文件弹框
   handleModalVisible = () => {
     this.setState({
@@ -271,6 +264,12 @@ class ProcessModel extends Component {
   handleClose = () => {
     this.setState({
       visible: false,
+    });
+  };
+
+  handleDetailClose = () => {
+    this.setState({
+      detailVisible: false,
     });
   };
 
@@ -291,7 +290,6 @@ class ProcessModel extends Component {
 
   render() {
     const { pagination, loading, list, visible, detailVisible, detailValue } = this.state;
-    const { status } = this.props;
     let tableWidth = 0;
     let columns = [
       {
@@ -327,24 +325,14 @@ class ProcessModel extends Component {
       },
       {
         title: '序列',
-        dataIndex: 'version',
+        dataIndex: 'sampleSequenceCount',
         width: 140,
-        render: value => (
-          <Tag color="green" style={{ padding: '0 10px' }}>
-            {value}
-          </Tag>
-        ),
+        render: (value, row) => `${value} (${row.sampleLengthTotal}bp)`,
       },
       {
         title: '长度',
-        dataIndex: 'status',
-        width: 150,
-        render: value => (
-          <Badge
-            status={formatter(status, value, 'value', 'status')}
-            text={formatter(status, value, 'value', 'text')}
-          />
-        ),
+        dataIndex: 'sampleLengthMin',
+        render: (value, row) => `${value}-${row.sampleLengthMax} (${row.sampleLengthAve})`,
       },
       {
         title: '操作',
@@ -404,7 +392,15 @@ class ProcessModel extends Component {
           </Card>
         </div>
         {visible ? <UploadSequenceFile visible={visible} handleClose={this.handleClose} /> : ''}
-        {detailVisible ? <SampleDetail visible={detailVisible} detailValue={detailValue} /> : ''}
+        {detailVisible ? (
+          <SampleDetail
+            visible={detailVisible}
+            detailValue={detailValue}
+            handleClose={this.handleDetailClose}
+          />
+        ) : (
+          ''
+        )}
       </PageHeaderWrapper>
     );
   }
