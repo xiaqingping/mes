@@ -296,11 +296,17 @@ class ProcessEdit extends Component {
   };
 
   // 点击关闭关联
-  onClose = () => {
-    this.setState({
-      taskLoading: true,
-      visible: false,
-    });
+  onClose = v => {
+    if (v === 'close') {
+      this.setState({
+        taskLoading: !!v,
+        visible: false,
+      });
+    } else {
+      this.setState({
+        visible: false,
+      });
+    }
   };
 
   // 打开参数
@@ -318,7 +324,6 @@ class ProcessEdit extends Component {
 
   // 关闭参数
   handleClose = value => {
-    console.log(value);
     const newData = value.map((item, index) => ({ ...item, sortNo: index }));
     const sonData = newData;
     newData.map((item, index) => {
@@ -329,7 +334,6 @@ class ProcessEdit extends Component {
       return true;
     });
     sonData[0].sortNo = 0;
-    console.log(sonData);
     this.setState({
       parameterVisible: false,
       paramter: sonData,
@@ -385,6 +389,9 @@ class ProcessEdit extends Component {
   getData = value => {
     const { taskList, ids, sonIds, paramter } = this.state;
     // const { processAddData } = this.props;
+    this.setState({
+      taskLoading: true,
+    });
     const oldModelProcess = paramter;
     let data = taskList;
     const idsData = ids;
@@ -541,7 +548,11 @@ class ProcessEdit extends Component {
         dataIndex: 'isAutomatic',
         width: 250,
         render: (value, row, index) => (
-          <Switch disabled={value === 2} onChange={() => this.changeIsAutomatic(row, index)} />
+          <Switch
+            disabled={value === 2}
+            defaultChecked={row.automatic === 1}
+            onChange={() => this.changeIsAutomatic(row, index)}
+          />
         ),
       },
       {
@@ -741,7 +752,7 @@ class ProcessEdit extends Component {
           {visible ? (
             <AssociatedProcessModel
               visible={visible}
-              onClose={this.onClose}
+              onClose={v => this.onClose(v)}
               getData={v => this.getData(v)}
               ids={ids}
             />

@@ -4,7 +4,6 @@ import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import { Button, Card, Form, Col, AutoComplete, Avatar, Tag, Badge, Select } from 'antd';
 import TableSearchForm from '@/components/TableSearchForm';
 import { UploadOutlined } from '@ant-design/icons';
-import router from 'umi/router';
 import { connect } from 'dva';
 import _ from 'lodash';
 import { formatter } from '@/utils/utils';
@@ -96,7 +95,6 @@ class ProcessModel extends Component {
       ...formData,
       ...options,
     };
-    console.log(data);
     api.getProcess(data).then(res => {
       const uuids = res.rows.map(e => e.picture);
       disk

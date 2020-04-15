@@ -156,7 +156,7 @@ class AssociatedProcessModel extends React.Component {
   };
 
   sendData = async id => {
-    this.props.onClose();
+    this.props.onClose('close');
     const res = await api.getAllPreTasks(id, this.props.ids);
     this.props.getData(res);
   };
@@ -170,7 +170,7 @@ class AssociatedProcessModel extends React.Component {
 
   render() {
     const { onClose } = this.props;
-    const { list, loading, pagination } = this.state;
+    const { list, loading, pagination, visible } = this.state;
     const columns = [
       {
         title: '编号/名称',
@@ -227,7 +227,7 @@ class AssociatedProcessModel extends React.Component {
     return (
       <Modal
         title={this.titleContent()}
-        visible={this.state.visible}
+        visible={visible}
         onOk={this.handleOk}
         onCancel={onClose}
         width={747}

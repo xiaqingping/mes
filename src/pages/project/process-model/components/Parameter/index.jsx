@@ -1,6 +1,6 @@
 // 参数分配
 import React from 'react';
-import { Modal, List, Card, Button } from 'antd';
+import { Modal, List, Card, Button, message } from 'antd';
 import { ArrowsAltOutlined, PlusOutlined } from '@ant-design/icons';
 import EnlargePage from '../EnlargePage/enlargePage';
 import AddGroup from '../AddGroup/addGroup';
@@ -40,6 +40,10 @@ class Parameter extends React.Component {
   handleAddGroup = () => {
     const { data } = this.state;
     const newData = data;
+    if (data.some(item => item.groupName === '分组A')) {
+      message.error('已经存在了分组A');
+      return false;
+    }
     newData.splice(1, 0, {
       sortNo: '',
       groupName: '分组A',
@@ -98,7 +102,7 @@ class Parameter extends React.Component {
           }}
           spellCheck="false"
           style={{
-            width: '200px',
+            width: '180px',
             border: 'none',
             outline: 'none',
             paddingLeft: '10px',
@@ -120,7 +124,7 @@ class Parameter extends React.Component {
         <br />
         <div
           style={{
-            width: '220px',
+            width: '200px',
             fontWeight: '200',
             marginTop: '5px',
           }}
@@ -138,7 +142,6 @@ class Parameter extends React.Component {
             }}
             onChange={e => {
               data[index + 1].groupDescribe = e.target.value;
-              console.log(data);
               this.setState({
                 data: [...data],
               });
@@ -214,7 +217,6 @@ class Parameter extends React.Component {
     if (moveType === 1) {
       // 拖到具体分类
       if (type === 2) {
-        // console.log(value, moveElement);
         // console.log(value.params.filter(item => item.paramId === moveElement.paramId).length);
         if (value.params.filter(item => item.paramId === moveElement.paramId).length === 0) {
           // 添加到新对象里
@@ -252,7 +254,6 @@ class Parameter extends React.Component {
           newData[typeIndex].params.splice(old, 1, moveElement);
         }
       }
-
       this.setState({
         data: newData,
       });
@@ -361,7 +362,7 @@ class Parameter extends React.Component {
                     <Card
                       title={this.titleContent(item, index)}
                       hoverable
-                      style={{ width: '269px', height: '234px' }}
+                      style={{ width: '269px', height: '234px', overflowY: 'auto' }}
                       onDrop={() => this.drop(item, 2, index + 1)}
                       onDragOver={e => this.dragOver(e)}
                     >
@@ -431,7 +432,7 @@ class Parameter extends React.Component {
                   </Card>
                 </List.Item>
               ) : (
-                <div />
+                <div style={{ display: 'none' }} />
               )
             }
             className="list-style card-item-style"
