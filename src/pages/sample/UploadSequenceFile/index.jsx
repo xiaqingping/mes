@@ -143,7 +143,7 @@ class UploadSequenceFile extends React.Component {
         percent={30}
         size="small"
         showInfo={false}
-        style={{ position: 'absolute', top: '45px' }}
+        style={{ position: 'absolute', top: '55px' }}
       />
     </List.Item>
   );

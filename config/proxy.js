@@ -17,6 +17,11 @@ export default {
     changeOrigin: true,
     pathRewrite: { '^/192.168.20.12:8360/': '' },
   },
+  '/192.168.20.12:8460/': {
+    target: 'http://192.168.20.12:8460/',
+    changeOrigin: true,
+    pathRewrite: { '^/192.168.20.12:8460/': '' },
+  },
   '/192.168.20.6:8166/': {
     target: 'http://192.168.20.6:8166/',
     changeOrigin: true,

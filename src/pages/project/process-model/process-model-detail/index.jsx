@@ -261,20 +261,27 @@ class DrawerTool extends Component {
     });
     api.getPreTasks(item.id).then(res => {
       const uuids = res.map(i => i.picture);
-      disk.getFiles({ sourceCode: uuids.join(','), sourceKey: 'project_task_model' }).then(r => {
-        const newList = res.map(e => {
-          const filterItem = r.filter(it => it.sourceCode === e.picture);
-          const fileId = filterItem[0] && filterItem[0].id;
-          return {
-            ...e,
-            fileId,
-          };
+      if (uuids) {
+        disk.getFiles({ sourceCode: uuids.join(','), sourceKey: 'project_task_model' }).then(r => {
+          const newList = res.map(e => {
+            const filterItem = r.filter(it => it.sourceCode === e.picture);
+            const fileId = filterItem[0] && filterItem[0].id;
+            return {
+              ...e,
+              fileId,
+            };
+          });
+          this.setState({
+            childrenDrawer: true,
+            task: newList,
+          });
         });
+      } else {
         this.setState({
           childrenDrawer: true,
-          task: newList,
+          task: res,
         });
-      });
+      }
     });
   };
 

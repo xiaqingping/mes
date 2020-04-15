@@ -121,6 +121,10 @@ service.interceptors.request.use(config => {
         config.url = config.url.replace('http://192.168.20.12:8360/', '/192.168.20.12:8360/');
         config.baseURL = '/';
       }
+      if (config.url.indexOf('http://192.168.20.12:8460/') > -1) {
+        config.url = config.url.replace('http://192.168.20.12:8460/', '/192.168.20.12:8460/');
+        config.baseURL = '/';
+      }
       if (config.url.indexOf('http://192.168.20.6:8166/') > -1) {
         config.url = config.url.replace('http://192.168.20.6:8166/', '/192.168.20.6:8166/');
         config.baseURL = '/';
