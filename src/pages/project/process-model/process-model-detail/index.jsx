@@ -48,18 +48,20 @@ class DrawerTool extends Component {
             disk
               .getFiles({ sourceCode: ids.join(','), sourceKey: 'project_process_model' })
               .then(r => {
-                const newList = taskModels.map(e => {
-                  const filterItem = r.filter(item => item.sourceCode === e.picture);
-                  const listId = filterItem[0] && filterItem[0].id;
-                  return {
-                    ...e,
-                    listId,
-                  };
-                });
-                newData.taskModels = newList;
-                this.setState({
-                  detailValue: newData,
-                });
+                if (r) {
+                  const newList = taskModels.map(e => {
+                    const filterItem = r.filter(item => item.sourceCode === e.picture);
+                    const listId = filterItem[0] && filterItem[0].id;
+                    return {
+                      ...e,
+                      listId,
+                    };
+                  });
+                  newData.taskModels = newList;
+                  this.setState({
+                    detailValue: newData,
+                  });
+                }
               });
           }
           this.setState({
@@ -123,6 +125,42 @@ class DrawerTool extends Component {
     // });
   };
 
+  // 更换版本
+  handleChangeVersion = v => {
+    processApi.getProcessChangeVersion(v).then(res => {
+      let newData = {};
+      if (res.picture) {
+        disk.getFiles({ sourceCode: res.picture, sourceKey: 'project_process_model' }).then(i => {
+          const picId = i[0].id;
+          newData = { ...res, picId };
+          this.setState({
+            detailValue: newData,
+          });
+          if (res.taskModels.length !== 0) {
+            res.taskModels.map((item, index) => {
+              if (item.picture) {
+                disk
+                  .getFiles({ sourceCode: item.picture, sourceKey: 'project_process_model' })
+                  .then(r => {
+                    const listId = r[0].id;
+                    newData.taskModels[index].listId = listId;
+                    this.setState({
+                      detailValue: newData,
+                    });
+                  });
+              }
+              return true;
+            });
+          }
+        });
+      } else {
+        this.setState({
+          detailValue: res,
+        });
+      }
+    });
+  };
+
   CollapseTool = value => {
     const { visable, selectVersion, parameterVisible, detailValue, open } = this.state;
     return (
@@ -162,7 +200,7 @@ class DrawerTool extends Component {
                           style={{ cursor: 'pointer' }}
                           onClick={() => {
                             if (item !== value.version) {
-                              this.props.handleChangeVersion({ code: value.code, version: item });
+                              this.handleChangeVersion({ code: value.code, version: item });
                             }
                             this.setState({
                               visable: !visable,

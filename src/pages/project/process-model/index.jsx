@@ -353,42 +353,6 @@ class ProcessModel extends Component {
     });
   };
 
-  // 更换版本
-  handleChangeVersion = v => {
-    api.getProcessChangeVersion(v).then(res => {
-      let newData = {};
-      if (res.picture) {
-        disk.getFiles({ sourceCode: res.picture, sourceKey: 'project_process_model' }).then(i => {
-          const picId = i[0].id;
-          newData = { ...res, picId };
-          this.setState({
-            detailValue: newData,
-          });
-          if (res.taskModels.length !== 0) {
-            res.taskModels.map((item, index) => {
-              if (item.picture) {
-                disk
-                  .getFiles({ sourceCode: item.picture, sourceKey: 'project_process_model' })
-                  .then(r => {
-                    const listId = r[0].id;
-                    newData.taskModels[index].listId = listId;
-                    this.setState({
-                      detailValue: newData,
-                    });
-                  });
-              }
-              return true;
-            });
-          }
-        });
-      } else {
-        this.setState({
-          detailValue: res,
-        });
-      }
-    });
-  };
-
   // 新建
   handleModalVisible = () => {
     router.push('/project/process-model/add');

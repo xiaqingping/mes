@@ -36,7 +36,7 @@ class SampleDetail extends Component {
         <Drawer
           width={500}
           closable={false}
-          onClose={this.onClose}
+          onClose={this.props.handleClose}
           visible={this.props.visible}
           className="drawer-style"
         >

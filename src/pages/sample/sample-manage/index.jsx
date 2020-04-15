@@ -1,13 +1,13 @@
 // 流程模型
 import React, { Component } from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
-import { Button, Card, Form, Col, AutoComplete, Avatar, Tag, Badge, Select } from 'antd';
+import { Button, Card, Form, Col, AutoComplete, Tag, Badge, Select } from 'antd';
 import TableSearchForm from '@/components/TableSearchForm';
 import { UploadOutlined } from '@ant-design/icons';
 import { connect } from 'dva';
 import _ from 'lodash';
 import { formatter } from '@/utils/utils';
-import api from '@/pages/project/api/processModel/';
+import api from '@/pages/sample/api/sample';
 import disk from '@/pages/project/api/disk';
 import DefaultHeadPicture from '@/assets/imgs/defaultheadpicture.jpg';
 import StandardTable from '@/pages/project/components/StandardTable';
@@ -48,7 +48,7 @@ class ProcessModel extends Component {
   }
 
   callParter = value => {
-    api.getProcessCodeAndName(value).then(res => {
+    api.getSampleCodeAndName(value).then(res => {
       this.setState({ nameCodeVal: res });
     });
   };
@@ -95,7 +95,7 @@ class ProcessModel extends Component {
       ...formData,
       ...options,
     };
-    api.getProcess(data).then(res => {
+    api.getSample(data).then(res => {
       const uuids = res.rows.map(e => e.picture);
       disk
         .getFiles({
@@ -142,12 +142,12 @@ class ProcessModel extends Component {
 
   // 流程模型选择样式
   renderOption = item => ({
-    value: `${item.code}  ${item.name}`,
+    value: `${item.sampleCode}  ${item.sampleName}`,
     label: (
       // <Option key={item.id} text={item.name}>
       <div style={{ display: 'flex', marginLeft: '14px', padding: '6px 0' }}>
-        <span>{item.code}</span>&nbsp;&nbsp;
-        <span>{item.name}</span>
+        <span>{item.sampleCode}</span>&nbsp;&nbsp;
+        <span>{item.sampleName}</span>
       </div>
       // </Option>
     ),
@@ -254,13 +254,6 @@ class ProcessModel extends Component {
     );
   };
 
-  // 关闭详情抽屉
-  // onClose = () => {
-  //   this.setState({
-  //     visible: false,
-  //   });
-  // };
-
   // 打开上传序列文件弹框
   handleModalVisible = () => {
     this.setState({
@@ -271,6 +264,12 @@ class ProcessModel extends Component {
   handleClose = () => {
     this.setState({
       visible: false,
+    });
+  };
+
+  handleDetailClose = () => {
+    this.setState({
+      detailVisible: false,
     });
   };
 
@@ -291,62 +290,49 @@ class ProcessModel extends Component {
 
   render() {
     const { pagination, loading, list, visible, detailVisible, detailValue } = this.state;
-    const { status } = this.props;
     let tableWidth = 0;
     let columns = [
       {
         title: '编号/名称',
-        dataIndex: 'code',
+        dataIndex: 'sampleCode',
         width: 300,
         render: (value, row) => (
           <>
-            <Avatar
-              src={row.fileId ? disk.downloadFiles(row.fileId, { view: true }) : DefaultHeadPicture}
-              style={{ float: 'left', width: '46px', height: '46px' }}
-            />
             <div style={{ float: 'left', marginLeft: '10px' }}>
               <div>{value}</div>
-              <div style={{ color: '#B9B9B9' }}>{row.name}</div>
+              <div style={{ color: '#B9B9B9' }}>{row.sampleName}</div>
             </div>
           </>
         ),
       },
       {
         title: '创建人/时间',
-        dataIndex: 'describe',
+        dataIndex: 'creatorName',
         width: 400,
-      },
-      {
-        title: '样品识别号',
-        dataIndex: 'publisherName',
-        width: 200,
         render: (value, row) => (
           <>
-            <div>{value}</div>
-            <div>{row.publishDate}</div>
+            <div style={{ float: 'left', marginLeft: '10px' }}>
+              <div>{value}</div>
+              <div>{new Date(row.createDate).toLocaleDateString()}</div>
+            </div>
           </>
         ),
       },
       {
+        title: '样品识别号',
+        dataIndex: 'sampleIdentificationCode',
+        width: 200,
+      },
+      {
         title: '序列',
-        dataIndex: 'version',
+        dataIndex: 'sampleSequenceCount',
         width: 140,
-        render: value => (
-          <Tag color="green" style={{ padding: '0 10px' }}>
-            {value}
-          </Tag>
-        ),
+        render: (value, row) => `${value} (${row.sampleLengthTotal}bp)`,
       },
       {
         title: '长度',
-        dataIndex: 'status',
-        width: 150,
-        render: value => (
-          <Badge
-            status={formatter(status, value, 'value', 'status')}
-            text={formatter(status, value, 'value', 'text')}
-          />
-        ),
+        dataIndex: 'sampleLengthMin',
+        render: (value, row) => `${value}-${row.sampleLengthMax} (${row.sampleLengthAve})`,
       },
       {
         title: '操作',
@@ -406,7 +392,15 @@ class ProcessModel extends Component {
           </Card>
         </div>
         {visible ? <UploadSequenceFile visible={visible} handleClose={this.handleClose} /> : ''}
-        {detailVisible ? <SampleDetail visible={detailVisible} detailValue={detailValue} /> : ''}
+        {detailVisible ? (
+          <SampleDetail
+            visible={detailVisible}
+            detailValue={detailValue}
+            handleClose={this.handleDetailClose}
+          />
+        ) : (
+          ''
+        )}
       </PageHeaderWrapper>
     );
   }
