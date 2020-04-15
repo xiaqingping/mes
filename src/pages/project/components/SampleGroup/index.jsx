@@ -1,7 +1,7 @@
 import React from 'react';
 import { Table, Popconfirm, Button, Modal, Input } from 'antd';
 import { PlusOutlined, CloseOutlined, PlusSquareOutlined } from '@ant-design/icons';
-import { SketchPicker, SketchPicker } from 'react-color';
+import { SketchPicker } from 'react-color';
 import { randomcolor } from '@/utils/utils';
 
 // import SampleChoose from './components/SampleChoose';

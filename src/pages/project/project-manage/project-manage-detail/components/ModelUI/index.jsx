@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Modal, Form, Input, Button } from 'antd';
 import { InfoCircleOutlined } from '@ant-design/icons';
 
@@ -23,8 +23,8 @@ const EditInforModel = props => {
     const row = await form.validateFields();
     const data = {
       id: props.processList.id,
-      ...row
-    }
+      ...row,
+    };
     props.getData(data);
     props.onClose();
   };
@@ -40,7 +40,7 @@ const EditInforModel = props => {
         footer={[
           <Button key="submit" type="primary" loading={confirmLoading} onClick={handleOk}>
             确定
-          </Button>
+          </Button>,
         ]}
         centered
         width={650}
@@ -48,13 +48,9 @@ const EditInforModel = props => {
         <Form
           name="basic"
           form={form}
-          initialValues={{ name: props.processList.name , describe: props.processList.describe}}
+          initialValues={{ name: props.processList.name, describe: props.processList.describe }}
         >
-          <FormItem
-            label="名称"
-            name="name"
-            rules={[{ required: true, message: '请输入名称!' }]}
-          >
+          <FormItem label="名称" name="name" rules={[{ required: true, message: '请输入名称!' }]}>
             <Input style={{ width: 260, height: 32 }} />
           </FormItem>
           <FormItem
@@ -68,7 +64,7 @@ const EditInforModel = props => {
       </Modal>
     </div>
   );
-}
+};
 
 /**
  * 成员 修改权限 模态框
@@ -88,7 +84,7 @@ const EditJurisdictionModel = props => {
       type: 'ok',
       id: props.data.id,
       jurisdictionValue: props.data.jurisdictionValue,
-    }
+    };
     props.getData(data);
     props.onClose();
   };
@@ -105,15 +101,14 @@ const EditJurisdictionModel = props => {
         width={350}
       >
         <div style={{ textAlign: 'center' }}>
-          <InfoCircleOutlined style={{ fontSize: 40, color: '#f6b03b' }}/>
-          <p style={{ marginTop: 25, fontSize: 16, marginBottom: 5}}>
+          <InfoCircleOutlined style={{ fontSize: 40, color: '#f6b03b' }} />
+          <p style={{ marginTop: 25, fontSize: 16, marginBottom: 5 }}>
             是否将{props.data.name}修改为{props.data.jurisdictionName}?
           </p>
         </div>
       </Modal>
     </div>
   );
-
-}
+};
 
 export { EditInforModel, EditJurisdictionModel };

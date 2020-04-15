@@ -1,8 +1,7 @@
 const projectDetailModel = {
   namespace: 'projectDetail',
   state: {
-    filedList: [
-      {
+    filedList: [{
         id: 1,
         code: 111111,
         name: 'XXXX文件1',
@@ -41,14 +40,21 @@ const projectDetailModel = {
     ],
 
     // 权限
-    jurisdiction: [
-      { id: 1, name: '所有者' },
-      { id: 2, name: '管理者' },
-      { id: 3, name: '参与者' },
+    jurisdiction: [{
+        id: 1,
+        name: '所有者'
+      },
+      {
+        id: 2,
+        name: '管理者'
+      },
+      {
+        id: 3,
+        name: '参与者'
+      },
     ],
     // 执行记录状态
-    execRecordStatus: [
-      {
+    execRecordStatus: [{
         id: '1',
         name: '等待中',
         status: 'default',
@@ -75,8 +81,7 @@ const projectDetailModel = {
       },
     ],
     // 业务伙伴认证状态
-    BpCertificationStatus: [
-      {
+    BpCertificationStatus: [{
         id: 1,
         name: '未认证',
         // i18n: 'bp.unapproved',
@@ -102,8 +107,7 @@ const projectDetailModel = {
       },
     ],
     // 销售范围冻结状态
-    SalesOrderBlock: [
-      {
+    SalesOrderBlock: [{
         id: 1,
         name: '冻结',
         // i18n: 'bp.block',
@@ -125,11 +129,17 @@ const projectDetailModel = {
   effects: {},
   reducers: {
     setProcssesParam(state, action) {
-      return { ...state, procssesParam: action.payload };
+      return {
+        ...state,
+        procssesParam: action.payload
+      };
     },
     setParamList(state, action) {
-      return { ...state, paramList: action.payload };
+      return {
+        ...state,
+        paramList: action.payload
+      };
     },
   },
 };
-export default  projectDetailModel;
+export default projectDetailModel;
