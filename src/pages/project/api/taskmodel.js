@@ -1,9 +1,9 @@
 import request from '@/utils/request';
 
-let http = 'http://192.168.20.12:8360';
-if (process.env.NODE_ENV !== 'development') {
-  http = '/projectmodel';
-}
+const http = '/projectmodel';
+// if (process.env.NODE_ENV !== 'development') {
+//   http = '/projectmodel';
+// }
 export default {
   // 任务模型模糊搜索
   searchTaskModel(params) {
