@@ -60,7 +60,7 @@ class ArgumentForm extends React.Component {
     console.log(argumentValues);
 
     this.props.emitArguments(argumentValues);
-    this.props.onClose();
+    // this.props.onClose();
   };
 
   onFinishFailed = () => {
