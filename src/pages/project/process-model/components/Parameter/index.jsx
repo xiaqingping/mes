@@ -217,13 +217,11 @@ class Parameter extends React.Component {
     if (moveType === 1) {
       // 拖到具体分类
       if (type === 2) {
-        console.log(value, index);
         // console.log(value.params.filter(item => item.paramId === moveElement.paramId).length);
         if (value.params.filter(item => item.paramId === moveElement.paramId).length === 0) {
           // 添加到新对象里
           newData.forEach((item, i) => {
             if (item.groupName === value.groupName) {
-              console.log(i);
               newData[i].params.push(moveElement);
             }
           });
