@@ -1,8 +1,9 @@
 import React from 'react';
 import { Table, Popconfirm, Button, Modal, Input } from 'antd';
-import { PlusOutlined } from '@ant-design/icons';
-import { SketchPicker } from 'react-color';
+import { PlusOutlined, CloseOutlined, PlusSquareOutlined } from '@ant-design/icons';
+import { SketchPicker, SketchPicker } from 'react-color';
 import { randomcolor } from '@/utils/utils';
+
 // import SampleChoose from './components/SampleChoose';
 import './index.less';
 
@@ -13,91 +14,169 @@ class SampleSelect extends React.Component {
     tableData: [
       {
         key: '1',
+        sample: '样品1',
         name: 'John Brown',
-        alia: '好的哈',
-        sequence: 'New York No. 1 Lake Park',
-        length: 3000 - 7000,
+        age: '好的哈',
+        address: 'New York No. 1 Lake Park',
+        // length: 3000 - 7000,
       },
       {
         key: '2',
+        sample: '样品2',
         name: 'Jim Green',
-        alia: '好的哈1',
-        sequence: 'New York No. 1 Lake Park1',
-        length: 3444 - 7000,
+        age: '好的哈1',
+        address: 'New York No. 1 Lake Park1',
+        // length: 3444 - 7000,
       },
       {
         key: '3',
+        sample: '样品3',
         name: 'Joe Black',
-        alia: '好的哈2',
-        sequence: 'New York No. 1 Lake Park2',
-        length: 5000 - 7000,
+        age: '好的哈2',
+        address: 'New York No. 1 Lake Park2',
+        // length: 5000 - 7000,
       },
     ],
 
-    columns: [
+    headers: [],
+    columns: [],
+  };
+
+  componentDidMount() {
+    const headers = [
       {
-        title: '样品',
-        dataIndex: 'name',
-        key: 'name',
+        field: 'name',
+        title: '姓名',
       },
       {
-        title: '分组方案一',
-        dataIndex: 'group1',
-        key: 'group1',
-        render: (text, record, index) => {
+        field: 'age',
+        title: '年龄',
+      },
+      {
+        field: 'address',
+        title: '地址',
+      },
+    ];
+    this.setState({
+      headers,
+    });
+
+    const firstColumn = {
+      title: '样品',
+      dataIndex: 'sample',
+      key: 'sample',
+    };
+    const lastColumn = {
+      title: () => {
+        return <PlusSquareOutlined onClick={this.add} />;
+      },
+      dataIndex: 'add',
+      key: 'add',
+    };
+
+    const columns = [firstColumn, ...this.formatHeader(headers), lastColumn];
+    this.setState({
+      columns,
+    });
+  }
+
+  removeColumn = e => {
+    const { headers } = this.state;
+    console.log(e);
+    console.log(headers);
+    console.log(this.state.columns);
+    const headerArr = headers.filter(item => {
+      return item.field !== e.field;
+    });
+
+    this.setState(
+      {
+        headers: headerArr,
+      },
+      () => {
+        const hds = this.state.headers;
+        const firstColumn = {
+          title: '样品',
+          dataIndex: 'sample',
+          key: 'sample',
+        };
+        const lastColumn = {
+          title: () => {
+            return <PlusSquareOutlined onClick={this.add} />;
+          },
+          dataIndex: 'add',
+          key: 'add',
+        };
+        const columns = [firstColumn, ...this.formatHeader(hds), lastColumn];
+        this.setState({
+          columns,
+        });
+      },
+    );
+  };
+
+  handleBlur = () => {
+    // alert(111);
+  };
+
+  formatHeader = headers => {
+    const groups = headers.map(e => {
+      return {
+        title: () => {
           return (
-            <div style={{ display: 'flex' }}>
-              <div>{text}</div>
-              <div style={{ width: 20, height: 20, backgroundColor: '3' }} />
+            <div className="project_manage_UI_sample_group_title">
+              <input defaultValue={e.title} onBlur={this.handleBlur} />
+
+              <CloseOutlined onClick={() => this.removeColumn(e)} />
             </div>
           );
         },
-      },
-      {
-        title: '序列',
-        dataIndex: 'sequence',
-        key: 'sequence',
-      },
-      {
-        title: '长度',
-        dataIndex: 'length',
-        key: 'length',
-      },
-      {
-        title: '文件',
-        dataIndex: 'files',
-        key: 'files',
-        render: (text, record) => {
-          return (
-            <a
-              onClick={() => {
-                this.viewSelected(record);
-              }}
-            >
-              已选{text || 0}个
-            </a>
-          );
+        dataIndex: `${e.field}`,
+        key: `${e.field}`,
+        render: (text, record, input) => {
+          return <Input />;
         },
-      },
-    ],
+      };
+    });
+
+    return groups;
   };
 
   setTitle = () => {};
 
   add = () => {
-    const { columns } = this.state;
-    const cls = [
-      ...columns,
-      { title: '分组方案', dataIndex: 'arr1', key: 'xx', render: () => <Input /> },
-    ];
-    this.setState({
-      columns: cls,
-    });
+    const { columns, headers } = this.state;
+    const addheader = { field: Date.now(), title: '分组方案' };
+    this.setState(
+      {
+        // columns: cls,
+        headers: [...headers, addheader],
+      },
+      () => {
+        const hds = this.state.headers;
+        const firstColumn = {
+          title: '样品',
+          dataIndex: 'sample',
+          key: 'sample',
+        };
+        const lastColumn = {
+          title: () => {
+            return <PlusSquareOutlined onClick={this.add} />;
+          },
+          dataIndex: 'add',
+          key: 'add',
+        };
+        const cls = [firstColumn, ...this.formatHeader(hds), lastColumn];
+        this.setState({
+          columns: cls,
+        });
+      },
+    );
   };
 
   render() {
-    const { tableData, visible, columns } = this.state;
-
+    const { tableData, visible, headers, columns } = this.state;
+    console.log(this.formatHeader(headers));
     return (
       <>
         <Button onClick={this.add}>新增</Button>
