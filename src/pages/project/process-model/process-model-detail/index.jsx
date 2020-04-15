@@ -302,9 +302,11 @@ class DrawerTool extends Component {
         task: res,
       });
       const uuids = res.map(i => i.picture);
+      console.log(uuids);
       if (uuids && uuids.length !== 0) {
         disk.getFiles({ sourceCode: uuids.join(','), sourceKey: 'project_task_model' }).then(r => {
           const newList = res.map(e => {
+            if (!e.picture) return false;
             const filterItem = r.filter(it => it.sourceCode === e.picture);
             const fileId = filterItem[0] && filterItem[0].id;
             return {
