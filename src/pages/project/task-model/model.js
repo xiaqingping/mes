@@ -49,14 +49,7 @@ const SeqModel = {
         text: "已禁用",
         key: '3'
       },
-      {
-        label: '已过期',
-        data: "已发布",
-        value: 4,
-        status: "warning",
-        text: "已过期",
-        key: '4'
-      },
+
     ],
 
     viewId: "", // 任务模型列表点击查看的id
