@@ -298,6 +298,9 @@ class DrawerTool extends Component {
       taskName: item.name,
     });
     api.getPreTasks(item.id).then(res => {
+      this.setState({
+        task: res,
+      });
       const uuids = res.map(i => i.picture);
       if (uuids && uuids.length !== 0) {
         disk.getFiles({ sourceCode: uuids.join(','), sourceKey: 'project_task_model' }).then(r => {
@@ -317,7 +320,6 @@ class DrawerTool extends Component {
       } else {
         this.setState({
           childrenDrawer: true,
-          task: res,
         });
       }
     });
