@@ -1,10 +1,10 @@
 import request from '@/utils/request';
 
 // 2组
-const http2 = '/projectmodel';
-// if (process.env.NODE_ENV !== 'development') {
-//   http2 = '/projectmodel';
-// }
+let http2 = '/projectmodel';
+if (process.env.NODE_ENV !== 'development') {
+  http2 = '/projectmodel';
+}
 
 export default {
   // 流程模型接口
