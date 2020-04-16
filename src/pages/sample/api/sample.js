@@ -19,6 +19,14 @@ export default {
     });
   },
 
+  // 样品保存
+  addSample(data) {
+    return request(`${http2}/v1/`, {
+      method: 'POST',
+      data,
+    });
+  },
+
   // 样品详细页
   getSampleDetail(id) {
     return request(`${http2}/v1/${id}`);
