@@ -94,6 +94,12 @@ class DrawerTool extends Component {
   // 关闭参数
   handleClose = value => {
     const { detailValue } = this.state;
+    if (detailValue.status !== 1) {
+      this.setState({
+        parameterVisible: false,
+      });
+      return false;
+    }
     const newData = value.map((item, index) => {
       const itemLength = value.length;
       return { ...item, sortNo: itemLength - index };

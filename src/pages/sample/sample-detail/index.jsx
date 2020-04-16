@@ -19,7 +19,7 @@ class SampleDetail extends Component {
       .getSampleDetail(detailValue.id)
       .then(res => {
         this.setState({
-          detailValue: res.rows,
+          detailValue: res,
         });
       })
       .catch(() => {

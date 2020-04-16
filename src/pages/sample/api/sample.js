@@ -24,44 +24,19 @@ export default {
     return request(`${http2}/v1/${id}`);
   },
 
-  // 删除流程模型
-  deleteProcess(id) {
-    return request(`${http2}/v1/process/${id}/deletion`, {
-      method: 'PUT',
+  // 解析序列文件返回样品详细信息
+  getSequenceFileAnalysis(data) {
+    return request(`${http2}/v1/sequenceFile/analysis`, {
+      method: 'POST',
+      data,
     });
   },
 
-  // 发布流程模型
-  publishment(id) {
-    return request(`${http2}/v1/process/${id}/publishment`, {
-      method: 'PUT',
+  // 上传图片
+  UploadFiles(uploadUrl, params) {
+    return request(uploadUrl, {
+      method: 'POST',
+      ...params,
     });
-  },
-
-  // 禁用流程模型
-  unPublishment(id) {
-    return request(`${http2}/v1/process/${id}/forbiddance`, {
-      method: 'PUT',
-    });
-  },
-
-  // 查询任务模型详细信息
-  getProcessDetail(id) {
-    return request(`${http2}/v1/process/${id}`);
-  },
-
-  // 根据code和version查询流程模型详细信息
-  getProcessChangeVersion(data) {
-    return request(`${http2}/v1/process/${data.code}/${data.version}`);
-  },
-
-  // 流程模型编号模糊搜索
-  getProcessCodeAndName(data) {
-    return request(`${http2}/v1/process/${data}/search`);
-  },
-
-  // 流程模型发布人模糊搜索
-  getProcessPublisherCodeAndName(data) {
-    return request(`${http2}/v1/process/publisher/${data}/search`);
   },
 };
