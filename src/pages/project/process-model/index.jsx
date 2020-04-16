@@ -59,7 +59,6 @@ class ProcessModel extends Component {
   }
 
   componentDidMount() {
-    console.log(DefaultHeadPicture);
     this.getTableData(this.initialValues);
   }
 
@@ -119,6 +118,9 @@ class ProcessModel extends Component {
     };
     api.getProcess(data).then(res => {
       const uuids = res.rows.map(e => e.picture);
+      this.setState({
+        list: res.rows,
+      });
       disk
         .getFiles({
           sourceCode: uuids.join(','),
@@ -134,6 +136,7 @@ class ProcessModel extends Component {
                 fileId,
               };
             });
+
             this.setState({
               list: newList,
             });
@@ -145,6 +148,7 @@ class ProcessModel extends Component {
                 fileId,
               };
             });
+
             this.setState({
               list: newList,
             });
@@ -316,7 +320,7 @@ class ProcessModel extends Component {
           </FormItem>
         </Col>
         <Col xxl={6} lg={languageCode === 'EN' ? 12 : 0}>
-          <FormItem label="发布人" name="publisherCode">
+          <FormItem label="发布人" name="publisherName">
             <AutoComplete
               onSearch={this.inputValuePublish}
               options={nameCodeVal.map(this.renderOptionPublish)}
@@ -346,42 +350,6 @@ class ProcessModel extends Component {
   onClose = () => {
     this.setState({
       visible: false,
-    });
-  };
-
-  // 更换版本
-  handleChangeVersion = v => {
-    api.getProcessChangeVersion(v).then(res => {
-      let newData = {};
-      if (res.picture) {
-        disk.getFiles({ sourceCode: res.picture, sourceKey: 'project_process_model' }).then(i => {
-          const picId = i[0].id;
-          newData = { ...res, picId };
-          this.setState({
-            detailValue: newData,
-          });
-          if (res.taskModels.length !== 0) {
-            res.taskModels.map((item, index) => {
-              if (item.picture) {
-                disk
-                  .getFiles({ sourceCode: item.picture, sourceKey: 'project_process_model' })
-                  .then(r => {
-                    const listId = r[0].id;
-                    newData.taskModels[index].listId = listId;
-                    this.setState({
-                      detailValue: newData,
-                    });
-                  });
-              }
-              return true;
-            });
-          }
-        });
-      } else {
-        this.setState({
-          detailValue: res,
-        });
-      }
     });
   };
 

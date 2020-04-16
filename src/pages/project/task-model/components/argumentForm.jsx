@@ -1,6 +1,7 @@
 import React from 'react';
 
 import { Form, Input, Button, Row, Col, Switch, Spin } from 'antd';
+import InputItems from './formItems/inputItems';
 import '../index.less';
 import { connect } from 'dva';
 
@@ -60,7 +61,7 @@ class ArgumentForm extends React.Component {
     console.log(argumentValues);
 
     this.props.emitArguments(argumentValues);
-    this.props.onClose();
+    // this.props.onClose();
   };
 
   onFinishFailed = () => {
@@ -74,7 +75,7 @@ class ArgumentForm extends React.Component {
     const { loading, viewForm } = this.state;
     console.log(viewForm);
     viewForm.isrequired = viewForm.isrequired ? '是' : '否';
-    const { fromView } = this.props;
+    const { fromView, type } = this.props;
     return loading ? (
       <div style={{ textAlign: 'center', marginTop: 15 }}>
         <Spin />
@@ -88,7 +89,8 @@ class ArgumentForm extends React.Component {
           onFinishFailed={this.onFinishFailed}
           onFinish={this.onFinish}
         >
-          <Form.Item
+          {type === 'input' && <InputItems fromView={fromView} viewForm={viewForm} />}
+          {/* <Form.Item
             label="参数Key："
             name="paramKey"
             rules={
@@ -144,11 +146,8 @@ class ArgumentForm extends React.Component {
 
           <Form.Item label="验证说明：" name="validDesc">
             {fromView ? viewForm.validDesc : <Input placeholder="请输入 " />}
-          </Form.Item>
-          <div
-            style={{ width: '100%' }}
-            // className="task_model_argu_form_submit_wrap"
-          >
+          </Form.Item> */}
+          <div style={{ width: '100%' }}>
             <div className="task_model_argu_form_submit">
               <Form.Item>
                 {!fromView && (

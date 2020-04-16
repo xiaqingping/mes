@@ -1,40 +1,27 @@
 import request from '@/utils/request';
 
 // 2组
-const http2 = '/projectmodel';
-// if (process.env.NODE_ENV !== 'development') {
-//   http2 = '/projectmodel';
-// }
+let http2 = 'http://192.168.20.12:8460';
+if (process.env.NODE_ENV !== 'development') {
+  http2 = '/projectmodel';
+}
 
 export default {
-  // 流程模型接口
-  // 流程模型分页列表
-  getProcess(params) {
-    return request(`${http2}/v1/process`, { params });
+  // 样品模糊搜索
+  getSampleCodeAndName(data) {
+    return request(`${http2}/v1/${data}/search`);
   },
 
-  // 创建流程模型
-  addProcess(data) {
-    return request(`${http2}/v1/process`, {
-      method: 'POST',
-      data,
+  // 样品列表(分页)
+  getSample(params) {
+    return request(`${http2}/v1/`, {
+      params,
     });
   },
 
-  // 创建流程模型
-  upgradeProcess(id, data) {
-    return request(`${http2}/v1/process/${id}/upgrade`, {
-      method: 'POST',
-      data,
-    });
-  },
-
-  // 修改流程模型
-  changeProcess(data) {
-    return request(`${http2}/v1/process`, {
-      method: 'PUT',
-      data,
-    });
+  // 样品详细页
+  getSampleDetail(id) {
+    return request(`${http2}/v1/${id}`);
   },
 
   // 删除流程模型

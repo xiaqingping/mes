@@ -1,84 +1,32 @@
 // 上传序列文件
 import React from 'react';
-import { Modal, Button, Upload, Carousel, Table } from 'antd';
-import { InboxOutlined, CloseOutlined } from '@ant-design/icons';
+import { Modal, Button, Carousel, Table, List, Progress } from 'antd';
+import { InboxOutlined, PaperClipOutlined, CloseOutlined } from '@ant-design/icons';
+import { guid } from '@/utils/utils';
+import request from '@/utils/request';
 import './index.less';
-
-const { Dragger } = Upload;
+import axios from 'axios';
+import disk from '../api/disk';
 
 class UploadSequenceFile extends React.Component {
   static getDerivedStateFromProps(nextProps) {
     return { visible: nextProps.visible };
   }
 
-  state = {
-    loading: false,
-    visible: false,
-    fileLists: [
-      {
-        uid: '1',
-        name: 'i11111mage.png',
-        status: 'done',
-        url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
-      },
-      {
-        uid: '2',
-        name: 'image.png',
-        status: 'done',
-        url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
-      },
-      {
-        uid: '3',
-        name: 'image.png',
-        status: 'done',
-        url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
-      },
-      {
-        uid: '4',
-        name: 'image.png',
-        status: 'done',
-        url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
-      },
-      // {
-      //   uid: '5',
-      //   name: 'image.png',
-      //   status: 'error',
-      // },
-      // {
-      //   uid: '6',
-      //   name: 'image.png',
-      //   status: 'done',
-      //   url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
-      // },
-      // {
-      //   uid: '7',
-      //   name: 'image.png',
-      //   status: 'done',
-      //   url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
-      // },
-      // {
-      //   uid: '8',
-      //   name: 'image.png',
-      //   status: 'done',
-      //   url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
-      // },
-      // {
-      //   uid: '9',
-      //   name: 'image.png',
-      //   status: 'done',
-      //   url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
-      // },
-      // {
-      //   uid: '10',
-      //   name: 'image.png',
-      //   status: 'error',
-      // },
-      // {
-      //   uid: '11',
-      //   name: 'bpic10823_s.jpg',
-      // },
-    ],
-  };
+  constructor(props) {
+    super(props);
+    const guuid = guid();
+    this.state = {
+      guuid,
+      loading: false,
+      visible: false,
+      filesNameList: [],
+      filesId: [],
+      progressStatus: '',
+    };
+  }
+
+  callback = v => v;
 
   getTableData = (options = {}) => {
     const { pagination } = this.state;
@@ -149,9 +97,61 @@ class UploadSequenceFile extends React.Component {
     }
   };
 
+  // 上传文件
+  handleUpload = (e, callback) => {
+    const self = this;
+    const { filesNameList } = self.state;
+    const file = e.target.files;
+    const { guuid } = this.state;
+    const uploadUrl = disk.uploadMoreFiles('ngs_sample', guuid);
+    const data = new FormData();
+    for (let i = 0; i < file.length; i++) {
+      data.append('files', file[i]);
+      self.setState({
+        filesNameList: [...filesNameList, file[i].name],
+      });
+    }
+    const config = {
+      headers: { 'Content-Type': 'multipart/form-data' },
+      onUploadProgress(progress) {
+        callback(`${(progress.loaded / progress.total) * 100}%`);
+      },
+    };
+    request(uploadUrl, {
+      method: 'POST',
+      data,
+      ...config,
+    }).then(res => {
+      console.log(res);
+    });
+  };
+
+  // 文件列表
+  itemList = (item, index) => {
+    const { progressStatus } = this.state;
+    return (
+      <List.Item
+        style={{ fontSize: '16px', width: '160px', float: 'left', position: 'relative' }}
+        key={index + item}
+      >
+        <span>
+          <PaperClipOutlined style={{ fontSize: '18px' }} />
+          <span style={{ display: 'inline-block', marginLeft: '10px' }}>{item}</span>
+        </span>
+        <Button icon={<CloseOutlined />} style={{ border: 'none' }} />
+        <Progress
+          percent={this.callback}
+          size="small"
+          showInfo={false}
+          style={{ position: 'absolute', top: '55px' }}
+        />
+      </List.Item>
+    );
+  };
+
   render() {
-    const { list, loading, visible, fileLists } = this.state;
-    const newFileList = this.expoleArr(fileLists);
+    const { list, loading, visible, progressStatus, filesNameList } = this.state;
+    const newFileList = this.expoleArr(filesNameList);
     const columns = [
       {
         title: '样品',
@@ -176,6 +176,7 @@ class UploadSequenceFile extends React.Component {
         visible={visible}
         onCancel={this.props.handleClose}
         width={871}
+        className="upload-page"
         footer={[
           <Button key="submit" type="primary" onClick={this.props.handleClose}>
             确认
@@ -183,34 +184,41 @@ class UploadSequenceFile extends React.Component {
         ]}
         maskClosable={false}
       >
-        <div style={{ float: 'left', width: '200px' }}>
-          <Dragger
-            action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
-            multiple
-            onChange={(file, fileList) => this.handleChange(file, fileList)}
-            style={{ width: '173px' }}
-            showUploadList={false}
+        <div style={{ float: 'left', width: '170px', height: '142px', position: 'relative' }}>
+          <div
+            style={{
+              width: '100%',
+              height: '100%',
+              border: '1px solid black',
+              textAlign: 'center',
+              background: '#FBFBFB',
+            }}
           >
-            {this.uploadButton()}
-          </Dragger>
+            <InboxOutlined style={{ fontSize: '64px', color: '#1890FF', marginTop: '12px' }} />
+            <div style={{ fontSize: '16px' }}>点击或将文件</div>
+            <div style={{ fontSize: '16px' }}>拖拽到这里上传</div>
+          </div>
+          <input
+            type="file"
+            onChange={e => this.handleUpload(e, this.callback)}
+            multiple="multiple"
+            style={{
+              opacity: 0,
+              cursor: 'pointer',
+              width: '170px',
+              height: '142px',
+              outline: 'none',
+              position: 'absolute',
+              top: '0',
+              zIndex: '10',
+            }}
+          />
         </div>
         {/* 轮播图 */}
-        <div style={{ width: '600px', float: 'left' }}>
+        <div style={{ width: '645px', float: 'left', paddingLeft: '45px' }}>
           <Carousel>
-            {newFileList.map((item, index) => (
-              <Upload
-                key={index}
-                defaultFileList={item}
-                showUploadList={{
-                  removeIcon: (
-                    <CloseOutlined
-                      onClick={() => {
-                        console.log(123);
-                      }}
-                    />
-                  ),
-                }}
-              />
+            {newFileList.map((it, index) => (
+              <List dataSource={it} renderItem={item => this.itemList(item)} key={index} />
             ))}
           </Carousel>
         </div>

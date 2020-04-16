@@ -249,6 +249,9 @@ class TaskModel extends Component {
     } = this.state;
     const ids = [];
     const { argumentList } = this.props.taskModel;
+    if (!imageUrl) {
+      return message.error('请上传头像!');
+    }
 
     const form = this.tableSearchFormRef.current.getFieldsValue();
     form.isAutomatic = checked ? 1 : 2;

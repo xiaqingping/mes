@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Drawer, Button, Popconfirm, Dropdown, Menu, Spin, Empty } from 'antd';
+import { Drawer, Button, Popconfirm, Dropdown, Menu, Spin, Empty, message } from 'antd';
 import api from '@/pages/project/api/taskmodel';
 import { connect } from 'dva';
 import ArgumentForm from './argumentForm';
@@ -118,8 +118,15 @@ class ArgumentModel extends Component {
     if (isEdit) {
       list[idx] = props;
     } else {
+      const listkeys = list.map(item => {
+        return item.paramKey;
+      });
+      if (listkeys.includes(props.paramKey)) {
+        return message.error('参数中存在相同参数key!');
+      }
       list.push(props);
     }
+    this.toggleChildrenDrawer(false);
     this.setState({
       argumentList: list,
     });
