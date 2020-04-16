@@ -19,6 +19,7 @@ class ArgumentModel extends Component {
   componentDidMount() {
     // alert(1);
     // 获取列表
+
     const isAdd = window.location.href.indexOf('add') > 0;
     const { argumentList } = this.props.taskModel;
     console.log(argumentList);
@@ -39,26 +40,14 @@ class ArgumentModel extends Component {
     } else {
       this.getArgumentList();
     }
+  }
 
-    // if (isAdd) {
-    //   // 如果是新增
-    //   if (argumentList && !argumentList.length) {
-    //     this.setState({
-    //       argumentList,
-    //     });
-    //   } else {
-    //     this.setState({
-    //       argumentList: [],
-    //     });
-    //     const { dispatch } = this.props;
-    //     dispatch({
-    //       type: 'taskModel/getArgumentsList',
-    //       payload: this.state.argumentList,
-    //     });
-    //   }
-    // } else {
-    //   this.getArgumentList();
-    // }
+  componentWillUnmount() {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'taskModel/getArgumentsList',
+      payload: null,
+    });
   }
 
   getArgumentList = () => {
