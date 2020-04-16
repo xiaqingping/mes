@@ -1,5 +1,3 @@
-// import React from 'react';
-
 /**
  * 计算时差 精确到时、分、秒
  * @param {String} startTime 开始时间
@@ -25,51 +23,6 @@ const calculateTimeDifference = (startTime, endTime) => {
   return `${hours}h${minutes}m${seconds}s`;
 }
 
-
-/**
- * 对比参数列表和参数值列表 合并取值
- * @param {String} paramData 参数data
- * @param {String} valueData 参数值data
- */
-const comparisonMerge = (paramData, valueData, newParamData) => {
-  const newData = JSON.parse(JSON.stringify(paramData));
-  newData[0].params = [];
-
-  const newList = [];
-  newParamData.forEach(paramItem => {
-    valueData.forEach(valueItem => {
-      const newItem = JSON.parse(JSON.stringify(paramItem));
-      if (paramItem.paramKey === valueItem.paramKey) {
-        // newItem.paramKey = valueItem.paramKey;
-        newItem.paramValue = valueItem.paramValue;
-        newList.push(newItem);
-      }
-    })
-  })
-
-  newData[0].params = newList;
-  return newData;
-}
-
-
-/**
- * 合并参数列表下级数据
- * @param {String} paramData
- */
-const paramDataFilter = paramData => {
-  const newParamData = [];
-  paramData.forEach(item => {
-    item.params.forEach(it => {
-      const newIt = JSON.parse(JSON.stringify(it));
-      if (newIt.paramProperties && newIt.paramProperties.length > 0) {
-        newIt.paramProperties.forEach(ie => {
-          newIt[ie.paramPropertyKey] = ie.paramPropertyValue
-        })
-        newParamData.push(newIt);
-      }
-    })
-  })
-  return newParamData;
-}
-
-export { calculateTimeDifference, comparisonMerge, paramDataFilter };
+export {
+  calculateTimeDifference,
+};

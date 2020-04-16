@@ -1,5 +1,5 @@
 // 流程列表
-import { Form, Table, Tag, Divider, Button, message } from 'antd';
+import { Form, Table, Tag, Divider, Button, message, Avatar } from 'antd';
 import React, { Component } from 'react';
 import { connect } from 'dva';
 import {
@@ -12,7 +12,6 @@ import router from 'umi/router';
 import api from '@/pages/project/api/projectManageDetail';
 import TaskList  from '../TaskList';
 import { EditInforModel }  from '../ModelUI';
-import { comparisonMerge, paramDataFilter } from '../../functions';
 import ProgressMould from '../ProgressMould';
 // import { formatter } from '@/utils/utils';
 
@@ -66,21 +65,21 @@ class ProcessList extends Component {
   };
 
    // 查看流程参数
-  searchProcessParam = (row, list) => {
-    api.getProcessParam(row.processModelId).then(paramData => {
-      api.getProcessParamValue(row.id).then(valueData => {
-        const newParamData = paramDataFilter(paramData);
-        const data = comparisonMerge(paramData, valueData, newParamData);
-        data.requestType = 'editParam';
-        data.processesId = list[0].id;
+  searchProcessParam = processesData => {
+    // console.log(processesData); // 流程数据
+    // console.log(projectData);   // 项目数据
+    const data = {
+      processId: processesData.id,                    // 流程ID
+      processModelId: processesData.processModelId,   // 流程模型ID
+      requestType: 'editParam',                       // 请求类型
+    };
 
-        this.props.dispatch({
-          type: 'projectDetail/setProcssesParam',
-          payload: data
-        })
-        router.push('/project/project-manage/process-parameter');
-      })
+    this.props.dispatch({
+      type: 'projectDetail/setUserForParam',
+      payload: data
     })
+    router.push('/project/project-manage/process-parameter');
+
   }
 
   // 流程进度开始
@@ -226,34 +225,30 @@ class ProcessList extends Component {
       {
         title: '流程模型',
         dataIndex: 'processModelName',
-        width: 300,
+        width: 350,
         render: (value, row) => (
-          <div style={{display:"flex"}}>
-            <img
-              // src={row.processModelPicture}
-              src='/favicon.png'
-              alt="Sangon"
-              height='50'
-              width="50"
-              style={{borderRadius: '100%' }}
-            />
-            <div style={{ marginLeft: 10, marginTop: 4}}>
-              <p>
-                {value} <br/> {row.processModelCode}
-                <Tag color="green">{row.processModeVersion}</Tag>
-              </p>
-            </div>
-
-          </div>
-        )
+            <>
+              <Avatar
+                src='/favicon.png'
+                style={{ float: 'left', width: '46px', height: '46px' }}
+              />
+              <div style={{ float: 'left', marginLeft: '10px' }}>
+                <div>{value}</div>
+                <div>
+                  <span style={{ marginRight: 10 }}> {row.processModelCode} </span>
+                  <Tag color="green" > {row.processModeVersion} </Tag>
+                </div>
+              </div>
+            </>
+          )
       },
       {
         title: '参数',
         dataIndex: 'type',
-        width: 90,
+        width: 100,
         render: (value, row) => (
           <SlidersOutlined
-            onClick={() => this.searchProcessParam(row, list)}
+            onClick={() => this.searchProcessParam(row)}
             style={{ fontSize: 20 }}
           />
         )

@@ -25,18 +25,18 @@ const ModelType = props => {
  */
 const InputModel = props => {
   const { data } = props;
-
   // 判断是否可为空
   const onChange = e => {
     if (e.target.value === '') {
-      if(data.isrequired === 1) {
+      if(data.isrequired) {
         message.warning(`${data.paramName}参数值不能为空`);
         const { paramKey } = data;
+        if (data.defaultValue === undefined) data.defaultValue = '';
         e.target.setValue({ [paramKey]: data.paramValue || data.defaultValue });
       }
     }
-
   }
+
   return (
     <Form.Item
       label={data.paramName}
@@ -49,6 +49,7 @@ const InputModel = props => {
         placeholder={data.placeholder}
         defaultValue={data.paramValue ? data.paramValue: data.defaultValue}
         onChange={event => onChange(event)}
+        // ref={input => setInput(input)}
       />
     </Form.Item>
   );
