@@ -1,12 +1,13 @@
 import React from 'react';
-import { Table, Popconfirm, Button, Modal, Input } from 'antd';
+import { Table, Select, Button, Modal, Input, AutoComplete, Popover } from 'antd';
 import { PlusOutlined, CloseOutlined, PlusSquareOutlined } from '@ant-design/icons';
 import { SketchPicker } from 'react-color';
-import { randomcolor } from '@/utils/utils';
-
-// import SampleChoose from './components/SampleChoose';
+import { getrandomColor } from '@/utils/utils';
 import './index.less';
 
+const { Option } = AutoComplete;
+let inputValue = '';
+let select = null;
 class SampleSelect extends React.Component {
   state = {
     visible: false,
@@ -40,6 +41,7 @@ class SampleSelect extends React.Component {
 
     headers: [],
     columns: [],
+    optionList: ['当前样品'],
   };
 
   componentDidMount() {
@@ -48,14 +50,14 @@ class SampleSelect extends React.Component {
         field: 'name',
         title: '姓名',
       },
-      // {
-      //   field: 'age',
-      //   title: '年龄',
-      // },
-      // {
-      //   field: 'address',
-      //   title: '地址',
-      // },
+      {
+        field: 'age',
+        title: '年龄',
+      },
+      {
+        field: 'address',
+        title: '地址',
+      },
     ];
     this.setState({
       headers,
@@ -84,9 +86,6 @@ class SampleSelect extends React.Component {
 
   removeColumn = e => {
     const { headers } = this.state;
-    console.log(e);
-    console.log(headers);
-    console.log(this.state.columns);
     const headerArr = headers.filter(item => {
       return item.field !== e.field;
     });
@@ -123,6 +122,46 @@ class SampleSelect extends React.Component {
     // alert(111);
   };
 
+  onInputBlur = e => {
+    console.log(e);
+    if (!select) {
+      const { optionList } = this.state;
+      const list = [...optionList];
+      list.push(inputValue);
+      this.setState({
+        optionList: list,
+      });
+    }
+  };
+
+  onInputChange = v => {
+    inputValue = v;
+  };
+
+  handleSelect = () => {
+    select = true;
+  };
+
+  selectRender = () => {
+    const { optionList } = this.state;
+    return (
+      <AutoComplete
+        style={{ width: '80%' }}
+        onChange={this.onInputChange}
+        onBlur={this.onInputBlur}
+        onSelect={this.handleSelect}
+      >
+        {optionList.map(item => {
+          return (
+            <Option key={Date.now()} value={item}>
+              {item}
+            </Option>
+          );
+        })}
+      </AutoComplete>
+    );
+  };
+
   formatHeader = headers => {
     const groups = headers.map(e => {
       return {
@@ -138,8 +177,34 @@ class SampleSelect extends React.Component {
         dataIndex: `${e.field}`,
         key: `${e.field}`,
         width: 100,
-        render: (text, record, input) => {
-          return <Input />;
+        render: (text, record, index) => {
+          return (
+            <div style={{ display: 'flex' }}>
+              {this.selectRender()}
+              <Popover
+                overlayClassName="project_manage_sample_ui_select"
+                overlayStyle={{ padding: 0 }}
+                content={
+                  <SketchPicker
+                    color={record.color || this.state.color}
+                    onChangeComplete={color => this.handleChange(color, record, index)}
+                  />
+                }
+                trigger="click"
+                placement="bottom"
+              >
+                <div
+                  style={{
+                    width: 20,
+                    height: 20,
+                    marginLeft: 15,
+                    marginTop: 6,
+                    backgroundColor: getrandomColor(),
+                  }}
+                />
+              </Popover>
+            </div>
+          );
         },
       };
     });
@@ -183,20 +248,20 @@ class SampleSelect extends React.Component {
 
   render() {
     const { tableData, visible, headers, columns } = this.state;
-    console.log(this.formatHeader(headers));
+
     return (
       <>
-        <Button onClick={this.add}>新增</Button>
+        <Button onClick={this.uploadGroup}>上传</Button>
         <Table columns={columns} dataSource={tableData} pagination={false} />
 
         <Modal
-          title="选择样品"
+          title="上传分组方案"
           visible={visible}
           onOk={this.handleOk}
           onCancel={this.handleCancel}
           width={820}
         >
-          {/* <SampleChoose /> */}
+          <p>kdkdk</p>
         </Modal>
       </>
     );

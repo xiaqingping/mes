@@ -1,7 +1,8 @@
 import request from '@/utils/request';
 
-let http = '/projectmodel';
+let http = 'http://192.168.20.12:8360';
 //  'http://192.168.20.12:8360';
+// '/projectmodel';
 if (process.env.NODE_ENV !== 'development') {
   http = '/projectmodel';
 }
