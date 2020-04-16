@@ -1,9 +1,11 @@
 import React from 'react';
 
-import { Form, Input, Button, Row, Col, Switch, Spin } from 'antd';
-import InputItems from './formItems/inputItems';
-import '../index.less';
+import { Form, Button, Spin } from 'antd';
 import { connect } from 'dva';
+import InputItems from './formItems/inputItems';
+import BaseFormItems from './formItems/baseFormItems';
+import NumericalInput from './formItems/numericalInput';
+import '../index.less';
 
 class ArgumentForm extends React.Component {
   constructor() {
@@ -71,11 +73,13 @@ class ArgumentForm extends React.Component {
 
   render() {
     const formItemLayout = null;
-    // const buttonItemLayout = null;
     const { loading, viewForm } = this.state;
     console.log(viewForm);
     viewForm.isrequired = viewForm.isrequired ? '是' : '否';
     const { fromView, type } = this.props;
+    console.log(type);
+
+    const compGroup = ['sample_select', 'sample_group', 'sample_environment_factor'];
     return loading ? (
       <div style={{ textAlign: 'center', marginTop: 15 }}>
         <Spin />
@@ -90,63 +94,9 @@ class ArgumentForm extends React.Component {
           onFinish={this.onFinish}
         >
           {type === 'input' && <InputItems fromView={fromView} viewForm={viewForm} />}
-          {/* <Form.Item
-            label="参数Key："
-            name="paramKey"
-            rules={
-              !fromView && [
-                {
-                  required: true,
-                  message: '请输入参数名称',
-                },
-              ]
-            }
-          >
-            {fromView ? <span>{viewForm.paramKey}</span> : <Input placeholder="请输入参数名称 " />}
-          </Form.Item>
-          <Form.Item
-            label="参数描述："
-            name="paramName"
-            rules={
-              !fromView && [
-                {
-                  required: true,
-                  message: '请输入参数名称',
-                },
-              ]
-            }
-          >
-            {fromView ? viewForm.paramName : <Input placeholder="请输入 " />}
-          </Form.Item>
-          <Row gutter={16}>
-            <Col span={12}>
-              <Form.Item label="是否必填：" name="isrequired" valuePropName="checked">
-                {fromView ? viewForm.isrequired : <Switch defaultChecked />}
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item label="提示文字：" name="placeholder">
-                {fromView ? viewForm.placeholder : <Input placeholder="请输入 " />}
-              </Form.Item>
-            </Col>
-          </Row>
-          <Row gutter={16}>
-            <Col span={12}>
-              <Form.Item label="默认值：" name="defaultValue">
-                {fromView ? viewForm.defaultValue : <Input placeholder="请输入 " />}
-              </Form.Item>
-            </Col>
+          {compGroup.includes(type) && <BaseFormItems fromView={fromView} viewForm={viewForm} />}
+          {type === 'number_input' && <NumericalInput fromView={fromView} viewForm={viewForm} />}
 
-            <Col span={12}>
-              <Form.Item label="验证规则：" name="validRule">
-                {fromView ? viewForm.validRule : <Input placeholder="请输入 " />}
-              </Form.Item>
-            </Col>
-          </Row>
-
-          <Form.Item label="验证说明：" name="validDesc">
-            {fromView ? viewForm.validDesc : <Input placeholder="请输入 " />}
-          </Form.Item> */}
           <div style={{ width: '100%' }}>
             <div className="task_model_argu_form_submit">
               <Form.Item>

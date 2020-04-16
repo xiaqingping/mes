@@ -48,14 +48,14 @@ class SampleSelect extends React.Component {
         field: 'name',
         title: '姓名',
       },
-      {
-        field: 'age',
-        title: '年龄',
-      },
-      {
-        field: 'address',
-        title: '地址',
-      },
+      // {
+      //   field: 'age',
+      //   title: '年龄',
+      // },
+      // {
+      //   field: 'address',
+      //   title: '地址',
+      // },
     ];
     this.setState({
       headers,
@@ -65,6 +65,7 @@ class SampleSelect extends React.Component {
       title: '样品',
       dataIndex: 'sample',
       key: 'sample',
+      width: 100,
     };
     const lastColumn = {
       title: () => {
@@ -72,6 +73,7 @@ class SampleSelect extends React.Component {
       },
       dataIndex: 'add',
       key: 'add',
+      width: 100,
     };
 
     const columns = [firstColumn, ...this.formatHeader(headers), lastColumn];
@@ -99,6 +101,7 @@ class SampleSelect extends React.Component {
           title: '样品',
           dataIndex: 'sample',
           key: 'sample',
+          width: 100,
         };
         const lastColumn = {
           title: () => {
@@ -106,6 +109,7 @@ class SampleSelect extends React.Component {
           },
           dataIndex: 'add',
           key: 'add',
+          width: 100,
         };
         const columns = [firstColumn, ...this.formatHeader(hds), lastColumn];
         this.setState({
@@ -133,6 +137,7 @@ class SampleSelect extends React.Component {
         },
         dataIndex: `${e.field}`,
         key: `${e.field}`,
+        width: 100,
         render: (text, record, input) => {
           return <Input />;
         },
@@ -158,6 +163,7 @@ class SampleSelect extends React.Component {
           title: '样品',
           dataIndex: 'sample',
           key: 'sample',
+          width: 100,
         };
         const lastColumn = {
           title: () => {
@@ -165,6 +171,7 @@ class SampleSelect extends React.Component {
           },
           dataIndex: 'add',
           key: 'add',
+          width: 100,
         };
         const cls = [firstColumn, ...this.formatHeader(hds), lastColumn];
         this.setState({
@@ -181,9 +188,7 @@ class SampleSelect extends React.Component {
       <>
         <Button onClick={this.add}>新增</Button>
         <Table columns={columns} dataSource={tableData} pagination={false} />
-        <Button type="dashed" block onClick={this.chooseSample} style={{ marginTop: 20 }}>
-          <PlusOutlined /> 选择样品
-        </Button>
+
         <Modal
           title="选择样品"
           visible={visible}

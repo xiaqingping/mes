@@ -3,9 +3,8 @@ import { Drawer, Button, Popconfirm, Dropdown, Menu, Spin, Empty, message } from
 import api from '@/pages/project/api/taskmodel';
 import { connect } from 'dva';
 import ArgumentForm from './argumentForm';
-import SampleSelect from './sampleSelect';
-import SampleGroup from './sampleGroup';
-import '../index.less';
+// import SampleSelect from './sampleSelect';
+// import '../index.less';
 
 class ArgumentModel extends Component {
   state = {
@@ -342,8 +341,7 @@ class ArgumentModel extends Component {
             onClose={() => this.toggleChildrenDrawer(false)}
             title={this.titleContent()}
           >
-            {type === 'input' && <ArgumentForm {...props} />}
-            {(type === 'sample_select' || type === 'sample_group') && <SampleSelect {...props} />}
+            <ArgumentForm {...props} />
           </Drawer>
         </Drawer>
       </div>
