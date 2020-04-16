@@ -2,9 +2,8 @@ import React from 'react';
 
 import { Form, Button, Spin } from 'antd';
 import { connect } from 'dva';
-import InputItems from './formItems/inputItems';
-import BaseFormItems from './formItems/baseFormItems';
-import NumericalInput from './formItems/numericalInput';
+
+import FactoryComponent from './formItems';
 import '../index.less';
 
 class ArgumentForm extends React.Component {
@@ -79,7 +78,6 @@ class ArgumentForm extends React.Component {
     const { fromView, type } = this.props;
     console.log(type);
 
-    const compGroup = ['sample_select', 'sample_group', 'sample_environment_factor'];
     return loading ? (
       <div style={{ textAlign: 'center', marginTop: 15 }}>
         <Spin />
@@ -93,10 +91,7 @@ class ArgumentForm extends React.Component {
           onFinishFailed={this.onFinishFailed}
           onFinish={this.onFinish}
         >
-          {type === 'input' && <InputItems fromView={fromView} viewForm={viewForm} />}
-          {compGroup.includes(type) && <BaseFormItems fromView={fromView} viewForm={viewForm} />}
-          {type === 'number_input' && <NumericalInput fromView={fromView} viewForm={viewForm} />}
-
+          <FactoryComponent fromView={fromView} viewForm={viewForm} type={type} />
           <div style={{ width: '100%' }}>
             <div className="task_model_argu_form_submit">
               <Form.Item>
