@@ -208,6 +208,12 @@ class TaskModel extends Component {
         }),
       );
     }
+    if (info.file.status === 'error') {
+      this.setState({
+        loading: false,
+      });
+      message.error('图片上传失败!');
+    }
   };
 
   // 导航列表title样式
