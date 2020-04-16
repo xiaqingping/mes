@@ -11,7 +11,17 @@ module.exports = {
         {
           name: 'metadata',
           path: '/hts/analyze/metadata',
-          component: './hts/pages/analyze/metadata',
+          hideChildrenInMenu: true,
+          routes: [{
+              path: '/hts/analyze/metadata',
+              component: './hts/pages/analyze/metadata',
+            },
+            {
+              name: 'metadata-paramList',
+              path: '/hts/analyze/metadata/paramList',
+              component: './hts/pages/analyze/metadata/paramList',
+            },
+          ],
         },
         {
           name: 'otu',
