@@ -7,11 +7,42 @@ class SampleChoose extends React.Component {
   state = {
     tableData: [
       {
-        // name:"11",
+        id: '111',
+        sample: '样品1',
+        files: [
+          { filename: '文件1', fileId: '2222', xulie: '序列', length: '200' },
+          { filename: '文件2', fileId: '33333', xulie: '序列', length: '200' },
+        ],
       },
     ],
     visible: false,
   };
+
+  componentDidMount() {
+    const { tableData } = this.state;
+    tableData.forEach(item => {
+      const isAllChecked = item.files.every(v => {
+        return v.checked;
+      });
+      const atLeastOne = item.files.some(v => {
+        return v.checked;
+      });
+      if (isAllChecked) {
+        item.indeterminate = false;
+        item.checked = true;
+      } else if (atLeastOne) {
+        item.indeterminate = true;
+        item.checked = false;
+      } else {
+        item.indeterminate = false;
+        item.checked = false;
+      }
+    });
+    // const data = tableData.map(item => {
+    //   item.checked = false;
+    //   item.indeterminate = false;
+    // });
+  }
 
   handleUploadChange = info => {
     if (info.file.status === 'done') {
@@ -19,9 +50,54 @@ class SampleChoose extends React.Component {
     }
   };
 
-  handleCheckboxChange = (e, row) => {
-    console.log(e);
+  handleCheckboxChange = (e, row, text, item, index) => {
+    const { tableData } = this.state;
+    console.log(e.target.checked);
     console.log(row);
+    console.log(text);
+    console.log(item);
+    let selectRow = tableData.filter(v => {
+      return v.id === row.id;
+    });
+    selectRow = selectRow[0];
+    if (item) {
+      selectRow.files.forEach(i => {
+        if (i.fileId === item.fileId) {
+          i.checked = e.target.checked;
+        }
+      });
+      const checkedLen = selectRow.files.filter(r => {
+        return r.checked;
+      }).length;
+      if (checkedLen === selectRow.files.length) {
+        selectRow.indeterminate = false;
+        selectRow.checked = true;
+      } else if (checkedLen === 0) {
+        selectRow.indeterminate = false;
+        selectRow.checked = false;
+      } else {
+        selectRow.indeterminate = true;
+        selectRow.checked = false;
+      }
+
+      const tbData = [...tableData];
+      tbData[index] = selectRow;
+      this.setState({
+        tableData: tbData,
+      });
+    } else {
+      selectRow.checked = e.target.checked;
+      selectRow.indeterminate = false;
+      // 如果没有item表示, 是点击的样品
+      selectRow.files.forEach(i => {
+        i.checked = e.target.checked;
+      });
+    }
+    const tbData = [...tableData];
+    tbData[index] = selectRow;
+    this.setState({
+      tableData: tbData,
+    });
   };
 
   toggleVis = v => {
@@ -49,27 +125,50 @@ class SampleChoose extends React.Component {
     const columns = [
       {
         title: '样品',
-        dataIndex: 'name',
-        key: 'name',
+        dataIndex: 'sample',
+        key: 'sample',
         filters: [],
         render: (text, record, index) => {
-          return <Checkbox onChange={e => this.handleCheckboxChange(e, record)}>Checkbox</Checkbox>;
+          return (
+            <Checkbox
+              onChange={e => this.handleCheckboxChange(e, record, text, undefined, index)}
+              indeterminate={record.indeterminate}
+              checked={record.checked}
+            >
+              {text}
+            </Checkbox>
+          );
         },
       },
       {
         title: '文件',
-        dataIndex: 'file',
-        key: 'alia',
+        dataIndex: 'files',
+        key: 'files',
         render: (text, record, index) => {
-          return <Checkbox onChange={e => this.handleCheckboxChange(e, record)}>Checkbox</Checkbox>;
+          console.log(text);
+          return text.map(item => {
+            return (
+              <div>
+                <Checkbox
+                  onChange={e => this.handleCheckboxChange(e, record, text, item, index)}
+                  key={item.fileId}
+                  checked={item.checked}
+                >
+                  {item.filename}
+                </Checkbox>
+              </div>
+            );
+          });
         },
       },
       {
         title: '序列',
-        dataIndex: 'sequence',
-        key: 'sequence',
+        dataIndex: 'xulie',
+        key: 'xulie',
         render: (text, record) => {
-          return <div>hsjsjsj</div>;
+          return record.files.map(item => {
+            return <div>{item.xulie}</div>;
+          });
         },
       },
       {
@@ -77,7 +176,9 @@ class SampleChoose extends React.Component {
         dataIndex: 'length',
         key: 'length',
         render: (text, record) => {
-          return <div>ddd</div>;
+          return record.files.map(item => {
+            return <div>{item.length}</div>;
+          });
         },
       },
     ];
