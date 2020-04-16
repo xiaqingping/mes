@@ -1,6 +1,6 @@
 import request from '@/utils/request';
 
-const http = 'http://192.168.20.12:8360';
+const http = '/projectmodel';
 // if (process.env.NODE_ENV !== 'development') {
 //   http = '/projectmodel';
 // }
