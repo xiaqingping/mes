@@ -49,8 +49,8 @@ class FileUpload extends React.Component {
             </Dragger>
           </div>
 
-          <div>
-            <TextArea rows={4} />
+          <div style={{ width: '100%', marginLeft: 30 }}>
+            <TextArea rows={6} />
           </div>
         </div>
         <Table columns={columns} dataSource={tableData} pagination={false} />

@@ -4,6 +4,7 @@ import { PlusOutlined, CloseOutlined, PlusSquareOutlined } from '@ant-design/ico
 import { SketchPicker } from 'react-color';
 import { getrandomColor } from '@/utils/utils';
 import './index.less';
+import GroupUpload from './components/groupUpload';
 
 const { Option } = AutoComplete;
 let inputValue = '';
@@ -83,6 +84,13 @@ class SampleSelect extends React.Component {
     this.setState({
       columns,
     });
+
+    const { tableData } = this.state;
+    let data = [...tableData];
+    data = data.map(item => {
+      item.color = getrandomColor();
+      return item;
+    });
   }
 
   removeColumn = e => {
@@ -158,7 +166,18 @@ class SampleSelect extends React.Component {
     );
   };
 
-  handleChange = () => {};
+  handleColorChange = (color, text, record, index) => {
+    console.log(object);
+    const { tableData } = this.state;
+    const row = { ...record };
+    row.color = color.hex;
+    const datas = [...tableData];
+    datas[index] = row;
+
+    this.setState({
+      tableData: datas,
+    });
+  };
 
   formatHeader = headers => {
     const groups = headers.map(e => {
@@ -185,7 +204,7 @@ class SampleSelect extends React.Component {
                 content={
                   <SketchPicker
                     color={record.color || this.state.color}
-                    onChangeComplete={color => this.handleChange(color, record, index)}
+                    onChangeComplete={color => this.handleColorChange(color, text, record, index)}
                   />
                 }
                 trigger="click"
@@ -244,6 +263,24 @@ class SampleSelect extends React.Component {
     );
   };
 
+  toggleVis = v => {
+    this.setState({
+      visible: v,
+    });
+  };
+
+  uploadGroup = () => {
+    this.toggleVis(true);
+  };
+
+  handleOk = () => {
+    this.toggleVis(false);
+  };
+
+  handleCancel = () => {
+    this.toggleVis(false);
+  };
+
   render() {
     const { tableData, visible, headers, columns } = this.state;
 
@@ -259,7 +296,7 @@ class SampleSelect extends React.Component {
           onCancel={this.handleCancel}
           width={820}
         >
-          <p>kdkdk</p>
+          <GroupUpload />
         </Modal>
       </>
     );
