@@ -208,6 +208,11 @@ class TaskModel extends Component {
         }),
       );
     }
+    if (info.file.status === 'error') {
+      this.setState({
+        loading: false,
+      });
+    }
   };
 
   // 导航列表title样式

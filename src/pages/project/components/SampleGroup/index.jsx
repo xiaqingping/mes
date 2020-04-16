@@ -59,6 +59,7 @@ class SampleSelect extends React.Component {
         title: '地址',
       },
     ];
+
     this.setState({
       headers,
     });
@@ -145,12 +146,7 @@ class SampleSelect extends React.Component {
   selectRender = () => {
     const { optionList } = this.state;
     return (
-      <AutoComplete
-        style={{ width: '80%' }}
-        onChange={this.onInputChange}
-        onBlur={this.onInputBlur}
-        onSelect={this.handleSelect}
-      >
+      <AutoComplete style={{ width: '80%' }} onBlur={this.onInputBlur}>
         {optionList.map(item => {
           return (
             <Option key={Date.now()} value={item}>
@@ -161,6 +157,8 @@ class SampleSelect extends React.Component {
       </AutoComplete>
     );
   };
+
+  handleChange = () => {};
 
   formatHeader = headers => {
     const groups = headers.map(e => {
@@ -199,7 +197,7 @@ class SampleSelect extends React.Component {
                     height: 20,
                     marginLeft: 15,
                     marginTop: 6,
-                    backgroundColor: getrandomColor(),
+                    backgroundColor: record.color,
                   }}
                 />
               </Popover>
