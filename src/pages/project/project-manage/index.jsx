@@ -284,6 +284,7 @@ class ProjectManagement extends Component {
       type: 'projectManage/setProjectData',
       payload: data,
     });
+    console.log(data);
     router.push('/project/project-manage/add');
   };
 
@@ -444,25 +445,15 @@ class ProjectManagement extends Component {
       {
         fixed: 'right',
         title: '操作',
-        render: (value, row, index) => {
-          const { editIndex } = this.state;
-          let actions;
-          // console.log(this.state);
-          if (editIndex !== index) {
-            if (row.status === 1) {
-              actions = (
-                <>
-                  <Popconfirm title="确定删除数据？" onConfirm={() => this.deleteRow(row)}>
-                    <a>删除</a>
-                  </Popconfirm>
-                  <Divider type="vertical" />
-                  <a onClick={() => this.editRow(row)}>修改</a>
-                </>
-              );
-            }
-          }
-          return actions;
-        },
+        render: row => (
+          <>
+            <Popconfirm title="确定删除数据？" onConfirm={() => this.deleteRow(row)}>
+              <a>删除</a>
+            </Popconfirm>
+            <Divider type="vertical" />
+            <a onClick={() => this.editRow(row)}>修改</a>
+          </>
+        ),
       },
     ];
 
