@@ -226,24 +226,6 @@ class ProjectManagement extends Component {
             </Select>
           </FormItem>
         </Col>
-        {/* <Col>
-          <FormItem label="状态" name="statusList">
-            <Select
-              mode="multiple"
-              maxTagCount={2}
-              maxTagTextLength={3}
-              style={{ width: '200px' }}
-              // allowClear
-              // placeholder="请选择状态"
-            >
-              {statusList.map(e => (
-                <Option value={e.value} key={e.value}>
-                  {e.text}
-                </Option>
-              ))}
-            </Select>
-          </FormItem>
-        </Col> */}
         <Col xxl={6} xl={8} lg={languageCode === 'EN' ? 12 : 0}>
           <FormItem label="创建人" name="creatorName">
             <Input placeholder="请输入创建人" />
@@ -399,7 +381,14 @@ class ProjectManagement extends Component {
           const color = formatter(statusList, value, 'value', 'color');
           return (
             <Dropdown overlay={this.menuList(row)}>
-              <Button style={{ background: color, color: '#fff', borderRadius: '20px' }}>
+              <Button
+                style={{
+                  background: color,
+                  color: '#fff',
+                  borderRadius: '12px',
+                  textAlign: 'center',
+                }}
+              >
                 {formatter(statusList, value, 'value', 'text')}
               </Button>
             </Dropdown>
