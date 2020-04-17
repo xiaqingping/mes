@@ -53,7 +53,6 @@ class ProcessParameter extends Component {
     }
     // 创建项目 未保存时修改参数值
     if (data.requestType === 'updateParam') {
-      // console.log(data);
       message.success('updateParam');
       this.getProcessParam(data.processModelId)   // 查询流程参数
     }
@@ -75,66 +74,61 @@ class ProcessParameter extends Component {
     //     return false;
     // }
 
-
-    // 处理参数数据
-    const newParam = this.deleteNullGroup(param);   // 删除参数为空的分组
-    // 无参数 返回上一页
-    if (newParam.length === 0) {
-      message.error('暂无参数！');
-      window.history.back(-1);
-      return false;
-    }
-    const newParamData = this.disposeParamAttribute(newParam);  // 处理参数属性
-
-
-    // 添加 参数值
-    if (requestType === 'addParam') {
-      message.success('添加操作');
-      if (param.length > 0 ) {
-        this.setState({ paramList: newParamData });
-      }
-    }
-
-
-    // 修改 未保存的参数值
-    if (requestType === 'updateParam') {
-      message.success('修改操作');
-      const processParamValue = params;
-      console.log(processParamValue);
-      // 有参数值时
-      if (newParamData.length > 0 && processParamValue.length > 0){
-        // 合并参数和参数值
-        const data = this.comparedWith(newParamData, processParamValue);
-        this.setState({ paramList: data })
+    if (param.length > 0) {
+      // 处理参数数据
+      const newParam = this.deleteNullGroup(param);   // 删除参数为空的分组
+      // 无参数 返回上一页
+      if (newParam.length === 0) {
+        message.error('暂无参数！');
+        window.history.back(-1);
         return false;
       }
-      // 未设置参数值时
-      if (param.length > 0 && paramValue.length === 0){
-        this.setState({ paramList: newParamData })
+      const newParamData = this.disposeParamAttribute(newParam);  // 处理参数属性
+
+      // 添加 参数值
+      if (requestType === 'addParam') {
+        message.success('添加操作');
+        if (param.length > 0 ) {
+          this.setState({ paramList: newParamData });
+        }
+      }
+
+
+      // 修改 未保存的参数值
+      if (requestType === 'updateParam') {
+        message.success('修改操作');
+        const processParamValue = params;
+        // 有参数值时
+        if (newParamData.length > 0 && processParamValue.length > 0){
+          // 合并参数和参数值
+          const data = this.comparedWith(newParamData, processParamValue);
+          this.setState({ paramList: data })
+          return false;
+        }
+        // 未设置参数值时
+        if (param.length > 0 && paramValue.length === 0){
+          this.setState({ paramList: newParamData })
+        }
+      }
+
+
+      // 编辑 参数值
+      if (requestType === 'editParam') {
+        message.success('编辑操作');
+
+        // 有参数值时
+        if (newParamData.length > 0 && paramValue.length > 0){
+          // 合并参数和参数值
+          const data = this.comparedWith(newParamData, paramValue);
+          this.setState({ paramList: data })
+          return false;
+        }
+        // 未设置参数值时
+        if (param.length > 0 && paramValue.length === 0){
+          this.setState({ paramList: newParamData })
+        }
       }
     }
-
-
-
-    // 编辑 参数值
-    if (requestType === 'editParam') {
-      message.success('编辑操作');
-
-      // 有参数值时
-      if (newParamData.length > 0 && paramValue.length > 0){
-        // 合并参数和参数值
-        const data = this.comparedWith(newParamData, paramValue);
-        this.setState({ paramList: data })
-        return false;
-      }
-      // 未设置参数值时
-      if (param.length > 0 && paramValue.length === 0){
-        this.setState({ paramList: newParamData })
-      }
-    }
-
-
-
     return false
   }
 
@@ -151,13 +145,10 @@ class ProcessParameter extends Component {
 
   // 保存
   getFromData = values => {
-    // console.log(values);
 
     const data = this.conversionData(values);
     const { userForParamData } = this.props.projectDetail;
     const { requestType, processModelId } = userForParamData;
-    // console.log(requestType);
-    // console.log(processModelId);
 
     // 添加
     if (requestType === 'addParam') {
@@ -176,8 +167,8 @@ class ProcessParameter extends Component {
 
     // 编辑
     if (requestType === 'editParam') {
-      const { processesId } = userForParamData;
-      const id = processesId;
+      const { processId } = userForParamData;
+      const id = processId;
       api.updateProcessesParameter(id, data).then(() => {
         window.history.back(-1);
       });
@@ -292,7 +283,6 @@ class ProcessParameter extends Component {
    * paramData 参数
    */
   deleteNullGroup = data => {
-    // console.log(data);
     const newData = [];
     data.forEach(item => {
       if (item.params.length > 0) {
@@ -336,9 +326,6 @@ class ProcessParameter extends Component {
           groupData.params = nparam
         }
       })
-      // 处理好的参数列表赋值到对应的分组下
-      // groupData.params.push(nparam)
-      // console.log(groupData);
 
       // 每个分组数据重新push到新数组中
       newData.push(groupData);
@@ -364,8 +351,19 @@ class ProcessParameter extends Component {
         valueData.forEach(valueItem => {
           const newItem = JSON.parse(JSON.stringify(paramItem));
           if (paramItem.paramKey === valueItem.paramKey) {
-            newItem.paramValue = valueItem.paramValue;
-            newList.push(newItem);
+            if (newList.length > 0) {
+              const ids = [];
+              newList.forEach(listItem => {
+                ids.push(listItem.id);
+              })
+              if (ids.indexOf(paramItem.id) === -1) {
+                newItem.paramValue = valueItem.paramValue;
+                newList.push(newItem);
+              }
+            } else {
+              newItem.paramValue = valueItem.paramValue;
+              newList.push(newItem);
+            }
           }
         })
       })
