@@ -1,7 +1,7 @@
 import React from 'react';
 import { Table, Button, message, Checkbox, Modal } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
-import FileUpload from './fileUpload';
+import FileUpload from '../../UploadSequenceFile/lunbotu';
 
 class SampleChoose extends React.Component {
   state = {
@@ -38,10 +38,6 @@ class SampleChoose extends React.Component {
         item.checked = false;
       }
     });
-    // const data = tableData.map(item => {
-    //   item.checked = false;
-    //   item.indeterminate = false;
-    // });
   }
 
   handleUploadChange = info => {
@@ -108,9 +104,6 @@ class SampleChoose extends React.Component {
 
   openUpload = () => {
     this.toggleVis(true);
-    // this.setState({
-    //   visible: true,
-    // });
   };
 
   handleOk = () => {
@@ -191,16 +184,7 @@ class SampleChoose extends React.Component {
           </Button>
         </div>
         <Table columns={columns} dataSource={tableData} pagination={false} />
-        <Modal
-          bodyStyle={{ paddingTop: 10 }}
-          title="上传序列文件"
-          visible={visible}
-          onOk={this.handleOk}
-          onCancel={this.handleCancel}
-          width={820}
-        >
-          <FileUpload />
-        </Modal>
+        {visible && <FileUpload />}
       </>
     );
   }
