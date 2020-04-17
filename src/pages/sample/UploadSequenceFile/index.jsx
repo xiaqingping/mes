@@ -1,14 +1,13 @@
 /* eslint-disable react/no-string-refs */
 // 上传序列文件
 import React from 'react';
-import { Modal, Button, Table, List, Progress, message, Input } from 'antd';
+import { Modal, Button, Carousel, Table, List, Progress, message } from 'antd';
 import { InboxOutlined, PaperClipOutlined } from '@ant-design/icons';
 import { guid, cutString } from '@/utils/utils';
 import api from '@/pages/sample/api/sample';
 import './index.less';
 import disk from '../api/disk';
 
-const { TextArea } = Input;
 class UploadSequenceFile extends React.Component {
   static getDerivedStateFromProps(nextProps) {
     return { visible: nextProps.visible };
@@ -40,6 +39,15 @@ class UploadSequenceFile extends React.Component {
       <p>拖曳到这里上传</p>
     </div>
   );
+
+  // 图片的分组
+  expoleArr = arr => {
+    const result = [];
+    for (let i = 0, len = arr.length; i < len; i += 6) {
+      result.push(arr.slice(i, i + 6));
+    }
+    return result;
+  };
 
   // 删除files文件
   deleteFiles = v => {
@@ -90,6 +98,7 @@ class UploadSequenceFile extends React.Component {
           name: item,
           progress: `${(progress.loaded / progress.total) * 100}`,
           status: 'loading',
+          done: false,
         }));
         self.setState({
           filesNameList: [...newData, ...filesNameList],
@@ -109,6 +118,7 @@ class UploadSequenceFile extends React.Component {
           progress: 100,
           status: 'success',
           fileId: res[index],
+          done: true,
         }));
         self.setState({
           filesNameList: [...newData, ...filesNameList],
@@ -144,6 +154,7 @@ class UploadSequenceFile extends React.Component {
           name: item,
           progress: 100,
           status: 'error',
+          done: false,
         }));
         self.setState({
           filesNameList: [...newData, ...filesNameList],
@@ -155,6 +166,7 @@ class UploadSequenceFile extends React.Component {
   // 文件列表
   itemList = item => (
     <List.Item style={{ width: '160px', float: 'left', position: 'relative' }} key={item.id}>
+      {/* <span>{item.done ? 1 : 2}</span> */}
       <span>
         <PaperClipOutlined style={{ fontSize: '18px', float: 'left' }} />
         <span style={{ display: 'inline', marginLeft: '10px', fontSize: '14px' }} title={item.name}>
@@ -183,6 +195,27 @@ class UploadSequenceFile extends React.Component {
     </List.Item>
   );
 
+  // 上一页
+  handlePrev = () => {
+    this.refs.img.prev();
+  };
+
+  // 下一页
+  handleNext = () => {
+    this.refs.img.next();
+  };
+
+  // 判断table里面的原始文件数据前面的id
+  getFilesContent = (item, filesNameList) => {
+    // console.log(item, filesNameList);
+    if (item.sequenceFileName) {
+      if (filesNameList.filter(i => i.fileId === item.sourceSequenceFileId).length !== 0) {
+        return filesNameList.filter(i => i.fileId === item.sourceSequenceFileId)[0].id;
+      }
+    }
+    return '';
+  };
+
   // 提交
   handleOK = () => {
     const { tableList } = this.state;
@@ -193,6 +226,7 @@ class UploadSequenceFile extends React.Component {
 
   render() {
     const { loading, visible, filesNameList, tableList } = this.state;
+    const newFileList = this.expoleArr(filesNameList);
     const columns = [
       {
         title: '样品',
@@ -302,15 +336,34 @@ class UploadSequenceFile extends React.Component {
             }}
           />
         </div>
-        {/* 输入框 */}
+        {/* 轮播图 */}
         <div style={{ width: '645px', float: 'left', paddingLeft: '45px', position: 'relative' }}>
-          <TextArea
-            rows={6}
-            style={{ resize: 'none' }}
-            placeholder="粘贴或快速输入，分隔符支持“逗号（，）”、“空格（）”、“竖线（|）”、“制表符（）”"
-          />
+          {newFileList.length > 1 ? (
+            <a
+              style={{ position: 'absolute', top: '45px', left: '20px', fontSize: '30px' }}
+              onClick={this.handlePrev}
+            >
+              &lt;
+            </a>
+          ) : (
+            ''
+          )}
+          <Carousel ref="img">
+            {newFileList.map((it, index) => (
+              <List dataSource={it} renderItem={item => this.itemList(item)} key={index} />
+            ))}
+          </Carousel>
+          {newFileList.length > 1 ? (
+            <a
+              style={{ position: 'absolute', top: '45px', right: '20px', fontSize: '30px' }}
+              onClick={this.handleNext}
+            >
+              &gt;
+            </a>
+          ) : (
+            ''
+          )}
         </div>
-
         {/* 表格 */}
         <div style={{ clear: 'both' }}>
           <Table

@@ -32,6 +32,8 @@ const projectModel = {
       //   status: 'warning',
       // },
     ],
+    // 颜色
+    colorStore: [],
   },
   effects: {},
   reducers: {},

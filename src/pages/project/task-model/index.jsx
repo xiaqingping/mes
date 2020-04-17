@@ -25,12 +25,12 @@ import debounce from 'lodash/debounce';
 import router from 'umi/router';
 import { formatter, getOperates } from '@/utils/utils';
 import api from '@/pages/project/api/taskmodel';
-import TaskModelView from './taskModelView';
-import StandardTable from '../components/StandardTable';
 import SampleSelect from '@/pages/project/components/SampleSelect';
 import SampleGroup from '@/pages/project/components/SampleGroup';
 import disk from '@/pages/project/api/disk';
 import DefaultHeadPicture from '@/assets/imgs/upload_middle.png';
+import StandardTable from '../components/StandardTable';
+import TaskModelView from './taskModelView';
 
 const FormItem = Form.Item;
 const { Option } = Select;
@@ -564,8 +564,8 @@ class TaskModel extends Component {
             reload={this.reGetData}
           />
         )}
-        {/* <SampleSelect />
-        <SampleGroup /> */}
+        {/* <SampleSelect /> */}
+        {/* <SampleGroup /> */}
       </PageHeaderWrapper>
     );
   }
