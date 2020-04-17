@@ -19,7 +19,7 @@ class ProjectEdit extends Component {
   constructor(props) {
     super(props);
     const { projectData, labelList } = props.projectManage;
-    console.log(projectData)
+    console.log(projectData);
 
     this.state = {
       requestType: projectData.requestType || 'addProject', // 请求类型
@@ -202,10 +202,18 @@ class ProjectEdit extends Component {
       <PageHeaderWrapper title={this.navContent(projectData)}>
         <Form ref={this.formRef}>
           <Card bordered={false}>
-            <FormItem label="名称" name="name" style={{ paddingRight: '50px' }}>
+            <FormItem
+              label="名称"
+              name="name"
+              style={{ paddingRight: '50px', width: '600px', marginBottom: '20px' }}
+            >
               <Input placeholder="请输入项目名称" maxLength={20} style={{ marginLeft: '40px' }} />
             </FormItem>
-            <FormItem label="描述" name="describe" style={{ paddingRight: '50px' }}>
+            <FormItem
+              label="描述"
+              name="describe"
+              style={{ paddingRight: '50px', width: '600px', marginBottom: '20px' }}
+            >
               <TextArea
                 rows={4}
                 placeholder="请输入项目描述"
@@ -213,7 +221,7 @@ class ProjectEdit extends Component {
                 style={{ marginLeft: '40px' }}
               />
             </FormItem>
-            <div style={{ width: '300px' }}>
+            <div style={{ width: '300px', marginBottom: '20px' }}>
               <FormItem label="所有者" name="bpName">
                 <Search
                   onSearch={() => this.showBPList.visibleShow(true)}
@@ -223,7 +231,7 @@ class ProjectEdit extends Component {
                 />
               </FormItem>
             </div>
-            <div>
+            <div style={{ marginBottom: '20px' }}>
               <FormItem label="时间" name="time" style={{ paddingRight: '50px' }}>
                 {requestType === 'addProject' ? (
                   <RangePicker
@@ -242,7 +250,7 @@ class ProjectEdit extends Component {
                     ]}
                     onChange={this.handleOnChangeTime}
                     style={{ marginLeft: '40px' }}
-                    // disabled={requestType === 'editProject'}
+                    disabled={requestType === 'editProject'}
                   />
                 )}
               </FormItem>
@@ -263,7 +271,6 @@ class ProjectEdit extends Component {
                         borderColor: '#dcdcdc',
                         lineHeight: '30px',
                         textAlign: 'center',
-                        // backgroundColor: '#F5F5F5',
                       }}
                     >
                       {item.name} {item.text}
