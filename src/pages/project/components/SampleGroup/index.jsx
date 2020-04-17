@@ -4,7 +4,7 @@ import { PlusOutlined, CloseOutlined, PlusSquareOutlined } from '@ant-design/ico
 import { SketchPicker } from 'react-color';
 import { getrandomColor } from '@/utils/utils';
 import './index.less';
-import GroupUpload from './components/groupUpload';
+import GroupUpload from '../UploadSequenceFile/index';
 
 const { Option } = AutoComplete;
 let inputValue = '';
@@ -288,15 +288,7 @@ class SampleSelect extends React.Component {
         <Button onClick={this.uploadGroup}>上传</Button>
         <Table columns={columns} dataSource={tableData} pagination={false} />
 
-        <Modal
-          title="上传分组方案"
-          visible={visible}
-          onOk={this.handleOk}
-          onCancel={this.handleCancel}
-          width={820}
-        >
-          <GroupUpload />
-        </Modal>
+        {visible && <GroupUpload />}
       </>
     );
   }
