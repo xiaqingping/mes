@@ -1,8 +1,7 @@
 import React from 'react';
-import { Avatar, Tag, Card, message, Spin } from 'antd';
-import { DownOutlined, UpOutlined, SettingOutlined } from '@ant-design/icons';
+import { Avatar, Tag, Card, Spin } from 'antd';
+import { DownOutlined, UpOutlined } from '@ant-design/icons';
 import { connect } from 'dva';
-import router from 'umi/router';
 import api from '@/pages/project/api/taskmodel';
 import ArgumentModel from './argumentModel';
 import disk from '@/pages/project/api/disk';

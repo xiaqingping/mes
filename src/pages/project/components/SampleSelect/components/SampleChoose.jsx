@@ -1,0 +1,209 @@
+import React from 'react';
+import { Table, Button, message, Checkbox, Modal } from 'antd';
+import { UploadOutlined } from '@ant-design/icons';
+import FileUpload from './fileUpload';
+
+class SampleChoose extends React.Component {
+  state = {
+    tableData: [
+      {
+        id: '111',
+        sample: '样品1',
+        files: [
+          { filename: '文件1', fileId: '2222', xulie: '序列', length: '200' },
+          { filename: '文件2', fileId: '33333', xulie: '序列', length: '200' },
+        ],
+      },
+    ],
+    visible: false,
+  };
+
+  componentDidMount() {
+    const { tableData } = this.state;
+    tableData.forEach(item => {
+      const isAllChecked = item.files.every(v => {
+        return v.checked;
+      });
+      const atLeastOne = item.files.some(v => {
+        return v.checked;
+      });
+      if (isAllChecked) {
+        item.indeterminate = false;
+        item.checked = true;
+      } else if (atLeastOne) {
+        item.indeterminate = true;
+        item.checked = false;
+      } else {
+        item.indeterminate = false;
+        item.checked = false;
+      }
+    });
+    // const data = tableData.map(item => {
+    //   item.checked = false;
+    //   item.indeterminate = false;
+    // });
+  }
+
+  handleUploadChange = info => {
+    if (info.file.status === 'done') {
+      message.success(`文件上传成功！`);
+    }
+  };
+
+  handleCheckboxChange = (e, row, text, item, index) => {
+    const { tableData } = this.state;
+    console.log(e.target.checked);
+    console.log(row);
+    console.log(text);
+    console.log(item);
+    let selectRow = tableData.filter(v => {
+      return v.id === row.id;
+    });
+    selectRow = selectRow[0];
+    if (item) {
+      selectRow.files.forEach(i => {
+        if (i.fileId === item.fileId) {
+          i.checked = e.target.checked;
+        }
+      });
+      const checkedLen = selectRow.files.filter(r => {
+        return r.checked;
+      }).length;
+      if (checkedLen === selectRow.files.length) {
+        selectRow.indeterminate = false;
+        selectRow.checked = true;
+      } else if (checkedLen === 0) {
+        selectRow.indeterminate = false;
+        selectRow.checked = false;
+      } else {
+        selectRow.indeterminate = true;
+        selectRow.checked = false;
+      }
+
+      const tbData = [...tableData];
+      tbData[index] = selectRow;
+      this.setState({
+        tableData: tbData,
+      });
+    } else {
+      selectRow.checked = e.target.checked;
+      selectRow.indeterminate = false;
+      // 如果没有item表示, 是点击的样品
+      selectRow.files.forEach(i => {
+        i.checked = e.target.checked;
+      });
+    }
+    const tbData = [...tableData];
+    tbData[index] = selectRow;
+    this.setState({
+      tableData: tbData,
+    });
+  };
+
+  toggleVis = v => {
+    this.setState({
+      visible: v,
+    });
+  };
+
+  openUpload = () => {
+    this.toggleVis(true);
+    // this.setState({
+    //   visible: true,
+    // });
+  };
+
+  handleOk = () => {
+    this.toggleVis(false);
+  };
+
+  handleCancel = () => {
+    this.toggleVis(false);
+  };
+
+  render() {
+    const columns = [
+      {
+        title: '样品',
+        dataIndex: 'sample',
+        key: 'sample',
+        filters: [],
+        render: (text, record, index) => {
+          return (
+            <Checkbox
+              onChange={e => this.handleCheckboxChange(e, record, text, undefined, index)}
+              indeterminate={record.indeterminate}
+              checked={record.checked}
+            >
+              {text}
+            </Checkbox>
+          );
+        },
+      },
+      {
+        title: '文件',
+        dataIndex: 'files',
+        key: 'files',
+        render: (text, record, index) => {
+          console.log(text);
+          return text.map(item => {
+            return (
+              <div>
+                <Checkbox
+                  onChange={e => this.handleCheckboxChange(e, record, text, item, index)}
+                  key={item.fileId}
+                  checked={item.checked}
+                >
+                  {item.filename}
+                </Checkbox>
+              </div>
+            );
+          });
+        },
+      },
+      {
+        title: '序列',
+        dataIndex: 'xulie',
+        key: 'xulie',
+        render: (text, record) => {
+          return record.files.map(item => {
+            return <div>{item.xulie}</div>;
+          });
+        },
+      },
+      {
+        title: '长度',
+        dataIndex: 'length',
+        key: 'length',
+        render: (text, record) => {
+          return record.files.map(item => {
+            return <div>{item.length}</div>;
+          });
+        },
+      },
+    ];
+    const { tableData, visible } = this.state;
+    return (
+      <>
+        <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+          <Button type="primary" onClick={() => this.openUpload(true)}>
+            <UploadOutlined /> 序列文件
+          </Button>
+        </div>
+        <Table columns={columns} dataSource={tableData} pagination={false} />
+        <Modal
+          bodyStyle={{ paddingTop: 10 }}
+          title="上传序列文件"
+          visible={visible}
+          onOk={this.handleOk}
+          onCancel={this.handleCancel}
+          width={820}
+        >
+          <FileUpload />
+        </Modal>
+      </>
+    );
+  }
+}
+
+export default SampleChoose;

@@ -3,7 +3,8 @@ import { Drawer, Button, Popconfirm, Dropdown, Menu, Spin, Empty, message } from
 import api from '@/pages/project/api/taskmodel';
 import { connect } from 'dva';
 import ArgumentForm from './argumentForm';
-import '../index.less';
+// import SampleSelect from './sampleSelect';
+// import '../index.less';
 
 class ArgumentModel extends Component {
   state = {
@@ -249,6 +250,16 @@ class ArgumentModel extends Component {
       </Menu>
     );
 
+    const props = {
+      fromView,
+      type,
+      editOriginData,
+      emitArguments: this.emitArguments,
+      onClose: () => {
+        this.toggleChildrenDrawer(false);
+      },
+    };
+
     return (
       <div className="task_model_argu_draw_wrap">
         <Drawer
@@ -319,17 +330,7 @@ class ArgumentModel extends Component {
             onClose={() => this.toggleChildrenDrawer(false)}
             title={this.titleContent()}
           >
-            {type === 'input' && (
-              <ArgumentForm
-                fromView={fromView}
-                type={type}
-                editOriginData={editOriginData}
-                emitArguments={this.emitArguments}
-                onClose={() => {
-                  this.toggleChildrenDrawer(false);
-                }}
-              />
-            )}
+            <ArgumentForm {...props} />
           </Drawer>
         </Drawer>
       </div>

@@ -27,6 +27,8 @@ import { formatter, getOperates } from '@/utils/utils';
 import api from '@/pages/project/api/taskmodel';
 import TaskModelView from './taskModelView';
 import StandardTable from '../components/StandardTable';
+import SampleSelect from '@/pages/project/components/SampleSelect';
+import SampleGroup from '@/pages/project/components/SampleGroup';
 import disk from '@/pages/project/api/disk';
 import DefaultHeadPicture from '@/assets/imgs/upload_middle.png';
 
@@ -562,6 +564,8 @@ class TaskModel extends Component {
             reload={this.reGetData}
           />
         )}
+        {/* <SampleSelect />
+        <SampleGroup /> */}
       </PageHeaderWrapper>
     );
   }
