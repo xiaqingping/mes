@@ -14,4 +14,9 @@ export default {
   getMetadataOriginalParam(params) {
     return request(`${http}/metadatas/v1/analysisRecords/${params}/originalParam`);
   },
+
+  // 查询元数据参数
+  getMetadataAnalysisParam(params) {
+    return request(`${http}/metadatas/v1/analysisRecords/${params}/analysisParam`);
+  },
 }

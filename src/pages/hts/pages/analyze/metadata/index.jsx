@@ -1,7 +1,7 @@
 /**
  * 元数据分析
  */
-import { Card, Col, Divider, Form, Input, Badge, Select, DatePicker, message   } from 'antd';
+import { Card, Col, Form, Input, Badge, Select, DatePicker, message   } from 'antd';
 import React, { Component } from 'react';
 import { connect } from 'dva';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
@@ -23,22 +23,16 @@ class Metadata extends Component {
   tableFormRef = React.createRef();
 
   state = {
-    // 分页参数
-    pagination: {},
-    // 表格数据
-    list: [],
-    // 加载状态
-    loading: true,
-    // 选中行数据
-    selectedRows: [],
+    pagination: {},       // 分页参数
+    list: [],             // 表格数据
+    loading: true,        // 加载状态
+    selectedRows: [],     // 选中行数据
     visibleParam: false,  // 显示参数抽屉
-    // selectedId: [],       // 选中的状态数组
     originalParam: [],    // 原始参数列表
   };
 
   // 顶部表单默认值
   initialValues = {
-    // status: 1,
     page: 1,
     pageSize: 10,
   };
@@ -81,29 +75,20 @@ class Metadata extends Component {
           </FormItem>
         </Col>
         <Col lg={6} md={8} sm={12}>
-          <FormItem label="开始时间" name="startTime">
-            <RangePicker
-              showTime={{ format: 'HH:mm:ss' }}
-              format="YYYY-MM-DD HH:mm:ss"
-              onChange={this.onChangeStartTime}
-            />
+          <FormItem label="开始时间" name="beginDate">
+            <RangePicker format="YYYY-MM-DD"/>
           </FormItem>
         </Col>
         <Col lg={6} md={8} sm={12}>
-          <FormItem label="结束时间" name="endTime">
-            <RangePicker
-              showTime={{ format: 'HH:mm:ss' }}
-              format="YYYY-MM-DD HH:mm:ss"
-              onChange={this.onChangeEndTime}
-            />
+          <FormItem label="结束时间" name="endDate">
+            <RangePicker format="YYYY-MM-DD" />
           </FormItem>
         </Col>
         <Col lg={6} md={8} sm={12}>
-          <FormItem label="状态" name="status">
+          <FormItem label="状态" name="statusList">
             <Select
               mode="multiple"
               style={{ width: '100%' }}
-              onChange={this.handleChange}
             >
               {status.map(e => (
                 <Option value={e.id} key={e.id}>
@@ -122,6 +107,7 @@ class Metadata extends Component {
 
   // 分页
   handleStandardTableChange = data => {
+    console.log(data);
     this.getTableData({
       page: data.current,
       pageSize: data.pageSize,
@@ -140,11 +126,43 @@ class Metadata extends Component {
     this.setState({ loading: true });
 
     const formData = this.tableSearchFormRef.current.getFieldsValue();
+    console.log(formData);
     const { pagination } = this.state;
     const { current: page, pageSize } = pagination;
+
+    let newData = [];
+
+    // 状态
+    if (formData.statusList) {
+      newData = { ...newData, statusList: formData.statusList.join(',') };
+      console.log(newData);
+      delete formData.statusList;
+    }
+
+    // 开始时间
+    if (formData.beginDate) {
+      newData = {
+        ...newData,
+        beginDateBefore: formData.beginDate[0].format('YYYY-MM-DD'),
+        beginDateAfter: formData.beginDate[1].format('YYYY-MM-DD'),
+      };
+      delete formData.beginDate;
+    }
+
+    // 结束时间
+    if (formData.endDate) {
+      newData = {
+        ...newData,
+        endDateBefore: formData.endDate[0].format('YYYY-MM-DD'),
+        endDateAfter: formData.endDate[1].format('YYYY-MM-DD'),
+      };
+      delete formData.endDate;
+    }
+
     const data = {
       page,
       pageSize,
+      ...newData,
       ...formData,
       ...options,
     };
@@ -153,8 +171,8 @@ class Metadata extends Component {
       this.setState({
         list: res.results,
         pagination: {
-          current: options.page,
-          pageSize: options.pageSize,
+          current: data.page,
+          pageSize: data.pageSize,
           total: res.total,
         },
         loading: false,
@@ -180,34 +198,13 @@ class Metadata extends Component {
     }
   };
 
-  // 开始时间 查询条件
-  onChangeStartTime = (value, dateString) => {
-    const beginDateBefore = dateString[0];
-    const beginDateAfter = dateString[1];
-    this.initialValues.beginDateBefore = beginDateBefore;
-    this.initialValues.beginDateAfter = beginDateAfter;
-    console.log(this.initialValues);
-  }
-
-  // 结束时间 查询条件
-  onChangeEndTime = (value, dateString) => {
-    const endDateBefore = dateString[0];
-    const endDateAfter = dateString[1];
-    this.initialValues.beginDateBefore = endDateBefore;
-    this.initialValues.beginDateAfter = endDateAfter;
-    console.log(this.initialValues);
-  }
-
-  // 选中状态 查询条件
-  handleChange = value => {
-    console.log(value);
-    // this.setState({ selectedId: value })
-  }
-
   // 查看参数列表页
-  searchParamList = () => {
-    console.log(123)
-    router.push('/hts/analyze/metadata/paramList');
+  searchParamList = data => {
+    this.props.dispatch({
+      type: 'htsCache/setMetadataRow',
+      payload: data
+    })
+    return router.push('/hts/analyze/metadata/paramList');
   }
 
   // 查看参数 抽屉
@@ -237,12 +234,10 @@ class Metadata extends Component {
       list,
       loading,
       visibleParam,
-      // selectedId,
       originalParam
     } = this.state;
     const { status } = this.props.htsCache;
     let tableWidth = 0;
-    // console.log(selectedId);
 
     const components = {
       body: {
@@ -254,23 +249,28 @@ class Metadata extends Component {
       {
         title: '编号',
         dataIndex: 'code',
-        render: value => ( <a onClick={() => this.searchParamList()}>{value}</a> )
+        key: 'code',
+        render: (value, row) => ( <a onClick={() => this.searchParamList(row)}>{value}</a> )
       },
       {
         title: '项目编号',
         dataIndex: 'projectCode',
+        key: 'projectCode',
       },
       {
         title: '任务编号',
         dataIndex: 'taskCode',
+        key: 'taskCode',
       },
       {
         title: '操作人',
         dataIndex: 'operatorName',
+        key: 'operatorName',
       },
       {
         title: '开始/结束时间',
         dataIndex: 'beginDate',
+        key: 'beginDate',
         render: (text, row) => (
           <>
             {row.beginDate}
@@ -282,10 +282,11 @@ class Metadata extends Component {
       {
         title: '状态',
         dataIndex: 'status',
-        render: value => {
+        key: 'status',
+        render: (value, row) => {
           const name = formatter(status, value);
           const sta = formatter(status, value, 'id', 'status');
-          return <Badge status={sta} text={name} />;
+          return <Badge status={sta} text={name} key={row.id}/>;
         },
       },
       {
@@ -315,6 +316,7 @@ class Metadata extends Component {
               getTableData={this.getTableData}
               simpleForm={this.simpleForm}
               advancedForm={this.advancedForm}
+              rowKey="id"
             />
           </Card>
           <Card style={{ marginTop: '24px' }}>
@@ -322,6 +324,7 @@ class Metadata extends Component {
               <StandardTable
                 scroll={{ x: tableWidth }}
                 rowClassName="editable-row"
+                rowKey="id"
                 selectedRows={selectedRows}
                 components={components}
                 loading={loading}

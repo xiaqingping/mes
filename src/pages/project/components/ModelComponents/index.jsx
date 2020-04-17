@@ -28,7 +28,7 @@ const InputModel = props => {
   // 判断是否可为空
   const onChange = e => {
     if (e.target.value === '') {
-      if(data.isrequired) {
+      if(data.isrequired === 'true') {
         message.warning(`${data.paramName}参数值不能为空`);
         const { paramKey } = data;
         if (data.defaultValue === undefined) data.defaultValue = '';
