@@ -4,7 +4,7 @@ import React from 'react';
 import { Modal, Button, Carousel, Table, List, Progress, message } from 'antd';
 import { InboxOutlined, PaperClipOutlined } from '@ant-design/icons';
 import { guid, cutString } from '@/utils/utils';
-import api from '@/pages/sample/api/sample';
+import api from './api/sample';
 import './index.less';
 import disk from './api/disk';
 
@@ -216,7 +216,7 @@ class UploadSequenceFile extends React.Component {
   handleOK = () => {
     const { tableList } = this.state;
     api.addSample(tableList).then(() => {
-      this.props.handleClose();
+      this.props.handleClose(true);
     });
   };
 

@@ -44,11 +44,14 @@ class ArgumentModel extends Component {
   }
 
   componentWillUnmount() {
-    const { dispatch } = this.props;
-    dispatch({
-      type: 'taskModel/getArgumentsList',
-      payload: null,
-    });
+    const { fromView } = this.props;
+    if (fromView) {
+      const { dispatch } = this.props;
+      dispatch({
+        type: 'taskModel/getArgumentsList',
+        payload: [],
+      });
+    }
   }
 
   getArgumentList = () => {
