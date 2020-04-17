@@ -20,9 +20,10 @@ class Test extends Component {
   constructor(props) {
     super(props);
     const { processSelectedList, paramList, projectInfor } = this.props.projectManage;
+    console.log(projectInfor);
 
     this.state = {
-      list: processSelectedList,
+      list: projectInfor.type === 'add' ? [] : processSelectedList,
       loading: false,
       visible: false,
       projectInfor,
@@ -55,33 +56,42 @@ class Test extends Component {
     this.setState({
       list: newData,
     });
+    this.props.dispatch({
+      type: 'projectManage/setProcessSelectedList',
+      payload: newData,
+    });
   };
 
   // 打开参数
   handleOpen = row => {
+    // 传流程id，流程模型id，请求类型。
+    // console.log(row);
+
     const { paramList } = this.props.projectManage;
 
-    let data = {};
-    if (paramList.length === 0 && paramList.processModelId === undefined) {
-      // 添加 参数值
-      data = {
-        requestType: 'addParam',
-        processModelId: row.id,
-      }
-    } else {
-      // 修改 参数值
-      data = {
-        requestType: 'updateParam',
-        processModelId: row.id,
-        params: paramList.params,
-      }
+    if (paramList.length === 0) {
+      api.getProcessParam(row.id).then(res => {
+        if (!res || res.length === 0) return message.error('当前流程暂无参数！');
+        const data = res;
+        data.requestType = 'addParam';
+        data.processId = row.id;
+        this.props.dispatch({
+          type: 'projectDetail/setProcssesParam',
+          payload: data,
+        });
+        router.push('/project/project-manage/process-parameter');
+        return false;
+      });
     }
-
+    const data = paramList;
+    console.log(data);
+    data.requestType = 'updateParam';
     this.props.dispatch({
-      type: 'projectDetail/setUserForParam',
-      payload: data
-    })
+      type: 'projectDetail/setProcssesParam',
+      payload: data,
+    });
     router.push('/project/project-manage/process-parameter');
+    return false;
   };
 
   // 获取模态框选中的流程模型数据
@@ -130,7 +140,10 @@ class Test extends Component {
     projectInfor.processList = newList;
     const data = projectInfor;
 
-    api.addProjects(data).then(() => router.push('/project/project-manage'));
+    api.addProjects(data).then(() => {
+      console.log(123);
+      // return router.push('/project/project-manage');
+    });
     return '';
   };
 
@@ -171,9 +184,6 @@ class Test extends Component {
         dataIndex: 'parameter',
         width: 100,
         render: (value, row) => (
-          // <SlidersOutlined onClick={() => this.handleOpen(row)} style={{ fontSize: 20 }} />
-          // <div onClick={() => this.handleOpen(row)} style={{ fontSize: 20 }}>
-          //   {/* <img src={ParamPic} alt=""/> */}
           // </div>
           <div className="task_model_add_task_icon" onClick={() => this.handleOpen(row)} />
         ),
@@ -190,7 +200,6 @@ class Test extends Component {
       },
       {
         title: '操作',
-        fixed: 'right',
         width: 200,
         render: value => (
           <>
@@ -201,12 +210,7 @@ class Test extends Component {
               onConfirm={() => this.confirm(value)}
               okText="确定"
               cancelText="取消"
-            >
-              {/* <div
-                    style={{ width: 20, height: 20 }}
-                    className="task_model_add_model_delet_icon"
-                  /> */}
-            </Popconfirm>
+            />
           </>
         ),
       },
@@ -244,7 +248,6 @@ class Test extends Component {
           >
             <Button
               type="dashed"
-              // onClick={this.showModal}
               onClick={this.onOpen}
               icon={<PlusOutlined />}
               style={{

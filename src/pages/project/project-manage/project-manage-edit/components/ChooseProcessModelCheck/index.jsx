@@ -67,7 +67,7 @@ class ChooseProcessModelCheck extends React.Component {
                 width={1200}
                 footer={null}
               >
-                <div style={{ height: '320px' }}>
+                <div style={{ height: '320px', overflow: 'auto' }}>
                   {/* 上部 */}
                   <div style={{ height: '50px' }}>
                     <Avatar
