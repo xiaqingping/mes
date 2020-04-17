@@ -61,6 +61,7 @@ class AssociatedProcessModel extends React.Component {
     const { pagination } = this.state;
     const { current: page, pageSize: rows } = pagination;
     const data = {
+      ...{ status: 2 },
       page,
       rows,
       ...formData,
