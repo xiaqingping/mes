@@ -249,11 +249,64 @@ const INIT_STATE = {
       groupSchemeList: [
         {
           groupSchemeName: '分组方案一',
+          groupList: [
+            {
+              sampleId: 311,
+              groupName: '分组一',
+              groupColour: 'red',
+              sampleList: []
+            },
+            {
+              sampleId: 312,
+              groupName: '分组二',
+              groupColour: 'red',
+            },
+            {
+              sampleId: 313,
+              groupName: '分组三',
+              groupColour: 'red',
+            },
+          ],
+          sampleList: [],
+        },
+        {
+          groupSchemeName: '分组方案二',
           groupList: [],
-        }
+          sampleList: [
+            {
+              sampleId: 211,
+              sampleName: '样品一'
+            }
+          ],
+        },
+        {
+          groupSchemeName: '分组方案三',
+          groupList: [
+            {
+              sampleId: 411,
+              groupName: '分组4',
+              groupColour: 'red',
+
+            },
+            {
+              sampleId: 412,
+              groupName: '分组5',
+              groupColour: 'red',
+            },
+            {
+              sampleId: 413,
+              groupName: '分组6',
+              groupColour: 'red',
+            },
+          ],
+          sampleList: [],
+        },
       ]
     }
-  ]
+  ],
+
+  // 元数据编号查看参数传递数据
+  metadataRow: [],
 };
 
 const BasicModel = {
@@ -284,6 +337,9 @@ const BasicModel = {
       const { type, data } = setCache(namespace, payload, processing);
 
       return { ...state, [type]: data };
+    },
+    setMetadataRow(state, action) {
+      return { ...state, metadataRow: action.payload };
     },
   },
   subscriptions: {
