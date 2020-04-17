@@ -212,6 +212,7 @@ class TaskModel extends Component {
       this.setState({
         loading: false,
       });
+      message.error('图片上传失败!');
     }
   };
 
@@ -605,7 +606,15 @@ class TaskModel extends Component {
               >
                 <Input placeholder="请输入任务名称" />
               </Form.Item>
-              <Form.Item name="describe">
+              <Form.Item
+                name="describe"
+                rules={[
+                  {
+                    required: true,
+                    message: '请输入任务描述',
+                  },
+                ]}
+              >
                 <Input.TextArea placeholder="请输入任务描述" rows={4} />
               </Form.Item>
               <Form.Item

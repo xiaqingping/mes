@@ -167,7 +167,6 @@ class SampleSelect extends React.Component {
   };
 
   handleColorChange = (color, text, record, index) => {
-    console.log(object);
     const { tableData } = this.state;
     const row = { ...record };
     row.color = color.hex;

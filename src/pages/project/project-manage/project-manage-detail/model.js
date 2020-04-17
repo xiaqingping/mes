@@ -121,17 +121,17 @@ const projectDetailModel = {
       },
     ],
 
-    // 流程列表参数
-    procssesParam: [],
+    // 参数页面所传递数据
+    userForParamData: [],
     // 参数值列表
     paramList: [],
   },
   effects: {},
   reducers: {
-    setProcssesParam(state, action) {
+    setUserForParam(state, action) {
       return {
         ...state,
-        procssesParam: action.payload
+        userForParamData: action.payload
       };
     },
     setParamList(state, action) {
