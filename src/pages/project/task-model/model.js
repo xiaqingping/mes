@@ -21,25 +21,26 @@ const SeqModel = {
     formItemType: [{
         type: "input",
         text: "单行输入"
-      }, {
-        type: "sample_select",
-        text: '样品选择'
-      }, {
-        type: "sample_group",
-        text: '样品分组'
-      }, {
-        type: "sample_environment_factor",
-        text: '样品环境因子表'
-      }, {
-        type: "number_input",
-        text: '数值输入'
-      }, {
-        type: "checkbox",
-        text: "多选"
-      }, {
-        type: "radio",
-        text: "单选"
-      }
+      },
+      //  {
+      //   type: "sample_select",
+      //   text: '样品选择'
+      // }, {
+      //   type: "sample_group",
+      //   text: '样品分组'
+      // }, {
+      //   type: "sample_environment_factor",
+      //   text: '样品环境因子表'
+      // }, {
+      //   type: "number_input",
+      //   text: '数值输入'
+      // }, {
+      //   type: "checkbox",
+      //   text: "多选"
+      // }, {
+      //   type: "radio",
+      //   text: "单选"
+      // }
 
     ],
     taskModelStatusOptions: [{
