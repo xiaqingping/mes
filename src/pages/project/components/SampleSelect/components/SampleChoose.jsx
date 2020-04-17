@@ -11,7 +11,7 @@ class SampleChoose extends React.Component {
         sample: '样品1',
         files: [
           { filename: '文件1', fileId: '2222', xulie: '序列', length: '200' },
-          { filename: '文件2', fileId: '33333', xulie: '序列', length: '200' },
+          { filename: '文件2', fileId: '33333', xulie: '序列', length: '200', checked: true },
         ],
       },
     ],
@@ -19,26 +19,28 @@ class SampleChoose extends React.Component {
   };
 
   componentDidMount() {
+    this.getTableData();
+  }
+
+  getTableData = () => {
+    // 请求接口, 获取后台数据
     const { tableData } = this.state;
     tableData.forEach(item => {
-      const isAllChecked = item.files.every(v => {
+      const fileCheckedLen = item.files.filter(v => {
         return v.checked;
-      });
-      const atLeastOne = item.files.some(v => {
-        return v.checked;
-      });
-      if (isAllChecked) {
+      }).length;
+      if (fileCheckedLen === item.files.length) {
         item.indeterminate = false;
         item.checked = true;
-      } else if (atLeastOne) {
-        item.indeterminate = true;
+      } else if (fileCheckedLen === 0) {
+        item.indeterminate = false;
         item.checked = false;
       } else {
-        item.indeterminate = false;
+        item.indeterminate = true;
         item.checked = false;
       }
     });
-  }
+  };
 
   handleUploadChange = info => {
     if (info.file.status === 'done') {
@@ -110,7 +112,10 @@ class SampleChoose extends React.Component {
     this.toggleVis(false);
   };
 
-  handleCancel = () => {
+  handleFileUploadClose = v => {
+    if (v) {
+      this.getTableData();
+    }
     this.toggleVis(false);
   };
 
@@ -178,13 +183,22 @@ class SampleChoose extends React.Component {
     const { tableData, visible } = this.state;
     return (
       <>
-        <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-          <Button type="primary" onClick={() => this.openUpload(true)}>
-            <UploadOutlined /> 序列文件
-          </Button>
-        </div>
-        <Table columns={columns} dataSource={tableData} pagination={false} />
-        {visible && <FileUpload />}
+        <Modal
+          bodyStyle={{ paddingTop: 10 }}
+          title="选择样品"
+          visible
+          onOk={this.props.handleOk}
+          onCancel={this.props.handleCancel}
+          width={820}
+        >
+          <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+            <Button type="primary" onClick={() => this.openUpload(true)}>
+              <UploadOutlined /> 序列文件
+            </Button>
+          </div>
+          <Table columns={columns} dataSource={tableData} pagination={false} />
+          {visible && <FileUpload handleClose={this.handleFileUploadClose} />}
+        </Modal>
       </>
     );
   }

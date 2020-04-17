@@ -244,16 +244,7 @@ class SampleSelect extends React.Component {
         >
           <PlusOutlined /> 选择样品
         </Button>
-        <Modal
-          bodyStyle={{ paddingTop: 10 }}
-          title="选择样品"
-          visible={visible}
-          onOk={this.handleOk}
-          onCancel={this.handleCancel}
-          width={820}
-        >
-          <SampleChoose />
-        </Modal>
+        {visible && <SampleChoose handleOk={this.handleOk} handleCancel={this.handleCancel} />}
       </>
     );
   }

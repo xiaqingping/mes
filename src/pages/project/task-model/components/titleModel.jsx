@@ -106,6 +106,7 @@ class TitleModel extends React.Component {
     this.setState({
       viewVisible: true,
     });
+    console.log(item);
     console.log(this.props);
     // TODO 获取数据参数数据
     const { dispatch } = this.props;
