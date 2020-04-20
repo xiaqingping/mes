@@ -182,7 +182,6 @@ class SampleSelect extends React.Component {
   };
 
   onInputBlur = e => {
-    console.log(e);
     if (!select) {
       const { optionList } = this.state;
       const list = [...optionList];

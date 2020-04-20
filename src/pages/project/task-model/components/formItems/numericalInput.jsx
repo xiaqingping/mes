@@ -51,16 +51,43 @@ class numericalInput extends React.Component {
           </Col>
         </Row>
         <Row gutter={16}>
-          <Col span={12}>
+          <Col span={10}>
             <Form.Item label="默认值：" name="defaultValue">
               {fromView ? viewForm.defaultValue : <Input placeholder="请输入 " />}
             </Form.Item>
           </Col>
-          <Col span={12}>
-            <Form.Item label="输入区间" name="validRule">
-              {fromView ? viewForm.validRule : <Input placeholder="最小值~最大值 " />}
-            </Form.Item>
-          </Col>
+          <Form.Item label="输入区间" name="interval">
+            {fromView ? (
+              viewForm.interval
+            ) : (
+              <Input.Group compact>
+                <Form.Item name="min">
+                  <Input style={{ width: 80, textAlign: 'center' }} placeholder="最小值" />
+                </Form.Item>
+                <Input
+                  className="site-input-split"
+                  style={{
+                    width: 30,
+                    borderLeft: 0,
+                    borderRight: 0,
+                    pointerEvents: 'none',
+                  }}
+                  placeholder="~"
+                  disabled
+                />
+                <Form.Item name="max">
+                  <Input
+                    className="site-input-right"
+                    style={{
+                      width: 80,
+                      textAlign: 'center',
+                    }}
+                    placeholder="最大值"
+                  />
+                </Form.Item>
+              </Input.Group>
+            )}
+          </Form.Item>
         </Row>
 
         <Form.Item label="验证说明：" name="validDesc">
@@ -70,7 +97,7 @@ class numericalInput extends React.Component {
           {fromView ? (
             viewForm.inputMode
           ) : (
-            <Select defaultValue="one" style={{ width: 160 }} allowClear>
+            <Select defaultValue="请选择" style={{ width: 160 }} allowClear>
               <Option value="one">滑动条+输入框</Option>
               <Option value="two">滑动条</Option>
               <Option value="three">输入框</Option>
