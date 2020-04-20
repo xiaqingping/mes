@@ -3,18 +3,22 @@ import React from 'react';
 import InputItems from './inputItems';
 import BaseFormItems from './baseFormItems';
 import NumericalInput from './numericalInput';
+import CheckedAndRadio from './checkAndRadio';
 
 class FactoryComponent extends React.Component {
   state = {};
 
   render() {
+    // 样品, 分组, 环境因子组件
     const compGroup = ['sample_select', 'sample_group', 'sample_environment_factor'];
+    const checkGroup = ['checkbox', 'radio']; // 单选, 多选的组件
     const { fromView, viewForm, type } = this.props;
     return (
       <>
         {type === 'input' && <InputItems fromView={fromView} viewForm={viewForm} />}
         {compGroup.includes(type) && <BaseFormItems fromView={fromView} viewForm={viewForm} />}
         {type === 'number_input' && <NumericalInput fromView={fromView} viewForm={viewForm} />}
+        {checkGroup.includes(type) && <CheckedAndRadio />}
       </>
     );
   }
