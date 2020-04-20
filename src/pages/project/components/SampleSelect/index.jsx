@@ -117,7 +117,12 @@ class SampleSelect extends React.Component {
   handleChange = (color, record, index) => {
     const { tableData } = this.state;
     const row = { ...record };
-    row.color = color.hex;
+    const isIncludes = this.props.project.colorStore.includes(color.hex);
+    if (isIncludes) {
+      row.color = getrandomColor();
+    } else {
+      row.color = color.hex;
+    }
     row.visible = false;
     const datas = [...tableData];
     datas[index] = row;
@@ -181,13 +186,14 @@ class SampleSelect extends React.Component {
   receiveData = data1 => {
     const { tableData, fromChoosedFile } = this.state;
     const list = [...tableData];
-    console.log(data1);
 
+    const colorStore = [];
     // 从选择样品进来的
     if (!fromChoosedFile) {
       data1.forEach(item => {
         if (!tableData.length) {
           item.color = getrandomColor();
+          colorStore.push(item.color);
         }
         tableData.forEach(v => {
           if (item.id === v.id) {
@@ -195,6 +201,7 @@ class SampleSelect extends React.Component {
           } else {
             item.color = getrandomColor();
           }
+          colorStore.push(item.color);
         });
         return item;
       });
@@ -202,6 +209,8 @@ class SampleSelect extends React.Component {
       this.setState({
         tableData: data1,
       });
+      this.setColorStore(colorStore);
+      console.log(this.props.project.colorStore);
     } else {
       // 从已选择进来的
 
@@ -215,8 +224,8 @@ class SampleSelect extends React.Component {
   };
 
   render() {
-    const { tableData, visible, sampleId, chooseFileIds } = this.state;
-
+    const { tableData, visible, sampleId, chooseFileIds, popVis } = this.state;
+    console.log(this.props.project);
     const columns = [
       {
         title: '样品',
@@ -226,6 +235,8 @@ class SampleSelect extends React.Component {
           return (
             <div style={{ display: 'flex' }}>
               <Popover
+                visible={popVis}
+                // onVisibleChange={this.handlePopVisChange}
                 overlayClassName="project_manage_sample_ui_select"
                 overlayStyle={{ padding: 0 }}
                 content={
@@ -256,8 +267,8 @@ class SampleSelect extends React.Component {
       },
       {
         title: '别名',
-        dataIndex: 'alia',
-        key: 'alia',
+        dataIndex: 'sampleAlias',
+        key: 'sampleAlias',
         render: (text, record, index) => {
           return (
             <div className="project_manage_sample_select_table_alia">
@@ -339,9 +350,6 @@ class SampleSelect extends React.Component {
         },
       },
     ];
-    // 点击'已选择n个'时候, 需要传给后台的样品id和已选取文件的id
-    const ids = { sampleId, chooseFileIds };
-    // 点击选择样品时候, 需要传给后台所有的已选取文件的id;
 
     return (
       <>

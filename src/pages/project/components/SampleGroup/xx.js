@@ -1,5 +1,3 @@
-import group from "@/pages/system/group"
-
 {
   {
     sampleLi: [{
