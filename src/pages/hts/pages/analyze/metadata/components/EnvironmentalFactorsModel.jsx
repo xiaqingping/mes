@@ -6,7 +6,7 @@ import { Table, Card, Input } from 'antd';
 import { CloseOutlined, PlusSquareOutlined } from '@ant-design/icons';
 import EditableCell from '@/components/EditableCell';
 
-class EnvironmentalFactorsTable extends React.Component {
+class EnvironmentalFactorsModel extends React.Component {
   constructor(props) {
     super(props);
     console.log(props);
@@ -77,7 +77,7 @@ class EnvironmentalFactorsTable extends React.Component {
         title: '样品',
         dataIndex: 'sampleAlias',
         key: 'sampleAlias',
-        width: 100,
+        width: 200,
       },
       // 表头 最后一列
       lastColumn: {
@@ -113,27 +113,28 @@ class EnvironmentalFactorsTable extends React.Component {
     });
   }
 
-  // save = async e => {
-  //   try {
-  //     const values = await form.validateFields();
-  //     toggleEdit();
-  //     this.handleSave({ ...record, ...values });
-  //   } catch (errInfo) {
-  //     console.log('Save failed:', errInfo);
-  //   }
-  // };
+  save = async e => {
+    console.log(e);
+    // try {
+    //   const values = await form.validateFields();
+    //   toggleEdit();
+    //   this.handleSave({ ...record, ...values });
+    // } catch (errInfo) {
+    //   console.log('Save failed:', errInfo);
+    // }
+  };
 
-  // handleSave = row => {
-  //   console.log(row);
-  //   const { data } = this.state;
-  //   const newData = [...data];
-  //   const index = newData.findIndex(item => row.key === item.key);
-  //   const item = newData[index];
-  //   newData.splice(index, 1, { ...item, ...row });
-  //   this.setState({
-  //     data: newData,
-  //   });
-  // };
+  handleSave = row => {
+    console.log(row);
+    const { data } = this.state;
+    const newData = [...data];
+    const index = newData.findIndex(item => row.key === item.key);
+    const item = newData[index];
+    newData.splice(index, 1, { ...item, ...row });
+    this.setState({
+      data: newData,
+    });
+  };
 
   // 新增列
   addColumn = () => {
@@ -151,7 +152,7 @@ class EnvironmentalFactorsTable extends React.Component {
       newHeader = {
         id: num,
         dataIndex: `header_${num}`,
-        title: `分组方案_${num}`,
+        title: `环境因子_${num}`,
         editable: true,
         inputType: <Input style={{ width: '90%' }} onPressEnter={this.save} onBlur={this.save} />,
       };
@@ -159,28 +160,13 @@ class EnvironmentalFactorsTable extends React.Component {
       newHeader = {
         id: 2,
         dataIndex: 'header_2',
-        title: '分组方案_2',
+        title: '环境因子_2',
         editable: true,
-        inputType: <Input style={{ width: '90%' }} />,
+        inputType: <Input style={{ width: '90%' }} onPressEnter={this.save} onBlur={this.save} />,
       };
     }
 
-    this.setState(
-      {
-        headers: [...headers, newHeader],
-      },
-      () => {
-        const hds = this.state.headers;
-        const cls = [firstColumn, ...this.formatHeader(hds), lastColumn];
-        console.log(cls);
-        const newData = this.setDataSource(newHeader);
-        this.setState({ columns: cls, data: newData });
-      },
-    );
-  };
-
-  // 设置表格数据
-  setDataSource = newHeader => {
+    // 设置表格数据
     const { data } = this.state;
     const newData = [];
     data.forEach(item => {
@@ -189,14 +175,24 @@ class EnvironmentalFactorsTable extends React.Component {
       newItem[key] = '123';
       newData.push(newItem);
     });
-    console.log(newData);
-    return newData;
+
+    this.setState(
+      {
+        headers: [...headers, newHeader],
+      },
+      () => {
+        const hds = this.state.headers;
+        const cls = [firstColumn, ...this.formatHeader(hds), lastColumn];
+        this.setState({ columns: cls, data: newData });
+      },
+    );
   };
 
   // 移除列
   removeColumn = e => {
-    const { headers, firstColumn, lastColumn } = this.state;
+    const { data, headers, firstColumn, lastColumn } = this.state;
     const headerArr = headers.filter(item => item.id !== e.id);
+    const dataArr = data.filter(item => item[e.dataInde] !== e.dataIndex);
 
     this.setState(
       {
@@ -205,9 +201,20 @@ class EnvironmentalFactorsTable extends React.Component {
       () => {
         const hds = this.state.headers;
         const columns = [firstColumn, ...this.formatHeader(hds), lastColumn];
-        this.setState({ columns });
+        this.setState({ columns, data: dataArr });
       },
     );
+  };
+
+  // 修改表头
+  handleOnChange = (row, event) => {
+    const { headers } = this.state;
+    headers.forEach(item => {
+      if (row.id === item.id) {
+        item.title = event.target.value;
+      }
+    });
+    this.setState({ headers });
   };
 
   // componentDidUpdate(props) {
@@ -218,28 +225,25 @@ class EnvironmentalFactorsTable extends React.Component {
 
   // 格式化表头 可编辑Input
   formatHeader = headers => {
-    const groups = headers.map(e => {
-      console.log(e);
-      return {
-        title: () => (
-          <div className="project_manage_UI_sample_group_title" key={e.id}>
-            <input defaultValue={e.title} onBlur={this.handleBlur} />
-            <CloseOutlined onClick={() => this.removeColumn(e)} />
-          </div>
-        ),
-        dataIndex: `${e.dataIndex}`,
-        key: `${e.key}`,
-        width: 100,
-      };
-    });
+    const groups = headers.map(item => ({
+      title: () => (
+        <div className="project_manage_UI_sample_group_title" key={item.id}>
+          <input defaultValue={item.title} onChange={event => this.handleOnChange(item, event)} />
+          <CloseOutlined onClick={() => this.removeColumn(item)} />
+        </div>
+      ),
+      dataIndex: `${item.dataIndex}`,
+      key: `${item.key}`,
+      width: 100,
+    }));
 
     return groups;
   };
 
   render() {
     const { columns, data } = this.state;
-    console.log(columns);
-    console.log(data);
+    // console.log(columns);
+    // console.log(data);
 
     const components = {
       body: {
@@ -278,4 +282,4 @@ class EnvironmentalFactorsTable extends React.Component {
   }
 }
 
-export default EnvironmentalFactorsTable;
+export default EnvironmentalFactorsModel;
