@@ -409,8 +409,8 @@ class ProcessModel extends Component {
     const { pagination, loading, visible, detailValue, list } = this.state;
 
     const { status } = this.props;
-    let tableWidth = 0;
-    let columns = [
+    // let tableWidth = 0;
+    const columns = [
       {
         title: '编号/名称',
         dataIndex: 'code',
@@ -549,15 +549,15 @@ class ProcessModel extends Component {
       },
     ];
 
-    columns = columns.map(col => {
-      // eslint-disable-next-line no-param-reassign
-      if (!col.width) col.width = 100;
-      tableWidth += col.width;
-      if (!col.editable) {
-        return col;
-      }
-      return true;
-    });
+    // columns = columns.map(col => {
+    //   // eslint-disable-next-line no-param-reassign
+    //   if (!col.width) col.width = 100;
+    //   tableWidth += col.width;
+    //   if (!col.editable) {
+    //     return col;
+    //   }
+    //   return true;
+    // });
 
     return (
       <PageHeaderWrapper>
@@ -584,7 +584,7 @@ class ProcessModel extends Component {
             </div>
             <Form ref={this.tableFormRef} className="table-style-set">
               <StandardTable
-                scroll={{ x: tableWidth }}
+                // scroll={{ x: tableWidth }}
                 rowClassName="editable-row"
                 loading={loading}
                 data={{ list, pagination }}

@@ -19,17 +19,12 @@ class SampleSelect extends React.Component {
         groupList: [
           {
             id: 'aaaaa',
-            name: '样品1',
+            name: '别名1',
             type: 'sample',
           },
           {
             id: 'bbb',
-            name: '样品2',
-            type: 'sample',
-          },
-          {
-            id: 'ccccc',
-            name: '样品3',
+            name: '别名2',
             type: 'sample',
           },
         ],
@@ -44,7 +39,7 @@ class SampleSelect extends React.Component {
           },
           {
             id: 'bbb',
-            name: '当前样品',
+            name: '',
             type: 'sample',
           },
           {
@@ -99,21 +94,37 @@ class SampleSelect extends React.Component {
         name: '分组方案三',
         groupList: [
           {
-            id: 'bbbbbbb',
-            name: 'con3',
+            id: 'aaaaa',
+            name: 'con2',
             type: 'group',
-            color: 'AAFFdd',
+            color: 'AAFFGG',
             sampleList: [
               {
                 id: 'aaaaa',
                 name: '别名1',
               },
+            ],
+          },
+          {
+            id: 'bbb',
+            name: 'con3',
+            type: 'group',
+            color: 'AAFFBB',
+            sampleList: [
               {
                 id: 'bbbb',
                 name: '别名2',
               },
+            ],
+          },
+          {
+            id: 'ccccc',
+            name: 'con4',
+            type: 'group',
+            color: 'AAFFCC',
+            sampleList: [
               {
-                id: 'cccc',
+                id: 'ccccc',
                 name: '别名3',
               },
             ],
@@ -135,17 +146,28 @@ class SampleSelect extends React.Component {
       editable: index !== 0,
       width: 100,
     }));
-    const data = [];
+    let data = [];
     tableData.map((item, index) => {
       item.groupList.map((i, ind) => data.push(tableData[index].groupList[ind]));
     });
-    console.log(columnsList);
+
+    data = this.expoleArr(data, tableData[0].groupList.length);
     console.log(data);
+
     this.setState({
       columns: columnsList,
       data,
     });
   }
+
+  // 数组分组
+  expoleArr = (arr, l) => {
+    const result = [];
+    for (let i = 0, len = arr.length; i < len; i += l) {
+      result.push(arr.slice(i, i + l));
+    }
+    return result;
+  };
 
   removeColumn = e => {
     const { headers } = this.state;
@@ -322,7 +344,6 @@ class SampleSelect extends React.Component {
 
   render() {
     const { tableData, visible, data, columns } = this.state;
-
     return (
       <>
         <Button onClick={this.uploadGroup}>上传</Button>
