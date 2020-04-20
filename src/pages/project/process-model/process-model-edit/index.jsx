@@ -137,25 +137,16 @@ class ProcessEdit extends Component {
         picture: res.picture,
         loading: true,
         processData: res,
+        pageLoading: false,
+        imageUrl: disk.downloadFiles(res.picture, { view: true }),
       });
-      disk
-        .getFiles({
-          sourceCode: res.picture,
-          sourceKey: 'project_process_model',
-        })
-        .then(v => {
-          this.setState({
-            imageUrl: v.length !== 0 ? disk.downloadFiles(v[0].id, { view: true }) : '',
-            pageLoading: false,
-          });
-          this.props.dispatch({
-            type: 'processModel/setProcessDetail',
-            payload: {
-              ...res,
-              fileId: v.length !== 0 ? v[0].id : '',
-            },
-          });
-        });
+      this.props.dispatch({
+        type: 'processModel/setProcessDetail',
+        payload: {
+          ...res,
+        },
+      });
+
       if (res.version) {
         this.setState({
           versionType: versionFun(res.version),
@@ -166,7 +157,6 @@ class ProcessEdit extends Component {
 
   // 图片上传
   handleChange = info => {
-    const { guuid } = this.state;
     if (info.file.status === 'uploading') {
       this.setState({ loading: true });
       return;
@@ -177,7 +167,7 @@ class ProcessEdit extends Component {
         this.setState({
           imageUrl,
           loading: false,
-          picture: guuid,
+          picture: info.file.response[0],
         }),
       );
     }
@@ -362,8 +352,8 @@ class ProcessEdit extends Component {
         sonIdsData.some((item, index) => {
           if (i === item) {
             sonIdsData.splice(index, 1);
-            return true;
           }
+          return true;
         });
       });
     }
