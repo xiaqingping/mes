@@ -11,9 +11,10 @@ import EditableCell from '@/components/EditableCell';
 import api from '@/pages/hts/api';
 import { formatter } from '@/utils/utils';
 import router from 'umi/router';
+import EnvironmentalFactorsModel from
+  '@/pages/project/components/ModelComponents/EnvironmentalFactorsModel';
+import CheckBoxModel from '@/pages/project/components/ModelComponents/CheckBoxModel';
 import { ParamDrawer } from './components/ModelUI';
-import EnvironmentalFactorsModel from './components/EnvironmentalFactorsModel';
-import CheckBoxModel from './components/CheckBoxModel';
 
 const FormItem = Form.Item;
 const { Option } = Select;
