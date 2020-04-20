@@ -10,6 +10,7 @@ class SampleChoose extends React.Component {
     tableData: [],
     visible: false,
     loading: false,
+    filterData: [],
   };
 
   componentDidMount() {
@@ -32,10 +33,15 @@ class SampleChoose extends React.Component {
       api
         .getChosedFileDetails(payload)
         .then(res => {
+          const filterData = [res].map(item => {
+            item = { text: item.sampleName, value: item.sampleCode };
+            return item;
+          });
           this.setState(
             {
               tableData: [res],
               loading: false,
+              filterData,
             },
             () => {
               this.handleDataFormat();
@@ -53,10 +59,16 @@ class SampleChoose extends React.Component {
       api
         .getSampleList(payload)
         .then(res => {
+          const filterData = res.map(item => {
+            item = { text: item.sampleName, value: item.sampleCode };
+            return item;
+          });
+          console.log(filterData);
           this.setState(
             {
               tableData: res,
               loading: false,
+              filterData,
             },
             () => {
               this.handleDataFormat();
@@ -182,13 +194,15 @@ class SampleChoose extends React.Component {
   };
 
   render() {
+    const { filterData } = this.state;
     const columns = [
       {
         title: '样品',
         width: 150,
         dataIndex: 'sampleName',
         key: 'sampleName',
-        filters: [],
+        filters: filterData,
+        onFilter: (value, record) => record.sampleCode.includes(value),
         render: (text, record, index) => {
           return (
             <Checkbox

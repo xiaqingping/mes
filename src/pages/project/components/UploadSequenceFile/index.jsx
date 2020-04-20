@@ -205,7 +205,7 @@ class UploadSequenceFile extends React.Component {
         ),
       },
       {
-        title: '原始文件',
+        title: '分组方案',
         dataIndex: 'cc',
         render: (value, row) => (
           <>
@@ -253,7 +253,7 @@ class UploadSequenceFile extends React.Component {
     ];
     return (
       <Modal
-        title="上传序列文件"
+        title="上传分组方案"
         visible
         onCancel={this.props.handleClose}
         width={871}

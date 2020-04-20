@@ -11,11 +11,12 @@ const TableModel = props => (
     <Table
       // scroll={{ x: tableWidth, y: 400 }}
       rowKey="id"
+      loading={props.loading}
       pagination={false}
       columns={props.columns}
       dataSource={props.data}
     />
   </Card>
-)
+);
 
 export { TableModel };

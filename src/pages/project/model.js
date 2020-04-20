@@ -38,11 +38,12 @@ const projectModel = {
   effects: {},
   reducers: {
     setColorStore(state, action) {
+      console.log(action.payload);
       return {
         ...state,
-        colorStore: action.payload
-      }
-    }
+        colorStore: action.payload,
+      };
+    },
   },
 };
 export default projectModel;

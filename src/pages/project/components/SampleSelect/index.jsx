@@ -42,7 +42,7 @@ class SampleSelect extends React.Component {
       colorStore.push(item.color);
       return item;
     });
-    this.setColorStore(colorStore);
+    // this.setColorStore(colorStore);
     this.setState({
       tableData: list,
     });
@@ -50,6 +50,7 @@ class SampleSelect extends React.Component {
 
   setColorStore = colorStore => {
     const { dispatch } = this.props;
+    console.log(colorStore);
     dispatch({
       type: 'project/setColorStore',
       payload: colorStore,
@@ -59,9 +60,7 @@ class SampleSelect extends React.Component {
   handleDelete = row => {
     const { tableData } = this.state;
     let list = [...tableData];
-    list = list.filter(item => {
-      return item.id !== row.id;
-    });
+    list = list.filter(item => item.id !== row.id);
     const colorStore = [];
     list.forEach(item => {
       colorStore.push(item.color);
@@ -161,9 +160,7 @@ class SampleSelect extends React.Component {
   viewSelected = record => {
     this.toggleVis(true);
 
-    const checkedFileList = record.sampleProperties.filter(item => {
-      return item.isChoose;
-    });
+    const checkedFileList = record.sampleProperties.filter(item => item.isChoose);
     let checkedFilesIds = [];
     checkedFileList.forEach(item => {
       checkedFilesIds = [...checkedFilesIds, item.sequenceFileId];
@@ -224,46 +221,42 @@ class SampleSelect extends React.Component {
   };
 
   render() {
-    const { tableData, visible, sampleId, chooseFileIds, popVis } = this.state;
+    const { tableData, visible, sampleId, chooseFileIds } = this.state;
     console.log(this.props.project);
     const columns = [
       {
         title: '样品',
         dataIndex: 'sampleName',
         key: 'sampleName',
-        render: (text, record, index) => {
-          return (
-            <div style={{ display: 'flex' }}>
-              <Popover
-                visible={popVis}
-                // onVisibleChange={this.handlePopVisChange}
-                overlayClassName="project_manage_sample_ui_select"
-                overlayStyle={{ padding: 0 }}
-                content={
-                  <SketchPicker
-                    color={record.color || this.state.color}
-                    onChangeComplete={color => this.handleChange(color, record, index)}
-                  />
-                }
-                trigger="click"
-                placement="bottom"
-              >
-                <div
-                  style={{
-                    width: 20,
-                    height: 20,
-                    backgroundColor: record.color,
-                    position: 'relative',
-                  }}
-                  onClick={() => {
-                    this.handleClick(record, index);
-                  }}
+        render: (text, record, index) => (
+          <div style={{ display: 'flex' }}>
+            <Popover
+              overlayClassName="project_manage_sample_ui_select"
+              overlayStyle={{ padding: 0 }}
+              content={
+                <SketchPicker
+                  color={record.color || this.state.color}
+                  onChangeComplete={color => this.handleChange(color, record, index)}
                 />
-              </Popover>
-              <div style={{ marginLeft: 10 }}>{text}</div>
-            </div>
-          );
-        },
+              }
+              trigger="click"
+              placement="bottom"
+            >
+              <div
+                style={{
+                  width: 20,
+                  height: 20,
+                  backgroundColor: record.color,
+                  position: 'relative',
+                }}
+                onClick={() => {
+                  this.handleClick(record, index);
+                }}
+              />
+            </Popover>
+            <div style={{ marginLeft: 10 }}>{text}</div>
+          </div>
+        ),
       },
       {
         title: '别名',
@@ -287,32 +280,26 @@ class SampleSelect extends React.Component {
         title: '序列',
         dataIndex: 'sequence',
         key: 'sequence',
-        render: (text, row) => {
-          return (
-            <>
-              <div>{`${row.sampleSequenceCount} ( ${row.sampleLengthTotal}bp)`}</div>
-            </>
-          );
-        },
+        render: (text, row) => (
+          <>
+            <div>{`${row.sampleSequenceCount} ( ${row.sampleLengthTotal}bp)`}</div>
+          </>
+        ),
       },
       {
         title: '长度',
         dataIndex: 'length',
         key: 'length',
-        render: (text, row) => {
-          return (
-            <>{`${row.sampleLengthMin}-${row.sampleLengthMax} (avg ${row.sampleLengthAve})`}</>
-          );
-        },
+        render: (text, row) => (
+          <>{`${row.sampleLengthMin}-${row.sampleLengthMax} (avg ${row.sampleLengthAve})`}</>
+        ),
       },
       {
         title: '文件',
         dataIndex: 'files',
         key: 'files',
         render: (text, record) => {
-          const lens = record.sampleProperties.filter(item => {
-            return item.isChoose;
-          }).length;
+          const lens = record.sampleProperties.filter(item => item.isChoose).length;
           return (
             <a
               onClick={() => {
@@ -327,27 +314,25 @@ class SampleSelect extends React.Component {
       {
         title: '操作',
         key: 'action',
-        render: (text, record) => {
-          return (
-            <>
-              <Popconfirm
-                placement="topRight"
-                title="确定要删除吗？"
-                onConfirm={() => this.handleDelete(record)}
-                okText="确定"
-                cancelText="取消"
+        render: (text, record) => (
+          <>
+            <Popconfirm
+              placement="topRight"
+              title="确定要删除吗？"
+              onConfirm={() => this.handleDelete(record)}
+              okText="确定"
+              cancelText="取消"
+            >
+              <a
+              // onClick={() => {
+              //   this.handleDelete(record);
+              // }}
               >
-                <a
-                // onClick={() => {
-                //   this.handleDelete(record);
-                // }}
-                >
-                  删除
-                </a>
-              </Popconfirm>
-            </>
-          );
-        },
+                删除
+              </a>
+            </Popconfirm>
+          </>
+        ),
       },
     ];
 

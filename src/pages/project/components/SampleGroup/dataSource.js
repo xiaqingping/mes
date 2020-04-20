@@ -1,4 +1,4 @@
- const tableData = [
+ const tableData1 = [
    // 第一个分组方案
    {
      "groupSchemeName": "groupingscheme1",
@@ -49,3 +49,72 @@
      "groupList": null
    }
  ]
+
+
+ function column2row(data) {
+   const header = [];
+   const tableData = [];
+   for (let i = 0; i < data.length; i++) {
+     const column = data[i];
+     const h = {
+       groupSchemeName: column.groupSchemeName,
+       type: column.sampleList ? 'sampleList' : 'groupList'
+     }
+
+     header.push(h)
+
+     const row = column.groupList || column.sampleList;
+
+     for (let j = 0; j < row.length; j++) {
+       if (!tableData[j]) {
+         tableData[j] = [];
+       }
+       tableData[j][i] = data[i][h.type][j]
+     }
+   }
+
+   return {
+     header,
+     rows: tableData
+   }
+ }
+
+ console.log(column2row(tableData1))
+
+ //  const headers = [];
+ //  const rows = []
+ //  tableData.forEach(item => {
+ //    headers.push(item.groupSchemeName);
+ //    if (item.sampleList) {
+ //      item.sampleList.forEach(samp => {
+ //        rows.push({
+ //          ...samp,
+ //          groupName: '当前样品',
+
+ //        })
+ //      })
+
+ //    } else {
+ //      item.groupList.forEach(group => {
+ //        group.sampleList.forEach(samp => {
+ //          rows.forEach(item => {
+ //            if (samp.metadataSampleId !== item.metadataSampleId) {
+ //              rows.push({
+ //                ...samp,
+ //                //  groupName: group.groupName
+ //              })
+ //            }
+ //          })
+ //          //  isIncludes = rows.includes(samp)
+ //          //  if (!isIncludes) {
+ //          //    rows.push(samp)
+ //          //  }
+ //        })
+ //      })
+
+ //    }
+
+
+ //  })
+
+ //  console.log(rows);

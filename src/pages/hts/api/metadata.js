@@ -1,8 +1,10 @@
 import request from '@/utils/request';
 
 // 元数据分析
-const http = 'http://192.168.20.6:8167';
-
+let http = 'http://192.168.20.6:8167';
+if (process.env.NODE_ENV !== 'development') {
+  http = '/ngsMetadatas';
+}
 
 export default {
   // 查询元数据分析列表
@@ -19,4 +21,4 @@ export default {
   getMetadataAnalysisParam(params) {
     return request(`${http}/metadatas/v1/analysisRecords/${params}/analysisParam`);
   },
-}
+};
