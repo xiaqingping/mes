@@ -3,35 +3,24 @@
 const SeqModel = {
   namespace: 'sampleSelect',
   state: {
-
     sampleId: null,
-    checkedFilesIds: null
-
-
-
+    checkedFilesIds: null,
   },
-  effects: {
-
-
-  },
+  effects: {},
   reducers: {
-    setSampleId(state, {
-      payload
-    }) {
+    setSampleId(state, { payload }) {
       return {
         ...state,
-        sampleId: payload
-      }
+        sampleId: payload,
+      };
     },
 
-    setCheckedFilesIds(state, {
-      payload
-    }) {
+    setCheckedFilesIds(state, { payload }) {
       return {
         ...state,
-        checkedFilesIds: payload
-      }
-    }
+        checkedFilesIds: payload,
+      };
+    },
     // setCheckedIds(state, {
     //   payload
     // }) {
@@ -50,8 +39,6 @@ const SeqModel = {
     //     viewId: payload
     //   }
     // },
-
-
   },
 };
 export default SeqModel;
