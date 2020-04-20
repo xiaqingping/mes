@@ -12,7 +12,8 @@ import api from '@/pages/hts/api';
 import { formatter } from '@/utils/utils';
 import router from 'umi/router';
 import { ParamDrawer } from './components/ModelUI';
-import EnvironmentalFactorsTable from './components/EnvironmentalFactorsTable';
+import EnvironmentalFactorsModel from './components/EnvironmentalFactorsModel';
+import CheckBoxModel from './components/CheckBoxModel';
 
 const FormItem = Form.Item;
 const { Option } = Select;
@@ -313,7 +314,8 @@ class Metadata extends Component {
           onClose={this.onCloseParamDrawer}
           data={originalParam}
         />
-        <EnvironmentalFactorsTable data={123} />
+        <EnvironmentalFactorsModel data={123} />
+        <CheckBoxModel />
       </PageHeaderWrapper>
     );
   }
