@@ -4,9 +4,9 @@ const projectModel = {
     statusList: [
       { value: 1, text: '未开始', color: 'red' },
       { value: 2, text: '进行中', color: 'pink' },
-      { value: 3, text: '已完成', color: 'skyblue' },
-      { value: 4, text: '已终止', color: 'yellowgreen' },
-      { value: 5, text: '待处理', color: 'indigo' },
+      { value: 3, text: '已完成', color: '#108EE9' },
+      { value: 4, text: '已终止', color: '#F42D2D' },
+      { value: 5, text: '待处理', color: '#7ED321' },
     ],
     // 业务伙伴认证状态
     BpCertificationStatus: [

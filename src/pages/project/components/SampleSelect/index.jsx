@@ -15,17 +15,11 @@ class SampleSelect extends React.Component {
 
   state = {
     visible: false,
-    color: {
-      r: '241',
-      g: '112',
-      b: '19',
-      a: '1',
-    },
     tableData: [],
     sampleId: null, // 样品id   点击'已选择n个'时候, 需要传给后台的样品id和已选取文件的id
     chooseFileIds: null, // 所有已选文件id集合 点击选择样品时候, 需要传给后台所有的已选取文件的id;
     fromChoosedFile: null, // 从已选择n个文件来的
-    processId: null,
+    processId: null, // 流程id， 刚进入页面时候获取表格数据需要传入的id
   };
 
   componentDidMount() {
@@ -42,63 +36,23 @@ class SampleSelect extends React.Component {
 
     const { tableData } = this.state;
     let list = [...tableData];
-    // let tableData = [
-    //   {
-    //     id: '26f310f20c634f828954e2a8dd76fe21',
-    //     sampleCode: '2357284259',
-    //     sampleName: 'M04046',
-    //     sampleIdentificationCode: 'M04046',
-    //     sampleSequenceCount: 1,
-    //     sampleLengthMin: 417,
-    //     sampleLengthMax: 417,
-    //     sampleLengthAve: 417.0,
-    //     sampleLengthTotal: 417,
-    //     bpCode: 'aa',
-    //     bpName: '',
-    //     creatorCode: '123',
-    //     creatorName: '123',
-    //     createDate: '2020-04-17T15:20:26',
-    //     isChoose: 0,
-    //     sampleProperties: [
-    //       {
-    //         id: '168ad0f995dc4d58866ae0a3b772e065',
-    //         sampleId: '26f310f20c634f828954e2a8dd76fe21',
-    //         sequenceFileId: '6fa708dbd8904419b3f757696916f89a',
-    //         sequenceFileName: '16S190377.fastaM04046.fasta',
-    //         sourceSequenceFileId: '5cf6ecb555cb4c96b236f2e2e12397dc',
-    //         sourceSequenceFileName: '16S190377.fasta',
-    //         sampleSequenceCount: 1,
-    //         sampleLengthMin: 417,
-    //         sampleLengthMax: 417,
-    //         sampleLengthAve: 417.0,
-    //         sampleLengthTotal: 417,
-    //         createDate: '2020-04-17T13:22:51',
-    //         isChoose: 0,
-    //       },
-    //       {
-    //         id: '22f51632dcfb406b9ffa23ca5c7a468d',
-    //         sampleId: '26f310f20c634f828954e2a8dd76fe21',
-    //         sequenceFileId: 'd260190a6bf64c61959ca146a0c27f29',
-    //         sequenceFileName: '16S190377.fastaM04046.fasta',
-    //         sourceSequenceFileId: '24f9b6764f1542ef98eae01f23876ffb',
-    //         sourceSequenceFileName: '16S190377.fasta',
-    //         sampleSequenceCount: 1,
-    //         sampleLengthMin: 417,
-    //         sampleLengthMax: 417,
-    //         sampleLengthAve: 417.0,
-    //         sampleLengthTotal: 417,
-    //         createDate: '2020-04-17T14:29:07',
-    //         isChoose: 0,
-    //       },
-    //     ],
-    //   },
-    // ];
+    const colorStore = [];
     list = list.map(item => {
       item.color = getrandomColor();
+      colorStore.push(item.color);
       return item;
     });
+    this.setColorStore(colorStore);
     this.setState({
       tableData: list,
+    });
+  };
+
+  setColorStore = colorStore => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'project/setColorStore',
+      payload: colorStore,
     });
   };
 
@@ -108,9 +62,22 @@ class SampleSelect extends React.Component {
     list = list.filter(item => {
       return item.id !== row.id;
     });
-    this.setState({
-      tableData: list,
+    const colorStore = [];
+    list.forEach(item => {
+      colorStore.push(item.color);
     });
+    console.log(colorStore);
+    this.setColorStore(colorStore);
+    console.log(this.props.project);
+    this.setState(
+      {
+        tableData: list,
+      },
+      () => {
+        // TODO将改变返回给父组件
+        // this.props.emitData(tableData);
+      },
+    );
   };
 
   // 点击选择样品
@@ -218,30 +185,6 @@ class SampleSelect extends React.Component {
 
     // 从选择样品进来的
     if (!fromChoosedFile) {
-      // const data = {};
-      // list.forEach(row => {
-      //   data[row.id] = row;
-      // });
-
-      // data1.forEach(row => {
-      //   if (!data[row.id]) {
-      //     // -----------------------------------------
-      //     row.color = getrandomColor();
-      //     list.push(row);
-      //     debugger;
-      //   } else {
-      //     row.sampleProperties.forEach(file => {
-      //       const tFiles = data[row.id].sampleProperties;
-      //       for (let i = 0; i < tFiles.length; i++) {
-      //         if (file.sequenceFileId === tFiles[i].sequenceFileId) {
-      //           return;
-      //         }
-      //       }
-      //       data[row.id].sampleProperties.push(file);
-      //     });
-      //   }
-      // });
-
       data1.forEach(item => {
         if (!tableData.length) {
           item.color = getrandomColor();
@@ -427,6 +370,6 @@ class SampleSelect extends React.Component {
   }
 }
 
-export default connect(({ sampleSelect }) => ({
-  sampleSelect,
+export default connect(({ project }) => ({
+  project,
 }))(SampleSelect);

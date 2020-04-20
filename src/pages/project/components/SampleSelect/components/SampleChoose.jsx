@@ -1,6 +1,7 @@
 import React from 'react';
 import { Table, Button, Tooltip, Checkbox, Modal } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
+import { connect } from 'dva';
 import FileUpload from '../../UploadSequenceFile/lunbotu';
 import api from '../api/sample.js';
 
@@ -295,4 +296,6 @@ class SampleChoose extends React.Component {
   }
 }
 
-export default SampleChoose;
+export default connect(({ project }) => ({
+  project,
+}))(SampleChoose);
