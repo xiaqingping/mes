@@ -1,5 +1,5 @@
 import React from 'react';
-import { Table, Button, message, Checkbox, Modal } from 'antd';
+import { Table, Button, Tooltip, Checkbox, Modal } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
 import FileUpload from '../../UploadSequenceFile/lunbotu';
 import api from '../api/sample.js';
@@ -33,7 +33,7 @@ class SampleChoose extends React.Component {
         .then(res => {
           this.setState(
             {
-              tableData: res,
+              tableData: [res],
               loading: false,
             },
             () => {
@@ -205,10 +205,12 @@ class SampleChoose extends React.Component {
         dataIndex: 'sampleProperties',
         key: 'sampleProperties',
         ellipsis: true,
+
         render: (text, record, index) => {
           return text.map(item => {
             return (
               <div>
+                {/* <Tooltip title={item.sequenceFileName} > */}
                 <Checkbox
                   onChange={e => this.handleCheckboxChange(e, record, text, item, index)}
                   key={item.fileId}
@@ -216,6 +218,7 @@ class SampleChoose extends React.Component {
                 >
                   {item.sequenceFileName}
                 </Checkbox>
+                {/* </Tooltip> */}
               </div>
             );
           });

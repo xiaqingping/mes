@@ -67,5 +67,10 @@ export default {
     return request(`${http2}/v1/${id}/sequenceFiles`, {
       params
     });
+  },
+
+  // 获取样品选择框组件样品列表
+  getSampleSelectTableData(id) {
+    return request(`${http2} /projects/v1/processes/${id}/parameter`);
   }
 };

@@ -9,6 +9,10 @@ import SampleChoose from './components/SampleChoose';
 import './index.less';
 
 class SampleSelect extends React.Component {
+  static getDerivedStateFromProps(nextProps) {
+    return { processId: nextProps.processId };
+  }
+
   state = {
     visible: false,
     color: {
@@ -21,6 +25,7 @@ class SampleSelect extends React.Component {
     sampleId: null, // 样品id   点击'已选择n个'时候, 需要传给后台的样品id和已选取文件的id
     chooseFileIds: null, // 所有已选文件id集合 点击选择样品时候, 需要传给后台所有的已选取文件的id;
     fromChoosedFile: null, // 从已选择n个文件来的
+    processId: null,
   };
 
   componentDidMount() {
@@ -30,8 +35,10 @@ class SampleSelect extends React.Component {
   getTableData = () => {
     // TODO 比如修改时候, 获取已有样品选择接口.
     // 这个接口就是 /projects/v1/processes/流程id (需要从外界获取)/parameter
-    //
-    // api.
+    // const { processId } = this.props;
+    // api.getSampleSelectTableData(processId).then(res => {
+    //   console.log(res);
+    // });
 
     const { tableData } = this.state;
     let list = [...tableData];
@@ -151,7 +158,6 @@ class SampleSelect extends React.Component {
     this.setState({
       tableData: datas,
     });
-    // debugger;
   };
 
   handleOk = data => {
@@ -182,6 +188,7 @@ class SampleSelect extends React.Component {
   // 查看已选择的
   viewSelected = record => {
     this.toggleVis(true);
+
     const checkedFileList = record.sampleProperties.filter(item => {
       return item.isChoose;
     });
@@ -190,11 +197,16 @@ class SampleSelect extends React.Component {
       checkedFilesIds = [...checkedFilesIds, item.sequenceFileId];
     });
 
-    this.setState({
-      sampleId: record.id,
-      chooseFileIds: checkedFilesIds,
-      fromChoosedFile: true,
-    });
+    this.setState(
+      {
+        sampleId: record.id,
+        chooseFileIds: checkedFilesIds,
+        fromChoosedFile: true,
+      },
+      () => {
+        console.log(this.state);
+      },
+    );
     // 当点击时候传样品id以及已选择文件id;
     // api.getSelectedData()
   };
@@ -230,12 +242,28 @@ class SampleSelect extends React.Component {
       //   }
       // });
 
+      data1.forEach(item => {
+        if (!tableData.length) {
+          item.color = getrandomColor();
+        }
+        tableData.forEach(v => {
+          if (item.id === v.id) {
+            item.color = v.color ? v.color : getrandomColor();
+          } else {
+            item.color = getrandomColor();
+          }
+        });
+        return item;
+      });
+
       this.setState({
         tableData: data1,
       });
     } else {
       // 从已选择进来的
+
       const index = list.findIndex(item => data1[0].id === item.id);
+      data1[0].color = list[index].color || getrandomColor();
       list.splice(index, 1, ...data1);
       this.setState({
         tableData: list,
