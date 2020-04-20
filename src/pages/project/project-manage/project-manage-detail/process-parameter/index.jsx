@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import { Card, List, Form, Layout, Button, message } from 'antd';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import { connect } from 'dva';
-import { ModelType } from '@/pages/project/components/ModelComponents';
+import { InputModel } from '@/pages/project/components/ModelComponents';
 import api from '@/pages/project/api/projectManageDetail';
 import style from './index.less';
 
@@ -17,10 +17,10 @@ class ProcessParameter extends Component {
     // requestType: '',
     // processId: '',
     // processModelId: '',
-    paramList: [],          // 参数列表
-    processParam: [],       // 参数
-    processParamValue: [],  // 参数值
-  }
+    paramList: [], // 参数列表
+    processParam: [], // 参数
+    processParamValue: [], // 参数值
+  };
 
   constructor(props) {
     super(props);
@@ -37,32 +37,30 @@ class ProcessParameter extends Component {
       window.history.back(-1);
       this.props.dispatch({
         type: 'projectManage/setParamList',
-        payload: []
-      })
+        payload: [],
+      });
       return false;
     }
     // 创建项目 添加参数值
     if (data.requestType === 'addParam') {
       message.success('addParam');
-      this.getProcessParam(data.processModelId)   // 查询流程参数
+      this.getProcessParam(data.processModelId); // 查询流程参数
     }
     // 流程参数 修改参数值
     if (data.requestType === 'editParam') {
-      this.getProcessParam(data.processModelId)   // 查询流程参数
-      this.getProcessParamValue(data.processId)   // 查询流程参数值
+      this.getProcessParam(data.processModelId); // 查询流程参数
+      this.getProcessParamValue(data.processId); // 查询流程参数值
     }
     // 创建项目 未保存时修改参数值
     if (data.requestType === 'updateParam') {
       message.success('updateParam');
-      this.getProcessParam(data.processModelId)   // 查询流程参数
+      this.getProcessParam(data.processModelId); // 查询流程参数
     }
-    return false
+    return false;
   };
 
   // 组件加载时
   componentDidMount = () => {};
-
-
 
   // 获取参数 参数值
   getParamData = (param, paramValue) => {
@@ -76,62 +74,59 @@ class ProcessParameter extends Component {
 
     if (param.length > 0) {
       // 处理参数数据
-      const newParam = this.deleteNullGroup(param);   // 删除参数为空的分组
+      const newParam = this.deleteNullGroup(param); // 删除参数为空的分组
       // 无参数 返回上一页
       if (newParam.length === 0) {
         message.error('暂无参数！');
         window.history.back(-1);
         return false;
       }
-      const newParamData = this.disposeParamAttribute(newParam);  // 处理参数属性
+      const newParamData = this.disposeParamAttribute(newParam); // 处理参数属性
 
       // 添加 参数值
       if (requestType === 'addParam') {
         message.success('添加操作');
-        if (param.length > 0 ) {
+        if (param.length > 0) {
           this.setState({ paramList: newParamData });
         }
       }
-
 
       // 修改 未保存的参数值
       if (requestType === 'updateParam') {
         message.success('修改操作');
         const processParamValue = params;
         // 有参数值时
-        if (newParamData.length > 0 && processParamValue.length > 0){
+        if (newParamData.length > 0 && processParamValue.length > 0) {
           // 合并参数和参数值
           const data = this.comparedWith(newParamData, processParamValue);
-          this.setState({ paramList: data })
+          this.setState({ paramList: data });
           return false;
         }
         // 未设置参数值时
-        if (param.length > 0 && paramValue.length === 0){
-          this.setState({ paramList: newParamData })
+        if (param.length > 0 && paramValue.length === 0) {
+          this.setState({ paramList: newParamData });
         }
       }
-
 
       // 编辑 参数值
       if (requestType === 'editParam') {
         message.success('编辑操作');
 
         // 有参数值时
-        if (newParamData.length > 0 && paramValue.length > 0){
+        if (newParamData.length > 0 && paramValue.length > 0) {
           // 合并参数和参数值
           const data = this.comparedWith(newParamData, paramValue);
-          this.setState({ paramList: data })
+          this.setState({ paramList: data });
           return false;
         }
         // 未设置参数值时
-        if (param.length > 0 && paramValue.length === 0){
-          this.setState({ paramList: newParamData })
+        if (param.length > 0 && paramValue.length === 0) {
+          this.setState({ paramList: newParamData });
         }
       }
     }
-    return false
-  }
-
+    return false;
+  };
 
   // edit 设置表单初始值
   setInitialFromValues = data => {
@@ -145,7 +140,6 @@ class ProcessParameter extends Component {
 
   // 保存
   getFromData = values => {
-
     const data = this.conversionData(values);
     const { userForParamData } = this.props.projectDetail;
     const { requestType, processModelId } = userForParamData;
@@ -185,11 +179,10 @@ class ProcessParameter extends Component {
     newProcessParam.forEach(groupItem => {
       groupItem.params.forEach(paramItem => {
         paramData.push(paramItem);
-      })
-    })
+      });
+    });
     // 参数和属性合并为一层数据
     const nParamData = this.manageAttribute(paramData);
-
 
     // 拆分键值对
     const newFormData = this.splitFormData(formData);
@@ -205,7 +198,7 @@ class ProcessParameter extends Component {
       }
       delete newItem.defaultValue;
       newData.push(newItem);
-    })
+    });
 
     return data;
   };
@@ -231,7 +224,7 @@ class ProcessParameter extends Component {
       });
     });
     return data;
-  }
+  };
 
   /**
    * 获取参数的任务模型ID
@@ -251,7 +244,7 @@ class ProcessParameter extends Component {
       });
     });
     return data;
-  }
+  };
 
   /**
    * 参数和属性合并为一层数据
@@ -259,14 +252,14 @@ class ProcessParameter extends Component {
    */
   manageAttribute = params => {
     const nparam = [];
-    params.forEach(paramItem =>{
+    params.forEach(paramItem => {
       const nParamItem = JSON.parse(JSON.stringify(paramItem));
       // 遍历参数属性列表
       const propertyList = paramItem.paramProperties;
-      propertyList.forEach(proItem =>{
+      propertyList.forEach(proItem => {
         // key：value
-        nParamItem[proItem.paramPropertyKey] = proItem.paramPropertyValue
-      })
+        nParamItem[proItem.paramPropertyKey] = proItem.paramPropertyValue;
+      });
 
       // 删除 参数属性列表和排序 字段（可不删）
       delete nParamItem.paramProperties;
@@ -274,9 +267,9 @@ class ProcessParameter extends Component {
 
       // 保存处理好的参数
       nparam.push(nParamItem);
-    })
+    });
     return nparam;
-  }
+  };
 
   /**
    * 删除参数为空的分组
@@ -288,9 +281,9 @@ class ProcessParameter extends Component {
       if (item.params.length > 0) {
         newData.push(item);
       }
-    })
+    });
     return newData;
-  }
+  };
 
   /**
    * 处理参数属性
@@ -307,14 +300,14 @@ class ProcessParameter extends Component {
       // 遍历参数列表
       const paramList = groupItem.params;
       const nparam = [];
-      paramList.forEach(paramItem =>{
+      paramList.forEach(paramItem => {
         const nParamItem = JSON.parse(JSON.stringify(paramItem));
         // 遍历参数属性列表
         const propertyList = paramItem.paramProperties;
-        propertyList.forEach(proItem =>{
+        propertyList.forEach(proItem => {
           // key：value
-          nParamItem[proItem.paramPropertyKey] = proItem.paramPropertyValue
-        })
+          nParamItem[proItem.paramPropertyKey] = proItem.paramPropertyValue;
+        });
 
         // 删除 参数属性列表和排序 字段（可不删）
         delete nParamItem.paramProperties;
@@ -323,15 +316,15 @@ class ProcessParameter extends Component {
         // 保存处理好的参数
         nparam.push(nParamItem);
         if (groupData.id === nParamItem.groupId) {
-          groupData.params = nparam
+          groupData.params = nparam;
         }
-      })
+      });
 
       // 每个分组数据重新push到新数组中
       newData.push(groupData);
-    })
+    });
     return newData;
-  }
+  };
 
   /**
    * 合并参数列表和参数值
@@ -355,7 +348,7 @@ class ProcessParameter extends Component {
               const ids = [];
               newList.forEach(listItem => {
                 ids.push(listItem.id);
-              })
+              });
               if (ids.indexOf(paramItem.id) === -1) {
                 newItem.paramValue = valueItem.paramValue;
                 newList.push(newItem);
@@ -365,14 +358,14 @@ class ProcessParameter extends Component {
               newList.push(newItem);
             }
           }
-        })
-      })
+        });
+      });
       groupData.params = newList;
       list.push(groupData);
-    })
+    });
 
     return list;
-  }
+  };
 
   /**
    * 获取流程参数
@@ -385,12 +378,12 @@ class ProcessParameter extends Component {
         window.history.back(-1);
         return false;
       }
-      this.setState({ processParam: res },() => {
-        this.getParamData(this.state.processParam,this.state.processParamValue);
+      this.setState({ processParam: res }, () => {
+        this.getParamData(this.state.processParam, this.state.processParamValue);
       });
       return false;
-    })
-  }
+    });
+  };
 
   /**
    * 获取流程参数值
@@ -399,13 +392,12 @@ class ProcessParameter extends Component {
   getProcessParamValue = processId => {
     api.getProcessParamValue(processId).then(res => {
       this.setState({ processParamValue: res }, () => {
-        this.getParamData(this.state.processParam,this.state.processParamValue);
+        this.getParamData(this.state.processParam, this.state.processParamValue);
         // 设置默认值
         this.setInitialFromValues(res);
       });
-    })
-  }
-
+    });
+  };
 
   render() {
     const { paramList } = this.state;
@@ -427,7 +419,18 @@ class ProcessParameter extends Component {
                   <Card title={item.groupName} style={{ width: '100%' }}>
                     {item.params.map((it, index) => {
                       const newIndex = JSON.parse(JSON.stringify(index));
-                      return <ModelType data={it} key={newIndex} />;
+
+                      if (it.type === 'txtShuRuKuang')
+                        return <InputModel data={it} key={newIndex} />;
+                      if (it.type === 'input') return <InputModel data={it} key={newIndex} />;
+
+                      return false;
+
+                      // const test = 'InputModel';
+                      // const name =
+                      // `<${test} data={${it}} key={${newIndex}} sampleList={} getData={} />`;
+                      // return <div dangerouslySetInnerHTML={{ __html: name }} />;
+                      // return <ModelType data={it} key={newIndex} sampleList={} getData={}/>;
                     })}
                   </Card>
                 </List.Item>

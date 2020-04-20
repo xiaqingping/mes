@@ -1,7 +1,7 @@
 /**
  * 元数据分析
  */
-import { Card, Col, Form, Input, Badge, Select, DatePicker, message   } from 'antd';
+import { Card, Col, Form, Input, Badge, Select, DatePicker, message } from 'antd';
 import React, { Component } from 'react';
 import { connect } from 'dva';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
@@ -12,6 +12,7 @@ import api from '@/pages/hts/api';
 import { formatter } from '@/utils/utils';
 import router from 'umi/router';
 import { ParamDrawer } from './components/ModelUI';
+import EnvironmentalFactorsTable from './components/EnvironmentalFactorsTable';
 
 const FormItem = Form.Item;
 const { Option } = Select;
@@ -23,12 +24,12 @@ class Metadata extends Component {
   tableFormRef = React.createRef();
 
   state = {
-    pagination: {},       // 分页参数
-    list: [],             // 表格数据
-    loading: true,        // 加载状态
-    selectedRows: [],     // 选中行数据
-    visibleParam: false,  // 显示参数抽屉
-    originalParam: [],    // 原始参数列表
+    pagination: {}, // 分页参数
+    list: [], // 表格数据
+    loading: true, // 加载状态
+    selectedRows: [], // 选中行数据
+    visibleParam: false, // 显示参数抽屉
+    originalParam: [], // 原始参数列表
   };
 
   // 顶部表单默认值
@@ -76,7 +77,7 @@ class Metadata extends Component {
         </Col>
         <Col lg={6} md={8} sm={12}>
           <FormItem label="开始时间" name="beginDate">
-            <RangePicker format="YYYY-MM-DD"/>
+            <RangePicker format="YYYY-MM-DD" />
           </FormItem>
         </Col>
         <Col lg={6} md={8} sm={12}>
@@ -86,10 +87,7 @@ class Metadata extends Component {
         </Col>
         <Col lg={6} md={8} sm={12}>
           <FormItem label="状态" name="statusList">
-            <Select
-              mode="multiple"
-              style={{ width: '100%' }}
-            >
+            <Select mode="multiple" style={{ width: '100%' }}>
               {status.map(e => (
                 <Option value={e.id} key={e.id}>
                   {e.name}
@@ -99,8 +97,8 @@ class Metadata extends Component {
           </FormItem>
         </Col>
       </>
-    )
-  }
+    );
+  };
 
   // 获取此页面需要用到的基础数据
   getCacheData = () => {};
@@ -126,7 +124,6 @@ class Metadata extends Component {
     this.setState({ loading: true });
 
     const formData = this.tableSearchFormRef.current.getFieldsValue();
-    console.log(formData);
     const { pagination } = this.state;
     const { current: page, pageSize } = pagination;
 
@@ -177,35 +174,17 @@ class Metadata extends Component {
         },
         loading: false,
       });
-    })
-  };
-
-  // 保存和修改之后的保存
-  saveRow = async index => {
-    const { storages } = this.props;
-    try {
-      const row = await this.tableFormRef.current.validateFields();
-      const storageName = storages.filter(e => e.code === row.storageCode)[0].name;
-      const { list } = this.state;
-      const newData = { ...list[index], ...row, storageName };
-      if (newData.id < 0) {
-        api.seqfactory.addSeqfactory(newData).then(() => this.getTableData());
-      } else {
-        api.seqfactory.updateSeqfactory(newData).then(() => this.getTableData());
-      }
-    } catch (error) {
-      console.log(error);
-    }
+    });
   };
 
   // 查看参数列表页
   searchParamList = data => {
     this.props.dispatch({
       type: 'htsCache/setMetadataRow',
-      payload: data
-    })
+      payload: data,
+    });
     return router.push('/hts/analyze/metadata/paramList');
-  }
+  };
 
   // 查看参数 抽屉
   searchParamDrawer = data => {
@@ -217,25 +196,17 @@ class Metadata extends Component {
         });
         return false;
       }
-      return message.warning('暂无参数！')
-    })
-  }
+      return message.warning('暂无参数！');
+    });
+  };
 
   // 关闭参数抽屉
   onCloseParamDrawer = () => {
     this.setState({ visibleParam: false });
-  }
-
+  };
 
   render() {
-    const {
-      pagination,
-      selectedRows,
-      list,
-      loading,
-      visibleParam,
-      originalParam
-    } = this.state;
+    const { pagination, selectedRows, list, loading, visibleParam, originalParam } = this.state;
     const { status } = this.props.htsCache;
     let tableWidth = 0;
 
@@ -250,7 +221,7 @@ class Metadata extends Component {
         title: '编号',
         dataIndex: 'code',
         key: 'code',
-        render: (value, row) => ( <a onClick={() => this.searchParamList(row)}>{value}</a> )
+        render: (value, row) => <a onClick={() => this.searchParamList(row)}>{value}</a>,
       },
       {
         title: '项目编号',
@@ -286,14 +257,14 @@ class Metadata extends Component {
         render: (value, row) => {
           const name = formatter(status, value);
           const sta = formatter(status, value, 'id', 'status');
-          return <Badge status={sta} text={name} key={row.id}/>;
+          return <Badge status={sta} text={name} key={row.id} />;
         },
       },
       {
         fixed: 'right',
         title: '操作',
         width: 130,
-        render: (value, row) => <a onClick={() => this.searchParamDrawer(row)}>参数</a>
+        render: (value, row) => <a onClick={() => this.searchParamDrawer(row)}>参数</a>,
       },
     ];
 
@@ -337,7 +308,12 @@ class Metadata extends Component {
             </Form>
           </Card>
         </div>
-        <ParamDrawer visible={visibleParam} onClose={this.onCloseParamDrawer} data={originalParam}/>
+        <ParamDrawer
+          visible={visibleParam}
+          onClose={this.onCloseParamDrawer}
+          data={originalParam}
+        />
+        <EnvironmentalFactorsTable data={123} />
       </PageHeaderWrapper>
     );
   }
