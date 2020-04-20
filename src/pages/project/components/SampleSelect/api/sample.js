@@ -21,7 +21,7 @@ export default {
 
   // 样品保存
   addSample(data) {
-    return request(`${http2}/v1/`, {
+    return request(`${http2}/v1`, {
       method: 'POST',
       data,
     });
@@ -47,4 +47,25 @@ export default {
       ...params,
     });
   },
+
+  // 样品列表(不分页)
+  getSampleList(params) {
+    return request(`${http2}/v1/properties`, {
+      params,
+    });
+  },
+
+  // 查询样品文件选择信息
+  getChosedFileDetails(params) {
+    const {
+      id
+    } = params;
+    const payload = {
+      ...params
+    }
+    delete payload.id;
+    return request(`${http2}/v1/${id}/sequenceFiles`, {
+      params
+    });
+  }
 };

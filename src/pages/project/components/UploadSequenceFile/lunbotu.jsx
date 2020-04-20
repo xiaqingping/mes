@@ -105,6 +105,11 @@ class UploadSequenceFile extends React.Component {
         });
       },
     };
+
+    this.setState({
+      loading: true,
+    });
+
     api
       .UploadFiles(uploadUrl, {
         data,
@@ -126,6 +131,7 @@ class UploadSequenceFile extends React.Component {
           if (tableList.length === 0) {
             self.setState({
               tableList: [...r],
+              loading: false,
             });
           } else {
             tableList.map((item, index) => {
@@ -142,6 +148,7 @@ class UploadSequenceFile extends React.Component {
             });
             self.setState({
               tableList,
+              loading: false,
             });
           }
         });
@@ -156,6 +163,7 @@ class UploadSequenceFile extends React.Component {
         self.setState({
           filesNameList: [...newData, ...filesNameList],
           countNum: id + filesData.length,
+          loading: false,
         });
       });
   };
@@ -215,6 +223,16 @@ class UploadSequenceFile extends React.Component {
   // 提交
   handleOK = () => {
     const { tableList } = this.state;
+    const bpCode = 'aa';
+    let list = [...tableList];
+    list = list.map(item => {
+      item = { ...item, bpCode };
+      return item;
+    });
+    this.setState({
+      tableList: list,
+    });
+
     api.addSample(tableList).then(() => {
       this.props.handleClose(true);
     });
@@ -273,7 +291,7 @@ class UploadSequenceFile extends React.Component {
             {row.sampleProperties && row.sampleProperties.length !== 0
               ? row.sampleProperties.map(item => (
                   <div>
-                    {`${item.sampleLengthMin}-${item.sampleLengthMax} (${item.sampleLengthAve})`}
+                    {`${item.sampleLengthMin}-${item.sampleLengthMax} (avg ${item.sampleLengthAve})`}
                   </div>
                 ))
               : ''}

@@ -22,7 +22,7 @@ const SeqModel = {
         type: "input",
         text: "单行输入"
       },
-      //  {
+      // {
       //   type: "sample_select",
       //   text: '样品选择'
       // }, {
