@@ -2,7 +2,7 @@
 import React, { Component } from 'react';
 import { Drawer, Avatar, Tag, List, Card, Badge, Spin, Empty } from 'antd';
 import { DownOutlined, UpOutlined } from '@ant-design/icons';
-import { formatter, compare, cutString } from '@/utils/utils';
+import { formatter, cutString } from '@/utils/utils';
 import './index.less';
 import api from '@/pages/project/api/taskmodel';
 import processApi from '@/pages/project/api/processModel/';
@@ -207,7 +207,7 @@ class DrawerTool extends Component {
                 }
               >
                 收起
-                <DownOutlined />
+                <UpOutlined />
               </a>
             ) : (
               <a
@@ -219,7 +219,7 @@ class DrawerTool extends Component {
                 }
               >
                 展开
-                <UpOutlined />
+                <DownOutlined />
               </a>
             )}
           </div>

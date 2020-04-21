@@ -4,15 +4,12 @@ import { Modal, List, Card } from 'antd';
 import { ShrinkOutlined } from '@ant-design/icons';
 
 const EnlargePage = props => {
-  const titleContent = item => {
-    console.log(item);
-    return (
-      <>
-        <div>{item.groupName}</div>
-        <div style={{ fontSize: '14px', color: 'rgba(0,0,0,0.45)' }}>{item.groupDescribe}</div>
-      </>
-    );
-  };
+  const titleContent = item => (
+    <>
+      <div>{item.groupName}</div>
+      <div style={{ fontSize: '14px', color: 'rgba(0,0,0,0.45)' }}>{item.groupDescribe}</div>
+    </>
+  );
   return (
     <Modal
       title={titleContent(props.typeEnlargeData)}
