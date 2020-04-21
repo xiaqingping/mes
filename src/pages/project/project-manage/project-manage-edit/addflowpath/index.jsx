@@ -23,6 +23,8 @@ class Test extends Component {
     super(props);
     const { processSelectedList, paramList, projectInfor } = this.props.projectManage;
     console.log(projectInfor);
+    console.log(this.props);
+    console.log(paramList);
 
     this.state = {
       list: projectInfor.type === 'add' ? [] : processSelectedList,
@@ -30,11 +32,20 @@ class Test extends Component {
       visible: false,
       projectInfor,
       paramList,
+      projectProcesses: [],
     };
+    console.log(this.state);
   }
 
   componentDidMount() {
     this.getData();
+    // 传过来的项目id
+    // const projectProcesses = this.props.location.state.newData;
+    // console.log(projectProcesses);
+    // this.setState({ projectProcesses },() => {
+    //   // console.log(this.state);
+    // });
+    // console.log(this.state);
   }
 
   componentWillUnmount() {
@@ -73,34 +84,29 @@ class Test extends Component {
 
   // 打开参数
   handleOpen = row => {
-    // 传流程id，流程模型id，请求类型。
-    // console.log(row);
-
     const { paramList } = this.props.projectManage;
 
-    if (paramList.length === 0) {
-      api.getProcessParam(row.id).then(res => {
-        if (!res || res.length === 0) return message.error('当前流程暂无参数！');
-        const data = res;
-        data.requestType = 'addParam';
-        data.processId = row.id;
-        this.props.dispatch({
-          type: 'projectDetail/setProcssesParam',
-          payload: data,
-        });
-        router.push('/project/project-manage/process-parameter');
-        return false;
-      });
+    let data = {};
+    if (paramList.length === 0 && paramList.processModelId === undefined) {
+      // 添加 参数值
+      data = {
+        requestType: 'addParam',
+        processModelId: row.id,
+      };
+    } else {
+      // 修改 参数值
+      data = {
+        requestType: 'updateParam',
+        processModelId: row.id,
+        params: paramList.params,
+      };
     }
-    const data = paramList;
-    console.log(data);
-    data.requestType = 'updateParam';
+
     this.props.dispatch({
-      type: 'projectDetail/setProcssesParam',
+      type: 'projectDetail/setUserForParam',
       payload: data,
     });
     router.push('/project/project-manage/process-parameter');
-    return false;
   };
 
   // 获取模态框选中的流程模型数据
@@ -118,7 +124,9 @@ class Test extends Component {
 
   // 保存
   handleSave = () => {
-    const { list, projectInfor, paramList } = this.state;
+    // const { projectProcesses} = this.state;
+    // console.log(projectProcesses);
+    const { list, projectInfor, paramList, projectProcesses } = this.state;
     let status = false;
     if (list === '' || list === undefined) {
       status = true;
@@ -145,14 +153,21 @@ class Test extends Component {
       }
       newList.push(newItem);
     });
+    console.log(newList);
 
     projectInfor.processList = newList;
     const data = projectInfor;
 
     api.addProjects(data).then(() => {
-      console.log(123);
+      console.log(data);
       // return router.push('/project/project-manage');
     });
+
+    if (projectProcesses.requestType === 'add') {
+      // api.addProjectsProcess({projectProcesses,data}).then(res => {
+      //   console.log(res);
+      // });
+    }
     return '';
   };
 
