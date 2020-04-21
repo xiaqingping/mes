@@ -14,9 +14,10 @@ import {
   Select,
   Dropdown,
   Menu,
+  Modal,
 } from 'antd';
 import TableSearchForm from '@/components/TableSearchForm';
-import { PlusOutlined } from '@ant-design/icons';
+import { PlusOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import router from 'umi/router';
 import { connect } from 'dva';
 import _ from 'lodash';
@@ -345,21 +346,21 @@ class ProcessModel extends Component {
   // 删除
   handleDelete = value => {
     api.deleteProcess(value.id).then(() => {
-      this.getTableData();
+      this.getTableData(this.initialValues);
     });
   };
 
   // 发布
   handlePublish = value => {
     api.publishment(value.id).then(() => {
-      this.getTableData();
+      this.getTableData(this.initialValues);
     });
   };
 
   // 禁用
   handleUnPublish = value => {
     api.unPublishment(value.id).then(() => {
-      this.getTableData();
+      this.getTableData(this.initialValues);
     });
   };
 
@@ -371,9 +372,42 @@ class ProcessModel extends Component {
     });
   };
 
+  confirm = row => {
+    Modal.confirm({
+      title: '删除流程模型',
+      content: '是否确定删除当前流程模型?',
+      icon: <ExclamationCircleOutlined />,
+      okText: '确认',
+      cancelText: '取消',
+      onOk: () => this.handleDelete(row),
+    });
+  };
+
+  // 获取按钮信息
+  getButton = (item, row) => {
+    if (item === '查看') {
+      return this.searchDetails(row);
+    }
+    if (item === '修改') {
+      return this.handleChange(row);
+    }
+    if (item === '升级') {
+      return this.handleUpgrade(row);
+    }
+    if (item === '删除') {
+      return this.confirm(row);
+    }
+    if (item === '发布') {
+      return this.handlePublish(row);
+    }
+    if (item === '禁用') {
+      return this.handleUnPublish(row);
+    }
+    return true;
+  };
+
   render() {
     const { pagination, loading, visible, detailValue, list } = this.state;
-
     const { status } = this.props;
 
     const columns = [
@@ -449,27 +483,7 @@ class ProcessModel extends Component {
                     <Menu.Item key={item}>
                       <a
                         className="task_model_add_argument_list"
-                        onClick={() => {
-                          if (item === '查看') {
-                            return this.searchDetails(row);
-                          }
-                          if (item === '修改') {
-                            return this.handleChange(row);
-                          }
-                          if (item === '升级') {
-                            return this.handleUpgrade(row);
-                          }
-                          if (item === '删除') {
-                            return this.handleDelete(row);
-                          }
-                          if (item === '发布') {
-                            return this.handlePublish(row);
-                          }
-                          if (item === '禁用') {
-                            return this.handleUnPublish(row);
-                          }
-                          return true;
-                        }}
+                        onClick={() => this.getButton(item, row)}
                       >
                         {item}
                       </a>
@@ -478,33 +492,10 @@ class ProcessModel extends Component {
               )}
             </Menu>
           );
+
           return (
             <>
-              <a
-                onClick={() => {
-                  if (operaList[0] === '查看') {
-                    return this.searchDetails(row);
-                  }
-                  if (operaList[0] === '修改') {
-                    return this.handleChange(row);
-                  }
-                  if (operaList[0] === '升级') {
-                    return this.handleUpgrade(row);
-                  }
-                  if (operaList[0] === '删除') {
-                    return this.handleDelete(row);
-                  }
-                  if (operaList[0] === '发布') {
-                    return this.handlePublish(row);
-                  }
-                  if (operaList[0] === '禁用') {
-                    return this.handleUnPublish(row);
-                  }
-                  return true;
-                }}
-              >
-                {operaList[0]}
-              </a>
+              <a onClick={() => this.getButton(operaList[0], row)}>{operaList[0]}</a>
               <Divider type="vertical" />
               <Dropdown overlay={menu} trigger={['click']}>
                 <a className="ant-dropdown-link" onClick={e => e.preventDefault()}>

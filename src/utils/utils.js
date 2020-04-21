@@ -1,11 +1,7 @@
 import _ from 'lodash';
-import {
-  parse
-} from 'querystring';
+import { parse } from 'querystring';
 import pathRegexp from 'path-to-regexp';
-import {
-  formatMessage
-} from 'umi/locale';
+import { formatMessage } from 'umi/locale';
 
 /* eslint no-useless-escape:0 import/prefer-default-export:0 */
 // eslint-disable-next-line max-len
@@ -21,12 +17,9 @@ export const getPageQuery = () => parse(window.location.href.split('?')[1]);
  */
 export const getAuthorityFromRouter = (router = [], pathname) => {
   const authority = router.find(
-    ({
-      routes,
-      path = '/'
-    }) =>
-    (path && pathRegexp(path).exec(pathname)) ||
-    (routes && getAuthorityFromRouter(routes, pathname)),
+    ({ routes, path = '/' }) =>
+      (path && pathRegexp(path).exec(pathname)) ||
+      (routes && getAuthorityFromRouter(routes, pathname)),
   );
   if (authority) return authority;
   return undefined;
@@ -102,9 +95,9 @@ export const formatter = (arr, value, key1, key2) => {
  */
 export const validateForm = form =>
   form
-  .validateFields()
-  .then(data => [true, data])
-  .catch(error => [false, error]);
+    .validateFields()
+    .then(data => [true, data])
+    .catch(error => [false, error]);
 
 /**
  * 获取表单的值（不验证）
@@ -184,18 +177,9 @@ export const format = id =>
  * @param {Object} customApi 自定义请求接口列表
  */
 export function* getCache(namespace, action, effects, defaultApi, customApi) {
-  const {
-    payload
-  } = action;
-  const {
-    call,
-    put,
-    select
-  } = effects;
-  const {
-    type,
-    options
-  } = payload;
+  const { payload } = action;
+  const { call, put, select } = effects;
+  const { type, options } = payload;
 
   let targetState;
 
@@ -249,10 +233,7 @@ export function* getCache(namespace, action, effects, defaultApi, customApi) {
  * @param {Function} fun 数据处理方法
  */
 export const setCache = (namespace, payload, fun) => {
-  const {
-    type,
-    targetState
-  } = payload;
+  const { type, targetState } = payload;
 
   const data = (fun[type] && fun[type](targetState)) || targetState;
 
@@ -332,17 +313,14 @@ export const compare = property => (a, b) => {
 // 判断字符是否为空
 export const isEmpty = obj => typeof obj === 'undefined' || obj === null || obj === '';
 
-
-// 随机生成rgb颜色值
-export const getrandomColor = function () {
-  return `#${  (function f (color) {
-    return (color += '0123456789abcdef' [Math.floor(Math.random() * 16)]) &&
-      (color.length == 6) ? color : f(color);
-  })('')}`;
-}
-
-
-
+// 随机生成颜色
+export const getrandomColor = () => {
+  const r = Math.floor(Math.random() * 256);
+  const g = Math.floor(Math.random() * 256);
+  const b = Math.floor(Math.random() * 256);
+  const color = `#${r.toString(16)}${g.toString(16)}${b.toString(16)}`;
+  return color;
+};
 
 // 版本排序
 export const versionSort = version => {
@@ -358,11 +336,11 @@ export const versionSort = version => {
         }
 
         if (current !== max) {
-          break
+          break;
         }
       }
     }
     [temp[i], temp[minIndex]] = [temp[minIndex], temp[i]];
   }
-  return temp.map(v => v.join('.'))
+  return temp.map(v => v.join('.'));
 };

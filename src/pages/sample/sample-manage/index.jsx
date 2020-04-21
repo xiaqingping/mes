@@ -226,7 +226,6 @@ class ProcessModel extends Component {
 
   render() {
     const { pagination, loading, list, visible, detailVisible, detailValue } = this.state;
-    // let tableWidth = 0;
     const columns = [
       {
         title: '编号/名称',

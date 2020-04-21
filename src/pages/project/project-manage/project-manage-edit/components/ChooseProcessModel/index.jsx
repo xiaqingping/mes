@@ -9,6 +9,7 @@ import _ from 'lodash';
 import api from '@/pages/project/api/processModel';
 import disk from '@/pages/project/api/disk';
 import ChooseProcessModelCheck from '../ChooseProcessModelCheck';
+import xuanzhong from '@/assets/imgs/xuanzhong.png';
 
 const FormItem = Form.Item;
 
@@ -374,7 +375,18 @@ class ChooseProcessModel extends React.Component {
                           </div>
                         </div>
                         <div style={{ fontSize: '14px', paddingLeft: '20px' }}>{item.describe}</div>
-                        <div className="isOk" />
+                        <div
+                          style={{ display: 'none' }}
+                          className={classNames({
+                            isOk: this.state.selectedIds.includes(item.id),
+                          })}
+                        >
+                          <img
+                            src={xuanzhong}
+                            alt=""
+                            style={{ position: 'absolute', right: '0', bottom: '0' }}
+                          />
+                        </div>
                       </Card.Grid>
                     </Col>
                   );
