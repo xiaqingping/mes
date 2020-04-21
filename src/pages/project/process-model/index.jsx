@@ -21,7 +21,7 @@ import router from 'umi/router';
 import { connect } from 'dva';
 import _ from 'lodash';
 import { DateUI } from '@/pages/project/components/AntdSearchUI';
-import { formatter, getOperates, getrandomColor } from '@/utils/utils';
+import { formatter, getOperates } from '@/utils/utils';
 import api from '@/pages/project/api/processModel/';
 import disk from '@/pages/project/api/disk';
 import DefaultHeadPicture from '@/assets/imgs/defaultheadpicture.jpg';
