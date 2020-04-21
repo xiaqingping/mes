@@ -10,6 +10,8 @@ import {
 } from '@ant-design/icons';
 import router from 'umi/router';
 import api from '@/pages/project/api/projectManageDetail';
+import disk from '@/pages/project/api/disk';
+import DefaultHeadPicture from '@/assets/imgs/defaultheadpicture.jpg';
 import TaskList from '../TaskList';
 import { EditInforModel } from '../ModelUI';
 import ProgressMould from '../ProgressMould';
@@ -235,7 +237,14 @@ class ProcessList extends Component {
         width: 350,
         render: (value, row) => (
           <>
-            <Avatar src="/favicon.png" style={{ float: 'left', width: '46px', height: '46px' }} />
+            <Avatar
+              src={
+                row.processModelPicture ?
+                  disk.downloadFiles(row.processModelPicture, { view: true }) : DefaultHeadPicture
+              }
+              // src="/favicon.png"
+              style={{ float: 'left', width: '46px', height: '46px' }}
+            />
             <div style={{ float: 'left', marginLeft: '10px' }}>
               <div>{value}</div>
               <div>
