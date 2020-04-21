@@ -565,7 +565,7 @@ class TaskModel extends Component {
           />
         )}
         {/* <SampleSelect /> */}
-        {/* <SampleGroup /> */}
+        <SampleGroup />
       </PageHeaderWrapper>
     );
   }
