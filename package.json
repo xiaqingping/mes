@@ -113,5 +113,9 @@
     "src/**/*.less",
     "config/**/*.js*",
     "scripts/**/*.js"
-  ]
+  ],
+  "main": "index.js",
+  "repository": "http://192.168.19.88/shopping/mes.git",
+  "author": "xiaqingping <xiaqingping@sangon.com>",
+  "license": "MIT"
 }

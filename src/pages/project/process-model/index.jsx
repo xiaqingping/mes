@@ -519,7 +519,7 @@ class ProcessModel extends Component {
 
     return (
       <PageHeaderWrapper>
-        <div className="tableList">
+        <div className="tableList processModeltableList">
           <Card bordered={false}>
             <TableSearchForm
               ref={this.tableSearchFormRef}
@@ -552,15 +552,17 @@ class ProcessModel extends Component {
             </Form>
           </Card>
           {visible ? (
-            <ProcessDetail
-              visible={visible}
-              // visible
-              onClose={this.onClose}
-              detailId={detailValue.id}
-              status={status}
-              handleChangeVersion={v => this.handleChangeVersion(v)}
-              handleUnPublish={row => this.handleUnPublish(row)}
-            />
+            <div>
+              <ProcessDetail
+                visible={visible}
+                // visible
+                onClose={this.onClose}
+                detailId={detailValue.id}
+                status={status}
+                handleChangeVersion={v => this.handleChangeVersion(v)}
+                handleUnPublish={row => this.handleUnPublish(row)}
+              />
+            </div>
           ) : null}
         </div>
       </PageHeaderWrapper>

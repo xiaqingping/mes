@@ -231,27 +231,33 @@ class AssociatedProcessModel extends React.Component {
         visible={visible}
         onOk={this.handleOk}
         onCancel={onClose}
-        width={747}
+        width={840}
         footer={null}
       >
-        <div className="tableList buttonStyle table-style-set-little" style={{ marginLeft: '8px' }}>
+        <div
+          className="tableList tableListTableSearchForm buttonStyle table-style-set-little"
+          style={{ marginLeft: '8px' }}
+        >
           <TableSearchForm
             ref={this.tableSearchFormRef}
             initialValues={this.initialValues}
             getTableData={this.getTableData}
             simpleForm={this.simpleForm}
           />
-          <Spin spinning={loading}>
-            <Table
-              columns={columns}
-              dataSource={list}
-              loading={loading}
-              rowKey="id"
-              size="small"
-              pagination={pagination}
-              onChange={this.handleStandardTableChange}
-            />
-          </Spin>
+          <div className="AssociatedProcessModel">
+            <Spin spinning={loading}>
+              <Table
+                columns={columns}
+                dataSource={list}
+                loading={loading}
+                rowKey="id"
+                size="small"
+                className="tableheader"
+                pagination={pagination}
+                onChange={this.handleStandardTableChange}
+              />
+            </Spin>
+          </div>
         </div>
       </Modal>
     );

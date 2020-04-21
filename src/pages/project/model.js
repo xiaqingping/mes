@@ -25,12 +25,12 @@ const projectModel = {
         status: 'error',
       },
       // 已过期
-      // {
-      //   value: 4,
-      //   text: '已过期',
-      //   // i18n: 'bp.expired',
-      //   status: 'warning',
-      // },
+      {
+        value: 4,
+        text: '已过期',
+        // i18n: 'bp.expired',
+        status: 'warning',
+      },
     ],
     // 颜色
     colorStore: [],
@@ -38,7 +38,6 @@ const projectModel = {
   effects: {},
   reducers: {
     setColorStore(state, action) {
-      console.log(action.payload);
       return {
         ...state,
         colorStore: action.payload,
