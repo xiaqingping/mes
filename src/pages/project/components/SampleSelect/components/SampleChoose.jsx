@@ -164,7 +164,9 @@ class SampleChoose extends React.Component {
   // };
 
   openUpload = () => {
-    this.toggleVis(true);
+    this.setState({
+      visible: true,
+    });
   };
 
   handleOk = () => {

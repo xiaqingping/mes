@@ -215,6 +215,7 @@ class SampleSelect extends React.Component {
         title: '样品',
         dataIndex: 'sampleName',
         key: 'sampleName',
+        width: 100,
       },
     ],
   };
@@ -224,6 +225,7 @@ class SampleSelect extends React.Component {
     title: () => <PlusSquareOutlined onClick={this.handleAdd} />,
     dataIndex: 'add',
     key: 'add',
+    width: 80,
   };
 
   componentDidMount() {
@@ -412,11 +414,12 @@ class SampleSelect extends React.Component {
       const newCol = {
         id: max + 1,
         title: item[titleName],
+        width: 100,
         dataIndex: `header_${max + 1}`,
         key: `header_${max + 1}`,
         render: (value, row, index) => {
           const color1 = `color_${max + 1}`;
-          return this.columnRender(value, row, index, color1);
+          return this.columnRender(value, row, index, color1, `header_${max + 1}`);
         },
       };
       newColumns.push(newCol);
@@ -428,10 +431,11 @@ class SampleSelect extends React.Component {
   };
 
   // 每列的render返回dom结构。
-  columnRender = (value, row, index, color1) => {
+  columnRender = (value, row, index, color1, col) => {
     return (
-      <div style={{ display: 'flex' }}>
-        <span style={{ marginRight: 10 }}>{value}</span>
+      <div style={{ display: 'flex' }} className="project_components_sample_group_render_wrap">
+        {/* <span style={{ marginRight: 10 }}>{value}</span> */}
+        {this.selectRender(value, row, index, color1, col)}
         <Popover
           overlayClassName="project_manage_sample_ui_select"
           overlayStyle={{ padding: 0 }}
@@ -550,8 +554,9 @@ class SampleSelect extends React.Component {
     });
   };
 
+  // 添加列
   handleAdd = () => {
-    const { columns } = this.state;
+    const { columns, groupSchemeData } = this.state;
     let cols = columns.slice(0, columns.length - 1);
     const ids = cols.map(item => item.id);
     const max = Math.max.apply(null, ids);
@@ -569,28 +574,77 @@ class SampleSelect extends React.Component {
           </div>
         );
       },
+      dupTitle: `分组方案_${max + 1}`,
+      width: 100,
       dataIndex: `header_${max + 1}`,
       key: `header_${max + 1}`,
       render: (value, row, index) => {
         const color1 = `color_${max + 1}`;
-        return this.columnRender(value, row, index, color1);
+        return this.columnRender(value, row, index, color1, `header_${max + 1}`);
       },
       // render:(value, )
     };
     cols = [...cols, newCol, this.lastColumn];
+    let soure = [...groupSchemeData];
+    const addHeader = `header_${max + 1}`;
+    const addColor = `color_${max + 1}`;
+    soure = soure.map(item => {
+      item[addHeader] = '';
+      item[addColor]='';
+      return item
+    });
     this.setState({
       columns: cols,
+      groupSchemeData: soure
     });
   };
 
-  onInputBlur = e => {};
+  // 选择组，blur 时候保存数据--- 当选择组的时候要加上默认的颜色
+  handleGroupSelectBlur = (e, value, row, index, col) => {
+    console.log(value);
+    console.log(row);
+    console.log(index);
+    console.log(col);
+    const option = e.target.value;
+    const { optionList } = this.state;
+    let list = [...optionList];
 
-  selectRender = () => {
+    if (!list.includes(option) && option) {
+      list = [...list, option];
+    }
+    // 如果blur时候的值跟原来的值一样， 说明数据没有改变
+    if (value !== option) {
+      row[col] = option;
+      const { groupSchemeData } = this.state;
+      const source = [...groupSchemeData];
+      source[index] = row;
+      this.setState(
+        {
+          groupSchemeData: source,
+        },
+        () => {
+          console.log(this.state.groupSchemeData);
+        },
+      );
+
+    }
+
+    this.setState({
+      optionList: list,
+    });
+  };
+
+  selectRender = (value, row, index, color1, col) => {
     const { optionList } = this.state;
     return (
-      <AutoComplete style={{ width: '80%' }} onBlur={this.onInputBlur}>
+      <AutoComplete
+        allowClear
+        style={{ width: '60%' }}
+        onBlur={e => this.handleGroupSelectBlur(e, value, row, index, col)}
+        defaultValue={value}
+      >
         {optionList.map(item => (
-          <Option key={Date.now()} value={item}>
+          <Option key={item} value={item}>
             {item}
           </Option>
         ))}
@@ -612,9 +666,25 @@ class SampleSelect extends React.Component {
     this.toggleVis(false);
   };
 
+  // 对数据进行校验
+  verifyData = ()=>{
+    const { groupSchemeData, columns } = this.state;
+    // 1. 一个分组方案里只能是单纯组或者单纯样品
+    // 2. 一个分组方案里面不能都是空
+    
+  }
+
   render() {
+    let tableWidth = 0;
     const { groupSchemeData, visible, columns } = this.state;
+    console.log(columns);
     console.log(groupSchemeData);
+    columns.map(col => {
+      if (!col.width) {
+        col.width = 100;
+      }
+      tableWidth += col.width;
+    });
     return (
       <div>
         <div
@@ -626,7 +696,16 @@ class SampleSelect extends React.Component {
           </Button>
         </div>
 
-        <Table columns={columns} dataSource={groupSchemeData} pagination={false} />
+        <Table
+          columns={columns}
+          dataSource={groupSchemeData}
+          pagination={false}
+          scroll={{ x: tableWidth }}
+        />
+
+        <Button onClick={this.verifyData} type="primary">
+          提交
+        </Button>
 
         {visible && <GroupUpload closeUpload={this.handleCloseUpload} />}
       </div>
