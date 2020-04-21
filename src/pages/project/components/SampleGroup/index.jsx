@@ -423,7 +423,7 @@ class SampleSelect extends React.Component {
     });
     // 获取的columns不能操作改写title， 所以需要在格式化columns之后重新 改写。
     let renderColumns = this.renderColumns(newColumns);
-    renderColumns = [...renderColumns,this.lastColumn]
+    renderColumns = [...renderColumns, this.lastColumn];
     return renderColumns;
   };
 
@@ -478,36 +478,60 @@ class SampleSelect extends React.Component {
     return columns;
   };
 
-  handleTitleBlur = (e, item, index) => {
-    item.dupTitle = e.target.value;
+  handleTitleBlur = (e, item, index, id) => {
     const { columns } = this.state;
     const cols = [...columns];
-    cols[index] = item;
+    if (id) {
+      let rowIndex = null;
+      let row = cols.filter((v, idx) => {
+        if (v.id === id) {
+          rowIndex = idx;
+        }
+        return v.id === id;
+      });
+      row = row[0];
+      row.dupTitle = e.target.value;
+      cols[rowIndex] = row;
+    } else {
+      item.dupTitle = e.target.value;
+
+      cols[index] = item;
+    }
+
     this.setState({
       columns: cols,
     });
   };
 
-  removeColumn = (item) => {
-
+  removeColumn = (item, id) => {
     const { columns } = this.state;
     let cols = [...columns];
-    cols = cols.filter(v => {
-      return v.id !== item.id;
-    });
-    // 这里不光删除列， 同时也要删除表格数据，，删除掉每一个行的该分组方案下的组数据；
-    const num = item.dataIndex.split('_')[1];
-    const { groupSchemeData } = this.state;
-    const tableDatas = [...groupSchemeData];
-    tableDatas.forEach(item => {
-      const prop = `header_${num}`;
-      delete item[prop];
-      return item;
-    });
-    this.setState({
-      columns: cols,
-      groupSchemeData: tableDatas,
-    });
+    if (!item) {
+      cols = cols.filter(v => {
+        return v.id !== id;
+      });
+
+      this.setState({
+        columns: cols,
+      });
+    } else {
+      cols = cols.filter(v => {
+        return v.id !== item.id;
+      });
+      // 这里不光删除列， 同时也要删除表格数据，，删除掉每一个行的该分组方案下的组数据；
+      const num = item.dataIndex.split('_')[1];
+      const { groupSchemeData } = this.state;
+      const tableDatas = [...groupSchemeData];
+      tableDatas.forEach(item => {
+        const prop = `header_${num}`;
+        delete item[prop];
+        return item;
+      });
+      this.setState({
+        columns: cols,
+        groupSchemeData: tableDatas,
+      });
+    }
   };
 
   handleColorChange = (color, value, row, index) => {
@@ -533,9 +557,25 @@ class SampleSelect extends React.Component {
     const max = Math.max.apply(null, ids);
     const newCol = {
       id: max + 1,
-      title: () => <Input defaultValue={`分组方案_${max + 1}`} />,
+      title: () => {
+        return (
+          <div className="project_manage_UI_sample_group_title">
+            <input
+              defaultValue={`分组方案_${max + 1}`}
+              onBlur={e => this.handleTitleBlur(e, null, null, max + 1)}
+            />
+
+            <CloseOutlined onClick={() => this.removeColumn(null, max + 1)} />
+          </div>
+        );
+      },
       dataIndex: `header_${max + 1}`,
       key: `header_${max + 1}`,
+      render: (value, row, index) => {
+        const color1 = `color_${max + 1}`;
+        return this.columnRender(value, row, index, color1);
+      },
+      // render:(value, )
     };
     cols = [...cols, newCol, this.lastColumn];
     this.setState({

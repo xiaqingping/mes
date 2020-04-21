@@ -1,12 +1,11 @@
-/* eslint-disable react/no-string-refs */
-// 上传序列文件
+// 上传分组方案
 import React from 'react';
 import { Modal, Button, Table, List, Progress, message, Input } from 'antd';
-import { InboxOutlined, PaperClipOutlined } from '@ant-design/icons';
-import { guid, cutString } from '@/utils/utils';
-import api from '@/pages/sample/api/sample';
+import { PaperClipOutlined } from '@ant-design/icons';
+import { cutString } from '@/utils/utils';
+import api from '@/pages/project/api/excel';
+import { UploadButton } from '@/pages/project/components/CustomComponents';
 import './index.less';
-import disk from './api/disk';
 
 const { TextArea } = Input;
 class UploadSequenceFile extends React.Component {
@@ -16,30 +15,13 @@ class UploadSequenceFile extends React.Component {
 
   constructor(props) {
     super(props);
-    const guuid = guid();
     this.state = {
-      guuid,
       loading: false,
-      visible: false,
       filesNameList: [],
-      countNum: 0,
+      tableHead: [],
       tableList: [],
     };
   }
-
-  // 上传按钮
-  uploadButton = () => (
-    <div
-      style={{
-        textAlign: 'center',
-        background: '#FBFBFB',
-      }}
-    >
-      <InboxOutlined style={{ fontSize: '70px', color: '#1890FF' }} />
-      <p>点击或将文件</p>
-      <p>拖曳到这里上传</p>
-    </div>
-  );
 
   // 删除files文件
   deleteFiles = v => {
@@ -63,93 +45,23 @@ class UploadSequenceFile extends React.Component {
 
   // 上传文件
   handleUpload = e => {
-    const self = this;
     const file = e.target.files;
-    const { guuid, filesNameList, countNum, tableList } = self.state;
-    const uploadUrl = disk.uploadMoreFiles('ngs_sample', guuid);
     const data = new FormData();
     let filesData = [];
-    const id = countNum;
-    const AllImgExt = '.fasta|.fastq|.fq|.jpg|.rar';
+    const AllImgExt = '.xls|.xlsx';
     for (let i = 0; i < file.length; i++) {
       const fileArr = file[i].name.split('.');
       if (AllImgExt.indexOf(fileArr[fileArr.length - 1]) === -1) {
         message.error('文件格式不正确');
         return false;
       }
-      data.append('files', file[i]);
+      data.append('file', file[i]);
       filesData = [...filesData, file[i].name];
     }
-
-    const config = {
-      headers: { 'Content-Type': 'multipart/form-data' },
-      // 进度条
-      onUploadProgress(progress) {
-        const newData = filesData.map((item, index) => ({
-          id: index + id + 1,
-          name: item,
-          progress: `${(progress.loaded / progress.total) * 100}`,
-          status: 'loading',
-        }));
-        self.setState({
-          filesNameList: [...newData, ...filesNameList],
-          countNum: id + filesData.length,
-        });
-      },
-    };
-    api
-      .UploadFiles(uploadUrl, {
-        data,
-        ...config,
-      })
-      .then(res => {
-        const newData = filesData.map((item, index) => ({
-          id: index + id + 1,
-          name: item,
-          progress: 100,
-          status: 'success',
-          fileId: res[index],
-        }));
-        self.setState({
-          filesNameList: [...newData, ...filesNameList],
-          countNum: id + filesData.length,
-        });
-        api.getSequenceFileAnalysis(res).then(r => {
-          if (tableList.length === 0) {
-            self.setState({
-              tableList: [...r],
-            });
-          } else {
-            tableList.map((item, index) => {
-              r.map(i => {
-                if (item.sampleIdentificationCode === i.sampleIdentificationCode) {
-                  tableList[index].sampleProperties = [
-                    ...item.sampleProperties,
-                    ...i.sampleProperties,
-                  ];
-                }
-                return true;
-              });
-              return true;
-            });
-            self.setState({
-              tableList,
-            });
-          }
-        });
-      })
-      .catch(() => {
-        const newData = filesData.map((item, index) => ({
-          id: index + id + 1,
-          name: item,
-          progress: 100,
-          status: 'error',
-        }));
-        self.setState({
-          filesNameList: [...newData, ...filesNameList],
-          countNum: id + filesData.length,
-        });
-      });
+    api.getFileProcessExcels(data).then(res => {
+      this.checkData(res);
+    });
+    return true;
   };
 
   // 文件列表
@@ -185,73 +97,69 @@ class UploadSequenceFile extends React.Component {
 
   // 提交
   handleOK = () => {
-    this.props.closeUpload();
     // const { tableList } = this.state;
     // api.addSample(tableList).then(() => {
     //   this.props.handleClose();
     // });
   };
 
+  // 数据分割
+  handleData = value => {
+    const arr = value.split('\n');
+    const newData = arr.map(item => item.split(/[，,| ]/));
+    let data = [];
+    newData.forEach(item => {
+      let temp = {};
+      item.forEach((it, index) => {
+        temp = { ...temp, [index]: it };
+      });
+      data = [...data, temp];
+    });
+    this.checkData(data);
+  };
+
+  // 数据检查
+  checkData = value => {
+    // 判断title不能为空
+    let err = false;
+    if (Object.values(value[0]).some(item => item === '')) {
+      message.error('数据格式不正确');
+      err = true;
+    }
+    const lengthNum = Object.keys(value[0]).length;
+    value.forEach((item, index) => {
+      // 判断每行的数据个数
+      if (Object.keys(item).length !== lengthNum) {
+        message.error('数据格式不正确');
+        err = true;
+      }
+      if (index !== 0) {
+        // TODO: 判断解析出来的数据第一项要等于样品数据的第一项
+        // item[0] 第一项
+      }
+    });
+
+    if (!err) {
+      this.setState({
+        tableHead: value.shift(),
+        tableList: value,
+      });
+    }
+  };
+
   render() {
-    const { loading, visible, filesNameList, tableList } = this.state;
-    const columns = [
-      {
-        title: '样品',
-        dataIndex: 'sampleName',
-        render: (value, row) => (
-          <>
-            <div style={{ color: 'black' }}>{value}</div>
-            <div>{row.sampleIdentificationCode}</div>
-          </>
-        ),
-      },
-      {
-        title: '分组方案',
-        dataIndex: 'cc',
-        render: (value, row) => (
-          <>
-            {row.sampleProperties && row.sampleProperties.length !== 0
-              ? row.sampleProperties.map(item => (
-                  <div>
-                    <span style={{ color: 'black' }}>
-                      {this.getFilesContent(item, filesNameList)}
-                    </span>{' '}
-                    {item.sourceSequenceFileName}
-                  </div>
-                ))
-              : ''}
-          </>
-        ),
-      },
-      {
-        title: '序列',
-        dataIndex: 'bb',
-        render: (value, row) => (
-          <>
-            {row.sampleProperties && row.sampleProperties.length !== 0
-              ? row.sampleProperties.map(item => (
-                  <div>{`${item.sampleSequenceCount} (${item.sampleLengthTotal}bp)`}</div>
-                ))
-              : ''}
-          </>
-        ),
-      },
-      {
-        title: '长度',
-        dataIndex: 'aa',
-        render: (value, row) => (
-          <>
-            {row.sampleProperties && row.sampleProperties.length !== 0
-              ? row.sampleProperties.map(item => (
-                  <div>
-                    {`${item.sampleLengthMin}-${item.sampleLengthMax} (${item.sampleLengthAve})`}
-                  </div>
-                ))
-              : ''}
-          </>
-        ),
-      },
-    ];
+    const { loading, tableList, tableHead } = this.state;
+    let columns = [];
+    Object.getOwnPropertyNames(tableHead).forEach(key => {
+      columns = [
+        ...columns,
+        {
+          title: tableHead[key],
+          dataIndex: key,
+        },
+      ];
+    });
+
     return (
       <Modal
         title="上传分组方案"
@@ -272,43 +180,19 @@ class UploadSequenceFile extends React.Component {
         ]}
         maskClosable={false}
       >
-        {/* 上传按钮图标 */}
+        {/* 上传文件 */}
         <div style={{ float: 'left', width: '170px', height: '142px', position: 'relative' }}>
-          <div
-            style={{
-              width: '100%',
-              height: '100%',
-              border: '1px dashed #DBDBDB',
-              textAlign: 'center',
-              background: '#FBFBFB',
-            }}
-          >
-            <InboxOutlined style={{ fontSize: '64px', color: '#1890FF', marginTop: '12px' }} />
-            <div style={{ fontSize: '16px' }}>点击或将文件</div>
-            <div style={{ fontSize: '16px' }}>拖拽到这里上传</div>
-          </div>
-          <input
-            type="file"
-            onChange={e => this.handleUpload(e, this.callback)}
-            multiple="multiple"
-            style={{
-              opacity: 0,
-              cursor: 'pointer',
-              width: '170px',
-              height: '142px',
-              outline: 'none',
-              position: 'absolute',
-              top: '0',
-              zIndex: '10',
-            }}
-          />
+          <UploadButton handleUpload={e => this.handleUpload(e)} />
         </div>
         {/* 输入框 */}
         <div style={{ width: '645px', float: 'left', paddingLeft: '45px', position: 'relative' }}>
           <TextArea
             rows={6}
             style={{ resize: 'none' }}
-            placeholder="粘贴或快速输入，分隔符支持“逗号（，）”、“空格（）”、“竖线（|）”、“制表符（）”"
+            placeholder="粘贴或快速输入，分隔符支持“逗号（，）”、“空格（ ）”、“竖线（|）”、“制表符（）”"
+            onBlur={v => {
+              this.handleData(v.target.value);
+            }}
           />
         </div>
 

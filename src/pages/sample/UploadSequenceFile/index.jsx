@@ -2,7 +2,8 @@
 // 上传序列文件
 import React from 'react';
 import { Modal, Button, Carousel, Table, List, Progress, message } from 'antd';
-import { InboxOutlined, PaperClipOutlined } from '@ant-design/icons';
+import { PaperClipOutlined } from '@ant-design/icons';
+import { UploadButton } from '@/pages/sample/components/CustomComponents';
 import { guid, cutString } from '@/utils/utils';
 import api from '@/pages/sample/api/sample';
 import './index.less';
@@ -17,28 +18,16 @@ class UploadSequenceFile extends React.Component {
     super(props);
     const guuid = guid();
     this.state = {
+      // eslint-disable-next-line react/no-unused-state
       guuid,
       loading: false,
       visible: false,
       filesNameList: [],
+      // eslint-disable-next-line react/no-unused-state
       countNum: 0,
       tableList: [],
     };
   }
-
-  // 上传按钮
-  uploadButton = () => (
-    <div
-      style={{
-        textAlign: 'center',
-        background: '#FBFBFB',
-      }}
-    >
-      <InboxOutlined style={{ fontSize: '70px', color: '#1890FF' }} />
-      <p>点击或将文件</p>
-      <p>拖曳到这里上传</p>
-    </div>
-  );
 
   // 图片的分组
   expoleArr = arr => {
@@ -161,6 +150,7 @@ class UploadSequenceFile extends React.Component {
           countNum: id + filesData.length,
         });
       });
+    return true;
   };
 
   // 文件列表
@@ -220,7 +210,7 @@ class UploadSequenceFile extends React.Component {
   handleOK = () => {
     const { tableList } = this.state;
     api.addSample(tableList).then(() => {
-      this.props.handleClose();
+      this.props.handleClose(true);
     });
   };
 
@@ -245,7 +235,7 @@ class UploadSequenceFile extends React.Component {
           <>
             {row.sampleProperties && row.sampleProperties.length !== 0
               ? row.sampleProperties.map(item => (
-                  <div>
+                  <div key={item}>
                     <span style={{ color: 'black' }}>
                       {this.getFilesContent(item, filesNameList)}
                     </span>{' '}
@@ -263,7 +253,9 @@ class UploadSequenceFile extends React.Component {
           <>
             {row.sampleProperties && row.sampleProperties.length !== 0
               ? row.sampleProperties.map(item => (
-                  <div>{`${item.sampleSequenceCount} (${item.sampleLengthTotal}bp)`}</div>
+                  <div
+                    key={item}
+                  >{`${item.sampleSequenceCount} (${item.sampleLengthTotal}bp)`}</div>
                 ))
               : ''}
           </>
@@ -276,7 +268,7 @@ class UploadSequenceFile extends React.Component {
           <>
             {row.sampleProperties && row.sampleProperties.length !== 0
               ? row.sampleProperties.map(item => (
-                  <div>
+                  <div key={item}>
                     {`${item.sampleLengthMin}-${item.sampleLengthMax} (${item.sampleLengthAve})`}
                   </div>
                 ))
@@ -289,7 +281,7 @@ class UploadSequenceFile extends React.Component {
       <Modal
         title="上传序列文件"
         visible={visible}
-        onCancel={this.props.handleClose}
+        onCancel={() => this.props.handleClose(false)}
         width={871}
         className="upload-page"
         footer={[
@@ -305,36 +297,9 @@ class UploadSequenceFile extends React.Component {
         ]}
         maskClosable={false}
       >
-        {/* 上传按钮图标 */}
+        {/* 上传文件 */}
         <div style={{ float: 'left', width: '170px', height: '142px', position: 'relative' }}>
-          <div
-            style={{
-              width: '100%',
-              height: '100%',
-              border: '1px dashed #DBDBDB',
-              textAlign: 'center',
-              background: '#FBFBFB',
-            }}
-          >
-            <InboxOutlined style={{ fontSize: '64px', color: '#1890FF', marginTop: '12px' }} />
-            <div style={{ fontSize: '16px' }}>点击或将文件</div>
-            <div style={{ fontSize: '16px' }}>拖拽到这里上传</div>
-          </div>
-          <input
-            type="file"
-            onChange={e => this.handleUpload(e, this.callback)}
-            multiple="multiple"
-            style={{
-              opacity: 0,
-              cursor: 'pointer',
-              width: '170px',
-              height: '142px',
-              outline: 'none',
-              position: 'absolute',
-              top: '0',
-              zIndex: '10',
-            }}
-          />
+          <UploadButton handleUpload={e => this.handleUpload(e)} />
         </div>
         {/* 轮播图 */}
         <div style={{ width: '645px', float: 'left', paddingLeft: '45px', position: 'relative' }}>
@@ -349,8 +314,8 @@ class UploadSequenceFile extends React.Component {
             ''
           )}
           <Carousel ref="img">
-            {newFileList.map((it, index) => (
-              <List dataSource={it} renderItem={item => this.itemList(item)} key={index} />
+            {newFileList.map(it => (
+              <List dataSource={it} renderItem={item => this.itemList(item)} key={it} />
             ))}
           </Carousel>
           {newFileList.length > 1 ? (
@@ -367,7 +332,7 @@ class UploadSequenceFile extends React.Component {
         {/* 表格 */}
         <div style={{ clear: 'both' }}>
           <Table
-            rowKey={record => record.sampleIdentificationCode}
+            rowKey={(record, index) => index}
             dataSource={tableList}
             columns={columns}
             loading={loading}

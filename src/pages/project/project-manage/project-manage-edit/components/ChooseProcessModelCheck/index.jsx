@@ -2,6 +2,8 @@
 import React from 'react';
 import { Modal, Table, Avatar, Col, Tag, Card, Row } from 'antd';
 import '../../index.less';
+import disk from '@/pages/project/api/disk';
+import DefaultHeadPicture from '@/assets/imgs/defaultheadpicture.jpg';
 // import apiprocess from '@/pages/project/api/processModel/';
 
 // 点击流程模型查看的模态框
@@ -40,17 +42,39 @@ class ChooseProcessModelCheck extends React.Component {
       {
         title: '任务',
         dataIndex: 'name',
-        width: 50,
+        width: 250,
+        render: (value, row) => (
+          <>
+            {/* <Avatar
+              src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
+              style={{ float: 'left' }}
+              size="large"
+            /> */}
+            <Avatar
+              src={row.fileId ? disk.downloadFiles(row.fileId, { view: true }) : DefaultHeadPicture}
+              style={{ float: 'left', width: '46px', height: '46px' }}
+            />
+            <div style={{ float: 'left' }}>
+              <div>{row.code}</div>
+              <div>{value}</div>
+            </div>
+          </>
+        ),
       },
       {
         title: '描述',
         dataIndex: 'describe',
-        width: 200,
+        width: 500,
       },
       {
         title: '版本',
         dataIndex: 'version',
         width: 100,
+        render: value => (
+          <Tag color="green" style={{ padding: '0 10px' }}>
+            {value}
+          </Tag>
+        ),
       },
     ];
 
@@ -64,16 +88,25 @@ class ChooseProcessModelCheck extends React.Component {
                 visible={this.props.visible}
                 onOk={this.vieweOk}
                 onCancel={this.viewCancel}
-                width={1200}
+                width={900}
                 footer={null}
               >
-                <div style={{ height: '320px', overflow: 'auto' }}>
+                <div style={{ height: '320px', paddingLeft: '30px', overflow: 'auto' }}>
                   {/* 上部 */}
-                  <div style={{ height: '50px' }}>
-                    <Avatar
+                  <div style={{ height: '80px' }}>
+                    {/* <Avatar
                       src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
-                      style={{ float: 'left', marginRight: '10px' }}
+                      style={{ float: 'left', marginRight: '10px',width: '60px',
+                      height: '60px', }}
                       size="large"
+                    /> */}
+                    <Avatar
+                      src={
+                        viewlist.fileId
+                          ? disk.downloadFiles(disk.fileId, { view: true })
+                          : DefaultHeadPicture
+                      }
+                      style={{ float: 'left', width: '60px', height: '60px' }}
                     />
                     <div
                       style={{
@@ -97,7 +130,9 @@ class ChooseProcessModelCheck extends React.Component {
                     </div>
                   </div>
                   {/* 描述 */}
-                  <div style={{ fontSize: '14px', padding: '5px' }}>{viewlist.describe}</div>
+                  <div style={{ fontSize: '14px', padding: '0 5px', marginBottom: '40px' }}>
+                    {viewlist.describe}
+                  </div>
                   {/* 表格 */}
                   <div>
                     <Table

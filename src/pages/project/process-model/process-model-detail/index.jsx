@@ -30,44 +30,9 @@ class DrawerTool extends Component {
     processApi
       .getProcessDetail(detailId)
       .then(res => {
-        let newData = {};
-        disk.getFiles({ sourceCode: res.picture, sourceKey: 'project_process_model' }).then(i => {
-          const picId = i.length !== 0 ? i[0].id : '';
-          newData = { ...res, picId };
-          let groupsData = null;
-          if (newData.groups && newData.groups.length !== 0) {
-            groupsData = newData.groups.sort(compare('sortNo'));
-          }
-          newData.groups = groupsData;
-          this.setState({
-            detailValue: newData,
-          });
-          if (res.taskModels.length !== 0) {
-            const { taskModels } = res;
-            const ids = taskModels.map(item => item.picture);
-            disk
-              .getFiles({ sourceCode: ids.join(','), sourceKey: 'project_process_model' })
-              .then(r => {
-                if (r) {
-                  const newList = taskModels.map(e => {
-                    const filterItem = r.filter(item => item.sourceCode === e.picture);
-                    const listId = filterItem[0] && filterItem[0].id;
-                    return {
-                      ...e,
-                      listId,
-                    };
-                  });
-                  newData.taskModels = newList;
-                  this.setState({
-                    detailValue: newData,
-                  });
-                }
-              });
-          }
-          this.setState({
-            detailValue: newData,
-            loading: false,
-          });
+        this.setState({
+          detailValue: res,
+          loading: false,
         });
       })
       .catch(() => {
@@ -134,45 +99,19 @@ class DrawerTool extends Component {
   // 更换版本
   handleChangeVersion = v => {
     processApi.getProcessChangeVersion(v).then(res => {
-      let newData = {};
-      if (res.picture) {
-        disk.getFiles({ sourceCode: res.picture, sourceKey: 'project_process_model' }).then(i => {
-          const picId = i[0].id;
-          newData = { ...res, picId };
-          this.setState({
-            detailValue: newData,
-          });
-          if (res.taskModels.length !== 0) {
-            res.taskModels.map((item, index) => {
-              if (item.picture) {
-                disk
-                  .getFiles({ sourceCode: item.picture, sourceKey: 'project_process_model' })
-                  .then(r => {
-                    const listId = r[0].id;
-                    newData.taskModels[index].listId = listId;
-                    this.setState({
-                      detailValue: newData,
-                    });
-                  });
-              }
-              return true;
-            });
-          }
-        });
-      } else {
-        this.setState({
-          detailValue: res,
-        });
-      }
+      this.setState({
+        detailValue: res,
+      });
     });
   };
 
-  CollapseTool = value => {
+  // title内容
+  titleContent = value => {
     const { visable, selectVersion, parameterVisible, detailValue, open } = this.state;
     return (
       <div style={{ marginTop: '25px' }}>
         <Avatar
-          src={value.picId ? disk.downloadFiles(value.picId, { view: true }) : ''}
+          src={value.picture ? disk.downloadFiles(value.picture, { view: true }) : ''}
           style={{ float: 'left' }}
           size="large"
         />
@@ -344,7 +283,7 @@ class DrawerTool extends Component {
     return (
       <div>
         <Drawer
-          title={errorPage ? '' : this.CollapseTool(detailValue)}
+          title={errorPage ? '' : this.titleContent(detailValue)}
           width={500}
           closable={false}
           onClose={this.onClose}
@@ -362,7 +301,7 @@ class DrawerTool extends Component {
                   <List.Item key={item}>
                     <Card hoverable style={{ width: '470px', height: '240px' }}>
                       <Avatar
-                        src={item.listId ? disk.downloadFiles(item.listId, { view: true }) : ''}
+                        src={item.picture ? disk.downloadFiles(item.picture, { view: true }) : ''}
                         style={{ float: 'left' }}
                         size="large"
                       />

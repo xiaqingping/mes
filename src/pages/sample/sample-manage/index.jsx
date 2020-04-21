@@ -194,10 +194,13 @@ class ProcessModel extends Component {
     });
   };
 
-  handleClose = () => {
+  handleClose = v => {
     this.setState({
       visible: false,
     });
+    if (v) {
+      this.getTableData();
+    }
   };
 
   handleDetailClose = () => {
@@ -223,8 +226,8 @@ class ProcessModel extends Component {
 
   render() {
     const { pagination, loading, list, visible, detailVisible, detailValue } = this.state;
-    let tableWidth = 0;
-    let columns = [
+    // let tableWidth = 0;
+    const columns = [
       {
         title: '编号/名称',
         dataIndex: 'sampleCode',
@@ -283,15 +286,15 @@ class ProcessModel extends Component {
       },
     ];
 
-    columns = columns.map(col => {
-      // eslint-disable-next-line no-param-reassign
-      if (!col.width) col.width = 100;
-      tableWidth += col.width;
-      if (!col.editable) {
-        return col;
-      }
-      return true;
-    });
+    // columns = columns.map(col => {
+    //   // eslint-disable-next-line no-param-reassign
+    //   if (!col.width) col.width = 100;
+    //   tableWidth += col.width;
+    //   if (!col.editable) {
+    //     return col;
+    //   }
+    //   return true;
+    // });
 
     return (
       <PageHeaderWrapper>
@@ -313,7 +316,7 @@ class ProcessModel extends Component {
             </div>
             <Form ref={this.tableFormRef} className="table-style-set">
               <StandardTable
-                scroll={{ x: tableWidth }}
+                // scroll={{ x: tableWidth }}
                 rowClassName="editable-row"
                 loading={loading}
                 data={{ list, pagination }}
@@ -329,7 +332,7 @@ class ProcessModel extends Component {
           <SampleDetail
             visible={detailVisible}
             detailValue={detailValue}
-            handleClose={this.handleDetailClose}
+            handleClose={v => this.handleDetailClose(v)}
           />
         ) : (
           ''

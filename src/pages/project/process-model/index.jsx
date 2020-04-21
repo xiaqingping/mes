@@ -117,43 +117,9 @@ class ProcessModel extends Component {
       ...options,
     };
     api.getProcess(data).then(res => {
-      const uuids = res.rows.map(e => e.picture);
       this.setState({
         list: res.rows,
       });
-      disk
-        .getFiles({
-          sourceCode: uuids.join(','),
-          sourceKey: 'project_process_model',
-        })
-        .then(v => {
-          if (v) {
-            const newList = res.rows.map(e => {
-              const filterItem = v.filter(item => item.sourceCode === e.picture);
-              const fileId = filterItem[0] && filterItem[0].id;
-              return {
-                ...e,
-                fileId,
-              };
-            });
-
-            this.setState({
-              list: newList,
-            });
-          } else {
-            const newList = res.rows.map(e => {
-              const fileId = '';
-              return {
-                ...e,
-                fileId,
-              };
-            });
-
-            this.setState({
-              list: newList,
-            });
-          }
-        });
 
       this.setState({
         pagination: {
@@ -409,7 +375,7 @@ class ProcessModel extends Component {
     const { pagination, loading, visible, detailValue, list } = this.state;
 
     const { status } = this.props;
-    // let tableWidth = 0;
+
     const columns = [
       {
         title: '编号/名称',
@@ -418,7 +384,9 @@ class ProcessModel extends Component {
         render: (value, row) => (
           <>
             <Avatar
-              src={row.fileId ? disk.downloadFiles(row.fileId, { view: true }) : DefaultHeadPicture}
+              src={
+                row.picture ? disk.downloadFiles(row.picture, { view: true }) : DefaultHeadPicture
+              }
               style={{ float: 'left', width: '46px', height: '46px' }}
             />
             <div style={{ float: 'left', marginLeft: '10px' }}>
@@ -549,16 +517,6 @@ class ProcessModel extends Component {
       },
     ];
 
-    // columns = columns.map(col => {
-    //   // eslint-disable-next-line no-param-reassign
-    //   if (!col.width) col.width = 100;
-    //   tableWidth += col.width;
-    //   if (!col.editable) {
-    //     return col;
-    //   }
-    //   return true;
-    // });
-
     return (
       <PageHeaderWrapper>
         <div className="tableList">
@@ -584,7 +542,6 @@ class ProcessModel extends Component {
             </div>
             <Form ref={this.tableFormRef} className="table-style-set">
               <StandardTable
-                // scroll={{ x: tableWidth }}
                 rowClassName="editable-row"
                 loading={loading}
                 data={{ list, pagination }}

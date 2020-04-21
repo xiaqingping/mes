@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import { Card, List, Form, Layout, Button, message } from 'antd';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import { connect } from 'dva';
-import { InputModel } from '@/pages/project/components/ModelComponents';
+import InputModel from '@/pages/project/components/ModelComponents/InputModel';
 import api from '@/pages/project/api/projectManageDetail';
 import style from './index.less';
 
