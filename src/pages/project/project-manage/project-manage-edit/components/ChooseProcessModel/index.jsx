@@ -8,8 +8,8 @@ import { connect } from 'dva';
 import _ from 'lodash';
 import api from '@/pages/project/api/processModel';
 import disk from '@/pages/project/api/disk';
-import ChooseProcessModelCheck from '../ChooseProcessModelCheck';
 import xuanzhong from '@/assets/imgs/xuanzhong.png';
+import ChooseProcessModelCheck from '../ChooseProcessModelCheck';
 
 const FormItem = Form.Item;
 
@@ -219,14 +219,10 @@ class ChooseProcessModel extends React.Component {
       );
     }
     if (selectedIds.includes(itemlist)) {
-      const newidsList = selectedIds.filter(value => {
-        return value !== itemlist;
-      });
+      const newidsList = selectedIds.filter(value => value !== itemlist);
       console.log(newidsList);
       // console.log('筛选值');
-      const newcodeList = selecteditem.filter(value => {
-        return value.id !== itemlist;
-      });
+      const newcodeList = selecteditem.filter(value => value.id !== itemlist);
       console.log(newcodeList);
 
       this.setState(
