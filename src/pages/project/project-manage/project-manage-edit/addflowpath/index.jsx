@@ -126,7 +126,12 @@ class Test extends Component {
   handleSave = () => {
     // const { projectProcesses} = this.state;
     // console.log(projectProcesses);
-    const { list, projectInfor, paramList, projectProcesses } = this.state;
+    const {
+      list,
+      projectInfor,
+      paramList,
+      // projectProcesses
+    } = this.state;
     let status = false;
     if (list === '' || list === undefined) {
       status = true;
@@ -158,16 +163,13 @@ class Test extends Component {
     projectInfor.processList = newList;
     const data = projectInfor;
 
-    api.addProjects(data).then(() => {
-      console.log(data);
-      // return router.push('/project/project-manage');
-    });
+    api.addProjects(data).then(() => router.push('/project/project-manage'));
 
-    if (projectProcesses.requestType === 'add') {
-      // api.addProjectsProcess({projectProcesses,data}).then(res => {
-      //   console.log(res);
-      // });
-    }
+    // if (projectProcesses.requestType === 'add') {
+    //   // api.addProjectsProcess({projectProcesses,data}).then(res => {
+    //   //   console.log(res);
+    //   // });
+    // }
     return '';
   };
 
