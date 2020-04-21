@@ -19,6 +19,12 @@ class InputModel extends React.Component {
     };
   }
 
+  // componentDidUpdate(props) {
+  //   if (props.sbm !== this.props.sbm) {
+  //     this.props.getData('testData', '1');
+  //   }
+  // }
+
   // 判断是否可为空
   onChange = e => {
     const { data } = this.state;
