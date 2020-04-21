@@ -1,13 +1,13 @@
 import request from '@/utils/request';
 
-// let http1 = '';
-let http1 = 'http://192.168.20.6:8166';
+let http1 = '';
+// let http1 = 'http://192.168.20.6:8166';
 if (process.env.NODE_ENV !== 'development') {
   http1 = '';
 }
 
-// let http2 = '/projectmodel';
-let http2 = 'http://192.168.20.12:8360';
+let http2 = '/projectmodel';
+// let http2 = 'http://192.168.20.12:8360';
 if (process.env.NODE_ENV !== 'development') {
   http2 = '/projectmodel';
 }

@@ -3,8 +3,11 @@ import React, { Component } from 'react';
 import { Card, List, Form, Layout, Button, message } from 'antd';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import { connect } from 'dva';
+import router from 'umi/router';
 import InputModel from '@/pages/project/components/ModelComponents/InputModel';
 import api from '@/pages/project/api/projectManageDetail';
+// import EnvironmentalFactorsModel from
+//   '@/pages/project/components/ModelComponents/EnvironmentalFactorsModel/index';
 import style from './index.less';
 
 const { Footer } = Layout;
@@ -24,17 +27,18 @@ class ProcessParameter extends Component {
 
   constructor(props) {
     super(props);
-    const { userForParamData } = props.projectDetail;
+    const { userForParamData } = this.props.projectDetail;
+    console.log(this.props.projectDetail);
     // 判断请求类型
     this.determineTheRequestType(userForParamData);
   }
 
   // 判断请求类型
   determineTheRequestType = data => {
+    console.log(data);
     // 请求类型为空 返回上一页
-    if (data.length === 0 || data.requestType === undefined) {
-      message.error('请求错误！返回上一页面！');
-      window.history.back(-1);
+    if (data.requestType === undefined) {
+      message.error('请求类型为空');
       this.props.dispatch({
         type: 'projectManage/setParamList',
         payload: [],
@@ -66,19 +70,12 @@ class ProcessParameter extends Component {
   getParamData = (param, paramValue) => {
     const { requestType, params } = this.props.projectDetail.userForParamData;
 
-    // if (requestType === '' || requestType === undefined || requestType === null) {
-    //     message.error('请求错误！返回上一页');
-    //     window.history.back(-1);
-    //     return false;
-    // }
-
     if (param.length > 0) {
       // 处理参数数据
       const newParam = this.deleteNullGroup(param); // 删除参数为空的分组
       // 无参数 返回上一页
       if (newParam.length === 0) {
-        message.error('暂无参数！');
-        window.history.back(-1);
+        message.error('暂无参数列表！');
         return false;
       }
       const newParamData = this.disposeParamAttribute(newParam); // 处理参数属性
@@ -374,8 +371,7 @@ class ProcessParameter extends Component {
   getProcessParam = processModelId => {
     api.getProcessParam(processModelId).then(res => {
       if (res.length === 0) {
-        message.error('暂无参数列表！');
-        window.history.back(-1);
+        message.error('未查询到参数！');
         return false;
       }
       this.setState({ processParam: res }, () => {
@@ -423,22 +419,20 @@ class ProcessParameter extends Component {
                       if (it.type === 'txtShuRuKuang')
                         return <InputModel data={it} key={newIndex} />;
                       if (it.type === 'input') return <InputModel data={it} key={newIndex} />;
-
                       return false;
-
-                      // const test = 'InputModel';
-                      // const name =
-                      // `<${test} data={${it}} key={${newIndex}} sampleList={} getData={} />`;
-                      // return <div dangerouslySetInnerHTML={{ __html: name }} />;
-                      // return <ModelType data={it} key={newIndex} sampleList={} getData={}/>;
                     })}
                   </Card>
                 </List.Item>
               )}
             />
+            {/* <EnvironmentalFactorsModel data={123} /> */}
+
             <Footer className={style.footer}>
               <div className={style.button}>
-                <Button className={style.back} onClick={() => window.history.back(-1)}>
+                <Button
+                  className={style.back}
+                  onClick={() => router.push('/project/project-manage/add/addflowpath')}
+                >
                   返回
                 </Button>
                 {/* <Button type="primary" htmlType="submit" onClick={() => this.saveParam()}> */}

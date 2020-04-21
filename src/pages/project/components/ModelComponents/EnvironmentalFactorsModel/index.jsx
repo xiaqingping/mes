@@ -2,14 +2,15 @@
  * 环境因子表
  */
 import React from 'react';
-import { Table, Card, Input } from 'antd';
+import { Table, Card, Button } from 'antd';
 import { CloseOutlined, PlusSquareOutlined } from '@ant-design/icons';
-import EditableCell from '@/components/EditableCell';
+import style from './index.less';
+import UploadSequenceFile from './UploadSequenceFile';
+
 
 class EnvironmentalFactorsModel extends React.Component {
   constructor(props) {
     super(props);
-    console.log(props);
     this.state = {
       // 样品选择框 样品列表
       sampleList: [
@@ -77,7 +78,7 @@ class EnvironmentalFactorsModel extends React.Component {
         title: '样品',
         dataIndex: 'sampleAlias',
         key: 'sampleAlias',
-        width: 200,
+        width: 100,
       },
       // 表头 最后一列
       lastColumn: {
@@ -86,6 +87,8 @@ class EnvironmentalFactorsModel extends React.Component {
         key: 'add',
         width: 100,
       },
+      // 上传模态框
+      visible: false,
     };
   }
 
@@ -113,58 +116,37 @@ class EnvironmentalFactorsModel extends React.Component {
     });
   }
 
-  save = async e => {
-    console.log(e);
-    // try {
-    //   const values = await form.validateFields();
-    //   toggleEdit();
-    //   this.handleSave({ ...record, ...values });
-    // } catch (errInfo) {
-    //   console.log('Save failed:', errInfo);
-    // }
-  };
-
-  handleSave = row => {
-    console.log(row);
-    const { data } = this.state;
-    const newData = [...data];
-    const index = newData.findIndex(item => row.key === item.key);
-    const item = newData[index];
-    newData.splice(index, 1, { ...item, ...row });
-    this.setState({
-      data: newData,
-    });
-  };
+  componentDidUpdate(props) {
+    if (props.submitStatus !== this.props.submitStatus) {
+      this.props.getData('testData', '环境因子');
+    }
+  }
 
   // 新增列
   addColumn = () => {
     const { headers, firstColumn, lastColumn } = this.state;
 
     // 设置新增列
-    let newHeader;
+    let num;
     if (headers.length > 0) {
       const ids = [];
       headers.forEach(item => {
         ids.push(item.id);
       });
       const max = Math.max.apply(null, ids);
-      const num = max + 1;
-      newHeader = {
-        id: num,
-        dataIndex: `header_${num}`,
-        title: `环境因子_${num}`,
-        editable: true,
-        inputType: <Input style={{ width: '90%' }} onPressEnter={this.save} onBlur={this.save} />,
-      };
+      num = max + 1;
     } else {
-      newHeader = {
-        id: 2,
-        dataIndex: 'header_2',
-        title: '环境因子_2',
-        editable: true,
-        inputType: <Input style={{ width: '90%' }} onPressEnter={this.save} onBlur={this.save} />,
-      };
+      num = 2;
     }
+
+    const newHeader = {
+      id: num,
+      dataIndex: `header_${num}`,
+      key: `header_${num}`,
+      title: `环境因子_${num}`,
+    };
+    const hds = [...headers, newHeader];
+    const cls = [firstColumn, ...this.formatHeader(hds), lastColumn];
 
     // 设置表格数据
     const { data } = this.state;
@@ -172,20 +154,15 @@ class EnvironmentalFactorsModel extends React.Component {
     data.forEach(item => {
       const newItem = JSON.parse(JSON.stringify(item));
       const key = newHeader.dataIndex;
-      newItem[key] = '123';
+      newItem[key] = '';
       newData.push(newItem);
     });
 
-    this.setState(
-      {
-        headers: [...headers, newHeader],
-      },
-      () => {
-        const hds = this.state.headers;
-        const cls = [firstColumn, ...this.formatHeader(hds), lastColumn];
-        this.setState({ columns: cls, data: newData });
-      },
-    );
+    this.setState({
+      headers: hds,
+      columns: cls,
+      data: newData,
+    });
   };
 
   // 移除列
@@ -207,75 +184,113 @@ class EnvironmentalFactorsModel extends React.Component {
   };
 
   // 修改表头
-  handleOnChange = (row, event) => {
+  handleOnChangeTitle = (row, event) => {
     const { headers } = this.state;
+    const newHeader = [];
     headers.forEach(item => {
       if (row.id === item.id) {
-        item.title = event.target.value;
+        const newItem = JSON.parse(JSON.stringify(item));;
+        newItem.title = event.target.value;
+        newHeader.push(newItem);
       }
     });
-    this.setState({ headers });
+    this.setState({ headers: newHeader });
   };
 
-  // componentDidUpdate(props) {
-  //   if (props.sbm !== this.props.sbm) {
-  //     this.props.getData('testData', '1');
-  //   }
-  // }
+  // 修改数据
+  handleOnChangeData = (row, event, title) => {
+    const { data, headers } = this.state;
+    let newKey;
+    headers.forEach(item => {
+      if (item.title === title){
+        newKey = item.key;
+      }
+    })
+    const newRow = JSON.parse(JSON.stringify(row));;
+    newRow[newKey] = event.target.value;
 
-  // 格式化表头 可编辑Input
+    const newData = [];
+    data.forEach(item => {
+      if (row.id === item.id) {
+        newData.push(newRow);
+      } else {
+        const newItem = JSON.parse(JSON.stringify(item));
+        newData.push(newItem);
+      }
+    });
+    this.setState({ headers: newData });
+  }
+
+  // 列显示样式
   formatHeader = headers => {
     const groups = headers.map(item => ({
       title: () => (
-        <div className="project_manage_UI_sample_group_title" key={item.id}>
-          <input defaultValue={item.title} onChange={event => this.handleOnChange(item, event)} />
+        <div className='project_manage_UI_sample_group_title' key={item.id}>
+          <input
+            defaultValue={item.title}
+            onChange={event => this.handleOnChangeTitle(item, event)}
+          />
           <CloseOutlined onClick={() => this.removeColumn(item)} />
         </div>
       ),
       dataIndex: `${item.dataIndex}`,
       key: `${item.key}`,
-      width: 100,
+      width: 170,
+      render: (value, row) => (
+          <div className={style.editTable} key={item.id}>
+            <input
+              defaultValue={value}
+              onChange={event => this.handleOnChangeData(row, event, item.title)}
+            />
+          </div>
+        )
     }));
 
     return groups;
   };
 
-  render() {
-    const { columns, data } = this.state;
-    // console.log(columns);
-    // console.log(data);
+  // 上传
+  uploadButton = () => {
+    this.setState({ visible: true })
+  }
 
-    const components = {
-      body: {
-        // row: EditableRow,
-        cell: EditableCell,
-      },
-    };
+  // 关闭上传
+  handleClose = () => {
+    this.setState({ visible: false })
+  }
+
+  render() {
+    const { columns, data, visible, sampleList } = this.state;
+    let tableWidth = 0;
 
     const newColumns = columns.map(col => {
+      if (!col.width) col.width = 100;
+      tableWidth += col.width;
       if (!col.editable) {
         return col;
       }
-      return {
-        ...col,
-        onCell: record => ({
-          record,
-          editable: col.editable,
-          dataIndex: col.dataIndex,
-          title: col.title,
-          handleSave: this.handleSave,
-        }),
-      };
+      return true;
     });
 
     return (
-      <Card title="环境因子表" style={{ width: '100%', marginTop: 30 }}>
+      <Card
+        title="环境因子表"
+        style={{ width: '100%', marginTop: 30, marginBottom: 100 }}
+        extra={
+          <Button type="primary"
+          onClick={() => this.uploadButton()}>上传</Button>
+        }
+      >
         <Table
+          scroll={{ x:tableWidth }}
           dataSource={data}
           columns={newColumns}
-          rowClassName={() => 'editable-row'}
           pagination={false}
-          components={components}
+        />
+        <UploadSequenceFile
+          visible={visible}
+          sampleList={sampleList}
+          handleClose={this.handleClose}
         />
       </Card>
     );

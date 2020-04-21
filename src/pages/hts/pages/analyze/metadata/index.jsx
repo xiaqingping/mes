@@ -11,9 +11,6 @@ import EditableCell from '@/components/EditableCell';
 import api from '@/pages/hts/api';
 import { formatter } from '@/utils/utils';
 import router from 'umi/router';
-import EnvironmentalFactorsModel from
-  '@/pages/project/components/ModelComponents/EnvironmentalFactorsModel';
-import CheckBoxModel from '@/pages/project/components/ModelComponents/CheckBoxModel';
 import { ParamDrawer } from './components/ModelUI';
 
 const FormItem = Form.Item;
@@ -315,8 +312,6 @@ class Metadata extends Component {
           onClose={this.onCloseParamDrawer}
           data={originalParam}
         />
-        <EnvironmentalFactorsModel data={123} />
-        <CheckBoxModel />
       </PageHeaderWrapper>
     );
   }
