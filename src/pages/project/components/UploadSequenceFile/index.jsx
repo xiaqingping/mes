@@ -185,10 +185,11 @@ class UploadSequenceFile extends React.Component {
 
   // 提交
   handleOK = () => {
-    const { tableList } = this.state;
-    api.addSample(tableList).then(() => {
-      this.props.handleClose();
-    });
+    this.props.closeUpload();
+    // const { tableList } = this.state;
+    // api.addSample(tableList).then(() => {
+    //   this.props.handleClose();
+    // });
   };
 
   render() {
@@ -255,7 +256,7 @@ class UploadSequenceFile extends React.Component {
       <Modal
         title="上传分组方案"
         visible
-        onCancel={this.props.handleClose}
+        onCancel={this.props.closeUpload}
         width={871}
         className="upload-page"
         footer={[

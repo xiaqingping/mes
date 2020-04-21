@@ -163,6 +163,7 @@ class paramList extends Component {
 
   // 转换分组方案数据
   transformGroup = data => {
+    console.log(data);
     const { groupColumns } = this.state;
     const { groupSchemeList, sampleList } = data;
 
@@ -172,6 +173,7 @@ class paramList extends Component {
 
     // 取出 表头
     const newColumns = this.getTableHeaderData(list, columns, titleName);
+    console.log(newColumns);
     // 取出 行数据
     const rowData = this.getRowDataGroup(list, sampleList, newColumns);
     console.log(rowData);
@@ -201,8 +203,12 @@ class paramList extends Component {
    * columns 初始列
    */
   getTableHeaderData = (data, columns, titleName) => {
-    const newColumns = JSON.parse(JSON.stringify(columns));
+    console.log(columns);
+    console.log(titleName);
+    console.log(data);
 
+    const newColumns = JSON.parse(JSON.stringify(columns));
+    console.log(newColumns);
     data.forEach(item => {
       // 获取当前id最大值
       const ids = [];
@@ -269,10 +275,11 @@ class paramList extends Component {
         });
       }
     });
+    console.log(samples);
 
     // 样品去重 排序
     const newData = this.sampleRemoveDuplication(samples, sampleList, groupColumns);
-
+    console.log(newData);
     return newData;
   };
 
@@ -408,6 +415,7 @@ class paramList extends Component {
         ids.push(samItem.metadataSampleId);
       }
     });
+    console.log(newSample);
 
     // 第一列样品 排序 与样品列表顺序一致
     const newData = [];
@@ -419,6 +427,7 @@ class paramList extends Component {
             metadataSampleId: it.metadataSampleId,
             sampleColor: '',
           };
+          console.log(columns);
           columns.forEach(groItem => {
             newIt[groItem.dataIndex] = groItem.title;
             // newIt.id = groItem.id;
@@ -428,6 +437,7 @@ class paramList extends Component {
         }
       });
     });
+    console.log(newData);
 
     return newData;
   };
