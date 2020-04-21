@@ -6,6 +6,8 @@ import { PlusOutlined } from '@ant-design/icons';
 import router from 'umi/router';
 import { connect } from 'dva';
 import api from '@/pages/project/api/projectManage';
+import disk from '@/pages/project/api/disk';
+import DefaultHeadPicture from '@/assets/imgs/defaultheadpicture.jpg';
 import ChooseProcessModel from '../components/ChooseProcessModel';
 // import ParamPic from '@/assets/imgs/canshu@1x.png';
 
@@ -33,6 +35,13 @@ class Test extends Component {
 
   componentDidMount() {
     this.getData();
+  }
+
+  componentWillUnmount() {
+    this.props.dispatch({
+      type: 'projectManage/setProcessSelectedList',
+      payload: [],
+    });
   }
 
   // 点击打开关联
@@ -153,7 +162,7 @@ class Test extends Component {
       {
         title: '名称/描述',
         dataIndex: 'name',
-        width: 300,
+        width: 900,
         render: (value, row) => (
           <>
             <div>{value}</div>
@@ -167,10 +176,14 @@ class Test extends Component {
         width: 300,
         render: (value, row) => (
           <>
-            <Avatar
+            {/* <Avatar
               src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
               style={{ float: 'left' }}
               size="large"
+            /> */}
+            <Avatar
+              src={row.fileId ? disk.downloadFiles(row.fileId, { view: true }) : DefaultHeadPicture}
+              style={{ float: 'left', width: '46px', height: '46px' }}
             />
             <div style={{ float: 'left' }}>
               <div>{value}</div>
@@ -191,7 +204,7 @@ class Test extends Component {
       {
         title: '版本',
         dataIndex: 'version',
-        width: 100,
+        width: 130,
         render: () => (
           <Tag color="green" style={{ padding: '0 10px' }}>
             V1.0
