@@ -373,7 +373,6 @@ class ProcessModel extends Component {
 
   render() {
     const { pagination, loading, visible, detailValue, list } = this.state;
-
     const { status } = this.props;
 
     const columns = [
