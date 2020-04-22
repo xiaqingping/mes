@@ -702,7 +702,7 @@ class ProcessEdit extends Component {
             <Card
               style={{ marginTop: '24px' }}
               title={this.titleContent()}
-              className="table-style-set"
+              className="table-style-set taskList"
             >
               <Spin spinning={taskLoading}>
                 <Table
@@ -723,7 +723,7 @@ class ProcessEdit extends Component {
                 onClick={this.onOpen}
                 icon={<PlusOutlined />}
               >
-                新增
+                选择任务模型
               </Button>
             </Card>
 
@@ -741,12 +741,14 @@ class ProcessEdit extends Component {
             </Card>
           </Form>
           {visible ? (
-            <AssociatedProcessModel
-              visible={visible}
-              onClose={v => this.onClose(v)}
-              getData={v => this.getData(v)}
-              ids={ids}
-            />
+            <div>
+              <AssociatedProcessModel
+                visible={visible}
+                onClose={v => this.onClose(v)}
+                getData={v => this.getData(v)}
+                ids={ids}
+              />
+            </div>
           ) : (
             ''
           )}

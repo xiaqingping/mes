@@ -94,6 +94,7 @@ class DrawerTool extends Component {
     //   parameterVisible: false,
     //   paramter: sonData,
     // });
+    return true;
   };
 
   // 更换版本
@@ -110,11 +111,14 @@ class DrawerTool extends Component {
     const { visable, selectVersion, parameterVisible, detailValue, open } = this.state;
     return (
       <div style={{ marginTop: '25px' }}>
-        <Avatar
-          src={value.picture ? disk.downloadFiles(value.picture, { view: true }) : ''}
-          style={{ float: 'left' }}
-          size="large"
-        />
+        <div className="titleContentImage">
+          <Avatar
+            src={value.picture ? disk.downloadFiles(value.picture, { view: true }) : ''}
+            style={{ float: 'left' }}
+            size="large"
+          />
+        </div>
+
         {/* 选择版本 */}
         <div style={{ float: 'left', marginLeft: '10px' }}>
           <div>
@@ -140,7 +144,8 @@ class DrawerTool extends Component {
                   {value.versions
                     ? value.versions.map(item => (
                         <Tag
-                          color={item === value.version ? 'green' : 'default'}
+                          // color={item === value.version ? 'green' : 'default'}
+                          color={value.version === 'V1.0' ? 'default' : 'green'}
                           key={item}
                           style={{ cursor: 'pointer' }}
                           onClick={() => {
@@ -288,7 +293,7 @@ class DrawerTool extends Component {
           closable={false}
           onClose={this.onClose}
           visible={this.props.visible}
-          className="drawer-style"
+          className="drawer-style processModelDetail"
         >
           {errorPage ? (
             <Empty />
