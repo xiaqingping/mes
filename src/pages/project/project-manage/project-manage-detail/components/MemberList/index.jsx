@@ -5,7 +5,6 @@ import { connect } from 'dva';
 import api from '@/pages/project/api/projectManageDetail';
 import { EditJurisdictionModel } from '../ModelUI';
 
-
 const { Option } = Select;
 
 class MemberList extends Component {
@@ -14,10 +13,10 @@ class MemberList extends Component {
   tableFormRef = React.createRef();
 
   state = {
-    list: [],             // 表格数据
-    loading: true,        // 加载状态
-    visibleModel: false,  // 编辑名称描述模态框是否显示
-    menberInfor: [],      // 成员名称描述
+    list: [], // 表格数据
+    loading: true, // 加载状态
+    visibleModel: false, // 编辑名称描述模态框是否显示
+    menberInfor: [], // 成员名称描述
   };
 
   // 组件挂载时
@@ -33,14 +32,13 @@ class MemberList extends Component {
   // 获取表格数据
   getTableData = projectId => {
     this.setState({ loading: true });
-    const data = { projectId }
+    const data = { projectId };
     api.getProjectMember(data).then(res => {
       this.setState({
         list: res,
         loading: false,
       });
-    })
-
+    });
   };
 
   // 修改成员权限
@@ -55,21 +53,21 @@ class MemberList extends Component {
       name: row.creatorName,
       jurisdictionName,
       jurisdictionValue: value,
-    }
+    };
     this.setState({
       visibleModel: true,
       menberInfor: data,
     });
-  }
+  };
 
   // 确认修改权限
   getEditModelData = data => {
-    if(data.type === 'ok') {
+    if (data.type === 'ok') {
       api.updateMemberJurisdiction(data).then(() => {
         this.getTableData(this.props.projectId);
-      })
+      });
     }
-  }
+  };
 
   // 关闭编辑模态框
   onCloseModel = () => {
@@ -78,12 +76,12 @@ class MemberList extends Component {
     });
   };
 
-   // 退出
+  // 退出
   handleExit = row => {
     api.deleteMember(row.id).then(() => {
       this.getTableData(this.props.projectId);
-    })
-  }
+    });
+  };
 
   render() {
     const { list, loading, visibleModel, menberInfor } = this.state;
@@ -94,48 +92,47 @@ class MemberList extends Component {
       {
         title: '用户名',
         dataIndex: 'creatorName',
-        width: 200,
+        width: 150,
         render: value => (
-          <div style={{display:"flex"}}>
+          <div style={{ display: 'flex' }}>
             <img
               // src={row.path}
-              src='/favicon.png'
+              src="/favicon.png"
               alt=""
-              height='50'
+              height="50"
               width="50"
-              style={{borderRadius: '100%' }}
+              style={{ borderRadius: '100%' }}
             />
-            <div style={{marginLeft:10, marginTop: 6}}>
+            <div style={{ marginLeft: 10, marginTop: 6 }}>
               <p>{value}</p>
             </div>
-
           </div>
-        )
+        ),
       },
       {
         title: '加入时间',
         dataIndex: 'createDate',
-        width: 150,
+        width: 180,
       },
       {
         title: '权限',
         dataIndex: 'jurisdictionValue',
-        width: 150,
+        width: 180,
         render: (value, row) => (
-            <Select
-              style={{ width: 100 }}
-              disabled={value === 1}
-              defaultValue={value}
-              bordered={false}
-              onChange={() => this.handleUpdateJurisdiction(value, row)}
-            >
-              {jurisdiction.map(e => (
-                <Option value={e.id} key={e.name}>
-                  {e.name}
-                </Option>
-              ))}
-            </Select>
-          )
+          <Select
+            style={{ width: 100 }}
+            disabled={value === 1}
+            defaultValue={value}
+            bordered={false}
+            onChange={() => this.handleUpdateJurisdiction(value, row)}
+          >
+            {jurisdiction.map(e => (
+              <Option value={e.id} key={e.name}>
+                {e.name}
+              </Option>
+            ))}
+          </Select>
+        ),
       },
       {
         title: '操作',
@@ -144,7 +141,7 @@ class MemberList extends Component {
         render: (value, row) => {
           if (value === 1) return '';
           return <a onClick={() => this.handleExit(row)}>退出</a>;
-        }
+        },
       },
     ];
 
