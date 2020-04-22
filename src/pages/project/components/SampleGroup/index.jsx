@@ -115,115 +115,131 @@ class SampleSelect extends React.Component {
       },
     ],
 
-    sampleList: [{
-      "id": "2a3beac6006a4a54a8cb6b4809ea9dc3",
-      "sampleCode": "1234",
-      "sampleName": "样品one",
-      "sampleAlias": "别名001",
-      "color": "purple",
-      "sampleSequenceCount": 15,
-      "sampleLengthTotal": 9000,
-      "sampleLengthAve": 600.0,
-      "sampleLengthMax": 4000,
-      "sampleLengthMin": 1000,
-      "sequenceFileCount": 2,
-      "sequenceFileList": [{
-        "sequenceFileId": "123",
-        "sequenceFileName": "a",
-        "sampleSequenceCount": 10,
-        "sampleLengthMin": 2000,
-        "sampleLengthMax": 4000,
-        "sampleLengthAve": 600.0,
-        "sampleLengthTotal": 6000
-      }, {
-        "sequenceFileId": "1234",
-        "sequenceFileName": "b",
-        "sampleSequenceCount": 5,
-        "sampleLengthMin": 1000,
-        "sampleLengthMax": 2000,
-        "sampleLengthAve": 600.0,
-        "sampleLengthTotal": 3000
-      }]
-    }, {
-      "id": "39fbe07a8c3546b3bca9801869a58c45",
-      "sampleCode": "12345",
-      "sampleName": "样品B",
-      "sampleAlias": "别名002",
-      "color": "red",
-      "sampleSequenceCount": 15,
-      "sampleLengthTotal": 9000,
-      "sampleLengthAve": 600.0,
-      "sampleLengthMax": 4000,
-      "sampleLengthMin": 1000,
-      "sequenceFileCount": 2,
-      "sequenceFileList": [{
-        "sequenceFileId": "123456",
-        "sequenceFileName": "d",
-        "sampleSequenceCount": 10,
-        "sampleLengthMin": 2000,
-        "sampleLengthMax": 4000,
-        "sampleLengthAve": 600.0,
-        "sampleLengthTotal": 6000
-      }, {
-        "sequenceFileId": "12345",
-        "sequenceFileName": "c",
-        "sampleSequenceCount": 5,
-        "sampleLengthMin": 1000,
-        "sampleLengthMax": 2000,
-        "sampleLengthAve": 600.0,
-        "sampleLengthTotal": 3000
-      }]
-    }, {
-      "id": "c8dc965476874dccb81c066df5a174d9",
-      "sampleCode": "1234567",
-      "sampleName": "样品D",
-      "sampleAlias": "别名004",
-      "color": "gray",
-      "sampleSequenceCount": 5,
-      "sampleLengthTotal": 2000,
-      "sampleLengthAve": 400.0,
-      "sampleLengthMax": 1500,
-      "sampleLengthMin": 500,
-      "sequenceFileCount": 1,
-      "sequenceFileList": [{
-        "sequenceFileId": "12345679",
-        "sequenceFileName": "e",
-        "sampleSequenceCount": 5,
-        "sampleLengthMin": 500,
-        "sampleLengthMax": 1500,
-        "sampleLengthAve": 400.0,
-        "sampleLengthTotal": 2000
-      }]
-    }, {
-      "id": "fef48d6d544b4eda8cceae3690404418",
-      "sampleCode": "123456",
-      "sampleName": "样品C",
-      "sampleAlias": "别名003",
-      "color": "blue",
-      "sampleSequenceCount": 15,
-      "sampleLengthTotal": 12000,
-      "sampleLengthAve": 800.0,
-      "sampleLengthMax": 6000,
-      "sampleLengthMin": 500,
-      "sequenceFileCount": 2,
-      "sequenceFileList": [{
-        "sequenceFileId": "1234567",
-        "sequenceFileName": "e",
-        "sampleSequenceCount": 5,
-        "sampleLengthMin": 500,
-        "sampleLengthMax": 1500,
-        "sampleLengthAve": 400.0,
-        "sampleLengthTotal": 2000
-      }, {
-        "sequenceFileId": "12345678",
-        "sequenceFileName": "f",
-        "sampleSequenceCount": 10,
-        "sampleLengthMin": 4000,
-        "sampleLengthMax": 6000,
-        "sampleLengthAve": 1000.0,
-        "sampleLengthTotal": 10000
-      }]
-    }],
+    sampleList: [
+      {
+        id: '2a3beac6006a4a54a8cb6b4809ea9dc3',
+        sampleCode: '1234',
+        sampleName: '样品one',
+        sampleAlias: '别名001',
+        color: 'purple',
+        sampleSequenceCount: 15,
+        sampleLengthTotal: 9000,
+        sampleLengthAve: 600.0,
+        sampleLengthMax: 4000,
+        sampleLengthMin: 1000,
+        sequenceFileCount: 2,
+        sequenceFileList: [
+          {
+            sequenceFileId: '123',
+            sequenceFileName: 'a',
+            sampleSequenceCount: 10,
+            sampleLengthMin: 2000,
+            sampleLengthMax: 4000,
+            sampleLengthAve: 600.0,
+            sampleLengthTotal: 6000,
+          },
+          {
+            sequenceFileId: '1234',
+            sequenceFileName: 'b',
+            sampleSequenceCount: 5,
+            sampleLengthMin: 1000,
+            sampleLengthMax: 2000,
+            sampleLengthAve: 600.0,
+            sampleLengthTotal: 3000,
+          },
+        ],
+      },
+      {
+        id: '39fbe07a8c3546b3bca9801869a58c45',
+        sampleCode: '12345',
+        sampleName: '样品B',
+        sampleAlias: '别名002',
+        color: 'red',
+        sampleSequenceCount: 15,
+        sampleLengthTotal: 9000,
+        sampleLengthAve: 600.0,
+        sampleLengthMax: 4000,
+        sampleLengthMin: 1000,
+        sequenceFileCount: 2,
+        sequenceFileList: [
+          {
+            sequenceFileId: '123456',
+            sequenceFileName: 'd',
+            sampleSequenceCount: 10,
+            sampleLengthMin: 2000,
+            sampleLengthMax: 4000,
+            sampleLengthAve: 600.0,
+            sampleLengthTotal: 6000,
+          },
+          {
+            sequenceFileId: '12345',
+            sequenceFileName: 'c',
+            sampleSequenceCount: 5,
+            sampleLengthMin: 1000,
+            sampleLengthMax: 2000,
+            sampleLengthAve: 600.0,
+            sampleLengthTotal: 3000,
+          },
+        ],
+      },
+      {
+        id: 'c8dc965476874dccb81c066df5a174d9',
+        sampleCode: '1234567',
+        sampleName: '样品D',
+        sampleAlias: '别名004',
+        color: 'gray',
+        sampleSequenceCount: 5,
+        sampleLengthTotal: 2000,
+        sampleLengthAve: 400.0,
+        sampleLengthMax: 1500,
+        sampleLengthMin: 500,
+        sequenceFileCount: 1,
+        sequenceFileList: [
+          {
+            sequenceFileId: '12345679',
+            sequenceFileName: 'e',
+            sampleSequenceCount: 5,
+            sampleLengthMin: 500,
+            sampleLengthMax: 1500,
+            sampleLengthAve: 400.0,
+            sampleLengthTotal: 2000,
+          },
+        ],
+      },
+      {
+        id: 'fef48d6d544b4eda8cceae3690404418',
+        sampleCode: '123456',
+        sampleName: '样品C',
+        sampleAlias: '别名003',
+        color: 'blue',
+        sampleSequenceCount: 15,
+        sampleLengthTotal: 12000,
+        sampleLengthAve: 800.0,
+        sampleLengthMax: 6000,
+        sampleLengthMin: 500,
+        sequenceFileCount: 2,
+        sequenceFileList: [
+          {
+            sequenceFileId: '1234567',
+            sequenceFileName: 'e',
+            sampleSequenceCount: 5,
+            sampleLengthMin: 500,
+            sampleLengthMax: 1500,
+            sampleLengthAve: 400.0,
+            sampleLengthTotal: 2000,
+          },
+          {
+            sequenceFileId: '12345678',
+            sequenceFileName: 'f',
+            sampleSequenceCount: 10,
+            sampleLengthMin: 4000,
+            sampleLengthMax: 6000,
+            sampleLengthAve: 1000.0,
+            sampleLengthTotal: 10000,
+          },
+        ],
+      },
+    ],
 
     groupSchemeData: [], // 分组方案数据
     // 分组方案
@@ -450,35 +466,33 @@ class SampleSelect extends React.Component {
   };
 
   // 每列的render返回dom结构。
-  columnRender = (value, row, index, color1, col) => {
-    return (
-      <div style={{ display: 'flex' }} className="project_components_sample_group_render_wrap">
-        {/* <span style={{ marginRight: 10 }}>{value}</span> */}
-        {this.selectRender(value, row, index, color1, col)}
-        <Popover
-          overlayClassName="project_manage_sample_ui_select"
-          overlayStyle={{ padding: 0 }}
-          content={
-            <SketchPicker
-              color={row[color1]}
-              onChangeComplete={color => this.handleColorChange(color, value, row, index)}
-            />
-          }
-          trigger="click"
-          placement="bottom"
-        >
-          <div
-            style={{
-              width: 20,
-              height: 20,
-              backgroundColor: row[color1],
-              position: 'relative',
-            }}
+  columnRender = (value, row, index, color1, col) => (
+    <div style={{ display: 'flex' }} className="project_components_sample_group_render_wrap">
+      {/* <span style={{ marginRight: 10 }}>{value}</span> */}
+      {this.selectRender(value, row, index, color1, col)}
+      <Popover
+        overlayClassName="project_manage_sample_ui_select"
+        overlayStyle={{ padding: 0 }}
+        content={
+          <SketchPicker
+            color={row[color1]}
+            onChangeComplete={color => this.handleColorChange(color, value, row, index)}
           />
-        </Popover>
-      </div>
-    );
-  };
+        }
+        trigger="click"
+        placement="bottom"
+      >
+        <div
+          style={{
+            width: 20,
+            height: 20,
+            backgroundColor: row[color1],
+            position: 'relative',
+          }}
+        />
+      </Popover>
+    </div>
+  );
 
   // 获取的columns不能操作改写title， 所以需要在格式化columns之后重新 改写。
   renderColumns = newColumns => {
@@ -486,15 +500,13 @@ class SampleSelect extends React.Component {
       if (index) {
         const { title } = item;
         item.dupTitle = title;
-        item.title = () => {
-          return (
-            <div className="project_manage_UI_sample_group_title">
-              <input defaultValue={title} onBlur={e => this.handleTitleBlur(e, item, index)} />
+        item.title = () => (
+          <div className="project_manage_UI_sample_group_title">
+            <input defaultValue={title} onBlur={e => this.handleTitleBlur(e, item, index)} />
 
-              <CloseOutlined onClick={() => this.removeColumn(item)} />
-            </div>
-          );
-        };
+            <CloseOutlined onClick={() => this.removeColumn(item)} />
+          </div>
+        );
       }
       return item;
     });
@@ -530,17 +542,13 @@ class SampleSelect extends React.Component {
     const { columns } = this.state;
     let cols = [...columns];
     if (!item) {
-      cols = cols.filter(v => {
-        return v.id !== id;
-      });
+      cols = cols.filter(v => v.id !== id);
 
       this.setState({
         columns: cols,
       });
     } else {
-      cols = cols.filter(v => {
-        return v.id !== item.id;
-      });
+      cols = cols.filter(v => v.id !== item.id);
       // 这里不光删除列， 同时也要删除表格数据，，删除掉每一个行的该分组方案下的组数据；
       const num = item.dataIndex.split('_')[1];
       const { groupSchemeData } = this.state;
@@ -581,18 +589,16 @@ class SampleSelect extends React.Component {
     const max = Math.max.apply(null, ids);
     const newCol = {
       id: max + 1,
-      title: () => {
-        return (
-          <div className="project_manage_UI_sample_group_title">
-            <input
-              defaultValue={`分组方案_${max + 1}`}
-              onBlur={e => this.handleTitleBlur(e, null, null, max + 1)}
-            />
+      title: () => (
+        <div className="project_manage_UI_sample_group_title">
+          <input
+            defaultValue={`分组方案_${max + 1}`}
+            onBlur={e => this.handleTitleBlur(e, null, null, max + 1)}
+          />
 
-            <CloseOutlined onClick={() => this.removeColumn(null, max + 1)} />
-          </div>
-        );
-      },
+          <CloseOutlined onClick={() => this.removeColumn(null, max + 1)} />
+        </div>
+      ),
       dupTitle: `分组方案_${max + 1}`,
       width: 100,
       dataIndex: `header_${max + 1}`,
@@ -694,8 +700,28 @@ class SampleSelect extends React.Component {
   render() {
     let tableWidth = 0;
     const { groupSchemeData, visible, columns } = this.state;
-    console.log(columns);
+    // console.log(columns);
     console.log(groupSchemeData);
+
+    const neData = {};
+    for (let i = 2; i < groupSchemeData.length + 2; i++) {
+      const groupList = [];
+      groupSchemeData.forEach(item => {
+        let group = {};
+        // if ()
+        const groupSchemeName = {
+          groupSchemeName: item[`header_${i}`],
+          sampleList: [
+            {
+              metadataSampleId: item.metadataSampleId,
+              sampleAlias: item.sampleName,
+            },
+          ],
+        };
+        group = { ...group, ...groupSchemeName };
+      });
+    }
+
     columns.map(col => {
       if (!col.width) {
         col.width = 100;
