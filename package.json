@@ -22,11 +22,6 @@
     "tsc": "tsc",
     "ui": "umi ui"
   },
-  "husky": {
-    "hooks": {
-      "pre-commit": "npm run lint-staged"
-    }
-  },
   "lint-staged": {
     "**/*.less": "stylelint --syntax less",
     "**/*.{js,jsx,ts,tsx}": "npm run lint-staged:js",
@@ -113,9 +108,5 @@
     "src/**/*.less",
     "config/**/*.js*",
     "scripts/**/*.js"
-  ],
-  "main": "index.js",
-  "repository": "http://192.168.19.88/shopping/mes.git",
-  "author": "xiaqingping <xiaqingping@sangon.com>",
-  "license": "MIT"
+  ]
 }
