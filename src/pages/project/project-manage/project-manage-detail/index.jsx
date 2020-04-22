@@ -111,7 +111,9 @@ class ProjectDetail extends Component {
             loading={loading}
           >
             <TabPane tab="流程列表" key="1">
-              <ProcessList projectId={projectId} />
+              <div className="classProcessList">
+                <ProcessList projectId={projectId} />
+              </div>
             </TabPane>
             <TabPane tab="文件" key="2">
               <FiledList />
