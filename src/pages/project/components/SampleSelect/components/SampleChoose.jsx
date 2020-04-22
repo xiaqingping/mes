@@ -2,7 +2,7 @@ import React from 'react';
 import { Table, Button, Tooltip, Checkbox, Modal } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
 import { connect } from 'dva';
-import FileUpload from '../../UploadSequenceFile/lunbotu';
+import FileUpload from '../../UploadSequenceFile/sequenUpload';
 import api from '../api/sample.js';
 
 class SampleChoose extends React.Component {
