@@ -531,7 +531,7 @@ class ProcessModel extends Component {
                 新建
               </Button>
             </div>
-            <Form ref={this.tableFormRef} className="table-style-set">
+            <Form ref={this.tableFormRef} className="table-style-set tableHeader">
               <StandardTable
                 rowClassName="editable-row"
                 loading={loading}
