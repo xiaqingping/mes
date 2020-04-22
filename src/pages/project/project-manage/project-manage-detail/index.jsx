@@ -102,7 +102,7 @@ class ProjectDetail extends Component {
           </div>
           <div className={styles.textDesc}>{list.describe}</div>
         </Card>
-        <Card>
+        <Card className="classTabPane">
           <Tabs
             defaultActiveKey="1"
             onChange={key => this.callback(key)}

@@ -1,5 +1,5 @@
 // 流程列表
-import { Form, Table, Col, Input, Button  } from 'antd';
+import { Form, Table, Col, Input, Button } from 'antd';
 import React, { Component } from 'react';
 import { connect } from 'dva';
 import { FileExclamationOutlined } from '@ant-design/icons';
@@ -18,8 +18,8 @@ class FiledList extends Component {
   tableFormRef = React.createRef();
 
   state = {
-    list: [],       // 表格数据
-    loading: true,  // 加载状态
+    list: [], // 表格数据
+    loading: true, // 加载状态
     // pagination: {},
   };
 
@@ -51,15 +51,15 @@ class FiledList extends Component {
   getTableData = () => {
     const data = this.props.projectDetail.filedList;
     this.setState({
-        list: data,
-        // pagination: {
-        //   current: options.page,
-        //   pageSize: options.rows,
-        //   total: data.total,
-        // },
-        loading: false,
-        // editIndex: -1,
-      });
+      list: data,
+      // pagination: {
+      //   current: options.page,
+      //   pageSize: options.rows,
+      //   total: data.total,
+      // },
+      loading: false,
+      // editIndex: -1,
+    });
   };
 
   // 顶部表单简单搜索
@@ -70,8 +70,8 @@ class FiledList extends Component {
           <Search />
         </FormItem>
       </Col>
-      <Col lg={6} md={8} sm={12}>
-      <FormItem label="" name="">
+      <Col className="classdownBtn" lg={3} md={8} sm={12}>
+        <FormItem label="" name="">
           <Button>下载</Button>
         </FormItem>
       </Col>
@@ -82,7 +82,8 @@ class FiledList extends Component {
     const {
       // pagination,
       // selectedRows,
-      list, loading
+      list,
+      loading,
     } = this.state;
     let tableWidth = 0;
 
@@ -99,10 +100,13 @@ class FiledList extends Component {
         width: 150,
         render: value => (
           <>
-            <FileExclamationOutlined style={{ fontSize: 18 }}/>
-            <span style={{marginLeft: 10}}>{value}</span>
+            {
+              // console.log(value)
+            }
+            <FileExclamationOutlined style={{ fontSize: 18 }} />
+            <span style={{ marginLeft: 10 }}>{value}</span>
           </>
-        )
+        ),
       },
       {
         title: '描述',
@@ -123,7 +127,7 @@ class FiledList extends Component {
         title: '大小',
         dataIndex: 'size',
         width: 100,
-        render: text => `${text}kb`
+        render: text => `${text}kb`,
       },
       {
         title: '操作',
@@ -138,6 +142,7 @@ class FiledList extends Component {
 
     columns = columns.map(col => {
       // if (!col.width) col.width = 100;
+      // console.log(col)
       tableWidth += col.width;
       if (!col.editable) {
         return col;
@@ -176,7 +181,9 @@ class FiledList extends Component {
           </Col>
         </Form> */}
         <Form ref={this.tableFormRef}>
+          {console.log(list)}
           <Table
+            className="scott"
             scroll={{ x: tableWidth, y: 400 }}
             rowKey="id"
             loading={loading}
