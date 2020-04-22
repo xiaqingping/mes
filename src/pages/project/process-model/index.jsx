@@ -507,6 +507,7 @@ class ProcessModel extends Component {
         },
       },
     ];
+
     return (
       <PageHeaderWrapper>
         <div className="tableList processModeltableList">
