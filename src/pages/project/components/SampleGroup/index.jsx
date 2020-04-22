@@ -299,7 +299,17 @@ class SampleGroup extends React.Component {
     const rowData = this.getRowDataGroup(data, sampleList, newColumns);
     // 填充行数据
     const newData = this.getFillData(data, rowData, newColumns);
+    // 将所有的颜色放到仓库里.
+    this.pushColorsToStore(newData);
 
+    // 保存 分组 表头数据
+    this.setState({
+      columns: newColumns,
+      groupSchemeData: newData,
+    });
+  };
+
+  pushColorsToStore = newData => {
     const colorStore = [];
     newData.forEach(row => {
       Object.keys(row).forEach(key => {
@@ -312,12 +322,6 @@ class SampleGroup extends React.Component {
     });
 
     this.setColorStore(colorStore);
-
-    // 保存 分组 表头数据
-    this.setState({
-      columns: newColumns,
-      groupSchemeData: newData,
-    });
   };
 
   setColorStore = colorStore => {
@@ -508,27 +512,29 @@ class SampleGroup extends React.Component {
     <div style={{ display: 'flex' }} className="project_components_sample_group_render_wrap">
       {/* <span style={{ marginRight: 10 }}>{value}</span> */}
       {this.selectRender(value, row, index, color1, col)}
-      <Popover
-        overlayClassName="project_manage_sample_ui_select"
-        overlayStyle={{ padding: 0 }}
-        content={
-          <SketchPicker
-            color={row[color1]}
-            onChangeComplete={color => this.handleColorChange(color, value, row, index)}
+      {row[color1] && (
+        <Popover
+          overlayClassName="project_manage_sample_ui_select"
+          overlayStyle={{ padding: 0 }}
+          content={
+            <SketchPicker
+              color={row[color1]}
+              onChangeComplete={color => this.handleColorChange(color, value, row, index)}
+            />
+          }
+          trigger="click"
+          placement="bottom"
+        >
+          <div
+            style={{
+              width: 20,
+              height: 20,
+              backgroundColor: row[color1],
+              position: 'relative',
+            }}
           />
-        }
-        trigger="click"
-        placement="bottom"
-      >
-        <div
-          style={{
-            width: 20,
-            height: 20,
-            backgroundColor: row[color1],
-            position: 'relative',
-          }}
-        />
-      </Popover>
+        </Popover>
+      )}
     </div>
   );
 
@@ -684,27 +690,8 @@ class SampleGroup extends React.Component {
     );
   };
 
-  showEditConfirm = (groupName, preGroupName) => {
-    // confirm({
-    //   title: `是否将分组“${preGroupName}”改为“${groupName}”？`,
-    //   icon: <ExclamationCircleOutlined />,
-    //   content: this.confirmGroupRender(groupName, preGroupName),
-    //   cancelText:'否',
-    //   okText:"是",
-    //   onOk() {
-    //     console.log('OK');
-    //   },
-    //   onCancel() {
-    //     console.log('Cancel');
-    //   },
-    // });
-  };
-
   // 选择组，blur 时候保存数据--- 当选择组的时候要加上默认的颜色
   handleGroupSelectBlur = (e, value, row, index, col) => {
-    console.log(row);
-    console.log(col);
-
     const option = e.target.value;
     const { optionList } = this.state;
     let list = [...optionList];
@@ -712,20 +699,32 @@ class SampleGroup extends React.Component {
     if (!list.includes(option) && option) {
       list = [...list, option];
     }
-    if (option && option !== '当前样品') {
-      const { groupSchemeData } = this.state;
+    const { groupSchemeData } = this.state;
+    const datas = [...groupSchemeData];
+    if (option && option !== '当前样品' && option !== value) {
       const num = col.split('_')[1];
-      row[`color_${num}`] = getrandomColor();
+
+      const hasSame = datas.some(item => {
+        if (item[col] === option) {
+          row[`color_${num}`] = item[`color_${num}`];
+        }
+        return item[col] === option;
+      });
+      if (!hasSame) row[`color_${num}`] = getrandomColor();
+      //  添加到颜色store
+      const { colorStore } = this.props.project;
+      const colors = [...colorStore];
+      colors.push(row[`color_${num}`]);
+      this.setColorStore(colors);
+
       row[col] = option;
-      const dataList = [...groupSchemeData];
-      dataList[index] = row;
+      datas[index] = row;
       this.setState({
-        groupSchemeData: dataList,
+        groupSchemeData: datas,
       });
     }
     // 如果blur时候的值跟原来的值一样， 说明数据没有改变
-    if (value !== option && value) {
-      // this.showEditConfirm(option,value)
+    if (value !== option && value && option !== '当前样品' && value !== '当前样品') {
       if (option === '当前样品') {
         this.handleUpdateGroup(row, col, option, index);
         return false;
@@ -738,7 +737,7 @@ class SampleGroup extends React.Component {
         okText: '是',
         onOk: () => {
           // 修改组名
-          const { groupSchemeData, columns } = this.state;
+          const { groupSchemeData } = this.state;
           const tableData = [...groupSchemeData];
           tableData.forEach(item => {
             if (item[col] === value) {
@@ -754,7 +753,7 @@ class SampleGroup extends React.Component {
             // columns,
           });
         },
-        onCancel() {
+        onCancel: () => {
           // 新增组名
           this.handleUpdateGroup(row, col, option, index);
         },
@@ -779,16 +778,13 @@ class SampleGroup extends React.Component {
   };
 
   selectRender = (value, row, index, color1, col) => {
-    // if (col.split('_')[1] == 2) {
-    //   console.log(value);
-    // }
-    // console.log(value);
     const { optionList } = this.state;
     return (
       <AutoComplete
         allowClear
         style={{ width: '60%' }}
         onBlur={e => this.handleGroupSelectBlur(e, value, row, index, col)}
+        onPressEnter={e => this.handleGroupSelectBlur(e, value, row, index, col)}
         defaultValue={value}
       >
         {optionList.map(item => (
@@ -818,13 +814,15 @@ class SampleGroup extends React.Component {
   verifyData = () => {
     const { groupSchemeData, columns } = this.state;
     // 1. 一个分组方案里只能是单纯组或者单纯样品
+    console.log(groupSchemeData);
+    console.log(columns);
     // 2. 一个分组方案里面不能都是空
   };
 
   render() {
     let tableWidth = 0;
     const { groupSchemeData, visible, columns } = this.state;
-    // console.log(columns);
+    console.log(columns);
     console.log(groupSchemeData);
 
     const neData = {};
