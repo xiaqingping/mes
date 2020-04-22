@@ -610,8 +610,8 @@ class ProcessEdit extends Component {
                       style={{ width: '56px', height: '56px', borderRadius: '50%' }}
                     />
                   ) : (
-                      uploadButton
-                    )}
+                    uploadButton
+                  )}
                 </Upload>
                 {/* </Form.Item> */}
               </div>
@@ -625,7 +625,7 @@ class ProcessEdit extends Component {
               </div>
 
               {/* 版本选择 */}
-              <div style={{ float: 'left' }} >
+              <div style={{ float: 'left' }}>
                 <div style={{ position: 'relative', display: 'inline-block', marginLeft: '30px' }}>
                   <Tag
                     color="green"
@@ -647,24 +647,24 @@ class ProcessEdit extends Component {
                     >
                       {versionType.length !== 0
                         ? versionType.map(item => (
-                          <Tag
-                            key={item}
-                            style={{ cursor: 'pointer' }}
-                            onClick={() => {
-                              this.setState({
-                                selectVersion: item,
-                                versionOpen: !versionOpen,
-                              });
-                            }}
-                          >
-                            {item}
-                          </Tag>
-                        ))
+                            <Tag
+                              key={item}
+                              style={{ cursor: 'pointer' }}
+                              onClick={() => {
+                                this.setState({
+                                  selectVersion: item,
+                                  versionOpen: !versionOpen,
+                                });
+                              }}
+                            >
+                              {item}
+                            </Tag>
+                          ))
                         : ''}
                     </Card>
                   ) : (
-                      ''
-                    )}
+                    ''
+                  )}
                 </div>
               </div>
 
@@ -749,18 +749,20 @@ class ProcessEdit extends Component {
               />
             </div>
           ) : (
-              ''
-            )}
+            ''
+          )}
           {/* 参数弹框 */}
           {parameterVisible ? (
-            <Parameter
-              visible={parameterVisible}
-              handleClose={value => this.handleClose(value)}
-              paramter={paramter}
-            />
+            <div className="classParameter">
+              <Parameter
+                visible={parameterVisible}
+                handleClose={value => this.handleClose(value)}
+                paramter={paramter}
+              />
+            </div>
           ) : (
-              ''
-            )}
+            ''
+          )}
         </Spin>
       </PageHeaderWrapper>
     );
