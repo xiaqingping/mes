@@ -7,66 +7,13 @@ import { CloseOutlined, PlusSquareOutlined } from '@ant-design/icons';
 import style from './index.less';
 import UploadSequenceFile from './UploadSequenceFile';
 
-
 class EnvironmentalFactorsModel extends React.Component {
   constructor(props) {
     super(props);
+    console.log(props);
     this.state = {
       // 样品选择框 样品列表
-      sampleList: [
-        {
-          colour: 'purple',
-          id: '586bf01efbb34d2c9b1911fad3baf174',
-          sampleAlias: '别名004',
-          sampleCode: '123456789',
-          sampleLengthAve: 600,
-          sampleLengthMax: 4000,
-          sampleLengthMin: 1000,
-          sampleLengthTotal: 9000,
-          sampleName: '未分组样品',
-          sampleSequenceCount: 15,
-          sequenceFileCount: 2,
-        },
-        {
-          colour: 'red',
-          id: 'b6545cf90ce340d8aa0c464f2fd422b7',
-          sampleAlias: '别名002',
-          sampleCode: '456',
-          sampleLengthAve: 600,
-          sampleLengthMax: 4000,
-          sampleLengthMin: 1000,
-          sampleLengthTotal: 9000,
-          sampleName: '样品B',
-          sampleSequenceCount: 15,
-          sequenceFileCount: 2,
-        },
-        {
-          colour: 'blue',
-          id: 'db820c4a2a15401f95943594f58b1084',
-          sampleAlias: '别名001',
-          sampleCode: '456',
-          sampleLengthAve: 600,
-          sampleLengthMax: 4000,
-          sampleLengthMin: 1000,
-          sampleLengthTotal: 9000,
-          sampleName: '样品A',
-          sampleSequenceCount: 15,
-          sequenceFileCount: 2,
-        },
-        {
-          colour: 'gray',
-          id: 'f98db018780144c1aec7444bf0a25622',
-          sampleAlias: '别名003',
-          sampleCode: '456',
-          sampleLengthAve: 600,
-          sampleLengthMax: 4000,
-          sampleLengthMin: 1000,
-          sampleLengthTotal: 9000,
-          sampleName: '样品C',
-          sampleSequenceCount: 15,
-          sequenceFileCount: 2,
-        },
-      ],
+      sampleList: props.sampleList || [],
       // 表数据
       data: [],
       // 表头
@@ -75,6 +22,7 @@ class EnvironmentalFactorsModel extends React.Component {
       headers: [],
       // 表头 第一列
       firstColumn: {
+        id: 1,
         title: '样品',
         dataIndex: 'sampleAlias',
         key: 'sampleAlias',
@@ -93,6 +41,18 @@ class EnvironmentalFactorsModel extends React.Component {
   }
 
   componentDidMount() {
+    this.initTable();
+    this.getParamData();
+  }
+
+  componentDidUpdate(props) {
+    if (props.submitStatus !== this.props.submitStatus) {
+      this.props.getData('testData', '环境因子');
+    }
+  }
+
+  // 初始化表格
+  initTable = () => {
     // 初始数据
     const { sampleList, headers, firstColumn, lastColumn } = this.state;
 
@@ -114,13 +74,45 @@ class EnvironmentalFactorsModel extends React.Component {
       data: newList,
       columns,
     });
-  }
+  };
 
-  componentDidUpdate(props) {
-    if (props.submitStatus !== this.props.submitStatus) {
-      this.props.getData('testData', '环境因子');
+  // 获取数据 整理显示
+  getDataDispose = (tableHaed, tableList) => {
+    const newHeader = tableHaed.filter(item => item.dataIndex !== 'sampleAlias');
+
+    // 获取表头
+    const { firstColumn, lastColumn } = this.state;
+    const newColumns = [firstColumn, ...this.formatHeader(newHeader), lastColumn];
+
+    this.setState({
+      data: tableList,
+      columns: newColumns,
+    });
+  };
+
+  // 获取参数数据
+  getParamData = () => {
+    const { paramList, sampleList } = this.props;
+    const { firstColumn } = this.state;
+    const paramValue = JSON.parse(paramList.paramValue);
+
+    if (paramList) {
+      const list = paramValue.environmentFactorList;
+      const columns = [firstColumn];
+      const titleName = 'environmentFactorName';
+
+      // 取出 表头
+      const newColumns = this.getTableHeaderData(list, columns, titleName);
+
+      // 取出 行数据
+      const rowData = this.getRowDataEnvironment(list, sampleList, newColumns);
+
+      // 填充行数据
+      const newData = this.getFillDataEnvironment(list, rowData);
+
+      this.getDataDispose(newColumns, newData);
     }
-  }
+  };
 
   // 新增列
   addColumn = () => {
@@ -189,7 +181,7 @@ class EnvironmentalFactorsModel extends React.Component {
     const newHeader = [];
     headers.forEach(item => {
       if (row.id === item.id) {
-        const newItem = JSON.parse(JSON.stringify(item));;
+        const newItem = JSON.parse(JSON.stringify(item));
         newItem.title = event.target.value;
         newHeader.push(newItem);
       }
@@ -202,11 +194,11 @@ class EnvironmentalFactorsModel extends React.Component {
     const { data, headers } = this.state;
     let newKey;
     headers.forEach(item => {
-      if (item.title === title){
+      if (item.title === title) {
         newKey = item.key;
       }
-    })
-    const newRow = JSON.parse(JSON.stringify(row));;
+    });
+    const newRow = JSON.parse(JSON.stringify(row));
     newRow[newKey] = event.target.value;
 
     const newData = [];
@@ -219,13 +211,13 @@ class EnvironmentalFactorsModel extends React.Component {
       }
     });
     this.setState({ headers: newData });
-  }
+  };
 
-  // 列显示样式
+  // 配置表头
   formatHeader = headers => {
     const groups = headers.map(item => ({
       title: () => (
-        <div className='project_manage_UI_sample_group_title' key={item.id}>
+        <div className="project_manage_UI_sample_group_title" key={item.id}>
           <input
             defaultValue={item.title}
             onChange={event => this.handleOnChangeTitle(item, event)}
@@ -237,13 +229,13 @@ class EnvironmentalFactorsModel extends React.Component {
       key: `${item.key}`,
       width: 170,
       render: (value, row) => (
-          <div className={style.editTable} key={item.id}>
-            <input
-              defaultValue={value}
-              onChange={event => this.handleOnChangeData(row, event, item.title)}
-            />
-          </div>
-        )
+        <div className={style.editTable} key={item.id}>
+          <input
+            defaultValue={value}
+            onChange={event => this.handleOnChangeData(row, event, item.title)}
+          />
+        </div>
+      ),
     }));
 
     return groups;
@@ -251,13 +243,141 @@ class EnvironmentalFactorsModel extends React.Component {
 
   // 上传
   uploadButton = () => {
-    this.setState({ visible: true })
-  }
+    this.setState({ visible: true });
+  };
 
   // 关闭上传
   handleClose = () => {
-    this.setState({ visible: false })
-  }
+    this.setState({ visible: false });
+  };
+
+  /**
+   * 获取表头
+   * data 数据列表
+   * columns 初始列
+   */
+  getTableHeaderData = (data, columns, titleName) => {
+    const newColumns = JSON.parse(JSON.stringify(columns));
+
+    data.forEach(item => {
+      // 获取当前id最大值
+      const ids = [];
+      newColumns.forEach(cItem => {
+        ids.push(cItem.id);
+      });
+      const max = Math.max.apply(null, ids);
+
+      // 取出表头数据
+      const newCol = {
+        id: max + 1,
+        title: item[titleName],
+        dataIndex: `hearder_${max + 1}`,
+        key: `hearder_${max + 1}`,
+      };
+      newColumns.push(newCol);
+    });
+    return newColumns;
+  };
+
+  /**
+   * 获取行数据 环境因子
+   * list 环境因子数据
+   * sampleList 样品列表数据
+   * columns 环境因子初始列
+   */
+  getRowDataEnvironment = (list, sampleList, columns) => {
+    const samples = [];
+    // 环境因子数据遍历
+    list.forEach(item => {
+      // 环境因子列表遍历
+      item.environmentFactorValueList.forEach(it => {
+        // 样品列表遍历
+        it.sampleList.forEach(t => {
+          samples.push(t);
+        });
+      });
+    });
+
+    // 样品去重 排序
+    const newData = this.sampleRemoveDuplication(samples, sampleList, columns);
+    return newData;
+  };
+
+  /**
+   * 填充行数据 环境因子
+   * list  环境因子数据
+   * rowData 行数据 有表头字段但数据为空
+   */
+  getFillDataEnvironment = (list, rowData) => {
+    // 环境因子遍历
+    list.forEach(item => {
+      const { environmentFactorName } = item;
+
+      // 行数据遍历
+      rowData.forEach(rowItem => {
+        // 环境因子列表遍历
+        item.environmentFactorValueList.forEach(valItem => {
+          // 环境因子值下的样品列表遍历
+          valItem.sampleList.forEach(samItem => {
+            // 找到对应的样品行
+            if (rowItem.metadataSampleId === samItem.metadataSampleId) {
+              Object.keys(rowItem).map(key => {
+                if (rowItem[key] === environmentFactorName) {
+                  rowItem[key] = valItem.environmentFactorValue;
+                }
+                // 删除多余属性
+                delete rowItem.sampleColor;
+                return false;
+              });
+            }
+          });
+        });
+      });
+    });
+    return rowData;
+  };
+
+  /**
+   * 样品去重 排序
+   * list 数据中拿到的样品列表
+   * sampleList 样品表中的样品列表
+   * columns 初始列数据
+   */
+  sampleRemoveDuplication = (list, sampleList, columns) => {
+    const newSample = [];
+    const ids = [];
+    list.forEach(samItem => {
+      if (newSample.length === 0) {
+        newSample.push(samItem);
+        ids.push(samItem.sampleId);
+      }
+      if (ids.indexOf(samItem.sampleId) === -1) {
+        newSample.push(samItem);
+        ids.push(samItem.sampleId);
+      }
+    });
+
+    // 第一列样品 排序 与样品列表顺序一致
+    const newData = [];
+    sampleList.forEach(item => {
+      newSample.forEach(it => {
+        if (item.id === it.sampleId) {
+          // 拼装行
+          const newIt = {
+            sampleId: it.sampleId,
+            sampleColor: '',
+          };
+          columns.forEach(groItem => {
+            newIt[groItem.dataIndex] = groItem.title;
+            // newIt.id = groItem.id;
+          });
+          newIt.sampleName = it.sampleAlias;
+          newData.push(newIt);
+        }
+      });
+    });
+    return newData;
+  };
 
   render() {
     const { columns, data, visible, sampleList } = this.state;
@@ -277,20 +397,24 @@ class EnvironmentalFactorsModel extends React.Component {
         title="环境因子表"
         style={{ width: '100%', marginTop: 30, marginBottom: 100 }}
         extra={
-          <Button type="primary"
-          onClick={() => this.uploadButton()}>上传</Button>
+          <Button type="primary" onClick={() => this.uploadButton()}>
+            上传
+          </Button>
         }
       >
+        {/* 表格 */}
         <Table
-          scroll={{ x:tableWidth }}
+          scroll={{ x: tableWidth }}
           dataSource={data}
           columns={newColumns}
           pagination={false}
         />
+        {/* 上传文件 */}
         <UploadSequenceFile
           visible={visible}
           sampleList={sampleList}
           handleClose={this.handleClose}
+          getUploadData={this.getDataDispose}
         />
       </Card>
     );

@@ -23,19 +23,85 @@ class ProcessParameter extends Component {
     paramList: [], // 参数列表
     processParam: [], // 参数
     processParamValue: [], // 参数值
+    // submitStatus: false,
+    // 样品选择框 样品列表
+    // sampleList: [
+    //   {
+    //     colour: 'purple',
+    //     id: '1234567',
+    //     sampleAlias: '别名004',
+    //     sampleCode: '1234567',
+    //     sampleLengthAve: 600,
+    //     sampleLengthMax: 4000,
+    //     sampleLengthMin: 1000,
+    //     sampleLengthTotal: 9000,
+    //     sampleName: '未分组样品',
+    //     sampleSequenceCount: 15,
+    //     sequenceFileCount: 2,
+    //   },
+    //   {
+    //     colour: 'red',
+    //     id: '12345',
+    //     sampleAlias: '别名002',
+    //     sampleCode: '456',
+    //     sampleLengthAve: 600,
+    //     sampleLengthMax: 4000,
+    //     sampleLengthMin: 1000,
+    //     sampleLengthTotal: 9000,
+    //     sampleName: '样品B',
+    //     sampleSequenceCount: 15,
+    //     sequenceFileCount: 2,
+    //   },
+    //   {
+    //     colour: 'blue',
+    //     id: '1234',
+    //     sampleAlias: '别名001',
+    //     sampleCode: '456',
+    //     sampleLengthAve: 600,
+    //     sampleLengthMax: 4000,
+    //     sampleLengthMin: 1000,
+    //     sampleLengthTotal: 9000,
+    //     sampleName: '样品A',
+    //     sampleSequenceCount: 15,
+    //     sequenceFileCount: 2,
+    //   },
+    //   {
+    //     colour: 'gray',
+    //     id: '123456',
+    //     sampleAlias: '别名003',
+    //     sampleCode: '456',
+    //     sampleLengthAve: 600,
+    //     sampleLengthMax: 4000,
+    //     sampleLengthMin: 1000,
+    //     sampleLengthTotal: 9000,
+    //     sampleName: '样品C',
+    //     sampleSequenceCount: 15,
+    //     sequenceFileCount: 2,
+    //   },
+    // ],
+    // // 环境因子参数
+    // paramData: {
+    //   id: "8dc20f4338484a348b0ddd94bf3516bc",
+    //   projectId: "cdf36f8403e644249fa4f6788456134c",
+    //   processId: "1831fd04c1cd450f9aefc3d77f3725c2",
+    //   processModelId: "85a9c0452b1e47ca909a30c753d5d820",
+    //   taskId: "10b85cce64034418b66642f3f19f76b9",
+    //   taskModelId: "f04bf8a80c6b4a7097f2c15b817df820",
+    //   paramKey: "environmentalFactor",
+    // eslint-disable-next-line max-len
+    //   paramValue: "{\"environmentFactorList\":[{\"environmentFactorName\": \"环境因子一\",\"environmentFactorValueList\" :[{\"environmentFactorValue\": \"10\",\"sampleList\": [{\"sampleId\" : \"1234\",\"sampleAlias\": \"别名001\"},{\"sampleId\" : \"123456\",\"sampleAlias\": \"别名003\"}]},{\"environmentFactorValue\": \"15\",\"sampleList\": [{\"sampleId\" : \"1234567\",\"sampleAlias\": \"别名004\"},{\"sampleId\" : \"12345\",\"sampleAlias\": \"别名002\"}]}]},{\"environmentFactorName\": \"环境因子二\",\"environmentFactorValueList\" :[{\"environmentFactorValue\": \"8\",\"sampleList\": [{\"sampleId\" : \"1234\",\"sampleAlias\": \"别名001\"},{\"sampleId\" : \"12345\",\"sampleAlias\": \"别名002\"},{\"sampleId\" : \"123456\",\"sampleAlias\": \"别名003\"},{\"sampleId\" : \"1234567\",\"sampleAlias\": \"别名004\"}]}]},{\"environmentFactorName\": \"环境因子三\",\"environmentFactorValueList\" :[{\"environmentFactorValue\": \"9\",\"sampleList\": [{\"sampleId\" : \"1234\",\"sampleAlias\": \"别名001\"}]},{\"environmentFactorValue\": \"12\",\"sampleList\": [{\"sampleId\" : \"12345\",\"sampleAlias\": \"别名002\"},{\"sampleId\" : \"123456\",\"sampleAlias\": \"别名003\"},{\"sampleId\" : \"1234567\",\"sampleAlias\": \"别名004\"}]}]}]}"
+    // },
   };
 
   constructor(props) {
     super(props);
     const { userForParamData } = this.props.projectDetail;
-    console.log(this.props.projectDetail);
     // 判断请求类型
     this.determineTheRequestType(userForParamData);
   }
 
   // 判断请求类型
   determineTheRequestType = data => {
-    console.log(data);
     // 请求类型为空 返回上一页
     if (data.requestType === undefined) {
       message.error('请求类型为空');
@@ -396,7 +462,12 @@ class ProcessParameter extends Component {
   };
 
   render() {
-    const { paramList } = this.state;
+    const {
+      paramList,
+      // sampleList,
+      // paramData,
+      // submitStatus,
+    } = this.state;
     const data = paramList;
 
     return (
@@ -425,7 +496,12 @@ class ProcessParameter extends Component {
                 </List.Item>
               )}
             />
-            {/* <EnvironmentalFactorsModel data={123} /> */}
+            {/* 环境因子 */}
+            {/* <EnvironmentalFactorsModel
+              sampleList={sampleList}
+              paramList={paramData}
+              submitStatus={submitStatus}
+            /> */}
 
             <Footer className={style.footer}>
               <div className={style.button}>

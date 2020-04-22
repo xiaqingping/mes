@@ -1,7 +1,7 @@
 // 上传分组方案
 import React from 'react';
 import { Modal, Button, Table, message, Input } from 'antd';
-import { UploadButton } from '@/pages/project/components/CustomComponents';
+import { UploadButton } from './CustomComponents';
 import api from './api/excel';
 import './index.less';
 
@@ -57,7 +57,6 @@ class UploadSequenceFile extends React.Component {
       filesData = [...filesData, file[i].name];
     }
     api.getFileProcessExcels(data).then(res => {
-      // console.log(res);
       this.checkData(res);
     });
     return true;
@@ -65,10 +64,39 @@ class UploadSequenceFile extends React.Component {
 
   // 提交
   handleOK = () => {
-    // const { tableList } = this.state;
-    // api.addSample(tableList).then(() => {
-    //   this.props.handleClose();
-    // });
+    const { tableHead, tableList } = this.state;
+    // 整理表头
+    const newTableHead = [];
+    Object.keys(tableHead).map(key => {
+      const item = {};
+      const nKey = Number(key) + 1;
+      if (key < 1) {
+        item.sampleAlias = tableHead[key];
+        item.dataIndex = 'sampleAlias';
+        item.key = 'sampleAlias';
+      }
+      if (key > 0) {
+        const headerName = `header_${nKey}`;
+        item.title = tableHead[key];
+        item.dataIndex = headerName;
+        item.key = headerName;
+      }
+      item.id = nKey;
+      newTableHead.push(item);
+      return false;
+    });
+    // 整理表数据
+    newTableHead.forEach((item, index) => {
+      tableList.forEach((it, ind) => {
+        it[item.key] = it[index];
+        it.id = Number(ind) + 1;
+        it.add = '';
+        delete it[index];
+      });
+    });
+    // 返回数据
+    this.props.getUploadData(newTableHead, tableList);
+    this.props.handleClose();
   };
 
   // 数据分割
@@ -87,7 +115,10 @@ class UploadSequenceFile extends React.Component {
   };
 
   // 数据检查
+  // eslint-disable-next-line consistent-return
   checkData = value => {
+    if (value[0][0] === '') return message.warning('未获取到数据, 不进行覆盖');
+
     const { sampleList } = this.props;
     // 判断title不能为空
     let err = false;
@@ -99,15 +130,18 @@ class UploadSequenceFile extends React.Component {
 
     // 判断是否有不存在的样品
     const dataAll = [];
-    sampleList.forEach(item => dataAll.push(item.sampleAlias))
-    value.forEach(item => {
-      if (item[0] === '样品') return false;
+    sampleList.forEach(item => dataAll.push(item.sampleAlias));
+    const newValue = [];
+    value.forEach((item, index) => {
+      if (index !== 0) newValue.push(item);
+    });
+    newValue.forEach(item => {
       if (dataAll.indexOf(item[0]) === -1) {
         message.warning(`${item[0]}不存在`);
         err = true;
       }
       return false;
-    })
+    });
 
     const newList = [];
     sampleList.forEach(samItem => {
@@ -123,8 +157,8 @@ class UploadSequenceFile extends React.Component {
             newList.push(valItem);
           }
         }
-      })
-    })
+      });
+    });
 
     if (!err) {
       this.setState({
