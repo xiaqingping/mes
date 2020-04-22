@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
 import { Drawer } from 'antd';
 import { connect } from 'dva';
-import TitleModel from './components/titleModel';
-import TaskModelTabs from './components/taskModelTabs';
 import api from '@/pages/project/api/taskmodel';
 import disk from '@/pages/project/api/disk';
+import TitleModel from './components/titleModel';
+import TaskModelTabs from './components/taskModelTabs';
 import './index.less';
 
 class TaskModel extends Component {
@@ -46,31 +46,10 @@ class TaskModel extends Component {
       preLoading: true,
     });
     api.getPreTasks(id).then(res => {
-      console.log(res);
-      const uuids = (res || []).map(e => e.picture);
-      disk
-        .getFiles({
-          sourceCode: uuids.join(','),
-          sourceKey: 'project_task_model',
-        })
-        .then(v => {
-          const newList = (res || []).map(e => {
-            const filterItem = (v || []).filter(item => item.sourceCode === e.picture) || [];
-            const fileId = filterItem[0] && filterItem[0].id;
-            return {
-              ...e,
-              fileId,
-            };
-          });
-          this.setState({
-            preTaskList: newList,
-            preLoading: false,
-          });
-        });
-      // this.setState({
-      //   preTaskList: res || [],
-      //   preLoading: false,
-      // });
+      this.setState({
+        preTaskList: res,
+        preLoading: false,
+      });
     });
   };
 
@@ -79,30 +58,10 @@ class TaskModel extends Component {
       postLoading: true,
     });
     api.getPostTasks(id).then(res => {
-      const uuids = (res || []).map(e => e.picture);
-      disk
-        .getFiles({
-          sourceCode: uuids.join(','),
-          sourceKey: 'project_task_model',
-        })
-        .then(v => {
-          const newList = (res || []).map(e => {
-            const filterItem = (v || []).filter(item => item.sourceCode === e.picture) || [];
-            const fileId = filterItem[0] && filterItem[0].id;
-            return {
-              ...e,
-              fileId,
-            };
-          });
-          this.setState({
-            postTasks: newList,
-            postLoading: false,
-          });
-        });
-      // this.setState({
-      //   postTasks: res || [],
-      //   postLoading: false,
-      // });
+      this.setState({
+        postTasks: res,
+        postLoading: false,
+      });
     });
   };
 

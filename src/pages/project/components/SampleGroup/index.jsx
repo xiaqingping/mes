@@ -784,7 +784,6 @@ class SampleGroup extends React.Component {
         allowClear
         style={{ width: '60%' }}
         onBlur={e => this.handleGroupSelectBlur(e, value, row, index, col)}
-        onPressEnter={e => this.handleGroupSelectBlur(e, value, row, index, col)}
         defaultValue={value}
       >
         {optionList.map(item => (
@@ -843,6 +842,39 @@ class SampleGroup extends React.Component {
         group = { ...group, ...groupSchemeName };
       });
     }
+
+    // 数据整理
+    // let tableHeard = [];
+    // columns.forEach((item, index) => {
+    //   if (index !== 0 && typeof item.id === 'number') {
+    //     tableHeard = [
+    //       ...tableHeard,
+    //       { groupSchemeName: item.dupTitle, sampleList: [], groupList: [] },
+    //     ];
+    //   }
+    // });
+
+    // console.log(tableHeard);
+    // for (let i = 2; i < groupSchemeData.length + 2; i++) {
+    //   if (!tableHeard[i - 2]) return false;
+    //   // eslint-disable-next-line no-loop-func
+    //   groupSchemeData.forEach(item => {
+    //     if (item[`header_${i}`] === '') return;
+    //     if (item[`header_${i}`] === '当前样品') {
+    //       tableHeard[i - 2].sampleList.push({
+    //         metadataSampleId: item[`header_${i}`],
+    //         sampleAlias: item.sampleName,
+    //       });
+    //     } else {
+    //       tableHeard[i - 2].groupList.push({
+    //         groupName: item[`header_${i}`],
+    //         color: item[`color_${i}`],
+    //       });
+    //     }
+    //   });
+    // }
+
+    // console.log(tableHeard);
 
     columns.map(col => {
       if (!col.width) {

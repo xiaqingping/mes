@@ -150,6 +150,7 @@ class UploadSequenceFile extends React.Component {
   render() {
     const { loading, tableList, tableHead } = this.state;
     let columns = [];
+    console.log(tableHead);
     Object.getOwnPropertyNames(tableHead).forEach(key => {
       columns = [
         ...columns,
@@ -159,7 +160,7 @@ class UploadSequenceFile extends React.Component {
         },
       ];
     });
-
+    console.log(tableList, tableHead);
     return (
       <Modal
         title="上传分组方案"

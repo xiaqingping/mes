@@ -5,9 +5,9 @@ import React, { Component } from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import { connect } from 'dva';
 import api from '@/pages/hts/api';
+import { message } from 'antd';
 import { TableModel } from '../components/AntdUI';
 import { FieldDrawer } from '../components/ModelUI';
-import { message } from 'antd';
 
 class paramList extends Component {
   constructor(props) {
@@ -89,7 +89,7 @@ class paramList extends Component {
           title: '样品',
           dataIndex: 'sampleName',
           key: 'sampleName',
-          width: 100
+          width: 100,
         },
       ],
       // 环境因子表
@@ -99,7 +99,7 @@ class paramList extends Component {
           title: '样品',
           dataIndex: 'sampleName',
           key: 'sampleName',
-          width: 100
+          width: 100,
         },
       ],
     };
@@ -107,7 +107,7 @@ class paramList extends Component {
 
   componentDidMount() {
     const { metadataRow } = this.props.htsCache;
-    if (metadataRow.length === 0)  {
+    if (metadataRow.length === 0) {
       message.warning('暂无数据');
       return false;
     }
@@ -369,8 +369,8 @@ class paramList extends Component {
           }
           return false;
         });
-      })
-    })
+      });
+    });
     return rowData;
   };
 
@@ -464,7 +464,6 @@ class paramList extends Component {
       environmentalFactorData,
     } = this.state;
     let tableWidth = 0;
-
 
     const newSampleColumns = sampleColumns.map(col => {
       if (!col.width) col.width = 100;
