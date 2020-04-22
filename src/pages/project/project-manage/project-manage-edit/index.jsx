@@ -187,6 +187,7 @@ class ProjectEdit extends Component {
   // 跳转到添加流程页面
   handleAdd = () => {
     const data = this.saveData();
+    data.requestType = 'add';
     if (data === 1) return;
     this.props.dispatch({
       type: 'projectManage/setProjectInfor',

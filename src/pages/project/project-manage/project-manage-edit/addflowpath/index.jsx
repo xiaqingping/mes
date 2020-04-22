@@ -13,47 +13,67 @@ import ChooseProcessModel from '../components/ChooseProcessModel';
 
 class Test extends Component {
   // 表单默认值
-  initialValues = {
-    status: 1,
-    page: 1,
-    pageSize: 5,
-  };
+  // initialValues = {
+  //   status: 1,
+  //   page: 1,
+  //   pageSize: 5,
+  // };
 
   constructor(props) {
     super(props);
-    const { processSelectedList, paramList, projectInfor } = this.props.projectManage;
-    console.log(projectInfor);
+    const {
+      // processSelectedList,
+      paramList,
+      projectInfor,
+    } = this.props.projectManage;
     console.log(this.props);
-    console.log(paramList);
+
+    let viewShow;
+    if (projectInfor.requestType === 'add') viewShow = [];
+
+    // 已创建的项目传过来的项目id和类型
+    if (!this.props.location.state) {
+      // const projectProcesses = this.props.location.state.newData;
+      // console.log(projectProcesses);
+      console.log(123);
+    }
+
+    // // if (projectProcesses.requestType === 'add') viewShow = [];
+    // viewShow = processSelectedList;
 
     this.state = {
-      list: projectInfor.type === 'add' ? [] : processSelectedList,
+      // list选中的流程参数数据
+      list: viewShow,
       loading: false,
       visible: false,
       projectInfor,
       paramList,
-      projectProcesses: [],
     };
     console.log(this.state);
   }
 
   componentDidMount() {
     this.getData();
-    // 传过来的项目id
+    // 传过来的项目id和类型
+
+    // if(this.props.location.state === []) {
+    //   return
+    //   // console.log(123);
+    // }
     // const projectProcesses = this.props.location.state.newData;
     // console.log(projectProcesses);
     // this.setState({ projectProcesses },() => {
     //   // console.log(this.state);
     // });
-    // console.log(this.state);
+    console.log(this.state);
   }
 
-  componentWillUnmount() {
-    this.props.dispatch({
-      type: 'projectManage/setProcessSelectedList',
-      payload: [],
-    });
-  }
+  // componentWillUnmount() {
+  //   this.props.dispatch({
+  //     type: 'projectManage/setProcessSelectedList',
+  //     payload: [],
+  //   });
+  // }
 
   // 点击打开关联
   onOpen = () => {
@@ -248,17 +268,8 @@ class Test extends Component {
 
     return (
       <PageHeaderWrapper>
-        <Form onFinish={this.handleSave}>
-          <Card
-            style={{ height: '48px', width: '100%', position: 'fixed', bottom: '0', left: '0' }}
-          >
-            <Button type="primary" style={{ float: 'right', marginTop: '-16px' }} htmlType="submit">
-              保存
-            </Button>
-          </Card>
-        </Form>
         <Card bordered={false}>
-          <div className="tableList">
+          <div className="tableList" style={{ height: '400px', overflow: 'auto' }}>
             <Form ref={this.tableFormRef}>
               <Table
                 rowClassName="editable-row"
@@ -290,6 +301,15 @@ class Test extends Component {
             </Button>
           </div>
         </Card>
+        <Form onFinish={this.handleSave}>
+          <Card
+            style={{ height: '48px', width: '100%', position: 'fixed', bottom: '0', left: '0' }}
+          >
+            <Button type="primary" style={{ float: 'right', marginTop: '-16px' }} htmlType="submit">
+              保存
+            </Button>
+          </Card>
+        </Form>
         <ChooseProcessModel
           visible={visible}
           onClose={this.onClose}
