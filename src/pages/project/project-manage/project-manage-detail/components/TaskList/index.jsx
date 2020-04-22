@@ -38,8 +38,8 @@ class TaskList extends Component {
       let index = null;
       openId.forEach((item, ind) => {
         if (item === id) {
-          index = ind
-          }
+          index = ind;
+        }
       });
       newData.splice(index, 1);
     }
@@ -88,7 +88,7 @@ class TaskList extends Component {
       newData.push(newItem);
     });
     return newData;
-  }
+  };
 
   // 合并参数列表和参数值
   disposeParamData = (paramData, valueData) => {
@@ -100,10 +100,10 @@ class TaskList extends Component {
           newItem.paramValue = valueItem.paramValue;
           newData.push(newItem);
         }
-      })
-    })
+      });
+    });
     return newData;
-  }
+  };
 
   // 任务执行记录开始运行
   startExecRecord = row => {
@@ -127,11 +127,7 @@ class TaskList extends Component {
   };
 
   render() {
-    const {
-      visibleParam,
-      parameterList,
-      openId,
-    } = this.state;
+    const { visibleParam, parameterList, openId } = this.state;
     const { detailList, taskList, visible } = this.props;
     const { execRecordStatus } = this.props.projectDetail;
 
@@ -139,7 +135,7 @@ class TaskList extends Component {
       {
         title: '编号',
         dataIndex: 'code',
-        width: 100,
+        width: 180,
         render: (value, row) => (
           <>
             <span>{value}</span>
@@ -153,7 +149,7 @@ class TaskList extends Component {
       {
         title: '状态',
         dataIndex: 'status',
-        width: 100,
+        width: 180,
         render: (value, row) => {
           const name = formatter(execRecordStatus, value);
           const status = formatter(execRecordStatus, value, 'id', 'status');
@@ -170,7 +166,7 @@ class TaskList extends Component {
       {
         title: '',
         dataIndex: 'status',
-        width: 50,
+        width: 60,
         render: (value, row) => {
           const duration = calculateTimeDifference(row.startTime, row.endTime);
           if (value === 4) {
@@ -193,69 +189,69 @@ class TaskList extends Component {
     ];
     return (
       <>
-        <Drawer
-          width="500px"
-          title={detailList.name}
-          closable={false}
-          onClose={this.props.onClose}
-          visible={visible}
-        >
-          <List
-            dataSource={taskList}
-            split={false}
-            renderItem={item => (
-              <List.Item key={item}>
-                <Card hoverable style={{ width: '100%' }}>
-                  <Avatar
-                    src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
-                    size="large"
-                    className={style.floatLeft}
-                  />
-                  <div className={style.FMLeft}>
-                    <div>
-                      <div className={style.floatLeft}>
-                        <div>{item.code}</div>
-                        <div className={style.name}>{item.name}</div>
-                      </div>
-                      <Tag className={style.version} color="green">
-                        {item.taskModelVersion}
-                      </Tag>
-                    </div>
-                    <div className={style.describe}>{item.describe}</div>
-                  </div>
-
-                  <div className={style.open}>
-                    {openId.filter(i => i === item.id).length !== 0 ? (
-                      <>
-                        <a
-                          onClick={() => this.showTable(item.id, 2)}
-                          style={{ float: 'right' }}
-                        >
-                          收起
-                          <UpOutlined />
-                        </a>
-                        <div className={style.taskExecRecordTable}>
-                          <Table
-                            size="small"
-                            columns={columns}
-                            rowKey="id"
-                            dataSource={item.taskExecRecordList}
-                            pagination={false}
-                          />
+        <div>
+          <Drawer
+            width="500px"
+            title={detailList.name}
+            closable={false}
+            onClose={this.props.onClose}
+            visible={visible}
+            className="classTaskList"
+          >
+            <List
+              dataSource={taskList}
+              split={false}
+              renderItem={item => (
+                <List.Item key={item}>
+                  <Card hoverable style={{ width: '100%' }}>
+                    <Avatar
+                      src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
+                      size="large"
+                      className={style.floatLeft}
+                    />
+                    <div className={style.FMLeft}>
+                      <div>
+                        <div className={style.floatLeft}>
+                          <div>{item.code}</div>
+                          <div className={style.name}>{item.name}</div>
                         </div>
-                      </>
-                    ) : (
-                      <a onClick={() => this.showTable(item.id, 1)}>
-                        展开
-                        <DownOutlined />
-                      </a>
-                    )}
-                  </div>
-                </Card>
-              </List.Item>
-            )}
-          />
-        </Drawer>
+                        <Tag className={style.version} color="green">
+                          {item.taskModelVersion}
+                        </Tag>
+                      </div>
+                      <div className={style.describe}>{item.describe}</div>
+                    </div>
+
+                    <div className={style.open}>
+                      {openId.filter(i => i === item.id).length !== 0 ? (
+                        <>
+                          <a onClick={() => this.showTable(item.id, 2)} style={{ float: 'right' }}>
+                            收起
+                            <UpOutlined />
+                          </a>
+                          <div className={style.taskExecRecordTable}>
+                            <Table
+                              size="small"
+                              columns={columns}
+                              rowKey="id"
+                              dataSource={item.taskExecRecordList}
+                              pagination={false}
+                            />
+                          </div>
+                        </>
+                      ) : (
+                        <a onClick={() => this.showTable(item.id, 1)}>
+                          展开
+                          <DownOutlined />
+                        </a>
+                      )}
+                    </div>
+                  </Card>
+                </List.Item>
+              )}
+            />
+          </Drawer>
+        </div>
         <Drawer
           title="参数"
           width={320}
