@@ -117,31 +117,8 @@ class TaskModel extends Component {
     api
       .getTaskModels(data)
       .then(res => {
-        const uuids = (res.rows || []).map(e => e.picture);
-        disk
-          .getFiles({
-            sourceCode: uuids.join(','),
-            sourceKey: 'project_task_model',
-          })
-          .then(v => {
-            const newList = (res.rows || []).map(e => {
-              const filterItem = (v || []).filter(item => item.sourceCode === e.picture) || [];
-              const fileId = (filterItem[0] && filterItem[0].id) || '';
-              return {
-                ...e,
-                fileId,
-              };
-            });
-            this.setState({
-              list: newList,
-            });
-          });
-        // .catch(() => {
-        //   this.setState({
-        //     list: res.rows,
-        //   });
-        // });
         this.setState({
+          list: res.rows,
           pagination: {
             current: data.page,
             pageSize: data.rows,
@@ -413,7 +390,9 @@ class TaskModel extends Component {
         render: (text, row) => (
           <div style={{ display: 'flex' }}>
             <Avatar
-              src={row.fileId ? disk.downloadFiles(row.fileId, { view: true }) : DefaultHeadPicture}
+              src={
+                row.picture ? disk.downloadFiles(row.picture, { view: true }) : DefaultHeadPicture
+              }
               style={{ float: 'left', width: '46px', height: '46px' }}
             />
             <div style={{ marginLeft: 10 }}>
