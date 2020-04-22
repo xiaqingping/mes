@@ -824,27 +824,39 @@ class SampleGroup extends React.Component {
   render() {
     let tableWidth = 0;
     const { groupSchemeData, visible, columns } = this.state;
-    // console.log(columns);
-    console.log(groupSchemeData);
 
-    const neData = {};
-    for (let i = 2; i < groupSchemeData.length + 2; i++) {
-      const groupList = [];
-      groupSchemeData.forEach(item => {
-        let group = {};
-        // if ()
-        const groupSchemeName = {
-          groupSchemeName: item[`header_${i}`],
-          sampleList: [
-            {
-              metadataSampleId: item.metadataSampleId,
-              sampleAlias: item.sampleName,
-            },
-          ],
-        };
-        group = { ...group, ...groupSchemeName };
-      });
-    }
+    // 数据整理
+    // let tableHeard = [];
+    // columns.forEach((item, index) => {
+    //   if (index !== 0 && typeof item.id === 'number') {
+    //     tableHeard = [
+    //       ...tableHeard,
+    //       { groupSchemeName: item.dupTitle, sampleList: [], groupList: [] },
+    //     ];
+    //   }
+    // });
+
+    // console.log(tableHeard);
+    // for (let i = 2; i < groupSchemeData.length + 2; i++) {
+    //   if (!tableHeard[i - 2]) return false;
+    //   // eslint-disable-next-line no-loop-func
+    //   groupSchemeData.forEach(item => {
+    //     if (item[`header_${i}`] === '') return;
+    //     if (item[`header_${i}`] === '当前样品') {
+    //       tableHeard[i - 2].sampleList.push({
+    //         metadataSampleId: item[`header_${i}`],
+    //         sampleAlias: item.sampleName,
+    //       });
+    //     } else {
+    //       tableHeard[i - 2].groupList.push({
+    //         groupName: item[`header_${i}`],
+    //         color: item[`color_${i}`],
+    //       });
+    //     }
+    //   });
+    // }
+
+    // console.log(tableHeard);
 
     columns.map(col => {
       if (!col.width) {

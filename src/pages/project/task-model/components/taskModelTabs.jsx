@@ -2,11 +2,11 @@ import React, { Component } from 'react';
 
 import { connect } from 'dva';
 import { Tabs, Avatar, Tag, Badge, Card, List, Spin } from 'antd';
-import ArgumentModel from './argumentModel';
 import api from '@/pages/project/api/taskmodel';
 import { formatter } from '@/utils/utils';
 import disk from '@/pages/project/api/disk';
 import DefaultHeadPicture from '@/assets/imgs/upload_middle.png';
+import ArgumentModel from './argumentModel';
 
 const { TabPane } = Tabs;
 // import TitleModel from './components/titleModel';
@@ -118,8 +118,8 @@ class TaskModelTabs extends Component {
                     <Card hoverable style={{ width: '520px' }}>
                       <Avatar
                         src={
-                          item.fileId
-                            ? disk.downloadFiles(item.fileId, { view: true })
+                          item.picture
+                            ? disk.downloadFiles(item.picture, { view: true })
                             : DefaultHeadPicture
                         }
                         style={{ float: 'left', marginRight: 10 }}
@@ -160,8 +160,8 @@ class TaskModelTabs extends Component {
                     <Card hoverable style={{ width: '520px' }}>
                       <Avatar
                         src={
-                          item.fileId
-                            ? disk.downloadFiles(item.fileId, { view: true })
+                          item.picture
+                            ? disk.downloadFiles(item.picture, { view: true })
                             : DefaultHeadPicture
                         }
                         style={{ float: 'left', marginRight: 10 }}
