@@ -13,198 +13,217 @@ class SampleSelect extends React.Component {
     visible: false,
 
     tableData: [
-      // 第一个分组方案
       {
-        groupSchemeName: 'groupingscheme1',
+        groupSchemeName: '分组方案四',
+        sampleList: null,
+        groupList: [
+          {
+            groupName: 'group4',
+            color: 'black',
+            sampleList: [
+              {
+                metadataSampleId: 'fef48d6d544b4eda8cceae3690404418',
+                sampleAlias: '别名003',
+              },
+              {
+                metadataSampleId: 'c8dc965476874dccb81c066df5a174d9',
+                sampleAlias: '别名004',
+              },
+            ],
+          },
+          {
+            groupName: 'group3',
+            color: 'yellow',
+            sampleList: [
+              {
+                metadataSampleId: '39fbe07a8c3546b3bca9801869a58c45',
+                sampleAlias: '别名002',
+              },
+              {
+                metadataSampleId: '2a3beac6006a4a54a8cb6b4809ea9dc3',
+                sampleAlias: '别名001',
+              },
+            ],
+          },
+        ],
+      },
+      {
+        groupSchemeName: '分组方案二',
+        sampleList: [
+          {
+            metadataSampleId: 'c8dc965476874dccb81c066df5a174d9',
+            sampleAlias: '别名004',
+          },
+        ],
+        groupList: null,
+      },
+      {
+        groupSchemeName: '分组方案三',
+        sampleList: [
+          {
+            metadataSampleId: 'fef48d6d544b4eda8cceae3690404418',
+            sampleAlias: '别名003',
+          },
+          {
+            metadataSampleId: '39fbe07a8c3546b3bca9801869a58c45',
+            sampleAlias: '别名002',
+          },
+          {
+            metadataSampleId: '2a3beac6006a4a54a8cb6b4809ea9dc3',
+            sampleAlias: '别名001',
+          },
+          {
+            metadataSampleId: 'c8dc965476874dccb81c066df5a174d9',
+            sampleAlias: '别名004',
+          },
+        ],
+        groupList: null,
+      },
+      {
+        groupSchemeName: '分组方案one',
+        sampleList: null,
         groupList: [
           {
             groupName: 'group1',
-            groupColour: 'blue',
-            // 组里面包含的样品列表
+            color: 'black',
             sampleList: [
               {
-                metadataSampleId: 'db820c4a2a15401f95943594f58b1084',
+                metadataSampleId: '39fbe07a8c3546b3bca9801869a58c45',
+                sampleAlias: '别名002',
+              },
+              {
+                metadataSampleId: '2a3beac6006a4a54a8cb6b4809ea9dc3',
                 sampleAlias: '别名001',
               },
             ],
           },
           {
             groupName: 'group2',
-            groupColour: 'red',
+            color: 'yellow',
             sampleList: [
               {
-                metadataSampleId: 'b6545cf90ce340d8aa0c464f2fd422b7',
-                sampleAlias: '别名002',
+                metadataSampleId: 'c8dc965476874dccb81c066df5a174d9',
+                sampleAlias: '别名004',
               },
-            ],
-          },
-          {
-            groupName: 'group3',
-            groupColour: 'gray',
-            sampleList: [
               {
-                metadataSampleId: 'f98db018780144c1aec7444bf0a25622',
+                metadataSampleId: 'fef48d6d544b4eda8cceae3690404418',
                 sampleAlias: '别名003',
               },
             ],
           },
         ],
       },
-      // 第二个分组方案
-      {
-        groupSchemeName: 'groupingscheme2',
-        sampleList: [
-          {
-            metadataSampleId: 'db820c4a2a15401f95943594f58b1084',
-            sampleAlias: '别名001',
-          },
-          {
-            metadataSampleId: 'b6545cf90ce340d8aa0c464f2fd422b7',
-            sampleAlias: '别名002',
-          },
-          {
-            metadataSampleId: 'f98db018780144c1aec7444bf0a25622',
-            sampleAlias: '别名003',
-          },
-        ],
-        groupList: null,
-      },
     ],
 
-    sampleList: [
-      {
-        id: '586bf01efbb34d2c9b1911fad3baf174',
-        sampleCode: '123456789',
-        sampleName: '未分组样品',
-        sampleAlias: '别名004',
-        colour: 'purple',
-        sampleSequenceCount: 15,
-        sampleLengthTotal: 9000,
-        sampleLengthAve: 600.0,
-        sampleLengthMax: 4000,
-        sampleLengthMin: 1000,
-        sequenceFileCount: 2,
-        sequenceFileList: [
-          {
-            sequenceFileId: '123456789987654321',
-            sequenceFileName: '123',
-            sampleSequenceCount: 5,
-            sampleLengthMin: 1000,
-            sampleLengthMax: 2000,
-            sampleLengthAve: 600.0,
-            sampleLengthTotal: 3000,
-          },
-          {
-            sequenceFileId: '1234567899876543210',
-            sequenceFileName: '3211245',
-            sampleSequenceCount: 10,
-            sampleLengthMin: 2000,
-            sampleLengthMax: 4000,
-            sampleLengthAve: 600.0,
-            sampleLengthTotal: 6000,
-          },
-        ],
-      },
-      {
-        id: 'b6545cf90ce340d8aa0c464f2fd422b7',
-        sampleCode: '456',
-        sampleName: '样品B',
-        sampleAlias: '别名002',
-        colour: 'red',
-        sampleSequenceCount: 15,
-        sampleLengthTotal: 9000,
-        sampleLengthAve: 600.0,
-        sampleLengthMax: 4000,
-        sampleLengthMin: 1000,
-        sequenceFileCount: 2,
-        sequenceFileList: [
-          {
-            sequenceFileId: '1234567899876543210',
-            sequenceFileName: 'gfdbhg',
-            sampleSequenceCount: 10,
-            sampleLengthMin: 2000,
-            sampleLengthMax: 4000,
-            sampleLengthAve: 600.0,
-            sampleLengthTotal: 6000,
-          },
-          {
-            sequenceFileId: '123456789987654321',
-            sequenceFileName: 'swdff',
-            sampleSequenceCount: 5,
-            sampleLengthMin: 1000,
-            sampleLengthMax: 2000,
-            sampleLengthAve: 600.0,
-            sampleLengthTotal: 3000,
-          },
-        ],
-      },
-      {
-        id: 'db820c4a2a15401f95943594f58b1084',
-        sampleCode: '456',
-        sampleName: '样品A',
-        sampleAlias: '别名001',
-        colour: 'blue',
-        sampleSequenceCount: 15,
-        sampleLengthTotal: 9000,
-        sampleLengthAve: 600.0,
-        sampleLengthMax: 4000,
-        sampleLengthMin: 1000,
-        sequenceFileCount: 2,
-        sequenceFileList: [
-          {
-            sequenceFileId: '1234567899876543210',
-            sequenceFileName: 'bacd',
-            sampleSequenceCount: 5,
-            sampleLengthMin: 1000,
-            sampleLengthMax: 2000,
-            sampleLengthAve: 600.0,
-            sampleLengthTotal: 3000,
-          },
-          {
-            sequenceFileId: '123456789987654321',
-            sequenceFileName: 'abc',
-            sampleSequenceCount: 10,
-            sampleLengthMin: 2000,
-            sampleLengthMax: 4000,
-            sampleLengthAve: 600.0,
-            sampleLengthTotal: 6000,
-          },
-        ],
-      },
-      {
-        id: 'f98db018780144c1aec7444bf0a25622',
-        sampleCode: '456',
-        sampleName: '样品C',
-        sampleAlias: '别名003',
-        colour: 'gray',
-        sampleSequenceCount: 15,
-        sampleLengthTotal: 9000,
-        sampleLengthAve: 600.0,
-        sampleLengthMax: 4000,
-        sampleLengthMin: 1000,
-        sequenceFileCount: 2,
-        sequenceFileList: [
-          {
-            sequenceFileId: '1234567899876543210',
-            sequenceFileName: 'hjdhfjdalja',
-            sampleSequenceCount: 10,
-            sampleLengthMin: 2000,
-            sampleLengthMax: 4000,
-            sampleLengthAve: 600.0,
-            sampleLengthTotal: 6000,
-          },
-          {
-            sequenceFileId: '123456789987654321',
-            sequenceFileName: 'hjdhfjdalja',
-            sampleSequenceCount: 5,
-            sampleLengthMin: 1000,
-            sampleLengthMax: 2000,
-            sampleLengthAve: 600.0,
-            sampleLengthTotal: 3000,
-          },
-        ],
-      },
-    ],
+    sampleList: [{
+      "id": "2a3beac6006a4a54a8cb6b4809ea9dc3",
+      "sampleCode": "1234",
+      "sampleName": "样品one",
+      "sampleAlias": "别名001",
+      "color": "purple",
+      "sampleSequenceCount": 15,
+      "sampleLengthTotal": 9000,
+      "sampleLengthAve": 600.0,
+      "sampleLengthMax": 4000,
+      "sampleLengthMin": 1000,
+      "sequenceFileCount": 2,
+      "sequenceFileList": [{
+        "sequenceFileId": "123",
+        "sequenceFileName": "a",
+        "sampleSequenceCount": 10,
+        "sampleLengthMin": 2000,
+        "sampleLengthMax": 4000,
+        "sampleLengthAve": 600.0,
+        "sampleLengthTotal": 6000
+      }, {
+        "sequenceFileId": "1234",
+        "sequenceFileName": "b",
+        "sampleSequenceCount": 5,
+        "sampleLengthMin": 1000,
+        "sampleLengthMax": 2000,
+        "sampleLengthAve": 600.0,
+        "sampleLengthTotal": 3000
+      }]
+    }, {
+      "id": "39fbe07a8c3546b3bca9801869a58c45",
+      "sampleCode": "12345",
+      "sampleName": "样品B",
+      "sampleAlias": "别名002",
+      "color": "red",
+      "sampleSequenceCount": 15,
+      "sampleLengthTotal": 9000,
+      "sampleLengthAve": 600.0,
+      "sampleLengthMax": 4000,
+      "sampleLengthMin": 1000,
+      "sequenceFileCount": 2,
+      "sequenceFileList": [{
+        "sequenceFileId": "123456",
+        "sequenceFileName": "d",
+        "sampleSequenceCount": 10,
+        "sampleLengthMin": 2000,
+        "sampleLengthMax": 4000,
+        "sampleLengthAve": 600.0,
+        "sampleLengthTotal": 6000
+      }, {
+        "sequenceFileId": "12345",
+        "sequenceFileName": "c",
+        "sampleSequenceCount": 5,
+        "sampleLengthMin": 1000,
+        "sampleLengthMax": 2000,
+        "sampleLengthAve": 600.0,
+        "sampleLengthTotal": 3000
+      }]
+    }, {
+      "id": "c8dc965476874dccb81c066df5a174d9",
+      "sampleCode": "1234567",
+      "sampleName": "样品D",
+      "sampleAlias": "别名004",
+      "color": "gray",
+      "sampleSequenceCount": 5,
+      "sampleLengthTotal": 2000,
+      "sampleLengthAve": 400.0,
+      "sampleLengthMax": 1500,
+      "sampleLengthMin": 500,
+      "sequenceFileCount": 1,
+      "sequenceFileList": [{
+        "sequenceFileId": "12345679",
+        "sequenceFileName": "e",
+        "sampleSequenceCount": 5,
+        "sampleLengthMin": 500,
+        "sampleLengthMax": 1500,
+        "sampleLengthAve": 400.0,
+        "sampleLengthTotal": 2000
+      }]
+    }, {
+      "id": "fef48d6d544b4eda8cceae3690404418",
+      "sampleCode": "123456",
+      "sampleName": "样品C",
+      "sampleAlias": "别名003",
+      "color": "blue",
+      "sampleSequenceCount": 15,
+      "sampleLengthTotal": 12000,
+      "sampleLengthAve": 800.0,
+      "sampleLengthMax": 6000,
+      "sampleLengthMin": 500,
+      "sequenceFileCount": 2,
+      "sequenceFileList": [{
+        "sequenceFileId": "1234567",
+        "sequenceFileName": "e",
+        "sampleSequenceCount": 5,
+        "sampleLengthMin": 500,
+        "sampleLengthMax": 1500,
+        "sampleLengthAve": 400.0,
+        "sampleLengthTotal": 2000
+      }, {
+        "sequenceFileId": "12345678",
+        "sequenceFileName": "f",
+        "sampleSequenceCount": 10,
+        "sampleLengthMin": 4000,
+        "sampleLengthMax": 6000,
+        "sampleLengthAve": 1000.0,
+        "sampleLengthTotal": 10000
+      }]
+    }],
 
     groupSchemeData: [], // 分组方案数据
     // 分组方案
@@ -289,7 +308,7 @@ class SampleSelect extends React.Component {
                   if (rowItem[key] === groupSchemeName) {
                     const num = key.split('_')[1];
                     const color = `color_${num}`;
-                    rowItem[color] = groItem.groupColour;
+                    rowItem[color] = groItem.color;
                     rowItem[key] = groItem.groupName;
                   }
                   return false;
@@ -590,12 +609,12 @@ class SampleSelect extends React.Component {
     const addColor = `color_${max + 1}`;
     soure = soure.map(item => {
       item[addHeader] = '';
-      item[addColor]='';
-      return item
+      item[addColor] = '';
+      return item;
     });
     this.setState({
       columns: cols,
-      groupSchemeData: soure
+      groupSchemeData: soure,
     });
   };
 
@@ -626,7 +645,6 @@ class SampleSelect extends React.Component {
           console.log(this.state.groupSchemeData);
         },
       );
-
     }
 
     this.setState({
@@ -667,12 +685,11 @@ class SampleSelect extends React.Component {
   };
 
   // 对数据进行校验
-  verifyData = ()=>{
+  verifyData = () => {
     const { groupSchemeData, columns } = this.state;
     // 1. 一个分组方案里只能是单纯组或者单纯样品
     // 2. 一个分组方案里面不能都是空
-    
-  }
+  };
 
   render() {
     let tableWidth = 0;

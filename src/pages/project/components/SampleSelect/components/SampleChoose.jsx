@@ -157,11 +157,11 @@ class SampleChoose extends React.Component {
     });
   };
 
-  // toggleVis = v => {
-  //   this.setState({
-  //     visible: v,
-  //   });
-  // };
+  toggleVis = v => {
+    this.setState({
+      visible: v,
+    });
+  };
 
   openUpload = () => {
     this.setState({
@@ -189,6 +189,7 @@ class SampleChoose extends React.Component {
   };
 
   handleFileUploadClose = v => {
+    this.toggleVis(v);
     if (v) {
       this.getTableData();
     }
