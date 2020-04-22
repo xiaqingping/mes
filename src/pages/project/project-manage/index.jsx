@@ -26,6 +26,7 @@ import StandardTable from '@/pages/project/components/StandardTable';
 import { formatter } from '@/utils/utils';
 import api from '@/pages/project/api/projectManage';
 import { DateUI } from '../components/AntdSearchUI';
+import './index.less';
 
 const { Option } = Select;
 const FormItem = Form.Item;
@@ -59,7 +60,7 @@ class ProjectManagement extends Component {
 
   callParter = value => {
     console.log(value);
-    api.gettProjectManageCodeAndName({ codeOrName: value }).then(res => {
+    api.gettProjectManageCodeAndName(value).then(res => {
       // console.log(res);
       this.setState({ nameCodeVal: res });
     });
@@ -296,6 +297,11 @@ class ProjectManagement extends Component {
     }
   };
 
+  // speciesdetail =() => {
+  //   console.log(123);
+  //   router.push('/project/project-manage/speciesSelected',);
+  // }
+
   // 状态下拉列表
   menuList = row => (
     <Menu>
@@ -334,7 +340,7 @@ class ProjectManagement extends Component {
         width: '200px',
         render: (value, row) => (
           <>
-            <div style={{ float: 'left', paddingLeft: '20px' }}>
+            <div style={{ float: 'left', marginLeft: '10px' }}>
               <div>{row.name}</div>
               <div>
                 <a onClick={() => this.searchDetails(row)}>{value}</a>
@@ -418,6 +424,16 @@ class ProjectManagement extends Component {
       {
         title: '成员数',
         dataIndex: 'memberCount',
+        // render: (value, row) => (
+        //   <>
+        //     <div style={{ float: 'left', paddingLeft: '20px' }}>
+        //       <div>{row.name}</div>
+        //       <div>
+        //         <a onClick={() => this.speciesdetail (row)}>{value}</a>
+        //       </div>
+        //     </div>
+        //   </>
+        // ),
       },
       {
         title: '开始-截止时间',
@@ -469,25 +485,27 @@ class ProjectManagement extends Component {
               simpleForm={this.simpleForm}
               advancedForm={this.advancedForm}
             />
-            <div className="tableListOperator">
-              <Button type="primary" onClick={() => this.handleAdd()}>
-                <PlusOutlined />
-                新建
-              </Button>
-            </div>
-            <Form ref={this.tableFormRef}>
-              <StandardTable
-                scroll={{ x: tableWidth }}
-                rowClassName="editable-row"
-                // rowKey="id"
-                loading={loading}
-                data={{ list, pagination }}
-                columns={columns}
-                onSelectRow={this.handleSelectRows}
-                onChange={this.handleStandardTableChange}
-              />
-            </Form>
           </div>
+        </Card>
+        <Card style={{ marginTop: '24px' }}>
+          <div className="tableListOperator">
+            <Button type="primary" onClick={() => this.handleAdd()}>
+              <PlusOutlined />
+              新建
+            </Button>
+          </div>
+          <Form ref={this.tableFormRef} className="table-style-set">
+            <StandardTable
+              scroll={{ x: tableWidth }}
+              rowClassName="editable-row"
+              // rowKey="id"
+              loading={loading}
+              data={{ list, pagination }}
+              columns={columns}
+              onSelectRow={this.handleSelectRows}
+              onChange={this.handleStandardTableChange}
+            />
+          </Form>
         </Card>
       </PageHeaderWrapper>
     );

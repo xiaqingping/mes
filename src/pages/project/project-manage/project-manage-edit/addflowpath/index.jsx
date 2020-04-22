@@ -6,6 +6,8 @@ import { PlusOutlined } from '@ant-design/icons';
 import router from 'umi/router';
 import { connect } from 'dva';
 import api from '@/pages/project/api/projectManage';
+import disk from '@/pages/project/api/disk';
+import DefaultHeadPicture from '@/assets/imgs/defaultheadpicture.jpg';
 import ChooseProcessModel from '../components/ChooseProcessModel';
 // import ParamPic from '@/assets/imgs/canshu@1x.png';
 
@@ -21,6 +23,8 @@ class Test extends Component {
     super(props);
     const { processSelectedList, paramList, projectInfor } = this.props.projectManage;
     console.log(projectInfor);
+    console.log(this.props);
+    console.log(paramList);
 
     this.state = {
       list: projectInfor.type === 'add' ? [] : processSelectedList,
@@ -28,11 +32,27 @@ class Test extends Component {
       visible: false,
       projectInfor,
       paramList,
+      projectProcesses: [],
     };
+    console.log(this.state);
   }
 
   componentDidMount() {
     this.getData();
+    // 传过来的项目id
+    // const projectProcesses = this.props.location.state.newData;
+    // console.log(projectProcesses);
+    // this.setState({ projectProcesses },() => {
+    //   // console.log(this.state);
+    // });
+    // console.log(this.state);
+  }
+
+  componentWillUnmount() {
+    this.props.dispatch({
+      type: 'projectManage/setProcessSelectedList',
+      payload: [],
+    });
   }
 
   // 点击打开关联
@@ -64,34 +84,29 @@ class Test extends Component {
 
   // 打开参数
   handleOpen = row => {
-    // 传流程id，流程模型id，请求类型。
-    // console.log(row);
-
     const { paramList } = this.props.projectManage;
 
-    if (paramList.length === 0) {
-      api.getProcessParam(row.id).then(res => {
-        if (!res || res.length === 0) return message.error('当前流程暂无参数！');
-        const data = res;
-        data.requestType = 'addParam';
-        data.processId = row.id;
-        this.props.dispatch({
-          type: 'projectDetail/setProcssesParam',
-          payload: data,
-        });
-        router.push('/project/project-manage/process-parameter');
-        return false;
-      });
+    let data = {};
+    if (paramList.length === 0 && paramList.processModelId === undefined) {
+      // 添加 参数值
+      data = {
+        requestType: 'addParam',
+        processModelId: row.id,
+      };
+    } else {
+      // 修改 参数值
+      data = {
+        requestType: 'updateParam',
+        processModelId: row.id,
+        params: paramList.params,
+      };
     }
-    const data = paramList;
-    console.log(data);
-    data.requestType = 'updateParam';
+
     this.props.dispatch({
-      type: 'projectDetail/setProcssesParam',
+      type: 'projectDetail/setUserForParam',
       payload: data,
     });
     router.push('/project/project-manage/process-parameter');
-    return false;
   };
 
   // 获取模态框选中的流程模型数据
@@ -109,7 +124,14 @@ class Test extends Component {
 
   // 保存
   handleSave = () => {
-    const { list, projectInfor, paramList } = this.state;
+    // const { projectProcesses} = this.state;
+    // console.log(projectProcesses);
+    const {
+      list,
+      projectInfor,
+      paramList,
+      // projectProcesses
+    } = this.state;
     let status = false;
     if (list === '' || list === undefined) {
       status = true;
@@ -136,14 +158,18 @@ class Test extends Component {
       }
       newList.push(newItem);
     });
+    console.log(newList);
 
     projectInfor.processList = newList;
     const data = projectInfor;
 
-    api.addProjects(data).then(() => {
-      console.log(123);
-      // return router.push('/project/project-manage');
-    });
+    api.addProjects(data).then(() => router.push('/project/project-manage'));
+
+    // if (projectProcesses.requestType === 'add') {
+    //   // api.addProjectsProcess({projectProcesses,data}).then(res => {
+    //   //   console.log(res);
+    //   // });
+    // }
     return '';
   };
 
@@ -153,7 +179,7 @@ class Test extends Component {
       {
         title: '名称/描述',
         dataIndex: 'name',
-        width: 300,
+        width: 900,
         render: (value, row) => (
           <>
             <div>{value}</div>
@@ -167,10 +193,14 @@ class Test extends Component {
         width: 300,
         render: (value, row) => (
           <>
-            <Avatar
+            {/* <Avatar
               src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
               style={{ float: 'left' }}
               size="large"
+            /> */}
+            <Avatar
+              src={row.fileId ? disk.downloadFiles(row.fileId, { view: true }) : DefaultHeadPicture}
+              style={{ float: 'left', width: '46px', height: '46px' }}
             />
             <div style={{ float: 'left' }}>
               <div>{value}</div>
@@ -191,7 +221,7 @@ class Test extends Component {
       {
         title: '版本',
         dataIndex: 'version',
-        width: 100,
+        width: 130,
         render: () => (
           <Tag color="green" style={{ padding: '0 10px' }}>
             V1.0

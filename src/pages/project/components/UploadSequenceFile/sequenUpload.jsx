@@ -234,7 +234,7 @@ class UploadSequenceFile extends React.Component {
     });
 
     api.addSample(tableList).then(() => {
-      this.props.handleClose(true);
+      this.props.handleClose(false);
     });
   };
 

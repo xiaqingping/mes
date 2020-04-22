@@ -12,9 +12,10 @@ import { message } from 'antd';
 class paramList extends Component {
   constructor(props) {
     super(props);
-    // const { metadataRow } = this.props.htsCache;
+    const { metadataRow } = this.props.htsCache;
+    console.log(metadataRow);
     this.state = {
-      // metadataRow,
+      metadataRow,
       loading: false,
       visibleField: false, // 序列文件抽屉是否显示
       rowData: [], // 样品 行数据
@@ -27,12 +28,12 @@ class paramList extends Component {
           title: '样品',
           dataIndex: 'sampleName',
           key: 'sampleName',
-          width: 200,
+          width: 100,
           render: (value, row) => (
             <>
               <div
                 style={{
-                  background: row.colour,
+                  background: row.color,
                   width: 20,
                   height: 20,
                   display: 'inline-block',
@@ -49,13 +50,13 @@ class paramList extends Component {
           title: '别名',
           dataIndex: 'sampleAlias',
           key: 'sampleAlias',
-          width: 200,
+          width: 100,
         },
         {
           title: '序列',
           dataIndex: 'sampleSequenceCount',
           key: 'sampleSequenceCount',
-          width: 200,
+          width: 100,
           render: (value, row) => (
             <>
               {value} ({row.sampleLengthTotal}bp)
@@ -66,7 +67,7 @@ class paramList extends Component {
           title: '长度',
           dataIndex: 'sampleLengthAve',
           key: 'sampleLengthAve',
-          width: 200,
+          width: 120,
           render: (value, row) => (
             <>
               {row.sampleLengthMin} - {row.sampleLengthMax} (avg {value})
@@ -77,7 +78,7 @@ class paramList extends Component {
           title: '文件',
           dataIndex: 'sequenceFileCount',
           key: 'sequenceFileCount',
-          width: 200,
+          width: 120,
           render: (value, row) => <a onClick={() => this.searchFieldDrawer(row)}>已选{value}个</a>,
         },
       ],
@@ -88,6 +89,7 @@ class paramList extends Component {
           title: '样品',
           dataIndex: 'sampleName',
           key: 'sampleName',
+          width: 100
         },
       ],
       // 环境因子表
@@ -97,23 +99,29 @@ class paramList extends Component {
           title: '样品',
           dataIndex: 'sampleName',
           key: 'sampleName',
+          width: 100
         },
       ],
     };
   }
 
   componentDidMount() {
+    const { metadataRow } = this.props.htsCache;
+    if (metadataRow.length === 0)  {
+      message.warning('暂无数据');
+      return false;
+    }
     this.getTableData();
+    return false;
   }
 
   // 获取表格数据
   getTableData = () => {
     this.setState({ loading: true });
-    // const { metadataRow } = this.state;
+    const { metadataRow } = this.state;
 
-    const id = 'b2626bfb584e4993aa8124fa503cfa9d';
-
-    api.metadata.getMetadataAnalysisParam(id).then(res => {
+    api.metadata.getMetadataAnalysisParam(metadataRow.id).then(res => {
+      console.log(res);
       if (
         res &&
         res.sampleList !== undefined &&
@@ -134,6 +142,7 @@ class paramList extends Component {
       }
       return message.warning('暂无样品数据');
     });
+    this.setState({ loading: false });
   };
 
   // 转换环境因子数据
@@ -175,7 +184,7 @@ class paramList extends Component {
     // 取出 行数据
     const rowData = this.getRowDataGroup(list, sampleList, newColumns);
     // 填充行数据
-    const newData = this.getFillData(list, rowData);
+    const newData = this.getFillData(list, rowData, newColumns);
 
     // 保存 分组 表头数据
     this.setState({
@@ -228,7 +237,7 @@ class paramList extends Component {
                   height: 20,
                   display: 'inline-block',
                   position: 'relative',
-                  top: 5,
+                  top: 1,
                   left: 100,
                   float: 'right',
                   marginRight: 160,
@@ -303,8 +312,9 @@ class paramList extends Component {
    * 填充行数据
    * groupList  分组方案数据
    * rowData 行数据 有表头字段但数据为空
+   * columns 表头数据
    */
-  getFillData = (groupList, rowData) => {
+  getFillData = (groupList, rowData, columns) => {
     // 分组方案遍历
     groupList.forEach(groupItem => {
       const { groupSchemeName } = groupItem;
@@ -323,7 +333,7 @@ class paramList extends Component {
                   if (rowItem[key] === groupSchemeName) {
                     const num = key.split('_')[1];
                     const color = `color_${num}`;
-                    rowItem[color] = groItem.groupColour;
+                    rowItem[color] = groItem.color;
                     rowItem[key] = groItem.groupName;
                   }
                   return false;
@@ -338,12 +348,11 @@ class paramList extends Component {
           groupItem.sampleList.forEach(samItem => {
             if (rowItem.metadataSampleId === samItem.metadataSampleId) {
               Object.keys(rowItem).map(key => {
-                if (rowItem[key] === groupSchemeName) {
-                  const num = key.split('_')[1];
-                  const color = `color_${num}`;
-                  rowItem[color] = '';
-                  rowItem[key] = '当前样品';
-                }
+                const num = key.split('_')[1];
+                let color;
+                if (num !== undefined) color = `color_${num}`;
+                rowItem[color] = '' || rowItem[color];
+                if (rowItem[key] === groupSchemeName) rowItem[key] = '当前样品';
                 return false;
               });
             }
@@ -351,6 +360,17 @@ class paramList extends Component {
         }
       });
     });
+
+    rowData.forEach(rItem => {
+      columns.forEach(cItem => {
+        Object.keys(rItem).map(key => {
+          if (rItem[key] === cItem.title) {
+            rItem[key] = '';
+          }
+          return false;
+        });
+      })
+    })
     return rowData;
   };
 
@@ -443,32 +463,64 @@ class paramList extends Component {
       groupSchemeData,
       environmentalFactorData,
     } = this.state;
+    let tableWidth = 0;
+
+
+    const newSampleColumns = sampleColumns.map(col => {
+      if (!col.width) col.width = 100;
+      tableWidth += col.width;
+      if (!col.editable) {
+        return col;
+      }
+      return true;
+    });
+
+    const newGroupColumns = groupColumns.map(col => {
+      if (!col.width) col.width = 100;
+      tableWidth += col.width;
+      if (!col.editable) {
+        return col;
+      }
+      return true;
+    });
+
+    const newEnvironmentalFactorColumns = environmentalFactorColumns.map(col => {
+      if (!col.width) col.width = 100;
+      tableWidth += col.width;
+      if (!col.editable) {
+        return col;
+      }
+      return true;
+    });
 
     return (
       <PageHeaderWrapper>
         <TableModel
           title="样品"
-          rowKey="id"
+          rowkey="id"
           loading={loading}
           data={sampleData}
-          columns={sampleColumns}
+          columns={newSampleColumns}
           searchFieldDrawer={row => {
             this.searchFieldDrawer(row);
           }}
+          tableWidth={tableWidth}
         />
         <TableModel
           title="分组方案"
-          rowKey="id"
+          rowkey="id"
           loading={loading}
           data={groupSchemeData}
-          columns={groupColumns}
+          columns={newGroupColumns}
+          tableWidth={tableWidth}
         />
         <TableModel
           title="环境因子表"
-          rowKey="id"
+          rowkey="id"
           loading={loading}
           data={environmentalFactorData}
-          columns={environmentalFactorColumns}
+          columns={newEnvironmentalFactorColumns}
+          tableWidth={tableWidth}
         />
 
         {/* 序列文件抽屉 */}
