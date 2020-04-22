@@ -19,6 +19,7 @@ const UploadButton = props => (
     </div>
     <input
       type="file"
+      value=""
       onChange={e => props.handleUpload(e)}
       multiple="multiple"
       style={{
