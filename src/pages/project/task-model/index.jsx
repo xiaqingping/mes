@@ -564,8 +564,8 @@ class TaskModel extends Component {
             reload={this.reGetData}
           />
         )}
-        {/* <SampleSelect /> */}
-        {/* <SampleGroup /> */}
+        {/* <SampleSelect />
+        <SampleGroup /> */}
       </PageHeaderWrapper>
     );
   }

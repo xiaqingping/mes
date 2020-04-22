@@ -121,6 +121,7 @@ class paramList extends Component {
     const { metadataRow } = this.state;
 
     api.metadata.getMetadataAnalysisParam(metadataRow.id).then(res => {
+      console.log(res);
       if (
         res &&
         res.sampleList !== undefined &&
@@ -141,6 +142,7 @@ class paramList extends Component {
       }
       return message.warning('暂无样品数据');
     });
+    this.setState({ loading: false });
   };
 
   // 转换环境因子数据

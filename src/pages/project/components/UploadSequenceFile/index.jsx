@@ -164,7 +164,7 @@ class UploadSequenceFile extends React.Component {
       <Modal
         title="上传分组方案"
         visible
-        onCancel={this.props.handleClose}
+        onCancel={this.props.closeUpload}
         width={871}
         className="upload-page"
         footer={[
