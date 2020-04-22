@@ -1,11 +1,11 @@
 :global {
   .process-model-edit {
     .ant-upload-select-picture-card {
-      border-radius: 50% !important;
       width: 58px !important;
       height: 58px !important;
-      border: 1px solid #aaaaaa;
       background-color: #d7d7d7;
+      border: 1px solid #aaa;
+      border-radius: 50% !important;
     }
     .ant-upload {
       padding: 0 !important;
@@ -14,8 +14,20 @@
 
   .padding-none {
     .ant-card-body {
-      text-align: center;
       padding: 5px;
+      text-align: center;
+    }
+  }
+
+  .taskList {
+    .ant-spin-container {
+      min-height: 258px;
+    }
+    .ant-card-body {
+      min-height: 365px;
+    }
+    .ant-empty-normal {
+      margin: 40px 0;
     }
   }
 }

@@ -504,35 +504,33 @@ class SampleGroup extends React.Component {
   };
 
   // 每列的render返回dom结构。
-  columnRender = (value, row, index, color1, col) => {
-    return (
-      <div style={{ display: 'flex' }} className="project_components_sample_group_render_wrap">
-        {/* <span style={{ marginRight: 10 }}>{value}</span> */}
-        {this.selectRender(value, row, index, color1, col)}
-        <Popover
-          overlayClassName="project_manage_sample_ui_select"
-          overlayStyle={{ padding: 0 }}
-          content={
-            <SketchPicker
-              color={row[color1]}
-              onChangeComplete={color => this.handleColorChange(color, value, row, index)}
-            />
-          }
-          trigger="click"
-          placement="bottom"
-        >
-          <div
-            style={{
-              width: 20,
-              height: 20,
-              backgroundColor: row[color1],
-              position: 'relative',
-            }}
+  columnRender = (value, row, index, color1, col) => (
+    <div style={{ display: 'flex' }} className="project_components_sample_group_render_wrap">
+      {/* <span style={{ marginRight: 10 }}>{value}</span> */}
+      {this.selectRender(value, row, index, color1, col)}
+      <Popover
+        overlayClassName="project_manage_sample_ui_select"
+        overlayStyle={{ padding: 0 }}
+        content={
+          <SketchPicker
+            color={row[color1]}
+            onChangeComplete={color => this.handleColorChange(color, value, row, index)}
           />
-        </Popover>
-      </div>
-    );
-  };
+        }
+        trigger="click"
+        placement="bottom"
+      >
+        <div
+          style={{
+            width: 20,
+            height: 20,
+            backgroundColor: row[color1],
+            position: 'relative',
+          }}
+        />
+      </Popover>
+    </div>
+  );
 
   // 获取的columns不能操作改写title， 所以需要在格式化columns之后重新 改写。
   renderColumns = newColumns => {
@@ -540,15 +538,13 @@ class SampleGroup extends React.Component {
       if (index) {
         const { title } = item;
         item.dupTitle = title;
-        item.title = () => {
-          return (
-            <div className="project_manage_UI_sample_group_title">
-              <input defaultValue={title} onBlur={e => this.handleTitleBlur(e, item, index)} />
+        item.title = () => (
+          <div className="project_manage_UI_sample_group_title">
+            <input defaultValue={title} onBlur={e => this.handleTitleBlur(e, item, index)} />
 
-              <CloseOutlined onClick={() => this.removeColumn(item)} />
-            </div>
-          );
-        };
+            <CloseOutlined onClick={() => this.removeColumn(item)} />
+          </div>
+        );
       }
       return item;
     });
@@ -584,17 +580,13 @@ class SampleGroup extends React.Component {
     const { columns } = this.state;
     let cols = [...columns];
     if (!item) {
-      cols = cols.filter(v => {
-        return v.id !== id;
-      });
+      cols = cols.filter(v => v.id !== id);
 
       this.setState({
         columns: cols,
       });
     } else {
-      cols = cols.filter(v => {
-        return v.id !== item.id;
-      });
+      cols = cols.filter(v => v.id !== item.id);
       // 这里不光删除列， 同时也要删除表格数据，，删除掉每一个行的该分组方案下的组数据；
       const num = item.dataIndex.split('_')[1];
       const { groupSchemeData } = this.state;
@@ -646,18 +638,16 @@ class SampleGroup extends React.Component {
     const max = Math.max.apply(null, ids);
     const newCol = {
       id: max + 1,
-      title: () => {
-        return (
-          <div className="project_manage_UI_sample_group_title">
-            <input
-              defaultValue={`分组方案_${max + 1}`}
-              onBlur={e => this.handleTitleBlur(e, null, null, max + 1)}
-            />
+      title: () => (
+        <div className="project_manage_UI_sample_group_title">
+          <input
+            defaultValue={`分组方案_${max + 1}`}
+            onBlur={e => this.handleTitleBlur(e, null, null, max + 1)}
+          />
 
-            <CloseOutlined onClick={() => this.removeColumn(null, max + 1)} />
-          </div>
-        );
-      },
+          <CloseOutlined onClick={() => this.removeColumn(null, max + 1)} />
+        </div>
+      ),
       dupTitle: `分组方案_${max + 1}`,
       width: 100,
       dataIndex: `header_${max + 1}`,
@@ -834,8 +824,28 @@ class SampleGroup extends React.Component {
   render() {
     let tableWidth = 0;
     const { groupSchemeData, visible, columns } = this.state;
-    console.log(columns);
+    // console.log(columns);
     console.log(groupSchemeData);
+
+    const neData = {};
+    for (let i = 2; i < groupSchemeData.length + 2; i++) {
+      const groupList = [];
+      groupSchemeData.forEach(item => {
+        let group = {};
+        // if ()
+        const groupSchemeName = {
+          groupSchemeName: item[`header_${i}`],
+          sampleList: [
+            {
+              metadataSampleId: item.metadataSampleId,
+              sampleAlias: item.sampleName,
+            },
+          ],
+        };
+        group = { ...group, ...groupSchemeName };
+      });
+    }
+
     columns.map(col => {
       if (!col.width) {
         col.width = 100;

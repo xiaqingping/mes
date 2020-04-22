@@ -27,8 +27,8 @@ export default {
   },
 
   // 项目管理：项目模糊搜索
-  gettProjectManageCodeAndName(params) {
-    return request(`${http1}/projects/v1/likeFindByNameOrCode`, { params });
+  gettProjectManageCodeAndName(data) {
+    return request(`${http1}/projects/v1/${data}/search`);
   },
 
   // 项目管理删除
@@ -51,6 +51,11 @@ export default {
     return request(`${http1}/projects/v1/${data.id}/status?status=${data.status}`, {
       method: 'PUT',
     });
+  },
+
+  // 项目管理流程列表新增
+  addProjectsProcess(data) {
+    return request(`${http1}/projects/v1/processes`, { method: 'POST', data });
   },
 
   /**
