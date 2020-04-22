@@ -1,6 +1,7 @@
 // 点击选择流程模型的模态框
 import React from 'react';
 import { Modal, Avatar, Col, Tag, Card, Row, Button, Form, AutoComplete } from 'antd';
+import InfiniteScroll from 'react-infinite-scroller';
 import TableSearchForm from '@/components/TableSearchForm';
 import '../../index.less';
 import classNames from 'classnames';
@@ -22,7 +23,7 @@ class ChooseProcessModel extends React.Component {
     super(props);
 
     this.state = {
-      pagination: {},
+      // pagination: {},
       // loading: false,
       nameCodeVal: [],
       viewvisible: false,
@@ -30,6 +31,11 @@ class ChooseProcessModel extends React.Component {
       selectedIds: [], // 所有被选择的id集合
       selecteditem: [], // 所有被选择的item数据的集合
       processCode: '',
+      hasMore: true, // 是否开启下拉加载
+      datas: [], // 接受我每次的数据
+      page: 1,
+      rows: 9,
+      count: 0, // 下拉加载
     };
 
     // 异步验证做节流处理
@@ -54,8 +60,9 @@ class ChooseProcessModel extends React.Component {
       : '';
     console.log(formData);
 
-    const { pagination, processCode } = this.state;
-    const { current: page, pageSize: rows } = pagination;
+    const { processCode, page, rows, datas, count, processlist } = this.state;
+    console.log(count);
+    // const { current: page, pageSize: rows } = pagination;
     console.log(processCode);
     let newData = [];
     let changePage = false;
@@ -68,7 +75,7 @@ class ChooseProcessModel extends React.Component {
       delete formData.code;
     }
     const newPage = changePage ? { page: 1 } : page;
-    console.log(newPage);
+    // console.log(newPage);
 
     const data = {
       page,
@@ -79,10 +86,13 @@ class ChooseProcessModel extends React.Component {
       ...newPage,
     };
 
+    // 超过200条数据 不继续监听下拉事件
+    // if (count && datas.length >= count) {
+    //   return false
+    // }
+
     api.getProcess(data).then(res => {
-      // console.log(res);
       const uuids = res.rows.map(e => e.picture);
-      // console.log(uuids);
       disk
         .getFiles({
           sourceCode: uuids.join(','),
@@ -117,10 +127,18 @@ class ChooseProcessModel extends React.Component {
           }
         });
 
-      // this.setState({
-      //   // processlist: res.rows,
-      //   loading: false,
-      // });
+      this.setState(
+        {
+          // processlist: res.rows,
+          processlist: [...datas, ...processlist],
+          count: processlist.count,
+          rows: rows + 1,
+          loading: false,
+        },
+        () => {
+          console.log(this.state);
+        },
+      );
     });
   };
 
@@ -194,19 +212,19 @@ class ChooseProcessModel extends React.Component {
 
   // 点击选中
   clickSelect = item => {
-    console.log(item);
+    // console.log(item);
     // const list =item.id;
     const { selectedIds, selecteditem } = this.state;
-    console.log(this.state);
+    // console.log(this.state);
 
     const itemlist = item.id;
     if (!selectedIds.includes(itemlist)) {
-      console.log('you');
+      // console.log('you');
 
       const idsList = [...selectedIds, itemlist];
       const codeList = [...selecteditem, item];
-      console.log(idsList);
-      console.log(codeList);
+      // console.log(idsList);
+      // console.log(codeList);
 
       this.setState(
         {
@@ -214,16 +232,16 @@ class ChooseProcessModel extends React.Component {
           selecteditem: codeList,
         },
         () => {
-          console.log(this.state);
+          // console.log(this.state);
         },
       );
     }
     if (selectedIds.includes(itemlist)) {
       const newidsList = selectedIds.filter(value => value !== itemlist);
-      console.log(newidsList);
+      // console.log(newidsList);
       // console.log('筛选值');
       const newcodeList = selecteditem.filter(value => value.id !== itemlist);
-      console.log(newcodeList);
+      // console.log(newcodeList);
 
       this.setState(
         {
@@ -231,7 +249,7 @@ class ChooseProcessModel extends React.Component {
           selecteditem: newcodeList,
         },
         () => {
-          console.log(this.state);
+          // console.log(this.state);
         },
       );
     }
@@ -267,8 +285,9 @@ class ChooseProcessModel extends React.Component {
   };
 
   render() {
-    const { viewvisible, processlist, viewlist } = this.state;
+    const { viewvisible, processlist, viewlist, hasMore } = this.state;
     // console.log(this.state);
+    console.log(hasMore);
     return (
       <Card bordered={false}>
         <div>
@@ -290,10 +309,15 @@ class ChooseProcessModel extends React.Component {
               </Card>
             </div>
             <div style={{ height: '430px', overflow: 'auto', padding: '5px' }} id="contentCenter">
-              <Row gutter={16} style={{ margin: '0' }}>
-                {processlist.map((item, index) => {
-                  const newIndex = JSON.parse(JSON.stringify(index));
-                  return (
+              <InfiniteScroll
+                initialLoad={false} // 不让它进入直接加载
+                pageStart={1} // 设置初始化请求的页数
+                loadMore={this.getTableData}
+                hasMore={hasMore} // 是否继续监听滚动事件 true 监听 | false 不再监听
+                useWindow={false}
+              >
+                <Row gutter={16} style={{ margin: '0' }}>
+                  {processlist.map(item => (
                     <Col
                       style={{
                         padding: '0',
@@ -302,16 +326,16 @@ class ChooseProcessModel extends React.Component {
                         width: '300px',
                       }}
                       // eslint-disable-next-line react/no-array-index-key
-                      key={newIndex}
-                      // key={index}
+                      key={item.id}
                     >
-                      <Card.Grid
+                      <Card
                         style={{
                           width: '300px',
                           padding: '0',
                           height: '170px',
                           boxShadow: '1px 1px 10px #ccc',
                         }}
+                        bordered={false}
                         onClick={() => this.clickSelect(item)}
                         className={classNames({
                           isSelect: this.state.selectedIds.includes(item.id),
@@ -320,9 +344,9 @@ class ChooseProcessModel extends React.Component {
                         <div
                           style={{
                             height: '80px',
-                            width: '300px',
+                            width: '270px',
                             paddingTop: '10px',
-                            marginBottom: '15px',
+                            // marginBottom: '15px',
                           }}
                         >
                           <Avatar
@@ -330,7 +354,7 @@ class ChooseProcessModel extends React.Component {
                             style={{
                               float: 'left',
                               marginRight: '10px',
-                              marginLeft: '20px',
+                              // marginLeft: '20px',
                               width: '60px',
                               height: '60px',
                             }}
@@ -340,7 +364,7 @@ class ChooseProcessModel extends React.Component {
                             style={{
                               float: 'left',
                               height: '50px',
-                              width: '120px',
+                              width: '100px',
                               textAlign: 'center',
                             }}
                           >
@@ -370,7 +394,9 @@ class ChooseProcessModel extends React.Component {
                             </Button>
                           </div>
                         </div>
-                        <div style={{ fontSize: '14px', paddingLeft: '20px' }}>{item.describe}</div>
+                        <div style={{ fontSize: '14px', paddingLeft: '20px', paddingTop: '10px' }}>
+                          {item.describe}
+                        </div>
                         <div
                           style={{ display: 'none' }}
                           className={classNames({
@@ -383,11 +409,11 @@ class ChooseProcessModel extends React.Component {
                             style={{ position: 'absolute', right: '0', bottom: '0' }}
                           />
                         </div>
-                      </Card.Grid>
+                      </Card>
                     </Col>
-                  );
-                })}
-              </Row>
+                  ))}
+                </Row>
+              </InfiniteScroll>
             </div>
           </Modal>
           <ChooseProcessModelCheck
