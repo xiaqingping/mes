@@ -13,12 +13,12 @@ module.exports = {
         },
         {
           name: 'detail',
-          path: '/project/project-manage/detail',
+          path: '/project/project-manage/detail/:id',
           component: './project/project-manage/project-manage-detail',
         },
         {
           name: 'process-parameter',
-          path: '/project/project-manage/process-parameter',
+          path: '/project/project-manage/process-parameter/:id',
           component: './project/project-manage/project-manage-detail/process-parameter',
         },
         {
@@ -28,7 +28,7 @@ module.exports = {
         },
         {
           name: 'addflowpath',
-          path: '/project/project-manage/add/addflowpath',
+          path: '/project/project-manage/add/addflowpath/:id',
           component: './project/project-manage/project-manage-edit/addflowpath',
         },
         {
