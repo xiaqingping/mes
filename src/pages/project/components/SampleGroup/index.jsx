@@ -263,6 +263,14 @@ class SampleGroup extends React.Component {
     ],
   };
 
+  firstColumn = {
+    id: 1,
+    title: '样品',
+    dataIndex: 'sampleName',
+    key: 'sampleName',
+    width: 100,
+  };
+
   lastColumn = {
     id: 'add',
     title: () => <PlusSquareOutlined onClick={this.handleAdd} />,
@@ -680,16 +688,14 @@ class SampleGroup extends React.Component {
     });
   };
 
-  confirmGroupRender = (groupName, preGroupName) => {
-    return (
+  confirmGroupRender = (groupName, preGroupName) => (
+    <div>
       <div>
-        <div>
-          点击“是”将分组“{preGroupName}”改为“{groupName}”
-        </div>
-        <div>点击“否”新增分组“{groupName}”</div>
+        点击“是”将分组“{preGroupName}”改为“{groupName}”
       </div>
-    );
-  };
+      <div>点击“否”新增分组“{groupName}”</div>
+    </div>
+  );
 
   // 选择组，blur 时候保存数据--- 当选择组的时候要加上默认的颜色
   handleGroupSelectBlur = (e, value, row, index, col) => {
@@ -703,6 +709,7 @@ class SampleGroup extends React.Component {
     }
     const { groupSchemeData } = this.state;
     const datas = [...groupSchemeData];
+    // 原来是'当前样品' 现在没有值
     if (!option && value === '当前样品') {
       // eslint-disable-next-line
       row[col] = option;
@@ -711,6 +718,8 @@ class SampleGroup extends React.Component {
         groupSchemeData: datas,
       });
     }
+
+    // 原来是个组或样品, 现在是组,并且名字不一致
     if (option && option !== '当前样品' && option !== value) {
       const num = col.split('_')[1];
 
@@ -760,7 +769,6 @@ class SampleGroup extends React.Component {
             }
             return item;
           });
-          console.log(tableData);
           // TODO: 色块还待解决
           this.setState(
             {
@@ -846,9 +854,7 @@ class SampleGroup extends React.Component {
       });
 
       const validFalse1 = group.includes('当前样品') && group.includes(!'');
-      const validFalse2 = group.every(item => {
-        return item === '';
-      });
+      const validFalse2 = group.every(item => item === '');
       const validFalse = validFalse1 || validFalse2;
 
       if (!validFalse) {
@@ -862,8 +868,6 @@ class SampleGroup extends React.Component {
 
   formatSubmitData = () => {
     const { groupSchemeData, columns } = this.state;
-    console.log(columns);
-    console.log(groupSchemeData);
     // 数据整理
     let tableHeard = [];
     columns.forEach((item, index) => {
@@ -906,35 +910,62 @@ class SampleGroup extends React.Component {
     return tableHeard;
   };
 
-  getDataFromUpload = data => {
-    const { groupSchemeData } = this.state;
-    const groupTableData = [];
-    console.log(data);
+  getDataFromUpload = (data, headData) => {
+    const { groupSchemeData, columns } = this.state;
+    let cols = [this.firstColumn];
     const dataFromUpload = [...data];
-    console.log(dataFromUpload);
     dataFromUpload.forEach(item => {
       groupSchemeData.forEach(row => {
         if (item[0] === row.sampleName) {
+          const num = Object.keys(item).length;
           item.sampleName = row.sampleName;
           item.metadataSampleId = row.metadataSampleId;
-          for (let i = 1; i < Object.keys(item).length; i++) {
+          for (let i = 1; i < num; i++) {
             item[`header_${i + 1}`] = item[i];
             item[`color_${i + 1}`] = getrandomColor();
           }
         }
       });
     });
-    console.log(dataFromUpload);
 
-    // groupTableData.forEach(row=>{
-
-    // })
+    Object.values(headData).forEach((head, idx) => {
+      if (idx > 0) {
+        const col = {
+          id: idx + 2,
+          title: head,
+          dupTitle: head,
+          width: 100,
+          dataIndex: `header_${idx + 1}`,
+          key: `header_${idx + 1}`,
+          render: (value, row, index) => {
+            const color1 = `color_${idx + 1}`;
+            return this.columnRender(value, row, index, color1, `header_${idx + 1}`);
+          },
+        };
+        cols.push(col);
+      }
+    });
+    const renderColumns = this.renderColumns(cols);
+    cols = [...renderColumns, this.lastColumn];
+    const cols1 = JSON.parse(JSON.stringify(cols));
+    const cols2 = [...cols];
+    this.setState(
+      {
+        groupSchemeData: dataFromUpload,
+        columns: cols1,
+      },
+      () => {
+        this.setState({
+          columns: cols2,
+        });
+      },
+    );
   };
 
   render() {
     let tableWidth = 0;
     const { groupSchemeData, visible, columns } = this.state;
-    console.log(groupSchemeData);
+    console.log(columns);
     columns.map(col => {
       if (!col.width) {
         // eslint-disable-next-line

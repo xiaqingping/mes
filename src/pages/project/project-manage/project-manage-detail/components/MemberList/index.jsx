@@ -1,5 +1,5 @@
 // 流程列表
-import { Form, Table, Select } from 'antd';
+import { Form, Table, Select, message } from 'antd';
 import React, { Component } from 'react';
 import { connect } from 'dva';
 import api from '@/pages/project/api/projectManageDetail';
@@ -65,10 +65,16 @@ class MemberList extends Component {
   // 确认修改权限
   getEditModelData = data => {
     if(data.type === 'ok') {
-      api.updateMemberJurisdiction(data).then(() => {
+      try {
+        api.updateMemberJurisdiction(data).then(() => {
+          this.getTableData(this.props.projectId);
+        })
+      } catch (e) {
         this.getTableData(this.props.projectId);
-      })
+        return message.error(e.message);
+      }
     }
+    return false;
   }
 
   // 关闭编辑模态框
@@ -121,7 +127,16 @@ class MemberList extends Component {
         title: '权限',
         dataIndex: 'jurisdictionValue',
         width: 150,
-        render: (value, row) => (
+        // eslint-disable-next-line arrow-body-style
+        render: (value, row) => {
+          // console.log(value);
+          // console.log(row);
+          // const userData = JSON.parse(localStorage.user);
+          // console.log(userData);
+          // if (value === 1) {
+
+          // }
+          return (
             <Select
               style={{ width: 100 }}
               disabled={value === 1}
@@ -136,6 +151,7 @@ class MemberList extends Component {
               ))}
             </Select>
           )
+        }
       },
       {
         title: '操作',
