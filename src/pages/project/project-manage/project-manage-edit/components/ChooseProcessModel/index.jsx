@@ -4,6 +4,7 @@ import { Modal, Avatar, Col, Tag, Card, Row, Button, Form, AutoComplete } from '
 import InfiniteScroll from 'react-infinite-scroller';
 import TableSearchForm from '@/components/TableSearchForm';
 import '../../index.less';
+import './index.less';
 import classNames from 'classnames';
 import { connect } from 'dva';
 import _ from 'lodash';
@@ -282,12 +283,13 @@ class ChooseProcessModel extends React.Component {
   render() {
     const { viewvisible, processlist, viewlist, hasMore } = this.state;
     // console.log(this.state);
-    console.log(hasMore);
+    // console.log(hasMore);
     return (
       <Card bordered={false}>
         <div>
           <Modal
             title="选择流程模型"
+            className="classChooseProcessModel"
             visible={this.props.visible}
             onOk={this.handleOk}
             onCancel={this.handleCancel}
