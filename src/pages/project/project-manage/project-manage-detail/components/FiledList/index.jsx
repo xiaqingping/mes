@@ -2,8 +2,12 @@
 import { Form, Table, Col, Input, Button } from 'antd';
 import React, { Component } from 'react';
 import { connect } from 'dva';
-import { FileExclamationOutlined } from '@ant-design/icons';
+// import { FileExclamationOutlined } from '@ant-design/icons';
 import TableSearchForm from '@/components/TableSearchForm';
+import excel from '@/assets/imgs/excel.png';
+import pdf from '@/assets/imgs/pdf.png';
+import file from '@/assets/imgs/file.png';
+import word from '@/assets/imgs/word.png';
 
 // import StandardTable from '@/components/StandardTable';
 // import EditableCell from '@/components/EditableCell';
@@ -78,7 +82,20 @@ class FiledList extends Component {
     </>
   );
 
-  imgtype = type => `@/assets/imgs/${type}.png`;
+  imgtype = type => {
+    console.log(type);
+    let res = word;
+    if (type === 'excel') {
+      res = excel;
+    } else if (type === 'word') {
+      res = word;
+    } else if (type === 'pdf') {
+      res = pdf;
+    } else {
+      res = file;
+    }
+    return res;
+  };
 
   render() {
     const {
@@ -100,12 +117,8 @@ class FiledList extends Component {
         dataIndex: 'name',
         width: 150,
         render: (value, item) => (
-          // render: value => (
           <>
             <img src={this.imgtype(item.type)} alt="" />
-
-            <img src="@/assets/imgs/excel.png" alt="" />
-            <FileExclamationOutlined style={{ fontSize: 18 }} />
             <span style={{ marginLeft: 10 }}>{value}</span>
           </>
         ),
