@@ -318,11 +318,18 @@ class TaskModel extends Component {
 
   // 禁用模型
   forbiddenModel = id => {
-    api.forbiddenTaskModel(id).then(() => {
-      message.success('任务模型已禁用!');
-      this.getTableData();
-      // this.updateListData(id);
-    });
+    api
+      .forbiddenTaskModel(id)
+      .then(() => {
+        message.success('任务模型已禁用!');
+        this.getTableData();
+        // this.updateListData(id);
+      })
+      .catch(() => {
+        this.setState({
+          loading: false,
+        });
+      });
   };
 
   reGetData = (v, id) => {
@@ -331,7 +338,8 @@ class TaskModel extends Component {
         visible: false,
         loading: true,
       });
-      this.forbiddenModel(id);
+
+      if (id) this.forbiddenModel(id);
     }
   };
 
@@ -543,8 +551,8 @@ class TaskModel extends Component {
             reload={this.reGetData}
           />
         )}
-        <SampleSelect />
-        <SampleGroup />
+        {/* <SampleSelect />
+        <SampleGroup /> */}
       </PageHeaderWrapper>
     );
   }
