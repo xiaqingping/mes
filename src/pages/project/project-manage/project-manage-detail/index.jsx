@@ -95,6 +95,7 @@ class ProjectDetail extends Component {
 
     return (
       <PageHeaderWrapper title={this.navContent(list)}>
+        {/* <Card className={styles.titleCard} > */}
         <Card className={styles.titleCard}>
           <div className={styles.width}>
             {list.name}

@@ -100,9 +100,6 @@ class FiledList extends Component {
         width: 150,
         render: value => (
           <>
-            {
-              // console.log(value)
-            }
             <FileExclamationOutlined style={{ fontSize: 18 }} />
             <span style={{ marginLeft: 10 }}>{value}</span>
           </>
@@ -162,12 +159,15 @@ class FiledList extends Component {
 
     return (
       <>
-        <TableSearchForm
-          ref={this.tableSearchFormRef}
-          initialValues={this.initialValues}
-          getTableData={this.getTableData}
-          simpleForm={this.simpleForm}
-        />
+        <div className="classTableSearchForm">
+          <TableSearchForm
+            ref={this.tableSearchFormRef}
+            initialValues={this.initialValues}
+            getTableData={this.getTableData}
+            simpleForm={this.simpleForm}
+          />
+        </div>
+
         {/* <Form ref={this.tableSearchFormRef}>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="" name="fieldName">
@@ -181,9 +181,7 @@ class FiledList extends Component {
           </Col>
         </Form> */}
         <Form ref={this.tableFormRef}>
-          {console.log(list)}
           <Table
-            className="scott"
             scroll={{ x: tableWidth, y: 400 }}
             rowKey="id"
             loading={loading}
