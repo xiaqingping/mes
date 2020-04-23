@@ -20,13 +20,13 @@ import { LoadingOutlined, PlusOutlined } from '@ant-design/icons';
 import { connect } from 'dva';
 import './index.less';
 import { guid, formatter, versionFun } from '@/utils/utils';
-import BeforeTask from './components/beforeTask';
-import ArgumentModel from './components/argumentModel';
 import classNames from 'classnames';
 import router from 'umi/router';
 import disk from '@/pages/project/api/disk';
 import api from '@/pages/project/api/taskmodel';
 import DefaultHeadPicture from '@/assets/imgs/upload_middle.png';
+import ArgumentModel from './components/argumentModel';
+import BeforeTask from './components/beforeTask';
 
 function getBase64(img, callback) {
   const reader = new FileReader();
@@ -106,26 +106,17 @@ class TaskModel extends Component {
             loading: false,
             picture: res.picture,
           });
-          console.log(res);
           const { dispatch } = this.props;
           (this.tableSearchFormRef.current || {}).setFieldsValue(res);
-          disk
-            .getFiles({
-              sourceCode: res.picture,
-              sourceKey: 'project_task_model',
-            })
-            .then(v => {
-              this.setState({
-                imageUrl: v.length !== 0 ? disk.downloadFiles(v[0].id, { view: true }) : '',
-              });
-              dispatch({
-                type: 'taskModel/getEditOriginModelData',
-                payload: { ...res, fileId: v.length !== 0 ? v[0].id : '' },
-              });
-            });
+
+          dispatch({
+            type: 'taskModel/getEditOriginModelData',
+            payload: { ...res },
+          });
           if (res.version) {
             this.setState({
               versionType: versionFun(res.version),
+              imageUrl: disk.downloadFiles(res.picture, { view: true }),
             });
           }
         })
@@ -193,7 +184,6 @@ class TaskModel extends Component {
 
   // 图片上传
   handleChange = info => {
-    const { guuid } = this.state;
     if (info.file.status === 'uploading') {
       this.setState({ loading: true });
       return;
@@ -204,7 +194,7 @@ class TaskModel extends Component {
         this.setState({
           imageUrl,
           loading: false,
-          picture: guuid,
+          picture: info.file.response[0],
         }),
       );
     }
@@ -228,13 +218,11 @@ class TaskModel extends Component {
   };
 
   // 任务模型列表title样式
-  titleContent = () => {
-    return (
-      <>
-        <div style={{ fontWeight: 'bolder', marginTop: 10, fontSize: 16 }}>前置任务列表</div>
-      </>
-    );
-  };
+  titleContent = () => (
+    <>
+      <div style={{ fontWeight: 'bolder', marginTop: 10, fontSize: 16 }}>前置任务列表</div>
+    </>
+  );
 
   // 是否可自动运行和交互分析
   onChange = checked => {
@@ -322,9 +310,7 @@ class TaskModel extends Component {
     }
   };
 
-  onFinishFailed = () => {
-    return false;
-  };
+  onFinishFailed = () => false;
 
   // 点击打开关联
   onOpen = () => {
@@ -352,9 +338,7 @@ class TaskModel extends Component {
     // console.log(row);
     const { tableData } = this.state;
     let list = [...tableData];
-    list = list.filter(item => {
-      return item.id !== row.id;
-    });
+    list = list.filter(item => item.id !== row.id);
     this.setState({
       tableData: list,
     });
@@ -481,22 +465,18 @@ class TaskModel extends Component {
         title: '编号/名称',
         dataIndex: 'code',
         width: 500,
-        render: (value, row) => {
-          return (
-            <div style={{ display: 'flex' }}>
-              <Avatar
-                src={
-                  row.fileId ? disk.downloadFiles(row.fileId, { view: true }) : DefaultHeadPicture
-                }
-                style={{ float: 'left', width: '46px', height: '46px', marginRight: 10 }}
-              />
-              <div>
-                <h5>{row.code}</h5>
-                <div>{row.name}</div>
-              </div>
+        render: (value, row) => (
+          <div style={{ display: 'flex' }}>
+            <Avatar
+              src={row.fileId ? disk.downloadFiles(row.fileId, { view: true }) : DefaultHeadPicture}
+              style={{ float: 'left', width: '46px', height: '46px', marginRight: 10 }}
+            />
+            <div>
+              <h5>{row.code}</h5>
+              <div>{row.name}</div>
             </div>
-          );
-        },
+          </div>
+        ),
       },
       {
         title: '版本',
@@ -512,16 +492,14 @@ class TaskModel extends Component {
         title: '状态',
         dataIndex: 'status',
         width: 400,
-        render: value => {
-          return (
-            <>
-              <Badge
-                status={formatter(taskModelStatusOptions, value, 'value', 'status')}
-                text={formatter(taskModelStatusOptions, value, 'value', 'label')}
-              />
-            </>
-          );
-        },
+        render: value => (
+          <>
+            <Badge
+              status={formatter(taskModelStatusOptions, value, 'value', 'status')}
+              text={formatter(taskModelStatusOptions, value, 'value', 'label')}
+            />
+          </>
+        ),
       },
       {
         title: '操作',

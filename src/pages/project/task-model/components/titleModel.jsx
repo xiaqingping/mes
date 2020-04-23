@@ -3,9 +3,9 @@ import { Avatar, Tag, Card, Spin } from 'antd';
 import { DownOutlined, UpOutlined } from '@ant-design/icons';
 import { connect } from 'dva';
 import api from '@/pages/project/api/taskmodel';
-import ArgumentModel from './argumentModel';
 import disk from '@/pages/project/api/disk';
 import { versionSort } from '@/utils/utils';
+import ArgumentModel from './argumentModel';
 import '../index.less';
 
 class TitleModel extends React.Component {
@@ -29,19 +29,10 @@ class TitleModel extends React.Component {
           this.setState({
             loading: true,
           });
-          const uuids = res.picture;
-          disk
-            .getFiles({
-              sourceCode: uuids,
-              sourceKey: 'project_task_model',
-            })
-            .then(v => {
-              const newList = { ...res, fileId: (v[0] || {}).id || '' };
-              this.setState({
-                viewData: newList,
-              });
-            });
 
+          this.setState({
+            viewData: res,
+          });
           if (res.versions) {
             const vers = versionSort(res.versions).map(item => {
               item = `V${item}`;
@@ -108,7 +99,7 @@ class TitleModel extends React.Component {
     });
     console.log(item);
     console.log(this.props);
-    // TODO 获取数据参数数据
+
     const { dispatch } = this.props;
 
     dispatch({
@@ -123,6 +114,7 @@ class TitleModel extends React.Component {
   onViewClose = () => {
     this.setState({
       viewVisible: false,
+      toViewArgument: false,
     });
   };
 
@@ -155,7 +147,7 @@ class TitleModel extends React.Component {
           <div style={{ display: 'flex' }}>
             <div>
               <Avatar
-                src={viewData.fileId ? disk.downloadFiles(viewData.fileId, { view: true }) : ''}
+                src={viewData.picture ? disk.downloadFiles(viewData.picture, { view: true }) : ''}
                 style={{ marginRight: 10 }}
                 size="large"
               />

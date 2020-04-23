@@ -85,6 +85,8 @@ const err = error => {
 /* eslint-disable no-param-reassign */
 // 请求拦截
 service.interceptors.request.use(config => {
+  // window.location.href = 'http://www.baidu.com';
+  // window.open('http://www.baidu.com');
   const token = localStorage.getItem('token');
   // GET请求处理请求参数
   // 去掉首尾空格

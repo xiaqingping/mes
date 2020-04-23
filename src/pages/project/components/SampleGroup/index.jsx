@@ -1,14 +1,21 @@
 import React from 'react';
 import { Table, Select, Button, Modal, Input, AutoComplete, Popover } from 'antd';
-import { UploadOutlined, PlusSquareOutlined, CloseOutlined } from '@ant-design/icons';
+import {
+  UploadOutlined,
+  PlusSquareOutlined,
+  CloseOutlined,
+  ExclamationCircleOutlined,
+} from '@ant-design/icons';
 import { SketchPicker } from 'react-color';
 import { getrandomColor } from '@/utils/utils';
 import './index.less';
+import { connect } from 'dva';
 import GroupUpload from '../UploadSequenceFile/index';
 
+const { confirm } = Modal;
 const { Option } = AutoComplete;
 
-class SampleSelect extends React.Component {
+class SampleGroup extends React.Component {
   state = {
     visible: false,
 
@@ -291,7 +298,9 @@ class SampleSelect extends React.Component {
     // // 取出 行数据
     const rowData = this.getRowDataGroup(data, sampleList, newColumns);
     // 填充行数据
-    const newData = this.getFillData(data, rowData);
+    const newData = this.getFillData(data, rowData, newColumns);
+    // 将所有的颜色放到仓库里.
+    this.pushColorsToStore(newData);
 
     // 保存 分组 表头数据
     this.setState({
@@ -300,12 +309,35 @@ class SampleSelect extends React.Component {
     });
   };
 
+  pushColorsToStore = newData => {
+    const colorStore = [];
+    newData.forEach(row => {
+      Object.keys(row).forEach(key => {
+        if (key.indexOf('color_') !== -1) {
+          if (row[key] && !colorStore.includes(row[key])) {
+            colorStore.push(row[key]);
+          }
+        }
+      });
+    });
+
+    this.setColorStore(colorStore);
+  };
+
+  setColorStore = colorStore => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'project/setColorStore',
+      payload: colorStore,
+    });
+  };
+
   /**
    * 填充行数据
    * groupList  分组方案数据
    * rowData 行数据 有表头字段但数据为空
    */
-  getFillData = (groupList, rowData) => {
+  getFillData = (groupList, rowData, columns) => {
     // 分组方案遍历
     groupList.forEach(groupItem => {
       const { groupSchemeName } = groupItem;
@@ -313,7 +345,7 @@ class SampleSelect extends React.Component {
       // 行数据遍历
       rowData.forEach(rowItem => {
         // 分组方案下的 分组列表不为空
-        if (groupItem.groupList && groupItem.groupList.length) {
+        if (groupItem.groupList !== null && groupItem.groupList.length !== 0) {
           // 分组列表遍历
           groupItem.groupList.forEach(groItem => {
             // 分组下的样品列表遍历
@@ -335,21 +367,31 @@ class SampleSelect extends React.Component {
         }
 
         // 分组方案下的 样品列表不为空
-        if (groupItem.sampleList && groupItem.sampleList.length) {
+        if (groupItem.sampleList !== null && groupItem.sampleList.length !== 0) {
           groupItem.sampleList.forEach(samItem => {
             if (rowItem.metadataSampleId === samItem.metadataSampleId) {
               Object.keys(rowItem).map(key => {
-                if (rowItem[key] === groupSchemeName) {
-                  const num = key.split('_')[1];
-                  const color = `color_${num}`;
-                  rowItem[color] = '';
-                  rowItem[key] = '当前样品';
-                }
+                const num = key.split('_')[1];
+                let color;
+                if (num !== undefined) color = `color_${num}`;
+                rowItem[color] = '' || rowItem[color];
+                if (rowItem[key] === groupSchemeName) rowItem[key] = '当前样品';
                 return false;
               });
             }
           });
         }
+      });
+    });
+
+    rowData.forEach(rItem => {
+      columns.forEach(cItem => {
+        Object.keys(rItem).map(key => {
+          if (rItem[key] === cItem.dupTitle) {
+            rItem[key] = '';
+          }
+          return false;
+        });
       });
     });
     return rowData;
@@ -470,27 +512,29 @@ class SampleSelect extends React.Component {
     <div style={{ display: 'flex' }} className="project_components_sample_group_render_wrap">
       {/* <span style={{ marginRight: 10 }}>{value}</span> */}
       {this.selectRender(value, row, index, color1, col)}
-      <Popover
-        overlayClassName="project_manage_sample_ui_select"
-        overlayStyle={{ padding: 0 }}
-        content={
-          <SketchPicker
-            color={row[color1]}
-            onChangeComplete={color => this.handleColorChange(color, value, row, index)}
+      {row[color1] && (
+        <Popover
+          overlayClassName="project_manage_sample_ui_select"
+          overlayStyle={{ padding: 0 }}
+          content={
+            <SketchPicker
+              color={row[color1]}
+              onChangeComplete={color => this.handleColorChange(color, value, row, index)}
+            />
+          }
+          trigger="click"
+          placement="bottom"
+        >
+          <div
+            style={{
+              width: 20,
+              height: 20,
+              backgroundColor: row[color1],
+              position: 'relative',
+            }}
           />
-        }
-        trigger="click"
-        placement="bottom"
-      >
-        <div
-          style={{
-            width: 20,
-            height: 20,
-            backgroundColor: row[color1],
-            position: 'relative',
-          }}
-        />
-      </Popover>
+        </Popover>
+      )}
     </div>
   );
 
@@ -566,11 +610,22 @@ class SampleSelect extends React.Component {
   };
 
   handleColorChange = (color, value, row, index) => {
+    // ---------------------首先判断选择的颜色在model里是否有重复---------
+    const { colorStore } = this.props.project;
+    const colors = [...colorStore];
+    let colorhex = color.hex;
+
+    const repeat = colorStore.includes(colorhex);
+    if (repeat) {
+      colorhex = getrandomColor();
+    }
+    colors.push(colorhex);
+    this.setColorStore(colors);
     Object.keys(row).forEach(key => {
       if (row[key] === value) {
         const num = key.split('_')[1];
         const colorName = `color_${num}`;
-        row[colorName] = color.hex;
+        row[colorName] = colorhex;
       }
     });
     const { groupSchemeData } = this.state;
@@ -624,12 +679,19 @@ class SampleSelect extends React.Component {
     });
   };
 
+  confirmGroupRender = (groupName, preGroupName) => {
+    return (
+      <div>
+        <div>
+          点击“是”将分组“{preGroupName}”改为“{groupName}”
+        </div>
+        <div>点击“否”新增分组“{groupName}”</div>
+      </div>
+    );
+  };
+
   // 选择组，blur 时候保存数据--- 当选择组的时候要加上默认的颜色
   handleGroupSelectBlur = (e, value, row, index, col) => {
-    console.log(value);
-    console.log(row);
-    console.log(index);
-    console.log(col);
     const option = e.target.value;
     const { optionList } = this.state;
     let list = [...optionList];
@@ -637,24 +699,81 @@ class SampleSelect extends React.Component {
     if (!list.includes(option) && option) {
       list = [...list, option];
     }
-    // 如果blur时候的值跟原来的值一样， 说明数据没有改变
-    if (value !== option) {
+    const { groupSchemeData } = this.state;
+    const datas = [...groupSchemeData];
+    if (option && option !== '当前样品' && option !== value) {
+      const num = col.split('_')[1];
+
+      const hasSame = datas.some(item => {
+        if (item[col] === option) {
+          row[`color_${num}`] = item[`color_${num}`];
+        }
+        return item[col] === option;
+      });
+      if (!hasSame) row[`color_${num}`] = getrandomColor();
+      //  添加到颜色store
+      const { colorStore } = this.props.project;
+      const colors = [...colorStore];
+      colors.push(row[`color_${num}`]);
+      this.setColorStore(colors);
+
       row[col] = option;
-      const { groupSchemeData } = this.state;
-      const source = [...groupSchemeData];
-      source[index] = row;
-      this.setState(
-        {
-          groupSchemeData: source,
+      datas[index] = row;
+      this.setState({
+        groupSchemeData: datas,
+      });
+    }
+    // 如果blur时候的值跟原来的值一样， 说明数据没有改变
+    if (value !== option && value && option !== '当前样品' && value !== '当前样品') {
+      if (option === '当前样品') {
+        this.handleUpdateGroup(row, col, option, index);
+        return false;
+      }
+      confirm({
+        title: `是否将分组“${value}”改为“${option}”？`,
+        icon: <ExclamationCircleOutlined />,
+        content: this.confirmGroupRender(option, value),
+        cancelText: '否',
+        okText: '是',
+        onOk: () => {
+          // 修改组名
+          const { groupSchemeData } = this.state;
+          const tableData = [...groupSchemeData];
+          tableData.forEach(item => {
+            if (item[col] === value) {
+              item[col] = option;
+              return item;
+            }
+            return item;
+          });
+          console.log(tableData);
+          // TODO: 为什么表格数据更新了， 视图没有更新？
+          this.setState({
+            groupSchemeData: tableData,
+            // columns,
+          });
         },
-        () => {
-          console.log(this.state.groupSchemeData);
+        onCancel: () => {
+          // 新增组名
+          this.handleUpdateGroup(row, col, option, index);
         },
-      );
+      });
     }
 
     this.setState({
       optionList: list,
+    });
+    return true;
+  };
+
+  // 修改组名
+  handleUpdateGroup = (row, col, option, index) => {
+    row[col] = option;
+    const { groupSchemeData } = this.state;
+    const source = [...groupSchemeData];
+    source[index] = row;
+    this.setState({
+      groupSchemeData: source,
     });
   };
 
@@ -694,13 +813,15 @@ class SampleSelect extends React.Component {
   verifyData = () => {
     const { groupSchemeData, columns } = this.state;
     // 1. 一个分组方案里只能是单纯组或者单纯样品
+    console.log(groupSchemeData);
+    console.log(columns);
     // 2. 一个分组方案里面不能都是空
   };
 
   render() {
     let tableWidth = 0;
     const { groupSchemeData, visible, columns } = this.state;
-    // console.log(columns);
+    console.log(columns);
     console.log(groupSchemeData);
 
     const neData = {};
@@ -721,6 +842,39 @@ class SampleSelect extends React.Component {
         group = { ...group, ...groupSchemeName };
       });
     }
+
+    // 数据整理
+    // let tableHeard = [];
+    // columns.forEach((item, index) => {
+    //   if (index !== 0 && typeof item.id === 'number') {
+    //     tableHeard = [
+    //       ...tableHeard,
+    //       { groupSchemeName: item.dupTitle, sampleList: [], groupList: [] },
+    //     ];
+    //   }
+    // });
+
+    // console.log(tableHeard);
+    // for (let i = 2; i < groupSchemeData.length + 2; i++) {
+    //   if (!tableHeard[i - 2]) return false;
+    //   // eslint-disable-next-line no-loop-func
+    //   groupSchemeData.forEach(item => {
+    //     if (item[`header_${i}`] === '') return;
+    //     if (item[`header_${i}`] === '当前样品') {
+    //       tableHeard[i - 2].sampleList.push({
+    //         metadataSampleId: item[`header_${i}`],
+    //         sampleAlias: item.sampleName,
+    //       });
+    //     } else {
+    //       tableHeard[i - 2].groupList.push({
+    //         groupName: item[`header_${i}`],
+    //         color: item[`color_${i}`],
+    //       });
+    //     }
+    //   });
+    // }
+
+    // console.log(tableHeard);
 
     columns.map(col => {
       if (!col.width) {
@@ -756,4 +910,6 @@ class SampleSelect extends React.Component {
   }
 }
 
-export default SampleSelect;
+export default connect(({ project }) => ({
+  project,
+}))(SampleGroup);
