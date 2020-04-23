@@ -12,68 +12,59 @@ import ChooseProcessModel from '../components/ChooseProcessModel';
 // import ParamPic from '@/assets/imgs/canshu@1x.png';
 
 class Test extends Component {
-  // 表单默认值
-  // initialValues = {
-  //   status: 1,
-  //   page: 1,
-  //   pageSize: 5,
-  // };
-
   constructor(props) {
     super(props);
-    const {
-      // processSelectedList,
-      paramList,
-      projectInfor,
-    } = this.props.projectManage;
+    const { processSelectedList, paramList, projectInfor } = this.props.projectManage;
     console.log(this.props);
 
     let viewShow;
-    if (projectInfor.requestType === 'add') viewShow = [];
-
-    // 已创建的项目传过来的项目id和类型
-    if (!this.props.location.state) {
-      // const projectProcesses = this.props.location.state.newData;
-      // console.log(projectProcesses);
-      console.log(123);
-    }
-
-    // // if (projectProcesses.requestType === 'add') viewShow = [];
-    // viewShow = processSelectedList;
 
     this.state = {
       // list选中的流程参数数据
-      list: viewShow,
+      list: processSelectedList,
       loading: false,
       visible: false,
       projectInfor,
       paramList,
+      buttonLoading: false,
+      projectProcesses: [],
     };
     console.log(this.state);
+
+    if (this.props.location.state) {
+      // 已创建的项目传过来的项目id和类型
+      const projectProcesses = this.props.location.state.newData;
+      console.log(projectProcesses);
+      if (projectProcesses.requestType === 'add') {
+        viewShow = [];
+        console.log(viewShow);
+        console.log('从已有项目新增页面跳转的');
+        // this.setState({
+        //   projectProcesses: 123,
+        // },() => {
+        //   console.log(this.state);
+        // });
+      }
+    } else {
+      if (projectInfor.requestType === 'add') {
+        console.log('基础信息页面跳转过来的');
+        viewShow = [];
+      } else {
+        console.log('从其他页面跳转进来的');
+        viewShow = processSelectedList;
+        console.log(viewShow);
+      }
+      console.log(123);
+    }
   }
 
   componentDidMount() {
+    this.props.dispatch({
+      type: 'projectManage/setProcessSelectedList',
+      payload: [],
+    });
     this.getData();
-    // 传过来的项目id和类型
-
-    // if(this.props.location.state === []) {
-    //   return
-    //   // console.log(123);
-    // }
-    // const projectProcesses = this.props.location.state.newData;
-    // console.log(projectProcesses);
-    // this.setState({ projectProcesses },() => {
-    //   // console.log(this.state);
-    // });
-    console.log(this.state);
   }
-
-  // componentWillUnmount() {
-  //   this.props.dispatch({
-  //     type: 'projectManage/setProcessSelectedList',
-  //     payload: [],
-  //   });
-  // }
 
   // 点击打开关联
   onOpen = () => {
@@ -144,57 +135,140 @@ class Test extends Component {
 
   // 保存
   handleSave = () => {
-    // const { projectProcesses} = this.state;
-    // console.log(projectProcesses);
-    const {
-      list,
-      projectInfor,
-      paramList,
-      // projectProcesses
-    } = this.state;
-    let status = false;
-    if (list === '' || list === undefined) {
-      status = true;
-    }
-    if (projectInfor === '' || projectInfor === undefined) {
-      status = true;
-    }
-    if (paramList === '' || paramList === undefined) {
-      status = true;
-    }
-    if (status) return message.error('数据为空');
-
-    // 设置好的参数追加在流程列表数据中
-    const newList = [];
-    list.forEach(item => {
-      let newItem = {};
-      newItem = {
-        describe: item.describe,
-        name: item.name,
-        processModelId: item.id,
-      };
-      if (item.id === paramList.processId) {
-        newItem.processesParamList = paramList.params;
-      }
-      newList.push(newItem);
+    this.setState({
+      buttonLoading: true,
     });
-    console.log(newList);
+    const { list, projectInfor, paramList, projectProcesses } = this.state;
+    // console.log(projectProcesses);
+    let status = false;
 
-    projectInfor.processList = newList;
-    const data = projectInfor;
+    if (projectInfor.requestType === 'add') {
+      if (list === '' || list === undefined) {
+        status = true;
+      }
+      if (projectInfor === '' || projectInfor === undefined) {
+        status = true;
+      }
+      if (paramList === '' || paramList === undefined) {
+        status = true;
+      }
+      if (status) return message.error('数据为空');
+      console.log('基础信息有值的保存');
+      // 设置好的参数追加在流程列表数据中
+      const newList = [];
+      list.forEach(item => {
+        let newItem = {};
+        newItem = {
+          describe: item.describe,
+          name: item.name,
+          processModelId: item.id,
+        };
+        if (item.id === paramList.processId) {
+          newItem.processesParamList = paramList.params;
+        }
+        newList.push(newItem);
+      });
+      console.log(list);
 
-    api.addProjects(data).then(() => router.push('/project/project-manage'));
+      projectInfor.processList = newList;
+      const data = projectInfor;
 
-    // if (projectProcesses.requestType === 'add') {
-    //   // api.addProjectsProcess({projectProcesses,data}).then(res => {
-    //   //   console.log(res);
-    //   // });
-    // }
+      console.log(newList);
+      api
+        .addProjects(data)
+        .then(() => {
+          this.setState({
+            buttonLoading: false,
+          });
+          // router.push('/project/project-manage');
+        })
+        .catch(() => {
+          this.setState({
+            buttonLoading: false,
+          });
+        });
+    } else {
+      if (this.props.location.state.newData) {
+        const { newData } = this.props.location.state;
+        const projectId = newData.id;
+        console.log(projectId);
+        const newList = [];
+        list.forEach(item => {
+          let newItem = {};
+          newItem = {
+            describe: item.describe,
+            name: item.name,
+            processModelId: item.id,
+          };
+          if (item.id === paramList.processId) {
+            newItem.processesParamList = paramList.params;
+          }
+          newList.push(newItem);
+        });
+        const processList = newList;
+        console.log(processList);
+        api
+          .addProjectsProcess({ projectId, processList })
+          .then(res => {
+            this.setState({
+              buttonLoading: false,
+            });
+            console.log(res);
+            // router.push('/project/project-manage/detail');
+          })
+          .catch(() => {
+            this.setState({
+              buttonLoading: false,
+            });
+          });
+      }
+      console.log('其他方式');
+    }
+
+    if (projectProcesses.requestType === 'add') {
+      // 如果是从项目流程新增跳转的，点保存要跳转回详情页面
+      const processIds = projectProcesses.id;
+      console.log('判断id');
+      console.log(processIds);
+
+      // // 设置好的参数追加在流程列表数据中
+      // const newList = [];
+      // list.forEach(item => {
+      //   let newItem = {};
+      //   newItem = {
+      //     describe: item.describe,
+      //     name: item.name,
+      //     processModelId: item.id,
+      //   };
+      //   if (item.id === paramList.processId) {
+      //     newItem.processesParamList = paramList.params;
+      //   }
+      //   newList.push(newItem);
+      // });
+      // // console.log(newList);
+      // // projectProcesses
+      // let projectParam;
+      // projectParam.processList = newList;
+      // const data = projectParam;
+
+      // api.addProjectsProcess({processIds,data}).then(res => {
+      //   this.setState({
+      //     buttonLoading: false,
+      //   });
+      //   console.log(res);
+      //   router.push('/project/project-manage/detail');
+      // }).catch(() => {
+      //   this.setState({
+      //     buttonLoading: false,
+      //   });
+      // });
+    }
     return '';
   };
 
   render() {
-    const { list, loading, visible } = this.state;
+    const { list, loading, visible, buttonLoading } = this.state;
+    console.log(list);
     const columns = [
       {
         title: '名称/描述',
@@ -265,7 +339,7 @@ class Test extends Component {
         ),
       },
     ];
-
+    console.log(123);
     return (
       <PageHeaderWrapper>
         <Card bordered={false}>
@@ -305,7 +379,12 @@ class Test extends Component {
           <Card
             style={{ height: '48px', width: '100%', position: 'fixed', bottom: '0', left: '0' }}
           >
-            <Button type="primary" style={{ float: 'right', marginTop: '-16px' }} htmlType="submit">
+            <Button
+              type="primary"
+              style={{ float: 'right', marginTop: '-16px' }}
+              htmlType="submit"
+              loading={buttonLoading}
+            >
               保存
             </Button>
           </Card>
