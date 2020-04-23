@@ -294,7 +294,6 @@ class DrawerTool extends Component {
     const { status } = this.props;
     return (
       <div>
-        {console.log(detailValue)}
         <Drawer
           title={errorPage ? '' : this.titleContent(detailValue)}
           width={500}
