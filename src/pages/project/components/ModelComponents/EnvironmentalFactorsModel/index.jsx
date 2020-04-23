@@ -47,7 +47,9 @@ class EnvironmentalFactorsModel extends React.Component {
 
   componentDidUpdate(props) {
     if (props.submitStatus !== this.props.submitStatus) {
-      this.props.getData('testData', '环境因子');
+      const data = this.handleSave();
+      console.log(data);
+      // this.props.getData('testData', '环境因子');
     }
   }
 
@@ -87,6 +89,7 @@ class EnvironmentalFactorsModel extends React.Component {
     this.setState({
       data: tableList,
       columns: newColumns,
+      headers: newHeader,
     });
   };
 
@@ -95,6 +98,23 @@ class EnvironmentalFactorsModel extends React.Component {
     const { paramList, sampleList } = this.props;
     const { firstColumn } = this.state;
     const paramValue = JSON.parse(paramList.paramValue);
+
+    console.log(paramValue);
+
+    // const newColumns = [];
+    // paramValue.environmentFactorList.forEach((item, index) => {
+    //   console.log(item);
+    //   console.log(index);
+    //   // 表头
+    //   const newCol = {
+    //     id: index + 1,
+    //     title: item.environmentFactorName,
+    //     dataIndex: index + 1,
+    //     key: index + 1,
+    //   };
+    //   newColumns.push(newCol);
+    // })
+    // console.log(newColumns);
 
     if (paramList) {
       const list = paramValue.environmentFactorList;
@@ -106,6 +126,7 @@ class EnvironmentalFactorsModel extends React.Component {
 
       // 取出 行数据
       const rowData = this.getRowDataEnvironment(list, sampleList, newColumns);
+      console.log(rowData);
 
       // 填充行数据
       const newData = this.getFillDataEnvironment(list, rowData);
@@ -113,6 +134,90 @@ class EnvironmentalFactorsModel extends React.Component {
       this.getDataDispose(newColumns, newData);
     }
   };
+
+  // 提交数据
+  handleSave = () => {
+    const { columns, data, headers } = this.state;
+    console.log(data);
+
+    if (data.length === 0 || headers.length === 0) return false;
+
+    // let tableHeard = [];
+    // headers.forEach((item, index) => {
+
+    //     tableHeard = [
+    //       ...tableHeard,
+    //       { groupSchemeName: item.dupTitle, sampleList: [], groupList: [] },
+    //     ];
+
+    // });
+
+    // console.log(headers);
+    // console.log(tableHeard);
+    // for (let i = 2; i < headers.length + 2; i++) {
+    //   if (!tableHeard[i - 2]) return false;
+    //   // eslint-disable-next-line no-loop-func
+    //   data.forEach(item => {
+    //     // if (item[`header_${i}`] === '') return;
+    //     // if (item[`header_${i}`] === '当前样品') {
+    //     //   tableHeard[i - 2].sampleList.push({
+    //     //     metadataSampleId: item[`header_${i}`],
+    //     //     sampleAlias: item.sampleName,
+    //     //   });
+    //     // } else {
+    //       tableHeard[i - 2].groupList.push({
+    //         groupName: item[`header_${i}`],
+    //         // color: item[`color_${i}`],
+    //       });
+    //     // }
+    //   });
+    // }
+
+    // return tableHeard
+
+      // 数据整理
+      let tableHeard = [];
+      headers.forEach(item => {
+        tableHeard = [
+          ...tableHeard,
+          { environmentFactorName: item.title, environmentFactorValueList: [] },
+        ];
+      });
+
+      // console.log(tableHeard);
+
+      for (let i = 2; i < tableHeard.length + 2; i++) {
+        if (!tableHeard[i - 2]) return false;
+        const values = [];
+        // eslint-disable-next-line no-loop-func
+        data.forEach(item => {
+          if (item[`header_${i}`] !== '') {
+            const sampleValue = {
+              sampleId: item.sampleId,
+              sampleAlias: item.sampleAlias,
+            }
+            const sampleList = [];
+            sampleList.push(sampleValue);
+            if (values.indexOf(item[`header_${i}`]) === -1){
+              tableHeard[i - 2].environmentFactorValueList.push({
+                environmentFactorValue: item[`header_${i}`],
+                sampleList,
+              });
+            } else {
+              tableHeard[i - 2].environmentFactorValueList.forEach(valItem => {
+                if (item[`header_${i}`] === valItem.environmentFactorValue) {
+                  valItem.sampleList.push(sampleValue);
+                }
+              })
+            }
+            values.push(item[`header_${i}`]);
+          }
+        });
+      }
+
+      return tableHeard;
+
+  }
 
   // 新增列
   addColumn = () => {
@@ -271,8 +376,8 @@ class EnvironmentalFactorsModel extends React.Component {
       const newCol = {
         id: max + 1,
         title: item[titleName],
-        dataIndex: `hearder_${max + 1}`,
-        key: `hearder_${max + 1}`,
+        dataIndex: `header_${max + 1}`,
+        key: `header_${max + 1}`,
       };
       newColumns.push(newCol);
     });
@@ -320,7 +425,7 @@ class EnvironmentalFactorsModel extends React.Component {
           // 环境因子值下的样品列表遍历
           valItem.sampleList.forEach(samItem => {
             // 找到对应的样品行
-            if (rowItem.metadataSampleId === samItem.metadataSampleId) {
+            if (rowItem.sampleId === samItem.sampleId) {
               Object.keys(rowItem).map(key => {
                 if (rowItem[key] === environmentFactorName) {
                   rowItem[key] = valItem.environmentFactorValue;
@@ -344,6 +449,7 @@ class EnvironmentalFactorsModel extends React.Component {
    * columns 初始列数据
    */
   sampleRemoveDuplication = (list, sampleList, columns) => {
+    // 去重
     const newSample = [];
     const ids = [];
     list.forEach(samItem => {
@@ -369,9 +475,8 @@ class EnvironmentalFactorsModel extends React.Component {
           };
           columns.forEach(groItem => {
             newIt[groItem.dataIndex] = groItem.title;
-            // newIt.id = groItem.id;
           });
-          newIt.sampleName = it.sampleAlias;
+          newIt.sampleAlias = it.sampleAlias;
           newData.push(newIt);
         }
       });
