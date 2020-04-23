@@ -255,7 +255,7 @@ class ProjectManagement extends Component {
   // 项目管理详情页面
   searchDetails = row => {
     const projectId = row.id;
-    router.push('/project/project-manage/detail', { projectId });
+    router.push(`/project/project-manage/detail/${projectId}`);
   };
 
   // 删除
