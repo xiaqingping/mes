@@ -70,13 +70,17 @@ class FiledList extends Component {
           <Search />
         </FormItem>
       </Col>
-      <Col className="classdownBtn" lg={3} md={8} sm={12}>
+      <Col className="classdownBtn" lg={6} md={8} sm={12}>
         <FormItem label="" name="">
           <Button>下载</Button>
         </FormItem>
       </Col>
     </>
   );
+
+  // imgtype = type => {
+  //   return './excel.png'
+  // }
 
   render() {
     const {
@@ -92,14 +96,15 @@ class FiledList extends Component {
     //     cell: EditableCell,
     //   },
     // };
-
     let columns = [
       {
         title: '文件名称',
         dataIndex: 'name',
         width: 150,
+        // render: (value, item) => (
         render: value => (
           <>
+            {/* <img src={this.imgtype(item.type)} alt=""/> */}
             <FileExclamationOutlined style={{ fontSize: 18 }} />
             <span style={{ marginLeft: 10 }}>{value}</span>
           </>
@@ -139,7 +144,7 @@ class FiledList extends Component {
 
     columns = columns.map(col => {
       // if (!col.width) col.width = 100;
-      // console.log(col)
+
       tableWidth += col.width;
       if (!col.editable) {
         return col;
@@ -151,6 +156,7 @@ class FiledList extends Component {
           rules: col.rules,
           inputType: col.inputType,
           dataIndex: col.dataIndex,
+          // title: [col.title, col.type],
           title: col.title,
           editing: rowIndex === this.state.editIndex,
         }),
@@ -181,6 +187,7 @@ class FiledList extends Component {
           </Col>
         </Form> */}
         <Form ref={this.tableFormRef}>
+          {/* {console.log(list)} */}
           <Table
             scroll={{ x: tableWidth, y: 400 }}
             rowKey="id"

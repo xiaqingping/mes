@@ -9,7 +9,7 @@ import {
   Select,
   Popconfirm,
   Col,
-  AutoComplete,
+  // AutoComplete,
   Menu,
   Dropdown,
   Input,
@@ -20,7 +20,8 @@ import {
 import TableSearchForm from '@/components/TableSearchForm';
 import { PlusOutlined } from '@ant-design/icons';
 import { connect } from 'dva';
-import _ from 'lodash';
+import debounce from 'lodash/debounce';
+// import _ from 'lodash';
 import router from 'umi/router';
 import StandardTable from '@/pages/project/components/StandardTable';
 import { formatter } from '@/utils/utils';
@@ -48,21 +49,22 @@ class ProjectManagement extends Component {
       loading: false,
       list: [],
       nameCodeVal: [],
-      projectIds: '',
+      projectIds: '', // 模糊搜索id值
+      modelSearchOptions: [], // 任务模型模糊搜素options
     };
     // 异步验证做节流处理
-    this.callParter = _.debounce(this.callParter, 500);
+    // this.callParter = _.debounce(this.callParter, 500);
+    this.fetchCodeData = debounce(this.fetchCodeData, 500);
   }
 
   componentDidMount() {
     this.getTableData(this.initialValues);
   }
 
-  callParter = value => {
-    console.log(value);
+  fetchCodeData = value => {
     api.gettProjectManageCodeAndName(value).then(res => {
-      // console.log(res);
-      this.setState({ nameCodeVal: res });
+      console.log(res);
+      this.setState({ modelSearchOptions: res || [] });
     });
   };
 
@@ -81,12 +83,6 @@ class ProjectManagement extends Component {
       changePage = true;
       newData = { ...newData, statusList: formData.statusList.join(',') };
       delete formData.statusList;
-    }
-    // 项目搜索条件
-    if (formData.id) {
-      changePage = true;
-      newData = { ...newData, id: projectIds };
-      delete formData.id;
     }
 
     // 创建时间
@@ -109,7 +105,9 @@ class ProjectManagement extends Component {
       ...newData,
       ...formData,
       ...options,
+      id: projectIds,
     };
+    console.log(data);
     api.getProjectManage(data, true).then(res => {
       // console.log(res)
       this.setState({
@@ -125,54 +123,24 @@ class ProjectManagement extends Component {
     // console.log(list);
   };
 
-  // 项目名称联想
-  renderOption = item => ({
-    code: item.code,
-    value: item.name,
-    id: item.id,
-    label: (
-      <div
-        style={{ display: 'flex', marginLeft: '14px', padding: '6px 0' }}
-        onClick={() => {
-          this.setState({
-            projectIds: item.id,
-          });
-        }}
-      >
-        <span>{item.code}</span>&nbsp;&nbsp;
-        <span>{item.name}</span>
-      </div>
-    ),
-  });
+  handleSearchCodeChange = value => {
+    console.log(value);
+    const { pagination } = this.state;
+    // console.log(pagination);
+    const page = {
+      current: 1,
+      pageSize: pagination.pageSize,
+    };
 
-  // 筛选值
-  inputValue = value => {
-    // console.log(value)
-    const { nameCodeVal } = this.state;
-    // console.log(nameCodeVal);
-    const arr = [];
-    if (!value) {
-      return false;
-    }
-    this.callParter(value);
-    if (nameCodeVal.length === 0) {
-      return false;
-    }
-    nameCodeVal.forEach(item => {
-      if (item.name.indexOf(value) !== -1) {
-        arr.push(item);
-      }
-      if (item.code.indexOf(value) !== -1 && arr.indexOf(item)) {
-        arr.push(item);
-      }
-      if (item.id.indexOf(value) !== -1 && arr.indexOf(item) && item.code.indexOf(value)) {
-        arr.push(item);
-      }
-    });
-    this.setState({
-      nameCodeVal: arr,
-    });
-    return true;
+    this.setState(
+      {
+        pagination: page,
+        projectIds: value.value,
+      },
+      () => {
+        console.log(this.state);
+      },
+    );
   };
 
   // 分页
@@ -203,17 +171,30 @@ class ProjectManagement extends Component {
 
   simpleForm = () => {
     const { languageCode, statusList } = this.props;
-    const { nameCodeVal } = this.state;
-    // console.log(this.props);
+    const { modelSearchOptions } = this.state;
+    console.log(modelSearchOptions);
     return (
       <>
         <Col xxl={6} xl={8} lg={languageCode === 'EN' ? 12 : 12}>
           <FormItem label="项目" name="id">
-            <AutoComplete
-              onSearch={this.inputValue}
-              options={nameCodeVal.map(this.renderOption)}
-              placeholder="请输入项目名称"
-            />
+            <Select
+              allowClear
+              showSearch
+              showArrow={false}
+              labelInValue
+              filterOption={false}
+              onSearch={this.fetchCodeData}
+              onChange={this.handleSearchCodeChange}
+              style={{ width: '100%' }}
+              optionFilterProp="children" // 对子元素--option进行筛选
+              optionLabelProp="label" // 回填的属性
+            >
+              {modelSearchOptions.map(d => (
+                <Option key={d.code} value={d.id} label={d.name}>
+                  {d.code}&nbsp;&nbsp;{d.name}
+                </Option>
+              ))}
+            </Select>
           </FormItem>
         </Col>
         <Col xxl={6} xl={8} lg={languageCode === 'EN' ? 12 : 0}>
