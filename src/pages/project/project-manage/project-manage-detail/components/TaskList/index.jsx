@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import { connect } from 'dva';
 import api from '@/pages/project/api/projectManageDetail';
 import { formatter } from '@/utils/utils';
-import { Drawer, Card, List, Avatar, Tag, Table, Badge, Tooltip, Form } from 'antd';
+import { Drawer, Card, List, Avatar, Table, Badge, Tooltip, Form } from 'antd';
 import {
   DownOutlined,
   UpOutlined,
@@ -13,6 +13,8 @@ import {
   PauseCircleOutlined,
 } from '@ant-design/icons';
 import { ModelType } from '@/pages/project/components/ModelComponents';
+import disk from '@/pages/project/api/disk';
+import DefaultHeadPicture from '@/assets/imgs/defaultheadpicture.jpg';
 import { calculateTimeDifference } from '../../functions';
 import style from './index.less';
 
@@ -189,69 +191,67 @@ class TaskList extends Component {
     ];
     return (
       <>
-        <div>
-          <Drawer
-            width="500px"
-            title={detailList.name}
-            closable={false}
-            onClose={this.props.onClose}
-            visible={visible}
-            className="classTaskList"
-          >
-            <List
-              dataSource={taskList}
-              split={false}
-              renderItem={item => (
-                <List.Item key={item}>
-                  <Card hoverable style={{ width: '100%' }}>
-                    <Avatar
-                      src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
-                      size="large"
-                      className={style.floatLeft}
-                    />
-                    <div className={style.FMLeft}>
-                      <div>
-                        <div className={style.floatLeft}>
-                          <div>{item.code}</div>
-                          <div className={style.name}>{item.name}</div>
-                        </div>
-                        <Tag className={style.version} color="green">
-                          {item.taskModelVersion}
-                        </Tag>
+        <Drawer
+          width="500px"
+          title={detailList.name}
+          closable={false}
+          onClose={this.props.onClose}
+          visible={visible}
+        >
+          <List
+            dataSource={taskList}
+            split={false}
+            renderItem={item => (
+              <List.Item key={item}>
+                <Card hoverable style={{ width: '100%' }}>
+                  <Avatar
+                    // src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
+                    src={
+                      item.processModelPicture
+                        ? disk.downloadFiles(item.processModelPicture, { view: true })
+                        : DefaultHeadPicture
+                    }
+                    size="large"
+                    className={style.floatLeft}
+                  />
+                  <div className={style.FMLeft}>
+                    <div>
+                      <div className={style.floatLeft}>
+                        <div>{item.code}</div>
+                        <div className={style.name}>{item.name}</div>
                       </div>
                       <div className={style.describe}>{item.describe}</div>
                     </div>
-
-                    <div className={style.open}>
-                      {openId.filter(i => i === item.id).length !== 0 ? (
-                        <>
-                          <a onClick={() => this.showTable(item.id, 2)} style={{ float: 'right' }}>
-                            收起
-                            <UpOutlined />
-                          </a>
-                          <div className={style.taskExecRecordTable}>
-                            <Table
-                              size="small"
-                              columns={columns}
-                              rowKey="id"
-                              dataSource={item.taskExecRecordList}
-                              pagination={false}
-                            />
-                          </div>
-                        </>
-                      ) : (
-                        <a onClick={() => this.showTable(item.id, 1)}>
-                          展开
-                          <DownOutlined />
+                  </div>
+                  <div className={style.open}>
+                    {openId.filter(i => i === item.id).length !== 0 ? (
+                      <>
+                        <a onClick={() => this.showTable(item.id, 2)} style={{ float: 'right' }}>
+                          收起
+                          <UpOutlined />
                         </a>
-                      )}
-                    </div>
-                  </Card>
-                </List.Item>
-              )}
-            />
-          </Drawer>
-        </div>
+                        <div className={style.taskExecRecordTable}>
+                          <Table
+                            size="small"
+                            columns={columns}
+                            rowKey="id"
+                            dataSource={item.taskExecRecordList}
+                            pagination={false}
+                          />
+                        </div>
+                      </>
+                    ) : (
+                      <a onClick={() => this.showTable(item.id, 1)}>
+                        展开
+                        <DownOutlined />
+                      </a>
+                    )}
+                  </div>
+                </Card>
+              </List.Item>
+            )}
+          />
+        </Drawer>
         <Drawer
           title="参数"
           width={320}

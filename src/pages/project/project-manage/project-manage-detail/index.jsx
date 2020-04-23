@@ -25,11 +25,7 @@ class ProjectDetail extends Component {
   };
 
   componentDidMount() {
-    if (this.props.location.state === undefined) {
-      router.push('/project/project-manage');
-      return;
-    }
-    const { projectId } = this.props.location.state;
+    const projectId = this.props.match.params.id;
     this.setState({ projectId });
     this.getTableData(projectId);
   }
@@ -58,10 +54,8 @@ class ProjectDetail extends Component {
 
   // 添加流程
   handleAddProcesses = data => {
-    const newData = [];
-    newData.id = data.id;
-    newData.requestType = 'add';
-    router.push('/project/project-manage/add/addflowpath', { newData });
+    const newData = `add,${data.id}`;
+    router.push(`/project/project-manage/add/addflowpath/${newData}`);
   };
 
   // 获取表格数据

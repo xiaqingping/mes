@@ -15,131 +15,132 @@ const { Footer } = Layout;
 class ProcessParameter extends Component {
   formRef = React.createRef();
 
-  state = {
-    // 参数页面前置数据
-    // requestType: '',
-    // processId: '',
-    // processModelId: '',
-    paramList: [], // 参数列表
-    processParam: [], // 参数
-    processParamValue: [], // 参数值
-    // submitStatus: false,
-    // 样品选择框 样品列表
-    // sampleList: [
-    //   {
-    //     colour: 'purple',
-    //     id: '1234567',
-    //     sampleAlias: '别名004',
-    //     sampleCode: '1234567',
-    //     sampleLengthAve: 600,
-    //     sampleLengthMax: 4000,
-    //     sampleLengthMin: 1000,
-    //     sampleLengthTotal: 9000,
-    //     sampleName: '未分组样品',
-    //     sampleSequenceCount: 15,
-    //     sequenceFileCount: 2,
-    //   },
-    //   {
-    //     colour: 'red',
-    //     id: '12345',
-    //     sampleAlias: '别名002',
-    //     sampleCode: '456',
-    //     sampleLengthAve: 600,
-    //     sampleLengthMax: 4000,
-    //     sampleLengthMin: 1000,
-    //     sampleLengthTotal: 9000,
-    //     sampleName: '样品B',
-    //     sampleSequenceCount: 15,
-    //     sequenceFileCount: 2,
-    //   },
-    //   {
-    //     colour: 'blue',
-    //     id: '1234',
-    //     sampleAlias: '别名001',
-    //     sampleCode: '456',
-    //     sampleLengthAve: 600,
-    //     sampleLengthMax: 4000,
-    //     sampleLengthMin: 1000,
-    //     sampleLengthTotal: 9000,
-    //     sampleName: '样品A',
-    //     sampleSequenceCount: 15,
-    //     sequenceFileCount: 2,
-    //   },
-    //   {
-    //     colour: 'gray',
-    //     id: '123456',
-    //     sampleAlias: '别名003',
-    //     sampleCode: '456',
-    //     sampleLengthAve: 600,
-    //     sampleLengthMax: 4000,
-    //     sampleLengthMin: 1000,
-    //     sampleLengthTotal: 9000,
-    //     sampleName: '样品C',
-    //     sampleSequenceCount: 15,
-    //     sequenceFileCount: 2,
-    //   },
-    // ],
-    // // 环境因子参数
-    // paramData: {
-    //   id: "8dc20f4338484a348b0ddd94bf3516bc",
-    //   projectId: "cdf36f8403e644249fa4f6788456134c",
-    //   processId: "1831fd04c1cd450f9aefc3d77f3725c2",
-    //   processModelId: "85a9c0452b1e47ca909a30c753d5d820",
-    //   taskId: "10b85cce64034418b66642f3f19f76b9",
-    //   taskModelId: "f04bf8a80c6b4a7097f2c15b817df820",
-    //   paramKey: "environmentalFactor",
-    // eslint-disable-next-line max-len
-    //   paramValue: "{\"environmentFactorList\":[{\"environmentFactorName\": \"环境因子一\",\"environmentFactorValueList\" :[{\"environmentFactorValue\": \"10\",\"sampleList\": [{\"sampleId\" : \"1234\",\"sampleAlias\": \"别名001\"},{\"sampleId\" : \"123456\",\"sampleAlias\": \"别名003\"}]},{\"environmentFactorValue\": \"15\",\"sampleList\": [{\"sampleId\" : \"1234567\",\"sampleAlias\": \"别名004\"},{\"sampleId\" : \"12345\",\"sampleAlias\": \"别名002\"}]}]},{\"environmentFactorName\": \"环境因子二\",\"environmentFactorValueList\" :[{\"environmentFactorValue\": \"8\",\"sampleList\": [{\"sampleId\" : \"1234\",\"sampleAlias\": \"别名001\"},{\"sampleId\" : \"12345\",\"sampleAlias\": \"别名002\"},{\"sampleId\" : \"123456\",\"sampleAlias\": \"别名003\"},{\"sampleId\" : \"1234567\",\"sampleAlias\": \"别名004\"}]}]},{\"environmentFactorName\": \"环境因子三\",\"environmentFactorValueList\" :[{\"environmentFactorValue\": \"9\",\"sampleList\": [{\"sampleId\" : \"1234\",\"sampleAlias\": \"别名001\"}]},{\"environmentFactorValue\": \"12\",\"sampleList\": [{\"sampleId\" : \"12345\",\"sampleAlias\": \"别名002\"},{\"sampleId\" : \"123456\",\"sampleAlias\": \"别名003\"},{\"sampleId\" : \"1234567\",\"sampleAlias\": \"别名004\"}]}]}]}"
-    // },
-  };
-
   constructor(props) {
     super(props);
-    const { userForParamData } = this.props.projectDetail;
+    const { id } = this.props.match.params;
+    const data = id.split(',');
+    console.log(data);
+    this.state = {
+      // 参数页面前置数据
+      requestType: data[2] || '', // 请求类型
+      processId: data[0] || '', // 流程ID
+      processModelId: data[1] || '', // 流程模型ID
+      projectId: data[3] || '', // 项目ID
+      paramList: [], // 参数列表
+      processParam: [], // 流程模型参数
+      processParamValue: [], // 流程参数值
+      // submitStatus: false,            // 是否提交
+      // // 样品选择框 样品列表
+      // sampleList: [
+      //   {
+      //     colour: 'purple',
+      //     id: '1234567',
+      //     sampleAlias: '别名004',
+      //     sampleCode: '1234567',
+      //     sampleLengthAve: 600,
+      //     sampleLengthMax: 4000,
+      //     sampleLengthMin: 1000,
+      //     sampleLengthTotal: 9000,
+      //     sampleName: '未分组样品',
+      //     sampleSequenceCount: 15,
+      //     sequenceFileCount: 2,
+      //   },
+      //   {
+      //     colour: 'red',
+      //     id: '12345',
+      //     sampleAlias: '别名002',
+      //     sampleCode: '456',
+      //     sampleLengthAve: 600,
+      //     sampleLengthMax: 4000,
+      //     sampleLengthMin: 1000,
+      //     sampleLengthTotal: 9000,
+      //     sampleName: '样品B',
+      //     sampleSequenceCount: 15,
+      //     sequenceFileCount: 2,
+      //   },
+      //   {
+      //     colour: 'blue',
+      //     id: '1234',
+      //     sampleAlias: '别名001',
+      //     sampleCode: '456',
+      //     sampleLengthAve: 600,
+      //     sampleLengthMax: 4000,
+      //     sampleLengthMin: 1000,
+      //     sampleLengthTotal: 9000,
+      //     sampleName: '样品A',
+      //     sampleSequenceCount: 15,
+      //     sequenceFileCount: 2,
+      //   },
+      //   {
+      //     colour: 'gray',
+      //     id: '123456',
+      //     sampleAlias: '别名003',
+      //     sampleCode: '456',
+      //     sampleLengthAve: 600,
+      //     sampleLengthMax: 4000,
+      //     sampleLengthMin: 1000,
+      //     sampleLengthTotal: 9000,
+      //     sampleName: '样品C',
+      //     sampleSequenceCount: 15,
+      //     sequenceFileCount: 2,
+      //   },
+      // ],
+      // // 环境因子参数
+      // paramData: {
+      //   id: "8dc20f4338484a348b0ddd94bf3516bc",
+      //   projectId: "cdf36f8403e644249fa4f6788456134c",
+      //   processId: "1831fd04c1cd450f9aefc3d77f3725c2",
+      //   processModelId: "85a9c0452b1e47ca909a30c753d5d820",
+      //   taskId: "10b85cce64034418b66642f3f19f76b9",
+      //   taskModelId: "f04bf8a80c6b4a7097f2c15b817df820",
+      //   paramKey: "environmentalFactor",
+      //   // eslint-disable-next-line max-len
+      // eslint-disable-next-line max-len
+      //   paramValue: "{\"environmentFactorList\":[{\"environmentFactorName\": \"环境因子一\",\"environmentFactorValueList\" :[{\"environmentFactorValue\": \"10\",\"sampleList\": [{\"sampleId\" : \"1234\",\"sampleAlias\": \"别名001\"},{\"sampleId\" : \"123456\",\"sampleAlias\": \"别名003\"}]},{\"environmentFactorValue\": \"15\",\"sampleList\": [{\"sampleId\" : \"1234567\",\"sampleAlias\": \"别名004\"},{\"sampleId\" : \"12345\",\"sampleAlias\": \"别名002\"}]}]},{\"environmentFactorName\": \"环境因子二\",\"environmentFactorValueList\" :[{\"environmentFactorValue\": \"8\",\"sampleList\": [{\"sampleId\" : \"1234\",\"sampleAlias\": \"别名001\"},{\"sampleId\" : \"12345\",\"sampleAlias\": \"别名002\"},{\"sampleId\" : \"123456\",\"sampleAlias\": \"别名003\"},{\"sampleId\" : \"1234567\",\"sampleAlias\": \"别名004\"}]}]},{\"environmentFactorName\": \"环境因子三\",\"environmentFactorValueList\" :[{\"environmentFactorValue\": \"9\",\"sampleList\": [{\"sampleId\" : \"1234\",\"sampleAlias\": \"别名001\"}]},{\"environmentFactorValue\": \"12\",\"sampleList\": [{\"sampleId\" : \"12345\",\"sampleAlias\": \"别名002\"},{\"sampleId\" : \"123456\",\"sampleAlias\": \"别名003\"},{\"sampleId\" : \"1234567\",\"sampleAlias\": \"别名004\"}]}]}]}"
+      // },
+    };
     // 判断请求类型
-    this.determineTheRequestType(userForParamData);
+    this.determineTheRequestType();
   }
-
-  // 判断请求类型
-  determineTheRequestType = data => {
-    // 请求类型为空 返回上一页
-    if (data.requestType === undefined) {
-      message.error('请求类型为空');
-      this.props.dispatch({
-        type: 'projectManage/setParamList',
-        payload: [],
-      });
-      return false;
-    }
-    // 创建项目 添加参数值
-    if (data.requestType === 'addParam') {
-      message.success('addParam');
-      this.getProcessParam(data.processModelId); // 查询流程参数
-    }
-    // 流程参数 修改参数值
-    if (data.requestType === 'editParam') {
-      this.getProcessParam(data.processModelId); // 查询流程参数
-      this.getProcessParamValue(data.processId); // 查询流程参数值
-    }
-    // 创建项目 未保存时修改参数值
-    if (data.requestType === 'updateParam') {
-      message.success('updateParam');
-      this.getProcessParam(data.processModelId); // 查询流程参数
-    }
-    return false;
-  };
 
   // 组件加载时
   componentDidMount = () => {};
 
+  // 是否提交
+  // setSubmit = () => {
+  //   this.setState({ submitStatus: true });
+  // }
+
+  // 判断请求类型
+  determineTheRequestType = () => {
+    const { requestType, processId, processModelId } = this.state;
+    // 创建项目 添加参数值
+    if (requestType === 'add') {
+      message.success('add');
+      this.getProcessParam(processModelId); // 查询流程参数
+    }
+    // 流程参数 修改参数值
+    if (requestType === 'edit') {
+      message.success('edit');
+      this.getProcessParam(processModelId); // 查询流程参数
+      this.getProcessParamValue(processId); // 查询流程参数值
+    }
+    // 创建项目 未保存时修改参数值
+    if (requestType === 'update') {
+      message.success('update');
+      this.getProcessParam(processModelId); // 查询流程参数
+    }
+    return false;
+  };
+
   // 获取参数 参数值
   getParamData = (param, paramValue) => {
-    const { requestType, params } = this.props.projectDetail.userForParamData;
+    const { requestType } = this.state;
 
     if (param.length > 0) {
       // 处理参数数据
       const newParam = this.deleteNullGroup(param); // 删除参数为空的分组
-      // 无参数 返回上一页
+      // 无参数
       if (newParam.length === 0) {
         message.error('暂无参数列表！');
         return false;
@@ -147,7 +148,7 @@ class ProcessParameter extends Component {
       const newParamData = this.disposeParamAttribute(newParam); // 处理参数属性
 
       // 添加 参数值
-      if (requestType === 'addParam') {
+      if (requestType === 'add') {
         message.success('添加操作');
         if (param.length > 0) {
           this.setState({ paramList: newParamData });
@@ -155,8 +156,12 @@ class ProcessParameter extends Component {
       }
 
       // 修改 未保存的参数值
-      if (requestType === 'updateParam') {
+      if (requestType === 'update') {
         message.success('修改操作');
+        // update参数值
+        const paramList = sessionStorage.getItem('processForParams');
+        const { params } = paramList;
+
         const processParamValue = params;
         // 有参数值时
         if (newParamData.length > 0 && processParamValue.length > 0) {
@@ -172,7 +177,7 @@ class ProcessParameter extends Component {
       }
 
       // 编辑 参数值
-      if (requestType === 'editParam') {
+      if (requestType === 'edit') {
         message.success('编辑操作');
 
         // 有参数值时
@@ -204,32 +209,33 @@ class ProcessParameter extends Component {
   // 保存
   getFromData = values => {
     const data = this.conversionData(values);
-    const { userForParamData } = this.props.projectDetail;
-    const { requestType, processModelId } = userForParamData;
+    const { requestType, processId, processModelId } = this.state;
 
-    // 添加
-    if (requestType === 'addParam') {
+    // 添加 修改
+    if (requestType === 'add' || requestType === 'updateParam') {
+      const paramsList = sessionStorage.getItem('processForParams');
+      const arr = [...paramsList.params, ...data];
       const newData = [];
-      newData.params = data;
+      newData.params = arr;
       newData.processModelId = processModelId;
-      this.props.dispatch({
-        type: 'projectManage/setParamList',
-        payload: newData,
-      });
-      window.history.back(-1);
+
+      sessionStorage.setItem('processForParams', newData);
+      return router.push('/project/project-manage/add/addflowpath');
     }
 
     // 修改
     // if (requestType === 'updateParam') {}
 
     // 编辑
-    if (requestType === 'editParam') {
-      const { processId } = userForParamData;
-      const id = processId;
-      api.updateProcessesParameter(id, data).then(() => {
-        window.history.back(-1);
+    if (requestType === 'edit') {
+      const { projectId } = this.state;
+      api.updateProcessesParameter(processId, data).then(() => {
+        if (projectId === '') return router.push(`/project/project-manage`);
+        router.push(`/project/project-manage/detail/${projectId}`);
+        return false;
       });
     }
+    return false;
   };
 
   // 保存时 参数数据格式转换
@@ -461,6 +467,16 @@ class ProcessParameter extends Component {
     });
   };
 
+  // 返回
+  goBackLink = () => {
+    const { requestType, projectId } = this.state;
+    if (requestType === 'add' || requestType === 'update') {
+      return router.push('/project/project-manage/add/addflowpath');
+    }
+    if (projectId === '') return router.push(`/project/project-manage`);
+    return router.push(`/project/project-manage/detail/${projectId}`);
+  };
+
   render() {
     const {
       paramList,
@@ -505,10 +521,10 @@ class ProcessParameter extends Component {
 
             <Footer className={style.footer}>
               <div className={style.button}>
-                <Button
-                  className={style.back}
-                  onClick={() => router.push('/project/project-manage/add/addflowpath')}
-                >
+                {/* <Button type="primary" onClick={() => this.setSubmit()}>
+                  组件提交
+                </Button> */}
+                <Button className={style.back} onClick={() => this.goBackLink()}>
                   返回
                 </Button>
                 {/* <Button type="primary" htmlType="submit" onClick={() => this.saveParam()}> */}

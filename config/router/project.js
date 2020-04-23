@@ -3,22 +3,24 @@ module.exports = {
   path: '/project',
   name: 'project',
   icon: 'user',
-  routes: [{
+  routes: [
+    {
       name: 'project-manage',
       path: '/project/project-manage',
       hideChildrenInMenu: true,
-      routes: [{
+      routes: [
+        {
           path: '/project/project-manage',
           component: './project/project-manage',
         },
         {
           name: 'detail',
-          path: '/project/project-manage/detail',
+          path: '/project/project-manage/detail/:id',
           component: './project/project-manage/project-manage-detail',
         },
         {
           name: 'process-parameter',
-          path: '/project/project-manage/process-parameter',
+          path: '/project/project-manage/process-parameter/:id',
           component: './project/project-manage/project-manage-detail/process-parameter',
         },
         {
@@ -28,7 +30,7 @@ module.exports = {
         },
         {
           name: 'addflowpath',
-          path: '/project/project-manage/add/addflowpath',
+          path: '/project/project-manage/add/addflowpath/:id',
           component: './project/project-manage/project-manage-edit/addflowpath',
         },
         {
@@ -42,7 +44,8 @@ module.exports = {
       name: 'process-model',
       path: '/project/process-model',
       hideChildrenInMenu: true,
-      routes: [{
+      routes: [
+        {
           path: '/project/process-model',
           component: './project/process-model',
         },
@@ -67,7 +70,8 @@ module.exports = {
       name: 'task-model',
       path: '/project/task-model',
       hideChildrenInMenu: true,
-      routes: [{
+      routes: [
+        {
           path: '/project/task-model',
           component: './project/task-model',
         },

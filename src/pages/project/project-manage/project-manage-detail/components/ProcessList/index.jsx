@@ -68,19 +68,9 @@ class ProcessList extends Component {
 
   // 查看流程参数
   searchProcessParam = processesData => {
-    // console.log(processesData); // 流程数据
-    // console.log(projectData);   // 项目数据
-    const data = {
-      processId: processesData.id, // 流程ID
-      processModelId: processesData.processModelId, // 流程模型ID
-      requestType: 'editParam', // 请求类型
-    };
-
-    this.props.dispatch({
-      type: 'projectDetail/setUserForParam',
-      payload: data,
-    });
-    router.push('/project/project-manage/process-parameter');
+    const { projectId } = this.props;
+    const data = `${processesData.id},${processesData.processModelId},edit,${projectId}`;
+    router.push(`/project/project-manage/process-parameter/${data}`);
   };
 
   // 流程进度开始
@@ -239,8 +229,9 @@ class ProcessList extends Component {
           <>
             <Avatar
               src={
-                row.processModelPicture ?
-                  disk.downloadFiles(row.processModelPicture, { view: true }) : DefaultHeadPicture
+                row.processModelPicture
+                  ? disk.downloadFiles(row.processModelPicture, { view: true })
+                  : DefaultHeadPicture
               }
               // src="/favicon.png"
               style={{ float: 'left', width: '46px', height: '46px' }}
