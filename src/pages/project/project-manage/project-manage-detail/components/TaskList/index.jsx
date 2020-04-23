@@ -13,6 +13,8 @@ import {
   PauseCircleOutlined,
 } from '@ant-design/icons';
 import { ModelType } from '@/pages/project/components/ModelComponents';
+import disk from '@/pages/project/api/disk';
+import DefaultHeadPicture from '@/assets/imgs/defaultheadpicture.jpg';
 import { calculateTimeDifference } from '../../functions';
 import style from './index.less';
 
@@ -207,7 +209,11 @@ class TaskList extends Component {
               <List.Item key={item}>
                 <Card hoverable style={{ width: '100%' }}>
                   <Avatar
-                    src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
+                    // src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
+                    src={
+                      item.processModelPicture ?
+                        disk.downloadFiles(item.processModelPicture, { view: true }) : DefaultHeadPicture
+                    }
                     size="large"
                     className={style.floatLeft}
                   />
