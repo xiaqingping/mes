@@ -518,6 +518,7 @@ class ProcessModel extends Component {
               getTableData={this.getTableData}
               simpleForm={this.simpleForm}
               advancedForm={this.advancedForm}
+              className="xxx"
             />
           </Card>
           <Card style={{ marginTop: '24px' }}>
