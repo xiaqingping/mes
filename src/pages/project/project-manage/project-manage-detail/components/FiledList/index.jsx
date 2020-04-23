@@ -78,9 +78,7 @@ class FiledList extends Component {
     </>
   );
 
-  // imgtype = type => {
-  //   return './excel.png'
-  // }
+  imgtype = type => `@/assets/imgs/${type}.png`;
 
   render() {
     const {
@@ -101,10 +99,10 @@ class FiledList extends Component {
         title: '文件名称',
         dataIndex: 'name',
         width: 150,
-        // render: (value, item) => (
-        render: value => (
+        render: (value, item) => (
+          // render: value => (
           <>
-            {/* <img src={this.imgtype(item.type)} alt=""/> */}
+            <img src={this.imgtype(item.type)} alt="" />
             <FileExclamationOutlined style={{ fontSize: 18 }} />
             <span style={{ marginLeft: 10 }}>{value}</span>
           </>
