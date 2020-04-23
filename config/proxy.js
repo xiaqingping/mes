@@ -32,4 +32,9 @@ export default {
     changeOrigin: true,
     pathRewrite: { '^/192.168.20.6:8167/': '' },
   },
+  '/192.168.20.27:8166/': {
+    target: 'http://192.168.20.27:8166/',
+    changeOrigin: true,
+    pathRewrite: { '^/192.168.20.27:8166/': '' },
+  },
 };
