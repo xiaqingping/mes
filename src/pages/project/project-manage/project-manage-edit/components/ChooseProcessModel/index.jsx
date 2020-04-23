@@ -86,11 +86,6 @@ class ChooseProcessModel extends React.Component {
       ...newPage,
     };
 
-    // 超过200条数据 不继续监听下拉事件
-    // if (count && datas.length >= count) {
-    //   return false
-    // }
-
     api.getProcess(data).then(res => {
       const uuids = res.rows.map(e => e.picture);
       disk
@@ -314,7 +309,7 @@ class ChooseProcessModel extends React.Component {
                 pageStart={1} // 设置初始化请求的页数
                 loadMore={this.getTableData}
                 hasMore={hasMore} // 是否继续监听滚动事件 true 监听 | false 不再监听
-                useWindow={false}
+                useWindow={false} // 为true就是窗口滚动，false是dom滚动
               >
                 <Row gutter={16} style={{ margin: '0' }}>
                   {processlist.map(item => (
