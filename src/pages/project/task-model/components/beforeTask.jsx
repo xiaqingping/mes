@@ -202,7 +202,7 @@ class BeforeTask extends React.Component {
             <div style={{ display: 'flex' }}>
               <Avatar
                 src={
-                  row.fileId ? disk.downloadFiles(row.fileId, { view: true }) : DefaultHeadPicture
+                  row.picture ? disk.downloadFiles(row.picture, { view: true }) : DefaultHeadPicture
                 }
                 style={{ float: 'left', width: '40px', height: '40px' }}
               />
