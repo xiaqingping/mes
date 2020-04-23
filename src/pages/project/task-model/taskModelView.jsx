@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import { Drawer } from 'antd';
 import { connect } from 'dva';
 import api from '@/pages/project/api/taskmodel';
-import disk from '@/pages/project/api/disk';
 import TitleModel from './components/titleModel';
 import TaskModelTabs from './components/taskModelTabs';
 import './index.less';

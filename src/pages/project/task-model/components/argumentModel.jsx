@@ -18,7 +18,6 @@ class ArgumentModel extends Component {
   };
 
   componentDidMount() {
-    // alert(1);
     // 获取列表
 
     const isAdd = window.location.href.indexOf('add') > 0;

@@ -99,7 +99,7 @@ class TitleModel extends React.Component {
     });
     console.log(item);
     console.log(this.props);
-    // TODO 获取数据参数数据
+
     const { dispatch } = this.props;
 
     dispatch({
@@ -114,6 +114,7 @@ class TitleModel extends React.Component {
   onViewClose = () => {
     this.setState({
       viewVisible: false,
+      toViewArgument: false,
     });
   };
 
