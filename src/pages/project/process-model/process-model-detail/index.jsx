@@ -106,6 +106,11 @@ class DrawerTool extends Component {
     });
   };
 
+  formdata = date => {
+    const str = `${date} `;
+    return str.substring(0, 10);
+  };
+
   // title内容
   titleContent = value => {
     const { visable, selectVersion, parameterVisible, detailValue, open } = this.state;
@@ -179,7 +184,9 @@ class DrawerTool extends Component {
               </div>
             </div>
           </div>
-          <div style={{ width: '255px', height: '50px', wordWrap: 'break-word' }}>{value.name}</div>
+          <div style={{ width: '255px', height: '50px', wordWrap: 'break-word' }}>
+            {value.name}-{value.creatorName + this.formdata(value.createDate)}
+          </div>
         </div>
 
         {/* 参数弹框 */}
@@ -287,6 +294,7 @@ class DrawerTool extends Component {
     const { status } = this.props;
     return (
       <div>
+        {console.log(detailValue)}
         <Drawer
           title={errorPage ? '' : this.titleContent(detailValue)}
           width={500}
