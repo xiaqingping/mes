@@ -1,5 +1,5 @@
 import React from 'react';
-import { Avatar, Tag, Card, Spin } from 'antd';
+import { Avatar, Tag, Card, Spin, message } from 'antd';
 import { DownOutlined, UpOutlined } from '@ant-design/icons';
 import { connect } from 'dva';
 import api from '@/pages/project/api/taskmodel';
@@ -72,7 +72,26 @@ class TitleModel extends React.Component {
 
   // 点击禁用， 禁用任务
   handleForbidden = id => {
-    this.props.reload('1', id);
+    this.setState({
+      loading: true,
+    });
+    api
+      .forbiddenTaskModel(id)
+      .then(() => {
+        this.setState({
+          loading: false,
+        });
+        message.success('任务模型已禁用!');
+        this.props.reload('1', id);
+        // this.updateListData(id);
+      })
+      .catch(() => {
+        this.setState({
+          loading: false,
+        });
+        this.props.reload(null);
+      });
+    // this.props.reload('1', id);
   };
 
   // 根据code和版本获取详细信息

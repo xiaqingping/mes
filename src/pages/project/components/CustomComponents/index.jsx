@@ -2,6 +2,7 @@
 import React from 'react';
 import { InboxOutlined } from '@ant-design/icons';
 
+// 上传按钮
 const UploadButton = props => (
   <>
     <div
@@ -17,22 +18,40 @@ const UploadButton = props => (
       <div style={{ fontSize: '16px' }}>点击或将文件</div>
       <div style={{ fontSize: '16px' }}>拖拽到这里上传</div>
     </div>
-    <input
-      type="file"
-      value=""
-      onChange={e => props.handleUpload(e)}
-      multiple="multiple"
-      style={{
-        opacity: 0,
-        cursor: 'pointer',
-        width: '170px',
-        height: '142px',
-        outline: 'none',
-        position: 'absolute',
-        top: '0',
-        zIndex: '10',
-      }}
-    />
+    {props.more ? (
+      <input
+        type="file"
+        value=""
+        onChange={e => props.handleUpload(e)}
+        multiple="multiple"
+        style={{
+          opacity: 0,
+          cursor: 'pointer',
+          width: '170px',
+          height: '142px',
+          outline: 'none',
+          position: 'absolute',
+          top: '0',
+          zIndex: '10',
+        }}
+      />
+    ) : (
+      <input
+        type="file"
+        value=""
+        onChange={e => props.handleUpload(e)}
+        style={{
+          opacity: 0,
+          cursor: 'pointer',
+          width: '170px',
+          height: '142px',
+          outline: 'none',
+          position: 'absolute',
+          top: '0',
+          zIndex: '10',
+        }}
+      />
+    )}
   </>
 );
 export { UploadButton };

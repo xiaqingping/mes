@@ -1,5 +1,5 @@
 import React from 'react';
-import { Table, Select, Button, Modal, Input, AutoComplete, Popover } from 'antd';
+import { Table, Button, Modal, AutoComplete, Popover, message } from 'antd';
 import {
   UploadOutlined,
   PlusSquareOutlined,
@@ -679,19 +679,18 @@ class SampleGroup extends React.Component {
     });
   };
 
-  confirmGroupRender = (groupName, preGroupName) => {
-    return (
+  confirmGroupRender = (groupName, preGroupName) => (
+    <div>
       <div>
-        <div>
-          点击“是”将分组“{preGroupName}”改为“{groupName}”
-        </div>
-        <div>点击“否”新增分组“{groupName}”</div>
+        点击“是”将分组“{preGroupName}”改为“{groupName}”
       </div>
-    );
-  };
+      <div>点击“否”新增分组“{groupName}”</div>
+    </div>
+  );
 
   // 选择组，blur 时候保存数据--- 当选择组的时候要加上默认的颜色
   handleGroupSelectBlur = (e, value, row, index, col) => {
+    console.log(col);
     const option = e.target.value;
     const { optionList } = this.state;
     let list = [...optionList];
@@ -701,11 +700,20 @@ class SampleGroup extends React.Component {
     }
     const { groupSchemeData } = this.state;
     const datas = [...groupSchemeData];
+    if (!option && value === '当前样品') {
+      // eslint-disable-next-line
+      row[col] = option;
+      datas[index] = row;
+      this.setState({
+        groupSchemeData: datas,
+      });
+    }
     if (option && option !== '当前样品' && option !== value) {
       const num = col.split('_')[1];
 
       const hasSame = datas.some(item => {
         if (item[col] === option) {
+          // eslint-disable-next-line
           row[`color_${num}`] = item[`color_${num}`];
         }
         return item[col] === option;
@@ -716,7 +724,7 @@ class SampleGroup extends React.Component {
       const colors = [...colorStore];
       colors.push(row[`color_${num}`]);
       this.setColorStore(colors);
-
+      // eslint-disable-next-line
       row[col] = option;
       datas[index] = row;
       this.setState({
@@ -737,21 +745,31 @@ class SampleGroup extends React.Component {
         okText: '是',
         onOk: () => {
           // 修改组名
-          const { groupSchemeData } = this.state;
+          const { columns } = this.state;
           const tableData = [...groupSchemeData];
+          const columns1 = JSON.parse(JSON.stringify(columns));
+          const columns2 = [...columns];
           tableData.forEach(item => {
             if (item[col] === value) {
+              // eslint-disable-next-line
               item[col] = option;
               return item;
             }
             return item;
           });
           console.log(tableData);
-          // TODO: 为什么表格数据更新了， 视图没有更新？
-          this.setState({
-            groupSchemeData: tableData,
-            // columns,
-          });
+          // TODO: 色块还待解决
+          this.setState(
+            {
+              groupSchemeData: tableData,
+              columns: columns1,
+            },
+            () => {
+              this.setState({
+                columns: columns2,
+              });
+            },
+          );
         },
         onCancel: () => {
           // 新增组名
@@ -768,6 +786,7 @@ class SampleGroup extends React.Component {
 
   // 修改组名
   handleUpdateGroup = (row, col, option, index) => {
+    // eslint-disable-next-line
     row[col] = option;
     const { groupSchemeData } = this.state;
     const source = [...groupSchemeData];
@@ -781,7 +800,6 @@ class SampleGroup extends React.Component {
     const { optionList } = this.state;
     return (
       <AutoComplete
-        allowClear
         style={{ width: '60%' }}
         onBlur={e => this.handleGroupSelectBlur(e, value, row, index, col)}
         defaultValue={value}
@@ -813,9 +831,77 @@ class SampleGroup extends React.Component {
   verifyData = () => {
     const { groupSchemeData, columns } = this.state;
     // 1. 一个分组方案里只能是单纯组或者单纯样品
+    // 2. 一个分组方案里面不能都是空
     console.log(groupSchemeData);
     console.log(columns);
-    // 2. 一个分组方案里面不能都是空
+    const datas = [...groupSchemeData];
+    const cols = [...columns];
+    const num = cols.length;
+    for (let i = 2; i < num; i++) {
+      const group = [];
+      datas.forEach(item => {
+        group.push(item[`header_${i}`]);
+      });
+      console.log(group);
+
+      const validFalse1 = group.includes('当前样品') && group.includes(!'');
+      const validFalse2 = group.every(item => item === '');
+      const validFalse = validFalse1 || validFalse2;
+      console.log(validFalse);
+      if (!validFalse) {
+        return message.error('存在空分组方案或者分组方案包含样品和组');
+      }
+      let formattedData = this.formatSubmitData();
+      formattedData = formattedData && JSON.stringify(formattedData);
+    }
+    return true;
+  };
+
+  formatSubmitData = () => {
+    const { groupSchemeData, columns } = this.state;
+    console.log(columns);
+    console.log(groupSchemeData);
+    // 数据整理
+    let tableHeard = [];
+    columns.forEach((item, index) => {
+      if (index !== 0 && typeof item.id === 'number') {
+        tableHeard = [
+          ...tableHeard,
+          { groupSchemeName: item.dupTitle, sampleList: [], groupList: [] },
+        ];
+      }
+    });
+
+    for (let i = 2; i < groupSchemeData.length + 2; i++) {
+      if (!tableHeard[i - 2]) return false;
+      // eslint-disable-next-line no-loop-func
+      groupSchemeData.forEach(item => {
+        if (item[`header_${i}`] === '') return;
+        if (item[`header_${i}`] === '当前样品') {
+          tableHeard[i - 2].sampleList.push({
+            sampleId: item.metadataSampleId,
+            sampleAlias: item.sampleName,
+          });
+        } else {
+          tableHeard[i - 2].groupList.push({
+            groupName: item[`header_${i}`],
+            color: item[`color_${i}`],
+            sampleList: [],
+          });
+          tableHeard[i - 2].groupList.forEach(gro => {
+            if (gro.groupName === item[`header_${i}`]) {
+              gro.sampleList.push({
+                sampleId: item.metadataSampleId,
+                sampleAlias: item.sampleName,
+              });
+            }
+          });
+        }
+      });
+    }
+
+    console.log(tableHeard);
+    return tableHeard;
   };
 
   render() {
@@ -824,63 +910,55 @@ class SampleGroup extends React.Component {
     console.log(columns);
     console.log(groupSchemeData);
 
-    const neData = {};
+    // 数据整理
+    let tableHeard = [];
+    columns.forEach((item, index) => {
+      if (index !== 0 && typeof item.id === 'number') {
+        tableHeard = [
+          ...tableHeard,
+          { groupSchemeName: item.dupTitle, sampleList: [], groupList: [] },
+        ];
+      }
+    });
+
+    console.log(tableHeard);
     for (let i = 2; i < groupSchemeData.length + 2; i++) {
-      const groupList = [];
+      if (!tableHeard[i - 2]) return false;
+      // eslint-disable-next-line no-loop-func
       groupSchemeData.forEach(item => {
-        let group = {};
-        // if ()
-        const groupSchemeName = {
-          groupSchemeName: item[`header_${i}`],
-          sampleList: [
-            {
-              metadataSampleId: item.metadataSampleId,
-              sampleAlias: item.sampleName,
-            },
-          ],
-        };
-        group = { ...group, ...groupSchemeName };
+        if (item[`header_${i}`] === '') return;
+        if (item[`header_${i}`] === '当前样品') {
+          tableHeard[i - 2].sampleList.push({
+            sampleId: item.metadataSampleId,
+            sampleAlias: item.sampleName,
+          });
+        } else {
+          tableHeard[i - 2].groupList.push({
+            groupName: item[`header_${i}`],
+            color: item[`color_${i}`],
+            sampleList: [],
+          });
+          tableHeard[i - 2].groupList.forEach(gro => {
+            if (gro.groupName === item[`header_${i}`]) {
+              gro.sampleList.push({
+                sampleId: item.metadataSampleId,
+                sampleAlias: item.sampleName,
+              });
+            }
+          });
+        }
       });
     }
 
-    // 数据整理
-    // let tableHeard = [];
-    // columns.forEach((item, index) => {
-    //   if (index !== 0 && typeof item.id === 'number') {
-    //     tableHeard = [
-    //       ...tableHeard,
-    //       { groupSchemeName: item.dupTitle, sampleList: [], groupList: [] },
-    //     ];
-    //   }
-    // });
-
-    // console.log(tableHeard);
-    // for (let i = 2; i < groupSchemeData.length + 2; i++) {
-    //   if (!tableHeard[i - 2]) return false;
-    //   // eslint-disable-next-line no-loop-func
-    //   groupSchemeData.forEach(item => {
-    //     if (item[`header_${i}`] === '') return;
-    //     if (item[`header_${i}`] === '当前样品') {
-    //       tableHeard[i - 2].sampleList.push({
-    //         metadataSampleId: item[`header_${i}`],
-    //         sampleAlias: item.sampleName,
-    //       });
-    //     } else {
-    //       tableHeard[i - 2].groupList.push({
-    //         groupName: item[`header_${i}`],
-    //         color: item[`color_${i}`],
-    //       });
-    //     }
-    //   });
-    // }
-
-    // console.log(tableHeard);
+    console.log(tableHeard);
 
     columns.map(col => {
       if (!col.width) {
+        // eslint-disable-next-line
         col.width = 100;
       }
       tableWidth += col.width;
+      return true;
     });
     return (
       <div>

@@ -297,10 +297,10 @@ export const getOperates = v => {
 
 /**
  * 版本输出
- * @param {String} v 字符串版本号
+ * @param {String} str 字符串版本号
  */
-export const versionFun = v => {
-  const version = v.substr(1);
+export const versionFun = str => {
+  const version = str.substr(1);
   return [`V${((version * 10 + 1) / 10).toFixed(1)}`, `V${((version * 10 + 10) / 10).toFixed(1)}`];
 };
 
@@ -310,8 +310,11 @@ export const compare = property => (a, b) => {
   return value1 - value2;
 };
 
-// 判断字符是否为空
-export const isEmpty = obj => typeof obj === 'undefined' || obj === null || obj === '';
+/**
+ * 判断字符是否为空
+ * @param {String} str 字符串判断的值
+ */
+export const isEmpty = str => typeof str === 'undefined' || str === null || str === '';
 
 // 随机生成颜色
 export const getrandomColor = () => {
@@ -343,4 +346,21 @@ export const versionSort = version => {
     [temp[i], temp[minIndex]] = [temp[minIndex], temp[i]];
   }
   return temp.map(v => v.join('.'));
+};
+
+/**
+ * 二维数组转换成一维数组加对象
+ * @param {Array} value 需要转换的数组
+ */
+export const arrChangeObject = value => {
+  let arr = [];
+  for (let i = 0; i < value.length; i++) {
+    let temp = {};
+    value[i].forEach((item, index) => {
+      const tempJson = { [index]: item };
+      temp = { ...temp, ...tempJson };
+    });
+    arr = [...arr, temp];
+  }
+  return arr;
 };
