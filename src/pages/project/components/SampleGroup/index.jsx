@@ -679,16 +679,14 @@ class SampleGroup extends React.Component {
     });
   };
 
-  confirmGroupRender = (groupName, preGroupName) => {
-    return (
+  confirmGroupRender = (groupName, preGroupName) => (
+    <div>
       <div>
-        <div>
-          点击“是”将分组“{preGroupName}”改为“{groupName}”
-        </div>
-        <div>点击“否”新增分组“{groupName}”</div>
+        点击“是”将分组“{preGroupName}”改为“{groupName}”
       </div>
-    );
-  };
+      <div>点击“否”新增分组“{groupName}”</div>
+    </div>
+  );
 
   // 选择组，blur 时候保存数据--- 当选择组的时候要加上默认的颜色
   handleGroupSelectBlur = (e, value, row, index, col) => {
@@ -847,9 +845,7 @@ class SampleGroup extends React.Component {
       console.log(group);
 
       const validFalse1 = group.includes('当前样品') && group.includes(!'');
-      const validFalse2 = group.every(item => {
-        return item === '';
-      });
+      const validFalse2 = group.every(item => item === '');
       const validFalse = validFalse1 || validFalse2;
       console.log(validFalse);
       if (!validFalse) {
@@ -926,7 +922,6 @@ class SampleGroup extends React.Component {
     });
 
     console.log(tableHeard);
-
     for (let i = 2; i < groupSchemeData.length + 2; i++) {
       if (!tableHeard[i - 2]) return false;
       // eslint-disable-next-line no-loop-func

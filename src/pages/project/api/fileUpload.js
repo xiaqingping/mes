@@ -13,4 +13,12 @@ export default {
       data,
     });
   },
+
+  // 解析csv数据返回页面
+  getFileProcessCsvs(data) {
+    return request('/fileProcess/v1/csvs', {
+      method: 'POST',
+      data,
+    });
+  },
 };

@@ -2,8 +2,8 @@
 import React from 'react';
 import { Modal, Button, Table, List, Progress, message, Input } from 'antd';
 import { PaperClipOutlined } from '@ant-design/icons';
-import { cutString } from '@/utils/utils';
-import api from '@/pages/project/api/excel';
+import { cutString, arrChangeObject } from '@/utils/utils';
+import api from '@/pages/project/api/fileUpload';
 import { UploadButton } from '@/pages/project/components/CustomComponents';
 import './index.less';
 
@@ -43,24 +43,49 @@ class UploadSequenceFile extends React.Component {
     });
   };
 
+  // // 上传文件
+  // handleUpload = e => {
+  //   const file = e.target.files;
+  //   console.log(file);
+  //   const data = new FormData();
+  //   let filesData = [];
+  //   const AllImgExt = '.xls|.xlsx';
+  //   for (let i = 0; i < file.length; i++) {
+  //     const fileArr = file[i].name.split('.');
+  //     if (AllImgExt.indexOf(fileArr[fileArr.length - 1]) === -1) {
+  //       message.error('文件格式不正确');
+  //       return false;
+  //     }
+  //     data.append('file', file[i]);
+  //     filesData = [...filesData, file[i].name];
+  //   }
+  //   api.getFileProcessExcels(data).then(res => {
+  //     this.checkData(res);
+  //   });
+  //   return true;
+  // };
+
   // 上传文件
   handleUpload = e => {
     const file = e.target.files;
     const data = new FormData();
-    let filesData = [];
-    const AllImgExt = '.xls|.xlsx';
-    for (let i = 0; i < file.length; i++) {
-      const fileArr = file[i].name.split('.');
-      if (AllImgExt.indexOf(fileArr[fileArr.length - 1]) === -1) {
-        message.error('文件格式不正确');
-        return false;
-      }
-      data.append('file', file[i]);
-      filesData = [...filesData, file[i].name];
+    const AllImgExt = '.xls|.xlsx|.csv';
+    const fileArr = file[0].name.split('.');
+    console.log(fileArr[fileArr.length - 1]);
+    if (AllImgExt.indexOf(fileArr[fileArr.length - 1]) === -1) {
+      message.error('文件格式不正确');
+      return false;
     }
-    api.getFileProcessExcels(data).then(res => {
-      this.checkData(res);
-    });
+    data.append('file', file[0]);
+    if (fileArr[fileArr.length - 1] === 'csv') {
+      api.getFileProcessCsvs(data).then(res => {
+        this.checkData(arrChangeObject(res));
+      });
+    } else {
+      api.getFileProcessExcels(data).then(res => {
+        this.checkData(res);
+      });
+    }
     return true;
   };
 
@@ -150,7 +175,7 @@ class UploadSequenceFile extends React.Component {
   render() {
     const { loading, tableList, tableHead } = this.state;
     let columns = [];
-    console.log(tableHead);
+
     Object.getOwnPropertyNames(tableHead).forEach(key => {
       columns = [
         ...columns,
@@ -160,7 +185,7 @@ class UploadSequenceFile extends React.Component {
         },
       ];
     });
-    console.log(tableList, tableHead);
+
     return (
       <Modal
         title="上传分组方案"
