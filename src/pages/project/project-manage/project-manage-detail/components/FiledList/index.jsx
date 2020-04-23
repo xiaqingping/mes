@@ -103,6 +103,8 @@ class FiledList extends Component {
           // render: value => (
           <>
             <img src={this.imgtype(item.type)} alt="" />
+
+            <img src="@/assets/imgs/excel.png" alt="" />
             <FileExclamationOutlined style={{ fontSize: 18 }} />
             <span style={{ marginLeft: 10 }}>{value}</span>
           </>
