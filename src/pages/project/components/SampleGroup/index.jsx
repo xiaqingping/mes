@@ -697,8 +697,97 @@ class SampleGroup extends React.Component {
     </div>
   );
 
+  // 当前的是个组的时候, 先查看这一列是否有同样的祖名, 如果有则,值和颜色都跟这个组一样的, 并且设置表格数据
+  judgeOptionAndColor = (row, option, datas, col, index) => {
+    const num = col.split('_')[1];
+    const hasSame = datas.some(item => {
+      if (item[col] === option) {
+        // eslint-disable-next-line
+        row[`color_${num}`] = item[`color_${num}`];
+      }
+      return item[col] === option;
+    });
+    if (!hasSame) row[`color_${num}`] = getrandomColor();
+    //  添加到颜色store
+    const { colorStore } = this.props.project;
+    const colors = [...colorStore];
+    colors.push(row[`color_${num}`]);
+    this.setColorStore(colors);
+    // eslint-disable-next-line
+    row[col] = option;
+    datas[index] = row;
+    this.setState({
+      groupSchemeData: datas,
+    });
+  };
+
+  setOtherSame = (row, value, option, datas, col, index, color1) => {
+    console.log(color1);
+    // 先判断这列是否有同名的, 如果有, 则依照原来的, 如果没有就照自己的,
+    const num = col.split('_')[1];
+    const hasSame = datas.some(item => {
+      if (item[col] === option) {
+        // eslint-disable-next-line
+        row[`color_${num}`] = item[`color_${num}`];
+      }
+      return item[col] === option;
+    });
+    datas.forEach(item => {
+      if (item[col] === value) {
+        const color = row[color1];
+        // eslint-disable-next-line
+        item[col] = option;
+        // eslint-disable-next-line
+        item[`color_${num}`] = color;
+        return item;
+      }
+      return item;
+    });
+    const { columns } = this.state;
+    const columns1 = JSON.parse(JSON.stringify(columns));
+    const columns2 = [...columns];
+    this.setState(
+      {
+        groupSchemeData: datas,
+        columns: columns1,
+      },
+      () => {
+        this.setState({
+          columns: columns2,
+        });
+      },
+    );
+  };
+
+  handleModalConfirm = (datas, row, option, value, col, index, color1) => {
+    confirm({
+      title: `是否将分组“${value}”改为“${option}”？`,
+      icon: <ExclamationCircleOutlined />,
+      content: this.confirmGroupRender(option, value),
+      cancelText: '否',
+      okText: '是',
+      onOk: () => {
+        this.setOtherSame(row, value, option, datas, col, index, color1);
+      },
+      onCancel: () => {
+        // 新增组名-- 如果新增的组名在这列存在, 那么颜色值都随之前的颜色随机生成一个,如果不存在颜色随机生成
+        this.handleUpdateGroup(row, col, datas, option, index);
+      },
+    });
+  };
+
+  setValueAndColorNone = (datas, row, option, value, col, index, color1) => {
+    row[col] = option;
+    row[color1] = '';
+    datas[index] = row;
+    console.log(datas);
+    this.setState({
+      groupSchemeData: datas,
+    });
+  };
+
   // 选择组，blur 时候保存数据--- 当选择组的时候要加上默认的颜色
-  handleGroupSelectBlur = (e, value, row, index, col) => {
+  handleGroupSelectBlur = (e, value, row, index, col, color1) => {
     console.log(col);
     const option = e.target.value;
     const { optionList } = this.state;
@@ -709,84 +798,26 @@ class SampleGroup extends React.Component {
     }
     const { groupSchemeData } = this.state;
     const datas = [...groupSchemeData];
-    // 原来是'当前样品' 现在没有值
-    if (!option && value === '当前样品') {
-      // eslint-disable-next-line
-      row[col] = option;
-      datas[index] = row;
-      this.setState({
-        groupSchemeData: datas,
-      });
-    }
-
-    // 原来是个组或样品, 现在是组,并且名字不一致
-    if (option && option !== '当前样品' && option !== value) {
-      const num = col.split('_')[1];
-
-      const hasSame = datas.some(item => {
-        if (item[col] === option) {
-          // eslint-disable-next-line
-          row[`color_${num}`] = item[`color_${num}`];
+    if (option !== value) {
+      // 当前有值
+      if (option) {
+        if (option !== '当前样品') {
+          if (!value) {
+            // 当前是个组, 之前没有值
+            this.judgeOptionAndColor(row, option, datas, col, index);
+          } else if (value === '当前样品') {
+            // 当前是个组, 之前是'当前样品'
+            this.judgeOptionAndColor(row, option, datas, col, index);
+          } else if (value !== '当前样品') {
+            // 当前是个组, 之前也是个组----弹框确认
+            this.handleModalConfirm(datas, row, option, value, col, index, color1);
+          }
+        } else if (option === '当前样品') {
+          this.setValueAndColorNone(datas, row, option, value, col, index, color1);
         }
-        return item[col] === option;
-      });
-      if (!hasSame) row[`color_${num}`] = getrandomColor();
-      //  添加到颜色store
-      const { colorStore } = this.props.project;
-      const colors = [...colorStore];
-      colors.push(row[`color_${num}`]);
-      this.setColorStore(colors);
-      // eslint-disable-next-line
-      row[col] = option;
-      datas[index] = row;
-      this.setState({
-        groupSchemeData: datas,
-      });
-    }
-    // 如果blur时候的值跟原来的值一样， 说明数据没有改变
-    if (value !== option && value && option !== '当前样品' && value !== '当前样品') {
-      if (option === '当前样品') {
-        this.handleUpdateGroup(row, col, option, index);
-        return false;
+      } else if (!option) {
+        this.setValueAndColorNone(datas, row, option, value, col, index, color1);
       }
-      confirm({
-        title: `是否将分组“${value}”改为“${option}”？`,
-        icon: <ExclamationCircleOutlined />,
-        content: this.confirmGroupRender(option, value),
-        cancelText: '否',
-        okText: '是',
-        onOk: () => {
-          // 修改组名
-          const { columns } = this.state;
-          const tableData = [...groupSchemeData];
-          const columns1 = JSON.parse(JSON.stringify(columns));
-          const columns2 = [...columns];
-          tableData.forEach(item => {
-            if (item[col] === value) {
-              // eslint-disable-next-line
-              item[col] = option;
-              return item;
-            }
-            return item;
-          });
-          // TODO: 色块还待解决
-          this.setState(
-            {
-              groupSchemeData: tableData,
-              columns: columns1,
-            },
-            () => {
-              this.setState({
-                columns: columns2,
-              });
-            },
-          );
-        },
-        onCancel: () => {
-          // 新增组名
-          this.handleUpdateGroup(row, col, option, index);
-        },
-      });
     }
 
     this.setState({
@@ -796,15 +827,8 @@ class SampleGroup extends React.Component {
   };
 
   // 修改组名
-  handleUpdateGroup = (row, col, option, index) => {
-    // eslint-disable-next-line
-    row[col] = option;
-    const { groupSchemeData } = this.state;
-    const source = [...groupSchemeData];
-    source[index] = row;
-    this.setState({
-      groupSchemeData: source,
-    });
+  handleUpdateGroup = (row, col, datas, option, index) => {
+    this.judgeOptionAndColor(row, option, datas, col, index);
   };
 
   selectRender = (value, row, index, color1, col) => {
@@ -812,7 +836,7 @@ class SampleGroup extends React.Component {
     return (
       <AutoComplete
         style={{ width: '60%' }}
-        onBlur={e => this.handleGroupSelectBlur(e, value, row, index, col)}
+        onBlur={e => this.handleGroupSelectBlur(e, value, row, index, col, color1)}
         defaultValue={value}
       >
         {optionList.map(item => (
