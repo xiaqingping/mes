@@ -1,16 +1,17 @@
 // 上传分组方案
 import React from 'react';
 import { Modal, Button, Table, List, Progress, message, Input } from 'antd';
-import { PaperClipOutlined } from '@ant-design/icons';
+import { PaperClipOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import { cutString } from '@/utils/utils';
 import api from '@/pages/project/api/excel';
 import { UploadButton } from '@/pages/project/components/CustomComponents';
 import './index.less';
 
 const { TextArea } = Input;
+const { confirm } = Modal;
 class UploadSequenceFile extends React.Component {
   static getDerivedStateFromProps(nextProps) {
-    return { visible: nextProps.visible };
+    return { visible: nextProps.visible, groupTableData: nextProps.groupTableData };
   }
 
   constructor(props) {
@@ -20,6 +21,7 @@ class UploadSequenceFile extends React.Component {
       filesNameList: [],
       tableHead: [],
       tableList: [],
+      groupTableData: [],
     };
   }
 
@@ -97,14 +99,26 @@ class UploadSequenceFile extends React.Component {
 
   // 提交
   handleOK = () => {
-    // const { tableList } = this.state;
-    // api.addSample(tableList).then(() => {
-    //   this.props.handleClose();
-    // });
+    confirm({
+      title: '确定提交此分组方案吗?',
+      icon: <ExclamationCircleOutlined />,
+      content: '提交后之前分组方案将被覆盖',
+      onOk: () => {
+        const { tableList } = this.state;
+        // console.log(tableList);
+        // debugger;
+        this.props.getData(tableList);
+        this.props.closeUpload();
+      },
+      onCancel: () => {
+        console.log('Cancel');
+      },
+    });
   };
 
   // 数据分割
   handleData = value => {
+    console.log(value);
     const arr = value.split('\n');
     const newData = arr.map(item => item.split(/[，,| ]/));
     let data = [];
@@ -120,6 +134,9 @@ class UploadSequenceFile extends React.Component {
 
   // 数据检查
   checkData = value => {
+    const { groupTableData } = this.state;
+    console.log(groupTableData);
+    console.log(value);
     // 判断title不能为空
     let err = false;
     if (Object.values(value[0]).some(item => item === '')) {
@@ -127,15 +144,22 @@ class UploadSequenceFile extends React.Component {
       err = true;
     }
     const lengthNum = Object.keys(value[0]).length;
+    const groupTableDataSampleList = groupTableData.map(row => {
+      return row.sampleName;
+    });
+
     value.forEach((item, index) => {
       // 判断每行的数据个数
       if (Object.keys(item).length !== lengthNum) {
         message.error('数据格式不正确');
         err = true;
       }
+      // 因为第一行是title, 所以要从1开始
       if (index !== 0) {
-        // TODO: 判断解析出来的数据第一项要等于样品数据的第一项
-        // item[0] 第一项
+        if (!groupTableDataSampleList.includes(item[0])) {
+          message.error('上传分组方案中样品有未知样品!');
+          err = true;
+        }
       }
     });
 

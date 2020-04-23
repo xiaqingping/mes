@@ -10,6 +10,7 @@ import { SketchPicker } from 'react-color';
 import { getrandomColor } from '@/utils/utils';
 import './index.less';
 import { connect } from 'dva';
+import { array } from 'prop-types';
 import GroupUpload from '../UploadSequenceFile/index';
 
 const { confirm } = Modal;
@@ -834,8 +835,7 @@ class SampleGroup extends React.Component {
     const { groupSchemeData, columns } = this.state;
     // 1. 一个分组方案里只能是单纯组或者单纯样品
     // 2. 一个分组方案里面不能都是空
-    console.log(groupSchemeData);
-    console.log(columns);
+
     const datas = [...groupSchemeData];
     const cols = [...columns];
     const num = cols.length;
@@ -844,14 +844,13 @@ class SampleGroup extends React.Component {
       datas.forEach(item => {
         group.push(item[`header_${i}`]);
       });
-      console.log(group);
 
       const validFalse1 = group.includes('当前样品') && group.includes(!'');
       const validFalse2 = group.every(item => {
         return item === '';
       });
       const validFalse = validFalse1 || validFalse2;
-      console.log(validFalse);
+
       if (!validFalse) {
         return message.error('存在空分组方案或者分组方案包含样品和组');
       }
@@ -904,59 +903,38 @@ class SampleGroup extends React.Component {
       });
     }
 
-    console.log(tableHeard);
     return tableHeard;
+  };
+
+  getDataFromUpload = data => {
+    const { groupSchemeData } = this.state;
+    const groupTableData = [];
+    console.log(data);
+    const dataFromUpload = [...data];
+    console.log(dataFromUpload);
+    dataFromUpload.forEach(item => {
+      groupSchemeData.forEach(row => {
+        if (item[0] === row.sampleName) {
+          item.sampleName = row.sampleName;
+          item.metadataSampleId = row.metadataSampleId;
+          for (let i = 1; i < Object.keys(item).length; i++) {
+            item[`header_${i + 1}`] = item[i];
+            item[`color_${i + 1}`] = getrandomColor();
+          }
+        }
+      });
+    });
+    console.log(dataFromUpload);
+
+    // groupTableData.forEach(row=>{
+
+    // })
   };
 
   render() {
     let tableWidth = 0;
     const { groupSchemeData, visible, columns } = this.state;
-    console.log(columns);
     console.log(groupSchemeData);
-
-    // 数据整理
-    let tableHeard = [];
-    columns.forEach((item, index) => {
-      if (index !== 0 && typeof item.id === 'number') {
-        tableHeard = [
-          ...tableHeard,
-          { groupSchemeName: item.dupTitle, sampleList: [], groupList: [] },
-        ];
-      }
-    });
-
-    console.log(tableHeard);
-
-    for (let i = 2; i < groupSchemeData.length + 2; i++) {
-      if (!tableHeard[i - 2]) return false;
-      // eslint-disable-next-line no-loop-func
-      groupSchemeData.forEach(item => {
-        if (item[`header_${i}`] === '') return;
-        if (item[`header_${i}`] === '当前样品') {
-          tableHeard[i - 2].sampleList.push({
-            sampleId: item.metadataSampleId,
-            sampleAlias: item.sampleName,
-          });
-        } else {
-          tableHeard[i - 2].groupList.push({
-            groupName: item[`header_${i}`],
-            color: item[`color_${i}`],
-            sampleList: [],
-          });
-          tableHeard[i - 2].groupList.forEach(gro => {
-            if (gro.groupName === item[`header_${i}`]) {
-              gro.sampleList.push({
-                sampleId: item.metadataSampleId,
-                sampleAlias: item.sampleName,
-              });
-            }
-          });
-        }
-      });
-    }
-
-    console.log(tableHeard);
-
     columns.map(col => {
       if (!col.width) {
         // eslint-disable-next-line
@@ -987,7 +965,13 @@ class SampleGroup extends React.Component {
           提交
         </Button>
 
-        {visible && <GroupUpload closeUpload={this.handleCloseUpload} />}
+        {visible && (
+          <GroupUpload
+            closeUpload={this.handleCloseUpload}
+            groupTableData={groupSchemeData}
+            getData={this.getDataFromUpload}
+          />
+        )}
       </div>
     );
   }
