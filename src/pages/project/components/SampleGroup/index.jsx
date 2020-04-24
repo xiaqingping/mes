@@ -60,9 +60,6 @@ class SampleGroup extends React.Component {
 
   componentDidMount() {
     // 转换分组方案数据
-    // console.log(this.state.sampleList);
-    // console.log(this.state.groupSchemeData);
-    // this.transformGroup(this.state.groupSchemeData);
     const { tableData } = this.state;
     console.log(tableData);
     this.setState(
@@ -70,25 +67,47 @@ class SampleGroup extends React.Component {
         groupSchemeData: tableData,
       },
       () => {
-        console.log(this.state.sampleList);
-        console.log(this.state.groupSchemeData);
         this.transformGroup(this.state.groupSchemeData);
       },
     );
-    // console.log(this.state.sampleList);
-    // console.log(this.state.groupSchemeData);
-    // this.transformGroup(this.state.groupSchemeData);
-    // const tableData = this.props.groupSchemeData;
-
-    // this.setState(
-    //   {
-    //     groupSchemeData: tableData,
-    //   },
-    //   () => {
-
-    //   },
-    // );
+    this.props.getFun(this.selectUpdateGroup);
   }
+
+  selectUpdateGroup = () => {
+    const { sampleList, groupSchemeData, columns } = this.state;
+    const selList = [...sampleList];
+    let groupList = [...groupSchemeData];
+    const selLen = selList && selList.length;
+    const groupLen = groupList && groupList.length;
+    const columns1 = JSON.parse(JSON.stringify(columns));
+    const columns2 = [...columns];
+    if (selLen < groupLen) {
+      // 删除样品更新
+      let filtedId = null;
+      selList.forEach(sel => {
+        groupList.forEach(gro => {
+          if (gro.metadataSampleId !== sel.id) {
+            filtedId = gro.metadataSampleId;
+          }
+        });
+      });
+      console.log(filtedId);
+      groupList = groupList.filter(item => item.metadataSampleId !== filtedId);
+      this.setState(
+        {
+          groupSchemeData: groupList,
+          columns: columns1,
+        },
+        () => {
+          this.setState({
+            columns: columns2,
+          });
+        },
+      );
+    } else {
+      // 添加样品更新
+    }
+  };
 
   // 转换分组方案数据
   transformGroup = data => {
