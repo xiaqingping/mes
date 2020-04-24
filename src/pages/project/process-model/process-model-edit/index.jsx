@@ -405,39 +405,6 @@ class ProcessEdit extends Component {
       sonIdsData.push(...item.preTaskIds);
     });
 
-    const uuids = data.map(e => e.picture);
-    disk
-      .getFiles({
-        sourceCode: uuids.join(','),
-        sourceKey: 'project_process_model',
-      })
-      .then(v => {
-        if (v) {
-          const newList = data.map(e => {
-            const filterItem = v.filter(item => item.sourceCode === e.picture);
-            const fileId = filterItem[0] && filterItem[0].id;
-            return {
-              ...e,
-              fileId,
-            };
-          });
-          this.setState({
-            taskList: newList,
-          });
-        } else {
-          const newList = data.map(e => {
-            const fileId = '';
-            return {
-              ...e,
-              fileId,
-            };
-          });
-          this.setState({
-            taskList: newList,
-          });
-        }
-      });
-
     this.setState({
       taskList: data,
       ids: idsData,
