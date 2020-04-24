@@ -1,14 +1,16 @@
 const projectDetailModel = {
   namespace: 'projectDetail',
   state: {
-    filedList: [{
+    filedList: [
+      {
         id: 1,
         code: 111111,
         name: 'XXXX文件1',
         processName: 'XXXX流程名称1',
         decs: '描述描述描述描述描述描述描述描述描述111',
         changerTime: '2019/10/20 12:00:36',
-        size: '6'
+        type: 'excel',
+        size: '6',
       },
       {
         id: 2,
@@ -17,7 +19,8 @@ const projectDetailModel = {
         processName: 'XXXX流程名称2',
         decs: '描述描述描述描述描述描述描述描述描述222',
         changerTime: '2019/10/20 12:00:36',
-        size: '360'
+        type: 'pdf',
+        size: '360',
       },
       {
         id: 3,
@@ -26,7 +29,8 @@ const projectDetailModel = {
         processName: 'XXXX流程名称3',
         decs: '描述描述描述描述描述描述描述描述描述333',
         changerTime: '2019/10/20 12:00:36',
-        size: '128'
+        type: 'file',
+        size: '128',
       },
       {
         id: 4,
@@ -35,22 +39,24 @@ const projectDetailModel = {
         processName: 'XXXX流程名称4',
         decs: '描述描述描述描述描述描述描述描述描述444',
         changerTime: '2019/10/20 12:00:36',
-        size: '128'
+        type: 'word',
+        size: '128',
       },
     ],
 
     // 权限
-    jurisdiction: [{
+    jurisdiction: [
+      {
         id: 1,
-        name: '所有者'
+        name: '所有者',
       },
       {
         id: 2,
-        name: '管理者'
+        name: '管理者',
       },
       {
         id: 3,
-        name: '参与者'
+        name: '参与者',
       },
     ],
   },

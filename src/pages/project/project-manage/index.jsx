@@ -458,7 +458,7 @@ class ProjectManagement extends Component {
     return (
       <PageHeaderWrapper>
         <Card bordered={false}>
-          <div className="tableList">
+          <div className="tableList classsimpleForm">
             <TableSearchForm
               ref={this.tableSearchFormRef}
               initialValues={this.initialValues}
@@ -468,7 +468,7 @@ class ProjectManagement extends Component {
             />
           </div>
         </Card>
-        <Card style={{ marginTop: '24px' }}>
+        <Card style={{ marginTop: '24px' }} className="classtableList">
           <div className="tableListOperator">
             <Button type="primary" onClick={() => this.handleAdd()}>
               <PlusOutlined />
@@ -477,6 +477,7 @@ class ProjectManagement extends Component {
           </div>
           <Form ref={this.tableFormRef} className="table-style-set">
             <StandardTable
+              className="classStandardTable"
               scroll={{ x: tableWidth }}
               rowClassName="editable-row"
               // rowKey="id"

@@ -25,4 +25,53 @@
       padding-left: 20px !important;
     }
   }
+
+  .ant-page-header-heading-title {
+    color: rgba(0, 0, 0, 0.65) !important;
+  }
+
+  .classsimpleForm {
+    margin-left: 6px;
+    .ant-form-item [placeholder='请输入创建人'] {
+      margin-left: 15px;
+    }
+  }
+
+  .classtableList {
+    .ant-card-body {
+      padding: 30px;
+    }
+  }
+
+  .classStandardTable {
+    margin-left: 30px;
+    .ant-table-content tr {
+      th:first-child,
+      td:first-child {
+        padding-left: 0 !important;
+        > div {
+          margin-left: 0 !important;
+          a {
+            color: rgba(0, 0, 0, 45);
+          }
+        }
+      }
+      td:first-child {
+        height: 79px;
+      }
+    }
+    .ant-table-tbody > tr button {
+      position: relative;
+      width: 60px;
+      height: 24px;
+      border-radius: 24px;
+      span {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        font-size: 12px;
+        transform: translate(-50%, -50%);
+      }
+    }
+  }
 }

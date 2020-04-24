@@ -14,63 +14,81 @@ import ChooseProcessModel from '../components/ChooseProcessModel';
 class Test extends Component {
   constructor(props) {
     super(props);
-    const {
-      // processSelectedList,
-      paramList,
-      projectInfor,
-    } = this.props.projectManage;
-    console.log(this.props);
+    // 传过来的已有项目的id和类型
+    const { id, type } = this.props.match.params;
+    console.log(id);
+    console.log(type);
+    // if(id===undefined) id ='';
+    // if(id) {
+    //   const data = id.split(',');
+    //   console.log(data);
+    //   this.state ={
+    //     processType: data[0] || '',     // 请求类型
+    //     projectIdProcess: data[1] || '',       // 项目ID
+    //     list: [],
+    //     loading: false,
+    //     visible: false,
+    //     buttonLoading: false,
+    //   }
+    //   console.log(this.state);
+    //   console.log('url有值的state');
+    // } else {
+    //   const {
+    //     paramList,
+    //     projectInfor,
+    //   } = this.props.projectManage;
+    //   console.log(this.props);
 
-    // let viewShow;
+    //   this.state = {
+    //     // list选中的流程参数数据
+    //     list: [],
+    //     loading: false,
+    //     visible: false,
+    //     projectInfor, // 项目基础信息
+    //     paramList, // 流程参数
+    //     buttonLoading: false,
+    //   };
+    //   console.log(this.state);
+    //   console.log('url无值的state');
+    // }
 
+    const { paramList, projectInfor } = this.props.projectManage;
     this.state = {
       // list选中的流程参数数据
       list: [],
-      // list:viewShow,
       loading: false,
       visible: false,
       projectInfor, // 项目基础信息
       paramList, // 流程参数
       buttonLoading: false,
-      projectProcesses: [],
+      processType: type || '',
+      projectId: id || '',
     };
-    console.log(this.state);
-
-    // if (this.props.location.state) {
-    //   // 已创建的项目传过来的项目id和类型
-    //   const projectProcesses = this.props.location.state.newData;
-    //   console.log(projectProcesses);
-    //   if (projectProcesses.requestType === 'add') {
-    //     viewShow = [];
-    //     console.log(viewShow);
-    //     console.log('从已有项目新增页面跳转的');
-    //   }
-    // } else {
-    //   if (projectInfor.requestType === 'add') {
-    //     console.log('基础信息页面跳转过来的');
-    //     viewShow = [];
-    //   } else {
-    //     console.log('从其他页面跳转进来的');
-    //     viewShow = processSelectedList;
-    //     console.log(viewShow);
-    //   }
-    //   console.log(123);
-    // }
   }
 
   componentDidMount() {
     this.getData();
     const introductionProcess = JSON.parse(sessionStorage.getItem('introduction '));
     console.log(introductionProcess);
-    if (introductionProcess) {
-      this.setState({
-        list: introductionProcess,
-      });
-      this.props.dispatch({
-        type: 'projectManage/setProcessSelectedList',
-        payload: introductionProcess,
-      });
-    }
+    // if (introductionProcess == null) {
+    //   console.log('从已有项目跳转的');
+    //   // this.setState({
+    //   //   list: [],
+    //   // });
+    //   this.props.dispatch({
+    //     type: 'projectManage/setProcessSelectedList',
+    //     // payload: introductionProcess,
+    //     payload: [],
+    //   });
+
+    // }else {
+    //   this.props.dispatch({
+    //     type: 'projectManage/setProcessSelectedList',
+    //     payload: introductionProcess,
+    //   });
+    //   console.log('从新建项目跳转的');
+
+    // }
   }
 
   // 点击打开关联
@@ -105,10 +123,10 @@ class Test extends Component {
     const paramList = sessionStorage.getItem('processForParams');
 
     let data = {};
-    if (paramList.length === 0 && paramList.processModelId === undefined) {
-      data = `'',${row.id},add`;
+    if (paramList === null) {
+      data = `,${row.id},add`;
     } else {
-      data = `'',${row.id},update`;
+      data = `,${row.id},update`;
     }
 
     router.push(`/project/project-manage/process-parameter/${data}`);
@@ -119,7 +137,7 @@ class Test extends Component {
     console.log(value);
     // 存储选中的流程模型数据
     if (!(value === '' || value === undefined)) {
-      sessionStorage.setItem('introduction ', JSON.stringify(value));
+      sessionStorage.setItem('introduction', JSON.stringify(value));
 
       this.setState({
         list: value,
@@ -136,9 +154,12 @@ class Test extends Component {
     this.setState({
       buttonLoading: true,
     });
-    const { list, projectInfor, paramList, projectProcesses } = this.state;
-    console.log(projectProcesses);
+    const { list, projectInfor, paramList, processType, projectIdProcess } = this.state;
+    console.log(this.state);
     let status = false;
+    // if(this.state !=='') {
+
+    // }
 
     if (projectInfor.requestType === 'add') {
       if (list === '' || list === undefined) {
@@ -170,8 +191,6 @@ class Test extends Component {
 
       projectInfor.processList = newList;
       const data = projectInfor;
-
-      console.log(newList);
       api
         .addProjects(data)
         .then(() => {
@@ -187,10 +206,9 @@ class Test extends Component {
         });
       sessionStorage.removeItem('introduction');
     } else {
-      if (this.props.location.state.newData) {
-        const { newData } = this.props.location.state;
-        const projectId = newData.id;
-        console.log(projectId);
+      if (processType === 'add') {
+        const projectId = projectIdProcess;
+        // console.log(projectId);
         const newList = [];
         list.forEach(item => {
           let newItem = {};
@@ -204,8 +222,8 @@ class Test extends Component {
           }
           newList.push(newItem);
         });
+        console.log(list);
         const processList = newList;
-        console.log(processList);
         api
           .addProjectsProcess({ projectId, processList })
           .then(res => {
@@ -225,6 +243,7 @@ class Test extends Component {
       }
       console.log('其他方式');
     }
+    sessionStorage.removeItem('introduction');
     return '';
   };
 
@@ -249,13 +268,10 @@ class Test extends Component {
         width: 300,
         render: (value, row) => (
           <>
-            {/* <Avatar
-              src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
-              style={{ float: 'left' }}
-              size="large"
-            /> */}
             <Avatar
-              src={row.fileId ? disk.downloadFiles(row.fileId, { view: true }) : DefaultHeadPicture}
+              src={
+                row.picture ? disk.downloadFiles(row.picture, { view: true }) : DefaultHeadPicture
+              }
               style={{ float: 'left', width: '46px', height: '46px' }}
             />
             <div style={{ float: 'left' }}>

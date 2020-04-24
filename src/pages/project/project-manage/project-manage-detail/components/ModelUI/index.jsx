@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+// import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Modal, Form, Input, Button } from 'antd';
 import { InfoCircleOutlined } from '@ant-design/icons';
 
@@ -32,6 +33,7 @@ const EditInforModel = props => {
   return (
     <div>
       <Modal
+        className="classEditFormItem"
         title="修改"
         visible={props.visible}
         onOk={handleOk}
@@ -45,22 +47,20 @@ const EditInforModel = props => {
         centered
         width={650}
       >
-        <Form
-          name="basic"
-          form={form}
-          initialValues={{ name: props.processList.name, describe: props.processList.describe }}
-        >
-          <FormItem label="名称" name="name" rules={[{ required: true, message: '请输入名称!' }]}>
-            <Input style={{ width: 260, height: 32 }} />
-          </FormItem>
-          <FormItem
-            label="描述"
-            name="describe"
-            rules={[{ required: true, message: '请输入相关描述!' }]}
+        <div>
+          <Form
+            name="basic"
+            form={form}
+            initialValues={{ name: props.processList.name, describe: props.processList.describe }}
           >
-            <TextArea rows={4} style={{ width: 470, height: 129, marginBottom: -10 }} />
-          </FormItem>
-        </Form>
+            <FormItem label="名称" name="name" rules={[{ message: '请输入名称!' }]}>
+              <Input style={{ width: 260, height: 32 }} />
+            </FormItem>
+            <FormItem label="描述" name="describe" rules={[{ message: '请输入相关描述!' }]}>
+              <TextArea rows={4} style={{ width: 470, height: 129, marginBottom: -10 }} />
+            </FormItem>
+          </Form>
+        </div>
       </Modal>
     </div>
   );

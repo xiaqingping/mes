@@ -233,6 +233,7 @@ class AssociatedProcessModel extends React.Component {
         onCancel={onClose}
         width={840}
         footer={null}
+        className="classAssociatedProcessModel"
       >
         <div
           className="tableList tableListTableSearchForm buttonStyle table-style-set-little"
@@ -248,6 +249,7 @@ class AssociatedProcessModel extends React.Component {
             <Spin spinning={loading}>
               <Table
                 columns={columns}
+                align="center"
                 dataSource={list}
                 loading={loading}
                 rowKey="id"
