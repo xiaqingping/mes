@@ -1,13 +1,8 @@
 // 流程列表
-import { Form, Table, Tag, Divider, Button, message, Avatar } from 'antd';
+import { Form, Table, Tag, Divider, message, Avatar } from 'antd';
 import React, { Component } from 'react';
 import { connect } from 'dva';
-import {
-  SlidersOutlined,
-  PlayCircleOutlined,
-  PauseCircleOutlined,
-  EditOutlined,
-} from '@ant-design/icons';
+import { SlidersOutlined, EditOutlined } from '@ant-design/icons';
 import router from 'umi/router';
 import api from '@/pages/project/api/projectManageDetail';
 import disk from '@/pages/project/api/disk';
@@ -15,7 +10,6 @@ import DefaultHeadPicture from '@/assets/imgs/defaultheadpicture.jpg';
 import TaskList from '../TaskList';
 import { EditInforModel } from '../ModelUI';
 import ProgressMould from '../ProgressMould';
-// import { formatter } from '@/utils/utils';
 
 class ProcessList extends Component {
   tableSearchFormRef = React.createRef();
@@ -43,7 +37,10 @@ class ProcessList extends Component {
     this.getTableData(projectId);
   }
 
-  // 获取表格数据
+  /**
+   * 获取表格数据
+   * projectId 项目ID
+   */
   getTableData = projectId => {
     this.setState({ loading: true });
     api.getProjectProcess(projectId).then(res => {
@@ -66,31 +63,45 @@ class ProcessList extends Component {
     });
   };
 
-  // 查看流程参数
+  /**
+   * 查看流程参数
+   * processesData 流程数据
+   */
   searchProcessParam = processesData => {
     const { projectId } = this.props;
-    const data = `${processesData.id},${processesData.processModelId},edit,${projectId}`;
-    router.push(`/project/project-manage/process-parameter/${data}`);
+    const type = 'edit';
+    const { processModelId } = processesData;
+    const processId = processesData.id;
+    router.push(
+      // eslint-disable-next-line max-len
+      `/project/project-manage/process-parameter/${type}/${processModelId}/${projectId}/${processId}`,
+    );
   };
 
   // 流程进度开始
   processStart = row => {
     this.setState({ loading: true });
     const { projectId } = this.props;
-    api.startProcessesProcess(row.id).then(() => {
-      this.getTableData(projectId);
-      this.setState({ loading: false });
-    });
+    api
+      .startProcessesProcess(row.id)
+      .then(() => {
+        this.getTableData(projectId);
+      })
+      .catch(e => message.error(e.message));
+    this.setState({ loading: false });
   };
 
-  // 流程进度开始
+  // 流程进度暂停
   processPause = row => {
     this.setState({ loading: true });
     const { projectId } = this.props;
-    api.pauseProcessesProcess(row.id).then(() => {
-      this.getTableData(projectId);
-      this.setState({ loading: false });
-    });
+    api
+      .pauseProcessesProcess(row.id)
+      .then(() => {
+        this.getTableData(projectId);
+      })
+      .catch(e => message.error(e.message));
+    this.setState({ loading: false });
   };
 
   // 删除
@@ -109,15 +120,16 @@ class ProcessList extends Component {
     });
   };
 
-  // 获取回传数据进行保存
+  /**
+   * 获取回传数据进行保存
+   * data 回传数据
+   */
   getEditModelData = data => {
     const { projectId } = this.props;
     api
       .saveProcessInfor(data)
       .then(() => {
-        this.setState({
-          visibleModel: false,
-        });
+        this.setState({ visibleModel: false });
         this.getTableData(projectId);
       })
       .catch();
@@ -184,42 +196,13 @@ class ProcessList extends Component {
         title: '进度',
         dataIndex: 'processProgress',
         width: 270,
-        render: (value, row) => {
-          if (row.status === 1) {
-            return (
-              <Button
-                onClick={() => this.processStart(row)}
-                type="primary"
-                style={{ borderRadius: '50px' }}
-              >
-                运行
-              </Button>
-            );
-          }
-          if (row.status === 2) {
-            return (
-              <>
-                <ProgressMould percentData={row} />
-                <PauseCircleOutlined
-                  style={{ marginLeft: '10px' }}
-                  onClick={() => this.processPause(row)}
-                />
-              </>
-            );
-          }
-          if (row.status === 3) {
-            return (
-              <>
-                <ProgressMould percentData={row} />
-                <PlayCircleOutlined
-                  style={{ marginLeft: '10px' }}
-                  onClick={() => this.processStart(row)}
-                />
-              </>
-            );
-          }
-          return <ProgressMould percentData={row} />;
-        },
+        render: (value, row) => (
+          <ProgressMould
+            percentData={row}
+            processStart={this.processStart}
+            processPause={this.processPause}
+          />
+        ),
       },
       {
         title: '流程模型',

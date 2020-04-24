@@ -194,7 +194,7 @@ class ProjectEdit extends Component {
       payload: data,
     });
 
-    router.push('/project/project-manage/add/addflowpath');
+    router.push('/project/project-manage/add/addflowpath/add');
   };
 
   render() {
