@@ -19,8 +19,14 @@ module.exports = {
           component: './project/project-manage/project-manage-detail',
         },
         {
+          name: 'detail-add',
+          path: '/project/project-manage/detail/addflowpath/:type/:projectId?',
+          component: './project/project-manage/project-manage-edit/addflowpath',
+        },
+        {
           name: 'process-parameter',
-          path: '/project/project-manage/process-parameter/:id',
+          path:
+            '/project/project-manage/process-parameter/:type/:processModelId/:projectId?/:processId?',
           component: './project/project-manage/project-manage-detail/process-parameter',
         },
         {
@@ -30,7 +36,7 @@ module.exports = {
         },
         {
           name: 'addflowpath',
-          path: '/project/project-manage/add/addflowpath/:id',
+          path: '/project/project-manage/add/addflowpath/:type/:projectId?',
           component: './project/project-manage/project-manage-edit/addflowpath',
         },
         {
@@ -94,8 +100,7 @@ module.exports = {
           name: 'group',
           path: '/project/task-model/group',
           component: './project/components/index.jsx',
-
-        }
+        },
       ],
     },
   ],

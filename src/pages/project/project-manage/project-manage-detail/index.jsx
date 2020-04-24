@@ -54,18 +54,22 @@ class ProjectDetail extends Component {
 
   // 添加流程
   handleAddProcesses = data => {
-    const newData = `add,${data.id}`;
-    router.push(`/project/project-manage/add/addflowpath/${newData}`);
+    const type = 'edit';
+    const projectId = data.id;
+    router.push(`/project/project-manage/detail/addflowpath/${type}/${projectId}`);
   };
 
   // 获取表格数据
   getTableData = projectId => {
-    api.getProjectProcess(projectId).then(res => {
-      this.setState({
-        list: res,
-        loading: false,
-      });
-    });
+    api
+      .getProjectProcess(projectId)
+      .then(res => {
+        this.setState({
+          list: res,
+        });
+      })
+      .catch();
+    this.setState({ loading: false });
   };
 
   // 导航列表title样式

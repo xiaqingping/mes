@@ -170,7 +170,8 @@ class TaskList extends Component {
         dataIndex: 'status',
         width: 60,
         render: (value, row) => {
-          const duration = calculateTimeDifference(row.startTime, row.endTime);
+          const duration = calculateTimeDifference(row.beginDate, row.endDate);
+          console.log(duration);
           if (value === 4) {
             return duration;
           }

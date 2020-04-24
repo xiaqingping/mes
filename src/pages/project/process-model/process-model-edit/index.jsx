@@ -405,39 +405,6 @@ class ProcessEdit extends Component {
       sonIdsData.push(...item.preTaskIds);
     });
 
-    const uuids = data.map(e => e.picture);
-    disk
-      .getFiles({
-        sourceCode: uuids.join(','),
-        sourceKey: 'project_process_model',
-      })
-      .then(v => {
-        if (v) {
-          const newList = data.map(e => {
-            const filterItem = v.filter(item => item.sourceCode === e.picture);
-            const fileId = filterItem[0] && filterItem[0].id;
-            return {
-              ...e,
-              fileId,
-            };
-          });
-          this.setState({
-            taskList: newList,
-          });
-        } else {
-          const newList = data.map(e => {
-            const fileId = '';
-            return {
-              ...e,
-              fileId,
-            };
-          });
-          this.setState({
-            taskList: newList,
-          });
-        }
-      });
-
     this.setState({
       taskList: data,
       ids: idsData,
@@ -502,7 +469,9 @@ class ProcessEdit extends Component {
         render: (value, row) => (
           <>
             <Avatar
-              src={row.fileId ? disk.downloadFiles(row.fileId, { view: true }) : DefaultHeadPicture}
+              src={
+                row.picture ? disk.downloadFiles(row.picture, { view: true }) : DefaultHeadPicture
+              }
               style={{ float: 'left', width: '46px', height: '46px' }}
             />
             <div style={{ float: 'left', marginLeft: '10px' }}>
