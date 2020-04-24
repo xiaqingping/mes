@@ -10,7 +10,9 @@ import './index.less';
 
 class SampleSelect extends React.Component {
   static getDerivedStateFromProps(nextProps) {
-    return { processId: nextProps.processId };
+    return {
+      tableData: nextProps.sampleList || [],
+    };
   }
 
   state = {
@@ -25,6 +27,12 @@ class SampleSelect extends React.Component {
   componentDidMount() {
     this.getTableData();
   }
+
+  // componentDidUpdate(props) {
+  //   if (props.submitStatus !== this.props.submitStatus) {
+  //     this.props.getData('testData', '环境因子');
+  //   }
+  // }
 
   getTableData = () => {
     // TODO 比如修改时候, 获取已有样品选择接口.
@@ -73,7 +81,7 @@ class SampleSelect extends React.Component {
         tableData: list,
       },
       () => {
-        // TODO将改变返回给父组件
+        // TODO:将改变返回给父组件
         // this.props.emitData(tableData);
       },
     );
@@ -218,6 +226,8 @@ class SampleSelect extends React.Component {
         tableData: list,
       });
     }
+    // TODO:将改变返回给父组件
+    // this.props.emitData(tableData);
   };
 
   render() {
