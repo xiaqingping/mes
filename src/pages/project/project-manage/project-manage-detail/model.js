@@ -59,6 +59,39 @@ const projectDetailModel = {
         name: '参与者',
       },
     ],
+    // 执行记录状态
+    execRecordStatus: [
+      {
+        id: '1',
+        name: '等待中',
+        status: 'default',
+      },
+      {
+        id: '2',
+        name: '运行中',
+        status: 'processing',
+      },
+      {
+        id: '3',
+        name: '已暂停',
+        status: 'warning',
+      },
+      {
+        id: '4',
+        name: '已完成',
+        status: 'success',
+      },
+      {
+        id: '5',
+        name: '已失败',
+        status: 'error',
+      },
+      {
+        id: '6',
+        name: '已取消',
+        status: 'default',
+      },
+    ],
   },
   effects: {},
   reducers: {},

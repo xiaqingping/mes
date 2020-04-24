@@ -15,9 +15,9 @@ class Test extends Component {
   constructor(props) {
     super(props);
     // 传过来的已有项目的id和类型
-    const { id, type } = this.props.match.params;
-    console.log(id);
-    console.log(type);
+    // TODO:
+    const { type, projectId } = this.props.match.params;
+    console.log(this.props.match.params);
     // if(id===undefined) id ='';
     // if(id) {
     //   const data = id.split(',');
@@ -52,17 +52,21 @@ class Test extends Component {
     //   console.log('url无值的state');
     // }
 
-    const { paramList, projectInfor } = this.props.projectManage;
+    // const { paramList, projectInfor } = this.props.projectManage;
     this.state = {
+      // TODO:
+      requestType: type, // 请求类型 edit：流程列表跳转 携带项目id  add：新建项目跳转 无id
+      projectId: projectId || '', // 项目Id
+
       // list选中的流程参数数据
       list: [],
       loading: false,
       visible: false,
-      projectInfor, // 项目基础信息
-      paramList, // 流程参数
+      // projectInfor, // 项目基础信息
+      // paramList, // 流程参数
       buttonLoading: false,
       processType: type || '',
-      projectId: id || '',
+      // projectId: id || '',
     };
   }
 
@@ -122,14 +126,21 @@ class Test extends Component {
   handleOpen = row => {
     const paramList = sessionStorage.getItem('processForParams');
 
-    let data = {};
-    if (paramList === null) {
-      data = `,${row.id},add`;
-    } else {
-      data = `,${row.id},update`;
-    }
+    // TODO:
+    const { projectId } = this.state;
 
-    router.push(`/project/project-manage/process-parameter/${data}`);
+    let type;
+    if (paramList === null) type = 'add';
+    if (paramList !== null) type = 'update';
+    const processModelId = row.id;
+
+    let url;
+    if (projectId === '') {
+      url = `/project/project-manage/process-parameter/${type}/${processModelId}`;
+    } else {
+      url = `/project/project-manage/process-parameter/${type}/${processModelId}/${projectId}`;
+    }
+    router.push(url);
   };
 
   // 获取模态框选中的流程模型数据

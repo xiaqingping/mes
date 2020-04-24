@@ -249,7 +249,8 @@ class ProjectManagement extends Component {
       payload: data,
     });
     console.log(data);
-    router.push('/project/project-manage/add');
+    const projectId = row.id;
+    router.push(`/project/project-manage/edit/${projectId}`);
   };
 
   // 项目管理详情页面

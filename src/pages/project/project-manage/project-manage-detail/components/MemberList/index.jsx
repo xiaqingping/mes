@@ -1,5 +1,5 @@
 // 流程列表
-import { Form, Table, Select } from 'antd';
+import { Form, Table, Select, message } from 'antd';
 import React, { Component } from 'react';
 import { connect } from 'dva';
 import api from '@/pages/project/api/projectManageDetail';
@@ -33,12 +33,15 @@ class MemberList extends Component {
   getTableData = projectId => {
     this.setState({ loading: true });
     const data = { projectId };
-    api.getProjectMember(data).then(res => {
-      this.setState({
-        list: res,
-        loading: false,
-      });
-    });
+    api
+      .getProjectMember(data)
+      .then(res => {
+        this.setState({
+          list: res,
+        });
+      })
+      .catch();
+    this.setState({ loading: false });
   };
 
   // 修改成员权限
@@ -63,10 +66,17 @@ class MemberList extends Component {
   // 确认修改权限
   getEditModelData = data => {
     if (data.type === 'ok') {
-      api.updateMemberJurisdiction(data).then(() => {
-        this.getTableData(this.props.projectId);
-      });
+      api
+        .updateMemberJurisdiction(data)
+        .then(() => {
+          this.getTableData(this.props.projectId);
+        })
+        .catch(e => {
+          this.getTableData(this.props.projectId);
+          return message.error(e.message);
+        });
     }
+    return false;
   };
 
   // 关闭编辑模态框
@@ -118,21 +128,29 @@ class MemberList extends Component {
         title: '权限',
         dataIndex: 'jurisdictionValue',
         width: 180,
-        render: (value, row) => (
-          <Select
-            style={{ width: 100 }}
-            disabled={value === 1}
-            defaultValue={value}
-            bordered={false}
-            onChange={() => this.handleUpdateJurisdiction(value, row)}
-          >
-            {jurisdiction.map(e => (
-              <Option value={e.id} key={e.name}>
-                {e.name}
-              </Option>
-            ))}
-          </Select>
-        ),
+        // eslint-disable-next-line arrow-body-style
+        render: (value, row) => {
+          const userData = JSON.parse(localStorage.user);
+          let disabledIs = true;
+          if (value === 1) {
+            if (userData.code === row.code) disabledIs = false;
+          }
+          return (
+            <Select
+              style={{ width: 100 }}
+              disabled={disabledIs}
+              defaultValue={value}
+              bordered={false}
+              onChange={() => this.handleUpdateJurisdiction(value, row)}
+            >
+              {jurisdiction.map(e => (
+                <Option value={e.id} key={e.name}>
+                  {e.name}
+                </Option>
+              ))}
+            </Select>
+          );
+        },
       },
       {
         title: '操作',
