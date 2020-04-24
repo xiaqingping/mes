@@ -2,12 +2,7 @@
 import { Form, Table, Tag, Divider, Button, message, Avatar } from 'antd';
 import React, { Component } from 'react';
 import { connect } from 'dva';
-import {
-  SlidersOutlined,
-  PlayCircleOutlined,
-  PauseCircleOutlined,
-  EditOutlined,
-} from '@ant-design/icons';
+import { PlayCircleOutlined, PauseCircleOutlined, EditOutlined } from '@ant-design/icons';
 import router from 'umi/router';
 import api from '@/pages/project/api/projectManageDetail';
 import disk from '@/pages/project/api/disk';
@@ -16,6 +11,8 @@ import TaskList from '../TaskList';
 import { EditInforModel } from '../ModelUI';
 import ProgressMould from '../ProgressMould';
 // import { formatter } from '@/utils/utils';
+
+import parameterImg from '@/assets/imgs/canshu@1x.png';
 
 class ProcessList extends Component {
   tableSearchFormRef = React.createRef();
@@ -150,7 +147,7 @@ class ProcessList extends Component {
       test,
     } = this.state;
 
-    let tableWidth = 0;
+    // let tableWidth = 0;
 
     let columns = [
       {
@@ -251,7 +248,12 @@ class ProcessList extends Component {
         dataIndex: 'type',
         width: 100,
         render: (value, row) => (
-          <SlidersOutlined onClick={() => this.searchProcessParam(row)} style={{ fontSize: 20 }} />
+          <img
+            src={parameterImg}
+            alt=""
+            onClick={() => this.searchProcessParam(row)}
+            style={{ fontSize: 20 }}
+          />
         ),
       },
       {
@@ -274,7 +276,7 @@ class ProcessList extends Component {
 
     columns = columns.map(col => {
       // if (!col.width) col.width = 100;
-      tableWidth += col.width;
+      // tableWidth += col.width;
       if (!col.editable) {
         return col;
       }
@@ -285,7 +287,7 @@ class ProcessList extends Component {
       <>
         <Form ref={this.tableFormRef}>
           <Table
-            scroll={{ x: tableWidth, y: 400 }}
+            // scroll={{ x: tableWidth, y: 400 }}
             rowKey="id"
             loading={loading}
             dataSource={list}
@@ -300,6 +302,7 @@ class ProcessList extends Component {
               },
             })}
             height={80}
+            pagination={false}
           />
         </Form>
         <TaskList
