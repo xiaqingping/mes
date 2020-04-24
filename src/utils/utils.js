@@ -307,9 +307,13 @@ export const versionFun = str => {
   return [`V${((version * 10 + 1) / 10).toFixed(1)}`, `V${((version * 10 + 10) / 10).toFixed(1)}`];
 };
 
-export const compare = property => (a, b) => {
-  const value1 = a[property];
-  const value2 = b[property];
+/**
+ * 排序
+ * @param {Array} arr 需要排序的数组
+ */
+export const compare = arr => (a, b) => {
+  const value1 = a[arr];
+  const value2 = b[arr];
   return value1 - value2;
 };
 
