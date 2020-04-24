@@ -82,6 +82,7 @@ class TaskModelTabs extends Component {
   onViewClose = () => {
     this.setState({
       viewVisible: false,
+      toViewArgument: false,
     });
   };
 
@@ -98,7 +99,7 @@ class TaskModelTabs extends Component {
     console.log(taskId);
 
     const { taskModel } = this.props;
-    const { taskModelStatusOptions } = taskModel.taskModel;
+    const { modelStatusOptions } = taskModel.taskModel;
 
     // debugger;
     return (
@@ -131,8 +132,8 @@ class TaskModelTabs extends Component {
                       </div>
 
                       <Badge
-                        status={formatter(taskModelStatusOptions, item.status, 'value', 'status')}
-                        text={formatter(taskModelStatusOptions, item.status, 'value', 'label')}
+                        status={formatter(modelStatusOptions, item.status, 'value', 'status')}
+                        text={formatter(modelStatusOptions, item.status, 'value', 'label')}
                         style={{ float: 'right', marginLeft: 10 }}
                       />
                       <Tag color="green" style={{ padding: '0 10px', float: 'right' }}>
@@ -173,8 +174,8 @@ class TaskModelTabs extends Component {
                       </div>
 
                       <Badge
-                        status={formatter(taskModelStatusOptions, item.status, 'value', 'status')}
-                        text={formatter(taskModelStatusOptions, item.status, 'value', 'label')}
+                        status={formatter(modelStatusOptions, item.status, 'value', 'status')}
+                        text={formatter(modelStatusOptions, item.status, 'value', 'label')}
                         style={{ float: 'right', marginLeft: 10 }}
                       />
                       <Tag color="green" style={{ padding: '0 10px', float: 'right' }}>
