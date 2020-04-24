@@ -1,4 +1,6 @@
-// 流程模型
+/**
+ * 流程模型  渲染table页面
+ */
 import React, { Component } from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import {
@@ -59,23 +61,37 @@ class ProcessModel extends Component {
     this.callPublish = _.debounce(this.callPublish, 500);
   }
 
+  /**
+   * 页面加载table
+   */
   componentDidMount() {
     this.getTableData(this.initialValues);
   }
 
+  /**
+   *  搜索流程模型
+   *  @param {string} value 需要搜索的值
+   */
   callParter = value => {
     api.getProcessCodeAndName(value).then(res => {
       this.setState({ nameCodeVal: res });
     });
   };
 
+  /**
+   *  搜索发布人
+   *  @param {string} value 需要搜索的值
+   */
   callPublish = value => {
     api.getProcessPublisherCodeAndName(value).then(res => {
       this.setState({ nameCodeVal: res });
     });
   };
 
-  // 获取表格数据
+  /**
+   *  获取表格数据
+   *  @param {object} options 需要搜索的值(如page,rows)
+   */
   getTableData = (options = {}) => {
     this.setState({ loading: true });
     const formData = this.tableSearchFormRef.current.getFieldsValue();
