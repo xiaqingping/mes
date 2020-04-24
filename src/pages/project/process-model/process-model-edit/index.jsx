@@ -502,7 +502,9 @@ class ProcessEdit extends Component {
         render: (value, row) => (
           <>
             <Avatar
-              src={row.fileId ? disk.downloadFiles(row.fileId, { view: true }) : DefaultHeadPicture}
+              src={
+                row.picture ? disk.downloadFiles(row.picture, { view: true }) : DefaultHeadPicture
+              }
               style={{ float: 'left', width: '46px', height: '46px' }}
             />
             <div style={{ float: 'left', marginLeft: '10px' }}>
