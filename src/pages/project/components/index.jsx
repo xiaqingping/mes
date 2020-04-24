@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card } from 'antd';
+import { Card, Button } from 'antd';
 import SampleSelect from '@/pages/project/components/SampleSelect';
 import SampleGroup from '@/pages/project/components/SampleGroup';
 
@@ -233,14 +233,60 @@ class Group extends React.Component {
         ],
       },
     ],
+    submitStatus: false,
+  };
+
+  // 获取样品选择框的最新state;
+  getSelectUpdateData = updateData => {
+    console.log(updateData);
+    this.setState(
+      {
+        sampleList: updateData,
+      },
+      () => {
+        this.handleUpdate();
+      },
+    );
+  };
+
+  // 传数据
+  submitData = subData => {
+    console.log(subData);
+  };
+
+  // 点击提交状态改变
+  handleSubmit = () => {
+    this.setState({
+      submitStatus: true,
+    });
   };
 
   render() {
-    const { sampleList, groupSchemeData } = this.state;
+    const { sampleList, groupSchemeData, submitStatus } = this.state;
     return (
       <Card>
-        <SampleSelect sampleList={sampleList} />
-        <SampleGroup groupSchemeData={groupSchemeData} sampleList={sampleList} />
+        <SampleSelect
+          sampleList={sampleList}
+          // 当样品选择改变的时候
+          emitData={this.getSelectUpdateData}
+          // 提交数据
+          getData={this.submitData}
+          // 提交状态
+          submitStatus={submitStatus}
+        />
+        <SampleGroup
+          groupSchemeData={groupSchemeData}
+          sampleList={sampleList} // 当样品选择改变的时候
+          emitData={this.getSelectUpdateData}
+          // 提交数据
+          getData={this.submitData}
+          // 提交状态
+          submitStatus={submitStatus}
+          getFun={func => {
+            this.handleUpdate = func;
+          }}
+        />
+        <Button onClick={this.handleSubmit}>提交</Button>
       </Card>
     );
   }

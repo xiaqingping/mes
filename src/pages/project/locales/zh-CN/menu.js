@@ -14,4 +14,5 @@ export default {
   'menu.project.task-model.add': '新建任务模型',
   'menu.project.task-model.edit': '修改',
   'menu.project.task-model.up': '升级',
+  'menu.project.task-model.group': '分组',
 };

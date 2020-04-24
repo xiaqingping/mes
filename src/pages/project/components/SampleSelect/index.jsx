@@ -18,36 +18,146 @@ class SampleSelect extends React.Component {
   state = {
     visible: false,
     tableData: [],
+    tableDatas: [],
     sampleId: null, // 样品id   点击'已选择n个'时候, 需要传给后台的样品id和已选取文件的id
     chooseFileIds: null, // 所有已选文件id集合 点击选择样品时候, 需要传给后台所有的已选取文件的id;
     fromChoosedFile: null, // 从已选择n个文件来的
     processId: null, // 流程id， 刚进入页面时候获取表格数据需要传入的id
+    columns: [
+      {
+        title: '样品',
+        dataIndex: 'sampleName',
+        key: 'sampleName',
+        render: (text, record, index) => (
+          <div style={{ display: 'flex' }}>
+            <Popover
+              overlayClassName="project_manage_sample_ui_select"
+              overlayStyle={{ padding: 0 }}
+              content={
+                <SketchPicker
+                  color={record.color || this.state.color}
+                  onChangeComplete={color => this.handleChange(color, record, index)}
+                />
+              }
+              trigger="click"
+              placement="bottom"
+            >
+              <div
+                style={{
+                  width: 20,
+                  height: 20,
+                  backgroundColor: record.color,
+                  position: 'relative',
+                }}
+                onClick={() => {
+                  this.handleClick(record, index);
+                }}
+              />
+            </Popover>
+            <div style={{ marginLeft: 10 }}>{text}</div>
+          </div>
+        ),
+      },
+      {
+        title: '别名',
+        dataIndex: 'sampleAlias',
+        key: 'sampleAlias',
+        render: (text, record, index) => {
+          return (
+            <div className="project_manage_sample_select_table_alia">
+              <input
+                type="text"
+                defaultValue={text}
+                onBlur={e => {
+                  this.saveData(record, index, e);
+                }}
+              />
+            </div>
+          );
+        },
+      },
+      {
+        title: '序列',
+        dataIndex: 'sequence',
+        key: 'sequence',
+        render: (text, row) => (
+          <>
+            <div>{`${row.sampleSequenceCount} ( ${row.sampleLengthTotal}bp)`}</div>
+          </>
+        ),
+      },
+      {
+        title: '长度',
+        dataIndex: 'length',
+        key: 'length',
+        render: (text, row) => (
+          <>{`${row.sampleLengthMin}-${row.sampleLengthMax} (avg ${row.sampleLengthAve})`}</>
+        ),
+      },
+      {
+        title: '文件',
+        dataIndex: 'files',
+        key: 'files',
+        render: (text, record) => {
+          const lens = record.sampleProperties.filter(item => item.isChoose).length;
+          return (
+            <a
+              onClick={() => {
+                this.viewSelected(record);
+              }}
+            >
+              已选{lens || 0}个
+            </a>
+          );
+        },
+      },
+      {
+        title: '操作',
+        key: 'action',
+        render: (text, record) => (
+          <>
+            <Popconfirm
+              placement="topRight"
+              title="确定要删除吗？"
+              onConfirm={() => this.handleDelete(record)}
+              okText="确定"
+              cancelText="取消"
+            >
+              <a>删除</a>
+            </Popconfirm>
+          </>
+        ),
+      },
+    ],
   };
 
   componentDidMount() {
     this.getTableData();
   }
 
-  // componentDidUpdate(props) {
-  //   if (props.submitStatus !== this.props.submitStatus) {
-  //     this.props.getData('testData', '环境因子');
-  //   }
-  // }
+  componentDidUpdate(props) {
+    if (props.submitStatus !== this.props.submitStatus) {
+      const { tableData } = this.state;
+      let list = [...tableData];
+      list = list.map(item => {
+        item.sampleId = item.id;
+        return item;
+      });
+      this.props.getData(list);
+    }
+  }
 
   getTableData = () => {
-    // TODO 比如修改时候, 获取已有样品选择接口.
-    // 这个接口就是 /projects/v1/processes/流程id (需要从外界获取)/parameter
-    // const { processId } = this.props;
-    // api.getSampleSelectTableData(processId).then(res => {
-    //   console.log(res);
-    // });
-
     const { tableData } = this.state;
     let list = [...tableData];
-    const colorStore = [];
+    // const colorStore = [];
     list = list.map(item => {
-      item.color = getrandomColor();
-      colorStore.push(item.color);
+      item.sampleProperties.forEach(v => {
+        v.isChoose = 1;
+        return v;
+      });
+      // item.color = getrandomColor();
+      // colorStore.push(item.color);
       return item;
     });
     // this.setColorStore(colorStore);
@@ -66,23 +176,28 @@ class SampleSelect extends React.Component {
   };
 
   handleDelete = row => {
-    const { tableData } = this.state;
-    let list = [...tableData];
-    list = list.filter(item => item.id !== row.id);
+    const { tableData, columns } = this.state;
+    const columns1 = JSON.parse(JSON.stringify(columns));
+    const columns2 = [...columns];
+    // const list = [...tableData];
+    const list1 = tableData.filter(item => item.id !== row.id);
+    console.log(list1);
     const colorStore = [];
-    list.forEach(item => {
+    list1.forEach(item => {
       colorStore.push(item.color);
     });
-    console.log(colorStore);
     this.setColorStore(colorStore);
-    console.log(this.props.project);
+    console.log(list1);
     this.setState(
       {
-        tableData: list,
+        tableDatas: list1,
+        columns: columns1,
       },
       () => {
-        // TODO:将改变返回给父组件
-        // this.props.emitData(tableData);
+        this.setState({
+          columns: columns2,
+        });
+        this.props.emitData(list1);
       },
     );
   };
@@ -227,129 +342,23 @@ class SampleSelect extends React.Component {
       });
     }
     // TODO:将改变返回给父组件
-    // this.props.emitData(tableData);
+    this.props.emitData(tableData);
   };
 
   render() {
-    const { tableData, visible, sampleId, chooseFileIds } = this.state;
-    console.log(this.props.project);
-    const columns = [
-      {
-        title: '样品',
-        dataIndex: 'sampleName',
-        key: 'sampleName',
-        render: (text, record, index) => (
-          <div style={{ display: 'flex' }}>
-            <Popover
-              overlayClassName="project_manage_sample_ui_select"
-              overlayStyle={{ padding: 0 }}
-              content={
-                <SketchPicker
-                  color={record.color || this.state.color}
-                  onChangeComplete={color => this.handleChange(color, record, index)}
-                />
-              }
-              trigger="click"
-              placement="bottom"
-            >
-              <div
-                style={{
-                  width: 20,
-                  height: 20,
-                  backgroundColor: record.color,
-                  position: 'relative',
-                }}
-                onClick={() => {
-                  this.handleClick(record, index);
-                }}
-              />
-            </Popover>
-            <div style={{ marginLeft: 10 }}>{text}</div>
-          </div>
-        ),
-      },
-      {
-        title: '别名',
-        dataIndex: 'sampleAlias',
-        key: 'sampleAlias',
-        render: (text, record, index) => {
-          return (
-            <div className="project_manage_sample_select_table_alia">
-              <input
-                type="text"
-                defaultValue={text}
-                onBlur={e => {
-                  this.saveData(record, index, e);
-                }}
-              />
-            </div>
-          );
-        },
-      },
-      {
-        title: '序列',
-        dataIndex: 'sequence',
-        key: 'sequence',
-        render: (text, row) => (
-          <>
-            <div>{`${row.sampleSequenceCount} ( ${row.sampleLengthTotal}bp)`}</div>
-          </>
-        ),
-      },
-      {
-        title: '长度',
-        dataIndex: 'length',
-        key: 'length',
-        render: (text, row) => (
-          <>{`${row.sampleLengthMin}-${row.sampleLengthMax} (avg ${row.sampleLengthAve})`}</>
-        ),
-      },
-      {
-        title: '文件',
-        dataIndex: 'files',
-        key: 'files',
-        render: (text, record) => {
-          const lens = record.sampleProperties.filter(item => item.isChoose).length;
-          return (
-            <a
-              onClick={() => {
-                this.viewSelected(record);
-              }}
-            >
-              已选{lens || 0}个
-            </a>
-          );
-        },
-      },
-      {
-        title: '操作',
-        key: 'action',
-        render: (text, record) => (
-          <>
-            <Popconfirm
-              placement="topRight"
-              title="确定要删除吗？"
-              onConfirm={() => this.handleDelete(record)}
-              okText="确定"
-              cancelText="取消"
-            >
-              <a
-              // onClick={() => {
-              //   this.handleDelete(record);
-              // }}
-              >
-                删除
-              </a>
-            </Popconfirm>
-          </>
-        ),
-      },
-    ];
+    const { tableDatas, visible, sampleId, chooseFileIds, tableData, columns } = this.state;
+    console.log(tableDatas);
+    let tableList = [];
+    if (tableDatas.length) {
+      tableList = tableDatas;
+    } else {
+      tableList = tableData;
+    }
 
     return (
       <>
         <div className="project_manage_sample_select_table">
-          <Table columns={columns} dataSource={tableData} pagination={false} />
+          <Table columns={columns} dataSource={tableList} pagination={false} />
         </div>
         <Button
           type="dashed"
