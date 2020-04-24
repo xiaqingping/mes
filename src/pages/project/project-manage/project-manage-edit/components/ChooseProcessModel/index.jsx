@@ -11,6 +11,7 @@ import _ from 'lodash';
 import api from '@/pages/project/api/processModel';
 import disk from '@/pages/project/api/disk';
 import xuanzhong from '@/assets/imgs/xuanzhong.png';
+import DefaultHeadPicture from '@/assets/imgs/upload_middle.png';
 import ChooseProcessModelCheck from '../ChooseProcessModelCheck';
 
 const FormItem = Form.Item;
@@ -33,7 +34,7 @@ class ChooseProcessModel extends React.Component {
       selecteditem: [], // 所有被选择的item数据的集合
       processCode: '',
       hasMore: true, // 是否开启下拉加载
-      datas: [], // 接受我每次的数据
+      // datas: [], // 接受我每次的数据
       page: 1,
       rows: 9,
       count: 0, // 下拉加载
@@ -61,9 +62,15 @@ class ChooseProcessModel extends React.Component {
       : '';
     console.log(formData);
 
-    const { processCode, page, rows, datas, count, processlist } = this.state;
+    const {
+      processCode,
+      page,
+      rows,
+      // datas,
+      count,
+      processlist,
+    } = this.state;
     console.log(count);
-    // const { current: page, pageSize: rows } = pagination;
     console.log(processCode);
     let newData = [];
     let changePage = false;
@@ -81,6 +88,7 @@ class ChooseProcessModel extends React.Component {
     const data = {
       page,
       rows,
+      status: 2,
       ...formData,
       ...options,
       ...newData,
@@ -88,45 +96,10 @@ class ChooseProcessModel extends React.Component {
     };
 
     api.getProcess(data).then(res => {
-      const uuids = res.rows.map(e => e.picture);
-      disk
-        .getFiles({
-          sourceCode: uuids.join(','),
-          sourceKey: 'project_process_model',
-        })
-        .then(v => {
-          if (v) {
-            const newList = res.rows.map(e => {
-              const filterItem = v.filter(item => item.sourceCode === e.picture);
-              // console.log(v);
-              const fileId = filterItem[0] && filterItem[0].id;
-              return {
-                ...e,
-                fileId,
-              };
-            });
-            // console.log(newList);
-            this.setState({
-              processlist: newList,
-            });
-          } else {
-            const newList = res.rows.map(e => {
-              const fileId = '';
-              return {
-                ...e,
-                fileId,
-              };
-            });
-            this.setState({
-              processlist: newList,
-            });
-          }
-        });
-
       this.setState(
         {
-          // processlist: res.rows,
-          processlist: [...datas, ...processlist],
+          processlist: res.rows,
+          // processlist: [...datas, ...processlist],
           count: processlist.count,
           rows: rows + 1,
           loading: false,
@@ -283,7 +256,7 @@ class ChooseProcessModel extends React.Component {
   render() {
     const { viewvisible, processlist, viewlist, hasMore } = this.state;
     // console.log(this.state);
-    // console.log(hasMore);
+    console.log(hasMore);
     return (
       <Card bordered={false}>
         <div>
@@ -347,7 +320,11 @@ class ChooseProcessModel extends React.Component {
                           }}
                         >
                           <Avatar
-                            src={item.fileId ? disk.downloadFiles(item.fileId, { view: true }) : ''}
+                            src={
+                              item.picture
+                                ? disk.downloadFiles(item.picture, { view: true })
+                                : DefaultHeadPicture
+                            }
                             style={{
                               float: 'left',
                               marginRight: '10px',

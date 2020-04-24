@@ -279,16 +279,19 @@ export const cutString = (str, len) => {
   return s;
 };
 
-// 任务模型获取操作列表
-export const getOperates = v => {
+/**
+ * 任务模型获取操作列表
+ * @param {String} str 状态编号
+ */
+export const getOperates = str => {
   let operas = null;
-  if (v * 1 === 1) {
+  if (str * 1 === 1) {
     operas = ['发布', '修改', '删除', '查看'];
-  } else if (v * 1 === 2) {
+  } else if (str * 1 === 2) {
     operas = ['禁用', '升级', '查看'];
-  } else if (v * 1 === 3) {
+  } else if (str * 1 === 3) {
     operas = ['发布', '升级', '查看'];
-  } else if (v * 1 === 4) {
+  } else if (str * 1 === 4) {
     operas = ['禁用', '查看'];
   }
 
@@ -316,7 +319,9 @@ export const compare = property => (a, b) => {
  */
 export const isEmpty = str => typeof str === 'undefined' || str === null || str === '';
 
-// 随机生成颜色
+/**
+ * 随机生成颜色
+ */
 export const getrandomColor = () => {
   const r = Math.floor(Math.random() * 256);
   const g = Math.floor(Math.random() * 256);
@@ -325,7 +330,9 @@ export const getrandomColor = () => {
   return color;
 };
 
-// 版本排序
+/**
+ * 版本排序
+ */
 export const versionSort = version => {
   const temp = version.map(v => v.replace('V', '').split('.'));
   for (let i = 0; i < temp.length; i++) {
