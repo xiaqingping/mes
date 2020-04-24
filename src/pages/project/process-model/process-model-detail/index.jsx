@@ -1,4 +1,4 @@
-// 详情二级抽屉
+/** 详情的抽屉页面  渲染详情页面 */
 import React, { Component } from 'react';
 import { Drawer, Avatar, Tag, List, Card, Badge, Spin, Empty } from 'antd';
 import { DownOutlined, UpOutlined } from '@ant-design/icons';
@@ -25,6 +25,7 @@ class DrawerTool extends Component {
     errorPage: false,
   };
 
+  /** 根据ID获取详情的具体数据  */
   componentDidMount() {
     const { detailId } = this.props;
     processApi
@@ -42,6 +43,7 @@ class DrawerTool extends Component {
       });
   }
 
+  /** 关闭详情抽屉 */
   onClose = () => {
     this.setState({
       selectVersion: '',
@@ -50,14 +52,18 @@ class DrawerTool extends Component {
     this.props.onClose();
   };
 
+  /** 点击禁用的操作 */
   onUnPublish = () => {
     const { detailValue } = this.state;
     this.props.handleUnPublish(detailValue);
     this.props.onClose();
   };
 
-  // 关闭参数
-  handleClose = value => {
+  /**
+   * 关闭参数弹框时候要保存分组参数数据
+   * @param {Array} arr 分组好以后的参数数据
+   */
+  handleClose = arr => {
     const { detailValue } = this.state;
     if (detailValue.status !== 1) {
       this.setState({
@@ -65,8 +71,8 @@ class DrawerTool extends Component {
       });
       return false;
     }
-    const newData = value.map((item, index) => {
-      const itemLength = value.length;
+    const newData = arr.map((item, index) => {
+      const itemLength = arr.length;
       return { ...item, sortNo: itemLength - index };
     });
     const sonData = newData;
@@ -85,19 +91,17 @@ class DrawerTool extends Component {
     }));
     data.groups = sonData;
     data.taskModels = taskdata;
-    // console.log(data);
     processApi.changeProcess(data);
     this.setState({
       parameterVisible: false,
     });
-    // this.setState({
-    //   parameterVisible: false,
-    //   paramter: sonData,
-    // });
     return true;
   };
 
-  // 更换版本
+  /**
+   * 更换版本
+   * @param {Array} arr 分组好以后的参数数据
+   */
   handleChangeVersion = v => {
     processApi.getProcessChangeVersion(v).then(res => {
       this.setState({
