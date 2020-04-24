@@ -105,6 +105,7 @@ const BasicLayout = props => {
   return (
     <>
       <ProLayout
+        className="classProLayout"
         logo={logo}
         formatMessage={formatMessage}
         menuHeaderRender={(logoDom, titleDom) => (

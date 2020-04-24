@@ -15,7 +15,6 @@
     text-align: right;
     border-top: 1px solid #f0f0f0;
 
-
     .ant-form-item {
       margin-bottom: 0;
     }
@@ -25,9 +24,7 @@
     .ant-drawer-body {
       padding-top: 20px;
     }
-
   }
-
 
   .task_model_view_tab_wrap {
     .ant-card-body {
@@ -65,14 +62,12 @@
     vertical-align: middle;
     background-image: url(../../../assets/imgs/canshu@1x.png);
     background-repeat: no-repeat;
-
   }
 
   .task_model_view_wrap {
     .ant-tabs {
       overflow: visible;
     }
-
   }
 
   .task_model_argu_model_pop {
@@ -89,7 +84,6 @@
       font-weight: 700;
       font-size: 14px;
       cursor: pointer;
-
     }
 
     .task_model_argu_content {
@@ -99,8 +93,6 @@
       font-size: 14px;
     }
   }
-
-
 
   .task_model_isHidden {
     display: none;
@@ -116,9 +108,8 @@
     height: 35px;
 
     &:hover {
-      background-color: #E6F7FF;
+      background-color: #e6f7ff;
     }
-
   }
 
   .task_model_pre_task_loading {
@@ -206,5 +197,20 @@
 
   .task-model-table-code-name-wrap {
     display: flex;
+  }
+
+  .classPageHeaderWrappers {
+    .ant-card-bordered .ant-card-body {
+      padding-left: 0 !important;
+      .ant-table-container thead > tr th:first-child {
+        padding-left: 60px;
+      }
+      .ant-table-container thead > tr > th {
+        background-color: rgb(250, 250, 250) !important;
+      }
+      .ant-table-container tbody > tr td:first-child {
+        padding-left: 60px;
+      }
+    }
   }
 }

@@ -299,7 +299,14 @@ class ProjectEdit extends Component {
             >
               保存
             </Button>
-            {requestType === 'addProject' ? (
+            <Button
+              type="primary"
+              // style={{ float: 'right', marginTop: '-16px' }}
+              onClick={() => this.handleAdd(true)}
+            >
+              添加流程
+            </Button>
+            {/* {requestType === 'addProject' ? (
               <Button
                 type="primary"
                 // style={{ float: 'right', marginTop: '-16px' }}
@@ -309,7 +316,7 @@ class ProjectEdit extends Component {
               </Button>
             ) : (
               ''
-            )}
+            )} */}
           </Card>
         </Form>
         {/* 业务伙伴模态框 */}
