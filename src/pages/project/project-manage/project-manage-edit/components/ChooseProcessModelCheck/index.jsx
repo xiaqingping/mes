@@ -4,9 +4,6 @@ import { Modal, Table, Avatar, Col, Tag, Card, Row } from 'antd';
 import '../../index.less';
 import disk from '@/pages/project/api/disk';
 import DefaultHeadPicture from '@/assets/imgs/defaultheadpicture.jpg';
-// import apiprocess from '@/pages/project/api/processModel/';
-
-// 点击流程模型查看的模态框
 
 class ChooseProcessModelCheck extends React.Component {
   // tableSearchFormRef = React.createRef();
@@ -22,7 +19,7 @@ class ChooseProcessModelCheck extends React.Component {
     this.state = {
       viewlist: props.viewlist, // 带过来的查看数据
     };
-    // console.log(this.state);
+    console.log(this.state);
   }
 
   vieweOk = () => {
@@ -45,13 +42,12 @@ class ChooseProcessModelCheck extends React.Component {
         width: 250,
         render: (value, row) => (
           <>
-            {/* <Avatar
-              src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
-              style={{ float: 'left' }}
-              size="large"
-            /> */}
             <Avatar
-              src={row.fileId ? disk.downloadFiles(row.fileId, { view: true }) : DefaultHeadPicture}
+              // src={row.fileId ? disk.downloadFiles(row.fileId,
+              //   { view: true }) : DefaultHeadPicture}
+              src={
+                row.picture ? disk.downloadFiles(row.picture, { view: true }) : DefaultHeadPicture
+              }
               style={{ float: 'left', width: '46px', height: '46px' }}
             />
             <div style={{ float: 'left' }}>
@@ -94,16 +90,15 @@ class ChooseProcessModelCheck extends React.Component {
                 <div style={{ height: '320px', paddingLeft: '30px', overflow: 'auto' }}>
                   {/* 上部 */}
                   <div style={{ height: '80px' }}>
-                    {/* <Avatar
-                      src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
-                      style={{ float: 'left', marginRight: '10px',width: '60px',
-                      height: '60px', }}
-                      size="large"
-                    /> */}
                     <Avatar
+                      // src={
+                      //   viewlist.fileId
+                      //     ? disk.downloadFiles(disk.fileId, { view: true })
+                      //     : DefaultHeadPicture
+                      // }
                       src={
-                        viewlist.fileId
-                          ? disk.downloadFiles(disk.fileId, { view: true })
+                        viewlist.picture
+                          ? disk.downloadFiles(viewlist.picture, { view: true })
                           : DefaultHeadPicture
                       }
                       style={{ float: 'left', width: '60px', height: '60px' }}
