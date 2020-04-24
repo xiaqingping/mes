@@ -173,7 +173,7 @@ class TitleModel extends React.Component {
             </div>
             <div style={{ fontWeight: '900' }}>
               <div style={{ fontWeight: '700', width: 170 }}>{viewData.code}</div>
-              <div style={{ width: 170, height: '50px' }}>{viewData.name}</div>
+              <div style={{ width: 170, height: '50px', overflow: 'auto' }}>{viewData.name}</div>
             </div>
           </div>
 

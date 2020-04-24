@@ -1,6 +1,4 @@
-/**
- * 流程模型  渲染table页面
- */
+/** 流程模型  渲染table页面 */
 import React, { Component } from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import {
@@ -61,9 +59,7 @@ class ProcessModel extends Component {
     this.callPublish = _.debounce(this.callPublish, 500);
   }
 
-  /**
-   * 页面加载table
-   */
+  /** 页面加载table  */
   componentDidMount() {
     this.getTableData(this.initialValues);
   }
@@ -149,7 +145,10 @@ class ProcessModel extends Component {
     });
   };
 
-  // 流程模型选择样式
+  /**
+   *  流程模型选择样式
+   *  @param {object} item 在下拉框里展示的值
+   */
   renderOption = item => ({
     value: `${item.code}  ${item.name}`,
     label: (
@@ -162,7 +161,10 @@ class ProcessModel extends Component {
     ),
   });
 
-  // 流程模型筛选值
+  /**
+   *  流程模型筛选值
+   *  @param {string} value input搜索的值
+   */
   inputValue = value => {
     const { nameCodeVal } = this.state;
     const arr = [];
@@ -188,7 +190,10 @@ class ProcessModel extends Component {
     return true;
   };
 
-  // 发布人选择样式
+  /**
+   *  发布人选择样式
+   *  @param {object} item 在下拉框里展示的值
+   */
   renderOptionPublish = item => ({
     value: item.publisherName,
     label: (
@@ -207,7 +212,10 @@ class ProcessModel extends Component {
     ),
   });
 
-  // 发布人筛选值
+  /**
+   *  发布人筛选值
+   *  @param {string} value input搜索的值
+   */
   inputValuePublish = value => {
     const { nameCodeValPublish } = this.state;
     const arr = [];
@@ -233,7 +241,11 @@ class ProcessModel extends Component {
     return true;
   };
 
-  // 分页
+  /**
+   *  分页
+   *  @param {object} pagination 分页的对象
+   *  @param {object} filters 检索的对象
+   */
   handleStandardTableChange = (pagination, filters) => {
     const { filtersData } = this.state;
     let filterData = {};
@@ -258,6 +270,7 @@ class ProcessModel extends Component {
     });
   };
 
+  /** 单行筛选条件 */
   simpleForm = () => {
     const { languageCode, status } = this.props;
     const { nameCodeVal } = this.state;
@@ -329,19 +342,22 @@ class ProcessModel extends Component {
     );
   };
 
-  // 关闭详情抽屉
+  /** 关闭详情抽屉 */
   onClose = () => {
     this.setState({
       visible: false,
     });
   };
 
-  // 新建
+  /** 新建 */
   handleModalVisible = () => {
     router.push('/project/process-model/add');
   };
 
-  // 升级
+  /**
+   * 升级
+   * @param {string} value 传入的id对象
+   */
   handleUpgrade = value => {
     api.getProcessDetail(value.id).then(res => {
       this.props.dispatch({
@@ -354,33 +370,48 @@ class ProcessModel extends Component {
     });
   };
 
-  // 修改
+  /**
+   * 修改
+   * @param {string} value 传入的id对象
+   */
   handleChange = value => {
     router.push(`/project/process-model/edit/${value.id}`);
   };
 
-  // 删除
+  /**
+   * 删除
+   * @param {string} value 传入的id对象
+   */
   handleDelete = value => {
     api.deleteProcess(value.id).then(() => {
       this.getTableData(this.initialValues);
     });
   };
 
-  // 发布
+  /**
+   * 发布
+   * @param {string} value 传入的id对象
+   */
   handlePublish = value => {
     api.publishment(value.id).then(() => {
       this.getTableData(this.initialValues);
     });
   };
 
-  // 禁用
+  /**
+   * 禁用
+   * @param {string} value 传入的id对象
+   */
   handleUnPublish = value => {
     api.unPublishment(value.id).then(() => {
       this.getTableData(this.initialValues);
     });
   };
 
-  // 查看详情
+  /**
+   * 查看详情
+   * @param {object} value 传入的详情数据
+   * */
   searchDetails = value => {
     this.setState({
       visible: true,
@@ -388,18 +419,26 @@ class ProcessModel extends Component {
     });
   };
 
-  confirm = row => {
+  /**
+   * 查看详情
+   * @param {string} value 传入的id
+   */
+  confirm = value => {
     Modal.confirm({
       title: '删除流程模型',
       content: '是否确定删除当前流程模型?',
       icon: <ExclamationCircleOutlined />,
       okText: '确认',
       cancelText: '取消',
-      onOk: () => this.handleDelete(row),
+      onOk: () => this.handleDelete(value),
     });
   };
 
-  // 获取按钮信息
+  /**
+   * 获取按钮信息
+   * @param {string} item 传入的按钮名称
+   * @param {object} row 操作的对象
+   */
   getButton = (item, row) => {
     if (item === '查看') {
       return this.searchDetails(row);
@@ -425,7 +464,6 @@ class ProcessModel extends Component {
   render() {
     const { pagination, loading, visible, detailValue, list } = this.state;
     const { status } = this.props;
-
     const columns = [
       {
         title: '编号/名称',

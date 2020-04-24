@@ -229,20 +229,21 @@ class UploadSequenceFile extends React.Component {
       item = { ...item, bpCode };
       return item;
     });
+
     this.setState({
       tableList: list,
       loading: true,
     });
 
     api
-      .addSample(tableList)
+      .addSample(list)
       .then(() => {
         this.setState({
           loading: false,
         });
         this.props.handleClose(false);
       })
-      .catch(err => {
+      .catch(() => {
         this.setState({
           loading: false,
         });
