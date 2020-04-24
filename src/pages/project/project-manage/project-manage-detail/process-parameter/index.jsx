@@ -22,13 +22,13 @@ class ProcessParameter extends Component {
     console.log(data);
     this.state = {
       // 参数页面前置数据
-      requestType: data[2] || '',     // 请求类型
-      processId: data[0] || '',       // 流程ID
-      processModelId: data[1] || '',  // 流程模型ID
-      projectId: data[3] || '',       // 项目ID
-      paramList: [],                  // 参数列表
-      processParam: [],               // 流程模型参数
-      processParamValue: [],          // 流程参数值
+      requestType: data[2] || '', // 请求类型
+      processId: data[0] || '', // 流程ID
+      processModelId: data[1] || '', // 流程模型ID
+      projectId: data[3] || '', // 项目ID
+      paramList: [], // 参数列表
+      processParam: [], // 流程模型参数
+      processParamValue: [], // 流程参数值
       // submitStatus: false,            // 是否提交
       // // 样品选择框 样品列表
       // sampleList: [
@@ -135,8 +135,7 @@ class ProcessParameter extends Component {
 
   // 获取参数 参数值
   getParamData = (param, paramValue) => {
-    const { requestType  } = this.state;
-
+    const { requestType } = this.state;
 
     if (param.length > 0) {
       // 处理参数数据
@@ -212,7 +211,6 @@ class ProcessParameter extends Component {
     const data = this.conversionData(values);
     const { requestType, processId, processModelId } = this.state;
 
-
     // 添加 修改
     if (requestType === 'add' || requestType === 'updateParam') {
       const paramsList = sessionStorage.getItem('processForParams');
@@ -221,7 +219,7 @@ class ProcessParameter extends Component {
       newData.params = arr;
       newData.processModelId = processModelId;
 
-      sessionStorage.setItem("processForParams", newData);
+      sessionStorage.setItem('processForParams', newData);
       return router.push('/project/project-manage/add/addflowpath');
     }
 
@@ -477,7 +475,7 @@ class ProcessParameter extends Component {
     }
     if (projectId === '') return router.push(`/project/project-manage`);
     return router.push(`/project/project-manage/detail/${projectId}`);
-  }
+  };
 
   render() {
     const {
@@ -526,10 +524,7 @@ class ProcessParameter extends Component {
                 {/* <Button type="primary" onClick={() => this.setSubmit()}>
                   组件提交
                 </Button> */}
-                <Button
-                  className={style.back}
-                  onClick={() => this.goBackLink()}
-                >
+                <Button className={style.back} onClick={() => this.goBackLink()}>
                   返回
                 </Button>
                 {/* <Button type="primary" htmlType="submit" onClick={() => this.saveParam()}> */}

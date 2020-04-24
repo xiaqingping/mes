@@ -21,10 +21,11 @@ const EnlargePage = props => {
       width={560}
       closeIcon={<ShrinkOutlined />}
       style={{ top: 180, right: 115 }}
+      className="EnlargePage"
     >
       <List
         rowKey="id"
-        style={{ height: '350px', overflowY: 'auto' }}
+        style={{ height: '310px', overflowY: 'auto' }}
         dataSource={props.typeEnlargeData.params}
         renderItem={item => (
           <List.Item key={item.id}>

@@ -10,7 +10,11 @@
 
   .processModeltableList {
     .ant-card-body {
-      padding-left: 32px;
+      padding-right: 0;
+      padding-left: 0;
+      .tableListOperator {
+        padding-left: 50px;
+      }
     }
     .ant-form-item-label {
       width: auto;
@@ -19,10 +23,10 @@
       margin-left: 0 !important;
     }
     .table-style-set table tr th:first-child {
-      padding-left: 2px !important;
+      padding-left: 50px !important;
     }
     .table-style-set table tr td:first-child {
-      padding-left: 2px !important;
+      padding-left: 50px !important;
     }
   }
 
@@ -37,5 +41,9 @@
 
   .tableHeader thead tr .ant-table-cell {
     background-color: rgb(250, 250, 250) !important;
+  }
+
+  form[id='表格搜索表单'] > div > div:last-child a {
+    font-size: 14px !important;
   }
 }

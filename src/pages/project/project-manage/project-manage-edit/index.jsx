@@ -201,7 +201,7 @@ class ProjectEdit extends Component {
     const { requestType, selectedlabels, projectData, labelList } = this.state;
     return (
       <PageHeaderWrapper title={this.navContent(projectData)}>
-        <Form ref={this.formRef}>
+        <Form ref={this.formRef} className="classPageHeaderWrapper">
           <Card bordered={false}>
             <FormItem
               label="名称"
@@ -283,17 +283,18 @@ class ProjectEdit extends Component {
           </Card>
           <Card
             style={{
-              height: '60px',
+              height: '56px',
               width: '100%',
               position: 'fixed',
               bottom: '0',
               left: '0',
-              lineHeight: '60px',
+              // lineHeight: '60px',
             }}
+            className="classPageHeaderWrapperFooter"
           >
             <Button
-              type="primary"
-              style={{ float: 'right', marginTop: '-16px', marginLeft: '20px' }}
+              type="default"
+              // style={{ float: 'right', marginTop: '-16px', marginLeft: '20px' }}
               onClick={() => this.handleSave(true, 'requestType')}
             >
               保存
@@ -301,7 +302,7 @@ class ProjectEdit extends Component {
             {requestType === 'addProject' ? (
               <Button
                 type="primary"
-                style={{ float: 'right', marginTop: '-16px' }}
+                // style={{ float: 'right', marginTop: '-16px' }}
                 onClick={() => this.handleAdd(true)}
               >
                 添加流程

@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import { connect } from 'dva';
 import api from '@/pages/project/api/projectManageDetail';
 import { formatter } from '@/utils/utils';
-import { Drawer, Card, List, Avatar, Tag, Table, Badge, Tooltip, Form } from 'antd';
+import { Drawer, Card, List, Avatar, Table, Badge, Tooltip, Form } from 'antd';
 import {
   DownOutlined,
   UpOutlined,
@@ -40,8 +40,8 @@ class TaskList extends Component {
       let index = null;
       openId.forEach((item, ind) => {
         if (item === id) {
-          index = ind
-          }
+          index = ind;
+        }
       });
       newData.splice(index, 1);
     }
@@ -90,7 +90,7 @@ class TaskList extends Component {
       newData.push(newItem);
     });
     return newData;
-  }
+  };
 
   // 合并参数列表和参数值
   disposeParamData = (paramData, valueData) => {
@@ -102,10 +102,10 @@ class TaskList extends Component {
           newItem.paramValue = valueItem.paramValue;
           newData.push(newItem);
         }
-      })
-    })
+      });
+    });
     return newData;
-  }
+  };
 
   // 任务执行记录开始运行
   startExecRecord = row => {
@@ -129,11 +129,7 @@ class TaskList extends Component {
   };
 
   render() {
-    const {
-      visibleParam,
-      parameterList,
-      openId,
-    } = this.state;
+    const { visibleParam, parameterList, openId } = this.state;
     const { detailList, taskList, visible } = this.props;
     const { execRecordStatus } = this.props.projectDetail;
 
@@ -141,7 +137,7 @@ class TaskList extends Component {
       {
         title: '编号',
         dataIndex: 'code',
-        width: 100,
+        width: 180,
         render: (value, row) => (
           <>
             <span>{value}</span>
@@ -155,7 +151,7 @@ class TaskList extends Component {
       {
         title: '状态',
         dataIndex: 'status',
-        width: 100,
+        width: 180,
         render: (value, row) => {
           const name = formatter(execRecordStatus, value);
           const status = formatter(execRecordStatus, value, 'id', 'status');
@@ -172,7 +168,7 @@ class TaskList extends Component {
       {
         title: '',
         dataIndex: 'status',
-        width: 50,
+        width: 60,
         render: (value, row) => {
           const duration = calculateTimeDifference(row.startTime, row.endTime);
           if (value === 4) {
@@ -211,8 +207,9 @@ class TaskList extends Component {
                   <Avatar
                     // src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
                     src={
-                      item.processModelPicture ?
-                        disk.downloadFiles(item.processModelPicture, { view: true }) : DefaultHeadPicture
+                      item.processModelPicture
+                        ? disk.downloadFiles(item.processModelPicture, { view: true })
+                        : DefaultHeadPicture
                     }
                     size="large"
                     className={style.floatLeft}
@@ -223,20 +220,13 @@ class TaskList extends Component {
                         <div>{item.code}</div>
                         <div className={style.name}>{item.name}</div>
                       </div>
-                      <Tag className={style.version} color="green">
-                        {item.taskModelVersion}
-                      </Tag>
+                      <div className={style.describe}>{item.describe}</div>
                     </div>
-                    <div className={style.describe}>{item.describe}</div>
                   </div>
-
                   <div className={style.open}>
                     {openId.filter(i => i === item.id).length !== 0 ? (
                       <>
-                        <a
-                          onClick={() => this.showTable(item.id, 2)}
-                          style={{ float: 'right' }}
-                        >
+                        <a onClick={() => this.showTable(item.id, 2)} style={{ float: 'right' }}>
                           收起
                           <UpOutlined />
                         </a>

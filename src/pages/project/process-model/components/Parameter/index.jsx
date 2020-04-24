@@ -53,6 +53,7 @@ class Parameter extends React.Component {
     this.setState({
       data: newData,
     });
+    return '';
     // this.setState({ addGroupVisible: true });
   };
 
@@ -283,63 +284,44 @@ class Parameter extends React.Component {
         className="parameter-style desc-title-style"
         maskClosable={false}
       >
-        <div
-          style={{
-            width: '630px',
-            height: '500px',
-            borderRight: '2px solid #E8E8E8',
-            borderTop: '2px solid #E8E8E8',
-            padding: '24px 0 24px 30px',
-            display: 'inline-block',
-            overflowY: 'auto',
-            position: 'relative',
-          }}
-        >
-          <EnlargePage
-            visible={typeEnlargeVisible}
-            handleBigClose={this.handleBigClose}
-            typeEnlargeData={typeEnlargeData}
-          />
-          <AddGroup
-            visible={addGroupVisible}
-            handleCloseGroup={(v, type = '') => this.handleCloseGroup(v, type)}
-          />
-
-          {/* 分组列表 */}
-          <List
-            style={{ float: 'left' }}
-            rowKey="id"
-            dataSource={
-              data.filter(item => item.groupName !== 'no').length === 0
-                ? ['noData']
-                : data.filter(item => item.groupName !== 'no')
-            }
-            grid={{
-              column: 2,
+        <div className="modelParamter">
+          <div
+            style={{
+              width: '630px',
+              height: '500px',
+              borderRight: '1px solid #E8E8E8',
+              borderTop: '1px solid #E8E8E8',
+              padding: '24px 0 24px 30px',
+              display: 'inline-block',
+              overflowY: 'auto',
+              position: 'relative',
             }}
-            renderItem={(item, index) => {
-              if (item === 'noData') {
-                return (
-                  <Button
-                    style={{
-                      width: '269px',
-                      height: '234px',
-                      float: 'left',
-                      padding: 0,
-                      margin: '0 10px',
-                    }}
-                    type="dashed"
-                    onClick={this.handleAddGroup}
-                    icon={<PlusOutlined />}
-                  >
-                    新增
-                  </Button>
-                );
+          >
+            <EnlargePage
+              visible={typeEnlargeVisible}
+              handleBigClose={this.handleBigClose}
+              typeEnlargeData={typeEnlargeData}
+            />
+            <AddGroup
+              visible={addGroupVisible}
+              handleCloseGroup={(v, type = '') => this.handleCloseGroup(v, type)}
+            />
+
+            {/* 分组列表 */}
+            <List
+              style={{ float: 'left' }}
+              rowKey="id"
+              dataSource={
+                data.filter(item => item.groupName !== 'no').length === 0
+                  ? ['noData']
+                  : data.filter(item => item.groupName !== 'no')
               }
-              return (
-                <>
-                  {/* 新增卡片 */}
-                  {index === 0 ? (
+              grid={{
+                column: 2,
+              }}
+              renderItem={(item, index) => {
+                if (item === 'noData') {
+                  return (
                     <Button
                       style={{
                         width: '269px',
@@ -354,90 +336,112 @@ class Parameter extends React.Component {
                     >
                       新增
                     </Button>
-                  ) : (
-                    ''
-                  )}
-
-                  <List.Item key={index}>
-                    <Card
-                      title={this.titleContent(item, index)}
-                      hoverable
-                      style={{ width: '269px', height: '234px', overflowY: 'auto' }}
-                      onDrop={() => this.drop(item, 2, index + 1)}
-                      onDragOver={e => this.dragOver(e)}
-                    >
-                      {data.filter(i => i.groupName !== 'no').length === 0 ? (
-                        ''
-                      ) : (
-                        <div>
-                          {item.params.map(v =>
-                            v.paramId ? (
-                              <Card
-                                hoverable
-                                key={v.paramId}
-                                style={{
-                                  float: 'left',
-                                  margin: '10px',
-                                }}
-                              >
-                                <div
-                                  onDrop={() => this.drop(v, 1)}
-                                  // onDragOver={e => this.dragOver(e)}
-                                  draggable
-                                  onDragStart={() => this.dragStart(v, 1, index + 1)}
-                                >
-                                  {v.paramName}
-                                </div>
-                              </Card>
-                            ) : (
-                              <div key={v.paramId} />
-                            ),
+                  );
+                }
+                return (
+                  <>
+                    {/* 新增卡片 */}
+                    {index === 0 ? (
+                      <Button
+                        style={{
+                          width: '269px',
+                          height: '234px',
+                          float: 'left',
+                          padding: 0,
+                          margin: '0 10px',
+                        }}
+                        type="dashed"
+                        onClick={this.handleAddGroup}
+                        icon={<PlusOutlined />}
+                      >
+                        新增
+                      </Button>
+                    ) : (
+                      ''
+                    )}
+                    <div className="addParamter">
+                      <List.Item key={index}>
+                        <Card
+                          title={this.titleContent(item, index)}
+                          hoverable
+                          style={{ width: '269px', height: '234px', overflowY: 'auto' }}
+                          onDrop={() => this.drop(item, 2, index + 1)}
+                          onDragOver={e => this.dragOver(e)}
+                        >
+                          {data.filter(i => i.groupName !== 'no').length === 0 ? (
+                            ''
+                          ) : (
+                            <div>
+                              {item.params.map(v =>
+                                v.paramId ? (
+                                  <Card
+                                    hoverable
+                                    key={v.paramId}
+                                    style={{
+                                      float: 'left',
+                                      margin: '10px',
+                                    }}
+                                  >
+                                    <div
+                                      onDrop={() => this.drop(v, 1)}
+                                      // onDragOver={e => this.dragOver(e)}
+                                      draggable
+                                      onDragStart={() => this.dragStart(v, 1, index + 1)}
+                                    >
+                                      {v.paramName}
+                                    </div>
+                                  </Card>
+                                ) : (
+                                  <div key={v.paramId} />
+                                ),
+                              )}
+                            </div>
                           )}
+                        </Card>
+                      </List.Item>
+                    </div>
+                  </>
+                );
+              }}
+              className="list-style card-item-style"
+              split={false}
+            />
+          </div>
+          <div
+            style={{
+              width: '241px',
+              height: '500px',
+              borderTop: '1px solid #E8E8E8',
+              padding: '24px 0 24px 30px',
+              display: 'inline-block',
+              overflowY: 'auto',
+            }}
+            onDrop={() => this.drop(data.filter(item => item.groupName === 'no')[0], 2)}
+            onDragOver={e => this.dragOver(e)}
+          >
+            {/* 未分组列表 */}
+            <List
+              rowKey="id"
+              dataSource={data.filter(item => item.groupName === 'no')[0].params}
+              renderItem={item =>
+                item.paramId ? (
+                  <List.Item key={item.paramId}>
+                    <Card hoverable>
+                      <div>
+                        <div draggable onDragStart={() => this.dragStart(item, 1, 0)}>
+                          {item.paramName}
                         </div>
-                      )}
+                      </div>
                     </Card>
                   </List.Item>
-                </>
-              );
-            }}
-            className="list-style card-item-style"
-            split={false}
-          />
-        </div>
-        <div
-          style={{
-            width: '241px',
-            height: '500px',
-            borderTop: '2px solid #E8E8E8',
-            padding: '24px 0 24px 30px',
-            display: 'inline-block',
-            overflowY: 'auto',
-          }}
-          onDrop={() => this.drop(data.filter(item => item.groupName === 'no')[0], 2)}
-          onDragOver={e => this.dragOver(e)}
-        >
-          {/* 未分组列表 */}
-          <List
-            rowKey="id"
-            dataSource={data.filter(item => item.groupName === 'no')[0].params}
-            renderItem={item =>
-              item.paramId ? (
-                <List.Item key={item.paramId}>
-                  <Card hoverable>
-                    <div>
-                      <div draggable onDragStart={() => this.dragStart(item, 1, 0)}>
-                        {item.paramName}
-                      </div>
-                    </div>
-                  </Card>
-                </List.Item>
-              ) : (
-                <div style={{ display: 'none' }} />
-              )
-            }
-            className="list-style card-item-style"
-            split={false}
-          />
+                ) : (
+                  <div style={{ display: 'none' }} />
+                )
+              }
+              className="list-style card-item-style"
+              split={false}
+            />
+          </div>
         </div>
       </Modal>
     );

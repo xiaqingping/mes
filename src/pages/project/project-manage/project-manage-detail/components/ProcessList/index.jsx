@@ -69,7 +69,7 @@ class ProcessList extends Component {
   // 查看流程参数
   searchProcessParam = processesData => {
     const { projectId } = this.props;
-    const data = `${processesData.id},${processesData.processModelId},edit,${projectId}`
+    const data = `${processesData.id},${processesData.processModelId},edit,${projectId}`;
     router.push(`/project/project-manage/process-parameter/${data}`);
   };
 
@@ -229,8 +229,9 @@ class ProcessList extends Component {
           <>
             <Avatar
               src={
-                row.processModelPicture ?
-                  disk.downloadFiles(row.processModelPicture, { view: true }) : DefaultHeadPicture
+                row.processModelPicture
+                  ? disk.downloadFiles(row.processModelPicture, { view: true })
+                  : DefaultHeadPicture
               }
               // src="/favicon.png"
               style={{ float: 'left', width: '46px', height: '46px' }}

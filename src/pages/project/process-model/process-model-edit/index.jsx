@@ -753,7 +753,7 @@ class ProcessEdit extends Component {
           )}
           {/* 参数弹框 */}
           {parameterVisible ? (
-            <div className="classParameter">
+            <div>
               <Parameter
                 visible={parameterVisible}
                 handleClose={value => this.handleClose(value)}

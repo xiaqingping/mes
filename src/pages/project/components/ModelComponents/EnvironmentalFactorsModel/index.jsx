@@ -137,7 +137,7 @@ class EnvironmentalFactorsModel extends React.Component {
 
   // 提交数据
   handleSave = () => {
-    const { columns, data, headers } = this.state;
+    const { data, headers } = this.state;
     console.log(data);
 
     if (data.length === 0 || headers.length === 0) return false;
@@ -175,49 +175,48 @@ class EnvironmentalFactorsModel extends React.Component {
 
     // return tableHeard
 
-      // 数据整理
-      let tableHeard = [];
-      headers.forEach(item => {
-        tableHeard = [
-          ...tableHeard,
-          { environmentFactorName: item.title, environmentFactorValueList: [] },
-        ];
-      });
+    // 数据整理
+    let tableHeard = [];
+    headers.forEach(item => {
+      tableHeard = [
+        ...tableHeard,
+        { environmentFactorName: item.title, environmentFactorValueList: [] },
+      ];
+    });
 
-      // console.log(tableHeard);
+    // console.log(tableHeard);
 
-      for (let i = 2; i < tableHeard.length + 2; i++) {
-        if (!tableHeard[i - 2]) return false;
-        const values = [];
-        // eslint-disable-next-line no-loop-func
-        data.forEach(item => {
-          if (item[`header_${i}`] !== '') {
-            const sampleValue = {
-              sampleId: item.sampleId,
-              sampleAlias: item.sampleAlias,
-            }
-            const sampleList = [];
-            sampleList.push(sampleValue);
-            if (values.indexOf(item[`header_${i}`]) === -1){
-              tableHeard[i - 2].environmentFactorValueList.push({
-                environmentFactorValue: item[`header_${i}`],
-                sampleList,
-              });
-            } else {
-              tableHeard[i - 2].environmentFactorValueList.forEach(valItem => {
-                if (item[`header_${i}`] === valItem.environmentFactorValue) {
-                  valItem.sampleList.push(sampleValue);
-                }
-              })
-            }
-            values.push(item[`header_${i}`]);
+    for (let i = 2; i < tableHeard.length + 2; i++) {
+      if (!tableHeard[i - 2]) return false;
+      const values = [];
+      // eslint-disable-next-line no-loop-func
+      data.forEach(item => {
+        if (item[`header_${i}`] !== '') {
+          const sampleValue = {
+            sampleId: item.sampleId,
+            sampleAlias: item.sampleAlias,
+          };
+          const sampleList = [];
+          sampleList.push(sampleValue);
+          if (values.indexOf(item[`header_${i}`]) === -1) {
+            tableHeard[i - 2].environmentFactorValueList.push({
+              environmentFactorValue: item[`header_${i}`],
+              sampleList,
+            });
+          } else {
+            tableHeard[i - 2].environmentFactorValueList.forEach(valItem => {
+              if (item[`header_${i}`] === valItem.environmentFactorValue) {
+                valItem.sampleList.push(sampleValue);
+              }
+            });
           }
-        });
-      }
+          values.push(item[`header_${i}`]);
+        }
+      });
+    }
 
-      return tableHeard;
-
-  }
+    return tableHeard;
+  };
 
   // 新增列
   addColumn = () => {

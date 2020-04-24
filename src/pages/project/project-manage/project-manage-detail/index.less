@@ -20,3 +20,61 @@
   border-radius: 4px;
 }
 
+:global {
+  .classMemberList {
+    .ant-table-cell img {
+      width: 36px;
+      height: 36px;
+    }
+    form.ant-form {
+      .ant-table tbody > tr > td {
+        padding: 6px 16px;
+      }
+      .ant-table-cell {
+        padding-left: 36px;
+      }
+    }
+  }
+
+  .classEditFormItem {
+    .ant-modal-body,
+    .ant-modal-header {
+      padding-left: 30px !important;
+      label {
+        color: rgba(0, 0, 0, 0.65);
+      }
+    }
+  }
+
+  .classTabPane {
+    .ant-tabs-tab {
+      padding-right: 30px !important;
+      padding-left: 30px !important;
+    }
+    .ant-card-body {
+      padding: 0;
+      .ant-table-container {
+        padding-left: 30px;
+      }
+    }
+    .classdownBtn {
+      padding-left: 17px !important;
+    }
+  }
+  .classTableSearchForm {
+    form {
+      position: relative;
+      .ant-col:nth-child(1) {
+        padding-left: 30px;
+      }
+      .ant-col:nth-child(2) {
+        position: absolute;
+        left: 530px;
+      }
+      .ant-col:nth-child(3) {
+        position: absolute;
+        left: 400px;
+      }
+    }
+  }
+}

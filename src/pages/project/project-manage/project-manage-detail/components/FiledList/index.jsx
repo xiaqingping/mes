@@ -1,9 +1,13 @@
 // 流程列表
-import { Form, Table, Col, Input, Button  } from 'antd';
+import { Form, Table, Col, Input, Button } from 'antd';
 import React, { Component } from 'react';
 import { connect } from 'dva';
-import { FileExclamationOutlined } from '@ant-design/icons';
+// import { FileExclamationOutlined } from '@ant-design/icons';
 import TableSearchForm from '@/components/TableSearchForm';
+import excel from '@/assets/imgs/excel.png';
+import pdf from '@/assets/imgs/pdf.png';
+import file from '@/assets/imgs/file.png';
+import word from '@/assets/imgs/word.png';
 
 // import StandardTable from '@/components/StandardTable';
 // import EditableCell from '@/components/EditableCell';
@@ -18,8 +22,8 @@ class FiledList extends Component {
   tableFormRef = React.createRef();
 
   state = {
-    list: [],       // 表格数据
-    loading: true,  // 加载状态
+    list: [], // 表格数据
+    loading: true, // 加载状态
     // pagination: {},
   };
 
@@ -51,15 +55,15 @@ class FiledList extends Component {
   getTableData = () => {
     const data = this.props.projectDetail.filedList;
     this.setState({
-        list: data,
-        // pagination: {
-        //   current: options.page,
-        //   pageSize: options.rows,
-        //   total: data.total,
-        // },
-        loading: false,
-        // editIndex: -1,
-      });
+      list: data,
+      // pagination: {
+      //   current: options.page,
+      //   pageSize: options.rows,
+      //   total: data.total,
+      // },
+      loading: false,
+      // editIndex: -1,
+    });
   };
 
   // 顶部表单简单搜索
@@ -70,19 +74,35 @@ class FiledList extends Component {
           <Search />
         </FormItem>
       </Col>
-      <Col lg={6} md={8} sm={12}>
-      <FormItem label="" name="">
+      <Col className="classdownBtn" lg={6} md={8} sm={12}>
+        <FormItem label="" name="">
           <Button>下载</Button>
         </FormItem>
       </Col>
     </>
   );
 
+  imgtype = type => {
+    console.log(type);
+    let res = word;
+    if (type === 'excel') {
+      res = excel;
+    } else if (type === 'word') {
+      res = word;
+    } else if (type === 'pdf') {
+      res = pdf;
+    } else {
+      res = file;
+    }
+    return res;
+  };
+
   render() {
     const {
       // pagination,
       // selectedRows,
-      list, loading
+      list,
+      loading,
     } = this.state;
     let tableWidth = 0;
 
@@ -91,18 +111,17 @@ class FiledList extends Component {
     //     cell: EditableCell,
     //   },
     // };
-
     let columns = [
       {
         title: '文件名称',
         dataIndex: 'name',
         width: 150,
-        render: value => (
+        render: (value, item) => (
           <>
-            <FileExclamationOutlined style={{ fontSize: 18 }}/>
-            <span style={{marginLeft: 10}}>{value}</span>
+            <img src={this.imgtype(item.type)} alt="" />
+            <span style={{ marginLeft: 10 }}>{value}</span>
           </>
-        )
+        ),
       },
       {
         title: '描述',
@@ -123,7 +142,7 @@ class FiledList extends Component {
         title: '大小',
         dataIndex: 'size',
         width: 100,
-        render: text => `${text}kb`
+        render: text => `${text}kb`,
       },
       {
         title: '操作',
@@ -138,6 +157,7 @@ class FiledList extends Component {
 
     columns = columns.map(col => {
       // if (!col.width) col.width = 100;
+
       tableWidth += col.width;
       if (!col.editable) {
         return col;
@@ -149,6 +169,7 @@ class FiledList extends Component {
           rules: col.rules,
           inputType: col.inputType,
           dataIndex: col.dataIndex,
+          // title: [col.title, col.type],
           title: col.title,
           editing: rowIndex === this.state.editIndex,
         }),
@@ -157,12 +178,15 @@ class FiledList extends Component {
 
     return (
       <>
-        <TableSearchForm
-          ref={this.tableSearchFormRef}
-          initialValues={this.initialValues}
-          getTableData={this.getTableData}
-          simpleForm={this.simpleForm}
-        />
+        <div className="classTableSearchForm">
+          <TableSearchForm
+            ref={this.tableSearchFormRef}
+            initialValues={this.initialValues}
+            getTableData={this.getTableData}
+            simpleForm={this.simpleForm}
+          />
+        </div>
+
         {/* <Form ref={this.tableSearchFormRef}>
           <Col lg={6} md={8} sm={12}>
             <FormItem label="" name="fieldName">
@@ -176,6 +200,7 @@ class FiledList extends Component {
           </Col>
         </Form> */}
         <Form ref={this.tableFormRef}>
+          {/* {console.log(list)} */}
           <Table
             scroll={{ x: tableWidth, y: 400 }}
             rowKey="id"

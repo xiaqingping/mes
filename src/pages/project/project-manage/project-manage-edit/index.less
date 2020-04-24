@@ -16,4 +16,35 @@
       display: inline-block !important;
     }
   }
+
+  .classPageHeaderWrapper {
+    > div:nth-child(1) .ant-card-body {
+      margin-bottom: 100px;
+      padding: 30px;
+      .ant-form-item-control {
+        margin-left: -15px !important;
+      }
+      > div {
+        margin-bottom: 20px;
+        textarea[placeholder='请输入项目描述'] {
+          height: 120px;
+        }
+      }
+      > div:last-child {
+        height: auto !important;
+      }
+    }
+  }
+
+  .classPageHeaderWrapperFooter {
+    .ant-card-body {
+      float: right;
+      padding: 12px;
+      padding-right: 35px;
+      button {
+        margin-left: 20px;
+        border-radius: 5px;
+      }
+    }
+  }
 }
