@@ -171,9 +171,7 @@ class UploadSequenceFile extends React.Component {
       err = true;
     }
     const lengthNum = Object.keys(value[0]).length;
-    const groupTableDataSampleList = groupTableData.map(row => {
-      return row.sampleName;
-    });
+    const groupTableDataSampleList = groupTableData.map(row => row.sampleName);
 
     value.forEach((item, index) => {
       // 判断每行的数据个数

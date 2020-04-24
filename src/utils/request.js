@@ -109,15 +109,6 @@ service.interceptors.request.use(config => {
     if (process.env.NODE_ENV === 'development') {
       config.headers.usercode = '123';
       config.headers.username = '123';
-      // 销售分析开发
-      // if (config.url.indexOf('http://192.168.19.71:8550/') > -1) {
-      //   config.url = config.url.replace('http://192.168.19.71:8550/', '/192.168.19.71:8550/');
-      //   config.baseURL = '/';
-      // }
-      // if (config.url.indexOf('http://192.168.19.71:8001/') > -1) {
-      //   config.url = config.url.replace('http://192.168.19.71:8001/', '/192.168.19.71:8001/');
-      //   config.baseURL = '/';
-      // }
       // 项目管理开发
       if (config.url.indexOf('http://192.168.20.12:8360/') > -1) {
         config.url = config.url.replace('http://192.168.20.12:8360/', '/192.168.20.12:8360/');
