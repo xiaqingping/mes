@@ -1,21 +1,18 @@
 /**
  * 业务伙伴模态框
  */
-import {
-  Input,
-  Modal,
-  Table,
-  Badge,
-  Button,
-  AutoComplete,
-} from 'antd';
+import { Input, Modal, Table, Badge, Button, AutoComplete, Col, Form } from 'antd';
 import React, { Component } from 'react';
 import { formatter } from '@/utils/utils';
 import { connect } from 'dva';
 import { UserOutlined, SearchOutlined } from '@ant-design/icons';
 import api from '@/pages/project/api/bp';
 import _ from 'lodash';
+import TableSearchForm from '@/components/TableSearchForm';
 
+import './index.less';
+
+const FormItem = Form.Item;
 
 class BPList extends Component {
   tableSearchFormRef = React.createRef();
@@ -33,11 +30,11 @@ class BPList extends Component {
     this.state = {
       // 分页参数
       pagination: {},
-      list: [],       // 表格数据
-      loading: true,  // 加载状态
+      list: [], // 表格数据
+      loading: true, // 加载状态
       visible: false, // 遮罩层的判断
-      nameOrCodeList: [],   // 名称编号 模糊查询前十条数据
-      bpCode: '',     // 查询条件bpCode
+      nameOrCodeList: [], // 名称编号 模糊查询前十条数据
+      bpCode: '', // 查询条件bpCode
     };
     // 异步验证做节流处理
     this.searchNameOrCode = _.debounce(this.searchNameOrCode, 500);
@@ -86,7 +83,6 @@ class BPList extends Component {
     const { pagination, bpCode } = this.state;
     const { current: page, pageSize } = pagination;
 
-
     const data = {
       page,
       pageSize,
@@ -117,7 +113,7 @@ class BPList extends Component {
       return;
     }
     api.getOrgCustomerByCodeOrName({ code_or_name: value }).then(res => {
-      this.setState({ nameOrCodeList: res, bpCode:'' });
+      this.setState({ nameOrCodeList: res, bpCode: '' });
     });
   };
 
@@ -127,24 +123,31 @@ class BPList extends Component {
     const type = this.visibleEmial(selectedKeys);
     console.log(type);
     if (type) {
-      this.initialValues.email = selectedKeys
+      this.initialValues.email = selectedKeys;
     } else {
-      this.initialValues.mobilePhone = selectedKeys
+      this.initialValues.mobilePhone = selectedKeys;
     }
     this.getTableData(this.initialValues);
-  }
+  };
 
   // 验证邮箱
   visibleEmial = value => {
     // eslint-disable-next-line max-len
-    const data = (/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/.test(value))
+    const data = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/.test(
+      value,
+    );
     return data;
-  }
+  };
 
   // 名称编号 表头搜索 显示样式
   renderNameOrCodeList = item => (
     <AutoComplete.Option key={item.name} text={item.name}>
-      <div style={{ display: 'flex' }}onClick={() => {this.setState({ bpCode: item.code })}}>
+      <div
+        style={{ display: 'flex' }}
+        onClick={() => {
+          this.setState({ bpCode: item.code });
+        }}
+      >
         <span>{item.code}</span>&nbsp;&nbsp;
         <span>{item.name}</span>
       </div>
@@ -154,7 +157,7 @@ class BPList extends Component {
   // 名称编号 表头查询条件
   getColumnSearchPropsNameOrCode = () => {
     const { nameOrCodeList } = this.state;
-    return ({
+    return {
       filterIcon: filtered => (
         <SearchOutlined style={{ color: filtered ? '#1890ff' : undefined }} />
       ),
@@ -174,7 +177,7 @@ class BPList extends Component {
             size="small"
             style={{ width: 90, marginRight: 8 }}
           >
-            <SearchOutlined/>
+            <SearchOutlined />
             搜索
           </Button>
           <Button onClick={clearFilters} size="small" style={{ width: 90 }}>
@@ -182,14 +185,12 @@ class BPList extends Component {
           </Button>
         </div>
       ),
-    });
-  }
+    };
+  };
 
   // 联系方式 表头查询条件
   getColumnSearchPropsPhoneOrEmail = () => ({
-    filterIcon: filtered => (
-      <SearchOutlined style={{ color: filtered ? '#1890ff' : undefined }} />
-    ),
+    filterIcon: filtered => <SearchOutlined style={{ color: filtered ? '#1890ff' : undefined }} />,
     filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
       <div style={{ padding: 8 }}>
         <Input
@@ -204,12 +205,40 @@ class BPList extends Component {
           size="small"
           style={{ width: 90, marginRight: 8 }}
         >
-          <SearchOutlined/>
+          <SearchOutlined />
           搜索
         </Button>
         <Button onClick={clearFilters} size="small" style={{ width: 90 }}>
           重置
         </Button>
+      </div>
+    ),
+  });
+
+  simpleForm = () => {
+    const { list } = this.state;
+    return (
+      <>
+        <Col lg={10}>
+          <FormItem label="名称" name="code">
+            <AutoComplete
+              onSearch={this.inputValue}
+              options={list.map(this.renderOption)}
+              // placeholder={formatMessage({ id: 'bp.inputHere' })}
+              // optionLabelProp="text"
+            />
+          </FormItem>
+        </Col>
+      </>
+    );
+  };
+
+  renderOption = item => ({
+    value: item.code,
+    label: (
+      <div style={{ display: 'flex' }} key={item.code}>
+        <span>{item.code}</span>&nbsp;&nbsp;
+        <span>{item.name}</span>
       </div>
     ),
   });
@@ -226,7 +255,9 @@ class BPList extends Component {
         width: 300,
         render: (value, row) => (
           <>
-            <p><UserOutlined /> &nbsp;{value}</p>
+            <p>
+              <UserOutlined /> &nbsp;{value}
+            </p>
             <p>{row.code}</p>
           </>
         ),
@@ -237,20 +268,20 @@ class BPList extends Component {
         dataIndex: 'certificationStatus',
         width: 150,
         render: value => {
-          const status = formatter(BpCertificationStatus, value, 'id', 'badge')
-          const text = formatter(BpCertificationStatus, value,)
-          return <Badge status={status} text={text} />
-        }
+          const status = formatter(BpCertificationStatus, value, 'id', 'badge');
+          const text = formatter(BpCertificationStatus, value);
+          return <Badge status={status} text={text} />;
+        },
       },
       {
         title: '冻结',
         dataIndex: 'salesOrderBlock',
         width: 150,
         render: value => {
-          const status = formatter(SalesOrderBlock, value, 'id', 'badge')
-          const text = formatter(SalesOrderBlock, value,)
-          return <Badge status={status} text={text} />
-        }
+          const status = formatter(SalesOrderBlock, value, 'id', 'badge');
+          const text = formatter(SalesOrderBlock, value);
+          return <Badge status={status} text={text} />;
+        },
       },
       {
         title: '联系方式',
@@ -259,18 +290,38 @@ class BPList extends Component {
         ...this.getColumnSearchPropsPhoneOrEmail(),
         render: (value, row) => {
           const statusPhone = formatter(
-              BpCertificationStatus, row.mobilePhoneVerifyStatus, 'id', 'badge'
-            )
+            BpCertificationStatus,
+            row.mobilePhoneVerifyStatus,
+            'id',
+            'badge',
+          );
           const statusEmail = formatter(
-              BpCertificationStatus, row.emailVerifyStatus, 'id', 'badge'
-            )
+            BpCertificationStatus,
+            row.emailVerifyStatus,
+            'id',
+            'badge',
+          );
           return (
             <>
-            {value ? (<p>{value}&nbsp;&nbsp;&nbsp;<Badge status={statusPhone}/></p>) : ('')}
-            {row.email ? (<p>{row.email}&nbsp;&nbsp;&nbsp;<Badge status={statusEmail}/></p>) : ('')}
+              {value ? (
+                <p>
+                  {value}&nbsp;&nbsp;&nbsp;
+                  <Badge status={statusPhone} />
+                </p>
+              ) : (
+                ''
+              )}
+              {row.email ? (
+                <p>
+                  {row.email}&nbsp;&nbsp;&nbsp;
+                  <Badge status={statusEmail} />
+                </p>
+              ) : (
+                ''
+              )}
             </>
-          )
-        }
+          );
+        },
       },
       {
         title: '操作',
@@ -297,8 +348,18 @@ class BPList extends Component {
           onCancel={this.handleCancel}
           footer={null}
         >
-          <div className="tableListOperator" />
+          <div className="tableListOperator">
+            {/* 搜索框 */}
+            <TableSearchForm
+              ref={this.tableSearchFormRef}
+              initialValues={this.initialValues}
+              getTableData={this.getTableData}
+              simpleForm={this.simpleForm}
+            />
+          </div>
+
           <Table
+            className="classTableList"
             scroll={{ x: tableWidth, y: 400 }}
             rowKey="id"
             loading={loading}
