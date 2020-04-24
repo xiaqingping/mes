@@ -110,11 +110,6 @@ class DrawerTool extends Component {
     });
   };
 
-  formdata = date => {
-    const str = `${date} `;
-    return str.substring(0, 10);
-  };
-
   // title内容
   titleContent = value => {
     const { visable, selectVersion, parameterVisible, detailValue, open } = this.state;
@@ -189,7 +184,8 @@ class DrawerTool extends Component {
             </div>
           </div>
           <div style={{ width: '255px', height: '50px', wordWrap: 'break-word' }}>
-            {value.name}-{value.creatorName + this.formdata(value.createDate)}
+            {value.name}-{value.creatorName}
+            {value.createDate ? value.createDate.slice(0, 10) : ''}
           </div>
         </div>
 
@@ -261,29 +257,8 @@ class DrawerTool extends Component {
     api.getPreTasks(item.id).then(res => {
       this.setState({
         task: res,
+        childrenDrawer: true,
       });
-      const uuids = res.map(i => i.picture);
-      if (uuids && uuids.length !== 0) {
-        disk.getFiles({ sourceCode: uuids.join(','), sourceKey: 'project_task_model' }).then(r => {
-          const newList = res.map(e => {
-            if (!e.picture) return false;
-            const filterItem = r.filter(it => it.sourceCode === e.picture);
-            const fileId = filterItem[0] && filterItem[0].id;
-            return {
-              ...e,
-              fileId,
-            };
-          });
-          this.setState({
-            childrenDrawer: true,
-            task: newList,
-          });
-        });
-      } else {
-        this.setState({
-          childrenDrawer: true,
-        });
-      }
     });
   };
 
@@ -377,7 +352,7 @@ class DrawerTool extends Component {
                     <List.Item key={item}>
                       <Card hoverable style={{ width: '470px', height: '240px' }}>
                         <Avatar
-                          src={item.fileId ? disk.downloadFiles(item.fileId, { view: true }) : ''}
+                          src={item.picture ? disk.downloadFiles(item.picture, { view: true }) : ''}
                           style={{ float: 'left' }}
                           size="large"
                         />
