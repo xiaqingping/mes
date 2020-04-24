@@ -8,6 +8,8 @@ import api from '@/pages/hts/api';
 import { message } from 'antd';
 import { TableModel } from '../components/AntdUI';
 import { FieldDrawer } from '../components/ModelUI';
+import NumberModels from '../components/NumberSelected';
+import Raio from '../components/TheRadio';
 
 class paramList extends Component {
   constructor(props) {
@@ -106,6 +108,7 @@ class paramList extends Component {
   }
 
   componentDidMount() {
+    console.log(this.props);
     const { metadataRow } = this.props.htsCache;
     if (metadataRow.length === 0) {
       message.warning('暂无数据');
@@ -114,6 +117,11 @@ class paramList extends Component {
     this.getTableData();
     return false;
   }
+
+  // 获取数据
+  getData = value => {
+    console.log(value);
+  };
 
   // 获取表格数据
   getTableData = () => {
@@ -521,6 +529,10 @@ class paramList extends Component {
           columns={newEnvironmentalFactorColumns}
           tableWidth={tableWidth}
         />
+
+        <NumberModels title="OTU聚类" getData={v => this.getData(v)} />
+
+        <Raio title="物种分类" />
 
         {/* 序列文件抽屉 */}
         <FieldDrawer visible={visibleField} onClose={this.onCloseFieldDrawer} data={rowData} />
