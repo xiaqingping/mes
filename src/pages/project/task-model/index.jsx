@@ -397,12 +397,15 @@ class TaskModel extends Component {
         key: 'codeAndName',
         render: (text, row) => (
           <div style={{ display: 'flex' }}>
-            <Avatar
-              src={
-                row.picture ? disk.downloadFiles(row.picture, { view: true }) : DefaultHeadPicture
-              }
-              style={{ float: 'left', width: '46px', height: '46px' }}
-            />
+            <div style={{ width: 46 }}>
+              <Avatar
+                src={
+                  row.picture ? disk.downloadFiles(row.picture, { view: true }) : DefaultHeadPicture
+                }
+                style={{ float: 'left', width: '46px', height: '46px' }}
+              />
+            </div>
+
             <div style={{ marginLeft: 10 }}>
               <div style={{ color: '#545454' }}>{row.name}</div>
               <div style={{ color: '#888' }}>{row.code}</div>

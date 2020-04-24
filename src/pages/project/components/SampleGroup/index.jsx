@@ -10,246 +10,25 @@ import { SketchPicker } from 'react-color';
 import { getrandomColor } from '@/utils/utils';
 import './index.less';
 import { connect } from 'dva';
-import { array } from 'prop-types';
 import GroupUpload from '../UploadSequenceFile/index';
 
 const { confirm } = Modal;
 const { Option } = AutoComplete;
 
 class SampleGroup extends React.Component {
+  static getDerivedStateFromProps(nextProps) {
+    return {
+      tableData: nextProps.groupSchemeData || [],
+      sampleList: nextProps.sampleList || [],
+    };
+  }
+
   state = {
     visible: false,
-
-    tableData: [
-      {
-        groupSchemeName: '分组方案四',
-        sampleList: null,
-        groupList: [
-          {
-            groupName: 'group4',
-            color: 'black',
-            sampleList: [
-              {
-                metadataSampleId: 'fef48d6d544b4eda8cceae3690404418',
-                sampleAlias: '别名003',
-              },
-              {
-                metadataSampleId: 'c8dc965476874dccb81c066df5a174d9',
-                sampleAlias: '别名004',
-              },
-            ],
-          },
-          {
-            groupName: 'group3',
-            color: 'yellow',
-            sampleList: [
-              {
-                metadataSampleId: '39fbe07a8c3546b3bca9801869a58c45',
-                sampleAlias: '别名002',
-              },
-              {
-                metadataSampleId: '2a3beac6006a4a54a8cb6b4809ea9dc3',
-                sampleAlias: '别名001',
-              },
-            ],
-          },
-        ],
-      },
-      {
-        groupSchemeName: '分组方案二',
-        sampleList: [
-          {
-            metadataSampleId: 'c8dc965476874dccb81c066df5a174d9',
-            sampleAlias: '别名004',
-          },
-        ],
-        groupList: null,
-      },
-      {
-        groupSchemeName: '分组方案三',
-        sampleList: [
-          {
-            metadataSampleId: 'fef48d6d544b4eda8cceae3690404418',
-            sampleAlias: '别名003',
-          },
-          {
-            metadataSampleId: '39fbe07a8c3546b3bca9801869a58c45',
-            sampleAlias: '别名002',
-          },
-          {
-            metadataSampleId: '2a3beac6006a4a54a8cb6b4809ea9dc3',
-            sampleAlias: '别名001',
-          },
-          {
-            metadataSampleId: 'c8dc965476874dccb81c066df5a174d9',
-            sampleAlias: '别名004',
-          },
-        ],
-        groupList: null,
-      },
-      {
-        groupSchemeName: '分组方案one',
-        sampleList: null,
-        groupList: [
-          {
-            groupName: 'group1',
-            color: 'black',
-            sampleList: [
-              {
-                metadataSampleId: '39fbe07a8c3546b3bca9801869a58c45',
-                sampleAlias: '别名002',
-              },
-              {
-                metadataSampleId: '2a3beac6006a4a54a8cb6b4809ea9dc3',
-                sampleAlias: '别名001',
-              },
-            ],
-          },
-          {
-            groupName: 'group2',
-            color: 'yellow',
-            sampleList: [
-              {
-                metadataSampleId: 'c8dc965476874dccb81c066df5a174d9',
-                sampleAlias: '别名004',
-              },
-              {
-                metadataSampleId: 'fef48d6d544b4eda8cceae3690404418',
-                sampleAlias: '别名003',
-              },
-            ],
-          },
-        ],
-      },
-    ],
-
-    sampleList: [
-      {
-        id: '2a3beac6006a4a54a8cb6b4809ea9dc3',
-        sampleCode: '1234',
-        sampleName: '样品one',
-        sampleAlias: '别名001',
-        color: 'purple',
-        sampleSequenceCount: 15,
-        sampleLengthTotal: 9000,
-        sampleLengthAve: 600.0,
-        sampleLengthMax: 4000,
-        sampleLengthMin: 1000,
-        sequenceFileCount: 2,
-        sequenceFileList: [
-          {
-            sequenceFileId: '123',
-            sequenceFileName: 'a',
-            sampleSequenceCount: 10,
-            sampleLengthMin: 2000,
-            sampleLengthMax: 4000,
-            sampleLengthAve: 600.0,
-            sampleLengthTotal: 6000,
-          },
-          {
-            sequenceFileId: '1234',
-            sequenceFileName: 'b',
-            sampleSequenceCount: 5,
-            sampleLengthMin: 1000,
-            sampleLengthMax: 2000,
-            sampleLengthAve: 600.0,
-            sampleLengthTotal: 3000,
-          },
-        ],
-      },
-      {
-        id: '39fbe07a8c3546b3bca9801869a58c45',
-        sampleCode: '12345',
-        sampleName: '样品B',
-        sampleAlias: '别名002',
-        color: 'red',
-        sampleSequenceCount: 15,
-        sampleLengthTotal: 9000,
-        sampleLengthAve: 600.0,
-        sampleLengthMax: 4000,
-        sampleLengthMin: 1000,
-        sequenceFileCount: 2,
-        sequenceFileList: [
-          {
-            sequenceFileId: '123456',
-            sequenceFileName: 'd',
-            sampleSequenceCount: 10,
-            sampleLengthMin: 2000,
-            sampleLengthMax: 4000,
-            sampleLengthAve: 600.0,
-            sampleLengthTotal: 6000,
-          },
-          {
-            sequenceFileId: '12345',
-            sequenceFileName: 'c',
-            sampleSequenceCount: 5,
-            sampleLengthMin: 1000,
-            sampleLengthMax: 2000,
-            sampleLengthAve: 600.0,
-            sampleLengthTotal: 3000,
-          },
-        ],
-      },
-      {
-        id: 'c8dc965476874dccb81c066df5a174d9',
-        sampleCode: '1234567',
-        sampleName: '样品D',
-        sampleAlias: '别名004',
-        color: 'gray',
-        sampleSequenceCount: 5,
-        sampleLengthTotal: 2000,
-        sampleLengthAve: 400.0,
-        sampleLengthMax: 1500,
-        sampleLengthMin: 500,
-        sequenceFileCount: 1,
-        sequenceFileList: [
-          {
-            sequenceFileId: '12345679',
-            sequenceFileName: 'e',
-            sampleSequenceCount: 5,
-            sampleLengthMin: 500,
-            sampleLengthMax: 1500,
-            sampleLengthAve: 400.0,
-            sampleLengthTotal: 2000,
-          },
-        ],
-      },
-      {
-        id: 'fef48d6d544b4eda8cceae3690404418',
-        sampleCode: '123456',
-        sampleName: '样品C',
-        sampleAlias: '别名003',
-        color: 'blue',
-        sampleSequenceCount: 15,
-        sampleLengthTotal: 12000,
-        sampleLengthAve: 800.0,
-        sampleLengthMax: 6000,
-        sampleLengthMin: 500,
-        sequenceFileCount: 2,
-        sequenceFileList: [
-          {
-            sequenceFileId: '1234567',
-            sequenceFileName: 'e',
-            sampleSequenceCount: 5,
-            sampleLengthMin: 500,
-            sampleLengthMax: 1500,
-            sampleLengthAve: 400.0,
-            sampleLengthTotal: 2000,
-          },
-          {
-            sequenceFileId: '12345678',
-            sequenceFileName: 'f',
-            sampleSequenceCount: 10,
-            sampleLengthMin: 4000,
-            sampleLengthMax: 6000,
-            sampleLengthAve: 1000.0,
-            sampleLengthTotal: 10000,
-          },
-        ],
-      },
-    ],
-
+    loading: false,
     groupSchemeData: [], // 分组方案数据
+    tableData: [],
+    sampleList: [],
     // 分组方案
     optionList: ['当前样品'],
     columns: [
@@ -280,16 +59,35 @@ class SampleGroup extends React.Component {
   };
 
   componentDidMount() {
+    // 转换分组方案数据
+    // console.log(this.state.sampleList);
+    // console.log(this.state.groupSchemeData);
+    // this.transformGroup(this.state.groupSchemeData);
     const { tableData } = this.state;
+    console.log(tableData);
     this.setState(
       {
         groupSchemeData: tableData,
       },
       () => {
-        // 转换分组方案数据
+        console.log(this.state.sampleList);
+        console.log(this.state.groupSchemeData);
         this.transformGroup(this.state.groupSchemeData);
       },
     );
+    // console.log(this.state.sampleList);
+    // console.log(this.state.groupSchemeData);
+    // this.transformGroup(this.state.groupSchemeData);
+    // const tableData = this.props.groupSchemeData;
+
+    // this.setState(
+    //   {
+    //     groupSchemeData: tableData,
+    //   },
+    //   () => {
+
+    //   },
+    // );
   }
 
   // 转换分组方案数据
@@ -310,11 +108,12 @@ class SampleGroup extends React.Component {
     const newData = this.getFillData(data, rowData, newColumns);
     // 将所有的颜色放到仓库里.
     this.pushColorsToStore(newData);
-
+    console.log(newData);
+    console.log(newColumns);
     // 保存 分组 表头数据
     this.setState({
-      columns: newColumns,
       groupSchemeData: newData,
+      columns: newColumns,
     });
   };
 
@@ -732,6 +531,7 @@ class SampleGroup extends React.Component {
       }
       return item[col] === option;
     });
+    // 紧接着把原来所有同名组改成相同组名以及颜色
     datas.forEach(item => {
       if (item[col] === value) {
         const color = row[color1];
@@ -776,6 +576,7 @@ class SampleGroup extends React.Component {
     });
   };
 
+  // 设置颜色和组名为空
   setValueAndColorNone = (datas, row, option, value, col, index, color1) => {
     row[col] = option;
     row[color1] = '';
@@ -890,6 +691,7 @@ class SampleGroup extends React.Component {
     return true;
   };
 
+  // 提交数据格式化,
   formatSubmitData = () => {
     const { groupSchemeData, columns } = this.state;
     // 数据整理
@@ -934,6 +736,7 @@ class SampleGroup extends React.Component {
     return tableHeard;
   };
 
+  // 获取从上传来的数据.
   getDataFromUpload = (data, headData) => {
     const { groupSchemeData, columns } = this.state;
     let cols = [this.firstColumn];
@@ -975,20 +778,24 @@ class SampleGroup extends React.Component {
     const cols2 = [...cols];
     this.setState(
       {
-        groupSchemeData: dataFromUpload,
+        // groupSchemeData: dataFromUpload,
         columns: cols1,
       },
       () => {
         this.setState({
           columns: cols2,
+          // 设置颜色有延迟, 所以加一步
+          groupSchemeData: dataFromUpload,
         });
+        console.log(this.state.groupSchemeData);
+        console.log(this.state.columns);
       },
     );
   };
 
   render() {
     let tableWidth = 0;
-    const { groupSchemeData, visible, columns } = this.state;
+    const { groupSchemeData, visible, columns, loading } = this.state;
     console.log(columns);
     columns.map(col => {
       if (!col.width) {
@@ -1014,6 +821,7 @@ class SampleGroup extends React.Component {
           dataSource={groupSchemeData}
           pagination={false}
           scroll={{ x: tableWidth }}
+          loading={loading}
         />
 
         <Button onClick={this.verifyData} type="primary">

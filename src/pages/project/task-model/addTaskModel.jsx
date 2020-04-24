@@ -113,6 +113,10 @@ class TaskModel extends Component {
             type: 'taskModel/getEditOriginModelData',
             payload: { ...res },
           });
+          dispatch({
+            type: 'taskModel/getArgumentsList',
+            payload: res.params,
+          });
           if (res.version) {
             this.setState({
               versionType: versionFun(res.version),
@@ -467,11 +471,16 @@ class TaskModel extends Component {
         width: 500,
         render: (value, row) => (
           <div style={{ display: 'flex' }}>
-            <Avatar
-              src={row.fileId ? disk.downloadFiles(row.fileId, { view: true }) : DefaultHeadPicture}
-              style={{ float: 'left', width: '46px', height: '46px', marginRight: 10 }}
-            />
-            <div>
+            <div style={{ width: 46 }}>
+              <Avatar
+                src={
+                  row.picture ? disk.downloadFiles(row.picture, { view: true }) : DefaultHeadPicture
+                }
+                style={{ float: 'left', width: '46px', height: '46px', marginRight: 10 }}
+              />
+            </div>
+
+            <div style={{ marginLeft: 10 }}>
               <h5>{row.code}</h5>
               <div>{row.name}</div>
             </div>
@@ -580,6 +589,10 @@ class TaskModel extends Component {
                     required: true,
                     message: '请输入任务名称',
                   },
+                  {
+                    max: 50,
+                    message: '最多输入50个字符',
+                  },
                 ]}
               >
                 <Input placeholder="请输入任务名称" />
@@ -591,6 +604,10 @@ class TaskModel extends Component {
                     required: true,
                     message: '请输入任务描述',
                   },
+                  {
+                    max: 255,
+                    message: '最多输入255个字符',
+                  },
                 ]}
               >
                 <Input.TextArea placeholder="请输入任务描述" rows={4} />
@@ -601,6 +618,10 @@ class TaskModel extends Component {
                   {
                     required: true,
                     message: '请输入标识',
+                  },
+                  {
+                    max: 50,
+                    message: '最多输入50个字符!',
                   },
                 ]}
               >

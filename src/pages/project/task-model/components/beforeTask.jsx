@@ -200,12 +200,17 @@ class BeforeTask extends React.Component {
         render: (value, row) => (
           <>
             <div style={{ display: 'flex' }}>
-              <Avatar
-                src={
-                  row.picture ? disk.downloadFiles(row.picture, { view: true }) : DefaultHeadPicture
-                }
-                style={{ float: 'left', width: '40px', height: '40px' }}
-              />
+              <div style={{ width: 40 }}>
+                <Avatar
+                  src={
+                    row.picture
+                      ? disk.downloadFiles(row.picture, { view: true })
+                      : DefaultHeadPicture
+                  }
+                  style={{ float: 'left', width: '40px', height: '40px' }}
+                />
+              </div>
+
               <div style={{ float: 'left', marginLeft: '10px' }}>
                 <div>{value}</div>
                 <div>{row.name}</div>
