@@ -209,8 +209,8 @@ class TaskList extends Component {
                   <Avatar
                     // src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
                     src={
-                      item.processModelPicture
-                        ? disk.downloadFiles(item.processModelPicture, { view: true })
+                      item.picture
+                        ? disk.downloadFiles(item.picture, { view: true })
                         : DefaultHeadPicture
                     }
                     size="large"

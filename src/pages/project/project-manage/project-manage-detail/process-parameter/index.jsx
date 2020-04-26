@@ -1,13 +1,19 @@
 // 流程参数
 import React, { Component } from 'react';
-import { Card, List, Form, Layout, Button, message } from 'antd';
+import { Card, List, Form, Layout, Button, message, Tooltip } from 'antd';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import { connect } from 'dva';
 import router from 'umi/router';
-import InputModel from '@/pages/project/components/ModelComponents/InputModel';
 import api from '@/pages/project/api/projectManageDetail';
+import { QuestionCircleOutlined } from '@ant-design/icons';
+/** 参数组件引用 */
 // eslint-disable-next-line max-len
-// import EnvironmentalFactorsModel from '@/pages/project/components/ModelComponents/EnvironmentalFactorsModel/index';
+import EnvironmentalFactorsModel from '@/components/ModelComponents/EnvironmentalFactorsModel';
+import SampleGroupModel from '@/components/ModelComponents/SampleGroupModel/index';
+import SampleSelectModel from '@/components/ModelComponents/SampleSelectModel/index';
+import CheckBoxModel from '@/components/ModelComponents/CheckBoxModel/index';
+import InputModel from '@/components/ModelComponents/InputModel/index';
+/** 样式 */
 import style from './index.less';
 
 const { Footer } = Layout;
@@ -18,8 +24,6 @@ class ProcessParameter extends Component {
   constructor(props) {
     super(props);
     const { type, processModelId, processId, projectId } = this.props.match.params;
-    console.log(this.props.match.params);
-    console.log(this.props);
     this.state = {
       // 参数页面前置数据
       requestType: type, // 请求类型
@@ -29,75 +33,9 @@ class ProcessParameter extends Component {
       paramList: [], // 参数列表
       processParam: [], // 流程模型参数
       processParamValue: [], // 流程参数值
-      // submitStatus: false, // 是否提交
-      // // 样品选择框 样品列表
-      // sampleList: [
-      //   {
-      //     colour: 'purple',
-      //     id: '1234567',
-      //     sampleAlias: '别名004',
-      //     sampleCode: '1234567',
-      //     sampleLengthAve: 600,
-      //     sampleLengthMax: 4000,
-      //     sampleLengthMin: 1000,
-      //     sampleLengthTotal: 9000,
-      //     sampleName: '未分组样品',
-      //     sampleSequenceCount: 15,
-      //     sequenceFileCount: 2,
-      //   },
-      //   {
-      //     colour: 'red',
-      //     id: '12345',
-      //     sampleAlias: '别名002',
-      //     sampleCode: '456',
-      //     sampleLengthAve: 600,
-      //     sampleLengthMax: 4000,
-      //     sampleLengthMin: 1000,
-      //     sampleLengthTotal: 9000,
-      //     sampleName: '样品B',
-      //     sampleSequenceCount: 15,
-      //     sequenceFileCount: 2,
-      //   },
-      //   {
-      //     colour: 'blue',
-      //     id: '1234',
-      //     sampleAlias: '别名001',
-      //     sampleCode: '456',
-      //     sampleLengthAve: 600,
-      //     sampleLengthMax: 4000,
-      //     sampleLengthMin: 1000,
-      //     sampleLengthTotal: 9000,
-      //     sampleName: '样品A',
-      //     sampleSequenceCount: 15,
-      //     sequenceFileCount: 2,
-      //   },
-      //   {
-      //     colour: 'gray',
-      //     id: '123456',
-      //     sampleAlias: '别名003',
-      //     sampleCode: '456',
-      //     sampleLengthAve: 600,
-      //     sampleLengthMax: 4000,
-      //     sampleLengthMin: 1000,
-      //     sampleLengthTotal: 9000,
-      //     sampleName: '样品C',
-      //     sampleSequenceCount: 15,
-      //     sequenceFileCount: 2,
-      //   },
-      // ],
-      // // 环境因子参数
-      // paramData: {
-      //   id: '8dc20f4338484a348b0ddd94bf3516bc',
-      //   projectId: 'cdf36f8403e644249fa4f6788456134c',
-      //   processId: '1831fd04c1cd450f9aefc3d77f3725c2',
-      //   processModelId: '85a9c0452b1e47ca909a30c753d5d820',
-      //   taskId: '10b85cce64034418b66642f3f19f76b9',
-      //   taskModelId: 'f04bf8a80c6b4a7097f2c15b817df820',
-      //   paramKey: 'environmentalFactor',
-      //   paramValue:
-      // eslint-disable-next-line max-len
-      //     '{"environmentFactorList":[{"environmentFactorName": "环境因子一","environmentFactorValueList" :[{"environmentFactorValue": "10","sampleList": [{"sampleId" : "1234","sampleAlias": "别名001"},{"sampleId" : "123456","sampleAlias": "别名003"}]},{"environmentFactorValue": "15","sampleList": [{"sampleId" : "1234567","sampleAlias": "别名004"},{"sampleId" : "12345","sampleAlias": "别名002"}]}]},{"environmentFactorName": "环境因子二","environmentFactorValueList" :[{"environmentFactorValue": "8","sampleList": [{"sampleId" : "1234","sampleAlias": "别名001"},{"sampleId" : "12345","sampleAlias": "别名002"},{"sampleId" : "123456","sampleAlias": "别名003"},{"sampleId" : "1234567","sampleAlias": "别名004"}]}]},{"environmentFactorName": "环境因子三","environmentFactorValueList" :[{"environmentFactorValue": "9","sampleList": [{"sampleId" : "1234","sampleAlias": "别名001"}]},{"environmentFactorValue": "12","sampleList": [{"sampleId" : "12345","sampleAlias": "别名002"},{"sampleId" : "123456","sampleAlias": "别名003"},{"sampleId" : "1234567","sampleAlias": "别名004"}]}]}]}',
-      // },
+      submitStatus: false, // 是否提交
+      // 样品选择框 样品列表
+      sampleList: [],
     };
     // 判断请求类型
     this.determineTheRequestType();
@@ -105,11 +43,6 @@ class ProcessParameter extends Component {
 
   // 组件加载时
   componentDidMount = () => {};
-
-  // 是否提交
-  // setSubmit = () => {
-  //   this.setState({ submitStatus: true });
-  // };
 
   // 判断请求类型
   determineTheRequestType = () => {
@@ -173,7 +106,6 @@ class ProcessParameter extends Component {
         const paramList = sessionStorage.getItem('processForParams');
 
         const processParamValue = paramList.params;
-        console.log(paramValue);
         // 有参数值时
         if (
           newParamData.length > 0 &&
@@ -195,7 +127,7 @@ class ProcessParameter extends Component {
       }
 
       // 编辑 参数值
-      if (requestType === 'edit') {
+      if (requestType === 'edit' || requestType === 'view') {
         message.success('编辑操作');
 
         // 有参数值时
@@ -224,14 +156,14 @@ class ProcessParameter extends Component {
     });
   };
 
-  // 保存
-  getFromData = values => {
+  // 保存提交
+  onFinish = values => {
+    this.setState({ submitStatus: true });
     const data = this.conversionData(values);
     const { requestType, processId, processModelId } = this.state;
-    console.log(data);
 
     // 添加 修改
-    if (requestType === 'add' || requestType === 'update') {
+    if (requestType === 'add' || requestType === 'updateParam') {
       const paramsList = sessionStorage.getItem('processForParams');
       const newData = { params: data, processModelId };
       const list = [];
@@ -240,7 +172,6 @@ class ProcessParameter extends Component {
       } else {
         list.push([...paramsList, newData]);
       }
-      console.log(list);
 
       sessionStorage.setItem('processForParams', JSON.stringify(list));
       return router.push('/project/project-manage/add/addflowpath/');
@@ -494,61 +425,159 @@ class ProcessParameter extends Component {
   goBackLink = () => {
     const { requestType, projectId } = this.state;
     let url;
-    console.log(requestType);
-    console.log(projectId);
     if (requestType === 'add' || requestType === 'update') {
-      // if (projectId === '' || projectId === undefined) {
-      // url = `/project/project-manage/add/addflowpath`;
-      // }
-      // if (projectId !== '') url = `/project/project-manage/add/addflowpath/add/${projectId}`;
-      return router.push(url);
+      return router.push(`/project/project-manage/add/addflowpath`);
     }
-    // if (projectId === '') url = `/project/project-manage`;
-    // if (projectId !== '') url = `/project/project-manage/detail/${projectId}`;
+    if (projectId === '') url = `/project/project-manage`;
+    if (projectId !== '') url = `/project/project-manage/detail/${projectId}`;
     return router.push(url);
   };
 
+  // 提交指令 组件返回数据
+  getData = data => {
+    console.log(data);
+  };
+
+  // 获取样品选择框的实时数据
+  getSelectUpdateData = updateData => {
+    this.setState(
+      {
+        sampleList: updateData,
+      },
+      () => {
+        this.handleUpdateSampleGroup();
+        this.handleUpdateEnvironmentFactor();
+      },
+    );
+  };
+
   render() {
-    const {
-      paramList,
-      // sampleList, paramData, submitStatus, requestType
-    } = this.state;
+    const { paramList, sampleList, submitStatus, requestType } = this.state;
     const data = paramList;
-    // console.log(requestType);
 
     return (
       <>
-        <PageHeaderWrapper>
+        <PageHeaderWrapper style={{ marginBottom: 100 }}>
           <Form
             name="basic"
             ref={this.formRef}
-            onFinish={this.getFromData}
+            onFinish={this.onFinish}
             onFinishFailed={this.onFinishFailed}
           >
             <List
               dataSource={data}
               renderItem={item => (
                 <List.Item>
-                  <Card title={item.groupName} style={{ width: '100%' }}>
+                  <Card
+                    title={item.groupName}
+                    style={{ width: '100%' }}
+                    extra={
+                      <Tooltip placement="right" title={item.groupDescribe}>
+                        <QuestionCircleOutlined />
+                      </Tooltip>
+                    }
+                  >
                     {item.params.map((it, index) => {
                       const newIndex = JSON.parse(JSON.stringify(index));
-
-                      if (it.type === 'txtShuRuKuang')
-                        return <InputModel data={it} key={newIndex} />;
-                      if (it.type === 'input') return <InputModel data={it} key={newIndex} />;
+                      // this.getModelType(it, newIndex);
+                      if (it.type === 'input')
+                        return (
+                          <InputModel
+                            paramList={it}
+                            key={newIndex}
+                            disabled={requestType === 'view'} // 禁用
+                            submitStatus={submitStatus} // 是否提交
+                            getData={this.getData} // 提交数据
+                          />
+                        );
+                      // 数值输入框
+                      if (it.type === 'number_input')
+                        return (
+                          <InputModel
+                            paramList={it}
+                            key={newIndex}
+                            disabled={requestType === 'view'}
+                            submitStatus={submitStatus}
+                            getData={this.getData}
+                          />
+                        );
+                      // 单选
+                      if (it.type === 'radio')
+                        return (
+                          <InputModel
+                            paramList={it}
+                            key={newIndex}
+                            disabled={requestType === 'view'}
+                            submitStatus={submitStatus}
+                            getData={this.getData}
+                          />
+                        );
+                      // 多选
+                      if (it.type === 'checkbox')
+                        return (
+                          <InputModel
+                            paramList={it}
+                            key={newIndex}
+                            disabled={requestType === 'view'}
+                            submitStatus={submitStatus}
+                            getData={this.getData}
+                          />
+                        );
+                      // 样品选择框
+                      if (it.type === 'sample_select')
+                        return (
+                          <SampleSelectModel
+                            paramList={it}
+                            key={newIndex}
+                            disabled={requestType === 'view'}
+                            submitStatus={submitStatus}
+                            sampleList={sampleList} // 样品列表
+                            getData={this.getData}
+                            // 当样品选择改变的时候
+                            emitData={this.getSelectUpdateData}
+                            setSelectState={this.setSelectState}
+                          />
+                        );
+                      // 样品分组方案
+                      if (it.type === 'sample_group') {
+                        return (
+                          <SampleGroupModel
+                            paramList={it}
+                            key={newIndex}
+                            disabled={requestType === 'view'}
+                            submitStatus={submitStatus}
+                            sampleList={sampleList}
+                            getData={this.getData}
+                            // 样品列表改变执行事件
+                            getFun={func => {
+                              this.handleUpdateSampleGroup = func;
+                            }}
+                          />
+                        );
+                      }
+                      // 样品环境因子
+                      if (it.type === 'sample_environment_factor') {
+                        return (
+                          <EnvironmentalFactorsModel
+                            paramList={it}
+                            key={newIndex}
+                            disabled={requestType === 'view'}
+                            submitStatus={submitStatus}
+                            sampleList={sampleList}
+                            getData={this.getData}
+                            // 样品列表改变执行事件
+                            getFun={func => {
+                              this.handleUpdateEnvironmentFactor = func;
+                            }}
+                          />
+                        );
+                      }
                       return false;
                     })}
                   </Card>
                 </List.Item>
               )}
             />
-            {/* 环境因子 */}
-            {/* <EnvironmentalFactorsModel
-              sampleList={sampleList}
-              paramList={paramData}
-              submitStatus={submitStatus}
-              disabled={requestType === 'view'}
-            /> */}
 
             <Footer className={style.footer}>
               <div className={style.button}>
