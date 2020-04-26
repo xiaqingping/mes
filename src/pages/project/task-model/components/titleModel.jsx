@@ -55,8 +55,6 @@ class TitleModel extends React.Component {
 
   // 切换版本
   switchVersion = item => {
-    console.log(item);
-
     const { versionOpen, viewData } = this.state;
 
     this.setState(
@@ -97,9 +95,7 @@ class TitleModel extends React.Component {
   // 根据code和版本获取详细信息
 
   getDetailByCodeVer = (code, version) => {
-    console.log(this.props);
     const { dispatch } = this.props;
-    console.log(dispatch);
     api.getdetailByCodeVer(code, version).then(res => {
       this.setState({
         viewData: res,
@@ -116,8 +112,6 @@ class TitleModel extends React.Component {
     this.setState({
       viewVisible: true,
     });
-    console.log(item);
-    console.log(this.props);
 
     const { dispatch } = this.props;
 

@@ -15,9 +15,7 @@ class TaskModel extends Component {
 
   componentDidMount() {
     // 获取抽屉数据
-    // console.log(this.props);
     const { viewId } = this.props;
-    console.log(viewId);
     if (viewId) {
       this.getPreData(viewId);
       this.getPostData(viewId);

@@ -106,7 +106,6 @@ class BeforeTask extends React.Component {
 
   fetchData = value => {
     api.getTaskNameAndCode(value).then(res => {
-      console.log(res);
       this.setState({
         children: res,
       });
@@ -115,7 +114,6 @@ class BeforeTask extends React.Component {
 
   handleSelectChange = value => {
     const { pagination } = this.state;
-    console.log(pagination);
     const page = {
       current: 1,
       pageSize: pagination.pageSize,
@@ -178,11 +176,9 @@ class BeforeTask extends React.Component {
   };
 
   handleChange = p => {
-    console.log(p);
     const page = p.current;
     const rows = p.pageSize;
     const pagination = { page, rows };
-    console.log(pagination);
     this.setState({
       pagination,
     });
