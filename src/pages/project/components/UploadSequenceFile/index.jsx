@@ -126,21 +126,23 @@ class UploadSequenceFile extends React.Component {
 
   // 提交
   handleOK = () => {
-    confirm({
-      title: '确定提交此分组方案吗?',
-      icon: <ExclamationCircleOutlined />,
-      content: '提交后之前分组方案将被覆盖',
-      onOk: () => {
-        const { tableList, tableHead } = this.state;
-        // console.log(tableList);
-        // debugger;
-        this.props.getData(tableList, tableHead);
-        this.props.closeUpload();
-      },
-      onCancel: () => {
-        console.log('Cancel');
-      },
-    });
+    const { tableList, tableHead } = this.state;
+    if (tableList && tableList.length) {
+      confirm({
+        title: '确定提交此分组方案吗?',
+        icon: <ExclamationCircleOutlined />,
+        content: '提交后之前分组方案将被覆盖',
+        onOk: () => {
+          this.props.getData(tableList, tableHead);
+          this.props.closeUpload();
+        },
+        onCancel: () => {
+          console.log('Cancel');
+        },
+      });
+    } else {
+      message.warning('请上传分组方案！');
+    }
   };
 
   // 数据分割
@@ -162,8 +164,6 @@ class UploadSequenceFile extends React.Component {
   // 数据检查
   checkData = value => {
     const { groupTableData } = this.state;
-    console.log(groupTableData);
-    console.log(value);
     // 判断title不能为空
     let err = false;
     if (Object.values(value[0]).some(item => item === '')) {

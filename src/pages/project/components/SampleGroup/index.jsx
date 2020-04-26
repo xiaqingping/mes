@@ -20,10 +20,12 @@ class SampleGroup extends React.Component {
     return {
       tableData: nextProps.groupSchemeData || [],
       sampleList: nextProps.sampleList || [],
+      disabled: nextProps.disabled,
     };
   }
 
   state = {
+    disabled: false,
     visible: false,
     loading: false,
     groupSchemeData: [], // 分组方案数据
@@ -61,7 +63,6 @@ class SampleGroup extends React.Component {
   componentDidMount() {
     // 转换分组方案数据
     const { tableData } = this.state;
-    console.log(tableData);
     this.setState(
       {
         groupSchemeData: tableData,
@@ -73,40 +74,56 @@ class SampleGroup extends React.Component {
     this.props.getFun(this.selectUpdateGroup);
   }
 
+  componentDidUpdate(props) {
+    if (props.submitStatus !== this.props.submitStatus) {
+      const list = this.verifyData();
+      console.log(list);
+      this.props.getData(list, 'sampleGroup');
+    }
+  }
+
   selectUpdateGroup = () => {
     const { sampleList, groupSchemeData, columns } = this.state;
     const selList = [...sampleList];
-    let groupList = [...groupSchemeData];
-    const selLen = selList && selList.length;
-    const groupLen = groupList && groupList.length;
+    const groupList = [...groupSchemeData];
     const columns1 = JSON.parse(JSON.stringify(columns));
     const columns2 = [...columns];
-    if (selLen < groupLen) {
-      // 删除样品更新
-      let filtedId = null;
-      selList.forEach(sel => {
-        groupList.forEach(gro => {
-          if (gro.metadataSampleId !== sel.id) {
-            filtedId = gro.metadataSampleId;
-          }
-        });
+    const cols = columns.map(item => {
+      return item.dataIndex;
+    });
+    const colLen = cols.slice(1, cols.length - 1);
+    const groupData = [];
+    selList.map(item => {
+      let newRow = {};
+      newRow = { metadataSampleId: item.id, sampleName: item.sampleAlias || item.sampleName };
+      // map一下分组数据
+      const mapGro = {};
+      groupList.forEach(gro => {
+        mapGro[gro.metadataSampleId] = gro;
       });
-      console.log(filtedId);
-      groupList = groupList.filter(item => item.metadataSampleId !== filtedId);
-      this.setState(
-        {
-          groupSchemeData: groupList,
-          columns: columns1,
-        },
-        () => {
-          this.setState({
-            columns: columns2,
-          });
-        },
-      );
-    } else {
-      // 添加样品更新
-    }
+      if (mapGro[item.id]) {
+        newRow = mapGro[item.id];
+      } else {
+        colLen.forEach(col => {
+          newRow[col] = '';
+        });
+      }
+      groupData.push(newRow);
+
+      return newRow;
+    });
+
+    this.setState(
+      {
+        groupSchemeData: groupData,
+        columns: columns1,
+      },
+      () => {
+        this.setState({
+          columns: columns2,
+        });
+      },
+    );
   };
 
   // 转换分组方案数据
@@ -127,8 +144,7 @@ class SampleGroup extends React.Component {
     const newData = this.getFillData(data, rowData, newColumns);
     // 将所有的颜色放到仓库里.
     this.pushColorsToStore(newData);
-    console.log(newData);
-    console.log(newColumns);
+
     // 保存 分组 表头数据
     this.setState({
       groupSchemeData: newData,
@@ -305,6 +321,7 @@ class SampleGroup extends React.Component {
    * columns 初始列
    */
   getTableHeaderData = (data, columns, titleName) => {
+    const { disabled } = this.state;
     const newColumns = JSON.parse(JSON.stringify(columns));
     data.forEach(item => {
       // 获取当前id最大值
@@ -330,7 +347,12 @@ class SampleGroup extends React.Component {
     });
     // 获取的columns不能操作改写title， 所以需要在格式化columns之后重新 改写。
     let renderColumns = this.renderColumns(newColumns);
-    renderColumns = [...renderColumns, this.lastColumn];
+    if (disabled) {
+      renderColumns = [...renderColumns];
+    } else {
+      renderColumns = [...renderColumns, this.lastColumn];
+    }
+
     return renderColumns;
   };
 
@@ -339,43 +361,62 @@ class SampleGroup extends React.Component {
     <div style={{ display: 'flex' }} className="project_components_sample_group_render_wrap">
       {/* <span style={{ marginRight: 10 }}>{value}</span> */}
       {this.selectRender(value, row, index, color1, col)}
-      {row[color1] && (
-        <Popover
-          overlayClassName="project_manage_sample_ui_select"
-          overlayStyle={{ padding: 0 }}
-          content={
-            <SketchPicker
-              color={row[color1]}
-              onChangeComplete={color => this.handleColorChange(color, value, row, index)}
-            />
-          }
-          trigger="click"
-          placement="bottom"
-        >
+      {row[color1] &&
+        (this.state.disabled ? (
           <div
             style={{
               width: 20,
               height: 20,
               backgroundColor: row[color1],
               position: 'relative',
+              marginLeft: 10,
+              marginTop: 6,
             }}
           />
-        </Popover>
-      )}
+        ) : (
+          <Popover
+            overlayClassName="project_manage_sample_ui_select"
+            overlayStyle={{ padding: 0 }}
+            content={
+              <SketchPicker
+                color={row[color1]}
+                onChangeComplete={color => this.handleColorChange(color, value, row, index)}
+              />
+            }
+            trigger="click"
+            placement="bottom"
+          >
+            <div
+              style={{
+                width: 20,
+                height: 20,
+                backgroundColor: row[color1],
+                position: 'relative',
+                marginLeft: 10,
+                marginTop: 6,
+              }}
+            />
+          </Popover>
+        ))}
     </div>
   );
 
   // 获取的columns不能操作改写title， 所以需要在格式化columns之后重新 改写。
   renderColumns = newColumns => {
+    const { disabled } = this.state;
     const columns = newColumns.map((item, index) => {
       if (index) {
         const { title } = item;
         item.dupTitle = title;
         item.title = () => (
           <div className="project_manage_UI_sample_group_title">
-            <input defaultValue={title} onBlur={e => this.handleTitleBlur(e, item, index)} />
+            <input
+              defaultValue={title}
+              onBlur={e => this.handleTitleBlur(e, item, index)}
+              disabled={this.state.disabled}
+            />
 
-            <CloseOutlined onClick={() => this.removeColumn(item)} />
+            {!disabled && <CloseOutlined onClick={() => this.removeColumn(item)} />}
           </div>
         );
       }
@@ -540,7 +581,6 @@ class SampleGroup extends React.Component {
   };
 
   setOtherSame = (row, value, option, datas, col, index, color1) => {
-    console.log(color1);
     // 先判断这列是否有同名的, 如果有, 则依照原来的, 如果没有就照自己的,
     const num = col.split('_')[1];
     const hasSame = datas.some(item => {
@@ -600,7 +640,6 @@ class SampleGroup extends React.Component {
     row[col] = option;
     row[color1] = '';
     datas[index] = row;
-    console.log(datas);
     this.setState({
       groupSchemeData: datas,
     });
@@ -608,7 +647,6 @@ class SampleGroup extends React.Component {
 
   // 选择组，blur 时候保存数据--- 当选择组的时候要加上默认的颜色
   handleGroupSelectBlur = (e, value, row, index, col, color1) => {
-    console.log(col);
     const option = e.target.value;
     const { optionList } = this.state;
     let list = [...optionList];
@@ -652,12 +690,13 @@ class SampleGroup extends React.Component {
   };
 
   selectRender = (value, row, index, color1, col) => {
-    const { optionList } = this.state;
+    const { optionList, disabled } = this.state;
     return (
       <AutoComplete
         style={{ width: '60%' }}
         onBlur={e => this.handleGroupSelectBlur(e, value, row, index, col, color1)}
         defaultValue={value}
+        disabled={disabled}
       >
         {optionList.map(item => (
           <Option key={item} value={item}>
@@ -687,27 +726,26 @@ class SampleGroup extends React.Component {
     const { groupSchemeData, columns } = this.state;
     // 1. 一个分组方案里只能是单纯组或者单纯样品
     // 2. 一个分组方案里面不能都是空
-
+    let formattedData;
     const datas = [...groupSchemeData];
     const cols = [...columns];
     const num = cols.length;
+
     for (let i = 2; i < num; i++) {
       const group = [];
       datas.forEach(item => {
         group.push(item[`header_${i}`]);
       });
-
-      const validFalse1 = group.includes('当前样品') && group.includes(!'');
-      const validFalse2 = group.every(item => item === '');
-      const validFalse = validFalse1 || validFalse2;
-
-      if (!validFalse) {
+      const validTrue1 = group.includes('当前样品') && group.includes(!'');
+      const validTrue2 = group.every(item => item === '');
+      const validFalse = validTrue1 || validTrue2;
+      if (validFalse) {
         return message.error('存在空分组方案或者分组方案包含样品和组');
       }
-      let formattedData = this.formatSubmitData();
-      formattedData = formattedData && JSON.stringify(formattedData);
     }
-    return true;
+    formattedData = this.formatSubmitData();
+    formattedData = formattedData && JSON.stringify(formattedData);
+    return formattedData;
   };
 
   // 提交数据格式化,
@@ -755,9 +793,19 @@ class SampleGroup extends React.Component {
     return tableHeard;
   };
 
+  // 将每个对象的head和header的值拼接为字符串作为map的key用来判断是否出现过相同的head
+  getMapKey = (item, head) => {
+    return `${head}_${item[head]}`;
+  };
+
+  // 根据head找到color
+  colorFieldByHead = (item, head) => {
+    return `color_${head.split('_')[1]}`;
+  };
+
   // 获取从上传来的数据.
   getDataFromUpload = (data, headData) => {
-    const { groupSchemeData, columns } = this.state;
+    const { groupSchemeData } = this.state;
     let cols = [this.firstColumn];
     const dataFromUpload = [...data];
     dataFromUpload.forEach(item => {
@@ -768,12 +816,18 @@ class SampleGroup extends React.Component {
           item.metadataSampleId = row.metadataSampleId;
           for (let i = 1; i < num; i++) {
             item[`header_${i + 1}`] = item[i];
-            item[`color_${i + 1}`] = getrandomColor();
+            item[`color_${i + 1}`] = item[i] === '当前样品' ? '' : getrandomColor();
+            // item[`color_${i + 1}`] = getrandomColor();
           }
         }
       });
     });
-
+    const headers = [];
+    Object.keys(dataFromUpload[0]).forEach(key => {
+      if (key.indexOf('header') !== -1) {
+        headers.push(key);
+      }
+    });
     Object.values(headData).forEach((head, idx) => {
       if (idx > 0) {
         const col = {
@@ -791,31 +845,49 @@ class SampleGroup extends React.Component {
         cols.push(col);
       }
     });
+    const head2color = new Map();
+    // 遍历对象数组
+    dataFromUpload.forEach(item => {
+      // 遍历对象的每个header
+      headers.forEach(head => {
+        // 如果head在map中存在 说明有重复的，那么就设定为第一次出现的值
+        if (head2color.has(this.getMapKey(item, head))) {
+          item[this.colorFieldByHead(item, head)] = head2color.get(this.getMapKey(item, head));
+          return;
+        }
+        // 是map中没出现过的,那么就保存起来
+        head2color.set(this.getMapKey(item, head), item[this.colorFieldByHead(item, head)]);
+      });
+    });
+
     const renderColumns = this.renderColumns(cols);
     cols = [...renderColumns, this.lastColumn];
     const cols1 = JSON.parse(JSON.stringify(cols));
     const cols2 = [...cols];
     this.setState(
       {
-        // groupSchemeData: dataFromUpload,
         columns: cols1,
       },
       () => {
-        this.setState({
-          columns: cols2,
-          // 设置颜色有延迟, 所以加一步
-          groupSchemeData: dataFromUpload,
-        });
-        console.log(this.state.groupSchemeData);
-        console.log(this.state.columns);
+        this.setState(
+          {
+            groupSchemeData: dataFromUpload,
+          },
+          () => {
+            this.setState({
+              columns: cols2,
+              // 设置颜色有延迟, 所以加一步
+              // groupSchemeData: dataFromUpload,
+            });
+          },
+        );
       },
     );
   };
 
   render() {
     let tableWidth = 0;
-    const { groupSchemeData, visible, columns, loading } = this.state;
-    console.log(columns);
+    const { groupSchemeData, visible, columns, loading, disabled } = this.state;
     columns.map(col => {
       if (!col.width) {
         // eslint-disable-next-line
@@ -826,14 +898,16 @@ class SampleGroup extends React.Component {
     });
     return (
       <div>
-        <div
-          style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 10, marginBottom: 10 }}
-        >
-          <Button onClick={this.uploadGroup} type="primary">
-            <UploadOutlined />
-            上传
-          </Button>
-        </div>
+        {!disabled && (
+          <div
+            style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 10, marginBottom: 10 }}
+          >
+            <Button onClick={this.uploadGroup} type="primary">
+              <UploadOutlined />
+              上传
+            </Button>
+          </div>
+        )}
 
         <Table
           columns={columns}

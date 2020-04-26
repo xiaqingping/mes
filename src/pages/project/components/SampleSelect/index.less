@@ -14,7 +14,13 @@
       border-width: 0;
       border-radius: 2px;
       outline: none;
+
     }
+
+    input[disabled] {
+      background-color: transparent;
+    }
+
 
     input:focus {
       background-color: #E5E5E5;
@@ -22,6 +28,14 @@
 
     input:hover {
       background-color: #E5E5E5;
+    }
+
+    input[disabled]:focus {
+      background-color: transparent;
+    }
+
+    input[disabled]:hover {
+      background-color: transparent;
     }
 
 
