@@ -561,85 +561,86 @@ class TaskModel extends Component {
           <Card className="process-model-edit">
             <Row>
               <Col xxl={14}>
-                <div style={{minWidth: ''}}>
-                  <div style={{ float: 'left', marginLeft: '1%' }}>
-                    {/* <Form.Item name="uploadPIc"> */}
-                    <Upload
-                      name="files"
-                      listType="picture-card"
-                      className="avatar-uploader"
-                      showUploadList={false}
-                      action={uploadUrl}
-                      headers={{ Authorization: this.props.authorization }}
-                      beforeUpload={beforeUpload}
-                      onChange={this.handleChange}
-                    >
-                      {imageUrl ? (
-                        <img
-                          src={imageUrl}
-                          alt="avatar"
-                          style={{ width: '56px', height: '56px', borderRadius: '50%' }}
-                        />
-                      ) : (
-                        uploadButton
-                      )}
-                    </Upload>
-                    {/* </Form.Item> */}
-                  </div>
-                  <div
-                    style={{ float: 'left', width: '62%', minWidth: '500px', marginLeft: '20px' }}
+                <div style={{ float: 'left', marginLeft: '1%' }}>
+                  {/* <Form.Item name="uploadPIc"> */}
+                  <Upload
+                    name="files"
+                    listType="picture-card"
+                    className="avatar-uploader"
+                    showUploadList={false}
+                    action={uploadUrl}
+                    headers={{ Authorization: this.props.authorization }}
+                    beforeUpload={beforeUpload}
+                    onChange={this.handleChange}
                   >
-                    <Form.Item
-                      name="name"
-                      rules={[
-                        {
-                          required: true,
-                          message: '请输入任务名称',
-                        },
-                        {
-                          max: 50,
-                          message: '最多输入50个字符',
-                        },
-                      ]}
-                    >
-                      <Input placeholder="请输入任务名称" />
-                    </Form.Item>
-                    <Form.Item
-                      name="describe"
-                      rules={[
-                        {
-                          required: true,
-                          message: '请输入任务描述',
-                        },
-                        {
-                          max: 255,
-                          message: '最多输入255个字符',
-                        },
-                      ]}
-                    >
-                      <Input.TextArea placeholder="请输入任务描述" rows={4} />
-                    </Form.Item>
-                    <Form.Item
-                      name="taskFlag"
-                      rules={[
-                        {
-                          required: true,
-                          message: '请输入标识',
-                        },
-                        {
-                          max: 50,
-                          message: '最多输入50个字符!',
-                        },
-                      ]}
-                    >
-                      <Input placeholder="请输入标识" />
-                    </Form.Item>
-                  </div>
+                    {imageUrl ? (
+                      <img
+                        src={imageUrl}
+                        alt="avatar"
+                        style={{ width: '56px', height: '56px', borderRadius: '50%' }}
+                      />
+                    ) : (
+                      uploadButton
+                    )}
+                  </Upload>
+                  {/* </Form.Item> */}
                 </div>
+                <div style={{ float: 'left', width: '62%', minWidth: '500px', marginLeft: '20px' }}>
+                  <Form.Item
+                    name="name"
+                    rules={[
+                      {
+                        required: true,
+                        message: '请输入任务名称',
+                      },
+                      {
+                        max: 50,
+                        message: '最多输入50个字符',
+                      },
+                    ]}
+                  >
+                    <Input placeholder="请输入任务名称" />
+                  </Form.Item>
+                  <Form.Item
+                    name="describe"
+                    rules={[
+                      {
+                        required: true,
+                        message: '请输入任务描述',
+                      },
+                      {
+                        max: 255,
+                        message: '最多输入255个字符',
+                      },
+                    ]}
+                  >
+                    <Input.TextArea placeholder="请输入任务描述" rows={4} />
+                  </Form.Item>
+                  <Form.Item
+                    name="taskFlag"
+                    rules={[
+                      {
+                        required: true,
+                        message: '请输入标识',
+                      },
+                      {
+                        max: 50,
+                        message: '最多输入50个字符!',
+                      },
+                    ]}
+                  >
+                    <Input placeholder="请输入标识" />
+                  </Form.Item>
+                </div>
+
                 {/* 版本选择 */}
-                <div style={{ float: 'left' }}>
+                <div style={{ float: 'left', width: '10%' }}>
                   <div
-                    style={{ position: 'relative', display: 'inline-block', marginLeft: '30px' }}
+                    style={{
+                      position: 'relative',
+                      display: 'inline-block',
+                      marginLeft: '30px',
+                    }}
                   >
                     <Tag
                       color="green"
