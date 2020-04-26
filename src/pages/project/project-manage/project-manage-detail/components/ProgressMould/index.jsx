@@ -99,7 +99,7 @@ class ProgressMould extends Component {
         </>
       );
     }
-    return <ProgressMould percentData={percentData} />;
+    return <Progress percent={val} size="small" style={{ float: 'left', width: '80%' }} />;
   }
 }
 
