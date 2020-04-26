@@ -12,7 +12,7 @@ import api from '@/pages/hts/api';
 import { formatter } from '@/utils/utils';
 import router from 'umi/router';
 import { ParamDrawer } from './components/ModelUI';
-import './index.less'
+import './index.less';
 
 const FormItem = Form.Item;
 const { Option } = Select;
@@ -208,7 +208,8 @@ class Metadata extends Component {
   render() {
     const { pagination, selectedRows, list, loading, visibleParam, originalParam } = this.state;
     const { status } = this.props.htsCache;
-    let tableWidth = 0;
+    // table x轴取消
+    // let tableWidth = 0;
 
     const components = {
       body: {
@@ -271,7 +272,7 @@ class Metadata extends Component {
 
     columns = columns.map(col => {
       const colWidth = col.width || 100;
-      tableWidth += colWidth;
+      // tableWidth += colWidth;
       return {
         ...col,
         width: colWidth,
