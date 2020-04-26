@@ -90,6 +90,7 @@ class ArgumentForm extends React.Component {
           ref={this.myRef}
           onFinishFailed={this.onFinishFailed}
           onFinish={this.onFinish}
+          hideRequiredMark="true"
         >
           <FactoryComponent fromView={fromView} viewForm={viewForm} type={type} />
           <div style={{ width: '100%' }}>

@@ -131,7 +131,6 @@ const SeqModel = {
     getArgumentsList(state, {
       payload
     }) {
-      console.log(payload);
       return {
         ...state,
         argumentList: payload,
