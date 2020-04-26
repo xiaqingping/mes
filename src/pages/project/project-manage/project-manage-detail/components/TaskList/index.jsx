@@ -222,10 +222,6 @@ class TaskList extends Component {
                       <div className={style.name}>{item.name}</div>
                     </div>
                     <div>
-                      {/* <div className={style.floatLeft}>
-                        <div>{item.code}</div>
-                        <div className={style.name}>{item.name}</div>
-                      </div> */}
                       <div className={style.describe}>{item.describe}</div>
                     </div>
                   </div>
