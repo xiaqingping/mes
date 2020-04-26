@@ -245,7 +245,7 @@ class Metadata extends Component {
           <>
             {row.beginDate}
             <br />
-            {row.endTime}
+            {row.endDate}
           </>
         ),
       },
