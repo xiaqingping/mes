@@ -180,7 +180,14 @@ class SampleSelect extends React.Component {
         item.sampleId = item.id;
         return item;
       });
-      this.props.getData(list, 'sampleSelect');
+
+      const { paramKey, taskModelId } = props;
+      const sendData = {
+        paramKey,
+        taskModelId,
+        paramValue: JSON.stringify(list),
+      };
+      this.props.getData(sendData, 'sampleSelect');
     }
   }
 
