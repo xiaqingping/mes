@@ -13,7 +13,6 @@ const { TabPane } = Tabs;
 
 class TaskModelTabs extends Component {
   static getDerivedStateFromProps(nextProps) {
-    console.log(nextProps.nowId);
     return {
       taskId: nextProps.nowId,
       preTaskList: nextProps.preTaskList,
@@ -30,15 +29,7 @@ class TaskModelTabs extends Component {
     preLoading: false,
     postLoading: false,
     toViewArgument: false,
-    taskId: 0,
   };
-
-  componentDidMount() {
-    // const { viewId } = this.props.taskModel.taskModel;
-    // console.log(this.getPreData(viewId));
-    // debugger;
-    // this.getPostData(viewId);
-  }
 
   getPreData = async id => {
     this.setState({
@@ -66,8 +57,6 @@ class TaskModelTabs extends Component {
     this.setState({
       viewVisible: true,
     });
-    console.log(this.props);
-    // TODO 获取数据参数数据
     const { dispatch } = this.props;
 
     dispatch({
@@ -94,9 +83,7 @@ class TaskModelTabs extends Component {
       preLoading,
       postLoading,
       toViewArgument,
-      taskId,
     } = this.state;
-    console.log(taskId);
 
     const { taskModel } = this.props;
     const { modelStatusOptions } = taskModel.taskModel;

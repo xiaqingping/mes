@@ -19,6 +19,7 @@ class ProcessParameter extends Component {
     super(props);
     const { type, processModelId, processId, projectId } = this.props.match.params;
     console.log(this.props.match.params);
+    console.log(this.props);
     this.state = {
       // 参数页面前置数据
       requestType: type, // 请求类型
@@ -239,6 +240,7 @@ class ProcessParameter extends Component {
       } else {
         list.push([...paramsList, newData]);
       }
+      console.log(list);
 
       sessionStorage.setItem('processForParams', JSON.stringify(list));
       return router.push('/project/project-manage/add/addflowpath/');
@@ -492,11 +494,17 @@ class ProcessParameter extends Component {
   goBackLink = () => {
     const { requestType, projectId } = this.state;
     let url;
+    console.log(requestType);
+    console.log(projectId);
     if (requestType === 'add' || requestType === 'update') {
-      return router.push(`/project/project-manage/add/addflowpath`);
+      // if (projectId === '' || projectId === undefined) {
+      // url = `/project/project-manage/add/addflowpath`;
+      // }
+      // if (projectId !== '') url = `/project/project-manage/add/addflowpath/add/${projectId}`;
+      return router.push(url);
     }
-    if (projectId === '') url = `/project/project-manage`;
-    if (projectId !== '') url = `/project/project-manage/detail/${projectId}`;
+    // if (projectId === '') url = `/project/project-manage`;
+    // if (projectId !== '') url = `/project/project-manage/detail/${projectId}`;
     return router.push(url);
   };
 

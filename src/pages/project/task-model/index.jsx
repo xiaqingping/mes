@@ -83,7 +83,6 @@ class TaskModel extends Component {
       : '';
     const { current: page, pageSize: rows } = pagination;
     let newData = [];
-    console.log(formData);
     if (formData.status) {
       newData = { ...newData, status: formData.status.join(',') };
       delete formData.status;
@@ -113,7 +112,6 @@ class TaskModel extends Component {
       publisherCode: formData.publisherCode && searchPublisherValue,
       ...options,
     };
-    console.log(data);
     api
       .getTaskModels(data)
       .then(res => {
@@ -167,7 +165,6 @@ class TaskModel extends Component {
 
   handleSearchCodeChange = value => {
     const { pagination } = this.state;
-    console.log(pagination);
     const page = {
       current: 1,
       pageSize: pagination.pageSize,
@@ -189,7 +186,6 @@ class TaskModel extends Component {
 
   handlePubisherChange = v => {
     const { pagination } = this.state;
-    console.log(pagination);
     const page = {
       current: 1,
       pageSize: pagination.pageSize,
@@ -445,7 +441,6 @@ class TaskModel extends Component {
         width: 150,
         filters: taskModelStatusOptions,
         render: value => (
-          // console.log(value);
           <>
             <Badge
               status={formatter(taskModelStatusOptions, value, 'value', 'status')}

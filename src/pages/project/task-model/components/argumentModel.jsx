@@ -22,11 +22,18 @@ class ArgumentModel extends Component {
 
     const isAdd = window.location.href.indexOf('add') > 0;
     const { argumentList } = this.props.taskModel;
-    console.log(argumentList);
-
     if (argumentList && argumentList.length > 0) {
+      const list = argumentList.map(item => {
+        item.myId = Date.now();
+        return item;
+      });
+      const { dispatch } = this.props;
+      dispatch({
+        type: 'taskModel/getArgumentsList',
+        payload: list,
+      });
       this.setState({
-        argumentList,
+        argumentList: list,
       });
     } else if ((argumentList || []).length === 0 && isAdd) {
       this.setState({
@@ -60,16 +67,13 @@ class ArgumentModel extends Component {
     this.setState({
       loading: true,
     });
-    console.log(selectParamsId);
     let id = isAdd ? selectParamsId : editTaskModelId;
     if (fromView) {
       id = selectParamsId;
     }
-    console.log(id);
     api
       .getTaskModelDetail(id)
       .then(res => {
-        console.log(res);
         const list = res.params.map(item => {
           item.myId = Date.now();
           return item;
@@ -111,6 +115,7 @@ class ArgumentModel extends Component {
       const listkeys = list.map(item => {
         return item.paramKey;
       });
+
       if (listkeys.includes(props.paramKey)) {
         return message.error('参数中存在相同参数key!');
       }
@@ -125,6 +130,7 @@ class ArgumentModel extends Component {
       type: 'taskModel/getArgumentsList',
       payload: list,
     });
+    return true;
   };
 
   toggleChildrenDrawer = (bool, item) => {
@@ -178,9 +184,7 @@ class ArgumentModel extends Component {
   };
 
   toViewArgumrnt = (item, idx) => {
-    console.log(item);
     const { formItemType } = this.props.taskModel;
-    console.log(this.props.taskModel);
     let title = null;
     formItemType.some(v => {
       if (v.type === item.type) {
@@ -214,8 +218,6 @@ class ArgumentModel extends Component {
     if (fromView) {
       argumentList.some(v => {
         if (v.paramId === item.paramId) {
-          console.log(item);
-
           this.setState({
             editOriginData: v,
             type: v.type,

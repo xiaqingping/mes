@@ -591,7 +591,7 @@ class ProcessEdit extends Component {
         <Spin spinning={pageLoading}>
           <Form onFinish={this.onFinish} initialValues={initialValues()}>
             {/* 编辑页面的上部操作部分 */}
-            <Card className="process-model-edit" style={{ paddingTop: '5px' }}>
+            <Card className="process-model-edit" style={{ paddingTop: '5px', minWidth: '600px' }}>
               <Row>
                 <Col xxl={14}>
                   <div style={{ float: 'left', marginLeft: '1%' }}>
@@ -622,6 +622,7 @@ class ProcessEdit extends Component {
                       float: 'left',
                       marginLeft: '20px',
                       width: '62%',
+                      minWidth: '500px',
                     }}
                   >
                     <Form.Item name="name">
@@ -679,7 +680,7 @@ class ProcessEdit extends Component {
                 </Col>
                 <Col xxl={10}>
                   {/* 交互分析 */}
-                  <div style={{ float: 'right', marginRight: '80px', marginTop: '5px' }}>
+                  <div style={{ float: 'right', marginRight: '80px' }}>
                     <span
                       style={{ fontSize: '16px', verticalAlign: 'middle', marginRight: '10px' }}
                     >
@@ -701,7 +702,6 @@ class ProcessEdit extends Component {
                       float: 'right',
                       marginRight: '40px',
                       fontSize: '16px',
-                      marginTop: '5px',
                     }}
                   >
                     <a

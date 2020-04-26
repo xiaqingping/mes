@@ -15,6 +15,8 @@ import {
   Popconfirm,
   Spin,
   Avatar,
+  Row,
+  Col,
 } from 'antd';
 import { LoadingOutlined, PlusOutlined } from '@ant-design/icons';
 import { connect } from 'dva';
@@ -151,7 +153,6 @@ class TaskModel extends Component {
     api
       .getPreTasks(id)
       .then(res => {
-        console.log(res);
         const uuids = [];
         const ids = [];
         (res || []).forEach(item => {
@@ -228,11 +229,6 @@ class TaskModel extends Component {
     </>
   );
 
-  // 是否可自动运行和交互分析
-  onChange = checked => {
-    console.log(`switch to ${checked}`);
-  };
-
   // 提交上传
   onFinish = () => {
     const {
@@ -262,7 +258,6 @@ class TaskModel extends Component {
     }
     form.picture = picture;
     form.version = selectVersion || 'V1.0';
-    console.log(form);
     this.setState({
       loading: true,
     });
@@ -297,7 +292,6 @@ class TaskModel extends Component {
         });
     }
     if (pageModel === 2) {
-      console.log(id);
       form.id = id;
       api
         .upgradeTaskModel(id, form)
@@ -339,7 +333,6 @@ class TaskModel extends Component {
   };
 
   handleDelete = row => {
-    // console.log(row);
     const { tableData } = this.state;
     let list = [...tableData];
     list = list.filter(item => item.id !== row.id);
@@ -414,7 +407,6 @@ class TaskModel extends Component {
 
   // 删除确认
   confirm = value => {
-    console.log(value);
     const { tableData, ids, sonIds } = this.state;
     const data = tableData;
     const idsData = ids;
@@ -537,7 +529,6 @@ class TaskModel extends Component {
     ];
 
     const uploadUrl = disk.uploadMoreFiles('project_task_model', guuid);
-    console.log(uploadUrl);
 
     return (
       <PageHeaderWrapper title={this.navContent()} className="classAddTaskModel">
@@ -557,138 +548,151 @@ class TaskModel extends Component {
           onFinishFailed={this.onFinishFailed}
         >
           <Card className="process-model-edit">
-            <div style={{ float: 'left', marginLeft: '20px' }}>
-              {/* <Form.Item name="uploadPIc"> */}
-              <Upload
-                name="files"
-                listType="picture-card"
-                className="avatar-uploader"
-                showUploadList={false}
-                action={uploadUrl}
-                headers={{ Authorization: this.props.authorization }}
-                beforeUpload={beforeUpload}
-                onChange={this.handleChange}
-              >
-                {imageUrl ? (
-                  <img
-                    src={imageUrl}
-                    alt="avatar"
-                    style={{ width: '56px', height: '56px', borderRadius: '50%' }}
-                  />
-                ) : (
-                  uploadButton
-                )}
-              </Upload>
-              {/* </Form.Item> */}
-            </div>
-            <div style={{ float: 'left', width: '620px', marginLeft: '20px' }}>
-              <Form.Item
-                name="name"
-                rules={[
-                  {
-                    required: true,
-                    message: '请输入任务名称',
-                  },
-                  {
-                    max: 50,
-                    message: '最多输入50个字符',
-                  },
-                ]}
-              >
-                <Input placeholder="请输入任务名称" />
-              </Form.Item>
-              <Form.Item
-                name="describe"
-                rules={[
-                  {
-                    required: true,
-                    message: '请输入任务描述',
-                  },
-                  {
-                    max: 255,
-                    message: '最多输入255个字符',
-                  },
-                ]}
-              >
-                <Input.TextArea placeholder="请输入任务描述" rows={4} />
-              </Form.Item>
-              <Form.Item
-                name="taskFlag"
-                rules={[
-                  {
-                    required: true,
-                    message: '请输入标识',
-                  },
-                  {
-                    max: 50,
-                    message: '最多输入50个字符!',
-                  },
-                ]}
-              >
-                <Input placeholder="请输入标识" />
-              </Form.Item>
-            </div>
+            <Row>
+              <Col xxl={14}>
+                <div style={{ float: 'left', marginLeft: '1%' }}>
+                  {/* <Form.Item name="uploadPIc"> */}
+                  <Upload
+                    name="files"
+                    listType="picture-card"
+                    className="avatar-uploader"
+                    showUploadList={false}
+                    action={uploadUrl}
+                    headers={{ Authorization: this.props.authorization }}
+                    beforeUpload={beforeUpload}
+                    onChange={this.handleChange}
+                  >
+                    {imageUrl ? (
+                      <img
+                        src={imageUrl}
+                        alt="avatar"
+                        style={{ width: '56px', height: '56px', borderRadius: '50%' }}
+                      />
+                    ) : (
+                      uploadButton
+                    )}
+                  </Upload>
+                  {/* </Form.Item> */}
+                </div>
+                <div style={{ float: 'left', width: '62%', minWidth: '500px', marginLeft: '20px' }}>
+                  <Form.Item
+                    name="name"
+                    rules={[
+                      {
+                        required: true,
+                        message: '请输入任务名称',
+                      },
+                      {
+                        max: 50,
+                        message: '最多输入50个字符',
+                      },
+                    ]}
+                  >
+                    <Input placeholder="请输入任务名称" />
+                  </Form.Item>
+                  <Form.Item
+                    name="describe"
+                    rules={[
+                      {
+                        required: true,
+                        message: '请输入任务描述',
+                      },
+                      {
+                        max: 255,
+                        message: '最多输入255个字符',
+                      },
+                    ]}
+                  >
+                    <Input.TextArea placeholder="请输入任务描述" rows={4} />
+                  </Form.Item>
+                  <Form.Item
+                    name="taskFlag"
+                    rules={[
+                      {
+                        required: true,
+                        message: '请输入标识',
+                      },
+                      {
+                        max: 50,
+                        message: '最多输入50个字符!',
+                      },
+                    ]}
+                  >
+                    <Input placeholder="请输入标识" />
+                  </Form.Item>
+                </div>
 
-            {/* 版本选择 */}
-            <div style={{ float: 'left' }}>
-              <div style={{ position: 'relative', display: 'inline-block', marginLeft: '30px' }}>
-                <Tag
-                  color="green"
-                  style={{ cursor: 'pointer' }}
-                  onClick={() => {
-                    this.setState({
-                      versionOpen: !versionOpen,
-                    });
+                {/* 版本选择 */}
+                <div style={{ float: 'left', width: '10%' }}>
+                  <div
+                    style={{
+                      position: 'relative',
+                      display: 'inline-block',
+                      marginLeft: '30px',
+                    }}
+                  >
+                    <Tag
+                      color="green"
+                      style={{ cursor: 'pointer' }}
+                      onClick={() => {
+                        this.setState({
+                          versionOpen: !versionOpen,
+                        });
+                      }}
+                    >
+                      {pageModel ? selectVersion || editOriginModelData.version : 'V1.0'}
+                      {/* {selectVersion || processDetail.version} */}
+                    </Tag>
+                    {versionOpen && pageModel === 2 && (
+                      <Card
+                        style={{ position: 'absolute', zIndex: '100', top: '28px' }}
+                        hoverable
+                        className="padding-none"
+                      >
+                        {versionType.length !== 0 &&
+                          versionType.map(item => (
+                            <Tag
+                              key={item}
+                              style={{ cursor: 'pointer' }}
+                              onClick={() => {
+                                this.setState({
+                                  selectVersion: item,
+                                  versionOpen: !versionOpen,
+                                });
+                              }}
+                            >
+                              {item}
+                            </Tag>
+                          ))}
+                      </Card>
+                    )}
+                  </div>
+                </div>
+              </Col>
+              <Col xxl={10}>
+                <div
+                  style={{
+                    float: 'right',
+                    marginRight: '100px',
+                    fontSize: '16px',
+                    verticalAlign: 'middle',
                   }}
                 >
-                  {pageModel ? selectVersion || editOriginModelData.version : 'V1.0'}
-                  {/* {selectVersion || processDetail.version} */}
-                </Tag>
-                {versionOpen && pageModel === 2 && (
-                  <Card
-                    style={{ position: 'absolute', zIndex: '100', top: '28px' }}
-                    hoverable
-                    className="padding-none"
-                  >
-                    {versionType.length !== 0 &&
-                      versionType.map(item => (
-                        <Tag
-                          key={item}
-                          style={{ cursor: 'pointer' }}
-                          onClick={() => {
-                            this.setState({
-                              selectVersion: item,
-                              versionOpen: !versionOpen,
-                            });
-                          }}
-                        >
-                          {item}
-                        </Tag>
-                      ))}
-                  </Card>
-                )}
-              </div>
-            </div>
+                  <Form.Item name="isAutomatic" valuePropName="checked">
+                    <span style={{ fontSize: '16px', marginRight: 10 }}>是否可自动运行：</span>
+                    <Switch checked={checked} onChange={this.switchChange} />
+                  </Form.Item>
+                </div>
 
-            <div
-              style={{
-                float: 'right',
-                marginRight: '100px',
-                fontSize: '16px',
-                verticalAlign: 'middle',
-              }}
-            >
-              <Form.Item name="isAutomatic" valuePropName="checked">
-                <span style={{ fontSize: '16px', marginRight: 10 }}>是否可自动运行：</span>
-                <Switch checked={checked} onChange={this.switchChange} />
-              </Form.Item>
-            </div>
-
-            <div style={{ float: 'right', marginRight: '60px', marginTop: 3, fontSize: '16px' }}>
-              <a href="#" style={{ marginLeft: '10px' }} onClick={this.openArgumentModel}>
-                参数
-              </a>
-            </div>
+                <div
+                  style={{ float: 'right', marginRight: '40px', marginTop: 3, fontSize: '16px' }}
+                >
+                  <a href="#" style={{ marginLeft: '10px' }} onClick={this.openArgumentModel}>
+                    参数
+                  </a>
+                </div>
+              </Col>
+            </Row>
           </Card>
 
           <Card style={{ marginTop: '24px' }} title={this.titleContent()}>
