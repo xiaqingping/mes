@@ -208,7 +208,6 @@ class Parameter extends React.Component {
   // 拖拽元素经过放置元素时
   dragOver = e => {
     e.preventDefault(); // 此处的代码是必须的  不然无法拖拽
-    // console.log('拖拽中');
   };
 
   /**
@@ -220,12 +219,10 @@ class Parameter extends React.Component {
   drop = (value, type, index) => {
     const { data, moveType, moveElement, moveIndex } = this.state;
     const newData = data;
-    // console.log(data);
     // 拖动的是元素放入分类，或者元素排序变更
     if (moveType === 1) {
       // 拖到具体分类
       if (type === 2) {
-        // console.log(value.params.filter(item => item.paramId === moveElement.paramId).length);
         if (value.params.filter(item => item.paramId === moveElement.paramId).length === 0) {
           // 添加到新对象里
           newData.forEach((item, i) => {
