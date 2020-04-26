@@ -204,14 +204,11 @@
       padding-right: 24px;
     }
     .tableListOperator {
-      padding-bottom: 36px !important;
       margin-bottom: 0;
+      padding-bottom: 36px !important;
     }
-    tbody >tr >td.ant-table-cell {
+    tbody > tr > td.ant-table-cell {
       height: 79px;
-    }
-    .ant-card-bordered .ant-card-body {
-      padding-right: 0;
     }
     .task_model_list_form_body {
       form > div > div:last-child {
@@ -221,13 +218,14 @@
       }
       .ant-card-body {
         padding-right: 30px;
-        padding-left: 30px;
+        padding-left: 36px;
         .ant-form-item-label {
           width: auto;
         }
       }
     }
     .ant-card-bordered .ant-card-body {
+      padding-right: 0;
       padding-left: 0 !important;
       .ant-table-container thead > tr th:first-child {
         padding-left: 60px;
@@ -241,12 +239,12 @@
     }
   }
 
-  .classTaskModelView  {
+  .classTaskModelView {
     .ant-drawer-body {
       > div:nth-child(1) {
         .ant-avatar-image {
-            width: 50px;
-            height: 50px;
+          width: 50px;
+          height: 50px;
           img {
             width: 100%;
             height: 100%;
@@ -256,9 +254,21 @@
           font-size: 16px;
         }
       }
+      .classIsOpen {
+        margin-top: 30px !important;
+      }
+      .classVersion {
+        > div:nth-child(2) {
+          transform: translateX(-35px);
+        }
+        > div:nth-child(3) {
+          transform: translateX(-70px);
+        }
+      }
     }
     .task_model_view_wrap .ant-card-body {
-      span.ant-badge, span.ant-tag {
+      span.ant-badge,
+      span.ant-tag {
         transform: translateY(50%);
       }
     }
@@ -266,12 +276,29 @@
 
   .classBeforeTask {
     .ant-modal-body {
-      padding-right: 50px;
-      padding-left: 50px;
+      padding-right: 0;
+      padding-left: 0;
+      .ant-table-content {
+        th.ant-table-cell:first-child {
+          padding-left: 50px;
+        }
+      }
+      .ant-table-tbody {
+        td.ant-table-cell:first-child {
+          padding-left: 50px;
+        }
+      }
+      .ant-pagination {
+        margin-right: 24px;
+      }
     }
   }
 
   .classAddTaskModel > .ant-pro-grid-content {
     padding-bottom: 60px;
+  }
+
+  .classtableListOperator {
+    padding-left: 36px !important;
   }
 }

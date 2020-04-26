@@ -384,7 +384,7 @@ class TaskModel extends Component {
     const { visible } = this.state;
     const { taskModel } = this.props;
     const { taskModelStatusOptions } = taskModel;
-    let tableWidth = 0;
+    // let tableWidth = 0;
     let columns = [
       {
         title: '编号/名称',
@@ -502,7 +502,7 @@ class TaskModel extends Component {
     columns = columns.map(col => {
       // eslint-disable-next-line no-param-reassign
       if (!col.width) col.width = 100;
-      tableWidth += col.width;
+      // tableWidth += col.width;
       if (!col.editable) {
         return col;
       }
@@ -524,7 +524,7 @@ class TaskModel extends Component {
             </div>
           </Card>
           <Card style={{ marginTop: 24 }}>
-            <div className="tableListOperator">
+            <div className="tableListOperator classtableListOperator">
               <Button type="primary" onClick={() => this.handleAdd()}>
                 <PlusOutlined />
                 新建
