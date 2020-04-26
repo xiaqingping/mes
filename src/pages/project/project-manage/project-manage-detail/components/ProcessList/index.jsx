@@ -238,7 +238,7 @@ class ProcessList extends Component {
             src={parameterImg}
             alt=""
             onClick={() => this.searchProcessParam(row)}
-            style={{ fontSize: 20 }}
+            style={{ fontSize: 20, cursor: 'pointer' }}
           />
         ),
       },
