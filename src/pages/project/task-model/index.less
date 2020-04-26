@@ -200,10 +200,30 @@
   }
 
   .classPageHeaderWrappers {
+    .ant-pagination {
+      padding-right: 24px;
+    }
+    .tableListOperator {
+      padding-bottom: 36px !important;
+      margin-bottom: 0;
+    }
+    tbody >tr >td.ant-table-cell {
+      height: 79px;
+    }
+    .ant-card-bordered .ant-card-body {
+      padding-right: 0;
+    }
     .task_model_list_form_body {
       form > div > div:last-child {
         a {
           font-size: 14px !important;
+        }
+      }
+      .ant-card-body {
+        padding-right: 30px;
+        padding-left: 30px;
+        .ant-form-item-label {
+          width: auto;
         }
       }
     }
@@ -219,5 +239,39 @@
         padding-left: 60px;
       }
     }
+  }
+
+  .classTaskModelView  {
+    .ant-drawer-body {
+      > div:nth-child(1) {
+        .ant-avatar-image {
+            width: 50px;
+            height: 50px;
+          img {
+            width: 100%;
+            height: 100%;
+          }
+        }
+        > div > div > div {
+          font-size: 16px;
+        }
+      }
+    }
+    .task_model_view_wrap .ant-card-body {
+      span.ant-badge, span.ant-tag {
+        transform: translateY(50%);
+      }
+    }
+  }
+
+  .classBeforeTask {
+    .ant-modal-body {
+      padding-right: 50px;
+      padding-left: 50px;
+    }
+  }
+
+  .classAddTaskModel > .ant-pro-grid-content {
+    padding-bottom: 60px;
   }
 }

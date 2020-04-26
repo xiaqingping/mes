@@ -104,7 +104,7 @@ class FiledList extends Component {
       list,
       loading,
     } = this.state;
-    let tableWidth = 0;
+    // let tableWidth = 0;
 
     // const components = {
     //   body: {
@@ -158,7 +158,7 @@ class FiledList extends Component {
     columns = columns.map(col => {
       // if (!col.width) col.width = 100;
 
-      tableWidth += col.width;
+      // tableWidth += col.width;
       if (!col.editable) {
         return col;
       }
@@ -202,7 +202,7 @@ class FiledList extends Component {
         <Form ref={this.tableFormRef}>
           {/* {console.log(list)} */}
           <Table
-            scroll={{ x: tableWidth, y: 400 }}
+            // scroll={{ x: tableWidth, y: 400 }}
             rowKey="id"
             loading={loading}
             dataSource={list}

@@ -12,6 +12,7 @@ import api from '@/pages/hts/api';
 import { formatter } from '@/utils/utils';
 import router from 'umi/router';
 import { ParamDrawer } from './components/ModelUI';
+import './index.less';
 
 const FormItem = Form.Item;
 const { Option } = Select;
@@ -207,7 +208,8 @@ class Metadata extends Component {
   render() {
     const { pagination, selectedRows, list, loading, visibleParam, originalParam } = this.state;
     const { status } = this.props.htsCache;
-    let tableWidth = 0;
+    // table x轴取消
+    // let tableWidth = 0;
 
     const components = {
       body: {
@@ -220,6 +222,7 @@ class Metadata extends Component {
         title: '编号',
         dataIndex: 'code',
         key: 'code',
+        width: 120,
         render: (value, row) => <a onClick={() => this.searchParamList(row)}>{value}</a>,
       },
       {
@@ -262,14 +265,14 @@ class Metadata extends Component {
       {
         fixed: 'right',
         title: '操作',
-        width: 130,
+        width: 70,
         render: (value, row) => <a onClick={() => this.searchParamDrawer(row)}>参数</a>,
       },
     ];
 
     columns = columns.map(col => {
       const colWidth = col.width || 100;
-      tableWidth += colWidth;
+      // tableWidth += colWidth;
       return {
         ...col,
         width: colWidth,
@@ -278,7 +281,7 @@ class Metadata extends Component {
 
     return (
       <PageHeaderWrapper>
-        <div className="tableList">
+        <div className="tableList classMetaData">
           <Card bordered={false}>
             <TableSearchForm
               ref={this.tableSearchFormRef}
@@ -292,7 +295,7 @@ class Metadata extends Component {
           <Card style={{ marginTop: '24px' }}>
             <Form ref={this.tableFormRef}>
               <StandardTable
-                scroll={{ x: tableWidth }}
+                // scroll={{ x: tableWidth }}
                 rowClassName="editable-row"
                 rowKey="id"
                 selectedRows={selectedRows}

@@ -564,7 +564,7 @@ class ProcessModel extends Component {
 
     return (
       <PageHeaderWrapper>
-        <div className="tableList processModeltableList">
+        <div className="tableList processModeltableList classtableList">
           <Card bordered={false}>
             <TableSearchForm
               ref={this.tableSearchFormRef}

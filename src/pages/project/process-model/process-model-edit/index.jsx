@@ -15,6 +15,8 @@ import {
   Badge,
   Avatar,
   Spin,
+  Row,
+  Col,
 } from 'antd';
 import { LoadingOutlined, PlusOutlined } from '@ant-design/icons';
 import { connect } from 'dva';
@@ -35,7 +37,6 @@ import DefaultHeadPicture from '@/assets/imgs/defaultheadpicture.jpg';
  * @param {Function} callback 回调的结果
  */
 function getBase64(img, callback) {
-  console.log(img);
   const reader = new FileReader();
   reader.addEventListener('load', () => callback(reader.result));
   reader.readAsDataURL(img);
@@ -171,7 +172,10 @@ class ProcessEdit extends Component {
     });
   };
 
-  // 图片上传
+  /**
+   * 图片上传
+   * @param {object} info 上传的对象
+   */
   handleChange = info => {
     if (info.file.status === 'uploading') {
       this.setState({ loading: true });
@@ -189,7 +193,10 @@ class ProcessEdit extends Component {
     }
   };
 
-  // 导航列表title样式
+  /**
+   * 导航列表title样式
+   * @param {object} processData 详情数据
+   */
   navContent = processData => {
     const { pageModel } = this.state;
     if (pageModel) {
@@ -198,10 +205,13 @@ class ProcessEdit extends Component {
     return '';
   };
 
-  // 流程模型列表title样式
+  /** 流程模型列表title样式 */
   titleContent = () => <div style={{ fontWeight: 'bolder', padding: '8px' }}>任务列表</div>;
 
-  // 提交上传
+  /**
+   * 提交上传
+   * @param {object} values 提交保存的数据
+   */
   onFinish = values => {
     this.setState({
       buttonLoading: true,
@@ -216,7 +226,6 @@ class ProcessEdit extends Component {
       picture,
       paramter,
     } = this.state;
-    // const { processAddData } = this.props;
     const data = {};
     const taskModelIds = [];
     taskList.forEach(item => {
@@ -294,7 +303,7 @@ class ProcessEdit extends Component {
     return true;
   };
 
-  // 点击打开关联
+  /** 点击打开关联 */
   onOpen = () => {
     this.setState({
       visible: true,
@@ -302,7 +311,7 @@ class ProcessEdit extends Component {
     });
   };
 
-  // 点击关闭关联
+  /** 点击关闭关联 */
   onClose = v => {
     if (v === 'close') {
       this.setState({
@@ -316,7 +325,7 @@ class ProcessEdit extends Component {
     }
   };
 
-  // 打开参数
+  /** 打开参数 */
   handleOpen = () => {
     const { paramter } = this.state;
     if (paramter) {
@@ -328,7 +337,10 @@ class ProcessEdit extends Component {
     }
   };
 
-  // 关闭参数
+  /**
+   * 关闭参数
+   * @param {Array} value 参数的数据
+   */
   handleClose = value => {
     const newData = value.map((item, index) => ({ ...item, sortNo: index }));
     const sonData = newData;
@@ -346,19 +358,16 @@ class ProcessEdit extends Component {
     });
   };
 
-  // 删除任务
+  /**
+   * 删除任务
+   * @param {object} value 删除的id
+   */
   handleDelete = value => {
     const { taskList, ids, sonIds, paramter } = this.state;
     const data = taskList;
-    // const { ids, sonIds } = this.props;
     const idsData = ids;
     const sonIdsData = sonIds;
     const { preTaskIds } = value;
-    // data = [...taskList, ...value];
-    // value.forEach(item => {
-    //   idsData.push(item.id);
-    //   sonIdsData.push(...item.preTaskIds);
-    // });
     const newData = data.filter(item => item.id !== value.id);
     const newIdsData = idsData.filter(item => item !== value.id);
 
@@ -373,7 +382,6 @@ class ProcessEdit extends Component {
       });
     }
     // 删除参数分类里的数据
-    // let paramterData = paramter;
     if (paramter) {
       const paramterData = paramter.map(item => {
         const params = item.params.filter(i => i.taskModelId !== value.id);
@@ -391,7 +399,10 @@ class ProcessEdit extends Component {
     });
   };
 
-  // 获取子级数据
+  /**
+   * 获取子级数据
+   * @param {Array} value 任务选择获取的数据
+   */
   getData = value => {
     const { taskList, ids, sonIds, paramter } = this.state;
     // const { processAddData } = this.props;
@@ -431,6 +442,11 @@ class ProcessEdit extends Component {
   };
 
   // 修改任务列表的开关
+  /**
+   * 修改任务列表的开关
+   * @param {object} row 当前行的对象
+   * @param {Int} index 当前行的键
+   */
   changeIsAutomatic = (row, index) => {
     const { taskList } = this.state;
     const newTaskList = taskList;
@@ -575,110 +591,130 @@ class ProcessEdit extends Component {
         <Spin spinning={pageLoading}>
           <Form onFinish={this.onFinish} initialValues={initialValues()}>
             {/* 编辑页面的上部操作部分 */}
-            <Card className="process-model-edit" style={{ paddingTop: '5px', height: '220px' }}>
-              <div style={{ float: 'left', marginLeft: '20px' }}>
-                <Upload
-                  name="files"
-                  listType="picture-card"
-                  className="avatar-uploader"
-                  showUploadList={false}
-                  action={uploadUrl}
-                  headers={{ Authorization: this.props.authorization }}
-                  beforeUpload={beforeUpload}
-                  onChange={this.handleChange}
-                  style={{ width: '60px', height: '60px' }}
-                >
-                  {imageUrl ? (
-                    <img
-                      src={imageUrl}
-                      alt="avatar"
-                      style={{ width: '56px', height: '56px', borderRadius: '50%' }}
-                    />
-                  ) : (
-                    uploadButton
-                  )}
-                </Upload>
-              </div>
-              <div style={{ float: 'left', width: '620px', marginLeft: '20px' }}>
-                <Form.Item name="name">
-                  <Input placeholder="请输入流程名称" />
-                </Form.Item>
-                <Form.Item name="describe">
-                  <Input.TextArea placeholder="请输入流程描述" rows={4} />
-                </Form.Item>
-              </div>
-
-              {/* 版本选择 */}
-              <div style={{ float: 'left' }}>
-                <div style={{ position: 'relative', display: 'inline-block', marginLeft: '30px' }}>
-                  <Tag
-                    color="green"
-                    style={{ cursor: 'pointer' }}
-                    onClick={() => {
-                      this.setState({
-                        versionOpen: !versionOpen,
-                      });
+            <Card className="process-model-edit" style={{ paddingTop: '5px', minWidth: '600px' }}>
+              <Row>
+                <Col xxl={14}>
+                  <div style={{ float: 'left', marginLeft: '1%' }}>
+                    <Upload
+                      name="files"
+                      listType="picture-card"
+                      className="avatar-uploader"
+                      showUploadList={false}
+                      action={uploadUrl}
+                      headers={{ Authorization: this.props.authorization }}
+                      beforeUpload={beforeUpload}
+                      onChange={this.handleChange}
+                      style={{ width: '60px', height: '60px' }}
+                    >
+                      {imageUrl ? (
+                        <img
+                          src={imageUrl}
+                          alt="avatar"
+                          style={{ width: '56px', height: '56px', borderRadius: '50%' }}
+                        />
+                      ) : (
+                        uploadButton
+                      )}
+                    </Upload>
+                  </div>
+                  <div
+                    style={{
+                      float: 'left',
+                      marginLeft: '20px',
+                      width: '62%',
+                      minWidth: '500px',
                     }}
                   >
-                    {pageModel ? selectVersion || processData.version : 'V1.0'}
-                  </Tag>
-                  {versionOpen && pageModel === 2 ? (
-                    <Card
-                      style={{ position: 'absolute', zIndex: '100', top: '28px' }}
-                      hoverable
-                      className="padding-none"
-                    >
-                      {versionType.length !== 0
-                        ? versionType.map(item => (
-                            <Tag
-                              key={item}
-                              style={{ cursor: 'pointer' }}
-                              onClick={() => {
-                                this.setState({
-                                  selectVersion: item,
-                                  versionOpen: !versionOpen,
-                                });
-                              }}
-                            >
-                              {item}
-                            </Tag>
-                          ))
-                        : ''}
-                    </Card>
-                  ) : (
-                    ''
-                  )}
-                </div>
-              </div>
+                    <Form.Item name="name">
+                      <Input placeholder="请输入流程名称" />
+                    </Form.Item>
+                    <Form.Item name="describe">
+                      <Input.TextArea placeholder="请输入流程描述" rows={4} />
+                    </Form.Item>
+                  </div>
 
-              {/* 交互分析 */}
-              <div style={{ float: 'right', marginRight: '80px', marginTop: '5px' }}>
-                <span style={{ fontSize: '16px', verticalAlign: 'middle', marginRight: '10px' }}>
-                  交互分析：
-                </span>
-                <span>
-                  <Form.Item
-                    name="interactionAnalysis"
-                    valuePropName="checked"
-                    style={{ float: 'right', marginTop: '-4px' }}
+                  {/* 版本选择 */}
+                  <div style={{ float: 'left', width: '10%' }}>
+                    <div
+                      style={{ position: 'relative', display: 'inline-block', marginLeft: '30px' }}
+                    >
+                      <Tag
+                        color="green"
+                        style={{ cursor: 'pointer' }}
+                        onClick={() => {
+                          this.setState({
+                            versionOpen: !versionOpen,
+                          });
+                        }}
+                      >
+                        {pageModel ? selectVersion || processData.version : 'V1.0'}
+                      </Tag>
+                      {versionOpen && pageModel === 2 ? (
+                        <Card
+                          style={{ position: 'absolute', zIndex: '100', top: '28px' }}
+                          hoverable
+                          className="padding-none"
+                        >
+                          {versionType.length !== 0
+                            ? versionType.map(item => (
+                                <Tag
+                                  key={item}
+                                  style={{ cursor: 'pointer' }}
+                                  onClick={() => {
+                                    this.setState({
+                                      selectVersion: item,
+                                      versionOpen: !versionOpen,
+                                    });
+                                  }}
+                                >
+                                  {item}
+                                </Tag>
+                              ))
+                            : ''}
+                        </Card>
+                      ) : (
+                        ''
+                      )}
+                    </div>
+                  </div>
+                </Col>
+                <Col xxl={10}>
+                  {/* 交互分析 */}
+                  <div style={{ float: 'right', marginRight: '80px' }}>
+                    <span
+                      style={{ fontSize: '16px', verticalAlign: 'middle', marginRight: '10px' }}
+                    >
+                      交互分析：
+                    </span>
+                    <span>
+                      <Form.Item
+                        name="interactionAnalysis"
+                        valuePropName="checked"
+                        style={{ float: 'right', marginTop: '-4px' }}
+                      >
+                        <Switch style={{ verticalAlign: 'middle' }} defaultChecked />
+                      </Form.Item>
+                    </span>
+                  </div>
+                  {/* 参数 */}
+                  <div
+                    style={{
+                      float: 'right',
+                      marginRight: '40px',
+                      fontSize: '16px',
+                    }}
                   >
-                    <Switch style={{ verticalAlign: 'middle' }} defaultChecked />
-                  </Form.Item>
-                </span>
-              </div>
-              {/* 参数 */}
-              <div
-                style={{ float: 'right', marginRight: '40px', fontSize: '16px', marginTop: '5px' }}
-              >
-                <a
-                  onClick={() => {
-                    this.handleOpen();
-                  }}
-                  style={{ marginLeft: '10px', marginRight: '20px', fontSize: '16px' }}
-                >
-                  参数
-                </a>
-              </div>
+                    <a
+                      onClick={() => {
+                        this.handleOpen();
+                      }}
+                      style={{ marginLeft: '10px', marginRight: '20px', fontSize: '16px' }}
+                    >
+                      参数
+                    </a>
+                  </div>
+                </Col>
+              </Row>
             </Card>
 
             {/* 任务table的显示 */}

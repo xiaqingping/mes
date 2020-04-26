@@ -96,12 +96,12 @@ class MemberList extends Component {
   render() {
     const { list, loading, visibleModel, menberInfor } = this.state;
     const { jurisdiction } = this.props.projectDetail;
-    let tableWidth = 0;
+    // let tableWidth = 0;
 
     let columns = [
       {
         title: '用户名',
-        dataIndex: 'creatorName',
+        dataIndex: 'name',
         width: 150,
         render: value => (
           <div style={{ display: 'flex' }}>
@@ -164,7 +164,7 @@ class MemberList extends Component {
     ];
 
     columns = columns.map(col => {
-      tableWidth += col.width;
+      // tableWidth += col.width;
       if (!col.editable) {
         return col;
       }
@@ -175,7 +175,7 @@ class MemberList extends Component {
       <>
         <Form ref={this.tableFormRef}>
           <Table
-            scroll={{ x: tableWidth, y: 400 }}
+            // scroll={{ x: tableWidth, y: 400 }}
             rowKey="id"
             loading={loading}
             dataSource={list}

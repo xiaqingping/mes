@@ -18,44 +18,12 @@ class Test extends Component {
     // TODO:
     const { type, projectId } = this.props.match.params;
     console.log(this.props.match.params);
-    // if(id===undefined) id ='';
-    // if(id) {
-    //   const data = id.split(',');
-    //   console.log(data);
-    //   this.state ={
-    //     processType: data[0] || '',     // 请求类型
-    //     projectIdProcess: data[1] || '',       // 项目ID
-    //     list: [],
-    //     loading: false,
-    //     visible: false,
-    //     buttonLoading: false,
-    //   }
-    //   console.log(this.state);
-    //   console.log('url有值的state');
-    // } else {
-    //   const {
-    //     paramList,
-    //     projectInfor,
-    //   } = this.props.projectManage;
-    //   console.log(this.props);
-
-    //   this.state = {
-    //     // list选中的流程参数数据
-    //     list: [],
-    //     loading: false,
-    //     visible: false,
-    //     projectInfor, // 项目基础信息
-    //     paramList, // 流程参数
-    //     buttonLoading: false,
-    //   };
-    //   console.log(this.state);
-    //   console.log('url无值的state');
-    // }
-
     const { paramList, projectInfor } = this.props.projectManage;
+    // const projectInfor = this.props.projectManage;
+
     this.state = {
       // TODO:
-      requestType: type, // 请求类型 edit：流程列表跳转 携带项目id  add：新建项目跳转 无id
+      processType: type, // 请求类型 edit：流程列表跳转 携带项目id  add：新建项目跳转 无id
       projectId: projectId || '', // 项目Id
 
       // list选中的流程参数数据
@@ -65,31 +33,49 @@ class Test extends Component {
       projectInfor, // 项目基础信息
       paramList, // 流程参数
       buttonLoading: false,
-      processType: type || '',
       // projectId: id || '',
     };
   }
 
   componentDidMount() {
+    const { projectInfor, paramList, processType } = this.state;
     this.getData();
-    const introductionProcess = JSON.parse(sessionStorage.getItem('introduction '));
+    // 保存已选流程
+    const introductionProcess = JSON.parse(sessionStorage.getItem('introduction'));
     console.log(introductionProcess);
-    if (introductionProcess == null) {
-      console.log('从已有项目跳转的');
-      // this.setState({
-      //   list: [],
-      // });
-      this.props.dispatch({
-        type: 'projectManage/setProcessSelectedList',
-        // payload: introductionProcess,
-        payload: [],
+
+    // 参数页面点击保存带回的参数
+    const paramsList = JSON.parse(sessionStorage.getItem('processForParams'));
+    console.log(paramsList);
+    this.setState(
+      {
+        paramList: paramsList,
+      },
+      () => {
+        console.log(this.state);
+      },
+    );
+
+    if (introductionProcess !== null) {
+      this.setState({
+        list: introductionProcess,
       });
-    } else {
       this.props.dispatch({
         type: 'projectManage/setProcessSelectedList',
         payload: introductionProcess,
       });
-      console.log('从新建项目跳转的');
+    }
+    if (projectInfor.requestType === 'add') {
+      console.log('新建项目清空保存');
+      sessionStorage.removeItem('introduction');
+    }
+    if (processType === 'edit') {
+      console.log('已有项目页面清空保存');
+      sessionStorage.removeItem('introduction');
+    }
+    if (paramList === null) {
+      console.log('参数页面返回');
+      sessionStorage.removeItem('introduction');
     }
   }
 
@@ -122,7 +108,9 @@ class Test extends Component {
 
   // 打开参数
   handleOpen = row => {
-    const paramList = sessionStorage.getItem('processForParams');
+    // 参数数据
+    const paramList = JSON.parse(sessionStorage.getItem('processForParams'));
+    console.log(paramList);
 
     // TODO:
     const { projectId } = this.state;
@@ -163,11 +151,12 @@ class Test extends Component {
     this.setState({
       buttonLoading: true,
     });
-    const { list, projectInfor, paramList, processType, projectIdProcess } = this.state;
+    const { list, projectInfor, paramList, processType, projectId } = this.state;
     console.log(this.state);
     let status = false;
 
     if (projectInfor.requestType === 'add') {
+      console.log('新建项目跳转，基础信息有值的保存,');
       if (list === '' || list === undefined) {
         status = true;
       }
@@ -178,7 +167,7 @@ class Test extends Component {
         status = true;
       }
       if (status) return message.error('数据为空');
-      console.log('基础信息有值的保存');
+
       // 设置好的参数追加在流程列表数据中
       const newList = [];
       list.forEach(item => {
@@ -188,9 +177,11 @@ class Test extends Component {
           name: item.name,
           processModelId: item.id,
         };
-        if (item.id === paramList.processId) {
-          newItem.processesParamList = paramList.params;
-        }
+        console.log(item.id);
+        console.log(paramList);
+        // if (item.id === paramList.processId) {
+        //   newItem.processesParamList = paramList.params;
+        // }
         newList.push(newItem);
       });
       console.log(list);
@@ -211,44 +202,48 @@ class Test extends Component {
           });
         });
       sessionStorage.removeItem('introduction');
-    } else {
-      if (processType === 'add') {
-        const projectId = projectIdProcess;
-        // console.log(projectId);
-        const newList = [];
-        list.forEach(item => {
-          let newItem = {};
-          newItem = {
-            describe: item.describe,
-            name: item.name,
-            processModelId: item.id,
-          };
-          if (item.id === paramList.processId) {
-            newItem.processesParamList = paramList.params;
-          }
-          newList.push(newItem);
-        });
-        console.log(list);
-        const processList = newList;
-        api
-          .addProjectsProcess({ projectId, processList })
-          .then(res => {
-            this.setState({
-              buttonLoading: false,
-            });
-            console.log(res);
-            // router.push('/project/project-manage/detail');
-          })
-          .catch(() => {
-            this.setState({
-              buttonLoading: false,
-            });
-          });
-
-        sessionStorage.removeItem('introduction');
-      }
-      console.log('其他方式');
     }
+    if (processType === 'edit') {
+      console.log('正常从已有项目跳转，');
+      const newList = [];
+
+      // 参数数据
+      const paramsList = JSON.parse(sessionStorage.getItem('processForParams'));
+      console.log(paramsList);
+
+      list.forEach(item => {
+        let newItem = {};
+        newItem = {
+          describe: item.describe,
+          name: item.name,
+          processModelId: item.id,
+        };
+        // if (item.id === paramList.processId) {
+        //   newItem.processesParamList = paramList.params;
+        // }
+        newList.push(newItem);
+      });
+      console.log(list);
+      const processList = newList;
+      api
+        .addProjectsProcess({ projectId, processList })
+        .then(res => {
+          this.setState({
+            buttonLoading: false,
+          });
+          console.log(res);
+          router.push(`/project/project-manage/detail/${projectId}`);
+        })
+        .catch(() => {
+          this.setState({
+            buttonLoading: false,
+          });
+        });
+    }
+
+    // if(paramsList) {
+
+    // }
     sessionStorage.removeItem('introduction');
     return '';
   };

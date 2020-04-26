@@ -165,9 +165,9 @@ class TitleModel extends React.Component {
                 size="large"
               />
             </div>
-            <div style={{ fontWeight: '900' }}>
-              <div style={{ fontWeight: '700', width: 170 }}>{viewData.code}</div>
-              <div style={{ width: 170, height: '50px', overflow: 'auto' }}>{viewData.name}</div>
+            <div style={{ fontWeight: '900', marginRight: '30px' }}>
+              <div style={{ fontWeight: '700' }}>{viewData.code}</div>
+              <div style={{ height: '50px', overflow: 'auto' }}>{viewData.name}</div>
             </div>
           </div>
 
@@ -207,11 +207,11 @@ class TitleModel extends React.Component {
             </div>
           </div>
 
-          <div style={{ marginLeft: 40 }} onClick={() => this.viewParams(viewData)}>
+          <div style={{ marginLeft: 30 }} onClick={() => this.viewParams(viewData)}>
             <div className="task_model_add_task_icon" />
           </div>
 
-          <div style={{ marginLeft: 68, fontSize: '14px' }}>
+          <div style={{ marginLeft: 40, fontSize: '14px' }}>
             {(viewData.status * 1 === 2 || viewData.status * 1 === 4) && (
               <div
                 style={{ marginRight: '16px', color: 'red', cursor: 'pointer', marginLeft: 16 }}

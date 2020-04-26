@@ -309,12 +309,16 @@ class ProcessModel extends Component {
               noButton
             />
             <div className="tableListOperator">
-              <Button onClick={() => this.handleModalVisible()} style={{ marginLeft: '8px' }}>
+              <Button
+                type="primary"
+                onClick={() => this.handleModalVisible()}
+                style={{ marginLeft: '8px' }}
+              >
                 <UploadOutlined />
                 上传序列文件
               </Button>
             </div>
-            <Form ref={this.tableFormRef} className="table-style-set">
+            <Form ref={this.tableFormRef} className="table-style-set classSampleList">
               <StandardTable
                 // scroll={{ x: tableWidth }}
                 rowClassName="editable-row"

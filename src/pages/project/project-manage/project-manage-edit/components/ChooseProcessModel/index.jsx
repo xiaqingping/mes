@@ -116,7 +116,7 @@ class ChooseProcessModel extends React.Component {
     const { nameCodeVal } = this.state;
     return (
       <>
-        <Col xxl={6} lg={languageCode === 'EN' ? 12 : 8}>
+        <Col xxl={8} lg={languageCode === 'EN' ? 12 : 8}>
           <FormItem label="流程模型" name="code">
             <AutoComplete
               style={{ width: '200px' }}
