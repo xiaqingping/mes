@@ -19,7 +19,6 @@ class ArgumentForm extends React.Component {
 
   componentDidMount() {
     const { editOriginData } = this.props;
-    console.log(editOriginData);
     const otherProperties = editOriginData.paramPropertiesStr
       ? JSON.parse(editOriginData.paramPropertiesStr)
       : editOriginData.paramPropertiesMap;
@@ -59,8 +58,6 @@ class ArgumentForm extends React.Component {
     argumentValues.myId = this.props.editOriginData.myId
       ? this.props.editOriginData.myId
       : Date.now();
-    console.log(argumentValues);
-
     this.props.emitArguments(argumentValues);
     // this.props.onClose();
   };
@@ -73,10 +70,8 @@ class ArgumentForm extends React.Component {
   render() {
     const formItemLayout = null;
     const { loading, viewForm } = this.state;
-    console.log(viewForm);
     viewForm.isrequired = viewForm.isrequired ? '是' : '否';
     const { fromView, type } = this.props;
-    console.log(type);
 
     return loading ? (
       <div style={{ textAlign: 'center', marginTop: 15 }}>

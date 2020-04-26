@@ -153,7 +153,6 @@ class TaskModel extends Component {
     api
       .getPreTasks(id)
       .then(res => {
-        console.log(res);
         const uuids = [];
         const ids = [];
         (res || []).forEach(item => {
@@ -230,11 +229,6 @@ class TaskModel extends Component {
     </>
   );
 
-  // 是否可自动运行和交互分析
-  onChange = checked => {
-    console.log(`switch to ${checked}`);
-  };
-
   // 提交上传
   onFinish = () => {
     const {
@@ -264,7 +258,6 @@ class TaskModel extends Component {
     }
     form.picture = picture;
     form.version = selectVersion || 'V1.0';
-    console.log(form);
     this.setState({
       loading: true,
     });
@@ -299,7 +292,6 @@ class TaskModel extends Component {
         });
     }
     if (pageModel === 2) {
-      console.log(id);
       form.id = id;
       api
         .upgradeTaskModel(id, form)
@@ -341,7 +333,6 @@ class TaskModel extends Component {
   };
 
   handleDelete = row => {
-    // console.log(row);
     const { tableData } = this.state;
     let list = [...tableData];
     list = list.filter(item => item.id !== row.id);
@@ -416,7 +407,6 @@ class TaskModel extends Component {
 
   // 删除确认
   confirm = value => {
-    console.log(value);
     const { tableData, ids, sonIds } = this.state;
     const data = tableData;
     const idsData = ids;
@@ -539,7 +529,6 @@ class TaskModel extends Component {
     ];
 
     const uploadUrl = disk.uploadMoreFiles('project_task_model', guuid);
-    console.log(uploadUrl);
 
     return (
       <PageHeaderWrapper title={this.navContent()} className="classAddTaskModel">
