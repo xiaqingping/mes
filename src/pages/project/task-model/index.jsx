@@ -25,8 +25,8 @@ import debounce from 'lodash/debounce';
 import router from 'umi/router';
 import { formatter, getOperates } from '@/utils/utils';
 import api from '@/pages/project/api/taskmodel';
-import SampleSelect from '@/pages/project/components/SampleSelect';
-import SampleGroup from '@/pages/project/components/SampleGroup';
+// import SampleSelect from '@/pages/project/components/SampleSelect';
+// import SampleGroup from '@/pages/project/components/SampleGroup';
 import disk from '@/pages/project/api/disk';
 import DefaultHeadPicture from '@/assets/imgs/upload_middle.png';
 import StandardTable from '../components/StandardTable';
@@ -467,6 +467,7 @@ class TaskModel extends Component {
               {operaList.map(
                 (item, index) =>
                   index && (
+                    // eslint-disable-next-line react/no-array-index-key
                     <Menu.Item key={index}>
                       <a
                         className="task_model_add_argument_list"
@@ -514,7 +515,7 @@ class TaskModel extends Component {
     });
     const { loading, list, pagination, viewId } = this.state;
     return (
-      <PageHeaderWrapper>
+      <PageHeaderWrapper className="classPageHeaderWrappers">
         <Spin spinning={loading} size="large">
           <Card bordered={false} className="task_model_list_form_body">
             <div className="tableList">

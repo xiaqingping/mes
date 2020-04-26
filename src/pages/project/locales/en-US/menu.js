@@ -13,5 +13,4 @@ export default {
   'menu.project.task-model.edit': 'Edit Task Model',
   'menu.project.task-model.up': 'Upgrade',
   'menu.project.task-model.group': 'Group',
-
 };

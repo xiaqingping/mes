@@ -25,7 +25,8 @@ module.exports = {
         },
         {
           name: 'process-parameter',
-          path: '/project/project-manage/process-parameter/:type/:processModelId/:projectId?/:processId?',
+          path:
+            '/project/project-manage/process-parameter/:type/:processModelId/:projectId?/:processId?',
           component: './project/project-manage/project-manage-detail/process-parameter',
         },
         {
@@ -99,8 +100,7 @@ module.exports = {
           name: 'group',
           path: '/project/task-model/group',
           component: './project/components/index.jsx',
-
-        }
+        },
       ],
     },
   ],

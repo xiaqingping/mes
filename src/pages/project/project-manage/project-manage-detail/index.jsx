@@ -94,13 +94,15 @@ class ProjectDetail extends Component {
     return (
       <PageHeaderWrapper title={this.navContent(list)}>
         {/* <Card className={styles.titleCard} > */}
-        <Card className={styles.titleCard}>
-          <div className={styles.width}>
-            {list.name}
-            <span className={styles.textCode}>{list.code}</span>
-          </div>
-          <div className={styles.textDesc}>{list.describe}</div>
-        </Card>
+        <div className="classPageHeaderWrapper ">
+          <Card className={styles.titleCard}>
+            <div className={styles.width}>
+              {list.name}
+              <span className={styles.textCode}>{list.code}</span>
+            </div>
+            <div className={styles.textDesc}>{list.describe}</div>
+          </Card>
+        </div>
         <Card className="classTabPane">
           <Tabs
             defaultActiveKey="1"
@@ -109,7 +111,7 @@ class ProjectDetail extends Component {
             tabBarExtraContent={this.operations()}
             loading={loading}
           >
-            <TabPane tab="流程列表" key="1">
+            <TabPane tab="流程列表" key="1" width="120px">
               <div className="classProcessList">
                 <ProcessList projectId={projectId} />
               </div>

@@ -151,8 +151,7 @@ class DrawerTool extends Component {
                   {value.versions
                     ? value.versions.map(item => (
                         <Tag
-                          // color={item === value.version ? 'green' : 'default'}
-                          color={value.version === 'V1.0' ? 'default' : 'green'}
+                          color={item === value.version ? 'green' : 'default'}
                           key={item}
                           style={{ cursor: 'pointer' }}
                           onClick={() => {

@@ -26,29 +26,32 @@
     }
   }
 
-  .ant-page-header-heading-title {
-    color: rgba(0, 0, 0, 0.65) !important;
-  }
-
   .classsimpleForm {
     margin-left: 6px;
     .ant-form-item [placeholder='请输入创建人'] {
       margin-left: 15px;
+      .ant-col {
+        height: 35px;
+      }
     }
   }
 
+  .ant-pro-page-header-wrap-children-content .ant-card-body:first-child {
+    padding-bottom: 8px;
+  }
   .classtableList {
     .ant-card-body {
-      padding: 30px;
+      padding-left: 0;
+      th.ant-table-cell {
+        background-color: #fafafa !important;
+      }
     }
   }
 
   .classStandardTable {
-    margin-left: 30px;
     .ant-table-content tr {
       th:first-child,
       td:first-child {
-        padding-left: 0 !important;
         > div {
           margin-left: 0 !important;
           a {
@@ -73,5 +76,14 @@
         transform: translate(-50%, -50%);
       }
     }
+  }
+
+  .tableListOperator {
+    margin-bottom: 15px;
+    padding-left: 30px !important;
+  }
+
+  .classsimpleForm form > div > div:last-child a {
+    font-size: 14px !important;
   }
 }

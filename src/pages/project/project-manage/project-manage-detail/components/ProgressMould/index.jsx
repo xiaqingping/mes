@@ -1,10 +1,7 @@
 import React, { Component } from 'react';
 import { Progress, Button } from 'antd';
 import api from '@/pages/project/api/projectManageDetail';
-import {
-  PlayCircleOutlined,
-  PauseCircleOutlined,
-} from '@ant-design/icons';
+import { PlayCircleOutlined, PauseCircleOutlined } from '@ant-design/icons';
 
 /**
  * 流程进度局部刷新
