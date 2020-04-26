@@ -9,7 +9,7 @@ import { Table, Card } from 'antd';
 const TableModel = props => (
   <Card bordered={false} title={props.title} style={{ marginBottom: 30 }}>
     <Table
-      scroll={{ x: props.tableWidth }}
+      // scroll={{ x: props.tableWidth }}
       rowKey="id"
       loading={props.loading}
       pagination={false}

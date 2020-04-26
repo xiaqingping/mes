@@ -10,6 +10,7 @@ import { TableModel } from '../components/AntdUI';
 import { FieldDrawer } from '../components/ModelUI';
 import NumberModels from '../components/NumberSelected';
 import Raio from '../components/TheRadio';
+import './index.less'
 
 class paramList extends Component {
   constructor(props) {
@@ -30,7 +31,7 @@ class paramList extends Component {
           title: '样品',
           dataIndex: 'sampleName',
           key: 'sampleName',
-          width: 100,
+          width: 120,
           render: (value, row) => (
             <>
               <div
@@ -58,7 +59,7 @@ class paramList extends Component {
           title: '序列',
           dataIndex: 'sampleSequenceCount',
           key: 'sampleSequenceCount',
-          width: 100,
+          width: 120,
           render: (value, row) => (
             <>
               {value} ({row.sampleLengthTotal}bp)
@@ -80,7 +81,7 @@ class paramList extends Component {
           title: '文件',
           dataIndex: 'sequenceFileCount',
           key: 'sequenceFileCount',
-          width: 120,
+          width: 60,
           render: (value, row) => <a onClick={() => this.searchFieldDrawer(row)}>已选{value}个</a>,
         },
       ],
@@ -91,7 +92,7 @@ class paramList extends Component {
           title: '样品',
           dataIndex: 'sampleName',
           key: 'sampleName',
-          width: 100,
+          width: 120,
         },
       ],
       // 环境因子表
@@ -101,7 +102,7 @@ class paramList extends Component {
           title: '样品',
           dataIndex: 'sampleName',
           key: 'sampleName',
-          width: 100,
+          width: 270,
         },
       ],
     };
@@ -501,7 +502,7 @@ class paramList extends Component {
     });
 
     return (
-      <PageHeaderWrapper>
+      <PageHeaderWrapper className="classParamList">
         <TableModel
           title="样品"
           rowkey="id"

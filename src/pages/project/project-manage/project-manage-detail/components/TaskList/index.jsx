@@ -198,6 +198,7 @@ class TaskList extends Component {
           closable={false}
           onClose={this.props.onClose}
           visible={visible}
+          className="classDrawerTaskList"
         >
           <List
             dataSource={taskList}
@@ -216,11 +217,11 @@ class TaskList extends Component {
                     className={style.floatLeft}
                   />
                   <div className={style.FMLeft}>
+                    <div className={style.floatLeft}>
+                      <div>{item.code}</div>
+                      <div className={style.name}>{item.name}</div>
+                    </div>
                     <div>
-                      <div className={style.floatLeft}>
-                        <div>{item.code}</div>
-                        <div className={style.name}>{item.name}</div>
-                      </div>
                       <div className={style.describe}>{item.describe}</div>
                     </div>
                   </div>

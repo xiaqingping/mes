@@ -540,7 +540,7 @@ class TaskModel extends Component {
     console.log(uploadUrl);
 
     return (
-      <PageHeaderWrapper title={this.navContent()}>
+      <PageHeaderWrapper title={this.navContent()} className="classAddTaskModel">
         <div
           className={classNames({ task_model_isHidden: !loading }, 'task_model_add_loading_style')}
         >

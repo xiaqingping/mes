@@ -272,7 +272,7 @@ class Test extends Component {
       {
         title: '流程模型',
         dataIndex: 'name',
-        width: 300,
+        width: 400,
         render: (value, row) => (
           <>
             <Avatar

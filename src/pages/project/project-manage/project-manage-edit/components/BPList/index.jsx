@@ -8,7 +8,6 @@ import { connect } from 'dva';
 import { UserOutlined, SearchOutlined } from '@ant-design/icons';
 import api from '@/pages/project/api/bp';
 import _ from 'lodash';
-import TableSearchForm from '@/components/TableSearchForm';
 
 import './index.less';
 
@@ -347,17 +346,8 @@ class BPList extends Component {
           onOk={this.handleOk}
           onCancel={this.handleCancel}
           footer={null}
+          className="classBOList"
         >
-          <div className="tableListOperator">
-            {/* 搜索框 */}
-            <TableSearchForm
-              ref={this.tableSearchFormRef}
-              initialValues={this.initialValues}
-              getTableData={this.getTableData}
-              simpleForm={this.simpleForm}
-            />
-          </div>
-
           <Table
             className="classTableList"
             scroll={{ x: tableWidth, y: 400 }}
