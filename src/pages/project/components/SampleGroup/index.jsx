@@ -78,7 +78,13 @@ class SampleGroup extends React.Component {
     if (props.submitStatus !== this.props.submitStatus) {
       const list = this.verifyData();
       console.log(list);
-      this.props.getData(list, 'sampleGroup');
+      const { paramKey, taskModelId } = props;
+      const sendData = {
+        paramKey,
+        paramValue: JSON.stringify(list),
+        taskModelId,
+      };
+      this.props.getData(sendData, 'groupScheme');
     }
   }
 
