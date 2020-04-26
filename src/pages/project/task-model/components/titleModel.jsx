@@ -162,6 +162,7 @@ class TitleModel extends React.Component {
             display: 'flex',
             justifyContent: 'space-between',
           }}
+          className="classVersion"
         >
           <div style={{ display: 'flex' }}>
             <div>
@@ -228,7 +229,10 @@ class TitleModel extends React.Component {
                 禁用
               </div>
             )}
-            <div style={{ marginTop: 12, fontSize: 13, marginRight: -2, textAlign: 'right' }}>
+            <div
+              style={{ marginTop: 12, fontSize: 13, marginRight: -2, textAlign: 'right' }}
+              className="classIsOpen"
+            >
               {open ? (
                 <a
                   href="#"

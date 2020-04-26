@@ -245,7 +245,7 @@ class BPList extends Component {
   render() {
     const { pagination, list, loading, visible } = this.state;
     const { BpCertificationStatus, SalesOrderBlock } = this.props.projectManage;
-    let tableWidth = 0;
+    // let tableWidth = 0;
 
     let columns = [
       {
@@ -331,11 +331,12 @@ class BPList extends Component {
       },
     ];
 
-    columns = columns.map(col => {
-      // if (!col.width) col.width = 100;
-      tableWidth += col.width;
-      return col;
-    });
+    // columns = columns.map(col => {
+    //   // if (!col.width) col.width = 100;
+    //   // tableWidth += col.width;
+    //   return col;
+    // });
+    columns = columns.map(col => col);
 
     return (
       <div>
@@ -350,7 +351,7 @@ class BPList extends Component {
         >
           <Table
             className="classTableList"
-            scroll={{ x: tableWidth, y: 400 }}
+            scroll={{ y: 400 }}
             rowKey="id"
             loading={loading}
             dataSource={list}
