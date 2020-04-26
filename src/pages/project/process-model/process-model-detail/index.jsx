@@ -110,7 +110,10 @@ class DrawerTool extends Component {
     });
   };
 
-  // title内容
+  /**
+   * title内容
+   * @param {object} arr 详情的信息
+   */
   titleContent = value => {
     const { visable, selectVersion, parameterVisible, detailValue, open } = this.state;
     return (
@@ -248,7 +251,10 @@ class DrawerTool extends Component {
     );
   };
 
-  // 弹出二级抽屉
+  /**
+   * 弹出二级抽屉
+   * @param {object} arr 详情的信息
+   */
   showChildrenDrawer = item => {
     this.setState({
       taskName: item.name,
@@ -261,6 +267,7 @@ class DrawerTool extends Component {
     });
   };
 
+  /** 关闭二级抽屉  */
   onChildrenDrawerClose = () => {
     this.setState({
       childrenDrawer: false,
