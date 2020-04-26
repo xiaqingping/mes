@@ -11,11 +11,13 @@ import './index.less';
 class SampleSelect extends React.Component {
   static getDerivedStateFromProps(nextProps) {
     return {
-      tableData: nextProps.sampleList || [],
+      tableDatas: nextProps.sampleList || [],
+      disabled: nextProps.disabled,
     };
   }
 
   state = {
+    disabled: false,
     visible: false,
     tableData: [],
     tableDatas: [],
@@ -30,18 +32,7 @@ class SampleSelect extends React.Component {
         key: 'sampleName',
         render: (text, record, index) => (
           <div style={{ display: 'flex' }}>
-            <Popover
-              overlayClassName="project_manage_sample_ui_select"
-              overlayStyle={{ padding: 0 }}
-              content={
-                <SketchPicker
-                  color={record.color || this.state.color}
-                  onChangeComplete={color => this.handleChange(color, record, index)}
-                />
-              }
-              trigger="click"
-              placement="bottom"
-            >
+            {this.state.disabled ? (
               <div
                 style={{
                   width: 20,
@@ -53,7 +44,32 @@ class SampleSelect extends React.Component {
                   this.handleClick(record, index);
                 }}
               />
-            </Popover>
+            ) : (
+              <Popover
+                overlayClassName="project_manage_sample_ui_select"
+                overlayStyle={{ padding: 0 }}
+                content={
+                  <SketchPicker
+                    color={record.color || this.state.color}
+                    onChangeComplete={color => this.handleChange(color, record, index)}
+                  />
+                }
+                trigger="click"
+                placement="bottom"
+              >
+                <div
+                  style={{
+                    width: 20,
+                    height: 20,
+                    backgroundColor: record.color,
+                    position: 'relative',
+                  }}
+                  onClick={() => {
+                    this.handleClick(record, index);
+                  }}
+                />
+              </Popover>
+            )}
             <div style={{ marginLeft: 10 }}>{text}</div>
           </div>
         ),
@@ -66,6 +82,7 @@ class SampleSelect extends React.Component {
           return (
             <div className="project_manage_sample_select_table_alia">
               <input
+                disabled={this.state.disabled}
                 type="text"
                 defaultValue={text}
                 onBlur={e => {
@@ -132,7 +149,27 @@ class SampleSelect extends React.Component {
   };
 
   componentDidMount() {
-    this.getTableData();
+    const { tableDatas, disabled, columns } = this.state;
+    const tableData = JSON.parse(JSON.stringify(tableDatas));
+    if (disabled) {
+      this.setState(
+        {
+          tableData,
+          columns: columns.slice(0, columns.length - 1),
+        },
+        () => {
+          this.getTableData();
+        },
+      );
+    }
+    this.setState(
+      {
+        tableData,
+      },
+      () => {
+        this.getTableData();
+      },
+    );
   }
 
   componentDidUpdate(props) {
@@ -143,7 +180,7 @@ class SampleSelect extends React.Component {
         item.sampleId = item.id;
         return item;
       });
-      this.props.getData(list);
+      this.props.getData(list, 'sampleSelect');
     }
   }
 
@@ -176,11 +213,12 @@ class SampleSelect extends React.Component {
   };
 
   handleDelete = row => {
-    const { tableData, columns } = this.state;
+    const { columns, tableData } = this.state;
+    const list = [...tableData];
+    console.log(tableData);
     const columns1 = JSON.parse(JSON.stringify(columns));
     const columns2 = [...columns];
-    // const list = [...tableData];
-    const list1 = tableData.filter(item => item.id !== row.id);
+    const list1 = list.filter(item => item.id !== row.id);
     console.log(list1);
     const colorStore = [];
     list1.forEach(item => {
@@ -188,16 +226,17 @@ class SampleSelect extends React.Component {
     });
     this.setColorStore(colorStore);
     console.log(list1);
+    // this.props.emitData(list1);
     this.setState(
       {
-        tableDatas: list1,
+        tableData: list1,
         columns: columns1,
       },
       () => {
+        this.props.emitData(list1);
         this.setState({
           columns: columns2,
         });
-        this.props.emitData(list1);
       },
     );
   };
@@ -330,46 +369,49 @@ class SampleSelect extends React.Component {
         tableData: data1,
       });
       this.setColorStore(colorStore);
-      console.log(this.props.project.colorStore);
+
+      this.props.emitData(data1);
     } else {
       // 从已选择进来的
-
       const index = list.findIndex(item => data1[0].id === item.id);
       data1[0].color = list[index].color || getrandomColor();
       list.splice(index, 1, ...data1);
       this.setState({
         tableData: list,
       });
+      // TODO:将改变返回给父组件
+      this.props.emitData(list);
     }
-    // TODO:将改变返回给父组件
-    this.props.emitData(tableData);
   };
 
   render() {
-    const { tableDatas, visible, sampleId, chooseFileIds, tableData, columns } = this.state;
-    console.log(tableDatas);
-    let tableList = [];
-    if (tableDatas.length) {
-      tableList = tableDatas;
-    } else {
-      tableList = tableData;
-    }
+    const { visible, sampleId, chooseFileIds, tableData, columns, disabled } = this.state;
+    // console.log(tableData);
+    // let tableList = [];
+    // if (tableDatas.length) {
+    //   tableList = tableDatas;
+    // } else {
+    //   tableList = tableData;
+    // }
 
     return (
       <>
         <div className="project_manage_sample_select_table">
-          <Table columns={columns} dataSource={tableList} pagination={false} />
+          <Table columns={columns} dataSource={tableData} pagination={false} />
         </div>
-        <Button
-          type="dashed"
-          block
-          onClick={this.chooseSample}
-          style={{ marginTop: 20, position: 'static' }}
-        >
-          <PlusOutlined /> 选择样品
-        </Button>
+        {!disabled && (
+          <Button
+            type="dashed"
+            block
+            onClick={this.chooseSample}
+            style={{ marginTop: 20, position: 'static' }}
+          >
+            <PlusOutlined /> 选择样品
+          </Button>
+        )}
         {visible && (
           <SampleChoose
+            disabled={disabled}
             handleOk={this.handleOk}
             handleCancel={this.handleCancel}
             id={sampleId}
