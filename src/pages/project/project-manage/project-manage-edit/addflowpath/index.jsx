@@ -79,13 +79,6 @@ class Test extends Component {
     }
   }
 
-  // componentWillUnmount() {
-  //   this.props.dispatch({
-  //     type: 'projectManage/setProcessSelectedList',
-  //     payload: [],
-  //   });
-  // }
-
   // 点击打开关联
   onOpen = () => {
     this.setState({
@@ -186,9 +179,9 @@ class Test extends Component {
         };
         console.log(item.id);
         console.log(paramList);
-        if (item.id === paramList.processId) {
-          newItem.processesParamList = paramList.params;
-        }
+        // if (item.id === paramList.processId) {
+        //   newItem.processesParamList = paramList.params;
+        // }
         newList.push(newItem);
       });
       console.log(list);
@@ -213,6 +206,7 @@ class Test extends Component {
     if (processType === 'edit') {
       console.log('正常从已有项目跳转，');
       const newList = [];
+
       // 参数数据
       const paramsList = JSON.parse(sessionStorage.getItem('processForParams'));
       console.log(paramsList);
@@ -272,7 +266,7 @@ class Test extends Component {
       {
         title: '流程模型',
         dataIndex: 'name',
-        width: 400,
+        width: 300,
         render: (value, row) => (
           <>
             <Avatar
