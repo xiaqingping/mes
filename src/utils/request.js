@@ -5,7 +5,7 @@ import { formatMessage } from 'umi/locale';
 
 const baseURLMap = {
   dev: 'https://devapi.sangon.com:30443/api',
-  test: 'https://testapi.sangon.com:8443/api',
+  test: 'https://testapi.sangon.com/api',
   pre: 'https://preapi.sangon.com/api',
   prod: 'https://api.sangon.com/api',
 };
