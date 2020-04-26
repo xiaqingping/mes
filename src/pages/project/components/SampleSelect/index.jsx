@@ -82,7 +82,7 @@ class SampleSelect extends React.Component {
           return (
             <div className="project_manage_sample_select_table_alia">
               <input
-                disabled
+                disabled={this.state.disabled}
                 type="text"
                 defaultValue={text}
                 onBlur={e => {

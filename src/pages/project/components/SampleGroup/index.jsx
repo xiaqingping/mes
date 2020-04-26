@@ -917,9 +917,9 @@ class SampleGroup extends React.Component {
           loading={loading}
         />
 
-        <Button onClick={this.verifyData} type="primary">
+        {/* <Button onClick={this.verifyData} type="primary">
           提交
-        </Button>
+        </Button> */}
 
         {visible && (
           <GroupUpload

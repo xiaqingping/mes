@@ -43,6 +43,10 @@
   }
 
   .project_components_sample_group_render_wrap {
+    .ant-select-focused {
+      outline: none !important;
+    }
+
     .ant-select-single:not(.ant-select-customize-input) .ant-select-selector {
       background-color: transparent;
       border: 1px solid transparent;
@@ -66,6 +70,19 @@
 
     .ant-select-disabled.ant-select-single:not(.ant-select-customize-input) .ant-select-selector {
       cursor: default;
+    }
+
+    .ant-select-selector {
+      border: none !important;
+      outline: none !important;
+    }
+
+    .ant-select-selector:hover {
+      background-color: #fff !important;
+    }
+
+    .ant-select-selector:focus {
+      background-color: #fff !important;
     }
   }
 }

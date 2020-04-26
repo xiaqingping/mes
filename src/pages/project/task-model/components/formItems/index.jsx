@@ -18,7 +18,7 @@ class FactoryComponent extends React.Component {
         {type === 'input' && <InputItems fromView={fromView} viewForm={viewForm} />}
         {compGroup.includes(type) && <BaseFormItems fromView={fromView} viewForm={viewForm} />}
         {type === 'number_input' && <NumericalInput fromView={fromView} viewForm={viewForm} />}
-        {checkGroup.includes(type) && <CheckedAndRadio />}
+        {checkGroup.includes(type) && <CheckedAndRadio fromView={fromView} viewForm={viewForm} />}
       </>
     );
   }
