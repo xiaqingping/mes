@@ -63,7 +63,7 @@ const projectModel = {
         id: 1,
         name: '真核转录组',
         text: 'eukaryotic_transcriptome',
-        color: 'pink',
+        color: '#87d068',
       },
       {
         id: 2,
@@ -87,7 +87,7 @@ const projectModel = {
         id: 5,
         name: '简化基因组',
         text: 'RAD',
-        color: 'red',
+        color: 'lime',
       },
       {
         id: 6,
@@ -117,13 +117,13 @@ const projectModel = {
         id: 10,
         name: '小RNA',
         text: 'microRNA',
-        color: 'amber',
+        color: 'red',
       },
       {
         id: 11,
         name: '动植物基因组',
         text: 'eukaryotic_genome',
-        color: 'indigo',
+        color: 'magenta',
       },
       {
         id: 12,
