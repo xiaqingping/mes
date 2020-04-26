@@ -9,7 +9,7 @@ import request from '@/utils/request';
 
 // 1组
 // let http1 = 'http://192.168.20.27:8166';
-let http1 = 'http://192.168.20.27:8166';
+let http1 = '';
 if (process.env.NODE_ENV !== 'development') {
   http1 = '';
 }

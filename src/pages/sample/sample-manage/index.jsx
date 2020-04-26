@@ -297,7 +297,7 @@ class ProcessModel extends Component {
     // });
 
     return (
-      <PageHeaderWrapper className="">
+      <PageHeaderWrapper>
         <div className="tableList classSampleManage">
           <Card bordered={false}>
             <TableSearchForm
