@@ -2,23 +2,32 @@
  * 环境因子表
  */
 import React from 'react';
-import { Table, Card, Button } from 'antd';
+import { Table, Card, Button, message } from 'antd';
 import { CloseOutlined, PlusSquareOutlined } from '@ant-design/icons';
 import style from './index.less';
 import UploadSequenceFile from './UploadSequenceFile';
 
 class EnvironmentalFactorsModel extends React.Component {
+  static getDerivedStateFromProps(nextProps) {
+    return {
+      sampleList: nextProps.sampleList || [],
+      // submitStatus: nextProps.submitStatus || false,
+    };
+  }
+
   constructor(props) {
     super(props);
     console.log(props);
     this.state = {
       // 样品选择框 样品列表
-      sampleList: props.sampleList || [],
+      // sampleList: props.sampleList || [],
+      sampleList: [],
+      // submitStatus: false,
       // 表数据
       data: [],
-      // 表头
+      // 表格全部列
       columns: [],
-      // 新增列暂存区
+      // 表格新增列
       headers: [],
       // 表头 第一列
       firstColumn: {
@@ -43,15 +52,47 @@ class EnvironmentalFactorsModel extends React.Component {
   componentDidMount() {
     this.initTable();
     this.getParamData();
+    this.props.getFun(this.selectUpdateGroup);
   }
 
+  // 监听是否提交
   componentDidUpdate(props) {
     if (props.submitStatus !== this.props.submitStatus) {
-      const data = this.handleSave();
+      const data = this.verifyData();
       console.log(data);
-      // this.props.getData('testData', '环境因子');
+      // this.props.getData(data, '环境因子');
     }
   }
+
+  // 样品列表改变时同步环境因子样品列表
+  selectUpdateGroup = () => {
+    // console.log(this.state);
+    const { sampleList, data, headers } = this.state;
+    const newData = [];
+    sampleList.map(samItem => {
+      let newItem = {};
+      newItem = {
+        metadataSampleId: samItem.id,
+        sampleAlias: samItem.sampleAlias,
+      };
+      const item = {};
+      data.forEach(daItem => {
+        item[daItem.sampleId] = daItem;
+      });
+      if (item[samItem.id]) {
+        newItem = item[samItem.id];
+      } else {
+        headers.forEach(key => {
+          newItem[key] = '';
+        });
+      }
+      newData.push(newItem);
+      return false;
+    });
+    this.setState({
+      data: newData,
+    });
+  };
 
   // 初始化表格
   initTable = () => {
@@ -78,102 +119,11 @@ class EnvironmentalFactorsModel extends React.Component {
     });
   };
 
-  // 获取数据 整理显示
-  getDataDispose = (tableHaed, tableList) => {
-    const newHeader = tableHaed.filter(item => item.dataIndex !== 'sampleAlias');
-
-    // 获取表头
-    const { firstColumn, lastColumn } = this.state;
-    const newColumns = [firstColumn, ...this.formatHeader(newHeader), lastColumn];
-
-    this.setState({
-      data: tableList,
-      columns: newColumns,
-      headers: newHeader,
-    });
-  };
-
-  // 获取参数数据
-  getParamData = () => {
-    const { paramList, sampleList } = this.props;
-    const { firstColumn } = this.state;
-    const paramValue = JSON.parse(paramList.paramValue);
-
-    console.log(paramValue);
-
-    // const newColumns = [];
-    // paramValue.environmentFactorList.forEach((item, index) => {
-    //   console.log(item);
-    //   console.log(index);
-    //   // 表头
-    //   const newCol = {
-    //     id: index + 1,
-    //     title: item.environmentFactorName,
-    //     dataIndex: index + 1,
-    //     key: index + 1,
-    //   };
-    //   newColumns.push(newCol);
-    // })
-    // console.log(newColumns);
-
-    if (paramList) {
-      const list = paramValue.environmentFactorList;
-      const columns = [firstColumn];
-      const titleName = 'environmentFactorName';
-
-      // 取出 表头
-      const newColumns = this.getTableHeaderData(list, columns, titleName);
-
-      // 取出 行数据
-      const rowData = this.getRowDataEnvironment(list, sampleList, newColumns);
-      console.log(rowData);
-
-      // 填充行数据
-      const newData = this.getFillDataEnvironment(list, rowData);
-
-      this.getDataDispose(newColumns, newData);
-    }
-  };
-
-  // 提交数据
-  handleSave = () => {
+  // 提交数据格式化
+  formatSubmitData = () => {
     const { data, headers } = this.state;
-    console.log(data);
 
     if (data.length === 0 || headers.length === 0) return false;
-
-    // let tableHeard = [];
-    // headers.forEach((item, index) => {
-
-    //     tableHeard = [
-    //       ...tableHeard,
-    //       { groupSchemeName: item.dupTitle, sampleList: [], groupList: [] },
-    //     ];
-
-    // });
-
-    // console.log(headers);
-    // console.log(tableHeard);
-    // for (let i = 2; i < headers.length + 2; i++) {
-    //   if (!tableHeard[i - 2]) return false;
-    //   // eslint-disable-next-line no-loop-func
-    //   data.forEach(item => {
-    //     // if (item[`header_${i}`] === '') return;
-    //     // if (item[`header_${i}`] === '当前样品') {
-    //     //   tableHeard[i - 2].sampleList.push({
-    //     //     metadataSampleId: item[`header_${i}`],
-    //     //     sampleAlias: item.sampleName,
-    //     //   });
-    //     // } else {
-    //       tableHeard[i - 2].groupList.push({
-    //         groupName: item[`header_${i}`],
-    //         // color: item[`color_${i}`],
-    //       });
-    //     // }
-    //   });
-    // }
-
-    // return tableHeard
 
     // 数据整理
     let tableHeard = [];
@@ -183,8 +133,6 @@ class EnvironmentalFactorsModel extends React.Component {
         { environmentFactorName: item.title, environmentFactorValueList: [] },
       ];
     });
-
-    // console.log(tableHeard);
 
     for (let i = 2; i < tableHeard.length + 2; i++) {
       if (!tableHeard[i - 2]) return false;
@@ -214,11 +162,87 @@ class EnvironmentalFactorsModel extends React.Component {
         }
       });
     }
-
     return tableHeard;
   };
 
-  // 新增列
+  /**
+   * 验证数据
+   * 1. 环境因子下不能全部为空
+   */
+  verifyData = () => {
+    const { data, headers } = this.state;
+    const num = headers.length;
+    for (let i = 2; i < num; i++) {
+      console.log(i);
+      const list = [];
+      data.forEach(item => {
+        list.push(item[`header_${i}`]);
+      });
+      const validFalse = list.every(item => item === '');
+      if (validFalse) {
+        return message.error('存在空的环境因子');
+      }
+      const formattedData = this.formatSubmitData();
+      return formattedData;
+    }
+    return true;
+  };
+
+  /**
+   * 整理表头表数据
+   * tableHaed 表头数据
+   * tableList 表数据
+   */
+  getDataDispose = (tableHaed, tableList) => {
+    const newHeader = tableHaed.filter(item => item.dataIndex !== 'sampleAlias');
+
+    // 获取表头
+    const { firstColumn, lastColumn } = this.state;
+
+    const disabledIs = this.props.disabled; // 是否禁用
+    let newColumns;
+    if (disabledIs) newColumns = [firstColumn, ...this.formatHeader(newHeader)];
+    else newColumns = [firstColumn, ...this.formatHeader(newHeader), lastColumn];
+
+    this.setState({
+      data: tableList,
+      columns: newColumns,
+      headers: newHeader,
+    });
+  };
+
+  /**
+   * 获取参数数据
+   * paramList 父页面传递的 参数数据
+   * sampleList 父页面传递的 样品列表
+   */
+  getParamData = () => {
+    const { paramList, sampleList } = this.props;
+    const { firstColumn } = this.state;
+    const paramValue = JSON.parse(paramList.paramValue);
+
+    if (paramList) {
+      const list = paramValue.environmentFactorList;
+      const columns = [firstColumn];
+      const titleName = 'environmentFactorName';
+
+      // 取出 表头
+      const newColumns = this.getTableHeaderData(list, columns, titleName);
+      // 取出 行数据
+      const rowData = this.getRowDataEnvironment(list, sampleList, newColumns);
+      // 填充行数据
+      const newData = this.getFillDataEnvironment(list, rowData);
+
+      this.getDataDispose(newColumns, newData);
+    }
+  };
+
+  /**
+   * 新增列
+   * headers 表头数据
+   * firstColumn 第一列表头
+   * lastColumn 最后一列表头
+   */
   addColumn = () => {
     const { headers, firstColumn, lastColumn } = this.state;
 
@@ -261,11 +285,15 @@ class EnvironmentalFactorsModel extends React.Component {
     });
   };
 
-  // 移除列
-  removeColumn = e => {
+  /**
+   * 移除列
+   * data 表数据
+   * headers 表头数据
+   */
+  removeColumn = event => {
     const { data, headers, firstColumn, lastColumn } = this.state;
-    const headerArr = headers.filter(item => item.id !== e.id);
-    const dataArr = data.filter(item => item[e.dataInde] !== e.dataIndex);
+    const headerArr = headers.filter(item => item.id !== event.id);
+    const dataArr = data.filter(item => item[event.dataIndex] !== event.dataIndex);
 
     this.setState(
       {
@@ -279,7 +307,10 @@ class EnvironmentalFactorsModel extends React.Component {
     );
   };
 
-  // 修改表头
+  /**
+   * 修改表头
+   * row 当前行数据
+   */
   handleOnChangeTitle = (row, event) => {
     const { headers } = this.state;
     const newHeader = [];
@@ -293,7 +324,11 @@ class EnvironmentalFactorsModel extends React.Component {
     this.setState({ headers: newHeader });
   };
 
-  // 修改数据
+  /**
+   * 修改数据
+   * row 当前行数据
+   * title 当前列的title
+   */
   handleOnChangeData = (row, event, title) => {
     const { data, headers } = this.state;
     let newKey;
@@ -317,16 +352,21 @@ class EnvironmentalFactorsModel extends React.Component {
     this.setState({ headers: newData });
   };
 
-  // 配置表头
+  /**
+   * 配置表头
+   * headers 表头数据
+   */
   formatHeader = headers => {
+    const disabledIs = this.props.disabled; // 是否禁用
     const groups = headers.map(item => ({
       title: () => (
         <div className="project_manage_UI_sample_group_title" key={item.id}>
           <input
             defaultValue={item.title}
             onChange={event => this.handleOnChangeTitle(item, event)}
+            disabled={disabledIs}
           />
-          <CloseOutlined onClick={() => this.removeColumn(item)} />
+          {disabledIs ? '' : <CloseOutlined onClick={() => this.removeColumn(item)} />}
         </div>
       ),
       dataIndex: `${item.dataIndex}`,
@@ -337,6 +377,7 @@ class EnvironmentalFactorsModel extends React.Component {
           <input
             defaultValue={value}
             onChange={event => this.handleOnChangeData(row, event, item.title)}
+            disabled={disabledIs}
           />
         </div>
       ),
@@ -485,6 +526,7 @@ class EnvironmentalFactorsModel extends React.Component {
 
   render() {
     const { columns, data, visible, sampleList } = this.state;
+    const disabledIs = this.props.disabled; // 是否禁用
     let tableWidth = 0;
 
     const newColumns = columns.map(col => {
@@ -501,9 +543,13 @@ class EnvironmentalFactorsModel extends React.Component {
         title="环境因子表"
         style={{ width: '100%', marginTop: 30, marginBottom: 100 }}
         extra={
-          <Button type="primary" onClick={() => this.uploadButton()}>
-            上传
-          </Button>
+          disabledIs ? (
+            ''
+          ) : (
+            <Button type="primary" onClick={() => this.uploadButton()}>
+              上传
+            </Button>
+          )
         }
       >
         {/* 表格 */}

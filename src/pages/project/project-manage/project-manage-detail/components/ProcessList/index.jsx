@@ -1,58 +1,48 @@
 // 流程列表
-import { Form, Table, Tag, Divider, Button, message, Avatar } from 'antd';
+import { Form, Table, Tag, Divider, message, Avatar } from 'antd';
 import React, { Component } from 'react';
 import { connect } from 'dva';
-import {
-  SlidersOutlined,
-  PlayCircleOutlined,
-  PauseCircleOutlined,
-  EditOutlined,
-} from '@ant-design/icons';
+import { EditOutlined } from '@ant-design/icons';
 import router from 'umi/router';
 import api from '@/pages/project/api/projectManageDetail';
 import disk from '@/pages/project/api/disk';
 import DefaultHeadPicture from '@/assets/imgs/defaultheadpicture.jpg';
+import parameterImg from '@/assets/imgs/canshu@1x.png';
 import TaskList from '../TaskList';
 import { EditInforModel } from '../ModelUI';
 import ProgressMould from '../ProgressMould';
-// import { formatter } from '@/utils/utils';
 
 class ProcessList extends Component {
   tableSearchFormRef = React.createRef();
 
   tableFormRef = React.createRef();
 
-  state = {
-    // 表格
-    list: [], // 表格数据
-    loading: false, // 加载状态
-    editIndex: -1, // 当前编辑行icon
-    visibleModel: false, // 是否显示编辑模态框
-    processList: [], // 选中编辑行数据
+  constructor(props) {
+    super(props);
+    const { data } = this.props;
+    console.log(data);
+    this.state = {
+      // 表格
+      list: data.processList, // 表格数据
+      loading: false, // 加载状态
+      editIndex: -1, // 当前编辑行icon
+      visibleModel: false, // 是否显示编辑模态框
+      processList: [], // 选中编辑行数据
 
-    // 任务列表抽屉
-    visibleDrawer: false, // 是否显示抽屉
-    detailList: [], // 项目信息
-    taskList: [], // 任务列表信息
-    test: false,
-  };
+      // 任务列表抽屉
+      visibleDrawer: false, // 是否显示抽屉
+      detailList: [], // 项目信息
+      taskList: [], // 任务列表信息
+      test: false,
+    };
+    // console.log(this.state);
+  }
 
   // 组件挂载时
   componentDidMount() {
-    const { projectId } = this.props;
-    this.getTableData(projectId);
+    // const { data } = this.props;
+    // this.getTableData(data);
   }
-
-  // 获取表格数据
-  getTableData = projectId => {
-    this.setState({ loading: true });
-    api.getProjectProcess(projectId).then(res => {
-      this.setState({
-        list: res.processList,
-        loading: false,
-      });
-    });
-  };
 
   // 查看任务列表及执行记录
   searchTaskList = row => {
@@ -66,31 +56,52 @@ class ProcessList extends Component {
     });
   };
 
-  // 查看流程参数
+  /**
+   * 查看流程参数
+   * processesData 流程数据
+   */
   searchProcessParam = processesData => {
     const { projectId } = this.props;
-    const data = `${processesData.id},${processesData.processModelId},edit,${projectId}`;
-    router.push(`/project/project-manage/process-parameter/${data}`);
+    const { processModelId } = processesData;
+    const processId = processesData.id;
+
+    let type;
+    if (processesData.status === 2) {
+      type = 'edit';
+    } else {
+      type = 'view';
+    }
+
+    router.push(
+      // eslint-disable-next-line max-len
+      `/project/project-manage/process-parameter/${type}/${processModelId}/${projectId}/${processId}`,
+    );
   };
 
   // 流程进度开始
   processStart = row => {
     this.setState({ loading: true });
     const { projectId } = this.props;
-    api.startProcessesProcess(row.id).then(() => {
-      this.getTableData(projectId);
-      this.setState({ loading: false });
-    });
+    api
+      .startProcessesProcess(row.id)
+      .then(() => {
+        this.getTableData(projectId);
+      })
+      .catch(e => message.error(e.message));
+    this.setState({ loading: false });
   };
 
-  // 流程进度开始
+  // 流程进度暂停
   processPause = row => {
     this.setState({ loading: true });
     const { projectId } = this.props;
-    api.pauseProcessesProcess(row.id).then(() => {
-      this.getTableData(projectId);
-      this.setState({ loading: false });
-    });
+    api
+      .pauseProcessesProcess(row.id)
+      .then(() => {
+        this.getTableData(projectId);
+      })
+      .catch(e => message.error(e.message));
+    this.setState({ loading: false });
   };
 
   // 删除
@@ -109,15 +120,16 @@ class ProcessList extends Component {
     });
   };
 
-  // 获取回传数据进行保存
+  /**
+   * 获取回传数据进行保存
+   * data 回传数据
+   */
   getEditModelData = data => {
     const { projectId } = this.props;
     api
       .saveProcessInfor(data)
       .then(() => {
-        this.setState({
-          visibleModel: false,
-        });
+        this.setState({ visibleModel: false });
         this.getTableData(projectId);
       })
       .catch();
@@ -150,7 +162,7 @@ class ProcessList extends Component {
       test,
     } = this.state;
 
-    let tableWidth = 0;
+    // let tableWidth = 0;
 
     let columns = [
       {
@@ -184,42 +196,13 @@ class ProcessList extends Component {
         title: '进度',
         dataIndex: 'processProgress',
         width: 270,
-        render: (value, row) => {
-          if (row.status === 1) {
-            return (
-              <Button
-                onClick={() => this.processStart(row)}
-                type="primary"
-                style={{ borderRadius: '50px' }}
-              >
-                运行
-              </Button>
-            );
-          }
-          if (row.status === 2) {
-            return (
-              <>
-                <ProgressMould percentData={row} />
-                <PauseCircleOutlined
-                  style={{ marginLeft: '10px' }}
-                  onClick={() => this.processPause(row)}
-                />
-              </>
-            );
-          }
-          if (row.status === 3) {
-            return (
-              <>
-                <ProgressMould percentData={row} />
-                <PlayCircleOutlined
-                  style={{ marginLeft: '10px' }}
-                  onClick={() => this.processStart(row)}
-                />
-              </>
-            );
-          }
-          return <ProgressMould percentData={row} />;
-        },
+        render: (value, row) => (
+          <ProgressMould
+            percentData={row}
+            processStart={this.processStart}
+            processPause={this.processPause}
+          />
+        ),
       },
       {
         title: '流程模型',
@@ -251,7 +234,12 @@ class ProcessList extends Component {
         dataIndex: 'type',
         width: 100,
         render: (value, row) => (
-          <SlidersOutlined onClick={() => this.searchProcessParam(row)} style={{ fontSize: 20 }} />
+          <img
+            src={parameterImg}
+            alt=""
+            onClick={() => this.searchProcessParam(row)}
+            style={{ fontSize: 20 }}
+          />
         ),
       },
       {
@@ -274,7 +262,7 @@ class ProcessList extends Component {
 
     columns = columns.map(col => {
       // if (!col.width) col.width = 100;
-      tableWidth += col.width;
+      // tableWidth += col.width;
       if (!col.editable) {
         return col;
       }
@@ -285,7 +273,7 @@ class ProcessList extends Component {
       <>
         <Form ref={this.tableFormRef}>
           <Table
-            scroll={{ x: tableWidth, y: 400 }}
+            // scroll={{ x: tableWidth, y: 400 }}
             rowKey="id"
             loading={loading}
             dataSource={list}
@@ -300,6 +288,7 @@ class ProcessList extends Component {
               },
             })}
             height={80}
+            pagination={false}
           />
         </Form>
         <TaskList

@@ -55,12 +55,35 @@
       padding: 0;
       .ant-table-container {
         padding-left: 30px;
+        tbody > tr > {
+          td.ant-table-cell {
+            padding: 14px 16px !important;
+          }
+          td.ant-table-cell:first-child {
+            a {
+              color: rgba(0, 0, 0, 0.65);
+            }
+            a:hover {
+              color: #1890ff;
+            }
+          }
+        }
       }
     }
     .classdownBtn {
       padding-left: 17px !important;
     }
+    .ant-tabs-nav {
+      > div > .ant-tabs-tab {
+        width: 120px;
+        margin-right: 0;
+        font-size: 16px;
+        line-height: 36px;
+        text-align: center;
+      }
+    }
   }
+
   .classTableSearchForm {
     form {
       position: relative;
@@ -74,6 +97,35 @@
       .ant-col:nth-child(3) {
         position: absolute;
         left: 400px;
+      }
+    }
+  }
+
+  .classPageHeaderWrapper {
+    .ant-card-body {
+      margin: 0 !important;
+      padding: 30px 40px !important;
+      > div {
+        margin-bottom: 0 !important;
+      }
+    }
+  }
+
+  .classProcessList {
+    .ant-table-tbody {
+      > tr > .ant-table-cell:nth-child(2) {
+        button {
+          position: relative;
+          width: 55px;
+          height: 24px;
+          span {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            font-size: 12px;
+            transform: translate(-50%, -50%);
+          }
+        }
       }
     }
   }

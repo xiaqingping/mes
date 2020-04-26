@@ -18,6 +18,11 @@
   }
 
   .classPageHeaderWrapper {
+    .ant-card:nth-child(1) {
+      .ant-card-body .ant-row {
+        margin-bottom: 20px !important;
+      }
+    }
     > div:nth-child(1) .ant-card-body {
       margin-bottom: 100px;
       padding: 30px;
@@ -39,7 +44,7 @@
   .classPageHeaderWrapperFooter {
     .ant-card-body {
       float: right;
-      padding: 12px;
+      padding: 12px !important;
       padding-right: 35px;
       button {
         margin-left: 20px;

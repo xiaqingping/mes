@@ -1,4 +1,4 @@
-// 流程模型的编辑
+/** 流程模型的编辑 用于新增、修改、升级 */
 import React, { Component } from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import {
@@ -29,12 +29,22 @@ import router from 'umi/router';
 import deletePic from '@/assets/imgs/delete@1x.png';
 import DefaultHeadPicture from '@/assets/imgs/defaultheadpicture.jpg';
 
+/**
+ * 图片转换Base64
+ * @param {object} img 图片
+ * @param {Function} callback 回调的结果
+ */
 function getBase64(img, callback) {
+  console.log(img);
   const reader = new FileReader();
   reader.addEventListener('load', () => callback(reader.result));
   reader.readAsDataURL(img);
 }
 
+/**
+ * 图片上传时候判断
+ * @param {object} file 图片
+ */
 function beforeUpload(file) {
   const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png';
   if (!isJpgOrPng) {
@@ -89,6 +99,9 @@ class ProcessEdit extends Component {
     };
   }
 
+  /**
+   * 根据URL的ID，去获取详情信息
+   */
   componentDidMount() {
     if (this.props.match.params.id) {
       this.getDetails();
@@ -113,6 +126,9 @@ class ProcessEdit extends Component {
     }
   }
 
+  /**
+   * 根据URL的ID，去获取详情信息
+   */
   getDetails = () => {
     const data = this.props.match.params.id.split('-');
     api.getProcessDetail(data[0]).then(res => {
@@ -405,39 +421,6 @@ class ProcessEdit extends Component {
       sonIdsData.push(...item.preTaskIds);
     });
 
-    const uuids = data.map(e => e.picture);
-    disk
-      .getFiles({
-        sourceCode: uuids.join(','),
-        sourceKey: 'project_process_model',
-      })
-      .then(v => {
-        if (v) {
-          const newList = data.map(e => {
-            const filterItem = v.filter(item => item.sourceCode === e.picture);
-            const fileId = filterItem[0] && filterItem[0].id;
-            return {
-              ...e,
-              fileId,
-            };
-          });
-          this.setState({
-            taskList: newList,
-          });
-        } else {
-          const newList = data.map(e => {
-            const fileId = '';
-            return {
-              ...e,
-              fileId,
-            };
-          });
-          this.setState({
-            taskList: newList,
-          });
-        }
-      });
-
     this.setState({
       taskList: data,
       ids: idsData,
@@ -502,7 +485,9 @@ class ProcessEdit extends Component {
         render: (value, row) => (
           <>
             <Avatar
-              src={row.fileId ? disk.downloadFiles(row.fileId, { view: true }) : DefaultHeadPicture}
+              src={
+                row.picture ? disk.downloadFiles(row.picture, { view: true }) : DefaultHeadPicture
+              }
               style={{ float: 'left', width: '46px', height: '46px' }}
             />
             <div style={{ float: 'left', marginLeft: '10px' }}>
@@ -589,9 +574,9 @@ class ProcessEdit extends Component {
       <PageHeaderWrapper title={this.navContent(processData)}>
         <Spin spinning={pageLoading}>
           <Form onFinish={this.onFinish} initialValues={initialValues()}>
+            {/* 编辑页面的上部操作部分 */}
             <Card className="process-model-edit" style={{ paddingTop: '5px', height: '220px' }}>
               <div style={{ float: 'left', marginLeft: '20px' }}>
-                {/* <Form.Item name="uploadPIc"> */}
                 <Upload
                   name="files"
                   listType="picture-card"
@@ -613,7 +598,6 @@ class ProcessEdit extends Component {
                     uploadButton
                   )}
                 </Upload>
-                {/* </Form.Item> */}
               </div>
               <div style={{ float: 'left', width: '620px', marginLeft: '20px' }}>
                 <Form.Item name="name">
@@ -637,7 +621,6 @@ class ProcessEdit extends Component {
                     }}
                   >
                     {pageModel ? selectVersion || processData.version : 'V1.0'}
-                    {/* {selectVersion || processDetail.version} */}
                   </Tag>
                   {versionOpen && pageModel === 2 ? (
                     <Card
@@ -698,6 +681,7 @@ class ProcessEdit extends Component {
               </div>
             </Card>
 
+            {/* 任务table的显示 */}
             <Card
               style={{ marginTop: '24px' }}
               title={this.titleContent()}
@@ -726,6 +710,7 @@ class ProcessEdit extends Component {
               </Button>
             </Card>
 
+            {/* 提交按钮 */}
             <Card
               style={{ height: '48px', width: '100%', position: 'fixed', bottom: '0', left: '0' }}
             >
@@ -740,26 +725,22 @@ class ProcessEdit extends Component {
             </Card>
           </Form>
           {visible ? (
-            <div>
-              <AssociatedProcessModel
-                visible={visible}
-                onClose={v => this.onClose(v)}
-                getData={v => this.getData(v)}
-                ids={ids}
-              />
-            </div>
+            <AssociatedProcessModel
+              visible={visible}
+              onClose={v => this.onClose(v)}
+              getData={v => this.getData(v)}
+              ids={ids}
+            />
           ) : (
             ''
           )}
           {/* 参数弹框 */}
           {parameterVisible ? (
-            <div>
-              <Parameter
-                visible={parameterVisible}
-                handleClose={value => this.handleClose(value)}
-                paramter={paramter}
-              />
-            </div>
+            <Parameter
+              visible={parameterVisible}
+              handleClose={value => this.handleClose(value)}
+              paramter={paramter}
+            />
           ) : (
             ''
           )}
@@ -773,8 +754,5 @@ export default connect(({ global, user, project, processModel }) => ({
   languageCode: global.languageCode,
   authorization: user.currentUser.authorization,
   project,
-  // processAddData: processModel.processAddData,
   processDetail: processModel.processDetail,
-  // ids: processModel.ids,
-  // sonIds: processModel.sonIds,
 }))(ProcessEdit);

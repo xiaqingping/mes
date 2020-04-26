@@ -10,6 +10,7 @@ import api from '@/pages/sample/api/sample';
 import StandardTable from '@/pages/project/components/StandardTable';
 import UploadSequenceFile from '../UploadSequenceFile';
 import SampleDetail from '../sample-detail';
+import './index.less';
 
 const FormItem = Form.Item;
 const { Option } = Select;
@@ -297,7 +298,7 @@ class ProcessModel extends Component {
 
     return (
       <PageHeaderWrapper>
-        <div className="tableList">
+        <div className="tableList classSampleManage">
           <Card bordered={false}>
             <TableSearchForm
               ref={this.tableSearchFormRef}

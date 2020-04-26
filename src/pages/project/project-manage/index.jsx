@@ -172,7 +172,7 @@ class ProjectManagement extends Component {
   simpleForm = () => {
     const { languageCode, statusList } = this.props;
     const { modelSearchOptions } = this.state;
-    console.log(modelSearchOptions);
+    // console.log(modelSearchOptions);
     return (
       <>
         <Col xxl={6} xl={8} lg={languageCode === 'EN' ? 12 : 12}>
@@ -249,7 +249,8 @@ class ProjectManagement extends Component {
       payload: data,
     });
     console.log(data);
-    router.push('/project/project-manage/add');
+    const projectId = row.id;
+    router.push(`/project/project-manage/edit/${projectId}`);
   };
 
   // 项目管理详情页面
@@ -333,7 +334,7 @@ class ProjectManagement extends Component {
       {
         title: '描述',
         dataIndex: 'describe',
-        width: '200px',
+        width: '400px',
       },
       {
         title: '创建人/时间',
@@ -367,7 +368,7 @@ class ProjectManagement extends Component {
         render: (value, row) => {
           const color = formatter(statusList, value, 'value', 'color');
           return (
-            <Dropdown overlay={this.menuList(row)}>
+            <Dropdown overlay={this.menuList(row)} className="classmenulist">
               <Button
                 style={{
                   background: color,
