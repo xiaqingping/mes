@@ -218,9 +218,9 @@ class Test extends Component {
           name: item.name,
           processModelId: item.id,
         };
-        if (item.id === paramList.processId) {
-          newItem.processesParamList = paramList.params;
-        }
+        // if (item.id === paramList.processId) {
+        //   newItem.processesParamList = paramList.params;
+        // }
         newList.push(newItem);
       });
       console.log(list);
