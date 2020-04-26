@@ -536,7 +536,7 @@ class TaskModel extends Component {
               </Button>
             </div>
             <StandardTable
-              scroll={{ x: tableWidth }}
+              // scroll={{ x: tableWidth }}
               rowClassName="editable-row"
               selectedRows=""
               // loading={loading}

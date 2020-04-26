@@ -263,6 +263,7 @@ class BeforeTask extends React.Component {
         width={840}
         height={570}
         footer={null}
+        className="classBeforeTask"
       >
         <Spin spinning={loading}>
           <div className="tableList buttonStyle">
