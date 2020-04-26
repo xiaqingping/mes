@@ -1,9 +1,13 @@
-// 参数变大
+/** 参数分类点击以后变大显示页面 */
 import React from 'react';
 import { Modal, List, Card } from 'antd';
 import { ShrinkOutlined } from '@ant-design/icons';
 
 const EnlargePage = props => {
+  /**
+   * 标题的样式
+   * @param {object} item 详情的数据
+   */
   const titleContent = item => (
     <>
       <div>{item.groupName}</div>

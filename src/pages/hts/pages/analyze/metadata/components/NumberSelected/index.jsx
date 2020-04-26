@@ -9,13 +9,13 @@ class NumberModels extends React.Component {
 
   componentDidMount() {}
 
+  componentDidUpdate(prevProps, prevState) {}
+
   onChange = value => {
-    const values = value;
-    console.log(values);
     this.setState({
       inputValue: value,
     });
-    this.props.getData(values);
+    this.props.getData(value);
   };
 
   render() {
@@ -35,7 +35,7 @@ class NumberModels extends React.Component {
           <InputNumber
             min={0}
             max={1}
-            style={{ margin: '0 16px' }}
+            style={{ margin: '0 20px' }}
             step={0.01}
             value={inputValue}
             onChange={this.onChange}
