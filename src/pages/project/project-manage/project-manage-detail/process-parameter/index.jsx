@@ -230,7 +230,7 @@ class ProcessParameter extends Component {
     console.log(data);
 
     // 添加 修改
-    if (requestType === 'add' || requestType === 'updateParam') {
+    if (requestType === 'add' || requestType === 'update') {
       const paramsList = sessionStorage.getItem('processForParams');
       const newData = { params: data, processModelId };
       const list = [];
@@ -492,14 +492,8 @@ class ProcessParameter extends Component {
   goBackLink = () => {
     const { requestType, projectId } = this.state;
     let url;
-    console.log(requestType);
-    console.log(projectId);
     if (requestType === 'add' || requestType === 'update') {
-      if (projectId === '' || projectId === undefined) {
-        url = `/project/project-manage/add/addflowpath`;
-      }
-      // if (projectId !== '') url = `/project/project-manage/add/addflowpath/add/${projectId}`;
-      return router.push(url);
+      return router.push(`/project/project-manage/add/addflowpath`);
     }
     if (projectId === '') url = `/project/project-manage`;
     if (projectId !== '') url = `/project/project-manage/detail/${projectId}`;

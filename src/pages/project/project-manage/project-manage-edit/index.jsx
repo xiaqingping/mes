@@ -272,6 +272,7 @@ class ProjectEdit extends Component {
                         borderColor: '#dcdcdc',
                         lineHeight: '30px',
                         textAlign: 'center',
+                        cursor: 'pointer',
                       }}
                     >
                       {item.name} {item.text}
