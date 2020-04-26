@@ -239,6 +239,7 @@ class Group extends React.Component {
   // 获取样品选择框的最新state;
   getSelectUpdateData = updateData => {
     console.log(updateData);
+    
     this.setState(
       {
         sampleList: updateData,
@@ -248,6 +249,18 @@ class Group extends React.Component {
       },
     );
   };
+
+  // // 父组件修改
+  // setSelectState = data => {
+  //   this.setState(
+  //     {
+  //       sampleList: data,
+  //     },
+  //     () => {
+  //       this.handleUpdate();
+  //     },
+  //   );
+  // };
 
   // 传数据
   submitData = subData => {
@@ -273,11 +286,12 @@ class Group extends React.Component {
           getData={this.submitData}
           // 提交状态
           submitStatus={submitStatus}
+          setSelectState={this.setSelectState}
+          disabled={false}
         />
         <SampleGroup
           groupSchemeData={groupSchemeData}
           sampleList={sampleList} // 当样品选择改变的时候
-          emitData={this.getSelectUpdateData}
           // 提交数据
           getData={this.submitData}
           // 提交状态
@@ -285,6 +299,7 @@ class Group extends React.Component {
           getFun={func => {
             this.handleUpdate = func;
           }}
+          disabled={false}
         />
         <Button onClick={this.handleSubmit}>提交</Button>
       </Card>

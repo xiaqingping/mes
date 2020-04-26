@@ -6,7 +6,14 @@ import FileUpload from '../../UploadSequenceFile/sequenUpload';
 import api from '../api/sample.js';
 
 class SampleChoose extends React.Component {
+  static getDerivedStateFromProps(nextProps) {
+    return {
+      disabled: nextProps.disabled,
+    };
+  }
+
   state = {
+    disabled: false,
     tableData: [],
     visible: false,
     loading: false,
@@ -197,7 +204,7 @@ class SampleChoose extends React.Component {
   };
 
   render() {
-    const { filterData } = this.state;
+    const { filterData, disabled } = this.state;
     const columns = [
       {
         title: '样品',
@@ -289,22 +296,26 @@ class SampleChoose extends React.Component {
           visible
           // onOk={() => this.props.handleOk(tableData)}
           onCancel={this.props.handleCancel}
-          footer={[
-            <Button
-              key="submit"
-              type="primary"
-              onClick={this.handleOk}
-              // onClick={() => this.props.handleOk(tableData)}
-            >
-              确认
-            </Button>,
-          ]}
+          footer={
+            !disabled && [
+              <Button
+                key="submit"
+                type="primary"
+                onClick={this.handleOk}
+                // onClick={() => this.props.handleOk(tableData)}
+              >
+                确认
+              </Button>,
+            ]
+          }
         >
-          <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-            <Button type="primary" onClick={() => this.openUpload(true)}>
-              <UploadOutlined /> 序列文件
-            </Button>
-          </div>
+          {!disabled && (
+            <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+              <Button type="primary" onClick={() => this.openUpload(true)}>
+                <UploadOutlined /> 序列文件
+              </Button>
+            </div>
+          )}
           <Table columns={columns} dataSource={tableData} pagination={false} loading={loading} />
           {visible && <FileUpload handleClose={this.handleFileUploadClose} />}
         </Modal>

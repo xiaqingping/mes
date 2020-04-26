@@ -281,7 +281,7 @@ class ProjectManagement extends Component {
 
   // speciesdetail =() => {
   //   console.log(123);
-  //   router.push('/project/project-manage/speciesSelected',);
+  //   router.push('/hts/analyze/metadata/paramList',);
   // }
 
   // 状态下拉列表
@@ -406,12 +406,11 @@ class ProjectManagement extends Component {
       {
         title: '成员数',
         dataIndex: 'memberCount',
-        // render: (value, row) => (
+        // render: value => (
         //   <>
         //     <div style={{ float: 'left', paddingLeft: '20px' }}>
-        //       <div>{row.name}</div>
         //       <div>
-        //         <a onClick={() => this.speciesdetail (row)}>{value}</a>
+        //         <a onClick={() => this.speciesdetail ()}>{value}</a>
         //       </div>
         //     </div>
         //   </>

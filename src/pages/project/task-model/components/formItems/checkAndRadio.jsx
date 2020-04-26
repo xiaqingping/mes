@@ -4,7 +4,7 @@ import { Input, Form, Button, Switch } from 'antd';
 /**
  * 多选 配置页面
  */
-const CheckboxModel = () => {
+const CheckboxModel = props => {
   const [list, setList] = useState([
     {
       id: 1,
@@ -35,7 +35,8 @@ const CheckboxModel = () => {
     setList([...list, data]);
     console.log(list);
   };
-
+  const { fromView, viewForm } = props;
+  console.log(list);
   return (
     <>
       <Form.Item
@@ -48,7 +49,7 @@ const CheckboxModel = () => {
           },
         ]}
       >
-        <Input placeholder="请输入参数Key " />
+        {fromView ? <span>{viewForm.paramKey}</span> : <Input placeholder="请输入参数名称 " />}
       </Form.Item>
 
       <Form.Item
@@ -57,15 +58,16 @@ const CheckboxModel = () => {
         rules={[
           {
             required: true,
-            message: '请输入参数名称',
+            message: '请输入参数描述',
           },
         ]}
       >
-        <Input placeholder="请输入参数名称" />
+        {fromView ? <span>{viewForm.paramName}</span> : <Input placeholder="请输入参数描述" />}
       </Form.Item>
 
       <Form.Item label="是否必填：" name="isrequired">
-        <Switch />
+        {/* <Switch /> */}
+        {fromView ? viewForm.isrequired : <Switch defaultChecked />}
       </Form.Item>
 
       <p style={{ fontSize: 16, fontWeight: 'bold' }}>选项：</p>
@@ -84,6 +86,11 @@ const CheckboxModel = () => {
                     rules={[{ required: true, message: '请输入Key' }]}
                   >
                     <Input style={{ width: '50%' }} placeholder="请输入Key" />
+                    {/* {fromView ? (
+                      <span>{viewForm.paramKey}</span>
+                    ) : (
+                        <Input style={{ width: '50%' }} placeholder="请输入Key" />
+                    )} */}
                   </Form.Item>
                   <Form.Item
                     name={[[item.selectKey], 'selectValue']}
