@@ -1,5 +1,5 @@
 // 项目管理 编辑
-import { Card, Tabs, Spin } from 'antd';
+import { Card, Tabs } from 'antd';
 import React, { Component } from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import { connect } from 'dva';
@@ -17,16 +17,19 @@ const { TabPane } = Tabs;
 class ProjectDetail extends Component {
   tableSearchFormRef = React.createRef();
 
-  state = {
-    loading: true,
-    list: {}, // 基础信息数据
-    projectId: 0, // 项目ID
-    selectKey: '1', // Tabs切换
-  };
+  constructor(props) {
+    super(props);
+    const projectId = this.props.match.params.id;
+    this.state = {
+      loading: true,
+      list: {}, // 基础信息数据
+      projectId, // 项目ID
+      selectKey: '1', // Tabs切换
+    };
+  }
 
   componentDidMount() {
     const projectId = this.props.match.params.id;
-    this.setState({ projectId });
     this.getTableData(projectId);
   }
 
@@ -61,14 +64,9 @@ class ProjectDetail extends Component {
 
   // 获取表格数据
   getTableData = projectId => {
-    api
-      .getProjectProcess(projectId)
-      .then(res => {
-        this.setState({
-          list: res,
-        });
-      })
-      .catch();
+    api.getProjectProcess(projectId).then(res => {
+      this.setState({ list: res });
+    });
     this.setState({ loading: false });
   };
 
@@ -83,14 +81,7 @@ class ProjectDetail extends Component {
   render() {
     const { list, loading, projectId } = this.state;
 
-    if (loading) {
-      return (
-        <div className="example">
-          <Spin size="large" />
-        </div>
-      );
-    }
-
+    if (JSON.stringify(list) === '{}') return false;
     return (
       <PageHeaderWrapper title={this.navContent(list)}>
         {/* <Card className={styles.titleCard} > */}
@@ -113,7 +104,7 @@ class ProjectDetail extends Component {
           >
             <TabPane tab="流程列表" key="1" width="120px">
               <div className="classProcessList">
-                <ProcessList projectId={projectId} />
+                <ProcessList projectId={projectId} data={list} />
               </div>
             </TabPane>
             <TabPane tab="文件" key="2">
