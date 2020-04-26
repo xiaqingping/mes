@@ -123,7 +123,7 @@ class ArgumentModel extends Component {
     const { dispatch } = this.props;
     dispatch({
       type: 'taskModel/getArgumentsList',
-      payload: this.state.argumentList,
+      payload: list,
     });
   };
 
