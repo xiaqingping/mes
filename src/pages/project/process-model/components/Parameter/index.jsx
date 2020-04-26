@@ -1,11 +1,10 @@
-// 参数分配
+/** 参数拖动页面 */
 import React from 'react';
 import { Modal, List, Card, Button, message } from 'antd';
 import { ArrowsAltOutlined, PlusOutlined } from '@ant-design/icons';
 import EnlargePage from '../EnlargePage/enlargePage';
-import AddGroup from '../AddGroup/addGroup';
+// import AddGroup from '../AddGroup/addGroup';
 import './index.less';
-// import { sortable } from 'react-sortable';
 
 class Parameter extends React.Component {
   static getDerivedStateFromProps(nextProps) {
@@ -17,7 +16,7 @@ class Parameter extends React.Component {
     visible: false,
     typeEnlargeVisible: false,
     typeEnlargeData: [],
-    addGroupVisible: false,
+    // addGroupVisible: false,
     moveType: 0,
     moveElement: null,
     moveIndex: 0,
@@ -26,17 +25,20 @@ class Parameter extends React.Component {
     moveDescId: null,
   };
 
-  // 分类变大打开
+  /**
+   * 分类变大打开
+   * @param {object} item 当前选择变大的对象
+   */
   handleBigOpen = item => {
     this.setState({ typeEnlargeVisible: true, typeEnlargeData: item });
   };
 
-  // 分类变大关闭
+  /** 分类变大关闭 */
   handleBigClose = () => {
     this.setState({ typeEnlargeVisible: false });
   };
 
-  // 添加组分类打开
+  /** 添加组分类打开 */
   handleAddGroup = () => {
     const { data } = this.state;
     const newData = data;
@@ -57,24 +59,29 @@ class Parameter extends React.Component {
     // this.setState({ addGroupVisible: true });
   };
 
-  // 关闭添加组分类
-  handleCloseGroup = (v, type) => {
-    const { data } = this.state;
-    if (type) {
-      const newData = data;
-      newData.push({
-        sortNo: '',
-        groupName: v.groupName,
-        groupDescribe: v.groupDescribe,
-        params: [],
-      });
-      this.setState({
-        data: newData,
-      });
-    }
-    this.setState({ addGroupVisible: false });
-  };
+  // // 关闭添加组分类
+  // handleCloseGroup = (v, type) => {
+  //   const { data } = this.state;
+  //   if (type) {
+  //     const newData = data;
+  //     newData.push({
+  //       sortNo: '',
+  //       groupName: v.groupName,
+  //       groupDescribe: v.groupDescribe,
+  //       params: [],
+  //     });
+  //     this.setState({
+  //       data: newData,
+  //     });
+  //   }
+  //   // this.setState({ addGroupVisible: false });
+  // };
 
+  /**
+   * 标题样式
+   * @param {object} item 当前分组对象
+   * @param {Int} index 当前分组的键
+   */
   titleContent = (item, index) => {
     const { moveTitleId, moveDescId, data } = this.state;
     // const groups = JSON.parse(JSON.stringify(data));
@@ -201,7 +208,6 @@ class Parameter extends React.Component {
   // 拖拽元素经过放置元素时
   dragOver = e => {
     e.preventDefault(); // 此处的代码是必须的  不然无法拖拽
-    // console.log('拖拽中');
   };
 
   /**
@@ -213,12 +219,10 @@ class Parameter extends React.Component {
   drop = (value, type, index) => {
     const { data, moveType, moveElement, moveIndex } = this.state;
     const newData = data;
-    // console.log(data);
     // 拖动的是元素放入分类，或者元素排序变更
     if (moveType === 1) {
       // 拖到具体分类
       if (type === 2) {
-        // console.log(value.params.filter(item => item.paramId === moveElement.paramId).length);
         if (value.params.filter(item => item.paramId === moveElement.paramId).length === 0) {
           // 添加到新对象里
           newData.forEach((item, i) => {
@@ -269,7 +273,7 @@ class Parameter extends React.Component {
   };
 
   render() {
-    const { visible, typeEnlargeVisible, typeEnlargeData, addGroupVisible, data } = this.state;
+    const { visible, typeEnlargeVisible, typeEnlargeData, data } = this.state;
     if (!data) return false;
     if (!data.filter(item => item.groupName === 'no')[0]) {
       return false;
@@ -302,10 +306,10 @@ class Parameter extends React.Component {
               handleBigClose={this.handleBigClose}
               typeEnlargeData={typeEnlargeData}
             />
-            <AddGroup
+            {/* <AddGroup
               visible={addGroupVisible}
               handleCloseGroup={(v, type = '') => this.handleCloseGroup(v, type)}
-            />
+            /> */}
 
             {/* 分组列表 */}
             <List

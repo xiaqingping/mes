@@ -35,7 +35,6 @@ import DefaultHeadPicture from '@/assets/imgs/defaultheadpicture.jpg';
  * @param {Function} callback 回调的结果
  */
 function getBase64(img, callback) {
-  console.log(img);
   const reader = new FileReader();
   reader.addEventListener('load', () => callback(reader.result));
   reader.readAsDataURL(img);
@@ -171,7 +170,10 @@ class ProcessEdit extends Component {
     });
   };
 
-  // 图片上传
+  /**
+   * 图片上传
+   * @param {object} info 上传的对象
+   */
   handleChange = info => {
     if (info.file.status === 'uploading') {
       this.setState({ loading: true });
@@ -189,7 +191,10 @@ class ProcessEdit extends Component {
     }
   };
 
-  // 导航列表title样式
+  /**
+   * 导航列表title样式
+   * @param {object} processData 详情数据
+   */
   navContent = processData => {
     const { pageModel } = this.state;
     if (pageModel) {
@@ -198,10 +203,13 @@ class ProcessEdit extends Component {
     return '';
   };
 
-  // 流程模型列表title样式
+  /** 流程模型列表title样式 */
   titleContent = () => <div style={{ fontWeight: 'bolder', padding: '8px' }}>任务列表</div>;
 
-  // 提交上传
+  /**
+   * 提交上传
+   * @param {object} values 提交保存的数据
+   */
   onFinish = values => {
     this.setState({
       buttonLoading: true,
@@ -216,7 +224,6 @@ class ProcessEdit extends Component {
       picture,
       paramter,
     } = this.state;
-    // const { processAddData } = this.props;
     const data = {};
     const taskModelIds = [];
     taskList.forEach(item => {
@@ -294,7 +301,7 @@ class ProcessEdit extends Component {
     return true;
   };
 
-  // 点击打开关联
+  /** 点击打开关联 */
   onOpen = () => {
     this.setState({
       visible: true,
@@ -302,7 +309,7 @@ class ProcessEdit extends Component {
     });
   };
 
-  // 点击关闭关联
+  /** 点击关闭关联 */
   onClose = v => {
     if (v === 'close') {
       this.setState({
@@ -316,7 +323,7 @@ class ProcessEdit extends Component {
     }
   };
 
-  // 打开参数
+  /** 打开参数 */
   handleOpen = () => {
     const { paramter } = this.state;
     if (paramter) {
@@ -328,7 +335,10 @@ class ProcessEdit extends Component {
     }
   };
 
-  // 关闭参数
+  /**
+   * 关闭参数
+   * @param {Array} value 参数的数据
+   */
   handleClose = value => {
     const newData = value.map((item, index) => ({ ...item, sortNo: index }));
     const sonData = newData;
@@ -346,19 +356,16 @@ class ProcessEdit extends Component {
     });
   };
 
-  // 删除任务
+  /**
+   * 删除任务
+   * @param {object} value 删除的id
+   */
   handleDelete = value => {
     const { taskList, ids, sonIds, paramter } = this.state;
     const data = taskList;
-    // const { ids, sonIds } = this.props;
     const idsData = ids;
     const sonIdsData = sonIds;
     const { preTaskIds } = value;
-    // data = [...taskList, ...value];
-    // value.forEach(item => {
-    //   idsData.push(item.id);
-    //   sonIdsData.push(...item.preTaskIds);
-    // });
     const newData = data.filter(item => item.id !== value.id);
     const newIdsData = idsData.filter(item => item !== value.id);
 
@@ -373,7 +380,6 @@ class ProcessEdit extends Component {
       });
     }
     // 删除参数分类里的数据
-    // let paramterData = paramter;
     if (paramter) {
       const paramterData = paramter.map(item => {
         const params = item.params.filter(i => i.taskModelId !== value.id);
@@ -391,7 +397,10 @@ class ProcessEdit extends Component {
     });
   };
 
-  // 获取子级数据
+  /**
+   * 获取子级数据
+   * @param {Array} value 任务选择获取的数据
+   */
   getData = value => {
     const { taskList, ids, sonIds, paramter } = this.state;
     // const { processAddData } = this.props;
@@ -431,6 +440,11 @@ class ProcessEdit extends Component {
   };
 
   // 修改任务列表的开关
+  /**
+   * 修改任务列表的开关
+   * @param {object} row 当前行的对象
+   * @param {Int} index 当前行的键
+   */
   changeIsAutomatic = (row, index) => {
     const { taskList } = this.state;
     const newTaskList = taskList;

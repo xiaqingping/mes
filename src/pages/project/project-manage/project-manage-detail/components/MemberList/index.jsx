@@ -101,7 +101,7 @@ class MemberList extends Component {
     let columns = [
       {
         title: '用户名',
-        dataIndex: 'creatorName',
+        dataIndex: 'name',
         width: 150,
         render: value => (
           <div style={{ display: 'flex' }}>

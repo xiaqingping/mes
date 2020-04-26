@@ -1,4 +1,4 @@
-// 选择任务模型
+/** 选择任务模型 */
 import React from 'react';
 import { Modal, Table, Avatar, Form, Col, Tag, AutoComplete, Spin } from 'antd';
 import TableSearchForm from '@/components/TableSearchForm';
@@ -32,27 +32,42 @@ class AssociatedProcessModel extends React.Component {
       nameCodeVal: [],
       loading: true,
     };
-    this.callParter = _.debounce(this.callParter, 500);
+    this.callTask = _.debounce(this.callTask, 500);
   }
 
+  /** 加载table值 */
   componentDidMount() {
     this.getTableData(this.initialValues);
   }
 
-  callParter = value => {
+  /**
+   * 搜索任务名称的回调
+   * @param {string} value 输入内容的值
+   */
+  callTask = value => {
     api.getTaskNameAndCode(value).then(res => {
       this.setState({ nameCodeVal: res });
     });
   };
 
+  /**
+   * 标题样式
+   */
   titleContent = () => <div style={{ fontSize: '16px' }}>选择任务模型</div>;
 
+  /**
+   * 选择了关闭当前页面
+   */
   handleOk = () => {
     this.setState({
       visible: false,
     });
   };
 
+  /**
+   * 搜索table的值
+   * @param {object} options 搜索的条件参数
+   */
   getTableData = (options = {}) => {
     this.setState({ loading: true });
     const formData = this.tableSearchFormRef.current
@@ -80,6 +95,10 @@ class AssociatedProcessModel extends React.Component {
     });
   };
 
+  /**
+   * 自动搜索的下拉框样式
+   * @param {object} item 搜索到对象的值
+   */
   renderOption = item => ({
     value: item.code,
     label: (
@@ -92,14 +111,17 @@ class AssociatedProcessModel extends React.Component {
     ),
   });
 
-  // 筛选值
+  /**
+   * 筛选值
+   * @param {string} value 输入框内的值
+   */
   inputValue = value => {
     const { nameCodeVal } = this.state;
     const arr = [];
     if (!value) {
       return false;
     }
-    this.callParter(value);
+    this.callTask(value);
     if (nameCodeVal.length === 0) {
       return false;
     }
@@ -118,6 +140,9 @@ class AssociatedProcessModel extends React.Component {
     return true;
   };
 
+  /**
+   * 单行搜索框
+   */
   simpleForm = () => {
     const { nameCodeVal } = this.state;
     return (
@@ -136,12 +161,20 @@ class AssociatedProcessModel extends React.Component {
     );
   };
 
+  /**
+   * 选择的值传递给父组件
+   * @param {Int} id 选择的ID
+   */
   sendData = async id => {
     this.props.onClose('close');
     const res = await api.getAllPreTasks(id, this.props.ids);
     this.props.getData(res);
   };
 
+  /**
+   * table变更
+   * @param {object} pagination 分页
+   */
   handleStandardTableChange = pagination => {
     this.getTableData({
       page: pagination.current,
