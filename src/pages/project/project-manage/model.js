@@ -69,7 +69,7 @@ const projectModel = {
         id: 2,
         name: '宏转录组',
         text: 'metatranscriptome',
-        color: 'purple',
+        color: 'volcano',
       },
       {
         id: 3,
@@ -99,19 +99,19 @@ const projectModel = {
         id: 7,
         name: '微生物基因组',
         text: 'microbial_genome',
-        color: 'yellow',
+        color: 'cyan',
       },
       {
         id: 8,
         name: '重测序',
         text: 'resequencing',
-        color: 'skyblue',
+        color: 'gold',
       },
       {
         id: 9,
         name: '原核转录组',
         text: 'prokaryotic_transcriptom',
-        color: 'lavender',
+        color: 'purple',
       },
       {
         id: 10,
@@ -129,7 +129,7 @@ const projectModel = {
         id: 12,
         name: '微生物多样性',
         text: 'microbial_diversity',
-        color: 'jade',
+        color: 'geekblue',
       },
       {
         id: 13,
