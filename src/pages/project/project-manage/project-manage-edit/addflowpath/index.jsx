@@ -52,7 +52,7 @@ class Test extends Component {
     //   console.log('url无值的state');
     // }
 
-    // const { paramList, projectInfor } = this.props.projectManage;
+    const { paramList, projectInfor } = this.props.projectManage;
     this.state = {
       // TODO:
       requestType: type, // 请求类型 edit：流程列表跳转 携带项目id  add：新建项目跳转 无id
@@ -62,8 +62,8 @@ class Test extends Component {
       list: [],
       loading: false,
       visible: false,
-      // projectInfor, // 项目基础信息
-      // paramList, // 流程参数
+      projectInfor, // 项目基础信息
+      paramList, // 流程参数
       buttonLoading: false,
       processType: type || '',
       // projectId: id || '',
@@ -74,25 +74,23 @@ class Test extends Component {
     this.getData();
     const introductionProcess = JSON.parse(sessionStorage.getItem('introduction '));
     console.log(introductionProcess);
-    // if (introductionProcess == null) {
-    //   console.log('从已有项目跳转的');
-    //   // this.setState({
-    //   //   list: [],
-    //   // });
-    //   this.props.dispatch({
-    //     type: 'projectManage/setProcessSelectedList',
-    //     // payload: introductionProcess,
-    //     payload: [],
-    //   });
-
-    // }else {
-    //   this.props.dispatch({
-    //     type: 'projectManage/setProcessSelectedList',
-    //     payload: introductionProcess,
-    //   });
-    //   console.log('从新建项目跳转的');
-
-    // }
+    if (introductionProcess == null) {
+      console.log('从已有项目跳转的');
+      // this.setState({
+      //   list: [],
+      // });
+      this.props.dispatch({
+        type: 'projectManage/setProcessSelectedList',
+        // payload: introductionProcess,
+        payload: [],
+      });
+    } else {
+      this.props.dispatch({
+        type: 'projectManage/setProcessSelectedList',
+        payload: introductionProcess,
+      });
+      console.log('从新建项目跳转的');
+    }
   }
 
   // 点击打开关联
@@ -168,9 +166,6 @@ class Test extends Component {
     const { list, projectInfor, paramList, processType, projectIdProcess } = this.state;
     console.log(this.state);
     let status = false;
-    // if(this.state !=='') {
-
-    // }
 
     if (projectInfor.requestType === 'add') {
       if (list === '' || list === undefined) {
@@ -208,7 +203,7 @@ class Test extends Component {
           this.setState({
             buttonLoading: false,
           });
-          // router.push('/project/project-manage');
+          router.push('/project/project-manage');
         })
         .catch(() => {
           this.setState({
