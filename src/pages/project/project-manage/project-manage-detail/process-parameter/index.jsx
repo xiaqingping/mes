@@ -93,7 +93,6 @@ class ProcessParameter extends Component {
       //   taskId: '10b85cce64034418b66642f3f19f76b9',
       //   taskModelId: 'f04bf8a80c6b4a7097f2c15b817df820',
       //   paramKey: 'environmentalFactor',
-      //   // eslint-disable-next-line max-len
       //   paramValue:
       // eslint-disable-next-line max-len
       //     '{"environmentFactorList":[{"environmentFactorName": "环境因子一","environmentFactorValueList" :[{"environmentFactorValue": "10","sampleList": [{"sampleId" : "1234","sampleAlias": "别名001"},{"sampleId" : "123456","sampleAlias": "别名003"}]},{"environmentFactorValue": "15","sampleList": [{"sampleId" : "1234567","sampleAlias": "别名004"},{"sampleId" : "12345","sampleAlias": "别名002"}]}]},{"environmentFactorName": "环境因子二","environmentFactorValueList" :[{"environmentFactorValue": "8","sampleList": [{"sampleId" : "1234","sampleAlias": "别名001"},{"sampleId" : "12345","sampleAlias": "别名002"},{"sampleId" : "123456","sampleAlias": "别名003"},{"sampleId" : "1234567","sampleAlias": "别名004"}]}]},{"environmentFactorName": "环境因子三","environmentFactorValueList" :[{"environmentFactorValue": "9","sampleList": [{"sampleId" : "1234","sampleAlias": "别名001"}]},{"environmentFactorValue": "12","sampleList": [{"sampleId" : "12345","sampleAlias": "别名002"},{"sampleId" : "123456","sampleAlias": "别名003"},{"sampleId" : "1234567","sampleAlias": "别名004"}]}]}]}',
@@ -109,7 +108,7 @@ class ProcessParameter extends Component {
   // 是否提交
   // setSubmit = () => {
   //   this.setState({ submitStatus: true });
-  // }
+  // };
 
   // 判断请求类型
   determineTheRequestType = () => {
@@ -119,16 +118,23 @@ class ProcessParameter extends Component {
       message.success('add');
       this.getProcessParam(processModelId); // 查询流程参数
     }
+    // 创建项目 未保存时修改参数值
+    if (requestType === 'update') {
+      message.success('update');
+      this.getProcessParam(processModelId); // 查询流程参数
+    }
+
     // 流程参数 修改参数值
     if (requestType === 'edit') {
       message.success('edit');
       this.getProcessParam(processModelId); // 查询流程参数
       this.getProcessParamValue(processId); // 查询流程参数值
     }
-    // 创建项目 未保存时修改参数值
-    if (requestType === 'update') {
-      message.success('update');
+    // 查看参数
+    if (requestType === 'view') {
+      message.success('view');
       this.getProcessParam(processModelId); // 查询流程参数
+      this.getProcessParamValue(processId); // 查询流程参数值
     }
     return false;
   };
@@ -235,8 +241,7 @@ class ProcessParameter extends Component {
       }
 
       sessionStorage.setItem('processForParams', JSON.stringify(list));
-      console.log(sessionStorage);
-      // return router.push('/project/project-manage/add/addflowpath/');
+      return router.push('/project/project-manage/add/addflowpath/');
     }
 
     // 修改
@@ -487,9 +492,13 @@ class ProcessParameter extends Component {
   goBackLink = () => {
     const { requestType, projectId } = this.state;
     let url;
+    console.log(requestType);
+    console.log(projectId);
     if (requestType === 'add' || requestType === 'update') {
-      if (projectId === '') url = `/project/project-manage/add/addflowpath/123`;
-      if (projectId !== '') url = `/project/project-manage/add/addflowpath/edit/${projectId}`;
+      if (projectId === '' || projectId === undefined) {
+        url = `/project/project-manage/add/addflowpath`;
+      }
+      // if (projectId !== '') url = `/project/project-manage/add/addflowpath/add/${projectId}`;
       return router.push(url);
     }
     if (projectId === '') url = `/project/project-manage`;
@@ -500,9 +509,10 @@ class ProcessParameter extends Component {
   render() {
     const {
       paramList,
-      // sampleList, paramData, submitStatus
+      // sampleList, paramData, submitStatus, requestType
     } = this.state;
     const data = paramList;
+    // console.log(requestType);
 
     return (
       <>
@@ -535,6 +545,7 @@ class ProcessParameter extends Component {
               sampleList={sampleList}
               paramList={paramData}
               submitStatus={submitStatus}
+              disabled={requestType === 'view'}
             /> */}
 
             <Footer className={style.footer}>

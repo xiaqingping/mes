@@ -17,40 +17,32 @@ class ProcessList extends Component {
 
   tableFormRef = React.createRef();
 
-  state = {
-    // 表格
-    list: [], // 表格数据
-    loading: false, // 加载状态
-    editIndex: -1, // 当前编辑行icon
-    visibleModel: false, // 是否显示编辑模态框
-    processList: [], // 选中编辑行数据
+  constructor(props) {
+    super(props);
+    const { data } = this.props;
+    console.log(data);
+    this.state = {
+      // 表格
+      list: data.processList, // 表格数据
+      loading: false, // 加载状态
+      editIndex: -1, // 当前编辑行icon
+      visibleModel: false, // 是否显示编辑模态框
+      processList: [], // 选中编辑行数据
 
-    // 任务列表抽屉
-    visibleDrawer: false, // 是否显示抽屉
-    detailList: [], // 项目信息
-    taskList: [], // 任务列表信息
-    test: false,
-  };
+      // 任务列表抽屉
+      visibleDrawer: false, // 是否显示抽屉
+      detailList: [], // 项目信息
+      taskList: [], // 任务列表信息
+      test: false,
+    };
+    // console.log(this.state);
+  }
 
   // 组件挂载时
   componentDidMount() {
-    const { projectId } = this.props;
-    this.getTableData(projectId);
+    // const { data } = this.props;
+    // this.getTableData(data);
   }
-
-  /**
-   * 获取表格数据
-   * projectId 项目ID
-   */
-  getTableData = projectId => {
-    this.setState({ loading: true });
-    api.getProjectProcess(projectId).then(res => {
-      this.setState({
-        list: res.processList,
-        loading: false,
-      });
-    });
-  };
 
   // 查看任务列表及执行记录
   searchTaskList = row => {
@@ -70,9 +62,16 @@ class ProcessList extends Component {
    */
   searchProcessParam = processesData => {
     const { projectId } = this.props;
-    const type = 'edit';
     const { processModelId } = processesData;
     const processId = processesData.id;
+
+    let type;
+    if (processesData.status === 2) {
+      type = 'edit';
+    } else {
+      type = 'view';
+    }
+
     router.push(
       // eslint-disable-next-line max-len
       `/project/project-manage/process-parameter/${type}/${processModelId}/${projectId}/${processId}`,

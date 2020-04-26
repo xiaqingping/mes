@@ -36,7 +36,7 @@ module.exports = {
         },
         {
           name: 'addflowpath',
-          path: '/project/project-manage/add/addflowpath/:type/:projectId?',
+          path: '/project/project-manage/add/addflowpath/:type?/:projectId?',
           component: './project/project-manage/project-manage-edit/addflowpath',
         },
         {
