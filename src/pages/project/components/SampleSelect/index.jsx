@@ -319,7 +319,7 @@ class SampleSelect extends React.Component {
   saveData = (row, index, e) => {
     const { tableData } = this.state;
     const list = [...tableData];
-    list[index].alia = e.target.value;
+    list[index].sampleAlias = e.target.value;
     this.setState({
       tableData: list,
     });

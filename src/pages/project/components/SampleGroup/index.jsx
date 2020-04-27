@@ -386,7 +386,9 @@ class SampleGroup extends React.Component {
             content={
               <SketchPicker
                 color={row[color1]}
-                onChangeComplete={color => this.handleColorChange(color, value, row, index)}
+                onChangeComplete={color =>
+                  this.handleColorChange(color, value, row, index, col, color1)
+                }
               />
             }
             trigger="click"
@@ -483,7 +485,7 @@ class SampleGroup extends React.Component {
     }
   };
 
-  handleColorChange = (color, value, row, index) => {
+  handleColorChange = (color, value, row, index, col, color1) => {
     // ---------------------首先判断选择的颜色在model里是否有重复---------
     const { colorStore } = this.props.project;
     const colors = [...colorStore];
@@ -505,9 +507,9 @@ class SampleGroup extends React.Component {
     const { groupSchemeData } = this.state;
     const groupData = [...groupSchemeData];
     groupData[index] = row;
-    this.setState({
-      groupSchemeData: groupData,
-    });
+
+    // 修改之后需要将当前列同组的颜色改成一样的
+    this.setOtherSame(row, value, value, groupData, col, index, color1);
   };
 
   // 添加列
@@ -742,7 +744,10 @@ class SampleGroup extends React.Component {
       datas.forEach(item => {
         group.push(item[`header_${i}`]);
       });
-      const validTrue1 = group.includes('当前样品') && group.includes(!'');
+      const hasOtherValue = group.some(item => {
+        return item && item !== '当前样品';
+      });
+      const validTrue1 = group.includes('当前样品') && hasOtherValue;
       const validTrue2 = group.every(item => item === '');
       const validFalse = validTrue1 || validTrue2;
       if (validFalse) {
@@ -869,24 +874,15 @@ class SampleGroup extends React.Component {
     const renderColumns = this.renderColumns(cols);
     cols = [...renderColumns, this.lastColumn];
     const cols1 = JSON.parse(JSON.stringify(cols));
-    const cols2 = [...cols];
     this.setState(
       {
+        groupSchemeData: dataFromUpload,
         columns: cols1,
       },
       () => {
-        this.setState(
-          {
-            groupSchemeData: dataFromUpload,
-          },
-          () => {
-            this.setState({
-              columns: cols2,
-              // 设置颜色有延迟, 所以加一步
-              // groupSchemeData: dataFromUpload,
-            });
-          },
-        );
+        this.setState({
+          columns: cols,
+        });
       },
     );
   };
@@ -902,6 +898,7 @@ class SampleGroup extends React.Component {
       tableWidth += col.width;
       return true;
     });
+
     return (
       <div>
         {!disabled && (
@@ -922,11 +919,6 @@ class SampleGroup extends React.Component {
           scroll={{ x: tableWidth }}
           loading={loading}
         />
-
-        {/* <Button onClick={this.verifyData} type="primary">
-          提交
-        </Button> */}
-
         {visible && (
           <GroupUpload
             closeUpload={this.handleCloseUpload}
