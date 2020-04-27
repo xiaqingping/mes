@@ -359,15 +359,16 @@ class ProcessModel extends Component {
    * @param {string} value 传入的id对象
    */
   handleUpgrade = value => {
-    api.getProcessDetail(value.id).then(res => {
-      this.props.dispatch({
-        type: 'processModel/setProcessDetail',
-        payload: {
-          ...res,
-        },
-      });
-      router.push(`/project/process-model/up/${value.id}-up`);
-    });
+    // api.getProcessDetail(value.id).then(res => {
+    //   this.props.dispatch({
+    //     type: 'processModel/setValue',
+    //     payload: {
+    //       ...res,
+    //     },
+    //     key: 'processDetail',
+    //   });
+    router.push(`/project/process-model/up/${value.id}-up`);
+    // });
   };
 
   /**
