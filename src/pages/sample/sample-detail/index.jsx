@@ -1,4 +1,5 @@
-// 详情二级抽屉
+/* eslint-disable max-len */
+/** 详情查看 */
 import React, { Component } from 'react';
 import { Drawer, Spin, Empty, Table } from 'antd';
 import { connect } from 'dva';
@@ -12,6 +13,7 @@ class SampleDetail extends Component {
     detailValue: [],
   };
 
+  /** 搜索详情 */
   componentDidMount() {
     const { detailValue } = this.props;
     console.log(detailValue);
@@ -69,9 +71,9 @@ class SampleDetail extends Component {
               <div
                 style={{ margin: '15px 0' }}
               >{`${detailValue.sampleSequenceCount} (${detailValue.sampleLengthTotal}bp)`}</div>
-              <div
-                style={{ marginBottom: '50px' }}
-              >{`${detailValue.sampleLengthMin}-${detailValue.sampleLengthMax} (${detailValue.sampleLengthAve})`}</div>
+              <div style={{ marginBottom: '50px' }}>
+                {`${detailValue.sampleLengthMin}-${detailValue.sampleLengthMax} (${detailValue.sampleLengthAve})`}
+              </div>
               <Table
                 rowKey="id"
                 dataSource={detailValue.sampleProperties}
