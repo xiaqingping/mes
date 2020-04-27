@@ -2,7 +2,8 @@ import React from 'react';
 import { connect } from 'dva';
 import { PageLoading } from '@ant-design/pro-layout';
 import { Redirect } from 'umi';
-import { basic } from '@/api';
+// import { basic } from '@/api';
+import Axios from 'axios';
 
 const mouses = {
   x: undefined,
@@ -69,7 +70,13 @@ class SecurityLayout extends React.Component {
   getNotice = e => {
     mouses.active(e, () => {
       // TODO: 这里的接口换为消息通知接口
-      basic.getPlants();
+      let url = '';
+      if (BASE_API === 'dev') {
+        url = 'https://devapi.sangon.com:30443/sysinfo';
+      } else {
+        url = `https://${BASE_API}.sangon.com/sysinfo`;
+      }
+      Axios.get(url);
     });
   };
 
