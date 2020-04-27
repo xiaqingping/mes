@@ -18,7 +18,7 @@ class AvatarDropdown extends React.Component {
           type: 'login/logout',
         });
       }
-
+      localStorage.clear();
       return;
     }
 
