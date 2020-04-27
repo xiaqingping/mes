@@ -157,7 +157,7 @@ class ProcessModel extends Component {
     return (
       <>
         <Col xxl={6} xl={8} lg={languageCode === 'EN' ? 12 : 12}>
-          <FormItem label="样品" name="name">
+          <FormItem label="样品" name="name" style={{ marginTop: '8px' }}>
             <AutoComplete
               onSearch={this.inputValue}
               spellCheck="false"
@@ -171,7 +171,7 @@ class ProcessModel extends Component {
             </AutoComplete>
           </FormItem>
         </Col>
-        <Col span={16} style={{ textAlign: 'right' }}>
+        <Col span={16} style={{ textAlign: 'right', marginTop: '8px' }}>
           <Button type="primary" htmlType="submit">
             查询
           </Button>
@@ -286,16 +286,6 @@ class ProcessModel extends Component {
       },
     ];
 
-    // columns = columns.map(col => {
-    //   // eslint-disable-next-line no-param-reassign
-    //   if (!col.width) col.width = 100;
-    //   tableWidth += col.width;
-    //   if (!col.editable) {
-    //     return col;
-    //   }
-    //   return true;
-    // });
-
     return (
       <PageHeaderWrapper>
         <div className="tableList classSampleManage">
@@ -308,6 +298,8 @@ class ProcessModel extends Component {
               advancedForm={this.advancedForm}
               noButton
             />
+          </Card>
+          <Card bordered={false} style={{ marginTop: '24px' }}>
             <div className="tableListOperator">
               <Button
                 type="primary"

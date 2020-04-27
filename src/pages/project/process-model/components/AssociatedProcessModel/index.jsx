@@ -1,6 +1,6 @@
 /** 选择任务模型 */
 import React from 'react';
-import { Modal, Table, Avatar, Form, Col, Tag, AutoComplete, Spin } from 'antd';
+import { Modal, Table, Avatar, Form, Col, Tag, AutoComplete, Spin, Button } from 'antd';
 import TableSearchForm from '@/components/TableSearchForm';
 import { connect } from 'dva';
 import './index.less';
@@ -147,15 +147,29 @@ class AssociatedProcessModel extends React.Component {
     const { nameCodeVal } = this.state;
     return (
       <>
-        <Col lg={10}>
+        <Col xxl={12}>
           <FormItem label="名称" name="code">
             <AutoComplete
               onSearch={this.inputValue}
               options={nameCodeVal.map(this.renderOption)}
+              style={{ width: '252px' }}
               // placeholder={formatMessage({ id: 'bp.inputHere' })}
               // optionLabelProp="text"
             />
           </FormItem>
+        </Col>
+        <Col xxl={11} style={{ textAlign: 'right' }}>
+          <Button type="primary" htmlType="submit">
+            查询
+          </Button>
+          <Button
+            style={{ marginLeft: 8 }}
+            onClick={() => {
+              this.tableSearchFormRef.current.resetFields();
+            }}
+          >
+            重置
+          </Button>
         </Col>
       </>
     );
@@ -209,15 +223,7 @@ class AssociatedProcessModel extends React.Component {
         title: '描述',
         width: 280,
         dataIndex: 'describe',
-        render: value => (
-          <div
-            // className="addEllipsis"
-            title={value}
-            style={{ width: '250px', height: '50px', wordWrap: 'break-word' }}
-          >
-            {cutString(value, 65)}
-          </div>
-        ),
+        render: value => <span title={value}>{cutString(value, 85)}</span>,
       },
       {
         title: '版本',
@@ -250,17 +256,15 @@ class AssociatedProcessModel extends React.Component {
         footer={null}
         className="classAssociatedProcessModel"
       >
-        <div
-          className="tableList tableListTableSearchForm buttonStyle table-style-set-little"
-          style={{ marginLeft: '8px' }}
-        >
+        <div className="tableList tableListTableSearchForm buttonStyle table-style-set-little">
           <TableSearchForm
             ref={this.tableSearchFormRef}
             initialValues={this.initialValues}
             getTableData={this.getTableData}
             simpleForm={this.simpleForm}
+            noButton
           />
-          <div className="AssociatedProcessModel">
+          <div className="AssociatedProcessModel setTitleColor" style={{ marginTop: '10px' }}>
             <Spin spinning={loading}>
               <Table
                 columns={columns}

@@ -73,6 +73,8 @@ class SecurityLayout extends React.Component {
       let url = '';
       if (BASE_API === 'dev') {
         url = 'https://devapi.sangon.com:30443/sysinfo';
+      } else if (BASE_API === 'prod') {
+        url = 'https://api.sangon.com:30443/sysinfo';
       } else {
         url = `https://${BASE_API}.sangon.com/sysinfo`;
       }
