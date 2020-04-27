@@ -504,6 +504,7 @@ class TaskModel extends Component {
       },
       {
         title: '操作',
+        width: 100,
         render: (value, row) => {
           if (!sonIds.includes(row.id)) {
             return (
