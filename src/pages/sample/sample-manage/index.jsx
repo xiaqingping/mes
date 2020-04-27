@@ -157,7 +157,7 @@ class ProcessModel extends Component {
     return (
       <>
         <Col xxl={6} xl={8} lg={languageCode === 'EN' ? 12 : 12}>
-          <FormItem label="样品" name="name">
+          <FormItem label="样品" name="name" style={{ marginTop: '8px' }}>
             <AutoComplete
               onSearch={this.inputValue}
               spellCheck="false"
@@ -171,7 +171,7 @@ class ProcessModel extends Component {
             </AutoComplete>
           </FormItem>
         </Col>
-        <Col span={16} style={{ textAlign: 'right' }}>
+        <Col span={16} style={{ textAlign: 'right', marginTop: '8px' }}>
           <Button type="primary" htmlType="submit">
             查询
           </Button>
@@ -297,6 +297,7 @@ class ProcessModel extends Component {
               simpleForm={this.simpleForm}
               advancedForm={this.advancedForm}
               noButton
+              style={{ marginTop: '10px' }}
             />
           </Card>
           <Card bordered={false} style={{ marginTop: '24px' }}>
