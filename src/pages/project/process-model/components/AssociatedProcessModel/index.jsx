@@ -223,7 +223,11 @@ class AssociatedProcessModel extends React.Component {
         title: '描述',
         width: 280,
         dataIndex: 'describe',
-        render: value => <span title={value}>{cutString(value, 85)}</span>,
+        render: value => (
+          <span title={value} style={{ display: 'inline-block', width: '300px' }}>
+            {cutString(value, 80)}
+          </span>
+        ),
       },
       {
         title: '版本',

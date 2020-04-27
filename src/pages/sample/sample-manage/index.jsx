@@ -1,4 +1,4 @@
-// 流程模型
+/** 样品table页面 */
 import React, { Component } from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import { Button, Card, Form, Col, AutoComplete, Select } from 'antd';
@@ -14,7 +14,7 @@ import './index.less';
 
 const FormItem = Form.Item;
 const { Option } = Select;
-class ProcessModel extends Component {
+class SampleModel extends Component {
   tableSearchFormRef = React.createRef();
 
   // 顶部表单默认值
@@ -36,20 +36,28 @@ class ProcessModel extends Component {
       detailVisible: false,
     };
     // 异步验证做节流处理
-    this.callParter = _.debounce(this.callParter, 500);
+    this.callSample = _.debounce(this.callSample, 500);
   }
 
+  /** 加载table */
   componentDidMount() {
     this.getTableData(this.initialValues);
   }
 
-  callParter = value => {
+  /**
+   * 搜索样品
+   * @param {string} value 搜索的值
+   */
+  callSample = value => {
     api.getSampleCodeAndName(value).then(res => {
       this.setState({ nameCodeVal: res });
     });
   };
 
-  // 获取表格数据
+  /**
+   *  获取表格数据
+   *  @param {object} options 需要搜索的值(如page,rows)
+   */
   getTableData = (options = {}) => {
     this.setState({ loading: true });
     const formData = this.tableSearchFormRef.current.getFieldsValue();
@@ -86,14 +94,17 @@ class ProcessModel extends Component {
     });
   };
 
-  // 流程模型筛选值
+  /**
+   *  样品筛选值
+   *  @param {string} value input搜索的值
+   */
   inputValue = value => {
     const { nameCodeVal } = this.state;
     const arr = [];
     if (!value) {
       return false;
     }
-    this.callParter(value);
+    this.callSample(value);
     if (nameCodeVal.length === 0) {
       return false;
     }
@@ -113,7 +124,11 @@ class ProcessModel extends Component {
     return true;
   };
 
-  // 分页
+  /**
+   *  分页
+   *  @param {object} pagination 分页的对象
+   *  @param {object} filters 检索的对象
+   */
   handleStandardTableChange = (pagination, filters) => {
     const { filtersData } = this.state;
     let filterData = {};
@@ -138,6 +153,7 @@ class ProcessModel extends Component {
     });
   };
 
+  /** 单行筛选条件 */
   simpleForm = () => {
     const { languageCode } = this.props;
     const { nameCodeVal } = this.state;
@@ -188,36 +204,47 @@ class ProcessModel extends Component {
     );
   };
 
-  // 打开上传序列文件弹框
+  /** 打开上传序列文件弹框 */
   handleModalVisible = () => {
     this.setState({
       visible: true,
     });
   };
 
-  handleClose = v => {
+  /**
+   * 子页面关闭
+   * @param {string} status 传入的状态
+   */
+  handleClose = status => {
     this.setState({
       visible: false,
     });
-    if (v) {
+    if (status) {
       this.getTableData();
     }
   };
 
+  /** 关闭详情 */
   handleDetailClose = () => {
     this.setState({
       detailVisible: false,
     });
   };
 
-  // 删除
+  /**
+   * 删除
+   * @param {string} value 传入的id对象
+   */
   handleDelete = value => {
     api.deleteProcess(value.id).then(() => {
       this.getTableData();
     });
   };
 
-  // 查看详情
+  /**
+   * 查看详情
+   * @param {object} value 传入的详情数据
+   * */
   searchDetails = value => {
     this.setState({
       detailVisible: true,
@@ -234,7 +261,7 @@ class ProcessModel extends Component {
         width: 300,
         render: (value, row) => (
           <>
-            <div style={{ float: 'left', marginLeft: '10px' }}>
+            <div style={{ float: 'left' }}>
               <div>{value}</div>
               <div style={{ color: '#B9B9B9' }}>{row.sampleName}</div>
             </div>
@@ -247,7 +274,7 @@ class ProcessModel extends Component {
         width: 400,
         render: (value, row) => (
           <>
-            <div style={{ float: 'left', marginLeft: '10px' }}>
+            <div style={{ float: 'left' }}>
               <div>{value}</div>
               <div>{new Date(row.createDate).toLocaleDateString()}</div>
             </div>
@@ -262,12 +289,13 @@ class ProcessModel extends Component {
       {
         title: '序列',
         dataIndex: 'sampleSequenceCount',
-        width: 140,
+        width: 200,
         render: (value, row) => `${value} (${row.sampleLengthTotal}bp)`,
       },
       {
         title: '长度',
         dataIndex: 'sampleLengthMin',
+        width: 300,
         render: (value, row) => `${value}-${row.sampleLengthMax} (${row.sampleLengthAve})`,
       },
       {
@@ -304,7 +332,11 @@ class ProcessModel extends Component {
               <Button
                 type="primary"
                 onClick={() => this.handleModalVisible()}
-                style={{ marginLeft: '8px' }}
+                style={{
+                  margin: '5px 0 20px 8px',
+                  fontSize: '14px',
+                  color: '#ffffff',
+                }}
               >
                 <UploadOutlined />
                 上传序列文件
@@ -341,4 +373,4 @@ class ProcessModel extends Component {
 export default connect(({ global, sample }) => ({
   languageCode: global.languageCode,
   status: sample.status,
-}))(ProcessModel);
+}))(SampleModel);

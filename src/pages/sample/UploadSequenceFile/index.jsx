@@ -1,5 +1,5 @@
 /* eslint-disable react/no-string-refs */
-// 上传序列文件
+/** 上传序列文件 */
 import React from 'react';
 import { Modal, Button, Carousel, Table, List, Progress, message } from 'antd';
 import { PaperClipOutlined } from '@ant-design/icons';
@@ -29,7 +29,10 @@ class UploadSequenceFile extends React.Component {
     };
   }
 
-  // 图片的分组
+  /**
+   * 图片的分组
+   * @param {Array} arr 需要分组的数组
+   */
   expoleArr = arr => {
     const result = [];
     for (let i = 0, len = arr.length; i < len; i += 6) {
@@ -38,12 +41,15 @@ class UploadSequenceFile extends React.Component {
     return result;
   };
 
-  // 删除files文件
-  deleteFiles = v => {
+  /**
+   * 删除文件
+   * @param {object} obj 删除文件的对象
+   */
+  deleteFiles = obj => {
     const { filesNameList, tableList } = this.state;
     for (let i = tableList.length - 1; i >= 0; i--) {
       const result = tableList[i].sampleProperties.filter(
-        item => item.sourceSequenceFileId !== v.fileId,
+        item => item.sourceSequenceFileId !== obj.fileId,
       );
       if (result.length !== 0) {
         tableList[i].sampleProperties = result;
@@ -51,14 +57,17 @@ class UploadSequenceFile extends React.Component {
         console.log(tableList.splice(i, 1));
       }
     }
-    const newFiles = filesNameList.filter(item => item.id !== v.id);
+    const newFiles = filesNameList.filter(item => item.id !== obj.id);
     this.setState({
       filesNameList: newFiles,
       tableList: [...tableList],
     });
   };
 
-  // 上传文件
+  /**
+   * 上传文件
+   * @param {object} e 上传文件对象
+   */
   handleUpload = e => {
     const self = this;
     const file = e.target.files;
@@ -153,10 +162,12 @@ class UploadSequenceFile extends React.Component {
     return true;
   };
 
-  // 文件列表
+  /**
+   * 文件列表
+   * @param {object} item 具体的文件对象
+   */
   itemList = item => (
     <List.Item style={{ width: '160px', float: 'left', position: 'relative' }} key={item.id}>
-      {/* <span>{item.done ? 1 : 2}</span> */}
       <span>
         <PaperClipOutlined style={{ fontSize: '18px', float: 'left' }} />
         <span style={{ display: 'inline', marginLeft: '10px', fontSize: '14px' }} title={item.name}>
@@ -185,19 +196,22 @@ class UploadSequenceFile extends React.Component {
     </List.Item>
   );
 
-  // 上一页
+  /** 上一页 */
   handlePrev = () => {
     this.refs.img.prev();
   };
 
-  // 下一页
+  /** 下一页 */
   handleNext = () => {
     this.refs.img.next();
   };
 
-  // 判断table里面的原始文件数据前面的id
+  /**
+   * 判断table里面的原始文件数据前面的id
+   * @param {object} item 当前行的文件对象
+   * @param {Array} filesNameList 文件名称列表
+   */
   getFilesContent = (item, filesNameList) => {
-    // console.log(item, filesNameList);
     if (item.sequenceFileName) {
       if (filesNameList.filter(i => i.fileId === item.sourceSequenceFileId).length !== 0) {
         return filesNameList.filter(i => i.fileId === item.sourceSequenceFileId)[0].id;
@@ -206,7 +220,7 @@ class UploadSequenceFile extends React.Component {
     return '';
   };
 
-  // 提交
+  /** 提交 */
   handleOK = () => {
     const { tableList } = this.state;
     api.addSample(tableList).then(() => {
