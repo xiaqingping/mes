@@ -297,7 +297,6 @@ class ProcessModel extends Component {
               simpleForm={this.simpleForm}
               advancedForm={this.advancedForm}
               noButton
-              style={{ marginTop: '10px' }}
             />
           </Card>
           <Card bordered={false} style={{ marginTop: '24px' }}>
