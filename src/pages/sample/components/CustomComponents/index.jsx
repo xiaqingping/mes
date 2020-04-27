@@ -1,4 +1,4 @@
-// 定制组件
+/** 上传按钮的定制 */
 import React from 'react';
 import { InboxOutlined } from '@ant-design/icons';
 
