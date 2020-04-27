@@ -22,11 +22,6 @@
     "tsc": "tsc",
     "ui": "umi ui"
   },
-  "husky": {
-    "hooks": {
-      "pre-commit": "npm run lint-staged"
-    }
-  },
   "lint-staged": {
     "**/*.less": "stylelint --syntax less",
     "**/*.{js,jsx,ts,tsx}": "npm run lint-staged:js",
@@ -57,9 +52,9 @@
     "path-to-regexp": "^2.4.0",
     "prop-types": "^15.5.10",
     "qs": "^6.9.1",
-    "react": "^16.13.1",
+    "react": "^16.4.1",
     "react-color": "^2.18.0",
-    "react-dom": "^16.13.1",
+    "react-dom": "^16.4.1",
     "react-helmet": "^5.2.1",
     "react-infinite-scroller": "^1.2.4",
     "react-router": "^4.3.1",

@@ -35,14 +35,21 @@ class ProcessList extends Component {
       taskList: [], // 任务列表信息
       test: false,
     };
-    // console.log(this.state);
   }
 
   // 组件挂载时
-  componentDidMount() {
-    // const { data } = this.props;
-    // this.getTableData(data);
-  }
+  componentDidMount() {}
+
+  // 获取表格数据
+  getTableData = projectId => {
+    this.setState({ loading: true });
+    api.getProjectProcess(projectId).then(res => {
+      this.setState({
+        list: res.processList,
+        loading: false,
+      });
+    });
+  };
 
   // 查看任务列表及执行记录
   searchTaskList = row => {
@@ -78,34 +85,9 @@ class ProcessList extends Component {
     );
   };
 
-  // 流程进度开始
-  processStart = row => {
-    this.setState({ loading: true });
-    const { projectId } = this.props;
-    api
-      .startProcessesProcess(row.id)
-      .then(() => {
-        this.getTableData(projectId);
-      })
-      .catch(e => message.error(e.message));
-    this.setState({ loading: false });
-  };
-
-  // 流程进度暂停
-  processPause = row => {
-    this.setState({ loading: true });
-    const { projectId } = this.props;
-    api
-      .pauseProcessesProcess(row.id)
-      .then(() => {
-        this.getTableData(projectId);
-      })
-      .catch(e => message.error(e.message));
-    this.setState({ loading: false });
-  };
-
   // 删除
   handleDelete = row => {
+    this.setState({ loading: true });
     api.deleteProjectProcess(row.id).then(() => {
       this.getTableData(this.props.projectId);
     });
@@ -125,12 +107,11 @@ class ProcessList extends Component {
    * data 回传数据
    */
   getEditModelData = data => {
-    const { projectId } = this.props;
     api
       .saveProcessInfor(data)
       .then(() => {
         this.setState({ visibleModel: false });
-        this.getTableData(projectId);
+        this.getTableData(this.props.projectId);
       })
       .catch();
   };
