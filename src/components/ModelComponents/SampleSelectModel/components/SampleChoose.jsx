@@ -291,19 +291,14 @@ class SampleChoose extends React.Component {
       <>
         <Modal
           width={871}
-          bodyStyle={{ paddingTop: 10, height: 500, overflow: 'auto' }}
+          bodyStyle={{ paddingTop: 10, height: 400, overflow: 'auto' }}
           title="选择样品"
           visible
           // onOk={() => this.props.handleOk(tableData)}
           onCancel={this.props.handleCancel}
           footer={
             !disabled && [
-              <Button
-                key="submit"
-                type="primary"
-                onClick={this.handleOk}
-                // onClick={() => this.props.handleOk(tableData)}
-              >
+              <Button key="submit" type="primary" onClick={this.handleOk}>
                 确认
               </Button>,
             ]
@@ -324,6 +319,4 @@ class SampleChoose extends React.Component {
   }
 }
 
-export default connect(({ project }) => ({
-  project,
-}))(SampleChoose);
+export default SampleChoose;
