@@ -15,45 +15,78 @@ class InputModel extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      data: props.data,
+      paramList: props.paramList,
+      inputValue: props.paramList.paramValue || '',
     };
   }
 
-  // componentDidUpdate(props) {
-  //   if (props.sbm !== this.props.sbm) {
-  //     this.props.getData('testData', '1');
-  //   }
-  // }
+  // 监听提交状态
+  componentDidUpdate(props) {
+    if (props.submitStatus !== this.props.submitStatus) {
+      const data = this.formatSubmitData();
+      this.props.getData(data, 'input');
+    }
+  }
 
-  // 判断是否可为空
+  // 提交数据格式化
+  formatSubmitData = () => {
+    const error = this.verifyData();
+    if (error) return false;
+    const { paramList, inputValue } = this.state;
+    const data = {
+      paramKey: paramList.paramKey,
+      paramValue: inputValue,
+      taskModelId: paramList.taskModelId,
+    };
+    return data;
+  };
+
+  // 获取数据
   onChange = e => {
-    const { data } = this.state;
+    const { paramKey, paramValue, defaultValue } = this.state.paramList;
+    let error;
     if (e.target.value === '') {
-      if (data.isrequired === 'true') {
-        message.warning(`${data.paramName}参数值不能为空`);
-        const { paramKey } = data;
-        if (data.defaultValue === undefined) data.defaultValue = '';
-        e.target.setValue({ [paramKey]: data.paramValue || data.defaultValue });
+      error = this.verifyData();
+      if (error) {
+        if (defaultValue === undefined || paramValue === undefined) return false;
+        e.target.setValue({ [paramKey]: paramValue || defaultValue });
       }
     }
+    if (!error) this.setState({ inputValue: e.target.value });
+    return false;
+  };
+
+  // 验证数据
+  verifyData = () => {
+    const { paramList, inputValue } = this.state;
+    let error = false;
+    if (paramList.isrequired === 'true') {
+      if (inputValue === '' || inputValue === undefined) {
+        message.warning(`${paramList.paramName}`);
+        error = true;
+      }
+    }
+    return error;
   };
 
   render() {
-    const { data } = this.state;
+    const { paramList, inputValue } = this.state;
+    const data = paramList;
 
     return (
       <Form.Item
         label={data.paramName}
         name={data.paramKey}
         rules={[
-          { required: !!data.isRequired, pattern: data.validRules || '', message: data.validDesc },
+          // { required: data.isRequired, pattern: data.validRules || '', message: data.validDesc },
+          { required: data.isRequired, message: data.validDesc },
         ]}
       >
         <Input
           placeholder={data.placeholder}
-          defaultValue={data.paramValue ? data.paramValue : data.defaultValue}
+          disabled={this.props.disabled}
+          defaultValue={inputValue || data.defaultValue}
           onChange={event => this.onChange(event)}
-          // ref={input => setInput(input)}
         />
       </Form.Item>
     );
