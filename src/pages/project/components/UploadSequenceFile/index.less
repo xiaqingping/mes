@@ -1,35 +1,54 @@
 :global {
+  .setTitleColor {
+    .ant-table-container {
+      thead {
+        .ant-table-cell {
+          padding-top: 10px;
+          padding-bottom: 10px;
+          color: rgba(0, 0, 0, 0.65) !important;
+        }
+      }
+
+    }
+  }
+
   .ant-carousel .slick-slide {
-    text-align: center;
     height: 160px;
-    line-height: 160px;
     overflow: hidden;
+    line-height: 160px;
+    text-align: center;
   }
 
   .ant-carousel .slick-slide h3 {
     color: #fff;
   }
+
   .upload-page {
     .ant-modal-body {
       padding-top: 10px;
     }
+
     .ant-list-empty-text {
       padding: 0;
     }
+
     .ant-list-item {
       margin-right: 30px;
       border: none;
     }
-    .ant-upload-list-text > div {
+
+    .ant-upload-list-text>div {
       float: left;
       width: 185px;
       height: 45px;
     }
+
     .ant-upload-text-icon {
       .anticon-paper-clip {
         left: 10px;
       }
     }
+
     .ant-progress-bg {
       height: 3px !important;
     }
@@ -37,13 +56,16 @@
     .ant-list-split {
       vertical-align: top;
     }
+
     // 轮播图下方按钮
     .slick-dots-bottom {
+
       .slick-active,
       button {
         background: #aaaaaa !important;
         // color: black !important;
       }
+
       li {
         background-color: #d7d7d7;
       }
