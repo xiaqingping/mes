@@ -616,8 +616,7 @@ class ProcessModel extends Component {
   }
 }
 
-export default connect(({ global, project, processModel }) => ({
+export default connect(({ global, project }) => ({
   languageCode: global.languageCode,
   status: project.status,
-  processModel,
 }))(ProcessModel);
