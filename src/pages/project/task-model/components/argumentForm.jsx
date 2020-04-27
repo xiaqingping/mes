@@ -23,10 +23,10 @@ class ArgumentForm extends React.Component {
       ? JSON.parse(editOriginData.paramPropertiesStr)
       : editOriginData.paramPropertiesMap;
     if (otherProperties) {
-      if (otherProperties.isrequired === 'true') {
-        otherProperties.isrequired = true;
+      if (otherProperties.isRequired === 'true') {
+        otherProperties.isRequired = true;
       } else {
-        otherProperties.isrequired = false;
+        otherProperties.isRequired = false;
       }
     }
 
@@ -52,7 +52,7 @@ class ArgumentForm extends React.Component {
     delete data.paramName;
     delete data.paramKey;
     argumentValues.type = this.props.type;
-    data.isrequired = data.isrequired ? 'true' : 'false';
+    data.isRequired = data.isRequired ? 'true' : 'false';
     argumentValues.paramPropertiesStr = JSON.stringify(data);
     argumentValues.paramProperties = [];
     argumentValues.myId = this.props.editOriginData.myId
@@ -70,7 +70,7 @@ class ArgumentForm extends React.Component {
   render() {
     const formItemLayout = null;
     const { loading, viewForm } = this.state;
-    viewForm.isrequired = viewForm.isrequired ? '是' : '否';
+    viewForm.isRequired = viewForm.isRequired ? '是' : '否';
     const { fromView, type } = this.props;
 
     return loading ? (

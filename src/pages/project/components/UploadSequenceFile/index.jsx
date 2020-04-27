@@ -206,6 +206,7 @@ class UploadSequenceFile extends React.Component {
         {
           title: tableHead[key],
           dataIndex: key,
+          key,
         },
       ];
     });

@@ -38,8 +38,8 @@ class BaseFormItems extends React.Component {
         </Form.Item>
         <Row gutter={16}>
           <Col span={12}>
-            <Form.Item label="是否必填：" name="isrequired" valuePropName="checked">
-              {fromView ? viewForm.isrequired : <Switch defaultChecked />}
+            <Form.Item label="是否必填：" name="isRequired" valuePropName="checked">
+              {fromView ? viewForm.isRequired : <Switch defaultChecked />}
             </Form.Item>
           </Col>
         </Row>
