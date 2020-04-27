@@ -60,7 +60,6 @@ class CheckboxModel extends React.Component {
           viewData.push({ [key]: viewForm[key] });
         }
       });
-      console.log(JSON.stringify(viewData));
       viewData = this.sortListData(viewData);
       return viewData;
     }
