@@ -44,11 +44,9 @@ class numericalInput extends React.Component {
               {fromView ? viewForm.isRequired : <Switch defaultChecked />}
             </Form.Item>
           </Col>
-          <Col span={12}>
-            <Form.Item label="提示文字：" name="placeholder">
-              {fromView ? viewForm.placeholder : <Input placeholder="请输入 " />}
-            </Form.Item>
-          </Col>
+          <Form.Item label="提示文字：" name="placeholder">
+            {fromView ? viewForm.placeholder : <Input placeholder="请输入 " />}
+          </Form.Item>
         </Row>
         <Row gutter={16}>
           <Col span={10}>
@@ -56,7 +54,7 @@ class numericalInput extends React.Component {
               {fromView ? viewForm.defaultValue : <Input placeholder="请输入 " />}
             </Form.Item>
           </Col>
-          <Form.Item label="输入区间" name="interval">
+          <Form.Item label="输入区间" name="interval" style={{ marginLeft: '30px' }}>
             {fromView ? (
               viewForm.interval
             ) : (
@@ -71,6 +69,7 @@ class numericalInput extends React.Component {
                     borderLeft: 0,
                     borderRight: 0,
                     pointerEvents: 'none',
+                    backgroundColor: '#ffffff',
                   }}
                   placeholder="~"
                   disabled
@@ -79,8 +78,9 @@ class numericalInput extends React.Component {
                   <Input
                     className="site-input-right"
                     style={{
-                      width: 80,
+                      width: 70,
                       textAlign: 'center',
+                      borderLeft: 0,
                     }}
                     placeholder="最大值"
                   />

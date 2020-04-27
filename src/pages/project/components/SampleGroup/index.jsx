@@ -341,7 +341,7 @@ class SampleGroup extends React.Component {
       const newCol = {
         id: max + 1,
         title: item[titleName],
-        width: 100,
+        width: 150,
         dataIndex: `header_${max + 1}`,
         key: `header_${max + 1}`,
         render: (value, row, index) => {
@@ -419,12 +419,21 @@ class SampleGroup extends React.Component {
         item.title = () => (
           <div className="project_manage_UI_sample_group_title">
             <input
+              style={{ fontWeight: 'bolder', width: '100%' }}
               defaultValue={title}
               onBlur={e => this.handleTitleBlur(e, item, index)}
               disabled={this.state.disabled}
             />
 
-            {!disabled && <CloseOutlined onClick={() => this.removeColumn(item)} />}
+            {!disabled && (
+              <span
+                className="sample_group_table_title_close"
+                onClick={() => this.removeColumn(item)}
+                // style={{ position: 'absolute', right: 0, top: 0 }}
+              >
+                ×
+              </span>
+            )}
           </div>
         );
       }
@@ -514,24 +523,32 @@ class SampleGroup extends React.Component {
 
   // 添加列
   handleAdd = () => {
-    const { columns, groupSchemeData } = this.state;
+    const { columns, groupSchemeData, disabled } = this.state;
     let cols = columns.slice(0, columns.length - 1);
     const ids = cols.map(item => item.id);
     const max = Math.max.apply(null, ids);
     const newCol = {
       id: max + 1,
+      width: 150,
       title: () => (
         <div className="project_manage_UI_sample_group_title">
           <input
+            style={{ fontWeight: 'bolder', width: '100%' }}
             defaultValue={`分组方案_${max + 1}`}
             onBlur={e => this.handleTitleBlur(e, null, null, max + 1)}
           />
-
-          <CloseOutlined onClick={() => this.removeColumn(null, max + 1)} />
+          {!disabled && (
+            <span
+              className="sample_group_table_title_close"
+              onClick={() => this.removeColumn(null, max + 1)}
+            >
+              ×
+            </span>
+          )}
         </div>
       ),
       dupTitle: `分组方案_${max + 1}`,
-      width: 100,
+
       dataIndex: `header_${max + 1}`,
       key: `header_${max + 1}`,
       render: (value, row, index) => {
@@ -845,7 +862,7 @@ class SampleGroup extends React.Component {
           id: idx + 2,
           title: head,
           dupTitle: head,
-          width: 100,
+          width: 150,
           dataIndex: `header_${idx + 1}`,
           key: `header_${idx + 1}`,
           render: (value, row, index) => {
@@ -890,17 +907,18 @@ class SampleGroup extends React.Component {
   render() {
     let tableWidth = 0;
     const { groupSchemeData, visible, columns, loading, disabled } = this.state;
+    console.log(columns);
     columns.map(col => {
       if (!col.width) {
         // eslint-disable-next-line
-        col.width = 100;
+        col.width = 150;
       }
       tableWidth += col.width;
       return true;
     });
 
     return (
-      <div>
+      <div className="project_manage_sample_scheme_table_wrap">
         {!disabled && (
           <div
             style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 10, marginBottom: 10 }}

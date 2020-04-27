@@ -1,14 +1,20 @@
 :global {
   .project_manage_UI_sample_group_title {
-    input[disabled] {
-      background-color: transparent;
+    position: relative;
+
+    .sample_group_table_title_close {
+      position: absolute;
+      top: -5px;
+      right: 8px;
+      display: none;
+      color: #9C9C9C;
+      font-weight: 400;
+      font-size: 25px;
+      cursor: pointer;
     }
 
-    .anticon-close {
-      position: absolute;
-      top: 24px;
-      left: 152px;
-      display: none;
+    input[disabled] {
+      background-color: transparent;
     }
 
     input {
@@ -37,7 +43,7 @@
   }
 
   .project_manage_UI_sample_group_title:hover {
-    .anticon-close {
+    .sample_group_table_title_close {
       display: inline-block;
     }
   }
@@ -84,5 +90,16 @@
     .ant-select-selector:focus {
       background-color: #fff !important;
     }
+  }
+
+  .project_manage_sample_scheme_table_wrap {
+    .ant-table-cell {
+      .anticon-plus-square {
+        color: #9C9C9C;
+        font-weight: 200 !important;
+        font-size: 21px !important;
+      }
+    }
+
   }
 }

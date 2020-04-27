@@ -143,7 +143,6 @@ class TaskModel extends Component {
       type: 'taskModel/getArgumentsList',
       payload: null,
     });
-    // this.onFinish
   }
 
   getTableData = id => {
@@ -306,6 +305,7 @@ class TaskModel extends Component {
           });
         });
     }
+    return true;
   };
 
   onFinishFailed = () => false;

@@ -219,15 +219,6 @@ class BeforeTask extends React.Component {
         title: '描述',
         width: 280,
         dataIndex: 'describe',
-        // render: value => (
-        //   <div
-        //     // className="addEllipsis"
-        //     title={value}
-        //     style={{ width: '250px', height: '50px', wordWrap: 'break-word' }}
-        //   >
-        //     {cutString(value, 65)}
-        //   </div>
-        // ),
       },
       {
         title: '版本',
@@ -262,8 +253,8 @@ class BeforeTask extends React.Component {
         className="classBeforeTask"
       >
         <Spin spinning={loading}>
-          <div className="tableList buttonStyle">
-            <div style={{ paddingLeft: 10 }}>
+          <div className="tableList buttonStyle setTitleColor">
+            <div style={{ paddingLeft: 27 }}>
               <TableSearchForm
                 ref={this.tableSearchFormRef}
                 initialValues={this.initialValues}
