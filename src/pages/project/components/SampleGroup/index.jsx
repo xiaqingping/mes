@@ -1,11 +1,6 @@
 import React from 'react';
 import { Table, Button, Modal, AutoComplete, Popover, message } from 'antd';
-import {
-  UploadOutlined,
-  PlusSquareOutlined,
-  CloseOutlined,
-  ExclamationCircleOutlined,
-} from '@ant-design/icons';
+import { UploadOutlined, PlusSquareOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import { SketchPicker } from 'react-color';
 import { getrandomColor } from '@/utils/utils';
 import './index.less';
@@ -81,7 +76,7 @@ class SampleGroup extends React.Component {
       const { paramKey, taskModelId } = props;
       const sendData = {
         paramKey,
-        paramValue: JSON.stringify(list),
+        paramValue: list,
         taskModelId,
       };
       this.props.getData(sendData, 'groupScheme');
@@ -772,6 +767,7 @@ class SampleGroup extends React.Component {
       }
     }
     formattedData = this.formatSubmitData();
+    console.log(formattedData);
     formattedData = formattedData && JSON.stringify(formattedData);
     return formattedData;
   };
@@ -801,19 +797,23 @@ class SampleGroup extends React.Component {
             sampleAlias: item.sampleName,
           });
         } else {
-          tableHeard[i - 2].groupList.push({
-            groupName: item[`header_${i}`],
-            color: item[`color_${i}`],
-            sampleList: [],
-          });
-          tableHeard[i - 2].groupList.forEach(gro => {
-            if (gro.groupName === item[`header_${i}`]) {
-              gro.sampleList.push({
-                sampleId: item.metadataSampleId,
-                sampleAlias: item.sampleName,
-              });
-            }
-          });
+          const groNameList = tableHeard[i - 2].groupList.map(g => g.groupName);
+          if (!groNameList.includes(item[`header_${i}`])) {
+            tableHeard[i - 2].groupList.push({
+              groupName: item[`header_${i}`],
+              color: item[`color_${i}`],
+              sampleList: [],
+            });
+
+            tableHeard[i - 2].groupList.forEach(gro => {
+              if (gro.groupName === item[`header_${i}`]) {
+                gro.sampleList.push({
+                  sampleId: item.metadataSampleId,
+                  sampleAlias: item.sampleName,
+                });
+              }
+            });
+          }
         }
       });
     }
@@ -907,7 +907,6 @@ class SampleGroup extends React.Component {
   render() {
     let tableWidth = 0;
     const { groupSchemeData, visible, columns, loading, disabled } = this.state;
-    console.log(columns);
     columns.map(col => {
       if (!col.width) {
         // eslint-disable-next-line
@@ -916,7 +915,6 @@ class SampleGroup extends React.Component {
       tableWidth += col.width;
       return true;
     });
-
     return (
       <div className="project_manage_sample_scheme_table_wrap">
         {!disabled && (
