@@ -54,12 +54,13 @@ class CheckboxModel extends React.Component {
   getList = () => {
     const { fromView, viewForm } = this.props;
     if (fromView) {
-      const viewData = [];
+      let viewData = [];
       Object.keys(viewForm).forEach(key => {
         if (key.indexOf('select') !== -1) {
           viewData.push({ [key]: viewForm[key] });
         }
       });
+      viewData = this.sortListData(viewData);
       return viewData;
     }
     return true;
@@ -69,6 +70,7 @@ class CheckboxModel extends React.Component {
     const newData = JSON.parse(JSON.stringify(data));
     Object.keys(data).map(key => {
       newData[key] = JSON.parse(data[key]);
+      return true;
     });
     return newData;
   };
@@ -91,6 +93,28 @@ class CheckboxModel extends React.Component {
     this.setState({
       list: [...optionList, data],
     });
+  };
+
+  sortListData = data => {
+    const propertyArr = [];
+    const mapSelect = new Map();
+
+    data.forEach(item => {
+      Object.keys(item).forEach(key => {
+        propertyArr.push(key);
+        mapSelect.set(key, item);
+      });
+    });
+
+    propertyArr.sort();
+
+    const result = [];
+
+    propertyArr.forEach(p => {
+      result.push(mapSelect.get(p));
+    });
+
+    return result;
   };
 
   render() {
