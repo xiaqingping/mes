@@ -304,7 +304,11 @@ class ProcessModel extends Component {
               <Button
                 type="primary"
                 onClick={() => this.handleModalVisible()}
-                style={{ marginLeft: '8px' }}
+                style={{
+                  margin: '5px 0 20px 8px',
+                  fontSize: '14px',
+                  color: '#ffffff',
+                }}
               >
                 <UploadOutlined />
                 上传序列文件
