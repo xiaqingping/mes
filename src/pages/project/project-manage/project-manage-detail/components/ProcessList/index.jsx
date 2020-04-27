@@ -1,16 +1,18 @@
 // 流程列表
-import { Form, Table, Tag, Divider, message, Avatar } from 'antd';
+import { Form, Table, Tag, Divider, message, Avatar, Tooltip } from 'antd';
 import React, { Component } from 'react';
 import { connect } from 'dva';
-import { EditOutlined } from '@ant-design/icons';
+// import { EditOutlined } from '@ant-design/icons';
 import router from 'umi/router';
 import api from '@/pages/project/api/projectManageDetail';
 import disk from '@/pages/project/api/disk';
 import DefaultHeadPicture from '@/assets/imgs/defaultheadpicture.jpg';
 import parameterImg from '@/assets/imgs/canshu@1x.png';
+import edit from '@/assets/imgs/edit.png';
 import TaskList from '../TaskList';
 import { EditInforModel } from '../ModelUI';
 import ProgressMould from '../ProgressMould';
+import style from './index.less';
 
 class ProcessList extends Component {
   tableSearchFormRef = React.createRef();
@@ -20,7 +22,6 @@ class ProcessList extends Component {
   constructor(props) {
     super(props);
     const { data } = this.props;
-    console.log(data);
     this.state = {
       // 表格
       list: data.processList, // 表格数据
@@ -73,7 +74,7 @@ class ProcessList extends Component {
     const processId = processesData.id;
 
     let type;
-    if (processesData.status === 2) {
+    if (processesData.status === 1) {
       type = 'edit';
     } else {
       type = 'view';
@@ -143,35 +144,29 @@ class ProcessList extends Component {
       test,
     } = this.state;
 
-    // let tableWidth = 0;
+    let tableWidth = 0;
 
     let columns = [
       {
         title: '名称/描述',
         dataIndex: 'name',
         width: 600,
-        render: (value, row, index) => {
-          if (index === editIndex) {
-            return (
-              <>
-                <span>
-                  <a onClick={() => this.searchTaskList(row)}>
-                    {value} <br /> {row.describe}
-                  </a>
-                </span>
-                <EditOutlined
-                  onClick={() => this.editBasicInfor(row)}
-                  style={{ float: 'right', marginRight: 20, fontSize: 20 }}
-                />
-              </>
-            );
-          }
-          return (
-            <a onClick={() => this.searchTaskList(row)}>
-              {value} <br /> {row.describe}
-            </a>
-          );
-        },
+        render: (value, row, index) => (
+          <>
+            <span className={style.textEllipsis}>
+              <Tooltip placement="top" title={row.describe}>
+                <a onClick={() => this.searchTaskList(row)}>
+                  {value} <br /> {row.describe}
+                </a>
+              </Tooltip>
+            </span>
+            {index === editIndex && (
+              <span className={style.textEllipsisImg}>
+                <img src={edit} alt="" onClick={() => this.editBasicInfor(row)} />
+              </span>
+            )}
+          </>
+        ),
       },
       {
         title: '进度',
@@ -242,8 +237,8 @@ class ProcessList extends Component {
     ];
 
     columns = columns.map(col => {
-      // if (!col.width) col.width = 100;
-      // tableWidth += col.width;
+      if (!col.width) col.width = 100;
+      tableWidth += col.width;
       if (!col.editable) {
         return col;
       }
@@ -254,7 +249,7 @@ class ProcessList extends Component {
       <>
         <Form ref={this.tableFormRef}>
           <Table
-            // scroll={{ x: tableWidth, y: 400 }}
+            scroll={{ x: tableWidth, y: 400 }}
             rowKey="id"
             loading={loading}
             dataSource={list}
