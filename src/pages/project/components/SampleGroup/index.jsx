@@ -1,11 +1,6 @@
 import React from 'react';
 import { Table, Button, Modal, AutoComplete, Popover, message } from 'antd';
-import {
-  UploadOutlined,
-  PlusSquareOutlined,
-  CloseOutlined,
-  ExclamationCircleOutlined,
-} from '@ant-design/icons';
+import { UploadOutlined, PlusSquareOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import { SketchPicker } from 'react-color';
 import { getrandomColor } from '@/utils/utils';
 import './index.less';
@@ -81,7 +76,7 @@ class SampleGroup extends React.Component {
       const { paramKey, taskModelId } = props;
       const sendData = {
         paramKey,
-        paramValue: JSON.stringify(list),
+        paramValue: list,
         taskModelId,
       };
       this.props.getData(sendData, 'groupScheme');
@@ -772,6 +767,7 @@ class SampleGroup extends React.Component {
       }
     }
     formattedData = this.formatSubmitData();
+    console.log(formattedData);
     formattedData = formattedData && JSON.stringify(formattedData);
     return formattedData;
   };
@@ -785,7 +781,7 @@ class SampleGroup extends React.Component {
       if (index !== 0 && typeof item.id === 'number') {
         tableHeard = [
           ...tableHeard,
-          { groupSchemeName: item.dupTitle, sampleList: [], groupList: [] },
+          { groupSchemeName: item.dupTitle, sampleIdList: [], groupList: [] },
         ];
       }
     });
@@ -796,24 +792,39 @@ class SampleGroup extends React.Component {
       groupSchemeData.forEach(item => {
         if (item[`header_${i}`] === '') return;
         if (item[`header_${i}`] === '当前样品') {
-          tableHeard[i - 2].sampleList.push({
+          tableHeard[i - 2].sampleIdList.push({
             sampleId: item.metadataSampleId,
             sampleAlias: item.sampleName,
           });
         } else {
-          tableHeard[i - 2].groupList.push({
-            groupName: item[`header_${i}`],
-            color: item[`color_${i}`],
-            sampleList: [],
-          });
-          tableHeard[i - 2].groupList.forEach(gro => {
-            if (gro.groupName === item[`header_${i}`]) {
-              gro.sampleList.push({
-                sampleId: item.metadataSampleId,
-                sampleAlias: item.sampleName,
-              });
-            }
-          });
+          const groNameList = tableHeard[i - 2].groupList.map(g => g.groupName);
+          if (!groNameList.includes(item[`header_${i}`])) {
+            // 如果没有相同组名的话, 就push进groupList里,
+            tableHeard[i - 2].groupList.push({
+              groupName: item[`header_${i}`],
+              color: item[`color_${i}`],
+              sampleIdList: [],
+            });
+
+            tableHeard[i - 2].groupList.forEach(gro => {
+              if (gro.groupName === item[`header_${i}`]) {
+                gro.sampleIdList.push({
+                  sampleId: item.metadataSampleId,
+                  sampleAlias: item.sampleName,
+                });
+              }
+            });
+          } else {
+            // 如果是相同组名的话, 应该将sample的信息push到 sampleIdList 里面
+            tableHeard[i - 2].groupList.forEach(group => {
+              if (group.groupName === item[`header_${i}`]) {
+                group.sampleIdList.push({
+                  sampleId: item.metadataSampleId,
+                  sampleAlias: item.sampleName,
+                });
+              }
+            });
+          }
         }
       });
     }
@@ -907,7 +918,6 @@ class SampleGroup extends React.Component {
   render() {
     let tableWidth = 0;
     const { groupSchemeData, visible, columns, loading, disabled } = this.state;
-    console.log(columns);
     columns.map(col => {
       if (!col.width) {
         // eslint-disable-next-line
@@ -916,13 +926,18 @@ class SampleGroup extends React.Component {
       tableWidth += col.width;
       return true;
     });
-
     return (
       <div className="project_manage_sample_scheme_table_wrap">
         {!disabled && (
           <div
-            style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 10, marginBottom: 10 }}
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              marginTop: 10,
+              marginBottom: 10,
+            }}
           >
+            <div style={{ fontSize: 15, fontWeight: 'bold' }}>分组方案</div>
             <Button onClick={this.uploadGroup} type="primary">
               <UploadOutlined />
               上传

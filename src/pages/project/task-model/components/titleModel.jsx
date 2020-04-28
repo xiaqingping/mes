@@ -1,5 +1,5 @@
 import React from 'react';
-import { Avatar, Tag, Card, Spin, message } from 'antd';
+import { Avatar, Tag, Spin, message, Popover } from 'antd';
 import { DownOutlined, UpOutlined } from '@ant-design/icons';
 import { connect } from 'dva';
 import api from '@/pages/project/api/taskmodel';
@@ -131,6 +131,24 @@ class TitleModel extends React.Component {
     });
   };
 
+  popoverContent = (versionType, selectVersion, viewData) => {
+    console.log(versionType);
+    return versionType.map(item => (
+      <div>
+        <Tag
+          key={item}
+          color={item === (selectVersion || viewData.version) ? 'green' : ''}
+          style={{ cursor: 'pointer' }}
+          onClick={() => {
+            this.switchVersion(item);
+          }}
+        >
+          {item}
+        </Tag>
+      </div>
+    ));
+  };
+
   render() {
     const {
       viewData,
@@ -142,12 +160,12 @@ class TitleModel extends React.Component {
       toViewArgument,
       loading,
     } = this.state;
+
     return loading ? (
       <div style={{ textAlign: 'center' }}>
         <Spin />
       </div>
     ) : (
-      // style={{ borderBottom: '1px solid #f0f0f0' }}
       <div>
         <div
           style={{
@@ -174,37 +192,23 @@ class TitleModel extends React.Component {
 
           <div>
             <div style={{ position: 'relative', display: 'inline-block' }}>
-              <Tag
-                // color="green"
-                style={{ cursor: 'pointer' }}
-                onClick={() => {
-                  this.setState({ versionOpen: !versionOpen });
-                }}
+              <Popover
+                visible={versionOpen && (versionType || []).length > 1}
+                overlayClassName="task_model_view_version_tag"
+                placement="bottom"
+                content={
+                  (versionType || []).length > 1 &&
+                  this.popoverContent(versionType, selectVersion, viewData)
+                }
               >
-                {selectVersion || viewData.version}
-                {/* {selectVersion || processDetail.version} */}
-              </Tag>
-              {versionOpen && (versionType || []).length > 1 && (
-                <Card
-                  style={{ position: 'absolute', zIndex: '100', top: '28px' }}
-                  hoverable
-                  className="padding-none"
+                <Tag
+                  // color="green"
+                  style={{ cursor: 'pointer' }}
+                  onClick={() => this.setState({ versionOpen: true })}
                 >
-                  {(versionType || []).length > 1 &&
-                    versionType.map(item => (
-                      <Tag
-                        key={item}
-                        color={item === (selectVersion || viewData.version) ? 'green' : ''}
-                        style={{ cursor: 'pointer' }}
-                        onClick={() => {
-                          this.switchVersion(item);
-                        }}
-                      >
-                        {item}
-                      </Tag>
-                    ))}
-                </Card>
-              )}
+                  {selectVersion || viewData.version}
+                </Tag>
+              </Popover>
             </div>
           </div>
 

@@ -1,17 +1,17 @@
 import React from 'react';
-import { Table, Popover, Button, Popconfirm } from 'antd';
+import { Table, Popover, Button, Modal, Input, Popconfirm } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { SketchPicker } from 'react-color';
 import { getrandomColor } from '@/utils/utils';
 import { connect } from 'dva';
-// import api from './api/sample';
+import api from './api/sample';
 import SampleChoose from './components/SampleChoose';
 import './index.less';
 
 class SampleSelect extends React.Component {
   static getDerivedStateFromProps(nextProps) {
     return {
-      tableDatas: nextProps.sampleList || [],
+      tableDatas: nextProps.paramList.paramValue || [],
       disabled: nextProps.disabled,
     };
   }
@@ -78,18 +78,20 @@ class SampleSelect extends React.Component {
         title: '别名',
         dataIndex: 'sampleAlias',
         key: 'sampleAlias',
-        render: (text, record, index) => (
-          <div className="project_manage_sample_select_table_alia">
-            <input
-              disabled={this.state.disabled}
-              type="text"
-              defaultValue={text}
-              onBlur={e => {
-                this.saveData(record, index, e);
-              }}
-            />
-          </div>
-        ),
+        render: (text, record, index) => {
+          return (
+            <div className="project_manage_sample_select_table_alia">
+              <input
+                disabled={this.state.disabled}
+                type="text"
+                defaultValue={text}
+                onBlur={e => {
+                  this.saveData(record, index, e);
+                }}
+              />
+            </div>
+          );
+        },
       },
       {
         title: '序列',
@@ -210,6 +212,7 @@ class SampleSelect extends React.Component {
 
   setColorStore = colorStore => {
     const { dispatch } = this.props;
+    console.log(colorStore);
     dispatch({
       type: 'project/setColorStore',
       payload: colorStore,
@@ -219,14 +222,17 @@ class SampleSelect extends React.Component {
   handleDelete = row => {
     const { columns, tableData } = this.state;
     const list = [...tableData];
+    console.log(tableData);
     const columns1 = JSON.parse(JSON.stringify(columns));
     const columns2 = [...columns];
     const list1 = list.filter(item => item.id !== row.id);
+    console.log(list1);
     const colorStore = [];
     list1.forEach(item => {
       colorStore.push(item.color);
     });
     this.setColorStore(colorStore);
+    console.log(list1);
     // this.props.emitData(list1);
     this.setState(
       {
@@ -294,7 +300,7 @@ class SampleSelect extends React.Component {
     });
   };
 
-  handleOk = () => {
+  handleOk = data => {
     this.toggleVis(false);
   };
 
@@ -313,7 +319,7 @@ class SampleSelect extends React.Component {
   saveData = (row, index, e) => {
     const { tableData } = this.state;
     const list = [...tableData];
-    list[index].alia = e.target.value;
+    list[index].sampleAlias = e.target.value;
     this.setState({
       tableData: list,
     });
@@ -336,7 +342,7 @@ class SampleSelect extends React.Component {
         fromChoosedFile: true,
       },
       () => {
-        // console.log(this.state);
+        console.log(this.state);
       },
     );
     // 当点击时候传样品id以及已选择文件id;
@@ -387,13 +393,6 @@ class SampleSelect extends React.Component {
 
   render() {
     const { visible, sampleId, chooseFileIds, tableData, columns, disabled } = this.state;
-    // console.log(tableData);
-    // let tableList = [];
-    // if (tableDatas.length) {
-    //   tableList = tableDatas;
-    // } else {
-    //   tableList = tableData;
-    // }
 
     return (
       <>
