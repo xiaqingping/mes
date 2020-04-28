@@ -18,7 +18,7 @@ class ProjectEdit extends Component {
 
   constructor(props) {
     super(props);
-    const { projectData, labelList } = props.projectManage;
+    const { projectData, labels } = props.projectManage;
     console.log(projectData);
 
     this.state = {
@@ -29,7 +29,7 @@ class ProjectEdit extends Component {
       beginDate: '', // 开始时间
       endDate: '', // 结束时间
       projectData,
-      labelList,
+      labels,
     };
   }
 
@@ -57,7 +57,7 @@ class ProjectEdit extends Component {
         });
       }
       this.setState({
-        selectedlabels: data.labelList,
+        selectedlabels: data.labels,
         beginDate: data.beginDate,
         endDate: data.endDate,
       });
@@ -127,7 +127,7 @@ class ProjectEdit extends Component {
         bpName,
         endDate,
         beginDate,
-        labelList: selectedlabels,
+        labels: selectedlabels,
       };
     }
     if (requestType === 'editProject') {
@@ -135,7 +135,7 @@ class ProjectEdit extends Component {
         id: projectData.id,
         name: formData.name,
         describe: formData.describe,
-        labelList: selectedlabels,
+        labels: selectedlabels,
       };
     }
     return data;
@@ -198,7 +198,7 @@ class ProjectEdit extends Component {
   };
 
   render() {
-    const { requestType, selectedlabels, projectData, labelList } = this.state;
+    const { requestType, selectedlabels, projectData, labels } = this.state;
     return (
       <PageHeaderWrapper title={this.navContent(projectData)}>
         <Form ref={this.formRef} className="classPageHeaderWrapper">
@@ -259,8 +259,7 @@ class ProjectEdit extends Component {
             <div style={{ height: '250px' }}>
               <FormItem label="标签" name="label">
                 <div style={{ marginLeft: '40px', marginRight: '270px' }}>
-                  {/* <span style={{ marginRight: 8 }}>Categories:</span> */}
-                  {labelList.map(item => (
+                  {labels.map(item => (
                     <CheckableTag
                       key={item.id}
                       checked={selectedlabels.indexOf(item.id) > -1}
@@ -289,35 +288,22 @@ class ProjectEdit extends Component {
               position: 'fixed',
               bottom: '0',
               left: '0',
-              // lineHeight: '60px',
             }}
             className="classPageHeaderWrapperFooter"
           >
             <Button
               type="default"
-              // style={{ float: 'right', marginTop: '-16px', marginLeft: '20px' }}
               onClick={() => this.handleSave(true, 'requestType')}
             >
               保存
             </Button>
             <Button
               type="primary"
-              // style={{ float: 'right', marginTop: '-16px' }}
               onClick={() => this.handleAdd(true)}
             >
               添加流程
             </Button>
-            {/* {requestType === 'addProject' ? (
-              <Button
-                type="primary"
-                // style={{ float: 'right', marginTop: '-16px' }}
-                onClick={() => this.handleAdd(true)}
-              >
-                添加流程
-              </Button>
-            ) : (
-              ''
-            )} */}
+
           </Card>
         </Form>
         {/* 业务伙伴模态框 */}

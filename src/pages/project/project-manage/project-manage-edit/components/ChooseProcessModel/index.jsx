@@ -347,7 +347,7 @@ class ChooseProcessModel extends React.Component {
                             className="isView"
                           >
                             <Button
-                              style={{ border: '0', color: '#005bc3' }}
+                              style={{ border: '0', color: '#108ee9' }}
                               onClick={() => this.viewModal(item)}
                             >
                               查看

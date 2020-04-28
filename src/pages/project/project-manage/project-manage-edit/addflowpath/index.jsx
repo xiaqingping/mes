@@ -9,7 +9,7 @@ import api from '@/pages/project/api/projectManage';
 import disk from '@/pages/project/api/disk';
 import DefaultHeadPicture from '@/assets/imgs/defaultheadpicture.jpg';
 import ChooseProcessModel from '../components/ChooseProcessModel';
-// import ParamPic from '@/assets/imgs/canshu@1x.png';
+import '../index.less';
 
 class Test extends Component {
   constructor(props) {
@@ -216,17 +216,17 @@ class Test extends Component {
           paramList.forEach(e => {
             e.forEach(it => {
               if (item.id === it.processModelId) {
-                newItem.processesParamList = it.params;
+                newItem.processesParams = it.params;
               }
             })
           })
         } else {
-          newItem.processesParamList = paramList[0].params;
+          newItem.processesParams = paramList[0].params;
         }
         newList.push(newItem);
       });
 
-      projectInfor.processList = newList;
+      projectInfor.processes = newList;
       const data = projectInfor;
       api
         .addProjects(data)
@@ -260,19 +260,19 @@ class Test extends Component {
           paramList.forEach(e => {
             e.forEach(it => {
               if (item.id === it.processModelId) {
-                newItem.processesParamList = it.params;
+                newItem.processesParams = it.params;
               }
             })
           })
         } else {
-          newItem.processesParamList = paramList[0].params;
+          newItem.processesParams = paramList[0].params;
         }
         newList.push(newItem);
 
       });
-      const processList = newList;
+      const processes = newList;
       api
-        .addProjectsProcess({ projectId, processList })
+        .addProjectsProcess({ projectId, processes })
         .then(() => {
           this.setState({
             buttonLoading: false,
@@ -368,15 +368,17 @@ class Test extends Component {
         <Card bordered={false}>
           <div className="tableList" style={{ height: '400px', overflow: 'auto' }}>
             <Form ref={this.tableFormRef}>
-              <Table
-                rowClassName="editable-row"
-                rowKey="id"
-                loading={loading}
-                dataSource={list}
-                columns={columns}
-                pagination={false}
-                onSelectRow={this.handleSelectRows}
-              />
+              <div style={{ clear: 'both' }} className="setTitleColor">
+                <Table
+                  rowClassName="editable-row"
+                  rowKey="id"
+                  loading={loading}
+                  dataSource={list}
+                  columns={columns}
+                  pagination={false}
+                  onSelectRow={this.handleSelectRows}
+                />
+              </div>
             </Form>
           </div>
           <div
