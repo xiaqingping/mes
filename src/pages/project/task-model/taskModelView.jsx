@@ -6,13 +6,19 @@ import TitleModel from './components/titleModel';
 import TaskModelTabs from './components/taskModelTabs';
 import './index.less';
 
-class TaskModel extends Component {
+/**
+ * 查看任务模型 包含头部以及下面的前/后置tab
+ */
+class TaskModelView extends Component {
   static getDerivedStateFromProps(nextProps) {
     return { visible: nextProps.visible || false };
   }
 
   state = { nowId: '', preLoading: false, postLoading: false, postTasks: [], preTaskList: [] };
 
+  /**
+   * 根据id， 获取前置任务后置任务
+   */
   componentDidMount() {
     // 获取抽屉数据
     const { viewId } = this.props;
@@ -22,10 +28,17 @@ class TaskModel extends Component {
     }
   }
 
+  /**
+   * 关闭抽屉
+   */
   onClose = () => {
     this.props.onClose();
   };
 
+  /**
+   * 获取子组件传过来的更改的id， 根据id查询前后置任务
+   * @param {String} v 更改的id
+   */
   getId = v => {
     this.setState(
       {
@@ -38,6 +51,9 @@ class TaskModel extends Component {
     );
   };
 
+  /**
+   * 获取前置任务列表
+   */
   getPreData = id => {
     this.setState({
       preLoading: true,
@@ -50,6 +66,9 @@ class TaskModel extends Component {
     });
   };
 
+  /**
+   * 获取后置任务列表
+   */
   getPostData = id => {
     this.setState({
       postLoading: true,
@@ -76,7 +95,7 @@ class TaskModel extends Component {
           className="classTaskModelView"
         >
           <div>
-            <TitleModel emitData={this.getId} reload={this.props.reload}/>
+            <TitleModel emitData={this.getId} reload={this.props.reload} />
           </div>
           <div className="task_model_view_wrap">
             <TaskModelTabs
@@ -95,4 +114,4 @@ class TaskModel extends Component {
 
 export default connect(taskModel => ({
   taskModel,
-}))(TaskModel);
+}))(TaskModelView);

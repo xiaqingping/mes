@@ -6,6 +6,9 @@ import { connect } from 'dva';
 import FactoryComponent from './formItems';
 import '../index.less';
 
+/**
+ * 参数表单  任务模型参数新增修改升级查看时的每条参数的具体信息
+ */
 class ArgumentForm extends React.Component {
   constructor() {
     super();
@@ -43,6 +46,10 @@ class ArgumentForm extends React.Component {
     this.myRef.current.setFieldsValue(viewForm);
   }
 
+  /**
+   * 数据提交
+   * @param {Object} values 校验通过，form对象
+   */
   onFinish = values => {
     // 校验通过， values就是form对象
     const data = JSON.parse(JSON.stringify(values));
@@ -59,11 +66,12 @@ class ArgumentForm extends React.Component {
       ? this.props.editOriginData.myId
       : Date.now();
     this.props.emitArguments(argumentValues);
-    // this.props.onClose();
   };
 
+  /**
+   * 校验不通过
+   */
   onFinishFailed = () => {
-    // 校验不通过
     return false;
   };
 

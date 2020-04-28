@@ -3,8 +3,10 @@ import { Drawer, Button, Popconfirm, Dropdown, Menu, Spin, Empty, message } from
 import api from '@/pages/project/api/taskmodel';
 import { connect } from 'dva';
 import ArgumentForm from './argumentForm';
-// import SampleSelect from './sampleSelect';
-// import '../index.less';
+
+/**
+ * 任务新增，修改，升级，查看的参数列表页面
+ */
 
 class ArgumentModel extends Component {
   state = {
@@ -19,7 +21,6 @@ class ArgumentModel extends Component {
 
   componentDidMount() {
     // 获取列表
-
     const isAdd = window.location.href.indexOf('add') > 0;
     const { argumentList } = this.props.taskModel;
     if (argumentList && argumentList.length > 0) {
@@ -60,6 +61,9 @@ class ArgumentModel extends Component {
     }
   }
 
+  /**
+   * 根据id查询出当前任务的参数列表
+   */
   getArgumentList = () => {
     const { selectParamsId, editTaskModelId } = this.props.taskModel;
     const { fromView } = this.props;
@@ -97,6 +101,10 @@ class ArgumentModel extends Component {
       });
   };
 
+  /**
+   * 获取从参数form页面传过来的一条参数数据并确定是新增还是修改
+   * @param {Object} props 从参数form页面传过来的一条参数数据
+   */
   emitArguments = props => {
     const { argumentList } = this.state;
     const list = [...argumentList];
@@ -133,6 +141,11 @@ class ArgumentModel extends Component {
     return true;
   };
 
+  /**
+   *  开关抽屉
+   * @param {Boolean} bool 是否开关
+   * @param {Object} item 参数配置组件信息： {type:'input'， text:'单行输入'}...
+   */
   toggleChildrenDrawer = (bool, item) => {
     this.setState({
       childrenDrawer: bool,
@@ -146,19 +159,29 @@ class ArgumentModel extends Component {
     }
   };
 
+  /**
+   * 设置参数详情抽屉的title
+   */
   titleContent = () => {
     const { title, isAdd, paramName } = this.state;
     const paramname = isAdd ? '新增' : paramName;
-    const spliter = paramname ? '---' : '';
+    const spliter = paramname ? <div className="task_model_param_form_title" /> : '';
     return (
       <>
-        {/* <div style={{ fontSize: '16px' }}>{`${title}---${isAdd ? '新增' : paramName}`}</div> */}
-        <div style={{ fontSize: '16px' }}>{`${title}${spliter}${paramname}`}</div>
+        <div style={{ fontSize: '16px', display: 'flex' }}>
+          <span>{title}</span>
+          {spliter}
+          <span>{paramname}</span>
+        </div>
       </>
     );
   };
 
-  handleDelete = (item, index) => {
+  /**
+   * 删除一条参数
+   * @param {Number} index 当前数据的下标
+   */
+  handleDelete = index => {
     const { argumentList } = this.state;
     let list = [...argumentList];
     list = list.filter((v, idx) => {
@@ -183,6 +206,11 @@ class ArgumentModel extends Component {
     );
   };
 
+  /**
+   * 查看参数
+   * @param {Object} item 将要查看的参数的type/text信息
+   * @param {Number} idx 将要查看的参数下标
+   */
   toViewArgumrnt = (item, idx) => {
     const { formItemType } = this.props.taskModel;
     let title = null;
@@ -190,6 +218,7 @@ class ArgumentModel extends Component {
       if (v.type === item.type) {
         title = v.text;
       }
+      return true;
     });
 
     this.setState({
@@ -228,8 +257,6 @@ class ArgumentModel extends Component {
       });
     }
   };
-
-  deleteArgumentItem = () => {};
 
   render() {
     const { visible, onClose, fromView } = this.props;
@@ -291,20 +318,14 @@ class ArgumentModel extends Component {
                     >
                       {item.paramKey}
                     </span>
-                    <span
-                      className="task_model_argu_content"
-                      // style={{ display: 'inline-block', width: '200px' }}
-                    >
-                      {item.paramName}
-                    </span>
+                    <span className="task_model_argu_content">{item.paramName}</span>
                     {!fromView && (
                       <div style={{ float: 'right', paddingLeft: 40 }}>
                         <Popconfirm
                           overlayClassName="task_model_argu_model_pop"
-                          // width={200}
                           placement={index === 0 ? 'bottom' : 'top'}
                           title="确定要删除吗?"
-                          onConfirm={() => this.handleDelete(item, index)}
+                          onConfirm={() => this.handleDelete(index)}
                           okText="确认"
                           cancelText="取消"
                         >

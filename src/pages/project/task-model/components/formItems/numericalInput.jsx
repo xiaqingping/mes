@@ -3,6 +3,9 @@ import { Form, Input, Row, Col, Switch, Select } from 'antd';
 
 const { Option } = Select;
 
+/**
+ * 数值输入的form 结构
+ */
 class numericalInput extends React.Component {
   state = {};
 
