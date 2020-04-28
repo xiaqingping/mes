@@ -506,12 +506,19 @@ class ProcessParameter extends Component {
                       // this.getModelType(it, newIndex);
                       if (it.type === 'input')
                         return (
-                          <InputModel
+                          // <InputModel
+                          //   paramList={it}
+                          //   key={newIndex}
+                          //   disabled={requestType === 'view'} // 禁用
+                          //   submitStatus={submitStatus} // 是否提交
+                          //   getData={this.getModelData} // 提交数据
+                          // />
+                          <InputNumberModel
                             paramList={it}
                             key={newIndex}
-                            disabled={requestType === 'view'} // 禁用
-                            submitStatus={submitStatus} // 是否提交
-                            getData={this.getModelData} // 提交数据
+                            disabled={requestType === 'view'}
+                            submitStatus={submitStatus}
+                            getData={this.getModelData}
                           />
                         );
                       // 数值输入框

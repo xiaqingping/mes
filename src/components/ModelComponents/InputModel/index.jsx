@@ -72,7 +72,6 @@ class InputModel extends React.Component {
   render() {
     const { paramList, inputValue } = this.state;
     const data = paramList;
-
     return (
       <Form.Item
         label={data.paramName}
@@ -82,6 +81,7 @@ class InputModel extends React.Component {
           { required: data.isRequired, message: data.validDesc },
         ]}
       >
+
         <Input
           placeholder={data.placeholder}
           disabled={this.props.disabled}
