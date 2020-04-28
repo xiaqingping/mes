@@ -149,11 +149,14 @@ class ArgumentModel extends Component {
   titleContent = () => {
     const { title, isAdd, paramName } = this.state;
     const paramname = isAdd ? '新增' : paramName;
-    const spliter = paramname ? '---' : '';
+    const spliter = paramname ? <div className="task_model_param_form_title" /> : '';
     return (
       <>
-        {/* <div style={{ fontSize: '16px' }}>{`${title}---${isAdd ? '新增' : paramName}`}</div> */}
-        <div style={{ fontSize: '16px' }}>{`${title}${spliter}${paramname}`}</div>
+        <div style={{ fontSize: '16px', display: 'flex' }}>
+          <span>{title}</span>
+          {spliter}
+          <span>{paramname}</span>
+        </div>
       </>
     );
   };

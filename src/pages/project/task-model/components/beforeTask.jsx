@@ -219,6 +219,7 @@ class BeforeTask extends React.Component {
         title: '描述',
         width: 280,
         dataIndex: 'describe',
+        ellipsis: true,
       },
       {
         title: '版本',

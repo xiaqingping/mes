@@ -260,12 +260,13 @@ class TaskModel extends Component {
       loading: true,
     });
 
+    console.log(form);
+
     if (pageModel === 0) {
       api
         .createTaskModel(form)
         .then(() => {
           message.success('任务模型创建成功!');
-          // dispatchList();
           router.push('/project/task-model');
         })
         .catch(() => {
@@ -551,7 +552,6 @@ class TaskModel extends Component {
             <Row>
               <Col xxl={14}>
                 <div style={{ float: 'left', marginLeft: '1%' }}>
-                  {/* <Form.Item name="uploadPIc"> */}
                   <Upload
                     name="files"
                     listType="picture-card"
@@ -572,7 +572,6 @@ class TaskModel extends Component {
                       uploadButton
                     )}
                   </Upload>
-                  {/* </Form.Item> */}
                 </div>
                 <div style={{ float: 'left', width: '62%', minWidth: '500px', marginLeft: '20px' }}>
                   <Form.Item
@@ -641,7 +640,6 @@ class TaskModel extends Component {
                       }}
                     >
                       {pageModel ? selectVersion || editOriginModelData.version : 'V1.0'}
-                      {/* {selectVersion || processDetail.version} */}
                     </Tag>
                     {versionOpen && pageModel === 2 && (
                       <Card
@@ -678,7 +676,7 @@ class TaskModel extends Component {
                     verticalAlign: 'middle',
                   }}
                 >
-                  <Form.Item name="isAutomatic" valuePropName="checked">
+                  <Form.Item valuePropName="checked">
                     <span style={{ fontSize: '16px', marginRight: 10 }}>是否可自动运行：</span>
                     <Switch checked={checked} onChange={this.switchChange} />
                   </Form.Item>
@@ -721,15 +719,9 @@ class TaskModel extends Component {
           <Card
             style={{ height: '48px', width: '100%', position: 'fixed', bottom: '0', left: '0' }}
           >
-            <Form.Item>
-              <Button
-                type="primary"
-                style={{ float: 'right', marginTop: '-32px' }}
-                htmlType="submit"
-              >
-                提交
-              </Button>
-            </Form.Item>
+            <Button type="primary" style={{ float: 'right', marginTop: '-32px' }} htmlType="submit">
+              提交
+            </Button>
           </Card>
         </Form>
         <BeforeTask

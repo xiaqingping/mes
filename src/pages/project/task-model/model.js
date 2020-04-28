@@ -139,7 +139,6 @@ const SeqModel = {
     setViewId(state, {
       payload
     }) {
-      console.log(payload);
       return {
         ...state,
         viewId: payload,
@@ -148,7 +147,6 @@ const SeqModel = {
     setViewParamsId(state, {
       payload
     }) {
-      console.log(payload);
       return {
         ...state,
         selectParamsId: payload,

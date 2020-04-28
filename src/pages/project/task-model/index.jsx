@@ -25,8 +25,6 @@ import debounce from 'lodash/debounce';
 import router from 'umi/router';
 import { formatter, getOperates } from '@/utils/utils';
 import api from '@/pages/project/api/taskmodel';
-// import SampleSelect from '@/pages/project/components/SampleSelect';
-// import SampleGroup from '@/pages/project/components/SampleGroup';
 import disk from '@/pages/project/api/disk';
 import DefaultHeadPicture from '@/assets/imgs/upload_middle.png';
 import StandardTable from '../components/StandardTable';
@@ -414,6 +412,7 @@ class TaskModel extends Component {
         width: 400,
         dataIndex: 'describe',
         key: 'describe',
+        ellipsis: true,
       },
       {
         title: '发布人/时间',
