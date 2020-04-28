@@ -33,17 +33,15 @@ class ProcessParameter extends Component {
       processId, // 流程ID
       processModelId, // 流程模型ID
       projectId, // 项目ID
-      paramList: [], // 参数列表
+      paramGroupList: [], // 参数列表
       // 流程模型参数
       processParam: [],
       // 流程参数值
       processParamValue: [],
-      // 是否提交
-      submitStatus: false,
       // 样品选择框 样品列表
       sampleList: [],
       // 提交的数据
-      submitData: [],
+      paramList: [],
     };
     // 判断请求类型
     this.determineTheRequestType()
@@ -103,7 +101,8 @@ class ProcessParameter extends Component {
       if (requestType === 'add') {
         message.success('添加操作');
         if (param.length > 0) {
-          this.setState({ paramList: newParamData });
+          this.getDefaultParams(newParamData);
+          this.setState({ paramGroupList: newParamData });
         }
       }
 
@@ -111,9 +110,8 @@ class ProcessParameter extends Component {
       if (requestType === 'update') {
         message.success('修改操作');
         // update参数值
-        const paramList = sessionStorage.getItem('processForParams');
-
-        const processParamValue = paramList.params;
+        const processParamList = sessionStorage.getItem('processForParams');
+        const processParamValue = processParamList.params;
         // 有参数值时
         if (
           newParamData.length > 0 &&
@@ -125,12 +123,14 @@ class ProcessParameter extends Component {
         ) {
           // 合并参数和参数值
           const data = this.comparedWith(newParamData, paramValue);
-          this.setState({ paramList: data });
+          console.log(data);
+          this.setState({ paramGroupList: data });
           return false;
         }
         // 未设置参数值时
         if (param.length > 0 && paramValue.length === 0) {
-          this.setState({ paramList: newParamData });
+          this.getDefaultParams(newParamData);
+          this.setState({ paramGroupList: newParamData });
         }
       }
 
@@ -142,16 +142,31 @@ class ProcessParameter extends Component {
         if (newParamData.length > 0 && paramValue.length > 0) {
           // 合并参数和参数值
           const data = this.comparedWith(newParamData, paramValue);
-          this.setState({ paramList: data });
+          this.getDefaultParams(data);
+          this.setState({ paramGroupList: data });
           return false;
         }
         // 未设置参数值时
         if (param.length > 0 && paramValue.length === 0) {
-          this.setState({ paramList: newParamData });
+          this.getDefaultParams(newParamData);
+          this.setState({ paramGroupList: newParamData });
         }
       }
     }
     return false;
+  };
+
+  /**
+   * 获取初始参数列表 提交时作为默认数据
+   * @param {Array} paramGroupList 参数分组数据
+   */
+  getDefaultParams = paramGroupList => {
+    let paramList = [];
+    paramGroupList.forEach(groItem => {
+      const { params } = groItem;
+      paramList = [...paramList, ...params];
+    });
+    this.setState({ paramList });
   };
 
   // edit 设置表单初始值
@@ -165,35 +180,33 @@ class ProcessParameter extends Component {
   };
 
   // 保存提交
-  onFinish = values => {
-    this.setState({ submitStatus: true });
-    const data = this.conversionData(values);
+  onSubmit = () => {
+    const { paramList } = this.state;
+
     const { requestType, processId, processModelId, projectId } = this.state;
     let url;
 
     // 添加 修改
     if (requestType === 'add' || requestType === 'update') {
-      const paramsList = JSON.parse(sessionStorage.getItem('processForParams'));
-      console.log(paramsList);
-      const newData = { params: data, processModelId };
+      const processParams = JSON.parse(sessionStorage.getItem('processForParams'));
+      const newData = { params: paramList, processModelId };
       const list = [];
-      if (paramsList === '' || paramsList === null) {
-        list.push(newData);
+      if (processParams) {
+        list.push([...processParams, newData]);
       } else {
-        list.push([...paramsList, newData]);
+        list.push(newData);
       }
 
       sessionStorage.setItem('processForParams', JSON.stringify(list));
-      // sessionStorage.removeItem('processForParams');
+      sessionStorage.removeItem('processForParams');
       if (projectId === '' || projectId === undefined)
-        url = `/project/project-manage/add/addflowpath`;
-      if (projectId) url = `/project/project-manage/add/addflowpath/edit/${projectId}`;
+        url = `/project/project-manage/add/addflowpath/add/''/1`;
+      if (projectId) url = `/project/project-manage/detail/edit/${projectId}/2`;
       return router.push(url);
     }
     // 编辑
     if (requestType === 'edit') {
-
-      api.updateProcessesParameter(processId, data).then(() => {
+      api.updateProcessesParameter(processId, paramList).then(() => {
         if (projectId === '') url = `/project/project-manage`;
         if (projectId !== '') url = `/project/project-manage/detail/${projectId}`;
         return router.push(url);
@@ -202,117 +215,31 @@ class ProcessParameter extends Component {
     return false;
   };
 
-  // 提交指令 组件返回数据
-  getModelData = data => {
-    const { submitData } = this.state;
-    // console.log(submitData);
-    // console.log(data);
-    const newData = [...submitData, data];
-    // console.log(newData);
-    this.setState({ submitData: newData });
-  };
-
-  // 保存时 参数数据格式转换
-  conversionData = formData => {
-    // 删除参数为空的分组
-    const { processParam } = this.state;
-    const newProcessParam = this.deleteNullGroup(processParam);
-    // 获取所有参数
-    const paramData = [];
-    newProcessParam.forEach(groupItem => {
-      groupItem.params.forEach(paramItem => {
-        paramData.push(paramItem);
-      });
-    });
-    // 参数和属性合并为一层数据
-    const nParamData = this.manageAttribute(paramData);
-
-    // 拆分键值对
-    const newFormData = this.splitFormData(formData);
-    // 获取参数的任务模型ID
-    const data = this.getParamTaskModelId(nParamData, newFormData);
-
-    // 将默认值的赋值到已提交的数据中
-    const newData = [];
-    data.forEach(item => {
-      const newItem = JSON.parse(JSON.stringify(item));
-      if (item.paramValue === undefined || item.paramValue === '') {
-        newItem.paramValue = item.defaultValue;
-      }
-      delete newItem.defaultValue;
-      newData.push(newItem);
-    });
-
-    return data;
-  };
-
   /**
-   * 拆分form表单的值
-   * formData 表单的值 input
+   * 组件返回数据
+   * @param {string} data 组件数据
+   * @param {string} type 组件类型
+   * @param {boolean} isVerify 是否通过验证
    */
-  splitFormData = formData => {
-    // 取出键.值
-    const dataKeys = Object.keys(formData);
-    const dataValues = Object.values(formData);
-    // 合并
-    const data = [];
-    dataKeys.forEach((key, indexK) => {
-
-      dataValues.forEach((val, indexV) => {
-        const newItem = {};
-        if (indexK === indexV) {
-          newItem.paramKey = key;
-          newItem.paramValue = val;
-          data.push(newItem);
+  getModelData = (data, type, isVerify) => {
+    const { paramList } = this.state;
+    if (isVerify) {
+      const newParams = paramList.filter(item => item.paramKey !== data.paramKey);
+      console.log(newParams);
+      paramList.forEach(item => {
+        if (item.paramKey === data.paramKey) {
+          const newItem = JSON.parse(JSON.stringify(item));
+          newItem.paramValue = data.paramValue;
+          newParams.push(newItem);
         }
-      });
-    });
-    return data;
-  };
-
-  /**
-   * 获取参数的任务模型ID
-   * params 参数列表
-   * values 参数值列表
-   */
-  getParamTaskModelId = (params, values) => {
-    const data = [];
-    params.forEach(paramItem => {
-      values.forEach(valItem => {
-        const newIt = JSON.parse(JSON.stringify(valItem));
-        if (paramItem.paramKey === valItem.paramKey) {
-          newIt.taskModelId = paramItem.taskModelId;
-          newIt.defaultValue = paramItem.defaultValue || paramItem.deafultValue;
-          data.push(newIt);
-        }
-      });
-    });
-    return data;
-  };
-
-  /**
-   * 参数和属性合并为一层数据
-   * params 参数列表
-   */
-  manageAttribute = params => {
-    const nparam = [];
-    params.forEach(paramItem => {
-      const nParamItem = JSON.parse(JSON.stringify(paramItem));
-      // 遍历参数属性列表
-      const propertyList = paramItem.paramProperties;
-      propertyList.forEach(proItem => {
-        // key：value
-        nParamItem[proItem.paramPropertyKey] = proItem.paramPropertyValue;
+        return false;
       });
 
-      // 删除 参数属性列表和排序 字段（可不删）
-      delete nParamItem.paramProperties;
-      delete nParamItem.sortNo;
-
-      // 保存处理好的参数
-      nparam.push(nParamItem);
-    });
-    return nparam;
+      this.setState({
+        paramList: newParams,
+      });
+    }
+    return message.warning('数据验证未通过');
   };
 
   /**
@@ -384,6 +311,7 @@ class ProcessParameter extends Component {
 
       const paramList = groupItem.params;
       const newList = [];
+      const idList = [];
       paramList.forEach(paramItem => {
         valueData.forEach(valueItem => {
           const newItem = JSON.parse(JSON.stringify(paramItem));
@@ -401,6 +329,13 @@ class ProcessParameter extends Component {
               newItem.paramValue = valueItem.paramValue;
               newList.push(newItem);
             }
+          }
+          if (idList.length === 0) {
+            idList.push(newItem.id);
+            newList.push(newItem);
+          } else if (idList.indexOf(newItem.id) === -1) {
+            idList.push(newItem.id);
+            newList.push(newItem);
           }
         });
       });
@@ -447,9 +382,9 @@ class ProcessParameter extends Component {
     const { requestType, projectId } = this.state;
     let url;
     if (requestType === 'add' || requestType === 'update') {
-      if (projectId) url = `/project/project-manage/add/addflowpath/edit/${projectId}`;
+      if (projectId) url = `/project/project-manage/detail/edit/${projectId}/2`;
       if (projectId === '' || projectId === undefined)
-        url = `/project/project-manage/add/addflowpath`;
+        url = `/project/project-manage/add/addflowpath/add/''/1`;
     } else {
       if (projectId === '') url = `/project/project-manage`;
       if (projectId !== '') url = `/project/project-manage/detail/${projectId}`;
@@ -472,18 +407,12 @@ class ProcessParameter extends Component {
   };
 
   render() {
-    const { paramList, sampleList, submitStatus, requestType } = this.state;
-    const data = paramList
+    const { paramGroupList, sampleList, requestType } = this.state;
+    const data = paramGroupList;
     return (
       <>
         <PageHeaderWrapper style={{ marginBottom: 100 }}>
-          <Form
-            name="basic"
-            ref={this.formRef}
-            onFinish={this.onFinish}
-            onFinishFailed={this.onFinishFailed}
-          >
-
+          <Form name="basic" ref={this.formRef}>
             <List
               dataSource={data}
               renderItem={item => (
@@ -506,19 +435,11 @@ class ProcessParameter extends Component {
                       // this.getModelType(it, newIndex);
                       if (it.type === 'input')
                         return (
-                          // <InputModel
-                          //   paramList={it}
-                          //   key={newIndex}
-                          //   disabled={requestType === 'view'} // 禁用
-                          //   submitStatus={submitStatus} // 是否提交
-                          //   getData={this.getModelData} // 提交数据
-                          // />
-                          <InputNumberModel
+                          <InputModel
                             paramList={it}
                             key={newIndex}
-                            disabled={requestType === 'view'}
-                            submitStatus={submitStatus}
-                            getData={this.getModelData}
+                            disabled={requestType === 'view'} // 禁用
+                            getData={this.getModelData} // 提交数据
                           />
                         );
                       // 数值输入框
@@ -528,7 +449,6 @@ class ProcessParameter extends Component {
                             paramList={it}
                             key={newIndex}
                             disabled={requestType === 'view'}
-                            submitStatus={submitStatus}
                             getData={this.getModelData}
                           />
                         );
@@ -540,7 +460,6 @@ class ProcessParameter extends Component {
                             paramList={it}
                             key={newIndex}
                             disabled={requestType === 'view'}
-                            submitStatus={submitStatus}
                             getData={this.getModelData}
                           />
                         );
@@ -551,7 +470,6 @@ class ProcessParameter extends Component {
                             paramList={it}
                             key={newIndex}
                             disabled={requestType === 'view'}
-                            submitStatus={submitStatus}
                             getData={this.getModelData}
                           />
                         );
@@ -562,7 +480,6 @@ class ProcessParameter extends Component {
                             paramList={it}
                             key={newIndex}
                             disabled={requestType === 'view'}
-                            submitStatus={submitStatus}
                             sampleList={sampleList} // 样品列表
                             getData={this.getModelData}
                             // 当样品选择改变的时候
@@ -577,7 +494,6 @@ class ProcessParameter extends Component {
                             paramList={it}
                             key={newIndex}
                             disabled={requestType === 'view'}
-                            submitStatus={submitStatus}
                             sampleList={sampleList}
                             getData={this.getModelData}
                             // 样品列表改变执行事件
@@ -594,7 +510,6 @@ class ProcessParameter extends Component {
                             paramList={it}
                             key={newIndex}
                             disabled={requestType === 'view'}
-                            submitStatus={submitStatus}
                             sampleList={sampleList}
                             getData={this.getModelData}
                             // 样品列表改变执行事件
@@ -616,14 +531,13 @@ class ProcessParameter extends Component {
                 <Button className={style.back} onClick={() => this.goBackLink()}>
                   返回
                 </Button>
-                {/* <Button type="primary" htmlType="submit" onClick={() => this.saveParam()}> */}
                 {requestType === 'view' ? (
                   ''
                 ) : (
-                    <Button type="primary" htmlType="submit">
-                      提交
-                    </Button>
-                  )}
+                  <Button type="primary" onClick={this.onSubmit}>
+                    提交
+                  </Button>
+                )}
               </div>
             </Footer>
           </Form>

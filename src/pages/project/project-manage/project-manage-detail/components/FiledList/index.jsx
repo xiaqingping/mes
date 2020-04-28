@@ -1,18 +1,13 @@
-// 流程列表
+// 项目 文件列表
 import { Form, Table, Col, Input, Button } from 'antd';
 import React, { Component } from 'react';
 import { connect } from 'dva';
-// import { FileExclamationOutlined } from '@ant-design/icons';
 import TableSearchForm from '@/components/TableSearchForm';
 import excel from '@/assets/imgs/excel.png';
 import pdf from '@/assets/imgs/pdf.png';
 import file from '@/assets/imgs/file.png';
 import word from '@/assets/imgs/word.png';
 
-// import StandardTable from '@/components/StandardTable';
-// import EditableCell from '@/components/EditableCell';
-// import { formatter } from '@/utils/utils';
-// import api from '@/api';
 const FormItem = Form.Item;
 const { Search } = Input;
 
@@ -43,26 +38,12 @@ class FiledList extends Component {
   // 获取此页面需要用到的基础数据
   getCacheData = () => {};
 
-  // 分页
-  // handleStandardTableChange = data => {
-  //   this.getTableData({
-  //     page: data.current,
-  //     rows: data.pageSize,
-  //   });
-  // };
-
   // 获取表格数据
   getTableData = () => {
     const data = this.props.projectDetail.filedList;
     this.setState({
       list: data,
-      // pagination: {
-      //   current: options.page,
-      //   pageSize: options.rows,
-      //   total: data.total,
-      // },
       loading: false,
-      // editIndex: -1,
     });
   };
 
@@ -83,7 +64,6 @@ class FiledList extends Component {
   );
 
   imgtype = type => {
-    console.log(type);
     let res = word;
     if (type === 'excel') {
       res = excel;
@@ -98,19 +78,8 @@ class FiledList extends Component {
   };
 
   render() {
-    const {
-      // pagination,
-      // selectedRows,
-      list,
-      loading,
-    } = this.state;
+    const { list, loading } = this.state;
     // let tableWidth = 0;
-
-    // const components = {
-    //   body: {
-    //     cell: EditableCell,
-    //   },
-    // };
     let columns = [
       {
         title: '文件名称',
@@ -186,31 +155,15 @@ class FiledList extends Component {
             simpleForm={this.simpleForm}
           />
         </div>
-
-        {/* <Form ref={this.tableSearchFormRef}>
-          <Col lg={6} md={8} sm={12}>
-            <FormItem label="" name="fieldName">
-              <Search />
-            </FormItem>
-          </Col>
-          <Col lg={6} md={8} sm={12}>
-          <FormItem label="" name="">
-              <Button>下载</Button>
-            </FormItem>
-          </Col>
-        </Form> */}
         <Form ref={this.tableFormRef}>
-          {/* {console.log(list)} */}
           <Table
             // scroll={{ x: tableWidth, y: 400 }}
             rowKey="id"
             loading={loading}
             dataSource={list}
-            // selectedRows={selectedRows}
             rowSelection="checkbox"
-            // pagination={pagination}
+            pagination={false}
             columns={columns}
-            onChange={this.handleStandardTableChange}
           />
         </Form>
       </>

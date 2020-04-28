@@ -13,7 +13,7 @@ const { Option } = AutoComplete;
 class SampleGroup extends React.Component {
   static getDerivedStateFromProps(nextProps) {
     return {
-      tableData: nextProps.groupSchemeData || [],
+      tableData: nextProps.paramList.paramValue || [],
       sampleList: nextProps.sampleList || [],
       disabled: nextProps.disabled,
     };
@@ -72,19 +72,34 @@ class SampleGroup extends React.Component {
   }
 
   componentDidUpdate(props) {
-    if (props.submitStatus !== this.props.submitStatus) {
-      const list = this.verifyData();
-      console.log(list);
-      const { paramKey, taskModelId } = props;
-      const sendData = {
-        paramKey,
-        paramValue: list,
-        taskModelId,
-      };
-      // TODO: 是否校验通过
-      this.props.getData(sendData, 'groupScheme', this.validPass);
-    }
+    // if (props.submitStatus !== this.props.submitStatus) {
+    //   const list = this.verifyData();
+    //   console.log(list);
+    //   const { paramKey, taskModelId } = props.paramList;
+    //   const sendData = {
+    //     paramKey,
+    //     paramValue: JSON.stringify(list),
+    //     taskModelId,
+    //   };
+    //   // TODO: 是否校验通过
+    //   this.validPass = !!list;
+    //   this.props.getData(sendData, 'groupScheme', this.validPass);
+    // }
   }
+
+  sendDataOnChange = () => {
+    const list = this.verifyData();
+    console.log(list);
+    const { paramKey, taskModelId } = this.props.paramList;
+    const sendData = {
+      paramKey,
+      paramValue: JSON.stringify(list),
+      taskModelId,
+    };
+
+    this.validPass = !!list;
+    this.props.getData(sendData, 'groupScheme', this.validPass);
+  };
 
   selectUpdateGroup = () => {
     const { sampleList, groupSchemeData, columns } = this.state;
@@ -192,11 +207,11 @@ class SampleGroup extends React.Component {
       // 行数据遍历
       rowData.forEach(rowItem => {
         // 分组方案下的 分组列表不为空
-        if (groupItem.groupList !== null && groupItem.groupList.length !== 0) {
+        if (groupItem.groups !== null && groupItem.groups.length !== 0) {
           // 分组列表遍历
-          groupItem.groupList.forEach(groItem => {
+          groupItem.groups.forEach(groItem => {
             // 分组下的样品列表遍历
-            groItem.sampleList.forEach(samItem => {
+            groItem.sampleIds.forEach(samItem => {
               // 找到对应的样品行
               if (rowItem.metadataSampleId === samItem.metadataSampleId) {
                 Object.keys(rowItem).map(key => {
@@ -214,8 +229,8 @@ class SampleGroup extends React.Component {
         }
 
         // 分组方案下的 样品列表不为空
-        if (groupItem.sampleList !== null && groupItem.sampleList.length !== 0) {
-          groupItem.sampleList.forEach(samItem => {
+        if (groupItem.sampleIds !== null && groupItem.sampleIds.length !== 0) {
+          groupItem.sampleIds.forEach(samItem => {
             if (rowItem.metadataSampleId === samItem.metadataSampleId) {
               Object.keys(rowItem).map(key => {
                 const num = key.split('_')[1];
@@ -255,16 +270,16 @@ class SampleGroup extends React.Component {
     const samples = [];
     groupList.forEach(groupItem => {
       // 分组方案下的 样品列表 为空
-      if (groupItem.sampleList === null) {
-        groupItem.groupList.forEach(groItem => {
-          groItem.sampleList.forEach(samItem => {
+      if (groupItem.sampleIds === null) {
+        groupItem.groups.forEach(groItem => {
+          groItem.sampleIds.forEach(samItem => {
             samples.push(samItem);
           });
         });
       }
       // 分组方案下的 分组列表 为空
-      if (groupItem.groupList === null) {
-        groupItem.sampleList.forEach(samItem => {
+      if (groupItem.groups === null) {
+        groupItem.sampleIds.forEach(samItem => {
           samples.push(samItem);
         });
       }
@@ -462,6 +477,7 @@ class SampleGroup extends React.Component {
     this.setState({
       columns: cols,
     });
+    this.sendDataOnChange();
   };
 
   removeColumn = (item, id) => {
@@ -567,6 +583,7 @@ class SampleGroup extends React.Component {
       columns: cols,
       groupSchemeData: soure,
     });
+    this.sendDataOnChange();
   };
 
   confirmGroupRender = (groupName, preGroupName) => (
@@ -703,6 +720,7 @@ class SampleGroup extends React.Component {
     this.setState({
       optionList: list,
     });
+    this.sendDataOnChange();
     return true;
   };
 
@@ -748,7 +766,7 @@ class SampleGroup extends React.Component {
     const { groupSchemeData, columns } = this.state;
     // 1. 一个分组方案里只能是单纯组或者单纯样品
     // 2. 一个分组方案里面不能都是空
-    let formattedData;
+
     const datas = [...groupSchemeData];
     const cols = [...columns];
     const num = cols.length;
@@ -762,16 +780,21 @@ class SampleGroup extends React.Component {
         return item && item !== '当前样品';
       });
       const validTrue1 = group.includes('当前样品') && hasOtherValue;
-      const validTrue2 = group.every(item => item === '');
-      const validFalse = validTrue1 || validTrue2;
+      // const validTrue2 = group.every(item => item === '');
+      // const validFalse = validTrue1 || validTrue2;
+      const validFalse = validTrue1;
       this.validPass = !validFalse;
       if (validFalse) {
-        return message.error('存在空分组方案或者分组方案包含样品和组');
+        message.error('存在空分组方案或者分组方案包含样品和组');
+        return false;
+      }
+      if (this.props.paramList.required && datas && !datas.length) {
+        message.error('分组方案为必须，请设置分组方案！');
+        return false;
       }
     }
-    formattedData = this.formatSubmitData();
+    const formattedData = this.formatSubmitData();
     console.log(formattedData);
-    formattedData = formattedData && JSON.stringify(formattedData);
     return formattedData;
   };
 
@@ -782,10 +805,7 @@ class SampleGroup extends React.Component {
     let tableHeard = [];
     columns.forEach((item, index) => {
       if (index !== 0 && typeof item.id === 'number') {
-        tableHeard = [
-          ...tableHeard,
-          { groupSchemeName: item.dupTitle, sampleIdList: [], groupList: [] },
-        ];
+        tableHeard = [...tableHeard, { groupSchemeName: item.dupTitle, sampleIds: [], groups: [] }];
       }
     });
 
@@ -796,33 +816,33 @@ class SampleGroup extends React.Component {
       groupSchemeData.forEach(item => {
         if (item[`header_${i}`] === '') return;
         if (item[`header_${i}`] === '当前样品') {
-          tableHeard[i - 2].sampleIdList.push({
+          tableHeard[i - 2].sampleIds.push({
             sampleId: item.metadataSampleId,
             sampleAlias: item.sampleName,
           });
         } else {
-          const groNameList = tableHeard[i - 2].groupList.map(g => g.groupName);
+          const groNameList = tableHeard[i - 2].groups.map(g => g.groupName);
           if (!groNameList.includes(item[`header_${i}`])) {
             // 如果没有相同组名的话, 就push进groupList里,
-            tableHeard[i - 2].groupList.push({
+            tableHeard[i - 2].groups.push({
               groupName: item[`header_${i}`],
               color: item[`color_${i}`],
-              sampleIdList: [],
+              sampleIds: [],
             });
 
-            tableHeard[i - 2].groupList.forEach(gro => {
+            tableHeard[i - 2].groups.forEach(gro => {
               if (gro.groupName === item[`header_${i}`]) {
-                gro.sampleIdList.push({
+                gro.sampleIds.push({
                   sampleId: item.metadataSampleId,
                   sampleAlias: item.sampleName,
                 });
               }
             });
           } else {
-            // 如果是相同组名的话, 应该将sample的信息push到 sampleIdList 里面
-            tableHeard[i - 2].groupList.forEach(group => {
+            // 如果是相同组名的话, 应该将sample的信息push到 sampleIds 里面
+            tableHeard[i - 2].groups.forEach(group => {
               if (group.groupName === item[`header_${i}`]) {
-                group.sampleIdList.push({
+                group.sampleIds.push({
                   sampleId: item.metadataSampleId,
                   sampleAlias: item.sampleName,
                 });

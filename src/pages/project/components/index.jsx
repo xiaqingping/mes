@@ -8,12 +8,13 @@ class Group extends React.Component {
     groupSchemeData: [
       {
         groupSchemeName: '分组方案四',
-        sampleList: null,
-        groupList: [
+        // sampleList: null,
+        sampleIds: null,
+        groups: [
           {
             groupName: 'group4',
             color: 'black',
-            sampleList: [
+            sampleIds: [
               {
                 metadataSampleId: 'fef48d6d544b4eda8cceae3690404418',
                 sampleAlias: '别名003',
@@ -27,7 +28,7 @@ class Group extends React.Component {
           {
             groupName: 'group3',
             color: 'yellow',
-            sampleList: [
+            sampleIds: [
               {
                 metadataSampleId: '39fbe07a8c3546b3bca9801869a58c45',
                 sampleAlias: '别名002',
@@ -42,17 +43,17 @@ class Group extends React.Component {
       },
       {
         groupSchemeName: '分组方案二',
-        sampleList: [
+        sampleIds: [
           {
             metadataSampleId: 'c8dc965476874dccb81c066df5a174d9',
             sampleAlias: '别名004',
           },
         ],
-        groupList: null,
+        groups: null,
       },
       {
         groupSchemeName: '分组方案三',
-        sampleList: [
+        sampleIds: [
           {
             metadataSampleId: 'fef48d6d544b4eda8cceae3690404418',
             sampleAlias: '别名003',
@@ -70,16 +71,16 @@ class Group extends React.Component {
             sampleAlias: '别名004',
           },
         ],
-        groupList: null,
+        groups: null,
       },
       {
         groupSchemeName: '分组方案one',
-        sampleList: null,
-        groupList: [
+        sampleIds: null,
+        groups: [
           {
             groupName: 'group1',
             color: 'black',
-            sampleList: [
+            sampleIds: [
               {
                 metadataSampleId: '39fbe07a8c3546b3bca9801869a58c45',
                 sampleAlias: '别名002',
@@ -93,7 +94,7 @@ class Group extends React.Component {
           {
             groupName: 'group2',
             color: 'yellow',
-            sampleList: [
+            sampleIds: [
               {
                 metadataSampleId: 'c8dc965476874dccb81c066df5a174d9',
                 sampleAlias: '别名004',
@@ -250,18 +251,6 @@ class Group extends React.Component {
     );
   };
 
-  // // 父组件修改
-  // setSelectState = data => {
-  //   this.setState(
-  //     {
-  //       sampleList: data,
-  //     },
-  //     () => {
-  //       this.handleUpdate();
-  //     },
-  //   );
-  // };
-
   // 传数据
   submitData = (subData, a, b) => {
     console.log(b);
@@ -279,19 +268,29 @@ class Group extends React.Component {
     const { sampleList, groupSchemeData, submitStatus } = this.state;
     return (
       <Card>
-        {/* <SampleSelect
-          sampleList={sampleList}
+        <SampleSelect
+          paramList={{
+            paramKey: 'xxx',
+            paramValue: sampleList,
+            taskModelId: '1111',
+            required: true,
+          }}
           // 当样品选择改变的时候
           emitData={this.getSelectUpdateData}
           // 提交数据
           getData={this.submitData}
           // 提交状态
           submitStatus={submitStatus}
-          setSelectState={this.setSelectState}
           disabled={false}
-        /> */}
+        />
         <SampleGroup
-          groupSchemeData={groupSchemeData}
+          paramList={{
+            paramKey: 'xxx',
+            paramValue: groupSchemeData,
+            taskModelId: '1111',
+            required: true,
+          }}
+          // groupSchemeData={groupSchemeData}
           sampleList={sampleList} // 当样品选择改变的时候
           // 提交数据
           getData={this.submitData}

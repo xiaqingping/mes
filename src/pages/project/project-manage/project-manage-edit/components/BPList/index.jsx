@@ -8,7 +8,6 @@ import { connect } from 'dva';
 import { UserOutlined, SearchOutlined } from '@ant-design/icons';
 import api from '@/pages/project/api/bp';
 import _ from 'lodash';
-
 import './index.less';
 
 const FormItem = Form.Item;
@@ -251,13 +250,17 @@ class BPList extends Component {
       {
         title: '业务伙伴',
         dataIndex: 'name',
-        width: 300,
+        width: 200,
         render: (value, row) => (
           <>
-            <p>
-              <UserOutlined /> &nbsp;{value}
-            </p>
-            <p>{row.code}</p>
+              <div
+              style={{paddingLeft:'30px'}}
+              >
+                <p style={{paddingTop:'8px',marginBottom:'0'}}>
+                  <UserOutlined /> &nbsp;{value}
+                </p>
+                <p style={{paddingBottom:'8px',marginBottom:'0'}}>{row.code}</p>
+              </div>
           </>
         ),
         ...this.getColumnSearchPropsNameOrCode(),
@@ -265,7 +268,7 @@ class BPList extends Component {
       {
         title: '认证',
         dataIndex: 'certificationStatus',
-        width: 150,
+        width: 100,
         render: value => {
           const status = formatter(BpCertificationStatus, value, 'id', 'badge');
           const text = formatter(BpCertificationStatus, value);
@@ -275,7 +278,7 @@ class BPList extends Component {
       {
         title: '冻结',
         dataIndex: 'salesOrderBlock',
-        width: 150,
+        width: 100,
         render: value => {
           const status = formatter(SalesOrderBlock, value, 'id', 'badge');
           const text = formatter(SalesOrderBlock, value);
@@ -285,7 +288,7 @@ class BPList extends Component {
       {
         title: '联系方式',
         dataIndex: 'mobilePhone',
-        width: 200,
+        width: 170,
         ...this.getColumnSearchPropsPhoneOrEmail(),
         render: (value, row) => {
           const statusPhone = formatter(
@@ -303,7 +306,7 @@ class BPList extends Component {
           return (
             <>
               {value ? (
-                <p>
+                <p style={{marginBottom:'0'}}>
                   {value}&nbsp;&nbsp;&nbsp;
                   <Badge status={statusPhone} />
                 </p>
@@ -311,7 +314,7 @@ class BPList extends Component {
                 ''
               )}
               {row.email ? (
-                <p>
+                <p style={{marginBottom:'0'}}>
                   {row.email}&nbsp;&nbsp;&nbsp;
                   <Badge status={statusEmail} />
                 </p>
@@ -341,7 +344,7 @@ class BPList extends Component {
     return (
       <div>
         <Modal
-          width="1200px"
+          width="1000px"
           title="业务伙伴 - 客户"
           visible={visible}
           onOk={this.handleOk}
@@ -358,8 +361,7 @@ class BPList extends Component {
             pagination={pagination}
             columns={columns}
             onChange={this.handleStandardTableChange}
-            height={70}
-            // onChange={('', filters) => {console.log(filters)}}
+            // height={70}
           />
         </Modal>
       </div>

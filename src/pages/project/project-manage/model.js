@@ -1,14 +1,14 @@
 const projectModel = {
   namespace: 'projectManage',
   state: {
-    // statusList: [
+    // status: [
     //   { value: 1, text: '未开始', color: 'red' },
     //   { value: 2, text: '进行中', color: 'pink' },
     //   { value: 3, text: '已完成', color: '#108EE9' },
     //   { value: 4, text: '已终止', color: '#F42D2D' },
     //   { value: 5, text: '待处理', color: '#7ED321' },
     // ],
-    statusList: [
+    status: [
       { value: 1, text: '未开始', color: 'rgba(0, 0, 0, 0.2)' },
       { value: 2, text: '进行中', color: '#1890ff' },
       { value: 3, text: '已完成', color: '#52c41a' },
@@ -58,7 +58,7 @@ const projectModel = {
       },
     ],
     // 标签
-    labelList: [
+    labels: [
       {
         id: 1,
         name: '真核转录组',

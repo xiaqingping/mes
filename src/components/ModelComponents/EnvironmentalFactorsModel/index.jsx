@@ -11,7 +11,6 @@ class EnvironmentalFactorsModel extends React.Component {
   static getDerivedStateFromProps(nextProps) {
     return {
       sampleList: nextProps.sampleList || [],
-      // submitStatus: nextProps.submitStatus || false,
     };
   }
 
@@ -19,9 +18,10 @@ class EnvironmentalFactorsModel extends React.Component {
     super(props);
     this.state = {
       // 样品选择框 样品列表
-      // sampleList: props.sampleList || [],
       sampleList: [],
-      // submitStatus: false,
+      // 参数列表
+      // eslint-disable-next-line react/no-unused-state
+      paramList: props.paramList,
       // 表数据
       data: [],
       // 表格全部列
@@ -52,14 +52,6 @@ class EnvironmentalFactorsModel extends React.Component {
     this.initTable();
     this.getParamData();
     this.props.getFun(this.selectUpdateDataSource);
-  }
-
-  // 监听是否提交
-  componentDidUpdate(props) {
-    if (props.submitStatus !== this.props.submitStatus) {
-      const data = this.formatSubmitData();
-      if (data !== undefined && data.length > 0) this.props.getData(data, 'environmentFactor');
-    }
   }
 
   // 初始化表格
@@ -118,8 +110,14 @@ class EnvironmentalFactorsModel extends React.Component {
   };
 
   // 提交数据格式化
-  formatSubmitData = () => {
-    const { data, headers } = this.state;
+  formatSubmitData = (tableSources, type) => {
+    const { paramList } = this.state;
+    let { data, headers } = this.state;
+    if (type === 'tableHeader') {
+      headers = tableSources;
+    } else if (type === 'tableData') {
+      data = tableSources;
+    }
 
     if (data.length === 0 || headers.length === 0) return false;
 
@@ -140,7 +138,7 @@ class EnvironmentalFactorsModel extends React.Component {
         if (item[`header_${i}`] !== '') {
           const sampleValue = {
             sampleId: item.sampleId,
-            sampleAlias: item.sampleAlias,
+            sampleName: item.sampleName,
           };
           const sampleList = [];
           sampleList.push(sampleValue);
@@ -161,8 +159,17 @@ class EnvironmentalFactorsModel extends React.Component {
       });
     }
     // 验证数据
-    const errorNum = this.verifyData(tableData);
-    if (errorNum === 1) return tableData;
+    const error = this.verifyData(tableData);
+    if (error) return false;
+    const newData = {
+      paramData: {
+        paramKey: paramList.paramKey,
+        paramValue: JSON.stringify(tableData),
+        taskModelId: paramList.taskModelId,
+      },
+      isVerify: true,
+    };
+    this.props.getData(newData.paramData, 'environmentFactor', newData.isVerify);
     return false;
   };
 
@@ -171,14 +178,14 @@ class EnvironmentalFactorsModel extends React.Component {
    * 1. 环境因子下不能全部为空
    */
   verifyData = tableData => {
-    let errorNum = true;
+    let error = false;
     tableData.forEach(item => {
       if (item.environmentFactorValueList.length === 0) {
         message.error('存在空的环境因子');
-        errorNum = false;
+        error = true;
       }
     });
-    return errorNum;
+    return error;
   };
 
   /**
@@ -187,7 +194,7 @@ class EnvironmentalFactorsModel extends React.Component {
    * tableList 表数据
    */
   getDataDispose = (tableHaed, tableList) => {
-    const newHeader = tableHaed.filter(item => item.dataIndex !== 'sampleAlias');
+    const newHeader = tableHaed.filter(item => item.dataIndex !== 'sampleName');
 
     // 获取表头
     const { firstColumn, lastColumn } = this.state;
@@ -318,6 +325,7 @@ class EnvironmentalFactorsModel extends React.Component {
         newHeader.push(newItem);
       }
     });
+    this.formatSubmitData(newHeader, 'tableHeader');
     this.setState({ headers: newHeader });
   };
 
@@ -346,7 +354,8 @@ class EnvironmentalFactorsModel extends React.Component {
         newData.push(newItem);
       }
     });
-    this.setState({ headers: newData });
+    this.formatSubmitData(newData, 'tableData');
+    this.setState({ data: newData });
   };
 
   /**
@@ -360,7 +369,8 @@ class EnvironmentalFactorsModel extends React.Component {
         <div className="project_manage_UI_sample_group_title" key={item.id}>
           <input
             defaultValue={item.title}
-            onChange={event => this.handleOnChangeTitle(item, event)}
+            // onChange={event => this.handleOnChangeTitle(item, event)}
+            onBlur={event => this.handleOnChangeTitle(item, event)}
             disabled={disabledIs}
           />
           {disabledIs ? '' : <CloseOutlined onClick={() => this.removeColumn(item)} />}
@@ -373,7 +383,8 @@ class EnvironmentalFactorsModel extends React.Component {
         <div className={style.editTable} key={item.id}>
           <input
             defaultValue={value}
-            onChange={event => this.handleOnChangeData(row, event, item.title)}
+            // onChange={event => this.handleOnChangeData(row, event, item.title)}
+            onBlur={event => this.handleOnChangeData(row, event, item.title)}
             disabled={disabledIs}
           />
         </div>
@@ -515,7 +526,7 @@ class EnvironmentalFactorsModel extends React.Component {
           columns.forEach(groItem => {
             newIt[groItem.dataIndex] = groItem.title;
           });
-          newIt.sampleAlias = it.sampleAlias;
+          newIt.sampleName = it.sampleName;
           newData.push(newIt);
         }
       });

@@ -70,7 +70,7 @@ class TaskList extends Component {
 
   // 查看任执行记录的参数
   searchParameter = row => {
-    const valueData = row.taskExecRecordParamList;
+    const valueData = row.taskExecRecordParams;
     api.getTaskParam(row.taskModelId).then(res => {
       // 对比合并参数
       const paramData = this.disposeTaskData(res);
@@ -237,7 +237,7 @@ class TaskList extends Component {
                             size="small"
                             columns={columns}
                             rowKey="id"
-                            dataSource={item.taskExecRecordList}
+                            dataSource={item.taskExecRecords}
                             pagination={false}
                           />
                         </div>

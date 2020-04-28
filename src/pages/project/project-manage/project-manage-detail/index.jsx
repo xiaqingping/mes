@@ -59,11 +59,12 @@ class ProjectDetail extends Component {
   handleAddProcesses = data => {
     const type = 'edit';
     const projectId = data.id;
-    router.push(`/project/project-manage/detail/addflowpath/${type}/${projectId}`);
+    router.push(`/project/project-manage/detail/${type}/${projectId}`);
   };
 
   // 获取表格数据
   getTableData = projectId => {
+    this.setState({ loading: true });
     api.getProjectProcess(projectId).then(res => {
       this.setState({ list: res });
     });

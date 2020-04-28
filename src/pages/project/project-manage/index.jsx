@@ -48,12 +48,10 @@ class ProjectManagement extends Component {
       pagination: {},
       loading: false,
       list: [],
-      nameCodeVal: [],
       projectIds: '', // 模糊搜索id值
       modelSearchOptions: [], // 任务模型模糊搜素options
     };
     // 异步验证做节流处理
-    // this.callParter = _.debounce(this.callParter, 500);
     this.fetchCodeData = debounce(this.fetchCodeData, 500);
   }
 
@@ -63,7 +61,6 @@ class ProjectManagement extends Component {
 
   fetchCodeData = value => {
     api.gettProjectManageCodeAndName(value).then(res => {
-      console.log(res);
       this.setState({ modelSearchOptions: res || [] });
     });
   };
@@ -71,7 +68,6 @@ class ProjectManagement extends Component {
   // 获取表格数据
   getTableData = (options = {}) => {
     const formData = this.tableSearchFormRef.current.getFieldsValue();
-    console.log(formData);
     const { pagination, projectIds } = this.state;
     const { current: page, pageSize } = pagination;
 
@@ -79,10 +75,10 @@ class ProjectManagement extends Component {
 
     let changePage = false;
     // 状态
-    if (formData.statusList) {
+    if (formData.status) {
       changePage = true;
-      newData = { ...newData, statusList: formData.statusList.join(',') };
-      delete formData.statusList;
+      newData = { ...newData, status: formData.status.join(',') };
+      delete formData.status;
     }
 
     // 创建时间
@@ -107,9 +103,7 @@ class ProjectManagement extends Component {
       ...options,
       id: projectIds,
     };
-    console.log(data);
     api.getProjectManage(data, true).then(res => {
-      // console.log(res)
       this.setState({
         list: res.results,
         pagination: {
@@ -120,13 +114,10 @@ class ProjectManagement extends Component {
         loading: false,
       });
     });
-    // console.log(list);
   };
 
   handleSearchCodeChange = value => {
-    console.log(value);
     const { pagination } = this.state;
-    // console.log(pagination);
     const page = {
       current: 1,
       pageSize: pagination.pageSize,
@@ -136,10 +127,7 @@ class ProjectManagement extends Component {
       {
         pagination: page,
         projectIds: value.value,
-      },
-      () => {
-        console.log(this.state);
-      },
+      }
     );
   };
 
@@ -170,9 +158,8 @@ class ProjectManagement extends Component {
   };
 
   simpleForm = () => {
-    const { languageCode, statusList } = this.props;
+    const { languageCode, status } = this.props;
     const { modelSearchOptions } = this.state;
-    // console.log(modelSearchOptions);
     return (
       <>
         <Col xxl={6} xl={8} lg={languageCode === 'EN' ? 12 : 12}>
@@ -198,9 +185,9 @@ class ProjectManagement extends Component {
           </FormItem>
         </Col>
         <Col xxl={6} xl={8} lg={languageCode === 'EN' ? 12 : 0}>
-          <FormItem label="状态" name="statusList">
+          <FormItem label="状态" name="status">
             <Select mode="multiple" maxTagCount={2} maxTagTextLength={3}>
-              {statusList.map(item => (
+              {status.map(item => (
                 <Option key={item.value} value={item.value}>
                   {item.text}
                 </Option>
@@ -248,7 +235,6 @@ class ProjectManagement extends Component {
       type: 'projectManage/setProjectData',
       payload: data,
     });
-    console.log(data);
     const projectId = row.id;
     router.push(`/project/project-manage/edit/${projectId}`);
   };
@@ -279,10 +265,6 @@ class ProjectManagement extends Component {
     }
   };
 
-  // speciesdetail =() => {
-  //   console.log(123);
-  //   router.push('/hts/analyze/metadata/paramList',);
-  // }
 
   // 状态下拉列表
   menuList = row => (
@@ -312,7 +294,7 @@ class ProjectManagement extends Component {
       loading,
       // statusVisible ,statusId
     } = this.state;
-    const { statusList, labelList } = this.props;
+    const { status, labels } = this.props;
     let tableWidth = 0;
 
     let columns = [
@@ -364,9 +346,9 @@ class ProjectManagement extends Component {
         title: '状态',
         dataIndex: 'status',
         width: '100px',
-        filters: statusList,
+        filters: status,
         render: (value, row) => {
-          const color = formatter(statusList, value, 'value', 'color');
+          const color = formatter(status, value, 'value', 'color');
           return (
             <Dropdown overlay={this.menuList(row)} className="classmenulist">
               <Button
@@ -377,7 +359,7 @@ class ProjectManagement extends Component {
                   textAlign: 'center',
                 }}
               >
-                {formatter(statusList, value, 'value', 'text')}
+                {formatter(status, value, 'value', 'text')}
               </Button>
             </Dropdown>
           );
@@ -385,13 +367,13 @@ class ProjectManagement extends Component {
       },
       {
         title: '标签',
-        dataIndex: 'labelList',
+        dataIndex: 'labels',
         width: 250,
         render: value => {
           const arr = [];
           if(value) {
             value.forEach(item => {
-              labelList.forEach(i => {
+              labels.forEach(i => {
                 if (i.id === item) {
                   arr.push(
                     <Tag color={i.color} key={i.id}>
@@ -408,15 +390,6 @@ class ProjectManagement extends Component {
       {
         title: '成员数',
         dataIndex: 'memberCount',
-        // render: value => (
-        //   <>
-        //     <div style={{ float: 'left', paddingLeft: '20px' }}>
-        //       <div>
-        //         <a onClick={() => this.speciesdetail ()}>{value}</a>
-        //       </div>
-        //     </div>
-        //   </>
-        // ),
       },
       {
         title: '开始-截止时间',
@@ -455,7 +428,6 @@ class ProjectManagement extends Component {
       return true;
     });
 
-    // console.log(list);
 
     return (
       <PageHeaderWrapper>
@@ -499,6 +471,6 @@ class ProjectManagement extends Component {
 export default connect(({ global, projectManage }) => ({
   languageCode: global.languageCode,
   projectManage,
-  statusList: projectManage.statusList,
-  labelList: projectManage.labelList,
+  status: projectManage.status,
+  labels: projectManage.labels,
 }))(ProjectManagement);
