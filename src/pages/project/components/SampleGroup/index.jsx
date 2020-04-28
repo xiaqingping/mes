@@ -72,20 +72,34 @@ class SampleGroup extends React.Component {
   }
 
   componentDidUpdate(props) {
-    if (props.submitStatus !== this.props.submitStatus) {
-      const list = this.verifyData();
-      console.log(list);
-      const { paramKey, taskModelId } = props;
-      const sendData = {
-        paramKey,
-        paramValue: JSON.stringify(list),
-        taskModelId,
-      };
-      // TODO: 是否校验通过
-      this.validPass = !!list;
-      this.props.getData(sendData, 'groupScheme', this.validPass);
-    }
+    // if (props.submitStatus !== this.props.submitStatus) {
+    //   const list = this.verifyData();
+    //   console.log(list);
+    //   const { paramKey, taskModelId } = props.paramList;
+    //   const sendData = {
+    //     paramKey,
+    //     paramValue: JSON.stringify(list),
+    //     taskModelId,
+    //   };
+    //   // TODO: 是否校验通过
+    //   this.validPass = !!list;
+    //   this.props.getData(sendData, 'groupScheme', this.validPass);
+    // }
   }
+
+  sendDataOnChange = () => {
+    const list = this.verifyData();
+    console.log(list);
+    const { paramKey, taskModelId } = this.props.paramList;
+    const sendData = {
+      paramKey,
+      paramValue: JSON.stringify(list),
+      taskModelId,
+    };
+
+    this.validPass = !!list;
+    this.props.getData(sendData, 'groupScheme', this.validPass);
+  };
 
   selectUpdateGroup = () => {
     const { sampleList, groupSchemeData, columns } = this.state;
@@ -463,6 +477,7 @@ class SampleGroup extends React.Component {
     this.setState({
       columns: cols,
     });
+    this.sendDataOnChange();
   };
 
   removeColumn = (item, id) => {
@@ -568,6 +583,7 @@ class SampleGroup extends React.Component {
       columns: cols,
       groupSchemeData: soure,
     });
+    this.sendDataOnChange();
   };
 
   confirmGroupRender = (groupName, preGroupName) => (
@@ -704,6 +720,7 @@ class SampleGroup extends React.Component {
     this.setState({
       optionList: list,
     });
+    this.sendDataOnChange();
     return true;
   };
 
@@ -763,8 +780,9 @@ class SampleGroup extends React.Component {
         return item && item !== '当前样品';
       });
       const validTrue1 = group.includes('当前样品') && hasOtherValue;
-      const validTrue2 = group.every(item => item === '');
-      const validFalse = validTrue1 || validTrue2;
+      // const validTrue2 = group.every(item => item === '');
+      // const validFalse = validTrue1 || validTrue2;
+      const validFalse = validTrue1;
       this.validPass = !validFalse;
       if (validFalse) {
         message.error('存在空分组方案或者分组方案包含样品和组');

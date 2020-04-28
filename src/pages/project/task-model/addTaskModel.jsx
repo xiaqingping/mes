@@ -122,6 +122,7 @@ class TaskModel extends Component {
             loading: false,
             picture: res.picture,
           });
+
           const { dispatch } = this.props;
           (this.tableSearchFormRef.current || {}).setFieldsValue(res);
 
@@ -198,6 +199,7 @@ class TaskModel extends Component {
               tableLoading: false,
             });
           });
+        this.getData(res);
       })
       .catch(() => {
         this.setState({
@@ -426,7 +428,7 @@ class TaskModel extends Component {
     data = [...tableData, ...value];
     (value || []).forEach(item => {
       idsData.unshift(item.id);
-      sonIdsData.unshift(...item.preTaskIds);
+      sonIdsData.unshift(...(item.preTaskIds || []));
     });
 
     const uuids = (data || []).map(e => e.picture);
@@ -487,7 +489,7 @@ class TaskModel extends Component {
 
   render() {
     const { taskModel } = this.props;
-    const { taskModelStatusOptions, editOriginModelData } = taskModel;
+    const { modelStatusOptions, editOriginModelData } = taskModel;
     const {
       tableData,
       visible,
@@ -550,8 +552,8 @@ class TaskModel extends Component {
         render: value => (
           <>
             <Badge
-              status={formatter(taskModelStatusOptions, value, 'value', 'status')}
-              text={formatter(taskModelStatusOptions, value, 'value', 'label')}
+              status={formatter(modelStatusOptions, value, 'value', 'status')}
+              text={formatter(modelStatusOptions, value, 'value', 'label')}
             />
           </>
         ),

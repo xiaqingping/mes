@@ -1,5 +1,5 @@
 import React from 'react';
-import { Table, Popover, Button, Modal, Input, Popconfirm } from 'antd';
+import { Table, Popover, Button, Popconfirm } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { SketchPicker } from 'react-color';
 import { getrandomColor } from '@/utils/utils';
@@ -174,24 +174,41 @@ class SampleSelect extends React.Component {
   }
 
   componentDidUpdate(props) {
-    if (props.submitStatus !== this.props.submitStatus) {
-      const { tableData } = this.state;
-      let list = [...tableData];
-      list = list.map(item => {
-        item.sampleId = item.id;
-        return item;
-      });
-
-      const { paramKey, taskModelId } = props;
-      const sendData = {
-        paramKey,
-        taskModelId,
-        paramValue: JSON.stringify(list),
-      };
-      this.validPass = !(this.props.paramList.required && list && !list.length);
-      this.props.getData(sendData, 'sampleSelect', this.validPass);
-    }
+    // if (props.submitStatus !== this.props.submitStatus) {
+    //   const { tableData } = this.state;
+    //   let list = [...tableData];
+    //   list = list.map(item => {
+    //     item.sampleId = item.id;
+    //     return item;
+    //   });
+    //   const { paramKey, taskModelId } = props;
+    //   const sendData = {
+    //     paramKey,
+    //     taskModelId,
+    //     paramValue: JSON.stringify(list),
+    //   };
+    //   this.validPass = !(this.props.paramList.required && list && !list.length);
+    //   this.props.getData(sendData, 'sampleSelect', this.validPass);
+    // }
   }
+
+  sendDataOnChange = () => {
+    const { tableData } = this.state;
+    let list = [...tableData];
+    list = list.map(item => {
+      item.sampleId = item.id;
+      return item;
+    });
+
+    const { paramKey, taskModelId } = this.props.paramList;
+    const sendData = {
+      paramKey,
+      taskModelId,
+      paramValue: JSON.stringify(list),
+    };
+    this.validPass = !(this.props.paramList.required && list && !list.length);
+    this.props.getData(sendData, 'sampleSelect', this.validPass);
+  };
 
   getTableData = () => {
     const { tableData } = this.state;
@@ -325,6 +342,7 @@ class SampleSelect extends React.Component {
     this.setState({
       tableData: list,
     });
+    this.sendDataOnChange();
   };
 
   // 查看已选择的
