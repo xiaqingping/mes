@@ -1,6 +1,9 @@
 import React from 'react';
 import { Form, Input, Button, Row, Col, Switch, Spin } from 'antd';
 
+/**
+ * 参数form 的基本结构
+ */
 class BaseFormItems extends React.Component {
   state = {};
 

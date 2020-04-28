@@ -786,7 +786,8 @@ class SampleGroup extends React.Component {
       }
     });
 
-    for (let i = 2; i < groupSchemeData.length + 2; i++) {
+    for (let i = 2; i < tableHeard.length + 2; i++) {
+      if (i === 6) console.log(tableHeard[i - 1]);
       if (!tableHeard[i - 2]) return false;
       // eslint-disable-next-line no-loop-func
       groupSchemeData.forEach(item => {

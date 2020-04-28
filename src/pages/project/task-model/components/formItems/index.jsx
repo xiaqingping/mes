@@ -5,6 +5,9 @@ import BaseFormItems from './baseFormItems';
 import NumericalInput from './numericalInput';
 import CheckedAndRadio from './checkAndRadio';
 
+/**
+ * 任务模型参数配置的工厂组件 统一判断需要展示的组件
+ */
 class FactoryComponent extends React.Component {
   state = {};
 
