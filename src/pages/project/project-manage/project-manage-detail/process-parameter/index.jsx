@@ -168,7 +168,6 @@ class ProcessParameter extends Component {
   onFinish = values => {
     this.setState({ submitStatus: true });
     const data = this.conversionData(values);
-    // console.log("values", values)
     const { requestType, processId, processModelId, projectId } = this.state;
     let url;
 
@@ -507,38 +506,23 @@ class ProcessParameter extends Component {
                       // this.getModelType(it, newIndex);
                       if (it.type === 'input')
                         return (
-                          // <InputModel
-                          //   paramList={it}
-                          //   key={newIndex}
-                          //   disabled={requestType === 'view'} // 禁用
-                          //   submitStatus={submitStatus} // 是否提交
-                          //   getData={this.getModelData} // 提交数据
-                          // />
-                          <InputNumberModel
+                          <InputModel
                             paramList={it}
                             key={newIndex}
-                            disabled={requestType === 'view'}
+                            disabled={requestType === 'view'} // 禁用
                             submitStatus={submitStatus} // 是否提交
                             getData={this.getModelData} // 提交数据
                           />
-
                         );
                       // 数值输入框
                       if (it.type === 'number_input') {
                         return (
-                          // <InputModel
-                          //   paramList={it}
-                          //   key={newIndex}
-                          //   disabled={requestType === 'view'}
-                          //   submitStatus={submitStatus}
-                          //   getData={this.getModelData}
-                          // />
                           <InputNumberModel
                             paramList={it}
                             key={newIndex}
                             disabled={requestType === 'view'}
-                            submitStatus={submitStatus} // 是否提交
-                            getData={this.getModelData} // 提交数据
+                            submitStatus={submitStatus}
+                            getData={this.getModelData}
                           />
                         );
                       }
