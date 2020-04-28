@@ -263,7 +263,8 @@ class Group extends React.Component {
   // };
 
   // 传数据
-  submitData = subData => {
+  submitData = (subData, a, b) => {
+    console.log(b);
     console.log(subData.paramValue);
   };
 

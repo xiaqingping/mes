@@ -39,6 +39,8 @@ class SampleGroup extends React.Component {
     ],
   };
 
+  validPass = null;
+
   firstColumn = {
     id: 1,
     title: '样品',
@@ -79,7 +81,8 @@ class SampleGroup extends React.Component {
         paramValue: list,
         taskModelId,
       };
-      this.props.getData(sendData, 'groupScheme');
+      // TODO: 是否校验通过
+      this.props.getData(sendData, 'groupScheme', this.validPass);
     }
   }
 
@@ -424,7 +427,6 @@ class SampleGroup extends React.Component {
               <span
                 className="sample_group_table_title_close"
                 onClick={() => this.removeColumn(item)}
-                // style={{ position: 'absolute', right: 0, top: 0 }}
               >
                 ×
               </span>
@@ -603,7 +605,7 @@ class SampleGroup extends React.Component {
   setOtherSame = (row, value, option, datas, col, index, color1) => {
     // 先判断这列是否有同名的, 如果有, 则依照原来的, 如果没有就照自己的,
     const num = col.split('_')[1];
-    const hasSame = datas.some(item => {
+    datas.some(item => {
       if (item[col] === option) {
         // eslint-disable-next-line
         row[`color_${num}`] = item[`color_${num}`];
@@ -762,6 +764,7 @@ class SampleGroup extends React.Component {
       const validTrue1 = group.includes('当前样品') && hasOtherValue;
       const validTrue2 = group.every(item => item === '');
       const validFalse = validTrue1 || validTrue2;
+      this.validPass = !validFalse;
       if (validFalse) {
         return message.error('存在空分组方案或者分组方案包含样品和组');
       }

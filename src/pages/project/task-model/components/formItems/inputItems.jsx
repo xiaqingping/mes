@@ -1,6 +1,9 @@
 import React from 'react';
-import { Form, Input, Button, Row, Col, Switch, Spin } from 'antd';
+import { Form, Input, Row, Col, Switch } from 'antd';
 
+/**
+ * 单行输入的表单结构
+ */
 class InputItems extends React.Component {
   state = {};
 

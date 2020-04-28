@@ -12,7 +12,9 @@ import disk from '@/pages/project/api/disk';
 const { Option } = Select;
 
 const FormItem = Form.Item;
-
+/**
+ * 前置任务列表  任务模型选择前置任务
+ */
 class BeforeTask extends React.Component {
   tableSearchFormRef = React.createRef();
 
@@ -41,14 +43,24 @@ class BeforeTask extends React.Component {
     this.getTableData(this.initialValues);
   }
 
+  /**
+   * modal表title
+   */
   titleContent = () => <div style={{ fontSize: '16px' }}>选择任务模型</div>;
 
+  /**
+   * Modal点击确认操作
+   */
   handleOk = () => {
     this.setState({
       visible: false,
     });
   };
 
+  /**
+   * 获取表格数据
+   * @param {Object} option 外部传入的props
+   */
   getTableData = (options = {}) => {
     this.setState({ loading: true });
     const { pagination, value } = this.state;
@@ -104,6 +116,10 @@ class BeforeTask extends React.Component {
       });
   };
 
+  /**
+   * 获取模糊搜索的数据
+   * @param {String} 用户输入在input框中的值
+   */
   fetchData = value => {
     api.getTaskNameAndCode(value).then(res => {
       this.setState({
@@ -112,6 +128,10 @@ class BeforeTask extends React.Component {
     });
   };
 
+  /**
+   * 更新value
+   * @param {Object} value 用户选中的值
+   */
   handleSelectChange = value => {
     const { pagination } = this.state;
     const page = {
@@ -125,6 +145,9 @@ class BeforeTask extends React.Component {
     });
   };
 
+  /**
+   * 简单模式下的DOM
+   */
   simpleForm = () => {
     const { children } = this.state;
     return (
@@ -158,6 +181,10 @@ class BeforeTask extends React.Component {
     );
   };
 
+  /**
+   * 获取前置任务数据
+   *  @param {String}} 用户选中的id
+   */
   sendData = async id => {
     this.setState({
       loading: true,
@@ -175,6 +202,9 @@ class BeforeTask extends React.Component {
     this.props.onClose();
   };
 
+  /**
+   * 表格点击页码，筛选的回调
+   */
   handleChange = p => {
     const page = p.current;
     const rows = p.pageSize;
@@ -266,7 +296,6 @@ class BeforeTask extends React.Component {
             <Table
               columns={columns}
               dataSource={list}
-              // loading={loading}
               rowKey="id"
               size="small"
               pagination={pagination}
