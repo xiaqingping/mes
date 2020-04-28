@@ -76,7 +76,7 @@ class SecurityLayout extends React.Component {
       } else if (BASE_API === 'prod') {
         url = 'https://api.sangon.com/sysinfo';
       } else {
-        url = `https://${BASE_API}.sangon.com/sysinfo`;
+        url = `https://${BASE_API}api.sangon.com/sysinfo`;
       }
       Axios.get(url);
     });
