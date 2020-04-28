@@ -374,7 +374,7 @@ class ProcessEdit extends Component {
 
     if (preTaskIds.length !== 0) {
       preTaskIds.forEach(i => {
-        sonIdsData.some((item, index) => {
+        sonIdsData.forEach((item, index) => {
           if (i === item) {
             sonIdsData.splice(index, 1);
           }
@@ -428,6 +428,7 @@ class ProcessEdit extends Component {
         });
       }
     });
+
     value.forEach(item => {
       idsData.push(item.id);
       sonIdsData.push(...item.preTaskIds);
