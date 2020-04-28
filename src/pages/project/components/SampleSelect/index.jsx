@@ -4,14 +4,13 @@ import { PlusOutlined } from '@ant-design/icons';
 import { SketchPicker } from 'react-color';
 import { getrandomColor } from '@/utils/utils';
 import { connect } from 'dva';
-import api from './api/sample';
 import SampleChoose from './components/SampleChoose';
 import './index.less';
 
 class SampleSelect extends React.Component {
   static getDerivedStateFromProps(nextProps) {
     return {
-      tableDatas: nextProps.sampleList || [],
+      tableDatas: nextProps.paramList.paramValue || [],
       disabled: nextProps.disabled,
     };
   }
@@ -148,6 +147,8 @@ class SampleSelect extends React.Component {
     ],
   };
 
+  validPass = null;
+
   componentDidMount() {
     const { tableDatas, disabled, columns } = this.state;
     const tableData = JSON.parse(JSON.stringify(tableDatas));
@@ -187,7 +188,8 @@ class SampleSelect extends React.Component {
         taskModelId,
         paramValue: JSON.stringify(list),
       };
-      this.props.getData(sendData, 'sampleSelect');
+      this.validPass = !(this.props.paramList.required && list && !list.length);
+      this.props.getData(sendData, 'sampleSelect', this.validPass);
     }
   }
 
