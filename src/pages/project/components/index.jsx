@@ -263,7 +263,8 @@ class Group extends React.Component {
   // };
 
   // 传数据
-  submitData = subData => {
+  submitData = (subData, a, b) => {
+    console.log(b);
     console.log(subData.paramValue);
   };
 
@@ -278,7 +279,7 @@ class Group extends React.Component {
     const { sampleList, groupSchemeData, submitStatus } = this.state;
     return (
       <Card>
-        <SampleSelect
+        {/* <SampleSelect
           sampleList={sampleList}
           // 当样品选择改变的时候
           emitData={this.getSelectUpdateData}
@@ -288,7 +289,7 @@ class Group extends React.Component {
           submitStatus={submitStatus}
           setSelectState={this.setSelectState}
           disabled={false}
-        />
+        /> */}
         <SampleGroup
           groupSchemeData={groupSchemeData}
           sampleList={sampleList} // 当样品选择改变的时候

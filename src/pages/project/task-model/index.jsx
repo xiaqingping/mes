@@ -25,8 +25,6 @@ import debounce from 'lodash/debounce';
 import router from 'umi/router';
 import { formatter, getOperates } from '@/utils/utils';
 import api from '@/pages/project/api/taskmodel';
-// import SampleSelect from '@/pages/project/components/SampleSelect';
-// import SampleGroup from '@/pages/project/components/SampleGroup';
 import disk from '@/pages/project/api/disk';
 import DefaultHeadPicture from '@/assets/imgs/upload_middle.png';
 import StandardTable from '../components/StandardTable';
@@ -35,6 +33,9 @@ import TaskModelView from './taskModelView';
 const FormItem = Form.Item;
 const { Option } = Select;
 
+/**
+ * 任务模型列表页面
+ */
 class TaskModel extends Component {
   tableSearchFormRef = React.createRef();
 
@@ -69,6 +70,9 @@ class TaskModel extends Component {
     this.getTableData(this.initialValues);
   }
 
+  /**
+   * 获取表格数据
+   */
   getTableData = (options = {}) => {
     const {
       pagination,
@@ -132,7 +136,11 @@ class TaskModel extends Component {
       });
   };
 
-  // 筛选状态
+  /**
+   * 状态筛选
+   * @param {Object} pagination 页码对象
+   * @param {Object} filters 所有选择的状态对象
+   */
   handleStandardTableChange = (pagination, filters) => {
     const { filtersData } = this.state;
     let filterData = {};
@@ -157,12 +165,20 @@ class TaskModel extends Component {
     });
   };
 
+  /**
+   * 搜索任务模型用户键入时请求模糊数据
+   * @param {String} value 用户键入的值
+   */
   fetchCodeData = value => {
     api.searchTaskModel(value).then(res => {
       this.setState({ modelSearchOptions: res || [] });
     });
   };
 
+  /**
+   * 用户选择模型，设置选择的值
+   * @param {String} value 用户选择的一条数据
+   */
   handleSearchCodeChange = value => {
     const { pagination } = this.state;
     const page = {
@@ -176,6 +192,10 @@ class TaskModel extends Component {
     });
   };
 
+  /**
+   * 发布人模糊搜索
+   * @param {String} value 用户键入的值
+   */
   fetchPublisherData = value => {
     api.searchPublisherName(value).then(res => {
       this.setState({
@@ -184,6 +204,10 @@ class TaskModel extends Component {
     });
   };
 
+  /**
+   * 选中发布人
+   * @param {String} value 用户选择的一条数据
+   */
   handlePubisherChange = v => {
     const { pagination } = this.state;
     const page = {
@@ -196,8 +220,9 @@ class TaskModel extends Component {
     });
   };
 
-  // ---------------------------------------------------------------------------------
-
+  /**
+   * 简单表单模式DOM结构
+   */
   simpleForm = () => {
     const { languageCode, status } = this.props;
     const { modelSearchOptions, publisherOptions } = this.state;
@@ -276,21 +301,32 @@ class TaskModel extends Component {
     );
   };
 
+  /**
+   * 关闭查看参数抽屉
+   */
   onClose = () => {
     this.setState({
       visible: false,
     });
   };
-  // 新建模型
 
+  /**
+   * 新建模型
+   */
   handleAdd = () => {
     router.push('/project/task-model/add');
   };
 
+  /**
+   * 修改模型
+   */
   goToEdit = id => {
     router.push(`/project/task-model/edit/${id}`);
   };
 
+  /**
+   * 查看模型
+   */
   viewDetails = v => {
     const { dispatch } = this.props;
     dispatch({
@@ -303,7 +339,9 @@ class TaskModel extends Component {
     });
   };
 
-  // 发布
+  /**
+   * 发布模型
+   */
   publishModel = v => {
     api.publishTaskModel(v.id).then(() => {
       message.success('任务模型发布成功!');
@@ -312,7 +350,9 @@ class TaskModel extends Component {
     });
   };
 
-  // 禁用模型
+  /**
+   * 禁用模型
+   */
   forbiddenModel = id => {
     api
       .forbiddenTaskModel(id)
@@ -328,6 +368,11 @@ class TaskModel extends Component {
       });
   };
 
+  /**
+   * 子组件要求父组件关闭抽屉
+   * @param {Boolean} v 是否关闭
+   * @param {String} id 禁用id
+   */
   reGetData = (v, id) => {
     if (v) {
       this.setState({
@@ -339,7 +384,9 @@ class TaskModel extends Component {
     }
   };
 
-  // 删除模型
+  /**
+   * 删除模型
+   */
   deleteModel = id => {
     api.deleteTaskModel(id).then(() => {
       message.success('任务模型删除成功!');
@@ -347,11 +394,18 @@ class TaskModel extends Component {
     });
   };
 
-  // 升级
+  /**
+   * 升级模型
+   */
   upgradeModel = id => {
     router.push(`/project/task-model/up/${id}-up`);
   };
 
+  /**
+   * 根据操作字段，做相应操作
+   * @param {String} op 操作
+   * @param {Object} v 每行数据
+   */
   operate = (op, v) => {
     // op: 操作  v: 每行的数据
     if (op === '发布') {
@@ -360,7 +414,6 @@ class TaskModel extends Component {
       this.goToEdit(v.id);
     } else if (op === '删除') {
       this.confirm(v.id);
-      // this.deleteModel(v.id);
     } else if (op === '查看') {
       this.viewDetails(v);
     } else if (op === '升级') {
@@ -370,6 +423,10 @@ class TaskModel extends Component {
     }
   };
 
+  /**
+   * 模型删除确认
+   * @param {String} id 删除模型的id
+   */
   confirm(id) {
     Modal.confirm({
       title: '是否确定删除?',
@@ -414,6 +471,7 @@ class TaskModel extends Component {
         width: 400,
         dataIndex: 'describe',
         key: 'describe',
+        ellipsis: true,
       },
       {
         title: '发布人/时间',
@@ -502,7 +560,6 @@ class TaskModel extends Component {
     columns = columns.map(col => {
       // eslint-disable-next-line no-param-reassign
       if (!col.width) col.width = 100;
-      // tableWidth += col.width;
       if (!col.editable) {
         return col;
       }

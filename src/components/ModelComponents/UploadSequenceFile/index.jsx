@@ -47,28 +47,6 @@ class UploadSequenceFile extends React.Component {
     });
   };
 
-  // // 上传文件
-  // handleUpload = e => {
-  //   const file = e.target.files;
-  //   console.log(file);
-  //   const data = new FormData();
-  //   let filesData = [];
-  //   const AllImgExt = '.xls|.xlsx';
-  //   for (let i = 0; i < file.length; i++) {
-  //     const fileArr = file[i].name.split('.');
-  //     if (AllImgExt.indexOf(fileArr[fileArr.length - 1]) === -1) {
-  //       message.error('文件格式不正确');
-  //       return false;
-  //     }
-  //     data.append('file', file[i]);
-  //     filesData = [...filesData, file[i].name];
-  //   }
-  //   api.getFileProcessExcels(data).then(res => {
-  //     this.checkData(res);
-  //   });
-  //   return true;
-  // };
-
   // 上传文件
   handleUpload = e => {
     const file = e.target.files;
@@ -206,6 +184,7 @@ class UploadSequenceFile extends React.Component {
         {
           title: tableHead[key],
           dataIndex: key,
+          key,
         },
       ];
     });
@@ -247,7 +226,7 @@ class UploadSequenceFile extends React.Component {
         </div>
 
         {/* 表格 */}
-        <div style={{ clear: 'both' }}>
+        <div style={{ clear: 'both' }} className="setTitleColor">
           <Table
             rowKey={record => record.sampleIdentificationCode}
             dataSource={tableList}

@@ -11,6 +11,9 @@ import ArgumentModel from './argumentModel';
 const { TabPane } = Tabs;
 // import TitleModel from './components/titleModel';
 
+/**
+ * 任务模型查看页面的tab  展示其前置任务和后置任务
+ */
 class TaskModelTabs extends Component {
   static getDerivedStateFromProps(nextProps) {
     return {
@@ -31,19 +34,17 @@ class TaskModelTabs extends Component {
     toViewArgument: false,
   };
 
+  /**
+   * 根据id查询出所有的前置任务
+   */
   getPreData = async id => {
     this.setState({
       preLoading: true,
     });
 
-    // const data = await api.getPreTasks(id);
-    // api.getPreTasks(id).then()
-
     this.setState({
       preLoading: false,
     });
-    // return data || [];
-    // debugger;
     api.getPreTasks(id).then(res => {
       this.setState({
         preTaskList: res || [],
@@ -51,8 +52,10 @@ class TaskModelTabs extends Component {
     });
   };
 
-  onChange = () => {};
-
+  /**
+   * 获取被选中的模型的id
+   * @param {Object} item 被查看的任务模型数据
+   */
   toViewParams = item => {
     this.setState({
       viewVisible: true,
@@ -68,6 +71,9 @@ class TaskModelTabs extends Component {
     });
   };
 
+  /**
+   * 关闭抽屉， 清除数据
+   */
   onViewClose = () => {
     this.setState({
       viewVisible: false,
@@ -91,7 +97,7 @@ class TaskModelTabs extends Component {
     // debugger;
     return (
       <div className="task_model_view_tab_wrap">
-        <Tabs defaultActiveKey="1" onChange={this.onChange}>
+        <Tabs defaultActiveKey="1">
           <TabPane tab="前置任务" key="1">
             {preLoading ? (
               <div className="task_model_pre_task_loading">

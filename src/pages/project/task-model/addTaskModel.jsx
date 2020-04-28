@@ -30,12 +30,19 @@ import DefaultHeadPicture from '@/assets/imgs/upload_middle.png';
 import ArgumentModel from './components/argumentModel';
 import BeforeTask from './components/beforeTask';
 
+/**
+ * 图片转化成base64
+ */
 function getBase64(img, callback) {
   const reader = new FileReader();
   reader.addEventListener('load', () => callback(reader.result));
   reader.readAsDataURL(img);
 }
 
+/**
+ * 上传前的校验
+ * @param {Binary} file 上传的文件
+ */
 function beforeUpload(file) {
   const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png';
   if (!isJpgOrPng) {
@@ -48,6 +55,9 @@ function beforeUpload(file) {
   return isJpgOrPng && isLt2M;
 }
 
+/**
+ * 任务模型的新建，修改，升级， 查看页面
+ */
 class TaskModel extends Component {
   tableSearchFormRef = React.createRef();
 
@@ -89,6 +99,10 @@ class TaskModel extends Component {
     };
   }
 
+  /**
+   * 页面渲染时根据url判断是新增，修改，升级，查看里的哪一种
+   * 获取相应数据
+   */
   componentDidMount() {
     const { isAdd, id } = this.state;
     if (isAdd) {
@@ -137,6 +151,9 @@ class TaskModel extends Component {
     }
   }
 
+  /**
+   * 组件销毁清除数据
+   */
   componentWillUnmount() {
     const { dispatch } = this.props;
     dispatch({
@@ -145,6 +162,9 @@ class TaskModel extends Component {
     });
   }
 
+  /**
+   * 根据新的id， 获取模型的前置任务和后置任务
+   */
   getTableData = id => {
     this.setState({
       tableLoading: true,
@@ -186,7 +206,10 @@ class TaskModel extends Component {
       });
   };
 
-  // 图片上传
+  /**
+   * 文件上传过程中的change事件
+   * @param {Object} info 文件上传信息
+   */
   handleChange = info => {
     if (info.file.status === 'uploading') {
       this.setState({ loading: true });
@@ -210,25 +233,30 @@ class TaskModel extends Component {
     }
   };
 
-  // 导航列表title样式
+  /**
+   * 设置页面头部展示信息
+   */
   navContent = () => {
     const { pageModel } = this.state;
     const { editOriginModelData } = this.props.taskModel;
-
     if (pageModel) {
-      return <div>{`${editOriginModelData.name} ${editOriginModelData.id}`}</div>;
+      return <div>{`${editOriginModelData.name} ${editOriginModelData.code}`}</div>;
     }
-    return '';
+    return true;
   };
 
-  // 任务模型列表title样式
+  /**
+   * 设置前置任务列表的title
+   */
   titleContent = () => (
     <>
       <div style={{ fontWeight: 'bolder', marginTop: 10, fontSize: 16 }}>前置任务列表</div>
     </>
   );
 
-  // 提交上传
+  /**
+   * 数据提交
+   */
   onFinish = () => {
     const {
       checked,
@@ -261,12 +289,13 @@ class TaskModel extends Component {
       loading: true,
     });
 
+    console.log(form);
+
     if (pageModel === 0) {
       api
         .createTaskModel(form)
         .then(() => {
           message.success('任务模型创建成功!');
-          // dispatchList();
           router.push('/project/task-model');
         })
         .catch(() => {
@@ -308,16 +337,23 @@ class TaskModel extends Component {
     return true;
   };
 
+  /**
+   * 校验失败
+   */
   onFinishFailed = () => false;
 
-  // 点击打开关联
+  /**
+   * 打开关联模型modal
+   */
   onOpen = () => {
     this.setState({
       visible: true,
     });
   };
 
-  // 点击关闭关联 添加数据到表格
+  /**
+   * 点击关闭关联 添加数据到表格
+   */
   onClose = (row, select) => {
     const { tableData } = this.state;
     const tableData1 = [...tableData];
@@ -332,6 +368,10 @@ class TaskModel extends Component {
     }
   };
 
+  /**
+   * 删除某一项前置任务
+   * @param {Object} row 需要删除的那一项的数据对象
+   */
   handleDelete = row => {
     const { tableData } = this.state;
     let list = [...tableData];
@@ -341,6 +381,9 @@ class TaskModel extends Component {
     });
   };
 
+  /**
+   * 打开参数抽屉， 设置当前参数id
+   */
   openArgumentModel = () => {
     const { dispatch } = this.props;
     const { id } = this.state;
@@ -353,19 +396,28 @@ class TaskModel extends Component {
     });
   };
 
+  /**
+   * 关闭参数抽屉
+   */
   onArgumentClose = () => {
     this.setState({
       argumentVisible: false,
     });
   };
 
+  /**
+   * 设置开关状态
+   */
   switchChange = e => {
     this.setState({
       checked: e,
     });
   };
 
-  // 获取子级数据
+  /**
+   * 获取子级数据
+   * @param {Object} value 子组件传过来的数据对象
+   */
   getData = async value => {
     const { tableData, ids, sonIds } = this.state;
     let data = tableData;
@@ -405,7 +457,9 @@ class TaskModel extends Component {
     });
   };
 
-  // 删除确认
+  /**
+   * 删除确认
+   */
   confirm = value => {
     const { tableData, ids, sonIds } = this.state;
     const data = tableData;
@@ -552,7 +606,6 @@ class TaskModel extends Component {
             <Row>
               <Col xxl={14}>
                 <div style={{ float: 'left', marginLeft: '1%' }}>
-                  {/* <Form.Item name="uploadPIc"> */}
                   <Upload
                     name="files"
                     listType="picture-card"
@@ -573,7 +626,6 @@ class TaskModel extends Component {
                       uploadButton
                     )}
                   </Upload>
-                  {/* </Form.Item> */}
                 </div>
                 <div style={{ float: 'left', width: '62%', minWidth: '500px', marginLeft: '20px' }}>
                   <Form.Item
@@ -642,7 +694,6 @@ class TaskModel extends Component {
                       }}
                     >
                       {pageModel ? selectVersion || editOriginModelData.version : 'V1.0'}
-                      {/* {selectVersion || processDetail.version} */}
                     </Tag>
                     {versionOpen && pageModel === 2 && (
                       <Card
@@ -679,7 +730,7 @@ class TaskModel extends Component {
                     verticalAlign: 'middle',
                   }}
                 >
-                  <Form.Item name="isAutomatic" valuePropName="checked">
+                  <Form.Item valuePropName="checked">
                     <span style={{ fontSize: '16px', marginRight: 10 }}>是否可自动运行：</span>
                     <Switch checked={checked} onChange={this.switchChange} />
                   </Form.Item>
@@ -722,15 +773,9 @@ class TaskModel extends Component {
           <Card
             style={{ height: '48px', width: '100%', position: 'fixed', bottom: '0', left: '0' }}
           >
-            <Form.Item>
-              <Button
-                type="primary"
-                style={{ float: 'right', marginTop: '-32px' }}
-                htmlType="submit"
-              >
-                提交
-              </Button>
-            </Form.Item>
+            <Button type="primary" style={{ float: 'right', marginTop: '-32px' }} htmlType="submit">
+              提交
+            </Button>
           </Card>
         </Form>
         <BeforeTask

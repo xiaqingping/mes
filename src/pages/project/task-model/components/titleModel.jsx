@@ -1,5 +1,5 @@
 import React from 'react';
-import { Avatar, Tag, Card, Spin, message } from 'antd';
+import { Avatar, Tag, Spin, message, Popover } from 'antd';
 import { DownOutlined, UpOutlined } from '@ant-design/icons';
 import { connect } from 'dva';
 import api from '@/pages/project/api/taskmodel';
@@ -8,6 +8,9 @@ import { versionSort } from '@/utils/utils';
 import ArgumentModel from './argumentModel';
 import '../index.less';
 
+/**
+ * 任务模型查看抽屉的title
+ */
 class TitleModel extends React.Component {
   state = {
     open: false,
@@ -53,7 +56,10 @@ class TitleModel extends React.Component {
     }
   }
 
-  // 切换版本
+  /**
+   * 切换版本
+   * @param {String} 版本号
+   */
   switchVersion = item => {
     const { versionOpen, viewData } = this.state;
 
@@ -68,7 +74,9 @@ class TitleModel extends React.Component {
     );
   };
 
-  // 点击禁用， 禁用任务
+  /**
+   * 禁用模型
+   */
   handleForbidden = id => {
     this.setState({
       loading: true,
@@ -92,8 +100,11 @@ class TitleModel extends React.Component {
     // this.props.reload('1', id);
   };
 
-  // 根据code和版本获取详细信息
-
+  /**
+   * 根据code和版本获取详细信息
+   * @param {String} code 任务模型code
+   * @param {String} version 模型版本
+   */
   getDetailByCodeVer = (code, version) => {
     const { dispatch } = this.props;
     api.getdetailByCodeVer(code, version).then(res => {
@@ -108,6 +119,10 @@ class TitleModel extends React.Component {
     });
   };
 
+  /**
+   * 设置当前任务模型的参数id
+   * @param {Object} item 当前任务模型的详细信息
+   */
   viewParams = item => {
     this.setState({
       viewVisible: true,
@@ -124,11 +139,37 @@ class TitleModel extends React.Component {
     });
   };
 
+  /**
+   * 关闭抽屉， 消除数据
+   */
   onViewClose = () => {
     this.setState({
       viewVisible: false,
       toViewArgument: false,
     });
+  };
+
+  /**
+   * 切换版本的popover的DOM结构
+   * @param {Array} versionType 模型的所有版本号
+   * @param {String} selectVersion 选择的版本号
+   * @param {Object} viewData 当前模型的详细信息
+   */
+  popoverContent = (versionType, selectVersion, viewData) => {
+    return versionType.map(item => (
+      <div>
+        <Tag
+          key={item}
+          color={item === (selectVersion || viewData.version) ? 'green' : ''}
+          style={{ cursor: 'pointer' }}
+          onClick={() => {
+            this.switchVersion(item);
+          }}
+        >
+          {item}
+        </Tag>
+      </div>
+    ));
   };
 
   render() {
@@ -142,12 +183,12 @@ class TitleModel extends React.Component {
       toViewArgument,
       loading,
     } = this.state;
+
     return loading ? (
       <div style={{ textAlign: 'center' }}>
         <Spin />
       </div>
     ) : (
-      // style={{ borderBottom: '1px solid #f0f0f0' }}
       <div>
         <div
           style={{
@@ -174,37 +215,23 @@ class TitleModel extends React.Component {
 
           <div>
             <div style={{ position: 'relative', display: 'inline-block' }}>
-              <Tag
-                // color="green"
-                style={{ cursor: 'pointer' }}
-                onClick={() => {
-                  this.setState({ versionOpen: !versionOpen });
-                }}
+              <Popover
+                visible={versionOpen && (versionType || []).length > 1}
+                overlayClassName="task_model_view_version_tag"
+                placement="bottom"
+                content={
+                  (versionType || []).length > 1 &&
+                  this.popoverContent(versionType, selectVersion, viewData)
+                }
               >
-                {selectVersion || viewData.version}
-                {/* {selectVersion || processDetail.version} */}
-              </Tag>
-              {versionOpen && (versionType || []).length > 1 && (
-                <Card
-                  style={{ position: 'absolute', zIndex: '100', top: '28px' }}
-                  hoverable
-                  className="padding-none"
+                <Tag
+                  // color="green"
+                  style={{ cursor: 'pointer' }}
+                  onClick={() => this.setState({ versionOpen: true })}
                 >
-                  {(versionType || []).length > 1 &&
-                    versionType.map(item => (
-                      <Tag
-                        key={item}
-                        color={item === (selectVersion || viewData.version) ? 'green' : ''}
-                        style={{ cursor: 'pointer' }}
-                        onClick={() => {
-                          this.switchVersion(item);
-                        }}
-                      >
-                        {item}
-                      </Tag>
-                    ))}
-                </Card>
-              )}
+                  {selectVersion || viewData.version}
+                </Tag>
+              </Popover>
             </div>
           </div>
 
