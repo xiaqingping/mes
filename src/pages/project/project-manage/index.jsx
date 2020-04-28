@@ -370,7 +370,6 @@ class ProjectManagement extends Component {
         dataIndex: 'labels',
         width: 250,
         render: value => {
-          console.log(value);
           const arr = [];
           value.forEach(item => {
             labels.forEach(i => {
