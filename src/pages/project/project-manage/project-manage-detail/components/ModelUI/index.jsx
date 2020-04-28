@@ -23,7 +23,7 @@ const EditInforModel = props => {
   const handleOk = async () => {
     const row = await form.validateFields();
     const data = {
-      id: props.processList.id,
+      id: props.rowData.id,
       ...row,
     };
     props.getData(data);
@@ -51,7 +51,7 @@ const EditInforModel = props => {
           <Form
             name="basic"
             form={form}
-            initialValues={{ name: props.processList.name, describe: props.processList.describe }}
+            initialValues={{ name: props.rowData.name, describe: props.rowData.describe }}
           >
             <FormItem label="名称" name="name" rules={[{ message: '请输入名称!' }]}>
               <Input style={{ width: 260, height: 32 }} />

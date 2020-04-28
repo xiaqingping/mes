@@ -11,12 +11,10 @@ import { Checkbox, Form, message } from 'antd';
 class CheckBoxModel extends React.Component {
   constructor(props) {
     super(props);
-    console.log(props);
     this.state = {
       paramList: props.paramList,
       selectList: [],
       checkedValues: [],
-      // checkedValues: ['k3'],
     };
   }
 
@@ -25,25 +23,21 @@ class CheckBoxModel extends React.Component {
     this.formatGetData();
   };
 
-  // 监听是否提交
-  componentDidUpdate(props) {
-    if (props.submitStatus !== this.props.submitStatus) {
-      const data = this.formatSubmitData();
-      this.props.getData(data, 'checkBox');
-    }
-  }
-
   // 格式化提交数据
-  formatSubmitData = () => {
-    const error = this.verifyData();
+  formatSubmitData = checkedValues => {
+    const { paramList } = this.state;
+    const error = this.verifyData(checkedValues);
     if (error) return false;
-    const { paramList, checkedValues } = this.state;
     const data = {
-      paramKey: paramList.paramKey,
-      paramValue: checkedValues,
-      taskModelId: paramList.taskModelId,
+      paramData: {
+        paramKey: paramList.paramKey,
+        paramValue: JSON.stringify(checkedValues),
+        taskModelId: paramList.taskModelId,
+      },
+      isVerify: true,
     };
-    return data;
+    this.props.getData(data.paramData, 'checkBox', data.isVerify);
+    return false;
   };
 
   // 处理获取到的数据
@@ -61,12 +55,15 @@ class CheckBoxModel extends React.Component {
         selectList.push(newItem);
       }
     });
-    this.setState({ selectList });
+    // 解析参数值
+    let checkedValues = [];
+    if (paramList.paramValue) checkedValues = JSON.parse(paramList.paramValue);
+    this.setState({ selectList, checkedValues });
   };
 
   // 验证数据
-  verifyData = () => {
-    const { paramList, checkedValues } = this.state;
+  verifyData = checkedValues => {
+    const { paramList } = this.state;
     let error = false;
     if (paramList.isRequired === 'true') {
       if (checkedValues.length === 0) {
@@ -74,37 +71,29 @@ class CheckBoxModel extends React.Component {
         error = true;
       }
     }
+    if (checkedValues.length === 0) error = true;
     return error;
   };
 
   // 获取选中项
   onChange = checkedValues => {
-    this.setState({ checkedValues });
+    this.formatSubmitData(checkedValues);
   };
 
   render() {
     const { paramList, checkedValues, selectList } = this.state;
     const data = paramList;
 
-    // const options = [
-    //   { label: 'v1', value: 'k1' },
-    //   { label: 'v2', value: 'k2' },
-    //   { label: 'v3', value: 'k3' },
-    // ];
-
     return (
       <Form.Item
         label={data.paramName}
-        name={data.paramKey}
         rules={[
           {
             required: data.isRequired,
-            // pattern: data.validRules || '',
             message: data.validDesc || '',
           },
         ]}
       >
-        {/* <Checkbox.Group options={options} defaultValue={['k1']} /> */}
         <Checkbox.Group
           options={selectList}
           defaultValue={checkedValues}

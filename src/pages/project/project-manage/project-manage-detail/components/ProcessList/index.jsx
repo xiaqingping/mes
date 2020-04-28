@@ -24,11 +24,11 @@ class ProcessList extends Component {
     const { data } = this.props;
     this.state = {
       // 表格
-      list: data.processList, // 表格数据
+      list: data.processes, // 表格数据
       loading: false, // 加载状态
       editIndex: -1, // 当前编辑行icon
       visibleModel: false, // 是否显示编辑模态框
-      processList: [], // 选中编辑行数据
+      rowData: [], // 选中编辑行数据
 
       // 任务列表抽屉
       visibleDrawer: false, // 是否显示抽屉
@@ -46,7 +46,7 @@ class ProcessList extends Component {
     this.setState({ loading: true });
     api.getProjectProcess(projectId).then(res => {
       this.setState({
-        list: res.processList,
+        list: res.processes,
         loading: false,
       });
     });
@@ -99,7 +99,7 @@ class ProcessList extends Component {
     this.setState({
       test: true,
       visibleModel: true,
-      processList: row,
+      rowData: row,
     });
   };
 
@@ -137,7 +137,7 @@ class ProcessList extends Component {
       loading,
       editIndex,
       visibleModel,
-      processList,
+      rowData,
       visibleDrawer,
       detailList,
       taskList,
@@ -249,6 +249,7 @@ class ProcessList extends Component {
       <>
         <Form ref={this.tableFormRef}>
           <Table
+            style={{ paddingRight: 30 }}
             scroll={{ x: tableWidth, y: 400 }}
             rowKey="id"
             loading={loading}
@@ -277,7 +278,7 @@ class ProcessList extends Component {
           visible={visibleModel}
           submit={test}
           onClose={this.onCloseModel}
-          processList={processList}
+          rowData={rowData}
           getData={this.getEditModelData}
         />
       </>

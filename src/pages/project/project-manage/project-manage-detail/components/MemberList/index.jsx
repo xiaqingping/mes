@@ -106,7 +106,6 @@ class MemberList extends Component {
         render: value => (
           <div style={{ display: 'flex' }}>
             <img
-              // src={row.path}
               src="/favicon.png"
               alt=""
               height="50"
@@ -181,6 +180,7 @@ class MemberList extends Component {
             dataSource={list}
             columns={columns}
             onChange={this.handleStandardTableChange}
+            pagination={false}
           />
         </Form>
         <EditJurisdictionModel

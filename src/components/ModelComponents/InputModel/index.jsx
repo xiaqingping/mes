@@ -20,52 +20,47 @@ class InputModel extends React.Component {
     };
   }
 
-  // 监听提交状态
-  componentDidUpdate(props) {
-    if (props.submitStatus !== this.props.submitStatus) {
-      const data = this.formatSubmitData();
-      this.props.getData(data, 'input');
-    }
-  }
+  componentDidMount() {}
 
-  // 提交数据格式化
-  formatSubmitData = () => {
-    const error = this.verifyData();
-    if (error) return false;
-    const { paramList, inputValue } = this.state;
-    const data = {
-      paramKey: paramList.paramKey,
-      paramValue: inputValue,
-      taskModelId: paramList.taskModelId,
-    };
-    return data;
+  // 实时获取数据 回传给父组件
+  onBlur = e => {
+    this.formatSubmitData(e.target.value);
   };
 
-  // 获取数据
-  onChange = e => {
-    const { paramKey, paramValue, defaultValue } = this.state.paramList;
-    let error;
-    if (e.target.value === '') {
-      error = this.verifyData();
-      if (error) {
-        if (defaultValue === undefined || paramValue === undefined) return false;
-        e.target.setValue({ [paramKey]: paramValue || defaultValue });
-      }
-    }
-    if (!error) this.setState({ inputValue: e.target.value });
+  // 格式化提交数据
+  formatSubmitData = value => {
+    const error = this.verifyData(value);
+    if (error) return false;
+    const { paramList } = this.state;
+    const data = {
+      paramData: {
+        paramKey: paramList.paramKey,
+        paramValue: value,
+        taskModelId: paramList.taskModelId,
+      },
+      isVerify: true,
+    };
+    this.props.getData(data.paramData, 'input', data.isVerify);
     return false;
   };
 
   // 验证数据
-  verifyData = () => {
-    const { paramList, inputValue } = this.state;
+  verifyData = value => {
+    const { paramName, defaultValue, validDesc, isrequired } = this.state.paramList;
     let error = false;
-    if (paramList.isrequired === 'true') {
-      if (inputValue === '' || inputValue === undefined) {
-        message.warning(`${paramList.paramName}`);
-        error = true;
+    if (isrequired === 'true') {
+      if (!value) {
+        if (!defaultValue) {
+          if (validDesc) {
+            message.warning(validDesc);
+          } else {
+            message.warning(`${paramName}不能为空`);
+          }
+          error = true;
+        }
       }
     }
+    if (!value) error = true;
     return error;
   };
 
@@ -86,7 +81,7 @@ class InputModel extends React.Component {
           placeholder={data.placeholder}
           disabled={this.props.disabled}
           defaultValue={inputValue || data.defaultValue}
-          onChange={event => this.onChange(event)}
+          onBlur={event => this.onBlur(event)}
         />
       </Form.Item>
     );
