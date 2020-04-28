@@ -6,6 +6,7 @@ import { connect } from 'dva';
 import router from 'umi/router';
 import api from '@/pages/project/api/projectManageDetail';
 import { QuestionCircleOutlined } from '@ant-design/icons';
+
 /** 参数组件引用 */
 // eslint-disable-next-line max-len
 import EnvironmentalFactorsModel from '@/components/ModelComponents/EnvironmentalFactorsModel';
@@ -13,6 +14,8 @@ import SampleGroupModel from '@/components/ModelComponents/SampleGroupModel/inde
 import SampleSelectModel from '@/components/ModelComponents/SampleSelectModel/index';
 import CheckBoxModel from '@/components/ModelComponents/CheckBoxModel/index';
 import InputModel from '@/components/ModelComponents/InputModel/index';
+import InputNumberModel from '@/components/ModelComponents/InputNumberModel';
+
 /** 样式 */
 import style from './index.less';
 
@@ -43,11 +46,12 @@ class ProcessParameter extends Component {
       submitData: [],
     };
     // 判断请求类型
-    this.determineTheRequestType();
+    this.determineTheRequestType()
   }
 
   // 组件加载时
-  componentDidMount = () => {};
+  componentDidMount = () => {
+  };
 
   // 判断请求类型
   determineTheRequestType = () => {
@@ -85,7 +89,6 @@ class ProcessParameter extends Component {
    */
   getParamData = (param, paramValue) => {
     const { requestType } = this.state;
-
     if (param.length > 0) {
       // 处理参数数据
       const newParam = this.deleteNullGroup(param); // 删除参数为空的分组
@@ -164,9 +167,8 @@ class ProcessParameter extends Component {
   // 保存提交
   onFinish = values => {
     this.setState({ submitStatus: true });
-    console.log(this.state);
-
     const data = this.conversionData(values);
+    // console.log("values", values)
     const { requestType, processId, processModelId, projectId } = this.state;
     let url;
 
@@ -189,9 +191,9 @@ class ProcessParameter extends Component {
       if (projectId) url = `/project/project-manage/add/addflowpath/edit/${projectId}`;
       return router.push(url);
     }
-
     // 编辑
     if (requestType === 'edit') {
+
       api.updateProcessesParameter(processId, data).then(() => {
         if (projectId === '') url = `/project/project-manage`;
         if (projectId !== '') url = `/project/project-manage/detail/${projectId}`;
@@ -204,9 +206,10 @@ class ProcessParameter extends Component {
   // 提交指令 组件返回数据
   getModelData = data => {
     const { submitData } = this.state;
-    console.log(data);
+    // console.log(submitData);
+    // console.log(data);
     const newData = [...submitData, data];
-    console.log(newData);
+    // console.log(newData);
     this.setState({ submitData: newData });
   };
 
@@ -255,6 +258,7 @@ class ProcessParameter extends Component {
     // 合并
     const data = [];
     dataKeys.forEach((key, indexK) => {
+
       dataValues.forEach((val, indexV) => {
         const newItem = {};
         if (indexK === indexV) {
@@ -470,8 +474,7 @@ class ProcessParameter extends Component {
 
   render() {
     const { paramList, sampleList, submitStatus, requestType } = this.state;
-    const data = paramList;
-
+    const data = paramList
     return (
       <>
         <PageHeaderWrapper style={{ marginBottom: 100 }}>
@@ -481,6 +484,7 @@ class ProcessParameter extends Component {
             onFinish={this.onFinish}
             onFinishFailed={this.onFinishFailed}
           >
+
             <List
               dataSource={data}
               renderItem={item => (
@@ -503,25 +507,41 @@ class ProcessParameter extends Component {
                       // this.getModelType(it, newIndex);
                       if (it.type === 'input')
                         return (
-                          <InputModel
+                          // <InputModel
+                          //   paramList={it}
+                          //   key={newIndex}
+                          //   disabled={requestType === 'view'} // 禁用
+                          //   submitStatus={submitStatus} // 是否提交
+                          //   getData={this.getModelData} // 提交数据
+                          // />
+                          <InputNumberModel
                             paramList={it}
                             key={newIndex}
-                            disabled={requestType === 'view'} // 禁用
+                            disabled={requestType === 'view'}
+                            submitStatus={submitStatus} // 是否提交
+                            getData={this.getModelData} // 提交数据
+                          />
+
+                        );
+                      // 数值输入框
+                      if (it.type === 'number_input') {
+                        return (
+                          // <InputModel
+                          //   paramList={it}
+                          //   key={newIndex}
+                          //   disabled={requestType === 'view'}
+                          //   submitStatus={submitStatus}
+                          //   getData={this.getModelData}
+                          // />
+                          <InputNumberModel
+                            paramList={it}
+                            key={newIndex}
+                            disabled={requestType === 'view'}
                             submitStatus={submitStatus} // 是否提交
                             getData={this.getModelData} // 提交数据
                           />
                         );
-                      // 数值输入框
-                      if (it.type === 'number_input')
-                        return (
-                          <InputModel
-                            paramList={it}
-                            key={newIndex}
-                            disabled={requestType === 'view'}
-                            submitStatus={submitStatus}
-                            getData={this.getModelData}
-                          />
-                        );
+                      }
                       // 单选
                       if (it.type === 'radio')
                         return (
@@ -609,10 +629,10 @@ class ProcessParameter extends Component {
                 {requestType === 'view' ? (
                   ''
                 ) : (
-                  <Button type="primary" htmlType="submit">
-                    提交
-                  </Button>
-                )}
+                    <Button type="primary" htmlType="submit">
+                      提交
+                    </Button>
+                  )}
               </div>
             </Footer>
           </Form>
