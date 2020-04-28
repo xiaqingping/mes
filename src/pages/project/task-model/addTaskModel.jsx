@@ -214,9 +214,8 @@ class TaskModel extends Component {
   navContent = () => {
     const { pageModel } = this.state;
     const { editOriginModelData } = this.props.taskModel;
-
     if (pageModel) {
-      return <div>{`${editOriginModelData.name} ${editOriginModelData.id}`}</div>;
+      return <div>{`${editOriginModelData.name} ${editOriginModelData.code}`}</div>;
     }
     return '';
   };

@@ -31,11 +31,16 @@ class ProcessParameter extends Component {
       processModelId, // 流程模型ID
       projectId, // 项目ID
       paramList: [], // 参数列表
-      processParam: [], // 流程模型参数
-      processParamValue: [], // 流程参数值
-      submitStatus: false, // 是否提交
+      // 流程模型参数
+      processParam: [],
+      // 流程参数值
+      processParamValue: [],
+      // 是否提交
+      submitStatus: false,
       // 样品选择框 样品列表
       sampleList: [],
+      // 提交的数据
+      submitData: [],
     };
     // 判断请求类型
     this.determineTheRequestType();
@@ -159,12 +164,16 @@ class ProcessParameter extends Component {
   // 保存提交
   onFinish = values => {
     this.setState({ submitStatus: true });
+    console.log(this.state);
+
     const data = this.conversionData(values);
-    const { requestType, processId, processModelId } = this.state;
+    const { requestType, processId, processModelId, projectId } = this.state;
+    let url;
 
     // 添加 修改
-    if (requestType === 'add' || requestType === 'updateParam') {
-      const paramsList = sessionStorage.getItem('processForParams');
+    if (requestType === 'add' || requestType === 'update') {
+      const paramsList = JSON.parse(sessionStorage.getItem('processForParams'));
+      console.log(paramsList);
       const newData = { params: data, processModelId };
       const list = [];
       if (paramsList === '' || paramsList === null) {
@@ -174,22 +183,31 @@ class ProcessParameter extends Component {
       }
 
       sessionStorage.setItem('processForParams', JSON.stringify(list));
-      return router.push('/project/project-manage/add/addflowpath/');
+      // sessionStorage.removeItem('processForParams');
+      if (projectId === '' || projectId === undefined)
+        url = `/project/project-manage/add/addflowpath`;
+      if (projectId) url = `/project/project-manage/add/addflowpath/edit/${projectId}`;
+      return router.push(url);
     }
-
-    // 修改
-    // if (requestType === 'updateParam') {}
 
     // 编辑
     if (requestType === 'edit') {
-      const { projectId } = this.state;
       api.updateProcessesParameter(processId, data).then(() => {
-        if (projectId === '') return router.push(`/project/project-manage`);
-        router.push(`/project/project-manage/detail/${projectId}`);
-        return false;
+        if (projectId === '') url = `/project/project-manage`;
+        if (projectId !== '') url = `/project/project-manage/detail/${projectId}`;
+        return router.push(url);
       });
     }
     return false;
+  };
+
+  // 提交指令 组件返回数据
+  getModelData = data => {
+    const { submitData } = this.state;
+    console.log(data);
+    const newData = [...submitData, data];
+    console.log(newData);
+    this.setState({ submitData: newData });
   };
 
   // 保存时 参数数据格式转换
@@ -426,16 +444,15 @@ class ProcessParameter extends Component {
     const { requestType, projectId } = this.state;
     let url;
     if (requestType === 'add' || requestType === 'update') {
-      return router.push(`/project/project-manage/add/addflowpath`);
+      if (projectId) url = `/project/project-manage/add/addflowpath/edit/${projectId}`;
+      if (projectId === '' || projectId === undefined)
+        url = `/project/project-manage/add/addflowpath`;
+    } else {
+      if (projectId === '') url = `/project/project-manage`;
+      if (projectId !== '') url = `/project/project-manage/detail/${projectId}`;
     }
-    if (projectId === '') url = `/project/project-manage`;
-    if (projectId !== '') url = `/project/project-manage/detail/${projectId}`;
-    return router.push(url);
-  };
 
-  // 提交指令 组件返回数据
-  getData = data => {
-    console.log(data);
+    return router.push(url);
   };
 
   // 获取样品选择框的实时数据
@@ -469,13 +486,17 @@ class ProcessParameter extends Component {
               renderItem={item => (
                 <List.Item>
                   <Card
-                    title={item.groupName}
-                    style={{ width: '100%' }}
-                    extra={
-                      <Tooltip placement="right" title={item.groupDescribe}>
-                        <QuestionCircleOutlined />
-                      </Tooltip>
+                    title={
+                      <>
+                        <span style={{ display: 'inline-block' }}>{item.groupName}</span>
+                        <span style={{ display: 'inline-block', marginLeft: 30 }}>
+                          <Tooltip placement="right" title={<span>{item.groupDescribe}</span>}>
+                            <QuestionCircleOutlined />
+                          </Tooltip>
+                        </span>
+                      </>
                     }
+                    style={{ width: '100%' }}
                   >
                     {item.params.map((it, index) => {
                       const newIndex = JSON.parse(JSON.stringify(index));
@@ -487,7 +508,7 @@ class ProcessParameter extends Component {
                             key={newIndex}
                             disabled={requestType === 'view'} // 禁用
                             submitStatus={submitStatus} // 是否提交
-                            getData={this.getData} // 提交数据
+                            getData={this.getModelData} // 提交数据
                           />
                         );
                       // 数值输入框
@@ -498,7 +519,7 @@ class ProcessParameter extends Component {
                             key={newIndex}
                             disabled={requestType === 'view'}
                             submitStatus={submitStatus}
-                            getData={this.getData}
+                            getData={this.getModelData}
                           />
                         );
                       // 单选
@@ -509,18 +530,18 @@ class ProcessParameter extends Component {
                             key={newIndex}
                             disabled={requestType === 'view'}
                             submitStatus={submitStatus}
-                            getData={this.getData}
+                            getData={this.getModelData}
                           />
                         );
                       // 多选
                       if (it.type === 'checkbox')
                         return (
-                          <InputModel
+                          <CheckBoxModel
                             paramList={it}
                             key={newIndex}
                             disabled={requestType === 'view'}
                             submitStatus={submitStatus}
-                            getData={this.getData}
+                            getData={this.getModelData}
                           />
                         );
                       // 样品选择框
@@ -532,7 +553,7 @@ class ProcessParameter extends Component {
                             disabled={requestType === 'view'}
                             submitStatus={submitStatus}
                             sampleList={sampleList} // 样品列表
-                            getData={this.getData}
+                            getData={this.getModelData}
                             // 当样品选择改变的时候
                             emitData={this.getSelectUpdateData}
                             setSelectState={this.setSelectState}
@@ -547,7 +568,7 @@ class ProcessParameter extends Component {
                             disabled={requestType === 'view'}
                             submitStatus={submitStatus}
                             sampleList={sampleList}
-                            getData={this.getData}
+                            getData={this.getModelData}
                             // 样品列表改变执行事件
                             getFun={func => {
                               this.handleUpdateSampleGroup = func;
@@ -564,7 +585,7 @@ class ProcessParameter extends Component {
                             disabled={requestType === 'view'}
                             submitStatus={submitStatus}
                             sampleList={sampleList}
-                            getData={this.getData}
+                            getData={this.getModelData}
                             // 样品列表改变执行事件
                             getFun={func => {
                               this.handleUpdateEnvironmentFactor = func;
@@ -581,16 +602,17 @@ class ProcessParameter extends Component {
 
             <Footer className={style.footer}>
               <div className={style.button}>
-                {/* <Button type="primary" onClick={() => this.setSubmit()}>
-                  组件提交
-                </Button> */}
                 <Button className={style.back} onClick={() => this.goBackLink()}>
                   返回
                 </Button>
                 {/* <Button type="primary" htmlType="submit" onClick={() => this.saveParam()}> */}
-                <Button type="primary" htmlType="submit">
-                  提交
-                </Button>
+                {requestType === 'view' ? (
+                  ''
+                ) : (
+                  <Button type="primary" htmlType="submit">
+                    提交
+                  </Button>
+                )}
               </div>
             </Footer>
           </Form>

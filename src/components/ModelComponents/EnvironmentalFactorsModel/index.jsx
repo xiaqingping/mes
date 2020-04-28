@@ -2,7 +2,7 @@
  * 环境因子表
  */
 import React from 'react';
-import { Table, Card, Button, message } from 'antd';
+import { Table, Button, message } from 'antd';
 import { CloseOutlined, PlusSquareOutlined, UploadOutlined } from '@ant-design/icons';
 import style from './index.less';
 import UploadSequenceFile from './UploadSequenceFile';
@@ -465,9 +465,11 @@ class EnvironmentalFactorsModel extends React.Component {
             if (rowItem.sampleId === samItem.sampleId) {
               Object.keys(rowItem).map(key => {
                 if (rowItem[key] === environmentFactorName) {
+                  // eslint-disable-next-line no-param-reassign
                   rowItem[key] = valItem.environmentFactorValue;
                 }
                 // 删除多余属性
+                // eslint-disable-next-line no-param-reassign
                 delete rowItem.sampleColor;
                 return false;
               });
@@ -527,6 +529,7 @@ class EnvironmentalFactorsModel extends React.Component {
     let tableWidth = 0;
 
     const newColumns = columns.map(col => {
+      // eslint-disable-next-line no-param-reassign
       if (!col.width) col.width = 100;
       tableWidth += col.width;
       if (!col.editable) {

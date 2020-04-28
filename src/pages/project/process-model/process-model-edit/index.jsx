@@ -158,10 +158,11 @@ class ProcessEdit extends Component {
         imageUrl: disk.downloadFiles(res.picture, { view: true }),
       });
       this.props.dispatch({
-        type: 'processModel/setProcessDetail',
+        type: 'processModel/setValue',
         payload: {
           ...res,
         },
+        key: 'processDetail',
       });
 
       if (res.version) {
@@ -200,7 +201,7 @@ class ProcessEdit extends Component {
   navContent = processData => {
     const { pageModel } = this.state;
     if (pageModel) {
-      return <div>{`${processData.name} ${processData.id}`}</div>;
+      return <div>{`${processData.name} ${processData.code}`}</div>;
     }
     return '';
   };
