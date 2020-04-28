@@ -30,7 +30,7 @@ class ProgressMould extends Component {
 
   // 查询流程进度及状态
   getProcessesProgressData = percentData => {
-    api.getProcessesProgress({ processIdList: [percentData.id].join(',') }).then(res => {
+    api.getProcessesProgress({ processIds: [percentData.id].join(',') }).then(res => {
       this.setState({
         percent: res[0].processProgress,
         status: res[0].status,

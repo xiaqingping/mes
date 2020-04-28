@@ -8,9 +8,7 @@ import api from '@/pages/hts/api';
 import { message } from 'antd';
 import { TableModel } from '../components/AntdUI';
 import { FieldDrawer } from '../components/ModelUI';
-import NumberModels from '../components/NumberSelected';
-import Raio from '../components/TheRadio';
-import './index.less'
+import './index.less';
 
 class paramList extends Component {
   constructor(props) {
@@ -530,10 +528,6 @@ class paramList extends Component {
           columns={newEnvironmentalFactorColumns}
           tableWidth={tableWidth}
         />
-
-        <NumberModels title="OTU聚类" getData={v => this.getData(v)} />
-
-        <Raio title="物种分类" />
 
         {/* 序列文件抽屉 */}
         <FieldDrawer visible={visibleField} onClose={this.onCloseFieldDrawer} data={rowData} />
