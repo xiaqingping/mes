@@ -1,10 +1,9 @@
 import React from 'react';
-import { Table, Popover, Button, Modal, Input, Popconfirm } from 'antd';
+import { Table, Popover, Button, Popconfirm } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { SketchPicker } from 'react-color';
 import { getrandomColor } from '@/utils/utils';
 import { connect } from 'dva';
-import api from './api/sample';
 import SampleChoose from './components/SampleChoose';
 import './index.less';
 
@@ -148,6 +147,8 @@ class SampleSelect extends React.Component {
     ],
   };
 
+  validPass = null;
+
   componentDidMount() {
     const { tableDatas, disabled, columns } = this.state;
     const tableData = JSON.parse(JSON.stringify(tableDatas));
@@ -173,23 +174,41 @@ class SampleSelect extends React.Component {
   }
 
   componentDidUpdate(props) {
-    if (props.submitStatus !== this.props.submitStatus) {
-      const { tableData } = this.state;
-      let list = [...tableData];
-      list = list.map(item => {
-        item.sampleId = item.id;
-        return item;
-      });
-
-      const { paramKey, taskModelId } = props;
-      const sendData = {
-        paramKey,
-        taskModelId,
-        paramValue: JSON.stringify(list),
-      };
-      this.props.getData(sendData, 'sampleSelect');
-    }
+    // if (props.submitStatus !== this.props.submitStatus) {
+    //   const { tableData } = this.state;
+    //   let list = [...tableData];
+    //   list = list.map(item => {
+    //     item.sampleId = item.id;
+    //     return item;
+    //   });
+    //   const { paramKey, taskModelId } = props;
+    //   const sendData = {
+    //     paramKey,
+    //     taskModelId,
+    //     paramValue: JSON.stringify(list),
+    //   };
+    //   this.validPass = !(this.props.paramList.required && list && !list.length);
+    //   this.props.getData(sendData, 'sampleSelect', this.validPass);
+    // }
   }
+
+  sendDataOnChange = () => {
+    const { tableData } = this.state;
+    let list = [...tableData];
+    list = list.map(item => {
+      item.sampleId = item.id;
+      return item;
+    });
+
+    const { paramKey, taskModelId } = this.props.paramList;
+    const sendData = {
+      paramKey,
+      taskModelId,
+      paramValue: JSON.stringify(list),
+    };
+    this.validPass = !(this.props.paramList.required && list && !list.length);
+    this.props.getData(sendData, 'sampleSelect', this.validPass);
+  };
 
   getTableData = () => {
     const { tableData } = this.state;
@@ -323,6 +342,7 @@ class SampleSelect extends React.Component {
     this.setState({
       tableData: list,
     });
+    this.sendDataOnChange();
   };
 
   // 查看已选择的
@@ -393,6 +413,13 @@ class SampleSelect extends React.Component {
 
   render() {
     const { visible, sampleId, chooseFileIds, tableData, columns, disabled } = this.state;
+    // console.log(tableData);
+    // let tableList = [];
+    // if (tableDatas.length) {
+    //   tableList = tableDatas;
+    // } else {
+    //   tableList = tableData;
+    // }
 
     return (
       <>
