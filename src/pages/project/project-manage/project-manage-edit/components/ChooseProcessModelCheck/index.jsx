@@ -14,25 +14,23 @@ class ChooseProcessModelCheck extends React.Component {
   }
 
   constructor(props) {
-    // console.log(props);
     super(props);
     this.state = {
       viewlist: props.viewlist, // 带过来的查看数据
     };
-    console.log(this.state);
   }
 
+  // 点击确定，关闭弹框
   vieweOk = () => {
     this.props.onClose();
-    // console.log('点击确定');
   };
 
+  // 点击x，关闭弹框
   viewCancel = () => {
     this.props.onClose();
   };
 
   render() {
-    // console.log(this.props);
     const { viewlist } = this.state;
 
     const columns = [

@@ -21,12 +21,9 @@ class ChooseProcessModel extends React.Component {
   tableSearchFormRef = React.createRef();
 
   constructor(props) {
-    // console.log(props);
     super(props);
 
     this.state = {
-      // pagination: {},
-      // loading: false,
       nameCodeVal: [],
       viewvisible: false,
       processlist: [], // 流程模型数据
@@ -34,20 +31,24 @@ class ChooseProcessModel extends React.Component {
       selecteditem: [], // 所有被选择的item数据的集合
       processCode: '',
       hasMore: true, // 是否开启下拉加载
-      // datas: [], // 接受我每次的数据
       page: 1,
       rows: 9,
-      count: 0, // 下拉加载
+      // count: 0, // 下拉加载
     };
 
     // 异步验证做节流处理
     this.callParter = _.debounce(this.callParter, 500);
   }
 
+  /**
+ * 渲染页面时调用
+ *getTableData 获取表格数据的方法名
+ */
   componentDidMount() {
     this.getTableData();
   }
 
+  // 异步验证做节流处理的方法
   callParter = value => {
     api.getProcessCodeAndName(value).then(res => {
       this.setState({ nameCodeVal: res });
@@ -56,34 +57,24 @@ class ChooseProcessModel extends React.Component {
 
   // 获取表格数据
   getTableData = (options = {}) => {
-    // this.setState({ loading: true });
     const formData = this.tableSearchFormRef.current
       ? this.tableSearchFormRef.current.getFieldsValue()
       : '';
-    console.log(formData);
 
     const {
       processCode,
       page,
       rows,
-      // datas,
-      count,
-      processlist,
     } = this.state;
-    console.log(count);
-    console.log(processCode);
     let newData = [];
     let changePage = false;
 
     if (formData.code) {
       changePage = true;
       newData = { ...newData, code: processCode };
-      console.log(newData);
-      console.log(changePage);
       delete formData.code;
     }
     const newPage = changePage ? { page: 1 } : page;
-    // console.log(newPage);
 
     const data = {
       page,
@@ -99,18 +90,16 @@ class ChooseProcessModel extends React.Component {
       this.setState(
         {
           processlist: res.rows,
-          // processlist: [...datas, ...processlist],
-          count: processlist.count,
           rows: rows + 1,
-          loading: false,
-        },
-        () => {
-          console.log(this.state);
-        },
-      );
+          // loading: false,
+        });
     });
   };
 
+  /**
+   * 搜索条件
+   * getTableData 获取表格数据的方法名
+   */
   simpleForm = () => {
     const { languageCode } = this.props;
     const { nameCodeVal } = this.state;
@@ -148,6 +137,7 @@ class ChooseProcessModel extends React.Component {
     ),
   });
 
+  // 选中联想框的值的方法
   inputValue = value => {
     const { nameCodeVal } = this.state;
     const arr = [];
@@ -168,63 +158,58 @@ class ChooseProcessModel extends React.Component {
     });
     this.setState({
       nameCodeVal: arr,
-      // allowClear: 'ture',
     });
-    console.log(nameCodeVal);
     return true;
   };
 
-  // 关闭
+  // 关闭模态框的方法
   handleCancel = () => {
     this.props.onClose();
   };
 
-  // 点击选中
+
+  /**
+   * 点击选中流程模型的方法
+   * @param {Object} idsList 存储已选中的流程模型的id
+   * @param {Array} processModelList 存储已选中的流程模型的整条数据
+   * @param {Object} selectedIds 选中的流程模型的id
+   * @param {Array} selecteditem 选中的流程模型的整条数据
+   */
   clickSelect = item => {
-    // console.log(item);
-    // const list =item.id;
     const { selectedIds, selecteditem } = this.state;
-    // console.log(this.state);
 
     const itemlist = item.id;
     if (!selectedIds.includes(itemlist)) {
-      // console.log('you');
 
       const idsList = [...selectedIds, itemlist];
-      const codeList = [...selecteditem, item];
-      // console.log(idsList);
-      // console.log(codeList);
+      const processModelList = [...selecteditem, item];
 
       this.setState(
         {
           selectedIds: idsList,
-          selecteditem: codeList,
-        },
-        () => {
-          // console.log(this.state);
-        },
+          selecteditem: processModelList,
+        }
       );
     }
     if (selectedIds.includes(itemlist)) {
       const newidsList = selectedIds.filter(value => value !== itemlist);
-      // console.log(newidsList);
-      // console.log('筛选值');
-      const newcodeList = selecteditem.filter(value => value.id !== itemlist);
-      // console.log(newcodeList);
+      const newProcessModelList = selecteditem.filter(value => value.id !== itemlist);
 
       this.setState(
         {
           selectedIds: newidsList,
-          selecteditem: newcodeList,
-        },
-        () => {
-          // console.log(this.state);
-        },
+          selecteditem: newProcessModelList,
+        }
       );
     }
   };
 
-  // 查看
+
+  /**
+   * 点击查看流程模型下的任务模型
+   * @param {Array} viewlist 存储的流程模型的数据
+   * viewvisible 控制任务模型的模态框是否弹出
+   */
   viewModal = item => {
     api.getProcessDetail(item.id).then(res => {
       this.setState({
@@ -237,12 +222,15 @@ class ChooseProcessModel extends React.Component {
     });
   };
 
-  // 点击确定保存数据
+
+  /**
+   * 点击确定保存数据
+   * @param {Array} selecteditem 所有被选择的流程模型数据的集合
+   * onClose 关闭流程模型弹框的方法
+   */
   handleOk = () => {
     const { selecteditem } = this.state;
-    console.log(selecteditem);
     this.props.getData(selecteditem);
-
     this.props.onClose();
   };
 
@@ -255,8 +243,6 @@ class ChooseProcessModel extends React.Component {
 
   render() {
     const { viewvisible, processlist, viewlist, hasMore } = this.state;
-    // console.log(this.state);
-    console.log(hasMore);
     return (
       <Card bordered={false}>
         <div>
@@ -361,7 +347,7 @@ class ChooseProcessModel extends React.Component {
                             className="isView"
                           >
                             <Button
-                              style={{ border: '0', color: '#005bc3' }}
+                              style={{ border: '0', color: '#108ee9' }}
                               onClick={() => this.viewModal(item)}
                             >
                               查看
