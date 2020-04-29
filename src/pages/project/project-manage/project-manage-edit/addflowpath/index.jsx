@@ -225,7 +225,8 @@ class Test extends Component {
               }
           })
         } else {
-          newItem.processesParams = paramList[0].params;
+          console.log(paramList);
+          newItem.processesParams = paramList.params;
         }
         newList.push(newItem);
       });
@@ -268,7 +269,7 @@ class Test extends Component {
               }
           })
         } else {
-          newItem.processesParams = paramList[0].params;
+          newItem.processesParams = paramList.params;
         }
         newList.push(newItem);
 

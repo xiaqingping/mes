@@ -342,7 +342,7 @@ class ProjectManagement extends Component {
       {
         title: '状态',
         dataIndex: 'status',
-        width: '100px',
+        width: '200px',
         filters: status,
         render: (value, row) => {
           const color = formatter(status, value, 'value', 'color');
@@ -354,7 +354,10 @@ class ProjectManagement extends Component {
                   color: '#fff',
                   borderRadius: '12px',
                   textAlign: 'center',
+                  width:'60px',
+                  height:'24px'
                 }}
+                size="small"
               >
                 {formatter(status, value, 'value', 'text')}
               </Button>
