@@ -564,7 +564,7 @@ class ProcessModel extends Component {
 
     return (
       <PageHeaderWrapper>
-        <Card bordered={false}>
+        <Card bordered={false} className="setSearchCard">
           <TableSearchForm
             ref={this.tableSearchFormRef}
             initialValues={this.initialValues}

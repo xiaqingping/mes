@@ -123,12 +123,10 @@ class ProjectManagement extends Component {
       pageSize: pagination.pageSize,
     };
 
-    this.setState(
-      {
-        pagination: page,
-        projectIds: value.value,
-      }
-    );
+    this.setState({
+      pagination: page,
+      projectIds: value.value,
+    });
   };
 
   // 分页
@@ -264,7 +262,6 @@ class ProjectManagement extends Component {
       });
     }
   };
-
 
   // 状态下拉列表
   menuList = row => (
@@ -426,11 +423,10 @@ class ProjectManagement extends Component {
       return true;
     });
 
-
     return (
       <PageHeaderWrapper>
-        <Card bordered={false}>
-          <div className="tableList classsimpleForm">
+        <Card bordered={false} className="setSearchCard">
+          <div>
             <TableSearchForm
               ref={this.tableSearchFormRef}
               initialValues={this.initialValues}
@@ -440,16 +436,15 @@ class ProjectManagement extends Component {
             />
           </div>
         </Card>
-        <Card style={{ marginTop: '24px' }} className="classtableList">
-          <div className="tableListOperator">
+        <Card style={{ marginTop: '24px' }}>
+          <div>
             <Button type="primary" onClick={() => this.handleAdd()}>
               <PlusOutlined />
               新建
             </Button>
           </div>
-          <Form ref={this.tableFormRef} className="table-style-set">
+          <Form ref={this.tableFormRef}>
             <StandardTable
-              className="classStandardTable"
               scroll={{ x: tableWidth }}
               rowClassName="editable-row"
               // rowKey="id"
