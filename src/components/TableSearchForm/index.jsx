@@ -3,7 +3,7 @@ import { DownOutlined, UpOutlined } from '@ant-design/icons';
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'umi/locale';
-import styles from './index.less';
+import './index.less';
 
 /**
  * 表格查询表单
@@ -27,7 +27,6 @@ const TableSearchForm = React.forwardRef((props, ref) => {
       ref={ref}
       form={form}
       name="表格搜索表单"
-      className={styles['table-search-form']}
       onFinish={onFinish}
       initialValues={props.initialValues}
     >
@@ -41,7 +40,7 @@ const TableSearchForm = React.forwardRef((props, ref) => {
             span={expand && props.advancedForm ? 24 : 6}
             style={expand && props.advancedForm ? { textAlign: 'right' } : { textAlign: 'center' }}
           >
-            <Button type="primary" htmlType="submit">
+            <Button type="primary" htmlType="submit" style={{ marginBottom: '24px' }}>
               <FormattedMessage id="action.search" />
             </Button>
             <Button
@@ -54,7 +53,7 @@ const TableSearchForm = React.forwardRef((props, ref) => {
             </Button>
             {props.advancedForm ? (
               <a
-                style={{ marginLeft: 8, fontSize: 12 }}
+                style={{ marginLeft: 8, fontSize: 14 }}
                 onClick={() => {
                   setExpand(!expand);
                 }}
