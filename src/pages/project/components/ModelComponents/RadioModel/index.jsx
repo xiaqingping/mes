@@ -7,7 +7,7 @@
  * @param {String} paramValue 默认值
  */
 import React from 'react';
-import { Select, Descriptions } from 'antd';
+import { Select, Descriptions, message } from 'antd';
 
 const { Option } = Select;
 
@@ -46,13 +46,30 @@ class radioModel extends React.Component {
       paramValue: value,
       taskModelId: paramList.taskModelId,
     }
-    this.props.getData(data, 'radio', true);
+    const verify = this.verifyData(value)
+    if(!verify) return
+    this.props.getData(data, 'radio', verify);
+  }
+
+  // 验证数据
+  verifyData = value => {
+    const { paramList } = this.state;
+    let verify = true
+    if (paramList.isRequired === 'true') {
+      if (value.length === 0) {
+        message.warning(`${paramList.paramName}参数不能为空`);
+        verify = true;
+      }
+      verify = false
+    }
+    return verify
   }
 
   setLabel = value => {
     const str = this.state.paramList.isRequired ? '（必填）' : '（选填）'
     return value + str
   }
+
 
   render() {
     const { paramList } = this.state
@@ -70,7 +87,7 @@ class radioModel extends React.Component {
           >
             {
               selectList.map(item =>
-              <Option key={item.selectKey} value={item.selectValue}>{item.selectValue}</Option>
+                <Option key={item.selectKey} value={item.selectValue}>{item.selectValue}</Option>
               )
             }
           </Select>

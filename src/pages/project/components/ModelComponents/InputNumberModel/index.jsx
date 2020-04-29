@@ -17,11 +17,12 @@ class NumberModels extends React.Component {
     super(props);
     // 处理paramValue
     const { paramList } = props
+    console.log(paramList.max)
     this.state = {
       paramList,
       inputValue: paramList.paramValue || 0,
-      max: paramList.maxNum || 1,
-      min: paramList.minNum || 0,
+      max: parseFloat(paramList.max) || 1,
+      min: parseFloat(paramList.min) || 0,
       inputMode: paramList.inputMode
     }
   }
