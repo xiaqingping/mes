@@ -34,6 +34,7 @@ class radioModel extends React.Component {
     return selectList
   }
 
+
   /**
    * 值的获取, 处理抛出结果
    * @param {string} 当前元素的值
