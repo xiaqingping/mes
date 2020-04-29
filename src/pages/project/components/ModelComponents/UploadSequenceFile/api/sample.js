@@ -1,9 +1,9 @@
 import request from '@/utils/request';
 
 // 2组
-let http2 = 'http://192.168.20.12:8460';
+let http2 = '/ngssamples';
 if (process.env.NODE_ENV !== 'development') {
-  http2 = '/projectmodel';
+  http2 = '/ngssamples';
 }
 
 export default {
