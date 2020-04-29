@@ -372,16 +372,17 @@ class ProcessEdit extends Component {
     const newData = data.filter(item => item.id !== value.id);
     const newIdsData = idsData.filter(item => item !== value.id);
 
-    if (preTaskIds.length !== 0) {
+    if (preTaskIds.length) {
       preTaskIds.forEach(i => {
-        sonIdsData.forEach((item, index) => {
+        sonIdsData.some((item, index) => {
           if (i === item) {
             sonIdsData.splice(index, 1);
+            return true;
           }
-          return true;
         });
       });
     }
+
     // 删除参数分类里的数据
     if (paramter) {
       const paramterData = paramter.map(item => {

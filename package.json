@@ -37,6 +37,7 @@
   "dependencies": {
     "@ant-design/icons": "^4.0.2",
     "@ant-design/pro-layout": "^5.0.5",
+    "@ant-design/pro-table": "^2.2.7",
     "@antv/g2plot": "^1.0.2",
     "antd": "^4.0.0",
     "axios": "^0.19.2",
