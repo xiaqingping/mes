@@ -86,7 +86,7 @@ class Metadata extends Component {
           </FormItem>
         </Col>
         <Col lg={6} md={8} sm={12}>
-          <FormItem label="状态" name="statusList">
+          <FormItem label="状态" name="status">
             <Select mode="multiple" style={{ width: '100%' }}>
               {status.map(e => (
                 <Option value={e.id} key={e.id}>
@@ -130,10 +130,10 @@ class Metadata extends Component {
     let newData = [];
 
     // 状态
-    if (formData.statusList) {
-      newData = { ...newData, statusList: formData.statusList.join(',') };
+    if (formData.status) {
+      newData = { ...newData, status: formData.status.join(',') };
       console.log(newData);
-      delete formData.statusList;
+      delete formData.status;
     }
 
     // 开始时间

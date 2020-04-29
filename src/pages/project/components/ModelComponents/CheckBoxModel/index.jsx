@@ -2,7 +2,7 @@ import React from 'react';
 import { Checkbox, Form, message } from 'antd';
 
 /**
- * 单行输入框
+ * 多选
  * @param {String} paramName 参数名称
  * @param {String} paramKey 参数Key
  * @param {boolean} isRequired 是否必填

@@ -8,11 +8,11 @@ import api from '@/pages/project/api/projectManageDetail';
 import { QuestionCircleOutlined } from '@ant-design/icons';
 /** 参数组件引用 */
 // eslint-disable-next-line max-len
-import EnvironmentalFactorsModel from '@/components/ModelComponents/EnvironmentalFactorsModel';
-import SampleGroupModel from '@/components/ModelComponents/SampleGroupModel/index';
-import SampleSelectModel from '@/components/ModelComponents/SampleSelectModel/index';
-import CheckBoxModel from '@/components/ModelComponents/CheckBoxModel/index';
-import InputModel from '@/components/ModelComponents/InputModel/index';
+import EnvironmentalFactorsModel from '@/pages/project/components/ModelComponents/EnvironmentalFactorsModel';
+import SampleGroupModel from '@/pages/project/components/ModelComponents/SampleGroupModel/index';
+import SampleSelectModel from '@/pages/project/components/ModelComponents/SampleSelectModel/index';
+import CheckBoxModel from '@/pages/project/components/ModelComponents/CheckBoxModel/index';
+import InputModel from '@/pages/project/components/ModelComponents/InputModel/index';
 /** 样式 */
 import style from './index.less';
 
@@ -167,6 +167,10 @@ class ProcessParameter extends Component {
   };
 
   // edit 设置表单初始值
+  /**
+   * 编辑状态 设置表单初始值
+   * @param {string} data 组件数据
+   */
   setInitialFromValues = data => {
     data.forEach(item => {
       const { paramKey } = item;
@@ -176,10 +180,9 @@ class ProcessParameter extends Component {
     });
   };
 
-  // 保存提交
+  /** 保存提交 */
   onSubmit = () => {
     const { paramList } = this.state;
-
     const { requestType, processId, processModelId, projectId } = this.state;
     let url;
 
@@ -195,7 +198,6 @@ class ProcessParameter extends Component {
       }
 
       sessionStorage.setItem('processForParams', JSON.stringify(list));
-      sessionStorage.removeItem('processForParams');
       if (projectId === '' || projectId === undefined)
         url = `/project/project-manage/add/addflowpath/add/''/1`;
       if (projectId) url = `/project/project-manage/detail/edit/${projectId}/2`;
@@ -236,6 +238,7 @@ class ProcessParameter extends Component {
       this.setState({
         paramList: newParams,
       });
+      return false;
     }
     return message.warning('数据验证未通过');
   };
