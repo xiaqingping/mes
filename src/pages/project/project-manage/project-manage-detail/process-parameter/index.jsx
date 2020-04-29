@@ -12,7 +12,7 @@ import { QuestionCircleOutlined } from '@ant-design/icons';
 import EnvironmentalFactorsModel from '@/pages/project/components/ModelComponents/EnvironmentalFactorsModel';
 import SampleGroupModel from '@/pages/project/components/ModelComponents/SampleGroupModel/index';
 import SampleSelectModel from '@/pages/project/components/ModelComponents/SampleSelectModel/index';
-// import CheckBoxModel from '@/pages/project/components/ModelComponents/CheckBoxModel';
+import CheckBoxModel from '@/pages/project/components/ModelComponents/CheckBoxModel';
 import InputModel from '@/pages/project/components/ModelComponents/InputModel/index';
 import InputNumberModel from '@/pages/project/components/ModelComponents/InputNumberModel';
 import RadioModel from '@/pages/project/components/ModelComponents/RadioModel';
@@ -461,29 +461,29 @@ class ProcessParameter extends Component {
                       // 单选
                       if (it.type === 'radio')
                         return (
-                          <div>单选框</div>
-                          // <InputModel
-                          //   paramList={it}
-                          //   key={newIndex}
-                          //   disabled={requestType === 'view'}
-                          //   getData={this.getModelData}
-                          // />
-                        );
-                      // 多选
-                      if (it.type === 'checkbox')
-                        return (
                           <RadioModel
                             paramList={it}
                             key={newIndex}
                             disabled={requestType === 'view'}
                             getData={this.getModelData}
                           />
-                          // <CheckBoxModel
-                          //   paramList={it}
-                          //   key={newIndex}
-                          //   disabled={requestType === 'view'}
-                          //   getData={this.getModelData}
-                          // />
+                        );
+
+                      // 多选
+                      if (it.type === 'checkbox')
+                        return (
+                            // <RadioModel
+                            //   paramList={this.props.projectDetail.paramLists}
+                            //   key={newIndex}
+                            //   disabled={requestType === 'view'}
+                            //   getData={this.getModelData}
+                            // />
+                            <CheckBoxModel
+                              paramList={it}
+                              key={newIndex}
+                              disabled={requestType === 'view'}
+                              getData={this.getModelData}
+                            />
                         );
                       // 样品选择框
                       if (it.type === 'sample_select')
@@ -560,5 +560,5 @@ class ProcessParameter extends Component {
 }
 
 export default connect(({ projectDetail }) => ({
-  projectDetail,
+  projectDetail
 }))(ProcessParameter);

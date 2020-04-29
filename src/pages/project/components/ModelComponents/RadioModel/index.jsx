@@ -5,37 +5,59 @@ import { Select, Descriptions } from 'antd';
 const { Option } = Select;
 
 class radioModel extends React.Component {
-  state = {
-    selectValue: '',
-  };
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      paramList: props.paramList,
+    };
+  }
+
+  setSelectValue = paramList => {
+    const selectList = []
+    Object.keys(paramList).forEach(key => {
+      if (key.indexOf('select_') !== -1) {
+        selectList.push(
+          {
+            "key": key,
+            "value": paramList[key]
+          }
+        )
+      }
+    })
+    return selectList
+  }
 
   /**
    * 值的获取
    * @param {string} value 当前元素的值
    */
   handleChange = value => {
-    this.setState({
-      selectValue: value,
-    });
-    this.props.getData(value);
+    const { paramList } = this.state;
+    const data = {
+      paramKey: paramList.paramKey,
+      paramValue: value,
+      taskModelId: paramList.taskModelId,
+    }
+    this.props.getData(data, 'radio', true);
   };
 
   render() {
-    const {selectValue} = this.state
-    console.log(selectValue)
+    const { paramList } = this.state
+    const selectList = this.setSelectValue(paramList)
     return (
       <Descriptions layout="vertical">
-        <Descriptions.Item label="物种分类数据库（必填）">
+        <Descriptions.Item label={paramList.paramName}>
           <Select
             placeholder="请选择"
             style={{ width: '150px' }}
             onChange={e => this.handleChange(e, 'select')}
             allowClear
-            key="1"
+            defaultValue={paramList.defaultValue}
           >
-            <Option key="1" value="one">滑动条+输入框</Option>
-            {/* <Option value="two">滑动条</Option>
-            <Option value="three">输入框</Option> */}
+            {
+              selectList.map(item => <Option key={item.key} value={item.key}>{item.value}</Option>)
+            }
           </Select>
         </Descriptions.Item>
       </Descriptions>

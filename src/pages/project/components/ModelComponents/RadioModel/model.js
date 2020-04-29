@@ -1,5 +1,5 @@
-const radioModel = {
-  namespace: 'radioModel',
+const radioModelData = {
+  namespace: 'radioModelData',
   state: {
     paramLists: {
       "id": "0c4fd02d1d1340a4b74ee88ff25908d5",
@@ -19,4 +19,4 @@ const radioModel = {
   effects: {},
   reducers: {},
 };
-export default radioModel;
+export default radioModelData;
