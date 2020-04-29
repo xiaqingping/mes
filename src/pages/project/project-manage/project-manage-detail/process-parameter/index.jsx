@@ -12,9 +12,10 @@ import { QuestionCircleOutlined } from '@ant-design/icons';
 import EnvironmentalFactorsModel from '@/components/ModelComponents/EnvironmentalFactorsModel';
 import SampleGroupModel from '@/components/ModelComponents/SampleGroupModel/index';
 import SampleSelectModel from '@/components/ModelComponents/SampleSelectModel/index';
-import CheckBoxModel from '@/components/ModelComponents/CheckBoxModel/index';
+// import CheckBoxModel from '@/components/ModelComponents/CheckBoxModel/index';
 import InputModel from '@/components/ModelComponents/InputModel/index';
 import InputNumberModel from '@/components/ModelComponents/InputNumberModel';
+import RadioModel from '@/components/ModelComponents/RadioModel';
 
 /** 样式 */
 import style from './index.less';
@@ -456,22 +457,29 @@ class ProcessParameter extends Component {
                       // 单选
                       if (it.type === 'radio')
                         return (
-                          <InputModel
-                            paramList={it}
-                            key={newIndex}
-                            disabled={requestType === 'view'}
-                            getData={this.getModelData}
-                          />
+                          <div>单选框</div>
+                          // <InputModel
+                          //   paramList={it}
+                          //   key={newIndex}
+                          //   disabled={requestType === 'view'}
+                          //   getData={this.getModelData}
+                          // />
                         );
                       // 多选
                       if (it.type === 'checkbox')
                         return (
-                          <CheckBoxModel
+                          <RadioModel
                             paramList={it}
                             key={newIndex}
                             disabled={requestType === 'view'}
                             getData={this.getModelData}
                           />
+                          // <CheckBoxModel
+                          //   paramList={it}
+                          //   key={newIndex}
+                          //   disabled={requestType === 'view'}
+                          //   getData={this.getModelData}
+                          // />
                         );
                       // 样品选择框
                       if (it.type === 'sample_select')
@@ -534,10 +542,10 @@ class ProcessParameter extends Component {
                 {requestType === 'view' ? (
                   ''
                 ) : (
-                  <Button type="primary" onClick={this.onSubmit}>
-                    提交
-                  </Button>
-                )}
+                    <Button type="primary" onClick={this.onSubmit}>
+                      提交
+                    </Button>
+                  )}
               </div>
             </Footer>
           </Form>

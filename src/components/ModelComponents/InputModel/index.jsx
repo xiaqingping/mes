@@ -14,6 +14,7 @@ import { Input, Form, message } from 'antd';
 class InputModel extends React.Component {
   constructor(props) {
     super(props);
+    console.log(props)
     this.state = {
       paramList: props.paramList,
       inputValue: props.paramList.paramValue || '',

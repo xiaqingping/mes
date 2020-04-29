@@ -4,7 +4,7 @@ import { Select, Descriptions } from 'antd';
 
 const { Option } = Select;
 
-class Classify extends React.Component {
+class radioModel extends React.Component {
   state = {
     selectValue: '',
   };
@@ -21,6 +21,8 @@ class Classify extends React.Component {
   };
 
   render() {
+    const {selectValue} = this.state
+    console.log(selectValue)
     return (
       <Descriptions layout="vertical">
         <Descriptions.Item label="物种分类数据库（必填）">
@@ -29,10 +31,11 @@ class Classify extends React.Component {
             style={{ width: '150px' }}
             onChange={e => this.handleChange(e, 'select')}
             allowClear
+            key="1"
           >
-            <Option value="one">滑动条+输入框</Option>
-            <Option value="two">滑动条</Option>
-            <Option value="three">输入框</Option>
+            <Option key="1" value="one">滑动条+输入框</Option>
+            {/* <Option value="two">滑动条</Option>
+            <Option value="three">输入框</Option> */}
           </Select>
         </Descriptions.Item>
       </Descriptions>
@@ -40,4 +43,4 @@ class Classify extends React.Component {
   }
 }
 
-export default Classify;
+export default radioModel;
