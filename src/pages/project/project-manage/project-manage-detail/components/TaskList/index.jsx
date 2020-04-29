@@ -12,7 +12,7 @@ import {
   PlayCircleOutlined,
   PauseCircleOutlined,
 } from '@ant-design/icons';
-import { ModelType } from '@/pages/project/components/ModelComponents';
+// import { ModelType } from '@/pages/project/components/ModelComponents';
 import disk from '@/pages/project/api/disk';
 import DefaultHeadPicture from '@/assets/imgs/defaultheadpicture.jpg';
 import { calculateTimeDifference } from '../../functions';
@@ -70,7 +70,7 @@ class TaskList extends Component {
 
   // 查看任执行记录的参数
   searchParameter = row => {
-    const valueData = row.taskExecRecordParamList;
+    const valueData = row.taskExecRecordParams;
     api.getTaskParam(row.taskModelId).then(res => {
       // 对比合并参数
       const paramData = this.disposeTaskData(res);
@@ -237,7 +237,7 @@ class TaskList extends Component {
                             size="small"
                             columns={columns}
                             rowKey="id"
-                            dataSource={item.taskExecRecordList}
+                            dataSource={item.taskExecRecords}
                             pagination={false}
                           />
                         </div>
@@ -267,7 +267,8 @@ class TaskList extends Component {
             renderItem={item => (
               <List.Item key={item}>
                 <Form>
-                  <ModelType data={item} />
+                  {console.log(item)}
+                  {/* <ModelType data={item} /> */}
                 </Form>
               </List.Item>
             )}
