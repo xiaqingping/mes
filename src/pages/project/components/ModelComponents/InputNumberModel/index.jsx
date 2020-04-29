@@ -124,8 +124,4 @@ NumberModels.propTypes = {
   disabled: PropTypes.bool
 };
 
-// export default NumberModels;
-
-export default connect(({ projectDetail }) => ({
-  projectDetail,
-}))(NumberModels);
+export default NumberModels;
