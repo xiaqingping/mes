@@ -77,20 +77,18 @@ class SampleSelect extends React.Component {
         title: '别名',
         dataIndex: 'sampleAlias',
         key: 'sampleAlias',
-        render: (text, record, index) => {
-          return (
-            <div className="project_manage_sample_select_table_alia">
-              <input
-                disabled={this.state.disabled}
-                type="text"
-                defaultValue={text}
-                onBlur={e => {
-                  this.saveData(record, index, e);
-                }}
-              />
-            </div>
-          );
-        },
+        render: (text, record, index) => (
+          <div className="project_manage_sample_select_table_alia">
+            <input
+              disabled={this.state.disabled}
+              type="text"
+              defaultValue={text}
+              onBlur={e => {
+                this.saveData(record, index, e);
+              }}
+            />
+          </div>
+        ),
       },
       {
         title: '序列',
@@ -332,6 +330,7 @@ class SampleSelect extends React.Component {
   };
 
   handleCancel = () => {
+    console.log(123);
     this.toggleVis(false);
   };
 
