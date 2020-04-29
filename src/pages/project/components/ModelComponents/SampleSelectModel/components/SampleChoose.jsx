@@ -95,9 +95,7 @@ class SampleChoose extends React.Component {
     const { tableData } = this.state;
     const list = [...tableData];
     list.forEach(item => {
-      const fileCheckedLen = item.sampleProperties.filter(v => {
-        return v.isChoose;
-      }).length;
+      const fileCheckedLen = item.sampleProperties.filter(v => v.isChoose).length;
       if (fileCheckedLen === item.sampleProperties.length) {
         item.indeterminate = false;
         item.isChoose = 1;
@@ -116,9 +114,7 @@ class SampleChoose extends React.Component {
 
   handleCheckboxChange = (e, row, text, item, index) => {
     const { tableData } = this.state;
-    let selectRow = tableData.filter(v => {
-      return v.id === row.id;
-    });
+    let selectRow = tableData.filter(v => v.id === row.id);
     selectRow = selectRow[0];
     if (item) {
       selectRow.sampleProperties.forEach(i => {
@@ -126,9 +122,7 @@ class SampleChoose extends React.Component {
           i.isChoose = e.target.checked ? 1 : 0;
         }
       });
-      const checkedLen = selectRow.sampleProperties.filter(r => {
-        return r.isChoose;
-      }).length;
+      const checkedLen = selectRow.sampleProperties.filter(r => r.isChoose).length;
       if (checkedLen === selectRow.sampleProperties.length) {
         selectRow.indeterminate = false;
         selectRow.isChoose = 1;
@@ -183,9 +177,7 @@ class SampleChoose extends React.Component {
     const { tableData } = this.state;
     if (!id) {
       // 点击选择样品过来的。
-      const checkedSample = tableData.filter(item => {
-        return item.indeterminate || item.isChoose;
-      });
+      const checkedSample = tableData.filter(item => item.indeterminate || item.isChoose);
       this.props.sendData(checkedSample);
     } else {
       // 点击已选择文件过来的。
@@ -196,6 +188,7 @@ class SampleChoose extends React.Component {
   };
 
   handleFileUploadClose = v => {
+    console.log(v);
     this.toggleVis(v);
     if (v) {
       this.getTableData();
@@ -213,17 +206,15 @@ class SampleChoose extends React.Component {
         key: 'sampleName',
         filters: filterData,
         onFilter: (value, record) => record.sampleCode.includes(value),
-        render: (text, record, index) => {
-          return (
-            <Checkbox
-              onChange={e => this.handleCheckboxChange(e, record, text, undefined, index)}
-              indeterminate={record.indeterminate}
-              checked={record.isChoose}
-            >
-              {text}
-            </Checkbox>
-          );
-        },
+        render: (text, record, index) => (
+          <Checkbox
+            onChange={e => this.handleCheckboxChange(e, record, text, undefined, index)}
+            indeterminate={record.indeterminate}
+            checked={record.isChoose}
+          >
+            {text}
+          </Checkbox>
+        ),
       },
       {
         title: '文件',
@@ -231,23 +222,20 @@ class SampleChoose extends React.Component {
         key: 'sampleProperties',
         ellipsis: true,
 
-        render: (text, record, index) => {
-          return text.map(item => {
-            return (
-              <div>
-                {/* <Tooltip title={item.sequenceFileName} > */}
-                <Checkbox
-                  onChange={e => this.handleCheckboxChange(e, record, text, item, index)}
-                  key={item.fileId}
-                  checked={item.isChoose}
-                >
-                  {item.sequenceFileName}
-                </Checkbox>
-                {/* </Tooltip> */}
-              </div>
-            );
-          });
-        },
+        render: (text, record, index) =>
+          text.map(item => (
+            <div>
+              {/* <Tooltip title={item.sequenceFileName} > */}
+              <Checkbox
+                onChange={e => this.handleCheckboxChange(e, record, text, item, index)}
+                key={item.fileId}
+                checked={item.isChoose}
+              >
+                {item.sequenceFileName}
+              </Checkbox>
+              {/* </Tooltip> */}
+            </div>
+          )),
       },
       {
         title: '序列',
@@ -255,17 +243,15 @@ class SampleChoose extends React.Component {
         key: 'xulie',
         width: 180,
         ellipsis: true,
-        render: (text, row) => {
-          return (
-            <>
-              {row.sampleProperties &&
-                row.sampleProperties.length &&
-                row.sampleProperties.map(item => (
-                  <div>{`${item.sampleSequenceCount} (${item.sampleLengthTotal}bp)`}</div>
-                ))}
-            </>
-          );
-        },
+        render: (text, row) => (
+          <>
+            {row.sampleProperties &&
+              row.sampleProperties.length &&
+              row.sampleProperties.map(item => (
+                <div>{`${item.sampleSequenceCount} (${item.sampleLengthTotal}bp)`}</div>
+              ))}
+          </>
+        ),
       },
       {
         title: '长度',
