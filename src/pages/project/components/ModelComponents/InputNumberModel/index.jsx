@@ -11,13 +11,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Slider, InputNumber, message } from 'antd';
+import { connect } from 'dva'
 
 class NumberModels extends React.Component {
   constructor(props) {
     super(props);
     // 处理paramValue
     const { paramList } = props
-    console.log(paramList.max)
     this.state = {
       paramList,
       inputValue: paramList.paramValue || 0,
@@ -49,7 +49,6 @@ class NumberModels extends React.Component {
    */
   verifyData = () => {
     const { max, min, inputValue, paramList } = this.state;
-    console.log(parseFloat(inputValue) <= max && parseFloat(inputValue) >= min)
     if (parseFloat(inputValue) <= max && parseFloat(inputValue) >= min ) return true
     if (paramList.validDesc) {
       message.warning(paramList.validDesc)
@@ -80,7 +79,6 @@ class NumberModels extends React.Component {
     const { disabled } = this.props;
     return (
       <>
-
         <div>{paramList.paramName} {paramList.isRequired ?
         (<span>（必填）</span>) : (<span>（选填）</span>)}</div>
 
@@ -126,4 +124,8 @@ NumberModels.propTypes = {
   disabled: PropTypes.bool
 };
 
-export default NumberModels;
+// export default NumberModels;
+
+export default connect(({ projectDetail }) => ({
+  projectDetail,
+}))(NumberModels);

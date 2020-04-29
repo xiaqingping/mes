@@ -123,7 +123,6 @@ class ProcessParameter extends Component {
         ) {
           // 合并参数和参数值
           const data = this.comparedWith(newParamData, paramValue);
-          console.log(data);
           this.setState({ paramGroupList: data });
           return false;
         }

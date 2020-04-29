@@ -152,7 +152,6 @@ const projectModel = {
   effects: {},
   reducers: {
     setviewlist(state, payload) {
-      // console.log(action);
       return { ...state, viewlist: payload };
     },
     setProjectData(state, action) {
