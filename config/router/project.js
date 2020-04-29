@@ -20,7 +20,7 @@ module.exports = {
         },
         {
           name: 'detail-add',
-          path: '/project/project-manage/detail/:type?/:projectId?/:id?',
+          path: '/project/project-manage/detail/:type?/:projectId?/:paramsType?',
           component: './project/project-manage/project-manage-edit/addflowpath',
         },
         {
@@ -36,7 +36,7 @@ module.exports = {
         },
         {
           name: 'addflowpath',
-          path: '/project/project-manage/add/addflowpath/:type?/:projectId?/:id?',
+          path: '/project/project-manage/add/addflowpath/:type?/:projectId?/:paramsType?',
           component: './project/project-manage/project-manage-edit/addflowpath',
         },
         {

@@ -314,7 +314,6 @@ class ChooseProcessModel extends React.Component {
                             style={{
                               float: 'left',
                               marginRight: '10px',
-                              // marginLeft: '20px',
                               width: '60px',
                               height: '60px',
                             }}
