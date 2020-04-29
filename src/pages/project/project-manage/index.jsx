@@ -371,17 +371,19 @@ class ProjectManagement extends Component {
         width: 250,
         render: value => {
           const arr = [];
-          value.forEach(item => {
-            labels.forEach(i => {
-              if (i.id === item) {
-                arr.push(
-                  <Tag color={i.color} key={i.id}>
-                    {i.name} {i.text}
-                  </Tag>,
-                );
-              }
+          if(value) {
+            value.forEach(item => {
+              labels.forEach(i => {
+                if (i.id === item) {
+                  arr.push(
+                    <Tag color={i.color} key={i.id}>
+                      {i.name} {i.text}
+                    </Tag>,
+                  );
+                }
+              });
             });
-          });
+          }
           return <>{arr}</>;
         },
       },

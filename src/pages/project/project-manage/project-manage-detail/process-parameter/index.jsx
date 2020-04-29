@@ -6,13 +6,18 @@ import { connect } from 'dva';
 import router from 'umi/router';
 import api from '@/pages/project/api/projectManageDetail';
 import { QuestionCircleOutlined } from '@ant-design/icons';
+
 /** 参数组件引用 */
 // eslint-disable-next-line max-len
 import EnvironmentalFactorsModel from '@/pages/project/components/ModelComponents/EnvironmentalFactorsModel';
 import SampleGroupModel from '@/pages/project/components/ModelComponents/SampleGroupModel/index';
 import SampleSelectModel from '@/pages/project/components/ModelComponents/SampleSelectModel/index';
-import CheckBoxModel from '@/pages/project/components/ModelComponents/CheckBoxModel/index';
+import CheckBoxModel from '@/pages/project/components/ModelComponents/CheckBoxModel';
 import InputModel from '@/pages/project/components/ModelComponents/InputModel/index';
+import InputNumberModel from '@/pages/project/components/ModelComponents/InputNumberModel';
+import RadioModel from '@/pages/project/components/ModelComponents/RadioModel';
+
+
 /** 样式 */
 import style from './index.less';
 
@@ -41,11 +46,12 @@ class ProcessParameter extends Component {
       paramList: [],
     };
     // 判断请求类型
-    this.determineTheRequestType();
+    this.determineTheRequestType()
   }
 
   // 组件加载时
-  componentDidMount = () => {};
+  componentDidMount = () => {
+  };
 
   // 判断请求类型
   determineTheRequestType = () => {
@@ -83,7 +89,6 @@ class ProcessParameter extends Component {
    */
   getParamData = (param, paramValue) => {
     const { requestType } = this.state;
-
     if (param.length > 0) {
       // 处理参数数据
       const newParam = this.deleteNullGroup(param); // 删除参数为空的分组
@@ -203,7 +208,6 @@ class ProcessParameter extends Component {
       if (projectId) url = `/project/project-manage/detail/edit/${projectId}/2`;
       return router.push(url);
     }
-
     // 编辑
     if (requestType === 'edit') {
       api.updateProcessesParameter(processId, paramList).then(() => {
@@ -225,7 +229,6 @@ class ProcessParameter extends Component {
     const { paramList } = this.state;
     if (isVerify) {
       const newParams = paramList.filter(item => item.paramKey !== data.paramKey);
-      console.log(newParams);
       paramList.forEach(item => {
         if (item.paramKey === data.paramKey) {
           const newItem = JSON.parse(JSON.stringify(item));
@@ -444,34 +447,36 @@ class ProcessParameter extends Component {
                           />
                         );
                       // 数值输入框
-                      if (it.type === 'number_input')
+                      if (it.type === 'number_input') {
                         return (
-                          <InputModel
+                          <InputNumberModel
                             paramList={it}
                             key={newIndex}
                             disabled={requestType === 'view'}
                             getData={this.getModelData}
                           />
                         );
+                      }
                       // 单选
                       if (it.type === 'radio')
                         return (
-                          <InputModel
+                          <RadioModel
                             paramList={it}
                             key={newIndex}
                             disabled={requestType === 'view'}
                             getData={this.getModelData}
                           />
                         );
+
                       // 多选
                       if (it.type === 'checkbox')
                         return (
-                          <CheckBoxModel
-                            paramList={it}
-                            key={newIndex}
-                            disabled={requestType === 'view'}
-                            getData={this.getModelData}
-                          />
+                            <CheckBoxModel
+                              paramList={it}
+                              key={newIndex}
+                              disabled={requestType === 'view'}
+                              getData={this.getModelData}
+                            />
                         );
                       // 样品选择框
                       if (it.type === 'sample_select')
@@ -534,10 +539,10 @@ class ProcessParameter extends Component {
                 {requestType === 'view' ? (
                   ''
                 ) : (
-                  <Button type="primary" onClick={this.onSubmit}>
-                    提交
-                  </Button>
-                )}
+                    <Button type="primary" onClick={this.onSubmit}>
+                      提交
+                    </Button>
+                  )}
               </div>
             </Footer>
           </Form>
@@ -548,5 +553,5 @@ class ProcessParameter extends Component {
 }
 
 export default connect(({ projectDetail }) => ({
-  projectDetail,
+  projectDetail
 }))(ProcessParameter);

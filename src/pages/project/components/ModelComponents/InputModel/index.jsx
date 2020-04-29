@@ -14,6 +14,7 @@ import { Input, Form, message } from 'antd';
 class InputModel extends React.Component {
   constructor(props) {
     super(props);
+    console.log(props)
     this.state = {
       paramList: props.paramList,
       inputValue: props.paramList.paramValue || '',
@@ -67,7 +68,6 @@ class InputModel extends React.Component {
   render() {
     const { paramList, inputValue } = this.state;
     const data = paramList;
-
     return (
       <Form.Item
         label={data.paramName}
@@ -77,6 +77,7 @@ class InputModel extends React.Component {
           { required: data.isRequired, message: data.validDesc },
         ]}
       >
+
         <Input
           placeholder={data.placeholder}
           disabled={this.props.disabled}

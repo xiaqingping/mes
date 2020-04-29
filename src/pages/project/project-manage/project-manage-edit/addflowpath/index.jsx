@@ -251,6 +251,7 @@ class Test extends Component {
 
     }
     if (processType === 'edit') {
+      console.log('edit')
       // console.log('正常从已有项目跳转，');
       const newList = [];
 
@@ -289,6 +290,8 @@ class Test extends Component {
           });
         });
     }
+
+    console.log(1231213)
 
     // if(paramsList) {
 
