@@ -48,7 +48,7 @@ class ProjectDetail extends Component {
       return (
         <PlusSquareOutlined
           onClick={() => this.handleAddProcesses(list)}
-          style={{ fontSize: 20, color: '#1890ff' }}
+          style={{ fontSize: 20, color: '#1890ff', paddingRight: 30, paddingTop: 20 }}
         />
       );
     }
@@ -99,7 +99,6 @@ class ProjectDetail extends Component {
           <Tabs
             defaultActiveKey="1"
             onChange={key => this.callback(key)}
-            style={{ height: 480 }}
             tabBarExtraContent={this.operations()}
             loading={loading}
           >

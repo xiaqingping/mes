@@ -11,10 +11,13 @@ import { Checkbox, Form, message } from 'antd';
 class CheckBoxModel extends React.Component {
   constructor(props) {
     super(props);
+    let values;
+    if (props.paramList.paramValue) values = JSON.parse(props.paramList.paramValue);
+    values = [];
     this.state = {
       paramList: props.paramList,
       selectList: [],
-      checkedValues: [],
+      checkedValues: values,
     };
   }
 
@@ -83,6 +86,7 @@ class CheckBoxModel extends React.Component {
   render() {
     const { paramList, checkedValues, selectList } = this.state;
     const data = paramList;
+    console.log(checkedValues);
 
     return (
       <Form.Item
