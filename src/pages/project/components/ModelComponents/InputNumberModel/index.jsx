@@ -11,7 +11,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Slider, InputNumber, message } from 'antd';
-import { connect } from 'dva'
 
 class NumberModels extends React.Component {
   constructor(props) {
