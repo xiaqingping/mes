@@ -96,11 +96,11 @@ module.exports = {
           path: '/project/task-model/up/:id',
           component: './project/task-model/addTaskModel.jsx',
         },
-        {
-          name: 'group',
-          path: '/project/task-model/group',
-          component: './project/components/index.jsx',
-        },
+        // {
+        //   name: 'group',
+        //   path: '/project/task-model/group',
+        //   component: './project/components/index.jsx',
+        // },
       ],
     },
   ],
