@@ -94,6 +94,6 @@ const projectDetailModel = {
     ],
   },
   effects: {},
-  reducers: {},
+  reducers: {}
 };
 export default projectDetailModel;
