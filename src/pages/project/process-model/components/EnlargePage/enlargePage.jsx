@@ -29,7 +29,7 @@ const EnlargePage = props => {
     >
       <List
         rowKey="id"
-        style={{ height: '310px', overflowY: 'auto' }}
+        style={{ height: '312px', overflowY: 'auto' }}
         dataSource={props.typeEnlargeData.params}
         renderItem={item => (
           <List.Item key={item.id}>
@@ -40,7 +40,7 @@ const EnlargePage = props => {
             </Card>
           </List.Item>
         )}
-        className="list-style card-item-style"
+        className="card-item-style"
         split={false}
       />
     </Modal>
