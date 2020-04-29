@@ -12,7 +12,7 @@ import {
   PlayCircleOutlined,
   PauseCircleOutlined,
 } from '@ant-design/icons';
-import { ModelType } from '@/pages/project/components/ModelComponents';
+// import { ModelType } from '@/pages/project/components/ModelComponents';
 import disk from '@/pages/project/api/disk';
 import DefaultHeadPicture from '@/assets/imgs/defaultheadpicture.jpg';
 import { calculateTimeDifference } from '../../functions';
@@ -267,7 +267,8 @@ class TaskList extends Component {
             renderItem={item => (
               <List.Item key={item}>
                 <Form>
-                  <ModelType data={item} />
+                  {console.log(item)}
+                  {/* <ModelType data={item} /> */}
                 </Form>
               </List.Item>
             )}

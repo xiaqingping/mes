@@ -17,7 +17,8 @@ class Test extends Component {
     // 传过来的已有项目的id和类型
     // TODO:
     const { type, projectId ,paramsType} = this.props.match.params;
-    const { paramList, projectInfor } = this.props.projectManage;
+    console.log(this.props.match.params);
+    const { projectInfor } = this.props.projectManage;
 
     this.state = {
       // TODO:
@@ -30,7 +31,7 @@ class Test extends Component {
       loading: false,
       visible: false,
       projectInfor, // 项目基础信息
-      paramList, // 流程参数
+      paramList:[], // 流程参数
       buttonLoading: false,
     };
   }
@@ -56,6 +57,8 @@ class Test extends Component {
     this.setState(
       {
         paramList: paramsList,
+      },() => {
+        console.log(this.state);
       }
     );
 
@@ -70,9 +73,9 @@ class Test extends Component {
     }
 
     if (processType === 'add' && paramsType ===undefined) {
-      // console.log('新建项目进入页面先清空已选流程的数据');
+      console.log('新建项目进入页面先清空已选流程的数据');
       sessionStorage.removeItem('introduction');
-      sessionStorage.removeItem('processForParams');
+      // sessionStorage.removeItem('processForParams');
       this.props.dispatch({
         type: 'projectManage/setProcessSelectedList',
         payload: introductionProcess,
@@ -83,9 +86,9 @@ class Test extends Component {
     }
 
     if(processType === 'edit' && paramsType ===undefined) {
-      // console.log('已建项目进入页面先清空已选流程的数据');
+      console.log('已建项目进入页面先清空已选流程的数据');
       sessionStorage.removeItem('introduction');
-      sessionStorage.removeItem('processForParams');
+      // sessionStorage.removeItem('processForParams');
       this.props.dispatch({
         type: 'projectManage/setProcessSelectedList',
         payload: introductionProcess,
@@ -145,7 +148,7 @@ class Test extends Component {
     const processModelId = row.id;
 
     let url;
-    if (projectId === '') {
+    if (projectId === '' || projectId === "''") {
       url = `/project/project-manage/process-parameter/${type}/${processModelId}`;
     } else {
       url = `/project/project-manage/process-parameter/${type}/${processModelId}/${projectId}`;
@@ -191,7 +194,7 @@ class Test extends Component {
     let status = false;
 
     if (projectInfor.requestType === 'add') {
-      // console.log('新建项目跳转，基础信息有值的保存,');
+      console.log('新建项目跳转，基础信息有值的保存,');
       if (list === '' || list === undefined) {
         status = true;
       }
@@ -212,7 +215,8 @@ class Test extends Component {
           name: item.name,
           processModelId: item.id,
         };
-        if(paramList.length >1) {
+        console.log(paramList);
+        if(paramList.length > 1) {
           paramList.forEach(e => {
             e.forEach(it => {
               if (item.id === it.processModelId) {
@@ -246,7 +250,7 @@ class Test extends Component {
 
     }
     if (processType === 'edit') {
-      // console.log('正常从已有项目跳转，');
+      console.log('正常从已有项目跳转，');
       const newList = [];
 
       list.forEach(item => {
@@ -256,6 +260,8 @@ class Test extends Component {
           name: item.name,
           processModelId: item.id,
         };
+        console.log(paramList);
+
         if(paramList.length >1) {
           paramList.forEach(e => {
             e.forEach(it => {
@@ -296,6 +302,7 @@ class Test extends Component {
 
   render() {
     const { list, loading, visible, buttonLoading } = this.state;
+    console.log(this.state);
     const columns = [
       {
         title: '名称/描述',
