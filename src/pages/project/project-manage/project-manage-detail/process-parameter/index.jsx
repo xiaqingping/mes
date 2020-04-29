@@ -210,6 +210,7 @@ class ProcessParameter extends Component {
     }
     // 编辑
     if (requestType === 'edit') {
+      console.log(paramList)
       api.updateProcessesParameter(processId, paramList).then(() => {
         if (projectId === '') url = `/project/project-manage`;
         if (projectId !== '') url = `/project/project-manage/detail/${projectId}`;
@@ -436,6 +437,8 @@ class ProcessParameter extends Component {
                     style={{ width: '100%' }}
                   >
                     {item.params.map((it, index) => {
+                      console.log(item)
+                      console.log(it)
                       const newIndex = JSON.parse(JSON.stringify(index));
                       // this.getModelType(it, newIndex);
                       if (it.type === 'input')
@@ -472,12 +475,6 @@ class ProcessParameter extends Component {
                       // 多选
                       if (it.type === 'checkbox')
                         return (
-                            // <RadioModel
-                            //   paramList={this.props.projectDetail.paramLists}
-                            //   key={newIndex}
-                            //   disabled={requestType === 'view'}
-                            //   getData={this.getModelData}
-                            // />
                             <CheckBoxModel
                               paramList={it}
                               key={newIndex}

@@ -196,6 +196,7 @@ class Test extends Component {
     let status = false;
 
     if (projectInfor.requestType === 'add') {
+      console.log('add')
       console.log('新建项目跳转，基础信息有值的保存,');
       if (list === '' || list === undefined) {
         status = true;
@@ -251,6 +252,7 @@ class Test extends Component {
 
     }
     if (processType === 'edit') {
+      console.log('edit')
       // console.log('正常从已有项目跳转，');
       const newList = [];
 
@@ -289,6 +291,8 @@ class Test extends Component {
           });
         });
     }
+
+    console.log(1231213)
 
     // if(paramsList) {
 
