@@ -37,8 +37,9 @@ const TableSearchForm = React.forwardRef((props, ref) => {
           ''
         ) : (
           <Col
-            span={expand && props.advancedForm ? 24 : 6}
-            style={expand && props.advancedForm ? { textAlign: 'right' } : { textAlign: 'center' }}
+            xxl={expand && props.advancedForm ? 24 : 6}
+            xl={expand && props.advancedForm ? 24 : 8}
+            style={{ textAlign: 'right' }}
           >
             <Button type="primary" htmlType="submit" style={{ marginBottom: '24px' }}>
               <FormattedMessage id="action.search" />

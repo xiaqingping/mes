@@ -210,7 +210,6 @@ class ProcessParameter extends Component {
     }
     // 编辑
     if (requestType === 'edit') {
-      console.log(paramList)
       api.updateProcessesParameter(processId, paramList).then(() => {
         if (projectId === '') url = `/project/project-manage`;
         if (projectId !== '') url = `/project/project-manage/detail/${projectId}`;
@@ -230,7 +229,6 @@ class ProcessParameter extends Component {
     const { paramList } = this.state;
     if (isVerify) {
       const newParams = paramList.filter(item => item.paramKey !== data.paramKey);
-      console.log(newParams);
       paramList.forEach(item => {
         if (item.paramKey === data.paramKey) {
           const newItem = JSON.parse(JSON.stringify(item));
@@ -437,8 +435,6 @@ class ProcessParameter extends Component {
                     style={{ width: '100%' }}
                   >
                     {item.params.map((it, index) => {
-                      console.log(item)
-                      console.log(it)
                       const newIndex = JSON.parse(JSON.stringify(index));
                       // this.getModelType(it, newIndex);
                       if (it.type === 'input')

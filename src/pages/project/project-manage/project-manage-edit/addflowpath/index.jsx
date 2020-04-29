@@ -195,8 +195,7 @@ class Test extends Component {
     const { list, projectInfor, paramList, processType, projectId } = this.state;
     let status = false;
 
-    if (projectInfor.requestType === 'add') {
-      console.log('add')
+    if (processType === 'add') {
       console.log('新建项目跳转，基础信息有值的保存,');
       if (list === '' || list === undefined) {
         status = true;
@@ -304,7 +303,7 @@ class Test extends Component {
 
   render() {
     const { list, loading, visible, buttonLoading } = this.state;
-    // console.log(this.state);
+    console.log(this.state);
     const columns = [
       {
         title: '名称/描述',

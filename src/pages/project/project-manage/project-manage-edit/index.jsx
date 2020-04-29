@@ -6,7 +6,9 @@ import router from 'umi/router';
 import { connect } from 'dva';
 import moment from 'moment';
 import api from '@/pages/project/api/projectManage';
+// import classNames from 'classnames';
 import BPList from './components/BPList';
+import './index.less';
 
 const FormItem = Form.Item;
 const { TextArea, Search } = Input;
@@ -92,7 +94,9 @@ class ProjectEdit extends Component {
       requestType,
       projectData,
     } = this.state;
+    console.log(this.state);
     const formData = this.formRef.current.getFieldsValue();
+    console.log(formData);
 
     if (formData.name === undefined) {
       message.error('项目名称不能为空！');
@@ -102,6 +106,7 @@ class ProjectEdit extends Component {
       message.error('项目描述不能为空！');
       return 1;
     }
+
     // 新增项目时
     if (requestType === 'addProject') {
       if (bpName === '') {
@@ -114,6 +119,10 @@ class ProjectEdit extends Component {
       }
       if (endDate === '') {
         message.error('结束时间不能为空！');
+        return 1;
+      }
+      if (selectedlabels.length===0) {
+        message.error('标签不能为空！');
         return 1;
       }
     }
@@ -187,18 +196,25 @@ class ProjectEdit extends Component {
   // 跳转到添加流程页面
   handleAdd = () => {
     const data = this.saveData();
-    data.requestType = 'add';
-    if (data === 1) return;
-    this.props.dispatch({
-      type: 'projectManage/setProjectInfor',
-      payload: data,
-    });
+    if (data === 1) {
+      this.props.dispatch({
+        type: 'projectManage/setProjectInfor',
+        payload: data,
+      });
+    }else {
+      data.requestType = 'add';
+      this.props.dispatch({
+        type: 'projectManage/setProjectInfor',
+        payload: data,
+      });
 
-    router.push('/project/project-manage/add/addflowpath/add');
+      router.push('/project/project-manage/add/addflowpath/add');
+    }
+
   };
 
   render() {
-    const { requestType, selectedlabels, projectData, labels } = this.state;
+    const { requestType, selectedlabels, projectData, labels} = this.state;
     return (
       <PageHeaderWrapper title={this.navContent(projectData)}>
         <Form ref={this.formRef} className="classPageHeaderWrapper">
@@ -297,12 +313,23 @@ class ProjectEdit extends Component {
             >
               保存
             </Button>
-            <Button
-              type="primary"
-              onClick={() => this.handleAdd(true)}
-            >
-              添加流程
-            </Button>
+            {requestType === 'addProject' ? (
+                  <Button
+                  type="primary"
+                  onClick={() => this.handleAdd(true)}
+                >
+                  添加流程
+                </Button>
+                ) : (
+                  <Button
+                    type="primary"
+                    onClick={() => this.handleAdd(true)}
+                    className="isShow"
+                    >
+                    添加流程
+                  </Button>
+                )}
+
 
           </Card>
         </Form>

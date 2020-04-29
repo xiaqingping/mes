@@ -3,7 +3,6 @@
  * @param {String} paramName 参数名称
  * @param {String} paramKey 参数Key
  * @param {boolean} isRequired 是否必填
- * @param {String} placeholder 请输入
  * @param {String} defaultValue 默认值
  * @param {String} validRules 验证规则
  * @param {String} validDesc 验证说明
@@ -17,30 +16,14 @@ class NumberModels extends React.Component {
   constructor(props) {
     super(props);
     // 处理paramValue
-    const paramValue = this.setParamValue()
+    const { paramList } = props
     this.state = {
-      paramList: props.paramList,
-      inputValue: paramValue,
-      max: props.paramList.maxNum || 1,
-      min: props.paramList.minNum || 0,
-    };
-  }
-
-
-  /**
-   * 检查ParamValue
-   * @param {object}
-   */
-  setParamValue = () => {
-    const { paramList } = this.props
-    const maxNum = paramList.max || 1
-    const minNum = paramList.min || 0
-    if (typeof paramValue !== 'number'
-      || parseFloat(paramList.paramValue) > minNum
-      || parseFloat(paramList.paramValue) < maxNum) {
-      return 0
+      paramList,
+      inputValue: paramList.paramValue || 0,
+      max: paramList.maxNum || 1,
+      min: paramList.minNum || 0,
+      inputMode: paramList.inputMode
     }
-    return paramList.paramValue
   }
 
   /**
@@ -64,12 +47,14 @@ class NumberModels extends React.Component {
    * 验证数据
    */
   verifyData = () => {
-    const { max, min, inputValue } = this.state;
-    console.log(max, min)
-    if (parseFloat(inputValue) <= max && parseFloat(inputValue) >= min) {
-      return true
+    const { max, min, inputValue, paramList } = this.state;
+    console.log(parseFloat(inputValue) <= max && parseFloat(inputValue) >= min)
+    if (parseFloat(inputValue) <= max && parseFloat(inputValue) >= min ) return true
+    if (paramList.validDesc) {
+      message.warning(paramList.validDesc)
+    } else {
+      message.warning(`值不合法`)
     }
-    message.warning(`值不合法`);
     return false
   };
 
@@ -84,32 +69,34 @@ class NumberModels extends React.Component {
       inputValue: value,
     });
     const { data, isVerify } = this.formatSubmitData();
-    console.log(data, isVerify)
+    if(!isVerify) return
     this.props.getData(data, 'number_input', isVerify)
   };
 
 
   render() {
-    const { paramList, inputValue, max, min } = this.state;
-    const { disabled, inputPattern } = this.props;
+    const {  inputValue, max, min, inputMode, paramList } = this.state;
+    const { disabled } = this.props;
     return (
       <>
-        <div>序列相似度（选填）</div>
+
+        <div>{paramList.paramName} {paramList.isRequired ?
+        (<span>（必填）</span>) : (<span>（选填）</span>)}</div>
+
         {/* 组件InputNumber */}
         <div>
-          {inputPattern !== 3 ? (
+          {inputMode !== 'three' ? (
             <Slider
               disabled={disabled}
               min={min}
               max={max}
               onChange={this.onChange}
               value={inputValue}
-              defaultValue={inputValue || paramList.defaultValue}
               step={0.01}
               style={{ width: '200px', float: 'left' }}
             />
           ) : null}
-          {inputPattern !== 2 ? (
+          {inputMode !== 'two' ? (
             <InputNumber
               disabled={disabled}
               min={0}
@@ -117,8 +104,9 @@ class NumberModels extends React.Component {
               style={{ margin: '0 20px' }}
               step={0.01}
               value={inputValue}
-              // defaultValue={inputValue || data.defaultValue}
+              defaultValue={inputValue}
               onChange={this.onChange}
+              onPressEnter={this.onChange}
             />
           ) : null}
           范围（{min}-{max}）

@@ -258,9 +258,8 @@ class AssociatedProcessModel extends React.Component {
         onCancel={onClose}
         width={840}
         footer={null}
-        className="classAssociatedProcessModel"
       >
-        <div className="tableList tableListTableSearchForm buttonStyle table-style-set-little">
+        <div>
           <TableSearchForm
             ref={this.tableSearchFormRef}
             initialValues={this.initialValues}
@@ -268,7 +267,7 @@ class AssociatedProcessModel extends React.Component {
             simpleForm={this.simpleForm}
             noButton
           />
-          <div className="AssociatedProcessModel setTitleColor" style={{ marginTop: '10px' }}>
+          <div style={{ marginTop: '10px' }}>
             <Spin spinning={loading}>
               <Table
                 columns={columns}
