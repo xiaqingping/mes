@@ -536,7 +536,7 @@ class ProcessModel extends Component {
                   index && (
                     <Menu.Item key={item}>
                       <a
-                        className="task_model_add_argument_list"
+                        className="process_model_add_argument_list"
                         onClick={() => this.getButton(item, row)}
                       >
                         {item}
@@ -584,7 +584,7 @@ class ProcessModel extends Component {
               新建
             </Button>
           </div>
-          <Form ref={this.tableFormRef} className="">
+          <Form ref={this.tableFormRef}>
             <StandardTable
               rowClassName="editable-row"
               loading={loading}
@@ -596,17 +596,15 @@ class ProcessModel extends Component {
           </Form>
         </Card>
         {visible ? (
-          <div>
-            <ProcessDetail
-              visible={visible}
-              // visible
-              onClose={this.onClose}
-              detailId={detailValue.id}
-              status={status}
-              handleChangeVersion={v => this.handleChangeVersion(v)}
-              handleUnPublish={row => this.handleUnPublish(row)}
-            />
-          </div>
+          <ProcessDetail
+            visible={visible}
+            // visible
+            onClose={this.onClose}
+            detailId={detailValue.id}
+            status={status}
+            handleChangeVersion={v => this.handleChangeVersion(v)}
+            handleUnPublish={row => this.handleUnPublish(row)}
+          />
         ) : null}
       </PageHeaderWrapper>
     );

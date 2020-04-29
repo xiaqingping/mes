@@ -416,7 +416,7 @@ class Parameter extends React.Component {
               width: '241px',
               height: '500px',
               borderTop: '1px solid #E8E8E8',
-              padding: '24px 0 24px 30px',
+              padding: '0 12px 12px 12px',
               display: 'inline-block',
               overflowY: 'auto',
             }}
