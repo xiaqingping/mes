@@ -69,34 +69,6 @@ class TaskList extends Component {
     return <span>开始：{row.beginDate}</span>;
   };
 
-  // 处理任务参数列表
-  disposeTaskData = data => {
-    const newData = [];
-    data.forEach(item => {
-      const newItem = JSON.parse(JSON.stringify(item));
-      newItem.paramProperties.forEach(e => {
-        newItem[e.paramPropertyKey] = e.paramPropertyValue;
-      });
-      newData.push(newItem);
-    });
-    return newData;
-  };
-
-  // 合并参数列表和参数值
-  disposeParamData = (paramData, valueData) => {
-    const newData = [];
-    paramData.forEach(paramItem => {
-      valueData.forEach(valueItem => {
-        const newItem = JSON.parse(JSON.stringify(paramItem));
-        if (paramItem.paramKey === valueItem.paramKey) {
-          newItem.paramValue = valueItem.paramValue;
-          newData.push(newItem);
-        }
-      });
-    });
-    return newData;
-  };
-
   // 任务执行记录开始运行
   startExecRecord = row => {
     api.startExecRecord(row.id).then(() => {
@@ -113,21 +85,12 @@ class TaskList extends Component {
 
   // 查看任执行记录的参数
   searchParameter = row => {
-    // console.log(row);
-
     const data = {
-      type: 'view',
+      paramValues: row.taskExecRecordParams,
       taskExecRecordId: row.id,
       taskModelId: row.taskModelId,
     };
     this.setState({ visibleParam: true, paramForData: data });
-    // const valueData = row.taskExecRecordParams;
-    // api.getTaskParam(row.taskModelId).then(res => {
-    //   // 对比合并参数
-    //   const paramData = this.disposeTaskData(res);
-    //   const parameterList = this.disposeParamData(paramData, valueData);
-    //   this.setState({ visibleParam: true, parameterList });
-    // });
   };
 
   // 关闭 任务执行记录参数抽屉
@@ -247,7 +210,7 @@ class TaskList extends Component {
 
                   <div className={style.open}>
                     {openId.filter(i => i === item.id).length !== 0 ? (
-                      <d>
+                      <div>
                         <a onClick={() => this.showTable(item.id, 2)} style={{ float: 'right' }}>
                           <UpOutlined />
                         </a>
@@ -260,7 +223,7 @@ class TaskList extends Component {
                             pagination={false}
                           />
                         </div>
-                      </d>
+                      </div>
                     ) : (
                       <a onClick={() => this.showTable(item.id, 1)}>
                         <DownOutlined />

@@ -1,26 +1,26 @@
 import request from '@/utils/request';
 
 // 2组
-let http2 = 'http://192.168.20.12:8460';
+let http2 = '/ngssamples';
 if (process.env.NODE_ENV !== 'development') {
-  http2 = '/projectmodel';
+  http2 = '/ngssamples';
 }
 
 export default {
   // 样品模糊搜索
-  getSampleCodeAndName(data) {
+  getSampleCodeAndName (data) {
     return request(`${http2}/v1/${data}/search`);
   },
 
   // 样品列表(分页)
-  getSample(params) {
+  getSample (params) {
     return request(`${http2}/v1/`, {
       params,
     });
   },
 
   // 样品保存
-  addSample(data) {
+  addSample (data) {
     return request(`${http2}/v1`, {
       method: 'POST',
       data,
@@ -28,12 +28,12 @@ export default {
   },
 
   // 样品详细页
-  getSampleDetail(id) {
+  getSampleDetail (id) {
     return request(`${http2}/v1/${id}`);
   },
 
   // 解析序列文件返回样品详细信息
-  getSequenceFileAnalysis(data) {
+  getSequenceFileAnalysis (data) {
     return request(`${http2}/v1/sequenceFile/analysis`, {
       method: 'POST',
       data,
@@ -41,7 +41,7 @@ export default {
   },
 
   // 上传图片
-  UploadFiles(uploadUrl, params) {
+  UploadFiles (uploadUrl, params) {
     return request(uploadUrl, {
       method: 'POST',
       ...params,
@@ -49,14 +49,14 @@ export default {
   },
 
   // 样品列表(不分页)
-  getSampleList(params) {
+  getSampleList (params) {
     return request(`${http2}/v1/properties`, {
       params,
     });
   },
 
   // 查询样品文件选择信息
-  getChosedFileDetails(params) {
+  getChosedFileDetails (params) {
     const {
       id
     } = params;
@@ -70,7 +70,7 @@ export default {
   },
 
   // 获取样品选择框组件样品列表
-  getSampleSelectTableData(id) {
+  getSampleSelectTableData (id) {
     return request(`${http2} /projects/v1/processes/${id}/parameter`);
   }
 };

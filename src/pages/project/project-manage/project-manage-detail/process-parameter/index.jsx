@@ -17,7 +17,6 @@ import InputModel from '@/pages/project/components/ModelComponents/InputModel/in
 import InputNumberModel from '@/pages/project/components/ModelComponents/InputNumberModel';
 import RadioModel from '@/pages/project/components/ModelComponents/RadioModel';
 
-
 /** 样式 */
 import style from './index.less';
 
@@ -46,12 +45,11 @@ class ProcessParameter extends Component {
       paramList: [],
     };
     // 判断请求类型
-    this.determineTheRequestType()
+    this.determineTheRequestType();
   }
 
   // 组件加载时
-  componentDidMount = () => {
-  };
+  componentDidMount = () => {};
 
   // 判断请求类型
   determineTheRequestType = () => {
@@ -203,6 +201,7 @@ class ProcessParameter extends Component {
       }
 
       sessionStorage.setItem('processForParams', JSON.stringify(list));
+
       if (projectId === '' || projectId === undefined)
         url = `/project/project-manage/add/addflowpath/add/''/1`;
       if (projectId) url = `/project/project-manage/detail/edit/${projectId}/2`;
@@ -471,12 +470,12 @@ class ProcessParameter extends Component {
                       // 多选
                       if (it.type === 'checkbox')
                         return (
-                            <CheckBoxModel
-                              paramList={it}
-                              key={newIndex}
-                              disabled={requestType === 'view'}
-                              getData={this.getModelData}
-                            />
+                          <CheckBoxModel
+                            paramList={it}
+                            key={newIndex}
+                            disabled={requestType === 'view'}
+                            getData={this.getModelData}
+                          />
                         );
                       // 样品选择框
                       if (it.type === 'sample_select')
@@ -539,10 +538,10 @@ class ProcessParameter extends Component {
                 {requestType === 'view' ? (
                   ''
                 ) : (
-                    <Button type="primary" onClick={this.onSubmit}>
-                      提交
-                    </Button>
-                  )}
+                  <Button type="primary" onClick={this.onSubmit}>
+                    提交
+                  </Button>
+                )}
               </div>
             </Footer>
           </Form>
@@ -553,5 +552,5 @@ class ProcessParameter extends Component {
 }
 
 export default connect(({ projectDetail }) => ({
-  projectDetail
+  projectDetail,
 }))(ProcessParameter);
