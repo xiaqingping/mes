@@ -720,11 +720,7 @@ class ProcessEdit extends Component {
             </Card>
 
             {/* 任务table的显示 */}
-            <Card
-              style={{ marginTop: '24px' }}
-              title={this.titleContent()}
-              className="table-style-set taskList"
-            >
+            <Card style={{ marginTop: '24px' }} title={this.titleContent()}>
               <Spin spinning={taskLoading}>
                 <Table
                   rowKey="id"

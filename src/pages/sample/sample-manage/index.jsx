@@ -173,7 +173,7 @@ class SampleModel extends Component {
     return (
       <>
         <Col xxl={6} xl={8} lg={languageCode === 'EN' ? 12 : 12}>
-          <FormItem label="样品" name="name" style={{ marginTop: '8px' }}>
+          <FormItem label="样品" name="name">
             <AutoComplete
               onSearch={this.inputValue}
               spellCheck="false"
@@ -187,7 +187,7 @@ class SampleModel extends Component {
             </AutoComplete>
           </FormItem>
         </Col>
-        <Col span={16} style={{ textAlign: 'right', marginTop: '8px' }}>
+        <Col span={16} style={{ textAlign: 'right' }}>
           <Button type="primary" htmlType="submit">
             查询
           </Button>
@@ -316,8 +316,8 @@ class SampleModel extends Component {
 
     return (
       <PageHeaderWrapper>
-        <div className="tableList classSampleManage">
-          <Card bordered={false}>
+        <div>
+          <Card bordered={false} className="setSearchCard">
             <TableSearchForm
               ref={this.tableSearchFormRef}
               initialValues={this.initialValues}
@@ -328,21 +328,21 @@ class SampleModel extends Component {
             />
           </Card>
           <Card bordered={false} style={{ marginTop: '24px' }}>
-            <div className="tableListOperator">
+            <div>
               <Button
                 type="primary"
                 onClick={() => this.handleModalVisible()}
                 style={{
-                  margin: '5px 0 20px 8px',
                   fontSize: '14px',
                   color: '#ffffff',
+                  marginBottom: '35px',
                 }}
               >
                 <UploadOutlined />
                 上传序列文件
               </Button>
             </div>
-            <Form ref={this.tableFormRef} className="table-style-set classSampleList">
+            <Form ref={this.tableFormRef}>
               <StandardTable
                 // scroll={{ x: tableWidth }}
                 rowClassName="editable-row"

@@ -118,7 +118,7 @@ class DrawerTool extends Component {
     const { visable, selectVersion, parameterVisible, detailValue, open } = this.state;
     return (
       <div style={{ marginTop: '25px' }}>
-        <div className="titleContentImage">
+        <div>
           <Avatar
             src={value.picture ? disk.downloadFiles(value.picture, { view: true }) : ''}
             style={{ float: 'left' }}
@@ -146,7 +146,7 @@ class DrawerTool extends Component {
                 <Card
                   style={{ position: 'absolute', zIndex: '100', top: '28px' }}
                   hoverable
-                  className="padding-none"
+                  // className="padding-none"
                 >
                   {value.versions
                     ? value.versions.map(item => (
@@ -285,7 +285,7 @@ class DrawerTool extends Component {
           closable={false}
           onClose={this.onClose}
           visible={this.props.visible}
-          className="drawer-style processModelDetail"
+          // className="drawer-style processModelDetail"
         >
           {errorPage ? (
             <Empty />
@@ -341,7 +341,7 @@ class DrawerTool extends Component {
                     </Card>
                   </List.Item>
                 )}
-                className="list-style"
+                // className="list-style"
                 split={false}
               />
               <Drawer
@@ -395,7 +395,7 @@ class DrawerTool extends Component {
                       </Card>
                     </List.Item>
                   )}
-                  className="list-style"
+                  // className="list-style"
                   split={false}
                 />
               </Drawer>
