@@ -312,7 +312,15 @@ class UploadSequenceFile extends React.Component {
         maskClosable={false}
       >
         {/* 上传文件 */}
-        <div style={{ float: 'left', width: '170px', height: '142px', position: 'relative' }}>
+        <div
+          style={{
+            float: 'left',
+            width: '170px',
+            height: '142px',
+            position: 'relative',
+            marginBottom: '18px',
+          }}
+        >
           <UploadButton handleUpload={e => this.handleUpload(e)} />
         </div>
         {/* 轮播图 */}
