@@ -197,7 +197,6 @@ class SampleSelect extends React.Component {
       item.sampleId = item.id;
       return item;
     });
-
     const { paramKey, taskModelId } = this.props.paramList;
     const sendData = {
       paramKey,
@@ -391,11 +390,13 @@ class SampleSelect extends React.Component {
         return item;
       });
 
-      this.setState({
-        tableData: data1,
-      });
+      this.setState(
+        {
+          tableData: data1,
+        },
+        () => this.sendDataOnChange(),
+      );
       this.setColorStore(colorStore);
-
       this.props.emitData(data1);
     } else {
       // 从已选择进来的
@@ -405,6 +406,7 @@ class SampleSelect extends React.Component {
       this.setState({
         tableData: list,
       });
+      console.log(`list${list}`);
       // TODO:将改变返回给父组件
       this.props.emitData(list);
     }
@@ -442,7 +444,7 @@ class SampleSelect extends React.Component {
             handleCancel={this.handleCancel}
             id={sampleId}
             chooseFileIds={chooseFileIds}
-            sendData={this.receiveData}
+            sendData={v => this.receiveData(v)}
           />
         )}
       </>
