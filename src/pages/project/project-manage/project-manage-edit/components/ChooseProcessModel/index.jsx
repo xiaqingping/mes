@@ -323,14 +323,15 @@ class ChooseProcessModel extends React.Component {
                             style={{
                               float: 'left',
                               height: '50px',
-                              width: '100px',
+                              width: '120px',
                               textAlign: 'center',
                             }}
                           >
                             <ul style={{ padding: '0', textAlign: 'center' }}>
-                              <li>{item.name}</li>
-                              <li>
-                                <Tag color="green" style={{ width: '50px', height: '20px' }}>
+                              <li style={{textAlign:'left',marginBottom:'3px'}}>{item.name}</li>
+                              <li style={{textAlign:'left'}}>
+                                <Tag color="green" style={{ width: '50px', height: '20px' ,
+                                textAlign:'center',lineHeight:'18px'}}>
                                   {item.version}
                                 </Tag>
                               </li>
@@ -339,8 +340,9 @@ class ChooseProcessModel extends React.Component {
                           <div
                             style={{
                               fontSize: '14px',
-                              float: 'right',
-                              color: '#005bc3',
+                              position:'absolute',
+                              right:'0',
+                              top:'16px',
                               marginRight: '10px',
                             }}
                             className="isView"
@@ -353,7 +355,8 @@ class ChooseProcessModel extends React.Component {
                             </Button>
                           </div>
                         </div>
-                        <div style={{ fontSize: '14px', paddingLeft: '20px', paddingTop: '10px' }}>
+                        <div style={{ fontSize: '14px', paddingTop: '10px' ,
+                        WebkitBoxOrient:'vertical'}}>
                           {item.describe}
                         </div>
                         <div
