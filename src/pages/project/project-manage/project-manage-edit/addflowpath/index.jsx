@@ -19,6 +19,7 @@ class Test extends Component {
     const { type, projectId ,paramsType} = this.props.match.params;
     // console.log(this.props.match.params);
     const { projectInfor } = this.props.projectManage;
+    console.log(projectInfor);
 
     this.state = {
       // TODO:
@@ -104,9 +105,19 @@ class Test extends Component {
 
   // 点击打开关联
   onOpen = () => {
+    const {projectInfor,processType} =this.state;
+    console.log(this.state);
+    if(processType==='add'&& projectInfor.length===0) {
+      this.setState({
+        visible: false,
+      });
+      message.error('新建项目基础信息未保存！请重新选择新建');
+      router.push('/project/project-manage');
+    }
     this.setState({
       visible: true,
     });
+
   };
 
   // 点击关闭关联
@@ -232,6 +243,7 @@ class Test extends Component {
       });
 
       projectInfor.processes = newList;
+      console.log(projectInfor);
       const data = projectInfor;
       api
         .addProjects(data)
@@ -251,7 +263,6 @@ class Test extends Component {
 
     }
     if (processType === 'edit') {
-      console.log('edit')
       // console.log('正常从已有项目跳转，');
       const newList = [];
 
@@ -290,8 +301,6 @@ class Test extends Component {
           });
         });
     }
-
-    console.log(1231213)
 
     // if(paramsList) {
 
@@ -373,27 +382,17 @@ class Test extends Component {
     ];
     return (
       <PageHeaderWrapper>
-        <Card bordered={false}>
-          <div className="tableList" style={{ height: '400px', overflow: 'auto' }}>
-            <Form ref={this.tableFormRef}>
-              <div style={{ clear: 'both' }} className="setTitleColor">
-                <Table
-                  rowClassName="editable-row"
-                  rowKey="id"
-                  loading={loading}
-                  dataSource={list}
-                  columns={columns}
-                  pagination={false}
-                  onSelectRow={this.handleSelectRows}
-                />
-              </div>
-            </Form>
-          </div>
-          <div
-            style={{
-              width: '100%',
-            }}
-          >
+        <Form ref={this.tableFormRef} onFinish={this.handleSave}>
+          <Card>
+            <Table
+                rowClassName="editable-row"
+                rowKey="id"
+                loading={loading}
+                dataSource={list}
+                columns={columns}
+                pagination={false}
+                onSelectRow={this.handleSelectRows}
+              />
             <Button
               type="dashed"
               onClick={this.onOpen}
@@ -406,9 +405,7 @@ class Test extends Component {
             >
               选择流程模型
             </Button>
-          </div>
-        </Card>
-        <Form onFinish={this.handleSave}>
+          </Card>
           <Card
             style={{ height: '48px', width: '100%', position: 'fixed', bottom: '0', left: '0' }}
           >
@@ -422,11 +419,16 @@ class Test extends Component {
             </Button>
           </Card>
         </Form>
-        <ChooseProcessModel
-          visible={visible}
-          onClose={this.onClose}
-          getData={v => this.getData(v)}
-        />
+
+        {visible ? (
+            <ChooseProcessModel
+              visible={visible}
+              onClose={v => this.onClose(v)}
+              getData={v => this.getData(v)}
+            />
+          ) : (
+            ''
+          )}
       </PageHeaderWrapper>
     );
   }
