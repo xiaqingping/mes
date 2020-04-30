@@ -21,12 +21,15 @@ class CheckBoxModel extends React.Component {
     };
   }
 
-  // 组件加载时
+  /** 组件加载时 */
   componentDidMount = () => {
     this.formatGetData();
   };
 
-  // 格式化提交数据
+  /**
+   * 格式化提交数据
+   * @param {Array} checkedValues checkBox选中数据
+   */
   formatSubmitData = checkedValues => {
     const { paramList } = this.state;
     const error = this.verifyData(checkedValues);
@@ -43,7 +46,7 @@ class CheckBoxModel extends React.Component {
     return false;
   };
 
-  // 处理获取到的数据
+  /** 处理获取到的数据 */
   formatGetData = () => {
     const { paramList } = this.state;
     // 取出选项列表
@@ -86,7 +89,6 @@ class CheckBoxModel extends React.Component {
   render() {
     const { paramList, checkedValues, selectList } = this.state;
     const data = paramList;
-    console.log(checkedValues);
 
     return (
       <Form.Item

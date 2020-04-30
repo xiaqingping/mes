@@ -42,16 +42,24 @@ class TaskExecRecordParam extends Component {
     if (!param) return message.warning('当前任务暂无参数');
 
     const { paramValues } = this.state;
-    if (paramValues) console.log(paramValues);
-    const newParams = this.disposeTaskData(param);
-    console.log(newParams);
-    this.setState({ paramData: newParams });
+    let newParamData;
+    if (paramValues) {
+      const newParam = this.disposeTaskData(param);
+      newParamData = this.disposeParamData(newParam, paramValues);
+    } else {
+      newParamData = this.disposeTaskData(param);
+    }
+    this.setState({ paramData: newParamData });
+    return false;
   };
 
-  // 处理任务模型参数列表
-  disposeTaskData = data => {
+  /**
+   * 处理任务模型参数列表
+   * @param {Array} param  任务模型参数
+   */
+  disposeTaskData = param => {
     const newData = [];
-    data.forEach(item => {
+    param.forEach(item => {
       const newItem = JSON.parse(JSON.stringify(item));
       delete newItem.paramProperties;
       delete newItem.paramPropertiesMap;
@@ -63,7 +71,11 @@ class TaskExecRecordParam extends Component {
     return newData;
   };
 
-  // 合并参数列表和参数值
+  /**
+   * 合并参数列表和参数值
+   * @param {Array} paramData  任务模型参数
+   * @param {Array} valueData  任务执行记录参数
+   */
   disposeParamData = (paramData, valueData) => {
     const newData = [];
     paramData.forEach(paramItem => {

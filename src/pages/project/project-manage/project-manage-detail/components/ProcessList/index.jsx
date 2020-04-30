@@ -144,9 +144,7 @@ class ProcessList extends Component {
       test,
     } = this.state;
 
-    let tableWidth = 0;
-
-    let columns = [
+    const columns = [
       {
         title: '名称/描述',
         dataIndex: 'name',
@@ -236,26 +234,16 @@ class ProcessList extends Component {
       },
     ];
 
-    columns = columns.map(col => {
-      if (!col.width) col.width = 100;
-      tableWidth += col.width;
-      if (!col.editable) {
-        return col;
-      }
-      return true;
-    });
-
     return (
       <>
         <Form ref={this.tableFormRef}>
           <Table
             style={{ paddingRight: 30 }}
-            scroll={{ x: tableWidth, y: 400 }}
+            scroll={{ y: 400 }}
             rowKey="id"
             loading={loading}
             dataSource={list}
             columns={columns}
-            onChange={this.handleStandardTableChange}
             onRow={(record, index) => ({
               onMouseEnter: () => {
                 this.setState({ editIndex: index });

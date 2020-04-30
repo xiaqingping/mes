@@ -1,4 +1,4 @@
-// 项目管理 编辑
+/** 项目管理 编辑页面 */
 import { Card, Tabs } from 'antd';
 import React, { Component } from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';

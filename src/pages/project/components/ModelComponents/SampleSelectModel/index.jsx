@@ -149,7 +149,10 @@ class SampleSelect extends React.Component {
 
   componentDidMount() {
     const { tableDatas, disabled, columns } = this.state;
-    const tableData = JSON.parse(JSON.stringify(tableDatas));
+    let tableData = [];
+    if (typeof tableDatas === 'string') {
+      tableData = JSON.parse(tableDatas);
+    }
     if (disabled) {
       this.setState(
         {
@@ -228,7 +231,7 @@ class SampleSelect extends React.Component {
 
   setColorStore = colorStore => {
     const { dispatch } = this.props;
-    console.log(colorStore);
+    // console.log(colorStore);
     dispatch({
       type: 'project/setColorStore',
       payload: colorStore,
@@ -238,17 +241,17 @@ class SampleSelect extends React.Component {
   handleDelete = row => {
     const { columns, tableData } = this.state;
     const list = [...tableData];
-    console.log(tableData);
+    // console.log(tableData);
     const columns1 = JSON.parse(JSON.stringify(columns));
     const columns2 = [...columns];
     const list1 = list.filter(item => item.id !== row.id);
-    console.log(list1);
+    // console.log(list1);
     const colorStore = [];
     list1.forEach(item => {
       colorStore.push(item.color);
     });
     this.setColorStore(colorStore);
-    console.log(list1);
+    // console.log(list1);
     // this.props.emitData(list1);
     this.setState(
       {
@@ -329,7 +332,6 @@ class SampleSelect extends React.Component {
   };
 
   handleCancel = () => {
-    console.log(123);
     this.toggleVis(false);
   };
 
@@ -406,7 +408,7 @@ class SampleSelect extends React.Component {
       this.setState({
         tableData: list,
       });
-      console.log(`list${list}`);
+      // console.log(`list${list}`);
       // TODO:将改变返回给父组件
       this.props.emitData(list);
     }
@@ -421,6 +423,8 @@ class SampleSelect extends React.Component {
     // } else {
     //   tableList = tableData;
     // }
+
+    if (typeof tableData === 'string') return false;
 
     return (
       <>
