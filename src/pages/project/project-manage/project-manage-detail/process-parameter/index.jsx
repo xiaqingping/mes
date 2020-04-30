@@ -225,6 +225,7 @@ class ProcessParameter extends Component {
    */
   getModelData = (data, type, isVerify) => {
     const { paramList } = this.state;
+
     if (isVerify) {
       const newParams = paramList.filter(item => item.paramKey !== data.paramKey);
       paramList.forEach(item => {
@@ -246,7 +247,7 @@ class ProcessParameter extends Component {
 
   /**
    * 删除参数为空的分组
-   * paramData 参数
+   * @param {Array} data 参数
    */
   deleteNullGroup = data => {
     const newData = [];

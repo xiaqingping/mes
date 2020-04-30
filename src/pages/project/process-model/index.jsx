@@ -22,7 +22,7 @@ import router from 'umi/router';
 import { connect } from 'dva';
 import _ from 'lodash';
 import { DateUI } from '@/pages/project/components/AntdSearchUI';
-import { formatter, getOperates } from '@/utils/utils';
+import { formatter, getOperates, cutString } from '@/utils/utils';
 import api from '@/pages/project/api/processModel/';
 import disk from '@/pages/project/api/disk';
 import DefaultHeadPicture from '@/assets/imgs/defaultheadpicture.jpg';
@@ -488,6 +488,7 @@ class ProcessModel extends Component {
         title: '描述',
         dataIndex: 'describe',
         width: 400,
+        render: value => <div title={value}>{cutString(value, 115)}</div>,
       },
       {
         title: '发布人/时间',

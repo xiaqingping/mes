@@ -775,7 +775,7 @@ class TaskModel extends Component {
           <Card
             style={{ height: '48px', width: '100%', position: 'fixed', bottom: '0', left: '0' }}
           >
-            <Button type="primary" style={{ float: 'right', marginTop: '-32px' }} htmlType="submit">
+            <Button type="primary" style={{ float: 'right', marginTop: '-16px' }} htmlType="submit">
               提交
             </Button>
           </Card>

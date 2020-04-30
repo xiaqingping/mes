@@ -1,4 +1,11 @@
-/** 详情的抽屉页面  渲染详情页面 */
+/**
+ * 详情的抽屉页面  渲染详情页面
+ * @param {Function} onClose 关闭页面
+ * @param {Object} detailId  详情对象
+ * @param {Array} status 状态
+ * @param {Function} handleChangeVersion 选择版本
+ * @param {Function} handleUnPublish 禁用的方法
+ */
 import React, { Component } from 'react';
 import { Drawer, Avatar, Tag, List, Card, Badge, Spin, Empty } from 'antd';
 import { DownOutlined, UpOutlined } from '@ant-design/icons';
