@@ -233,6 +233,7 @@ class ProjectManagement extends Component {
       type: 'projectManage/setProjectData',
       payload: data,
     });
+    sessionStorage.setItem('ModifyProject', JSON.stringify(row));
     const projectId = row.id;
     router.push(`/project/project-manage/edit/${projectId}`);
   };
