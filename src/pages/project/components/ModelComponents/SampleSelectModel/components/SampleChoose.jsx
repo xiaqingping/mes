@@ -178,11 +178,9 @@ class SampleChoose extends React.Component {
     if (!id) {
       // 点击选择样品过来的。
       const checkedSample = tableData.filter(item => item.indeterminate || item.isChoose);
-      // console.log(`点击选择样品过来的${checkedSample}`);
       this.props.sendData(checkedSample);
     } else {
       // 点击已选择文件过来的。
-      // console.log(`点击已选择文件过来的。${tableData}`);
       this.props.sendData(tableData);
     }
 

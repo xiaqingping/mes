@@ -148,9 +148,9 @@ class CheckboxModel extends React.Component {
           {fromView ? <span>{viewForm.paramName}</span> : <Input placeholder="请输入参数描述" />}
         </Form.Item>
 
-        <Form.Item label="是否必填：" name="isrequired">
+        <Form.Item label="是否必填：" name="isRequired">
           {/* <Switch /> */}
-          {fromView ? viewForm.isrequired : <Switch defaultChecked />}
+          {fromView ? viewForm.isRequired : <Switch defaultChecked />}
         </Form.Item>
 
         <p style={{ fontSize: 16, fontWeight: 'bold' }}>选项：</p>

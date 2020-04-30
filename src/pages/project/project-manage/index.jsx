@@ -354,8 +354,8 @@ class ProjectManagement extends Component {
                   color: '#fff',
                   borderRadius: '12px',
                   textAlign: 'center',
-                  width:'60px',
-                  height:'24px'
+                  width: '60px',
+                  height: '24px',
                 }}
                 size="small"
               >
@@ -371,7 +371,7 @@ class ProjectManagement extends Component {
         width: 250,
         render: value => {
           const arr = [];
-          if(value) {
+          if (value) {
             value.forEach(item => {
               labels.forEach(i => {
                 if (i.id === item) {

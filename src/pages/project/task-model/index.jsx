@@ -567,10 +567,10 @@ class TaskModel extends Component {
     });
     const { loading, list, pagination, viewId } = this.state;
     return (
-      <PageHeaderWrapper className="classPageHeaderWrappers">
+      <PageHeaderWrapper>
         <Spin spinning={loading} size="large">
-          <Card bordered={false} className="task_model_list_form_body">
-            <div className="tableList">
+          <Card bordered={false} className="setSearchCard">
+            <div>
               <TableSearchForm
                 ref={this.tableSearchFormRef}
                 initialValues={this.initialValues}
@@ -581,8 +581,12 @@ class TaskModel extends Component {
             </div>
           </Card>
           <Card style={{ marginTop: 24 }}>
-            <div className="tableListOperator classtableListOperator">
-              <Button type="primary" onClick={() => this.handleAdd()}>
+            <div>
+              <Button
+                type="primary"
+                onClick={() => this.handleAdd()}
+                style={{ marginBottom: '35px' }}
+              >
                 <PlusOutlined />
                 新建
               </Button>
