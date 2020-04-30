@@ -20,11 +20,15 @@ class ProjectEdit extends Component {
 
   constructor(props) {
     super(props);
+
+    const modifyProject =this.props.match.params;
+    // console.log(modifyProject);
+
     const { projectData, labels } = props.projectManage;
-    console.log(projectData);
 
     this.state = {
       requestType: projectData.requestType || 'addProject', // 请求类型
+      // requestType: 'editProject' || 'addProject' || [], // 请求类型
       selectedlabels: [], // 选中标签
       bpCode: '', // bp编号
       bpName: '', // bp名称
@@ -32,18 +36,48 @@ class ProjectEdit extends Component {
       endDate: '', // 结束时间
       projectData,
       labels,
+      modifyProject,
     };
   }
 
   // 组件加载时
   componentDidMount = () => {
-    const { projectData } = this.state;
+
+    // 从项目列表页带过来的数据
+    const projectRow = JSON.parse(sessionStorage.getItem('ModifyProject'));
+
+    const { projectData ,modifyProject} = this.state;
+    // console.log(this.state);
+    if(projectRow) {
+      if(modifyProject) {
+        this.formRef.current.setFieldsValue({
+          name: projectRow.name,
+          describe: projectRow.describe,
+          bpName: projectRow.bpName,
+        });
+        this.setState({
+          selectedlabels: projectRow.labels,
+          beginDate: projectRow.beginDate,
+          endDate: projectRow.endDate,
+        });
+
+      }
+    } else {
+      // console.log('清除页面缓存');
+      sessionStorage.removeItem('ModifyProject');
+    }
+
+
+
+
+
     this.requestTypeInit(projectData);
   };
 
   // 判断请求类型
   requestTypeInit = data => {
     const { requestType } = this.state;
+    console.log(requestType);
     if (requestType === 'addProject') {
       this.setState({
         requestType,
@@ -70,16 +104,20 @@ class ProjectEdit extends Component {
   // 保存
   handleSave = () => {
     const data = this.saveData();
-    const { requestType } = this.state;
-    if (requestType === 'addProject') {
+    const { modifyProject} = this.state;
+    if (modifyProject === []) {
+      // console.log('新建项目的信息');
       api.addProjects(data).then(() => {
         router.push('/project/project-manage');
       });
     }
-    if (requestType === 'editProject') {
+    if (modifyProject !== []) {
+      // console.log('修改项目的信息');
       api.updateProjects(data).then(() => {
         router.push('/project/project-manage');
       });
+      // console.log('清除页面缓存');
+      sessionStorage.removeItem('ModifyProject');
     }
   };
 
@@ -91,12 +129,9 @@ class ProjectEdit extends Component {
       bpName,
       endDate,
       beginDate,
-      requestType,
-      projectData,
+      modifyProject
     } = this.state;
-    console.log(this.state);
     const formData = this.formRef.current.getFieldsValue();
-    console.log(formData);
 
     if (formData.name === undefined) {
       message.error('项目名称不能为空！');
@@ -107,8 +142,9 @@ class ProjectEdit extends Component {
       return 1;
     }
 
+    let data;
     // 新增项目时
-    if (requestType === 'addProject') {
+    if (modifyProject === []) {
       if (bpName === '') {
         message.error('所有者不能为空！');
         return 1;
@@ -125,10 +161,7 @@ class ProjectEdit extends Component {
         message.error('标签不能为空！');
         return 1;
       }
-    }
 
-    let data;
-    if (requestType === 'addProject') {
       data = {
         name: formData.name,
         describe: formData.describe,
@@ -139,14 +172,18 @@ class ProjectEdit extends Component {
         labels: selectedlabels,
       };
     }
-    if (requestType === 'editProject') {
+
+
+    if (modifyProject !== []) {
+      // console.log('修改项目的信息');
       data = {
-        id: projectData.id,
+        id: modifyProject.id,
         name: formData.name,
         describe: formData.describe,
         labels: selectedlabels,
       };
     }
+
     return data;
   };
 
@@ -214,7 +251,8 @@ class ProjectEdit extends Component {
   };
 
   render() {
-    const { requestType, selectedlabels, projectData, labels} = this.state;
+    const { requestType, selectedlabels, projectData, labels,modifyProject} = this.state;
+    // console.log(this.state);
     return (
       <PageHeaderWrapper title={this.navContent(projectData)}>
         <Form ref={this.formRef} className="classPageHeaderWrapper">
@@ -244,13 +282,13 @@ class ProjectEdit extends Component {
                   onSearch={() => this.showBPList.visibleShow(true)}
                   style={{ marginLeft: '26px' }}
                   readOnly
-                  disabled={requestType === 'editProject'}
+                  disabled={modifyProject !==[]}
                 />
               </FormItem>
             </div>
             <div style={{ marginBottom: '20px' }}>
               <FormItem label="时间" name="time" style={{ paddingRight: '50px' }}>
-                {requestType === 'addProject' ? (
+                {requestType === 'addProject' && modifyProject ===[] ? (
                   <RangePicker
                     showTime={{ format: 'HH:mm:ss' }}
                     format="YYYY-MM-DD HH:mm:ss"
@@ -267,7 +305,7 @@ class ProjectEdit extends Component {
                     ]}
                     onChange={this.handleOnChangeTime}
                     style={{ marginLeft: '40px' }}
-                    disabled={requestType === 'editProject'}
+                    disabled={modifyProject !==[]}
                   />
                 )}
               </FormItem>
@@ -278,7 +316,8 @@ class ProjectEdit extends Component {
                   {labels.map(item => (
                     <CheckableTag
                       key={item.id}
-                      checked={selectedlabels.indexOf(item.id) > -1}
+                      checked={selectedlabels.indexOf(item.id) > -1 && selectedlabels !==[]}
+                      // checked={selectedlabels.length!==0}
                       onChange={checked => this.handleOnChangelabel(item.id, checked)}
                       style={{
                         height: '30px',
@@ -313,7 +352,7 @@ class ProjectEdit extends Component {
             >
               保存
             </Button>
-            {requestType === 'addProject' ? (
+            {modifyProject === [] ? (
                   <Button
                   type="primary"
                   onClick={() => this.handleAdd(true)}
