@@ -22,6 +22,15 @@ import style from './index.less';
 
 const { Footer } = Layout;
 
+function compare(property) {
+  // eslint-disable-next-line func-names
+  return function(a, b) {
+    const value1 = a[property];
+    const value2 = b[property];
+    return value1 - value2;
+  };
+}
+
 class ProcessParameter extends Component {
   formRef = React.createRef();
 
@@ -54,26 +63,15 @@ class ProcessParameter extends Component {
   // 判断请求类型
   determineTheRequestType = () => {
     const { requestType, processId, processModelId } = this.state;
-    // 创建项目 添加参数值
-    if (requestType === 'add') {
-      message.success('add');
-      this.getProcessParam(processModelId); // 查询流程参数
-    }
-    // 创建项目 未保存时修改参数值
-    if (requestType === 'update') {
-      message.success('update');
+    message.success(requestType);
+
+    // 创建项目 添加参数值 / 未保存时修改参数值
+    if (requestType === 'add' || requestType === 'update') {
       this.getProcessParam(processModelId); // 查询流程参数
     }
 
-    // 流程参数 修改参数值
-    if (requestType === 'edit') {
-      message.success('edit');
-      this.getProcessParam(processModelId); // 查询流程参数
-      this.getProcessParamValue(processId); // 查询流程参数值
-    }
-    // 查看参数
-    if (requestType === 'view') {
-      message.success('view');
+    // 流程参数 修改参数值 / 查看参数
+    if (requestType === 'edit' || requestType === 'view') {
       this.getProcessParam(processModelId); // 查询流程参数
       this.getProcessParamValue(processId); // 查询流程参数值
     }
@@ -82,8 +80,8 @@ class ProcessParameter extends Component {
 
   /**
    * 获取数据 执行不同的处理
-   * param  流程模型参数
-   * paramValue 流程参数值
+   * @param {Array} param  流程模型参数
+   * @param {Array} paramValue 流程参数值
    */
   getParamData = (param, paramValue) => {
     const { requestType } = this.state;
@@ -102,7 +100,8 @@ class ProcessParameter extends Component {
         message.success('添加操作');
         if (param.length > 0) {
           this.getDefaultParams(newParamData);
-          this.setState({ paramGroupList: newParamData });
+          const newData = this.compareParams(newParamData, 'sortNo');
+          this.setState({ paramGroupList: newData });
         }
       }
 
@@ -112,6 +111,7 @@ class ProcessParameter extends Component {
         // update参数值
         const processParamList = sessionStorage.getItem('processForParams');
         const processParamValue = processParamList.params;
+
         // 有参数值时
         if (
           newParamData.length > 0 &&
@@ -123,13 +123,17 @@ class ProcessParameter extends Component {
         ) {
           // 合并参数和参数值
           const data = this.comparedWith(newParamData, paramValue);
-          this.setState({ paramGroupList: data });
+          const newData = this.compareParams(data, 'sortNo');
+
+          this.setState({ paramGroupList: newData });
           return false;
         }
+
         // 未设置参数值时
         if (param.length > 0 && paramValue.length === 0) {
           this.getDefaultParams(newParamData);
-          this.setState({ paramGroupList: newParamData });
+          const newData = this.compareParams(newParamData, 'sortNo');
+          this.setState({ paramGroupList: newData });
         }
       }
 
@@ -142,17 +146,36 @@ class ProcessParameter extends Component {
           // 合并参数和参数值
           const data = this.comparedWith(newParamData, paramValue);
           this.getDefaultParams(data);
-          this.setState({ paramGroupList: data });
+          const newData = this.compareParams(data, 'sortNo');
+          this.setState({ paramGroupList: newData });
           return false;
         }
         // 未设置参数值时
         if (param.length > 0 && paramValue.length === 0) {
           this.getDefaultParams(newParamData);
-          this.setState({ paramGroupList: newParamData });
+          const newData = this.compareParams(newParamData, 'sortNo');
+          this.setState({ paramGroupList: newData });
         }
       }
     }
     return false;
+  };
+
+  /**
+   * 参数排序
+   * @param {Array} paramGroupList 参数分组数据
+   * @param {String} field 排序字段
+   */
+  compareParams = (paramGroupData, field) => {
+    const newData = [];
+    paramGroupData.forEach(groItem => {
+      const newGroupItem = JSON.parse(JSON.stringify(groItem));
+      const { params } = groItem;
+      const newParams = params.sort(compare([field]));
+      newGroupItem.params = newParams;
+      newData.push(newGroupItem);
+    });
+    return newData;
   };
 
   /**
@@ -164,7 +187,13 @@ class ProcessParameter extends Component {
     paramGroupList.forEach(groItem => {
       const { params } = groItem;
       paramList = [...paramList, ...params];
+      groItem.params.forEach(item => {
+        if (item.type === 'sample_select') {
+          this.setState({ sampleList: JSON.parse(item.paramValue) });
+        }
+      });
     });
+
     this.setState({ paramList });
   };
 
@@ -221,11 +250,10 @@ class ProcessParameter extends Component {
    * 组件返回数据
    * @param {string} data 组件数据
    * @param {string} type 组件类型
-   * @param {boolean} isVerify 是否通过验证
+   * @param {boolean} isVerify 数据是否通过验证
    */
   getModelData = (data, type, isVerify) => {
     const { paramList } = this.state;
-
     if (isVerify) {
       const newParams = paramList.filter(item => item.paramKey !== data.paramKey);
       paramList.forEach(item => {
@@ -247,7 +275,7 @@ class ProcessParameter extends Component {
 
   /**
    * 删除参数为空的分组
-   * @param {Array} data 参数
+   * @param {Array} data 流程参数
    */
   deleteNullGroup = data => {
     const newData = [];
@@ -261,7 +289,7 @@ class ProcessParameter extends Component {
 
   /**
    * 处理参数属性
-   * paramData 参数
+   * @param {Array} data 流程参数
    */
   disposeParamAttribute = data => {
     const newData = [];
@@ -282,10 +310,11 @@ class ProcessParameter extends Component {
           // key：value
           nParamItem[proItem.paramPropertyKey] = proItem.paramPropertyValue;
         });
+        // TODO:
+        nParamItem.sortNo = Number(paramItem.sortNo.split('')[0]);
 
-        // 删除 参数属性列表和排序 字段（可不删）
+        // 删除 参数属性列表 字段（可不删）
         delete nParamItem.paramProperties;
-        delete nParamItem.sortNo;
 
         // 保存处理好的参数
         nparam.push(nParamItem);
@@ -302,8 +331,8 @@ class ProcessParameter extends Component {
 
   /**
    * 合并参数列表和参数值
-   * paramData 参数分组数据
-   * valueData 参数值
+   * @param {Array} paramGroupData 参数分组数据
+   * @param {Array} valueData 参数值
    */
   comparedWith = (paramGroupData, valueData) => {
     const list = [];
@@ -314,31 +343,21 @@ class ProcessParameter extends Component {
 
       const paramList = groupItem.params;
       const newList = [];
-      const idList = [];
+      const ids = [];
       paramList.forEach(paramItem => {
         valueData.forEach(valueItem => {
           const newItem = JSON.parse(JSON.stringify(paramItem));
           if (paramItem.paramKey === valueItem.paramKey) {
-            if (newList.length > 0) {
-              const ids = [];
-              newList.forEach(listItem => {
-                ids.push(listItem.id);
-              });
+            if (newList.length === 0) {
+              newItem.paramValue = valueItem.paramValue;
+              newList.push(newItem);
+            } else {
+              newList.forEach(listItem => ids.push(listItem.id));
               if (ids.indexOf(paramItem.id) === -1) {
                 newItem.paramValue = valueItem.paramValue;
                 newList.push(newItem);
               }
-            } else {
-              newItem.paramValue = valueItem.paramValue;
-              newList.push(newItem);
             }
-          }
-          if (idList.length === 0) {
-            idList.push(newItem.id);
-            newList.push(newItem);
-          } else if (idList.indexOf(newItem.id) === -1) {
-            idList.push(newItem.id);
-            newList.push(newItem);
           }
         });
       });
@@ -351,7 +370,7 @@ class ProcessParameter extends Component {
 
   /**
    * 获取流程参数
-   * processModelId 流程模型ID
+   * @param {Array} processModelId 流程模型ID
    */
   getProcessParam = processModelId => {
     api.getProcessParam(processModelId).then(res => {
@@ -368,7 +387,7 @@ class ProcessParameter extends Component {
 
   /**
    * 获取流程参数值
-   * processModelId 流程ID
+   * @param {Array} processModelId 流程ID
    */
   getProcessParamValue = processId => {
     api.getProcessParamValue(processId).then(res => {
@@ -380,7 +399,23 @@ class ProcessParameter extends Component {
     });
   };
 
-  // 返回
+  /**
+   * 获取样品选择框的实时数据
+   * @param {Array} updateData 样品列表数据
+   */
+  getSelectUpdateData = updateData => {
+    this.setState(
+      {
+        sampleList: updateData,
+      },
+      () => {
+        this.handleUpdateSampleGroup();
+        this.handleUpdateEnvironmentFactor();
+      },
+    );
+  };
+
+  /** 返回 */
   goBackLink = () => {
     const { requestType, projectId } = this.state;
     let url;
@@ -394,19 +429,6 @@ class ProcessParameter extends Component {
     }
 
     return router.push(url);
-  };
-
-  // 获取样品选择框的实时数据
-  getSelectUpdateData = updateData => {
-    this.setState(
-      {
-        sampleList: updateData,
-      },
-      () => {
-        this.handleUpdateSampleGroup();
-        this.handleUpdateEnvironmentFactor();
-      },
-    );
   };
 
   render() {
@@ -478,7 +500,7 @@ class ProcessParameter extends Component {
                           />
                         );
                       // 样品选择框
-                      if (it.type === 'sample_select')
+                      if (it.type === 'sample_select') {
                         return (
                           <SampleSelectModel
                             paramList={it}
@@ -491,6 +513,7 @@ class ProcessParameter extends Component {
                             setSelectState={this.setSelectState}
                           />
                         );
+                      }
                       // 样品分组方案
                       if (it.type === 'sample_group') {
                         return (

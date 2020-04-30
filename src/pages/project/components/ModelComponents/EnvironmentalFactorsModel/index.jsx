@@ -87,7 +87,7 @@ class EnvironmentalFactorsModel extends React.Component {
     sampleList.map(samItem => {
       let newItem = {};
       newItem = {
-        metadataSampleId: samItem.id,
+        sampleId: samItem.id,
         sampleName: samItem.sampleAlias || samItem.sampleName,
       };
       const item = {};
@@ -137,7 +137,8 @@ class EnvironmentalFactorsModel extends React.Component {
       data.forEach(item => {
         if (item[`header_${i}`] !== '') {
           const sampleValue = {
-            sampleId: item.sampleId,
+            // TODO:
+            sampleId: item.sampleId || item.metadataSampleId,
             sampleName: item.sampleName,
           };
           const sampleList = [];
@@ -225,18 +226,19 @@ class EnvironmentalFactorsModel extends React.Component {
     const paramValue = JSON.parse(paramList.paramValue);
 
     if (paramList) {
-      const list = paramValue.environmentFactorList;
+      const list = paramValue;
       const columns = [firstColumn];
       const titleName = 'environmentFactorName';
+      if (list) {
+        // 取出 表头
+        const newColumns = this.getTableHeaderData(list, columns, titleName);
+        // 取出 行数据
+        const rowData = this.getRowDataEnvironment(list, sampleList, newColumns);
+        // 填充行数据
+        const newData = this.getFillDataEnvironment(list, rowData);
 
-      // 取出 表头
-      const newColumns = this.getTableHeaderData(list, columns, titleName);
-      // 取出 行数据
-      const rowData = this.getRowDataEnvironment(list, sampleList, newColumns);
-      // 填充行数据
-      const newData = this.getFillDataEnvironment(list, rowData);
-
-      this.getDataDispose(newColumns, newData);
+        this.getDataDispose(newColumns, newData);
+      }
     }
     return false;
   };
@@ -347,7 +349,8 @@ class EnvironmentalFactorsModel extends React.Component {
 
     const newData = [];
     data.forEach(item => {
-      if (row.id === item.id) {
+      // if (row.metadataSampleId === item.metadataSampleId) {
+      if (row.sampleId === item.sampleId) {
         newData.push(newRow);
       } else {
         const newItem = JSON.parse(JSON.stringify(item));
@@ -369,7 +372,6 @@ class EnvironmentalFactorsModel extends React.Component {
         <div className="project_manage_UI_sample_group_title" key={item.id}>
           <input
             defaultValue={item.title}
-            // onChange={event => this.handleOnChangeTitle(item, event)}
             onBlur={event => this.handleOnChangeTitle(item, event)}
             disabled={disabledIs}
           />
@@ -383,7 +385,6 @@ class EnvironmentalFactorsModel extends React.Component {
         <div className={style.editTable} key={item.id}>
           <input
             defaultValue={value}
-            // onChange={event => this.handleOnChangeData(row, event, item.title)}
             onBlur={event => this.handleOnChangeData(row, event, item.title)}
             disabled={disabledIs}
           />
