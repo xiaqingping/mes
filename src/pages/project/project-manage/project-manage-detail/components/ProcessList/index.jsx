@@ -82,7 +82,7 @@ class ProcessList extends Component {
 
     router.push(
       // eslint-disable-next-line max-len
-      `/project/project-manage/process-parameter/${type}/${processModelId}/${projectId}/${processId}`,
+     `/project/project-manage/process-parameter/${type}/${processModelId}/${projectId}/${processId}`,
     );
   };
 
@@ -143,7 +143,6 @@ class ProcessList extends Component {
       taskList,
       test,
     } = this.state;
-
     const columns = [
       {
         title: '名称/描述',

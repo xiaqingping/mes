@@ -380,7 +380,7 @@ class ProcessParameter extends Component {
       }
       this.setState({ processParam: res }, () => {
         this.getParamData(this.state.processParam, this.state.processParamValue);
-      });
+      })
       return false;
     });
   };
@@ -467,7 +467,7 @@ class ProcessParameter extends Component {
                             getData={this.getModelData} // 提交数据
                           />
                         );
-                      // 数值输入框
+                      // // 数值输入框
                       if (it.type === 'number_input') {
                         return (
                           <InputNumberModel
@@ -489,7 +489,7 @@ class ProcessParameter extends Component {
                           />
                         );
 
-                      // 多选
+                      // // 多选
                       if (it.type === 'checkbox')
                         return (
                           <CheckBoxModel
