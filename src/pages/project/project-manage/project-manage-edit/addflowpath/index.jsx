@@ -291,10 +291,6 @@ class Test extends Component {
           });
         });
     }
-
-    // if(paramsList) {
-
-    // }
     sessionStorage.removeItem('introduction');
     sessionStorage.removeItem('processForParams');
     return '';
@@ -302,7 +298,6 @@ class Test extends Component {
 
   render() {
     const { list, loading, visible, buttonLoading } = this.state;
-    console.log(this.state);
     const columns = [
       {
         title: '名称/描述',
