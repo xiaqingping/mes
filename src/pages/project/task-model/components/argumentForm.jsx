@@ -71,9 +71,7 @@ class ArgumentForm extends React.Component {
   /**
    * 校验不通过
    */
-  onFinishFailed = () => {
-    return false;
-  };
+  onFinishFailed = () => false;
 
   render() {
     const formItemLayout = null;

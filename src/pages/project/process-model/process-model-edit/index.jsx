@@ -372,16 +372,17 @@ class ProcessEdit extends Component {
     const newData = data.filter(item => item.id !== value.id);
     const newIdsData = idsData.filter(item => item !== value.id);
 
-    if (preTaskIds.length !== 0) {
+    if (preTaskIds.length) {
       preTaskIds.forEach(i => {
         sonIdsData.some((item, index) => {
           if (i === item) {
             sonIdsData.splice(index, 1);
+            return true;
           }
-          return true;
         });
       });
     }
+
     // 删除参数分类里的数据
     if (paramter) {
       const paramterData = paramter.map(item => {
@@ -428,6 +429,7 @@ class ProcessEdit extends Component {
         });
       }
     });
+
     value.forEach(item => {
       idsData.push(item.id);
       sonIdsData.push(...item.preTaskIds);
@@ -719,11 +721,7 @@ class ProcessEdit extends Component {
             </Card>
 
             {/* 任务table的显示 */}
-            <Card
-              style={{ marginTop: '24px' }}
-              title={this.titleContent()}
-              className="table-style-set taskList"
-            >
+            <Card style={{ marginTop: '24px', marginBottom: '70px' }} title={this.titleContent()}>
               <Spin spinning={taskLoading}>
                 <Table
                   rowKey="id"

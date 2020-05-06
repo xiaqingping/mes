@@ -1,7 +1,7 @@
 import request from '@/utils/request';
 
 let http1 = '';
-// let http1 = 'http://192.168.20.6:8166';
+// let http1 = 'http://192.168.20.43:8166';
 if (process.env.NODE_ENV !== 'development') {
   http1 = '';
 }
@@ -18,47 +18,47 @@ export default {
    */
 
   // 查询项目基础信息及流程列表
-  getProjectProcess(params) {
+  getProjectProcess (params) {
     return request(`${http1}/projects/v1/${params}`);
   },
 
   // 查询流程参数值
-  getProcessParamValue(params) {
+  getProcessParamValue (params) {
     return request(`${http1}/projects/v1/processes/${params}/parameter`);
   },
 
   // 查询任务列表
-  getProjectTask(params) {
+  getProjectTask (params) {
     return request(`${http1}/projects/v1/tasks`, { params });
   },
 
   // 查询成员列表
-  getProjectMember(params) {
+  getProjectMember (params) {
     return request(`${http1}/projects/v1/member`, { params });
   },
 
   // 保存流程名称和描述
-  saveProcessInfor(data) {
+  saveProcessInfor (data) {
     return request(`${http1}/projects/v1/processes`, { method: 'PUT', data });
   },
 
   // 删除流程
-  deleteProjectProcess(data) {
+  deleteProjectProcess (data) {
     return request(`${http1}/projects/v1/processes/${data}/deleted`, { method: 'PUT' });
   },
 
   // 项目流程暂停运行
-  pauseProcessesProcess(data) {
+  pauseProcessesProcess (data) {
     return request(`${http1}/projects/v1/processes/${data}/pause`, { method: 'PUT' });
   },
 
   // 项目流程开始运行
-  startProcessesProcess(data) {
+  startProcessesProcess (data) {
     return request(`${http1}/projects/v1/processes/${data}/start`, { method: 'PUT' });
   },
 
   // 修改成员权限
-  updateMemberJurisdiction(data) {
+  updateMemberJurisdiction (data) {
     // eslint-disable-next-line max-len
     return request(
       `${http1}/projects/v1/member/
@@ -68,40 +68,45 @@ export default {
   },
 
   // 删除项目成员
-  deleteMember(data) {
+  deleteMember (data) {
     return request(`${http1}/projects/v1/member/${data}/deleted`, { method: 'PUT' });
   },
 
   // 任务执行记录参数查询
-  getExecRecordParam(data) {
+  getExecRecordParam (data) {
     return request(`${http1}/projects/v1/tasks/execRecord/${data}/param`);
   },
 
   // 任务执行记录开始运行
-  startExecRecord(data) {
+  startExecRecord (data) {
     return request(`${http1}/projects/v1/tasks/execRecord/${data}/start`, { method: 'PUT' });
   },
 
   // 任务执行记录暂停运行
-  pauseExecRecord(data) {
+  pauseExecRecord (data) {
     return request(`${http1}/projects/v1/tasks/execRecord/${data}/pause`, { method: 'PUT' });
   },
 
   // 查询流程进度
-  getProcessesProgress(params) {
+  getProcessesProgress (params) {
     return request(`${http1}/projects/v1/processes/progress`, { params });
   },
 
   // 修改流程参数
-  updateProcessesParameter(id, data) {
+  updateProcessesParameter (id, data) {
     return request(`${http1}/projects/v1/processes/${id}/parameter`, { method: 'PUT', data });
+  },
+
+  // 查询任务执行记录参数
+  getTaskExecRecordParam (params) {
+    return request(`${http1}/projects/v1/tasks/execRecord/${params}/param`);
   },
 
   /**
    * 流程模型
    */
   // 查询流程模型的参数列表
-  getProcessParam(params) {
+  getProcessParam (params) {
     return request(`${http2}/v1/process/${params}/params`);
   },
 
@@ -109,7 +114,7 @@ export default {
    * 任务模型
    */
   // 查询任务模型参数列表
-  getTaskParam(params) {
+  getTaskModelParam (params) {
     return request(`${http2}/v1/task/${params}/params`);
   },
 };

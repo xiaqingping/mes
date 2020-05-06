@@ -6,7 +6,9 @@ import router from 'umi/router';
 import { connect } from 'dva';
 import moment from 'moment';
 import api from '@/pages/project/api/projectManage';
+// import classNames from 'classnames';
 import BPList from './components/BPList';
+import './index.less';
 
 const FormItem = Form.Item;
 const { TextArea, Search } = Input;
@@ -18,8 +20,8 @@ class ProjectEdit extends Component {
 
   constructor(props) {
     super(props);
-    const { projectData, labelList } = props.projectManage;
-    console.log(projectData);
+    const { projectData, labels } = props.projectManage;
+    // console.log(projectData);
 
     this.state = {
       requestType: projectData.requestType || 'addProject', // 请求类型
@@ -29,7 +31,7 @@ class ProjectEdit extends Component {
       beginDate: '', // 开始时间
       endDate: '', // 结束时间
       projectData,
-      labelList,
+      labels,
     };
   }
 
@@ -57,7 +59,7 @@ class ProjectEdit extends Component {
         });
       }
       this.setState({
-        selectedlabels: data.labelList,
+        selectedlabels: data.labels,
         beginDate: data.beginDate,
         endDate: data.endDate,
       });
@@ -92,7 +94,9 @@ class ProjectEdit extends Component {
       requestType,
       projectData,
     } = this.state;
+    console.log(this.state);
     const formData = this.formRef.current.getFieldsValue();
+    console.log(formData);
 
     if (formData.name === undefined) {
       message.error('项目名称不能为空！');
@@ -102,6 +106,7 @@ class ProjectEdit extends Component {
       message.error('项目描述不能为空！');
       return 1;
     }
+
     // 新增项目时
     if (requestType === 'addProject') {
       if (bpName === '') {
@@ -116,6 +121,10 @@ class ProjectEdit extends Component {
         message.error('结束时间不能为空！');
         return 1;
       }
+      if (selectedlabels.length===0) {
+        message.error('标签不能为空！');
+        return 1;
+      }
     }
 
     let data;
@@ -127,7 +136,7 @@ class ProjectEdit extends Component {
         bpName,
         endDate,
         beginDate,
-        labelList: selectedlabels,
+        labels: selectedlabels,
       };
     }
     if (requestType === 'editProject') {
@@ -135,7 +144,7 @@ class ProjectEdit extends Component {
         id: projectData.id,
         name: formData.name,
         describe: formData.describe,
-        labelList: selectedlabels,
+        labels: selectedlabels,
       };
     }
     return data;
@@ -187,18 +196,25 @@ class ProjectEdit extends Component {
   // 跳转到添加流程页面
   handleAdd = () => {
     const data = this.saveData();
-    data.requestType = 'add';
-    if (data === 1) return;
-    this.props.dispatch({
-      type: 'projectManage/setProjectInfor',
-      payload: data,
-    });
+    if (data === 1) {
+      this.props.dispatch({
+        type: 'projectManage/setProjectInfor',
+        payload: data,
+      });
+    }else {
+      data.requestType = 'add';
+      this.props.dispatch({
+        type: 'projectManage/setProjectInfor',
+        payload: data,
+      });
 
-    router.push('/project/project-manage/add/addflowpath/add');
+      router.push('/project/project-manage/add/addflowpath/add');
+    }
+
   };
 
   render() {
-    const { requestType, selectedlabels, projectData, labelList } = this.state;
+    const { requestType, selectedlabels, projectData, labels} = this.state;
     return (
       <PageHeaderWrapper title={this.navContent(projectData)}>
         <Form ref={this.formRef} className="classPageHeaderWrapper">
@@ -259,8 +275,7 @@ class ProjectEdit extends Component {
             <div style={{ height: '250px' }}>
               <FormItem label="标签" name="label">
                 <div style={{ marginLeft: '40px', marginRight: '270px' }}>
-                  {/* <span style={{ marginRight: 8 }}>Categories:</span> */}
-                  {labelList.map(item => (
+                  {labels.map(item => (
                     <CheckableTag
                       key={item.id}
                       checked={selectedlabels.indexOf(item.id) > -1}
@@ -289,35 +304,33 @@ class ProjectEdit extends Component {
               position: 'fixed',
               bottom: '0',
               left: '0',
-              // lineHeight: '60px',
             }}
             className="classPageHeaderWrapperFooter"
           >
             <Button
               type="default"
-              // style={{ float: 'right', marginTop: '-16px', marginLeft: '20px' }}
               onClick={() => this.handleSave(true, 'requestType')}
             >
               保存
             </Button>
-            <Button
-              type="primary"
-              // style={{ float: 'right', marginTop: '-16px' }}
-              onClick={() => this.handleAdd(true)}
-            >
-              添加流程
-            </Button>
-            {/* {requestType === 'addProject' ? (
-              <Button
-                type="primary"
-                // style={{ float: 'right', marginTop: '-16px' }}
-                onClick={() => this.handleAdd(true)}
-              >
-                添加流程
-              </Button>
-            ) : (
-              ''
-            )} */}
+            {requestType === 'addProject' ? (
+                  <Button
+                  type="primary"
+                  onClick={() => this.handleAdd(true)}
+                >
+                  添加流程
+                </Button>
+                ) : (
+                  <Button
+                    type="primary"
+                    onClick={() => this.handleAdd(true)}
+                    className="isShow"
+                    >
+                    添加流程
+                  </Button>
+                )}
+
+
           </Card>
         </Form>
         {/* 业务伙伴模态框 */}

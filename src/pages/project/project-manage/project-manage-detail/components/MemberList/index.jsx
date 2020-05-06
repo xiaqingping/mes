@@ -1,4 +1,4 @@
-// 流程列表
+/** 成员列表 渲染Table页面 */
 import { Form, Table, Select, message } from 'antd';
 import React, { Component } from 'react';
 import { connect } from 'dva';
@@ -106,7 +106,6 @@ class MemberList extends Component {
         render: value => (
           <div style={{ display: 'flex' }}>
             <img
-              // src={row.path}
               src="/favicon.png"
               alt=""
               height="50"
@@ -181,6 +180,7 @@ class MemberList extends Component {
             dataSource={list}
             columns={columns}
             onChange={this.handleStandardTableChange}
+            pagination={false}
           />
         </Form>
         <EditJurisdictionModel

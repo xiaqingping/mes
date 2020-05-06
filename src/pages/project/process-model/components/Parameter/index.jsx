@@ -1,4 +1,9 @@
-/** 参数拖动页面 */
+/**
+ * 参数拖动页面
+ * @param {boolean} visible 是否显示隐藏
+ * @param {Function} handleClose 关闭页面方法
+ * @param {Array} paramter 参数
+ */
 import React from 'react';
 import { Modal, List, Card, Button, message } from 'antd';
 import { ArrowsAltOutlined, PlusOutlined } from '@ant-design/icons';
@@ -416,7 +421,7 @@ class Parameter extends React.Component {
               width: '241px',
               height: '500px',
               borderTop: '1px solid #E8E8E8',
-              padding: '24px 0 24px 30px',
+              padding: '12px 20px 12px 20px',
               display: 'inline-block',
               overflowY: 'auto',
             }}

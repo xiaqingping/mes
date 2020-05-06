@@ -24,11 +24,11 @@ class ProcessList extends Component {
     const { data } = this.props;
     this.state = {
       // 表格
-      list: data.processList, // 表格数据
+      list: data.processes, // 表格数据
       loading: false, // 加载状态
       editIndex: -1, // 当前编辑行icon
       visibleModel: false, // 是否显示编辑模态框
-      processList: [], // 选中编辑行数据
+      rowData: [], // 选中编辑行数据
 
       // 任务列表抽屉
       visibleDrawer: false, // 是否显示抽屉
@@ -46,7 +46,7 @@ class ProcessList extends Component {
     this.setState({ loading: true });
     api.getProjectProcess(projectId).then(res => {
       this.setState({
-        list: res.processList,
+        list: res.processes,
         loading: false,
       });
     });
@@ -99,7 +99,7 @@ class ProcessList extends Component {
     this.setState({
       test: true,
       visibleModel: true,
-      processList: row,
+      rowData: row,
     });
   };
 
@@ -137,16 +137,14 @@ class ProcessList extends Component {
       loading,
       editIndex,
       visibleModel,
-      processList,
+      rowData,
       visibleDrawer,
       detailList,
       taskList,
       test,
     } = this.state;
 
-    let tableWidth = 0;
-
-    let columns = [
+    const columns = [
       {
         title: '名称/描述',
         dataIndex: 'name',
@@ -236,25 +234,16 @@ class ProcessList extends Component {
       },
     ];
 
-    columns = columns.map(col => {
-      if (!col.width) col.width = 100;
-      tableWidth += col.width;
-      if (!col.editable) {
-        return col;
-      }
-      return true;
-    });
-
     return (
       <>
         <Form ref={this.tableFormRef}>
           <Table
-            scroll={{ x: tableWidth, y: 400 }}
+            style={{ paddingRight: 30 }}
+            scroll={{ y: 400 }}
             rowKey="id"
             loading={loading}
             dataSource={list}
             columns={columns}
-            onChange={this.handleStandardTableChange}
             onRow={(record, index) => ({
               onMouseEnter: () => {
                 this.setState({ editIndex: index });
@@ -277,7 +266,7 @@ class ProcessList extends Component {
           visible={visibleModel}
           submit={test}
           onClose={this.onCloseModel}
-          processList={processList}
+          rowData={rowData}
           getData={this.getEditModelData}
         />
       </>

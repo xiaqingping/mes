@@ -8,9 +8,7 @@ import api from '@/pages/hts/api';
 import { message } from 'antd';
 import { TableModel } from '../components/AntdUI';
 import { FieldDrawer } from '../components/ModelUI';
-import NumberModels from '../components/NumberSelected';
-import Raio from '../components/TheRadio';
-import './index.less'
+import './index.less';
 
 class paramList extends Component {
   constructor(props) {
@@ -133,14 +131,14 @@ class paramList extends Component {
       console.log(res);
       if (
         res &&
-        res.sampleList !== undefined &&
-        res.groupSchemeList !== undefined &&
-        res.environmentFactorList !== undefined
+        res.samples !== undefined &&
+        res.groupSchemes !== undefined &&
+        res.environmentFactors !== undefined
       ) {
         this.setState({
-          sampleData: res.sampleList,
-          groupSchemeData: res.groupSchemeList,
-          environmentalFactorData: res.environmentFactorList,
+          sampleData: res.samples,
+          groupSchemeData: res.groupSchemes,
+          environmentalFactorData: res.environmentFactors,
         });
         // 转换分组方案数据
         this.transformGroup(res);
@@ -157,9 +155,9 @@ class paramList extends Component {
   // 转换环境因子数据
   transformEnvironmentFactor = data => {
     const { environmentalFactorColumns } = this.state;
-    const { environmentFactorList, sampleList } = data;
+    const { environmentFactors, samples } = data;
 
-    const list = environmentFactorList;
+    const list = environmentFactors;
     const columns = environmentalFactorColumns;
     const titleName = 'environmentFactorName';
 
@@ -167,7 +165,7 @@ class paramList extends Component {
     const newColumns = this.getTableHeaderData(list, columns, titleName);
 
     // 取出 行数据
-    const rowData = this.getRowDataEnvironment(list, sampleList, newColumns);
+    const rowData = this.getRowDataEnvironment(list, samples, newColumns);
 
     // 填充行数据
     const newData = this.getFillDataEnvironment(list, rowData);
@@ -182,16 +180,16 @@ class paramList extends Component {
   // 转换分组方案数据
   transformGroup = data => {
     const { groupColumns } = this.state;
-    const { groupSchemeList, sampleList } = data;
+    const { groupSchemes, samples } = data;
 
-    const list = groupSchemeList;
+    const list = groupSchemes;
     const columns = groupColumns;
     const titleName = 'groupSchemeName';
 
     // 取出 表头
     const newColumns = this.getTableHeaderData(list, columns, titleName);
     // 取出 行数据
-    const rowData = this.getRowDataGroup(list, sampleList, newColumns);
+    const rowData = this.getRowDataGroup(list, samples, newColumns);
     // 填充行数据
     const newData = this.getFillData(list, rowData, newColumns);
 
@@ -272,16 +270,16 @@ class paramList extends Component {
     const samples = [];
     groupList.forEach(groupItem => {
       // 分组方案下的 样品列表 为空
-      if (groupItem.sampleList === null) {
-        groupItem.groupList.forEach(groItem => {
-          groItem.sampleList.forEach(samItem => {
+      if (groupItem.samples === null) {
+        groupItem.groups.forEach(groItem => {
+          groItem.samples.forEach(samItem => {
             samples.push(samItem);
           });
         });
       }
       // 分组方案下的 分组列表 为空
-      if (groupItem.groupList === null) {
-        groupItem.sampleList.forEach(samItem => {
+      if (groupItem.groups === null) {
+        groupItem.samples.forEach(samItem => {
           samples.push(samItem);
         });
       }
@@ -304,9 +302,9 @@ class paramList extends Component {
     // 环境因子数据遍历
     list.forEach(item => {
       // 环境因子列表遍历
-      item.environmentFactorValueList.forEach(it => {
+      item.environmentFactorValues.forEach(it => {
         // 样品列表遍历
-        it.sampleList.forEach(t => {
+        it.samples.forEach(t => {
           samples.push(t);
         });
       });
@@ -331,11 +329,11 @@ class paramList extends Component {
       // 行数据遍历
       rowData.forEach(rowItem => {
         // 分组方案下的 分组列表不为空
-        if (groupItem.groupList !== null && groupItem.groupList.length !== 0) {
+        if (groupItem.groups !== null && groupItem.groups.length !== 0) {
           // 分组列表遍历
-          groupItem.groupList.forEach(groItem => {
+          groupItem.groups.forEach(groItem => {
             // 分组下的样品列表遍历
-            groItem.sampleList.forEach(samItem => {
+            groItem.samples.forEach(samItem => {
               // 找到对应的样品行
               if (rowItem.metadataSampleId === samItem.metadataSampleId) {
                 Object.keys(rowItem).map(key => {
@@ -353,8 +351,8 @@ class paramList extends Component {
         }
 
         // 分组方案下的 样品列表不为空
-        if (groupItem.sampleList !== null && groupItem.sampleList.length !== 0) {
-          groupItem.sampleList.forEach(samItem => {
+        if (groupItem.samples !== null && groupItem.samples.length !== 0) {
+          groupItem.samples.forEach(samItem => {
             if (rowItem.metadataSampleId === samItem.metadataSampleId) {
               Object.keys(rowItem).map(key => {
                 const num = key.split('_')[1];
@@ -396,9 +394,9 @@ class paramList extends Component {
       // 行数据遍历
       rowData.forEach(rowItem => {
         // 环境因子列表遍历
-        item.environmentFactorValueList.forEach(valItem => {
+        item.environmentFactorValues.forEach(valItem => {
           // 环境因子值下的样品列表遍历
-          valItem.sampleList.forEach(samItem => {
+          valItem.samples.forEach(samItem => {
             // 找到对应的样品行
             if (rowItem.metadataSampleId === samItem.metadataSampleId) {
               Object.keys(rowItem).map(key => {
@@ -530,10 +528,6 @@ class paramList extends Component {
           columns={newEnvironmentalFactorColumns}
           tableWidth={tableWidth}
         />
-
-        <NumberModels title="OTU聚类" getData={v => this.getData(v)} />
-
-        <Raio title="物种分类" />
 
         {/* 序列文件抽屉 */}
         <FieldDrawer visible={visibleField} onClose={this.onCloseFieldDrawer} data={rowData} />

@@ -3,26 +3,27 @@ import React, { Component } from 'react';
 import { connect } from 'dva';
 import api from '@/pages/project/api/projectManageDetail';
 import { formatter } from '@/utils/utils';
-import { Drawer, Card, List, Avatar, Table, Badge, Tooltip, Form } from 'antd';
+import { Drawer, Card, List, Avatar, Table, Badge, Tooltip, Tag } from 'antd';
 import {
   DownOutlined,
   UpOutlined,
-  SlidersOutlined,
-  ClockCircleOutlined,
   PlayCircleOutlined,
   PauseCircleOutlined,
 } from '@ant-design/icons';
-import { ModelType } from '@/pages/project/components/ModelComponents';
+import canshu from '@/assets/imgs/canshu@1x.png';
+import clock from '@/assets/imgs/clock.png';
 import disk from '@/pages/project/api/disk';
 import DefaultHeadPicture from '@/assets/imgs/defaultheadpicture.jpg';
 import { calculateTimeDifference } from '../../functions';
 import style from './index.less';
+import TaskExecRecordParam from '../TaskExecRecordParam';
 
 class TaskList extends Component {
   state = {
     visibleParam: false,
-    parameterList: [],
     openId: [],
+    // 任务执行记录参数 所需数据
+    paramForData: [],
   };
 
   // 获取此页面需要用到的基础数据
@@ -68,45 +69,6 @@ class TaskList extends Component {
     return <span>开始：{row.beginDate}</span>;
   };
 
-  // 查看任执行记录的参数
-  searchParameter = row => {
-    const valueData = row.taskExecRecordParamList;
-    api.getTaskParam(row.taskModelId).then(res => {
-      // 对比合并参数
-      const paramData = this.disposeTaskData(res);
-      const parameterList = this.disposeParamData(paramData, valueData);
-      this.setState({ visibleParam: true, parameterList });
-    });
-  };
-
-  // 处理任务参数列表
-  disposeTaskData = data => {
-    const newData = [];
-    data.forEach(item => {
-      const newItem = JSON.parse(JSON.stringify(item));
-      newItem.paramProperties.forEach(e => {
-        newItem[e.paramPropertyKey] = e.paramPropertyValue;
-      });
-      newData.push(newItem);
-    });
-    return newData;
-  };
-
-  // 合并参数列表和参数值
-  disposeParamData = (paramData, valueData) => {
-    const newData = [];
-    paramData.forEach(paramItem => {
-      valueData.forEach(valueItem => {
-        const newItem = JSON.parse(JSON.stringify(paramItem));
-        if (paramItem.paramKey === valueItem.paramKey) {
-          newItem.paramValue = valueItem.paramValue;
-          newData.push(newItem);
-        }
-      });
-    });
-    return newData;
-  };
-
   // 任务执行记录开始运行
   startExecRecord = row => {
     api.startExecRecord(row.id).then(() => {
@@ -121,7 +83,17 @@ class TaskList extends Component {
     });
   };
 
-  // 关闭二级抽屉
+  // 查看任执行记录的参数
+  searchParameter = row => {
+    const data = {
+      paramValues: row.taskExecRecordParams,
+      taskExecRecordId: row.id,
+      taskModelId: row.taskModelId,
+    };
+    this.setState({ visibleParam: true, paramForData: data });
+  };
+
+  // 关闭 任务执行记录参数抽屉
   onCloseParam = () => {
     this.setState({
       visibleParam: false,
@@ -129,9 +101,10 @@ class TaskList extends Component {
   };
 
   render() {
-    const { visibleParam, parameterList, openId } = this.state;
+    const { visibleParam, openId, paramForData } = this.state;
     const { detailList, taskList, visible } = this.props;
     const { execRecordStatus } = this.props.projectDetail;
+    console.log(paramForData);
 
     const columns = [
       {
@@ -141,8 +114,10 @@ class TaskList extends Component {
         render: (value, row) => (
           <>
             <span>{value}</span>
-            <SlidersOutlined
-              className={style.marginLeft}
+            <img
+              src={canshu}
+              alt=""
+              className={style.canshu}
               onClick={() => this.searchParameter(row)}
             />
           </>
@@ -159,7 +134,7 @@ class TaskList extends Component {
             <>
               <Badge status={status} text={name} />
               <Tooltip title={this.time(row)}>
-                <ClockCircleOutlined className={style.marginLeft} />
+                <img src={clock} alt="" className={style.clock} />
               </Tooltip>
             </>
           );
@@ -171,7 +146,6 @@ class TaskList extends Component {
         width: 60,
         render: (value, row) => {
           const duration = calculateTimeDifference(row.beginDate, row.endDate);
-          console.log(duration);
           if (value === 4) {
             return duration;
           }
@@ -206,30 +180,38 @@ class TaskList extends Component {
             renderItem={item => (
               <List.Item key={item}>
                 <Card hoverable style={{ width: '100%' }}>
-                  <Avatar
-                    // src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
-                    src={
-                      item.picture
-                        ? disk.downloadFiles(item.picture, { view: true })
-                        : DefaultHeadPicture
-                    }
-                    size="large"
-                    className={style.floatLeft}
-                  />
                   <div className={style.FMLeft}>
-                    <div className={style.floatLeft}>
+                    <Avatar
+                      // src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
+                      src={
+                        item.picture
+                          ? disk.downloadFiles(item.picture, { view: true })
+                          : DefaultHeadPicture
+                      }
+                      size="large"
+                      className={style.floatLeft}
+                    />
+                    <div
+                      style={{
+                        position: 'relative',
+                        top: -1,
+                        left: 10,
+                        paddingBottom: -5,
+                      }}
+                    >
                       <div>{item.code}</div>
                       <div className={style.name}>{item.name}</div>
-                    </div>
-                    <div>
-                      <div className={style.describe}>{item.describe}</div>
+                      <div className={style.version}>
+                        <Tag color="green">{item.taskModelVersion}</Tag>
+                      </div>
                     </div>
                   </div>
+                  <div className={style.describe}>{item.describe}</div>
+
                   <div className={style.open}>
                     {openId.filter(i => i === item.id).length !== 0 ? (
-                      <>
+                      <div>
                         <a onClick={() => this.showTable(item.id, 2)} style={{ float: 'right' }}>
-                          收起
                           <UpOutlined />
                         </a>
                         <div className={style.taskExecRecordTable}>
@@ -237,14 +219,13 @@ class TaskList extends Component {
                             size="small"
                             columns={columns}
                             rowKey="id"
-                            dataSource={item.taskExecRecordList}
+                            dataSource={item.taskExecRecords}
                             pagination={false}
                           />
                         </div>
-                      </>
+                      </div>
                     ) : (
                       <a onClick={() => this.showTable(item.id, 1)}>
-                        展开
                         <DownOutlined />
                       </a>
                     )}
@@ -254,25 +235,16 @@ class TaskList extends Component {
             )}
           />
         </Drawer>
-        <Drawer
-          title="参数"
-          width={320}
-          closable={false}
-          onClose={this.onCloseParam}
-          visible={visibleParam}
-        >
-          <List
-            dataSource={parameterList}
-            split={false}
-            renderItem={item => (
-              <List.Item key={item}>
-                <Form>
-                  <ModelType data={item} />
-                </Form>
-              </List.Item>
-            )}
+        {/* 任务执行记录参数 */}
+        {visibleParam ? (
+          <TaskExecRecordParam
+            visible={visibleParam}
+            paramList={paramForData}
+            onClose={this.onCloseParam}
           />
-        </Drawer>
+        ) : (
+          ''
+        )}
       </>
     );
   }

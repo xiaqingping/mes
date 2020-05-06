@@ -1,4 +1,11 @@
-/** 详情的抽屉页面  渲染详情页面 */
+/**
+ * 详情的抽屉页面  渲染详情页面
+ * @param {Function} onClose 关闭页面
+ * @param {Object} detailId  详情对象
+ * @param {Array} status 状态
+ * @param {Function} handleChangeVersion 选择版本
+ * @param {Function} handleUnPublish 禁用的方法
+ */
 import React, { Component } from 'react';
 import { Drawer, Avatar, Tag, List, Card, Badge, Spin, Empty } from 'antd';
 import { DownOutlined, UpOutlined } from '@ant-design/icons';
@@ -118,7 +125,7 @@ class DrawerTool extends Component {
     const { visable, selectVersion, parameterVisible, detailValue, open } = this.state;
     return (
       <div style={{ marginTop: '25px' }}>
-        <div className="titleContentImage">
+        <div>
           <Avatar
             src={value.picture ? disk.downloadFiles(value.picture, { view: true }) : ''}
             style={{ float: 'left' }}
@@ -146,7 +153,7 @@ class DrawerTool extends Component {
                 <Card
                   style={{ position: 'absolute', zIndex: '100', top: '28px' }}
                   hoverable
-                  className="padding-none"
+                  // className="padding-none"
                 >
                   {value.versions
                     ? value.versions.map(item => (
@@ -285,7 +292,7 @@ class DrawerTool extends Component {
           closable={false}
           onClose={this.onClose}
           visible={this.props.visible}
-          className="drawer-style processModelDetail"
+          // className="drawer-style processModelDetail"
         >
           {errorPage ? (
             <Empty />
@@ -341,7 +348,7 @@ class DrawerTool extends Component {
                     </Card>
                   </List.Item>
                 )}
-                className="list-style"
+                // className="list-style"
                 split={false}
               />
               <Drawer
@@ -395,7 +402,7 @@ class DrawerTool extends Component {
                       </Card>
                     </List.Item>
                   )}
-                  className="list-style"
+                  // className="list-style"
                   split={false}
                 />
               </Drawer>

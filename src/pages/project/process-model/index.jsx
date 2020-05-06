@@ -22,7 +22,7 @@ import router from 'umi/router';
 import { connect } from 'dva';
 import _ from 'lodash';
 import { DateUI } from '@/pages/project/components/AntdSearchUI';
-import { formatter, getOperates } from '@/utils/utils';
+import { formatter, getOperates, cutString } from '@/utils/utils';
 import api from '@/pages/project/api/processModel/';
 import disk from '@/pages/project/api/disk';
 import DefaultHeadPicture from '@/assets/imgs/defaultheadpicture.jpg';
@@ -35,7 +35,6 @@ const { Option } = Select;
 class ProcessModel extends Component {
   tableSearchFormRef = React.createRef();
 
-  // 顶部表单默认值
   initialValues = {
     page: 1,
     rows: 10,
@@ -489,6 +488,7 @@ class ProcessModel extends Component {
         title: '描述',
         dataIndex: 'describe',
         width: 400,
+        render: value => <div title={value}>{cutString(value, 115)}</div>,
       },
       {
         title: '发布人/时间',
@@ -537,7 +537,7 @@ class ProcessModel extends Component {
                   index && (
                     <Menu.Item key={item}>
                       <a
-                        className="task_model_add_argument_list"
+                        className="process_model_add_argument_list"
                         onClick={() => this.getButton(item, row)}
                       >
                         {item}
@@ -565,52 +565,48 @@ class ProcessModel extends Component {
 
     return (
       <PageHeaderWrapper>
-        <div className="tableList processModeltableList classtableList">
-          <Card bordered={false}>
-            <TableSearchForm
-              ref={this.tableSearchFormRef}
-              initialValues={this.initialValues}
-              getTableData={this.getTableData}
-              simpleForm={this.simpleForm}
-              advancedForm={this.advancedForm}
+        <Card bordered={false} className="setSearchCard">
+          <TableSearchForm
+            ref={this.tableSearchFormRef}
+            initialValues={this.initialValues}
+            getTableData={this.getTableData}
+            simpleForm={this.simpleForm}
+            advancedForm={this.advancedForm}
+          />
+        </Card>
+        <Card style={{ marginTop: '24px' }}>
+          <div>
+            <Button
+              type="primary"
+              onClick={() => this.handleModalVisible()}
+              style={{ marginBottom: '35px' }}
+            >
+              <PlusOutlined />
+              新建
+            </Button>
+          </div>
+          <Form ref={this.tableFormRef}>
+            <StandardTable
+              rowClassName="editable-row"
+              loading={loading}
+              data={{ list, pagination }}
+              columns={columns}
+              onSelectRow={this.handleSelectRows}
+              onChange={this.handleStandardTableChange}
             />
-          </Card>
-          <Card style={{ marginTop: '24px' }}>
-            <div className="tableListOperator">
-              <Button
-                type="primary"
-                onClick={() => this.handleModalVisible()}
-                style={{ marginLeft: '8px' }}
-              >
-                <PlusOutlined />
-                新建
-              </Button>
-            </div>
-            <Form ref={this.tableFormRef} className="table-style-set tableHeader">
-              <StandardTable
-                rowClassName="editable-row"
-                loading={loading}
-                data={{ list, pagination }}
-                columns={columns}
-                onSelectRow={this.handleSelectRows}
-                onChange={this.handleStandardTableChange}
-              />
-            </Form>
-          </Card>
-          {visible ? (
-            <div>
-              <ProcessDetail
-                visible={visible}
-                // visible
-                onClose={this.onClose}
-                detailId={detailValue.id}
-                status={status}
-                handleChangeVersion={v => this.handleChangeVersion(v)}
-                handleUnPublish={row => this.handleUnPublish(row)}
-              />
-            </div>
-          ) : null}
-        </div>
+          </Form>
+        </Card>
+        {visible ? (
+          <ProcessDetail
+            visible={visible}
+            // visible
+            onClose={this.onClose}
+            detailId={detailValue.id}
+            status={status}
+            handleChangeVersion={v => this.handleChangeVersion(v)}
+            handleUnPublish={row => this.handleUnPublish(row)}
+          />
+        ) : null}
       </PageHeaderWrapper>
     );
   }
