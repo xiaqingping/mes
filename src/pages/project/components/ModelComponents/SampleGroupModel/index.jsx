@@ -107,9 +107,7 @@ class SampleGroup extends React.Component {
     const groupList = [...groupSchemeData];
     const columns1 = JSON.parse(JSON.stringify(columns));
     const columns2 = [...columns];
-    const cols = columns.map(item => {
-      return item.dataIndex;
-    });
+    const cols = columns.map(item => item.dataIndex);
     const colLen = cols.slice(1, cols.length - 1);
     const groupData = [];
     selList.map(item => {
@@ -776,9 +774,7 @@ class SampleGroup extends React.Component {
       datas.forEach(item => {
         group.push(item[`header_${i}`]);
       });
-      const hasOtherValue = group.some(item => {
-        return item && item !== '当前样品';
-      });
+      const hasOtherValue = group.some(item => item && item !== '当前样品');
       const validTrue1 = group.includes('当前样品') && hasOtherValue;
       // const validTrue2 = group.every(item => item === '');
       // const validFalse = validTrue1 || validTrue2;
@@ -857,14 +853,10 @@ class SampleGroup extends React.Component {
   };
 
   // 将每个对象的head和header的值拼接为字符串作为map的key用来判断是否出现过相同的head
-  getMapKey = (item, head) => {
-    return `${head}_${item[head]}`;
-  };
+  getMapKey = (item, head) => `${head}_${item[head]}`;
 
   // 根据head找到color
-  colorFieldByHead = (item, head) => {
-    return `color_${head.split('_')[1]}`;
-  };
+  colorFieldByHead = (item, head) => `color_${head.split('_')[1]}`;
 
   // 获取从上传来的数据.
   getDataFromUpload = (data, headData) => {
