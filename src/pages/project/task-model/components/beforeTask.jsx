@@ -285,7 +285,7 @@ class BeforeTask extends React.Component {
       >
         <Spin spinning={loading}>
           <div className="tableList buttonStyle setTitleColor">
-            <div style={{ paddingLeft: 27 }}>
+            <div>
               <TableSearchForm
                 ref={this.tableSearchFormRef}
                 initialValues={this.initialValues}

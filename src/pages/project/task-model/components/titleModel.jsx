@@ -273,7 +273,7 @@ class TitleModel extends React.Component {
           </div>
         </div>
         {open && (
-          <div style={{ marginLeft: '50px', color: '#858585', fontSize: '14px', marginBottom: 20 }}>
+          <div style={{ marginLeft: '62px', color: '#858585', fontSize: '14px', marginBottom: 20 }}>
             <div>{viewData.publisherName}</div>
             <div style={{ marginBottom: '7px' }}>{viewData.publishDate}</div>
             <div style={{ width: '400px' }}>{viewData.describe}</div>

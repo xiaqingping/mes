@@ -44,31 +44,31 @@ class SampleSelect extends React.Component {
                 }}
               />
             ) : (
-              <Popover
-                overlayClassName="project_manage_sample_ui_select"
-                overlayStyle={{ padding: 0 }}
-                content={
-                  <SketchPicker
-                    color={record.color || this.state.color}
-                    onChangeComplete={color => this.handleChange(color, record, index)}
+                <Popover
+                  overlayClassName="project_manage_sample_ui_select"
+                  overlayStyle={{ padding: 0 }}
+                  content={
+                    <SketchPicker
+                      color={record.color || this.state.color}
+                      onChangeComplete={color => this.handleChange(color, record, index)}
+                    />
+                  }
+                  trigger="click"
+                  placement="bottom"
+                >
+                  <div
+                    style={{
+                      width: 20,
+                      height: 20,
+                      backgroundColor: record.color,
+                      position: 'relative',
+                    }}
+                    onClick={() => {
+                      this.handleClick(record, index);
+                    }}
                   />
-                }
-                trigger="click"
-                placement="bottom"
-              >
-                <div
-                  style={{
-                    width: 20,
-                    height: 20,
-                    backgroundColor: record.color,
-                    position: 'relative',
-                  }}
-                  onClick={() => {
-                    this.handleClick(record, index);
-                  }}
-                />
-              </Popover>
-            )}
+                </Popover>
+              )}
             <div style={{ marginLeft: 10 }}>{text}</div>
           </div>
         ),
@@ -339,10 +339,14 @@ class SampleSelect extends React.Component {
     const { tableData } = this.state;
     const list = [...tableData];
     list[index].sampleAlias = e.target.value;
-    this.setState({
-      tableData: list,
-    });
-    this.sendDataOnChange();
+    this.setState(
+      {
+        tableData: list,
+      },
+      () => {
+        this.sendDataOnChange();
+      },
+    );
   };
 
   // 查看已选择的
@@ -405,9 +409,12 @@ class SampleSelect extends React.Component {
       const index = list.findIndex(item => data1[0].id === item.id);
       data1[0].color = list[index].color || getrandomColor();
       list.splice(index, 1, ...data1);
-      this.setState({
-        tableData: list,
-      });
+      this.setState(
+        {
+          tableData: list,
+        },
+        () => this.sendDataOnChange(),
+      );
       // console.log(`list${list}`);
       // TODO:将改变返回给父组件
       this.props.emitData(list);
@@ -416,7 +423,6 @@ class SampleSelect extends React.Component {
 
   render() {
     const { visible, sampleId, chooseFileIds, tableData, columns, disabled } = this.state;
-    // console.log(tableData);
     // let tableList = [];
     // if (tableDatas.length) {
     //   tableList = tableDatas;
@@ -456,6 +462,6 @@ class SampleSelect extends React.Component {
   }
 }
 
-export default connect(({ project }) => ({
-  project,
+export default connect(({ componentsModel }) => ({
+  componentsModel,
 }))(SampleSelect);

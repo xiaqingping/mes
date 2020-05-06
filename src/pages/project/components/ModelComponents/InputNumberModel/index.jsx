@@ -97,8 +97,8 @@ class NumberModels extends React.Component {
           {inputMode !== 'two' ? (
             <InputNumber
               disabled={disabled}
-              min={0}
-              max={1}
+              min={min}
+              max={max}
               style={{ margin: '0 20px' }}
               step={0.01}
               value={inputValue}
