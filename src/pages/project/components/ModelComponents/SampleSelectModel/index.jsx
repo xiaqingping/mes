@@ -44,31 +44,31 @@ class SampleSelect extends React.Component {
                 }}
               />
             ) : (
-              <Popover
-                overlayClassName="project_manage_sample_ui_select"
-                overlayStyle={{ padding: 0 }}
-                content={
-                  <SketchPicker
-                    color={record.color || this.state.color}
-                    onChangeComplete={color => this.handleChange(color, record, index)}
+                <Popover
+                  overlayClassName="project_manage_sample_ui_select"
+                  overlayStyle={{ padding: 0 }}
+                  content={
+                    <SketchPicker
+                      color={record.color || this.state.color}
+                      onChangeComplete={color => this.handleChange(color, record, index)}
+                    />
+                  }
+                  trigger="click"
+                  placement="bottom"
+                >
+                  <div
+                    style={{
+                      width: 20,
+                      height: 20,
+                      backgroundColor: record.color,
+                      position: 'relative',
+                    }}
+                    onClick={() => {
+                      this.handleClick(record, index);
+                    }}
                   />
-                }
-                trigger="click"
-                placement="bottom"
-              >
-                <div
-                  style={{
-                    width: 20,
-                    height: 20,
-                    backgroundColor: record.color,
-                    position: 'relative',
-                  }}
-                  onClick={() => {
-                    this.handleClick(record, index);
-                  }}
-                />
-              </Popover>
-            )}
+                </Popover>
+              )}
             <div style={{ marginLeft: 10 }}>{text}</div>
           </div>
         ),
@@ -416,7 +416,6 @@ class SampleSelect extends React.Component {
 
   render() {
     const { visible, sampleId, chooseFileIds, tableData, columns, disabled } = this.state;
-    // console.log(tableData);
     // let tableList = [];
     // if (tableDatas.length) {
     //   tableList = tableDatas;
