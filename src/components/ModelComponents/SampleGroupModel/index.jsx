@@ -474,10 +474,14 @@ class SampleGroup extends React.Component {
       cols[index] = item;
     }
 
-    this.setState({
-      columns: cols,
-    });
-    this.sendDataOnChange();
+    this.setState(
+      {
+        columns: cols,
+      },
+      () => {
+        this.sendDataOnChange();
+      },
+    );
   };
 
   removeColumn = (item, id) => {
@@ -579,11 +583,15 @@ class SampleGroup extends React.Component {
       item[addColor] = '';
       return item;
     });
-    this.setState({
-      columns: cols,
-      groupSchemeData: soure,
-    });
-    this.sendDataOnChange();
+    this.setState(
+      {
+        columns: cols,
+        groupSchemeData: soure,
+      },
+      () => {
+        this.sendDataOnChange();
+      },
+    );
   };
 
   confirmGroupRender = (groupName, preGroupName) => (
@@ -614,9 +622,14 @@ class SampleGroup extends React.Component {
     // eslint-disable-next-line
     row[col] = option;
     datas[index] = row;
-    this.setState({
-      groupSchemeData: datas,
-    });
+    this.setState(
+      {
+        groupSchemeData: datas,
+      },
+      () => {
+        this.sendDataOnChange();
+      },
+    );
   };
 
   setOtherSame = (row, value, option, datas, col, index, color1) => {
@@ -653,6 +666,7 @@ class SampleGroup extends React.Component {
         this.setState({
           columns: columns2,
         });
+        this.sendDataOnChange();
       },
     );
   };
@@ -679,9 +693,14 @@ class SampleGroup extends React.Component {
     row[col] = option;
     row[color1] = '';
     datas[index] = row;
-    this.setState({
-      groupSchemeData: datas,
-    });
+    this.setState(
+      {
+        groupSchemeData: datas,
+      },
+      () => {
+        this.sendDataOnChange();
+      },
+    );
   };
 
   // 选择组，blur 时候保存数据--- 当选择组的时候要加上默认的颜色
@@ -720,7 +739,7 @@ class SampleGroup extends React.Component {
     this.setState({
       optionList: list,
     });
-    this.sendDataOnChange();
+    // this.sendDataOnChange();
     return true;
   };
 
