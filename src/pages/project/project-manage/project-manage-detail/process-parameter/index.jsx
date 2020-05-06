@@ -52,7 +52,7 @@ class ProcessParameter extends Component {
       sampleList: [],
       // 提交的数据
       paramList: [],
-    };
+    }
     // 判断请求类型
     this.determineTheRequestType();
   }
@@ -441,7 +441,6 @@ class ProcessParameter extends Component {
     const { paramGroupList, sampleList, requestType } = this.state;
     const data = paramGroupList;
     if (data.length === 0) return false;
-    console.log(data);
     return (
       <>
         <PageHeaderWrapper style={{ marginBottom: 100 }}>
