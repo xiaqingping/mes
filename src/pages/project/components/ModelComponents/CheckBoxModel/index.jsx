@@ -41,8 +41,9 @@ class CheckBoxModel extends React.Component {
         taskModelId: paramList.taskModelId,
       },
       isVerify: true,
-    };
-    this.props.getData(data.paramData, 'checkBox', data.isVerify);
+    }
+    if(!data.isVerify) return ''
+    this.props.getData(data.paramData, 'checkbox', data.isVerify);
     return false;
   };
 
@@ -83,13 +84,15 @@ class CheckBoxModel extends React.Component {
 
   // 获取选中项
   onChange = checkedValues => {
+    this.setState({
+      checkedValues
+    })
     this.formatSubmitData(checkedValues);
   };
 
   render() {
     const { paramList, checkedValues, selectList } = this.state;
     const data = paramList;
-
     return (
       <Form.Item
         label={data.paramName}
@@ -102,7 +105,7 @@ class CheckBoxModel extends React.Component {
       >
         <Checkbox.Group
           options={selectList}
-          defaultValue={checkedValues}
+          value={checkedValues}
           disabled={this.props.disabled}
           onChange={this.onChange}
         />

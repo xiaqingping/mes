@@ -104,7 +104,6 @@ class TaskList extends Component {
     const { visibleParam, openId, paramForData } = this.state;
     const { detailList, taskList, visible } = this.props;
     const { execRecordStatus } = this.props.projectDetail;
-    console.log(paramForData);
 
     const columns = [
       {
