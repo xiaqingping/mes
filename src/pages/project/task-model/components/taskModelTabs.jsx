@@ -127,9 +127,9 @@ class TaskModelTabs extends Component {
                       <Badge
                         status={formatter(modelStatusOptions, item.status, 'value', 'status')}
                         text={formatter(modelStatusOptions, item.status, 'value', 'label')}
-                        style={{ float: 'right', marginLeft: 10 }}
+                        style={{ float: 'right', marginLeft: 15, marginTop: 2 }}
                       />
-                      <Tag color="green" style={{ padding: '0 10px', float: 'right' }}>
+                      <Tag color="green" style={{ float: 'right' }}>
                         {item.version}
                       </Tag>
                     </Card>
@@ -169,9 +169,9 @@ class TaskModelTabs extends Component {
                       <Badge
                         status={formatter(modelStatusOptions, item.status, 'value', 'status')}
                         text={formatter(modelStatusOptions, item.status, 'value', 'label')}
-                        style={{ float: 'right', marginLeft: 10 }}
+                        style={{ float: 'right', marginLeft: 15, marginTop: 2 }}
                       />
-                      <Tag color="green" style={{ padding: '0 10px', float: 'right' }}>
+                      <Tag color="green" style={{ float: 'right' }}>
                         {item.version}
                       </Tag>
                     </Card>

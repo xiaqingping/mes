@@ -9,7 +9,9 @@ import GroupUpload from '../UploadSequenceFile/index';
 
 const { confirm } = Modal;
 const { Option } = AutoComplete;
-
+/**
+ * 样品分组组件 渲染样品分组table
+ */
 class SampleGroup extends React.Component {
   static getDerivedStateFromProps(nextProps) {
     return {
@@ -39,8 +41,14 @@ class SampleGroup extends React.Component {
     ],
   };
 
+  /**
+   * 组件校验是否通过
+   */
   validPass = null;
 
+  /**
+   * table第一列
+   */
   firstColumn = {
     id: 1,
     title: '样品',
@@ -49,6 +57,9 @@ class SampleGroup extends React.Component {
     width: 100,
   };
 
+  /**
+   * table最后一列
+   */
   lastColumn = {
     id: 'add',
     title: () => <PlusSquareOutlined onClick={this.handleAdd} />,
@@ -57,12 +68,15 @@ class SampleGroup extends React.Component {
     width: 80,
   };
 
+  /**
+   * 转换分组方案数据， 因为数据是从父组件传过来的， 不好更改， 所以重新定义一个变量接收
+   * 同时在挂载时抛出数据更新的方法给父组件。
+   */
   componentDidMount() {
-    // 转换分组方案数据
     const { tableData } = this.state;
     this.setState(
       {
-        groupSchemeData: tableData,
+        groupSchemeData: JSON.parse(tableData),
       },
       () => {
         this.transformGroup(this.state.groupSchemeData);
@@ -71,22 +85,25 @@ class SampleGroup extends React.Component {
     this.props.getFun(this.selectUpdateGroup);
   }
 
-  componentDidUpdate(props) {
-    // if (props.submitStatus !== this.props.submitStatus) {
-    //   const list = this.verifyData();
-    //   console.log(list);
-    //   const { paramKey, taskModelId } = props.paramList;
-    //   const sendData = {
-    //     paramKey,
-    //     paramValue: JSON.stringify(list),
-    //     taskModelId,
-    //   };
-    //   // TODO: 是否校验通过
-    //   this.validPass = !!list;
-    //   this.props.getData(sendData, 'groupScheme', this.validPass);
-    // }
-  }
+  // componentDidUpdate(props) {
+  // if (props.submitStatus !== this.props.submitStatus) {
+  //   const list = this.verifyData();
+  //   console.log(list);
+  //   const { paramKey, taskModelId } = props.paramList;
+  //   const sendData = {
+  //     paramKey,
+  //     paramValue: JSON.stringify(list),
+  //     taskModelId,
+  //   };
+  //   // TODO: 是否校验通过
+  //   this.validPass = !!list;
+  //   this.props.getData(sendData, 'groupScheme', this.validPass);
+  // }
+  // }
 
+  /**
+   * 每次数据改变时都将数据发送给父组件。防止点击提交时各组件提交数据冲突
+   */
   sendDataOnChange = () => {
     const list = this.verifyData();
     console.log(list);
@@ -101,6 +118,9 @@ class SampleGroup extends React.Component {
     this.props.getData(sendData, 'groupScheme', this.validPass);
   };
 
+  /**
+   * 选择性的更新分组方案组件， 当样品改变时更新组件
+   */
   selectUpdateGroup = () => {
     const { sampleList, groupSchemeData, columns } = this.state;
     const selList = [...sampleList];
@@ -145,7 +165,9 @@ class SampleGroup extends React.Component {
     );
   };
 
-  // 转换分组方案数据
+  /**
+   * 转换分组方案数据
+   */
   transformGroup = data => {
     const { columns } = this.state;
     // const { groupSchemeList, sampleList } = data;
@@ -171,6 +193,10 @@ class SampleGroup extends React.Component {
     });
   };
 
+  /**
+   * 将颜色放到model里
+   * @param {Object} newData 转换成的横向数据
+   */
   pushColorsToStore = newData => {
     const colorStore = [];
     newData.forEach(row => {
@@ -186,6 +212,10 @@ class SampleGroup extends React.Component {
     this.setColorStore(colorStore);
   };
 
+  /**
+   * 更新model颜色数据
+   * @param {Array} colorStore 新的color集合
+   */
   setColorStore = colorStore => {
     const { dispatch } = this.props;
     dispatch({
@@ -375,7 +405,14 @@ class SampleGroup extends React.Component {
     return renderColumns;
   };
 
-  // 每列的render返回dom结构。
+  /**
+   * 每列的render返回dom结构。
+   * @param {String} value 当前列的值
+   * @param {Object} row 当前行数据
+   * @param {Number} index 当前行号
+   * @param {String} color1 当前列的color号比如：color_1
+   * @param {String} col 当前列的列， 比如header_1
+   */
   columnRender = (value, row, index, color1, col) => (
     <div style={{ display: 'flex' }} className="project_components_sample_group_render_wrap">
       {/* <span style={{ marginRight: 10 }}>{value}</span> */}
@@ -1007,6 +1044,6 @@ class SampleGroup extends React.Component {
   }
 }
 
-export default connect(({ project }) => ({
-  project,
+export default connect(({ componentsModel }) => ({
+  componentsModel,
 }))(SampleGroup);
