@@ -1,6 +1,6 @@
 // 点击选择流程模型的模态框
 import React from 'react';
-import { Modal, Avatar, Col, Tag, Card, Row, Button, Form, AutoComplete } from 'antd';
+import { Modal, Avatar, Col, Tag, Card, Row, Button, Form, AutoComplete, Spin } from 'antd';
 import InfiniteScroll from 'react-infinite-scroller';
 import TableSearchForm from '@/components/TableSearchForm';
 import '../../index.less';
@@ -33,7 +33,7 @@ class ChooseProcessModel extends React.Component {
       hasMore: true, // 是否开启下拉加载
       page: 1,
       rows: 9,
-      // count: 0, // 下拉加载
+      // allListNum: 0, // 下拉加载
     };
 
     // 异步验证做节流处理
@@ -41,9 +41,9 @@ class ChooseProcessModel extends React.Component {
   }
 
   /**
- * 渲染页面时调用
- *getTableData 获取表格数据的方法名
- */
+   * 渲染页面时调用
+   *getTableData 获取表格数据的方法名
+   */
   componentDidMount() {
     this.getTableData();
   }
@@ -61,11 +61,7 @@ class ChooseProcessModel extends React.Component {
       ? this.tableSearchFormRef.current.getFieldsValue()
       : '';
 
-    const {
-      processCode,
-      page,
-      rows,
-    } = this.state;
+    const { processCode, page, rows } = this.state;
     let newData = [];
     let changePage = false;
 
@@ -87,12 +83,12 @@ class ChooseProcessModel extends React.Component {
     };
 
     api.getProcess(data).then(res => {
-      this.setState(
-        {
-          processlist: res.rows,
-          rows: rows + 1,
-          // loading: false,
-        });
+      this.setHasMore(res.total);
+      this.setState({
+        processlist: res.rows,
+        rows: rows + 2,
+        // allListNum: res.total,
+      });
     });
   };
 
@@ -167,7 +163,6 @@ class ChooseProcessModel extends React.Component {
     this.props.onClose();
   };
 
-
   /**
    * 点击选中流程模型的方法
    * @param {Object} idsList 存储已选中的流程模型的id
@@ -180,30 +175,24 @@ class ChooseProcessModel extends React.Component {
 
     const itemlist = item.id;
     if (!selectedIds.includes(itemlist)) {
-
       const idsList = [...selectedIds, itemlist];
       const processModelList = [...selecteditem, item];
 
-      this.setState(
-        {
-          selectedIds: idsList,
-          selecteditem: processModelList,
-        }
-      );
+      this.setState({
+        selectedIds: idsList,
+        selecteditem: processModelList,
+      });
     }
     if (selectedIds.includes(itemlist)) {
       const newidsList = selectedIds.filter(value => value !== itemlist);
       const newProcessModelList = selecteditem.filter(value => value.id !== itemlist);
 
-      this.setState(
-        {
-          selectedIds: newidsList,
-          selecteditem: newProcessModelList,
-        }
-      );
+      this.setState({
+        selectedIds: newidsList,
+        selecteditem: newProcessModelList,
+      });
     }
   };
-
 
   /**
    * 点击查看流程模型下的任务模型
@@ -222,7 +211,6 @@ class ChooseProcessModel extends React.Component {
     });
   };
 
-
   /**
    * 点击确定保存数据
    * @param {Array} selecteditem 所有被选择的流程模型数据的集合
@@ -239,6 +227,15 @@ class ChooseProcessModel extends React.Component {
     this.setState({
       viewvisible: false,
     });
+  };
+
+  setHasMore = num => {
+    const { processlist } = this.state;
+    if (num === processlist.length) {
+      this.setState({
+        hasMore: false,
+      });
+    }
   };
 
   render() {
@@ -281,6 +278,7 @@ class ChooseProcessModel extends React.Component {
                         marginRight: '10px',
                         width: '300px',
                       }}
+                      span={8}
                       // eslint-disable-next-line react/no-array-index-key
                       key={item.id}
                     >
@@ -328,10 +326,19 @@ class ChooseProcessModel extends React.Component {
                             }}
                           >
                             <ul style={{ padding: '0', textAlign: 'center' }}>
-                              <li style={{textAlign:'left',marginBottom:'3px'}}>{item.name}</li>
-                              <li style={{textAlign:'left'}}>
-                                <Tag color="green" style={{ width: '50px', height: '20px' ,
-                                textAlign:'center',lineHeight:'18px'}}>
+                              <li style={{ textAlign: 'left', marginBottom: '3px' }}>
+                                {item.name}
+                              </li>
+                              <li style={{ textAlign: 'left' }}>
+                                <Tag
+                                  color="green"
+                                  style={{
+                                    width: '50px',
+                                    height: '20px',
+                                    textAlign: 'center',
+                                    lineHeight: '18px',
+                                  }}
+                                >
                                   {item.version}
                                 </Tag>
                               </li>
@@ -340,9 +347,9 @@ class ChooseProcessModel extends React.Component {
                           <div
                             style={{
                               fontSize: '14px',
-                              position:'absolute',
-                              right:'0',
-                              top:'16px',
+                              position: 'absolute',
+                              right: '0',
+                              top: '16px',
                               marginRight: '10px',
                             }}
                             className="isView"
@@ -355,8 +362,13 @@ class ChooseProcessModel extends React.Component {
                             </Button>
                           </div>
                         </div>
-                        <div style={{ fontSize: '14px', paddingTop: '10px' ,
-                        WebkitBoxOrient:'vertical'}}>
+                        <div
+                          style={{
+                            fontSize: '14px',
+                            paddingTop: '10px',
+                            WebkitBoxOrient: 'vertical',
+                          }}
+                        >
                           {item.describe}
                         </div>
                         <div
@@ -375,6 +387,11 @@ class ChooseProcessModel extends React.Component {
                     </Col>
                   ))}
                 </Row>
+                {hasMore && (
+                  <div className="demo-loading-container">
+                    <Spin />
+                  </div>
+                )}
               </InfiniteScroll>
             </div>
           </Modal>

@@ -158,7 +158,7 @@ class AssociatedProcessModel extends React.Component {
             />
           </FormItem>
         </Col>
-        <Col xxl={11} style={{ textAlign: 'right' }}>
+        <Col xxl={12} style={{ textAlign: 'right' }}>
           <Button type="primary" htmlType="submit">
             查询
           </Button>
