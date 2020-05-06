@@ -229,6 +229,10 @@ class ChooseProcessModel extends React.Component {
     });
   };
 
+  /**
+   * 设置禁止加载
+   * @param {Int} num 加载的总数量
+   */
   setHasMore = num => {
     const { processlist } = this.state;
     if (num === processlist.length) {
