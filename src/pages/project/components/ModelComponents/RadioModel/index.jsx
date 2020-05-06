@@ -66,13 +66,14 @@ class radioModel extends React.Component {
   }
 
   setLabel = value => {
-    const str = this.state.paramList.isRequired ? '（必填）' : '（选填）'
+    const str = JSON.parse(this.state.paramList.isRequired) ? '（必填）' : '（选填）'
     return value + str
   }
 
 
   render() {
     const { paramList } = this.state
+
     // 获取Select数据
     const selectList = this.setSelectValue(paramList)
     return (

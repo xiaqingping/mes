@@ -1,4 +1,9 @@
-/** 参数分类点击以后变大显示页面 */
+/**
+ * 参数分类点击以后变大显示页面
+ * @param {boolean} visible 显示或者隐藏
+ * @param {Function} handleBigClose 关闭
+ * @param {object} typeEnlargeData 详情的数据
+ */
 import React from 'react';
 import { Modal, List, Card } from 'antd';
 import { ShrinkOutlined } from '@ant-design/icons';

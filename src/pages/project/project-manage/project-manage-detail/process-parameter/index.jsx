@@ -100,6 +100,7 @@ class ProcessParameter extends Component {
         message.success('添加操作');
         if (param.length > 0) {
           this.getDefaultParams(newParamData);
+          console.log(newParamData);
           const newData = this.compareParams(newParamData, 'sortNo');
           this.setState({ paramGroupList: newData });
         }
@@ -184,17 +185,20 @@ class ProcessParameter extends Component {
    */
   getDefaultParams = paramGroupList => {
     let paramList = [];
+    let sampleList = [];
     paramGroupList.forEach(groItem => {
       const { params } = groItem;
       paramList = [...paramList, ...params];
       groItem.params.forEach(item => {
         if (item.type === 'sample_select') {
-          this.setState({ sampleList: JSON.parse(item.paramValue) });
+          if (item.paramValue) {
+            sampleList = [...sampleList, JSON.parse(item.paramValue)];
+          }
+          // this.setState({ sampleList: JSON.parse(item.paramValue) });
         }
       });
     });
-
-    this.setState({ paramList });
+    this.setState({ paramList, sampleList });
   };
 
   // edit 设置表单初始值
@@ -205,9 +209,11 @@ class ProcessParameter extends Component {
   setInitialFromValues = data => {
     data.forEach(item => {
       const { paramKey } = item;
-      this.formRef.current.setFieldsValue({
-        [paramKey]: item.paramValue || item.deafultValue,
-      });
+      if (this.formRef.current) {
+        this.formRef.current.setFieldsValue({
+          [paramKey]: item.paramValue || item.deafultValue,
+        });
+      }
     });
   };
 
@@ -380,7 +386,7 @@ class ProcessParameter extends Component {
       }
       this.setState({ processParam: res }, () => {
         this.getParamData(this.state.processParam, this.state.processParamValue);
-      });
+      })
       return false;
     });
   };
@@ -434,6 +440,8 @@ class ProcessParameter extends Component {
   render() {
     const { paramGroupList, sampleList, requestType } = this.state;
     const data = paramGroupList;
+    if (data.length === 0) return false;
+    console.log(data);
     return (
       <>
         <PageHeaderWrapper style={{ marginBottom: 100 }}>
@@ -467,7 +475,7 @@ class ProcessParameter extends Component {
                             getData={this.getModelData} // 提交数据
                           />
                         );
-                      // 数值输入框
+                      // // 数值输入框
                       if (it.type === 'number_input') {
                         return (
                           <InputNumberModel
@@ -489,7 +497,7 @@ class ProcessParameter extends Component {
                           />
                         );
 
-                      // 多选
+                      // // 多选
                       if (it.type === 'checkbox')
                         return (
                           <CheckBoxModel

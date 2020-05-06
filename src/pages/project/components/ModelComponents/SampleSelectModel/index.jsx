@@ -433,7 +433,6 @@ class SampleSelect extends React.Component {
   render() {
     const { visible, sampleId, chooseFileIds, tableData, columns, disabled } = this.state;
     if (typeof tableData === 'string') return false;
-
     return (
       <>
         <div className="project_manage_sample_select_table">

@@ -20,8 +20,9 @@ class ProjectEdit extends Component {
 
   constructor(props) {
     super(props);
+    const projectId =this.props.match.params;
     const { projectData, labels } = props.projectManage;
-    // console.log(projectData);
+    // console.log(this.props);
 
     this.state = {
       requestType: projectData.requestType || 'addProject', // 请求类型
@@ -32,55 +33,59 @@ class ProjectEdit extends Component {
       endDate: '', // 结束时间
       projectData,
       labels,
+      projectId,
     };
   }
 
   // 组件加载时
   componentDidMount = () => {
-    const { projectData } = this.state;
-    this.requestTypeInit(projectData);
-  };
-
-  // 判断请求类型
-  requestTypeInit = data => {
-    const { requestType } = this.state;
-    if (requestType === 'addProject') {
+    // const { projectData ,projectId,requestType} = this.state;
+    // this.requestTypeInit(projectData);
+    const { projectId,requestType} = this.state;
+    const modifyProject = JSON.parse(sessionStorage.getItem('ModifyProject'));
+    if(JSON.stringify(projectId) === '{}') {
       this.setState({
         requestType,
+      },() => {
+        // console.log(this.state);
       });
     }
-    if (requestType === 'editProject') {
+    if(JSON.stringify(projectId) !== '{}') {
       // 设置初始值
       if (!(this.formRef.current === null)) {
         this.formRef.current.setFieldsValue({
-          name: data.name,
-          describe: data.describe,
-          bpName: data.bpName,
+          name: modifyProject.name,
+          describe: modifyProject.describe,
+          bpName: modifyProject.bpName,
         });
       }
       this.setState({
-        selectedlabels: data.labels,
-        beginDate: data.beginDate,
-        endDate: data.endDate,
+        selectedlabels: modifyProject.labels,
+        beginDate: modifyProject.beginDate,
+        endDate: modifyProject.endDate,
       });
     }
     return false;
   };
 
+
   // 保存
   handleSave = () => {
     const data = this.saveData();
-    const { requestType } = this.state;
-    if (requestType === 'addProject') {
+    const { projectId } = this.state;
+    // 新建
+    if (JSON.stringify(projectId) === '{}') {
       api.addProjects(data).then(() => {
         router.push('/project/project-manage');
       });
     }
-    if (requestType === 'editProject') {
+    // 修改
+    if (JSON.stringify(projectId) !== '{}') {
       api.updateProjects(data).then(() => {
         router.push('/project/project-manage');
       });
     }
+    sessionStorage.removeItem('ModifyProject');
   };
 
   // 保存时所需数据
@@ -91,44 +96,41 @@ class ProjectEdit extends Component {
       bpName,
       endDate,
       beginDate,
-      requestType,
-      projectData,
+      projectId,
     } = this.state;
-    console.log(this.state);
+    // console.log(this.state);
     const formData = this.formRef.current.getFieldsValue();
-    console.log(formData);
+    // console.log(formData);
 
     if (formData.name === undefined) {
       message.error('项目名称不能为空！');
-      return 1;
+      return false;
     }
     if (formData.describe === undefined) {
       message.error('项目描述不能为空！');
-      return 1;
+      return false;
     }
 
-    // 新增项目时
-    if (requestType === 'addProject') {
+    // 新增项目
+    let data;
+    if (JSON.stringify(projectId) === '{}') {
+      // console.log('新建项目')
       if (bpName === '') {
         message.error('所有者不能为空！');
-        return 1;
+        return false;
       }
       if (beginDate === '') {
         message.error('开始时间不能为空！');
-        return 1;
+        return false;
       }
       if (endDate === '') {
         message.error('结束时间不能为空！');
-        return 1;
+        return false;
       }
       if (selectedlabels.length===0) {
         message.error('标签不能为空！');
-        return 1;
+        return false;
       }
-    }
-
-    let data;
-    if (requestType === 'addProject') {
       data = {
         name: formData.name,
         describe: formData.describe,
@@ -139,9 +141,12 @@ class ProjectEdit extends Component {
         labels: selectedlabels,
       };
     }
-    if (requestType === 'editProject') {
+
+
+    // 修改项目
+    if (JSON.stringify(projectId) !== '{}') {
       data = {
-        id: projectData.id,
+        id: projectId.id,
         name: formData.name,
         describe: formData.describe,
         labels: selectedlabels,
@@ -180,14 +185,17 @@ class ProjectEdit extends Component {
   };
 
   // 导航列表title样式
-  navContent = data => {
-    const { requestType } = this.state;
+  navContent = () => {
+    // console.log(data);
+    const modifyProject = JSON.parse(sessionStorage.getItem('ModifyProject'));
+    // console.log(modifyProject)
+    const { projectId} = this.state;
     let titleName;
-    if (requestType === 'addProject') {
+    if (JSON.stringify(projectId) === '{}') {
       titleName = '新建项目';
     }
-    if (requestType === 'editProject') {
-      titleName = data.name;
+    if (JSON.stringify(projectId) !== '{}') {
+      titleName = modifyProject.name;
     }
 
     return <div>{titleName}</div>;
@@ -196,7 +204,8 @@ class ProjectEdit extends Component {
   // 跳转到添加流程页面
   handleAdd = () => {
     const data = this.saveData();
-    if (data === 1) {
+    console.log(data);
+    if (data === false) {
       this.props.dispatch({
         type: 'projectManage/setProjectInfor',
         payload: data,
@@ -214,7 +223,8 @@ class ProjectEdit extends Component {
   };
 
   render() {
-    const { requestType, selectedlabels, projectData, labels} = this.state;
+    const { selectedlabels, projectData, labels,projectId} = this.state;
+    console.log(this.state);
     return (
       <PageHeaderWrapper title={this.navContent(projectData)}>
         <Form ref={this.formRef} className="classPageHeaderWrapper">
@@ -244,13 +254,13 @@ class ProjectEdit extends Component {
                   onSearch={() => this.showBPList.visibleShow(true)}
                   style={{ marginLeft: '26px' }}
                   readOnly
-                  disabled={requestType === 'editProject'}
+                  disabled={JSON.stringify(projectId) !== '{}'}
                 />
               </FormItem>
             </div>
             <div style={{ marginBottom: '20px' }}>
               <FormItem label="时间" name="time" style={{ paddingRight: '50px' }}>
-                {requestType === 'addProject' ? (
+                {JSON.stringify(projectId) === '{}'  ? (
                   <RangePicker
                     showTime={{ format: 'HH:mm:ss' }}
                     format="YYYY-MM-DD HH:mm:ss"
@@ -261,13 +271,17 @@ class ProjectEdit extends Component {
                   <RangePicker
                     showTime={{ format: 'HH:mm:ss' }}
                     format="YYYY-MM-DD HH:mm:ss"
-                    defaultValue={[
+                    // defaultValue={[
+                    //   moment(projectData.beginDate, 'YYYYMMDD HH:mm:ss'),
+                    //   moment(projectData.endDate, 'YYYYMMDD HH:mm:ss'),
+                    // ]}
+                    initialValues ={[
                       moment(projectData.beginDate, 'YYYYMMDD HH:mm:ss'),
                       moment(projectData.endDate, 'YYYYMMDD HH:mm:ss'),
                     ]}
                     onChange={this.handleOnChangeTime}
                     style={{ marginLeft: '40px' }}
-                    disabled={requestType === 'editProject'}
+                    disabled={JSON.stringify(projectId) !== '{}'}
                   />
                 )}
               </FormItem>
@@ -309,11 +323,11 @@ class ProjectEdit extends Component {
           >
             <Button
               type="default"
-              onClick={() => this.handleSave(true, 'requestType')}
+              onClick={() => this.handleSave()}
             >
               保存
             </Button>
-            {requestType === 'addProject' ? (
+            {JSON.stringify(projectId) === '{}' ? (
                   <Button
                   type="primary"
                   onClick={() => this.handleAdd(true)}
