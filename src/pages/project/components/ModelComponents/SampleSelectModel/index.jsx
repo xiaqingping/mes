@@ -339,10 +339,14 @@ class SampleSelect extends React.Component {
     const { tableData } = this.state;
     const list = [...tableData];
     list[index].sampleAlias = e.target.value;
-    this.setState({
-      tableData: list,
-    });
-    this.sendDataOnChange();
+    this.setState(
+      {
+        tableData: list,
+      },
+      () => {
+        this.sendDataOnChange();
+      },
+    );
   };
 
   // 查看已选择的
@@ -405,9 +409,12 @@ class SampleSelect extends React.Component {
       const index = list.findIndex(item => data1[0].id === item.id);
       data1[0].color = list[index].color || getrandomColor();
       list.splice(index, 1, ...data1);
-      this.setState({
-        tableData: list,
-      });
+      this.setState(
+        {
+          tableData: list,
+        },
+        () => this.sendDataOnChange(),
+      );
       // console.log(`list${list}`);
       // TODO:将改变返回给父组件
       this.props.emitData(list);
@@ -456,6 +463,6 @@ class SampleSelect extends React.Component {
   }
 }
 
-export default connect(({ project }) => ({
-  project,
+export default connect(({ componentsModel }) => ({
+  componentsModel,
 }))(SampleSelect);
