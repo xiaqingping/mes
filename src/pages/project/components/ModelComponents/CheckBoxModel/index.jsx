@@ -84,7 +84,6 @@ class CheckBoxModel extends React.Component {
 
   // 获取选中项
   onChange = checkedValues => {
-    console.log(checkedValues)
     this.setState({
       checkedValues
     })
