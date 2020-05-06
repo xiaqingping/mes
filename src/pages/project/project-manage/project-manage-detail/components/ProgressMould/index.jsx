@@ -23,6 +23,7 @@ class ProgressMould extends Component {
     const { percentData } = this.props;
     if (percentData.status === 2) {
       this.interval = setInterval(() => {
+        console.log(123);
         this.getProcessesProgressData(percentData);
       }, 10000);
     }
@@ -31,6 +32,9 @@ class ProgressMould extends Component {
   // 查询流程进度及状态
   getProcessesProgressData = percentData => {
     api.getProcessesProgress({ processIds: [percentData.id].join(',') }).then(res => {
+      if (res[0].status === 4) {
+        clearInterval(this.interval);
+      }
       this.setState({
         percent: res[0].processProgress,
         status: res[0].status,
@@ -41,9 +45,13 @@ class ProgressMould extends Component {
   // 流程进度开始
   processStart = row => {
     const { percentData } = this.props;
+    console.log(row, percentData);
     api.startProcessesProcess(row.id).then(() => {
       console.log('start');
       this.getProcessesProgressData(percentData);
+      this.interval = setInterval(() => {
+        this.getProcessesProgressData(percentData);
+      }, 1000);
     });
   };
 

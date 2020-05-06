@@ -580,14 +580,15 @@ class ProcessEdit extends Component {
     // 设置默认值
     const initialValues = () => {
       if (pageModel) {
-        const defaultData = {
+        return {
           name: processData.name,
           describe: processData.describe,
           interactionAnalysis: processData.interactionAnalysis === 1,
         };
-        return defaultData;
       }
-      return '';
+      return {
+        interactionAnalysis: processData.interactionAnalysis === undefined,
+      };
     };
     return (
       <PageHeaderWrapper title={this.navContent(processData)}>
