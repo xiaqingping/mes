@@ -9,8 +9,15 @@ import './index.less';
 
 class SampleSelect extends React.Component {
   static getDerivedStateFromProps(nextProps) {
+    let sampleList = [];
+    if (nextProps.paramList.paramValue && typeof nextProps.paramList.paramValue === 'string') {
+      sampleList = JSON.parse(nextProps.paramList.paramValue);
+    } else {
+      sampleList = nextProps.paramList.paramValue;
+    }
+    console.log(sampleList);
     return {
-      tableDatas: nextProps.paramList.paramValue || [],
+      tableDatas: sampleList || [],
       disabled: nextProps.disabled,
     };
   }
@@ -44,31 +51,31 @@ class SampleSelect extends React.Component {
                 }}
               />
             ) : (
-                <Popover
-                  overlayClassName="project_manage_sample_ui_select"
-                  overlayStyle={{ padding: 0 }}
-                  content={
-                    <SketchPicker
-                      color={record.color || this.state.color}
-                      onChangeComplete={color => this.handleChange(color, record, index)}
-                    />
-                  }
-                  trigger="click"
-                  placement="bottom"
-                >
-                  <div
-                    style={{
-                      width: 20,
-                      height: 20,
-                      backgroundColor: record.color,
-                      position: 'relative',
-                    }}
-                    onClick={() => {
-                      this.handleClick(record, index);
-                    }}
+              <Popover
+                overlayClassName="project_manage_sample_ui_select"
+                overlayStyle={{ padding: 0 }}
+                content={
+                  <SketchPicker
+                    color={record.color || this.state.color}
+                    onChangeComplete={color => this.handleChange(color, record, index)}
                   />
-                </Popover>
-              )}
+                }
+                trigger="click"
+                placement="bottom"
+              >
+                <div
+                  style={{
+                    width: 20,
+                    height: 20,
+                    backgroundColor: record.color,
+                    position: 'relative',
+                  }}
+                  onClick={() => {
+                    this.handleClick(record, index);
+                  }}
+                />
+              </Popover>
+            )}
             <div style={{ marginLeft: 10 }}>{text}</div>
           </div>
         ),
@@ -149,14 +156,14 @@ class SampleSelect extends React.Component {
 
   componentDidMount() {
     const { tableDatas, disabled, columns } = this.state;
-    let tableData = [];
-    if (typeof tableDatas === 'string') {
-      tableData = JSON.parse(tableDatas);
-    }
+    // let tableData = [];
+    // if (typeof tableDatas === 'string') {
+    //   tableData = JSON.parse(tableDatas);
+    // }
     if (disabled) {
       this.setState(
         {
-          tableData,
+          tableData: tableDatas,
           columns: columns.slice(0, columns.length - 1),
         },
         () => {
@@ -166,7 +173,7 @@ class SampleSelect extends React.Component {
     }
     this.setState(
       {
-        tableData,
+        tableData: tableDatas,
       },
       () => {
         this.getTableData();
@@ -174,24 +181,24 @@ class SampleSelect extends React.Component {
     );
   }
 
-  componentDidUpdate(props) {
-    // if (props.submitStatus !== this.props.submitStatus) {
-    //   const { tableData } = this.state;
-    //   let list = [...tableData];
-    //   list = list.map(item => {
-    //     item.sampleId = item.id;
-    //     return item;
-    //   });
-    //   const { paramKey, taskModelId } = props;
-    //   const sendData = {
-    //     paramKey,
-    //     taskModelId,
-    //     paramValue: JSON.stringify(list),
-    //   };
-    //   this.validPass = !(this.props.paramList.required && list && !list.length);
-    //   this.props.getData(sendData, 'sampleSelect', this.validPass);
-    // }
-  }
+  // componentDidUpdate(props) {
+  // if (props.submitStatus !== this.props.submitStatus) {
+  //   const { tableData } = this.state;
+  //   let list = [...tableData];
+  //   list = list.map(item => {
+  //     item.sampleId = item.id;
+  //     return item;
+  //   });
+  //   const { paramKey, taskModelId } = props;
+  //   const sendData = {
+  //     paramKey,
+  //     taskModelId,
+  //     paramValue: JSON.stringify(list),
+  //   };
+  //   this.validPass = !(this.props.paramList.required && list && !list.length);
+  //   this.props.getData(sendData, 'sampleSelect', this.validPass);
+  // }
+  // }
 
   sendDataOnChange = () => {
     const { tableData } = this.state;
@@ -206,6 +213,8 @@ class SampleSelect extends React.Component {
       taskModelId,
       paramValue: JSON.stringify(list),
     };
+    // TODO: 这里修改了别名，并将修改后的数据传递给index，但是在分组那里获取的数据里并没有别名字段， 以后等文慧过来查看原因
+    console.log(list);
     this.validPass = !(this.props.paramList.required && list && !list.length);
     this.props.getData(sendData, 'sampleSelect', this.validPass);
   };
@@ -233,7 +242,7 @@ class SampleSelect extends React.Component {
     const { dispatch } = this.props;
     // console.log(colorStore);
     dispatch({
-      type: 'project/setColorStore',
+      type: 'componentsModel/setColorStore',
       payload: colorStore,
     });
   };
@@ -304,7 +313,7 @@ class SampleSelect extends React.Component {
   handleChange = (color, record, index) => {
     const { tableData } = this.state;
     const row = { ...record };
-    const isIncludes = this.props.project.colorStore.includes(color.hex);
+    const isIncludes = this.props.componentsModel.colorStore.includes(color.hex);
     if (isIncludes) {
       row.color = getrandomColor();
     } else {
@@ -416,22 +425,14 @@ class SampleSelect extends React.Component {
         () => this.sendDataOnChange(),
       );
       // console.log(`list${list}`);
-      // TODO:将改变返回给父组件
+      // 将改变返回给父组件
       this.props.emitData(list);
     }
   };
 
   render() {
     const { visible, sampleId, chooseFileIds, tableData, columns, disabled } = this.state;
-    // let tableList = [];
-    // if (tableDatas.length) {
-    //   tableList = tableDatas;
-    // } else {
-    //   tableList = tableData;
-    // }
-
     if (typeof tableData === 'string') return false;
-
     return (
       <>
         <div className="project_manage_sample_select_table">
@@ -462,6 +463,6 @@ class SampleSelect extends React.Component {
   }
 }
 
-export default connect(({ componentsModel }) => ({
-  componentsModel,
+export default connect(({ project }) => ({
+  project,
 }))(SampleSelect);
