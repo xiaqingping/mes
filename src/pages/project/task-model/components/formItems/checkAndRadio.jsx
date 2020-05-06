@@ -166,47 +166,42 @@ class CheckboxModel extends React.Component {
           return (
             <>
               {fromView ? (
-                <div style={{ width: 500, overflow: 'hidden' }}>
-                  <div style={{ float: 'left' }}>
-                    <span style={{ position: 'relative', left: 0, top: 5 }}>{lebel} :</span>
+                <div style={{ width: '400px',height:'40px',lineHeight:'40px',marginBottom:'5px'}}>
+                  <div style={{ float: 'left',marginRight:'10px', height:'40px',}}>
+                  {lebel} :
                   </div>
-                  <div style={{ float: 'right', marginRight: 50, width: 380 }}>
+                  <div style={{ float: 'right', marginRight: 30, width: 300 ,
+                    height:'40px',paddingTop:'4px'}}>
                     <Form.Item label="" name={item.selectKey} key={index}>
                       <Input.Group compact>
                         <Form.Item
                           name={[[fieldName], 'selectKey']}
-                          noStyle
+                          // noStyle
                           rules={[{ required: true, message: '请输入Key' }]}
                         >
-                          <span style={{ width: 130, marginRight: 10 }}>
+                          <span style={{ width: '100px', marginRight: 10 }}>
                             {item[fieldName].selectKey}
                           </span>
                         </Form.Item>
                         <Form.Item
                           name={[[fieldName], 'selectValue']}
-                          noStyle
+                          // noStyle
                           rules={[{ required: true, message: '请输入名称' }]}
                         >
-                          <span style={{ width: 130 }}>{item[fieldName].selectValue}</span>
-                          {/* <Input style={{ width: '50%' }} placeholder="请输入名称" /> */}
-                          {/* {fromView ? (
-                        <span>{item[fieldName].selectValue}</span>
-                      ) : (
-                        <Input style={{ width: '50%' }} placeholder="请输入Key" />
-                      )} */}
+                          <span style={{ width: '100px '}}>{item[fieldName].selectValue}</span>
                         </Form.Item>
                       </Input.Group>
                     </Form.Item>
                   </div>
                 </div>
               ) : (
-                <div style={{ width: 500, overflow: 'hidden' }}>
-                  <div style={{ float: 'left' }}>
-                    <span style={{ position: 'relative', left: 0, top: 5 }}>
-                      {item.selectName} :
-                    </span>
+                <div style={{ width: '400px',height:'40px' ,
+                lineHeight:'40px',marginBottom:'5px'}}>
+                  <div style={{ float: 'left',marginRight:'10px', height:'40px'}}>
+                    {item.selectName} :
                   </div>
-                  <div style={{ float: 'right', marginRight: 50, width: 380 }}>
+                  <div style={{ float: 'right', marginRight: 30, width: 300 ,
+                    height:'40px',paddingTop:'4px'}}>
                     <Form.Item label="" name={item.selectKey}>
                       <Input.Group compact>
                         <Form.Item
