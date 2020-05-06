@@ -100,7 +100,6 @@ class ProcessParameter extends Component {
         message.success('添加操作');
         if (param.length > 0) {
           this.getDefaultParams(newParamData);
-          console.log(newParamData);
           const newData = this.compareParams(newParamData, 'sortNo');
           this.setState({ paramGroupList: newData });
         }
@@ -192,7 +191,7 @@ class ProcessParameter extends Component {
       groItem.params.forEach(item => {
         if (item.type === 'sample_select') {
           if (item.paramValue) {
-            sampleList = [...sampleList, JSON.parse(item.paramValue)];
+            sampleList = [...sampleList, ...JSON.parse(item.paramValue)];
           }
           // this.setState({ sampleList: JSON.parse(item.paramValue) });
         }
@@ -386,7 +385,7 @@ class ProcessParameter extends Component {
       }
       this.setState({ processParam: res }, () => {
         this.getParamData(this.state.processParam, this.state.processParamValue);
-      })
+      });
       return false;
     });
   };
