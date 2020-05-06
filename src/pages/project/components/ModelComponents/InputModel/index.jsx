@@ -20,8 +20,6 @@ class InputModel extends React.Component {
     };
   }
 
-  componentDidMount() { }
-
   // 实时获取数据 回传给父组件
   onBlur = e => {
     this.formatSubmitData(e.target.value);
