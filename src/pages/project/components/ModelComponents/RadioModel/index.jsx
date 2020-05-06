@@ -47,7 +47,7 @@ class radioModel extends React.Component {
       taskModelId: paramList.taskModelId,
     }
     const verify = this.verifyData(value)
-    if(!verify) return
+    if (!verify) return
     this.props.getData(data, 'radio', verify);
   }
 
@@ -73,6 +73,7 @@ class radioModel extends React.Component {
 
   render() {
     const { paramList } = this.state
+    const { disabled } = this.props
 
     // 获取Select数据
     const selectList = this.setSelectValue(paramList)
@@ -80,6 +81,7 @@ class radioModel extends React.Component {
       <Descriptions layout="vertical">
         <Descriptions.Item label={this.setLabel(paramList.paramName)}>
           <Select
+            disabled={disabled}
             placeholder="请选择"
             style={{ width: '150px' }}
             onChange={e => this.handleChange(e, 'select')}

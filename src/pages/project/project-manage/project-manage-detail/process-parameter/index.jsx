@@ -20,6 +20,7 @@ import RadioModel from '@/pages/project/components/ModelComponents/RadioModel';
 /** 样式 */
 import style from './index.less';
 
+
 const { Footer } = Layout;
 
 function compare(property) {
@@ -489,7 +490,7 @@ class ProcessParameter extends Component {
                           />
                         );
 
-                      // // 多选
+                      // 多选
                       if (it.type === 'checkbox')
                         return (
                           <CheckBoxModel
