@@ -434,7 +434,6 @@ class ProcessParameter extends Component {
   render() {
     const { paramGroupList, sampleList, requestType } = this.state;
     const data = paramGroupList;
-    // console.log(paramGroupList, sampleList, requestType, paramGroupList)
     return (
       <>
         <PageHeaderWrapper style={{ marginBottom: 100 }}>
