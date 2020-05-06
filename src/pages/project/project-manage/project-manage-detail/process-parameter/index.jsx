@@ -101,6 +101,7 @@ class ProcessParameter extends Component {
         message.success('添加操作');
         if (param.length > 0) {
           this.getDefaultParams(newParamData);
+          console.log(newParamData);
           const newData = this.compareParams(newParamData, 'sortNo');
           this.setState({ paramGroupList: newData });
         }
@@ -185,17 +186,20 @@ class ProcessParameter extends Component {
    */
   getDefaultParams = paramGroupList => {
     let paramList = [];
+    let sampleList = [];
     paramGroupList.forEach(groItem => {
       const { params } = groItem;
       paramList = [...paramList, ...params];
       groItem.params.forEach(item => {
         if (item.type === 'sample_select') {
-          this.setState({ sampleList: JSON.parse(item.paramValue) });
+          if (item.paramValue) {
+            sampleList = [...sampleList, JSON.parse(item.paramValue)];
+          }
+          // this.setState({ sampleList: JSON.parse(item.paramValue) });
         }
       });
     });
-
-    this.setState({ paramList });
+    this.setState({ paramList, sampleList });
   };
 
   // edit 设置表单初始值
@@ -206,9 +210,11 @@ class ProcessParameter extends Component {
   setInitialFromValues = data => {
     data.forEach(item => {
       const { paramKey } = item;
-      this.formRef.current.setFieldsValue({
-        [paramKey]: item.paramValue || item.deafultValue,
-      });
+      if (this.formRef.current) {
+        this.formRef.current.setFieldsValue({
+          [paramKey]: item.paramValue || item.deafultValue,
+        });
+      }
     });
   };
 
@@ -435,6 +441,8 @@ class ProcessParameter extends Component {
   render() {
     const { paramGroupList, sampleList, requestType } = this.state;
     const data = paramGroupList;
+    if (data.length === 0) return false;
+    console.log(data);
     return (
       <>
         <PageHeaderWrapper style={{ marginBottom: 100 }}>

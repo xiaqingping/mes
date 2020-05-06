@@ -14,9 +14,21 @@ const { Option } = AutoComplete;
  */
 class SampleGroup extends React.Component {
   static getDerivedStateFromProps(nextProps) {
+    let tableDatas = [];
+    let sampleLists = [];
+    if (nextProps.paramList.paramValue && typeof nextProps.paramList.paramValue === 'string') {
+      tableDatas = JSON.parse(nextProps.paramList.paramValue);
+    } else {
+      tableDatas = nextProps.paramList.paramValue;
+    }
+    if (nextProps.sampleList && typeof nextProps.sampleList === 'string') {
+      sampleLists = JSON.parse(nextProps.sampleList);
+    } else {
+      sampleLists = nextProps.sampleList;
+    }
     return {
-      tableData: nextProps.paramList.paramValue || [],
-      sampleList: nextProps.sampleList || [],
+      tableData: tableDatas || [],
+      sampleList: sampleLists || [],
       disabled: nextProps.disabled,
     };
   }
@@ -76,7 +88,7 @@ class SampleGroup extends React.Component {
     const { tableData } = this.state;
     this.setState(
       {
-        groupSchemeData: JSON.parse(tableData),
+        groupSchemeData: tableData,
       },
       () => {
         this.transformGroup(this.state.groupSchemeData);
@@ -85,28 +97,11 @@ class SampleGroup extends React.Component {
     this.props.getFun(this.selectUpdateGroup);
   }
 
-  // componentDidUpdate(props) {
-  // if (props.submitStatus !== this.props.submitStatus) {
-  //   const list = this.verifyData();
-  //   console.log(list);
-  //   const { paramKey, taskModelId } = props.paramList;
-  //   const sendData = {
-  //     paramKey,
-  //     paramValue: JSON.stringify(list),
-  //     taskModelId,
-  //   };
-  //   // TODO: 是否校验通过
-  //   this.validPass = !!list;
-  //   this.props.getData(sendData, 'groupScheme', this.validPass);
-  // }
-  // }
-
   /**
    * 每次数据改变时都将数据发送给父组件。防止点击提交时各组件提交数据冲突
    */
   sendDataOnChange = () => {
     const list = this.verifyData();
-    console.log(list);
     const { paramKey, taskModelId } = this.props.paramList;
     const sendData = {
       paramKey,
@@ -119,7 +114,7 @@ class SampleGroup extends React.Component {
   };
 
   /**
-   * 选择性的更新分组方案组件， 当样品改变时更新组件
+   *  当样品改变时更新组件
    */
   selectUpdateGroup = () => {
     const { sampleList, groupSchemeData, columns } = this.state;
@@ -127,18 +122,16 @@ class SampleGroup extends React.Component {
     const groupList = [...groupSchemeData];
     const columns1 = JSON.parse(JSON.stringify(columns));
     const columns2 = [...columns];
-    const cols = columns.map(item => {
-      return item.dataIndex;
-    });
+    const cols = columns.map(item => item.dataIndex);
     const colLen = cols.slice(1, cols.length - 1);
     const groupData = [];
     selList.map(item => {
       let newRow = {};
-      newRow = { metadataSampleId: item.id, sampleName: item.sampleAlias || item.sampleName };
+      newRow = { sampleId: item.id, sampleName: item.sampleAlias || item.sampleName };
       // map一下分组数据
       const mapGro = {};
       groupList.forEach(gro => {
-        mapGro[gro.metadataSampleId] = gro;
+        mapGro[gro.sampleId] = gro;
       });
       if (mapGro[item.id]) {
         newRow = mapGro[item.id];
@@ -170,27 +163,27 @@ class SampleGroup extends React.Component {
    */
   transformGroup = data => {
     const { columns } = this.state;
-    // const { groupSchemeList, sampleList } = data;
     const { sampleList } = this.state;
-    // const list = data;
     const cols = [...columns];
     const titleName = 'groupSchemeName';
-
     // 取出 表头
     const newColumns = this.getTableHeaderData(data, cols, titleName);
-
     // // 取出 行数据
     const rowData = this.getRowDataGroup(data, sampleList, newColumns);
-    // 填充行数据
+    // // 填充行数据
     const newData = this.getFillData(data, rowData, newColumns);
     // 将所有的颜色放到仓库里.
     this.pushColorsToStore(newData);
-
     // 保存 分组 表头数据
-    this.setState({
-      groupSchemeData: newData,
-      columns: newColumns,
-    });
+    this.setState(
+      {
+        groupSchemeData: newData,
+        columns: newColumns,
+      },
+      () => {
+        this.selectUpdateGroup();
+      },
+    );
   };
 
   /**
@@ -243,7 +236,7 @@ class SampleGroup extends React.Component {
             // 分组下的样品列表遍历
             groItem.sampleIds.forEach(samItem => {
               // 找到对应的样品行
-              if (rowItem.metadataSampleId === samItem.metadataSampleId) {
+              if (rowItem.sampleId === samItem.sampleId) {
                 Object.keys(rowItem).map(key => {
                   if (rowItem[key] === groupSchemeName) {
                     const num = key.split('_')[1];
@@ -261,7 +254,7 @@ class SampleGroup extends React.Component {
         // 分组方案下的 样品列表不为空
         if (groupItem.sampleIds !== null && groupItem.sampleIds.length !== 0) {
           groupItem.sampleIds.forEach(samItem => {
-            if (rowItem.metadataSampleId === samItem.metadataSampleId) {
+            if (rowItem.sampleId === samItem.sampleId) {
               Object.keys(rowItem).map(key => {
                 const num = key.split('_')[1];
                 let color;
@@ -300,7 +293,7 @@ class SampleGroup extends React.Component {
     const samples = [];
     groupList.forEach(groupItem => {
       // 分组方案下的 样品列表 为空
-      if (groupItem.sampleIds === null) {
+      if (groupItem.sampleIds === null || (groupItem.sampleIds && !groupItem.sampleIds.length)) {
         groupItem.groups.forEach(groItem => {
           groItem.sampleIds.forEach(samItem => {
             samples.push(samItem);
@@ -308,7 +301,7 @@ class SampleGroup extends React.Component {
         });
       }
       // 分组方案下的 分组列表 为空
-      if (groupItem.groups === null) {
+      if (groupItem.groups === null || (groupItem.groups && !groupItem.groups.length)) {
         groupItem.sampleIds.forEach(samItem => {
           samples.push(samItem);
         });
@@ -333,11 +326,11 @@ class SampleGroup extends React.Component {
     list.forEach(samItem => {
       if (newSample.length === 0) {
         newSample.push(samItem);
-        ids.push(samItem.metadataSampleId);
+        ids.push(samItem.sampleId);
       }
-      if (ids.indexOf(samItem.metadataSampleId) === -1) {
+      if (ids.indexOf(samItem.sampleId) === -1) {
         newSample.push(samItem);
-        ids.push(samItem.metadataSampleId);
+        ids.push(samItem.sampleId);
       }
     });
 
@@ -345,10 +338,10 @@ class SampleGroup extends React.Component {
     const newData = [];
     sampleList.forEach(item => {
       newSample.forEach(it => {
-        if (item.id === it.metadataSampleId) {
+        if (item.id === it.sampleId) {
           // 拼装行
           const newIt = {
-            metadataSampleId: it.metadataSampleId,
+            sampleId: it.sampleId,
             sampleColor: '',
           };
           columns.forEach(groItem => {
@@ -360,7 +353,6 @@ class SampleGroup extends React.Component {
         }
       });
     });
-
     return newData;
   };
 
@@ -459,7 +451,10 @@ class SampleGroup extends React.Component {
     </div>
   );
 
-  // 获取的columns不能操作改写title， 所以需要在格式化columns之后重新 改写。
+  /**
+   * 获取的columns不能操作改写title， 所以需要在格式化columns之后重新 改写。
+   * @param {Object} newColumns 之前生成的列
+   */
   renderColumns = newColumns => {
     const { disabled } = this.state;
     const columns = newColumns.map((item, index) => {
@@ -491,6 +486,13 @@ class SampleGroup extends React.Component {
     return columns;
   };
 
+  /**
+   * 表头blur事件，修改表头， 更新columns数据
+   * @param {Object} e blur事件对象
+   * @param {Object} item 每列（column）对象
+   * @param {Number} index 行号
+   * @param {String} id 列的id
+   */
   handleTitleBlur = (e, item, index, id) => {
     const { columns } = this.state;
     const cols = [...columns];
@@ -832,9 +834,7 @@ class SampleGroup extends React.Component {
       datas.forEach(item => {
         group.push(item[`header_${i}`]);
       });
-      const hasOtherValue = group.some(item => {
-        return item && item !== '当前样品';
-      });
+      const hasOtherValue = group.some(item => item && item !== '当前样品');
       const validTrue1 = group.includes('当前样品') && hasOtherValue;
       // const validTrue2 = group.every(item => item === '');
       // const validFalse = validTrue1 || validTrue2;
@@ -850,7 +850,6 @@ class SampleGroup extends React.Component {
       }
     }
     const formattedData = this.formatSubmitData();
-    console.log(formattedData);
     return formattedData;
   };
 
@@ -866,14 +865,13 @@ class SampleGroup extends React.Component {
     });
 
     for (let i = 2; i < tableHeard.length + 2; i++) {
-      if (i === 6) console.log(tableHeard[i - 1]);
       if (!tableHeard[i - 2]) return false;
       // eslint-disable-next-line no-loop-func
       groupSchemeData.forEach(item => {
         if (item[`header_${i}`] === '') return;
         if (item[`header_${i}`] === '当前样品') {
           tableHeard[i - 2].sampleIds.push({
-            sampleId: item.metadataSampleId,
+            sampleId: item.sampleId,
             sampleAlias: item.sampleName,
           });
         } else {
@@ -889,7 +887,7 @@ class SampleGroup extends React.Component {
             tableHeard[i - 2].groups.forEach(gro => {
               if (gro.groupName === item[`header_${i}`]) {
                 gro.sampleIds.push({
-                  sampleId: item.metadataSampleId,
+                  sampleId: item.sampleId,
                   sampleAlias: item.sampleName,
                 });
               }
@@ -899,7 +897,7 @@ class SampleGroup extends React.Component {
             tableHeard[i - 2].groups.forEach(group => {
               if (group.groupName === item[`header_${i}`]) {
                 group.sampleIds.push({
-                  sampleId: item.metadataSampleId,
+                  sampleId: item.sampleId,
                   sampleAlias: item.sampleName,
                 });
               }
@@ -913,14 +911,10 @@ class SampleGroup extends React.Component {
   };
 
   // 将每个对象的head和header的值拼接为字符串作为map的key用来判断是否出现过相同的head
-  getMapKey = (item, head) => {
-    return `${head}_${item[head]}`;
-  };
+  getMapKey = (item, head) => `${head}_${item[head]}`;
 
   // 根据head找到color
-  colorFieldByHead = (item, head) => {
-    return `color_${head.split('_')[1]}`;
-  };
+  colorFieldByHead = (item, head) => `color_${head.split('_')[1]}`;
 
   // 获取从上传来的数据.
   getDataFromUpload = (data, headData) => {
@@ -932,7 +926,7 @@ class SampleGroup extends React.Component {
         if (item[0] === row.sampleName) {
           const num = Object.keys(item).length;
           item.sampleName = row.sampleName;
-          item.metadataSampleId = row.metadataSampleId;
+          item.sampleId = row.sampleId;
           for (let i = 1; i < num; i++) {
             item[`header_${i + 1}`] = item[i];
             item[`color_${i + 1}`] = item[i] === '当前样品' ? '' : getrandomColor();
@@ -1044,6 +1038,6 @@ class SampleGroup extends React.Component {
   }
 }
 
-export default connect(({ componentsModel }) => ({
-  componentsModel,
+export default connect(({ project }) => ({
+  project,
 }))(SampleGroup);
