@@ -24,8 +24,8 @@ class ArgumentModel extends Component {
     const isAdd = window.location.href.indexOf('add') > 0;
     const { argumentList } = this.props.taskModel;
     if (argumentList && argumentList.length > 0) {
-      const list = argumentList.map(item => {
-        item.myId = Date.now();
+      const list = argumentList.map((item, index) => {
+        item.myId = Date.now() + index;
         return item;
       });
       const { dispatch } = this.props;
@@ -78,8 +78,8 @@ class ArgumentModel extends Component {
     api
       .getTaskModelDetail(id)
       .then(res => {
-        const list = res.params.map(item => {
-          item.myId = Date.now();
+        const list = res.params.map((item, index) => {
+          item.myId = Date.now() + index;
           return item;
         });
         const { dispatch } = this.props;
@@ -109,6 +109,8 @@ class ArgumentModel extends Component {
     const { argumentList } = this.state;
     const list = [...argumentList];
     let idx = null;
+    console.log(props);
+    console.log(list);
     const isEdit = list.some((item, index) => {
       if (item.myId === props.myId) {
         idx = index;
@@ -118,6 +120,8 @@ class ArgumentModel extends Component {
       return item.myId === props.myId;
     });
     if (isEdit) {
+      console.log(idx);
+      debugger;
       list[idx] = props;
     } else {
       const listkeys = list.map(item => {
@@ -214,11 +218,12 @@ class ArgumentModel extends Component {
   toViewArgumrnt = (item, idx) => {
     const { formItemType } = this.props.taskModel;
     let title = null;
+    console.log(formItemType);
+
     formItemType.some(v => {
       if (v.type === item.type) {
         title = v.text;
       }
-      return true;
     });
 
     this.setState({
@@ -290,7 +295,7 @@ class ArgumentModel extends Component {
         this.toggleChildrenDrawer(false);
       },
     };
-
+    console.log(argumentList);
     return (
       <div className="task_model_argu_draw_wrap">
         <Drawer
