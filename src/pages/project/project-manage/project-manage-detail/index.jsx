@@ -28,6 +28,7 @@ class ProjectDetail extends Component {
     };
   }
 
+  /** 组件加载时 */
   componentDidMount() {
     const projectId = this.props.match.params.id;
     // 加载table数据

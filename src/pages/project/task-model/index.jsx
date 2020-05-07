@@ -1,4 +1,4 @@
-// 任务模型
+/** 任务模型 */
 import React, { Component } from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import {
@@ -66,12 +66,14 @@ class TaskModel extends Component {
     this.fetchPublisherData = debounce(this.fetchPublisherData, 500);
   }
 
+  /** 组件加载时 */
   componentDidMount() {
     this.getTableData(this.initialValues);
   }
 
   /**
    * 获取表格数据
+   * @param {object} options table数据获取条件
    */
   getTableData = (options = {}) => {
     const {

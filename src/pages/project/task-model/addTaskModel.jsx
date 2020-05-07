@@ -1,4 +1,4 @@
-// 流程模型的编辑
+/** 流程模型的编辑 */
 import React, { Component } from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import {
@@ -20,7 +20,6 @@ import {
 } from 'antd';
 import { LoadingOutlined, PlusOutlined } from '@ant-design/icons';
 import { connect } from 'dva';
-import './index.less';
 import { guid, formatter, versionFun } from '@/utils/utils';
 import classNames from 'classnames';
 import router from 'umi/router';
@@ -30,7 +29,11 @@ import DefaultHeadPicture from '@/assets/imgs/upload_middle.png';
 import ArgumentModel from './components/argumentModel';
 import BeforeTask from './components/beforeTask';
 
+/** 自定义样式 */
+import './index.less';
+
 /**
+ *
  * 图片转化成base64
  */
 function getBase64(img, callback) {
