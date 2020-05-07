@@ -31,8 +31,8 @@ class SampleGroup extends React.Component {
       tableData: tableDatas || [],
       sampleList: sampleLists || [],
       // TODO: 提交时一定要记得改过来
-      // disabled: nextProps.disabled,
-      disabled: false,
+      disabled: nextProps.disabled,
+      // disabled: false,
     };
   }
 

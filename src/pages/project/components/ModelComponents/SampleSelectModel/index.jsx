@@ -21,8 +21,8 @@ class SampleSelect extends React.Component {
     return {
       tableDatas: sampleList || [],
       // TODO: 提交时一定要修改过来
-      // disabled: nextProps.disabled,
-      disabled: false,
+      disabled: nextProps.disabled,
+      // disabled: false,
     };
   }
 
