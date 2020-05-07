@@ -13,11 +13,12 @@ class ProgressMould extends Component {
     percentData: this.props.percentData,
   };
 
+  /** 组件加载 */
   componentDidMount() {
     this.getDelayData()
   }
 
-  // 定时器
+  /** 定时器 */
   // eslint-disable-next-line react/sort-comp
   getDelayData = () => {
     const { percentData } = this.props;
@@ -29,7 +30,10 @@ class ProgressMould extends Component {
     }
   };
 
-  // 查询流程进度及状态
+  /**
+   * 查询流程进度及状态
+   * @param {object} percentData 回传数据
+   *  */
   getProcessesProgressData = percentData => {
     const { setStatus } = this.props
     api.getProcessesProgress({ processIds: [percentData.id].join(',') }).then(res => {
@@ -44,7 +48,10 @@ class ProgressMould extends Component {
     });
   };
 
-  // 流程进度开始
+  /**
+   * 流程进度开始
+   * @param {object} row 回传数据
+   */
   processStart = row => {
     const { percentData } = this.props;
     api.startProcessesProcess(row.id).then(() => {
@@ -55,7 +62,10 @@ class ProgressMould extends Component {
     })
   }
 
-  // 流程进度暂停
+  /**
+   * 流程进度暂停
+   * @param {object} row 回传数据
+   */
   processPause = row => {
     const { percentData } = this.props;
     api.pauseProcessesProcess(row.id).then(() => {
@@ -63,6 +73,7 @@ class ProgressMould extends Component {
     });
   };
 
+  /** 组件销毁前 */
   componentWillUnmount() {
     clearInterval(this.interval);
   }
