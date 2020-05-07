@@ -19,7 +19,7 @@ class Test extends Component {
     const { type, projectId, paramsType } = this.props.match.params;
     // console.log(this.props.match.params);
     const { projectInfor } = this.props.projectManage;
-    console.log(projectInfor);
+    // console.log(projectInfor);
 
     this.state = {
       // TODO:
@@ -72,7 +72,7 @@ class Test extends Component {
     }
 
     if (processType === 'add' && paramsType === undefined) {
-      console.log('新建项目进入页面先清空已选流程的数据');
+      // console.log('新建项目进入页面先清空已选流程的数据');
       sessionStorage.removeItem('introduction');
       sessionStorage.removeItem('processForParams');
       this.props.dispatch({
@@ -85,7 +85,7 @@ class Test extends Component {
     }
 
     if (processType === 'edit' && paramsType === undefined) {
-      console.log('已建项目进入页面先清空已选流程的数据');
+      // console.log('已建项目进入页面先清空已选流程的数据');
       sessionStorage.removeItem('introduction');
       sessionStorage.removeItem('processForParams');
       this.props.dispatch({
@@ -180,6 +180,7 @@ class Test extends Component {
    * @param introduction 存储已选流程数据的方法名
    */
   getData = value => {
+    console.log(value);
     // 存储选中的流程模型数据
     if (!(value === '' || value === undefined)) {
       sessionStorage.setItem('introduction', JSON.stringify(value));
@@ -210,7 +211,7 @@ class Test extends Component {
     let status = false;
 
     if (processType === 'add') {
-      console.log('新建项目跳转，基础信息有值的保存,');
+      // console.log('新建项目跳转，基础信息有值的保存,');
       if (list === '' || list === undefined) {
         status = true;
       }
@@ -234,19 +235,19 @@ class Test extends Component {
         if (paramList.length > 1) {
           paramList.forEach(e => {
             if (item.id === e.processModelId) {
-              console.log('id等于参数模块的id');
+              // console.log('id等于参数模块的id');
               newItem.processesParams = e.params;
             }
           });
         } else {
-          console.log(paramList);
+          // console.log(paramList);
           newItem.processesParams = paramList.params;
         }
         newList.push(newItem);
       });
 
       projectInfor.processes = newList;
-      console.log(projectInfor);
+      // console.log(projectInfor);
       const data = projectInfor;
       api
         .addProjects(data)

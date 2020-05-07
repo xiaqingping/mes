@@ -20,7 +20,7 @@ class BPList extends Component {
   // 顶部表单默认值
   initialValues = {
     page: 1,
-    pageSize: 10,
+    pageSize: 6,
   };
 
   constructor(props) {
@@ -358,7 +358,6 @@ class BPList extends Component {
         >
           <Table
             className="classTableList"
-            scroll={{ y: 400 }}
             rowKey="id"
             loading={loading}
             dataSource={list}
