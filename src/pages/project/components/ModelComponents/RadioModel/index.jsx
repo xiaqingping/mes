@@ -72,7 +72,7 @@ class radioModel extends React.Component {
 
   /**
    * 设置Itemlabel状态拼接
-   * @param {string} value label
+   * @param {string} value Itemlabel
    */
   setLabel = value => {
     const str = JSON.parse(this.state.paramList.isRequired) ? '（必填）' : '（选填）'
