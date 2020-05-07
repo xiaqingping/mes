@@ -1,4 +1,4 @@
-// 项目 文件列表
+/** 项目 文件列表 */
 import { Form, Table, Col, Input, Button } from 'antd';
 import React, { Component } from 'react';
 import { connect } from 'dva';
@@ -29,16 +29,16 @@ class FiledList extends Component {
     rows: 10,
   };
 
-  // 组件挂载时
+  /** 组件挂载时 */
   componentDidMount() {
     this.getCacheData();
     this.getTableData(this.initialValues);
   }
 
-  // 获取此页面需要用到的基础数据
+  /** 获取此页面需要用到的基础数据 */
   getCacheData = () => {};
 
-  // 获取表格数据
+  /** 获取表格数据 */
   getTableData = () => {
     const data = this.props.projectDetail.filedList;
     this.setState({
@@ -47,7 +47,7 @@ class FiledList extends Component {
     });
   };
 
-  // 顶部表单简单搜索
+  /** 顶部表单简单搜索 */
   simpleForm = () => (
     <>
       <Col lg={6} md={8} sm={12}>
@@ -63,6 +63,10 @@ class FiledList extends Component {
     </>
   );
 
+  /**
+   * 设置img icon类型
+   * @param {string} type 文件类型
+   */
   imgtype = type => {
     let res = word;
     if (type === 'excel') {
