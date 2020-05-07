@@ -37,15 +37,14 @@ class Test extends Component {
     };
   }
 
-  /**
+/**
    * 渲染页面时调用
    * @param {Array} paramList 参数数据
    * @param {String} processType url带来的判断类型
    * @param {Object} paramsType 进入参数页面返回时传入的判断类型
-   *  introduction 存储已选流程数据的方法名
-   *  processForParams 存储参数数据的方法名
+   * @param introduction 存储已选流程数据的方法名
+   * @param processForParams 存储参数数据的方法名
    */
-
   componentDidMount() {
     const { processType, paramsType } = this.state;
     this.getData();
@@ -99,10 +98,16 @@ class Test extends Component {
     }
   }
 
-  // 点击打开关联
+
+/**
+ * 点击打开关联
+ * @param {array} projectInfor 新建项目的基础信息
+ * @param {strin} processType 新建项目传入的类型
+ * @param {string} visible 控制模态框的显示收藏
+ * */
   onOpen = () => {
     const { projectInfor, processType } = this.state;
-    console.log(this.state);
+    // console.log(this.state);
     if (processType === 'add' && projectInfor.length === 0) {
       this.setState({
         visible: false,
@@ -122,7 +127,13 @@ class Test extends Component {
     });
   };
 
-  // 删除已选流程
+
+/**
+ * 删除已选流程
+ * @param {object} value 当前数据
+ * @param {Array} tableData 已选中的流程模型的集合
+ * @param {Array} newData 已删除过的流程模型的集合
+ * */
   deleteRow = value => {
     const tableData = this.state.list;
     const newData = tableData.filter(item => item.id !== value.id);
@@ -138,9 +149,9 @@ class Test extends Component {
   /**
    * 打开参数
    * @param {Array} paramList 参数数据
-   * introduction 存储已选流程数据的方法名
-   * projectId 项目id
-   * processModelId 流程模型id
+   * @param introduction 存储已选流程数据的方法名
+   * @param projectId 项目id
+   * @param processModelId 流程模型id
    */
   handleOpen = row => {
     // 参数数据
@@ -166,7 +177,7 @@ class Test extends Component {
   /**
    * 获取模态框选中的流程模型数据
    * @param {Array} list 已选流程
-   * introduction 存储已选流程数据的方法名
+   * @param introduction 存储已选流程数据的方法名
    */
   getData = value => {
     // 存储选中的流程模型数据
@@ -188,8 +199,8 @@ class Test extends Component {
    * @param {String} projectInfor 新建项目的基础信息
    * @param {Array} list 已选流程
    * @param {Array} paramList 参数数据
-   * processType url带来的判断类型
-   * projectId 项目id
+   * @param {String} processType url带来的判断类型
+   * @param {String} projectId 项目id
    */
   handleSave = () => {
     this.setState({
