@@ -26,7 +26,7 @@ module.exports = {
         {
           name: 'process-parameter',
           path:
-            '/project/project-manage/process-parameter/:type/:processModelId/:projectId?/:processId?',
+            '/project/project-manage/process-parameter/:type?/:processModelId/:projectId?/:processId?',
           component: './project/project-manage/project-manage-detail/process-parameter',
         },
         {
