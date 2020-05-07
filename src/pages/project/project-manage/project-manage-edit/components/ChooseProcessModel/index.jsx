@@ -94,7 +94,7 @@ class ChooseProcessModel extends React.Component {
 
   /**
    * 搜索条件
-   * getTableData 获取表格数据的方法名
+   * @param  {string} nameCodeVal 模糊搜索获取到的数据
    */
   simpleForm = () => {
     const { languageCode } = this.props;
@@ -197,7 +197,7 @@ class ChooseProcessModel extends React.Component {
   /**
    * 点击查看流程模型下的任务模型
    * @param {Array} viewlist 存储的流程模型的数据
-   * viewvisible 控制任务模型的模态框是否弹出
+   * @param {string} viewvisible 控制任务模型的模态框是否弹出
    */
   viewModal = item => {
     api.getProcessDetail(item.id).then(res => {
@@ -214,7 +214,7 @@ class ChooseProcessModel extends React.Component {
   /**
    * 点击确定保存数据
    * @param {Array} selecteditem 所有被选择的流程模型数据的集合
-   * onClose 关闭流程模型弹框的方法
+   * @param onClose 关闭流程模型弹框的方法
    */
   handleOk = () => {
     const { selecteditem } = this.state;
