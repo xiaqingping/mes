@@ -158,7 +158,7 @@ class AssociatedProcessModel extends React.Component {
             />
           </FormItem>
         </Col>
-        <Col xxl={11} style={{ textAlign: 'right' }}>
+        <Col xxl={12} style={{ textAlign: 'right' }}>
           <Button type="primary" htmlType="submit">
             查询
           </Button>
@@ -214,7 +214,7 @@ class AssociatedProcessModel extends React.Component {
             />
             <div style={{ float: 'left', marginLeft: '10px' }}>
               <div>{cutString(value, 16)}</div>
-              <div>{cutString(row.name, 16)}</div>
+              <div title={row.name}>{cutString(row.name, 16)}</div>
             </div>
           </>
         ),

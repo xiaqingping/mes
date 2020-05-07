@@ -52,7 +52,7 @@ class ProcessParameter extends Component {
       sampleList: [],
       // 提交的数据
       paramList: [],
-    };
+    }
     // 判断请求类型
     this.determineTheRequestType();
   }
@@ -100,7 +100,6 @@ class ProcessParameter extends Component {
         message.success('添加操作');
         if (param.length > 0) {
           this.getDefaultParams(newParamData);
-          console.log(newParamData);
           const newData = this.compareParams(newParamData, 'sortNo');
           this.setState({ paramGroupList: newData });
         }
@@ -441,7 +440,6 @@ class ProcessParameter extends Component {
     const { paramGroupList, sampleList, requestType } = this.state;
     const data = paramGroupList;
     if (data.length === 0) return false;
-    console.log(data);
     return (
       <>
         <PageHeaderWrapper style={{ marginBottom: 100 }}>
@@ -497,7 +495,7 @@ class ProcessParameter extends Component {
                           />
                         );
 
-                      // // 多选
+                      // 多选
                       if (it.type === 'checkbox')
                         return (
                           <CheckBoxModel

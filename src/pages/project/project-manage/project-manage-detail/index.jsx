@@ -81,7 +81,6 @@ class ProjectDetail extends Component {
 
   render() {
     const { list, loading, projectId } = this.state;
-
     if (JSON.stringify(list) === '{}') return false;
     return (
       <PageHeaderWrapper title={this.navContent(list)}>
