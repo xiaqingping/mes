@@ -1,7 +1,6 @@
 import React from 'react';
-import { Table, Button, Tooltip, Checkbox, Modal } from 'antd';
+import { Table, Button, Checkbox, Modal } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
-import { connect } from 'dva';
 import FileUpload from '../../UploadSequenceFile/sequenUpload';
 import api from '../api/sample.js';
 
@@ -227,13 +226,16 @@ class SampleChoose extends React.Component {
         filters: filterData,
         onFilter: (value, record) => record.sampleCode.includes(value),
         render: (text, record, index) => (
-          <Checkbox
-            onChange={e => this.handleCheckboxChange(e, record, text, undefined, index)}
-            indeterminate={record.indeterminate}
-            checked={record.isChoose}
-          >
-            {text}
-          </Checkbox>
+          <div className={disabled ? 'project_manage_params_sample_choose_checkbox' : ''}>
+            <Checkbox
+              onChange={e => this.handleCheckboxChange(e, record, text, undefined, index)}
+              indeterminate={record.indeterminate}
+              checked={record.isChoose}
+              disabled={disabled}
+            >
+              {text}
+            </Checkbox>
+          </div>
         ),
       },
       {
@@ -244,12 +246,16 @@ class SampleChoose extends React.Component {
 
         render: (text, record, index) =>
           text.map(item => (
-            <div>
+            <div
+              key={item.fileId}
+              style={{ marginBottom: 20 }}
+              className={disabled ? 'project_manage_params_sample_choose_checkbox' : ''}
+            >
               {/* <Tooltip title={item.sequenceFileName} > */}
               <Checkbox
                 onChange={e => this.handleCheckboxChange(e, record, item, index)}
-                key={item.fileId}
                 checked={item.isChoose}
+                disabled={disabled}
               >
                 {item.sequenceFileName}
               </Checkbox>
@@ -264,13 +270,15 @@ class SampleChoose extends React.Component {
         width: 180,
         ellipsis: true,
         render: (text, row) => (
-          <>
+          <div>
             {row.sampleProperties &&
               row.sampleProperties.length &&
-              row.sampleProperties.map(item => (
-                <div>{`${item.sampleSequenceCount} (${item.sampleLengthTotal}bp)`}</div>
+              row.sampleProperties.map((item, index) => (
+                <div className="project_manage_params_sample_choose_checkbox_style" key={index}>
+                  {`${item.sampleSequenceCount} (${item.sampleLengthTotal}bp)`}
+                </div>
               ))}
-          </>
+          </div>
         ),
       },
       {
@@ -280,15 +288,15 @@ class SampleChoose extends React.Component {
         width: 130,
         ellipsis: true,
         render: (text, row) => (
-          <>
+          <div>
             {row.sampleProperties &&
               row.sampleProperties.length &&
-              row.sampleProperties.map(item => (
-                <div>
+              row.sampleProperties.map((item, index) => (
+                <div className="project_manage_params_sample_choose_checkbox_style" key={index}>
                   {`${item.sampleLengthMin}-${item.sampleLengthMax} (avg ${item.sampleLengthAve})`}
                 </div>
               ))}
-          </>
+          </div>
         ),
       },
     ];
@@ -311,13 +319,19 @@ class SampleChoose extends React.Component {
           }
         >
           {!disabled && (
-            <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 10 }}>
               <Button type="primary" onClick={() => this.openUpload(true)}>
                 <UploadOutlined /> 序列文件
               </Button>
             </div>
           )}
-          <Table columns={columns} dataSource={tableData} pagination={false} loading={loading} />
+          <Table
+            columns={columns}
+            dataSource={tableData}
+            pagination={false}
+            loading={loading}
+            size="small"
+          />
           {visible && <FileUpload handleClose={this.handleFileUploadClose} />}
         </Modal>
       </>

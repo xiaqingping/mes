@@ -209,6 +209,16 @@ class UploadSequenceFile extends React.Component {
       ];
     });
 
+    let tableWidth = 0;
+    columns.forEach(col => {
+      if (!col.width) {
+        // eslint-disable-next-line
+        col.width = 150;
+      }
+      tableWidth += col.width;
+      return true;
+    });
+
     return (
       <Modal
         title="上传分组方案"
@@ -237,7 +247,7 @@ class UploadSequenceFile extends React.Component {
         <div style={{ width: '645px', float: 'left', paddingLeft: '45px', position: 'relative' }}>
           <TextArea
             rows={6}
-            style={{ resize: 'none' }}
+            style={{ resize: 'none', marginBottom: 10 }}
             placeholder="粘贴或快速输入，分隔符支持“逗号（，）”、“空格（ ）”、“竖线（|）”、“制表符（）”"
             onBlur={v => {
               this.handleData(v.target.value);
@@ -254,7 +264,7 @@ class UploadSequenceFile extends React.Component {
             loading={loading}
             onChange={this.tableChange}
             pagination={false}
-            scroll={{ y: 260 }}
+            scroll={{ y: 260, x: tableWidth }}
           />
         </div>
       </Modal>
