@@ -15,18 +15,16 @@ class UploadSequenceFile extends React.Component {
 
   constructor(props) {
     super(props);
-    const guuid = guid();
     this.state = {
-      guuid,
       loading: false,
-      visible: false,
       filesNameList: [],
-      countNum: 0,
       tableList: [],
     };
   }
 
-  // 上传按钮
+  /**
+   * 上传按钮DOM渲染
+   */
   uploadButton = () => (
     <div
       style={{
@@ -40,7 +38,10 @@ class UploadSequenceFile extends React.Component {
     </div>
   );
 
-  // 图片的分组
+  /**
+   * 图片的分组
+   * @param {Array} arr 所有图片的集合
+   */
   expoleArr = arr => {
     const result = [];
     for (let i = 0, len = arr.length; i < len; i += 6) {
@@ -49,7 +50,10 @@ class UploadSequenceFile extends React.Component {
     return result;
   };
 
-  // 删除files文件
+  /**
+   * 删除files文件
+   * @param {Object} v 要删除的那条数据对象
+   */
   deleteFiles = v => {
     const { filesNameList, tableList } = this.state;
     for (let i = tableList.length - 1; i >= 0; i--) {
@@ -69,7 +73,10 @@ class UploadSequenceFile extends React.Component {
     });
   };
 
-  // 上传文件
+  /**
+   * 上传文件
+   * @param {Object} e 上传文件的事件对象
+   */
   handleUpload = e => {
     const self = this;
     const file = e.target.files;
@@ -168,7 +175,10 @@ class UploadSequenceFile extends React.Component {
       });
   };
 
-  // 文件列表
+  /**
+   * 文件列表
+   * @param {Object} item 每一条文件信息
+   */
   itemList = item => (
     <List.Item style={{ width: '160px', float: 'left', position: 'relative' }} key={item.id}>
       <span>
@@ -199,19 +209,26 @@ class UploadSequenceFile extends React.Component {
     </List.Item>
   );
 
-  // 上一页
+  /**
+   * 上一页
+   */
   handlePrev = () => {
     this.refs.img.prev();
   };
 
-  // 下一页
+  /**
+   * 下一页
+   */
   handleNext = () => {
     this.refs.img.next();
   };
 
-  // 判断table里面的原始文件数据前面的id
+  /**
+   * 判断table里面的原始文件数据前面的id
+   * @param {Object} item 每一条文件信息
+   * @param {Object} filesNameList 文件列表
+   */
   getFilesContent = (item, filesNameList) => {
-    // console.log(item, filesNameList);
     if (item.sequenceFileName) {
       if (filesNameList.filter(i => i.fileId === item.sourceSequenceFileId).length !== 0) {
         return filesNameList.filter(i => i.fileId === item.sourceSequenceFileId)[0].id;
@@ -220,7 +237,9 @@ class UploadSequenceFile extends React.Component {
     return '';
   };
 
-  // 提交
+  /**
+   * 提交
+   */
   handleOK = () => {
     const { tableList } = this.state;
     const bpCode = 'aa';
@@ -251,7 +270,7 @@ class UploadSequenceFile extends React.Component {
   };
 
   render() {
-    const { loading, visible, filesNameList, tableList } = this.state;
+    const { loading, filesNameList, tableList } = this.state;
     const newFileList = this.expoleArr(filesNameList);
     const columns = [
       {

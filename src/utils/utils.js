@@ -347,7 +347,9 @@ export const isEmpty = str => typeof str === 'undefined' || str === null || str 
  */
 export const getrandomColor = () => {
   const colorStr = Math.floor(Math.random() * 0xFFFFFF).toString(16).toUpperCase();
-  return `#${  "000000".substring(0, 6 - colorStr)  }${colorStr}`;
+  let color = `#${  "000000".substring(0, 6 - colorStr)  }${colorStr}`;
+  color = color.length === 7 ? color : getrandomColor();
+  return color;
 };
 
 /**

@@ -26,6 +26,7 @@ class SampleGroup extends React.Component {
     } else {
       sampleLists = nextProps.sampleList;
     }
+    console.log(sampleLists);
     return {
       tableData: tableDatas || [],
       sampleList: sampleLists || [],
@@ -86,14 +87,10 @@ class SampleGroup extends React.Component {
    */
   componentDidMount() {
     const { tableData } = this.state;
-    this.setState(
-      {
-        groupSchemeData: tableData,
-      },
-      () => {
-        this.transformGroup(this.state.groupSchemeData);
-      },
-    );
+    this.setState({
+      groupSchemeData: tableData,
+    });
+    this.transformGroup(tableData);
     this.props.getFun(this.selectUpdateGroup);
   }
 
@@ -114,7 +111,7 @@ class SampleGroup extends React.Component {
   };
 
   /**
-   *  当样品改变时更新组件
+   *  当样品改变时更新分组组件
    */
   selectUpdateGroup = () => {
     const { sampleList, groupSchemeData, columns } = this.state;
@@ -134,17 +131,19 @@ class SampleGroup extends React.Component {
         mapGro[gro.sampleId] = gro;
       });
       if (mapGro[item.id]) {
+        // TODO:这里当样品选择框修改别名时候， 分组数据并没有刷新，因为这边是直接copy过来的。
         newRow = mapGro[item.id];
       } else {
         colLen.forEach(col => {
           newRow[col] = '';
         });
+        console.log(newRow);
       }
       groupData.push(newRow);
 
       return newRow;
     });
-
+    console.log(groupData);
     this.setState(
       {
         groupSchemeData: groupData,
@@ -348,7 +347,7 @@ class SampleGroup extends React.Component {
             newIt[groItem.dataIndex] = groItem.dupTitle;
             // newIt.id = groItem.id;
           });
-          newIt.sampleName = it.sampleAlias;
+          newIt.sampleName = it.sampleAlias || it.sampleName;
           newData.push(newIt);
         }
       });
@@ -523,6 +522,11 @@ class SampleGroup extends React.Component {
     );
   };
 
+  /**
+   * 删除列
+   * @param {Object} item 每列（column）对象
+   * @param {String} id 每列（column）的id
+   */
   removeColumn = (item, id) => {
     const { columns } = this.state;
     let cols = [...columns];
@@ -538,10 +542,10 @@ class SampleGroup extends React.Component {
       const num = item.dataIndex.split('_')[1];
       const { groupSchemeData } = this.state;
       const tableDatas = [...groupSchemeData];
-      tableDatas.forEach(item => {
+      tableDatas.forEach(v => {
         const prop = `header_${num}`;
-        delete item[prop];
-        return item;
+        delete v[prop];
+        return v;
       });
       this.setState({
         columns: cols,
@@ -550,6 +554,15 @@ class SampleGroup extends React.Component {
     }
   };
 
+  /**
+   * 选取颜色值
+   * @param {String} color 回调的颜色对象
+   * @param {String} value 当前单元格值
+   * @param {Object} row 当前行数据
+   * @param {Number} index 当前行下标
+   * @param {String} col 当前列的列 header_xx
+   * @param {String} color1 当前列的color号比如：color_1
+   */
   handleColorChange = (color, value, row, index, col, color1) => {
     // ---------------------首先判断选择的颜色在model里是否有重复---------
     const { colorStore } = this.props.project;
@@ -574,10 +587,12 @@ class SampleGroup extends React.Component {
     groupData[index] = row;
 
     // 修改之后需要将当前列同组的颜色改成一样的
-    this.setOtherSame(row, value, value, groupData, col, index, color1);
+    this.setOtherSame(row, value, value, groupData, col, color1);
   };
 
-  // 添加列
+  /**
+   * 点击加号添加列
+   */
   handleAdd = () => {
     const { columns, groupSchemeData, disabled } = this.state;
     let cols = columns.slice(0, columns.length - 1);
@@ -633,6 +648,9 @@ class SampleGroup extends React.Component {
     );
   };
 
+  /**
+   * 修改组名时的渲染内容
+   */
   confirmGroupRender = (groupName, preGroupName) => (
     <div>
       <div>
@@ -642,7 +660,14 @@ class SampleGroup extends React.Component {
     </div>
   );
 
-  // 当前的是个组的时候, 先查看这一列是否有同样的祖名, 如果有则,值和颜色都跟这个组一样的, 并且设置表格数据
+  /**
+   * 当前的是个组的时候, 先查看这一列是否有同样的祖名, 如果有则,值和颜色都跟这个组一样的, 并且设置表格数据
+   * @param {Object} row 当前行的数据
+   * @param {String} option blur之后的值， 即需要添加在select里的新的option
+   * @param {Object} datas 分组的表格数据
+   * @param {String} col 当前列的列 header_xx
+   * @param {Number} index 当前行下标
+   */
   judgeOptionAndColor = (row, option, datas, col, index) => {
     const num = col.split('_')[1];
     const hasSame = datas.some(item => {
@@ -671,7 +696,16 @@ class SampleGroup extends React.Component {
     );
   };
 
-  setOtherSame = (row, value, option, datas, col, index, color1) => {
+  /**
+   *  判断当前分组方案里是否有同名的组， 设置组名及颜色
+   * @param {Object} row 当前行的数据
+   * @param {String} value 当前单元格值
+   * @param {String} option blur之后的值， 即需要添加在select里的新的option
+   * @param {Object} datas 分组的表格数据
+   * @param {String} col 当前列的列 header_xx
+   * @param {String} color1 当前列的color号比如：color_1
+   */
+  setOtherSame = (row, value, option, datas, col, color1) => {
     // 先判断这列是否有同名的, 如果有, 则依照原来的, 如果没有就照自己的,
     const num = col.split('_')[1];
     datas.some(item => {
@@ -710,6 +744,16 @@ class SampleGroup extends React.Component {
     );
   };
 
+  /**
+   * 修改组名的弹框相关操作（点击是和否时的两中操作）
+   * @param {Object} row 当前行的数据
+   * @param {String} value 当前单元格值
+   * @param {String} option blur之后的值， 即需要添加在select里的新的option
+   * @param {Object} datas 分组的表格数据
+   * @param {String} col 当前列的列 header_xx
+   * @param {String} color1 当前列的color号比如：color_1
+   * @param {Number} index 当前行下标
+   */
   handleModalConfirm = (datas, row, option, value, col, index, color1) => {
     confirm({
       title: `是否将分组“${value}”改为“${option}”？`,
@@ -718,7 +762,7 @@ class SampleGroup extends React.Component {
       cancelText: '否',
       okText: '是',
       onOk: () => {
-        this.setOtherSame(row, value, option, datas, col, index, color1);
+        this.setOtherSame(row, value, option, datas, col, color1);
       },
       onCancel: () => {
         // 新增组名-- 如果新增的组名在这列存在, 那么颜色值都随之前的颜色随机生成一个,如果不存在颜色随机生成
@@ -727,8 +771,17 @@ class SampleGroup extends React.Component {
     });
   };
 
-  // 设置颜色和组名为空
-  setValueAndColorNone = (datas, row, option, value, col, index, color1) => {
+  /**
+   * 设置颜色和组名为空
+   * @param {Object} row 当前行的数据
+   * @param {String} value 当前单元格值
+   * @param {String} option blur之后的值， 即需要添加在select里的新的option
+   * @param {Object} datas 分组的表格数据
+   * @param {String} col 当前列的列 header_xx
+   * @param {String} color1 当前列的color号比如：color_1
+   * @param {Number} index 当前行下标
+   */
+  setValueAndColorNone = (datas, row, option, col, index, color1) => {
     row[col] = option;
     row[color1] = '';
     datas[index] = row;
@@ -742,7 +795,16 @@ class SampleGroup extends React.Component {
     );
   };
 
-  // 选择组，blur 时候保存数据--- 当选择组的时候要加上默认的颜色
+  /**
+   * 选择组，blur 时候保存数据--- 当选择组的时候要加上默认的颜色
+   * @param {String} e blur时的事件对象
+   * @param {Object} row 当前行的数据
+   * @param {String} value 当前单元格值
+   * @param {Object} datas 分组的表格数据
+   * @param {String} col 当前列的列 header_xx
+   * @param {String} color1 当前列的color号比如：color_1
+   * @param {Number} index 当前行下标
+   */
   handleGroupSelectBlur = (e, value, row, index, col, color1) => {
     const option = e.target.value;
     const { optionList } = this.state;
@@ -768,10 +830,10 @@ class SampleGroup extends React.Component {
             this.handleModalConfirm(datas, row, option, value, col, index, color1);
           }
         } else if (option === '当前样品') {
-          this.setValueAndColorNone(datas, row, option, value, col, index, color1);
+          this.setValueAndColorNone(datas, row, option, col, index, color1);
         }
       } else if (!option) {
-        this.setValueAndColorNone(datas, row, option, value, col, index, color1);
+        this.setValueAndColorNone(datas, row, option, col, index, color1);
       }
     }
 
@@ -782,11 +844,21 @@ class SampleGroup extends React.Component {
     return true;
   };
 
-  // 修改组名
+  /**
+   * 修改组名
+   */
   handleUpdateGroup = (row, col, datas, option, index) => {
     this.judgeOptionAndColor(row, option, datas, col, index);
   };
 
+  /**
+   * 修改组名时的下来框
+   * @param {Object} row 当前行的数据
+   * @param {String} value 当前单元格值
+   * @param {String} col 当前列的列 header_xx
+   * @param {String} color1 当前列的color号比如：color_1
+   * @param {Number} index 当前行下标
+   */
   selectRender = (value, row, index, color1, col) => {
     const { optionList, disabled } = this.state;
     return (
@@ -805,21 +877,34 @@ class SampleGroup extends React.Component {
     );
   };
 
+  /**
+   * 设置上传modal的visible
+   * @param {Boolean} v 是否开启
+   */
   toggleVis = v => {
     this.setState({
       visible: v,
     });
   };
 
+  /**
+   * 上传分组方案
+   */
   uploadGroup = () => {
     this.toggleVis(true);
   };
 
+  /**
+   * 关闭上传分组方案弹框
+   */
   handleCloseUpload = () => {
     this.toggleVis(false);
   };
 
-  // 对数据进行校验
+  /**
+   * 对数据进行校验
+   */
+
   verifyData = () => {
     const { groupSchemeData, columns } = this.state;
     // 1. 一个分组方案里只能是单纯组或者单纯样品
@@ -841,7 +926,7 @@ class SampleGroup extends React.Component {
       const validFalse = validTrue1;
       this.validPass = !validFalse;
       if (validFalse) {
-        message.error('存在空分组方案或者分组方案包含样品和组');
+        message.error('分组方案包含样品和组');
         return false;
       }
       if (this.props.paramList.required && datas && !datas.length) {
@@ -853,7 +938,9 @@ class SampleGroup extends React.Component {
     return formattedData;
   };
 
-  // 提交数据格式化,
+  /**
+   * 提交数据格式化
+   */
   formatSubmitData = () => {
     const { groupSchemeData, columns } = this.state;
     // 数据整理
@@ -910,13 +997,25 @@ class SampleGroup extends React.Component {
     return tableHeard;
   };
 
-  // 将每个对象的head和header的值拼接为字符串作为map的key用来判断是否出现过相同的head
+  /**
+   *  将每个对象的head和header的值拼接为字符串作为map的key用来判断是否出现过相同的head
+   * @param {Object} item 从上传获取来的每一条数据对象
+   * @param {String} head 获取到的header_xx
+   */
+
   getMapKey = (item, head) => `${head}_${item[head]}`;
 
-  // 根据head找到color
-  colorFieldByHead = (item, head) => `color_${head.split('_')[1]}`;
+  /**
+   *  根据head找到color
+   *  @param {String} head 获取到的header_xx
+   */
+  colorFieldByHead = head => `color_${head.split('_')[1]}`;
 
-  // 获取从上传来的数据.
+  /**
+   * 获取从上传来的数据.
+   * @param {Object} data 获取到的表格信息
+   * @param {Object} headData 获取到的表头信息
+   */
   getDataFromUpload = (data, headData) => {
     const { groupSchemeData } = this.state;
     let cols = [this.firstColumn];
@@ -965,11 +1064,11 @@ class SampleGroup extends React.Component {
       headers.forEach(head => {
         // 如果head在map中存在 说明有重复的，那么就设定为第一次出现的值
         if (head2color.has(this.getMapKey(item, head))) {
-          item[this.colorFieldByHead(item, head)] = head2color.get(this.getMapKey(item, head));
+          item[this.colorFieldByHead(head)] = head2color.get(this.getMapKey(item, head));
           return;
         }
         // 是map中没出现过的,那么就保存起来
-        head2color.set(this.getMapKey(item, head), item[this.colorFieldByHead(item, head)]);
+        head2color.set(this.getMapKey(item, head), item[this.colorFieldByHead(head)]);
       });
     });
 
