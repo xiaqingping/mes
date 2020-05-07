@@ -79,7 +79,6 @@ class radioModel extends React.Component {
     return value + str
   }
 
-
   render() {
     const { paramList } = this.state
     const { disabled } = this.props
