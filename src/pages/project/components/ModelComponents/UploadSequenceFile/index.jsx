@@ -11,6 +11,10 @@ import './index.less';
 
 const { TextArea } = Input;
 const { confirm } = Modal;
+
+/**
+ * 上传分组方案弹框组件
+ */
 class UploadSequenceFile extends React.Component {
   static getDerivedStateFromProps(nextProps) {
     return { visible: nextProps.visible, groupTableData: nextProps.groupTableData };
@@ -27,7 +31,10 @@ class UploadSequenceFile extends React.Component {
     };
   }
 
-  // 删除files文件
+  /**
+   * 删除files文件
+   * @param {Object} v 要删除的每一个文件列表里面的文件
+   */
   deleteFiles = v => {
     const { filesNameList, tableList } = this.state;
     for (let i = tableList.length - 1; i >= 0; i--) {
@@ -47,7 +54,10 @@ class UploadSequenceFile extends React.Component {
     });
   };
 
-  // 上传文件
+  /**
+   * 上传文件
+   * @param {Object} e 上传文件的事件对象
+   */
   handleUpload = e => {
     const file = e.target.files;
     const data = new FormData();
@@ -71,7 +81,10 @@ class UploadSequenceFile extends React.Component {
     return true;
   };
 
-  // 文件列表
+  /**
+   * 文件列表
+   * @param {Object} item 每一个文件信息
+   */
   itemList = item => (
     <List.Item style={{ width: '160px', float: 'left', position: 'relative' }} key={item.id}>
       <span>
@@ -102,7 +115,9 @@ class UploadSequenceFile extends React.Component {
     </List.Item>
   );
 
-  // 提交
+  /**
+   * 提交
+   */
   handleOK = () => {
     const { tableList, tableHead } = this.state;
     if (tableList && tableList.length) {
@@ -123,7 +138,10 @@ class UploadSequenceFile extends React.Component {
     }
   };
 
-  // 数据分割
+  /**
+   * 数据分割
+   * @param 当文本域blur时获取到的输入/粘贴的值
+   */
   handleData = value => {
     console.log(value);
     const arr = value.split('\n');
@@ -139,7 +157,9 @@ class UploadSequenceFile extends React.Component {
     this.checkData(data);
   };
 
-  // 数据检查
+  /**
+   * 数据检查
+   */
   checkData = value => {
     const { groupTableData } = this.state;
     // 判断title不能为空
