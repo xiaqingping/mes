@@ -19,17 +19,20 @@ class MemberList extends Component {
     menberInfor: [], // 成员名称描述
   };
 
-  // 组件挂载时
+  /** 组件挂载时 */
   componentDidMount() {
     const { projectId } = this.props;
     this.getCacheData();
     this.getTableData(projectId);
   }
 
-  // 获取此页面需要用到的基础数据
+  /** 获取此页面需要用到的基础数据 */
   getCacheData = () => {};
 
-  // 获取表格数据
+  /**
+   * 获取表格数据
+   * @param {string} projectId 项目列表ID
+   */
   getTableData = projectId => {
     this.setState({ loading: true });
     const data = { projectId };
@@ -44,7 +47,11 @@ class MemberList extends Component {
     this.setState({ loading: false });
   };
 
-  // 修改成员权限
+  /**
+   * 修改成员权限
+   * @param {number} value 成员类型
+   * @param {object} row 表格数据
+   */
   handleUpdateJurisdiction = (value, row) => {
     let jurisdictionName = '';
     if (value === 1) jurisdictionName = '所有者';
@@ -63,7 +70,10 @@ class MemberList extends Component {
     });
   };
 
-  // 确认修改权限
+  /**
+   * 确认修改权限
+   * @param {object} data 表格数据row
+   */
   getEditModelData = data => {
     if (data.type === 'ok') {
       api
@@ -79,14 +89,14 @@ class MemberList extends Component {
     return false;
   };
 
-  // 关闭编辑模态框
+  /** 关闭编辑模态框 */
   onCloseModel = () => {
     this.setState({
       visibleModel: false,
     });
   };
 
-  // 退出
+  /** 退出 */
   handleExit = row => {
     api.deleteMember(row.id).then(() => {
       this.getTableData(this.props.projectId);

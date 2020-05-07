@@ -18,10 +18,14 @@ class NumberModels extends React.Component {
     // 处理paramValue
     const { paramList } = props
     this.state = {
+      // 接收的参数列表
       paramList,
+      // 输入框默认值
       inputValue: paramList.paramValue || 0,
+      // 输入框默认范围
       max: parseFloat(paramList.max) || 1,
       min: parseFloat(paramList.min) || 0,
+      // 组件显示类型
       inputMode: paramList.inputMode
     }
   }
@@ -60,7 +64,7 @@ class NumberModels extends React.Component {
   //
   /**
    * 获取数据 获取保存更改值
-   * @param {String}
+   * @param {String} value 输入框值
    */
   onChange = async value => {
     if(!parseFloat(value)) return

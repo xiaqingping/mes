@@ -30,10 +30,14 @@ class ProjectDetail extends Component {
 
   componentDidMount() {
     const projectId = this.props.match.params.id;
+    // 加载table数据
     this.getTableData(projectId);
   }
 
-  // Tabs切换
+  /**
+   * Tabs切换
+   * @param {string} key Tabs 参数
+   */
   callback = key => {
     this.setState({
       selectKey: key,
@@ -41,7 +45,7 @@ class ProjectDetail extends Component {
     this.operations();
   };
 
-  // Tabs抬头操作
+  /** Tabs抬头操作 */
   operations = () => {
     const { selectKey, list } = this.state;
     if (selectKey === '1') {
@@ -55,14 +59,20 @@ class ProjectDetail extends Component {
     return '';
   };
 
-  // 添加流程
+  /**
+   * 添加流程
+   * @param {object} data 基础信息数据list
+   */
   handleAddProcesses = data => {
     const type = 'edit';
     const projectId = data.id;
     router.push(`/project/project-manage/detail/${type}/${projectId}`);
   };
 
-  // 获取表格数据
+  /**
+   * 获取表格数据
+   * @param {string} projectId 查询字符串guid
+   */
   getTableData = projectId => {
     this.setState({ loading: true });
     api.getProjectProcess(projectId).then(res => {
@@ -71,7 +81,10 @@ class ProjectDetail extends Component {
     this.setState({ loading: false });
   };
 
-  // 导航列表title样式
+  /**
+   * 导航列表title样式
+   * @param {string} list 基础信息数据list
+   */
   navContent = list => {
     if (list) {
       return <div>{list.name}</div>;

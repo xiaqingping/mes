@@ -1,4 +1,4 @@
-// 任务列表 抽屉
+/** 任务列表 抽屉 */
 import React, { Component } from 'react';
 import { connect } from 'dva';
 import api from '@/pages/project/api/projectManageDetail';
@@ -10,13 +10,18 @@ import {
   PlayCircleOutlined,
   PauseCircleOutlined,
 } from '@ant-design/icons';
+
+/** 静态资源 */
 import canshu from '@/assets/imgs/canshu@1x.png';
 import clock from '@/assets/imgs/clock.png';
 import disk from '@/pages/project/api/disk';
 import DefaultHeadPicture from '@/assets/imgs/defaultheadpicture.jpg';
+
 import { calculateTimeDifference } from '../../functions';
-import style from './index.less';
 import TaskExecRecordParam from '../TaskExecRecordParam';
+
+/** 自定义样式 */
+import style from './index.less';
 
 class TaskList extends Component {
   state = {
@@ -26,10 +31,14 @@ class TaskList extends Component {
     paramForData: [],
   };
 
-  // 获取此页面需要用到的基础数据
+  /** 获取此页面需要用到的基础数据 */
   getCacheData = () => {};
 
-  // 是否显示执行记录表
+  /**
+   * 是否显示执行记录表
+   * @param {string} id 数据listId
+   * @param {string} type 类型
+   */
   showTable = (id, type) => {
     const { openId } = this.state;
     const newData = openId;
@@ -52,7 +61,10 @@ class TaskList extends Component {
     });
   };
 
-  // 提示框 时间信息
+  /**
+   * 提示框 时间信息
+   * @param {object} row 回传数据
+   */
   time = row => {
     if (row.status === 1) {
       return <span>未开始</span>;
@@ -69,21 +81,21 @@ class TaskList extends Component {
     return <span>开始：{row.beginDate}</span>;
   };
 
-  // 任务执行记录开始运行
+  /** 任务执行记录开始运行 */
   startExecRecord = row => {
     api.startExecRecord(row.id).then(() => {
       this.props.onClose();
     });
   };
 
-  // 任务执行记录暂停运行
+  /** 任务执行记录暂停运行 */
   pauseExecRecord = row => {
     api.pauseExecRecord(row.id).then(() => {
       this.props.onClose();
     });
   };
 
-  // 查看任执行记录的参数
+  /** searchParameter */
   searchParameter = row => {
     const data = {
       paramValues: row.taskExecRecordParams,
@@ -93,7 +105,7 @@ class TaskList extends Component {
     this.setState({ visibleParam: true, paramForData: data });
   };
 
-  // 关闭 任务执行记录参数抽屉
+  /** 关闭 任务执行记录参数抽屉 */
   onCloseParam = () => {
     this.setState({
       visibleParam: false,

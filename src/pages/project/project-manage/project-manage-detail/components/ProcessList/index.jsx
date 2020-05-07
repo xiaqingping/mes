@@ -1,4 +1,4 @@
-// 流程列表
+/** 流程列表 */
 import { Form, Table, Tag, Divider, message, Avatar, Tooltip } from 'antd';
 import React, { Component } from 'react';
 import { connect } from 'dva';
@@ -39,17 +39,20 @@ class ProcessList extends Component {
     };
   }
 
-  // 组件挂载时
+  /** 组件挂载时 */
   componentDidMount() {}
 
-  // 设置运行完成状态
+  /** 设置运行完成状态 */
   setprocessesStatus = () => {
     this.setState({
       processesStatus: true
     })
   }
 
-  // 获取表格数据
+  /**
+   * 获取表格数据
+   * @param {string} projectId 项目id
+   * */
   getTableData = projectId => {
     this.setState({ loading: true });
     api.getProjectProcess(projectId).then(res => {
@@ -60,7 +63,10 @@ class ProcessList extends Component {
     });
   };
 
-  // 查看任务列表及执行记录
+  /**
+   * 查看任务列表及执行记录
+   * @param {object} row 表格数据
+   */
   searchTaskList = row => {
     const data = { processId: row.id };
     api.getProjectTask(data).then(res => {
@@ -74,7 +80,7 @@ class ProcessList extends Component {
 
   /**
    * 查看流程参数
-   * processesData 流程数据
+   * @param {object} processesData 流程数据
    */
   searchProcessParam = processesData => {
     const { projectId } = this.props;
@@ -99,7 +105,7 @@ class ProcessList extends Component {
     );
   };
 
-  // 删除
+  /** 删除 */
   handleDelete = row => {
     this.setState({ loading: true });
     api.deleteProjectProcess(row.id).then(() => {
@@ -107,7 +113,7 @@ class ProcessList extends Component {
     });
   };
 
-  // 编辑名称描述模态框
+  /** 编辑名称描述模态框 */
   editBasicInfor = row => {
     this.setState({
       test: true,
@@ -118,7 +124,7 @@ class ProcessList extends Component {
 
   /**
    * 获取回传数据进行保存
-   * data 回传数据
+   * @param {object} data 回传数据
    */
   getEditModelData = data => {
     api
@@ -130,14 +136,14 @@ class ProcessList extends Component {
       .catch();
   };
 
-  // 关闭编辑模态框
+  /** 关闭编辑模态框 */
   onCloseModel = () => {
     this.setState({
       visibleModel: false,
     });
   };
 
-  // 关闭任务列表抽屉
+  /** 关闭任务列表抽屉 */
   onCloseTask = () => {
     this.setState({
       visibleDrawer: false,
