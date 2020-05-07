@@ -18,6 +18,7 @@ class UploadSequenceFile extends React.Component {
     this.state = {
       loading: false,
       filesNameList: [],
+      countNum: 0,
       tableList: [],
     };
   }
@@ -63,7 +64,7 @@ class UploadSequenceFile extends React.Component {
       if (result.length !== 0) {
         tableList[i].sampleProperties = result;
       } else {
-        console.log(tableList.splice(i, 1));
+        // console.log(tableList.splice(i, 1));
       }
     }
     const newFiles = filesNameList.filter(item => item.id !== v.id);
@@ -173,6 +174,7 @@ class UploadSequenceFile extends React.Component {
           loading: false,
         });
       });
+    return true;
   };
 
   /**
@@ -231,7 +233,8 @@ class UploadSequenceFile extends React.Component {
   getFilesContent = (item, filesNameList) => {
     if (item.sequenceFileName) {
       if (filesNameList.filter(i => i.fileId === item.sourceSequenceFileId).length !== 0) {
-        return filesNameList.filter(i => i.fileId === item.sourceSequenceFileId)[0].id;
+        const num = filesNameList.filter(i => i.fileId === item.sourceSequenceFileId)[0].id;
+        return num;
       }
     }
     return '';
@@ -322,7 +325,8 @@ class UploadSequenceFile extends React.Component {
             {row.sampleProperties && row.sampleProperties.length !== 0
               ? row.sampleProperties.map(item => (
                   <div>
-                    {`${item.sampleLengthMin}-${item.sampleLengthMax} (avg ${item.sampleLengthAve})`}
+                    {`${item.sampleLengthMin}-${item.sampleLengthMax}
+                    (avg ${item.sampleLengthAve})`}
                   </div>
                 ))
               : ''}
@@ -351,7 +355,16 @@ class UploadSequenceFile extends React.Component {
         maskClosable={false}
       >
         {/* 上传按钮图标 */}
-        <div style={{ float: 'left', width: '170px', height: '142px', position: 'relative' }}>
+        <div
+          style={{
+            float: 'left',
+            width: '170px',
+            height: '142px',
+            position: 'relative',
+            overflow: 'hidden',
+            paddingBottom: 10,
+          }}
+        >
           <div
             style={{
               width: '100%',
@@ -410,7 +423,7 @@ class UploadSequenceFile extends React.Component {
           )}
         </div>
         {/* 表格 */}
-        <div style={{ clear: 'both' }}>
+        <div style={{ clear: 'both', marginTop: 10 }}>
           <Table
             rowKey={record => record.sampleIdentificationCode}
             dataSource={tableList}
