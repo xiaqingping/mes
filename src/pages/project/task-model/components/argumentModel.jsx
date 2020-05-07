@@ -109,8 +109,6 @@ class ArgumentModel extends Component {
     const { argumentList } = this.state;
     const list = [...argumentList];
     let idx = null;
-    console.log(props);
-    console.log(list);
     const isEdit = list.some((item, index) => {
       if (item.myId === props.myId) {
         idx = index;
@@ -120,8 +118,6 @@ class ArgumentModel extends Component {
       return item.myId === props.myId;
     });
     if (isEdit) {
-      console.log(idx);
-      debugger;
       list[idx] = props;
     } else {
       const listkeys = list.map(item => {
@@ -218,8 +214,6 @@ class ArgumentModel extends Component {
   toViewArgumrnt = (item, idx) => {
     const { formItemType } = this.props.taskModel;
     let title = null;
-    console.log(formItemType);
-
     formItemType.some(v => {
       if (v.type === item.type) {
         title = v.text;
@@ -295,7 +289,6 @@ class ArgumentModel extends Component {
         this.toggleChildrenDrawer(false);
       },
     };
-    console.log(argumentList);
     return (
       <div className="task_model_argu_draw_wrap">
         <Drawer
