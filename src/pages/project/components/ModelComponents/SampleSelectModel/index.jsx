@@ -1,5 +1,5 @@
 import React from 'react';
-import { Table, Popover, Button, Popconfirm } from 'antd';
+import { Table, Popover, Button, Popconfirm, message } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { SketchPicker } from 'react-color';
 import { getrandomColor } from '@/utils/utils';
@@ -20,7 +20,9 @@ class SampleSelect extends React.Component {
     }
     return {
       tableDatas: sampleList || [],
-      disabled: nextProps.disabled,
+      // TODO: 提交时一定要修改过来
+      // disabled: nextProps.disabled,
+      disabled: false,
     };
   }
 
@@ -226,15 +228,16 @@ class SampleSelect extends React.Component {
     let list = [...tableData];
     list = list.map(item => {
       item.sampleId = item.id;
+      item.sampleProperties = item.sampleProperties.filter(i => i.isChoose);
       return item;
     });
+    console.log(list);
     const { paramKey, taskModelId } = this.props.paramList;
     const sendData = {
       paramKey,
       taskModelId,
       paramValue: JSON.stringify(list),
     };
-    // TODO: 这里修改了别名，并将修改后的数据传递给index，但是在分组那里获取的数据里并没有别名字段， 以后等文慧过来查看原因
     this.validPass = !(this.props.paramList.required && list && !list.length);
     this.props.getData(sendData, 'sampleSelect', this.validPass);
   };
@@ -295,6 +298,8 @@ class SampleSelect extends React.Component {
       },
     );
     this.props.emitData(list1);
+    this.sendDataOnChange(list1);
+    // this.props.getData(list1);
   };
 
   /**
@@ -340,9 +345,11 @@ class SampleSelect extends React.Component {
    */
   handleChange = (color, record, index) => {
     const { tableData } = this.state;
+    const { colorStore } = this.props.project;
     const row = { ...record };
-    const isIncludes = this.props.project.colorStore.includes(color.hex);
+    const isIncludes = colorStore.includes(color.hex);
     if (isIncludes) {
+      message.warning('存在相同颜色，已为您自动生成一个新颜色！');
       row.color = getrandomColor();
     } else {
       row.color = color.hex;
