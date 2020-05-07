@@ -85,8 +85,7 @@ class ChooseProcessModelCheck extends React.Component {
                 footer={null}
                 style={{marginBottom:'20px'}}
               >
-                <div style={{ height: '400px', paddingLeft: '30px',
-                marginBottom:'20px' }}>
+                <div style={{ height: '400px', paddingLeft: '30px'}}>
                   {/* 上部 */}
                   <div style={{ height: '80px' }}>
                     <Avatar
