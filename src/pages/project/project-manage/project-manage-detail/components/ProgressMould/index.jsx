@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { Progress, Button } from 'antd';
 import api from '@/pages/project/api/projectManageDetail';
 import { PlayCircleOutlined, PauseCircleOutlined } from '@ant-design/icons';
+import { connect } from 'dva'
 
 /**
  * 流程进度局部刷新
@@ -14,7 +15,7 @@ class ProgressMould extends Component {
   };
 
   componentDidMount() {
-    this.getDelayData();
+    this.getDelayData()
   }
 
   // 定时器
@@ -43,17 +44,17 @@ class ProgressMould extends Component {
   };
 
   // 流程进度开始
-  processStart = row => {
+  processStart = async row => {
     const { percentData } = this.props;
-    console.log(row, percentData);
-    api.startProcessesProcess(row.id).then(() => {
-      console.log('start');
+    await api.startProcessesProcess(row.id).then(() => {
       this.getProcessesProgressData(percentData);
       this.interval = setInterval(() => {
         this.getProcessesProgressData(percentData);
-      }, 1000);
-    });
-  };
+      }, 1000)
+    })
+    const { setStatus } = this.props
+    setStatus()
+  }
 
   // 流程进度暂停
   processPause = row => {
@@ -71,9 +72,6 @@ class ProgressMould extends Component {
     const { percent, status, percentData } = this.state;
     if (percent === '' || percent === undefined || percent === null) return false;
     const val = percent.toFixed(2) * 100;
-    // console.log(percent);
-    // console.log(status);
-
     if (status === 1) {
       return (
         <Button
@@ -111,4 +109,6 @@ class ProgressMould extends Component {
   }
 }
 
-export default ProgressMould;
+export default connect(({projectManage}) => ({
+  projectManage
+}))(ProgressMould)
