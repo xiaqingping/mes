@@ -439,11 +439,6 @@ class ProcessParameter extends Component {
   render() {
     const { paramGroupList, sampleList, requestType } = this.state;
     const data = paramGroupList;
-    console.log(data);
-    console.log(data[0]);
-
-    // data[0].groupDescribe ='kkkk'
-    console.log(data.groupDescribe);
     if (data.length === 0) return false;
     return (
       <>
