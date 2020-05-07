@@ -7,6 +7,9 @@ import { connect } from 'dva';
 import SampleChoose from './components/SampleChoose';
 import './index.less';
 
+/**
+ * 样品选择框组件
+ */
 class SampleSelect extends React.Component {
   static getDerivedStateFromProps(nextProps) {
     let sampleList = [];
@@ -15,7 +18,6 @@ class SampleSelect extends React.Component {
     } else {
       sampleList = nextProps.paramList.paramValue;
     }
-    console.log(sampleList);
     return {
       tableDatas: sampleList || [],
       disabled: nextProps.disabled,
@@ -30,7 +32,6 @@ class SampleSelect extends React.Component {
     sampleId: null, // 样品id   点击'已选择n个'时候, 需要传给后台的样品id和已选取文件的id
     chooseFileIds: null, // 所有已选文件id集合 点击选择样品时候, 需要传给后台所有的已选取文件的id;
     fromChoosedFile: null, // 从已选择n个文件来的
-    processId: null, // 流程id， 刚进入页面时候获取表格数据需要传入的id
     columns: [
       {
         title: '样品',
@@ -101,19 +102,45 @@ class SampleSelect extends React.Component {
         title: '序列',
         dataIndex: 'sequence',
         key: 'sequence',
-        render: (text, row) => (
-          <>
-            <div>{`${row.sampleSequenceCount} ( ${row.sampleLengthTotal}bp)`}</div>
-          </>
-        ),
+        render: (text, row) => {
+          const choosedProperties = row.sampleProperties.filter(item => item.isChoose);
+          let sampleSequenceCount = 0;
+          let sampleLengthTotal = 0;
+          choosedProperties.forEach(item => {
+            sampleSequenceCount += item.sampleSequenceCount;
+            sampleLengthTotal += item.sampleLengthTotal;
+          });
+          return (
+            <>
+              <div>{`${sampleSequenceCount} ( ${sampleLengthTotal}bp)`}</div>
+            </>
+          );
+        },
       },
       {
         title: '长度',
         dataIndex: 'length',
         key: 'length',
-        render: (text, row) => (
-          <>{`${row.sampleLengthMin}-${row.sampleLengthMax} (avg ${row.sampleLengthAve})`}</>
-        ),
+        render: (text, row) => {
+          const choosedProperties = row.sampleProperties.filter(item => item.isChoose);
+          let sampleLengthMin = 0;
+          const sampleLengthMins = [];
+          let sampleLengthMax = 0;
+          const sampleLengthMaxs = [];
+          let sampleLengthAve = 0;
+          let sampleLengthTotal = 0;
+          let sampleSequenceCount = 0;
+          choosedProperties.forEach(item => {
+            sampleLengthMins.push(item.sampleLengthMin);
+            sampleLengthMaxs.push(item.sampleLengthMax);
+            sampleLengthTotal += item.sampleLengthTotal;
+            sampleSequenceCount += item.sampleSequenceCount;
+          });
+          sampleLengthAve = (sampleLengthTotal / sampleSequenceCount).toFixed(2);
+          sampleLengthMin = Math.max.apply(null, sampleLengthMins);
+          sampleLengthMax = Math.max.apply(null, sampleLengthMaxs);
+          return <>{`${sampleLengthMin}-${sampleLengthMax} (avg ${sampleLengthAve})`}</>;
+        },
       },
       {
         title: '文件',
@@ -152,33 +179,25 @@ class SampleSelect extends React.Component {
     ],
   };
 
+  /**
+   * 是否校验通过
+   */
   validPass = null;
 
+  /**
+   *  在这个生命周期中将tableDatas数据复制一份，以防止子组件不能改变父组件传过来的值的问题并实现数据渲染页面
+   */
   componentDidMount() {
     const { tableDatas, disabled, columns } = this.state;
-    // let tableData = [];
-    // if (typeof tableDatas === 'string') {
-    //   tableData = JSON.parse(tableDatas);
-    // }
     if (disabled) {
-      this.setState(
-        {
-          tableData: tableDatas,
-          columns: columns.slice(0, columns.length - 1),
-        },
-        () => {
-          this.getTableData();
-        },
-      );
+      this.setState({
+        columns: columns.slice(0, columns.length - 1),
+      });
     }
-    this.setState(
-      {
-        tableData: tableDatas,
-      },
-      () => {
-        this.getTableData();
-      },
-    );
+    this.setState({
+      tableData: tableDatas,
+    });
+    this.getTableData(tableDatas);
   }
 
   // componentDidUpdate(props) {
@@ -200,8 +219,10 @@ class SampleSelect extends React.Component {
   // }
   // }
 
-  sendDataOnChange = () => {
-    const { tableData } = this.state;
+  /**
+   * 每次数据发生改变时都将数据传给父组件
+   */
+  sendDataOnChange = tableData => {
     let list = [...tableData];
     list = list.map(item => {
       item.sampleId = item.id;
@@ -214,75 +235,76 @@ class SampleSelect extends React.Component {
       paramValue: JSON.stringify(list),
     };
     // TODO: 这里修改了别名，并将修改后的数据传递给index，但是在分组那里获取的数据里并没有别名字段， 以后等文慧过来查看原因
-    console.log(list);
     this.validPass = !(this.props.paramList.required && list && !list.length);
     this.props.getData(sendData, 'sampleSelect', this.validPass);
   };
 
-  getTableData = () => {
-    const { tableData } = this.state;
+  /**
+   * 将原始数据加一个已选择标记
+   * @param {Object} tableData 原始样品数据
+   */
+  getTableData = tableData => {
     let list = [...tableData];
-    // const colorStore = [];
     list = list.map(item => {
       item.sampleProperties.forEach(v => {
         v.isChoose = 1;
         return v;
       });
-      // item.color = getrandomColor();
-      // colorStore.push(item.color);
       return item;
     });
-    // this.setColorStore(colorStore);
     this.setState({
       tableData: list,
     });
   };
 
+  /**
+   * 设置colorStore
+   */
   setColorStore = colorStore => {
     const { dispatch } = this.props;
-    // console.log(colorStore);
     dispatch({
-      type: 'componentsModel/setColorStore',
+      type: 'project/setColorStore',
       payload: colorStore,
     });
   };
 
+  /**
+   * 删除样品
+   * @param {Object} row 每行的样品信息
+   */
   handleDelete = row => {
     const { columns, tableData } = this.state;
     const list = [...tableData];
-    // console.log(tableData);
     const columns1 = JSON.parse(JSON.stringify(columns));
     const columns2 = [...columns];
     const list1 = list.filter(item => item.id !== row.id);
-    // console.log(list1);
     const colorStore = [];
     list1.forEach(item => {
       colorStore.push(item.color);
     });
     this.setColorStore(colorStore);
-    // console.log(list1);
-    // this.props.emitData(list1);
     this.setState(
       {
         tableData: list1,
         columns: columns1,
       },
       () => {
-        this.props.emitData(list1);
         this.setState({
           columns: columns2,
         });
       },
     );
+    this.props.emitData(list1);
   };
 
-  // 点击选择样品
+  /**
+   * 点击选择样品，打开弹框并请求后台数据
+   */
   chooseSample = () => {
     this.setState({
       visible: true,
       fromChoosedFile: false,
     });
-    //-----------------------------------------
     const { tableData } = this.state;
     let choosedIds = [];
     tableData.forEach(item => {
@@ -299,6 +321,9 @@ class SampleSelect extends React.Component {
     });
   };
 
+  /**
+   * 点击样品前面的色块， 控制选色器的显示隐藏
+   */
   handleClick = (record, index) => {
     const { tableData } = this.state;
     const row = { ...record };
@@ -310,10 +335,13 @@ class SampleSelect extends React.Component {
     });
   };
 
+  /**
+   * 点击样品前面的色块， 获取颜色
+   */
   handleChange = (color, record, index) => {
     const { tableData } = this.state;
     const row = { ...record };
-    const isIncludes = this.props.componentsModel.colorStore.includes(color.hex);
+    const isIncludes = this.props.project.colorStore.includes(color.hex);
     if (isIncludes) {
       row.color = getrandomColor();
     } else {
@@ -328,10 +356,16 @@ class SampleSelect extends React.Component {
     });
   };
 
-  handleOk = data => {
+  /**
+   * 点击打开选择样品弹框
+   */
+  handleOk = () => {
     this.toggleVis(false);
   };
 
+  /**
+   * 切换弹框的打开闭合
+   */
   toggleVis = v => {
     this.setState({
       visible: v,
@@ -340,25 +374,32 @@ class SampleSelect extends React.Component {
     });
   };
 
+  /**
+   * 点击取消，关闭弹框
+   */
   handleCancel = () => {
     this.toggleVis(false);
   };
 
+  /**
+   * 当blur时候给样品修改别名，并重新设置数据并发送给父组件
+   */
   saveData = (row, index, e) => {
     const { tableData } = this.state;
     const list = [...tableData];
     list[index].sampleAlias = e.target.value;
-    this.setState(
-      {
-        tableData: list,
-      },
-      () => {
-        this.sendDataOnChange();
-      },
-    );
+    this.setState({
+      tableData: list,
+    });
+    this.sendDataOnChange(list);
+    // TODO:这里给他更新了，但是分组并没有更新，是什么原因？
+    this.props.emitData(list);
   };
 
-  // 查看已选择的
+  /**
+   * 查看已选择的文件信息
+   * @param {Object} record 点击查看的那行数据
+   */
   viewSelected = record => {
     this.toggleVis(true);
 
@@ -368,20 +409,17 @@ class SampleSelect extends React.Component {
       checkedFilesIds = [...checkedFilesIds, item.sequenceFileId];
     });
 
-    this.setState(
-      {
-        sampleId: record.id,
-        chooseFileIds: checkedFilesIds,
-        fromChoosedFile: true,
-      },
-      () => {
-        console.log(this.state);
-      },
-    );
-    // 当点击时候传样品id以及已选择文件id;
-    // api.getSelectedData()
+    this.setState({
+      sampleId: record.id,
+      chooseFileIds: checkedFilesIds,
+      fromChoosedFile: true,
+    });
   };
 
+  /**
+   * 获取从上传序列文件弹框得到的数据
+   * @param {Object} data1 从上传序列文件弹框得到的数据
+   */
   receiveData = data1 => {
     const { tableData, fromChoosedFile } = this.state;
     const list = [...tableData];
@@ -393,24 +431,25 @@ class SampleSelect extends React.Component {
         if (!tableData.length) {
           item.color = getrandomColor();
           colorStore.push(item.color);
-        }
-        tableData.forEach(v => {
-          if (item.id === v.id) {
-            item.color = v.color ? v.color : getrandomColor();
+        } else {
+          const tableDataMap = {};
+          tableData.forEach(td => {
+            tableDataMap[td.id] = td;
+          });
+          if (tableDataMap[item.id]) {
+            item.color = tableDataMap[item.id].color
+              ? tableDataMap[item.id].color
+              : getrandomColor();
           } else {
             item.color = getrandomColor();
           }
-          colorStore.push(item.color);
-        });
+        }
         return item;
       });
-
-      this.setState(
-        {
-          tableData: data1,
-        },
-        () => this.sendDataOnChange(),
-      );
+      this.setState({
+        tableData: data1,
+      });
+      this.sendDataOnChange(data1);
       this.setColorStore(colorStore);
       this.props.emitData(data1);
     } else {
@@ -418,13 +457,10 @@ class SampleSelect extends React.Component {
       const index = list.findIndex(item => data1[0].id === item.id);
       data1[0].color = list[index].color || getrandomColor();
       list.splice(index, 1, ...data1);
-      this.setState(
-        {
-          tableData: list,
-        },
-        () => this.sendDataOnChange(),
-      );
-      // console.log(`list${list}`);
+      this.setState({
+        tableData: list,
+      });
+      this.sendDataOnChange(list);
       // 将改变返回给父组件
       this.props.emitData(list);
     }

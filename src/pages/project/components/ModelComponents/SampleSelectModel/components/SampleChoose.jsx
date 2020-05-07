@@ -5,6 +5,9 @@ import { connect } from 'dva';
 import FileUpload from '../../UploadSequenceFile/sequenUpload';
 import api from '../api/sample.js';
 
+/**
+ * 选择样品弹框
+ */
 class SampleChoose extends React.Component {
   static getDerivedStateFromProps(nextProps) {
     return {
@@ -24,6 +27,9 @@ class SampleChoose extends React.Component {
     this.getTableData();
   }
 
+  /**
+   * 获取表格数据
+   */
   getTableData = () => {
     // 请求接口, 获取后台数据
     const { id, chooseFileIds } = this.props;
@@ -31,10 +37,6 @@ class SampleChoose extends React.Component {
       loading: true,
     });
     if (id) {
-      // if (formData.status) {
-      //   newData = { ...newData, status: formData.status.join(',') };
-      //   delete formData.status;
-      // }
       const payload = { id, chooseFileIds: chooseFileIds.join(',') };
 
       api
@@ -91,6 +93,9 @@ class SampleChoose extends React.Component {
     }
   };
 
+  /**
+   * 对获取到的表格数据增加标记
+   */
   handleDataFormat = () => {
     const { tableData } = this.state;
     const list = [...tableData];
@@ -112,7 +117,14 @@ class SampleChoose extends React.Component {
     });
   };
 
-  handleCheckboxChange = (e, row, text, item, index) => {
+  /**
+   * 点击多选框时， 设置多选框的状态，并渲染页面
+   * @param {Object} e 多选框改变时的事件对象
+   * @param {Object} row 当前行数据
+   * @param {Object} item 每一个文件的信息
+   * @param {Number} index 当前行号
+   */
+  handleCheckboxChange = (e, row, item, index) => {
     const { tableData } = this.state;
     let selectRow = tableData.filter(v => v.id === row.id);
     selectRow = selectRow[0];
@@ -158,18 +170,27 @@ class SampleChoose extends React.Component {
     });
   };
 
+  /**
+   * 选则样品以及上传序列文件的弹框的显示和隐藏
+   */
   toggleVis = v => {
     this.setState({
       visible: v,
     });
   };
 
+  /**
+   * 打开上传序列文件
+   */
   openUpload = () => {
     this.setState({
       visible: true,
     });
   };
 
+  /**
+   * 点击选择样品弹框的确认
+   */
   handleOk = () => {
     const { id } = this.props;
     this.props.handleOk();
@@ -183,17 +204,16 @@ class SampleChoose extends React.Component {
       // 点击已选择文件过来的。
       this.props.sendData(tableData);
     }
-
-    // this.toggleVis(false);
   };
 
+  /**
+   * 接受子组件是否关闭弹框指令并根据情况进行相关操作
+   */
   handleFileUploadClose = v => {
-    console.log(v);
     this.toggleVis(v);
     if (v) {
       this.getTableData();
     }
-    // this.toggleVis(false);
   };
 
   render() {
@@ -227,7 +247,7 @@ class SampleChoose extends React.Component {
             <div>
               {/* <Tooltip title={item.sequenceFileName} > */}
               <Checkbox
-                onChange={e => this.handleCheckboxChange(e, record, text, item, index)}
+                onChange={e => this.handleCheckboxChange(e, record, item, index)}
                 key={item.fileId}
                 checked={item.isChoose}
               >

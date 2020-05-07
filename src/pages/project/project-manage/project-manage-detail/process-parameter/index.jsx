@@ -192,7 +192,7 @@ class ProcessParameter extends Component {
       groItem.params.forEach(item => {
         if (item.type === 'sample_select') {
           if (item.paramValue) {
-            sampleList = [...sampleList, JSON.parse(item.paramValue)];
+            sampleList = [...sampleList, ...JSON.parse(item.paramValue)];
           }
           // this.setState({ sampleList: JSON.parse(item.paramValue) });
         }
@@ -386,7 +386,7 @@ class ProcessParameter extends Component {
       }
       this.setState({ processParam: res }, () => {
         this.getParamData(this.state.processParam, this.state.processParamValue);
-      })
+      });
       return false;
     });
   };
