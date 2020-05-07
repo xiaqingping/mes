@@ -61,7 +61,6 @@ class NumberModels extends React.Component {
     return false
   };
 
-  //
   /**
    * 获取数据 获取保存更改值
    * @param {String} value 输入框值

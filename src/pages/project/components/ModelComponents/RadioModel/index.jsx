@@ -1,5 +1,7 @@
 /**
  * 单选框
+ * @module 单选框
+ * @param {object} paramList 基础数据
  * @param {String} paramName 参数名称
  * @param {String} paramKey 参数Key
  * @param {boolean} isRequired 是否必填
@@ -15,14 +17,14 @@ class radioModel extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
+      // 基础数据list
       paramList: props.paramList,
     }
   }
 
   /**
-   * 设置单选下拉列表值
-   * @param {object}
-   * @param {object}
+   * 设置单选下拉列表值value
+   * @param {object} paramList 下拉框value
    */
   setSelectValue = paramList => {
     const selectList = []
@@ -37,7 +39,7 @@ class radioModel extends React.Component {
 
   /**
    * 值的获取, 处理抛出结果
-   * @param {string} 当前元素的值
+   * @param {string} value 当前元素的值
    */
   handleChange = value => {
     const { paramList } = this.state
@@ -51,7 +53,10 @@ class radioModel extends React.Component {
     this.props.getData(data, 'radio', verify);
   }
 
-  // 验证数据
+  /**
+   * 验证数据
+   * @param {object} 待验证数据
+   */
   verifyData = value => {
     const { paramList } = this.state;
     let verify = true
@@ -65,6 +70,10 @@ class radioModel extends React.Component {
     return verify
   }
 
+  /**
+   * 设置Itemlabel状态拼接
+   * @param {string} value label
+   */
   setLabel = value => {
     const str = JSON.parse(this.state.paramList.isRequired) ? '（必填）' : '（选填）'
     return value + str

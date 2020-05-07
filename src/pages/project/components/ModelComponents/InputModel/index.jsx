@@ -20,7 +20,10 @@ class InputModel extends React.Component {
     };
   }
 
-  // 实时获取数据 回传给父组件
+  /**
+   * 实时获取数据 回传给父组件
+   * @param {object} e 目标对象
+   */
   onBlur = e => {
     this.formatSubmitData(e.target.value);
   };
@@ -42,7 +45,10 @@ class InputModel extends React.Component {
     return false;
   };
 
-  // 验证数据
+  /**
+   * 验证数据
+   * @param {string} value 验证值
+   */
   verifyData = value => {
     const { paramName, defaultValue, validDesc, isrequired } = this.state.paramList;
     let error = false;
