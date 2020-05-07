@@ -65,11 +65,11 @@
       padding: 0;
 
       .ant-table-container {
-        padding-left: 30px;
+        // padding-left: 30px;
 
         tbody>tr> {
           td.ant-table-cell {
-            padding: 14px 16px !important;
+            padding: 14px 36px !important;
           }
 
           td.ant-table-cell:first-child {
@@ -132,6 +132,7 @@
   }
 
   .classProcessList {
+    padding-bottom: 30px;
     .ant-table-tbody {
       >tr>.ant-table-cell:nth-child(2) {
         button {
@@ -148,6 +149,10 @@
           }
         }
       }
+    }
+
+    .ant-table thead > tr > th, .ant-table tbody > tr > td, .ant-table tfoot > tr > th, .ant-table tfoot > tr > td {
+      padding: 16px 36px;
     }
   }
 }

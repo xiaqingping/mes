@@ -49,23 +49,32 @@ class ProjectManagement extends Component {
       loading: false,
       list: [],
       projectIds: '', // 模糊搜索id值
-      modelSearchOptions: [], // 任务模型模糊搜素options
+      modelSearchOptions: [], // 项目管理模糊搜素options
     };
     // 异步验证做节流处理
     this.fetchCodeData = debounce(this.fetchCodeData, 500);
   }
 
+  // 组件加载时
   componentDidMount() {
     this.getTableData(this.initialValues);
   }
 
+  // 异步节流处理的方法
   fetchCodeData = value => {
     api.gettProjectManageCodeAndName(value).then(res => {
       this.setState({ modelSearchOptions: res || [] });
     });
   };
 
-  // 获取表格数据
+
+/**
+ * 获取表格数据
+ * @param {string} formData 表单数据
+ * @param {string} pagination 分页
+ * @param {string} projectIds 模糊搜索id值
+ * @param {Array} data 获取表格数据传入的值
+ *  */
   getTableData = (options = {}) => {
     const formData = this.tableSearchFormRef.current.getFieldsValue();
     const { pagination, projectIds } = this.state;
@@ -116,6 +125,10 @@ class ProjectManagement extends Component {
     });
   };
 
+/**
+ * 项目管理的搜索功能的筛选
+ * @param {string} value 用户选择的一条数据
+ *  */
   handleSearchCodeChange = value => {
     const { pagination } = this.state;
     const page = {
@@ -129,7 +142,13 @@ class ProjectManagement extends Component {
     });
   };
 
-  // 分页
+
+
+/**
+ * 分页
+ * @param {Object} pagination 页码对象
+ * @param {Object} filters 所有选择的状态对象
+ */
   handleStandardTableChange = (pagination, filters) => {
     const { filtersData } = this.state;
     let filterData = {};
@@ -155,6 +174,13 @@ class ProjectManagement extends Component {
     });
   };
 
+
+/**
+ * 简单查询条件
+ * @param  fetchCodeData 异步节流处理的方法
+ * @param handleSearchCodeChange 搜索功能
+ * @param modelSearchOptions 项目管理模糊搜索
+ */
   simpleForm = () => {
     const { languageCode, status } = this.props;
     const { modelSearchOptions } = this.state;
@@ -202,7 +228,10 @@ class ProjectManagement extends Component {
     );
   };
 
-  // 完整查询条件
+
+/**
+ * 完整查询条件
+ */
   advancedForm = () => {
     const { languageCode } = this.state;
     return (
@@ -215,7 +244,11 @@ class ProjectManagement extends Component {
     );
   };
 
-  // 新增
+
+/**
+ * 新建项目
+ * @param {object} data 点击新建项目时传入的类型
+ */
   handleAdd = () => {
     const data = { requestType: 'addProject' };
     this.props.dispatch({
@@ -225,7 +258,11 @@ class ProjectManagement extends Component {
     router.push('/project/project-manage/add');
   };
 
-  // 修改
+/**
+ * 修改项目信息
+ * @param {string} requestType 点击新建项目时传入的类型
+ * @param ModifyProject 存入sessionStorage的方法名（项目基础信息）
+ *  */
   editRow = row => {
     const data = row;
     data.requestType = 'editProject';
@@ -238,20 +275,32 @@ class ProjectManagement extends Component {
     router.push(`/project/project-manage/edit/${projectId}`);
   };
 
-  // 项目管理详情页面
+
+/**
+ * 项目管理详情页面
+ * @param {object} projectId 当前数据的id
+ * */
   searchDetails = row => {
     const projectId = row.id;
     router.push(`/project/project-manage/detail/${projectId}`);
   };
 
-  // 删除
+/**
+ * 删除
+ * @param {Array} row 当前数据
+ * */
   deleteRow = row => {
     api.deleteProjectManage(row.id).then(() => {
       this.getTableData();
     });
   };
 
-  // 修改项目状态
+
+/**
+ * 修改项目状态
+ * @param {Array} row 当前数据
+ * @param {object} type 类型
+ * */
   handleUpdateStatus = (row, type) => {
     if (!(row.status === type)) {
       const data = {
@@ -444,7 +493,8 @@ class ProjectManagement extends Component {
         </Card>
         <Card style={{ marginTop: '24px' }}>
           <div>
-            <Button type="primary" onClick={() => this.handleAdd()}>
+            <Button type="primary" onClick={() => this.handleAdd()}
+              style={{ marginBottom: '35px' }}>
               <PlusOutlined />
               新建
             </Button>

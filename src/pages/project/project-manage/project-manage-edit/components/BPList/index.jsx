@@ -115,11 +115,15 @@ class BPList extends Component {
     });
   };
 
-  // 联系方式 搜索
+
+/**
+ * 联系方式 搜索
+ * @param {Array} row 当前数据
+ * @param {object} type 类型
+ * */
   searchPhoneOrEmail = selectedKeys => {
-    console.log(selectedKeys);
     const type = this.visibleEmial(selectedKeys);
-    console.log(type);
+    // console.log(type);
     if (type) {
       this.initialValues.email = selectedKeys;
     } else {
