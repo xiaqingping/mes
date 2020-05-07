@@ -139,8 +139,6 @@ class ProcessParameter extends Component {
 
       // 编辑 参数值
       if (requestType === 'edit' || requestType === 'view') {
-        message.success('编辑操作');
-
         // 有参数值时
         if (newParamData.length > 0 && paramValue.length > 0) {
           // 合并参数和参数值

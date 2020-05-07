@@ -14,7 +14,7 @@ class ProgressMould extends Component {
   };
 
   componentDidMount() {
-    this.getDelayData();
+    this.getDelayData()
   }
 
   // 定时器
@@ -31,9 +31,11 @@ class ProgressMould extends Component {
 
   // 查询流程进度及状态
   getProcessesProgressData = percentData => {
+    const { setStatus } = this.props
     api.getProcessesProgress({ processIds: [percentData.id].join(',') }).then(res => {
       if (res[0].status === 4) {
         clearInterval(this.interval);
+        setStatus()
       }
       this.setState({
         percent: res[0].processProgress,
@@ -45,15 +47,13 @@ class ProgressMould extends Component {
   // 流程进度开始
   processStart = row => {
     const { percentData } = this.props;
-    console.log(row, percentData);
     api.startProcessesProcess(row.id).then(() => {
-      console.log('start');
       this.getProcessesProgressData(percentData);
       this.interval = setInterval(() => {
         this.getProcessesProgressData(percentData);
-      }, 1000);
-    });
-  };
+      }, 1000)
+    })
+  }
 
   // 流程进度暂停
   processPause = row => {
@@ -71,9 +71,6 @@ class ProgressMould extends Component {
     const { percent, status, percentData } = this.state;
     if (percent === '' || percent === undefined || percent === null) return false;
     const val = percent.toFixed(2) * 100;
-    // console.log(percent);
-    // console.log(status);
-
     if (status === 1) {
       return (
         <Button
@@ -111,4 +108,4 @@ class ProgressMould extends Component {
   }
 }
 
-export default ProgressMould;
+export default ProgressMould
