@@ -444,7 +444,7 @@ class ProjectManagement extends Component {
         </Card>
         <Card style={{ marginTop: '24px' }}>
           <div>
-            <Button type="primary" onClick={() => this.handleAdd()}>
+            <Button type="primary" onClick={() => this.handleAdd()} style={{ marginBottom: '35px' }}>
               <PlusOutlined />
               新建
             </Button>

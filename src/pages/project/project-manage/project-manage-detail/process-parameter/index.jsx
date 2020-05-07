@@ -63,7 +63,7 @@ class ProcessParameter extends Component {
   // 判断请求类型
   determineTheRequestType = () => {
     const { requestType, processId, processModelId } = this.state;
-    message.success(requestType);
+    // message.success(requestType);
 
     // 创建项目 添加参数值 / 未保存时修改参数值
     if (requestType === 'add' || requestType === 'update') {
@@ -439,6 +439,11 @@ class ProcessParameter extends Component {
   render() {
     const { paramGroupList, sampleList, requestType } = this.state;
     const data = paramGroupList;
+    console.log(data);
+    console.log(data[0]);
+
+    // data[0].groupDescribe ='kkkk'
+    console.log(data.groupDescribe);
     if (data.length === 0) return false;
     return (
       <>
@@ -453,9 +458,9 @@ class ProcessParameter extends Component {
                       <>
                         <span style={{ display: 'inline-block' }}>{item.groupName}</span>
                         <span style={{ display: 'inline-block', marginLeft: 30 }}>
-                          <Tooltip placement="right" title={<span>{item.groupDescribe}</span>}>
+                          {item.groupDescribe && <Tooltip placement="right" title={<span>{item.groupDescribe}</span>}>
                             <QuestionCircleOutlined />
-                          </Tooltip>
+                          </Tooltip>}
                         </span>
                       </>
                     }
