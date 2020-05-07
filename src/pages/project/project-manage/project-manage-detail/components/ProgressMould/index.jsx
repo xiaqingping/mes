@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import { Progress, Button } from 'antd';
 import api from '@/pages/project/api/projectManageDetail';
 import { PlayCircleOutlined, PauseCircleOutlined } from '@ant-design/icons';
-import { connect } from 'dva'
 
 /**
  * 流程进度局部刷新
@@ -109,6 +108,4 @@ class ProgressMould extends Component {
   }
 }
 
-export default connect(({projectManage}) => ({
-  projectManage
-}))(ProgressMould)
+export default ProgressMould

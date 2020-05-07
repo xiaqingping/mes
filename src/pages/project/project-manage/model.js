@@ -141,13 +141,9 @@ const projectModel = {
     projectInfor: [],
     // 流程参数列表
     paramList: [],
-    processesStatus: false,
   },
   effects: {},
   reducers: {
-    setProcessesStatus(state, { payload }) {
-      return { ...state, processesStatus: payload }
-    },
     setviewlist(state, payload) {
       return { ...state, viewlist: payload };
     },

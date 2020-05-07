@@ -35,13 +35,14 @@ class ProcessList extends Component {
       detailList: [], // 项目信息
       taskList: [], // 任务列表信息
       test: false,
-      processesStatus: false
+      processesStatus: false, // 任务是否运行的状态
     };
   }
 
   // 组件挂载时
   componentDidMount() {}
 
+  // 设置运行完成状态
   setprocessesStatus = () => {
     this.setState({
       processesStatus: true
