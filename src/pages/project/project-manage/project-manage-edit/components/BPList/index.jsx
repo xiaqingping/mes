@@ -20,7 +20,7 @@ class BPList extends Component {
   // 顶部表单默认值
   initialValues = {
     page: 1,
-    pageSize: 10,
+    pageSize: 6,
   };
 
   constructor(props) {
@@ -115,11 +115,15 @@ class BPList extends Component {
     });
   };
 
-  // 联系方式 搜索
+
+/**
+ * 联系方式 搜索
+ * @param {Array} row 当前数据
+ * @param {object} type 类型
+ * */
   searchPhoneOrEmail = selectedKeys => {
-    console.log(selectedKeys);
     const type = this.visibleEmial(selectedKeys);
-    console.log(type);
+    // console.log(type);
     if (type) {
       this.initialValues.email = selectedKeys;
     } else {
@@ -354,7 +358,6 @@ class BPList extends Component {
         >
           <Table
             className="classTableList"
-            scroll={{ y: 400 }}
             rowKey="id"
             loading={loading}
             dataSource={list}

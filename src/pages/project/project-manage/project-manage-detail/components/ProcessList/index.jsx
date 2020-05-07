@@ -35,11 +35,19 @@ class ProcessList extends Component {
       detailList: [], // 项目信息
       taskList: [], // 任务列表信息
       test: false,
+      processesStatus: false, // 任务是否运行的状态
     };
   }
 
   // 组件挂载时
   componentDidMount() {}
+
+  // 设置运行完成状态
+  setprocessesStatus = () => {
+    this.setState({
+      processesStatus: true
+    })
+  }
 
   // 获取表格数据
   getTableData = projectId => {
@@ -72,12 +80,17 @@ class ProcessList extends Component {
     const { projectId } = this.props;
     const { processModelId } = processesData;
     const processId = processesData.id;
+    const { processesStatus } = this.state
 
     let type;
     if (processesData.status === 1) {
       type = 'edit';
     } else {
       type = 'view';
+    }
+
+    if(processesStatus) {
+      type = 'view'
     }
 
     router.push(
@@ -174,6 +187,7 @@ class ProcessList extends Component {
             percentData={row}
             processStart={this.processStart}
             processPause={this.processPause}
+            setStatus={this.setprocessesStatus}
           />
         ),
       },
@@ -238,7 +252,6 @@ class ProcessList extends Component {
         <Form ref={this.tableFormRef}>
           <Table
             style={{ paddingRight: 30 }}
-            scroll={{ y: 400 }}
             rowKey="id"
             loading={loading}
             dataSource={list}

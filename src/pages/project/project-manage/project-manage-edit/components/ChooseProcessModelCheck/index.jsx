@@ -85,8 +85,7 @@ class ChooseProcessModelCheck extends React.Component {
                 footer={null}
                 style={{marginBottom:'20px'}}
               >
-                <div style={{ height: '400px', paddingLeft: '30px',
-                paddingTop:'20px',marginBottom:'20px' }}>
+                <div style={{ height: '400px', paddingLeft: '30px'}}>
                   {/* 上部 */}
                   <div style={{ height: '80px' }}>
                     <Avatar
@@ -125,7 +124,7 @@ class ChooseProcessModelCheck extends React.Component {
                     {viewlist.describe}
                   </div>
                   {/* 表格 */}
-                  <div style={{height:'200px',overflow: 'auto',}}>
+                  <div style={{height:'235px',overflow: 'auto',}}>
                     <Table
                       columns={columns}
                       pagination={false}

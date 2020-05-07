@@ -9,6 +9,7 @@ import StandardTable from '@/components/StandardTable';
 import TableSearchForm from '@/components/TableSearchForm';
 import EditableCell from '@/components/EditableCell';
 import api from '@/api';
+import ProTable from '@ant-design/pro-table';
 
 const FormItem = Form.Item;
 
@@ -91,20 +92,20 @@ class OTU extends Component {
   getTableData = (options = {}) => {
     this.setState({ loading: true });
 
-    const formData = this.tableSearchFormRef.current.getFieldsValue();
+    // const formData = this.tableSearchFormRef.current.getFieldsValue();
     const { pagination } = this.state;
     const { current: page, pageSize: rows } = pagination;
     const data = {
       page,
       rows,
-      ...formData,
+      // ...formData,
       ...options,
     };
 
-    const list = Object.keys(Array.from({ length: 10 })).map(() => ({
+    const list = Object.keys(Array.from({ length: 100 })).map((item, index) => ({
       id: Math.random(),
-      code: '123',
-      projectCode: '456',
+      code: Math.random(),
+      projectCode: `456${index}`,
       taskCode: '789',
       mainCode: '123456789',
       operator: '老王',
@@ -148,7 +149,6 @@ class OTU extends Component {
   render() {
     const { pagination, selectedRows, list, loading } = this.state;
     let tableWidth = 0;
-
     const components = {
       body: {
         cell: EditableCell,
@@ -157,7 +157,7 @@ class OTU extends Component {
 
     let columns = [
       {
-        title: '编号',
+        title: '编号编号',
         dataIndex: 'code',
       },
       {
@@ -222,29 +222,18 @@ class OTU extends Component {
 
     return (
       <PageHeaderWrapper>
-        <Card bordered={false}>
-          <div className="tableList">
-            <TableSearchForm
-              ref={this.tableSearchFormRef}
-              initialValues={this.initialValues}
-              getTableData={this.getTableData}
-              simpleForm={this.simpleForm}
-            />
-            <Form ref={this.tableFormRef}>
-              <StandardTable
-                scroll={{ x: tableWidth }}
-                rowClassName="editable-row"
-                selectedRows={selectedRows}
-                components={components}
-                loading={loading}
-                data={{ list, pagination }}
-                columns={columns}
-                onSelectRow={this.handleSelectRows}
-                onChange={this.handleStandardTableChange}
-              />
-            </Form>
-          </div>
-        </Card>
+        {/* <Card bordered={false}> */}
+        <Form ref={this.tableFormRef}>
+          <ProTable
+            headerTitle="查询表格"
+            rowKey="key"
+            request={() => ({ data: list })}
+            columns={columns}
+            options={false}
+            // form={pagination}
+          />
+        </Form>
+        {/* </Card> */}
       </PageHeaderWrapper>
     );
   }
