@@ -18,7 +18,6 @@ class SampleSelect extends React.Component {
     } else {
       sampleList = nextProps.paramList.paramValue;
     }
-    console.log(sampleList);
 
     return {
       tableDatas: sampleList || [],
@@ -236,13 +235,14 @@ class SampleSelect extends React.Component {
       return item;
     });
     console.log(list);
-    const { paramKey, taskModelId } = this.props.paramList;
+    const { paramKey, taskModelId, id } = this.props.paramList;
     const sendData = {
       paramKey,
       taskModelId,
       paramValue: JSON.stringify(list),
+      groupId: id, // 每个参数分组的id，先定groupId这个字段， 以后要改再改
     };
-    this.validPass = !(this.props.paramList.required && list && !list.length);
+    this.validPass = !(this.props.paramList.isrequired && list && !list.length);
     this.props.getData(sendData, 'sampleSelect', this.validPass);
   };
 
@@ -252,10 +252,10 @@ class SampleSelect extends React.Component {
    */
   getTableData = tableData => {
     let list = [...tableData];
-    console.log(list);
-    const colorStore = [];
+    let colorStore = [];
     list = list.map(item => {
-      colorStore.push(item.color);
+      colorStore = [...colorStore, item.color];
+      // colorStore.push(item.color);
       item.sampleProperties.forEach(v => {
         v.isChoose = 1;
         return v;
@@ -265,7 +265,10 @@ class SampleSelect extends React.Component {
     this.setState({
       tableData: list,
     });
-    this.setColorStore(colorStore);
+    const storeColor = this.props.project.colorStore;
+    // 因为样品选择和分组方案加载完成时都会设置颜色store， 为防止覆盖，所以才这样写
+    const colors = [...colorStore, ...storeColor];
+    this.setColorStore([...new Set(colors)]);
   };
 
   /**
@@ -353,19 +356,20 @@ class SampleSelect extends React.Component {
    */
   handleChange = (color, record, index) => {
     const { tableData } = this.state;
-    const { colorStore } = this.props.project;
+    let { colorStore } = this.props.project;
     const row = { ...record };
     const isIncludes = colorStore.includes(color.hex);
+    colorStore = colorStore.filter(item => item !== color.hex);
     if (isIncludes) {
       message.warning('存在相同颜色，已为您自动生成一个新颜色！');
       row.color = getrandomColor();
     } else {
       row.color = color.hex;
     }
+    this.setColorStore([...colorStore, row.color]);
     row.visible = false;
     const datas = [...tableData];
     datas[index] = row;
-
     this.setState({
       tableData: datas,
     });
@@ -437,14 +441,21 @@ class SampleSelect extends React.Component {
   receiveData = data1 => {
     const { tableData, fromChoosedFile } = this.state;
     const list = [...tableData];
+    const colors = this.props.project.colorStore;
+    const sampleColors = tableData.map(s => s.color);
 
-    const colorStore = [];
     // 从选择样品进来的
     if (!fromChoosedFile) {
+      // 如果从选择样品进来，因为是全覆盖， 所以，将之前样品的color全部从store里去掉，之后再统一加上
+      colors.forEach((c, idx) => {
+        if (sampleColors.includes(c)) {
+          colors.splice(idx, 1, '');
+        }
+      });
+      const cols = colors.filter(i => i !== '');
       data1.forEach(item => {
         if (!tableData.length) {
           item.color = getrandomColor();
-          colorStore.push(item.color);
         } else {
           const tableDataMap = {};
           tableData.forEach(td => {
@@ -463,8 +474,9 @@ class SampleSelect extends React.Component {
       this.setState({
         tableData: data1,
       });
+      const colorStore = data1.map(i => i.color);
       this.sendDataOnChange(data1);
-      this.setColorStore(colorStore);
+      this.setColorStore([...colorStore, ...cols]);
       this.props.emitData(data1);
     } else {
       // 从已选择进来的
@@ -481,6 +493,7 @@ class SampleSelect extends React.Component {
   };
 
   render() {
+    console.log(this.props.project.colorStore);
     const { visible, sampleId, chooseFileIds, tableData, columns, disabled } = this.state;
     const { paramName } = this.props.paramList;
     if (typeof tableData === 'string') return false;
