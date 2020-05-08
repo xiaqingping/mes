@@ -179,6 +179,7 @@ class Test extends Component {
    * @param introduction 存储已选流程数据的方法名
    */
   getData = value => {
+
     // 存储选中的流程模型数据
     if (!(value === '' || value === undefined)) {
       sessionStorage.setItem('introduction', JSON.stringify(value));

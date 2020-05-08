@@ -14,7 +14,7 @@ class paramList extends Component {
   constructor(props) {
     super(props);
     const { metadataRow } = this.props.htsCache;
-    console.log(metadataRow);
+    // console.log(metadataRow);
     this.state = {
       metadataRow,
       loading: false,
@@ -107,7 +107,7 @@ class paramList extends Component {
   }
 
   componentDidMount() {
-    console.log(this.props);
+    // console.log(this.props);
     const { metadataRow } = this.props.htsCache;
     if (metadataRow.length === 0) {
       message.warning('暂无数据');
@@ -128,7 +128,7 @@ class paramList extends Component {
     const { metadataRow } = this.state;
 
     api.metadata.getMetadataAnalysisParam(metadataRow.id).then(res => {
-      console.log(res);
+      // console.log(res);
       if (
         res &&
         res.samples !== undefined &&
@@ -202,7 +202,8 @@ class paramList extends Component {
 
   // 查看序列文件 抽屉
   searchFieldDrawer = row => {
-    this.setState({ visibleField: true, rowData: row.sequenceFileList });
+    this.setState({ visibleField: true, rowData: row.sampleProperties })
+    // this.setState({ visibleField: true, rowData: row.sequenceFileList });
   };
 
   // 关闭序列文件抽屉
@@ -503,7 +504,7 @@ class paramList extends Component {
       <PageHeaderWrapper className="classParamList">
         <TableModel
           title="样品"
-          rowkey="id"
+          rowkey={newSampleColumns.key}
           loading={loading}
           data={sampleData}
           columns={newSampleColumns}
@@ -514,7 +515,7 @@ class paramList extends Component {
         />
         <TableModel
           title="分组方案"
-          rowkey="id"
+          rowkey={newGroupColumns.key}
           loading={loading}
           data={groupSchemeData}
           columns={newGroupColumns}
@@ -522,7 +523,7 @@ class paramList extends Component {
         />
         <TableModel
           title="环境因子表"
-          rowkey="id"
+          rowkey={newEnvironmentalFactorColumns.key}
           loading={loading}
           data={environmentalFactorData}
           columns={newEnvironmentalFactorColumns}
@@ -530,6 +531,7 @@ class paramList extends Component {
         />
 
         {/* 序列文件抽屉 */}
+        {/* {console.log(rowData)} */}
         <FieldDrawer visible={visibleField} onClose={this.onCloseFieldDrawer} data={rowData} />
       </PageHeaderWrapper>
     );

@@ -9,14 +9,13 @@ import { Table, Card } from 'antd';
 const TableModel = props => (
   <Card bordered={false} title={props.title} style={{ marginBottom: 30 }}>
     <Table
-      // scroll={{ x: props.tableWidth }}
-      rowKey="id"
+      rowKey={props.rowKey || 'id'}
       loading={props.loading}
       pagination={false}
       columns={props.columns}
       dataSource={props.data}
     />
   </Card>
-);
+)
 
-export { TableModel };
+export { TableModel }
