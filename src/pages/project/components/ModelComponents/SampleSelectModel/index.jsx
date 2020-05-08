@@ -18,6 +18,8 @@ class SampleSelect extends React.Component {
     } else {
       sampleList = nextProps.paramList.paramValue;
     }
+    console.log(sampleList);
+
     return {
       tableDatas: sampleList || [],
       // TODO: 提交时一定要修改过来
@@ -48,6 +50,7 @@ class SampleSelect extends React.Component {
                   height: 20,
                   backgroundColor: record.color,
                   position: 'relative',
+                  borderRadius: 2,
                 }}
                 onClick={() => {
                   this.handleClick(record, index);
@@ -72,6 +75,7 @@ class SampleSelect extends React.Component {
                     height: 20,
                     backgroundColor: record.color,
                     position: 'relative',
+                    borderRadius: 2,
                   }}
                   onClick={() => {
                     this.handleClick(record, index);
@@ -243,12 +247,15 @@ class SampleSelect extends React.Component {
   };
 
   /**
-   * 将原始数据加一个已选择标记
+   * 给原始数据加一个已选择标记
    * @param {Object} tableData 原始样品数据
    */
   getTableData = tableData => {
     let list = [...tableData];
+    console.log(list);
+    const colorStore = [];
     list = list.map(item => {
+      colorStore.push(item.color);
       item.sampleProperties.forEach(v => {
         v.isChoose = 1;
         return v;
@@ -258,6 +265,7 @@ class SampleSelect extends React.Component {
     this.setState({
       tableData: list,
     });
+    this.setColorStore(colorStore);
   };
 
   /**
@@ -399,7 +407,6 @@ class SampleSelect extends React.Component {
       tableData: list,
     });
     this.sendDataOnChange(list);
-    // TODO:这里给他更新了，但是分组并没有更新，是什么原因？
     this.props.emitData(list);
   };
 
@@ -475,9 +482,15 @@ class SampleSelect extends React.Component {
 
   render() {
     const { visible, sampleId, chooseFileIds, tableData, columns, disabled } = this.state;
+    const { paramName } = this.props.paramList;
     if (typeof tableData === 'string') return false;
     return (
-      <>
+      <div className="project_manage_sample_select_table_wrap">
+        <div
+          style={{ fontSize: 15, color: 'rgba(0,0,0,.65)', fontWeight: 'bold', marginBottom: 18 }}
+        >
+          {paramName}
+        </div>
         <div className="project_manage_sample_select_table">
           <Table columns={columns} dataSource={tableData} pagination={false} />
         </div>
@@ -501,7 +514,7 @@ class SampleSelect extends React.Component {
             sendData={v => this.receiveData(v)}
           />
         )}
-      </>
+      </div>
     );
   }
 }
