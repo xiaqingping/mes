@@ -1,15 +1,18 @@
 /**
  * OTU分析
  */
-import { Card, Col, Divider, Form, Input, Badge } from 'antd';
+import { Card, Col, Divider, Form, Input, Avatar, Badge, Tag, Button } from 'antd';
+import { PlusOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import React, { Component } from 'react';
 import { connect } from 'dva';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import StandardTable from '@/components/StandardTable';
-import TableSearchForm from '@/components/TableSearchForm';
+import DefaultHeadPicture from '@/assets/imgs/defaultheadpicture.jpg';
 import EditableCell from '@/components/EditableCell';
-import api from '@/api';
+import api from '@/pages/project/api/processModel/';
+import disk from '@/pages/project/api/disk';
 import ProTable from '@ant-design/pro-table';
+import { formatter, getOperates, cutString } from '@/utils/utils';
 
 const FormItem = Form.Item;
 
@@ -41,10 +44,10 @@ class OTU extends Component {
   };
 
   // 组件挂载时
-  componentDidMount() {
-    this.getCacheData();
-    this.getTableData(this.initialValues);
-  }
+  // componentDidMount() {
+  //   this.getCacheData();
+  //   // this.getTableData(this.initialValues);
+  // }
 
   // 顶部表单简单搜索
   simpleForm = () => (
@@ -74,12 +77,12 @@ class OTU extends Component {
   getCacheData = () => {};
 
   // 分页
-  handleStandardTableChange = data => {
-    this.getTableData({
-      page: data.current,
-      rows: data.pageSize,
-    });
-  };
+  // handleStandardTableChange = data => {
+  //   this.getTableData({
+  //     page: data.current,
+  //     rows: data.pageSize,
+  //   });
+  // };
 
   // 选择行
   handleSelectRows = rows => {
@@ -91,152 +94,184 @@ class OTU extends Component {
   // 获取表格数据
   getTableData = (options = {}) => {
     this.setState({ loading: true });
-
     // const formData = this.tableSearchFormRef.current.getFieldsValue();
-    const { pagination } = this.state;
-    const { current: page, pageSize: rows } = pagination;
+    // console.log(options);
+    const { pagination, processCode, publisherCode } = this.state;
+    const { pageSize: rows = 10 } = pagination;
+    const newData = [];
+    const changePage = false;
+    // if (formData.status) {
+    //   changePage = true;
+    //   newData = { ...newData, status: formData.status.join(',') };
+    //   delete formData.status;
+    // }
+
+    // if (formData.publishDate) {
+    //   changePage = true;
+    //   newData = {
+    //     ...newData,
+    //     publishBeginDate: formData.publishDate[0].format('YYYY-MM-DD'),
+    //     publicEndDate: formData.publishDate[1].format('YYYY-MM-DD'),
+    //   };
+    //   delete formData.publishDate;
+    // }
+
+    // if (formData.name) {
+    //   changePage = true;
+    //   newData = { ...newData, code: processCode };
+    //   delete formData.name;
+    // }
+    // if (formData.publisherName) {
+    //   changePage = true;
+    //   newData = { ...newData, publisherCode };
+    //   delete formData.publisherName;
+    // }
+    const newPage = changePage ? { page: 1 } : { page: options.current };
     const data = {
-      page,
+      ...newPage,
       rows,
+      ...newData,
       // ...formData,
       ...options,
     };
+    console.log(data);
+    api.getProcess(data).then(res => {
+      this.setState({
+        list: res.rows,
+      });
 
-    const list = Object.keys(Array.from({ length: 100 })).map((item, index) => ({
-      id: Math.random(),
-      code: Math.random(),
-      projectCode: `456${index}`,
-      taskCode: '789',
-      mainCode: '123456789',
-      operator: '老王',
-      startTime: '2020/3/19',
-      endTime: '2020/3/20',
-      status: 1,
-    }));
-    const res = {
-      total: 10,
-      rows: list,
-    };
-    this.setState({
-      list: res.rows,
-      pagination: {
-        current: data.page,
-        pageSize: data.rows,
-        total: res.total,
-      },
-      loading: false,
+      this.setState({
+        pagination: {
+          current: data.page,
+          pageSize: data.rows,
+          total: res.total,
+        },
+        loading: false,
+      });
     });
   };
 
   // 保存和修改之后的保存
-  saveRow = async index => {
-    const { storages } = this.props;
-    try {
-      const row = await this.tableFormRef.current.validateFields();
-      const storageName = storages.filter(e => e.code === row.storageCode)[0].name;
-      const { list } = this.state;
-      const newData = { ...list[index], ...row, storageName };
-      if (newData.id < 0) {
-        api.seqfactory.addSeqfactory(newData).then(() => this.getTableData());
-      } else {
-        api.seqfactory.updateSeqfactory(newData).then(() => this.getTableData());
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  // saveRow = async index => {
+  //   const { storages } = this.props;
+  //   try {
+  //     const row = await this.tableFormRef.current.validateFields();
+  //     const storageName = storages.filter(e => e.code === row.storageCode)[0].name;
+  //     const { list } = this.state;
+  //     const newData = { ...list[index], ...row, storageName };
+  //     if (newData.id < 0) {
+  //       api.seqfactory.addSeqfactory(newData).then(() => this.getTableData());
+  //     } else {
+  //       api.seqfactory.updateSeqfactory(newData).then(() => this.getTableData());
+  //     }
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
 
   render() {
     const { pagination, selectedRows, list, loading } = this.state;
-    let tableWidth = 0;
-    const components = {
-      body: {
-        cell: EditableCell,
-      },
-    };
-
-    let columns = [
+    const { status } = this.props;
+    const columns = [
       {
-        title: '编号编号',
+        title: '编号/名称',
         dataIndex: 'code',
-      },
-      {
-        title: '项目编号',
-        dataIndex: 'projectCode',
-      },
-      {
-        title: '任务编号',
-        dataIndex: 'taskCode',
-      },
-      {
-        title: '主任务编号',
-        dataIndex: 'mainCode',
-      },
-      {
-        title: '操作人',
-        dataIndex: 'operator',
-      },
-      {
-        title: '开始/结束时间',
-        dataIndex: 'time',
-        render: (text, row) => (
+        width: 300,
+        render: (value, row) => (
           <>
-            {row.startTime}
-            <br />
-            {row.endTime}
+            <Avatar
+              src={
+                row.picture ? disk.downloadFiles(row.picture, { view: true }) : DefaultHeadPicture
+              }
+              style={{ float: 'left', width: '46px', height: '46px' }}
+            />
+            <div style={{ float: 'left', marginLeft: '10px' }}>
+              <div>{value}</div>
+              <div style={{ color: '#B9B9B9' }}>{row.name}</div>
+            </div>
           </>
+        ),
+      },
+      {
+        title: '描述',
+        dataIndex: 'describe',
+        width: 400,
+        render: value => <div title={value}>{cutString(value, 115)}</div>,
+      },
+      {
+        title: '发布人/时间',
+        dataIndex: 'publisherName',
+        width: 200,
+        render: (value, row) => (
+          <>
+            <div>{value}</div>
+            <div>{row.publishDate}</div>
+          </>
+        ),
+      },
+      {
+        title: '版本',
+        dataIndex: 'version',
+        width: 140,
+        render: value => (
+          <Tag color="green" style={{ padding: '0 10px' }}>
+            {value}
+          </Tag>
         ),
       },
       {
         title: '状态',
         dataIndex: 'status',
-        render: text => {
-          if (text !== 1) return <Badge status="error" text="失败" />;
-          return <Badge status="success" text="正常" />;
-        },
-      },
-      {
-        fixed: 'right',
-        title: '操作',
-        width: 130,
-        render: () => (
-          <>
-            <a>终止</a>
-            <Divider type="vertical" />
-            <a>挂起</a>
-            <Divider type="vertical" />
-            <a>参数</a>
-          </>
+        width: 150,
+        filters: status,
+        render: value => (
+          <Badge
+            status={formatter(status, value, 'value', 'status')}
+            text={formatter(status, value, 'value', 'text')}
+          />
         ),
       },
     ];
 
-    columns = columns.map(col => {
-      const colWidth = col.width || 100;
-      tableWidth += colWidth;
-      return {
-        ...col,
-        width: colWidth,
-      };
-    });
-
     return (
       <PageHeaderWrapper>
         {/* <Card bordered={false}> */}
-        <Form ref={this.tableFormRef}>
-          <ProTable
-            headerTitle="查询表格"
-            rowKey="key"
-            request={() => ({ data: list })}
-            columns={columns}
-            options={false}
-            // form={pagination}
-          />
-        </Form>
+        {/* <Form ref={this.tableFormRef}> */}
+        <ProTable
+          headerTitle={
+            <Button
+              type="primary"
+              // onClick={() => this.handleModalVisible()}
+              // style={{ marginBottom: '35px' }}
+            >
+              <PlusOutlined />
+              新建
+            </Button>
+          }
+          rowKey="id"
+          request={params => {
+            this.getTableData(params);
+            return { data: list };
+          }}
+          columns={columns}
+          options={false}
+          // search={false}
+          pagination={{
+            showSizeChanger: true,
+            showQuickJumper: true,
+            showTotal: (total, range) => {
+              const totalPage = Math.ceil(total / (pagination.pageSize || 10));
+              const currentPage = Math.ceil(range[0] / (pagination.pageSize || 10));
+              return `共 ${total} 条记录 第 ${currentPage}/${totalPage} 页`;
+            },
+            ...pagination,
+          }}
+        />
+        {/* </Form> */}
         {/* </Card> */}
       </PageHeaderWrapper>
     );
   }
 }
 
-export default connect()(OTU);
+export default OTU;

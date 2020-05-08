@@ -7,7 +7,7 @@
  * @param {Function} handleUnPublish 禁用的方法
  */
 import React, { Component } from 'react';
-import { Drawer, Avatar, Tag, List, Card, Badge, Spin, Empty } from 'antd';
+import { Drawer, Avatar, Tag, List, Card, Badge, Spin, Empty, message } from 'antd';
 import { DownOutlined, UpOutlined } from '@ant-design/icons';
 import { formatter, cutString } from '@/utils/utils';
 import './index.less';
@@ -76,19 +76,13 @@ class DrawerTool extends Component {
       this.setState({
         parameterVisible: false,
       });
+      message.error('只有未发布状态可以编辑！');
       return false;
     }
-    const newData = arr.map((item, index) => {
-      const itemLength = arr.length;
-      return { ...item, sortNo: itemLength - index };
-    });
+    const newData = arr.map((item, index) => ({ ...item, sortNo: index }));
     const sonData = newData;
     newData.map((item, index) => {
-      sonData[index].params = item.params.map((i, ind) => {
-        const iLength = item.params.length;
-        return { ...i, sortNo: iLength - ind };
-      });
-      return true;
+      sonData[index].params = item.params.map((i, ind) => ({ ...i, sortNo: ind }));
     });
     sonData[0].sortNo = 0;
     const data = JSON.parse(JSON.stringify(detailValue));
@@ -102,7 +96,7 @@ class DrawerTool extends Component {
     this.setState({
       parameterVisible: false,
     });
-    return true;
+    this.props.onClose();
   };
 
   /**
