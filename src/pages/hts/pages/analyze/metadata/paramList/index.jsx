@@ -328,7 +328,8 @@ class paramList extends Component {
       const { groupSchemeName } = groupItem;
 
       // 行数据遍历
-      rowData.forEach(rowItem => {
+      rowData.forEach(rowItems => {
+        const rowItem = rowItems
         // 分组方案下的 分组列表不为空
         if (groupItem.groups !== null && groupItem.groups.length !== 0) {
           // 分组列表遍历
@@ -369,7 +370,8 @@ class paramList extends Component {
       });
     });
 
-    rowData.forEach(rItem => {
+    rowData.forEach(rItems => {
+      const rItem = rItems
       columns.forEach(cItem => {
         Object.keys(rItem).map(key => {
           if (rItem[key] === cItem.title) {
@@ -393,7 +395,8 @@ class paramList extends Component {
       const { environmentFactorName } = item;
 
       // 行数据遍历
-      rowData.forEach(rowItem => {
+      rowData.forEach(rowItems => {
+        const rowItem = rowItems
         // 环境因子列表遍历
         item.environmentFactorValues.forEach(valItem => {
           // 环境因子值下的样品列表遍历
@@ -473,7 +476,8 @@ class paramList extends Component {
     } = this.state;
     let tableWidth = 0;
 
-    const newSampleColumns = sampleColumns.map(col => {
+    const newSampleColumns = sampleColumns.map(cols => {
+      const col = cols
       if (!col.width) col.width = 100;
       tableWidth += col.width;
       if (!col.editable) {
@@ -482,7 +486,8 @@ class paramList extends Component {
       return true;
     });
 
-    const newGroupColumns = groupColumns.map(col => {
+    const newGroupColumns = groupColumns.map(cols => {
+      const col = cols
       if (!col.width) col.width = 100;
       tableWidth += col.width;
       if (!col.editable) {
@@ -491,7 +496,8 @@ class paramList extends Component {
       return true;
     });
 
-    const newEnvironmentalFactorColumns = environmentalFactorColumns.map(col => {
+    const newEnvironmentalFactorColumns = environmentalFactorColumns.map(cols => {
+      const col = cols
       if (!col.width) col.width = 100;
       tableWidth += col.width;
       if (!col.editable) {
@@ -504,7 +510,7 @@ class paramList extends Component {
       <PageHeaderWrapper className="classParamList">
         <TableModel
           title="样品"
-          rowkey={newSampleColumns.key}
+          rowkey='id'
           loading={loading}
           data={sampleData}
           columns={newSampleColumns}
@@ -515,7 +521,7 @@ class paramList extends Component {
         />
         <TableModel
           title="分组方案"
-          rowkey={newGroupColumns.key}
+          rowkey='metadataSampleId'
           loading={loading}
           data={groupSchemeData}
           columns={newGroupColumns}
@@ -523,7 +529,7 @@ class paramList extends Component {
         />
         <TableModel
           title="环境因子表"
-          rowkey={newEnvironmentalFactorColumns.key}
+          rowkey='metadataSampleId'
           loading={loading}
           data={environmentalFactorData}
           columns={newEnvironmentalFactorColumns}

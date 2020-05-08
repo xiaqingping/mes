@@ -6,16 +6,16 @@ import { Table, Card } from 'antd';
 /**
  * 表格组件
  */
-const TableModel = props => (
+const TableModel = props => props.data.length > 0 ? (
   <Card bordered={false} title={props.title} style={{ marginBottom: 30 }}>
     <Table
-      rowKey={props.rowKey || 'id'}
+      rowKey={props.rowkey || 'id'}
       loading={props.loading}
       pagination={false}
       columns={props.columns}
       dataSource={props.data}
     />
   </Card>
-)
+) : null
 
 export { TableModel }
