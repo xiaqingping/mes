@@ -249,23 +249,20 @@ class OTU extends Component {
             </Button>
           }
           rowKey="id"
-          request={params => {
-            this.getTableData(params);
-            return { data: list };
-          }}
+          request={params => api.getProcess(params).then(res => ({ data: res.rows }))}
           columns={columns}
           options={false}
           // search={false}
-          pagination={{
-            showSizeChanger: true,
-            showQuickJumper: true,
-            showTotal: (total, range) => {
-              const totalPage = Math.ceil(total / (pagination.pageSize || 10));
-              const currentPage = Math.ceil(range[0] / (pagination.pageSize || 10));
-              return `共 ${total} 条记录 第 ${currentPage}/${totalPage} 页`;
-            },
-            ...pagination,
-          }}
+          // pagination={{
+          //   showSizeChanger: true,
+          //   showQuickJumper: true,
+          //   showTotal: (total, range) => {
+          //     const totalPage = Math.ceil(total / (pagination.pageSize || 10));
+          //     const currentPage = Math.ceil(range[0] / (pagination.pageSize || 10));
+          //     return `共 ${total} 条记录 第 ${currentPage}/${totalPage} 页`;
+          //   },
+          //   ...pagination,
+          // }}
         />
         {/* </Form> */}
         {/* </Card> */}

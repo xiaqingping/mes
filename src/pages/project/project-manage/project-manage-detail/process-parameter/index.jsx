@@ -1,4 +1,4 @@
-/** 流程参数 */
+// 流程参数
 import React, { Component } from 'react';
 import { Card, List, Form, Layout, Button, message, Tooltip } from 'antd';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
@@ -52,7 +52,7 @@ class ProcessParameter extends Component {
       sampleList: [],
       // 提交的数据
       paramList: [],
-    }
+    };
     // 判断请求类型
     this.determineTheRequestType();
   }
@@ -60,9 +60,7 @@ class ProcessParameter extends Component {
   // 组件加载时
   componentDidMount = () => {};
 
-  /**
-   * 判断请求类型
-   */
+  // 判断请求类型
   determineTheRequestType = () => {
     const { requestType, processId, processModelId } = this.state;
     // message.success(requestType);
@@ -200,8 +198,8 @@ class ProcessParameter extends Component {
     this.setState({ paramList, sampleList });
   };
 
+  // edit 设置表单初始值
   /**
-   * edit 设置表单初始值
    * 编辑状态 设置表单初始值
    * @param {string} data 组件数据
    */
@@ -453,9 +451,11 @@ class ProcessParameter extends Component {
                       <>
                         <span style={{ display: 'inline-block' }}>{item.groupName}</span>
                         <span style={{ display: 'inline-block', marginLeft: 30 }}>
-                          {item.groupDescribe && <Tooltip placement="right" title={<span>{item.groupDescribe}</span>}>
-                            <QuestionCircleOutlined />
-                          </Tooltip>}
+                          {item.groupDescribe && (
+                            <Tooltip placement="right" title={<span>{item.groupDescribe}</span>}>
+                              <QuestionCircleOutlined />
+                            </Tooltip>
+                          )}
                         </span>
                       </>
                     }

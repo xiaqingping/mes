@@ -7,14 +7,14 @@
  * @param {Function} handleUnPublish 禁用的方法
  */
 import React, { Component } from 'react';
-import { Drawer, Avatar, Tag, List, Card, Badge, Spin, Empty, message } from 'antd';
+import { Drawer, Avatar, Tag, List, Card, Badge, Spin, Empty } from 'antd';
 import { DownOutlined, UpOutlined } from '@ant-design/icons';
 import { formatter, cutString } from '@/utils/utils';
 import './index.less';
 import api from '@/pages/project/api/taskmodel';
 import processApi from '@/pages/project/api/processModel/';
 import disk from '@/pages/project/api/disk';
-import Parameter from '@/pages/project/process-model/components/Parameter';
+import Parameter from '@/pages/project/process-model/components/ParameterDetails';
 import ParamPic from '@/assets/imgs/canshu@1x.png';
 import { connect } from 'dva';
 
@@ -68,35 +68,11 @@ class DrawerTool extends Component {
 
   /**
    * 关闭参数弹框时候要保存分组参数数据
-   * @param {Array} arr 分组好以后的参数数据
    */
-  handleClose = arr => {
-    const { detailValue } = this.state;
-    if (detailValue.status !== 1) {
-      this.setState({
-        parameterVisible: false,
-      });
-      message.error('只有未发布状态可以编辑！');
-      return false;
-    }
-    const newData = arr.map((item, index) => ({ ...item, sortNo: index }));
-    const sonData = newData;
-    newData.map((item, index) => {
-      sonData[index].params = item.params.map((i, ind) => ({ ...i, sortNo: ind }));
-    });
-    sonData[0].sortNo = 0;
-    const data = JSON.parse(JSON.stringify(detailValue));
-    const taskdata = detailValue.taskModels.map(item => ({
-      taskModelId: item.id,
-      automatic: item.automatic,
-    }));
-    data.groups = sonData;
-    data.taskModels = taskdata;
-    processApi.changeProcess(data);
+  handleClose = () => {
     this.setState({
       parameterVisible: false,
     });
-    this.props.onClose();
   };
 
   /**
@@ -196,7 +172,7 @@ class DrawerTool extends Component {
         {parameterVisible ? (
           <Parameter
             visible={parameterVisible}
-            handleClose={v => this.handleClose(v)}
+            handleClose={this.handleClose}
             paramter={detailValue.groups}
           />
         ) : (

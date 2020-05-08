@@ -5,7 +5,7 @@
  * @param {object} typeEnlargeData 详情的数据
  */
 import React from 'react';
-import { Modal, List, Card } from 'antd';
+import { Modal, List, Card, Button } from 'antd';
 import { ShrinkOutlined } from '@ant-design/icons';
 
 const EnlargePage = props => {
@@ -15,7 +15,12 @@ const EnlargePage = props => {
    */
   const titleContent = item => (
     <>
-      <div>{item.groupName}</div>
+      <span>{item.groupName}</span>
+      <Button
+        icon={<ShrinkOutlined />}
+        style={{ border: 'none', float: 'right', marginRight: '-10px', marginTop: '-10px' }}
+        onClick={props.handleBigClose}
+      />
       <div style={{ fontSize: '14px', color: 'rgba(0,0,0,0.45)' }}>{item.groupDescribe}</div>
     </>
   );
@@ -23,14 +28,12 @@ const EnlargePage = props => {
     <Modal
       title={titleContent(props.typeEnlargeData)}
       visible={props.visible}
-      onCancel={props.handleBigClose}
       footer={null}
       mask={false}
       maskClosable={false}
       width={560}
-      closeIcon={<ShrinkOutlined />}
+      closable={false}
       style={{ top: 180, right: 115 }}
-      className="EnlargePage"
     >
       <List
         rowKey="id"

@@ -328,14 +328,6 @@ class ProcessEdit extends Component {
    * @param {Array} value 参数的数据
    */
   handleClose = value => {
-    const { processData } = this.state;
-    if (processData.status !== 1) {
-      this.setState({
-        parameterVisible: false,
-      });
-      message.error('只有未发布状态可以编辑！');
-      return false;
-    }
     const newData = value.map((item, index) => ({ ...item, sortNo: index }));
     const sonData = newData;
     newData.map((item, index) => {
