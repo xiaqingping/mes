@@ -384,15 +384,54 @@ class ProcessEdit extends Component {
   };
 
   /**
+   * 判断有没有重复的样品，分组和环境因子
+   * @param {Array} value 新添加的值
+   * @param {Array} taskList 原有的值
+   */
+  judgeFunction = (value, taskList) => {
+    const { project } = this.props;
+    let flag = false;
+    const type = [];
+    if (value.length) {
+      value.map(item => {
+        console.log(item.params);
+        item.params.map(it => {
+          type.push(it.type);
+        });
+      });
+    }
+    if (taskList.length) {
+      taskList.map(item => {
+        item.params.map(it => {
+          type.push(it.type);
+        });
+      });
+    }
+    ['sample_select', 'sample_group', 'sample_environment_factor'].forEach(item => {
+      if (type.reduce((a, v) => (v === item ? a + 1 : a + 0), 0) > 1) {
+        message.error(`${formatter(project.formItemType, item, 'type', 'text')}不能重复添加`);
+        flag = true;
+      }
+    });
+    return flag;
+  };
+
+  /**
    * 获取子级数据
    * @param {Array} value 任务选择获取的数据
    */
   getData = value => {
     const { taskList, ids, sonIds, paramter } = this.state;
-    // const { processAddData } = this.props;
     this.setState({
       taskLoading: true,
     });
+    // 判断有没有重复的样品，分组和环境因子
+    if (this.judgeFunction(value, taskList)) {
+      this.setState({
+        taskLoading: false,
+      });
+      return false;
+    }
     const oldModelProcess = paramter;
     let data = taskList;
     const idsData = ids;
