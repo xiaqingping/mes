@@ -101,11 +101,12 @@ class SampleGroup extends React.Component {
    */
   sendDataOnChange = () => {
     const list = this.verifyData();
-    const { paramKey, taskModelId } = this.props.paramList;
+    const { paramKey, taskModelId, id } = this.props.paramList;
     const sendData = {
       paramKey,
       paramValue: JSON.stringify(list),
       taskModelId,
+      groupId: id, // 每个参数分组的id，先定groupId这个字段， 以后要改再改
     };
     console.log(list);
     this.validPass = !!list;
@@ -193,6 +194,7 @@ class SampleGroup extends React.Component {
    * @param {Object} newData 转换成的横向数据
    */
   pushColorsToStore = newData => {
+    const { sampleList } = this.state;
     const colorStore = [];
     newData.forEach(row => {
       Object.keys(row).forEach(key => {
@@ -203,8 +205,12 @@ class SampleGroup extends React.Component {
         }
       });
     });
-
-    this.setColorStore(colorStore);
+    // 因为样品选择和分组方案加载完成时都会设置颜色store， 为防止覆盖，所以才这样写
+    const sampleColors = [];
+    sampleList.forEach(item => {
+      sampleColors.push(item.color);
+    });
+    this.setColorStore([...colorStore, ...sampleColors]);
   };
 
   /**
@@ -557,10 +563,15 @@ class SampleGroup extends React.Component {
         delete v[prop];
         return v;
       });
-      this.setState({
-        columns: cols,
-        groupSchemeData: tableDatas,
-      });
+      this.setState(
+        {
+          columns: cols,
+          groupSchemeData: tableDatas,
+        },
+        () => {
+          this.sendDataOnChange();
+        },
+      );
     }
   };
 
@@ -576,22 +587,24 @@ class SampleGroup extends React.Component {
   handleColorChange = (color, value, row, index, col, color1) => {
     // ---------------------首先判断选择的颜色在model里是否有重复---------
     const { colorStore } = this.props.project;
-    const colors = [...colorStore];
+    let colors = [...colorStore];
     let colorhex = color.hex;
 
     const repeat = colorStore.includes(colorhex);
     if (repeat) {
+      message.warning('存在重复颜色，已为您随机生成一个颜色！');
       colorhex = getrandomColor();
     }
     colors.push(colorhex);
-    this.setColorStore(colors);
     Object.keys(row).forEach(key => {
       if (row[key] === value) {
         const num = key.split('_')[1];
         const colorName = `color_${num}`;
+        colors = colors.filter(i => i !== row[colorName]);
         row[colorName] = colorhex;
       }
     });
+    this.setColorStore(colors);
     const { groupSchemeData } = this.state;
     const groupData = [...groupSchemeData];
     groupData[index] = row;
@@ -926,7 +939,10 @@ class SampleGroup extends React.Component {
     const datas = [...groupSchemeData];
     const cols = [...columns];
     const num = cols.length;
-
+    if (this.props.paramList.isrequired && num === 2) {
+      message.error('分组方案为必须，请设置分组方案！');
+      return false;
+    }
     for (let i = 2; i < num; i++) {
       const group = [];
       datas.forEach(item => {
@@ -940,10 +956,6 @@ class SampleGroup extends React.Component {
       this.validPass = !validFalse;
       if (validFalse) {
         message.error('分组方案包含样品和组');
-        return false;
-      }
-      if (this.props.paramList.required && datas && !datas.length) {
-        message.error('分组方案为必须，请设置分组方案！');
         return false;
       }
     }

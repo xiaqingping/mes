@@ -7,6 +7,7 @@
 import React from 'react';
 import { Modal, List, Card, Button, message } from 'antd';
 import { ArrowsAltOutlined, PlusOutlined } from '@ant-design/icons';
+import { compare } from '@/utils/utils';
 import EnlargePage from '../EnlargePage/enlargePage';
 // import AddGroup from '../AddGroup/addGroup';
 import './index.less';
@@ -29,6 +30,21 @@ class Parameter extends React.Component {
     moveTitleId: null,
     moveDescId: null,
   };
+
+  componentDidMount() {
+    const { data } = this.state;
+    const newData = data.sort(compare('sortNo'));
+    const arr = [];
+    newData.forEach(item => {
+      const newGroupItem = JSON.parse(JSON.stringify(item));
+      const { params } = item;
+      newGroupItem.params = params.sort(compare('sortNo'));
+      arr.push(newGroupItem);
+    });
+    this.setState({
+      data: arr,
+    });
+  }
 
   /**
    * 分类变大打开

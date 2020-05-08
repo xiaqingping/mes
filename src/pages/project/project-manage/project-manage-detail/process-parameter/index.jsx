@@ -52,7 +52,7 @@ class ProcessParameter extends Component {
       sampleList: [],
       // 提交的数据
       paramList: [],
-    }
+    };
     // 判断请求类型
     this.determineTheRequestType();
   }
@@ -202,7 +202,6 @@ class ProcessParameter extends Component {
   };
 
   /**
-   * edit 设置表单初始值
    * 编辑状态 设置表单初始值
    * @param {string} data 组件数据
    */
@@ -454,10 +453,11 @@ class ProcessParameter extends Component {
                       <>
                         <span style={{ display: 'inline-block' }}>{item.groupName}</span>
                         <span style={{ display: 'inline-block', marginLeft: 30 }}>
-                          {item.groupDescribe &&
-                          <Tooltip placement="right" title={<span>{item.groupDescribe}</span>}>
-                            <QuestionCircleOutlined />
-                          </Tooltip>}
+                          {item.groupDescribe && (
+                            <Tooltip placement="right" title={<span>{item.groupDescribe}</span>}>
+                              <QuestionCircleOutlined />
+                            </Tooltip>
+                          )}
                         </span>
                       </>
                     }
