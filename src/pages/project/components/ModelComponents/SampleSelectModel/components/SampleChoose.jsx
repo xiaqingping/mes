@@ -1,6 +1,7 @@
 import React from 'react';
 import { Table, Button, Checkbox, Modal } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
+import classnames from 'classnames';
 import FileUpload from '../../UploadSequenceFile/sequenUpload';
 import api from '../api/sample.js';
 
@@ -228,7 +229,7 @@ class SampleChoose extends React.Component {
         render: (text, record, index) => (
           <div className={disabled ? 'project_manage_params_sample_choose_checkbox' : ''}>
             <Checkbox
-              onChange={e => this.handleCheckboxChange(e, record, text, undefined, index)}
+              onChange={e => this.handleCheckboxChange(e, record, undefined, index)}
               indeterminate={record.indeterminate}
               checked={record.isChoose}
               disabled={disabled}
@@ -248,8 +249,9 @@ class SampleChoose extends React.Component {
           text.map(item => (
             <div
               key={item.fileId}
-              style={{ marginBottom: 20 }}
-              className={disabled ? 'project_manage_params_sample_choose_checkbox' : ''}
+              className={classnames('project_manage_params_sample_choose_checkbox_style', {
+                project_manage_params_sample_choose_checkbox: disabled,
+              })}
             >
               {/* <Tooltip title={item.sequenceFileName} > */}
               <Checkbox

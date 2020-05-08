@@ -1,6 +1,6 @@
 import React from 'react';
 import { Table, Button, Modal, AutoComplete, Popover, message } from 'antd';
-import { UploadOutlined, PlusSquareOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
+import { UploadOutlined, PlusSquareOutlined, QuestionCircleOutlined } from '@ant-design/icons';
 import { SketchPicker } from 'react-color';
 import { getrandomColor } from '@/utils/utils';
 import './index.less';
@@ -31,8 +31,8 @@ class SampleGroup extends React.Component {
       tableData: tableDatas || [],
       sampleList: sampleLists || [],
       // TODO: 提交时一定要记得改过来
-      disabled: nextProps.disabled,
-      // disabled: false,
+      // disabled: nextProps.disabled,
+      disabled: false,
     };
   }
 
@@ -107,7 +107,7 @@ class SampleGroup extends React.Component {
       paramValue: JSON.stringify(list),
       taskModelId,
     };
-
+    console.log(list);
     this.validPass = !!list;
     this.props.getData(sendData, 'groupScheme', this.validPass);
   };
@@ -426,6 +426,7 @@ class SampleGroup extends React.Component {
               position: 'relative',
               marginLeft: 10,
               marginTop: 6,
+              borderRadius: 2,
             }}
           />
         ) : (
@@ -451,6 +452,7 @@ class SampleGroup extends React.Component {
                 position: 'relative',
                 marginLeft: 10,
                 marginTop: 6,
+                borderRadius: 2,
               }}
             />
           </Popover>
@@ -660,7 +662,7 @@ class SampleGroup extends React.Component {
    * 修改组名时的渲染内容
    */
   confirmGroupRender = (groupName, preGroupName) => (
-    <div>
+    <div style={{ fontFamily: 'PingFangSC-Regular', fontSize: 14, color: 'rgba(0,0,0,.65)' }}>
       <div>
         点击“是”将分组“{preGroupName}”改为“{groupName}”
       </div>
@@ -764,8 +766,12 @@ class SampleGroup extends React.Component {
    */
   handleModalConfirm = (datas, row, option, value, col, index, color1) => {
     confirm({
-      title: `是否将分组“${value}”改为“${option}”？`,
-      icon: <ExclamationCircleOutlined />,
+      title: (
+        <div style={{ fontFamily: 'PingFangSC-Medium', fontSize: 16, color: 'rgba(0,0,0,.85)' }}>
+          是否将分组“{value}”改为“{option}”？
+        </div>
+      ),
+      icon: <QuestionCircleOutlined />,
       content: this.confirmGroupRender(option, value),
       cancelText: '否',
       okText: '是',
@@ -1087,9 +1093,15 @@ class SampleGroup extends React.Component {
         columns: cols1,
       },
       () => {
-        this.setState({
-          columns: cols,
-        });
+        this.setState(
+          {
+            columns: cols,
+          },
+          // 增加这行就可以实现，上传分组方案后， 样品里有但分组方案里没有的样品也会在分组方案表格里，(以后有整个需求可以加上)
+          // () => this.selectUpdateGroup(),
+        );
+
+        this.sendDataOnChange();
       },
     );
   };
@@ -1116,7 +1128,7 @@ class SampleGroup extends React.Component {
               marginBottom: 10,
             }}
           >
-            <div style={{ fontSize: 15, fontWeight: 'bold', marginTop: 5 }}>分组方案</div>
+            <div style={{ fontSize: 14, fontWeight: 'bold', marginTop: 5 }}>分组方案</div>
             <Button onClick={this.uploadGroup} type="primary">
               <UploadOutlined />
               上传

@@ -44,7 +44,7 @@ class UploadSequenceFile extends React.Component {
       if (result.length !== 0) {
         tableList[i].sampleProperties = result;
       } else {
-        console.log(tableList.splice(i, 1));
+        // console.log(tableList.splice(i, 1));
       }
     }
     const newFiles = filesNameList.filter(item => item.id !== v.id);
@@ -63,7 +63,7 @@ class UploadSequenceFile extends React.Component {
     const data = new FormData();
     const AllImgExt = '.xls|.xlsx|.csv';
     const fileArr = file[0].name.split('.');
-    console.log(fileArr[fileArr.length - 1]);
+    // console.log(fileArr[fileArr.length - 1]);
     if (AllImgExt.indexOf(fileArr[fileArr.length - 1]) === -1) {
       message.error('文件格式不正确');
       return false;
@@ -130,7 +130,7 @@ class UploadSequenceFile extends React.Component {
           this.props.closeUpload();
         },
         onCancel: () => {
-          console.log('Cancel');
+          // console.log('Cancel');
         },
       });
     } else {
@@ -143,7 +143,6 @@ class UploadSequenceFile extends React.Component {
    * @param 当文本域blur时获取到的输入/粘贴的值
    */
   handleData = value => {
-    console.log(value);
     const arr = value.split('\n');
     const newData = arr.map(item => item.split(/[，,| ]/));
     let data = [];

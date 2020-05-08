@@ -18,11 +18,13 @@ class SampleSelect extends React.Component {
     } else {
       sampleList = nextProps.paramList.paramValue;
     }
+    console.log(sampleList);
+
     return {
       tableDatas: sampleList || [],
       // TODO: 提交时一定要修改过来
-      disabled: nextProps.disabled,
-      // disabled: false,
+      // disabled: nextProps.disabled,
+      disabled: false,
     };
   }
 
@@ -48,6 +50,7 @@ class SampleSelect extends React.Component {
                   height: 20,
                   backgroundColor: record.color,
                   position: 'relative',
+                  borderRadius: 2,
                 }}
                 onClick={() => {
                   this.handleClick(record, index);
@@ -72,6 +75,7 @@ class SampleSelect extends React.Component {
                     height: 20,
                     backgroundColor: record.color,
                     position: 'relative',
+                    borderRadius: 2,
                   }}
                   onClick={() => {
                     this.handleClick(record, index);
@@ -243,12 +247,15 @@ class SampleSelect extends React.Component {
   };
 
   /**
-   * 将原始数据加一个已选择标记
+   * 给原始数据加一个已选择标记
    * @param {Object} tableData 原始样品数据
    */
   getTableData = tableData => {
     let list = [...tableData];
+    console.log(list);
+    const colorStore = [];
     list = list.map(item => {
+      colorStore.push(item.color);
       item.sampleProperties.forEach(v => {
         v.isChoose = 1;
         return v;
@@ -258,6 +265,7 @@ class SampleSelect extends React.Component {
     this.setState({
       tableData: list,
     });
+    this.setColorStore(colorStore);
   };
 
   /**
