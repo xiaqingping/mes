@@ -166,12 +166,13 @@ class CheckboxModel extends React.Component {
           return (
             <>
               {fromView ? (
-                <div style={{ width: '400px',height:'40px',lineHeight:'40px',marginBottom:'5px'}}>
+                <div style={{ width: '370px',height:'40px',lineHeight:'40px',marginBottom:'5px'}}>
                   <div style={{ float: 'left',marginRight:'10px', height:'40px',}}>
                   {lebel} :
                   </div>
-                  <div style={{ float: 'right', marginRight: 30, width: 300 ,
+                  <div style={{ float: 'right', width: 300 ,
                     height:'40px',paddingTop:'4px'}}>
+                    // eslint-disable-next-line react/no-array-index-key
                     <Form.Item label="" name={item.selectKey} key={index}>
                       <Input.Group compact>
                         <Form.Item
@@ -195,12 +196,12 @@ class CheckboxModel extends React.Component {
                   </div>
                 </div>
               ) : (
-                <div style={{ width: '400px',height:'40px' ,
+                <div style={{ width: '370px',height:'40px' ,
                 lineHeight:'40px',marginBottom:'5px'}}>
                   <div style={{ float: 'left',marginRight:'10px', height:'40px'}}>
                     {item.selectName} :
                   </div>
-                  <div style={{ float: 'right', marginRight: 30, width: 300 ,
+                  <div style={{ float: 'right',  width: 300 ,
                     height:'40px',paddingTop:'4px'}}>
                     <Form.Item label="" name={item.selectKey}>
                       <Input.Group compact>
