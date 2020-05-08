@@ -5,6 +5,7 @@ import { SketchPicker } from 'react-color';
 import { getrandomColor } from '@/utils/utils';
 import './index.less';
 import { connect } from 'dva';
+import classnames from 'classnames';
 import GroupUpload from '../UploadSequenceFile/index';
 
 const { confirm } = Modal;
@@ -26,11 +27,12 @@ class SampleGroup extends React.Component {
     } else {
       sampleLists = nextProps.sampleList;
     }
-    console.log(sampleLists);
     return {
       tableData: tableDatas || [],
       sampleList: sampleLists || [],
+      // TODO: 提交时一定要记得改过来
       disabled: nextProps.disabled,
+      // disabled: false,
     };
   }
 
@@ -131,19 +133,19 @@ class SampleGroup extends React.Component {
         mapGro[gro.sampleId] = gro;
       });
       if (mapGro[item.id]) {
-        // TODO:这里当样品选择框修改别名时候， 分组数据并没有刷新，因为这边是直接copy过来的。
+        // 这里当样品选择框修改别名时候， 分组数据并没有刷新，因为这边是直接copy过来的。
         newRow = mapGro[item.id];
+        // 添加这行就可以解决上面的问题
+        newRow.sampleName = item.sampleAlias || item.sampleName;
       } else {
         colLen.forEach(col => {
           newRow[col] = '';
         });
-        console.log(newRow);
       }
       groupData.push(newRow);
 
       return newRow;
     });
-    console.log(groupData);
     this.setState(
       {
         groupSchemeData: groupData,
@@ -153,6 +155,7 @@ class SampleGroup extends React.Component {
         this.setState({
           columns: columns2,
         });
+        this.sendDataOnChange();
       },
     );
   };
@@ -405,7 +408,12 @@ class SampleGroup extends React.Component {
    * @param {String} col 当前列的列， 比如header_1
    */
   columnRender = (value, row, index, color1, col) => (
-    <div style={{ display: 'flex' }} className="project_components_sample_group_render_wrap">
+    <div
+      style={{ display: 'flex' }}
+      className={classnames('project_components_sample_group_render_wrap', {
+        sample_select_input_disabled: this.state.disabled,
+      })}
+    >
       {/* <span style={{ marginRight: 10 }}>{value}</span> */}
       {this.selectRender(value, row, index, color1, col)}
       {row[color1] &&
@@ -461,9 +469,9 @@ class SampleGroup extends React.Component {
         const { title } = item;
         item.dupTitle = title;
         item.title = () => (
-          <div className="project_manage_UI_sample_group_title">
+          <div className="project_manage_UI_sample_group_title" key={item.id}>
             <input
-              style={{ fontWeight: 'bolder', width: '100%' }}
+              style={{ width: '100%' }}
               defaultValue={title}
               onBlur={e => this.handleTitleBlur(e, item, index)}
               disabled={this.state.disabled}
@@ -604,7 +612,7 @@ class SampleGroup extends React.Component {
       title: () => (
         <div className="project_manage_UI_sample_group_title">
           <input
-            style={{ fontWeight: 'bolder', width: '100%' }}
+            style={{ width: '100%' }}
             defaultValue={`分组方案_${max + 1}`}
             onBlur={e => this.handleTitleBlur(e, null, null, max + 1)}
           />
@@ -840,7 +848,6 @@ class SampleGroup extends React.Component {
     this.setState({
       optionList: list,
     });
-    // this.sendDataOnChange();
     return true;
   };
 
@@ -863,7 +870,7 @@ class SampleGroup extends React.Component {
     const { optionList, disabled } = this.state;
     return (
       <AutoComplete
-        style={{ width: '60%' }}
+        style={{ width: '70%' }}
         onBlur={e => this.handleGroupSelectBlur(e, value, row, index, col, color1)}
         defaultValue={value}
         disabled={disabled}
@@ -1002,7 +1009,6 @@ class SampleGroup extends React.Component {
    * @param {Object} item 从上传获取来的每一条数据对象
    * @param {String} head 获取到的header_xx
    */
-
   getMapKey = (item, head) => `${head}_${item[head]}`;
 
   /**
@@ -1028,8 +1034,8 @@ class SampleGroup extends React.Component {
           item.sampleId = row.sampleId;
           for (let i = 1; i < num; i++) {
             item[`header_${i + 1}`] = item[i];
-            item[`color_${i + 1}`] = item[i] === '当前样品' ? '' : getrandomColor();
-            // item[`color_${i + 1}`] = getrandomColor();
+            item[`color_${i + 1}`] =
+              item[i] === '当前样品' || item[i] === '' ? '' : getrandomColor();
           }
         }
       });
@@ -1110,7 +1116,7 @@ class SampleGroup extends React.Component {
               marginBottom: 10,
             }}
           >
-            <div style={{ fontSize: 15, fontWeight: 'bold' }}>分组方案</div>
+            <div style={{ fontSize: 15, fontWeight: 'bold', marginTop: 5 }}>分组方案</div>
             <Button onClick={this.uploadGroup} type="primary">
               <UploadOutlined />
               上传

@@ -26,11 +26,12 @@
     }
 
     input:hover {
-      background-color: #f5f5f5;
+      background-color: #fff;
     }
 
     input:focus {
-      background-color: #f5f5f5;
+      // background-color: #f5f5f5;
+      background-color: #fff;
     }
 
     input[disabled]:hover {
@@ -49,15 +50,28 @@
   }
 
   .project_components_sample_group_render_wrap {
+
+
+
     .ant-select-focused {
       outline: none !important;
     }
 
     .ant-select-single:not(.ant-select-customize-input) .ant-select-selector {
-      background-color: transparent;
+      background-color: #fff;
       border: 1px solid transparent;
       outline: 1px solid transparent;
+
     }
+
+    &.sample_select_input_disabled {
+      .ant-select-single:not(.ant-select-customize-input) .ant-select-selector {
+        background-color: transparent;
+      }
+
+    }
+
+
 
     .ant-select-single:not(.ant-select-customize-input) .ant-select-selector:focus {
       border: 1px solid #d9d9d9;
@@ -70,8 +84,8 @@
     }
 
     .ant-select-disabled.ant-select-single:not(.ant-select-customize-input) .ant-select-selector input {
-      cursor: default;
       color: rgba(0, 0, 0, .65);
+      cursor: default;
     }
 
     .ant-select-disabled.ant-select-single:not(.ant-select-customize-input) .ant-select-selector {
@@ -84,12 +98,14 @@
     }
 
     .ant-select-selector:hover {
-      background-color: #fff !important;
+      background-color: #fff;
     }
 
     .ant-select-selector:focus {
-      background-color: #fff !important;
+      background-color: #fff;
     }
+
+
   }
 
   .project_manage_sample_scheme_table_wrap {

@@ -1,11 +1,10 @@
+/* eslint-disable array-callback-return */
 /** 流程模型的编辑 用于新增、修改、升级 */
 import React, { Component } from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import {
   Card,
-  Upload,
   message,
-  Input,
   Tag,
   Switch,
   Table,
@@ -17,6 +16,8 @@ import {
   Spin,
   Row,
   Col,
+  Menu,
+  Dropdown,
 } from 'antd';
 import { LoadingOutlined, PlusOutlined } from '@ant-design/icons';
 import { connect } from 'dva';
@@ -30,6 +31,7 @@ import api from '@/pages/project/api/processModel/';
 import router from 'umi/router';
 import deletePic from '@/assets/imgs/delete@1x.png';
 import DefaultHeadPicture from '@/assets/imgs/defaultheadpicture.jpg';
+import TopPages from '@/pages/project/process-model/components/EditTop';
 
 /**
  * 图片转换Base64
@@ -41,23 +43,6 @@ function getBase64(img, callback) {
   reader.addEventListener('load', () => callback(reader.result));
   reader.readAsDataURL(img);
 }
-
-/**
- * 图片上传时候判断
- * @param {object} file 图片
- */
-function beforeUpload(file) {
-  const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png';
-  if (!isJpgOrPng) {
-    message.error('You can only upload JPG/PNG file!');
-  }
-  const isLt2M = file.size / 1024 / 1024 < 2;
-  if (!isLt2M) {
-    message.error('Image must smaller than 2MB!');
-  }
-  return isJpgOrPng && isLt2M;
-}
-
 class ProcessEdit extends Component {
   tableSearchFormRef = React.createRef();
 
@@ -374,6 +359,7 @@ class ProcessEdit extends Component {
 
     if (preTaskIds.length) {
       preTaskIds.forEach(i => {
+        // eslint-disable-next-line consistent-return
         sonIdsData.some((item, index) => {
           if (i === item) {
             sonIdsData.splice(index, 1);
@@ -465,10 +451,7 @@ class ProcessEdit extends Component {
 
   render() {
     const uploadButton = (
-      <div style={{ borderRadius: '50%' }}>
-        {this.state.loading ? <LoadingOutlined /> : ''}
-        {/* <div className="ant-upload-text">Upload</div> */}
-      </div>
+      <div style={{ borderRadius: '50%' }}>{this.state.loading ? <LoadingOutlined /> : ''}</div>
     );
 
     const {
@@ -496,6 +479,7 @@ class ProcessEdit extends Component {
     if (pageModel !== 0 && processData.length === 0) {
       return false;
     }
+    if (pageModel === 2 && !versionType) return false;
     const columns = [
       {
         title: '编号/名称',
@@ -574,8 +558,30 @@ class ProcessEdit extends Component {
         },
       },
     ];
-
     const uploadUrl = disk.uploadMoreFiles('project_process_model', guuid);
+    let menu = '';
+    if (pageModel === 2) {
+      menu = (
+        <Menu>
+          {versionType.length !== 0
+            ? versionType.map(item => (
+                <Menu.Item
+                  key={item}
+                  style={{ cursor: 'pointer' }}
+                  onClick={() => {
+                    this.setState({
+                      selectVersion: item,
+                      versionOpen: !versionOpen,
+                    });
+                  }}
+                >
+                  {item}
+                </Menu.Item>
+              ))
+            : ''}
+        </Menu>
+      );
+    }
 
     // 设置默认值
     const initialValues = () => {
@@ -598,86 +604,29 @@ class ProcessEdit extends Component {
             <Card className="process-model-edit" style={{ paddingTop: '5px', minWidth: '600px' }}>
               <Row>
                 <Col xxl={14}>
-                  <div style={{ float: 'left', marginLeft: '1%' }}>
-                    <Upload
-                      name="files"
-                      listType="picture-card"
-                      className="avatar-uploader"
-                      showUploadList={false}
-                      action={uploadUrl}
-                      headers={{ Authorization: this.props.authorization }}
-                      beforeUpload={beforeUpload}
-                      onChange={this.handleChange}
-                      style={{ width: '60px', height: '60px' }}
-                    >
-                      {imageUrl ? (
-                        <img
-                          src={imageUrl}
-                          alt="avatar"
-                          style={{ width: '56px', height: '56px', borderRadius: '50%' }}
-                        />
-                      ) : (
-                        uploadButton
-                      )}
-                    </Upload>
-                  </div>
-                  <div
-                    style={{
-                      float: 'left',
-                      marginLeft: '20px',
-                      width: '62%',
-                      minWidth: '500px',
-                    }}
-                  >
-                    <Form.Item name="name">
-                      <Input placeholder="请输入流程名称" />
-                    </Form.Item>
-                    <Form.Item name="describe">
-                      <Input.TextArea placeholder="请输入流程描述" rows={4} />
-                    </Form.Item>
-                  </div>
-
+                  {/* 上传和2个输入框 */}
+                  <TopPages
+                    uploadUrl={uploadUrl}
+                    authorization={this.props.authorization}
+                    handleChange={this.handleChange}
+                    imageUrl={imageUrl}
+                    uploadButton={uploadButton}
+                  />
                   {/* 版本选择 */}
                   <div style={{ float: 'left', width: '10%' }}>
                     <div
                       style={{ position: 'relative', display: 'inline-block', marginLeft: '30px' }}
                     >
-                      <Tag
-                        color="green"
-                        style={{ cursor: 'pointer' }}
-                        onClick={() => {
-                          this.setState({
-                            versionOpen: !versionOpen,
-                          });
-                        }}
-                      >
-                        {pageModel ? selectVersion || processData.version : 'V1.0'}
-                      </Tag>
-                      {versionOpen && pageModel === 2 ? (
-                        <Card
-                          style={{ position: 'absolute', zIndex: '100', top: '28px' }}
-                          hoverable
-                          className="padding-none"
-                        >
-                          {versionType.length !== 0
-                            ? versionType.map(item => (
-                                <Tag
-                                  key={item}
-                                  style={{ cursor: 'pointer' }}
-                                  onClick={() => {
-                                    this.setState({
-                                      selectVersion: item,
-                                      versionOpen: !versionOpen,
-                                    });
-                                  }}
-                                >
-                                  {item}
-                                </Tag>
-                              ))
-                            : ''}
-                        </Card>
+                      {pageModel === 2 ? (
+                        <Dropdown overlay={menu} trigger={['click']}>
+                          <Tag color="green" style={{ cursor: 'pointer' }}>
+                            {pageModel ? selectVersion || processData.version : 'V1.0'}
+                          </Tag>
+                        </Dropdown>
                       ) : (
-                        ''
+                        <Tag color="green" style={{ cursor: 'pointer' }}>
+                          {pageModel ? selectVersion || processData.version : 'V1.0'}
+                        </Tag>
                       )}
                     </div>
                   </div>
