@@ -331,11 +331,7 @@ class ProcessEdit extends Component {
     const newData = value.map((item, index) => ({ ...item, sortNo: index }));
     const sonData = newData;
     newData.map((item, index) => {
-      sonData[index].params = item.params.map((i, ind) => {
-        const iLength = item.params.length;
-        return { ...i, sortNo: iLength - ind };
-      });
-      return true;
+      sonData[index].params = item.params.map((i, ind) => ({ ...i, sortNo: ind }));
     });
     sonData[0].sortNo = 0;
     this.setState({
