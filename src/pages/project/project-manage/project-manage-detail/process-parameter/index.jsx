@@ -92,7 +92,8 @@ class ProcessParameter extends Component {
       const newParam = this.deleteNullGroup(param); // 删除参数为空的分组
       // 无参数
       if (newParam.length === 0) {
-        message.error('暂无参数列表！');
+        message.error('暂无参数列表！')
+        setTimeout(() => router.goBack(), 1000)
         return false;
       }
       const newParamData = this.disposeParamAttribute(newParam); // 处理参数属性

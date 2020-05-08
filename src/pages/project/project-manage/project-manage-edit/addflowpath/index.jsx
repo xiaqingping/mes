@@ -98,7 +98,6 @@ class Test extends Component {
     }
   }
 
-
 /**
  * 点击打开关联
  * @param {array} projectInfor 新建项目的基础信息
@@ -180,7 +179,7 @@ class Test extends Component {
    * @param introduction 存储已选流程数据的方法名
    */
   getData = value => {
-    console.log(value);
+
     // 存储选中的流程模型数据
     if (!(value === '' || value === undefined)) {
       sessionStorage.setItem('introduction', JSON.stringify(value));
@@ -297,7 +296,8 @@ class Test extends Component {
           });
           router.push(`/project/project-manage/detail/${projectId}`);
         })
-        .catch(() => {
+        .catch(err => {
+          if(err.details[0]) message.error(err.details[0])
           this.setState({
             buttonLoading: false,
           });
