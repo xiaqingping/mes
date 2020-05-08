@@ -23,8 +23,8 @@ class SampleSelect extends React.Component {
     return {
       tableDatas: sampleList || [],
       // TODO: 提交时一定要修改过来
-      // disabled: nextProps.disabled,
-      disabled: false,
+      disabled: nextProps.disabled,
+      // disabled: false,
     };
   }
 
@@ -407,7 +407,6 @@ class SampleSelect extends React.Component {
       tableData: list,
     });
     this.sendDataOnChange(list);
-    // TODO:这里给他更新了，但是分组并没有更新，是什么原因？
     this.props.emitData(list);
   };
 
@@ -483,9 +482,15 @@ class SampleSelect extends React.Component {
 
   render() {
     const { visible, sampleId, chooseFileIds, tableData, columns, disabled } = this.state;
+    const { paramName } = this.props.paramList;
     if (typeof tableData === 'string') return false;
     return (
-      <>
+      <div className="project_manage_sample_select_table_wrap">
+        <div
+          style={{ fontSize: 15, color: 'rgba(0,0,0,.65)', fontWeight: 'bold', marginBottom: 18 }}
+        >
+          {paramName}
+        </div>
         <div className="project_manage_sample_select_table">
           <Table columns={columns} dataSource={tableData} pagination={false} />
         </div>
@@ -509,7 +514,7 @@ class SampleSelect extends React.Component {
             sendData={v => this.receiveData(v)}
           />
         )}
-      </>
+      </div>
     );
   }
 }

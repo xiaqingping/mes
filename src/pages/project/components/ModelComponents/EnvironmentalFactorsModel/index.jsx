@@ -539,6 +539,7 @@ class EnvironmentalFactorsModel extends React.Component {
     const { columns, data, visible, sampleList } = this.state;
     const disabledIs = this.props.disabled; // 是否禁用
     let tableWidth = 0;
+    const { paramName } = this.props.paramList;
 
     const newColumns = columns.map(col => {
       // eslint-disable-next-line no-param-reassign
@@ -552,8 +553,8 @@ class EnvironmentalFactorsModel extends React.Component {
 
     return (
       <div style={{ width: '100%', marginTop: 30, marginBottom: 30 }}>
-        <div style={{ float: 'left', marginTop: 10, fontSize: 16, fontWeight: 'bold' }}>
-          环境因子
+        <div style={{ float: 'left', marginTop: 10, fontSize: 15, fontWeight: 'bold' }}>
+          {paramName}
         </div>
         {!disabledIs || sampleList.length > 0 ? (
           <div

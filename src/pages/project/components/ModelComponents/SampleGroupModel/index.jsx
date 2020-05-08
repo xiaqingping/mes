@@ -31,8 +31,8 @@ class SampleGroup extends React.Component {
       tableData: tableDatas || [],
       sampleList: sampleLists || [],
       // TODO: 提交时一定要记得改过来
-      // disabled: nextProps.disabled,
-      disabled: false,
+      disabled: nextProps.disabled,
+      // disabled: false,
     };
   }
 
@@ -236,7 +236,7 @@ class SampleGroup extends React.Component {
           // 分组列表遍历
           groupItem.groups.forEach(groItem => {
             // 分组下的样品列表遍历
-            groItem.sampleIds.forEach(samItem => {
+            groItem.samples.forEach(samItem => {
               // 找到对应的样品行
               if (rowItem.sampleId === samItem.sampleId) {
                 Object.keys(rowItem).map(key => {
@@ -254,8 +254,8 @@ class SampleGroup extends React.Component {
         }
 
         // 分组方案下的 样品列表不为空
-        if (groupItem.sampleIds !== null && groupItem.sampleIds.length !== 0) {
-          groupItem.sampleIds.forEach(samItem => {
+        if (groupItem.samples !== null && groupItem.samples.length !== 0) {
+          groupItem.samples.forEach(samItem => {
             if (rowItem.sampleId === samItem.sampleId) {
               Object.keys(rowItem).map(key => {
                 const num = key.split('_')[1];
@@ -295,16 +295,16 @@ class SampleGroup extends React.Component {
     const samples = [];
     groupList.forEach(groupItem => {
       // 分组方案下的 样品列表 为空
-      if (groupItem.sampleIds === null || (groupItem.sampleIds && !groupItem.sampleIds.length)) {
+      if (groupItem.samples === null || (groupItem.samples && !groupItem.samples.length)) {
         groupItem.groups.forEach(groItem => {
-          groItem.sampleIds.forEach(samItem => {
+          groItem.samples.forEach(samItem => {
             samples.push(samItem);
           });
         });
       }
       // 分组方案下的 分组列表 为空
       if (groupItem.groups === null || (groupItem.groups && !groupItem.groups.length)) {
-        groupItem.sampleIds.forEach(samItem => {
+        groupItem.samples.forEach(samItem => {
           samples.push(samItem);
         });
       }
@@ -960,7 +960,7 @@ class SampleGroup extends React.Component {
     let tableHeard = [];
     columns.forEach((item, index) => {
       if (index !== 0 && typeof item.id === 'number') {
-        tableHeard = [...tableHeard, { groupSchemeName: item.dupTitle, sampleIds: [], groups: [] }];
+        tableHeard = [...tableHeard, { groupSchemeName: item.dupTitle, samples: [], groups: [] }];
       }
     });
 
@@ -970,7 +970,7 @@ class SampleGroup extends React.Component {
       groupSchemeData.forEach(item => {
         if (item[`header_${i}`] === '') return;
         if (item[`header_${i}`] === '当前样品') {
-          tableHeard[i - 2].sampleIds.push({
+          tableHeard[i - 2].samples.push({
             sampleId: item.sampleId,
             sampleAlias: item.sampleName,
           });
@@ -981,22 +981,22 @@ class SampleGroup extends React.Component {
             tableHeard[i - 2].groups.push({
               groupName: item[`header_${i}`],
               color: item[`color_${i}`],
-              sampleIds: [],
+              samples: [],
             });
 
             tableHeard[i - 2].groups.forEach(gro => {
               if (gro.groupName === item[`header_${i}`]) {
-                gro.sampleIds.push({
+                gro.samples.push({
                   sampleId: item.sampleId,
                   sampleAlias: item.sampleName,
                 });
               }
             });
           } else {
-            // 如果是相同组名的话, 应该将sample的信息push到 sampleIds 里面
+            // 如果是相同组名的话, 应该将sample的信息push到 samples 里面
             tableHeard[i - 2].groups.forEach(group => {
               if (group.groupName === item[`header_${i}`]) {
-                group.sampleIds.push({
+                group.samples.push({
                   sampleId: item.sampleId,
                   sampleAlias: item.sampleName,
                 });
@@ -1109,6 +1109,7 @@ class SampleGroup extends React.Component {
   render() {
     let tableWidth = 0;
     const { groupSchemeData, visible, columns, loading, disabled } = this.state;
+    const { paramName } = this.props.paramList;
     columns.map(col => {
       if (!col.width) {
         // eslint-disable-next-line
@@ -1128,7 +1129,7 @@ class SampleGroup extends React.Component {
               marginBottom: 10,
             }}
           >
-            <div style={{ fontSize: 14, fontWeight: 'bold', marginTop: 5 }}>分组方案</div>
+            <div style={{ fontSize: 15, fontWeight: 'bold', marginTop: 5 }}>{paramName}</div>
             <Button onClick={this.uploadGroup} type="primary">
               <UploadOutlined />
               上传
