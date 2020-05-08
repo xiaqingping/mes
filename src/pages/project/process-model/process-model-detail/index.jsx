@@ -14,7 +14,7 @@ import './index.less';
 import api from '@/pages/project/api/taskmodel';
 import processApi from '@/pages/project/api/processModel/';
 import disk from '@/pages/project/api/disk';
-import Parameter from '@/pages/project/process-model/components/Parameter';
+import Parameter from '@/pages/project/process-model/components/ParameterDetails';
 import ParamPic from '@/assets/imgs/canshu@1x.png';
 import { connect } from 'dva';
 
@@ -68,41 +68,11 @@ class DrawerTool extends Component {
 
   /**
    * 关闭参数弹框时候要保存分组参数数据
-   * @param {Array} arr 分组好以后的参数数据
    */
-  handleClose = arr => {
-    const { detailValue } = this.state;
-    if (detailValue.status !== 1) {
-      this.setState({
-        parameterVisible: false,
-      });
-      return false;
-    }
-    const newData = arr.map((item, index) => {
-      const itemLength = arr.length;
-      return { ...item, sortNo: itemLength - index };
-    });
-    const sonData = newData;
-    newData.map((item, index) => {
-      sonData[index].params = item.params.map((i, ind) => {
-        const iLength = item.params.length;
-        return { ...i, sortNo: iLength - ind };
-      });
-      return true;
-    });
-    sonData[0].sortNo = 0;
-    const data = JSON.parse(JSON.stringify(detailValue));
-    const taskdata = detailValue.taskModels.map(item => ({
-      taskModelId: item.id,
-      automatic: item.automatic,
-    }));
-    data.groups = sonData;
-    data.taskModels = taskdata;
-    processApi.changeProcess(data);
+  handleClose = () => {
     this.setState({
       parameterVisible: false,
     });
-    return true;
   };
 
   /**
@@ -202,7 +172,7 @@ class DrawerTool extends Component {
         {parameterVisible ? (
           <Parameter
             visible={parameterVisible}
-            handleClose={v => this.handleClose(v)}
+            handleClose={this.handleClose}
             paramter={detailValue.groups}
           />
         ) : (
