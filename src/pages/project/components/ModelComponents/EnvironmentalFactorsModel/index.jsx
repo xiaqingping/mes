@@ -10,7 +10,7 @@ import UploadSequenceFile from './UploadSequenceFile';
 class EnvironmentalFactorsModel extends React.Component {
   static getDerivedStateFromProps(nextProps) {
     return {
-      sampleList: nextProps.sampleList || [],
+      samples: nextProps.samples || [],
     };
   }
 
@@ -18,7 +18,7 @@ class EnvironmentalFactorsModel extends React.Component {
     super(props);
     this.state = {
       // 样品选择框 样品列表
-      sampleList: [],
+      samples: [],
       // 参数列表
       // eslint-disable-next-line react/no-unused-state
       paramList: props.paramList,
@@ -57,7 +57,7 @@ class EnvironmentalFactorsModel extends React.Component {
   // 初始化表格
   initTable = () => {
     // 初始数据
-    const { sampleList, headers, firstColumn, lastColumn } = this.state;
+    const { samples, headers, firstColumn, lastColumn } = this.state;
 
     // 获取表头
     const columns = [firstColumn, ...this.formatHeader(headers), lastColumn];
@@ -65,7 +65,7 @@ class EnvironmentalFactorsModel extends React.Component {
     const newList = [];
     // 获取表格数据
     let i = 1;
-    sampleList.forEach(item => {
+    samples.forEach(item => {
       const newItem = {};
       newItem.id = i++;
       newItem.sampleName = item.sampleAlias || item.sampleName;
@@ -82,9 +82,9 @@ class EnvironmentalFactorsModel extends React.Component {
 
   // 样品列表改变时同步环境因子样品列表
   selectUpdateDataSource = () => {
-    const { sampleList, data, headers } = this.state;
+    const { samples, data, headers } = this.state;
     const newData = [];
-    sampleList.map(samItem => {
+    samples.map(samItem => {
       let newItem = {};
       newItem = {
         sampleId: samItem.id,
@@ -126,7 +126,7 @@ class EnvironmentalFactorsModel extends React.Component {
     headers.forEach(item => {
       tableData = [
         ...tableData,
-        { environmentFactorName: item.title, environmentFactorValueList: [] },
+        { environmentFactorName: item.title, environmentFactorValues: [] },
       ];
     });
 
@@ -141,17 +141,17 @@ class EnvironmentalFactorsModel extends React.Component {
             sampleId: item.sampleId || item.metadataSampleId,
             sampleName: item.sampleName,
           };
-          const sampleList = [];
-          sampleList.push(sampleValue);
+          const samples = [];
+          samples.push(sampleValue);
           if (values.indexOf(item[`header_${i}`]) === -1) {
-            tableData[i - 2].environmentFactorValueList.push({
+            tableData[i - 2].environmentFactorValues.push({
               environmentFactorValue: item[`header_${i}`],
-              sampleList,
+              samples,
             });
           } else {
-            tableData[i - 2].environmentFactorValueList.forEach(valItem => {
+            tableData[i - 2].environmentFactorValues.forEach(valItem => {
               if (item[`header_${i}`] === valItem.environmentFactorValue) {
-                valItem.sampleList.push(sampleValue);
+                valItem.samples.push(sampleValue);
               }
             });
           }
@@ -181,7 +181,7 @@ class EnvironmentalFactorsModel extends React.Component {
   verifyData = tableData => {
     let error = false;
     tableData.forEach(item => {
-      if (item.environmentFactorValueList.length === 0) {
+      if (item.environmentFactorValues.length === 0) {
         message.error('存在空的环境因子');
         error = true;
       }
@@ -215,10 +215,10 @@ class EnvironmentalFactorsModel extends React.Component {
   /**
    * 获取参数数据
    * paramList 父页面传递的 参数数据
-   * sampleList 父页面传递的 样品列表
+   * samples 父页面传递的 样品列表
    */
   getParamData = () => {
-    const { paramList, sampleList } = this.props;
+    const { paramList, samples } = this.props;
     const { firstColumn } = this.state;
     if (paramList === undefined) return false;
     if (paramList.paramValue === undefined) return false;
@@ -233,7 +233,7 @@ class EnvironmentalFactorsModel extends React.Component {
         // 取出 表头
         const newColumns = this.getTableHeaderData(list, columns, titleName);
         // 取出 行数据
-        const rowData = this.getRowDataEnvironment(list, sampleList, newColumns);
+        const rowData = this.getRowDataEnvironment(list, samples, newColumns);
         // 填充行数据
         const newData = this.getFillDataEnvironment(list, rowData);
 
@@ -436,24 +436,24 @@ class EnvironmentalFactorsModel extends React.Component {
   /**
    * 获取行数据 环境因子
    * list 环境因子数据
-   * sampleList 样品列表数据
+   * samples 样品列表数据
    * columns 环境因子初始列
    */
-  getRowDataEnvironment = (list, sampleList, columns) => {
-    const samples = [];
+  getRowDataEnvironment = (list, samples, columns) => {
+    const newSamples = [];
     // 环境因子数据遍历
     list.forEach(item => {
       // 环境因子列表遍历
-      item.environmentFactorValueList.forEach(it => {
+      item.environmentFactorValues.forEach(it => {
         // 样品列表遍历
-        it.sampleList.forEach(t => {
-          samples.push(t);
+        it.samples.forEach(t => {
+          newSamples.push(t);
         });
       });
     });
 
     // 样品去重 排序
-    const newData = this.sampleRemoveDuplication(samples, sampleList, columns);
+    const newData = this.sampleRemoveDuplication(newSamples, samples, columns);
     return newData;
   };
 
@@ -470,9 +470,9 @@ class EnvironmentalFactorsModel extends React.Component {
       // 行数据遍历
       rowData.forEach(rowItem => {
         // 环境因子列表遍历
-        item.environmentFactorValueList.forEach(valItem => {
+        item.environmentFactorValues.forEach(valItem => {
           // 环境因子值下的样品列表遍历
-          valItem.sampleList.forEach(samItem => {
+          valItem.samples.forEach(samItem => {
             // 找到对应的样品行
             if (rowItem.sampleId === samItem.sampleId) {
               Object.keys(rowItem).map(key => {
@@ -496,10 +496,10 @@ class EnvironmentalFactorsModel extends React.Component {
   /**
    * 样品去重 排序
    * list 数据中拿到的样品列表
-   * sampleList 样品表中的样品列表
+   * samples 样品表中的样品列表
    * columns 初始列数据
    */
-  sampleRemoveDuplication = (list, sampleList, columns) => {
+  sampleRemoveDuplication = (list, samples, columns) => {
     // 去重
     const newSample = [];
     const ids = [];
@@ -516,7 +516,7 @@ class EnvironmentalFactorsModel extends React.Component {
 
     // 第一列样品 排序 与样品列表顺序一致
     const newData = [];
-    sampleList.forEach(item => {
+    samples.forEach(item => {
       newSample.forEach(it => {
         if (item.id === it.sampleId) {
           // 拼装行
@@ -536,7 +536,7 @@ class EnvironmentalFactorsModel extends React.Component {
   };
 
   render() {
-    const { columns, data, visible, sampleList } = this.state;
+    const { columns, data, visible, samples } = this.state;
     const disabledIs = this.props.disabled; // 是否禁用
     let tableWidth = 0;
     const { paramName } = this.props.paramList;
@@ -556,7 +556,7 @@ class EnvironmentalFactorsModel extends React.Component {
         <div style={{ float: 'left', marginTop: 10, fontSize: 15, fontWeight: 'bold' }}>
           {paramName}
         </div>
-        {!disabledIs || sampleList.length > 0 ? (
+        {!disabledIs || samples.length > 0 ? (
           <div
             onClick={() => this.uploadButton()}
             style={{ float: 'right', marginTop: 10, marginBottom: 10 }}
@@ -581,7 +581,7 @@ class EnvironmentalFactorsModel extends React.Component {
         {/* 上传文件 */}
         <UploadSequenceFile
           visible={visible}
-          sampleList={sampleList}
+          samples={samples}
           handleClose={this.handleClose}
           getUploadData={this.getDataDispose}
         />
