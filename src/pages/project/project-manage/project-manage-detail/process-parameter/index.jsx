@@ -511,6 +511,7 @@ class ProcessParameter extends Component {
                         );
                       // 样品选择框
                       if (it.type === 'sample_select') {
+                        console.log(it);
                         return (
                           <SampleSelectModel
                             paramList={it}

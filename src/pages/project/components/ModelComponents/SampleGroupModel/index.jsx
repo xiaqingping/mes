@@ -27,6 +27,7 @@ class SampleGroup extends React.Component {
     } else {
       sampleLists = nextProps.sampleList;
     }
+    console.log(nextProps.paramList);
     return {
       tableData: tableDatas || [],
       sampleList: sampleLists || [],
@@ -939,7 +940,7 @@ class SampleGroup extends React.Component {
     const datas = [...groupSchemeData];
     const cols = [...columns];
     const num = cols.length;
-    if (this.props.paramList.isrequired && num === 2) {
+    if (this.props.paramList.isRequired === 'true' && num === 2) {
       // message.error('分组方案为必须，请设置分组方案！');
       return false;
     }
