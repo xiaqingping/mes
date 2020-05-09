@@ -456,6 +456,7 @@ class SampleSelect extends React.Component {
       data1.forEach(item => {
         if (!tableData.length) {
           item.color = getrandomColor();
+          item.sampleAlias = '';
         } else {
           const tableDataMap = {};
           tableData.forEach(td => {
@@ -465,8 +466,12 @@ class SampleSelect extends React.Component {
             item.color = tableDataMap[item.id].color
               ? tableDataMap[item.id].color
               : getrandomColor();
+            item.sampleAlias = tableDataMap[item.id].sampleAlias
+              ? tableDataMap[item.id].sampleAlias
+              : '';
           } else {
             item.color = getrandomColor();
+            item.sampleAlias = '';
           }
         }
         return item;
