@@ -493,7 +493,6 @@ class SampleSelect extends React.Component {
   };
 
   render() {
-    console.log(this.props.project.colorStore);
     const { visible, sampleId, chooseFileIds, tableData, columns, disabled } = this.state;
     const { paramName } = this.props.paramList;
     if (typeof tableData === 'string') return false;

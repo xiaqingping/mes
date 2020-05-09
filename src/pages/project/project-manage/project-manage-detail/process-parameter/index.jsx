@@ -93,6 +93,7 @@ class ProcessParameter extends Component {
       // 无参数
       if (newParam.length === 0) {
         message.error('暂无参数列表！');
+        setTimeout(() => {router.goBack()}, 1000)
         return false;
       }
       const newParamData = this.disposeParamAttribute(newParam); // 处理参数属性
@@ -112,8 +113,7 @@ class ProcessParameter extends Component {
         message.success('修改操作');
         // update参数值
         const processParamList = sessionStorage.getItem('processForParams');
-        const processParamValue = processParamList.params;
-
+        const processParamValue = JSON.parse(processParamList)[0][0].params;
         // 有参数值时
         if (
           newParamData.length > 0 &&
@@ -124,7 +124,7 @@ class ProcessParameter extends Component {
           )
         ) {
           // 合并参数和参数值
-          const data = this.comparedWith(newParamData, paramValue);
+          const data = this.comparedWith(newParamData, processParamValue);
           const newData = this.compareParams(data, 'sortNo');
 
           this.setState({ paramGroupList: newData });
@@ -233,7 +233,6 @@ class ProcessParameter extends Component {
       }
 
       sessionStorage.setItem('processForParams', JSON.stringify(list));
-
       if (projectId === '' || projectId === undefined)
         url = `/project/project-manage/add/addflowpath/add/''/1`;
       if (projectId) url = `/project/project-manage/detail/edit/${projectId}/2`;
@@ -268,6 +267,7 @@ class ProcessParameter extends Component {
         }
         return false;
       });
+
 
       this.setState({
         paramList: newParams,
@@ -314,7 +314,7 @@ class ProcessParameter extends Component {
           // key：value
           nParamItem[proItem.paramPropertyKey] = proItem.paramPropertyValue;
         });
-        console.log(paramItem);
+        // console.log(paramItem);
         // TODO:
         // nParamItem.sortNo = Number(paramItem.sortNo.split('')[0]);
         nParamItem.sortNo = paramItem.sortNo;
@@ -441,7 +441,6 @@ class ProcessParameter extends Component {
     const { paramGroupList, sampleList, requestType } = this.state;
     const data = paramGroupList;
     if (data.length === 0) return false;
-    console.log(data, sampleList);
     return (
       <>
         <PageHeaderWrapper style={{ marginBottom: 100 }}>
@@ -468,6 +467,7 @@ class ProcessParameter extends Component {
                     {item.params.map((it, index) => {
                       const newIndex = JSON.parse(JSON.stringify(index));
                       // this.getModelType(it, newIndex);
+                      // console.log('it', it)
                       if (it.type === 'input')
                         return (
                           <InputModel
