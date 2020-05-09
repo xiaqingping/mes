@@ -394,17 +394,20 @@ class ProcessEdit extends Component {
     const type = [];
     if (value.length) {
       value.map(item => {
-        console.log(item.params);
+        if (!item.params) return false;
         item.params.map(it => {
           type.push(it.type);
         });
+        return true;
       });
     }
     if (taskList.length) {
       taskList.map(item => {
+        if (!item.params) return false;
         item.params.map(it => {
           type.push(it.type);
         });
+        return true;
       });
     }
     ['sample_select', 'sample_group', 'sample_environment_factor'].forEach(item => {
@@ -426,6 +429,7 @@ class ProcessEdit extends Component {
       taskLoading: true,
     });
     // 判断有没有重复的样品，分组和环境因子
+    console.log(value);
     if (this.judgeFunction(value, taskList)) {
       this.setState({
         taskLoading: false,
