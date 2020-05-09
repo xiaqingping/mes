@@ -7,7 +7,7 @@
 import React from 'react';
 import { Modal, List, Card, Button } from 'antd';
 import { ArrowsAltOutlined } from '@ant-design/icons';
-import { compare } from '@/utils/utils';
+import { compare, cutString } from '@/utils/utils';
 import EnlargePage from '../EnlargePage/enlargePage';
 // import AddGroup from '../AddGroup/addGroup';
 
@@ -58,7 +58,7 @@ class Parameter extends React.Component {
    * @param {Int} index 当前分组的键
    */
   titleContent = item => (
-    <div style={{ marginBottom: '5px', marginTop: '2px' }}>
+    <div style={{ marginBottom: '5px', marginTop: '2px', height: '86px' }}>
       <span
         style={{
           marginLeft: '10px',
@@ -88,7 +88,7 @@ class Parameter extends React.Component {
           color: 'rgba(0, 0, 0, 0.45)',
         }}
       >
-        {item.groupDescribe}
+        {cutString(item.groupDescribe, 58)}
       </div>
     </div>
   );
@@ -150,7 +150,7 @@ class Parameter extends React.Component {
                     <List.Item key={index}>
                       <Card
                         title={this.titleContent(item, index)}
-                        style={{ width: '269px', height: '234px', overflowY: 'auto' }}
+                        style={{ width: '269px', height: '234px', overflowY: 'hidden' }}
                       >
                         {data.filter(i => i.groupName !== 'no').length === 0 ? (
                           ''
@@ -164,6 +164,7 @@ class Parameter extends React.Component {
                                     float: 'left',
                                     margin: '10px',
                                   }}
+                                  hoverable
                                 >
                                   <div>{v.paramName}</div>
                                 </Card>
@@ -199,7 +200,7 @@ class Parameter extends React.Component {
               renderItem={item =>
                 item.paramId ? (
                   <List.Item key={item.paramId}>
-                    <Card>
+                    <Card hoverable>
                       <div>
                         <div>{item.paramName}</div>
                       </div>

@@ -121,7 +121,9 @@ class ProjectDetail extends Component {
               </div>
             </TabPane>
             <TabPane tab="文件" key="2">
-              <FiledList />
+              <div className="classFile">
+                <FiledList />
+              </div>
             </TabPane>
             <TabPane tab="成员" key="3">
               <div className="classMemberList">
