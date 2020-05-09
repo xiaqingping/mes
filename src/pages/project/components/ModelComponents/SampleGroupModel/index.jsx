@@ -27,7 +27,6 @@ class SampleGroup extends React.Component {
     } else {
       sampleLists = nextProps.sampleList;
     }
-    console.log(nextProps.paramList);
     return {
       tableData: tableDatas || [],
       sampleList: sampleLists || [],
@@ -56,6 +55,8 @@ class SampleGroup extends React.Component {
       },
     ],
   };
+
+
 
   /**
    * 组件校验是否通过
@@ -108,7 +109,6 @@ class SampleGroup extends React.Component {
       paramValue: JSON.stringify(list),
       taskModelId,
     };
-    console.log(list);
     this.validPass = !!list;
     this.props.getData(sendData, 'groupScheme', this.validPass);
   };

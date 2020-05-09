@@ -24,7 +24,7 @@ const { Footer } = Layout;
 
 function compare(property) {
   // eslint-disable-next-line func-names
-  return function(a, b) {
+  return function (a, b) {
     const value1 = a[property];
     const value2 = b[property];
     return value1 - value2;
@@ -60,7 +60,7 @@ class ProcessParameter extends Component {
   }
 
   // 组件加载时
-  componentDidMount = () => {};
+  componentDidMount = () => {}
 
   /**
    * 判断请求类型
@@ -97,7 +97,7 @@ class ProcessParameter extends Component {
       // 无参数
       if (newParam.length === 0) {
         message.error('暂无参数列表！');
-        setTimeout(() => {router.goBack()}, 1000)
+        setTimeout(() => { router.goBack() }, 1000)
         return false;
       }
       const newParamData = this.disposeParamAttribute(newParam); // 处理参数属性
@@ -262,6 +262,7 @@ class ProcessParameter extends Component {
     }
     // 编辑
     if (requestType === 'edit') {
+      console.log('edit', paramList)
       api.updateProcessesParameter(processId, paramList).then(() => {
         if (projectId === '') url = `/project/project-manage`;
         if (projectId !== '') url = `/project/project-manage/detail/${projectId}`;
@@ -476,7 +477,6 @@ class ProcessParameter extends Component {
     const { paramGroupList, sampleList, requestType } = this.state;
     const data = paramGroupList;
     if (data.length === 0) return false;
-    console.log(data);
     return (
       <>
         <PageHeaderWrapper style={{ marginBottom: 100 }}>
@@ -607,10 +607,10 @@ class ProcessParameter extends Component {
                 {requestType === 'view' ? (
                   ''
                 ) : (
-                  <Button type="primary" onClick={this.onSubmit}>
-                    提交
-                  </Button>
-                )}
+                    <Button type="primary" onClick={this.onSubmit}>
+                      提交
+                    </Button>
+                  )}
               </div>
             </Footer>
           </Form>
