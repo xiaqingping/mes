@@ -52,6 +52,8 @@ class ProcessParameter extends Component {
       sampleList: [],
       // 提交的数据
       paramList: [],
+      // 需要验证的列表
+      checkList: [],
     };
     // 判断请求类型
     this.determineTheRequestType();
@@ -87,6 +89,8 @@ class ProcessParameter extends Component {
    */
   getParamData = (param, paramValue) => {
     const { requestType } = this.state;
+    let newData = [];
+    const checkData = [];
     if (param.length > 0) {
       // 处理参数数据
       const newParam = this.deleteNullGroup(param); // 删除参数为空的分组
@@ -99,11 +103,20 @@ class ProcessParameter extends Component {
 
       // 添加 参数值
       if (requestType === 'add') {
+        newData.forEach(item => {
+          if (item.params.length) {
+            item.params.forEach(it => {
+              if (it.isRequired === 'true') {
+                checkData.push(it.paramKey);
+              }
+            });
+          }
+        });
         message.success('添加操作');
         if (param.length > 0) {
           this.getDefaultParams(newParamData);
-          const newData = this.compareParams(newParamData, 'sortNo');
-          this.setState({ paramGroupList: newData });
+          newData = this.compareParams(newParamData, 'sortNo');
+          // this.setState({ paramGroupList: newData });
         }
       }
 
@@ -125,17 +138,17 @@ class ProcessParameter extends Component {
         ) {
           // 合并参数和参数值
           const data = this.comparedWith(newParamData, paramValue);
-          const newData = this.compareParams(data, 'sortNo');
+          newData = this.compareParams(data, 'sortNo');
 
-          this.setState({ paramGroupList: newData });
+          // this.setState({ paramGroupList: newData });
           return false;
         }
 
         // 未设置参数值时
         if (param.length > 0 && paramValue.length === 0) {
           this.getDefaultParams(newParamData);
-          const newData = this.compareParams(newParamData, 'sortNo');
-          this.setState({ paramGroupList: newData });
+          newData = this.compareParams(newParamData, 'sortNo');
+          // this.setState({ paramGroupList: newData });
         }
       }
 
@@ -146,18 +159,20 @@ class ProcessParameter extends Component {
           // 合并参数和参数值
           const data = this.comparedWith(newParamData, paramValue);
           this.getDefaultParams(data);
-          const newData = this.compareParams(data, 'sortNo');
-          this.setState({ paramGroupList: newData });
-          return false;
+          newData = this.compareParams(data, 'sortNo');
+          // this.setState({ paramGroupList: newData });
+          // return false;
         }
         // 未设置参数值时
         if (param.length > 0 && paramValue.length === 0) {
           this.getDefaultParams(newParamData);
-          const newData = this.compareParams(newParamData, 'sortNo');
-          this.setState({ paramGroupList: newData });
+          newData = this.compareParams(newParamData, 'sortNo');
+          // this.setState({ paramGroupList: newData });
         }
       }
     }
+
+    this.setState({ paramGroupList: newData, checkList: checkData });
     return false;
   };
 
@@ -217,10 +232,17 @@ class ProcessParameter extends Component {
 
   /** 保存提交 */
   onSubmit = () => {
-    const { paramList } = this.state;
+    const { paramList, checkList } = this.state;
     const { requestType, processId, processModelId, projectId } = this.state;
     let url;
-
+    let flag = false;
+    if (checkList.length) {
+      flag = true;
+    }
+    if (flag) {
+      message.error('添加未完成');
+      return false;
+    }
     // 添加 修改
     if (requestType === 'add' || requestType === 'update') {
       const processParams = JSON.parse(sessionStorage.getItem('processForParams'));
@@ -257,7 +279,21 @@ class ProcessParameter extends Component {
    * @param {boolean} isVerify 数据是否通过验证
    */
   getModelData = (data, type, isVerify) => {
-    const { paramList } = this.state;
+    const { paramList, checkList } = this.state;
+    const checkData = [...checkList];
+    if (isVerify) {
+      if (checkData.includes(data.paramKey)) {
+        checkData.splice(
+          checkData.findIndex(item => item === data.paramKey),
+          1,
+        );
+      }
+    } else if (!checkData.includes(data.paramKey)) {
+      checkData.push(data.paramKey);
+    }
+    this.setState({
+      checkList: checkData,
+    });
     if (isVerify) {
       const newParams = paramList.filter(item => item.paramKey !== data.paramKey);
       paramList.forEach(item => {
@@ -274,7 +310,7 @@ class ProcessParameter extends Component {
       });
       return false;
     }
-    return message.warning('数据验证未通过');
+    // return message.warning('数据验证未通过');
   };
 
   /**
@@ -314,7 +350,7 @@ class ProcessParameter extends Component {
           // key：value
           nParamItem[proItem.paramPropertyKey] = proItem.paramPropertyValue;
         });
-        console.log(paramItem);
+
         // TODO:
         // nParamItem.sortNo = Number(paramItem.sortNo.split('')[0]);
         nParamItem.sortNo = paramItem.sortNo;
@@ -441,7 +477,7 @@ class ProcessParameter extends Component {
     const { paramGroupList, sampleList, requestType } = this.state;
     const data = paramGroupList;
     if (data.length === 0) return false;
-    console.log(data, sampleList);
+    console.log(data);
     return (
       <>
         <PageHeaderWrapper style={{ marginBottom: 100 }}>
