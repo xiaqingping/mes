@@ -221,7 +221,7 @@ class EnvironmentalFactorsModel extends React.Component {
    * samples 父页面传递的 样品列表
    */
   getParamData = () => {
-    const { paramList, samples } = this.props;
+    const { paramList, sampleList } = this.props;
     const { firstColumn } = this.state;
     if (paramList === undefined) return false;
     if (paramList.paramValue === undefined) return false;
@@ -236,7 +236,7 @@ class EnvironmentalFactorsModel extends React.Component {
         // 取出 表头
         const newColumns = this.getTableHeaderData(list, columns, titleName);
         // 取出 行数据
-        const rowData = this.getRowDataEnvironment(list, samples, newColumns);
+        const rowData = this.getRowDataEnvironment(list, sampleList, newColumns);
         // 填充行数据
         const newData = this.getFillDataEnvironment(list, rowData);
 
