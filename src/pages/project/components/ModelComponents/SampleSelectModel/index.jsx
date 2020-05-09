@@ -18,6 +18,7 @@ class SampleSelect extends React.Component {
     } else {
       sampleList = nextProps.paramList.paramValue;
     }
+    console.log(sampleList);
 
     return {
       tableDatas: sampleList || [],
@@ -235,12 +236,11 @@ class SampleSelect extends React.Component {
       return item;
     });
     console.log(list);
-    const { paramKey, taskModelId, id } = this.props.paramList;
+    const { paramKey, taskModelId } = this.props.paramList;
     const sendData = {
       paramKey,
       taskModelId,
       paramValue: JSON.stringify(list),
-      groupId: id, // 每个参数分组的id，先定groupId这个字段， 以后要改再改
     };
     this.validPass = !(this.props.paramList.isrequired && list && !list.length);
     this.props.getData(sendData, 'sampleSelect', this.validPass);
@@ -456,6 +456,7 @@ class SampleSelect extends React.Component {
       data1.forEach(item => {
         if (!tableData.length) {
           item.color = getrandomColor();
+          item.sampleAlias = '';
         } else {
           const tableDataMap = {};
           tableData.forEach(td => {
@@ -465,8 +466,12 @@ class SampleSelect extends React.Component {
             item.color = tableDataMap[item.id].color
               ? tableDataMap[item.id].color
               : getrandomColor();
+            item.sampleAlias = tableDataMap[item.id].sampleAlias
+              ? tableDataMap[item.id].sampleAlias
+              : '';
           } else {
             item.color = getrandomColor();
+            item.sampleAlias = '';
           }
         }
         return item;
@@ -493,7 +498,6 @@ class SampleSelect extends React.Component {
   };
 
   render() {
-    console.log(this.props.project.colorStore);
     const { visible, sampleId, chooseFileIds, tableData, columns, disabled } = this.state;
     const { paramName } = this.props.paramList;
     if (typeof tableData === 'string') return false;
