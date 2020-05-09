@@ -101,12 +101,11 @@ class SampleGroup extends React.Component {
    */
   sendDataOnChange = () => {
     const list = this.verifyData();
-    const { paramKey, taskModelId, id } = this.props.paramList;
+    const { paramKey, taskModelId } = this.props.paramList;
     const sendData = {
       paramKey,
       paramValue: JSON.stringify(list),
       taskModelId,
-      groupId: id, // 每个参数分组的id，先定groupId这个字段， 以后要改再改
     };
     console.log(list);
     this.validPass = !!list;
@@ -941,7 +940,7 @@ class SampleGroup extends React.Component {
     const cols = [...columns];
     const num = cols.length;
     if (this.props.paramList.isrequired && num === 2) {
-      message.error('分组方案为必须，请设置分组方案！');
+      // message.error('分组方案为必须，请设置分组方案！');
       return false;
     }
     for (let i = 2; i < num; i++) {
@@ -956,7 +955,7 @@ class SampleGroup extends React.Component {
       const validFalse = validTrue1;
       this.validPass = !validFalse;
       if (validFalse) {
-        message.error('分组方案包含样品和组');
+        // message.error('分组方案包含样品和组');
         return false;
       }
     }
