@@ -97,6 +97,7 @@ class EnvironmentalFactorsModel extends React.Component {
       });
       if (item[samItem.id]) {
         newItem = item[samItem.id];
+        newItem.sampleName = samItem.sampleAlias || samItem.sampleName;
       } else {
         headers.forEach(key => {
           newItem[key] = '';
