@@ -27,7 +27,7 @@ class SampleGroup extends React.Component {
     } else {
       sampleLists = nextProps.sampleList;
     }
-    console.log(nextProps.paramList);
+
     return {
       tableData: tableDatas || [],
       sampleList: sampleLists || [],
