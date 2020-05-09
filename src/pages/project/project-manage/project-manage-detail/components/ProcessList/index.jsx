@@ -237,7 +237,7 @@ class ProcessList extends Component {
       },
       {
         title: '操作',
-        width: 150,
+        width: 200,
         render: (value, row) => {
           if (row.interactionAnalysis === 1) {
             return (
