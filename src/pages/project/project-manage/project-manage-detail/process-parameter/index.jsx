@@ -279,7 +279,6 @@ class ProcessParameter extends Component {
    * @param {boolean} isVerify 数据是否通过验证
    */
   getModelData = (data, type, isVerify) => {
-    console.log(data, type, isVerify);
     const { paramList, checkList } = this.state;
     const checkData = [...checkList];
     if (isVerify) {
