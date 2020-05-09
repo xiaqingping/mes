@@ -25,36 +25,7 @@
 }
 
 :global {
-  .classMemberList {
-    .ant-table-cell img {
-      width: 36px;
-      height: 36px;
-    }
-
-    // form.ant-form {
-    //   .ant-table tbody>tr>td.ant-table-cell {
-    //     height: 55px;
-    //     padding: 6px 16px !important;
-    //   }
-
-    //   .ant-table-cell {
-    //     // padding-left: 36px;
-    //   }
-    // }
-
-    .ant-select-single:not(.ant-select-customize-input) .ant-select-selector {
-      padding:0;
-    }
-    .ant-table-thead > tr > th{
-      padding: 14px 36px !important;
-    }
-    .ant-table-tbody > tr > td {
-      padding: 14px 10px 14px 36px !important;
-    }
-  }
-
   .classEditFormItem {
-
     .ant-modal-body,
     .ant-modal-header {
       padding-left: 30px !important;
@@ -72,12 +43,12 @@
     }
 
     .ant-card-body {
-      padding: 0;
+      // padding: 0;
 
       .ant-table-container {
         // padding-left: 30px;
 
-        tbody>tr> {
+        tbody > tr > {
           // td.ant-table-cell {
           //   padding: 14px 10px 14px 36px !important;
           // }
@@ -100,7 +71,7 @@
     }
 
     .ant-tabs-nav {
-      >div>.ant-tabs-tab {
+      > div > .ant-tabs-tab {
         width: 120px;
         margin-right: 0;
         font-size: 16px;
@@ -128,7 +99,6 @@
         left: 400px;
       }
     }
-
   }
 
   .classPageHeaderWrapper {
@@ -136,7 +106,7 @@
       margin: 0 !important;
       padding: 30px 40px !important;
 
-      >div {
+      > div {
         margin-bottom: 0 !important;
       }
     }
@@ -145,7 +115,7 @@
   .classProcessList {
     padding-bottom: 50px;
     .ant-table-tbody {
-      >tr>.ant-table-cell:nth-child(2) {
+      > tr > .ant-table-cell:nth-child(2) {
         button {
           position: relative;
           width: 55px;
@@ -162,19 +132,12 @@
       }
     }
 
-    .ant-table thead > tr > th,.ant-table tbody > tr > td{
+    .ant-table thead > tr > th,
+    .ant-table tbody > tr > td {
       padding: 16px 36px;
     }
     // .ant-table tbody > tr > td  {
     //   padding: 16px 30px 16px 36px;
     // }
-  }
-
-  .classFile {
-    form {
-      .ant-card-body .ant-table-container tbody > tr td.ant-table-cell {
-        padding: 14px 10px 14px 12px !important;
-      }
-    }
   }
 }

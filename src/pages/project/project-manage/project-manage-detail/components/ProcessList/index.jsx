@@ -45,9 +45,9 @@ class ProcessList extends Component {
   /** 设置运行完成状态 */
   setprocessesStatus = () => {
     this.setState({
-      processesStatus: true
-    })
-  }
+      processesStatus: true,
+    });
+  };
 
   /**
    * 获取表格数据
@@ -86,7 +86,7 @@ class ProcessList extends Component {
     const { projectId } = this.props;
     const { processModelId } = processesData;
     const processId = processesData.id;
-    const { processesStatus } = this.state
+    const { processesStatus } = this.state;
 
     let type;
     if (processesData.status === 1) {
@@ -95,13 +95,13 @@ class ProcessList extends Component {
       type = 'view';
     }
 
-    if(processesStatus) {
-      type = 'view'
+    if (processesStatus) {
+      type = 'view';
     }
 
     router.push(
       // eslint-disable-next-line max-len
-     `/project/project-manage/process-parameter/${type}/${processModelId}/${projectId}/${processId}`,
+      `/project/project-manage/process-parameter/${type}/${processModelId}/${projectId}/${processId}`,
     );
   };
 
