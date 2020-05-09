@@ -18,7 +18,7 @@ class SampleSelect extends React.Component {
     } else {
       sampleList = nextProps.paramList.paramValue;
     }
-    console.log(sampleList);
+    console.log(nextProps.paramList);
 
     return {
       tableDatas: sampleList || [],
@@ -242,7 +242,7 @@ class SampleSelect extends React.Component {
       taskModelId,
       paramValue: JSON.stringify(list),
     };
-    this.validPass = !(this.props.paramList.isrequired && list && !list.length);
+    this.validPass = !(this.props.paramList.isRequired === 'true' && list && !list.length);
     this.props.getData(sendData, 'sampleSelect', this.validPass);
   };
 
