@@ -394,17 +394,20 @@ class ProcessEdit extends Component {
     const type = [];
     if (value.length) {
       value.map(item => {
-        console.log(item.params);
+        if (!item.params) return false;
         item.params.map(it => {
           type.push(it.type);
         });
+        return true;
       });
     }
     if (taskList.length) {
       taskList.map(item => {
+        if (!item.params) return false;
         item.params.map(it => {
           type.push(it.type);
         });
+        return true;
       });
     }
     ['sample_select', 'sample_group', 'sample_environment_factor'].forEach(item => {
