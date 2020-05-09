@@ -164,6 +164,10 @@ class TaskModel extends Component {
       type: 'taskModel/getArgumentsList',
       payload: null,
     });
+    dispatch({
+      type: 'taskModel/setFirstOpenParams',
+      payload: true,
+    });
   }
 
   /**
@@ -301,6 +305,7 @@ class TaskModel extends Component {
         .createTaskModel(form)
         .then(() => {
           message.success('任务模型创建成功!');
+          this.setParamsTypeStore([]);
           router.push('/project/task-model');
         })
         .catch(() => {
@@ -315,7 +320,7 @@ class TaskModel extends Component {
         .editTaskModel(form)
         .then(() => {
           message.success('任务模型修改成功!');
-          // dispatchList();
+          this.setParamsTypeStore([]);
           router.push('/project/task-model');
         })
         .catch(() => {
@@ -330,7 +335,7 @@ class TaskModel extends Component {
         .upgradeTaskModel(id, form)
         .then(() => {
           message.success('任务模型升级成功!');
-          // dispatchList();
+          this.setParamsTypeStore([]);
           router.push('/project/task-model');
         })
         .catch(() => {
@@ -340,6 +345,14 @@ class TaskModel extends Component {
         });
     }
     return true;
+  };
+
+  setParamsTypeStore = pretaskParamsType => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'taskModel/setAllPreTaskParamsType',
+      payload: pretaskParamsType,
+    });
   };
 
   /**
@@ -488,6 +501,19 @@ class TaskModel extends Component {
       ids: newIdsData,
       sonIds: sonIdsData,
     });
+    const { allPreTaskParamsType } = this.props.taskModel;
+    let presentType = [];
+    const filterTypes = [];
+    if (value.params && value.params.length) {
+      presentType = value.params.map(item => item.type);
+    }
+    allPreTaskParamsType.forEach(item => {
+      if (!presentType.includes(item)) {
+        filterTypes.push(item);
+      }
+    });
+
+    this.setParamsTypeStore(filterTypes);
   };
 
   render() {
