@@ -159,21 +159,38 @@ class TaskModel extends Component {
    * 组件销毁清除数据
    */
   componentWillUnmount() {
+    // const { dispatch } = this.props;
+    this.dispatchStore('getArgumentsList', null);
+    this.dispatchStore('setFirstOpenParams', true);
+    // dispatch({
+    //   type: 'taskModel/getArgumentsList',
+    //   payload: null,
+    // });
+    // dispatch({
+    //   type: 'taskModel/setFirstOpenParams',
+    //   payload: true,
+    // });
+  }
+
+  /**
+   * 封装dispatch方法
+   * @param {String} func store仓库里的设置相应state的方法名
+   * @param {any} value 需要设置store仓库里的设置相应的state值
+   */
+
+  dispatchStore = (func, value) => {
     const { dispatch } = this.props;
     dispatch({
-      type: 'taskModel/getArgumentsList',
-      payload: null,
+      type: `taskModel/${func}`,
+      payload: value,
     });
-    dispatch({
-      type: 'taskModel/setFirstOpenParams',
-      payload: true,
-    });
-  }
+  };
 
   /**
    * 根据新的id， 获取模型的前置任务和后置任务
    */
   getTableData = id => {
+    const preTaskTypes = [];
     this.setState({
       tableLoading: true,
     });
@@ -185,6 +202,11 @@ class TaskModel extends Component {
         (res || []).forEach(item => {
           uuids.push(item.picture);
           ids.push(item.id);
+          if (item.params && item.params.length) {
+            item.params.forEach(p => {
+              preTaskTypes.push(p.type);
+            });
+          }
         });
         disk
           .getFiles({
@@ -207,6 +229,7 @@ class TaskModel extends Component {
             });
           });
         this.getData(res);
+        this.dispatchStore('setAllPreTaskParamsType', preTaskTypes);
       })
       .catch(() => {
         this.setState({
