@@ -1,6 +1,6 @@
 // 选择任务模型
 import React from 'react';
-import { Modal, Table, Avatar, Form, Col, Tag, Select, Spin } from 'antd';
+import { Modal, Table, Avatar, Form, Col, Tag, Select, Spin, message } from 'antd';
 import TableSearchForm from '@/components/TableSearchForm';
 import { connect } from 'dva';
 import DefaultHeadPicture from '@/assets/imgs/upload_middle.png';
@@ -186,6 +186,7 @@ class BeforeTask extends React.Component {
    *  @param {String}} 用户选中的id
    */
   sendData = async id => {
+    let typeList = []; // 每次点击时先清空
     this.setState({
       loading: true,
     });
@@ -198,8 +199,42 @@ class BeforeTask extends React.Component {
     this.setState({
       loading: false,
     });
+
+    const { allPreTaskParamsType, argumentList } = this.props.taskModel;
+    const argumentTypeList = argumentList.map(item => item.type);
+    let pass = true;
+    typeList = [...allPreTaskParamsType, ...argumentTypeList];
+    const noDoubleParamType = ['sample_select', 'sample_group', 'sample_environment_factor'];
+    const resTypeList = [];
+    res.forEach(item => {
+      if (item.params && item.params.length) {
+        item.params.forEach(p => {
+          resTypeList.push(p.type);
+        });
+      }
+    });
+
+    resTypeList.forEach(item => {
+      if (noDoubleParamType.includes(item)) {
+        if (typeList.includes(item)) {
+          pass = false;
+          return false;
+        }
+      }
+    });
+
+    if (!pass) return message.error('样品选择框，环境因子，分组方案不能重复添加');
+    this.setParamsTypeStore([...allPreTaskParamsType, ...resTypeList]);
     this.props.getData(res);
     this.props.onClose();
+  };
+
+  setParamsTypeStore = pretaskParamsType => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'taskModel/setAllPreTaskParamsType',
+      payload: pretaskParamsType,
+    });
   };
 
   /**

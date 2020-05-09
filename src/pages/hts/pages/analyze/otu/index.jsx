@@ -177,6 +177,10 @@ class OTU extends Component {
         title: '编号/名称',
         dataIndex: 'code',
         width: 300,
+        renderFormItem: item => {
+          console.log(item);
+          return <Input placeholder="123" />;
+        },
         render: (value, row) => (
           <>
             <Avatar
@@ -249,20 +253,17 @@ class OTU extends Component {
             </Button>
           }
           rowKey="id"
-          request={params => api.getProcess(params).then(res => ({ data: res.rows }))}
+          request={params =>
+            api
+              .getProcess({ page: params.current, rows: params.pageSize })
+              .then(res => ({ data: res.rows, total: res.total, success: true }))
+          }
           columns={columns}
           options={false}
           // search={false}
-          // pagination={{
-          //   showSizeChanger: true,
-          //   showQuickJumper: true,
-          //   showTotal: (total, range) => {
-          //     const totalPage = Math.ceil(total / (pagination.pageSize || 10));
-          //     const currentPage = Math.ceil(range[0] / (pagination.pageSize || 10));
-          //     return `共 ${total} 条记录 第 ${currentPage}/${totalPage} 页`;
-          //   },
-          //   ...pagination,
-          // }}
+          pagination={{
+            defaultPageSize: 10,
+          }}
         />
         {/* </Form> */}
         {/* </Card> */}
