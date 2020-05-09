@@ -219,7 +219,7 @@ class ProjectManagement extends Component {
             </Select>
           </FormItem>
         </Col>
-        <Col xxl={6} xl={8} lg={languageCode === 'EN' ? 12 : 0}>
+        <Col xxl={6} lg={languageCode === 'EN' ? 12 : 0}>
           <FormItem label="创建人" name="creatorName">
             <Input placeholder="请输入创建人" />
           </FormItem>

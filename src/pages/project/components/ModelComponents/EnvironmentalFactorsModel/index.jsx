@@ -10,7 +10,7 @@ import UploadSequenceFile from './UploadSequenceFile';
 class EnvironmentalFactorsModel extends React.Component {
   static getDerivedStateFromProps(nextProps) {
     return {
-      samples: nextProps.samples || [],
+      samples: nextProps.sampleList || [],
     };
   }
 
@@ -82,6 +82,7 @@ class EnvironmentalFactorsModel extends React.Component {
 
   // 样品列表改变时同步环境因子样品列表
   selectUpdateDataSource = () => {
+    // debugger
     const { samples, data, headers } = this.state;
     const newData = [];
     samples.map(samItem => {
@@ -104,6 +105,7 @@ class EnvironmentalFactorsModel extends React.Component {
       newData.push(newItem);
       return false;
     });
+    console.log(newData);
     this.setState({
       data: newData,
     });
@@ -218,7 +220,7 @@ class EnvironmentalFactorsModel extends React.Component {
    * samples 父页面传递的 样品列表
    */
   getParamData = () => {
-    const { paramList, samples } = this.props;
+    const { paramList, sampleList } = this.props;
     const { firstColumn } = this.state;
     if (paramList === undefined) return false;
     if (paramList.paramValue === undefined) return false;
@@ -233,7 +235,7 @@ class EnvironmentalFactorsModel extends React.Component {
         // 取出 表头
         const newColumns = this.getTableHeaderData(list, columns, titleName);
         // 取出 行数据
-        const rowData = this.getRowDataEnvironment(list, samples, newColumns);
+        const rowData = this.getRowDataEnvironment(list, sampleList, newColumns);
         // 填充行数据
         const newData = this.getFillDataEnvironment(list, rowData);
 
@@ -439,21 +441,39 @@ class EnvironmentalFactorsModel extends React.Component {
    * samples 样品列表数据
    * columns 环境因子初始列
    */
+  // getRowDataEnvironment = (list, samples, columns) => {
+  //   const newSamples = [];
+  //   // 环境因子数据遍历
+  //   list.forEach(item => {
+  //     // 环境因子列表遍历
+  //     item.environmentFactorValues.forEach(it => {
+  //       // 样品列表遍历
+  //       it.samples.forEach(t => {
+  //         newSamples.push(t);
+  //       });
+  //     });
+  //   });
+
+  //   // 样品去重 排序
+  //   const newData = this.sampleRemoveDuplication(newSamples, samples, columns);
+  //   return newData;
+  // };
+
   getRowDataEnvironment = (list, samples, columns) => {
-    const newSamples = [];
+    const newsamples = [];
     // 环境因子数据遍历
     list.forEach(item => {
       // 环境因子列表遍历
       item.environmentFactorValues.forEach(it => {
         // 样品列表遍历
         it.samples.forEach(t => {
-          newSamples.push(t);
+          newsamples.push(t);
         });
       });
     });
 
     // 样品去重 排序
-    const newData = this.sampleRemoveDuplication(newSamples, samples, columns);
+    const newData = this.sampleRemoveDuplication(newsamples, samples, columns);
     return newData;
   };
 
