@@ -3,10 +3,7 @@ import React, { Component } from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import {
   Button,
-  Card,
   Divider,
-  Form,
-  Col,
   AutoComplete,
   Avatar,
   Tag,
@@ -16,24 +13,21 @@ import {
   Menu,
   Modal,
 } from 'antd';
-import TableSearchForm from '@/components/TableSearchForm';
 import { PlusOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import router from 'umi/router';
 import { connect } from 'dva';
 import _ from 'lodash';
-import { DateUI } from '@/pages/project/components/AntdSearchUI';
 import { formatter, getOperates, cutString } from '@/utils/utils';
 import api from '@/pages/project/api/processModel/';
 import disk from '@/pages/project/api/disk';
 import DefaultHeadPicture from '@/assets/imgs/defaultheadpicture.jpg';
-import StandardTable from '../components/StandardTable';
+import ProTable from '@ant-design/pro-table';
 import ProcessDetail from './process-model-detail';
 import './index.less';
 
-const FormItem = Form.Item;
 const { Option } = Select;
 class ProcessModel extends Component {
-  tableSearchFormRef = React.createRef();
+  ref = React.createRef();
 
   initialValues = {
     page: 1,
@@ -43,15 +37,12 @@ class ProcessModel extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      pagination: {},
-      loading: false,
       visible: false,
       detailValue: {},
       nameCodeVal: [],
       nameCodeValPublish: [],
       filtersData: null,
       processCode: '',
-      publisherCode: '',
     };
     // 异步验证做节流处理
     this.callParter = _.debounce(this.callParter, 500);
@@ -60,7 +51,7 @@ class ProcessModel extends Component {
 
   /** 页面加载table  */
   componentDidMount() {
-    this.getTableData(this.initialValues);
+    // this.getTableData(this.initialValues);
   }
 
   /**
@@ -79,70 +70,70 @@ class ProcessModel extends Component {
    */
   callPublish = value => {
     api.getProcessPublisherCodeAndName(value).then(res => {
-      this.setState({ nameCodeVal: res });
+      this.setState({ nameCodeValPublish: res });
     });
   };
 
-  /**
-   *  获取表格数据
-   *  @param {object} options 需要搜索的值(如page,rows)
-   */
-  getTableData = (options = {}) => {
-    this.setState({ loading: true });
-    const formData = this.tableSearchFormRef.current.getFieldsValue();
-    const { pagination, processCode, publisherCode } = this.state;
-    const { current: page, pageSize: rows } = pagination;
-    let newData = [];
-    let changePage = false;
-    if (formData.status) {
-      changePage = true;
-      newData = { ...newData, status: formData.status.join(',') };
-      delete formData.status;
-    }
+  // /**
+  //  *  获取表格数据
+  //  *  @param {object} options 需要搜索的值(如page,rows)
+  //  */
+  // getTableData = (options = {}) => {
+  //   this.setState({ loading: true });
+  //   const formData = this.tableSearchFormRef.current.getFieldsValue();
+  //   const { pagination, processCode, publisherCode } = this.state;
+  //   const { current: page, pageSize: rows } = pagination;
+  //   let newData = [];
+  //   let changePage = false;
+  //   if (formData.status) {
+  //     changePage = true;
+  //     newData = { ...newData, status: formData.status.join(',') };
+  //     delete formData.status;
+  //   }
 
-    if (formData.publishDate) {
-      changePage = true;
-      newData = {
-        ...newData,
-        publishBeginDate: formData.publishDate[0].format('YYYY-MM-DD'),
-        publicEndDate: formData.publishDate[1].format('YYYY-MM-DD'),
-      };
-      delete formData.publishDate;
-    }
+  //   if (formData.publishDate) {
+  //     changePage = true;
+  //     newData = {
+  //       ...newData,
+  //       publishBeginDate: formData.publishDate[0].format('YYYY-MM-DD'),
+  //       publicEndDate: formData.publishDate[1].format('YYYY-MM-DD'),
+  //     };
+  //     delete formData.publishDate;
+  //   }
 
-    if (formData.name) {
-      changePage = true;
-      newData = { ...newData, code: processCode };
-      delete formData.name;
-    }
-    if (formData.publisherName) {
-      changePage = true;
-      newData = { ...newData, publisherCode };
-      delete formData.publisherName;
-    }
-    const newPage = changePage ? { page: 1 } : page;
-    const data = {
-      ...newPage,
-      rows,
-      ...newData,
-      ...formData,
-      ...options,
-    };
-    api.getProcess(data).then(res => {
-      this.setState({
-        list: res.rows,
-      });
+  //   if (formData.name) {
+  //     changePage = true;
+  //     newData = { ...newData, code: processCode };
+  //     delete formData.name;
+  //   }
+  //   if (formData.publisherName) {
+  //     changePage = true;
+  //     newData = { ...newData, publisherCode };
+  //     delete formData.publisherName;
+  //   }
+  //   const newPage = changePage ? { page: 1 } : page;
+  //   const data = {
+  //     ...newPage,
+  //     rows,
+  //     ...newData,
+  //     ...formData,
+  //     ...options,
+  //   };
+  //   api.getProcess(data).then(res => {
+  //     this.setState({
+  //       list: res.rows,
+  //     });
 
-      this.setState({
-        pagination: {
-          current: data.page,
-          pageSize: data.rows,
-          total: res.total,
-        },
-        loading: false,
-      });
-    });
-  };
+  //     this.setState({
+  //       pagination: {
+  //         current: data.page,
+  //         pageSize: data.rows,
+  //         total: res.total,
+  //       },
+  //       loading: false,
+  //     });
+  //   });
+  // };
 
   /**
    *  流程模型选择样式
@@ -226,10 +217,11 @@ class ProcessModel extends Component {
       return false;
     }
     nameCodeValPublish.forEach(item => {
-      if (item.name.indexOf(value) !== -1 && arr.indexOf(item) !== -1) {
+      console.log(arr);
+      if (item.publisherName.indexOf(value) !== -1 && arr.indexOf(item) !== -1) {
         arr.push(item);
       }
-      if (item.code.indexOf(value) !== -1 && arr.indexOf(item) !== -1) {
+      if (item.publisherCode.indexOf(value) !== -1 && arr.indexOf(item) !== -1) {
         arr.push(item);
       }
     });
@@ -269,78 +261,6 @@ class ProcessModel extends Component {
     });
   };
 
-  /** 单行筛选条件 */
-  simpleForm = () => {
-    const { languageCode, status } = this.props;
-    const { nameCodeVal } = this.state;
-    const children = nameCodeVal.map(item => (
-      <Option key={item.code} value={item.name}>
-        <div
-          onClick={() => {
-            this.setState({
-              processCode: item.code,
-            });
-          }}
-        >
-          {item.code} {item.name}
-        </div>
-      </Option>
-    ));
-    return (
-      <>
-        <Col xxl={6} xl={8} lg={languageCode === 'EN' ? 12 : 12}>
-          <FormItem label="流程模型" name="name">
-            <AutoComplete
-              onSearch={this.inputValue}
-              spellCheck="false"
-              onKeyDown={() => {
-                this.setState({
-                  processCode: '',
-                });
-              }}
-            >
-              {children}
-            </AutoComplete>
-          </FormItem>
-        </Col>
-        <Col xxl={6} xl={8} lg={languageCode === 'EN' ? 12 : 0}>
-          <FormItem label="状态" name="status">
-            <Select mode="multiple" maxTagCount={2} maxTagTextLength={3}>
-              {status.map(item => (
-                <Option key={item.value} value={item.value}>
-                  {item.text}
-                </Option>
-              ))}
-            </Select>
-          </FormItem>
-        </Col>
-        <Col xxl={6} lg={languageCode === 'EN' ? 12 : 0}>
-          <FormItem label="发布人" name="publisherName">
-            <AutoComplete
-              onSearch={this.inputValuePublish}
-              options={nameCodeVal.map(this.renderOptionPublish)}
-              // placeholder={formatMessage({ id: 'bp.inputHere' })}
-              placeholder="发布人"
-            />
-          </FormItem>
-        </Col>
-      </>
-    );
-  };
-
-  /** 完整筛选条件 */
-  advancedForm = () => {
-    const { languageCode } = this.state;
-    return (
-      <DateUI
-        languageCode={languageCode}
-        label="发布时间"
-        name="publishDate"
-        placeholder={['开始时间', '结束时间']}
-      />
-    );
-  };
-
   /** 关闭详情抽屉 */
   onClose = () => {
     this.setState({
@@ -358,14 +278,6 @@ class ProcessModel extends Component {
    * @param {string} value 传入的id对象
    */
   handleUpgrade = value => {
-    // api.getProcessDetail(value.id).then(res => {
-    //   this.props.dispatch({
-    //     type: 'processModel/setValue',
-    //     payload: {
-    //       ...res,
-    //     },
-    //     key: 'processDetail',
-    //   });
     router.push(`/project/process-model/up/${value.id}-up`);
     // });
   };
@@ -384,7 +296,7 @@ class ProcessModel extends Component {
    */
   handleDelete = value => {
     api.deleteProcess(value.id).then(() => {
-      this.getTableData(this.initialValues);
+      this.ref.current.reload();
     });
   };
 
@@ -394,7 +306,7 @@ class ProcessModel extends Component {
    */
   handlePublish = value => {
     api.publishment(value.id).then(() => {
-      this.getTableData(this.initialValues);
+      this.ref.current.reload();
     });
   };
 
@@ -404,7 +316,7 @@ class ProcessModel extends Component {
    */
   handleUnPublish = value => {
     api.unPublishment(value.id).then(() => {
-      this.getTableData(this.initialValues);
+      this.ref.current.reload();
     });
   };
 
@@ -461,14 +373,79 @@ class ProcessModel extends Component {
     return true;
   };
 
-  render() {
-    const { pagination, loading, visible, detailValue, list } = this.state;
+  /**
+   * 列表查询数据的处理
+   * @param {object} params request返回的数据
+   */
+  getParamData = params => {
+    const { processCode, publisherCode } = this.state;
+    const newObj = {
+      page: params.current,
+      rows: params.pageSize,
+      status: params.status ? params.status : '',
+      code: params.name ? processCode : '',
+      publisherCode: params.publisherName ? publisherCode : '',
+      publishBeginDate: params.publishDate ? params.publishDate[0] : '',
+      publicEndDate: params.publishDate ? params.publishDate[1] : '',
+    };
+    Object.getOwnPropertyNames(newObj).forEach(key => {
+      if (!newObj[key]) {
+        delete newObj[key];
+      }
+    });
+    return newObj;
+  };
+
+  /**
+   * 状态的值处理
+   */
+  statusValue = () => {
     const { status } = this.props;
+    // 状态的值
+    let statusValue = {};
+    status.forEach(item => {
+      statusValue = { ...statusValue, [item.value]: { text: item.text, status: item.status } };
+    });
+    return statusValue;
+  };
+
+  render() {
+    const { visible, detailValue, nameCodeVal, nameCodeValPublish } = this.state;
+    const { status } = this.props;
+    const children = nameCodeVal.map(item => (
+      <Option key={item.code} value={item.name}>
+        <div
+          onClick={() => {
+            this.setState({
+              processCode: item.code,
+            });
+          }}
+        >
+          {item.code} {item.name}
+        </div>
+      </Option>
+    ));
+    const publishChildren = nameCodeValPublish.map(item => (
+      <Option key={item.publisherCode} value={item.publisherName}>
+        <div
+          // style={{ display: 'flex' }}
+          onClick={() => {
+            this.setState({
+              publisherCode: item.publisherCode,
+            });
+          }}
+        >
+          <span>{item.publisherName}</span>
+        </div>
+      </Option>
+    ));
+
     const columns = [
       {
         title: '编号/名称',
         dataIndex: 'code',
         width: 300,
+        hideInSearch: true,
         render: (value, row) => (
           <>
             <Avatar
@@ -485,15 +462,27 @@ class ProcessModel extends Component {
         ),
       },
       {
+        title: '流程模型',
+        dataIndex: 'name',
+        hideInTable: true,
+        renderFormItem: ({ onChange }) => (
+          <AutoComplete onSearch={this.inputValue} spellCheck="false" onChange={onChange}>
+            {children}
+          </AutoComplete>
+        ),
+      },
+      {
         title: '描述',
         dataIndex: 'describe',
         width: 400,
         render: value => <div title={value}>{cutString(value, 115)}</div>,
+        hideInSearch: true,
       },
       {
         title: '发布人/时间',
         dataIndex: 'publisherName',
         width: 200,
+        hideInSearch: true,
         render: (value, row) => (
           <>
             <div>{value}</div>
@@ -505,6 +494,7 @@ class ProcessModel extends Component {
         title: '版本',
         dataIndex: 'version',
         width: 140,
+        hideInSearch: true,
         render: value => (
           <Tag color="green" style={{ padding: '0 10px' }}>
             {value}
@@ -515,12 +505,47 @@ class ProcessModel extends Component {
         title: '状态',
         dataIndex: 'status',
         width: 150,
-        filters: status,
+        valueEnum: this.statusValue,
         render: value => (
           <Badge
             status={formatter(status, value, 'value', 'status')}
             text={formatter(status, value, 'value', 'text')}
           />
+        ),
+      },
+      {
+        title: '发布人',
+        dataIndex: 'publisherName',
+        width: 200,
+        renderFormItem: (item, { onChange }) => (
+          <AutoComplete
+            onSearch={this.inputValuePublish}
+            placeholder="发布人"
+            spellCheck="false"
+            onChange={onChange}
+          >
+            {publishChildren}
+          </AutoComplete>
+        ),
+        hideInTable: true,
+        render: (value, row) => (
+          <>
+            <div>{value}</div>
+            <div>{row.publishDate}</div>
+          </>
+        ),
+      },
+      {
+        title: '发布时间',
+        dataIndex: 'publishDate',
+        width: 200,
+        hideInTable: true,
+        valueType: 'dateRange',
+        render: (value, row) => (
+          <>
+            <div>{value}</div>
+            <div>{row.publishDate}</div>
+          </>
         ),
       },
       {
@@ -565,37 +590,27 @@ class ProcessModel extends Component {
 
     return (
       <PageHeaderWrapper>
-        <Card bordered={false} className="setSearchCard">
-          <TableSearchForm
-            ref={this.tableSearchFormRef}
-            initialValues={this.initialValues}
-            getTableData={this.getTableData}
-            simpleForm={this.simpleForm}
-            advancedForm={this.advancedForm}
-          />
-        </Card>
-        <Card style={{ marginTop: '24px' }}>
-          <div>
-            <Button
-              type="primary"
-              onClick={() => this.handleModalVisible()}
-              style={{ marginBottom: '35px' }}
-            >
+        <ProTable
+          actionRef={this.ref}
+          headerTitle={
+            <Button type="primary" onClick={() => this.handleModalVisible()}>
               <PlusOutlined />
               新建
             </Button>
-          </div>
-          <Form ref={this.tableFormRef}>
-            <StandardTable
-              rowClassName="editable-row"
-              loading={loading}
-              data={{ list, pagination }}
-              columns={columns}
-              onSelectRow={this.handleSelectRows}
-              onChange={this.handleStandardTableChange}
-            />
-          </Form>
-        </Card>
+          }
+          rowKey="id"
+          request={params =>
+            api
+              .getProcess(this.getParamData(params))
+              .then(res => ({ data: res.rows, total: res.total, success: true }))
+          }
+          columns={columns}
+          options={false}
+          pagination={{
+            defaultPageSize: 10,
+          }}
+        />
+
         {visible ? (
           <ProcessDetail
             visible={visible}
