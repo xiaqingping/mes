@@ -481,15 +481,13 @@ class ProjectManagement extends Component {
     return (
       <PageHeaderWrapper>
         <Card bordered={false} className="setSearchCard">
-          <div>
-            <TableSearchForm
-              ref={this.tableSearchFormRef}
-              initialValues={this.initialValues}
-              getTableData={this.getTableData}
-              simpleForm={this.simpleForm}
-              advancedForm={this.advancedForm}
-            />
-          </div>
+          <TableSearchForm
+            ref={this.tableSearchFormRef}
+            initialValues={this.initialValues}
+            getTableData={this.getTableData}
+            simpleForm={this.simpleForm}
+            advancedForm={this.advancedForm}
+          />
         </Card>
         <Card style={{ marginTop: '24px' }}>
           <div>
