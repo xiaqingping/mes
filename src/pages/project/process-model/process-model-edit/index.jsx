@@ -429,7 +429,6 @@ class ProcessEdit extends Component {
       taskLoading: true,
     });
     // 判断有没有重复的样品，分组和环境因子
-    console.log(value);
     if (this.judgeFunction(value, taskList)) {
       this.setState({
         taskLoading: false,
