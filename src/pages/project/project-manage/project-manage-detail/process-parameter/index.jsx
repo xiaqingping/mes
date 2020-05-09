@@ -92,8 +92,7 @@ class ProcessParameter extends Component {
       const newParam = this.deleteNullGroup(param); // 删除参数为空的分组
       // 无参数
       if (newParam.length === 0) {
-        message.error('暂无参数列表！')
-        setTimeout(() => router.goBack(), 1000)
+        message.error('暂无参数列表！');
         return false;
       }
       const newParamData = this.disposeParamAttribute(newParam); // 处理参数属性
@@ -315,8 +314,10 @@ class ProcessParameter extends Component {
           // key：value
           nParamItem[proItem.paramPropertyKey] = proItem.paramPropertyValue;
         });
+        console.log(paramItem);
         // TODO:
-        nParamItem.sortNo = Number(paramItem.sortNo.split('')[0]);
+        // nParamItem.sortNo = Number(paramItem.sortNo.split('')[0]);
+        nParamItem.sortNo = paramItem.sortNo;
 
         // 删除 参数属性列表 字段（可不删）
         delete nParamItem.paramProperties;
