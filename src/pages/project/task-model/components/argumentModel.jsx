@@ -22,8 +22,9 @@ class ArgumentModel extends Component {
   componentDidMount() {
     // 获取列表
     const isAdd = window.location.href.indexOf('add') > 0;
-    const { argumentList } = this.props.taskModel;
-    if (argumentList && argumentList.length > 0) {
+    const { argumentList, firstOpenParams } = this.props.taskModel;
+
+    if ((argumentList && argumentList.length > 0) || !firstOpenParams) {
       const list = argumentList.map((item, index) => {
         item.myId = Date.now() + index;
         return item;
@@ -87,6 +88,10 @@ class ArgumentModel extends Component {
           type: 'taskModel/getArgumentsList',
           payload: list,
         });
+        dispatch({
+          type: 'taskModel/setFirstOpenParams',
+          payload: false,
+        });
         this.setState({
           argumentList: list,
           loading: false,
@@ -120,12 +125,21 @@ class ArgumentModel extends Component {
     if (isEdit) {
       list[idx] = props;
     } else {
-      const listkeys = list.map(item => {
-        return item.paramKey;
+      const listkeys = [];
+      const listType = [];
+      const noDoubleList = ['sample_select', 'sample_group', 'sample_environment_factor'];
+      list.forEach(item => {
+        listkeys.push(item.paramKey);
+        listType.push(item.type);
       });
 
       if (listkeys.includes(props.paramKey)) {
         return message.error('参数中存在相同参数key!');
+      }
+      if (noDoubleList.includes(props.type)) {
+        if (listType.includes(props.type)) {
+          return message.error(`参数中只能存在唯一的样品选择，分组方案，环境因子`);
+        }
       }
       list.push(props);
     }

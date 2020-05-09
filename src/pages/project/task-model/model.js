@@ -108,9 +108,29 @@ const SeqModel = {
     editOriginModelData: {}, // index页点击一条任务模型时候的信息
     editTaskModelId: '', // 任务模型修改时候传的任务id, 查询参数列表
     taskDetail: null, // 任务模型详细信息
+    allPreTaskParamsType: [],
+    // 需要请求接口才能获取的参数列表，第一次点击开参数时，是true，之后就是false，走argumentList的数据，而不是从后台获取的数据了
+    // 这样就解决了， 如果第一次进去之后将参数清空了， 根据判断还会重新调一次接口的bug，导致数据并没有清除
+    firstOpenParams: true,
   },
   effects: {},
   reducers: {
+    setFirstOpenParams(state, {
+      payload
+    }) {
+      return {
+        ...state,
+        firstOpenParams: payload
+      }
+    },
+    setAllPreTaskParamsType(state, {
+      payload
+    }) {
+      return {
+        ...state,
+        allPreTaskParamsType: payload
+      }
+    },
     getTaskDetail(state, {
       payload
     }) {

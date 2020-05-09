@@ -117,6 +117,7 @@ class SampleGroup extends React.Component {
    *  当样品改变时更新分组组件
    */
   selectUpdateGroup = () => {
+    if (this.state.disabled) return; // 如果是查看的化就不需要做任何操作
     const { sampleList, groupSchemeData, columns } = this.state;
     const selList = [...sampleList];
     const groupList = [...groupSchemeData];
@@ -1042,6 +1043,7 @@ class SampleGroup extends React.Component {
    */
   getDataFromUpload = (data, headData) => {
     const { groupSchemeData } = this.state;
+    const { colorStore } = this.props.project;
     let cols = [this.firstColumn];
     const dataFromUpload = [...data];
     dataFromUpload.forEach(item => {
@@ -1052,8 +1054,13 @@ class SampleGroup extends React.Component {
           item.sampleId = row.sampleId;
           for (let i = 1; i < num; i++) {
             item[`header_${i + 1}`] = item[i];
-            item[`color_${i + 1}`] =
-              item[i] === '当前样品' || item[i] === '' ? '' : getrandomColor();
+            const color = getrandomColor();
+            if (item[i] === '当前样品' || item[i] === '') {
+              item[`color_${i + 1}`] = '';
+            } else {
+              item[`color_${i + 1}`] = color;
+              this.setColorStore([...colorStore, color]);
+            }
           }
         }
       });
