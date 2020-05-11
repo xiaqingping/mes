@@ -49,11 +49,6 @@ class ProcessModel extends Component {
     this.callPublish = _.debounce(this.callPublish, 500);
   }
 
-  /** 页面加载table  */
-  componentDidMount() {
-    // this.getTableData(this.initialValues);
-  }
-
   /**
    *  搜索流程模型
    *  @param {string} value 需要搜索的值
@@ -73,83 +68,6 @@ class ProcessModel extends Component {
       this.setState({ nameCodeValPublish: res });
     });
   };
-
-  // /**
-  //  *  获取表格数据
-  //  *  @param {object} options 需要搜索的值(如page,rows)
-  //  */
-  // getTableData = (options = {}) => {
-  //   this.setState({ loading: true });
-  //   const formData = this.tableSearchFormRef.current.getFieldsValue();
-  //   const { pagination, processCode, publisherCode } = this.state;
-  //   const { current: page, pageSize: rows } = pagination;
-  //   let newData = [];
-  //   let changePage = false;
-  //   if (formData.status) {
-  //     changePage = true;
-  //     newData = { ...newData, status: formData.status.join(',') };
-  //     delete formData.status;
-  //   }
-
-  //   if (formData.publishDate) {
-  //     changePage = true;
-  //     newData = {
-  //       ...newData,
-  //       publishBeginDate: formData.publishDate[0].format('YYYY-MM-DD'),
-  //       publicEndDate: formData.publishDate[1].format('YYYY-MM-DD'),
-  //     };
-  //     delete formData.publishDate;
-  //   }
-
-  //   if (formData.name) {
-  //     changePage = true;
-  //     newData = { ...newData, code: processCode };
-  //     delete formData.name;
-  //   }
-  //   if (formData.publisherName) {
-  //     changePage = true;
-  //     newData = { ...newData, publisherCode };
-  //     delete formData.publisherName;
-  //   }
-  //   const newPage = changePage ? { page: 1 } : page;
-  //   const data = {
-  //     ...newPage,
-  //     rows,
-  //     ...newData,
-  //     ...formData,
-  //     ...options,
-  //   };
-  //   api.getProcess(data).then(res => {
-  //     this.setState({
-  //       list: res.rows,
-  //     });
-
-  //     this.setState({
-  //       pagination: {
-  //         current: data.page,
-  //         pageSize: data.rows,
-  //         total: res.total,
-  //       },
-  //       loading: false,
-  //     });
-  //   });
-  // };
-
-  /**
-   *  流程模型选择样式
-   *  @param {object} item 在下拉框里展示的值
-   */
-  renderOption = item => ({
-    value: `${item.code}  ${item.name}`,
-    label: (
-      // <Option key={item.id} text={item.name}>
-      <div style={{ display: 'flex', marginLeft: '14px', padding: '6px 0' }}>
-        <span>{item.code}</span>&nbsp;&nbsp;
-        <span>{item.name}</span>
-      </div>
-      // </Option>
-    ),
-  });
 
   /**
    *  流程模型筛选值
@@ -181,28 +99,6 @@ class ProcessModel extends Component {
   };
 
   /**
-   *  发布人选择样式
-   *  @param {object} item 在下拉框里展示的值
-   */
-  renderOptionPublish = item => ({
-    value: item.publisherName,
-    label: (
-      // <Option key={item.id} text={item.name}>
-      <div
-        style={{ display: 'flex' }}
-        onClick={() => {
-          this.setState({
-            publisherCode: item.publisherCode,
-          });
-        }}
-      >
-        <span>{item.publisherName}</span>
-      </div>
-      // </Option>
-    ),
-  });
-
-  /**
    *  发布人筛选值
    *  @param {string} value input搜索的值
    */
@@ -230,35 +126,6 @@ class ProcessModel extends Component {
       // allowClear: 'ture',
     });
     return true;
-  };
-
-  /**
-   *  分页
-   *  @param {object} pagination 分页的对象
-   *  @param {object} filters 检索的对象
-   */
-  handleStandardTableChange = (pagination, filters) => {
-    const { filtersData } = this.state;
-    let filterData = {};
-    const page = pagination;
-    if (filters) {
-      if (filters.status && filters.status[0]) {
-        filterData.status = filters.status.join(',');
-      }
-      this.setState({
-        filtersData: filterData,
-      });
-      page.current = 1;
-      page.pageSize = 10;
-    } else if (filtersData) {
-      filterData = filtersData;
-    }
-
-    this.getTableData({
-      page: page.current,
-      rows: page.pageSize,
-      ...filterData,
-    });
   };
 
   /** 关闭详情抽屉 */
@@ -388,7 +255,6 @@ class ProcessModel extends Component {
       publishBeginDate: params.publishDate ? params.publishDate[0] : '',
       publicEndDate: params.publishDate ? params.publishDate[1] : '',
     };
-    console.log(params);
     Object.getOwnPropertyNames(newObj).forEach(key => {
       if (!newObj[key]) {
         delete newObj[key];
@@ -411,8 +277,11 @@ class ProcessModel extends Component {
     return statusValue;
   };
 
-  render() {
-    const { visible, detailValue, nameCodeVal, nameCodeValPublish } = this.state;
+  /**
+   * 设置表格的colums
+   */
+  columns = () => {
+    const { nameCodeVal, nameCodeValPublish } = this.state;
     const { status } = this.props;
     const children = nameCodeVal.map(item => (
       <Option key={item.code} value={item.name}>
@@ -441,8 +310,7 @@ class ProcessModel extends Component {
         </div>
       </Option>
     ));
-
-    const columns = [
+    return [
       {
         title: '编号/名称',
         dataIndex: 'code',
@@ -589,6 +457,11 @@ class ProcessModel extends Component {
         },
       },
     ];
+  };
+
+  render() {
+    const { visible, detailValue } = this.state;
+    const { status } = this.props;
 
     return (
       <PageHeaderWrapper>
@@ -606,7 +479,7 @@ class ProcessModel extends Component {
               .getProcess(this.getParamData(params))
               .then(res => ({ data: res.rows, total: res.total, success: true }))
           }
-          columns={columns}
+          columns={this.columns()}
           options={false}
           pagination={{
             defaultPageSize: 10,
