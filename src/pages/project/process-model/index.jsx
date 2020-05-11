@@ -29,11 +29,6 @@ const { Option } = Select;
 class ProcessModel extends Component {
   ref = React.createRef();
 
-  initialValues = {
-    page: 1,
-    rows: 10,
-  };
-
   constructor(props) {
     super(props);
     this.state = {
@@ -374,7 +369,7 @@ class ProcessModel extends Component {
         title: '状态',
         dataIndex: 'status',
         width: 150,
-        valueEnum: this.statusValue,
+        valueEnum: this.statusValue(),
         render: value => (
           <Badge
             status={formatter(status, value, 'value', 'status')}
