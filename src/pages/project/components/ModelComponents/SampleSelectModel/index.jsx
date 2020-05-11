@@ -18,7 +18,6 @@ class SampleSelect extends React.Component {
     } else {
       sampleList = nextProps.paramList.paramValue;
     }
-
     return {
       tableDatas: sampleList || [],
       // TODO: 提交时一定要修改过来

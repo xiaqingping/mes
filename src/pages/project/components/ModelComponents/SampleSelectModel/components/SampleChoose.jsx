@@ -72,7 +72,6 @@ class SampleChoose extends React.Component {
             item = { text: item.sampleName, value: item.sampleCode };
             return item;
           });
-          console.log(filterData);
           this.setState(
             {
               tableData: res,
