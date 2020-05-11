@@ -97,6 +97,8 @@ class EnvironmentalFactorsModel extends React.Component {
       });
       if (item[samItem.id]) {
         newItem = item[samItem.id];
+        newItem.sampleName = samItem.sampleAlias || samItem.sampleName;
+
       } else {
         headers.forEach(key => {
           newItem[key] = '';
@@ -435,29 +437,6 @@ class EnvironmentalFactorsModel extends React.Component {
     return newColumns;
   };
 
-  /**
-   * 获取行数据 环境因子
-   * list 环境因子数据
-   * samples 样品列表数据
-   * columns 环境因子初始列
-   */
-  // getRowDataEnvironment = (list, samples, columns) => {
-  //   const newSamples = [];
-  //   // 环境因子数据遍历
-  //   list.forEach(item => {
-  //     // 环境因子列表遍历
-  //     item.environmentFactorValues.forEach(it => {
-  //       // 样品列表遍历
-  //       it.samples.forEach(t => {
-  //         newSamples.push(t);
-  //       });
-  //     });
-  //   });
-
-  //   // 样品去重 排序
-  //   const newData = this.sampleRemoveDuplication(newSamples, samples, columns);
-  //   return newData;
-  // };
 
   getRowDataEnvironment = (list, samples, columns) => {
     const newsamples = [];
