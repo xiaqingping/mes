@@ -464,7 +464,7 @@ class TaskModel extends Component {
     let data = tableData;
     const idsData = ids;
     const sonIdsData = sonIds;
-    data = [...tableData, ...value];
+    data = [...tableData, ...(value || [])];
     (value || []).forEach(item => {
       idsData.unshift(item.id);
       sonIdsData.unshift(...(item.preTaskIds || []));
