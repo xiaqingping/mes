@@ -255,7 +255,7 @@ class OTU extends Component {
           rowKey="id"
           request={params =>
             api
-              .getProcess({ page: params.current, rows: params.pageSize })
+              .getProcess({ page: params.current, rows: params.pageSize, status: params.status })
               .then(res => ({ data: res.rows, total: res.total, success: true }))
           }
           columns={columns}
