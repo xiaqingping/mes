@@ -181,6 +181,8 @@ class ChooseProcessModel extends React.Component {
       this.setState({
         selectedIds: idsList,
         selecteditem: processModelList,
+      },() => {
+        console.log(selecteditem)
       });
     }
     if (selectedIds.includes(itemlist)) {
@@ -286,12 +288,13 @@ class ChooseProcessModel extends React.Component {
                       // eslint-disable-next-line react/no-array-index-key
                       key={item.id}
                     >
-                      <Card
+                      <Card.Grid
                         style={{
                           width: '300px',
-                          padding: '0',
                           height: '170px',
-                          boxShadow: '1px 1px 10px #ccc',
+                          padding:'0',
+                          paddingLeft:'24px'
+                          // boxShadow: '1px 1px 10px #ccc',
                         }}
                         bordered={false}
                         onClick={() => this.clickSelect(item)}
@@ -302,9 +305,7 @@ class ChooseProcessModel extends React.Component {
                         <div
                           style={{
                             height: '80px',
-                            width: '270px',
                             paddingTop: '10px',
-                            // marginBottom: '15px',
                           }}
                         >
                           <Avatar
@@ -324,7 +325,7 @@ class ChooseProcessModel extends React.Component {
                           <div
                             style={{
                               float: 'left',
-                              height: '50px',
+                              height: '80px',
                               width: '120px',
                               textAlign: 'center',
                             }}
@@ -351,10 +352,8 @@ class ChooseProcessModel extends React.Component {
                           <div
                             style={{
                               fontSize: '14px',
-                              position: 'absolute',
-                              right: '0',
-                              top: '16px',
-                              marginRight: '10px',
+                              float:'right',
+                              paddingRight:'5px'
                             }}
                             className="isView"
                           >
@@ -370,6 +369,7 @@ class ChooseProcessModel extends React.Component {
                           style={{
                             fontSize: '14px',
                             paddingTop: '10px',
+                            paddingRight:'24px',
                             WebkitBoxOrient: 'vertical',
                           }}
                         >
@@ -387,7 +387,7 @@ class ChooseProcessModel extends React.Component {
                             style={{ position: 'absolute', right: '0', bottom: '0' }}
                           />
                         </div>
-                      </Card>
+                      </Card.Grid>
                     </Col>
                   ))}
                 </Row>
