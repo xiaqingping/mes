@@ -41,7 +41,6 @@ class ProcessModel extends Component {
       detailValue: {},
       nameCodeVal: [],
       nameCodeValPublish: [],
-      filtersData: null,
       processCode: '',
     };
     // 异步验证做节流处理
