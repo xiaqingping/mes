@@ -4,8 +4,7 @@
 import React, { Component } from 'react';
 import {
   Badge,
-  message,
-  AutoComplete
+  message
 } from 'antd';
 // import { PlusOutlined } from '@ant-design/icons';
 import { connect } from 'dva';
@@ -23,7 +22,6 @@ class Metadata extends Component {
   state = {
     visibleParam: false, // 显示参数抽屉
     originalParam: [], // 原始参数列表
-    nameCodeVal: [],
   };
 
   // 顶部表单默认值
