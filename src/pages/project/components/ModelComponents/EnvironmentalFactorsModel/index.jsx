@@ -10,7 +10,7 @@ import UploadSequenceFile from './UploadSequenceFile';
 class EnvironmentalFactorsModel extends React.Component {
   static getDerivedStateFromProps(nextProps) {
     return {
-      samples: nextProps.sampleList || [],
+      sampleList: nextProps.sampleList || [],
     };
   }
 
@@ -18,7 +18,7 @@ class EnvironmentalFactorsModel extends React.Component {
     super(props);
     this.state = {
       // 样品选择框 样品列表
-      samples: [],
+      sampleList: [],
       // 参数列表
       // eslint-disable-next-line react/no-unused-state
       paramList: props.paramList,
@@ -38,7 +38,7 @@ class EnvironmentalFactorsModel extends React.Component {
       },
       // 表头 最后一列
       lastColumn: {
-        title: () => <PlusSquareOutlined onClick={this.addColumn} />,
+        title: () => <PlusSquareOutlined className={style.addButton} onClick={this.addColumn} />,
         dataIndex: 'add',
         key: 'add',
         width: 80,
@@ -57,7 +57,7 @@ class EnvironmentalFactorsModel extends React.Component {
   // 初始化表格
   initTable = () => {
     // 初始数据
-    const { samples, headers, firstColumn, lastColumn } = this.state;
+    const { sampleList, headers, firstColumn, lastColumn } = this.state;
 
     // 获取表头
     const columns = [firstColumn, ...this.formatHeader(headers), lastColumn];
@@ -65,13 +65,14 @@ class EnvironmentalFactorsModel extends React.Component {
     const newList = [];
     // 获取表格数据
     let i = 1;
-    samples.forEach(item => {
+    sampleList.forEach(item => {
       const newItem = {};
       newItem.id = i++;
       newItem.sampleName = item.sampleAlias || item.sampleName;
       newItem.add = '';
       newList.push(newItem);
     });
+
     this.setState({
       data: newList,
       columns,
@@ -81,10 +82,9 @@ class EnvironmentalFactorsModel extends React.Component {
 
   // 样品列表改变时同步环境因子样品列表
   selectUpdateDataSource = () => {
-    // debugger
-    const { samples, data, headers } = this.state;
+    const { sampleList, data, headers } = this.state;
     const newData = [];
-    samples.map(samItem => {
+    sampleList.map(samItem => {
       let newItem = {};
       newItem = {
         sampleId: samItem.id,
@@ -97,7 +97,6 @@ class EnvironmentalFactorsModel extends React.Component {
       if (item[samItem.id]) {
         newItem = item[samItem.id];
         newItem.sampleName = samItem.sampleAlias || samItem.sampleName;
-
       } else {
         headers.forEach(key => {
           newItem[key] = '';
@@ -111,7 +110,11 @@ class EnvironmentalFactorsModel extends React.Component {
     });
   };
 
-  // 提交数据格式化
+  /**
+   * 提交数据格式化
+   * @param {Array} tableSources 表格资源(表头数据或表数据)
+   * @param {String} type 资源类型
+   */
   formatSubmitData = (tableSources, type) => {
     const { paramList } = this.state;
     let { data, headers } = this.state;
@@ -121,56 +124,60 @@ class EnvironmentalFactorsModel extends React.Component {
       data = tableSources;
     }
 
-    if (data.length === 0 || headers.length === 0) return false;
+    let error;
 
     // 数据整理
     let tableData = [];
-    headers.forEach(item => {
-      tableData = [
-        ...tableData,
-        { environmentFactorName: item.title, environmentFactorValues: [] },
-      ];
-    });
-
-    for (let i = 2; i < tableData.length + 2; i++) {
-      if (!tableData[i - 2]) return false;
-      const values = [];
-      // eslint-disable-next-line no-loop-func
-      data.forEach(item => {
-        if (item[`header_${i}`] !== '') {
-          const sampleValue = {
-            // TODO:
-            sampleId: item.sampleId || item.metadataSampleId,
-            sampleName: item.sampleName,
-          };
-          const samples = [];
-          samples.push(sampleValue);
-          if (values.indexOf(item[`header_${i}`]) === -1) {
-            tableData[i - 2].environmentFactorValues.push({
-              environmentFactorValue: item[`header_${i}`],
-              samples,
-            });
-          } else {
-            tableData[i - 2].environmentFactorValues.forEach(valItem => {
-              if (item[`header_${i}`] === valItem.environmentFactorValue) {
-                valItem.samples.push(sampleValue);
-              }
-            });
-          }
-          values.push(item[`header_${i}`]);
-        }
+    if (data.length > 0 || headers.length > 0) {
+      headers.forEach(item => {
+        tableData = [
+          ...tableData,
+          { environmentFactorName: item.title, environmentFactorValues: [] },
+        ];
       });
+
+      for (let i = 2; i < tableData.length + 2; i++) {
+        if (!tableData[i - 2]) return false;
+        const values = [];
+        // eslint-disable-next-line no-loop-func
+        data.forEach(item => {
+          if (item[`header_${i}`] !== '') {
+            const sampleValue = {
+              // TODO:
+              sampleId: item.sampleId || item.metadataSampleId,
+              sampleName: item.sampleName,
+            };
+            const samples = [];
+            samples.push(sampleValue);
+            if (values.indexOf(item[`header_${i}`]) === -1) {
+              tableData[i - 2].environmentFactorValues.push({
+                environmentFactorValue: item[`header_${i}`],
+                samples,
+              });
+            } else {
+              tableData[i - 2].environmentFactorValues.forEach(valItem => {
+                if (item[`header_${i}`] === valItem.environmentFactorValue) {
+                  valItem.samples.push(sampleValue);
+                }
+              });
+            }
+            values.push(item[`header_${i}`]);
+          }
+        });
+      }
+      // 验证数据
+      error = this.verifyData(tableData);
     }
-    // 验证数据
-    const error = this.verifyData(tableData);
-    if (error) return false;
+
+    if (data.length === 0 || headers.length === 0 || tableData.length === 0) error = true;
+
     const newData = {
       paramData: {
         paramKey: paramList.paramKey,
-        paramValue: JSON.stringify(tableData),
+        paramValue: error ? 'false' : JSON.stringify(tableData),
         taskModelId: paramList.taskModelId,
       },
-      isVerify: true,
+      isVerify: !error,
     };
     this.props.getData(newData.paramData, 'environmentFactor', newData.isVerify);
     return false;
@@ -178,9 +185,10 @@ class EnvironmentalFactorsModel extends React.Component {
 
   /**
    * 验证数据
-   * 1. 环境因子下不能全部为空
+   * @param {Array} tableData 表数据
    */
   verifyData = tableData => {
+    // 环境因子下不能全部为空
     let error = false;
     tableData.forEach(item => {
       if (item.environmentFactorValues.length === 0) {
@@ -193,8 +201,8 @@ class EnvironmentalFactorsModel extends React.Component {
 
   /**
    * 整理表头表数据
-   * tableHaed 表头数据
-   * tableList 表数据
+   * @param {Array} tableHaed 表头数据
+   * @param {Array} tableList 表数据
    */
   getDataDispose = (tableHaed, tableList) => {
     const newHeader = tableHaed.filter(item => item.dataIndex !== 'sampleName');
@@ -216,8 +224,8 @@ class EnvironmentalFactorsModel extends React.Component {
 
   /**
    * 获取参数数据
-   * paramList 父页面传递的 参数数据
-   * samples 父页面传递的 样品列表
+   * @param {Array} paramList 父页面传递的 参数数据
+   * @param {Array} sampleList 父页面传递的 样品列表
    */
   getParamData = () => {
     const { paramList, sampleList } = this.props;
@@ -236,9 +244,9 @@ class EnvironmentalFactorsModel extends React.Component {
         const newColumns = this.getTableHeaderData(list, columns, titleName);
         // 取出 行数据
         const rowData = this.getRowDataEnvironment(list, sampleList, newColumns);
-        // console.log('rowData', rowData)
         // 填充行数据
         const newData = this.getFillDataEnvironment(list, rowData);
+
         this.getDataDispose(newColumns, newData);
       }
     }
@@ -247,9 +255,9 @@ class EnvironmentalFactorsModel extends React.Component {
 
   /**
    * 新增列
-   * headers 表头数据
-   * firstColumn 第一列表头
-   * lastColumn 最后一列表头
+   * @param {Array} headers 表头数据
+   * @param {Object} firstColumn 第一列表头
+   * @param {Object} lastColumn 最后一列表头
    */
   addColumn = () => {
     const { headers, firstColumn, lastColumn } = this.state;
@@ -295,14 +303,14 @@ class EnvironmentalFactorsModel extends React.Component {
 
   /**
    * 移除列
-   * data 表数据
-   * headers 表头数据
+   * @param {Array} data 表数据
+   * @param {Array} headers 表头数据
    */
   removeColumn = event => {
     const { data, headers, firstColumn, lastColumn } = this.state;
-    console.log(this.state)
     const headerArr = headers.filter(item => item.id !== event.id);
     const dataArr = data.filter(item => item[event.dataIndex] !== event.dataIndex);
+
     this.setState(
       {
         headers: headerArr,
@@ -311,14 +319,14 @@ class EnvironmentalFactorsModel extends React.Component {
         const hds = this.state.headers;
         const columns = [firstColumn, ...this.formatHeader(hds), lastColumn];
         this.setState({ columns, data: dataArr });
-        this.formatSubmitData(hds, 'tableHeader')
+        this.formatSubmitData(headerArr, 'tableHeader');
       },
     );
   };
 
   /**
    * 修改表头
-   * row 当前行数据
+   * @param {Object} row 当前行数据
    */
   handleOnChangeTitle = (row, event) => {
     const { headers } = this.state;
@@ -336,8 +344,8 @@ class EnvironmentalFactorsModel extends React.Component {
 
   /**
    * 修改数据
-   * row 当前行数据
-   * title 当前列的title
+   * @param {Object} row 当前行数据
+   * @param {String} title 当前列的title
    */
   handleOnChangeData = (row, event, title) => {
     const { data, headers } = this.state;
@@ -366,13 +374,13 @@ class EnvironmentalFactorsModel extends React.Component {
 
   /**
    * 配置表头
-   * headers 表头数据
+   * @param {Array} headers 表头数据
    */
   formatHeader = headers => {
     const disabledIs = this.props.disabled; // 是否禁用
     const groups = headers.map(item => ({
       title: () => (
-        <div className="project_manage_UI_sample_group_title" key={item.id}>
+        <div className={style.environmentFactorTitle} key={item.id}>
           <input
             defaultValue={item.title}
             onBlur={event => this.handleOnChangeTitle(item, event)}
@@ -383,7 +391,7 @@ class EnvironmentalFactorsModel extends React.Component {
       ),
       dataIndex: `${item.dataIndex}`,
       key: `${item.key}`,
-      width: 100,
+      width: 150,
       render: (value, row) => (
         <div className={style.editTable} key={item.id}>
           <input
@@ -398,20 +406,20 @@ class EnvironmentalFactorsModel extends React.Component {
     return groups;
   };
 
-  // 上传
+  /** 上传 */
   uploadButton = () => {
     this.setState({ visible: true });
   };
 
-  // 关闭上传
+  /** 关闭上传 */
   handleClose = () => {
     this.setState({ visible: false });
   };
 
   /**
    * 获取表头
-   * data 数据列表
-   * columns 初始列
+   * @param {Array} data 数据列表
+   * @param {Array} columns 初始列
    */
   getTableHeaderData = (data, columns, titleName) => {
     const newColumns = JSON.parse(JSON.stringify(columns));
@@ -436,8 +444,13 @@ class EnvironmentalFactorsModel extends React.Component {
     return newColumns;
   };
 
-
-  getRowDataEnvironment = (list, samples, columns) => {
+  /**
+   * 获取行数据 环境因子
+   * @param {Array} list 环境因子数据
+   * @param {Array} sampleList 样品列表数据
+   * @param {Array} columns 环境因子初始列
+   */
+  getRowDataEnvironment = (list, sampleList, columns) => {
     const newsamples = [];
     // 环境因子数据遍历
     list.forEach(item => {
@@ -449,18 +462,18 @@ class EnvironmentalFactorsModel extends React.Component {
         });
       });
     });
+
     // 样品去重 排序
-    const newData = this.sampleRemoveDuplication(newsamples, samples, columns);
+    const newData = this.sampleRemoveDuplication(newsamples, sampleList, columns);
     return newData;
   };
 
   /**
    * 填充行数据 环境因子
-   * list  环境因子数据
-   * rowData 行数据 有表头字段但数据为空
+   * @param {Array} list  环境因子数据
+   * @param {Array} rowData 行数据 有表头字段但数据为空
    */
   getFillDataEnvironment = (list, rowData) => {
-    console.log('list', list)
     // 环境因子遍历
     list.forEach(item => {
       const { environmentFactorName } = item;
@@ -493,11 +506,11 @@ class EnvironmentalFactorsModel extends React.Component {
 
   /**
    * 样品去重 排序
-   * list 数据中拿到的样品列表
-   * samples 样品表中的样品列表
-   * columns 初始列数据
+   * @param {Array} list 数据中拿到的样品列表
+   * @param {Array} sampleList 样品表中的样品列表
+   * @param {Array} columns 初始列数据
    */
-  sampleRemoveDuplication = (list, samples, columns) => {
+  sampleRemoveDuplication = (list, sampleList, columns) => {
     // 去重
     const newSample = [];
     const ids = [];
@@ -514,12 +527,8 @@ class EnvironmentalFactorsModel extends React.Component {
 
     // 第一列样品 排序 与样品列表顺序一致
     const newData = [];
-
-    samples.forEach(item => {
+    sampleList.forEach(item => {
       newSample.forEach(it => {
-        // console.log('item', item.id)
-        // console.log('it', it.sampleId)
-        // console.log('samples', samples)
         if (item.id === it.sampleId) {
           // 拼装行
           const newIt = {
@@ -534,19 +543,17 @@ class EnvironmentalFactorsModel extends React.Component {
         }
       });
     });
-    console.log('samples', newData)
     return newData;
   };
 
   render() {
-    const { columns, data, visible, samples } = this.state;
+    const { columns, data, visible, sampleList } = this.state;
     const disabledIs = this.props.disabled; // 是否禁用
     let tableWidth = 0;
     const { paramName } = this.props.paramList;
-
     const newColumns = columns.map(col => {
       // eslint-disable-next-line no-param-reassign
-      if (!col.width) col.width = 100;
+      if (!col.width) col.width = 150;
       tableWidth += col.width;
       if (!col.editable) {
         return col;
@@ -559,7 +566,7 @@ class EnvironmentalFactorsModel extends React.Component {
         <div style={{ float: 'left', marginTop: 10, fontSize: 15, fontWeight: 'bold' }}>
           {paramName}
         </div>
-        {!disabledIs || samples.length > 0 ? (
+        {!disabledIs || sampleList.length > 0 ? (
           <div
             onClick={() => this.uploadButton()}
             style={{ float: 'right', marginTop: 10, marginBottom: 10 }}
@@ -584,7 +591,7 @@ class EnvironmentalFactorsModel extends React.Component {
         {/* 上传文件 */}
         <UploadSequenceFile
           visible={visible}
-          samples={samples}
+          sampleList={sampleList}
           handleClose={this.handleClose}
           getUploadData={this.getDataDispose}
         />

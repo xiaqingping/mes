@@ -31,7 +31,7 @@ class MemberList extends Component {
 
   /**
    * 获取表格数据
-   * @param {string} projectId 项目列表ID
+   * @param {String} projectId  项目ID
    */
   getTableData = projectId => {
     this.setState({ loading: true });
@@ -49,8 +49,8 @@ class MemberList extends Component {
 
   /**
    * 修改成员权限
-   * @param {number} value 成员类型
-   * @param {object} row 表格数据
+   * @param {Number} value  权限值
+   * @param {Object} row  行数据
    */
   handleUpdateJurisdiction = (value, row) => {
     let jurisdictionName = '';
@@ -72,7 +72,7 @@ class MemberList extends Component {
 
   /**
    * 确认修改权限
-   * @param {object} data 表格数据row
+   * @param {Object} data  修改数据
    */
   getEditModelData = data => {
     if (data.type === 'ok') {
