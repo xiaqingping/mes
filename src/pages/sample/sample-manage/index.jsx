@@ -1,18 +1,16 @@
 /** 样品table页面 */
 import React, { Component } from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
-import { Button, Card, Form, Col, AutoComplete, Select } from 'antd';
-import TableSearchForm from '@/components/TableSearchForm';
+import { Button,   AutoComplete, Select } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
 import { connect } from 'dva';
 import _ from 'lodash';
 import api from '@/pages/sample/api/sample';
-import StandardTable from '@/pages/project/components/StandardTable';
+import ProTable from '@ant-design/pro-table';
 import UploadSequenceFile from '../UploadSequenceFile';
 import SampleDetail from '../sample-detail';
 import './index.less';
 
-const FormItem = Form.Item;
 const { Option } = Select;
 class SampleModel extends Component {
   tableSearchFormRef = React.createRef();
@@ -26,12 +24,9 @@ class SampleModel extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      pagination: {},
-      loading: false,
       visible: false,
       detailValue: {},
       nameCodeVal: [],
-      filtersData: null,
       sampleCode: '',
       detailVisible: false,
     };
@@ -41,7 +36,7 @@ class SampleModel extends Component {
 
   /** 加载table */
   componentDidMount() {
-    this.getTableData(this.initialValues);
+    this.getSampleData(this.initialValues);
   }
 
   /**
@@ -49,7 +44,7 @@ class SampleModel extends Component {
    * @param {string} value 搜索的值
    */
   callSample = value => {
-    api.getSampleCodeAndName(value).then(res => {
+    api.getSampleCodeAndName(value).then(res => {      
       this.setState({ nameCodeVal: res });
     });
   };
@@ -58,41 +53,24 @@ class SampleModel extends Component {
    *  获取表格数据
    *  @param {object} options 需要搜索的值(如page,rows)
    */
-  getTableData = (options = {}) => {
-    this.setState({ loading: true });
-    const formData = this.tableSearchFormRef.current.getFieldsValue();
-    const { pagination, sampleCode } = this.state;
-    const { current: page, pageSize: rows } = pagination;
-    let newData = [];
-    let changePage = false;
+  getSampleData = params => {
+    
+    const { sampleCode } = this.state;
 
-    if (formData.name) {
-      changePage = true;
-      newData = { ...newData, sampleCode };
-      delete formData.name;
-    }
-
-    const newPage = changePage ? { page: 1 } : page;
-    const data = {
-      ...newPage,
-      rows,
-      ...newData,
-      ...formData,
-      ...options,
+    const newObj = {
+      page: params.current,
+      rows: params.pageSize,
+      sampleCode: params.sampleCode ? sampleCode : '',
     };
-
-    api.getSample(data).then(res => {
-      this.setState({
-        list: res.rows,
-        pagination: {
-          current: data.page,
-          pageSize: data.rows,
-          total: res.total,
-        },
-        loading: false,
-      });
+    Object.getOwnPropertyNames(newObj).forEach(key => {
+      if (!newObj[key]) {
+        delete newObj[key];
+      }
     });
+
+    return newObj;
   };
+  
 
   /**
    *  样品筛选值
@@ -108,7 +86,7 @@ class SampleModel extends Component {
     if (nameCodeVal.length === 0) {
       return false;
     }
-
+   
     nameCodeVal.forEach(item => {
       if (item.sampleName.indexOf(value) !== -1 && arr.indexOf(item) !== -1) {
         arr.push(item);
@@ -119,89 +97,8 @@ class SampleModel extends Component {
     });
     this.setState({
       nameCodeVal: arr,
-      // allowClear: 'ture',
     });
     return true;
-  };
-
-  /**
-   *  分页
-   *  @param {object} pagination 分页的对象
-   *  @param {object} filters 检索的对象
-   */
-  handleStandardTableChange = (pagination, filters) => {
-    const { filtersData } = this.state;
-    let filterData = {};
-    const page = pagination;
-    if (filters) {
-      if (filters.status && filters.status[0]) {
-        filterData.status = filters.status.join(',');
-      }
-      this.setState({
-        filtersData: filterData,
-      });
-      page.current = 1;
-      page.pageSize = 10;
-    } else if (filtersData) {
-      filterData = filtersData;
-    }
-
-    this.getTableData({
-      page: page.current,
-      rows: page.pageSize,
-      ...filterData,
-    });
-  };
-
-  /** 单行筛选条件 */
-  simpleForm = () => {
-    const { languageCode } = this.props;
-    const { nameCodeVal } = this.state;
-    const children = nameCodeVal.map(item => (
-      <Option key={item.sampleCode} value={item.sampleName}>
-        <div
-          onClick={() => {
-            this.setState({
-              sampleCode: item.sampleCode,
-            });
-          }}
-        >
-          {item.sampleCode} {item.sampleName}
-        </div>
-      </Option>
-    ));
-    return (
-      <>
-        <Col xxl={6} xl={8} lg={languageCode === 'EN' ? 12 : 12}>
-          <FormItem label="样品" name="name">
-            <AutoComplete
-              onSearch={this.inputValue}
-              spellCheck="false"
-              onKeyDown={() => {
-                this.setState({
-                  sampleCode: '',
-                });
-              }}
-            >
-              {children}
-            </AutoComplete>
-          </FormItem>
-        </Col>
-        <Col span={16} style={{ textAlign: 'right' }}>
-          <Button type="primary" htmlType="submit">
-            查询
-          </Button>
-          <Button
-            style={{ marginLeft: 8 }}
-            onClick={() => {
-              this.tableSearchFormRef.current.resetFields();
-            }}
-          >
-            重置
-          </Button>
-        </Col>
-      </>
-    );
   };
 
   /** 打开上传序列文件弹框 */
@@ -220,7 +117,7 @@ class SampleModel extends Component {
       visible: false,
     });
     if (status) {
-      this.getTableData();
+      this.getSampleData();
     }
   };
 
@@ -235,11 +132,11 @@ class SampleModel extends Component {
    * 删除
    * @param {string} value 传入的id对象
    */
-  handleDelete = value => {
-    api.deleteProcess(value.id).then(() => {
-      this.getTableData();
-    });
-  };
+  // handleDelete = value => {
+  //   api.deleteProcess(value.id).then(() => {
+  //     this.getSampleData();
+  //   });
+  // };
 
   /**
    * 查看详情
@@ -252,26 +149,37 @@ class SampleModel extends Component {
     });
   };
 
-  render() {
-    const { pagination, loading, list, visible, detailVisible, detailValue } = this.state;
-    const columns = [
+  columns = () => {
+    const { nameCodeVal} = this.state;
+    const children = nameCodeVal.map(item => (
+      <Option key={item.sampleCode} value={item.sampleName}>
+        <div
+          onClick={() => {
+            this.setState({
+              sampleCode: item.sampleCode,
+            });
+          }}
+        >
+          {item.sampleCode} {item.sampleName}
+        </div>
+      </Option>
+    ));
+    return [
       {
         title: '编号/名称',
         dataIndex: 'sampleCode',
         width: 300,
-        render: (value, row) => (
-          <>
-            <div style={{ float: 'left' }}>
-              <div>{value}</div>
-              <div style={{ color: '#B9B9B9' }}>{row.sampleName}</div>
-            </div>
-          </>
+        renderFormItem: (item, { onChange }) => (
+          <AutoComplete onSearch={this.inputValue} spellCheck="false" onChange={onChange}>
+            {children}
+          </AutoComplete>
         ),
       },
       {
         title: '创建人/时间',
         dataIndex: 'creatorName',
         width: 400,
+        hideInSearch: true,
         render: (value, row) => (
           <>
             <div style={{ float: 'left' }}>
@@ -285,17 +193,20 @@ class SampleModel extends Component {
         title: '样品识别号',
         dataIndex: 'sampleIdentificationCode',
         width: 200,
+        hideInSearch: true,
       },
       {
         title: '序列',
         dataIndex: 'sampleSequenceCount',
         width: 200,
+        hideInSearch: true,
         render: (value, row) => `${value} (${row.sampleLengthTotal}bp)`,
       },
       {
         title: '长度',
         dataIndex: 'sampleLengthMin',
         width: 300,
+        hideInSearch: true,
         render: (value, row) => `${value}-${row.sampleLengthMax} (${row.sampleLengthAve})`,
       },
       {
@@ -313,48 +224,34 @@ class SampleModel extends Component {
         ),
       },
     ];
+  }
+
+  render() {
+    const {   visible, detailVisible, detailValue } = this.state;
+    
 
     return (
       <PageHeaderWrapper>
-        <div>
-          <Card bordered={false} className="setSearchCard">
-            <TableSearchForm
-              ref={this.tableSearchFormRef}
-              initialValues={this.initialValues}
-              getTableData={this.getTableData}
-              simpleForm={this.simpleForm}
-              advancedForm={this.advancedForm}
-              noButton
-            />
-          </Card>
-          <Card bordered={false} style={{ marginTop: '24px' }}>
-            <div>
-              <Button
-                type="primary"
-                onClick={() => this.handleModalVisible()}
-                style={{
-                  fontSize: '14px',
-                  color: '#ffffff',
-                  marginBottom: '35px',
-                }}
-              >
-                <UploadOutlined />
+          <ProTable
+          actionRef={this.tableSearchFormRef}
+          headerTitle={
+            <Button type="primary" onClick={() => this.handleModalVisible()}>
+              <UploadOutlined />
                 上传序列文件
-              </Button>
-            </div>
-            <Form ref={this.tableFormRef}>
-              <StandardTable
-                // scroll={{ x: tableWidth }}
-                rowClassName="editable-row"
-                loading={loading}
-                data={{ list, pagination }}
-                columns={columns}
-                onSelectRow={this.handleSelectRows}
-                onChange={this.handleStandardTableChange}
-              />
-            </Form>
-          </Card>
-        </div>
+            </Button>
+          }
+          rowKey="id"
+          request={params =>
+            api
+              .getSample(this.getSampleData(params))
+              .then(res => ({ data: res.rows, total: res.total, success: true }))
+          }
+          columns={this.columns()}
+          options={false}
+          pagination={{
+            defaultPageSize: 10,
+          }}
+        />
         {visible ? <UploadSequenceFile visible={visible} handleClose={this.handleClose} /> : ''}
         {detailVisible ? (
           <SampleDetail
