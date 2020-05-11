@@ -169,7 +169,7 @@ class BeforeTask extends React.Component {
               optionFilterProp="children" // 对子元素--option进行筛选
               optionLabelProp="label" // 回填的属性
             >
-              {children.map(d => (
+              {(children || []).map(d => (
                 <Option key={d.code} value={d.code} label={d.name}>
                   {d.code}&nbsp;&nbsp;{d.name}
                 </Option>
@@ -201,12 +201,12 @@ class BeforeTask extends React.Component {
     });
 
     const { allPreTaskParamsType, argumentList } = this.props.taskModel;
-    const argumentTypeList = argumentList.map(item => item.type);
+    const argumentTypeList = (argumentList || []).map(item => item.type);
     let pass = true;
     typeList = [...allPreTaskParamsType, ...argumentTypeList];
     const noDoubleParamType = ['sample_select', 'sample_group', 'sample_environment_factor'];
     const resTypeList = [];
-    res.forEach(item => {
+    (res || []).forEach(item => {
       if (item.params && item.params.length) {
         item.params.forEach(p => {
           resTypeList.push(p.type);

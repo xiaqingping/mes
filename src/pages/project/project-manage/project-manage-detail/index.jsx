@@ -67,7 +67,7 @@ class ProjectDetail extends Component {
   handleAddProcesses = data => {
     const type = 'edit';
     const projectId = data.id;
-    router.push(`/project/project-manage/detail/${type}/${projectId}`);
+    router.push(`/project/project-manage/detailAdd/${type}_${projectId}`);
   };
 
   /**

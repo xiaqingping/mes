@@ -559,9 +559,11 @@ class TaskModel extends Component {
         },
       },
     ];
+    let tableWidth = 0;
     columns = columns.map(col => {
       // eslint-disable-next-line no-param-reassign
       if (!col.width) col.width = 100;
+      tableWidth += col.width;
       if (!col.editable) {
         return col;
       }
@@ -594,7 +596,7 @@ class TaskModel extends Component {
               </Button>
             </div>
             <StandardTable
-              // scroll={{ x: tableWidth }}
+              scroll={{ x: tableWidth }}
               rowClassName="editable-row"
               selectedRows=""
               // loading={loading}
