@@ -112,7 +112,7 @@ class ProcessParameter extends Component {
           this.getDefaultParams(newParamData);
           data = newParamData;
         }
-        newData.forEach(item => {
+        data.forEach(item => {
           if (item.params.length) {
             item.params.forEach(it => {
               // TODO:
