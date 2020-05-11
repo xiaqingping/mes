@@ -23,10 +23,11 @@ import { DateUI } from '@/pages/project/components/AntdSearchUI';
 import { connect } from 'dva';
 import debounce from 'lodash/debounce';
 import router from 'umi/router';
-import { formatter, getOperates } from '@/utils/utils';
+import { formatter, getOperates, cutString } from '@/utils/utils';
 import api from '@/pages/project/api/taskmodel';
 import disk from '@/pages/project/api/disk';
 import DefaultHeadPicture from '@/assets/imgs/upload_middle.png';
+import ProTable from '@ant-design/pro-table';
 import StandardTable from '../components/StandardTable';
 import TaskModelView from './taskModelView';
 
@@ -84,6 +85,9 @@ class TaskModel extends Component {
       searchPublisherValue,
     } = this.state;
     this.setState({ loading: true });
+    console.log(this.tableSearchFormRef.current);
+    debugger;
+
     const formData = this.tableSearchFormRef.current
       ? this.tableSearchFormRef.current.getFieldsValue()
       : '';
@@ -426,30 +430,56 @@ class TaskModel extends Component {
   };
 
   /**
-   * 模型删除确认
-   * @param {String} id 删除模型的id
+   * 列表查询数据的处理
+   * @param {object} params request返回的数据
    */
-  confirm(id) {
-    Modal.confirm({
-      title: '是否确定删除?',
-      icon: <ExclamationCircleOutlined />,
-      okText: '确认',
-      cancelText: '取消',
-      onOk: () => this.deleteModel(id),
+  getParamData = params => {
+    const { processCode, publisherCode } = this.state;
+    const newObj = {
+      page: params.current,
+      rows: params.pageSize,
+      status: params.status ? params.status : '',
+      code: params.name ? processCode : '',
+      publisherCode: params.publisherName ? publisherCode : '',
+      publishBeginDate: params.publishDate ? params.publishDate[0] : '',
+      publicEndDate: params.publishDate ? params.publishDate[1] : '',
+    };
+    Object.getOwnPropertyNames(newObj).forEach(key => {
+      if (!newObj[key]) {
+        delete newObj[key];
+      }
     });
-  }
 
-  render() {
-    const { visible } = this.state;
+    return newObj;
+  };
+
+  /**
+   * 状态的值处理
+   */
+  statusValue = () => {
+    const { status } = this.props;
+    // 状态的值
+    let statusValue = {};
+    status.forEach(item => {
+      statusValue = { ...statusValue, [item.value]: { text: item.text, status: item.status } };
+    });
+    return statusValue;
+  };
+
+  /**
+   * 设置表格的colums
+   */
+  columns = () => {
+    const { modelSearchOptions, publisherOptions } = this.state;
     const { taskModel } = this.props;
     const { taskModelStatusOptions } = taskModel;
-    // let tableWidth = 0;
-    let columns = [
+    return [
       {
         title: '编号/名称',
         dataIndex: 'codeAndName',
         width: 250,
         key: 'codeAndName',
+        hideInSearch: true,
         render: (text, row) => (
           <div style={{ display: 'flex' }}>
             <div style={{ width: 46 }}>
@@ -469,43 +499,116 @@ class TaskModel extends Component {
         ),
       },
       {
+        title: '任务模型',
+        dataIndex: 'name',
+        hideInTable: true,
+        renderFormItem: (item, { onChange }) => (
+          <Select
+            allowClear
+            showSearch
+            showArrow={false}
+            labelInValue
+            filterOption={false}
+            onSearch={this.fetchCodeData}
+            onChange={this.handleSearchCodeChange}
+            style={{ width: '100%' }}
+            optionFilterProp="children" // 对子元素--option进行筛选
+            optionLabelProp="label" // 回填的属性
+          >
+            {modelSearchOptions.map(d => (
+              <Option key={d.code} value={d.code} label={d.name}>
+                {d.code}&nbsp;&nbsp;{d.name}
+              </Option>
+            ))}
+          </Select>
+        ),
+      },
+      {
         title: '描述',
-        width: 400,
         dataIndex: 'describe',
-        key: 'describe',
-        ellipsis: true,
+        width: 400,
+        render: value => <div title={value}>{cutString(value, 115)}</div>,
+        hideInSearch: true,
       },
       {
         title: '发布人/时间',
+        dataIndex: 'publisherName',
         width: 200,
-        dataIndex: 'publisherAndPublishTime',
-        key: 'publisherAndPublishTime',
+        hideInSearch: true,
         render: (value, row) => (
           <>
-            {row.publisherName}
-            <br />
-            {row.publishDate}
+            <div>{value}</div>
+            <div>{row.publishDate}</div>
           </>
         ),
       },
       {
         title: '版本',
-        width: 140,
-        key: 'version',
         dataIndex: 'version',
-        render: value => <>{value && <Tag color="green">{value}</Tag>}</>,
+        width: 140,
+        hideInSearch: true,
+        render: value => (
+          <Tag color="green" style={{ padding: '0 10px' }}>
+            {value}
+          </Tag>
+        ),
       },
       {
         title: '状态',
         dataIndex: 'status',
         width: 150,
-        filters: taskModelStatusOptions,
+        valueEnum: this.statusValue(),
         render: value => (
           <>
             <Badge
               status={formatter(taskModelStatusOptions, value, 'value', 'status')}
               text={formatter(taskModelStatusOptions, value, 'value', 'label')}
             />
+          </>
+        ),
+      },
+      {
+        title: '发布人',
+        dataIndex: 'publisherName',
+        width: 200,
+        renderFormItem: (item, { onChange }) => (
+          <Select
+            allowClear
+            showSearch
+            showArrow={false}
+            labelInValue
+            filterOption={false}
+            onSearch={this.fetchPublisherData}
+            onChange={this.handlePubisherChange}
+            style={{ width: '100%' }}
+            optionFilterProp="children" // 对子元素--option进行筛选
+            optionLabelProp="label" // 回填的属性
+          >
+            {publisherOptions.map(d => (
+              <Option key={d.publisherCode} value={d.publisherCode} label={d.publisherName}>
+                {d.publisherCode}&nbsp;&nbsp;{d.publisherName}
+              </Option>
+            ))}
+          </Select>
+        ),
+        hideInTable: true,
+        render: (value, row) => (
+          <>
+            <div>{value}</div>
+            <div>{row.publishDate}</div>
+          </>
+        ),
+      },
+      {
+        title: '发布时间',
+        dataIndex: 'publishDate',
+        width: 200,
+        hideInTable: true,
+        valueType: 'dateRange',
+        render: (value, row) => (
+          <>
+            <div>{value}</div>
+            <div>{row.publishDate}</div>
           </>
         ),
       },
@@ -559,20 +662,174 @@ class TaskModel extends Component {
         },
       },
     ];
-    let tableWidth = 0;
-    columns = columns.map(col => {
-      // eslint-disable-next-line no-param-reassign
-      if (!col.width) col.width = 100;
-      tableWidth += col.width;
-      if (!col.editable) {
-        return col;
-      }
-      return true;
+  };
+
+  /**
+   * 模型删除确认
+   * @param {String} id 删除模型的id
+   */
+  confirm(id) {
+    Modal.confirm({
+      title: '是否确定删除?',
+      icon: <ExclamationCircleOutlined />,
+      okText: '确认',
+      cancelText: '取消',
+      onOk: () => this.deleteModel(id),
     });
+  }
+
+  render() {
+    const { visible } = this.state;
+    const { taskModel } = this.props;
+    const { taskModelStatusOptions } = taskModel;
+    // let tableWidth = 0;
+    // let columns = [
+    //   {
+    //     title: '编号/名称',
+    //     dataIndex: 'codeAndName',
+    //     width: 250,
+    //     key: 'codeAndName',
+    //     render: (text, row) => (
+    //       <div style={{ display: 'flex' }}>
+    //         <div style={{ width: 46 }}>
+    //           <Avatar
+    //             src={
+    //               row.picture ? disk.downloadFiles(row.picture, { view: true }) : DefaultHeadPicture
+    //             }
+    //             style={{ float: 'left', width: '46px', height: '46px' }}
+    //           />
+    //         </div>
+
+    //         <div style={{ marginLeft: 10 }}>
+    //           <div style={{ color: '#545454' }}>{row.name}</div>
+    //           <div style={{ color: '#888' }}>{row.code}</div>
+    //         </div>
+    //       </div>
+    //     ),
+    //   },
+    //   {
+    //     title: '描述',
+    //     width: 400,
+    //     dataIndex: 'describe',
+    //     key: 'describe',
+    //     ellipsis: true,
+    //   },
+    //   {
+    //     title: '发布人/时间',
+    //     width: 200,
+    //     dataIndex: 'publisherAndPublishTime',
+    //     key: 'publisherAndPublishTime',
+    //     render: (value, row) => (
+    //       <>
+    //         {row.publisherName}
+    //         <br />
+    //         {row.publishDate}
+    //       </>
+    //     ),
+    //   },
+    //   {
+    //     title: '版本',
+    //     width: 140,
+    //     key: 'version',
+    //     dataIndex: 'version',
+    //     render: value => <>{value && <Tag color="green">{value}</Tag>}</>,
+    //   },
+    //   {
+    //     title: '状态',
+    //     dataIndex: 'status',
+    //     width: 150,
+    //     valueEnum: this.statusValue(),
+    //     render: value => (
+    //       <Badge
+    //         status={formatter(taskModelStatusOptions, value, 'value', 'status')}
+    //         text={formatter(taskModelStatusOptions, value, 'value', 'label')}
+    //       />
+    //     ),
+    //   },
+    //   {
+    //     title: '操作',
+
+    //     fixed: 'right',
+    //     width: 200,
+    //     render: value => {
+    //       const text = value.status;
+    //       const operaList = getOperates(text);
+    //       const menu = (
+    //         <Menu>
+    //           {operaList.map(
+    //             (item, index) =>
+    //               index && (
+    //                 // eslint-disable-next-line react/no-array-index-key
+    //                 <Menu.Item key={index}>
+    //                   <a
+    //                     className="task_model_add_argument_list"
+    //                     onClick={() => {
+    //                       this.operate(item, value);
+    //                     }}
+    //                   >
+    //                     {item}
+    //                   </a>
+    //                 </Menu.Item>
+    //               ),
+    //           )}
+    //         </Menu>
+    //       );
+
+    //       return (
+    //         <>
+    //           <a
+    //             onClick={() => {
+    //               this.operate(operaList[0], value);
+    //             }}
+    //           >
+    //             {operaList[0]}
+    //           </a>
+    //           <Divider type="vertical" />
+    //           <Dropdown overlay={menu} trigger={['click']}>
+    //             <a className="ant-dropdown-link" onClick={e => e.preventDefault()}>
+    //               更多
+    //               <DownOutlined />
+    //             </a>
+    //           </Dropdown>
+    //         </>
+    //       );
+    //     },
+    //   },
+    // ];
+    // let tableWidth = 0;
+    // columns = columns.map(col => {
+    //   // eslint-disable-next-line no-param-reassign
+    //   if (!col.width) col.width = 100;
+    //   tableWidth += col.width;
+    //   if (!col.editable) {
+    //     return col;
+    //   }
+    //   return true;
+    // });
     const { loading, list, pagination, viewId } = this.state;
     return (
       <PageHeaderWrapper>
-        <Spin spinning={loading} size="large">
+        <ProTable
+          actionRef={this.tableSearchFormRef}
+          headerTitle={
+            <Button type="primary" onClick={() => this.handleAdd()}>
+              <PlusOutlined />
+              新建
+            </Button>
+          }
+          rowKey="id"
+          request={params =>
+            api
+              .getTaskModels(this.getParamData(params))
+              .then(res => ({ data: res.rows, total: res.total, success: true }))
+          }
+          columns={this.columns()}
+          options={false}
+          pagination={{
+            defaultPageSize: 10,
+          }}
+        />
+        {/* <Spin spinning={loading} size="large">
           <Card bordered={false} className="setSearchCard">
             <div>
               <TableSearchForm
@@ -604,9 +861,8 @@ class TaskModel extends Component {
               columns={columns}
               onChange={this.handleStandardTableChange}
             />
-            {/* </div> */}
           </Card>
-        </Spin>
+        </Spin> */}
         {visible && (
           <TaskModelView
             visible={visible}
@@ -615,8 +871,6 @@ class TaskModel extends Component {
             reload={this.reGetData}
           />
         )}
-        {/* <SampleSelect />
-        <SampleGroup /> */}
       </PageHeaderWrapper>
     );
   }
