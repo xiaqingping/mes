@@ -72,7 +72,6 @@ class EnvironmentalFactorsModel extends React.Component {
       newItem.add = '';
       newList.push(newItem);
     });
-
     this.setState({
       data: newList,
       columns,
@@ -107,7 +106,6 @@ class EnvironmentalFactorsModel extends React.Component {
       newData.push(newItem);
       return false;
     });
-    console.log(newData);
     this.setState({
       data: newData,
     });
@@ -238,9 +236,9 @@ class EnvironmentalFactorsModel extends React.Component {
         const newColumns = this.getTableHeaderData(list, columns, titleName);
         // 取出 行数据
         const rowData = this.getRowDataEnvironment(list, sampleList, newColumns);
+        // console.log('rowData', rowData)
         // 填充行数据
         const newData = this.getFillDataEnvironment(list, rowData);
-
         this.getDataDispose(newColumns, newData);
       }
     }
@@ -302,9 +300,9 @@ class EnvironmentalFactorsModel extends React.Component {
    */
   removeColumn = event => {
     const { data, headers, firstColumn, lastColumn } = this.state;
+    console.log(this.state)
     const headerArr = headers.filter(item => item.id !== event.id);
     const dataArr = data.filter(item => item[event.dataIndex] !== event.dataIndex);
-
     this.setState(
       {
         headers: headerArr,
@@ -313,6 +311,7 @@ class EnvironmentalFactorsModel extends React.Component {
         const hds = this.state.headers;
         const columns = [firstColumn, ...this.formatHeader(hds), lastColumn];
         this.setState({ columns, data: dataArr });
+        this.formatSubmitData(hds, 'tableHeader')
       },
     );
   };
@@ -450,7 +449,6 @@ class EnvironmentalFactorsModel extends React.Component {
         });
       });
     });
-
     // 样品去重 排序
     const newData = this.sampleRemoveDuplication(newsamples, samples, columns);
     return newData;
@@ -462,6 +460,7 @@ class EnvironmentalFactorsModel extends React.Component {
    * rowData 行数据 有表头字段但数据为空
    */
   getFillDataEnvironment = (list, rowData) => {
+    console.log('list', list)
     // 环境因子遍历
     list.forEach(item => {
       const { environmentFactorName } = item;
@@ -515,8 +514,12 @@ class EnvironmentalFactorsModel extends React.Component {
 
     // 第一列样品 排序 与样品列表顺序一致
     const newData = [];
+
     samples.forEach(item => {
       newSample.forEach(it => {
+        // console.log('item', item.id)
+        // console.log('it', it.sampleId)
+        // console.log('samples', samples)
         if (item.id === it.sampleId) {
           // 拼装行
           const newIt = {
@@ -531,6 +534,7 @@ class EnvironmentalFactorsModel extends React.Component {
         }
       });
     });
+    console.log('samples', newData)
     return newData;
   };
 

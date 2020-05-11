@@ -27,7 +27,6 @@ class SampleGroup extends React.Component {
     } else {
       sampleLists = nextProps.sampleList;
     }
-    console.log(nextProps.paramList);
     return {
       tableData: tableDatas || [],
       sampleList: sampleLists || [],
@@ -40,6 +39,7 @@ class SampleGroup extends React.Component {
   state = {
     disabled: false,
     visible: false,
+    modalVisible: false, // 确认框的显示和隐藏
     loading: false,
     groupSchemeData: [], // 分组方案数据
     tableData: [],
@@ -56,6 +56,8 @@ class SampleGroup extends React.Component {
       },
     ],
   };
+
+
 
   /**
    * 组件校验是否通过
@@ -108,7 +110,6 @@ class SampleGroup extends React.Component {
       paramValue: JSON.stringify(list),
       taskModelId,
     };
-    console.log(list);
     this.validPass = !!list;
     this.props.getData(sendData, 'groupScheme', this.validPass);
   };
@@ -779,12 +780,22 @@ class SampleGroup extends React.Component {
    * @param {Number} index 当前行下标
    */
   handleModalConfirm = (datas, row, option, value, col, index, color1) => {
-    confirm({
+    const confirm1 = confirm({
       title: (
-        <div style={{ fontFamily: 'PingFangSC-Medium', fontSize: 16, color: 'rgba(0,0,0,.85)' }}>
+        <div className="project_manage_group_scheme_modal_confirm_title">
           是否将分组“{value}”改为“{option}”？
+          <a
+            onClick={() =>
+              this.destroyConfirm(confirm1, datas, row, option, value, col, index, color1)
+            }
+            className="modal_confirm_close"
+          >
+            ×
+          </a>
         </div>
       ),
+      className: 'project_manage_group_scheme_modal_confirm_title_wrap',
+      bodyStyle: { paddingTop: 10 },
       icon: <QuestionCircleOutlined />,
       content: this.confirmGroupRender(option, value),
       cancelText: '否',
@@ -797,6 +808,27 @@ class SampleGroup extends React.Component {
         this.handleUpdateGroup(row, col, datas, option, index);
       },
     });
+  };
+
+  /**
+   * 点击确认框的x 取消分组名的修改
+   * @param {Object} confirm1 当前确认框对象
+   */
+  destroyConfirm = confirm1 => {
+    confirm1.destroy();
+    const { columns } = this.state;
+    const columns1 = JSON.parse(JSON.stringify(columns));
+    const columns2 = [...columns];
+    this.setState(
+      {
+        columns: columns1,
+      },
+      () => {
+        this.setState({
+          columns: columns2,
+        });
+      },
+    );
   };
 
   /**
@@ -951,9 +983,9 @@ class SampleGroup extends React.Component {
       });
       const hasOtherValue = group.some(item => item && item !== '当前样品');
       const validTrue1 = group.includes('当前样品') && hasOtherValue;
-      // const validTrue2 = group.every(item => item === '');
-      // const validFalse = validTrue1 || validTrue2;
-      const validFalse = validTrue1;
+      const validTrue2 = group.every(item => item === '');
+      const validFalse = validTrue1 || validTrue2;
+      // const validFalse = validTrue1;
       this.validPass = !validFalse;
       if (validFalse) {
         // message.error('分组方案包含样品和组');
@@ -1127,7 +1159,7 @@ class SampleGroup extends React.Component {
 
   render() {
     let tableWidth = 0;
-    const { groupSchemeData, visible, columns, loading, disabled } = this.state;
+    const { groupSchemeData, visible, columns, loading, disabled, modalVisible } = this.state;
     const { paramName } = this.props.paramList;
     columns.map(col => {
       if (!col.width) {
@@ -1169,6 +1201,13 @@ class SampleGroup extends React.Component {
             groupTableData={groupSchemeData}
             getData={this.getDataFromUpload}
           />
+        )}
+        {modalVisible && (
+          <Modal title="Basic Modal" visible onOk={this.handleOk} onCancel={this.handleCancel}>
+            <p>Some contents...</p>
+            <p>Some contents...</p>
+            <p>Some contents...</p>
+          </Modal>
         )}
       </div>
     );
