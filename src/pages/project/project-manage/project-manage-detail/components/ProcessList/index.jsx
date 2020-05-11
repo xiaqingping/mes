@@ -101,7 +101,7 @@ class ProcessList extends Component {
 
     router.push(
       // eslint-disable-next-line max-len
-      `/project/project-manage/process-parameter/${type}/${processModelId}/${projectId}/${processId}`,
+      `/project/project-manage/process-parameter/${type}_${processModelId}_${projectId}_${processId}`,
     );
   };
 

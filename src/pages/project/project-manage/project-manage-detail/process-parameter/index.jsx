@@ -37,13 +37,15 @@ class ProcessParameter extends Component {
 
   constructor(props) {
     super(props);
-    const { type, processModelId, processId, projectId } = this.props.match.params;
+    const { id } = this.props.match.params;
+    const data = id.split('_');
+
     this.state = {
       // 参数页面前置数据
-      requestType: type, // 请求类型
-      processId, // 流程ID
-      processModelId, // 流程模型ID
-      projectId, // 项目ID
+      requestType: data[0] || '', // 请求类型
+      processModelId: data[1] || '', // 流程模型ID
+      projectId: data[2] || '', // 项目ID
+      processId: data[3] || '', // 流程ID
       paramGroupList: [], // 参数列表
       // 流程模型参数
       processParam: [],
@@ -249,8 +251,8 @@ class ProcessParameter extends Component {
 
       sessionStorage.setItem('processForParams', JSON.stringify(list));
       if (projectId === '' || projectId === undefined)
-        url = `/project/project-manage/add/addflowpath/add/''/1`;
-      if (projectId) url = `/project/project-manage/detail/edit/${projectId}/2`;
+        url = `/project/project-manage/add/addflowpath/add_''_1`;
+      if (projectId) url = `/project/project-manage/detailAdd/edit_${projectId}_2`;
       return router.push(url);
     }
     // 编辑
@@ -453,9 +455,9 @@ class ProcessParameter extends Component {
     const { requestType, projectId } = this.state;
     let url;
     if (requestType === 'add' || requestType === 'update') {
-      if (projectId) url = `/project/project-manage/detail/edit/${projectId}/2`;
+      if (projectId) url = `/project/project-manage/detailAdd/edit_${projectId}_2`;
       if (projectId === '' || projectId === undefined)
-        url = `/project/project-manage/add/addflowpath/add/''/1`;
+        url = `/project/project-manage/add/addflowpath/add_''_1`;
     } else {
       if (projectId === '') url = `/project/project-manage`;
       if (projectId !== '') url = `/project/project-manage/detail/${projectId}`;
