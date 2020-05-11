@@ -12,9 +12,14 @@ module.exports = {
           name: 'metadata',
           path: '/hts/analyze/metadata',
           hideChildrenInMenu: true,
-          routes: [{
+          routes: [
+            {
               path: '/hts/analyze/metadata',
               component: './hts/pages/analyze/metadata',
+            },
+            {
+              path: '/hts/analyze/metadata/copy',
+              component: './hts/pages/analyze/metadata/metadata1.jsx',
             },
             {
               name: 'metadata-paramList',
