@@ -16,16 +16,20 @@ class Test extends Component {
     super(props);
     // 传过来的已有项目的id和类型
     // TODO:
-    const { type, projectId, paramsType } = this.props.match.params;
+    // const { type, projectId, paramsType } = this.props.match.params;
+    const { id } = this.props.match.params;
+    console.log(id)
+    const data =id.split('_');
+    console.log(data)
     // console.log(this.props.match.params);
     const { projectInfor } = this.props.projectManage;
     // console.log(projectInfor);
 
     this.state = {
       // TODO:
-      processType: type, // 请求类型 edit：流程列表跳转 携带项目id  add：新建项目跳转 无id
-      projectId: projectId || '', // 项目Id
-      paramsType, // 参数页面带过来的判断是否强制刷新已选流程
+      processType: data[0], // 请求类型 edit：流程列表跳转 携带项目id  add：新建项目跳转 无id
+      projectId: data[1] || '', // 项目Id
+      paramsType:data[3], // 参数页面带过来的判断是否强制刷新已选流程
 
       // list选中的流程参数数据
       list: [],
@@ -51,6 +55,7 @@ class Test extends Component {
 
     // 保存已选流程
     const introductionProcess = JSON.parse(sessionStorage.getItem('introduction'));
+    console.log(introductionProcess)
 
     // 参数页面点击保存带回的参数
     const paramsList = JSON.parse(sessionStorage.getItem('processForParams'));
@@ -166,9 +171,9 @@ class Test extends Component {
 
     let url;
     if (projectId === '' || projectId === "''") {
-      url = `/project/project-manage/process-parameter/${type}/${processModelId}`;
+      url = `/project/project-manage/process-parameter/${type}_${processModelId}`;
     } else {
-      url = `/project/project-manage/process-parameter/${type}/${processModelId}/${projectId}`;
+      url = `/project/project-manage/process-parameter/${type}_${processModelId}_${projectId}`;
     }
     router.push(url);
   };
@@ -179,17 +184,39 @@ class Test extends Component {
    * @param introduction 存储已选流程数据的方法名
    */
   getData = value => {
+    const { list } = this.state;
+    console.log(value)
 
     // 存储选中的流程模型数据
     if (!(value === '' || value === undefined)) {
-      sessionStorage.setItem('introduction', JSON.stringify(value));
+      const processModalList = JSON.parse(sessionStorage.getItem('introduction'))||[];
+      // const list = this.state;
+      // console.log(value)
+      const listMap = {};
+      console.log(processModalList);
+      processModalList.forEach(item=>{
+        listMap[item.id] = item;
+      })
+      value.forEach(item=>{
+        if(!listMap[item.id]) {
+          processModalList.push(item)
+        }
+      })
+      // const listssss = [...list,...value];
+      // console.log(idsList)
+      sessionStorage.setItem('introduction', JSON.stringify(processModalList));
 
       this.setState({
-        list: value,
+        // list: value,
+        list: processModalList,
+      },() => {
+        console.log(this.state.list)
+        console.log(this.state)
       });
       this.props.dispatch({
         type: 'projectManage/setProcessSelectedList',
         payload: value,
+        // payload: idsList,
       });
     }
   };
