@@ -388,11 +388,13 @@ class ProcessModel extends Component {
       publishBeginDate: params.publishDate ? params.publishDate[0] : '',
       publicEndDate: params.publishDate ? params.publishDate[1] : '',
     };
+    console.log(params);
     Object.getOwnPropertyNames(newObj).forEach(key => {
       if (!newObj[key]) {
         delete newObj[key];
       }
     });
+
     return newObj;
   };
 
@@ -465,7 +467,7 @@ class ProcessModel extends Component {
         title: '流程模型',
         dataIndex: 'name',
         hideInTable: true,
-        renderFormItem: ({ onChange }) => (
+        renderFormItem: (item, { onChange }) => (
           <AutoComplete onSearch={this.inputValue} spellCheck="false" onChange={onChange}>
             {children}
           </AutoComplete>
