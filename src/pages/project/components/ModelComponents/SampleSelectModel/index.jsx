@@ -18,7 +18,6 @@ class SampleSelect extends React.Component {
     } else {
       sampleList = nextProps.paramList.paramValue;
     }
-    console.log(nextProps.paramList);
 
     return {
       tableDatas: sampleList || [],
