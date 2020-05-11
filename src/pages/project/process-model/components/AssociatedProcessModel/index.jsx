@@ -1,7 +1,6 @@
 /** 选择任务模型 */
 import React from 'react';
-import { Modal, Table, Avatar, Form, Col, Tag, AutoComplete, Spin, Button } from 'antd';
-import TableSearchForm from '@/components/TableSearchForm';
+import { Modal, Avatar, Tag, AutoComplete, Select } from 'antd';
 import { connect } from 'dva';
 import './index.less';
 import api from '@/pages/project/api/taskmodel';
@@ -9,8 +8,9 @@ import disk from '@/pages/project/api/disk';
 import { cutString } from '@/utils/utils';
 import _ from 'lodash';
 import DefaultHeadPicture from '@/assets/imgs/defaultheadpicture.jpg';
+import ProTable from '@ant-design/pro-table';
 
-const FormItem = Form.Item;
+const { Option } = Select;
 
 class AssociatedProcessModel extends React.Component {
   tableSearchFormRef = React.createRef();
@@ -19,25 +19,13 @@ class AssociatedProcessModel extends React.Component {
     return { visible: nextProps.visible || false };
   }
 
-  initialValues = {
-    page: 1,
-    rows: 5,
-  };
-
   constructor(props) {
     super(props);
     this.state = {
       visible: false,
-      pagination: {},
       nameCodeVal: [],
-      loading: true,
     };
     this.callTask = _.debounce(this.callTask, 500);
-  }
-
-  /** 加载table值 */
-  componentDidMount() {
-    this.getTableData(this.initialValues);
   }
 
   /**
@@ -63,53 +51,6 @@ class AssociatedProcessModel extends React.Component {
       visible: false,
     });
   };
-
-  /**
-   * 搜索table的值
-   * @param {object} options 搜索的条件参数
-   */
-  getTableData = (options = {}) => {
-    this.setState({ loading: true });
-    const formData = this.tableSearchFormRef.current
-      ? this.tableSearchFormRef.current.getFieldsValue()
-      : '';
-    const { pagination } = this.state;
-    const { current: page, pageSize: rows } = pagination;
-    const data = {
-      ...{ status: 2 },
-      page,
-      rows,
-      ...formData,
-      ...options,
-    };
-    api.getTaskModels(data).then(res => {
-      this.setState({
-        list: res.rows,
-        pagination: {
-          current: data.page,
-          pageSize: data.rows,
-          total: res.total,
-        },
-        loading: false,
-      });
-    });
-  };
-
-  /**
-   * 自动搜索的下拉框样式
-   * @param {object} item 搜索到对象的值
-   */
-  renderOption = item => ({
-    value: item.code,
-    label: (
-      // <Option key={item.id} text={item.name}>
-      <div style={{ display: 'flex' }} key={item.code}>
-        <span>{item.code}</span>&nbsp;&nbsp;
-        <span>{item.name}</span>
-      </div>
-      // </Option>
-    ),
-  });
 
   /**
    * 筛选值
@@ -141,41 +82,6 @@ class AssociatedProcessModel extends React.Component {
   };
 
   /**
-   * 单行搜索框
-   */
-  simpleForm = () => {
-    const { nameCodeVal } = this.state;
-    return (
-      <>
-        <Col xxl={12}>
-          <FormItem label="名称" name="code">
-            <AutoComplete
-              onSearch={this.inputValue}
-              options={nameCodeVal.map(this.renderOption)}
-              style={{ width: '252px' }}
-              // placeholder={formatMessage({ id: 'bp.inputHere' })}
-              // optionLabelProp="text"
-            />
-          </FormItem>
-        </Col>
-        <Col xxl={12} style={{ textAlign: 'right' }}>
-          <Button type="primary" htmlType="submit">
-            查询
-          </Button>
-          <Button
-            style={{ marginLeft: 8 }}
-            onClick={() => {
-              this.tableSearchFormRef.current.resetFields();
-            }}
-          >
-            重置
-          </Button>
-        </Col>
-      </>
-    );
-  };
-
-  /**
    * 选择的值传递给父组件
    * @param {Int} id 选择的ID
    */
@@ -186,24 +92,52 @@ class AssociatedProcessModel extends React.Component {
   };
 
   /**
-   * table变更
-   * @param {object} pagination 分页
+   * 列表查询数据的处理
+   * @param {object} params request返回的数据
    */
-  handleStandardTableChange = pagination => {
-    this.getTableData({
-      page: pagination.current,
-      rows: pagination.pageSize,
+  getParamData = params => {
+    console.log(params);
+    const { processCode, publisherCode } = this.state;
+    const newObj = {
+      page: params.current,
+      rows: params.pageSize,
+      status: params.status ? params.status : '',
+      code: params.name ? processCode : '',
+      publisherCode: params.publisherName ? publisherCode : '',
+      publishBeginDate: params.publishDate ? params.publishDate[0] : '',
+      publicEndDate: params.publishDate ? params.publishDate[1] : '',
+    };
+    Object.getOwnPropertyNames(newObj).forEach(key => {
+      if (!newObj[key]) {
+        delete newObj[key];
+      }
     });
+    // this.ref.current.reload();
+    return newObj;
   };
 
   render() {
     const { onClose } = this.props;
-    const { list, loading, pagination, visible } = this.state;
+    const { visible, nameCodeVal } = this.state;
+    const children = nameCodeVal.map(item => (
+      <Option key={item.code} value={item.name}>
+        <div
+          onClick={() => {
+            this.setState({
+              processCode: item.code,
+            });
+          }}
+        >
+          {item.code} {item.name}
+        </div>
+      </Option>
+    ));
     const columns = [
       {
         title: '编号/名称',
         dataIndex: 'code',
         width: 220,
+        hideInSearch: true,
         render: (value, row) => (
           <>
             <Avatar
@@ -223,15 +157,13 @@ class AssociatedProcessModel extends React.Component {
         title: '描述',
         width: 280,
         dataIndex: 'describe',
-        render: value => (
-          <span title={value} style={{ display: 'inline-block', width: '300px' }}>
-            {cutString(value, 80)}
-          </span>
-        ),
+        ellipsis: true,
+        hideInSearch: true,
       },
       {
         title: '版本',
         width: 100,
+        hideInSearch: true,
         dataIndex: 'version',
         render: value => (
           <Tag color="green" style={{ padding: '0 10px' }}>
@@ -248,6 +180,16 @@ class AssociatedProcessModel extends React.Component {
           </>
         ),
       },
+      {
+        title: '名称',
+        dataIndex: 'name',
+        hideInTable: true,
+        renderFormItem: (item, { onChange }) => (
+          <AutoComplete onSearch={this.inputValue} spellCheck="false" onChange={onChange}>
+            {children}
+          </AutoComplete>
+        ),
+      },
     ];
 
     return (
@@ -258,31 +200,24 @@ class AssociatedProcessModel extends React.Component {
         onCancel={onClose}
         width={840}
         footer={null}
+        className="associatedProcessModel"
       >
-        <div>
-          <TableSearchForm
-            ref={this.tableSearchFormRef}
-            initialValues={this.initialValues}
-            getTableData={this.getTableData}
-            simpleForm={this.simpleForm}
-            noButton
-          />
-          <div style={{ marginTop: '10px' }}>
-            <Spin spinning={loading}>
-              <Table
-                columns={columns}
-                align="center"
-                dataSource={list}
-                loading={loading}
-                rowKey="id"
-                size="small"
-                className="tableheader"
-                pagination={pagination}
-                onChange={this.handleStandardTableChange}
-              />
-            </Spin>
-          </div>
-        </div>
+        <ProTable
+          className="setNoTableToolbar"
+          columns={columns}
+          rowKey="id"
+          options={false}
+          search={{ span: 11 }}
+          request={params =>
+            api
+              .getTaskModels(this.getParamData(params))
+              .then(res => ({ data: res.rows, total: res.total, success: true }))
+          }
+          pagination={{
+            defaultPageSize: 4,
+            showSizeChanger: false,
+          }}
+        />
       </Modal>
     );
   }

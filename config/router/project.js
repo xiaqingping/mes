@@ -20,13 +20,17 @@ module.exports = {
         },
         {
           name: 'detail-add',
-          path: '/project/project-manage/detail/:type?/:projectId?/:paramsType?',
+          path: '/project/project-manage/detailAdd/:id',
+          // path: '/project/project-manage/detailAdd/:type?/:projectId?/:paramsType',
           component: './project/project-manage/project-manage-edit/addflowpath',
         },
         {
           name: 'process-parameter',
-          path:
-            '/project/project-manage/process-parameter/:type?/:processModelId/:projectId?/:processId?',
+          // path:
+          //   '/project/project-manage/process-parameter/:type?/:processModelId?/:projectId?/:processId',
+
+          path: '/project/project-manage/process-parameter/:id',
+
           component: './project/project-manage/project-manage-detail/process-parameter',
         },
         {
@@ -36,7 +40,7 @@ module.exports = {
         },
         {
           name: 'addflowpath',
-          path: '/project/project-manage/add/addflowpath/:type?/:projectId?/:paramsType?',
+          path: '/project/project-manage/add/addflowpath/:id',
           component: './project/project-manage/project-manage-edit/addflowpath',
         },
         {

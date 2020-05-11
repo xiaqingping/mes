@@ -239,6 +239,7 @@ class ProcessModel extends Component {
    * @param {object} params request返回的数据
    */
   getParamData = params => {
+    console.log(params);
     const { processCode, publisherCode } = this.state;
     const newObj = {
       page: params.current,
@@ -254,7 +255,7 @@ class ProcessModel extends Component {
         delete newObj[key];
       }
     });
-
+    // this.ref.current.reload();
     return newObj;
   };
 
@@ -319,8 +320,8 @@ class ProcessModel extends Component {
               style={{ float: 'left', width: '46px', height: '46px' }}
             />
             <div style={{ float: 'left', marginLeft: '10px' }}>
-              <div>{value}</div>
-              <div style={{ color: '#B9B9B9' }}>{row.name}</div>
+              <div>{cutString(row.name, 15)}</div>
+              <div style={{ color: '#B9B9B9' }}>{value}</div>
             </div>
           </>
         ),
@@ -339,7 +340,8 @@ class ProcessModel extends Component {
         title: '描述',
         dataIndex: 'describe',
         width: 400,
-        render: value => <div title={value}>{cutString(value, 115)}</div>,
+        ellipsis: true,
+        // render: value => <div title={value}>{cutString(value, 115)}</div>,
         hideInSearch: true,
       },
       {

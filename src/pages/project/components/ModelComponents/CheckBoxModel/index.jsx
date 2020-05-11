@@ -41,9 +41,9 @@ class CheckBoxModel extends React.Component {
         taskModelId: paramList.taskModelId,
       },
       isVerify: true,
-    }
-    if(!data.isVerify) return ''
-    this.props.getData(data.paramData, 'checkbox', data.isVerify);
+    };
+    if (!data.isVerify) return '';
+    this.props.getData(data.paramData, 'checkBox', data.isVerify);
     return false;
   };
 
@@ -68,7 +68,10 @@ class CheckBoxModel extends React.Component {
     this.setState({ selectList, checkedValues });
   };
 
-  // 验证数据
+  /**
+   * 验证数据
+   * @param {Array} checkedValues checkBox选中数据
+   */
   verifyData = checkedValues => {
     const { paramList } = this.state;
     let error = false;
@@ -82,17 +85,21 @@ class CheckBoxModel extends React.Component {
     return error;
   };
 
-  // 获取选中项
+  /**
+   * 获取选中项
+   * @param {Array} checkedValues checkBox选中数据
+   */
   onChange = checkedValues => {
     this.setState({
-      checkedValues
-    })
+      checkedValues,
+    });
     this.formatSubmitData(checkedValues);
   };
 
   render() {
     const { paramList, checkedValues, selectList } = this.state;
     const data = paramList;
+
     return (
       <Form.Item
         label={data.paramName}

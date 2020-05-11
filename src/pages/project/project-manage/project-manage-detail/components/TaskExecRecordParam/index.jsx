@@ -24,6 +24,8 @@ class TaskExecRecordParam extends Component {
       paramValues: this.props.paramList.paramValues,
       // 参数渲染数据
       paramData: [],
+      // 样品列表
+      sampleList: [],
     };
   }
 
@@ -49,7 +51,17 @@ class TaskExecRecordParam extends Component {
     } else {
       newParamData = this.disposeTaskData(param);
     }
-    this.setState({ paramData: newParamData });
+    // 去除样品列表数据
+    let sampleList = [];
+    param.forEach(item => {
+      // TODO:
+      if (item.type === 'sample_select' || item.type === 'sample') {
+        if (item.paramValue) {
+          sampleList = [...sampleList, ...JSON.parse(item.paramValue)];
+        }
+      }
+    });
+    this.setState({ paramData: newParamData, sampleList });
     return false;
   };
 
@@ -103,7 +115,7 @@ class TaskExecRecordParam extends Component {
   };
 
   render() {
-    const { paramData } = this.state;
+    const { paramData, sampleList } = this.state;
     return (
       <Drawer
         title="参数"
@@ -131,27 +143,47 @@ class TaskExecRecordParam extends Component {
                 return <InputNumberModel paramList={item} key={index} disabled />;
               }
               // 单选
-              if (it.type === 'radio') {
+              if (item.type === 'radio') {
                 return <RadioModel paramList={item} key={index} disabled />;
               }
 
               // 多选
-              if (it.type === 'checkbox') {
+              if (item.type === 'checkbox') {
                 return <CheckBoxModel paramList={item} key={index} disabled />;
               }
 
               // 样品选择框
-              if (it.type === 'sample_select') {
+              if (item.type === 'sample_select') {
                 return <SampleSelectModel paramList={item} key={index} disabled />;
               }
 
               // 样品分组方案
-              if (it.type === 'sample_group') {
-                return <SampleGroupModel paramList={item} key={index} disabled />;
+              if (item.type === 'sample_group') {
+                return (
+                  <SampleGroupModel
+                    paramList={item}
+                    key={index}
+                    sampleList={sampleList}
+                    getFun={func => {
+                      this.handleUpdateSampleGroup = func;
+                    }}
+                    disabled
+                  />
+                );
               }
               // 样品环境因子
-              if (it.type === 'sample_environment_factor') {
-                return <EnvironmentalFactorsModel paramList={item} key={index} disabled />;
+              if (item.type === 'sample_environment_factor') {
+                return (
+                  <EnvironmentalFactorsModel
+                    paramList={item}
+                    key={index}
+                    sampleList={sampleList}
+                    getFun={func => {
+                      this.handleUpdateEnvironmentFactor = func;
+                    }}
+                    disabled
+                  />
+                );
               }
               return false;
             }}

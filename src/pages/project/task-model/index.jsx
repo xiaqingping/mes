@@ -278,7 +278,7 @@ class TaskModel extends Component {
               filterOption={false}
               onSearch={this.fetchPublisherData}
               onChange={this.handlePubisherChange}
-              style={{ width: '100%' }}
+              // style={{ width: '100%' }}
               optionFilterProp="children" // 对子元素--option进行筛选
               optionLabelProp="label" // 回填的属性
             >
