@@ -239,7 +239,6 @@ class ProcessModel extends Component {
    * @param {object} params request返回的数据
    */
   getParamData = params => {
-    console.log(params);
     const { processCode, publisherCode } = this.state;
     const newObj = {
       page: params.current,

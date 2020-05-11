@@ -18,10 +18,6 @@ module.exports = {
               component: './hts/pages/analyze/metadata',
             },
             {
-              path: '/hts/analyze/metadata/copy',
-              component: './hts/pages/analyze/metadata/metadata1.jsx',
-            },
-            {
               name: 'metadata-paramList',
               path: '/hts/analyze/metadata/paramList',
               component: './hts/pages/analyze/metadata/paramList',
