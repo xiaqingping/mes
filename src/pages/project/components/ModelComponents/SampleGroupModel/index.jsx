@@ -57,8 +57,6 @@ class SampleGroup extends React.Component {
     ],
   };
 
-
-
   /**
    * 组件校验是否通过
    */
@@ -111,6 +109,7 @@ class SampleGroup extends React.Component {
       taskModelId,
     };
     this.validPass = !!list;
+    console.log(list, this.validPass);
     this.props.getData(sendData, 'groupScheme', this.validPass);
   };
 
@@ -551,9 +550,14 @@ class SampleGroup extends React.Component {
     if (!item) {
       cols = cols.filter(v => v.id !== id);
 
-      this.setState({
-        columns: cols,
-      });
+      this.setState(
+        {
+          columns: cols,
+        },
+        () => {
+          this.sendDataOnChange();
+        },
+      );
     } else {
       cols = cols.filter(v => v.id !== item.id);
       // 这里不光删除列， 同时也要删除表格数据，，删除掉每一个行的该分组方案下的组数据；
