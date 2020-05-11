@@ -225,7 +225,7 @@ class ProcessList extends Component {
       {
         title: '参数',
         dataIndex: 'type',
-        width: 100,
+        width: 150,
         render: (value, row) => (
           <img
             src={parameterImg}
