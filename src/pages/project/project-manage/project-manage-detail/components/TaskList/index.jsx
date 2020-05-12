@@ -95,7 +95,10 @@ class TaskList extends Component {
     });
   };
 
-  /** searchParameter */
+  /**
+   * 查看任务执行记录参数
+   * @param {object} row 行数据
+   */
   searchParameter = row => {
     const data = {
       paramValues: row.taskExecRecordParams,
