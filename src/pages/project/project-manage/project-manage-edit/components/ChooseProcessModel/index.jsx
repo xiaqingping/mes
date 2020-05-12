@@ -181,8 +181,6 @@ class ChooseProcessModel extends React.Component {
       this.setState({
         selectedIds: idsList,
         selecteditem: processModelList,
-      },() => {
-        console.log(selecteditem)
       });
     }
     if (selectedIds.includes(itemlist)) {
