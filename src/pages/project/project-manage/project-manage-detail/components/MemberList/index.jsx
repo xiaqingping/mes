@@ -8,8 +8,6 @@ import { EditJurisdictionModel } from '../ModelUI';
 const { Option } = Select;
 
 class MemberList extends Component {
-  tableSearchFormRef = React.createRef();
-
   tableFormRef = React.createRef();
 
   state = {

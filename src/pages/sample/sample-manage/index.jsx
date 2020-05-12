@@ -1,7 +1,7 @@
 /** 样品table页面 */
 import React, { Component } from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
-import { Button,   AutoComplete, Select } from 'antd';
+import { Button, AutoComplete, Select } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
 import { connect } from 'dva';
 import _ from 'lodash';
@@ -14,12 +14,6 @@ import './index.less';
 const { Option } = Select;
 class SampleModel extends Component {
   tableSearchFormRef = React.createRef();
-
-  // 顶部表单默认值
-  initialValues = {
-    page: 1,
-    rows: 10,
-  };
 
   constructor(props) {
     super(props);
@@ -34,17 +28,12 @@ class SampleModel extends Component {
     this.callSample = _.debounce(this.callSample, 500);
   }
 
-  /** 加载table */
-  componentDidMount() {
-    this.getSampleData(this.initialValues);
-  }
-
   /**
    * 搜索样品
    * @param {string} value 搜索的值
    */
   callSample = value => {
-    api.getSampleCodeAndName(value).then(res => {      
+    api.getSampleCodeAndName(value).then(res => {
       this.setState({ nameCodeVal: res });
     });
   };
@@ -53,8 +42,7 @@ class SampleModel extends Component {
    *  获取表格数据
    *  @param {object} options 需要搜索的值(如page,rows)
    */
-  getSampleData = params => {
-    
+  getParamsData = params => {
     const { sampleCode } = this.state;
 
     const newObj = {
@@ -70,7 +58,6 @@ class SampleModel extends Component {
 
     return newObj;
   };
-  
 
   /**
    *  样品筛选值
@@ -86,7 +73,7 @@ class SampleModel extends Component {
     if (nameCodeVal.length === 0) {
       return false;
     }
-   
+
     nameCodeVal.forEach(item => {
       if (item.sampleName.indexOf(value) !== -1 && arr.indexOf(item) !== -1) {
         arr.push(item);
@@ -150,7 +137,7 @@ class SampleModel extends Component {
   };
 
   columns = () => {
-    const { nameCodeVal} = this.state;
+    const { nameCodeVal } = this.state;
     const children = nameCodeVal.map(item => (
       <Option key={item.sampleCode} value={item.sampleName}>
         <div
@@ -224,26 +211,25 @@ class SampleModel extends Component {
         ),
       },
     ];
-  }
+  };
 
   render() {
-    const {   visible, detailVisible, detailValue } = this.state;
-    
+    const { visible, detailVisible, detailValue } = this.state;
 
     return (
       <PageHeaderWrapper>
-          <ProTable
+        <ProTable
           actionRef={this.tableSearchFormRef}
           headerTitle={
             <Button type="primary" onClick={() => this.handleModalVisible()}>
               <UploadOutlined />
-                上传序列文件
+              上传序列文件
             </Button>
           }
           rowKey="id"
           request={params =>
             api
-              .getSample(this.getSampleData(params))
+              .getSample(this.getParamsData(params))
               .then(res => ({ data: res.rows, total: res.total, success: true }))
           }
           columns={this.columns()}

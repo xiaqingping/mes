@@ -751,9 +751,9 @@ class TaskModel extends Component {
                     </Tag>
                     {versionOpen && pageModel === 2 && (
                       <Card
-                        style={{ position: 'absolute', zIndex: '100', top: '28px' }}
+                        style={{ position: 'absolute', zIndex: '100', top: '28px', padding: 10 }}
                         hoverable
-                        className="padding-none"
+                        className="project_task_model_addtask_tag_padding"
                       >
                         {versionType.length !== 0 &&
                           versionType.map(item => (

@@ -40,7 +40,6 @@ class TaskExecRecordParam extends Component {
    * @param {Array} param  任务模型参数
    */
   getTaskParamData = param => {
-    console.log(param);
     if (!param) return message.warning('当前任务暂无参数');
 
     const { paramValues } = this.state;
@@ -51,16 +50,14 @@ class TaskExecRecordParam extends Component {
     } else {
       newParamData = this.disposeTaskData(param);
     }
-    // 去除样品列表数据
-    let sampleList = [];
+    // 取出样品列表数据
+    let key;
     param.forEach(item => {
-      // TODO:
-      if (item.type === 'sample_select' || item.type === 'sample') {
-        if (item.paramValue) {
-          sampleList = [...sampleList, ...JSON.parse(item.paramValue)];
-        }
-      }
+      if (item.type === 'sample_select') key = item.paramKey;
     });
+    const sampleData = paramValues.filter(item => item.paramKey === key);
+    const sampleList = JSON.parse(sampleData[0].paramValue);
+
     this.setState({ paramData: newParamData, sampleList });
     return false;
   };
@@ -119,7 +116,7 @@ class TaskExecRecordParam extends Component {
     return (
       <Drawer
         title="参数"
-        width={320}
+        width={480}
         closable={false}
         onClose={this.props.onClose}
         visible={this.props.visible}

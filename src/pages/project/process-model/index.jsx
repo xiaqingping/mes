@@ -1,23 +1,12 @@
 /** 流程模型  渲染table页面 */
 import React, { Component } from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
-import {
-  Button,
-  Divider,
-  AutoComplete,
-  Avatar,
-  Tag,
-  Badge,
-  Select,
-  Dropdown,
-  Menu,
-  Modal,
-} from 'antd';
+import { Button, Divider, AutoComplete, Avatar, Tag, Select, Dropdown, Menu, Modal } from 'antd';
 import { PlusOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import router from 'umi/router';
 import { connect } from 'dva';
 import _ from 'lodash';
-import { formatter, getOperates, cutString } from '@/utils/utils';
+import { getOperates, cutString } from '@/utils/utils';
 import api from '@/pages/project/api/processModel/';
 import disk from '@/pages/project/api/disk';
 import DefaultHeadPicture from '@/assets/imgs/defaultheadpicture.jpg';
@@ -243,7 +232,7 @@ class ProcessModel extends Component {
     const newObj = {
       page: params.current,
       rows: params.pageSize,
-      status: params.status ? params.status : '',
+      status: params.status && params.status.length ? params.status.join(',') : '',
       code: params.name ? processCode : '',
       publisherCode: params.publisherName ? publisherCode : '',
       publishBeginDate: params.publishDate ? params.publishDate[0] : '',
@@ -268,6 +257,7 @@ class ProcessModel extends Component {
     status.forEach(item => {
       statusValue = { ...statusValue, [item.value]: { text: item.text, status: item.status } };
     });
+    console.log(statusValue);
     return statusValue;
   };
 
@@ -371,11 +361,20 @@ class ProcessModel extends Component {
         dataIndex: 'status',
         width: 150,
         valueEnum: this.statusValue(),
-        render: value => (
-          <Badge
-            status={formatter(status, value, 'value', 'status')}
-            text={formatter(status, value, 'value', 'text')}
-          />
+        renderFormItem: (item, { onChange }) => (
+          <Select
+            mode="multiple"
+            maxTagCount={1}
+            maxTagTextLength={3}
+            onChange={onChange}
+            allowClear
+          >
+            {status.map(it => (
+              <Option key={it.value} value={it.value}>
+                {it.text}
+              </Option>
+            ))}
+          </Select>
         ),
       },
       {
