@@ -148,9 +148,10 @@ class Metadata extends Component {
           return (
             <Select
               mode="multiple"
-              maxTagCount={3}
+              maxTagCount={2}
               maxTagTextLength={3}
               onChange={onChange}
+              className='statusName'
               allowClear
             >
               {
