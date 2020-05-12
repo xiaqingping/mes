@@ -19,7 +19,7 @@ module.exports = {
             },
             {
               name: 'metadata-paramList',
-              path: '/hts/analyze/metadata/paramList',
+              path: '/hts/analyze/metadata/paramList/:id',
               component: './hts/pages/analyze/metadata/paramList',
             },
           ],

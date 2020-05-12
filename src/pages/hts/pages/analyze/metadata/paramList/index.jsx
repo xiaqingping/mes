@@ -106,12 +106,11 @@ class paramList extends Component {
   }
 
   componentDidMount() {
-    // console.log(this.props);
-    const { metadataRow } = this.props.htsCache;
-    if (metadataRow.length === 0) {
-      message.warning('暂无数据');
-      return false;
-    }
+    // const { metadataRow } = this.props.htsCache;
+    // if (metadataRow.length === 0) {
+    //   message.warning('暂无数据');
+    //   return false;
+    // }
     this.getTableData();
     return false;
   }
@@ -120,9 +119,11 @@ class paramList extends Component {
 
   getTableData = () => {
     this.setState({ loading: true });
-    const { metadataRow } = this.state;
+    // const { metadataRow } = this.state;
+    // 获取url参数
+    const { id } = this.props.match.params;
 
-    api.metadata.getMetadataAnalysisParam(metadataRow.id).then(res => {
+    api.metadata.getMetadataAnalysisParam(id).then(res => {
       // console.log(res);
       if (
         res &&
