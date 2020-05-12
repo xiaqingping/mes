@@ -598,7 +598,7 @@ class SampleGroup extends React.Component {
     // ---------------------首先判断选择的颜色在model里是否有重复---------
     const { colorStore } = this.props.project;
     let colors = [...colorStore];
-    let colorhex = color.hex;
+    let colorhex = color.hex.toUpperCase();
 
     const repeat = colorStore.includes(colorhex);
     if (repeat) {
