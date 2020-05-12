@@ -977,7 +977,7 @@ class SampleGroup extends React.Component {
    */
 
   verifyData = () => {
-    const { groupSchemeData, columns, sampleList } = this.state;
+    const { groupSchemeData, columns } = this.state;
     const { isRequired } = this.props.paramList;
     // 1. 一个分组方案里只能是单纯组或者单纯样品
     // 2. 一个分组方案里面不能都是空
@@ -996,7 +996,7 @@ class SampleGroup extends React.Component {
       });
       const hasOtherValue = group.some(item => item && item !== '当前样品');
       const validTrue1 = group.includes('当前样品') && hasOtherValue;
-      const validTrue2 = sampleList.length && group.every(item => item === '');
+      const validTrue2 = group.every(item => item === '');
       const validFalse = validTrue1 || validTrue2;
       console.log(validFalse);
 
