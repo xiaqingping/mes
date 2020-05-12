@@ -120,6 +120,7 @@ class paramList extends Component {
   getTableData = () => {
     this.setState({ loading: true });
     // const { metadataRow } = this.state;
+    // 获取url参数
     const { id } = this.props.match.params;
 
     api.metadata.getMetadataAnalysisParam(id).then(res => {
