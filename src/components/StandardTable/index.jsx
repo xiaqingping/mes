@@ -91,7 +91,7 @@ class StandardTable extends Component {
             return `共 ${total} 条记录 第 ${currentPage}/${totalPage} 页`;
           },
           ...pagination,
-        }
+        } 
       : false;
     const rowSelection = {
       selectedRowKeys,
