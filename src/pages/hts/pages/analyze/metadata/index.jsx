@@ -151,7 +151,7 @@ class Metadata extends Component {
               maxTagCount={2}
               maxTagTextLength={3}
               onChange={onChange}
-              className='statusName'
+              className='setSelectMultipleType'
               allowClear
             >
               {
