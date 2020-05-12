@@ -350,7 +350,7 @@ class TaskModel extends Component {
   publishModel = v => {
     api.publishTaskModel(v.id).then(() => {
       message.success('任务模型发布成功!');
-      this.getTableData();
+      this.tableSearchFormRef.current.reload();
       // this.updateListData(v.id);
     });
   };
@@ -359,18 +359,11 @@ class TaskModel extends Component {
    * 禁用模型
    */
   forbiddenModel = id => {
-    api
-      .forbiddenTaskModel(id)
-      .then(() => {
-        message.success('任务模型已禁用!');
-        this.getTableData();
-        // this.updateListData(id);
-      })
-      .catch(() => {
-        this.setState({
-          loading: false,
-        });
-      });
+    api.forbiddenTaskModel(id).then(() => {
+      message.success('任务模型已禁用!');
+      this.tableSearchFormRef.current.reload();
+      // this.updateListData(id);
+    });
   };
 
   /**
@@ -490,7 +483,7 @@ class TaskModel extends Component {
             </div>
 
             <div style={{ marginLeft: 10 }}>
-              <div style={{ color: '#545454' }}>{row.name}</div>
+              <div style={{ color: '#545454' }}>{cutString(row.name, 15)}</div>
               <div style={{ color: '#888' }}>{row.code}</div>
             </div>
           </div>
