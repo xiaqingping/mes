@@ -102,13 +102,13 @@ class Metadata extends Component {
    * 设置状态颜色
    */
   setColor = value => {
-    let color = ''
+    let color = '#eee'
     if (value === '已完成') {
       color = '#52c41a'
     } else if (value === '已失败') {
       color = '#ff4d4f'
-    } else {
-      color = '#d9d9d9'
+    } else if (value === '进行中') {
+      color = '#1890ff'
     }
     return color
   }
