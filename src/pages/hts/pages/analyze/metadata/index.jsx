@@ -35,13 +35,12 @@ class Metadata extends Component {
    * @param {object} params request返回的数据
    */
   getParamData = params => {
-    console.log(params)
     const newObj = {
       page: params.current,
       pageSize: params.pageSize,
       status: params.status,
-      beginDateBefore: params.beginDate[0],
-      beginDateAfter: params.beginDate[1],
+      beginDateBefore: params.beginDate ? params.beginDate[0] : '',
+      beginDateAfter: params.beginDate ? params.beginDate[1] : '',
       endDateBefore: params.endDateBefore,
       endDateAfter: params.endDateAfter,
       code: params.code,
@@ -54,6 +53,7 @@ class Metadata extends Component {
         delete newObj[key];
       }
     });
+
     return newObj;
   };
 
@@ -97,6 +97,21 @@ class Metadata extends Component {
     })
     return statusValue;
   };
+
+  /**
+   * 设置状态颜色
+   */
+  setColor = value => {
+    let color = ''
+    if (value === '已完成') {
+      color = '#52c41a'
+    } else if (value === '已失败') {
+      color = '#ff4d4f'
+    } else {
+      color = '#d9d9d9'
+    }
+    return color
+  }
 
   render() {
     const { visibleParam, originalParam } = this.state;
@@ -145,7 +160,7 @@ class Metadata extends Component {
         render: (value, row) => {
           const name = formatter(status, value);
           const sta = formatter(status, value, 'id', 'status');
-          return <Badge status={sta} text={name} key={row.id} />;
+          return <Badge color={this.setColor(name)} status={sta} text={name} key={row.id} />;
         },
       },
       {
