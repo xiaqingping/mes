@@ -78,7 +78,6 @@ class ArgumentForm extends React.Component {
     const { loading, viewForm } = this.state;
     viewForm.isRequired = viewForm.isRequired ? '是' : '否';
     const { fromView, type } = this.props;
-
     return loading ? (
       <div style={{ textAlign: 'center', marginTop: 15 }}>
         <Spin />

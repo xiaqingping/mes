@@ -57,13 +57,13 @@ class Metadata extends Component {
     return newObj;
   };
 
-   // 查看参数列表页
-   searchParamList = data => {
-    this.props.dispatch({
-      type: 'htsCache/setMetadataRow',
-      payload: data,
-    });
-    return router.push('/hts/analyze/metadata/paramList');
+  // 查看参数列表页
+  searchParamList = data => {
+    // this.props.dispatch({
+    //   type: 'htsCache/setMetadataRow',
+    //   payload: data,
+    // });
+    return router.push(`/hts/analyze/metadata/paramList/${data.id}`);
   };
 
   // 查看参数 抽屉
@@ -185,7 +185,7 @@ class Metadata extends Component {
           actionRef={this.tableFormRef}
           rowKey="id"
           request={params => api.metadata.getMetadatas(this.getParamData(params))
-            .then(res =>({ data: res.results, total: res.total, success: true }))
+            .then(res => ({ data: res.results, total: res.total, success: true }))
           }
           columns={columns}
           options={false}

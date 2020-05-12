@@ -6,6 +6,7 @@ import { connect } from 'dva';
 import DefaultHeadPicture from '@/assets/imgs/upload_middle.png';
 import api from '@/pages/project/api/taskmodel';
 // import { cutString } from '@/utils/utils';
+import ProTable from '@ant-design/pro-table';
 import _ from 'lodash';
 import disk from '@/pages/project/api/disk';
 
@@ -248,6 +249,30 @@ class BeforeTask extends React.Component {
       pagination,
     });
     this.getTableData(pagination);
+  };
+
+  /**
+   * 列表查询数据的处理
+   * @param {object} params request返回的数据
+   */
+  getParamData = params => {
+    console.log(params);
+    const newObj = {
+      page: params.current,
+      rows: params.pageSize,
+      status: params.status && params.status.length ? params.status.join(',') : '',
+      code: params.name ? params.name.value : '',
+      publisherCode: params.publisherName ? params.publisherName.value : '',
+      publishBeginDate: params.publishDate ? params.publishDate[0] : '',
+      publicEndDate: params.publishDate ? params.publishDate[1] : '',
+    };
+    Object.getOwnPropertyNames(newObj).forEach(key => {
+      if (!newObj[key]) {
+        delete newObj[key];
+      }
+    });
+    console.log(newObj);
+    return newObj;
   };
 
   render() {
