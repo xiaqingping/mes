@@ -9,7 +9,6 @@ import { Modal, List, Card, Button } from 'antd';
 import { ArrowsAltOutlined } from '@ant-design/icons';
 import { compare, cutString } from '@/utils/utils';
 import EnlargePage from '../EnlargePage/enlargePage';
-// import AddGroup from '../AddGroup/addGroup';
 
 class Parameter extends React.Component {
   static getDerivedStateFromProps(nextProps) {
@@ -17,7 +16,6 @@ class Parameter extends React.Component {
   }
 
   state = {
-    // activeId: null,
     visible: false,
     typeEnlargeVisible: false,
     typeEnlargeData: [],
@@ -127,11 +125,7 @@ class Parameter extends React.Component {
               handleBigClose={this.handleBigClose}
               typeEnlargeData={typeEnlargeData}
             />
-            {/* <AddGroup
-              visible={addGroupVisible}
-              handleCloseGroup={(v, type = '') => this.handleCloseGroup(v, type)}
-            /> */}
-            {console.log(data)}
+
             {/* 分组列表 */}
             <List
               style={{ float: 'left' }}
