@@ -9,8 +9,8 @@ import {
   Select,
   Popconfirm,
   // Col,
-  Badge,
-  AutoComplete,
+  // Badge,
+  // AutoComplete,
   Menu,
   Dropdown,
   // Input,
@@ -21,7 +21,8 @@ import {
 // import TableSearchForm from '@/components/TableSearchForm';
 import { PlusOutlined } from '@ant-design/icons';
 import { connect } from 'dva';
-import _ from 'lodash';
+import debounce from 'lodash/debounce';
+// import _ from 'lodash';
 import router from 'umi/router';
 import ProTable from '@ant-design/pro-table';
 // import StandardTable from '@/pages/project/components/StandardTable';
@@ -48,49 +49,21 @@ class ProjectManagement extends Component {
     this.state = {
       nameCodeVal: [],
       projectId: '', // 模糊搜索id值
+      modelSearchOptions: [], // 项目管理模糊搜素options
     };
     // 异步验证做节流处理
-    this.callParter = _.debounce(this.callParter, 500);
+    this.fetchCodeData = debounce(this.fetchCodeData, 500);
+
   }
 
-  callParter = value => {
-    console.log(value)
+
+  // 异步节流处理的方法
+  fetchCodeData = value => {
     api.gettProjectManageCodeAndName(value).then(res => {
-      this.setState({ nameCodeVal: res|| [] },() => {
-        console.log(this.state)
-      });
+      this.setState({ modelSearchOptions: res || [] });
     });
   };
 
-  /**
-   *  流程模型筛选值
-   *  @param {string} value input搜索的值
-   */
-  inputValue = value => {
-    const { nameCodeVal } = this.state;
-    const arr = [];
-    if (!value) {
-      return false;
-    }
-    this.callParter(value);
-    if (nameCodeVal.length === 0) {
-      return false;
-    }
-    nameCodeVal.forEach(item => {
-      if (item.name.indexOf(value) !== -1 && arr.indexOf(item) !== -1) {
-        arr.push(item);
-      }
-      if (item.code.indexOf(value) !== -1 && arr.indexOf(item) !== -1) {
-        arr.push(item);
-      }
-    });
-    console.log(arr)
-    this.setState({
-      nameCodeVal: arr,
-      // allowClear: 'ture',
-    });
-    return true;
-  };
 
 
   /**
@@ -99,17 +72,17 @@ class ProjectManagement extends Component {
    */
   getParamData = params => {
     console.log(params);
-    const { processCode } = this.state;
     const newObj = {
       page: params.current,
       pageSize: params.pageSize,
-      status: params.status ? params.status : '',
-      id: params.name ? processCode : '',
-      beginDate: params.beginDate ? params.beginDate[0]: '',
-      endDate: params.beginDate ? params.beginDate[1]: '',
+      id: params.id ? params.id.value : '',
+      // status: params.status ? params.status : '',
+      status: params.status && params.status.length ? params.status.join(',') : '',
+      creatorCode: params.creatorCode,
+      beginDate: params.createDate ? params.createDate[0]: '',
+      endDate: params.createDate ? params.createDate[1]: '',
     };
     Object.getOwnPropertyNames(newObj).forEach(key => {
-      // console.log(key)
       if (!newObj[key]) {
         delete newObj[key];
       }
@@ -225,23 +198,10 @@ class ProjectManagement extends Component {
    */
 
   columns = () => {
-    const { nameCodeVal } = this.state;
+    const { nameCodeVal ,modelSearchOptions} = this.state;
     console.log(nameCodeVal)
     const { status ,labels} = this.props;
-    const children = nameCodeVal.map(item => (
-      <Option key={item.code} value={item.name}>
-        <div
-          onClick={() => {
-            this.setState({
-              projectId: item.id,
-            });
-          }}
-        >
-          {item.code} {item.name}
-        </div>
-      </Option>
-    ));
-    // console.log(children)
+    console.log(status)
     return [
       {
         title: '编号/名称',
@@ -297,9 +257,25 @@ class ProjectManagement extends Component {
         dataIndex: 'id',
         hideInTable: true,
         renderFormItem: (item, { onChange }) => (
-          <AutoComplete onSearch={this.inputValue} spellCheck="false" onChange={onChange}>
-            {children}
-          </AutoComplete>
+          <Select
+            allowClear
+            showSearch
+            showArrow={false}
+            labelInValue
+            filterOption={false}
+            onSearch={this.fetchCodeData}
+            // onChange={this.handleSearchCodeChange}
+            onChange={onChange}
+            style={{ width: '100%' }}
+            optionFilterProp="children" // 对子元素--option进行筛选
+            optionLabelProp="label" // 回填的属性
+          >
+            {modelSearchOptions.map(d => (
+              <Option key={d.code} value={d.id} label={d.name}>
+                {d.code}&nbsp;&nbsp;{d.name}
+              </Option>
+            ))}
+          </Select>
         ),
       },
       {
@@ -335,16 +311,31 @@ class ProjectManagement extends Component {
         width: 150,
         hideInTable: true,
         valueEnum: this.statusValue(),
-        render: value => (
-          <Badge
-            status={formatter(status, value, 'value', 'status')}
-            text={formatter(status, value, 'value', 'text')}
-          />
+        // render: value => (
+        //   <Badge
+        //     status={formatter(status, value, 'value', 'status')}
+        //     text={formatter(status, value, 'value', 'text')}
+        //   />
+        // ),
+        renderFormItem: (item, { onChange }) => (
+          <Select
+            mode="multiple"
+            maxTagCount={1}
+            maxTagTextLength={3}
+            onChange={onChange}
+            allowClear
+          >
+            {status.map(it => (
+              <Option key={it.value} value={it.value}>
+                {it.text}
+              </Option>
+            ))}
+          </Select>
         ),
       },
       {
         title: '创建人',
-        dataIndex: 'creatorName',
+        dataIndex: 'creatorCode',
         hideInTable: true,
       },
       {
@@ -355,7 +346,7 @@ class ProjectManagement extends Component {
         render: (value, row) => (
           <>
             <div>{value}</div>
-            <div>{row.publishDate}</div>
+            <div>{row.createDate}</div>
           </>
         ),
       },
