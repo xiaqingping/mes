@@ -1,23 +1,12 @@
 /** 流程模型  渲染table页面 */
 import React, { Component } from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
-import {
-  Button,
-  Divider,
-  AutoComplete,
-  Avatar,
-  Tag,
-  Badge,
-  Select,
-  Dropdown,
-  Menu,
-  Modal,
-} from 'antd';
+import { Button, Divider, AutoComplete, Avatar, Tag, Select, Dropdown, Menu, Modal } from 'antd';
 import { PlusOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import router from 'umi/router';
 import { connect } from 'dva';
 import _ from 'lodash';
-import { formatter, getOperates, cutString } from '@/utils/utils';
+import { getOperates, cutString } from '@/utils/utils';
 import api from '@/pages/project/api/processModel/';
 import disk from '@/pages/project/api/disk';
 import DefaultHeadPicture from '@/assets/imgs/defaultheadpicture.jpg';
@@ -268,6 +257,7 @@ class ProcessModel extends Component {
     status.forEach(item => {
       statusValue = { ...statusValue, [item.value]: { text: item.text, status: item.status } };
     });
+    console.log(statusValue);
     return statusValue;
   };
 
@@ -276,7 +266,6 @@ class ProcessModel extends Component {
    */
   columns = () => {
     const { nameCodeVal, nameCodeValPublish } = this.state;
-    const { status } = this.props;
     const children = nameCodeVal.map(item => (
       <Option key={item.code} value={item.name}>
         <div
@@ -371,12 +360,6 @@ class ProcessModel extends Component {
         dataIndex: 'status',
         width: 150,
         valueEnum: this.statusValue(),
-        render: value => (
-          <Badge
-            status={formatter(status, value, 'value', 'status')}
-            text={formatter(status, value, 'value', 'text')}
-          />
-        ),
       },
       {
         title: '发布人',

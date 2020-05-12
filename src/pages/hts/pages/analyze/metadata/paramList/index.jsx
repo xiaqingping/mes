@@ -8,7 +8,7 @@ import api from '@/pages/hts/api';
 import { message } from 'antd';
 import { TableModel } from '../components/AntdUI';
 import { FieldDrawer } from '../components/ModelUI';
-import './index.less';
+// import './index.less';
 
 class paramList extends Component {
   constructor(props) {

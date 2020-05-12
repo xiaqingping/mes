@@ -8,21 +8,21 @@ const projectModel = {
         value: 1,
         text: '未发布',
         // i18n: 'bp.verfication',
-        status: 'default',
+        status: 'Default',
       },
       // 已发布
       {
         value: 2,
         text: '已发布',
         // i18n: 'bp.completed',
-        status: 'success',
+        status: 'Success',
       },
       // 已禁用
       {
         value: 3,
         text: '已禁用',
         // i18n: 'bp.rejected',
-        status: 'error',
+        status: 'Error',
       },
       // 已过期
       // {
