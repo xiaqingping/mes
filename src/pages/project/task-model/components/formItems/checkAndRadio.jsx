@@ -21,6 +21,7 @@ class CheckboxModel extends React.Component {
 
   componentDidMount() {
     const { fromView, viewForm } = this.props;
+    console.log(viewForm);
     if (fromView) {
       const viewData = [];
       Object.keys(viewForm).forEach(key => {
@@ -49,7 +50,27 @@ class CheckboxModel extends React.Component {
         list: originList,
       });
     }
+    this.props.getFun(this.updateList);
   }
+
+  updateList = () => {
+    const { viewForm } = this.state;
+    console.log(viewForm);
+    this.setState({
+      list: [
+        {
+          id: 1,
+          selectName: '选项 3',
+          selectKey: 'select_1',
+        },
+        {
+          id: 2,
+          selectName: '选项 4',
+          selectKey: 'select_2',
+        },
+      ],
+    });
+  };
 
   getList = () => {
     const { fromView, viewForm } = this.props;
@@ -166,12 +187,18 @@ class CheckboxModel extends React.Component {
           return (
             <>
               {fromView ? (
-                <div style={{ width: '370px',height:'40px',lineHeight:'40px',marginBottom:'5px'}}>
-                  <div style={{ float: 'left',marginRight:'10px', height:'40px',}}>
-                  {lebel} :
+                <div
+                  style={{
+                    width: '370px',
+                    height: '40px',
+                    lineHeight: '40px',
+                    marginBottom: '5px',
+                  }}
+                >
+                  <div style={{ float: 'left', marginRight: '10px', height: '40px' }}>
+                    {lebel} :
                   </div>
-                  <div style={{ float: 'right', width: 300 ,
-                    height:'40px',paddingTop:'4px'}}>
+                  <div style={{ float: 'right', width: 300, height: '40px', paddingTop: '4px' }}>
                     // eslint-disable-next-line react/no-array-index-key
                     <Form.Item label="" name={item.selectKey} key={index}>
                       <Input.Group compact>
@@ -189,20 +216,25 @@ class CheckboxModel extends React.Component {
                           // noStyle
                           rules={[{ required: true, message: '请输入名称' }]}
                         >
-                          <span style={{ width: '100px '}}>{item[fieldName].selectValue}</span>
+                          <span style={{ width: '100px ' }}>{item[fieldName].selectValue}</span>
                         </Form.Item>
                       </Input.Group>
                     </Form.Item>
                   </div>
                 </div>
               ) : (
-                <div style={{ width: '370px',height:'40px' ,
-                lineHeight:'40px',marginBottom:'5px'}}>
-                  <div style={{ float: 'left',marginRight:'10px', height:'40px'}}>
+                <div
+                  style={{
+                    width: '370px',
+                    height: '40px',
+                    lineHeight: '40px',
+                    marginBottom: '5px',
+                  }}
+                >
+                  <div style={{ float: 'left', marginRight: '10px', height: '40px' }}>
                     {item.selectName} :
                   </div>
-                  <div style={{ float: 'right',  width: 300 ,
-                    height:'40px',paddingTop:'4px'}}>
+                  <div style={{ float: 'right', width: 300, height: '40px', paddingTop: '4px' }}>
                     <Form.Item label="" name={item.selectKey}>
                       <Input.Group compact>
                         <Form.Item

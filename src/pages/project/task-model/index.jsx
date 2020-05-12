@@ -1,12 +1,12 @@
 /** 任务模型 */
 import React, { Component } from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
-import { Button, Tag, Select, Divider, Badge, Menu, Dropdown, message, Modal, Avatar } from 'antd';
+import { Button, Tag, Select, Divider, Menu, Dropdown, message, Modal, Avatar } from 'antd';
 import { DownOutlined, PlusOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import { connect } from 'dva';
 import debounce from 'lodash/debounce';
 import router from 'umi/router';
-import { formatter, getOperates, cutString } from '@/utils/utils';
+import { getOperates, cutString } from '@/utils/utils';
 import api from '@/pages/project/api/taskmodel';
 import disk from '@/pages/project/api/disk';
 import DefaultHeadPicture from '@/assets/imgs/upload_middle.png';
