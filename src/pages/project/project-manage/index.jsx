@@ -47,8 +47,6 @@ class ProjectManagement extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      nameCodeVal: [],
-      projectId: '', // 模糊搜索id值
       modelSearchOptions: [], // 项目管理模糊搜素options
     };
     // 异步验证做节流处理
@@ -71,7 +69,6 @@ class ProjectManagement extends Component {
    * @param {object} params request返回的数据
    */
   getParamData = params => {
-    console.log(params);
     const newObj = {
       page: params.current,
       pageSize: params.pageSize,
@@ -198,10 +195,8 @@ class ProjectManagement extends Component {
    */
 
   columns = () => {
-    const { nameCodeVal ,modelSearchOptions} = this.state;
-    console.log(nameCodeVal)
+    const { modelSearchOptions} = this.state;
     const { status ,labels} = this.props;
-    console.log(status)
     return [
       {
         title: '编号/名称',
@@ -410,7 +405,6 @@ class ProjectManagement extends Component {
   };
 
   render() {
-    console.log(this.state)
     return (
       <PageHeaderWrapper>
         <ProTable
