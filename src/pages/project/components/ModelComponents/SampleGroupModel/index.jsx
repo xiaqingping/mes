@@ -27,6 +27,7 @@ class SampleGroup extends React.Component {
     } else {
       sampleLists = nextProps.sampleList;
     }
+    console.log(nextProps);
     return {
       tableData: tableDatas || [],
       sampleList: sampleLists || [],
@@ -102,12 +103,19 @@ class SampleGroup extends React.Component {
    */
   sendDataOnChange = () => {
     const list = this.verifyData();
-    const { paramKey, taskModelId } = this.props.paramList;
+    const { paramKey, taskModelId, isRequired } = this.props.paramList;
     const sendData = {
       paramKey,
       paramValue: JSON.stringify(list),
       taskModelId,
     };
+    // if (isRequired === 'true' && list && list.length) {
+    //   debugger;
+    //   this.validPass = true;
+    // } else {
+    //   debugger;
+    //   this.validPass = false;
+    // }
     this.validPass = !!list;
     console.log(list, this.validPass);
     this.props.getData(sendData, 'groupScheme', this.validPass);
@@ -970,13 +978,14 @@ class SampleGroup extends React.Component {
 
   verifyData = () => {
     const { groupSchemeData, columns } = this.state;
+    const { isRequired } = this.props.paramList;
     // 1. 一个分组方案里只能是单纯组或者单纯样品
     // 2. 一个分组方案里面不能都是空
 
     const datas = [...groupSchemeData];
     const cols = [...columns];
     const num = cols.length;
-    if (this.props.paramList.isRequired === 'true' && num === 2) {
+    if ((isRequired === 'true' && num === 2) || (isRequired === 'true' && !datas.length)) {
       // message.error('分组方案为必须，请设置分组方案！');
       return false;
     }
@@ -989,8 +998,10 @@ class SampleGroup extends React.Component {
       const validTrue1 = group.includes('当前样品') && hasOtherValue;
       const validTrue2 = group.every(item => item === '');
       const validFalse = validTrue1 || validTrue2;
-      // const validFalse = validTrue1;
+      console.log(validFalse);
+
       this.validPass = !validFalse;
+
       if (validFalse) {
         // message.error('分组方案包含样品和组');
         return false;
