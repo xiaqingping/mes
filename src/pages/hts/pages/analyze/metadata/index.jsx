@@ -35,12 +35,13 @@ class Metadata extends Component {
    * @param {object} params request返回的数据
    */
   getParamData = params => {
+    console.log(params)
     const newObj = {
       page: params.current,
       pageSize: params.pageSize,
       status: params.status,
-      beginDateBefore: params.beginDateBefore,
-      beginDateAfter: params.beginDateAfter,
+      beginDateBefore: params.beginDate[0],
+      beginDateAfter: params.beginDate[1],
       endDateBefore: params.endDateBefore,
       endDateAfter: params.endDateAfter,
       code: params.code,
