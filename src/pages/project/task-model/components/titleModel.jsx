@@ -143,6 +143,11 @@ class TitleModel extends React.Component {
    * 关闭抽屉， 消除数据
    */
   onViewClose = () => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'taskModel/setFirstOpenParams',
+      payload: true,
+    });
     this.setState({
       viewVisible: false,
       toViewArgument: false,

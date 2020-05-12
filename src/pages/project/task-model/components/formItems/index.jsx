@@ -16,24 +16,13 @@ class FactoryComponent extends React.Component {
     const compGroup = ['sample_select', 'sample_group', 'sample_environment_factor'];
     const checkGroup = ['checkbox', 'radio']; // 单选, 多选的组件
     const { fromView, viewForm, type } = this.props;
-    console.log(fromView, viewForm, type);
-    if (checkGroup.includes(type) && viewForm.paramKey) {
-      this.updateData(viewForm);
-    }
+
     return (
       <>
         {type === 'input' && <InputItems fromView={fromView} viewForm={viewForm} />}
         {compGroup.includes(type) && <BaseFormItems fromView={fromView} viewForm={viewForm} />}
         {type === 'number_input' && <NumericalInput fromView={fromView} viewForm={viewForm} />}
-        {checkGroup.includes(type) && (
-          <CheckedAndRadio
-            fromView={fromView}
-            viewForm={viewForm}
-            getFun={fun => {
-              this.updateData = fun;
-            }}
-          />
-        )}
+        {checkGroup.includes(type) && <CheckedAndRadio fromView={fromView} viewForm={viewForm} />}
       </>
     );
   }
