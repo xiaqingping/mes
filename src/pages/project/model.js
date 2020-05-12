@@ -68,7 +68,7 @@ const projectModel = {
   },
   effects: {},
   reducers: {
-    setColorStore(state, action) {
+    setColorStore (state, action) {
       return {
         ...state,
         colorStore: action.payload,

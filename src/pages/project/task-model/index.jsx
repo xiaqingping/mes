@@ -189,7 +189,7 @@ class TaskModel extends Component {
     const newObj = {
       page: params.current,
       rows: params.pageSize,
-      status: params.status ? params.status : '',
+      status: params.status && params.status.length ? params.status.join(',') : '',
       code: params.name ? params.name.value : '',
       publisherCode: params.publisherName ? params.publisherName.value : '',
       publishBeginDate: params.publishDate ? params.publishDate[0] : '',
@@ -214,6 +214,7 @@ class TaskModel extends Component {
     status.forEach(item => {
       statusValue = { ...statusValue, [item.value]: { text: item.text, status: item.status } };
     });
+    console.log(statusValue);
     return statusValue;
   };
 
@@ -222,8 +223,7 @@ class TaskModel extends Component {
    */
   columns = () => {
     const { modelSearchOptions, publisherOptions } = this.state;
-    const { taskModel } = this.props;
-    const { taskModelStatusOptions } = taskModel;
+    const { status } = this.props;
     return [
       {
         title: '编号/名称',
@@ -281,7 +281,6 @@ class TaskModel extends Component {
         title: '描述',
         dataIndex: 'describe',
         width: 400,
-        // ellipsis: true,
         render: value => <div title={value}>{cutString(value, 50)}</div>,
         hideInSearch: true,
       },
@@ -313,13 +312,20 @@ class TaskModel extends Component {
         dataIndex: 'status',
         width: 150,
         valueEnum: this.statusValue(),
-        render: value => (
-          <>
-            <Badge
-              status={formatter(taskModelStatusOptions, value, 'value', 'status')}
-              text={formatter(taskModelStatusOptions, value, 'value', 'label')}
-            />
-          </>
+        renderFormItem: (item, { onChange }) => (
+          <Select
+            mode="multiple"
+            maxTagCount={1}
+            maxTagTextLength={3}
+            onChange={onChange}
+            allowClear
+          >
+            {status.map(it => (
+              <Option key={it.value} value={it.value}>
+                {it.text}
+              </Option>
+            ))}
+          </Select>
         ),
       },
       {
