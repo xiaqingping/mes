@@ -4,7 +4,8 @@
 import React, { Component } from 'react';
 import {
   Badge,
-  message
+  message,
+  Select
 } from 'antd';
 // import { PlusOutlined } from '@ant-design/icons';
 import { connect } from 'dva';
@@ -15,6 +16,8 @@ import router from 'umi/router';
 import { formatter } from '@/utils/utils';
 import { ParamDrawer } from './components/ModelUI';
 import './index.less';
+
+const { Option } = Select
 
 class Metadata extends Component {
   tableFormRef = React.createRef();
@@ -35,10 +38,14 @@ class Metadata extends Component {
    * @param {object} params request返回的数据
    */
   getParamData = params => {
+    let selectStatus = ''
+    if (params.status) {
+      selectStatus = params.status.join(',')
+    }
     const newObj = {
       page: params.current,
       pageSize: params.pageSize,
-      status: params.status,
+      status: selectStatus,
       beginDateBefore: params.beginDate ? params.beginDate[0] : '',
       beginDateAfter: params.beginDate ? params.beginDate[1] : '',
       endDateBefore: params.endDateBefore,
@@ -53,18 +60,11 @@ class Metadata extends Component {
         delete newObj[key];
       }
     });
-
     return newObj;
   };
 
-   // 查看参数列表页
-   searchParamList = data => {
-    this.props.dispatch({
-      type: 'htsCache/setMetadataRow',
-      payload: data,
-    });
-    return router.push('/hts/analyze/metadata/paramList');
-  };
+  // 查看参数列表页
+  searchParamList = data => router.push(`/hts/analyze/metadata/paramList/${data.id}`)
 
   // 查看参数 抽屉
   searchParamDrawer = data => {
@@ -84,19 +84,6 @@ class Metadata extends Component {
   onCloseParamDrawer = () => {
     this.setState({ visibleParam: false });
   }
-
-  /**
-   * 状态的值处理
-   */
-  statusValue = () => {
-    const { status } = this.props.htsCache;
-    // 状态的值
-    let statusValue = {};
-    status.forEach(item => {
-      statusValue = { ...statusValue, [item.id]: { text: item.name, status: item.status } };
-    })
-    return statusValue;
-  };
 
   /**
    * 设置状态颜色
@@ -156,7 +143,23 @@ class Metadata extends Component {
         title: '状态',
         dataIndex: 'status',
         key: 'status',
-        valueEnum: this.statusValue(),
+        renderFormItem: (items, { onChange }) => {
+          const { status: statusType } = this.props.htsCache
+          return (
+            <Select
+              mode="multiple"
+              maxTagCount={3}
+              maxTagTextLength={3}
+              onChange={onChange}
+              allowClear
+            >
+              {
+                statusType.map(item =>
+                <Option key={item.id} value={item.id}>{item.name}</Option>)
+              }
+            </Select>
+          )
+        },
         render: (value, row) => {
           const name = formatter(status, value);
           const sta = formatter(status, value, 'id', 'status');
@@ -185,7 +188,7 @@ class Metadata extends Component {
           actionRef={this.tableFormRef}
           rowKey="id"
           request={params => api.metadata.getMetadatas(this.getParamData(params))
-            .then(res =>({ data: res.results, total: res.total, success: true }))
+            .then(res => ({ data: res.results, total: res.total, success: true }))
           }
           columns={columns}
           options={false}

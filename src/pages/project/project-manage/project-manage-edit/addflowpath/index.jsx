@@ -16,11 +16,8 @@ class Test extends Component {
     super(props);
     // 传过来的已有项目的id和类型
     // TODO:
-    // const { type, projectId, paramsType } = this.props.match.params;
     const { id } = this.props.match.params;
-    console.log(this.props.match)
     const data =id.split('_');
-    console.log(data)
     const { projectInfor } = this.props.projectManage;
 
     this.state = {
@@ -137,11 +134,8 @@ class Test extends Component {
  * @param {Array} newData 已删除过的流程模型的集合
  * */
   deleteRow = value => {
-    console.log(value)
     const tableData = this.state.list;
-    console.log(tableData)
     const newData = tableData.filter(item => item.id !== value.id);
-    console.log(newData)
 
     this.setState({
       list: newData,
@@ -150,6 +144,7 @@ class Test extends Component {
       type: 'projectManage/setProcessSelectedList',
       payload: newData,
     });
+    sessionStorage.setItem('introduction', JSON.stringify(newData));
   };
 
   /**
@@ -190,8 +185,9 @@ class Test extends Component {
     // 存储选中的流程模型数据
     if (!(value === '' || value === undefined)) {
       const processModalList = JSON.parse(sessionStorage.getItem('introduction'))||[];
+      // console.log(processModalList)
       const listMap = {};
-      console.log(processModalList);
+      // console.log(processModalList);
       processModalList.forEach(item=>{
         listMap[item.id] = item;
       })
@@ -328,7 +324,7 @@ class Test extends Component {
 
   render() {
     const { list, loading, visible, buttonLoading } = this.state;
-    console.log(this.state)
+    // console.log(this.state)
     const columns = [
       {
         title: '名称/描述',
