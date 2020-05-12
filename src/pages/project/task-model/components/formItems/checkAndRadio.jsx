@@ -14,10 +14,12 @@ class CheckboxModel extends React.Component {
   }
 
   state = {
-    list: [],
     viewForm: null,
     fromView: null,
+    xx: false,
   };
+
+  list = [];
 
   componentDidMount() {
     const { fromView, viewForm } = this.props;
@@ -29,10 +31,10 @@ class CheckboxModel extends React.Component {
           viewData.push({ [key]: viewForm[key] });
         }
       });
-
-      this.setState({
-        list: viewData,
-      });
+      this.list = viewData;
+      // this.setState({
+      //   list: viewData,
+      // });
     } else {
       const originList = [
         {
@@ -46,30 +48,44 @@ class CheckboxModel extends React.Component {
           selectKey: 'select_2',
         },
       ];
-      this.setState({
-        list: originList,
-      });
+
+      this.list = originList;
+      // this.setState({
+      //   list: originList,
+      // });
     }
     this.props.getFun(this.updateList);
   }
 
-  updateList = () => {
-    const { viewForm } = this.state;
+  updateList = viewForm => {
+    // const { viewForm } = this.state;
     console.log(viewForm);
-    this.setState({
-      list: [
-        {
-          id: 1,
-          selectName: '选项 3',
-          selectKey: 'select_1',
-        },
-        {
-          id: 2,
-          selectName: '选项 4',
-          selectKey: 'select_2',
-        },
-      ],
-    });
+    this.list = [
+      {
+        id: 1,
+        selectName: '选项 3',
+        selectKey: 'select_1',
+      },
+      {
+        id: 2,
+        selectName: '选项 4',
+        selectKey: 'select_2',
+      },
+    ];
+    // this.setState({
+    //   list: [
+    //     {
+    //       id: 1,
+    //       selectName: '选项 3',
+    //       selectKey: 'select_1',
+    //     },
+    //     {
+    //       id: 2,
+    //       selectName: '选项 4',
+    //       selectKey: 'select_2',
+    //     },
+    //   ],
+    // });
   };
 
   getList = () => {
@@ -97,7 +113,7 @@ class CheckboxModel extends React.Component {
   };
 
   addSelected = () => {
-    const { list } = this.state;
+    const { list } = this;
     const ids = [];
     list.forEach(item => ids.push(item.id));
     const max = Math.max.apply(null, ids);
@@ -110,10 +126,14 @@ class CheckboxModel extends React.Component {
       selectName: newName,
       selectKey: newKey,
     };
-    const optionList = this.state.list;
+    // const optionList = this.state.list;
+    this.list = [...this.list, data];
     this.setState({
-      list: [...optionList, data],
+      xx: true,
     });
+    // this.setState({
+    //   list: [...optionList, data],
+    // });
   };
 
   sortListData = data => {
@@ -139,8 +159,8 @@ class CheckboxModel extends React.Component {
   };
 
   render() {
-    const { fromView, viewForm, list } = this.state;
-    const listData = fromView ? this.getList() : list;
+    const { fromView, viewForm } = this.state;
+    const listData = fromView ? this.getList() : this.list;
     return (
       <>
         <Form.Item
@@ -199,7 +219,6 @@ class CheckboxModel extends React.Component {
                     {lebel} :
                   </div>
                   <div style={{ float: 'right', width: 300, height: '40px', paddingTop: '4px' }}>
-                    // eslint-disable-next-line react/no-array-index-key
                     <Form.Item label="" name={item.selectKey} key={index}>
                       <Input.Group compact>
                         <Form.Item

@@ -1,18 +1,16 @@
 // 选择任务模型
 import React from 'react';
-import { Modal, Table, Avatar, Form, Col, Tag, Select, Spin, message } from 'antd';
-import TableSearchForm from '@/components/TableSearchForm';
+import { Modal, Avatar, Form, Tag, Select, message } from 'antd';
 import { connect } from 'dva';
 import DefaultHeadPicture from '@/assets/imgs/upload_middle.png';
 import api from '@/pages/project/api/taskmodel';
-// import { cutString } from '@/utils/utils';
+import { cutString } from '@/utils/utils';
 import ProTable from '@ant-design/pro-table';
 import _ from 'lodash';
 import disk from '@/pages/project/api/disk';
 
 const { Option } = Select;
 
-const FormItem = Form.Item;
 /**
  * 前置任务列表  任务模型选择前置任务
  */
@@ -32,16 +30,10 @@ class BeforeTask extends React.Component {
     super(props);
     this.state = {
       visible: false,
-      pagination: {},
-      // nameCodeVal: [],
-      value: [],
       children: [],
+      loading: false,
     };
     this.fetchData = _.debounce(this.fetchData, 500);
-  }
-
-  componentDidMount() {
-    this.getTableData(this.initialValues);
   }
 
   /**
@@ -59,65 +51,6 @@ class BeforeTask extends React.Component {
   };
 
   /**
-   * 获取表格数据
-   * @param {Object} option 外部传入的props
-   */
-  getTableData = (options = {}) => {
-    this.setState({ loading: true });
-    const { pagination, value } = this.state;
-    const formData = this.tableSearchFormRef.current
-      ? this.tableSearchFormRef.current.getFieldsValue()
-      : '';
-    const { current: page, pageSize: rows } = pagination;
-
-    const data = {
-      page,
-      rows,
-      code: formData.code && value,
-      // ...formData,
-      ...options,
-      status: 2,
-    };
-    api
-      .getTaskModels(data)
-      .then(res => {
-        const uuids = (res.rows || []).map(e => e.picture);
-        disk
-          .getFiles({
-            sourceCode: uuids.join(','),
-            sourceKey: 'project_task_model',
-          })
-          .then(v => {
-            const newList = (res.rows || []).map(e => {
-              const filterItem = v ? v.filter(item => item.sourceCode === e.picture) : [];
-              const fileId = filterItem[0] && filterItem[0].id;
-              return {
-                ...e,
-                fileId,
-              };
-            });
-            this.setState({
-              list: newList,
-            });
-          });
-        this.setState({
-          pagination: {
-            current: data.page,
-            pageSize: data.rows,
-            total: res.total,
-          },
-          loading: false,
-        });
-      })
-      .catch(err => {
-        console.log(err);
-        this.setState({
-          loading: false,
-        });
-      });
-  };
-
-  /**
    * 获取模糊搜索的数据
    * @param {String} 用户输入在input框中的值
    */
@@ -127,59 +60,6 @@ class BeforeTask extends React.Component {
         children: res,
       });
     });
-  };
-
-  /**
-   * 更新value
-   * @param {Object} value 用户选中的值
-   */
-  handleSelectChange = value => {
-    const { pagination } = this.state;
-    const page = {
-      current: 1,
-      pageSize: pagination.pageSize,
-    };
-    // debugger;
-    this.setState({
-      value: value && value.value,
-      pagination: page,
-    });
-  };
-
-  /**
-   * 简单模式下的DOM
-   */
-  simpleForm = () => {
-    const { children } = this.state;
-    return (
-      <>
-        <Col lg={10}>
-          <FormItem label="名称" name="code">
-            <Select
-              allowClear
-              // mode="tag"
-              showSearch
-              showArrow={false}
-              labelInValue
-              // value={value} // 有值的话就会展示
-              // placeholder="Select users"
-              filterOption={false}
-              onSearch={this.fetchData}
-              onChange={this.handleSelectChange}
-              style={{ width: '100%' }}
-              optionFilterProp="children" // 对子元素--option进行筛选
-              optionLabelProp="label" // 回填的属性
-            >
-              {(children || []).map(d => (
-                <Option key={d.code} value={d.code} label={d.name}>
-                  {d.code}&nbsp;&nbsp;{d.name}
-                </Option>
-              ))}
-            </Select>
-          </FormItem>
-        </Col>
-      </>
-    );
   };
 
   /**
@@ -193,14 +73,11 @@ class BeforeTask extends React.Component {
     });
     const res = await api.getAllPreTasks(id, this.props.ids).catch(err => {
       console.log(err);
-      this.setState({
-        loading: false,
-      });
     });
     this.setState({
       loading: false,
     });
-
+    console.log(res);
     const { allPreTaskParamsType, argumentList } = this.props.taskModel;
     const argumentTypeList = (argumentList || []).map(item => item.type);
     let pass = true;
@@ -239,19 +116,6 @@ class BeforeTask extends React.Component {
   };
 
   /**
-   * 表格点击页码，筛选的回调
-   */
-  handleChange = p => {
-    const page = p.current;
-    const rows = p.pageSize;
-    const pagination = { page, rows };
-    this.setState({
-      pagination,
-    });
-    this.getTableData(pagination);
-  };
-
-  /**
    * 列表查询数据的处理
    * @param {object} params request返回的数据
    */
@@ -260,7 +124,7 @@ class BeforeTask extends React.Component {
     const newObj = {
       page: params.current,
       rows: params.pageSize,
-      status: params.status && params.status.length ? params.status.join(',') : '',
+      status: params.status ? params.status : '',
       code: params.name ? params.name.value : '',
       publisherCode: params.publisherName ? params.publisherName.value : '',
       publishBeginDate: params.publishDate ? params.publishDate[0] : '',
@@ -271,18 +135,17 @@ class BeforeTask extends React.Component {
         delete newObj[key];
       }
     });
-    console.log(newObj);
     return newObj;
   };
 
-  render() {
-    const { onClose } = this.props;
-    const { list, loading, pagination } = this.state;
-    const columns = [
+  columns = () => {
+    const { children } = this.state;
+    return [
       {
         title: '编号/名称',
         dataIndex: 'code',
         width: 220,
+        hideInSearch: true,
         render: (value, row) => (
           <>
             <div style={{ display: 'flex' }}>
@@ -299,7 +162,7 @@ class BeforeTask extends React.Component {
 
               <div style={{ float: 'left', marginLeft: '10px' }}>
                 <div>{value}</div>
-                <div>{row.name}</div>
+                <div title={row.name}>{cutString(row.name, 18)}</div>
               </div>
             </div>
           </>
@@ -310,11 +173,13 @@ class BeforeTask extends React.Component {
         width: 280,
         dataIndex: 'describe',
         ellipsis: true,
+        hideInSearch: true, // 在form里隐藏
       },
       {
         title: '版本',
         width: 100,
         dataIndex: 'version',
+        hideInSearch: true,
         render: value => (
           <Tag color="green" style={{ padding: '0 10px' }}>
             {value}
@@ -330,10 +195,42 @@ class BeforeTask extends React.Component {
           </>
         ),
       },
+      {
+        title: '名称',
+        dataIndex: 'name',
+        width: 220,
+        hideInTable: true, // 在表格里隐藏这列
+        renderFormItem: (item, { onChange }) => (
+          <Select
+            allowClear
+            showSearch
+            showArrow={false}
+            labelInValue
+            filterOption={false}
+            onSearch={this.fetchData}
+            onChange={onChange}
+            style={{ width: '100%' }}
+            optionFilterProp="children" // 对子元素--option进行筛选
+            optionLabelProp="label" // 回填的属性
+          >
+            {(children || []).map(d => (
+              <Option key={d.code} value={d.code} label={d.name}>
+                {d.code}&nbsp;&nbsp;{d.name}
+              </Option>
+            ))}
+          </Select>
+        ),
+      },
     ];
+  };
+
+  render() {
+    const { onClose } = this.props;
+    const { loading } = this.state;
 
     return (
       <Modal
+        bodyStyle={{ paddingTop: 0 }}
         title={this.titleContent()}
         visible={this.state.visible}
         onOk={this.handleOk}
@@ -343,26 +240,23 @@ class BeforeTask extends React.Component {
         footer={null}
         className="classBeforeTask"
       >
-        <Spin spinning={loading}>
-          <div className="tableList buttonStyle setTitleColor">
-            <div>
-              <TableSearchForm
-                ref={this.tableSearchFormRef}
-                initialValues={this.initialValues}
-                getTableData={this.getTableData}
-                simpleForm={this.simpleForm}
-              />
-            </div>
-            <Table
-              columns={columns}
-              dataSource={list}
-              rowKey="id"
-              size="small"
-              pagination={pagination}
-              onChange={this.handleChange}
-            />
-          </div>
-        </Spin>
+        <ProTable
+          actionRef={this.tableSearchFormRef}
+          rowKey="id"
+          className="setNoTableToolbar"
+          loading={loading}
+          search={{ span: 11 }}
+          request={params =>
+            api
+              .getTaskModels(this.getParamData(params))
+              .then(res => ({ data: res.rows, total: res.total, success: true }))
+          }
+          columns={this.columns()}
+          options={false}
+          pagination={{
+            defaultPageSize: 5,
+          }}
+        />
       </Modal>
     );
   }

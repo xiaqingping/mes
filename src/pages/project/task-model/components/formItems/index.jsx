@@ -16,8 +16,9 @@ class FactoryComponent extends React.Component {
     const compGroup = ['sample_select', 'sample_group', 'sample_environment_factor'];
     const checkGroup = ['checkbox', 'radio']; // 单选, 多选的组件
     const { fromView, viewForm, type } = this.props;
-    if (viewForm.paramKey) {
-      this.updateData();
+    console.log(fromView, viewForm, type);
+    if (checkGroup.includes(type) && viewForm.paramKey) {
+      this.updateData(viewForm);
     }
     return (
       <>
