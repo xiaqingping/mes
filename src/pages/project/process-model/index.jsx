@@ -309,7 +309,7 @@ class ProcessModel extends Component {
               style={{ float: 'left', width: '46px', height: '46px' }}
             />
             <div style={{ float: 'left', marginLeft: '10px' }}>
-              <div>{cutString(row.name, 15)}</div>
+              <div title={row.name}>{cutString(row.name, 12)}</div>
               <div style={{ color: '#B9B9B9' }}>{value}</div>
             </div>
           </>
@@ -328,7 +328,7 @@ class ProcessModel extends Component {
       {
         title: '描述',
         dataIndex: 'describe',
-        width: 400,
+        width: 300,
         ellipsis: true,
         // render: value => <div title={value}>{cutString(value, 115)}</div>,
         hideInSearch: true,
@@ -364,10 +364,11 @@ class ProcessModel extends Component {
         renderFormItem: (item, { onChange }) => (
           <Select
             mode="multiple"
-            maxTagCount={1}
+            maxTagCount={2}
             maxTagTextLength={3}
             onChange={onChange}
             allowClear
+            className="setSelectMultipleType"
           >
             {status.map(it => (
               <Option key={it.value} value={it.value}>
