@@ -8,7 +8,6 @@ import api from '@/pages/hts/api';
 import { message } from 'antd';
 import { TableModel } from '../components/AntdUI';
 import { FieldDrawer } from '../components/ModelUI';
-// import './index.less';
 
 class paramList extends Component {
   constructor(props) {
@@ -251,7 +250,7 @@ class paramList extends Component {
                     height: 20,
                     display: 'inline-block',
                     position: 'absolute',
-                    top: 17,
+                    top: 1,
                     left: 100,
                     float: 'right',
                     marginRight: 160,
