@@ -100,7 +100,7 @@ class paramList extends Component {
           title: '样品',
           dataIndex: 'sampleName',
           key: 'sampleName',
-          width: 270,
+          width: 120,
         },
       ],
     };
@@ -117,12 +117,8 @@ class paramList extends Component {
     return false;
   }
 
-  // 获取数据
-  getData = value => {
-    console.log(value);
-  };
+  /** 获取表格数据 */
 
-  // 获取表格数据
   getTableData = () => {
     this.setState({ loading: true });
     const { metadataRow } = this.state;
@@ -152,7 +148,10 @@ class paramList extends Component {
     this.setState({ loading: false });
   };
 
-  // 转换环境因子数据
+  /**
+   * 转换环境因子数据
+   * @param {Array} data 环境因子数据
+   */
   transformEnvironmentFactor = data => {
     const { environmentalFactorColumns } = this.state;
     const { environmentFactors, samples } = data;
@@ -177,7 +176,10 @@ class paramList extends Component {
     });
   };
 
-  // 转换分组方案数据
+  /**
+   * 转换分组方案数据
+   * @param {Array} data 分组方案数据
+   */
   transformGroup = data => {
     const { groupColumns } = this.state;
     const { groupSchemes, samples } = data;
@@ -200,21 +202,24 @@ class paramList extends Component {
     });
   };
 
-  // 查看序列文件 抽屉
+  //
+  /**
+   * 查看序列文件 抽屉
+   * @param {Array} row 行数据
+   */
   searchFieldDrawer = row => {
-    this.setState({ visibleField: true, rowData: row.sampleProperties })
-    // this.setState({ visibleField: true, rowData: row.sequenceFileList });
+    this.setState({ visibleField: true, rowData: row.sampleProperties });
   };
 
-  // 关闭序列文件抽屉
+  /** 关闭序列文件抽屉 */
   onCloseFieldDrawer = () => {
     this.setState({ visibleField: false });
   };
 
   /**
    * 获取表头
-   * data 数据列表
-   * columns 初始列
+   * @param {Array} data 数据列表
+   * @param {Object} columns 初始列
    */
   getTableHeaderData = (data, columns, titleName) => {
     const newColumns = JSON.parse(JSON.stringify(columns));
@@ -237,20 +242,22 @@ class paramList extends Component {
           const color = `color_${max + 1}`;
           return (
             <>
-              <span style={{ marginRight: 10 }}>{value}</span>
-              <div
-                style={{
-                  background: row[color],
-                  width: 20,
-                  height: 20,
-                  display: 'inline-block',
-                  position: 'relative',
-                  top: 1,
-                  left: 100,
-                  float: 'right',
-                  marginRight: 160,
-                }}
-              />
+              <span style={{ marginRight: 10 }}>
+                {value}
+                <div
+                  style={{
+                    background: row[color],
+                    width: 20,
+                    height: 20,
+                    display: 'inline-block',
+                    position: 'absolute',
+                    top: 17,
+                    left: 100,
+                    float: 'right',
+                    marginRight: 160,
+                  }}
+                />
+              </span>
             </>
           );
         },
@@ -262,9 +269,9 @@ class paramList extends Component {
 
   /**
    * 获取行数据 分组方案
-   * groupList 分组方案数据
-   * sampleList 样品列表数据
-   * groupColumns 分组方案初始列
+   * @param {Array} groupList 分组方案数据
+   * @param {Array} sampleList 样品列表数据
+   * @param {Object} groupColumns 分组方案初始列
    */
   getRowDataGroup = (groupList, sampleList, groupColumns) => {
     // 取出全部样品
@@ -294,9 +301,9 @@ class paramList extends Component {
 
   /**
    * 获取行数据 环境因子
-   * list 环境因子数据
-   * sampleList 样品列表数据
-   * columns 环境因子初始列
+   * @param {Array} list 环境因子数据
+   * @param {Array} sampleList 样品列表数据
+   * @param {Object} columns 环境因子初始列
    */
   getRowDataEnvironment = (list, sampleList, columns) => {
     const samples = [];
@@ -318,9 +325,9 @@ class paramList extends Component {
 
   /**
    * 填充行数据
-   * groupList  分组方案数据
-   * rowData 行数据 有表头字段但数据为空
-   * columns 表头数据
+   * @param {Array} groupList  分组方案数据
+   * @param {Array} rowData 行数据 有表头字段但数据为空
+   * @param {Object} columns 表头数据
    */
   getFillData = (groupList, rowData, columns) => {
     // 分组方案遍历
@@ -329,7 +336,7 @@ class paramList extends Component {
 
       // 行数据遍历
       rowData.forEach(rowItems => {
-        const rowItem = rowItems
+        const rowItem = rowItems;
         // 分组方案下的 分组列表不为空
         if (groupItem.groups !== null && groupItem.groups.length !== 0) {
           // 分组列表遍历
@@ -371,7 +378,7 @@ class paramList extends Component {
     });
 
     rowData.forEach(rItems => {
-      const rItem = rItems
+      const rItem = rItems;
       columns.forEach(cItem => {
         Object.keys(rItem).map(key => {
           if (rItem[key] === cItem.title) {
@@ -386,8 +393,8 @@ class paramList extends Component {
 
   /**
    * 填充行数据 环境因子
-   * list  环境因子数据
-   * rowData 行数据 有表头字段但数据为空
+   * @param {Array} list  环境因子数据
+   * @param {Array} rowData 行数据 有表头字段但数据为空
    */
   getFillDataEnvironment = (list, rowData) => {
     // 环境因子遍历
@@ -396,7 +403,7 @@ class paramList extends Component {
 
       // 行数据遍历
       rowData.forEach(rowItems => {
-        const rowItem = rowItems
+        const rowItem = rowItems;
         // 环境因子列表遍历
         item.environmentFactorValues.forEach(valItem => {
           // 环境因子值下的样品列表遍历
@@ -421,9 +428,9 @@ class paramList extends Component {
 
   /**
    * 样品去重 排序
-   * list 数据中拿到的样品列表
-   * sampleList 样品表中的样品列表
-   * columns 初始列数据
+   * @param {Array} list 数据中拿到的样品列表
+   * @param {Array} sampleList 样品表中的样品列表
+   * @param {Object} columns 初始列数据
    */
   sampleRemoveDuplication = (list, sampleList, columns) => {
     const newSample = [];
@@ -477,7 +484,7 @@ class paramList extends Component {
     let tableWidth = 0;
 
     const newSampleColumns = sampleColumns.map(cols => {
-      const col = cols
+      const col = cols;
       if (!col.width) col.width = 100;
       tableWidth += col.width;
       if (!col.editable) {
@@ -487,7 +494,7 @@ class paramList extends Component {
     });
 
     const newGroupColumns = groupColumns.map(cols => {
-      const col = cols
+      const col = cols;
       if (!col.width) col.width = 100;
       tableWidth += col.width;
       if (!col.editable) {
@@ -497,7 +504,7 @@ class paramList extends Component {
     });
 
     const newEnvironmentalFactorColumns = environmentalFactorColumns.map(cols => {
-      const col = cols
+      const col = cols;
       if (!col.width) col.width = 100;
       tableWidth += col.width;
       if (!col.editable) {
@@ -510,7 +517,7 @@ class paramList extends Component {
       <PageHeaderWrapper className="classParamList">
         <TableModel
           title="样品"
-          rowkey='id'
+          rowkey="id"
           loading={loading}
           data={sampleData}
           columns={newSampleColumns}
@@ -521,7 +528,7 @@ class paramList extends Component {
         />
         <TableModel
           title="分组方案"
-          rowkey='metadataSampleId'
+          rowkey="metadataSampleId"
           loading={loading}
           data={groupSchemeData}
           columns={newGroupColumns}
@@ -529,7 +536,7 @@ class paramList extends Component {
         />
         <TableModel
           title="环境因子表"
-          rowkey='metadataSampleId'
+          rowkey="metadataSampleId"
           loading={loading}
           data={environmentalFactorData}
           columns={newEnvironmentalFactorColumns}
@@ -537,7 +544,6 @@ class paramList extends Component {
         />
 
         {/* 序列文件抽屉 */}
-        {/* {console.log(rowData)} */}
         <FieldDrawer visible={visibleField} onClose={this.onCloseFieldDrawer} data={rowData} />
       </PageHeaderWrapper>
     );

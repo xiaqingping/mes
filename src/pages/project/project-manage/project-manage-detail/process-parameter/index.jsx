@@ -161,6 +161,16 @@ class ProcessParameter extends Component {
           this.getDefaultParams(newParamData);
           data = newParamData;
         }
+        data.forEach(item => {
+          if (item.params.length) {
+            item.params.forEach(it => {
+              // TODO:
+              if (it.isRequired === 'true' || it.isrequired === 'true') {
+                checkData.push(it.paramKey);
+              }
+            });
+          }
+        });
       }
     }
     if (!data) return false;
@@ -304,7 +314,7 @@ class ProcessParameter extends Component {
       });
       return false;
     }
-    // return message.warning('数据验证未通过');
+    return false;
   };
 
   /**
