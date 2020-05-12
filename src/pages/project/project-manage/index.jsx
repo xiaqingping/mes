@@ -9,7 +9,7 @@ import {
   Select,
   Popconfirm,
   // Col,
-  // Badge,
+  Badge,
   AutoComplete,
   Menu,
   Dropdown,
@@ -47,28 +47,17 @@ class ProjectManagement extends Component {
     super(props);
     this.state = {
       nameCodeVal: [],
-      // list: [],
-      projectIds: '', // 模糊搜索id值
-      // modelSearchOptions: [], // 项目管理模糊搜素options
+      projectId: '', // 模糊搜索id值
     };
-    // 异步验证做节流处理
-    // this.fetchCodeData = debounce(this.fetchCodeData, 500);
     // 异步验证做节流处理
     this.callParter = _.debounce(this.callParter, 500);
   }
 
-
-  // 异步节流处理的方法
-  // fetchCodeData = value => {
-  //   api.gettProjectManageCodeAndName(value).then(res => {
-  //     this.setState({ modelSearchOptions: res || [] });
-  //   });
-  // };
   callParter = value => {
     console.log(value)
     api.gettProjectManageCodeAndName(value).then(res => {
-      this.setState({ nameCodeVal: res },() => {
-        console.log(res)
+      this.setState({ nameCodeVal: res|| [] },() => {
+        console.log(this.state)
       });
     });
   };
@@ -95,6 +84,7 @@ class ProjectManagement extends Component {
         arr.push(item);
       }
     });
+    console.log(arr)
     this.setState({
       nameCodeVal: arr,
       // allowClear: 'ture',
@@ -109,17 +99,17 @@ class ProjectManagement extends Component {
    */
   getParamData = params => {
     console.log(params);
-    const { processCode, publisherCode } = this.state;
+    const { processCode } = this.state;
     const newObj = {
       page: params.current,
       pageSize: params.pageSize,
       status: params.status ? params.status : '',
-      code: params.name ? processCode : '',
-      publisherCode: params.publisherName ? publisherCode : '',
-      publishBeginDate: params.publishDate ? params.publishDate[0] : '',
-      publicEndDate: params.publishDate ? params.publishDate[1] : '',
+      id: params.name ? processCode : '',
+      beginDate: params.beginDate ? params.beginDate[0]: '',
+      endDate: params.beginDate ? params.beginDate[1]: '',
     };
     Object.getOwnPropertyNames(newObj).forEach(key => {
+      // console.log(key)
       if (!newObj[key]) {
         delete newObj[key];
       }
@@ -140,22 +130,6 @@ class ProjectManagement extends Component {
     return statusValue;
   };
 
-/**
- * 项目管理的搜索功能的筛选
- * @param {string} value 用户选择的一条数据
- *  */
-  // handleSearchCodeChange = value => {
-  //   const { pagination } = this.state;
-  //   const page = {
-  //     current: 1,
-  //     pageSize: pagination.pageSize,
-  //   };
-
-  //   this.setState({
-  //     pagination: page,
-  //     projectIds: value.value,
-  //   });
-  // };
 
 /**
  * 新建项目
@@ -259,16 +233,15 @@ class ProjectManagement extends Component {
         <div
           onClick={() => {
             this.setState({
-              projectIds: item.code,
+              projectId: item.id,
             });
           }}
         >
           {item.code} {item.name}
         </div>
       </Option>
-      // console.log(item)
     ));
-    console.log(children)
+    // console.log(children)
     return [
       {
         title: '编号/名称',
@@ -319,14 +292,9 @@ class ProjectManagement extends Component {
           </>
         ),
       },
-      // {
-      //   title: '项目',
-      //   dataIndex: 'name',
-      //   hideInTable: true,
-      // },
       {
         title: '项目',
-        dataIndex: 'name',
+        dataIndex: 'id',
         hideInTable: true,
         renderFormItem: (item, { onChange }) => (
           <AutoComplete onSearch={this.inputValue} spellCheck="false" onChange={onChange}>
@@ -339,6 +307,7 @@ class ProjectManagement extends Component {
         dataIndex: 'status',
         width: '200px',
         filters: status,
+        hideInSearch: true,
         render: (value, row) => {
           const color = formatter(status, value, 'value', 'color');
           return (
@@ -359,6 +328,19 @@ class ProjectManagement extends Component {
             </Dropdown>
           );
         },
+      },
+      {
+        title: '状态',
+        dataIndex: 'status',
+        width: 150,
+        hideInTable: true,
+        valueEnum: this.statusValue(),
+        render: value => (
+          <Badge
+            status={formatter(status, value, 'value', 'status')}
+            text={formatter(status, value, 'value', 'text')}
+          />
+        ),
       },
       {
         title: '创建人',
@@ -437,7 +419,6 @@ class ProjectManagement extends Component {
   };
 
   render() {
-    // const { nameCodeVal} = this.state;
     console.log(this.state)
     return (
       <PageHeaderWrapper>
