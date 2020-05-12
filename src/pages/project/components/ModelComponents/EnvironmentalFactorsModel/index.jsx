@@ -2,7 +2,7 @@
  * 环境因子表
  */
 import React from 'react';
-import { Table, Button, message } from 'antd';
+import { Table, Button } from 'antd';
 import { CloseOutlined, PlusSquareOutlined, UploadOutlined } from '@ant-design/icons';
 import style from './index.less';
 import UploadSequenceFile from './UploadSequenceFile';
@@ -105,6 +105,7 @@ class EnvironmentalFactorsModel extends React.Component {
       newData.push(newItem);
       return false;
     });
+    this.formatSubmitData(newData, 'tableData');
     this.setState({
       data: newData,
     });
@@ -169,12 +170,12 @@ class EnvironmentalFactorsModel extends React.Component {
       error = this.verifyData(tableData);
     }
 
-    if (data.length === 0 || headers.length === 0 || tableData.length === 0) error = true;
+    // if (data.length === 0 || headers.length === 0 || tableData.length === 0) error = true;
 
     const newData = {
       paramData: {
         paramKey: paramList.paramKey,
-        paramValue: error ? 'false' : JSON.stringify(tableData),
+        paramValue: error ? '' : JSON.stringify(tableData),
         taskModelId: paramList.taskModelId,
       },
       isVerify: !error,
@@ -188,14 +189,15 @@ class EnvironmentalFactorsModel extends React.Component {
    * @param {Array} tableData 表数据
    */
   verifyData = tableData => {
+    const { paramList, sampleList } = this.state;
     // 环境因子下不能全部为空
     let error = false;
     tableData.forEach(item => {
       if (item.environmentFactorValues.length === 0) {
-        message.error('存在空的环境因子');
         error = true;
       }
     });
+    if (paramList.isRequired === 'false' && sampleList.length === 0) error = false;
     return error;
   };
 
@@ -566,7 +568,7 @@ class EnvironmentalFactorsModel extends React.Component {
         <div style={{ float: 'left', marginTop: 10, fontSize: 15, fontWeight: 'bold' }}>
           {paramName}
         </div>
-        {!disabledIs || sampleList.length > 0 ? (
+        {!disabledIs && sampleList.length > 0 ? (
           <div
             onClick={() => this.uploadButton()}
             style={{ float: 'right', marginTop: 10, marginBottom: 10 }}

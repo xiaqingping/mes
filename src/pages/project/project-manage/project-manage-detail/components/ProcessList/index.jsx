@@ -15,8 +15,6 @@ import ProgressMould from '../ProgressMould';
 import style from './index.less';
 
 class ProcessList extends Component {
-  tableSearchFormRef = React.createRef();
-
   tableFormRef = React.createRef();
 
   constructor(props) {

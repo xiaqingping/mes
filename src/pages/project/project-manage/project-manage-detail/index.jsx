@@ -15,8 +15,6 @@ import MemberList from './components/MemberList/index';
 const { TabPane } = Tabs;
 
 class ProjectDetail extends Component {
-  tableSearchFormRef = React.createRef();
-
   constructor(props) {
     super(props);
     const projectId = this.props.match.params.id;

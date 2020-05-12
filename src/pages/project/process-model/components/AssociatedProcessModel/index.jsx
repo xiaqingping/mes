@@ -206,6 +206,7 @@ class AssociatedProcessModel extends React.Component {
           className="setNoTableToolbar"
           columns={columns}
           rowKey="id"
+          size="default"
           options={false}
           search={{ span: 11 }}
           request={params =>
