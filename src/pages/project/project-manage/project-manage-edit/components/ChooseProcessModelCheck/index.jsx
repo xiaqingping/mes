@@ -41,8 +41,6 @@ class ChooseProcessModelCheck extends React.Component {
         render: (value, row) => (
           <>
             <Avatar
-              // src={row.fileId ? disk.downloadFiles(row.fileId,
-              //   { view: true }) : DefaultHeadPicture}
               src={
                 row.picture ? disk.downloadFiles(row.picture, { view: true }) : DefaultHeadPicture
               }
