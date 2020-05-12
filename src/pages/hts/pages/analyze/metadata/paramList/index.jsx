@@ -8,6 +8,7 @@ import api from '@/pages/hts/api';
 import { message } from 'antd';
 import { TableModel } from '../components/AntdUI';
 import { FieldDrawer } from '../components/ModelUI';
+// import './index.less';
 
 class paramList extends Component {
   constructor(props) {
@@ -513,7 +514,7 @@ class paramList extends Component {
     });
 
     return (
-      <PageHeaderWrapper>
+      <PageHeaderWrapper className="classParamList">
         <TableModel
           title="样品"
           rowkey="id"
