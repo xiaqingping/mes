@@ -131,7 +131,7 @@ class Parameter extends React.Component {
               visible={addGroupVisible}
               handleCloseGroup={(v, type = '') => this.handleCloseGroup(v, type)}
             /> */}
-
+            {console.log(data)}
             {/* 分组列表 */}
             <List
               style={{ float: 'left' }}
@@ -144,41 +144,45 @@ class Parameter extends React.Component {
               grid={{
                 column: 2,
               }}
-              renderItem={(item, index) => (
-                <>
-                  <div className="addParamter">
-                    <List.Item key={index}>
-                      <Card
-                        title={this.titleContent(item, index)}
-                        style={{ width: '269px', height: '234px', overflowY: 'hidden' }}
-                      >
-                        {data.filter(i => i.groupName !== 'no').length === 0 ? (
-                          ''
-                        ) : (
-                          <div>
-                            {item.params.map(v =>
-                              v.paramId ? (
-                                <Card
-                                  key={v.paramId}
-                                  style={{
-                                    float: 'left',
-                                    margin: '10px',
-                                  }}
-                                  hoverable
-                                >
-                                  <div>{v.paramName}</div>
-                                </Card>
-                              ) : (
-                                <div key={v.paramId} />
-                              ),
-                            )}
-                          </div>
-                        )}
-                      </Card>
-                    </List.Item>
-                  </div>
-                </>
-              )}
+              renderItem={(item, index) =>
+                item === 'noData' ? (
+                  []
+                ) : (
+                  <>
+                    <div className="addParamter">
+                      <List.Item key={index}>
+                        <Card
+                          title={this.titleContent(item, index)}
+                          style={{ width: '269px', height: '234px', overflowY: 'hidden' }}
+                        >
+                          {data.filter(i => i.groupName !== 'no').length === 0 ? (
+                            ''
+                          ) : (
+                            <div>
+                              {item.params.map(v =>
+                                v.paramId ? (
+                                  <Card
+                                    key={v.paramId}
+                                    style={{
+                                      float: 'left',
+                                      margin: '10px',
+                                    }}
+                                    hoverable
+                                  >
+                                    <div>{v.paramName}</div>
+                                  </Card>
+                                ) : (
+                                  <div key={v.paramId} />
+                                ),
+                              )}
+                            </div>
+                          )}
+                        </Card>
+                      </List.Item>
+                    </div>
+                  </>
+                )
+              }
               className="list-style card-item-style"
               split={false}
             />
