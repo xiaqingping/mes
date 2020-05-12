@@ -50,9 +50,9 @@ class InputModel extends React.Component {
    * @param {string} value 验证值
    */
   verifyData = value => {
-    const { paramName, defaultValue, validDesc, isrequired } = this.state.paramList;
+    const { paramName, defaultValue, validDesc, isRequired } = this.state.paramList;
     let error = false;
-    if (isrequired === 'true') {
+    if (isRequired === 'true') {
       if (!value) {
         if (!defaultValue) {
           if (validDesc) {

@@ -12,7 +12,8 @@ module.exports = {
           name: 'metadata',
           path: '/hts/analyze/metadata',
           hideChildrenInMenu: true,
-          routes: [{
+          routes: [
+            {
               path: '/hts/analyze/metadata',
               component: './hts/pages/analyze/metadata',
             },

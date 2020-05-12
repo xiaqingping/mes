@@ -1,33 +1,25 @@
 /**
  * 元数据分析
  */
-import { Card, Col, Form, Input, Badge, Select, DatePicker, message } from 'antd';
 import React, { Component } from 'react';
+import {
+  Badge,
+  message
+} from 'antd';
+// import { PlusOutlined } from '@ant-design/icons';
 import { connect } from 'dva';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
-import StandardTable from '@/pages/hts/components/StandardTable';
-import TableSearchForm from '@/components/TableSearchForm';
-import EditableCell from '@/components/EditableCell';
+import ProTable from '@ant-design/pro-table';
 import api from '@/pages/hts/api';
-import { formatter } from '@/utils/utils';
 import router from 'umi/router';
+import { formatter } from '@/utils/utils';
 import { ParamDrawer } from './components/ModelUI';
 import './index.less';
 
-const FormItem = Form.Item;
-const { Option } = Select;
-const { RangePicker } = DatePicker;
-
 class Metadata extends Component {
-  tableSearchFormRef = React.createRef();
-
   tableFormRef = React.createRef();
 
   state = {
-    pagination: {}, // 分页参数
-    list: [], // 表格数据
-    loading: true, // 加载状态
-    selectedRows: [], // 选中行数据
     visibleParam: false, // 显示参数抽屉
     originalParam: [], // 原始参数列表
   };
@@ -38,147 +30,35 @@ class Metadata extends Component {
     pageSize: 10,
   };
 
-  // 组件挂载时
-  componentDidMount() {
-    this.getCacheData();
-    this.getTableData(this.initialValues);
-  }
-
-  // 顶部表单简单搜索
-  simpleForm = () => (
-    <>
-      <Col lg={6} md={8} sm={12}>
-        <FormItem label="编号" name="code">
-          <Input />
-        </FormItem>
-      </Col>
-      <Col lg={6} md={8} sm={12}>
-        <FormItem label="项目编号" name="projectCode">
-          <Input />
-        </FormItem>
-      </Col>
-      <Col lg={6} md={8} sm={12}>
-        <FormItem label="任务编号" name="taskCode">
-          <Input />
-        </FormItem>
-      </Col>
-    </>
-  );
-
-  // 顶部表单复杂搜索
-  advancedForm = () => {
-    const { status } = this.props.htsCache;
-    return (
-      <>
-        <Col lg={6} md={8} sm={12}>
-          <FormItem label="操作人" name="userCode">
-            <Input />
-          </FormItem>
-        </Col>
-        <Col lg={6} md={8} sm={12}>
-          <FormItem label="开始时间" name="beginDate">
-            <RangePicker format="YYYY-MM-DD" />
-          </FormItem>
-        </Col>
-        <Col lg={6} md={8} sm={12}>
-          <FormItem label="结束时间" name="endDate">
-            <RangePicker format="YYYY-MM-DD" />
-          </FormItem>
-        </Col>
-        <Col lg={6} md={8} sm={12}>
-          <FormItem label="状态" name="status">
-            <Select mode="multiple" style={{ width: '100%' }}>
-              {status.map(e => (
-                <Option value={e.id} key={e.id}>
-                  {e.name}
-                </Option>
-              ))}
-            </Select>
-          </FormItem>
-        </Col>
-      </>
-    );
-  };
-
-  // 获取此页面需要用到的基础数据
-  getCacheData = () => {};
-
-  // 分页
-  handleStandardTableChange = data => {
-    console.log(data);
-    this.getTableData({
-      page: data.current,
-      pageSize: data.pageSize,
-    });
-  };
-
-  // 选择行
-  handleSelectRows = rows => {
-    this.setState({
-      selectedRows: rows,
-    });
-  };
-
-  // 获取表格数据
-  getTableData = (options = {}) => {
-    this.setState({ loading: true });
-
-    const formData = this.tableSearchFormRef.current.getFieldsValue();
-    const { pagination } = this.state;
-    const { current: page, pageSize } = pagination;
-
-    let newData = [];
-
-    // 状态
-    if (formData.status) {
-      newData = { ...newData, status: formData.status.join(',') };
-      console.log(newData);
-      delete formData.status;
-    }
-
-    // 开始时间
-    if (formData.beginDate) {
-      newData = {
-        ...newData,
-        beginDateBefore: formData.beginDate[0].format('YYYY-MM-DD'),
-        beginDateAfter: formData.beginDate[1].format('YYYY-MM-DD'),
-      };
-      delete formData.beginDate;
-    }
-
-    // 结束时间
-    if (formData.endDate) {
-      newData = {
-        ...newData,
-        endDateBefore: formData.endDate[0].format('YYYY-MM-DD'),
-        endDateAfter: formData.endDate[1].format('YYYY-MM-DD'),
-      };
-      delete formData.endDate;
-    }
-
-    const data = {
-      page,
-      pageSize,
-      ...newData,
-      ...formData,
-      ...options,
+  /**
+   * 列表查询数据的处理
+   * @param {object} params request返回的数据
+   */
+  getParamData = params => {
+    console.log(params)
+    const newObj = {
+      page: params.current,
+      pageSize: params.pageSize,
+      status: params.status,
+      beginDateBefore: params.beginDate[0],
+      beginDateAfter: params.beginDate[1],
+      endDateBefore: params.endDateBefore,
+      endDateAfter: params.endDateAfter,
+      code: params.code,
+      projectCode: params.projectCode,
+      taskCode: params.taskCode,
+      userCode: params.userCode
     };
-
-    api.metadata.getMetadatas(data).then(res => {
-      this.setState({
-        list: res.results,
-        pagination: {
-          current: data.page,
-          pageSize: data.pageSize,
-          total: res.total,
-        },
-        loading: false,
-      });
+    Object.getOwnPropertyNames(newObj).forEach(key => {
+      if (!newObj[key]) {
+        delete newObj[key];
+      }
     });
+    return newObj;
   };
 
-  // 查看参数列表页
-  searchParamList = data => {
+   // 查看参数列表页
+   searchParamList = data => {
     this.props.dispatch({
       type: 'htsCache/setMetadataRow',
       payload: data,
@@ -203,20 +83,24 @@ class Metadata extends Component {
   // 关闭参数抽屉
   onCloseParamDrawer = () => {
     this.setState({ visibleParam: false });
+  }
+
+  /**
+   * 状态的值处理
+   */
+  statusValue = () => {
+    const { status } = this.props.htsCache;
+    // 状态的值
+    let statusValue = {};
+    status.forEach(item => {
+      statusValue = { ...statusValue, [item.id]: { text: item.name, status: item.status } };
+    })
+    return statusValue;
   };
 
   render() {
-    const { pagination, selectedRows, list, loading, visibleParam, originalParam } = this.state;
+    const { visibleParam, originalParam } = this.state;
     const { status } = this.props.htsCache;
-    // table x轴取消
-    // let tableWidth = 0;
-
-    const components = {
-      body: {
-        cell: EditableCell,
-      },
-    };
-
     let columns = [
       {
         title: '编号',
@@ -244,6 +128,7 @@ class Metadata extends Component {
         title: '开始/结束时间',
         dataIndex: 'beginDate',
         key: 'beginDate',
+        valueType: 'dateRange',
         render: (text, row) => (
           <>
             {row.beginDate}
@@ -256,6 +141,7 @@ class Metadata extends Component {
         title: '状态',
         dataIndex: 'status',
         key: 'status',
+        valueEnum: this.statusValue(),
         render: (value, row) => {
           const name = formatter(status, value);
           const sta = formatter(status, value, 'id', 'status');
@@ -272,7 +158,6 @@ class Metadata extends Component {
 
     columns = columns.map(col => {
       const colWidth = col.width || 100;
-      // tableWidth += colWidth;
       return {
         ...col,
         width: colWidth,
@@ -281,35 +166,18 @@ class Metadata extends Component {
 
     return (
       <PageHeaderWrapper>
-        <div className="tableList classMetaData">
-          <Card bordered={false}>
-            <TableSearchForm
-              ref={this.tableSearchFormRef}
-              initialValues={this.initialValues}
-              getTableData={this.getTableData}
-              simpleForm={this.simpleForm}
-              advancedForm={this.advancedForm}
-              rowKey="id"
-            />
-          </Card>
-          <Card style={{ marginTop: '24px' }}>
-            <Form ref={this.tableFormRef}>
-              <StandardTable
-                // scroll={{ x: tableWidth }}
-                rowClassName="editable-row"
-                rowKey="id"
-                selectedRows={selectedRows}
-                components={components}
-                loading={loading}
-                data={{ list, pagination }}
-                columns={columns}
-                onSelectRow={this.handleSelectRows}
-                onChange={this.handleStandardTableChange}
-                style={{ marginTop: 40, marginLeft: 24 }}
-              />
-            </Form>
-          </Card>
-        </div>
+        <ProTable
+          actionRef={this.tableFormRef}
+          rowKey="id"
+          request={params => api.metadata.getMetadatas(this.getParamData(params))
+            .then(res =>({ data: res.results, total: res.total, success: true }))
+          }
+          columns={columns}
+          options={false}
+          pagination={{
+            defaultPageSize: 10,
+          }}
+        />
         <ParamDrawer
           visible={visibleParam}
           onClose={this.onCloseParamDrawer}
