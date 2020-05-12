@@ -214,14 +214,15 @@ class ProcessEdit extends Component {
     } = this.state;
     const data = {};
     const taskModelIds = [];
+
     taskList.forEach(item => {
       taskModelIds.push({ taskModelId: item.id, automatic: item.automatic });
     });
     if (imageUrl) {
       data.picture = guuid;
     }
-    data.name = values.name.trim();
-    data.describe = values.describe.trim();
+    data.name = values.name ? values.name.trim() : '';
+    data.describe = values.describe ? values.describe.trim() : '';
     data.interactionAnalysis = values.interactionAnalysis ? 1 : 2;
     data.version = selectVersion || 'V1.0';
     data.taskModels = taskModelIds;
@@ -554,7 +555,7 @@ class ProcessEdit extends Component {
         width: 240,
         render: value => (
           <Badge
-            status={formatter(status, value, 'value', 'status')}
+            status={formatter(status, value, 'value', 'status').toLowerCase()}
             text={formatter(status, value, 'value', 'text')}
           />
         ),

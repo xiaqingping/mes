@@ -9,7 +9,6 @@ import { Modal, List, Card, Button } from 'antd';
 import { ArrowsAltOutlined } from '@ant-design/icons';
 import { compare, cutString } from '@/utils/utils';
 import EnlargePage from '../EnlargePage/enlargePage';
-// import AddGroup from '../AddGroup/addGroup';
 
 class Parameter extends React.Component {
   static getDerivedStateFromProps(nextProps) {
@@ -17,7 +16,6 @@ class Parameter extends React.Component {
   }
 
   state = {
-    // activeId: null,
     visible: false,
     typeEnlargeVisible: false,
     typeEnlargeData: [],
@@ -127,10 +125,6 @@ class Parameter extends React.Component {
               handleBigClose={this.handleBigClose}
               typeEnlargeData={typeEnlargeData}
             />
-            {/* <AddGroup
-              visible={addGroupVisible}
-              handleCloseGroup={(v, type = '') => this.handleCloseGroup(v, type)}
-            /> */}
 
             {/* 分组列表 */}
             <List
@@ -144,41 +138,45 @@ class Parameter extends React.Component {
               grid={{
                 column: 2,
               }}
-              renderItem={(item, index) => (
-                <>
-                  <div className="addParamter">
-                    <List.Item key={index}>
-                      <Card
-                        title={this.titleContent(item, index)}
-                        style={{ width: '269px', height: '234px', overflowY: 'hidden' }}
-                      >
-                        {data.filter(i => i.groupName !== 'no').length === 0 ? (
-                          ''
-                        ) : (
-                          <div>
-                            {item.params.map(v =>
-                              v.paramId ? (
-                                <Card
-                                  key={v.paramId}
-                                  style={{
-                                    float: 'left',
-                                    margin: '10px',
-                                  }}
-                                  hoverable
-                                >
-                                  <div>{v.paramName}</div>
-                                </Card>
-                              ) : (
-                                <div key={v.paramId} />
-                              ),
-                            )}
-                          </div>
-                        )}
-                      </Card>
-                    </List.Item>
-                  </div>
-                </>
-              )}
+              renderItem={(item, index) =>
+                item === 'noData' ? (
+                  []
+                ) : (
+                  <>
+                    <div className="addParamter">
+                      <List.Item key={index}>
+                        <Card
+                          title={this.titleContent(item, index)}
+                          style={{ width: '269px', height: '234px', overflowY: 'hidden' }}
+                        >
+                          {data.filter(i => i.groupName !== 'no').length === 0 ? (
+                            ''
+                          ) : (
+                            <div>
+                              {item.params.map(v =>
+                                v.paramId ? (
+                                  <Card
+                                    key={v.paramId}
+                                    style={{
+                                      float: 'left',
+                                      margin: '10px',
+                                    }}
+                                    hoverable
+                                  >
+                                    <div>{v.paramName}</div>
+                                  </Card>
+                                ) : (
+                                  <div key={v.paramId} />
+                                ),
+                              )}
+                            </div>
+                          )}
+                        </Card>
+                      </List.Item>
+                    </div>
+                  </>
+                )
+              }
               className="list-style card-item-style"
               split={false}
             />

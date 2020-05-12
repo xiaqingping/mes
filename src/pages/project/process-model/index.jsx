@@ -257,7 +257,6 @@ class ProcessModel extends Component {
     status.forEach(item => {
       statusValue = { ...statusValue, [item.value]: { text: item.text, status: item.status } };
     });
-    console.log(statusValue);
     return statusValue;
   };
 

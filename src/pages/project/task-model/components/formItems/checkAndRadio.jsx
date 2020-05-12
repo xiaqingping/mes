@@ -17,7 +17,6 @@ function compare(property) {
 
 class CheckboxModel extends React.Component {
   static getDerivedStateFromProps(nextProps) {
-    console.log(nextProps.viewForm);
     return {
       formData: nextProps.viewForm,
       fromView: nextProps.fromView,
@@ -58,7 +57,6 @@ class CheckboxModel extends React.Component {
    */
   getFromData = formData => {
     let viewData = [];
-    console.log(formData.paramKey);
     if (formData.paramKey) {
       const newData = [];
       Object.keys(formData).forEach(key => {
@@ -72,8 +70,6 @@ class CheckboxModel extends React.Component {
         Object.keys(item).forEach(key => {
           selectKey = key;
         });
-        console.log(item);
-        console.log(item[selectKey]);
 
         // const obj = JSON.parse(item[selectKey]);
         let obj;
@@ -89,7 +85,6 @@ class CheckboxModel extends React.Component {
         };
         data.push(newItem);
         const nData = data.sort(compare('id'));
-        console.log(nData);
 
         viewData = nData;
       });

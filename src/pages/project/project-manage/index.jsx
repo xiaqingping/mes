@@ -8,6 +8,7 @@ import {
   // Form,
   Select,
   Popconfirm,
+  message,
   // Col,
   // Badge,
   // AutoComplete,
@@ -147,7 +148,9 @@ class ProjectManagement extends Component {
  * */
   deleteRow = row => {
     api.deleteProjectManage(row.id).then(() => {
-      this.getTableData();
+      // this.getTableData();
+      message.success('项目管理删除成功!');
+      this.tableSearchFormRef.current.reload();
     });
   };
 
@@ -164,7 +167,7 @@ class ProjectManagement extends Component {
         status: type,
       };
       api.updateProjectStatus(data).then(() => {
-        this.getTableData(this.initialValues);
+        this.tableSearchFormRef.current.reload();
       });
     }
   };
@@ -306,19 +309,14 @@ class ProjectManagement extends Component {
         width: 150,
         hideInTable: true,
         valueEnum: this.statusValue(),
-        // render: value => (
-        //   <Badge
-        //     status={formatter(status, value, 'value', 'status')}
-        //     text={formatter(status, value, 'value', 'text')}
-        //   />
-        // ),
         renderFormItem: (item, { onChange }) => (
           <Select
             mode="multiple"
-            maxTagCount={1}
+            maxTagCount={2}
             maxTagTextLength={3}
             onChange={onChange}
             allowClear
+            className="setSelectMultipleType"
           >
             {status.map(it => (
               <Option key={it.value} value={it.value}>
@@ -408,7 +406,7 @@ class ProjectManagement extends Component {
     return (
       <PageHeaderWrapper>
         <ProTable
-          actionRef={this.ref}
+          actionRef={this.tableSearchFormRef}
           headerTitle={
             <Button type="primary" onClick={() => this.handleAdd()}>
               <PlusOutlined />
