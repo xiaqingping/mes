@@ -17,7 +17,6 @@ function compare(property) {
 
 class CheckboxModel extends React.Component {
   static getDerivedStateFromProps(nextProps) {
-    console.log(nextProps.viewForm);
     return {
       formData: nextProps.viewForm,
       fromView: nextProps.fromView,
@@ -71,7 +70,11 @@ class CheckboxModel extends React.Component {
         Object.keys(item).forEach(key => {
           selectKey = key;
         });
-        const obj = JSON.parse(item[selectKey]);
+
+        // const obj = JSON.parse(item[selectKey]);
+        let obj;
+        if (typeof item[selectKey] === 'string') obj = JSON.parse(item[selectKey]);
+        obj = item[selectKey];
         const id = selectKey.split('_')[1];
 
         const newItem = {
@@ -82,7 +85,6 @@ class CheckboxModel extends React.Component {
         };
         data.push(newItem);
         const nData = data.sort(compare('id'));
-        console.log(nData);
 
         viewData = nData;
       });
@@ -159,9 +161,9 @@ class CheckboxModel extends React.Component {
 
         <p style={{ fontSize: 16, fontWeight: 'bold' }}>选项：</p>
 
-        {selectList.map(item => (
+        {selectList.map((item, index) => (
           <>
-            <div style={{ width: 370, overflow: 'hidden' }}>
+            <div style={{ width: 370, overflow: 'hidden' }} key={index}>
               <div style={{ float: 'left', marginRight: '10px', height: '40px' }}>
                 <span style={{ position: 'relative', left: 0, top: 5 }}>{item.selectName} :</span>
               </div>
@@ -172,7 +174,7 @@ class CheckboxModel extends React.Component {
                     <span style={{ marginLeft: 20 }}>{item.selectValue}</span>
                   </div>
                 ) : (
-                  <Form.Item label="" name={item.selectKey}>
+                  <Form.Item label="" name={item.selectKey} key={index}>
                     <Input.Group compact>
                       <Form.Item
                         name={[[item.selectKey], 'selectKey']}
