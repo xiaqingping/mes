@@ -52,17 +52,20 @@ class NumberModels extends React.Component {
   verifyData = () => {
     const { max, min, inputValue, paramList } = this.state;
     let verifyMessage = ''
-    if (parseFloat(inputValue) <= max && parseFloat(inputValue) >= min )
-    return [true,  verifyMessage]
+
+    if (parseFloat(inputValue) <= max &&
+     parseFloat(inputValue) >= min ) return [true,  verifyMessage]
+
     if (paramList.validDesc) {
-      message.warning(paramList.validDesc)
       verifyMessage = paramList.validDesc
+      message.warning(verifyMessage)
     } else {
-      message.warning(`值不合法`)
       verifyMessage = `值不合法`
+      message.warning(verifyMessage)
     }
+
     return [false,  verifyMessage]
-  };
+  }
 
   /**
    * 获取数据 获取保存更改值

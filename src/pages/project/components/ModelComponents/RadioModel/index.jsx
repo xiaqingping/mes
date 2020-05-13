@@ -10,10 +10,11 @@
  */
 import React from 'react';
 import { Select, Descriptions, message } from 'antd';
+import PropTypes from 'prop-types';
 
 const { Option } = Select;
 
-class radioModel extends React.Component {
+class RadioModel extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
@@ -62,8 +63,8 @@ class radioModel extends React.Component {
     let verifyMessage = ''
     if (paramList.isRequired === 'true') {
       if (!value || value.length === 0) {
-        message.warning(`${paramList.paramName}参数不能为空`);
         verifyMessage = `${paramList.paramName}参数不能为空`
+        message.warning(verifyMessage)
         verify = false;
       }
     }
@@ -108,4 +109,12 @@ class radioModel extends React.Component {
   }
 }
 
-export default radioModel
+RadioModel.defaultProps = {
+  paramList: {}
+}
+
+RadioModel.propTypes = {
+  paramList: PropTypes.object
+}
+
+export default RadioModel
