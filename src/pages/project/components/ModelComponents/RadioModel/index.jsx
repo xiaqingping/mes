@@ -49,8 +49,7 @@ class radioModel extends React.Component {
       taskModelId: paramList.taskModelId,
     }
     const verify = this.verifyData(value)
-    if (!verify) return
-    this.props.getData(data, 'radio', verify);
+    this.props.getData(data, 'radio', ...verify);
   }
 
   /**
@@ -60,14 +59,15 @@ class radioModel extends React.Component {
   verifyData = value => {
     const { paramList } = this.state;
     let verify = true
+    let verifyMessage = ''
     if (paramList.isRequired === 'true') {
-      if (value.length === 0) {
+      if (!value || value.length === 0) {
         message.warning(`${paramList.paramName}参数不能为空`);
-        verify = true;
+        verifyMessage = `${paramList.paramName}参数不能为空`
+        verify = false;
       }
-      verify = false
     }
-    return verify
+    return [verify, verifyMessage]
   }
 
   /**

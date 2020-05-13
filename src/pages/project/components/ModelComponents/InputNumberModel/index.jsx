@@ -37,7 +37,6 @@ class NumberModels extends React.Component {
   formatSubmitData = () => {
     // 获取校验结果
     const isVerify = this.verifyData();
-    // if (isVerify) return false;
     const { paramList, inputValue } = this.state;
     const data = {
       paramKey: paramList.paramKey,
@@ -52,13 +51,17 @@ class NumberModels extends React.Component {
    */
   verifyData = () => {
     const { max, min, inputValue, paramList } = this.state;
-    if (parseFloat(inputValue) <= max && parseFloat(inputValue) >= min ) return true
+    let verifyMessage = ''
+    if (parseFloat(inputValue) <= max && parseFloat(inputValue) >= min )
+    return [true,  verifyMessage]
     if (paramList.validDesc) {
       message.warning(paramList.validDesc)
+      verifyMessage = paramList.validDesc
     } else {
       message.warning(`值不合法`)
+      verifyMessage = `值不合法`
     }
-    return false
+    return [false,  verifyMessage]
   };
 
   /**
@@ -69,10 +72,9 @@ class NumberModels extends React.Component {
     if(!parseFloat(value)) return
     await this.setState({
       inputValue: value,
-    });
-    const { data, isVerify } = this.formatSubmitData();
-    if(!isVerify) return
-    this.props.getData(data, 'number_input', isVerify)
+    })
+    const { data, isVerify } = this.formatSubmitData()
+    this.props.getData(data, 'number_input', ...isVerify)
   };
 
 
