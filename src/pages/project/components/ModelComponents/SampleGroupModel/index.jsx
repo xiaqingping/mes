@@ -27,7 +27,6 @@ class SampleGroup extends React.Component {
     } else {
       sampleLists = nextProps.sampleList;
     }
-    console.log(nextProps);
     return {
       tableData: tableDatas || [],
       sampleList: sampleLists || [],
@@ -62,6 +61,11 @@ class SampleGroup extends React.Component {
    * 组件校验是否通过
    */
   validPass = null;
+
+  /**
+   * 组件校验校验失败信息
+   */
+  errMessage = null;
 
   /**
    * table第一列
@@ -103,22 +107,14 @@ class SampleGroup extends React.Component {
    */
   sendDataOnChange = () => {
     const list = this.verifyData();
-    const { paramKey, taskModelId, isRequired } = this.props.paramList;
+    const { paramKey, taskModelId } = this.props.paramList;
     const sendData = {
       paramKey,
       paramValue: JSON.stringify(list),
       taskModelId,
     };
-    // if (isRequired === 'true' && list && list.length) {
-    //   debugger;
-    //   this.validPass = true;
-    // } else {
-    //   debugger;
-    //   this.validPass = false;
-    // }
     this.validPass = !!list;
-    console.log(list, this.validPass);
-    this.props.getData(sendData, 'groupScheme', this.validPass);
+    this.props.getData(sendData, 'groupScheme', this.validPass, this.errMessage);
   };
 
   /**
@@ -602,7 +598,7 @@ class SampleGroup extends React.Component {
     // ---------------------首先判断选择的颜色在model里是否有重复---------
     const { colorStore } = this.props.project;
     let colors = [...colorStore];
-    let colorhex = color.hex;
+    let colorhex = color.hex.toUpperCase();
 
     const repeat = colorStore.includes(colorhex);
     if (repeat) {
@@ -986,6 +982,7 @@ class SampleGroup extends React.Component {
     const cols = [...columns];
     const num = cols.length;
     if ((isRequired === 'true' && num === 2) || (isRequired === 'true' && !datas.length)) {
+      this.errMessage = '分组方案为必须项，请设置分组方案！';
       // message.error('分组方案为必须，请设置分组方案！');
       return false;
     }
@@ -998,10 +995,9 @@ class SampleGroup extends React.Component {
       const validTrue1 = group.includes('当前样品') && hasOtherValue;
       const validTrue2 = group.every(item => item === '');
       const validFalse = validTrue1 || validTrue2;
-      console.log(validFalse);
-
       this.validPass = !validFalse;
-
+      if (validTrue1) this.errMessage = '分组方案中包含样品和组';
+      if (validTrue2) this.errMessage = '存在空的分组方案';
       if (validFalse) {
         // message.error('分组方案包含样品和组');
         return false;

@@ -188,6 +188,8 @@ class SampleSelect extends React.Component {
    */
   validPass = null;
 
+  errorMessage = '';
+
   /**
    *  在这个生命周期中将tableDatas数据复制一份，以防止子组件不能改变父组件传过来的值的问题并实现数据渲染页面
    */
@@ -233,7 +235,6 @@ class SampleSelect extends React.Component {
       item.sampleProperties = item.sampleProperties.filter(i => i.isChoose);
       return item;
     });
-    console.log(list);
     const { paramKey, taskModelId } = this.props.paramList;
     const sendData = {
       paramKey,
@@ -241,7 +242,8 @@ class SampleSelect extends React.Component {
       paramValue: JSON.stringify(list),
     };
     this.validPass = !(this.props.paramList.isRequired === 'true' && list && !list.length);
-    this.props.getData(sendData, 'sampleSelect', this.validPass);
+    if (!this.validPass) this.errorMessage = '样品为必选，请选择样品！';
+    this.props.getData(sendData, 'sampleSelect', this.validPass, this.errorMessage);
   };
 
   /**
@@ -354,15 +356,15 @@ class SampleSelect extends React.Component {
    */
   handleChange = (color, record, index) => {
     const { tableData } = this.state;
-    let { colorStore } = this.props.project;
+    const { colorStore } = this.props.project;
     const row = { ...record };
-    const isIncludes = colorStore.includes(color.hex);
-    colorStore = colorStore.filter(item => item !== color.hex);
+    const isIncludes = colorStore.includes(color.hex.toUpperCase());
+    // colorStore = colorStore.filter(item => item !== color.hex.toUpperCase());
     if (isIncludes) {
       message.warning('存在相同颜色，已为您自动生成一个新颜色！');
       row.color = getrandomColor();
     } else {
-      row.color = color.hex;
+      row.color = color.hex.toUpperCase();
     }
     this.setColorStore([...colorStore, row.color]);
     row.visible = false;

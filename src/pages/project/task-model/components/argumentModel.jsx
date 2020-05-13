@@ -23,7 +23,6 @@ class ArgumentModel extends Component {
     // 获取列表
     const isAdd = window.location.href.indexOf('add') > 0;
     const { argumentList, firstOpenParams } = this.props.taskModel;
-
     if ((argumentList && argumentList.length > 0) || !firstOpenParams) {
       const list = argumentList.map((item, index) => {
         item.myId = Date.now() + index;
@@ -49,12 +48,17 @@ class ArgumentModel extends Component {
     } else {
       this.getArgumentList();
     }
+    const { dispatch } = this.props;
+    dispatch({
+      type: `taskModel/setFirstOpenParams`,
+      payload: false,
+    });
   }
 
   componentWillUnmount() {
     const { fromView } = this.props;
+    const { dispatch } = this.props;
     if (fromView) {
-      const { dispatch } = this.props;
       dispatch({
         type: 'taskModel/getArgumentsList',
         payload: [],
