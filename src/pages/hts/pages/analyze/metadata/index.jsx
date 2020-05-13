@@ -186,6 +186,7 @@ class Metadata extends Component {
     return (
       <PageHeaderWrapper>
         <ProTable
+          className="setNoTableToolbar"
           actionRef={this.tableFormRef}
           rowKey="id"
           request={params => api.metadata.getMetadatas(this.getParamData(params))
