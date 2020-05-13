@@ -92,6 +92,7 @@ class SampleSelect extends React.Component {
         render: (text, record, index) => (
           <div className="project_manage_sample_select_table_alia">
             <input
+              style={{ width: '100%' }}
               disabled={this.state.disabled}
               type="text"
               defaultValue={text}
@@ -205,25 +206,6 @@ class SampleSelect extends React.Component {
     });
     this.getTableData(tableDatas);
   }
-
-  // componentDidUpdate(props) {
-  // if (props.submitStatus !== this.props.submitStatus) {
-  //   const { tableData } = this.state;
-  //   let list = [...tableData];
-  //   list = list.map(item => {
-  //     item.sampleId = item.id;
-  //     return item;
-  //   });
-  //   const { paramKey, taskModelId } = props;
-  //   const sendData = {
-  //     paramKey,
-  //     taskModelId,
-  //     paramValue: JSON.stringify(list),
-  //   };
-  //   this.validPass = !(this.props.paramList.required && list && !list.length);
-  //   this.props.getData(sendData, 'sampleSelect', this.validPass);
-  // }
-  // }
 
   /**
    * 每次数据发生改变时都将数据传给父组件
