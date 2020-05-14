@@ -214,13 +214,13 @@ class ProjectManagement extends Component {
       {
         title: '描述',
         dataIndex: 'describe',
-        width: 300,
+        width: 400,
         hideInSearch: true,
       },
       {
         title: '创建人/时间',
         dataIndex: 'creatorName',
-        width: 300,
+        width: 200,
         hideInSearch: true,
         render: (value, row) => (
           <>
@@ -232,7 +232,7 @@ class ProjectManagement extends Component {
       },
       {
         title: '修改人/时间',
-        width: 300,
+        width: 200,
         dataIndex: 'changerName',
         hideInSearch: true,
         render: (value, row) => (
@@ -272,7 +272,7 @@ class ProjectManagement extends Component {
       {
         title: '状态',
         dataIndex: 'status',
-        width: 150,
+        width: 200,
         filters: status,
         hideInSearch: true,
         render: (value, row) => {
@@ -338,7 +338,7 @@ class ProjectManagement extends Component {
       {
         title: '标签',
         dataIndex: 'labels',
-        width: 200,
+        width: 250,
         hideInSearch: true,
         render: value => {
           const arr = [];
@@ -361,13 +361,13 @@ class ProjectManagement extends Component {
       {
         title: '成员数',
         dataIndex: 'memberCount',
-        width: 120,
+        width: 100,
         hideInSearch: true,
       },
       {
         title: '时间',
         dataIndex: 'beginDate',
-        width: 300,
+        width: 200,
         hideInSearch: true,
         render: (value, row) => (
           <>
@@ -381,7 +381,6 @@ class ProjectManagement extends Component {
         fixed: 'right',
         title: '操作',
         hideInSearch: true,
-        width: 200,
         render: row => (
           <>
             <Popconfirm title="确定删除数据？" onConfirm={() => this.deleteRow(row)}>
@@ -417,6 +416,7 @@ class ProjectManagement extends Component {
           pagination={{
             defaultPageSize: 10,
           }}
+          scroll={{ x: 2000 }}
         />
       </PageHeaderWrapper>
     );
