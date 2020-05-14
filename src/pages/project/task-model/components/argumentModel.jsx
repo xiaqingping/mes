@@ -1,3 +1,5 @@
+/* eslint-disable no-param-reassign */
+/* eslint-disable array-callback-return */
 import React, { Component } from 'react';
 import { Drawer, Button, Popconfirm, Dropdown, Menu, Spin, Empty, message } from 'antd';
 import api from '@/pages/project/api/taskmodel';
@@ -19,6 +21,9 @@ class ArgumentModel extends Component {
     type: '', // 组件类型 ,比如: input
   };
 
+  /**
+   * 获取所需要的参数列表
+   */
   componentDidMount() {
     // 获取列表
     const isAdd = window.location.href.indexOf('add') > 0;
@@ -55,6 +60,9 @@ class ArgumentModel extends Component {
     });
   }
 
+  /**
+   * 页面销毁之前清空数据
+   */
   componentWillUnmount() {
     const { fromView } = this.props;
     const { dispatch } = this.props;
@@ -91,10 +99,6 @@ class ArgumentModel extends Component {
         dispatch({
           type: 'taskModel/getArgumentsList',
           payload: list,
-        });
-        dispatch({
-          type: 'taskModel/setFirstOpenParams',
-          payload: false,
         });
         this.setState({
           argumentList: list,

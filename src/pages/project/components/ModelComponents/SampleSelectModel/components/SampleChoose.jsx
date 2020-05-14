@@ -1,9 +1,12 @@
+/* eslint-disable prefer-destructuring */
+/* eslint-disable no-param-reassign */
 import React from 'react';
 import { Table, Button, Checkbox, Modal } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
 import classnames from 'classnames';
 import FileUpload from '../../UploadSequenceFile/sequenUpload';
 import api from '../api/sample.js';
+import { cutString } from '@/utils/utils';
 
 /**
  * 选择样品弹框
@@ -245,24 +248,27 @@ class SampleChoose extends React.Component {
         ellipsis: true,
 
         render: (text, record, index) =>
-          text.map(item => (
-            <div
-              key={item.fileId}
-              className={classnames('project_manage_params_sample_choose_checkbox_style', {
-                project_manage_params_sample_choose_checkbox: disabled,
-              })}
-            >
-              {/* <Tooltip title={item.sequenceFileName} > */}
-              <Checkbox
-                onChange={e => this.handleCheckboxChange(e, record, item, index)}
-                checked={item.isChoose}
-                disabled={disabled}
+          text.map(item => {
+            return (
+              <div
+                key={item.sequenceFileId}
+                className={classnames('project_manage_params_sample_choose_checkbox_style', {
+                  project_manage_params_sample_choose_checkbox: disabled,
+                })}
               >
-                {item.sequenceFileName}
-              </Checkbox>
-              {/* </Tooltip> */}
-            </div>
-          )),
+                <div title={item.sequenceFileName}>
+                  <Checkbox
+                    onChange={e => this.handleCheckboxChange(e, record, item, index)}
+                    checked={item.isChoose}
+                    disabled={disabled}
+                    title={item.sequenceFileName}
+                  >
+                    {cutString(item.sequenceFileName, 30)}
+                  </Checkbox>
+                </div>
+              </div>
+            );
+          }),
       },
       {
         title: '序列',
@@ -274,11 +280,13 @@ class SampleChoose extends React.Component {
           <div>
             {row.sampleProperties &&
               row.sampleProperties.length &&
-              row.sampleProperties.map((item, index) => (
-                <div className="project_manage_params_sample_choose_checkbox_style" key={index}>
-                  {`${item.sampleSequenceCount} (${item.sampleLengthTotal}bp)`}
-                </div>
-              ))}
+              row.sampleProperties.map(item => {
+                return (
+                  <div className="project_manage_params_sample_choose_checkbox_style" key={item.id}>
+                    {`${item.sampleSequenceCount} (${item.sampleLengthTotal}bp)`}
+                  </div>
+                );
+              })}
           </div>
         ),
       },
@@ -292,8 +300,8 @@ class SampleChoose extends React.Component {
           <div>
             {row.sampleProperties &&
               row.sampleProperties.length &&
-              row.sampleProperties.map((item, index) => (
-                <div className="project_manage_params_sample_choose_checkbox_style" key={index}>
+              row.sampleProperties.map(item => (
+                <div className="project_manage_params_sample_choose_checkbox_style" key={item.id}>
                   {`${item.sampleLengthMin}-${item.sampleLengthMax} (avg ${item.sampleLengthAve})`}
                 </div>
               ))}

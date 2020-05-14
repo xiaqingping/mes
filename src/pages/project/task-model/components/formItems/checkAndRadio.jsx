@@ -71,10 +71,9 @@ class CheckboxModel extends React.Component {
           selectKey = key;
         });
 
-        // const obj = JSON.parse(item[selectKey]);
         let obj;
         if (typeof item[selectKey] === 'string') obj = JSON.parse(item[selectKey]);
-        obj = item[selectKey];
+        else obj = item[selectKey];
         const id = selectKey.split('_')[1];
 
         const newItem = {
@@ -85,6 +84,15 @@ class CheckboxModel extends React.Component {
         };
         data.push(newItem);
         const nData = data.sort(compare('id'));
+
+        const keyList = [];
+        nData.forEach(it => keyList.push(it.selectKey));
+        Object.keys(formData).forEach(key => {
+          if (keyList.includes(key)) {
+            if (typeof formData[key] === 'string') formData[key] = JSON.parse(formData[key]);
+          }
+        });
+        this.setState({ formData });
 
         viewData = nData;
       });
@@ -127,6 +135,8 @@ class CheckboxModel extends React.Component {
 
   render() {
     const { fromView, selectList, formData, viewStatus } = this.state;
+    console.log(selectList);
+    console.log(formData);
     return (
       <>
         <Form.Item
@@ -156,7 +166,13 @@ class CheckboxModel extends React.Component {
         </Form.Item>
 
         <Form.Item label="是否必填：" name="isRequired">
-          {viewStatus ? formData.isRequired : <Switch defaultChecked />}
+          {viewStatus ? (
+            formData.isRequired
+          ) : (
+            <Switch
+              defaultChecked={formData.isRequired === '是' || formData.isRequired === 'true'}
+            />
+          )}
         </Form.Item>
 
         <p style={{ fontSize: 16, fontWeight: 'bold' }}>选项：</p>

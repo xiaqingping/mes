@@ -1,5 +1,5 @@
 import React from 'react';
-import { Input, Form, message } from 'antd';
+import { Input, Form } from 'antd';
 
 /**
  * 单行输入框
@@ -28,20 +28,24 @@ class InputModel extends React.Component {
     this.formatSubmitData(e.target.value);
   };
 
-  // 格式化提交数据
+  /**
+   * 格式化提交数据
+   * @param {Array} value Input值
+   */
   formatSubmitData = value => {
-    const error = this.verifyData(value);
-    if (error) return false;
+    // 验证数据
+    const errorData = this.verifyData(value);
+    const { error } = errorData;
+
     const { paramList } = this.state;
-    const data = {
-      paramData: {
-        paramKey: paramList.paramKey,
-        paramValue: value,
-        taskModelId: paramList.taskModelId,
-      },
-      isVerify: true,
+    const paramData = {
+      paramKey: paramList.paramKey,
+      paramValue: error ? '' : value,
+      taskModelId: paramList.taskModelId,
     };
-    this.props.getData(data.paramData, 'input', data.isVerify);
+    const isVerify = !error;
+    const { message } = errorData;
+    this.props.getData(paramData, 'input', isVerify, message);
     return false;
   };
 
@@ -52,20 +56,20 @@ class InputModel extends React.Component {
   verifyData = value => {
     const { paramName, defaultValue, validDesc, isRequired } = this.state.paramList;
     let error = false;
+    let message = '';
     if (isRequired === 'true') {
       if (!value) {
         if (!defaultValue) {
           if (validDesc) {
-            message.warning(validDesc);
+            message = validDesc;
           } else {
-            message.warning(`${paramName}不能为空`);
+            message = `${paramName}为必填参数`;
           }
           error = true;
         }
       }
     }
-    if (!value) error = true;
-    return error;
+    return [error, message];
   };
 
   render() {
@@ -75,10 +79,7 @@ class InputModel extends React.Component {
       <Form.Item
         label={data.paramName}
         name={data.paramKey}
-        rules={[
-          // { required: data.isRequired, pattern: data.validRules || '', message: data.validDesc },
-          { required: data.isRequired, message: data.validDesc },
-        ]}
+        rules={[{ required: data.isRequired, message: data.validDesc }]}
       >
         <Input
           placeholder={data.placeholder}

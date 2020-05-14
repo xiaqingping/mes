@@ -1,3 +1,5 @@
+/* eslint-disable prefer-destructuring */
+/* eslint-disable no-param-reassign */
 import React from 'react';
 import { Table, Button, Modal, AutoComplete, Popover, message } from 'antd';
 import { UploadOutlined, PlusSquareOutlined, QuestionCircleOutlined } from '@ant-design/icons';
@@ -105,8 +107,8 @@ class SampleGroup extends React.Component {
   /**
    * 每次数据改变时都将数据发送给父组件。防止点击提交时各组件提交数据冲突
    */
-  sendDataOnChange = () => {
-    const list = this.verifyData();
+  sendDataOnChange = (groupSchemeData, columns) => {
+    const list = this.verifyData(groupSchemeData, columns);
     const { paramKey, taskModelId } = this.props.paramList;
     const sendData = {
       paramKey,
@@ -114,15 +116,28 @@ class SampleGroup extends React.Component {
       taskModelId,
     };
     this.validPass = !!list;
+    console.log(list, this.validPass, this.errMessage);
     this.props.getData(sendData, 'groupScheme', this.validPass, this.errMessage);
   };
 
   /**
    *  当样品改变时更新分组组件
+   * @param {String} fromDidMount 一个从didMount出来的标识，如果有，则不触发校验，一进来只是为了同步样品，而不需要校验。
+   * @param {Object} datas 分组方案表格数据
+   * @param {Array} colus 分组方案列数据
    */
-  selectUpdateGroup = () => {
-    if (this.state.disabled) return; // 如果是查看的化就不需要做任何操作
-    const { sampleList, groupSchemeData, columns } = this.state;
+  selectUpdateGroup = (fromDidMount, datas, colus) => {
+    // if (this.state.disabled) return; // 如果是查看的化就不需要做任何操作
+    const { sampleList } = this.state;
+    let groupSchemeData;
+    let columns;
+    if (datas) {
+      groupSchemeData = datas;
+      columns = colus;
+    } else {
+      groupSchemeData = this.state.groupSchemeData;
+      columns = this.state.columns;
+    }
     const selList = [...sampleList];
     const groupList = [...groupSchemeData];
     const columns1 = JSON.parse(JSON.stringify(columns));
@@ -132,7 +147,11 @@ class SampleGroup extends React.Component {
     const groupData = [];
     selList.map(item => {
       let newRow = {};
-      newRow = { sampleId: item.id, sampleName: item.sampleAlias || item.sampleName };
+      newRow = {
+        sampleId: item.id,
+        sampleName: item.sampleAlias || item.sampleName,
+        sampleAlias: item.sampleAlias,
+      };
       // map一下分组数据
       const mapGro = {};
       groupList.forEach(gro => {
@@ -143,6 +162,7 @@ class SampleGroup extends React.Component {
         newRow = mapGro[item.id];
         // 添加这行就可以解决上面的问题
         newRow.sampleName = item.sampleAlias || item.sampleName;
+        newRow.sampleAlias = item.sampleAlias;
       } else {
         colLen.forEach(col => {
           newRow[col] = '';
@@ -161,9 +181,12 @@ class SampleGroup extends React.Component {
         this.setState({
           columns: columns2,
         });
-        this.sendDataOnChange();
       },
     );
+    console.log(groupData);
+    if (!fromDidMount) {
+      this.sendDataOnChange(groupData, columns2);
+    }
   };
 
   /**
@@ -188,10 +211,13 @@ class SampleGroup extends React.Component {
         groupSchemeData: newData,
         columns: newColumns,
       },
-      () => {
-        this.selectUpdateGroup();
-      },
+      // () => {
+      //   this.selectUpdateGroup('fromDidMount');
+      // },
     );
+    console.log(newData);
+    console.log(newColumns);
+    this.selectUpdateGroup('fromDidMount', newData, newColumns);
   };
 
   /**
@@ -514,7 +540,7 @@ class SampleGroup extends React.Component {
    * @param {String} id 列的id
    */
   handleTitleBlur = (e, item, index, id) => {
-    const { columns } = this.state;
+    const { groupSchemeData, columns } = this.state;
     const cols = [...columns];
     if (id) {
       let rowIndex = null;
@@ -533,14 +559,10 @@ class SampleGroup extends React.Component {
       cols[index] = item;
     }
 
-    this.setState(
-      {
-        columns: cols,
-      },
-      () => {
-        this.sendDataOnChange();
-      },
-    );
+    this.setState({
+      columns: cols,
+    });
+    this.sendDataOnChange(groupSchemeData, cols);
   };
 
   /**
@@ -549,7 +571,7 @@ class SampleGroup extends React.Component {
    * @param {String} id 每列（column）的id
    */
   removeColumn = (item, id) => {
-    const { columns } = this.state;
+    const { groupSchemeData, columns } = this.state;
     let cols = [...columns];
     if (!item) {
       cols = cols.filter(v => v.id !== id);
@@ -558,15 +580,15 @@ class SampleGroup extends React.Component {
         {
           columns: cols,
         },
-        () => {
-          this.sendDataOnChange();
-        },
+        // () => {
+        //   this.sendDataOnChange();
+        // },
       );
+      this.sendDataOnChange(groupSchemeData, cols);
     } else {
       cols = cols.filter(v => v.id !== item.id);
       // 这里不光删除列， 同时也要删除表格数据，，删除掉每一个行的该分组方案下的组数据；
       const num = item.dataIndex.split('_')[1];
-      const { groupSchemeData } = this.state;
       const tableDatas = [...groupSchemeData];
       tableDatas.forEach(v => {
         const prop = `header_${num}`;
@@ -578,10 +600,11 @@ class SampleGroup extends React.Component {
           columns: cols,
           groupSchemeData: tableDatas,
         },
-        () => {
-          this.sendDataOnChange();
-        },
+        // () => {
+        //   this.sendDataOnChange();
+        // },
       );
+      this.sendDataOnChange(tableDatas, cols);
     }
   };
 
@@ -599,7 +622,7 @@ class SampleGroup extends React.Component {
     const { colorStore } = this.props.project;
     let colors = [...colorStore];
     let colorhex = color.hex.toUpperCase();
-
+    console.log(colorStore);
     const repeat = colorStore.includes(colorhex);
     if (repeat) {
       message.warning('存在重复颜色，已为您随机生成一个颜色！');
@@ -608,10 +631,12 @@ class SampleGroup extends React.Component {
     colors.push(colorhex);
     Object.keys(row).forEach(key => {
       if (row[key] === value) {
-        const num = key.split('_')[1];
-        const colorName = `color_${num}`;
-        colors = colors.filter(i => i !== row[colorName]);
-        row[colorName] = colorhex;
+        // const num = key.split('_')[1];
+        // const colorName = `color_${num}`;
+        // console.log(colorName);
+        // debugger;
+        colors = colors.filter(i => i !== row[color1]);
+        row[color1] = colorhex;
       }
     });
     this.setColorStore(colors);
@@ -675,10 +700,11 @@ class SampleGroup extends React.Component {
         columns: cols,
         groupSchemeData: soure,
       },
-      () => {
-        this.sendDataOnChange();
-      },
+      // () => {
+      //   this.sendDataOnChange();
+      // },
     );
+    this.sendDataOnChange(soure, cols);
   };
 
   /**
@@ -702,6 +728,7 @@ class SampleGroup extends React.Component {
    * @param {Number} index 当前行下标
    */
   judgeOptionAndColor = (row, option, datas, col, index) => {
+    const { columns } = this.state;
     const num = col.split('_')[1];
     const hasSame = datas.some(item => {
       if (item[col] === option) {
@@ -723,10 +750,11 @@ class SampleGroup extends React.Component {
       {
         groupSchemeData: datas,
       },
-      () => {
-        this.sendDataOnChange();
-      },
+      // () => {
+      //   this.sendDataOnChange();
+      // },
     );
+    this.sendDataOnChange(datas, columns);
   };
 
   /**
@@ -772,9 +800,10 @@ class SampleGroup extends React.Component {
         this.setState({
           columns: columns2,
         });
-        this.sendDataOnChange();
+        // this.sendDataOnChange();
       },
     );
+    this.sendDataOnChange(datas, columns2);
   };
 
   /**
@@ -850,6 +879,7 @@ class SampleGroup extends React.Component {
    * @param {Number} index 当前行下标
    */
   setValueAndColorNone = (datas, row, option, col, index, color1) => {
+    const { columns } = this.state;
     row[col] = option;
     row[color1] = '';
     datas[index] = row;
@@ -857,10 +887,11 @@ class SampleGroup extends React.Component {
       {
         groupSchemeData: datas,
       },
-      () => {
-        this.sendDataOnChange();
-      },
+      // () => {
+      //   this.sendDataOnChange();
+      // },
     );
+    this.sendDataOnChange(datas, columns);
   };
 
   /**
@@ -972,8 +1003,8 @@ class SampleGroup extends React.Component {
    * 对数据进行校验
    */
 
-  verifyData = () => {
-    const { groupSchemeData, columns } = this.state;
+  verifyData = (groupSchemeData, columns) => {
+    // const { groupSchemeData, columns } = this.state;
     const { isRequired } = this.props.paramList;
     // 1. 一个分组方案里只能是单纯组或者单纯样品
     // 2. 一个分组方案里面不能都是空
@@ -996,22 +1027,23 @@ class SampleGroup extends React.Component {
       const validTrue2 = group.every(item => item === '');
       const validFalse = validTrue1 || validTrue2;
       this.validPass = !validFalse;
-      if (validTrue1) this.errMessage = '分组方案中包含样品和组';
+      if (validTrue1) this.errMessage = '分组方案中同时包含当前样品和组';
       if (validTrue2) this.errMessage = '存在空的分组方案';
       if (validFalse) {
         // message.error('分组方案包含样品和组');
         return false;
       }
     }
-    const formattedData = this.formatSubmitData();
+    const formattedData = this.formatSubmitData(groupSchemeData, columns);
     return formattedData;
   };
 
   /**
    * 提交数据格式化
    */
-  formatSubmitData = () => {
-    const { groupSchemeData, columns } = this.state;
+  formatSubmitData = (groupSchemeData, columns) => {
+    // const { groupSchemeData, columns } = this.state;
+    console.log(groupSchemeData);
     // 数据整理
     let tableHeard = [];
     columns.forEach((item, index) => {
@@ -1028,7 +1060,8 @@ class SampleGroup extends React.Component {
         if (item[`header_${i}`] === '当前样品') {
           tableHeard[i - 2].samples.push({
             sampleId: item.sampleId,
-            sampleAlias: item.sampleName,
+            sampleAlias: item.sampleAlias || null,
+            sampleName: item.sampleName,
           });
         } else {
           const groNameList = tableHeard[i - 2].groups.map(g => g.groupName);
@@ -1044,7 +1077,8 @@ class SampleGroup extends React.Component {
               if (gro.groupName === item[`header_${i}`]) {
                 gro.samples.push({
                   sampleId: item.sampleId,
-                  sampleAlias: item.sampleName,
+                  sampleAlias: item.sampleAlias || null,
+                  sampleName: item.sampleName,
                 });
               }
             });
@@ -1054,7 +1088,8 @@ class SampleGroup extends React.Component {
               if (group.groupName === item[`header_${i}`]) {
                 group.samples.push({
                   sampleId: item.sampleId,
-                  sampleAlias: item.sampleName,
+                  sampleAlias: item.sampleAlias || null,
+                  sampleName: item.sampleName,
                 });
               }
             });
@@ -1163,9 +1198,11 @@ class SampleGroup extends React.Component {
           // () => this.selectUpdateGroup(),
         );
 
-        this.sendDataOnChange();
+        // this.sendDataOnChange();
       },
     );
+    this.selectUpdateGroup(dataFromUpload, cols);
+    this.sendDataOnChange(dataFromUpload, cols);
   };
 
   render() {

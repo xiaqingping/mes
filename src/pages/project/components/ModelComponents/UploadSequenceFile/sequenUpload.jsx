@@ -1,9 +1,10 @@
+/* eslint-disable no-param-reassign */
 /* eslint-disable react/no-string-refs */
 // 上传序列文件
 import React from 'react';
 import { Modal, Button, Carousel, Table, List, Progress, message } from 'antd';
 import { InboxOutlined, PaperClipOutlined } from '@ant-design/icons';
-import { guid, cutString } from '@/utils/utils';
+import { cutString } from '@/utils/utils';
 import api from './api/sample';
 import './index.less';
 import disk from './api/disk';
@@ -135,31 +136,38 @@ class UploadSequenceFile extends React.Component {
           filesNameList: [...newData, ...filesNameList],
           countNum: id + filesData.length,
         });
-        api.getSequenceFileAnalysis(res).then(r => {
-          if (tableList.length === 0) {
-            self.setState({
-              tableList: [...r],
-              loading: false,
-            });
-          } else {
-            tableList.map((item, index) => {
-              r.map(i => {
-                if (item.sampleIdentificationCode === i.sampleIdentificationCode) {
-                  tableList[index].sampleProperties = [
-                    ...item.sampleProperties,
-                    ...i.sampleProperties,
-                  ];
-                }
+        api
+          .getSequenceFileAnalysis(res)
+          .then(r => {
+            if (tableList.length === 0) {
+              self.setState({
+                tableList: [...r],
+                loading: false,
+              });
+            } else {
+              tableList.map((item, index) => {
+                r.map(i => {
+                  if (item.sampleIdentificationCode === i.sampleIdentificationCode) {
+                    tableList[index].sampleProperties = [
+                      ...item.sampleProperties,
+                      ...i.sampleProperties,
+                    ];
+                  }
+                  return true;
+                });
                 return true;
               });
-              return true;
-            });
+              self.setState({
+                tableList,
+                loading: false,
+              });
+            }
+          })
+          .catch(() => {
             self.setState({
-              tableList,
               loading: false,
             });
-          }
-        });
+          });
       })
       .catch(() => {
         const newData = filesData.map((item, index) => ({

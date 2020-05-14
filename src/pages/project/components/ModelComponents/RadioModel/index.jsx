@@ -10,10 +10,11 @@
  */
 import React from 'react';
 import { Select, Descriptions, message } from 'antd';
+import PropTypes from 'prop-types';
 
 const { Option } = Select;
 
-class radioModel extends React.Component {
+class RadioModel extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
@@ -49,8 +50,7 @@ class radioModel extends React.Component {
       taskModelId: paramList.taskModelId,
     }
     const verify = this.verifyData(value)
-    if (!verify) return
-    this.props.getData(data, 'radio', verify);
+    this.props.getData(data, 'radio', ...verify);
   }
 
   /**
@@ -60,14 +60,15 @@ class radioModel extends React.Component {
   verifyData = value => {
     const { paramList } = this.state;
     let verify = true
+    let verifyMessage = ''
     if (paramList.isRequired === 'true') {
-      if (value.length === 0) {
-        message.warning(`${paramList.paramName}参数不能为空`);
-        verify = true;
+      if (!value || value.length === 0) {
+        verifyMessage = `${paramList.paramName}参数不能为空`
+        message.warning(verifyMessage)
+        verify = false;
       }
-      verify = false
     }
-    return verify
+    return [verify, verifyMessage]
   }
 
   /**
@@ -108,4 +109,12 @@ class radioModel extends React.Component {
   }
 }
 
-export default radioModel
+RadioModel.defaultProps = {
+  paramList: {}
+}
+
+RadioModel.propTypes = {
+  paramList: PropTypes.object
+}
+
+export default RadioModel
