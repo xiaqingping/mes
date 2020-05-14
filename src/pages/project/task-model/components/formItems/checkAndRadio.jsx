@@ -179,7 +179,6 @@ class CheckboxModel extends React.Component {
 
         {selectList.map((item, index) => (
           <>
-            {console.log(item)}
             <div style={{ width: 370, overflow: 'hidden' }} key={index}>
               <div style={{ float: 'left', marginRight: '10px', height: '40px' }}>
                 <span style={{ position: 'relative', left: 0, top: 5 }}>{item.selectName} :</span>
