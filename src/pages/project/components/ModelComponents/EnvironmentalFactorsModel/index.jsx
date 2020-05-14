@@ -73,10 +73,15 @@ class EnvironmentalFactorsModel extends React.Component {
       newList.push(newItem);
     });
 
-    this.setState({
-      data: newList,
-      columns,
-    });
+    this.setState(
+      {
+        data: newList,
+        columns,
+      },
+      () => {
+        this.selectUpdateDataSource();
+      },
+    );
     return true;
   };
 
