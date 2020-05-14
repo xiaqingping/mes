@@ -7,7 +7,6 @@ import {
   message,
   Select
 } from 'antd';
-// import { PlusOutlined } from '@ant-design/icons';
 import { connect } from 'dva';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import ProTable from '@ant-design/pro-table';
@@ -25,13 +24,15 @@ class Metadata extends Component {
   state = {
     visibleParam: false, // 显示参数抽屉
     originalParam: [], // 原始参数列表
-  };
+  }
 
-  // 顶部表单默认值
-  initialValues = {
-    page: 1,
-    pageSize: 10,
-  };
+  /**
+   * 获取列表数据
+   * @param {Object} params 回调数据
+   */
+  getTableData = params => api.metadata.getMetadatas(this.getParamData(params))
+    .then(res => ({ data: res.results, total: res.total, success: true }))
+
 
   /**
    * 列表查询数据的处理
@@ -39,9 +40,8 @@ class Metadata extends Component {
    */
   getParamData = params => {
     let selectStatus = ''
-    if (params.status) {
-      selectStatus = params.status.join(',')
-    }
+    if (params.status) selectStatus = params.status.join(',')
+
     const newObj = {
       page: params.current,
       pageSize: params.pageSize,
@@ -54,19 +54,21 @@ class Metadata extends Component {
       projectCode: params.projectCode,
       taskCode: params.taskCode,
       userCode: params.userCode
-    };
+    }
+
     Object.getOwnPropertyNames(newObj).forEach(key => {
       if (!newObj[key]) {
-        delete newObj[key];
+        delete newObj[key]
       }
-    });
-    return newObj;
-  };
+    })
 
-  // 查看参数列表页
+    return newObj;
+  }
+
+  /** 查看参数列表页 */
   searchParamList = data => router.push(`/hts/analyze/metadata/paramList/${data.id}`)
 
-  // 查看参数 抽屉
+  /** 查看参数 抽屉 */
   searchParamDrawer = data => {
     api.metadata.getMetadataOriginalParam(data.id).then(res => {
       if (res && res.length > 0) {
@@ -80,28 +82,30 @@ class Metadata extends Component {
     });
   };
 
-  // 关闭参数抽屉
+  /**
+   * 关闭参数抽屉
+   */
   onCloseParamDrawer = () => {
     this.setState({ visibleParam: false });
   }
 
   /**
    * 设置状态颜色
+   * @param {String} value 状态
    */
   setColor = value => {
-    let color = '#eee'
-    if (value === '已完成') {
-      color = '#52c41a'
-    } else if (value === '已失败') {
-      color = '#ff4d4f'
-    } else if (value === '进行中') {
-      color = '#1890ff'
+    const reColor = {
+      '进行中': '#1890ff',
+      '已失败': '#ff4d4f',
+      '已完成': '#52c41a'
     }
-    return color
+    return value ? reColor[value] : '#eee'
   }
 
-  render() {
-    const { visibleParam, originalParam } = this.state;
+  /**
+   * 设置table数据格式
+   */
+  setcolumns = () => {
     const { status } = this.props.htsCache;
     let columns = [
       {
@@ -148,14 +152,15 @@ class Metadata extends Component {
           return (
             <Select
               mode="multiple"
-              maxTagCount={3}
+              maxTagCount={2}
               maxTagTextLength={3}
               onChange={onChange}
+              className='setSelectMultipleType'
               allowClear
             >
               {
                 statusType.map(item =>
-                <Option key={item.id} value={item.id}>{item.name}</Option>)
+                  <Option key={item.id} value={item.id}>{item.name}</Option>)
               }
             </Select>
           )
@@ -172,7 +177,7 @@ class Metadata extends Component {
         width: 70,
         render: (value, row) => <a onClick={() => this.searchParamDrawer(row)}>参数</a>,
       },
-    ];
+    ]
 
     columns = columns.map(col => {
       const colWidth = col.width || 100;
@@ -180,17 +185,21 @@ class Metadata extends Component {
         ...col,
         width: colWidth,
       };
-    });
+    })
 
+    return columns
+  }
+
+  render() {
+    const { visibleParam, originalParam } = this.state;
     return (
       <PageHeaderWrapper>
         <ProTable
+          className="setNoTableToolbar"
           actionRef={this.tableFormRef}
           rowKey="id"
-          request={params => api.metadata.getMetadatas(this.getParamData(params))
-            .then(res => ({ data: res.results, total: res.total, success: true }))
-          }
-          columns={columns}
+          request={parmas => this.getTableData(parmas)}
+          columns={this.setcolumns()}
           options={false}
           pagination={{
             defaultPageSize: 10,

@@ -197,7 +197,7 @@ class ProjectManagement extends Component {
       {
         title: '编号/名称',
         dataIndex: 'code',
-        width: '200px',
+        width: 200,
         hideInSearch: true,
         render: (value, row) => (
           <>
@@ -214,13 +214,13 @@ class ProjectManagement extends Component {
       {
         title: '描述',
         dataIndex: 'describe',
-        width: '400px',
+        width: 400,
         hideInSearch: true,
       },
       {
         title: '创建人/时间',
         dataIndex: 'creatorName',
-        width: '200px',
+        width: 200,
         hideInSearch: true,
         render: (value, row) => (
           <>
@@ -232,7 +232,7 @@ class ProjectManagement extends Component {
       },
       {
         title: '修改人/时间',
-        width: '200px',
+        width: 200,
         dataIndex: 'changerName',
         hideInSearch: true,
         render: (value, row) => (
@@ -272,7 +272,7 @@ class ProjectManagement extends Component {
       {
         title: '状态',
         dataIndex: 'status',
-        width: '200px',
+        width: 200,
         filters: status,
         hideInSearch: true,
         render: (value, row) => {
@@ -300,7 +300,6 @@ class ProjectManagement extends Component {
       {
         title: '状态',
         dataIndex: 'status',
-        width: 150,
         hideInTable: true,
         valueEnum: this.statusValue(),
         renderFormItem: (item, { onChange }) => (
@@ -363,13 +362,13 @@ class ProjectManagement extends Component {
       {
         title: '成员数',
         dataIndex: 'memberCount',
-        width: '100px',
+        width: 100,
         hideInSearch: true,
       },
       {
         title: '时间',
         dataIndex: 'beginDate',
-        width: '200px',
+        width: 200,
         hideInSearch: true,
         render: (value, row) => (
           <>
@@ -418,6 +417,7 @@ class ProjectManagement extends Component {
           pagination={{
             defaultPageSize: 10,
           }}
+          scroll={{ x: 2000 }}
         />
       </PageHeaderWrapper>
     );

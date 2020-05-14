@@ -467,6 +467,7 @@ class ProcessEdit extends Component {
       paramter: oldModelProcess,
       taskLoading: false,
     });
+    return true;
   };
 
   // 修改任务列表的开关

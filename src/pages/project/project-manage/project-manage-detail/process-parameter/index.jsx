@@ -23,6 +23,7 @@ import style from './index.less';
 
 const { Footer } = Layout;
 
+/** 排序 */
 function compare(property) {
   // eslint-disable-next-line func-names
   return function(a, b) {
@@ -57,6 +58,10 @@ class ProcessParameter extends Component {
       paramList: [],
       // 需要验证的列表
       checkList: [],
+      // 消息提示列表
+      messageList: [],
+      // 编辑状态是否新增全部参数
+      isEditAdd: false,
     };
     // 判断请求类型
     this.determineTheRequestType();
@@ -119,7 +124,11 @@ class ProcessParameter extends Component {
             item.params.forEach(it => {
               // TODO:
               if (it.isRequired === 'true' || it.isrequired === 'true') {
-                checkData.push(it.paramKey);
+                const obj = {
+                  paramKey: it.paramKey,
+                  paramName: it.paramName,
+                };
+                checkData.push(obj);
               }
             });
           }
@@ -136,14 +145,14 @@ class ProcessParameter extends Component {
         );
         const processParamValueList = processParamValue[0].params;
         // 有参数值时
-        if (newParamData.length > 0 && !isEmpty(processParamValue)) {
+        if (newParamData.length > 0 && !isEmpty(processParamValueList)) {
           // 合并参数和参数值
           data = this.comparedWith(newParamData, processParamValueList);
+          this.getDefaultParams(data);
         }
 
         // 未设置参数值时
-        if (newParamData.length > 0 && isEmpty(processParamValue)) {
-          this.getDefaultParams(newParamData);
+        if (newParamData.length > 0 && isEmpty(processParamValueList)) {
           data = newParamData;
         }
       }
@@ -158,15 +167,19 @@ class ProcessParameter extends Component {
         }
         // 未设置参数值时
         if (param.length > 0 && paramValue.length === 0) {
-          this.getDefaultParams(newParamData);
           data = newParamData;
+          this.setState({ isEditAdd: true });
         }
         data.forEach(item => {
           if (item.params.length) {
             item.params.forEach(it => {
               // TODO:
               if (it.isRequired === 'true' || it.isrequired === 'true') {
-                checkData.push(it.paramKey);
+                const obj = {
+                  paramKey: it.paramKey,
+                  paramName: it.paramName,
+                };
+                checkData.push(obj);
               }
             });
           }
@@ -212,7 +225,6 @@ class ProcessParameter extends Component {
           if (item.paramValue) {
             sampleList = [...sampleList, ...JSON.parse(item.paramValue)];
           }
-          // this.setState({ sampleList: JSON.parse(item.paramValue) });
         }
       });
     });
@@ -236,18 +248,62 @@ class ProcessParameter extends Component {
 
   /** 保存提交 */
   onSubmit = () => {
-    const { paramList, checkList } = this.state;
-    const { requestType, processId, processModelId, projectId } = this.state;
+    const {
+      paramList,
+      checkList,
+      messageList,
+      requestType,
+      processId,
+      processModelId,
+      projectId,
+    } = this.state;
 
-    let url;
-    let flag = false;
     if (checkList.length) {
-      flag = true;
-    }
-    if (flag) {
-      message.error('添加未完成');
+      if (messageList.length > 0) {
+        messageList.forEach(item => {
+          message.error(item.message);
+        });
+        return false;
+      }
+      if (checkList.length > 3) {
+        message.error(`有多个必填参数为空, 请检查填写的参数`);
+      } else {
+        checkList.forEach(item => {
+          message.error(`${item.paramName} 是必填参数`);
+        });
+      }
+
       return false;
     }
+
+    // if (requestType === 'update' || requestType === 'edit') {
+    //   if (messageList.length > 0) {
+    //     messageList.forEach(item => {
+    //       message.error(item.message);
+    //     });
+    //     return false;
+    //   }
+    //   if (checkList.length) {
+    //     message.error('添加未完成');
+    //   }
+    // }
+
+    // if (requestType === 'add') {
+    //   if (checkList.length) {
+    //     if (messageList.length > 0) {
+    //       messageList.forEach(item => {
+    //         message.error(item.message);
+    //       });
+    //       return false;
+    //     }
+    //   }
+    //   checkList.forEach(item => {
+    //     message.error(`${item.paramName} 是必填参数`);
+    //   });
+    //   return false;
+    // }
+
+    let url;
     // 添加 修改
     if (requestType === 'add' || requestType === 'update') {
       const processParams = JSON.parse(sessionStorage.getItem('processForParams'));
@@ -265,6 +321,7 @@ class ProcessParameter extends Component {
       if (projectId) url = `/project/project-manage/detailAdd/edit_${projectId}_2`;
       return router.push(url);
     }
+
     // 编辑
     if (requestType === 'edit') {
       api.updateProcessesParameter(processId, paramList).then(() => {
@@ -281,33 +338,54 @@ class ProcessParameter extends Component {
    * @param {string} data 组件数据
    * @param {string} type 组件类型
    * @param {boolean} isVerify 数据是否通过验证
+   * @param {String} massage 验证未通过时的错误提示
    */
-  getModelData = (data, type, isVerify) => {
-    const { paramList, checkList } = this.state;
-    const checkData = [...checkList];
+  getModelData = (data, type, isVerify, massage) => {
+    const { paramList, checkList, messageList, isEditAdd } = this.state;
+    let checkData = [...checkList];
+    const checkParamKey = [];
+    checkData.forEach(item => checkParamKey.push(item.paramKey));
+    let messageData = [...messageList];
     if (isVerify) {
-      if (checkData.includes(data.paramKey)) {
-        checkData.splice(
-          checkData.findIndex(item => item === data.paramKey),
-          1,
-        );
+      if (checkParamKey.includes(data.paramKey)) {
+        let newCheckData = [];
+        newCheckData = checkData.filter(item => item.paramKey !== data.paramKey);
+        checkData = newCheckData;
+        const newMessageData = messageData.filter(item => item.paramKey !== data.paramKey);
+        messageData = newMessageData;
       }
-    } else if (!checkData.includes(data.paramKey)) {
-      checkData.push(data.paramKey);
+    } else if (!checkParamKey.includes(data.paramKey)) {
+      const newItem = {
+        paramKey: data.paramKey,
+        paramName: data.paramName,
+      };
+      checkData.push(newItem);
+      const obj = {
+        paramKey: data.paramKey,
+        message: massage,
+      };
+      messageData.push(obj);
     }
     this.setState({
       checkList: checkData,
+      messageList: messageData,
     });
+
     if (isVerify) {
-      const newParams = paramList.filter(item => item.paramKey !== data.paramKey);
-      paramList.forEach(item => {
-        if (item.paramKey === data.paramKey) {
-          const newItem = JSON.parse(JSON.stringify(item));
-          newItem.paramValue = data.paramValue;
-          newParams.push(newItem);
-        }
-        return false;
-      });
+      let newParams = [];
+      if (isEditAdd) {
+        newParams = [...paramList, data];
+      } else {
+        newParams = paramList.filter(item => item.paramKey !== data.paramKey);
+        paramList.forEach(item => {
+          if (item.paramKey === data.paramKey) {
+            const newItem = JSON.parse(JSON.stringify(item));
+            newItem.paramValue = data.paramValue;
+            newParams.push(newItem);
+          }
+          return false;
+        });
+      }
 
       this.setState({
         paramList: newParams,

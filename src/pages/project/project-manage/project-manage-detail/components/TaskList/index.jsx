@@ -196,7 +196,6 @@ class TaskList extends Component {
                 <Card hoverable style={{ width: '100%' }}>
                   <div className={style.FMLeft}>
                     <Avatar
-                      // src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
                       src={
                         item.picture
                           ? disk.downloadFiles(item.picture, { view: true })

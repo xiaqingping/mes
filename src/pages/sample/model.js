@@ -33,37 +33,10 @@ const sampleModel = {
       },
     ],
 
-    detailValue: {
-      id: 100,
-      sampleCode: 'sampleCode',
-      sampleName: 'sampleCode',
-      sampleIdentificationCode: 'sampleCode',
-      sampleSequenceCount: 'sampleCode',
-      sampleLengthMin: 'sampleCode',
-      sampleLengthMax: 'sampleCode',
-      sampleLengthTotal: 'sampleCode',
-      bpCode: 'sampleCode',
-      bpName: 'sampleCode',
-      creatorCode: 'sampleCode',
-      creatorName: 'sampleCode',
-      createDate: 'sampleCode',
-      sampleProperties: [
-        {
-          id: '1000',
-          sampleId: '1000',
-          sequenceFileId: '1000',
-          sequenceFileName: '1000',
-          sourceSequenceFileId: '1000',
-          sourceSequenceFileName: '1000',
-          sampleSequenceCount: '1000',
-          sampleLengthMin: '1000',
-          sampleLengthMax: '1000',
-          sampleLengthAve: '1000',
-          createDate: '1000',
-        },
-      ],
-    },
+    // 能上传的文件类型
+    AllImgExt: '.fasta|.fastq|.fq',
   },
+
   effects: {},
   reducers: {},
 };
