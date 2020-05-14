@@ -253,7 +253,6 @@ class ProcessList extends Component {
       <>
         <Form ref={this.tableFormRef}>
           <Table
-            style={{ paddingRight: 30 }}
             rowKey="id"
             loading={loading}
             dataSource={list}
