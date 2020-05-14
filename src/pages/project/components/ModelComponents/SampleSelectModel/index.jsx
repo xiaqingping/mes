@@ -339,10 +339,11 @@ class SampleSelect extends React.Component {
    */
   handleChange = (color, record, index) => {
     const { tableData } = this.state;
-    const { colorStore } = this.props.project;
+    let { colorStore } = this.props.project;
+    console.log(colorStore);
     const row = { ...record };
     const isIncludes = colorStore.includes(color.hex.toUpperCase());
-    // colorStore = colorStore.filter(item => item !== color.hex.toUpperCase());
+    colorStore = colorStore.filter(item => item !== record.color);
     if (isIncludes) {
       message.warning('存在相同颜色，已为您自动生成一个新颜色！');
       row.color = getrandomColor();
