@@ -17,31 +17,20 @@ const ParamDrawer = props => {
       onClose={props.onClose}
       visible={props.visible}
     >
-      {/* {data.forEach(item=> {
-        console.log(item.paramKey);
-        console.log(item.paramValue);
-        return (
-          <p>{item.paramKey}: {item.paramValue}</p>
-        )
-      })} */}
       <List
         bordered={false}
         dataSource={data}
         rowKey="id"
         renderItem={item => (
           <List.Item>
-            <div style={{ float: 'left', width: 60 }}>
-              {item.paramKey} :
-            </div>
-            <div style={{ float: 'right', width: 400, height: 'auto' }}>
-              {item.paramValue}
-            </div>
+            <div style={{ float: 'left', width: 60 }}>{item.paramKey} :</div>
+            <div style={{ float: 'right', width: 400, height: 'auto' }}>{item.paramValue}</div>
           </List.Item>
         )}
       />
     </Drawer>
-  )
-}
+  );
+};
 
 /**
  * 序列文件抽屉
@@ -62,7 +51,7 @@ const FieldDrawer = props => {
         <>
           {value} ({row.sampleLengthTotal}bp)
         </>
-      )
+      ),
     },
     {
       title: '长度',
@@ -72,7 +61,7 @@ const FieldDrawer = props => {
         <>
           {row.sampleLengthMin} - {row.sampleLengthMax} (avg {value})
         </>
-      )
+      ),
     },
   ];
   return (
@@ -92,7 +81,7 @@ const FieldDrawer = props => {
         dataSource={props.data}
       />
     </Drawer>
-  )
-}
+  );
+};
 
 export { ParamDrawer, FieldDrawer };

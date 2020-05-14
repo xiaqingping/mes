@@ -2,7 +2,6 @@
 import { Form, Table, Tag, Divider, message, Avatar, Tooltip } from 'antd';
 import React, { Component } from 'react';
 import { connect } from 'dva';
-// import { EditOutlined } from '@ant-design/icons';
 import router from 'umi/router';
 import api from '@/pages/project/api/projectManageDetail';
 import disk from '@/pages/project/api/disk';
@@ -207,7 +206,6 @@ class ProcessList extends Component {
                   ? disk.downloadFiles(row.processModelPicture, { view: true })
                   : DefaultHeadPicture
               }
-              // src="/favicon.png"
               style={{ float: 'left', width: '46px', height: '46px' }}
             />
             <div style={{ float: 'left', marginLeft: '10px' }}>

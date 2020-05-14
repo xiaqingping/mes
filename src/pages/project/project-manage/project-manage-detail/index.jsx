@@ -10,7 +10,6 @@ import styles from './index.less';
 import ProcessList from './components/ProcessList/index';
 import FiledList from './components/FiledList/index';
 import MemberList from './components/MemberList/index';
-// import { expandedRowRender } from '../functions';
 
 const { TabPane } = Tabs;
 
@@ -96,7 +95,6 @@ class ProjectDetail extends Component {
     if (JSON.stringify(list) === '{}') return false;
     return (
       <PageHeaderWrapper title={this.navContent(list)}>
-        {/* <Card className={styles.titleCard} > */}
         <div className="classPageHeaderWrapper ">
           <Card className={styles.titleCard}>
             <div className={styles.width}>

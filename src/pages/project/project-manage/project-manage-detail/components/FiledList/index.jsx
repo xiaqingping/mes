@@ -3,7 +3,6 @@ import { Form, Table, Col, Input, Button } from 'antd';
 import React, { Component } from 'react';
 import { connect } from 'dva';
 import TableSearchForm from '@/components/TableSearchForm';
-// import ProTable from '@ant-design/pro-table';
 import excel from '@/assets/imgs/excel.png';
 import pdf from '@/assets/imgs/pdf.png';
 import file from '@/assets/imgs/file.png';
@@ -84,67 +83,8 @@ class FiledList extends Component {
     return res;
   };
 
-  /**
-   * 设置表格的colums
-   */
-  // columns = () => {
-  //   return [
-  //     {
-  //       title: '文件名称',
-  //       dataIndex: 'name',
-  //       width: 150,
-  //       hideInSearch: true,
-  //       render: (value, item) => (
-  //         <>
-  //           <img src={this.imgtype(item.type)} alt="" />
-  //           <span style={{ marginLeft: 10 }}>{value}</span>
-  //         </>
-  //       ),
-  //     },
-  //     {
-  //       title: '描述',
-  //       dataIndex: 'decs',
-  //       hideInSearch: true,
-  //       width: 350,
-  //     },
-  //     {
-  //       title: '来源',
-  //       dataIndex: 'processName',
-  //       hideInSearch: true,
-  //       width: 150,
-  //     },
-  //     {
-  //       title: '修改时间',
-  //       dataIndex: 'changerTime',
-  //       hideInSearch: true,
-  //       width: 150,
-  //     },
-  //     {
-  //       title: '大小',
-  //       dataIndex: 'size',
-  //       hideInSearch: true,
-  //       width: 100,
-  //       render: text => `${text}kb`,
-  //     },
-  //     {
-  //       title: '',
-  //       dataIndex: 'fieldName',
-  //       hideInTable: true,
-  //       width: 100,
-  //       renderFormItem: (item, index) => <Input key={index} />,
-  //     },
-  //     {
-  //       title: '操作',
-  //       width: 150,
-  //       hideInSearch: true,
-  //       render: () => <a onClick={() => console.log('删除')}>删除</a>,
-  //     },
-  //   ];
-  // };
-
   render() {
     const { list, loading } = this.state;
-    // let tableWidth = 0;
     let columns = [
       {
         title: '文件名称',
@@ -190,9 +130,6 @@ class FiledList extends Component {
     ];
 
     columns = columns.map(col => {
-      // if (!col.width) col.width = 100;
-
-      // tableWidth += col.width;
       if (!col.editable) {
         return col;
       }
@@ -203,7 +140,6 @@ class FiledList extends Component {
           rules: col.rules,
           inputType: col.inputType,
           dataIndex: col.dataIndex,
-          // title: [col.title, col.type],
           title: col.title,
           editing: rowIndex === this.state.editIndex,
         }),
@@ -212,17 +148,6 @@ class FiledList extends Component {
 
     return (
       <>
-        {/* <ProTable
-          actionRef={this.ref}
-          headerTitle=""
-          rowKey="id"
-          dataSource={list}
-          columns={this.columns()}
-          options={false}
-          pagination={{
-            defaultPageSize: 10,
-          }}
-        /> */}
         <div className="classTableSearchForm">
           <TableSearchForm
             ref={this.tableSearchFormRef}

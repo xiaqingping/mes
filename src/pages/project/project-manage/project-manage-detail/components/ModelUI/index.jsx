@@ -1,4 +1,3 @@
-// import React, { useState, useEffect } from 'react';
 import React, { useState } from 'react';
 import { Modal, Form, Input, Button } from 'antd';
 import { InfoCircleOutlined } from '@ant-design/icons';
