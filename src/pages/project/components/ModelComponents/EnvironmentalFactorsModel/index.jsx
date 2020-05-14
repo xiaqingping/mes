@@ -106,9 +106,7 @@ class EnvironmentalFactorsModel extends React.Component {
       return false;
     });
     this.formatSubmitData(newData, 'tableData');
-    this.setState({
-      data: newData,
-    });
+    this.setState({ data: newData });
   };
 
   /**
@@ -126,7 +124,7 @@ class EnvironmentalFactorsModel extends React.Component {
     }
 
     let error;
-    let errorData;
+    let errorData = {};
 
     // 数据整理
     let tableData = [];
@@ -193,6 +191,7 @@ class EnvironmentalFactorsModel extends React.Component {
     // 环境因子下不能全部为空
     let errorSta = false;
     let message = '';
+
     if (paramList.isRequired === 'true') {
       tableData.forEach(item => {
         if (item.environmentFactorValues.length === 0) {
@@ -200,10 +199,16 @@ class EnvironmentalFactorsModel extends React.Component {
           message = '环境因子为必须项，请设置环境因子！';
         }
       });
+      if (tableData.length === 0) {
+        errorSta = true;
+        message = '环境因子为必须项，请设置环境因子！';
+      }
     }
-    if (paramList.isRequired === 'false' && sampleList.length === 0) errorSta = false;
-    const data = { errorSta, message };
-    return data;
+    if (sampleList.length === 0 && tableData.length > 0) {
+      errorSta = true;
+      message = '存在空的环境因子！';
+    }
+    return { errorSta, message };
   };
 
   /**
