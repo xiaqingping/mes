@@ -60,6 +60,8 @@ class ProcessParameter extends Component {
       checkList: [],
       // 消息提示列表
       messageList: [],
+      // 编辑状态是否新增全部参数
+      isEditAdd: false,
     };
     // 判断请求类型
     this.determineTheRequestType();
@@ -166,6 +168,7 @@ class ProcessParameter extends Component {
         // 未设置参数值时
         if (param.length > 0 && paramValue.length === 0) {
           data = newParamData;
+          this.setState({ isEditAdd: true });
         }
         data.forEach(item => {
           if (item.params.length) {
@@ -255,30 +258,50 @@ class ProcessParameter extends Component {
       projectId,
     } = this.state;
 
-    if (requestType === 'update' || requestType === 'edit') {
+    if (checkList.length) {
       if (messageList.length > 0) {
         messageList.forEach(item => {
           message.error(item.message);
         });
         return false;
       }
-    }
-
-    if (requestType === 'add') {
-      if (checkList.length) {
-        if (messageList.length > 0) {
-          messageList.forEach(item => {
-            message.error(item.message);
-          });
-          return false;
-        }
+      if (checkList.length > 3) {
+        message.error(`有多个必填参数为空, 请检查填写的参数`);
+      } else {
+        checkList.forEach(item => {
+          message.error(`${item.paramName} 是必填参数`);
+        });
       }
-      checkList.forEach(item => {
-        message.error(`${item.paramName} 是必填参数`);
-      });
 
       return false;
     }
+
+    // if (requestType === 'update' || requestType === 'edit') {
+    //   if (messageList.length > 0) {
+    //     messageList.forEach(item => {
+    //       message.error(item.message);
+    //     });
+    //     return false;
+    //   }
+    //   if (checkList.length) {
+    //     message.error('添加未完成');
+    //   }
+    // }
+
+    // if (requestType === 'add') {
+    //   if (checkList.length) {
+    //     if (messageList.length > 0) {
+    //       messageList.forEach(item => {
+    //         message.error(item.message);
+    //       });
+    //       return false;
+    //     }
+    //   }
+    //   checkList.forEach(item => {
+    //     message.error(`${item.paramName} 是必填参数`);
+    //   });
+    //   return false;
+    // }
 
     let url;
     // 添加 修改
@@ -318,16 +341,18 @@ class ProcessParameter extends Component {
    * @param {String} massage 验证未通过时的错误提示
    */
   getModelData = (data, type, isVerify, massage) => {
-    const { paramList, checkList, messageList } = this.state;
+    const { paramList, checkList, messageList, isEditAdd } = this.state;
     let checkData = [...checkList];
     const checkParamKey = [];
     checkData.forEach(item => checkParamKey.push(item.paramKey));
-    const messageData = [...messageList];
+    let messageData = [...messageList];
     if (isVerify) {
       if (checkParamKey.includes(data.paramKey)) {
         let newCheckData = [];
         newCheckData = checkData.filter(item => item.paramKey !== data.paramKey);
         checkData = newCheckData;
+        const newMessageData = messageData.filter(item => item.paramKey !== data.paramKey);
+        messageData = newMessageData;
       }
     } else if (!checkParamKey.includes(data.paramKey)) {
       const newItem = {
@@ -347,15 +372,20 @@ class ProcessParameter extends Component {
     });
 
     if (isVerify) {
-      const newParams = paramList.filter(item => item.paramKey !== data.paramKey);
-      paramList.forEach(item => {
-        if (item.paramKey === data.paramKey) {
-          const newItem = JSON.parse(JSON.stringify(item));
-          newItem.paramValue = data.paramValue;
-          newParams.push(newItem);
-        }
-        return false;
-      });
+      let newParams = [];
+      if (isEditAdd) {
+        newParams = [...paramList, data];
+      } else {
+        newParams = paramList.filter(item => item.paramKey !== data.paramKey);
+        paramList.forEach(item => {
+          if (item.paramKey === data.paramKey) {
+            const newItem = JSON.parse(JSON.stringify(item));
+            newItem.paramValue = data.paramValue;
+            newParams.push(newItem);
+          }
+          return false;
+        });
+      }
 
       this.setState({
         paramList: newParams,
