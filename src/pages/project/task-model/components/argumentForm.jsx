@@ -24,7 +24,7 @@ class ArgumentForm extends React.Component {
    * 获取页面渲染需要的数据
    */
   componentDidMount() {
-    const { editOriginData } = this.props;
+    const { editOriginData, type } = this.props;
     const otherProperties = editOriginData.paramPropertiesStr
       ? JSON.parse(editOriginData.paramPropertiesStr)
       : editOriginData.paramPropertiesMap;
@@ -42,6 +42,15 @@ class ArgumentForm extends React.Component {
       myId: editOriginData.myId,
       ...otherProperties,
     };
+
+    if (type === 'checkbox' || type === 'radio') {
+      Object.getOwnPropertyNames(viewForm).forEach(key => {
+        if (key.includes('select_')) {
+          viewForm[key] = JSON.parse(viewForm[key]);
+        }
+      });
+    }
+
     this.setState({
       viewForm,
     });
