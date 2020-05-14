@@ -201,7 +201,7 @@ class EnvironmentalFactorsModel extends React.Component {
       tableData.forEach(item => {
         if (item.environmentFactorValues.length === 0) {
           errorSta = true;
-          message = '环境因子为必须项，请设置环境因子！';
+          message = '存在空的环境因子！';
         }
       });
       if (tableData.length === 0) {
@@ -211,7 +211,7 @@ class EnvironmentalFactorsModel extends React.Component {
     }
     if (sampleList.length === 0 && tableData.length > 0) {
       errorSta = true;
-      message = '存在空的环境因子！';
+      message = '环境因子为必须项，请设置环境因子！';
     }
     return { errorSta, message };
   };
