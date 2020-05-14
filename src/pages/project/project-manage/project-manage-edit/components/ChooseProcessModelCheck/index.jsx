@@ -6,7 +6,6 @@ import disk from '@/pages/project/api/disk';
 import DefaultHeadPicture from '@/assets/imgs/defaultheadpicture.jpg';
 
 class ChooseProcessModelCheck extends React.Component {
-  // tableSearchFormRef = React.createRef();
   static getDerivedStateFromProps(nextProps) {
     return {
       viewlist: nextProps.viewlist || [],
