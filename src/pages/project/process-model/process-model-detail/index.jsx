@@ -79,8 +79,8 @@ class DrawerTool extends Component {
    * 更换版本
    * @param {Array} arr 分组好以后的参数数据
    */
-  handleChangeVersion = v => {
-    processApi.getProcessChangeVersion(v).then(res => {
+  handleChangeVersion = arr => {
+    processApi.getProcessChangeVersion(arr).then(res => {
       this.setState({
         detailValue: res,
       });
@@ -89,7 +89,7 @@ class DrawerTool extends Component {
 
   /**
    * title内容
-   * @param {object} arr 详情的信息
+   * @param {object} value 详情的信息
    */
   titleContent = value => {
     const { visable, selectVersion, parameterVisible, detailValue, open } = this.state;
@@ -190,7 +190,6 @@ class DrawerTool extends Component {
           <div>
             {open ? (
               <a
-                href="#"
                 onClick={() =>
                   this.setState({
                     open: !open,
@@ -202,7 +201,6 @@ class DrawerTool extends Component {
               </a>
             ) : (
               <a
-                href="#"
                 onClick={() =>
                   this.setState({
                     open: !open,
@@ -230,7 +228,7 @@ class DrawerTool extends Component {
 
   /**
    * 弹出二级抽屉
-   * @param {object} arr 详情的信息
+   * @param {object} item 详情的信息
    */
   showChildrenDrawer = item => {
     this.setState({
