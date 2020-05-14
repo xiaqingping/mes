@@ -29,7 +29,6 @@ import ProTable from '@ant-design/pro-table';
 // import StandardTable from '@/pages/project/components/StandardTable';
 import { formatter } from '@/utils/utils';
 import api from '@/pages/project/api/projectManage';
-// import { DateUI } from '../components/AntdSearchUI';
 import './index.less';
 
 const { Option } = Select;
@@ -37,13 +36,6 @@ const { Option } = Select;
 
 class ProjectManagement extends Component {
   tableSearchFormRef = React.createRef();
-
-  // 顶部表单默认值
-  initialValues = {
-    // status: 1,
-    page: 1,
-    pageSize: 10,
-  };
 
   constructor(props) {
     super(props);
@@ -113,7 +105,7 @@ class ProjectManagement extends Component {
   /**
    * 修改项目信息
    * @param {string} requestType 点击新建项目时传入的类型
-   * @param ModifyProject 存入sessionStorage的方法名（项目基础信息）
+   * @param ModifyProject 存入sessionStorage的值（项目基础信息）
    *  */
   editRow = row => {
     const data = row;
@@ -287,6 +279,7 @@ class ProjectManagement extends Component {
                   textAlign: 'center',
                   width: '60px',
                   height: '24px',
+                  border: 'none',
                 }}
                 size="small"
               >
@@ -378,7 +371,7 @@ class ProjectManagement extends Component {
         ),
       },
       {
-        fixed: 'right',
+        // fixed: 'right',
         title: '操作',
         hideInSearch: true,
         render: row => (

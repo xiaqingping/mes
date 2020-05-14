@@ -1,3 +1,5 @@
+/* eslint-disable array-callback-return */
+/* eslint-disable consistent-return */
 /** 流程模型的编辑 */
 import React, { Component } from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
@@ -159,17 +161,8 @@ class TaskModel extends Component {
    * 组件销毁清除数据
    */
   componentWillUnmount() {
-    // const { dispatch } = this.props;
     this.dispatchStore('getArgumentsList', null);
     this.dispatchStore('setFirstOpenParams', true);
-    // dispatch({
-    //   type: 'taskModel/getArgumentsList',
-    //   payload: null,
-    // });
-    // dispatch({
-    //   type: 'taskModel/setFirstOpenParams',
-    //   payload: true,
-    // });
   }
 
   /**
@@ -370,6 +363,10 @@ class TaskModel extends Component {
     return true;
   };
 
+  /**
+   * 设置前置任务参数type store
+   * @param {Array} pretaskParamsType 所有前置任务的参数类型
+   */
   setParamsTypeStore = pretaskParamsType => {
     const { dispatch } = this.props;
     dispatch({
