@@ -52,9 +52,7 @@ class ProjectManagement extends Component {
     };
     // 异步验证做节流处理
     this.fetchCodeData = debounce(this.fetchCodeData, 500);
-
   }
-
 
   // 异步节流处理的方法
   fetchCodeData = value => {
@@ -62,8 +60,6 @@ class ProjectManagement extends Component {
       this.setState({ modelSearchOptions: res || [] });
     });
   };
-
-
 
   /**
    * 列表查询数据的处理
@@ -77,8 +73,8 @@ class ProjectManagement extends Component {
       // status: params.status ? params.status : '',
       status: params.status && params.status.length ? params.status.join(',') : '',
       creatorCode: params.creatorCode,
-      beginDate: params.createDate ? params.createDate[0]: '',
-      endDate: params.createDate ? params.createDate[1]: '',
+      beginDate: params.createDate ? params.createDate[0] : '',
+      endDate: params.createDate ? params.createDate[1] : '',
     };
     Object.getOwnPropertyNames(newObj).forEach(key => {
       if (!newObj[key]) {
@@ -101,11 +97,10 @@ class ProjectManagement extends Component {
     return statusValue;
   };
 
-
-/**
- * 新建项目
- * @param {object} data 点击新建项目时传入的类型
- */
+  /**
+   * 新建项目
+   * @param {object} data 点击新建项目时传入的类型
+   */
   handleAdd = () => {
     const data = { requestType: 'addProject' };
     this.props.dispatch({
@@ -115,11 +110,11 @@ class ProjectManagement extends Component {
     router.push('/project/project-manage/add');
   };
 
-/**
- * 修改项目信息
- * @param {string} requestType 点击新建项目时传入的类型
- * @param ModifyProject 存入sessionStorage的方法名（项目基础信息）
- *  */
+  /**
+   * 修改项目信息
+   * @param {string} requestType 点击新建项目时传入的类型
+   * @param ModifyProject 存入sessionStorage的方法名（项目基础信息）
+   *  */
   editRow = row => {
     const data = row;
     data.requestType = 'editProject';
@@ -132,20 +127,19 @@ class ProjectManagement extends Component {
     router.push(`/project/project-manage/edit/${projectId}`);
   };
 
-
-/**
- * 项目管理详情页面
- * @param {object} projectId 当前数据的id
- * */
+  /**
+   * 项目管理详情页面
+   * @param {object} projectId 当前数据的id
+   * */
   searchDetails = row => {
     const projectId = row.id;
     router.push(`/project/project-manage/detail/${projectId}`);
   };
 
-/**
- * 删除
- * @param {Array} row 当前数据
- * */
+  /**
+   * 删除
+   * @param {Array} row 当前数据
+   * */
   deleteRow = row => {
     api.deleteProjectManage(row.id).then(() => {
       // this.getTableData();
@@ -154,12 +148,11 @@ class ProjectManagement extends Component {
     });
   };
 
-
-/**
- * 修改项目状态
- * @param {Array} row 当前数据
- * @param {object} type 类型
- * */
+  /**
+   * 修改项目状态
+   * @param {Array} row 当前数据
+   * @param {object} type 类型
+   * */
   handleUpdateStatus = (row, type) => {
     if (!(row.status === type)) {
       const data = {
@@ -198,13 +191,13 @@ class ProjectManagement extends Component {
    */
 
   columns = () => {
-    const { modelSearchOptions} = this.state;
-    const { status ,labels} = this.props;
+    const { modelSearchOptions } = this.state;
+    const { status, labels } = this.props;
     return [
       {
         title: '编号/名称',
         dataIndex: 'code',
-        width: '200px',
+        width: 200,
         hideInSearch: true,
         render: (value, row) => (
           <>
@@ -221,13 +214,13 @@ class ProjectManagement extends Component {
       {
         title: '描述',
         dataIndex: 'describe',
-        width: '400px',
+        width: 400,
         hideInSearch: true,
       },
       {
         title: '创建人/时间',
         dataIndex: 'creatorName',
-        width: '200px',
+        width: 200,
         hideInSearch: true,
         render: (value, row) => (
           <>
@@ -239,7 +232,7 @@ class ProjectManagement extends Component {
       },
       {
         title: '修改人/时间',
-        width: '200px',
+        width: 200,
         dataIndex: 'changerName',
         hideInSearch: true,
         render: (value, row) => (
@@ -279,7 +272,7 @@ class ProjectManagement extends Component {
       {
         title: '状态',
         dataIndex: 'status',
-        width: '200px',
+        width: 200,
         filters: status,
         hideInSearch: true,
         render: (value, row) => {
@@ -306,7 +299,6 @@ class ProjectManagement extends Component {
       {
         title: '状态',
         dataIndex: 'status',
-        width: 150,
         hideInTable: true,
         valueEnum: this.statusValue(),
         renderFormItem: (item, { onChange }) => (
@@ -369,13 +361,13 @@ class ProjectManagement extends Component {
       {
         title: '成员数',
         dataIndex: 'memberCount',
-        width: '100px',
+        width: 100,
         hideInSearch: true,
       },
       {
         title: '时间',
         dataIndex: 'beginDate',
-        width: '200px',
+        width: 200,
         hideInSearch: true,
         render: (value, row) => (
           <>
@@ -399,7 +391,7 @@ class ProjectManagement extends Component {
           </>
         ),
       },
-    ]
+    ];
   };
 
   render() {
@@ -424,6 +416,7 @@ class ProjectManagement extends Component {
           pagination={{
             defaultPageSize: 10,
           }}
+          scroll={{ x: 2000 }}
         />
       </PageHeaderWrapper>
     );
