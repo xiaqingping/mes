@@ -1,4 +1,3 @@
-/* eslint-disable no-param-reassign */
 import React from 'react';
 import { Table, Popover, Button, Popconfirm, message } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
@@ -214,8 +213,9 @@ class SampleSelect extends React.Component {
   sendDataOnChange = tableData => {
     let list = [...tableData];
     list = list.map(item => {
-      item.sampleId = item.id;
-      item.sampleProperties = item.sampleProperties.filter(i => i.isChoose);
+      const newItem = item;
+      newItem.sampleId = item.id;
+      newItem.sampleProperties = item.sampleProperties.filter(i => i.isChoose);
       return item;
     });
     const { paramKey, taskModelId } = this.props.paramList;
@@ -240,7 +240,8 @@ class SampleSelect extends React.Component {
       colorStore = [...colorStore, item.color];
       // colorStore.push(item.color);
       item.sampleProperties.forEach(v => {
-        v.isChoose = 1;
+        const nv = v;
+        nv.isChoose = 1;
         return v;
       });
       return item;
@@ -340,7 +341,6 @@ class SampleSelect extends React.Component {
   handleChange = (color, record, index) => {
     const { tableData } = this.state;
     let { colorStore } = this.props.project;
-    console.log(colorStore);
     const row = { ...record };
     const isIncludes = colorStore.includes(color.hex.toUpperCase());
     colorStore = colorStore.filter(item => item !== record.color);
@@ -438,24 +438,25 @@ class SampleSelect extends React.Component {
       });
       const cols = colors.filter(i => i !== '');
       data1.forEach(item => {
+        const newItem = item;
         if (!tableData.length) {
-          item.color = getrandomColor();
-          item.sampleAlias = '';
+          newItem.color = getrandomColor();
+          newItem.sampleAlias = '';
         } else {
           const tableDataMap = {};
           tableData.forEach(td => {
             tableDataMap[td.id] = td;
           });
           if (tableDataMap[item.id]) {
-            item.color = tableDataMap[item.id].color
+            newItem.color = tableDataMap[item.id].color
               ? tableDataMap[item.id].color
               : getrandomColor();
-            item.sampleAlias = tableDataMap[item.id].sampleAlias
+            newItem.sampleAlias = tableDataMap[item.id].sampleAlias
               ? tableDataMap[item.id].sampleAlias
               : '';
           } else {
-            item.color = getrandomColor();
-            item.sampleAlias = '';
+            newItem.color = getrandomColor();
+            newItem.sampleAlias = '';
           }
         }
         return item;
@@ -469,8 +470,9 @@ class SampleSelect extends React.Component {
       this.props.emitData(data1);
     } else {
       // 从已选择进来的
+      const data = data1;
       const index = list.findIndex(item => data1[0].id === item.id);
-      data1[0].color = list[index].color || getrandomColor();
+      data[0].color = list[index].color || getrandomColor();
       list.splice(index, 1, ...data1);
       this.setState({
         tableData: list,
@@ -493,7 +495,7 @@ class SampleSelect extends React.Component {
           {paramName}
         </div>
         <div className="project_manage_sample_select_table">
-          <Table columns={columns} dataSource={tableData} pagination={false} />
+          <Table columns={columns} dataSource={tableData} pagination={false} rowKey="id" />
         </div>
         {!disabled && (
           <Button

@@ -1,4 +1,3 @@
-/* eslint-disable array-callback-return */
 /* eslint-disable consistent-return */
 /** 流程模型的编辑 */
 import React, { Component } from 'react';
@@ -513,6 +512,7 @@ class TaskModel extends Component {
             sonIdsData.splice(index, 1);
             return true;
           }
+          return true;
         });
       });
     }

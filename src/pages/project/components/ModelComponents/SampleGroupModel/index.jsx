@@ -1,5 +1,3 @@
-/* eslint-disable prefer-destructuring */
-/* eslint-disable no-param-reassign */
 import React from 'react';
 import { Table, Button, Modal, AutoComplete, Popover, message } from 'antd';
 import { UploadOutlined, PlusSquareOutlined, QuestionCircleOutlined } from '@ant-design/icons';
@@ -41,7 +39,7 @@ class SampleGroup extends React.Component {
   state = {
     disabled: false,
     visible: false,
-    modalVisible: false, // 确认框的显示和隐藏
+
     loading: false,
     groupSchemeData: [], // 分组方案数据
     tableData: [],
@@ -116,7 +114,7 @@ class SampleGroup extends React.Component {
       taskModelId,
     };
     this.validPass = !!list;
-    console.log(list, this.validPass, this.errMessage);
+    console.log(list, this.validPass, this.errMessage, columns);
     this.props.getData(sendData, 'groupScheme', this.validPass, this.errMessage);
   };
 
@@ -129,15 +127,8 @@ class SampleGroup extends React.Component {
   selectUpdateGroup = (fromDidMount, datas, colus) => {
     // if (this.state.disabled) return; // 如果是查看的化就不需要做任何操作
     const { sampleList } = this.state;
-    let groupSchemeData;
-    let columns;
-    if (datas) {
-      groupSchemeData = datas;
-      columns = colus;
-    } else {
-      groupSchemeData = this.state.groupSchemeData;
-      columns = this.state.columns;
-    }
+    const groupSchemeData = datas || this.state.groupSchemeData;
+    const columns = colus || this.state.columns;
     const selList = [...sampleList];
     const groupList = [...groupSchemeData];
     const columns1 = JSON.parse(JSON.stringify(columns));
@@ -268,6 +259,7 @@ class SampleGroup extends React.Component {
 
       // 行数据遍历
       rowData.forEach(rowItem => {
+        const newItem = rowItem;
         // 分组方案下的 分组列表不为空
         if (groupItem.groups !== null && groupItem.groups.length !== 0) {
           // 分组列表遍历
@@ -275,13 +267,13 @@ class SampleGroup extends React.Component {
             // 分组下的样品列表遍历
             groItem.samples.forEach(samItem => {
               // 找到对应的样品行
-              if (rowItem.sampleId === samItem.sampleId) {
-                Object.keys(rowItem).map(key => {
-                  if (rowItem[key] === groupSchemeName) {
+              if (newItem.sampleId === samItem.sampleId) {
+                Object.keys(newItem).map(key => {
+                  if (newItem[key] === groupSchemeName) {
                     const num = key.split('_')[1];
                     const color = `color_${num}`;
-                    rowItem[color] = groItem.color;
-                    rowItem[key] = groItem.groupName;
+                    newItem[color] = groItem.color;
+                    newItem[key] = groItem.groupName;
                   }
                   return false;
                 });
@@ -293,13 +285,13 @@ class SampleGroup extends React.Component {
         // 分组方案下的 样品列表不为空
         if (groupItem.samples !== null && groupItem.samples.length !== 0) {
           groupItem.samples.forEach(samItem => {
-            if (rowItem.sampleId === samItem.sampleId) {
-              Object.keys(rowItem).map(key => {
+            if (newItem.sampleId === samItem.sampleId) {
+              Object.keys(newItem).map(key => {
                 const num = key.split('_')[1];
                 let color;
                 if (num !== undefined) color = `color_${num}`;
-                rowItem[color] = '' || rowItem[color];
-                if (rowItem[key] === groupSchemeName) rowItem[key] = '当前样品';
+                newItem[color] = '' || newItem[color];
+                if (newItem[key] === groupSchemeName) newItem[key] = '当前样品';
                 return false;
               });
             }
@@ -309,10 +301,11 @@ class SampleGroup extends React.Component {
     });
 
     rowData.forEach(rItem => {
+      const newRItem = rItem;
       columns.forEach(cItem => {
-        Object.keys(rItem).map(key => {
-          if (rItem[key] === cItem.dupTitle) {
-            rItem[key] = '';
+        Object.keys(newRItem).map(key => {
+          if (newRItem[key] === cItem.dupTitle) {
+            newRItem[key] = '';
           }
           return false;
         });
@@ -504,10 +497,11 @@ class SampleGroup extends React.Component {
   renderColumns = newColumns => {
     const { disabled } = this.state;
     const columns = newColumns.map((item, index) => {
+      const newItem = item;
       if (index) {
         const { title } = item;
-        item.dupTitle = title;
-        item.title = () => (
+        newItem.dupTitle = title;
+        newItem.title = () => (
           <div className="project_manage_UI_sample_group_title" key={item.id}>
             <input
               style={{ width: '100%' }}
@@ -540,6 +534,7 @@ class SampleGroup extends React.Component {
    * @param {String} id 列的id
    */
   handleTitleBlur = (e, item, index, id) => {
+    const newItem = item;
     const { groupSchemeData, columns } = this.state;
     const cols = [...columns];
     if (id) {
@@ -550,11 +545,11 @@ class SampleGroup extends React.Component {
         }
         return v.id === id;
       });
-      row = row[0];
+      [row] = row;
       row.dupTitle = e.target.value;
       cols[rowIndex] = row;
     } else {
-      item.dupTitle = e.target.value;
+      newItem.dupTitle = e.target.value;
 
       cols[index] = item;
     }
@@ -591,8 +586,9 @@ class SampleGroup extends React.Component {
       const num = item.dataIndex.split('_')[1];
       const tableDatas = [...groupSchemeData];
       tableDatas.forEach(v => {
+        const newv = v;
         const prop = `header_${num}`;
-        delete v[prop];
+        delete newv[prop];
         return v;
       });
       this.setState(
@@ -619,6 +615,7 @@ class SampleGroup extends React.Component {
    */
   handleColorChange = (color, value, row, index, col, color1) => {
     // ---------------------首先判断选择的颜色在model里是否有重复---------
+    const newRow = row;
     const { colorStore } = this.props.project;
     let colors = [...colorStore];
     let colorhex = color.hex.toUpperCase();
@@ -631,12 +628,8 @@ class SampleGroup extends React.Component {
     colors.push(colorhex);
     Object.keys(row).forEach(key => {
       if (row[key] === value) {
-        // const num = key.split('_')[1];
-        // const colorName = `color_${num}`;
-        // console.log(colorName);
-        // debugger;
         colors = colors.filter(i => i !== row[color1]);
-        row[color1] = colorhex;
+        newRow[color1] = colorhex;
       }
     });
     this.setColorStore(colors);
@@ -691,8 +684,9 @@ class SampleGroup extends React.Component {
     const addHeader = `header_${max + 1}`;
     const addColor = `color_${max + 1}`;
     soure = soure.map(item => {
-      item[addHeader] = '';
-      item[addColor] = '';
+      const newItem = item;
+      newItem[addHeader] = '';
+      newItem[addColor] = '';
       return item;
     });
     this.setState(
@@ -728,32 +722,27 @@ class SampleGroup extends React.Component {
    * @param {Number} index 当前行下标
    */
   judgeOptionAndColor = (row, option, datas, col, index) => {
+    const newDatas = datas;
+    const newRow = row;
     const { columns } = this.state;
     const num = col.split('_')[1];
     const hasSame = datas.some(item => {
       if (item[col] === option) {
-        // eslint-disable-next-line
-        row[`color_${num}`] = item[`color_${num}`];
+        newRow[`color_${num}`] = item[`color_${num}`];
       }
       return item[col] === option;
     });
-    if (!hasSame) row[`color_${num}`] = getrandomColor();
+    if (!hasSame) newRow[`color_${num}`] = getrandomColor();
     //  添加到颜色store
     const { colorStore } = this.props.project;
     const colors = [...colorStore];
     colors.push(row[`color_${num}`]);
     this.setColorStore(colors);
-    // eslint-disable-next-line
-    row[col] = option;
-    datas[index] = row;
-    this.setState(
-      {
-        groupSchemeData: datas,
-      },
-      // () => {
-      //   this.sendDataOnChange();
-      // },
-    );
+    newRow[col] = option;
+    newDatas[index] = row;
+    this.setState({
+      groupSchemeData: datas,
+    });
     this.sendDataOnChange(datas, columns);
   };
 
@@ -800,7 +789,6 @@ class SampleGroup extends React.Component {
         this.setState({
           columns: columns2,
         });
-        // this.sendDataOnChange();
       },
     );
     this.sendDataOnChange(datas, columns2);
@@ -879,18 +867,15 @@ class SampleGroup extends React.Component {
    * @param {Number} index 当前行下标
    */
   setValueAndColorNone = (datas, row, option, col, index, color1) => {
+    const newRow = row;
+    const newDatas = datas;
     const { columns } = this.state;
-    row[col] = option;
-    row[color1] = '';
-    datas[index] = row;
-    this.setState(
-      {
-        groupSchemeData: datas,
-      },
-      // () => {
-      //   this.sendDataOnChange();
-      // },
-    );
+    newRow[col] = option;
+    newRow[color1] = '';
+    newDatas[index] = row;
+    this.setState({
+      groupSchemeData: datas,
+    });
     this.sendDataOnChange(datas, columns);
   };
 
@@ -1126,17 +1111,18 @@ class SampleGroup extends React.Component {
     const dataFromUpload = [...data];
     dataFromUpload.forEach(item => {
       groupSchemeData.forEach(row => {
+        const newItem = item;
         if (item[0] === row.sampleName) {
           const num = Object.keys(item).length;
-          item.sampleName = row.sampleName;
-          item.sampleId = row.sampleId;
+          newItem.sampleName = row.sampleName;
+          newItem.sampleId = row.sampleId;
           for (let i = 1; i < num; i++) {
-            item[`header_${i + 1}`] = item[i];
+            newItem[`header_${i + 1}`] = item[i];
             const color = getrandomColor();
             if (item[i] === '当前样品' || item[i] === '') {
-              item[`color_${i + 1}`] = '';
+              newItem[`color_${i + 1}`] = '';
             } else {
-              item[`color_${i + 1}`] = color;
+              newItem[`color_${i + 1}`] = color;
               this.setColorStore([...colorStore, color]);
             }
           }
@@ -1169,11 +1155,12 @@ class SampleGroup extends React.Component {
     const head2color = new Map();
     // 遍历对象数组
     dataFromUpload.forEach(item => {
+      const newItem = item;
       // 遍历对象的每个header
       headers.forEach(head => {
         // 如果head在map中存在 说明有重复的，那么就设定为第一次出现的值
         if (head2color.has(this.getMapKey(item, head))) {
-          item[this.colorFieldByHead(head)] = head2color.get(this.getMapKey(item, head));
+          newItem[this.colorFieldByHead(head)] = head2color.get(this.getMapKey(item, head));
           return;
         }
         // 是map中没出现过的,那么就保存起来
@@ -1201,13 +1188,14 @@ class SampleGroup extends React.Component {
         // this.sendDataOnChange();
       },
     );
+    // 增加这行就可以实现，上传分组方案后， 样品里有但分组方案里没有的样品也会在分组方案表格里，(以后有整个需求可以加上)
     this.selectUpdateGroup(dataFromUpload, cols);
     this.sendDataOnChange(dataFromUpload, cols);
   };
 
   render() {
     let tableWidth = 0;
-    const { groupSchemeData, visible, columns, loading, disabled, modalVisible } = this.state;
+    const { groupSchemeData, visible, columns, loading, disabled } = this.state;
     const { paramName } = this.props.paramList;
     columns.map(col => {
       if (!col.width) {
@@ -1242,6 +1230,7 @@ class SampleGroup extends React.Component {
           pagination={false}
           scroll={{ x: tableWidth }}
           loading={loading}
+          rowKey="sampleId"
         />
         {visible && (
           <GroupUpload
@@ -1249,13 +1238,6 @@ class SampleGroup extends React.Component {
             groupTableData={groupSchemeData}
             getData={this.getDataFromUpload}
           />
-        )}
-        {modalVisible && (
-          <Modal title="Basic Modal" visible onOk={this.handleOk} onCancel={this.handleCancel}>
-            <p>Some contents...</p>
-            <p>Some contents...</p>
-            <p>Some contents...</p>
-          </Modal>
         )}
       </div>
     );
