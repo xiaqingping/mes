@@ -1027,7 +1027,7 @@ class SampleGroup extends React.Component {
       const validTrue2 = group.every(item => item === '');
       const validFalse = validTrue1 || validTrue2;
       this.validPass = !validFalse;
-      if (validTrue1) this.errMessage = '分组方案中包含样品和组';
+      if (validTrue1) this.errMessage = '分组方案中同时包含当前样品和组';
       if (validTrue2) this.errMessage = '存在空的分组方案';
       if (validFalse) {
         // message.error('分组方案包含样品和组');
