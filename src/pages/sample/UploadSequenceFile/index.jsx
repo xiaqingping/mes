@@ -6,6 +6,7 @@ import { PaperClipOutlined } from '@ant-design/icons';
 import { UploadButton } from '@/pages/sample/components/CustomComponents';
 import { guid, cutString } from '@/utils/utils';
 import api from '@/pages/sample/api/sample';
+import { connect } from 'dva';
 import './index.less';
 import disk from '../api/disk';
 
@@ -72,11 +73,11 @@ class UploadSequenceFile extends React.Component {
     const self = this;
     const file = e.target.files;
     const { guuid, filesNameList, countNum, tableList } = self.state;
+    const { AllImgExt } = self.props;
     const uploadUrl = disk.uploadMoreFiles('ngs_sample', guuid);
     const data = new FormData();
     let filesData = [];
     const id = countNum;
-    const AllImgExt = '.fasta|.fastq|.fq|.jpg|.rar';
     for (let i = 0; i < file.length; i++) {
       const fileArr = file[i].name.split('.');
       if (AllImgExt.indexOf(fileArr[fileArr.length - 1]) === -1) {
@@ -368,4 +369,6 @@ class UploadSequenceFile extends React.Component {
   }
 }
 
-export default UploadSequenceFile;
+export default connect(({ sample }) => ({
+  AllImgExt: sample.AllImgExt,
+}))(UploadSequenceFile);
