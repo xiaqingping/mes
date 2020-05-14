@@ -1,7 +1,7 @@
 /** 样品table页面 */
 import React, { Component } from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
-import { Button,   AutoComplete, Select } from 'antd';
+import { Button, AutoComplete, Select } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
 import { connect } from 'dva';
 import _ from 'lodash';
@@ -44,7 +44,7 @@ class SampleModel extends Component {
    * @param {string} value 搜索的值
    */
   callSample = value => {
-    api.getSampleCodeAndName(value).then(res => {      
+    api.getSampleCodeAndName(value).then(res => {
       this.setState({ nameCodeVal: res });
     });
   };
@@ -54,13 +54,12 @@ class SampleModel extends Component {
    *  @param {object} options 需要搜索的值(如page,rows)
    */
   getSampleData = params => {
-    
     const { sampleCode } = this.state;
 
     const newObj = {
-      page: params.current,
-      rows: params.pageSize,
-      sampleCode: params.sampleCode ? sampleCode : '',
+      page: params ? params.current : 1,
+      rows: params ? params.pageSize : 10,
+      sampleCode: params && params.sampleCode ? sampleCode : '',
     };
     Object.getOwnPropertyNames(newObj).forEach(key => {
       if (!newObj[key]) {
@@ -70,7 +69,6 @@ class SampleModel extends Component {
 
     return newObj;
   };
-  
 
   /**
    *  样品筛选值
@@ -86,7 +84,7 @@ class SampleModel extends Component {
     if (nameCodeVal.length === 0) {
       return false;
     }
-   
+
     nameCodeVal.forEach(item => {
       if (item.sampleName.indexOf(value) !== -1 && arr.indexOf(item) !== -1) {
         arr.push(item);
@@ -129,16 +127,6 @@ class SampleModel extends Component {
   };
 
   /**
-   * 删除
-   * @param {string} value 传入的id对象
-   */
-  // handleDelete = value => {
-  //   api.deleteProcess(value.id).then(() => {
-  //     this.getSampleData();
-  //   });
-  // };
-
-  /**
    * 查看详情
    * @param {object} value 传入的详情数据
    * */
@@ -150,7 +138,7 @@ class SampleModel extends Component {
   };
 
   columns = () => {
-    const { nameCodeVal} = this.state;
+    const { nameCodeVal } = this.state;
     const children = nameCodeVal.map(item => (
       <Option key={item.sampleCode} value={item.sampleName}>
         <div
@@ -224,20 +212,19 @@ class SampleModel extends Component {
         ),
       },
     ];
-  }
+  };
 
   render() {
-    const {   visible, detailVisible, detailValue } = this.state;
-    
+    const { visible, detailVisible, detailValue } = this.state;
 
     return (
       <PageHeaderWrapper>
-          <ProTable
+        <ProTable
           actionRef={this.tableSearchFormRef}
           headerTitle={
             <Button type="primary" onClick={() => this.handleModalVisible()}>
               <UploadOutlined />
-                上传序列文件
+              上传序列文件
             </Button>
           }
           rowKey="id"
