@@ -56,7 +56,8 @@ class TaskExecRecordParam extends Component {
       if (item.type === 'sample_select') key = item.paramKey;
     });
     const sampleData = paramValues.filter(item => item.paramKey === key);
-    const sampleList = JSON.parse(sampleData[0].paramValue);
+    let sampleList = [];
+    if (sampleData.length > 0) sampleList = JSON.parse(sampleData[0].paramValue);
 
     this.setState({ paramData: newParamData, sampleList });
     return false;

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Checkbox, Form, message } from 'antd';
+import { Checkbox, Form } from 'antd';
 
 /**
  * 多选
@@ -32,18 +32,18 @@ class CheckBoxModel extends React.Component {
    */
   formatSubmitData = checkedValues => {
     const { paramList } = this.state;
-    const error = this.verifyData(checkedValues);
-    if (error) return false;
-    const data = {
-      paramData: {
-        paramKey: paramList.paramKey,
-        paramValue: JSON.stringify(checkedValues),
-        taskModelId: paramList.taskModelId,
-      },
-      isVerify: true,
+    // 验证数据
+    const errorData = this.verifyData(checkedValues);
+    const { error } = errorData;
+
+    const paramData = {
+      paramKey: paramList.paramKey,
+      paramValue: error ? '' : JSON.stringify(checkedValues),
+      taskModelId: paramList.taskModelId,
     };
-    if (!data.isVerify) return '';
-    this.props.getData(data.paramData, 'checkBox', data.isVerify);
+    const isVerify = !error;
+    const { message } = errorData;
+    this.props.getData(paramData, 'checkBox', isVerify, message);
     return false;
   };
 
@@ -75,14 +75,15 @@ class CheckBoxModel extends React.Component {
   verifyData = checkedValues => {
     const { paramList } = this.state;
     let error = false;
+    let message = '';
     if (paramList.isRequired === 'true') {
       if (checkedValues.length === 0) {
-        message.warning(`${paramList.paramName}参数不能为空`);
         error = true;
+        message = `${paramList.paramName}参数不能为空`;
       }
     }
-    if (checkedValues.length === 0) error = true;
-    return error;
+    const data = { error, message };
+    return data;
   };
 
   /**
