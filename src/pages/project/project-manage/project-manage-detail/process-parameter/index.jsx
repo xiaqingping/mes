@@ -187,7 +187,6 @@ class ProcessParameter extends Component {
     if (!data) return false;
     // 参数排序
     newData = this.compareParams(data, 'sortNo');
-    console.log(newData);
     this.setState({ paramGroupList: newData, checkList: checkData });
     return false;
   };
@@ -257,8 +256,6 @@ class ProcessParameter extends Component {
       projectId,
       processParamValue,
     } = this.state;
-
-    console.log(processParamValue);
 
     if (checkList.length) {
       if (messageList.length > 0) {
