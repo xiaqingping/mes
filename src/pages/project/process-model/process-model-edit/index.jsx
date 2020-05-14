@@ -514,7 +514,7 @@ class ProcessEdit extends Component {
     } = this.state;
 
     const {
-      project: { status },
+      processModel: { status },
     } = this.props;
     if (pageModel !== 0 && processData.length === 0) {
       return false;
@@ -556,7 +556,7 @@ class ProcessEdit extends Component {
         width: 240,
         render: value => (
           <Badge
-            status={formatter(status, value, 'value', 'status').toLowerCase()}
+            status={formatter(status, value, 'value', 'status')}
             text={formatter(status, value, 'value', 'text')}
           />
         ),
@@ -779,5 +779,5 @@ export default connect(({ global, user, project, processModel }) => ({
   languageCode: global.languageCode,
   authorization: user.currentUser.authorization,
   project,
-  processDetail: processModel.processDetail,
+  processModel,
 }))(ProcessEdit);

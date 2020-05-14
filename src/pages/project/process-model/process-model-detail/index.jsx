@@ -303,12 +303,7 @@ class DrawerTool extends Component {
                           <span>状态: </span>
                           <span style={{ marginLeft: '45px' }}>
                             <Badge
-                              status={formatter(
-                                status,
-                                item.status,
-                                'value',
-                                'status',
-                              ).toLowerCase()}
+                              status={formatter(status, item.status, 'value', 'status')}
                               text={formatter(status, item.status, 'value', 'text')}
                             />
                           </span>
@@ -364,12 +359,7 @@ class DrawerTool extends Component {
                             <span>状态: </span>
                             <span style={{ marginLeft: '45px' }}>
                               <Badge
-                                status={formatter(
-                                  status,
-                                  item.status,
-                                  'value',
-                                  'status',
-                                ).toLowerCase()}
+                                status={formatter(status, item.status, 'value', 'status')}
                                 text={formatter(status, item.status, 'value', 'text')}
                               />
                             </span>
@@ -394,6 +384,6 @@ class DrawerTool extends Component {
   }
 }
 
-export default connect(({ project }) => ({
-  status: project.status,
+export default connect(({ processModel }) => ({
+  status: processModel.status,
 }))(DrawerTool);

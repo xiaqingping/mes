@@ -29,7 +29,6 @@ import ProTable from '@ant-design/pro-table';
 // import StandardTable from '@/pages/project/components/StandardTable';
 import { formatter } from '@/utils/utils';
 import api from '@/pages/project/api/projectManage';
-// import { DateUI } from '../components/AntdSearchUI';
 import './index.less';
 
 const { Option } = Select;
@@ -37,13 +36,6 @@ const { Option } = Select;
 
 class ProjectManagement extends Component {
   tableSearchFormRef = React.createRef();
-
-  // 顶部表单默认值
-  initialValues = {
-    // status: 1,
-    page: 1,
-    pageSize: 10,
-  };
 
   constructor(props) {
     super(props);
