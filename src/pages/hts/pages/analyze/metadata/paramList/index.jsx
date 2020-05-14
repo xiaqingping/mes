@@ -251,7 +251,7 @@ class paramList extends Component {
                     height: 20,
                     display: 'inline-block',
                     position: 'absolute',
-                    top: 1,
+                    top: 17,
                     left: 100,
                     float: 'right',
                     marginRight: 160,
