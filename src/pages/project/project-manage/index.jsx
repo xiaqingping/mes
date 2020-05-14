@@ -105,7 +105,7 @@ class ProjectManagement extends Component {
   /**
    * 修改项目信息
    * @param {string} requestType 点击新建项目时传入的类型
-   * @param ModifyProject 存入sessionStorage的方法名（项目基础信息）
+   * @param ModifyProject 存入sessionStorage的值（项目基础信息）
    *  */
   editRow = row => {
     const data = row;
