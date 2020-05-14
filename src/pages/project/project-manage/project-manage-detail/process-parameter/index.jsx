@@ -267,9 +267,9 @@ class ProcessParameter extends Component {
         });
         return false;
       }
-      if (requestType === 'edit' && processParamValue.length === 0) {
-        return true;
-      }
+
+      if (requestType === 'edit' && processParamValue.length > 0) return true;
+
       if (checkList.length > 3) {
         message.error(`有多个必填参数为空, 请检查填写的参数`);
       } else {
