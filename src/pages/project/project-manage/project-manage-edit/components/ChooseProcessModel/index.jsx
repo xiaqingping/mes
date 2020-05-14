@@ -94,7 +94,7 @@ class ChooseProcessModel extends React.Component {
 
   /**
    * 搜索条件
-   * @param  {string} nameCodeVal 模糊搜索获取到的数据
+   * @param  {object} nameCodeVal 模糊搜索获取到的数据
    */
   simpleForm = () => {
     const { languageCode } = this.props;
@@ -245,8 +245,7 @@ class ChooseProcessModel extends React.Component {
   render() {
     const { viewvisible, processlist, viewlist, hasMore } = this.state;
     return (
-      <Card bordered={false}>
-        <div>
+      <div>
           <Modal
             title="选择流程模型"
             className="classChooseProcessModel"
@@ -256,14 +255,12 @@ class ChooseProcessModel extends React.Component {
             width={1050}
           >
             <div className="tableList">
-              <Card bordered={false}>
-                <TableSearchForm
+              <TableSearchForm
                   ref={this.tableSearchFormRef}
                   initialValues={this.initialValues}
                   getTableData={this.getTableData}
                   simpleForm={this.simpleForm}
                 />
-              </Card>
             </div>
             <div style={{ height: '430px', overflow: 'auto', padding: '5px' }} id="contentCenter">
               <InfiniteScroll
@@ -403,7 +400,6 @@ class ChooseProcessModel extends React.Component {
             viewlist={viewlist}
           />
         </div>
-      </Card>
     );
   }
 }

@@ -210,11 +210,11 @@ class Test extends Component {
 
   /**
    * 保存
-   * @param {String} projectInfor 新建项目的基础信息
+   * @param {object} projectInfor 新建项目的基础信息
    * @param {Array} list 已选流程
    * @param {Array} paramList 参数数据
-   * @param {String} processType url带来的判断类型
-   * @param {String} projectId 项目id
+   * @param {object} processType url带来的判断类型
+   * @param {object} projectId 项目id
    */
   handleSave = () => {
     this.setState({
