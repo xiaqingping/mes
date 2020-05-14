@@ -1,3 +1,4 @@
+/* eslint-disable no-param-reassign */
 import React from 'react';
 import { Table, Popover, Button, Popconfirm, message } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';

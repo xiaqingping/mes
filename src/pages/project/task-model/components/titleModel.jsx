@@ -1,3 +1,4 @@
+/* eslint-disable no-param-reassign */
 import React from 'react';
 import { Avatar, Tag, Spin, message, Popover } from 'antd';
 import { DownOutlined, UpOutlined } from '@ant-design/icons';

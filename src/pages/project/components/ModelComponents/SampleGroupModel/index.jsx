@@ -1,3 +1,5 @@
+/* eslint-disable prefer-destructuring */
+/* eslint-disable no-param-reassign */
 import React from 'react';
 import { Table, Button, Modal, AutoComplete, Popover, message } from 'antd';
 import { UploadOutlined, PlusSquareOutlined, QuestionCircleOutlined } from '@ant-design/icons';

@@ -1,3 +1,5 @@
+/* eslint-disable no-param-reassign */
+/* eslint-disable array-callback-return */
 import React, { Component } from 'react';
 import { Drawer, Button, Popconfirm, Dropdown, Menu, Spin, Empty, message } from 'antd';
 import api from '@/pages/project/api/taskmodel';

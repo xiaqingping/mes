@@ -1,3 +1,4 @@
+/* eslint-disable consistent-return */
 // 选择任务模型
 import React from 'react';
 import { Modal, Avatar, Tag, Select, message } from 'antd';
