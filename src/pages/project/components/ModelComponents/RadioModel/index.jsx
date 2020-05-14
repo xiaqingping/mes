@@ -16,11 +16,11 @@ const { Option } = Select;
 
 class RadioModel extends React.Component {
   constructor(props) {
-    super(props);
+    super(props)
     this.state = {
       // 基础数据list
       paramList: props.paramList,
-    };
+    }
   }
 
   /**
@@ -28,29 +28,30 @@ class RadioModel extends React.Component {
    * @param {object} paramList 下拉框value
    */
   setSelectValue = paramList => {
-    const selectList = [];
+    const selectList = []
     Object.keys(paramList).forEach(key => {
       if (key.indexOf('select_') !== -1) {
-        selectList.push(JSON.parse(paramList[key]));
+        selectList.push(JSON.parse(paramList[key]))
       }
-    });
-    return selectList;
-  };
+    })
+    return selectList
+  }
+
 
   /**
    * 值的获取, 处理抛出结果
    * @param {string} value 当前元素的值
    */
   handleChange = value => {
-    const { paramList } = this.state;
+    const { paramList } = this.state
     const data = {
       paramKey: paramList.paramKey,
       paramValue: value,
       taskModelId: paramList.taskModelId,
-    };
-    const verify = this.verifyData(value);
+    }
+    const verify = this.verifyData(value)
     this.props.getData(data, 'radio', ...verify);
-  };
+  }
 
   /**
    * 验证数据
@@ -58,33 +59,33 @@ class RadioModel extends React.Component {
    */
   verifyData = value => {
     const { paramList } = this.state;
-    let verify = true;
-    let verifyMessage = '';
+    let verify = true
+    let verifyMessage = ''
     if (paramList.isRequired === 'true') {
       if (!value || value.length === 0) {
-        verifyMessage = `${paramList.paramName}参数不能为空`;
-        message.warning(verifyMessage);
+        verifyMessage = `${paramList.paramName}参数不能为空`
+        message.warning(verifyMessage)
         verify = false;
       }
     }
-    return [verify, verifyMessage];
-  };
+    return [verify, verifyMessage]
+  }
 
   /**
    * 设置Itemlabel状态拼接
    * @param {string} value Itemlabel
    */
   setLabel = value => {
-    const str = JSON.parse(this.state.paramList.isRequired) ? '（必填）' : '（选填）';
-    return value + str;
-  };
+    const str = JSON.parse(this.state.paramList.isRequired) ? '（必填）' : '（选填）'
+    return value + str
+  }
 
   render() {
-    const { paramList } = this.state;
-    const { disabled } = this.props;
+    const { paramList } = this.state
+    const { disabled } = this.props
 
     // 获取Select数据
-    const selectList = this.setSelectValue(paramList);
+    const selectList = this.setSelectValue(paramList)
     return (
       <Descriptions layout="vertical">
         <Descriptions.Item label={this.setLabel(paramList.paramName)}>
@@ -96,11 +97,11 @@ class RadioModel extends React.Component {
             allowClear
             defaultValue={this.state.paramList.paramValue}
           >
-            {selectList.map(item => (
-              <Option key={item.selectKey} value={item.selectValue}>
-                {item.selectValue}
-              </Option>
-            ))}
+            {
+              selectList.map(item =>
+                <Option key={item.selectKey} value={item.selectValue}>{item.selectValue}</Option>
+              )
+            }
           </Select>
         </Descriptions.Item>
       </Descriptions>
@@ -109,11 +110,11 @@ class RadioModel extends React.Component {
 }
 
 RadioModel.defaultProps = {
-  paramList: {},
-};
+  paramList: {}
+}
 
 RadioModel.propTypes = {
-  paramList: PropTypes.object,
-};
+  paramList: PropTypes.object
+}
 
-export default RadioModel;
+export default RadioModel
