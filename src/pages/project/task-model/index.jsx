@@ -31,18 +31,10 @@ class TaskModel extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      // loading: false,
-      // list: [],
-      // pagination: {},
       visible: false, // 点击查看抽屉是否显示
       viewId: '',
-      // filtersData: null,
-      // processCode: '', // 任务模型code
-      // publisherCode: '',
       modelSearchOptions: [], // 任务模型模糊搜素options
       publisherOptions: [], // 发布人模糊搜索options
-      // searchCodevalue: null, // 模糊搜索code值
-      // searchPublisherValue: null, // 模糊搜索发布人值
     };
     this.fetchCodeData = debounce(this.fetchCodeData, 500);
     this.fetchPublisherData = debounce(this.fetchPublisherData, 500);
@@ -200,7 +192,6 @@ class TaskModel extends Component {
         delete newObj[key];
       }
     });
-    console.log(newObj);
     return newObj;
   };
 
@@ -214,7 +205,6 @@ class TaskModel extends Component {
     status.forEach(item => {
       statusValue = { ...statusValue, [item.value]: { text: item.text, status: item.status } };
     });
-    console.log(statusValue);
     return statusValue;
   };
 
@@ -315,10 +305,11 @@ class TaskModel extends Component {
         renderFormItem: (item, { onChange }) => (
           <Select
             mode="multiple"
-            maxTagCount={1}
+            maxTagCount={2}
             maxTagTextLength={3}
             onChange={onChange}
             allowClear
+            className="setSelectMultipleType"
           >
             {status.map(it => (
               <Option key={it.value} value={it.value}>

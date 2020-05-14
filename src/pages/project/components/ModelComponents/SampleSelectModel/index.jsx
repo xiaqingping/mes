@@ -1,3 +1,4 @@
+/* eslint-disable no-param-reassign */
 import React from 'react';
 import { Table, Popover, Button, Popconfirm, message } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
@@ -92,6 +93,7 @@ class SampleSelect extends React.Component {
         render: (text, record, index) => (
           <div className="project_manage_sample_select_table_alia">
             <input
+              style={{ width: '100%' }}
               disabled={this.state.disabled}
               type="text"
               defaultValue={text}
@@ -205,25 +207,6 @@ class SampleSelect extends React.Component {
     });
     this.getTableData(tableDatas);
   }
-
-  // componentDidUpdate(props) {
-  // if (props.submitStatus !== this.props.submitStatus) {
-  //   const { tableData } = this.state;
-  //   let list = [...tableData];
-  //   list = list.map(item => {
-  //     item.sampleId = item.id;
-  //     return item;
-  //   });
-  //   const { paramKey, taskModelId } = props;
-  //   const sendData = {
-  //     paramKey,
-  //     taskModelId,
-  //     paramValue: JSON.stringify(list),
-  //   };
-  //   this.validPass = !(this.props.paramList.required && list && !list.length);
-  //   this.props.getData(sendData, 'sampleSelect', this.validPass);
-  // }
-  // }
 
   /**
    * 每次数据发生改变时都将数据传给父组件
@@ -356,10 +339,11 @@ class SampleSelect extends React.Component {
    */
   handleChange = (color, record, index) => {
     const { tableData } = this.state;
-    const { colorStore } = this.props.project;
+    let { colorStore } = this.props.project;
+    console.log(colorStore);
     const row = { ...record };
     const isIncludes = colorStore.includes(color.hex.toUpperCase());
-    // colorStore = colorStore.filter(item => item !== color.hex.toUpperCase());
+    colorStore = colorStore.filter(item => item !== record.color);
     if (isIncludes) {
       message.warning('存在相同颜色，已为您自动生成一个新颜色！');
       row.color = getrandomColor();

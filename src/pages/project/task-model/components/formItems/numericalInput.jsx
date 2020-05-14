@@ -113,5 +113,3 @@ class numericalInput extends React.Component {
 }
 
 export default numericalInput;
-
-//--------------------------

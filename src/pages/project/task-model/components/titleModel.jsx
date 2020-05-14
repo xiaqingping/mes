@@ -1,3 +1,4 @@
+/* eslint-disable no-param-reassign */
 import React from 'react';
 import { Avatar, Tag, Spin, message, Popover } from 'antd';
 import { DownOutlined, UpOutlined } from '@ant-design/icons';
@@ -23,6 +24,9 @@ class TitleModel extends React.Component {
     loading: false,
   };
 
+  /**
+   * 加载完成，获取当前任务模型的具体信息
+   */
   componentDidMount() {
     const { viewId } = this.props.taskModel.taskModel;
     if (viewId) {
@@ -89,7 +93,6 @@ class TitleModel extends React.Component {
         });
         message.success('任务模型已禁用!');
         this.props.reload('1', id);
-        // this.updateListData(id);
       })
       .catch(() => {
         this.setState({
@@ -97,7 +100,6 @@ class TitleModel extends React.Component {
         });
         this.props.reload(null);
       });
-    // this.props.reload('1', id);
   };
 
   /**

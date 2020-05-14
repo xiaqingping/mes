@@ -1,6 +1,7 @@
+/* eslint-disable consistent-return */
 // 选择任务模型
 import React from 'react';
-import { Modal, Avatar, Form, Tag, Select, message } from 'antd';
+import { Modal, Avatar, Tag, Select, message } from 'antd';
 import { connect } from 'dva';
 import DefaultHeadPicture from '@/assets/imgs/upload_middle.png';
 import api from '@/pages/project/api/taskmodel';
@@ -77,7 +78,6 @@ class BeforeTask extends React.Component {
     this.setState({
       loading: false,
     });
-    console.log(res);
     const { allPreTaskParamsType, argumentList } = this.props.taskModel;
     const argumentTypeList = (argumentList || []).map(item => item.type);
     let pass = true;
@@ -107,6 +107,10 @@ class BeforeTask extends React.Component {
     this.props.onClose();
   };
 
+  /**
+   * 设置参数type store
+   * @param {Arrary} pretaskParamsType 所有前置任务参数的type
+   */
   setParamsTypeStore = pretaskParamsType => {
     const { dispatch } = this.props;
     dispatch({
@@ -120,7 +124,6 @@ class BeforeTask extends React.Component {
    * @param {object} params request返回的数据
    */
   getParamData = params => {
-    console.log(params);
     const newObj = {
       page: params.current,
       rows: params.pageSize,
@@ -138,6 +141,9 @@ class BeforeTask extends React.Component {
     return newObj;
   };
 
+  /**
+   * 表格columns
+   */
   columns = () => {
     const { children } = this.state;
     return [

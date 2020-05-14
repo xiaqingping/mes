@@ -20,6 +20,9 @@ class ArgumentForm extends React.Component {
     viewForm: {}, // 当是查看的时候, 表单数据
   };
 
+  /**
+   * 获取页面渲染需要的数据
+   */
   componentDidMount() {
     const { editOriginData } = this.props;
     const otherProperties = editOriginData.paramPropertiesStr

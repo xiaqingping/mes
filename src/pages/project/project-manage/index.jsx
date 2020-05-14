@@ -287,6 +287,7 @@ class ProjectManagement extends Component {
                   textAlign: 'center',
                   width: '60px',
                   height: '24px',
+                  border: 'none',
                 }}
                 size="small"
               >
@@ -378,7 +379,7 @@ class ProjectManagement extends Component {
         ),
       },
       {
-        fixed: 'right',
+        // fixed: 'right',
         title: '操作',
         hideInSearch: true,
         render: row => (
