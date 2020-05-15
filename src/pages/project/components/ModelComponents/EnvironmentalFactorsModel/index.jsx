@@ -347,7 +347,7 @@ class EnvironmentalFactorsModel extends React.Component {
    */
   handleOnChangeTitle = (row, event) => {
     const { headers } = this.state;
-    const newHeader = [];
+    const newHeader = headers.filter(item => row.id !== item.id);
     headers.forEach(item => {
       if (row.id === item.id) {
         const newItem = JSON.parse(JSON.stringify(item));
