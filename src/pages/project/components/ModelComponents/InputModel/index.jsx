@@ -69,7 +69,7 @@ class InputModel extends React.Component {
         }
       }
     }
-    return [error, message];
+    return { error, message };
   };
 
   render() {

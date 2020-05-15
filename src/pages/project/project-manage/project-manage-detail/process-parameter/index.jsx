@@ -167,21 +167,21 @@ class ProcessParameter extends Component {
         if (param.length > 0 && paramValue.length === 0) {
           data = newParamData;
           this.setState({ isEditAdd: true });
+          data.forEach(item => {
+            if (item.params.length) {
+              item.params.forEach(it => {
+                // TODO:
+                if (it.isRequired === 'true' || it.isrequired === 'true') {
+                  const obj = {
+                    paramKey: it.paramKey,
+                    paramName: it.paramName,
+                  };
+                  checkData.push(obj);
+                }
+              });
+            }
+          });
         }
-        data.forEach(item => {
-          if (item.params.length) {
-            item.params.forEach(it => {
-              // TODO:
-              if (it.isRequired === 'true' || it.isrequired === 'true') {
-                const obj = {
-                  paramKey: it.paramKey,
-                  paramName: it.paramName,
-                };
-                checkData.push(obj);
-              }
-            });
-          }
-        });
       }
     }
     if (!data) return false;
@@ -254,7 +254,6 @@ class ProcessParameter extends Component {
       processId,
       processModelId,
       projectId,
-      processParamValue,
     } = this.state;
 
     if (checkList.length) {
@@ -264,8 +263,6 @@ class ProcessParameter extends Component {
         });
         return false;
       }
-
-      if (requestType === 'edit' && processParamValue.length > 0) return true;
 
       if (checkList.length > 3) {
         message.error(`有多个必填参数为空, 请检查填写的参数`);
@@ -281,10 +278,17 @@ class ProcessParameter extends Component {
     // 添加 修改
     if (requestType === 'add' || requestType === 'update') {
       const processParams = JSON.parse(sessionStorage.getItem('processForParams'));
+      let newProcessParams = [];
+      if (processParams && processParams.length > 0) {
+        newProcessParams = processParams.filter(item => item.processModelId !== processModelId);
+      } else {
+        newProcessParams = processParams;
+      }
+
       const newData = { params: paramList, processModelId };
       let list = [];
-      if (processParams) {
-        list = [...processParams, newData];
+      if (newProcessParams) {
+        list = [...newProcessParams, newData];
       } else {
         list = [newData];
       }
@@ -320,6 +324,8 @@ class ProcessParameter extends Component {
     const checkParamKey = [];
     checkData.forEach(item => checkParamKey.push(item.paramKey));
     let messageData = [...messageList];
+
+    // 获取必填参数 提示信息
     if (isVerify) {
       if (checkParamKey.includes(data.paramKey)) {
         let newCheckData = [];
@@ -345,6 +351,7 @@ class ProcessParameter extends Component {
       messageList: messageData,
     });
 
+    // 数据通过验证时
     if (isVerify) {
       let newParams = [];
       if (isEditAdd) {
@@ -506,7 +513,7 @@ class ProcessParameter extends Component {
         sampleList: updateData,
       },
       () => {
-        // this.handleUpdateSampleGroup();
+        this.handleUpdateSampleGroup();
         this.handleUpdateEnvironmentFactor();
       },
     );
