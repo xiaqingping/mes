@@ -114,7 +114,6 @@ class ProcessParameter extends Component {
 
       // 添加 参数值
       if (requestType === 'add') {
-        message.success('添加操作');
         if (param.length > 0) {
           this.getDefaultParams(newParamData);
           data = newParamData;
@@ -137,7 +136,6 @@ class ProcessParameter extends Component {
 
       // 修改 未保存的参数值
       if (requestType === 'update') {
-        message.success('修改操作');
         // update参数值
         const processParamList = JSON.parse(sessionStorage.getItem('processForParams'));
         const processParamValue = processParamList.filter(
@@ -256,6 +254,7 @@ class ProcessParameter extends Component {
       processId,
       processModelId,
       projectId,
+      processParamValue,
     } = this.state;
 
     if (checkList.length) {
@@ -265,6 +264,9 @@ class ProcessParameter extends Component {
         });
         return false;
       }
+
+      if (requestType === 'edit' && processParamValue.length > 0) return true;
+
       if (checkList.length > 3) {
         message.error(`有多个必填参数为空, 请检查填写的参数`);
       } else {
@@ -272,36 +274,8 @@ class ProcessParameter extends Component {
           message.error(`${item.paramName} 是必填参数`);
         });
       }
-
       return false;
     }
-
-    // if (requestType === 'update' || requestType === 'edit') {
-    //   if (messageList.length > 0) {
-    //     messageList.forEach(item => {
-    //       message.error(item.message);
-    //     });
-    //     return false;
-    //   }
-    //   if (checkList.length) {
-    //     message.error('添加未完成');
-    //   }
-    // }
-
-    // if (requestType === 'add') {
-    //   if (checkList.length) {
-    //     if (messageList.length > 0) {
-    //       messageList.forEach(item => {
-    //         message.error(item.message);
-    //       });
-    //       return false;
-    //     }
-    //   }
-    //   checkList.forEach(item => {
-    //     message.error(`${item.paramName} 是必填参数`);
-    //   });
-    //   return false;
-    // }
 
     let url;
     // 添加 修改
@@ -340,7 +314,7 @@ class ProcessParameter extends Component {
    * @param {boolean} isVerify 数据是否通过验证
    * @param {String} massage 验证未通过时的错误提示
    */
-  getModelData = (data, type, isVerify, massage) => {
+  getModelData = (data, type, isVerify, errorMassage) => {
     const { paramList, checkList, messageList, isEditAdd } = this.state;
     let checkData = [...checkList];
     const checkParamKey = [];
@@ -362,7 +336,7 @@ class ProcessParameter extends Component {
       checkData.push(newItem);
       const obj = {
         paramKey: data.paramKey,
-        message: massage,
+        message: errorMassage,
       };
       messageData.push(obj);
     }
@@ -532,7 +506,7 @@ class ProcessParameter extends Component {
         sampleList: updateData,
       },
       () => {
-        this.handleUpdateSampleGroup();
+        // this.handleUpdateSampleGroup();
         this.handleUpdateEnvironmentFactor();
       },
     );
