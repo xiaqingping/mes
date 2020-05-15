@@ -82,7 +82,7 @@ class UploadSequenceFile extends React.Component {
   handleUpload = e => {
     const self = this;
     const file = e.target.files;
-    const { guuid, filesNameList, countNum, tableList } = self.state;
+    const { guuid, filesNameList, countNum, tableList } = this.state;
     const uploadUrl = disk.uploadMoreFiles('ngs_sample', guuid);
     const data = new FormData();
     let filesData = [];
@@ -415,9 +415,9 @@ class UploadSequenceFile extends React.Component {
             ''
           )}
           <Carousel ref="img">
-            {newFileList.map((it, index) => (
-              <List dataSource={it} renderItem={item => this.itemList(item)} key={index} />
-            ))}
+            {newFileList.map(it => {
+              return <List dataSource={it} renderItem={item => this.itemList(item)} key={it.id} />;
+            })}
           </Carousel>
           {newFileList.length > 1 ? (
             <a

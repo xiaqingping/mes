@@ -1,4 +1,3 @@
-/* eslint-disable consistent-return */
 // 选择任务模型
 import React from 'react';
 import { Modal, Avatar, Tag, Select, message } from 'antd';
@@ -99,12 +98,14 @@ class BeforeTask extends React.Component {
           return false;
         }
       }
+      return true;
     });
 
     if (!pass) return message.error('样品选择框，环境因子，分组方案不能重复添加');
     this.setParamsTypeStore([...allPreTaskParamsType, ...resTypeList]);
     this.props.getData(res);
     this.props.onClose();
+    return true;
   };
 
   /**

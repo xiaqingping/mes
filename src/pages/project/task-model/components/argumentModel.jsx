@@ -1,5 +1,3 @@
-/* eslint-disable no-param-reassign */
-/* eslint-disable array-callback-return */
 import React, { Component } from 'react';
 import { Drawer, Button, Popconfirm, Dropdown, Menu, Spin, Empty, message } from 'antd';
 import api from '@/pages/project/api/taskmodel';
@@ -30,7 +28,8 @@ class ArgumentModel extends Component {
     const { argumentList, firstOpenParams } = this.props.taskModel;
     if ((argumentList && argumentList.length > 0) || !firstOpenParams) {
       const list = argumentList.map((item, index) => {
-        item.myId = Date.now() + index;
+        const newItem = item;
+        newItem.myId = Date.now() + index;
         return item;
       });
       const { dispatch } = this.props;
@@ -92,7 +91,8 @@ class ArgumentModel extends Component {
       .getTaskModelDetail(id)
       .then(res => {
         const list = res.params.map((item, index) => {
-          item.myId = Date.now() + index;
+          const newItem = item;
+          newItem.myId = Date.now() + index;
           return item;
         });
         const { dispatch } = this.props;
@@ -236,6 +236,7 @@ class ArgumentModel extends Component {
   toViewArgumrnt = (item, idx) => {
     const { formItemType } = this.props.taskModel;
     let title = null;
+    // eslint-disable-next-line array-callback-return
     formItemType.some(v => {
       if (v.type === item.type) {
         title = v.text;

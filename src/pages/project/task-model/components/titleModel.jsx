@@ -1,4 +1,3 @@
-/* eslint-disable no-param-reassign */
 import React from 'react';
 import { Avatar, Tag, Spin, message, Popover } from 'antd';
 import { DownOutlined, UpOutlined } from '@ant-design/icons';
@@ -42,8 +41,9 @@ class TitleModel extends React.Component {
           });
           if (res.versions) {
             const vers = versionSort(res.versions).map(item => {
-              item = `V${item}`;
-              return item;
+              let newItem = item;
+              newItem = `V${item}`;
+              return newItem;
             });
             this.setState({
               versionType: vers,
