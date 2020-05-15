@@ -183,6 +183,7 @@ class EnvironmentalFactorsModel extends React.Component {
     const isVerify = !error;
     const { message } = errorData;
 
+    if (this.props.disabled) return false;
     this.props.getData(paramData, 'environmentFactor', isVerify, message);
     return false;
   };
