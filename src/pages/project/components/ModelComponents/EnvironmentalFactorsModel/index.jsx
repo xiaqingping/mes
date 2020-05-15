@@ -183,6 +183,7 @@ class EnvironmentalFactorsModel extends React.Component {
     const isVerify = !error;
     const { message } = errorData;
 
+    if (this.props.disabled) return false;
     this.props.getData(paramData, 'environmentFactor', isVerify, message);
     return false;
   };
@@ -347,7 +348,7 @@ class EnvironmentalFactorsModel extends React.Component {
    */
   handleOnChangeTitle = (row, event) => {
     const { headers } = this.state;
-    const newHeader = [];
+    const newHeader = headers.filter(item => row.id !== item.id);
     headers.forEach(item => {
       if (row.id === item.id) {
         const newItem = JSON.parse(JSON.stringify(item));
