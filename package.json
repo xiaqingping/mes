@@ -94,7 +94,7 @@
     "jsdom-global": "^3.0.2",
     "lint-staged": "^10.0.8",
     "mockjs": "^1.1.0",
-    "node-fetch": "^2.6.0",
+    "node-fetch": "^3.1.1",
     "prettier": "^1.19.1",
     "stylelint": "^13.2.0",
     "umi-plugin-antd-icon-config": "^1.0.3",
